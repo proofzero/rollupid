@@ -12,7 +12,7 @@ Build the CLI:
 
 ```
 $ npx shadow-cljs compile cli
-``
+```
 
 Build the tests:
 
