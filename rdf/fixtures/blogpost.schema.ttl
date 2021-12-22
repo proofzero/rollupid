@@ -1,0 +1,60 @@
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[]
+  a schema:BlogPosting ;
+  schema:accountablePerson [
+    a schema:Person ;
+    schema:name "Patrick Coombe"^^xsd:string ;
+    schema:url <https://patrickcoombe.com>
+  ] ;
+  schema:alternativeHeadline "An indepth article on why I love cats"^^xsd:string ;
+  schema:articleBody "Paste the body of your content in here in plaintext"^^xsd:string ;
+  schema:articleSection "Uncategorized posts"^^xsd:string ;
+  schema:author [
+    a schema:Person ;
+    schema:name "Patrick Coombe"^^xsd:string ;
+    schema:url <https://patrickcoombe.com>
+  ] ;
+  schema:contentLocation [
+    a schema:Place ;
+    schema:name "Delray Beach, FL"^^xsd:string
+  ] ;
+  schema:copyrightHolder ""^^xsd:string ;
+  schema:copyrightYear "2019"^^xsd:string ;
+  schema:creator [
+    a schema:Person ;
+    schema:name "Patrick Coombe"^^xsd:string ;
+    schema:url <https://patrickcoombe.com>
+  ] ;
+  schema:dateCreated "2019-02-11T11:11:11"^^schema:Date ;
+  schema:dateModified "2019-02-11T11:11:11"^^schema:Date ;
+  schema:datePublished "2019-02-11T11:11:11"^^schema:Date ;
+  schema:genre "SEO"^^xsd:string, "JSON-LD"^^xsd:string ;
+  schema:headline "My love of cats explained"^^xsd:string ;
+  schema:image <http://example.com/images/image.jpg> ;
+  schema:inLanguage "en-US"^^xsd:string ;
+  schema:isFamilyFriendly "true"^^xsd:string ;
+  schema:keywords "keyword1"^^xsd:string, "keyword2"^^xsd:string, "keyword3"^^xsd:string, "keyword4"^^xsd:string ;
+  schema:mainEntityOfPage <http://njh.me/True> ;
+  schema:publisher [
+    a schema:Organization ;
+    schema:logo [
+      a schema:ImageObject ;
+      schema:height "55"^^xsd:string ;
+      schema:url <http://www.example.com/logo.png> ;
+      schema:width "400"^^xsd:string
+    ] ;
+    schema:name "Patrick Coombe"^^xsd:string ;
+    schema:url <https://patrickcoombe.com>
+  ] ;
+  schema:sponsor [
+    a schema:Organization ;
+    schema:logo [
+      a schema:ImageObject ;
+      schema:url <http://www.example.com/logo.png>
+    ] ;
+    schema:name "Acme Widgets"^^xsd:string ;
+    schema:url <https://example.com>
+  ] ;
+  schema:url <http://example.com/blog/post>

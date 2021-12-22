@@ -1,0 +1,32 @@
+# rdf/examples/dcat-example-46.ttl
+#
+# The provenance of business context of a dataset can be described using
+# elements from the W3C Provenance Ontology [PROV-O]. For example, a
+# simple link from a dataset description to the project that generated
+# the dataset looks as follows:
+
+@prefix : <http://example.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:atnf-P366-2003SEPT
+  rdf:type dcat:Dataset ;
+  dct:bibliographicCitation "Burgay, M; McLaughlin, M; Kramer, M; Lyne, A; Joshi, B; Pearce, G; D'Amico, N; Possenti, A; Manchester, R; Camilo, F (2017): Parkes observations for project P366 semester 2003SEPT. v1. CSIRO. Data Collection. https://doi.org/10.4225/08/598dc08d07bb7" ;
+  dct:title "Parkes observations for project P366 semester 2003SEPT"@en ;
+  dcat:landingPage <https://data.csiro.au/dap/landingpage?pid=csiro:P366-2003SEPT> ;
+  prov:wasGeneratedBy :P366 ;
+.
+
+:P366
+  rdf:type prov:Activity ;
+  dct:type <http://dbpedia.org/resource/Observation> ;
+  prov:startedAtTime "2000-11-01"^^xsd:date ;
+  prov:used :Parkes-radio-telescope ;
+  prov:wasInformedBy :ATNF ;
+  rdfs:label "P366 - Parkes multibeam high-latitude pulsar survey"@en ;
+  rdfs:seeAlso <https://doi.org/10.1111/j.1365-2966.2006.10100.x> ;
+.

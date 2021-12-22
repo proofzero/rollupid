@@ -1,0 +1,222 @@
+@prefix dc: <http;//purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix jsonld: <http://www.w3.org/ns/json-ld#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# JSON-LD Vocabulary definition
+jsonld: a owl:Ontology;
+  dc:title "The JSON-LD Vocabulary"@en;
+  dc:description """This is a vocabulary document and is used to achieve certain features of the JSON-LD language."""@en;
+  dc:date "2020-03-30"^^xsd:date;
+  owl:versionInfo <https://github.com/w3c/json-ld-wg/commit/dfd1827c95a66bc36c01368e10b6e4f4bbb5c8b3>;
+  rdfs:seeAlso <http://www.w3.org/TR/json-ld11> .
+
+# Class definitions
+jsonld:Context a rdfs:Class;
+  rdfs:label "Context"@en;
+  rdfs:comment """Defines term definitions and other aspects of a JSON-LD `Context`.
+
+A [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) MUST be a map whose keys MUST be either _terms_, _compact IRIs_, _IRIs_, or one of the keywords `@base`, `@import`, `@language`, `@propagate`, `@protected`, `@type`, `@version`, or `@vocab`."""@en;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:PrefixDefinition a rdfs:Class;
+  rdfs:label "Prefix Definition"@en;
+  rdfs:comment """A string ([simple term definition](http://www.w3.org/TR/json-ld11/#dfn-simple-term-definitions)), expanding to an IRI."""@en;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#dfn-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:TermDefinition a rdfs:Class;
+  rdfs:label "Term Definition"@en;
+  rdfs:comment """A [term definition](http://www.w3.org/TR/json-ld11/#dfn-term-definitions) is an entry in a [context](#Context), where the key defines a term which may be used within a dictionary as a key, type, or elsewhere that a string is interpreted as a vocabulary item. Its value is an [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions).
+
+
+
+An [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definition) MUST be a map composed of zero or more keys from `@id`, `@reverse`, `@type`, `@language`, `@container`, `@context`, `@prefix`, `@propagate`, or `@protected`. An expanded term definition SHOULD NOT contain any other keys."""@en;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#dfn-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+
+# Property definitions
+jsonld:base a rdf:Property;
+  rdfs:label "base"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) has an `@base` key, its value MUST be an _IRI reference_, or `null`."""@en;
+  schema:domainIncludes jsonld:Context;
+  schema:rangeIncludes jsonld:Context;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:container a rdf:Property;
+  rdfs:label "container"@en;
+  rdfs:comment """The associated `@container` value in an [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions).
+
+If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an array containing exactly any one of those keywords, or a combination of `@set` and any of `@index`, `@id`, `@graph`, `@type`, `@language` in any order.
+
+`@container` may also be an array containing `@graph` along with either `@id` or `@index` and also optionally including `@set`.
+
+If the value is `@language`, when the term is used outside of the `@context`, the associated value MUST be a language map.
+
+If the value is `@index`, when the term is used outside of the `@context`, the associated value MUST be an index map."""@en;
+  schema:domainIncludes jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#expanded-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:context a rdf:Property;
+  rdfs:label "context"@en;
+  rdfs:comment """As an IRI, this link relation is used to associate a JSON-LD context with a JSON document so that it can be interpreted as JSON-LD. In an HTTP request header, specifies the location of a context to use for compaction. As a Context, defines an inline `context definition`."""@en;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#interpreting-json-as-json-ld>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:definition a rdf:Property;
+  rdfs:label "definition"@en;
+  rdfs:comment """Term definition(s) associated with this context."""@en;
+  schema:domainIncludes jsonld:Context;
+  schema:rangeIncludes jsonld:Context;
+  rdfs:isDefinedBy jsonld: .
+jsonld:direction a rdf:Property;
+  rdfs:label "direction"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) has an `@direction` key, its value MUST be one of `"ltr"` or `"rtl"`, or be `null`."""@en;
+  schema:domainIncludes jsonld:Context, jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:Context, jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:id a rdf:Property;
+  rdfs:label "id"@en;
+  rdfs:comment """The `@id` mapping of a [term definition](#TermDefinition)."""@en;
+  schema:domainIncludes jsonld:TermDefinition, jsonld:PrefixDefinition;
+  schema:rangeIncludes jsonld:TermDefinition, jsonld:PrefixDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#expanded-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:import a rdf:Property;
+  rdfs:label "import"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) contains the `@import` keyword, its value MUST be an _IRI reference_. When used as a reference from an `@import`, the referenced context definition MUST NOT include an `@import` key, itself."""@en;
+  schema:domainIncludes jsonld:Context;
+  schema:rangeIncludes jsonld:Context;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:language a rdf:Property;
+  rdfs:label "language"@en;
+  rdfs:comment """The [default language](https://www.w3.org/TR/json-ld11/#dfn-default-language) is set in the context using the `@language` key whose value MUST be a string representing a [BCP47](https://tools.ietf.org/html/bcp47) language code or null."""@en;
+  schema:domainIncludes jsonld:Context, jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:Context, jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#dfn-default-language>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:nest a rdf:Property;
+  rdfs:label "nest"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@nest` keyword, its value MUST be either `@nest`, or a _term_ which expands to `@nest`."""@en;
+  schema:domainIncludes jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#expanded-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:prefix a rdf:Property;
+  rdfs:label "prefix"@en;
+  rdfs:comment """With the value `true`, allows this term to be used to construct a compact IRI when compacting."""@en;
+  schema:domainIncludes jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#expanded-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:propagate a rdf:Property;
+  rdfs:label "propagate"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) contains the `@propagate` keyword, its value MUST be `true` or `false`."""@en;
+  schema:domainIncludes jsonld:Context, jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:Context, jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:protected a rdf:Property;
+  rdfs:label "protected"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) contains the `@protected` keyword, its value MUST be `true` or `false`."""@en;
+  schema:domainIncludes jsonld:Context, jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:Context, jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:reverse a rdf:Property;
+  rdfs:label "reverse"@en;
+  rdfs:comment """The `@reverse` mapping of an [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions)."""@en;
+  schema:domainIncludes jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#expanded-term-definition>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:term a rdf:Property;
+  rdfs:label "term"@en;
+  rdfs:comment """The term associated with a [term definition](#TermDefinition)."""@en;
+  schema:domainIncludes jsonld:TermDefinition, jsonld:PrefixDefinition;
+  schema:rangeIncludes jsonld:TermDefinition, jsonld:PrefixDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#dfn-term>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:type a rdf:Property;
+  rdfs:label "type"@en;
+  rdfs:comment """If the [context definition](https://www.w3.org/TR/json-ld11/#dfn-context-definition) contains the `@type` keyword, its value MUST be a map with only the entry `@container` set to `@set`, and optionally an entry `@protected`.
+
+
+
+If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@type` keyword, its value MUST be an _IRI reference_, a _term_, `null`, or one of the keywords `@id`, `@json`, `@none`, or `@vocab`."""@en;
+  schema:domainIncludes jsonld:Context, jsonld:TermDefinition;
+  schema:rangeIncludes jsonld:Context, jsonld:TermDefinition;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#context-definitions>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:version a rdf:Property;
+  rdfs:label "version"@en;
+  rdfs:comment """The [processing mode](https://www.w3.org/TR/json-ld11/#dfn-processing-mode) defines how a JSON-LD document is processed. By default, all documents are assumed to be conformant with [JSON-LD 1.1`](http://www.w3.org/TR/json-ld11). By defining a different version via explicit API option, other processing modes can be accessed. This specification defines extensions for the `json-ld-1.1` processing mode."""@en;
+  schema:domainIncludes jsonld:Context;
+  schema:rangeIncludes jsonld:Context;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#dfn-processing-mode>;
+  rdfs:isDefinedBy jsonld: .
+jsonld:vocab a rdf:Property;
+  rdfs:label "vocab"@en;
+  rdfs:comment """Used to expand properties and values in `@type` with a common prefix IRI."""@en;
+  schema:domainIncludes jsonld:Context;
+  schema:rangeIncludes jsonld:Context;
+  rdfs:seeAlso <https://www.w3.org/TR/json-ld11/#default-vocabulary>;
+  rdfs:isDefinedBy jsonld: .
+
+# Instance definitions
+jsonld:compacted a owl:NamedIndividual;
+  rdfs:label "compacted"@en;
+  rdfs:comment """This profile IRI is used to request or specify compacted JSON-LD document form."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:expanded a owl:NamedIndividual;
+  rdfs:label "expanded"@en;
+  rdfs:comment """This profile URI is used to request or specify expanded JSON-LD document form."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:flattened a owl:NamedIndividual;
+  rdfs:label "flattened"@en;
+  rdfs:comment """This profile URI is used to request or specify flattened JSON-LD document form."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:frame a owl:NamedIndividual;
+  rdfs:label "frame"@en;
+  rdfs:comment """As an IRI, this link relation is used to associate a JSON-LD frame with a JSON-LD document. In an HTTP request header, specifies the location of a frame to use for framing."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:framed a owl:NamedIndividual;
+  rdfs:label "framed"@en;
+  rdfs:comment """This profile URI is used to request or specify framed JSON-LD document form."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:graphContainerType a jsonld:ContainerType;
+  rdfs:label "@graph"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:idContainerType a jsonld:ContainerType;
+  rdfs:label "@id"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:indexContainerType a jsonld:ContainerType;
+  rdfs:label "@index"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:languageContainerType a jsonld:ContainerType;
+  rdfs:label "@language"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:listContainerType a jsonld:ContainerType;
+  rdfs:label "@list"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:setContainerType a jsonld:ContainerType;
+  rdfs:label "@set"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:streaming a owl:NamedIndividual;
+  rdfs:label "streaming"@en;
+  rdfs:comment """This profile URI is used to request or specify streaming JSON-LD document form."""@en;
+  rdfs:isDefinedBy jsonld: .
+jsonld:typeContainerType a jsonld:ContainerType;
+  rdfs:label "@type"@en;
+  rdfs:comment """If the [expanded term definition](https://www.w3.org/TR/json-ld11/#dfn-expanded-term-definitions) contains the `@container` keyword, its value MUST be either `@list`, `@set`, `@language`, `@index`, `@id`, `@graph`, `@type`, or be `null` or an _array_ containing exactly any one of those keywords."""@en;
+  rdfs:isDefinedBy jsonld: .

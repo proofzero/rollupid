@@ -1,0 +1,17 @@
+# rdf/examples/example-50.ttl
+#
+# A dataset distribution with a downloadable file that is compressed
+# into a gzip file.
+
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+<https://data.gov.cz/zdroj/datová-sada/247025684/22> a dcat:Distribution ;
+  dcat:accessURL <https://mvcr1.opendata.cz/czechpoint/2007.csv.gz> ;
+  dcat:downloadURL <https://mvcr1.opendata.cz/czechpoint/2007.csv.gz> ;
+  dct:license <https://data.gov.cz/podmínky-užití/volný-přístup/> ;
+  dct:conformsTo <https://mvcr1.opendata.cz/czechpoint/2007.json> ;
+  dct:format <http://publications.europa.eu/resource/authority/file-type/CSV> ;
+  dcat:mediaType <http://www.iana.org/assignments/media-types/text/csv> ;
+  dcat:compressFormat <http://www.iana.org/assignments/media-types/application/gzip>
+.
