@@ -1,0 +1,27 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [;; TODO depend on SDK
+  ]
+
+ ;; To build:
+ ;; $ npx shadow-cljs compile cli
+
+ :builds
+ {:cli
+  {:target :node-script
+   :main com.kubelt.cli/main
+   :compiler-options {:optimizations :simple
+                      :infer-externs :auto
+                      :output-feature-set :es-next}
+   :output-to "target/cli.js"}
+
+  :test
+  {:target :node-test
+   :output-to "target/cli-test.js"
+   :ns-regexp "-test$"
+   :autorun true}}}
