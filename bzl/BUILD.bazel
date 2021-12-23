@@ -1,6 +1,7 @@
 # bzl/BUILD.bazel
 #
-# Bazel build tooling.
+# For information on build files:
+# https://docs.bazel.build/versions/main/build-ref.html#BUILD_files
 
 exports_files([
     # Tool script used to invoke CLI tool "rapper", used for RDF
