@@ -26,6 +26,12 @@ The tests are configured to run automatically after building successfully, but t
 $ node target/cli-test.js
 ```
 
+Link the CLI locally:
+
+```
+$ npm link
+```
+
 Install the CLI:
 
 ```

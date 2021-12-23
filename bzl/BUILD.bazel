@@ -1,0 +1,9 @@
+# bzl/BUILD.bazel
+#
+# Bazel build tooling.
+
+exports_files([
+    # Tool script used to invoke CLI tool "rapper", used for RDF
+    # conversion to triples.
+    "rapper.sh",
+])
