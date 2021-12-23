@@ -2,9 +2,9 @@
 
 ## develop
 
-NB: You must have the [rapper](https://librdf.org/raptor/rapper.html) RDF parser utility must be installed for the `build` to succeed.
+NB: You must have the [rapper](https://librdf.org/raptor/rapper.html) RDF parser utility installed for the `build` to succeed.
 
-To convert the [Turtle](https://www.w3.org/TR/turtle/) (.ttl) files in `rdf/` into the formats we use, run the Bazel command:
+To convert the [Turtle](https://www.w3.org/TR/turtle/) (.ttl) files under `rdf/` into the formats we use, run the Bazel command:
 
 ```
 $ bazel build //rdf:*
