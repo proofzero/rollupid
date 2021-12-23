@@ -7,10 +7,22 @@ NB: You must have the [rapper](https://librdf.org/raptor/rapper.html) RDF parser
 To convert the [Turtle](https://www.w3.org/TR/turtle/) (.ttl) files under `rdf/` into the formats we use, run the Bazel command:
 
 ```
-$ bazel build //rdf:*
+$ bazel build //rdf/...
 ```
 
 This generates a collection of JSON3 and N-Quad files under `bazel-out` that can be used as dependencies in other parts of the build.
+
+To generate only the "external" vocabularies, defined elsewhere, run the command:
+
+```
+$ bazel build //rdf/external:*
+```
+
+To generate only the "internal" vocabularies, defined by us, run the command:
+
+```
+$ bazel build //rdf/internal:*
+```
 
 ## prefixes
 
