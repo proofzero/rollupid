@@ -10,7 +10,7 @@ To convert the [Turtle](https://www.w3.org/TR/turtle/) (.ttl) files in `rdf/` in
 $ bazel build //rdf:*
 ```
 
-This generates a collection of JSON3 and N-Quad files under `bazel-out` that can be uses as dependencies in other parts of the build.
+This generates a collection of JSON3 and N-Quad files under `bazel-out` that can be used as dependencies in other parts of the build.
 
 ## prefixes
 
