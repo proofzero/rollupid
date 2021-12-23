@@ -12,7 +12,11 @@ The [bzl/](bzl/) directory contains miscellaneous tooling for [Bazel](https://ba
 
 ### cli
 
-The [cli/](cli/) directory contains the source code for the kubelt CLI tool `kbt`.
+The [cli/](cli/) directory contains the kubelt CLI tool `kbt`.
+
+### p2p
+
+The [p2p/](p2p/) directory contains the kubelt peer-to-peer name resolution system.
 
 ### rdf
 
