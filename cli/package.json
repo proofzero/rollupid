@@ -11,9 +11,9 @@
   "author": "Kubelt Inc.",
   "license": "UNLICENSED",
   "devDependencies": {
-    "shadow-cljs": "2.16.9"
+    "shadow-cljs": "2.16.12"
   },
   "dependencies": {
-    "yargs": "17.3.0"
+    "yargs": "17.3.1"
   }
 }

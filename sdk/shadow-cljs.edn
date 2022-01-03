@@ -1,0 +1,98 @@
+;; sdk/shadow-cljs.edn
+
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [;; a pure Clojure/Script logging library
+  [com.taoensso/timbre "5.1.2"]
+  ;; fast, idiomatic pretty-printer
+  [fipp/fipp "0.6.25"]
+  ;; a micro-framework for building data-driven applications
+  [integrant/integrant "0.8.0"]
+  ;; facilities for async programming and communication
+  [org.clojure/core.async "1.5.648"]
+  ;; fast JSON encoding and decoding
+  [metosin/jsonista "0.3.5"]
+  ;; data-driven schemas for Clojure/Script
+  [metosin/malli "0.7.5"]
+  ;; tools for working with command line arguments
+  [org.clojure/tools.cli "1.0.206"]]
+
+ ;;:nrepl {:init-ns user.shared}
+
+ ;; Built-in targets include:
+ ;; :browser
+ ;; :node-library
+ ;; :node-script
+
+ ;; To compile a development build:
+ ;; $ npx shadow-cljs compile sdk|cli|web
+ ;;
+ ;; To compile a release build:
+ ;; $ npx shadow-cljs release sdk|cli|web
+
+ ;; It is possible to use shadow-cljs to invoke Clojure code, either to
+ ;; run a standalone command or potentially as part of a build (TBD). To
+ ;; invoke an example Clojure command:
+ ;;   $ npm run cmd:example
+ ;; This runs:
+ ;;   $ npx shadow-cljs run build.command/example
+ ;; Available options:
+ ;; * -o / --out-file :: output file name ["target/example.txt"]
+
+ :builds
+ {;; This is the core Node.js library that provides the Kubelt SDK,
+  ;; compiled for use with Node.js.
+  :sdk
+  {:target :node-library
+   ;; Each keyword in the :exports map is available in the generated
+   ;; library with that name.
+   :exports {:v1 com.kubelt.sdk/node-v1}
+   :compiler-options {;; :none :simple :advanced
+                      :optimizations :advanced
+                      :infer-externs :true
+                      :output-feature-set :es-next}
+   :output-to "target/sdk.js"}
+
+  ;; This build target generates a test file but doesn't run it:
+  ;; $ npx shadow-cljs compile/release test
+  ;;
+  ;; When :autorun is set this is performed automatically:
+  ;; $ node target/node-test.js
+  ;;
+  ;; The default test entrypoint, provided by shadow-cljs, executes
+  ;; cljs.test tests. If you want to use another testing framework
+  ;; you'll need to specify a new entrypoint by setting :main.
+
+  :node-test
+  {:target :node-test
+   :output-to "target/node-test.js"
+   :ns-regexp "-test$"
+   :autorun true}
+
+  ;; This is the core Node.js library that provides the Kubelt SDK,
+  ;; compiled for use in the browser.
+  :web
+  {:target :browser
+   :output-dir "target/web"
+   :asset-path "/js"
+   :modules {:base {:entries [com.kubelt.sdk]}}
+   :compiler-options {:output-feature-set :browser-2021}}
+
+  :web-test
+  {:target :browser-test
+   :test-dir "target/web-test"
+   :ns-regexp "-test$"}
+
+  ;; This is a development CLI used to run various commands for testing,
+  ;; preparing data, or performing other non-customer-facing operations.
+  :cli
+  {:target :node-script
+   :main com.kubelt.cli/main
+   :compiler-options {:optimizations :simple
+                      :infer-externs :true
+                      :output-feature-set :es-next}
+   :output-to "target/cli.js"}}}
