@@ -1,8 +1,9 @@
 (ns com.kubelt.sdk
   "Entry point for the Kubelt SDK."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
+   [com.kubelt.sdk.v1.account :as sdk.v1.account]
    [com.kubelt.sdk.v1.workspace :as sdk.v1.workspace]))
 
 ;; Entrypoint
@@ -39,6 +40,9 @@
 (def node-v1
   #js {:init sdk.v1/init-js
        :halt sdk.v1/halt-js!
+
+       ;; account
+       :account #js {:create sdk.v1.account/create-js!}
 
        ;; resource
 

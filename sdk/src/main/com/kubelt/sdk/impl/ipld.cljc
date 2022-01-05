@@ -30,26 +30,26 @@
    (keyword? x)
    (some #{x} supported-codecs)))
 
-;; Hashes
+;; Hashers
 ;; -----------------------------------------------------------------------------
 
-(def hash-blake3-256
-  :ipld.hash/blake3-256)
+(def hasher-blake3-256
+  :ipld.hasher/blake3-256)
 
-(def hash-sha2-256
-  :ipld.hash/sha2-256)
+(def hasher-sha2-256
+  :ipld.hasher/sha2-256)
 
-(def supported-hashes
-  #{hash-blake3-256
-    hash-sha2-256})
+(def supported-hashers
+  #{hasher-blake3-256
+    hasher-sha2-256})
 
-(def default-hash
-  hash-sha2-256)
+(def default-hasher
+  hasher-sha2-256)
 
-(defn hash?
+(defn hasher?
   "Return true if given a keyword representing a supported IPLD hash type,
   and false otherwise."
   [x]
   (and
    (keyword? x)
-   (some #{x} supported-hashes)))
+   (some #{x} supported-hashers)))

@@ -13,21 +13,21 @@
 (def data
   [:or map? vector?])
 
+(def ipld-codec
+  `[:enum ~@ipld/supported-codecs])
+
+(def ipld-hasher
+  `[:enum ~@ipld/supported-hashers])
+
 ;; Node
 ;; -----------------------------------------------------------------------------
 
 (def node
   [:map
    [:kubelt/type [:enum :kubelt.type/node]]
-   ;; TODO store reference to parent dag?
-   ;;[:kubelt.node/dag dag]
-   ;; TODO enumerate allowed keywords
-   [:kubelt.node/codec {:optional true} :qualified-keyword]
-   ;; TODO enumerate allowed keywords
-   [:kubelt.node/hash {:optional true} :qualified-keyword]
    [:kubelt.node/data data]
-   ;; TODO this should be recursive
-   [:kubelt.node/child vector? #_[:vector node]]])
+   [:ipld/codec {:optional true} ipld-codec]
+   [:ipld/hasher {:optional true} ipld-hasher]])
 
 (def node-schema
   [:and
@@ -48,7 +48,7 @@
    ;; TODO enumerate allowed keywords
    [:ipld/codec {:optional true} :qualified-keyword]
    ;; TODO enumerate allowed keywords
-   [:ipld/hash {:optional true} :qualified-keyword]])
+   [:ipld/hasher {:optional true} :qualified-keyword]])
 
 (def dag-schema
   [:and
@@ -67,7 +67,7 @@
    ;; TODO enumerate allowed keywords
    [:ipld/codec :qualified-keyword]
    ;; TODO enumerate allowed keywords
-   [:ipld/hash :qualified-keyword]])
+   [:ipld/hasher :qualified-keyword]])
 
 (def bag-schema
   [:and
