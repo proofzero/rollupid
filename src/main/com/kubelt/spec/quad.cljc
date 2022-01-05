@@ -7,6 +7,15 @@
 ;; the "Schema AST" map-based syntax instead as that should be faster to
 ;; instantiate for large schemas.
 
+;; Data
+;; -----------------------------------------------------------------------------
+
+(def lang-string-uri
+  "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
+
+(def xml-string-uri
+  "http://www.w3.org/2001/XMLSchema#string")
+
 ;; Language
 ;; -----------------------------------------------------------------------------
 ;; Language strings must be as defined by:
@@ -52,6 +61,11 @@
    [:map
     [:rdf/type [:enum :rdf.term/named-node]]]])
 
+;; TODO
+;; NB: If the literal has a language, its datatype has the IRI
+;; "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString". Otherwise,
+;; if no datatype is explicitly specified, the datatype has the IRI
+;; "http://www.w3.org/2001/XMLSchema#string".
 (def literal
   [:and
    term
@@ -81,6 +95,7 @@
 
 ;; TODO the subject can also potentially be a Quad term. This requires
 ;; that we define a recursive schema:
+;;
 ;; https://github.com/metosin/malli#recursive-schemas
 (def subject
   [:or blank-node named-node variable])
