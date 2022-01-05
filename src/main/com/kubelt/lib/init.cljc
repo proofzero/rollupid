@@ -7,8 +7,9 @@
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
    [com.kubelt.lib.detect :as detect]
-   [com.kubelt.lib.multiaddr :as multiaddr]
+   [com.kubelt.lib.multiaddr :as lib.multiaddr]
    [com.kubelt.lib.util :as util]
+   [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
   (:require
    #?@(:browser [[com.kubelt.lib.http.browser :as http.browser]]
@@ -43,7 +44,16 @@
    :client/p2p {:p2p/read {:http/scheme :https
                            :http/address "/ip4/127.0.0.1/tcp/9061"}
                 :p2p/write {:http/scheme :https
-                            :http/address "/ip4/127.0.0.1/tcp/9061"}}})
+                            :http/address "/ip4/127.0.0.1/tcp/9061"}}
+   ;; A map from scope identifier to session token (JWT). Upon
+   ;; successfully authenticating against a core, the returned session
+   ;; token is kept here.
+   :crypto/session {}
+   ;; The current "wallet" implementation. This is provided externally
+   ;; by the user.
+   ;; TODO provide no-op wallet implementation, or try to detect wallet
+   ;; in the environment, e.g. metamask in browser.
+   :crypto/wallet {}})
 
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------
@@ -103,13 +113,13 @@
         read-maddr (get read :http/address)
         read-scheme (get read :http/scheme)
         read-address (-> read-maddr
-                         multiaddr/str->map
+                         lib.multiaddr/str->map
                          (assoc :http/scheme read-scheme))
         ;; write
         write-maddr (get write :http/address)
         write-scheme (get write :http/scheme)
         write-address (-> write-maddr
-                          multiaddr/str->map
+                          lib.multiaddr/str->map
                           (assoc :http/scheme write-scheme))
         ;; Format log messages.
         log-read (str (name read-scheme) "::" read-maddr)
@@ -145,6 +155,32 @@
   {:pre [(satisfies? proto.http/HttpClient client)]}
   (log/debug {:log/msg "halt HTTP client"}))
 
+;; :crypto/session
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :crypto/session [_ env]
+  (log/debug {:log/msg "init session"})
+  ;; Our session storage map is a "vault".
+  {:com.kubelt/type :kubelt.type/vault
+   :vault/tokens {}})
+
+(defmethod ig/halt-key! :crypto/session [_ session]
+  (log/debug {:log/msg "halt session"}))
+
+;; :crypto/wallet
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :crypto/wallet [_ wallet]
+  (log/debug {:log/msg "init wallet"})
+  ;; If user provided a wallet, use it if it is valid. Otherwise, return
+  ;; a placeholder wallet that will need to be replaced.
+  (if-not (lib.wallet/valid? wallet)
+    (throw (ex-info "invalid wallet" wallet))
+    wallet))
+
+(defmethod ig/halt-key! :crypto/wallet [_ wallet]
+  (log/debug {:log/msg "halt wallet"}))
+
 ;; :sys/platform
 ;; -----------------------------------------------------------------------------
 
@@ -176,6 +212,10 @@
         ;; the current platform and initialize accordingly, otherwise.
         platform (or (get options :sys/platform)
                      (util/platform))
+        ;; Use the wallet provided by the user, or default to a no-op
+        ;; wallet otherwise.
+        wallet (or (get options :crypto/wallet)
+                   (lib.wallet/no-op))
         ;; Get p2p connection addresses determined by whether or not we
         ;; can detect a locally-running p2p node.
         default (:client/p2p system)
@@ -184,6 +224,7 @@
         ;; system.
         system (-> system
                    (assoc :sys/platform platform)
+                   (assoc :crypto/wallet wallet)
                    (assoc :client/http platform)
                    (assoc :client/p2p p2p-options))]
     ;; NB: If we provide an additional collection of keys when calling

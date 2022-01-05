@@ -40,7 +40,12 @@
   },
   "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097",
   "dependencies": {
+    "@colors/colors": "1.5.0",
+    "@ethersproject/keccak256": "5.6.0",
+    "@ethersproject/signing-key": "5.6.0",
+    "@ethersproject/wallet": "5.6.0",
     "@stablelib/utf8": "1.0.1",
+    "prompt": "1.2.2",
     "web3": "1.7.1",
     "yargs": "17.3.1"
   }

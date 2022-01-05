@@ -23,6 +23,7 @@
    (map? x)
    (= :kubelt.type/node (:kubelt/type x))))
 
+;; TODO check if data is valid edn.
 (defn data?
   "Return true if the given value is valid node data."
   [x]

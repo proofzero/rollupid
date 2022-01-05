@@ -1,5 +1,5 @@
-(ns com.kubelt.ddt.p2p.options
-  "Common options for p2p sub-command."
+(ns com.kubelt.ddt.options
+  "Common options various sub-commands."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 ;; Defaults
@@ -13,6 +13,13 @@
 
 ;; Options
 ;; -----------------------------------------------------------------------------
+
+(def tls-name
+  "tls")
+
+(def tls-config
+  #js {:describe "make request with(out) TLS"
+       :boolean true})
 
 (def host-name
   "host")
@@ -38,21 +45,37 @@
        :nargs 1
        :default port-default})
 
-;; Both --host, --port are required (NB: since defaults are supplied you
-;; won't receive an error if not supplied by user).
+(def wallet-name
+  "wallet")
+
+(def wallet-config
+  #js {:alias "w"
+       :describe "a wallet name"
+       :requiresArg true
+       :demandOption "wallet must be specified"
+       :string true
+       :nargs 1})
+
+;; All of these options are required. NB: the options with supplied
+;; defaults won't cause an error if not supplied by user.
 (def required-options
   #js [host-name
-       port-name])
+       port-name
+       wallet-name])
 
 ;; Public
 ;; -----------------------------------------------------------------------------
 
 (defn options
   [yargs]
+  ;; Add --(no-)tls option
+  (.option yargs tls-name tls-config)
   ;; Add --host option
   (.option yargs host-name host-config)
   ;; Add --port option
   (.option yargs port-name port-config)
+  ;; Add --wallet option
+  (.option yargs wallet-name wallet-config)
   ;; Indicate which options must be provided
   (.demandOption yargs required-options)
   ;; Pretend like this is functional

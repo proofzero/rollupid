@@ -1,5 +1,5 @@
 (ns com.kubelt.lib.wallet
-  "Wallet-related utilities. A 'wallet'"
+  "Wallet-related utilities."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   #?(:cljs
      (:require
@@ -8,7 +8,13 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.spec.wallet :as spec.wallet]))
+   [com.kubelt.spec.wallet :as spec.wallet])
+  #?(:node
+     (:require
+      [com.kubelt.lib.wallet.node :as wallet.node])))
+
+;; Public
+;; -----------------------------------------------------------------------------
 
 (defn wallet?
   [x]
@@ -19,7 +25,22 @@
 
 (defn valid?
   [x]
-  (malli/validate spec.wallet/wallet x))
+  ;; TODO sign a fixed value and ensure expected output, and/or other
+  ;; measures to ensure wallet performs as expected at runtime.
+  (and (wallet? x)
+       (malli/validate spec.wallet/wallet x)))
+
+(defn explain
+  "Return an explanation as to why a wallet is invalid."
+  [wallet]
+  (let [explain (lib.error/explain spec.wallet/wallet wallet)]
+    ;; If there's no error in validating the wallet, presumably a
+    ;; dynamic function check failed, i.e. invoking the signing function
+    ;; resulted in an unexpected signature output, etc.
+    ;;
+    ;; TODO check if explain resulted in an error, and if not, check
+    ;; functionality.
+    explain))
 
 ;; TODO support clj/cljs
 (defn to-edn
@@ -29,3 +50,65 @@
     {:com.kubelt/type :kubelt.type/wallet
      :wallet/sign-fn sign-fn}
     (lib.error/error "missing wallet signing function")))
+
+(defn no-op
+  "Return a no-op wallet that can be used as a placeholder."
+  []
+  {:post [(valid? %)]}
+  (let [null-address "0x00000000000000000000"
+        null-key {:com.kubelt.type :kubelt.type/public-key
+                  :key/data ""}]
+    {:com.kubelt/type :kubelt.type/wallet
+     :wallet/address null-address
+     :wallet/encrypt-key null-key
+     :wallet/decrypt-fn identity
+     :wallet/sign-fn identity}))
+
+#?(:node
+   (defn has-wallet?
+     "Return true if named wallet exists, and false otherwise."
+     [app-name wallet-name]
+     {:pre [(every? string? [app-name wallet-name])]}
+     (wallet.node/has-wallet? app-name wallet-name)))
+
+#?(:node
+   (defn can-decrypt?
+     "Return true if the wallet can be successfully decrypted with the
+     supplied password, and false otherwise."
+     [app-name wallet-name password]
+     {:pre [(every? string? [app-name wallet-name password])]}
+     (wallet.node/can-decrypt? app-name wallet-name password)))
+
+#?(:node
+   (defn init
+     "Initialize a wallet."
+     [app-name wallet-name password]
+     {:pre [(every? string? [app-name wallet-name password])]}
+     (wallet.node/init app-name wallet-name password)))
+
+#?(:node
+   (defn load
+     "Load a wallet."
+     [app-name wallet-name password]
+     {:pre [(every? string? [app-name wallet-name password])]}
+     (wallet.node/load app-name wallet-name password)))
+
+#?(:node
+   (defn ls
+     "List wallets."
+     [app-name]
+     {:pre [(string? app-name)]}
+     (wallet.node/ls app-name)))
+
+#?(:node
+   (defn delete!
+     "Delete a wallet."
+     [app-name wallet-name]
+     {:pre [(every? string? [app-name wallet-name])]}
+     (wallet.node/delete! app-name wallet-name)))
+
+;; TODO
+(defn create
+  "Create a platform-appropriate wallet."
+  []
+  #?(:node (wallet.node/create)))

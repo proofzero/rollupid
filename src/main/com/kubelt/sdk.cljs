@@ -49,7 +49,8 @@
 
        ;; account
        :account #js {:authenticate sdk.v1.account/authenticate-js!
-                     :isLoggedIn sdk.v1.account/logged-in-js?}
+                     :isLoggedIn sdk.v1.account/logged-in-js?
+                     :setWallet sdk.v1.account/set-wallet-js}
 
        ;; resource
        :resource #js {:add sdk.v1.resource/add-js!}

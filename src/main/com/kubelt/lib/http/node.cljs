@@ -14,8 +14,10 @@
    [malli.error :as me]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.lib.http.media-type :as http.media-type]
    [com.kubelt.lib.http.request :as http.request]
    [com.kubelt.lib.http.shared :as http.shared]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.spec.http :as spec.http]))
 
@@ -55,18 +57,28 @@
         headers (.-headers res)
         response {:http/status status-code
                   :http/headers headers}
-        ;; TODO collect data
-        body []]
+        body-chan (async/chan)]
     (.on res "data"
          (fn [data]
-           ;; FIXME
-           (conj body data)))
+           (async/go
+             (async/>! body-chan data))))
     (.on res "end"
          (fn []
-           (let [response (assoc response :http/body body)]
-             (async/go
-               (async/>! c response)
-               (async/close! c)))))))
+           (async/go
+             (async/take! body-chan
+                          (fn [body]
+                            ;; TODO more generic response type handling
+                            ;; TODO give user option of getting JS object, avoiding conversion
+                            (let [headers (js->clj headers)
+                                  data-edn (cond
+                                             (http.media-type/text? headers)
+                                             body
+                                             (http.media-type/json? headers)
+                                             (lib.json/from-json body true)
+                                             :else body)]
+                              (async/go
+                                (async/>! c data-edn)
+                                (async/close! c))))))))))
 
 (defn on-error
   [error]

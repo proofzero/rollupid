@@ -63,6 +63,10 @@
                         ;; is true then data will be pretty-printed.
                         (write-stdout [data]
                           (if pretty
+                            ;; FIXME this isn't printing
+                            ;; correctly. Using (pprint) works, and this
+                            ;; *used* to work before setting
+                            ;; up (with-out-str ...) above.
                             (pp/pprint data)
                             (prn data)))]
                   ;; Use require("fs").promises for a promisified file

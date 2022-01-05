@@ -1,10 +1,10 @@
 const path = require("path");
 const webpack = require("webpack");
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+//const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 const paths = {
   // Source files
-  src: path.resolve(__dirname, "../sdk-js/lib/sdk.js"),
+  src: path.resolve(__dirname, "../sdk-npm/lib/com.kubelt.sdk.js"),
 
   // Production build files
   build: path.resolve(__dirname, "./lib"),
@@ -21,7 +21,7 @@ module.exports = {
     libraryTarget: "commonjs2",
   },
   plugins: [
-    new NodePolyfillPlugin(),
+    //new NodePolyfillPlugin(),
     new webpack.ProvidePlugin({
       Buffer: ["buffer", "Buffer"],
       process: "process/browser",

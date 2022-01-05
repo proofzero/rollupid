@@ -6,7 +6,7 @@
   (:require
    [cognitect.transit :as transit])
   (:require
-   [com.kubelt.ddt.p2p.options :as cli.p2p]
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.sdk.v1 :as sdk]))
@@ -16,7 +16,7 @@
    :desc "Query a p2p namespace"
 
    :builder (fn [^Yargs yargs]
-              (cli.p2p/options yargs)
+              (ddt.options/options yargs)
               yargs)
 
    :handler (fn [args]
