@@ -1,0 +1,92 @@
+;; shadow-cljs configuration
+
+;; TODO use React (reagent) to generate the sidebar?
+;; TODO change build target name to :extension
+;; TODO put generated sidebar resources under sidebar directory (mkdir if necessary).
+;; TODO fix up stylesheet
+;; TODO all files are generated automatically when the :firefox target is compiled.
+;; TODO clean up build (shadow-cljs? package.json alias?)
+;; TODO package build as .xpi (zip)
+
+;; FIXME
+;; The Web Console logging API (console.log, console.info, console.warn,
+;; console.error) has been disabled by a script on this page.
+
+;; FIXME
+;; Source map error: Error: NetworkError when attempting to fetch resource.
+;; Resource URL: moz-extension://[uuid]/js/cljs-runtime/kubelt.panel.script.js
+;; Source Map URL: kubelt.panel.script.js.map
+;; https://developer.mozilla.org/en-US/docs/Tools/Debugger/Source_map_errors
+
+;; TODO thicken icon lines and use more canvas size to make them more legible.
+
+;; TODO copy resources, e.g. icons, into target directory
+
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [;; Immutable in-memory database and Datalog query engine
+  [datascript "1.3.5"]
+  ;; Render CSS in Clojure and ClojureScript
+  [garden "1.3.10"]
+  ;; Fast HTML generation from Clojure data
+  [hiccup "1.0.5"]
+  ;; Fast JSON encoding and decoding
+  [metosin/jsonista "0.3.5"]
+  ;; Tools for working with command line arguments
+  [org.clojure/tools.cli "1.0.206"]]
+
+ ;; To build everything (development):
+ ;;   $ npm run compile
+ ;; To build everything (production):
+ ;;   $ npm run release
+ ;;
+ ;; To build just the code (development):
+ ;;   $ npm run build:develop
+ ;; To build just the code (release):
+ ;;   $ npm run build:release
+ ;;
+ ;; To generate the sidebar:
+ ;;   $ npm run build:sidebar
+ ;;
+ ;; To generate the sidebar HTML:
+ ;;   $ npx run build:sidebar:html
+ ;; This runs:
+ ;;   $ npx shadow-cljs run kubelt.panel.html/generate
+ ;; Available options:
+ ;; * -o / --out-file :: output file name ["target/panel.html"]
+ ;;
+ ;; To generate the sidebar CSS:
+ ;;   $ npm run build:sidebar:style
+ ;; This runs:
+ ;;   $ npx shadow-cljs run kubelt.panel.style/generate
+ ;; Available options:
+ ;; * -o / --out-file :: output file name ["target/panel.css"]
+ ;;
+ ;; To generate the popup:
+ ;;   $ npm run build:popup
+ ;; To generate the manifest:
+ ;;   $ npm run build:manifest
+ ;; To generate all static assets (sidebar, popup, manifest):
+ ;;   $ npm run build:assets
+
+ :builds
+ {:kubelt
+  {:target :browser
+   :output-dir "target"
+   ;;:asset-path ""
+   :modules {:shared
+             {:entries []}
+             :popup
+             {:init-fn kubelt.popup.script/init
+              :depends-on #{:shared}}
+             :sidebar
+             {:init-fn kubelt.sidebar.script/init
+              :depends-on #{:shared}}
+             :worker
+             {:init-fn kubelt.worker.core/init
+              :depends-on #{:shared}
+              :web-worker true}}}}}
