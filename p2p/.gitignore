@@ -1,0 +1,9 @@
+
+# vim
+*~
+*.swp
+*.swo
+
+# nodejs 
+node_modules
+build
