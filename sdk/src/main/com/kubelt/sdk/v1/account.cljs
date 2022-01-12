@@ -1,5 +1,5 @@
 (ns com.kubelt.sdk.v1.account
-  ""
+  "Account management."
   {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"})
 
 ;; create-account
