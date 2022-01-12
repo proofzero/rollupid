@@ -42,7 +42,8 @@
        :halt sdk.v1/halt-js!
 
        ;; account
-       :account #js {:create sdk.v1.account/create-js!}
+       :account #js {;; TODO test me
+                     :create sdk.v1.account/create-js!}
 
        ;; resource
 
