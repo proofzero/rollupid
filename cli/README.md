@@ -2,6 +2,12 @@
 
 ## development
 
+Install environment (i.e. `java`), e.g., on Ubuntu:
+
+```
+$ sudo apt install openjdk-17-jre-headless
+```
+
 Install dependencies:
 
 ```
