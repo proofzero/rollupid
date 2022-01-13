@@ -11,6 +11,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "@stablelib/base64": "^1.0.1",
+    "@stablelib/sha256": "^1.0.1",
     "@types/body-parser": "^1.19.0",
     "@types/express-validator": "^3.0.0",
     "@types/jest": "^26.0.17",
