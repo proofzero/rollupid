@@ -1,11 +1,15 @@
 (ns com.kubelt.sdk.impl.init
   "SDK implementation."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    ["ipfs-http-client" :as ipfs-http])
   (:require
    [integrant.core :as ig]
-   [taoensso.timbre :as log]))
+   [taoensso.timbre :as log])
+  (:require
+   [com.kubelt.sdk.impl.http.browser :as http.browser]
+   [com.kubelt.sdk.impl.http.node :as http.node]
+   [com.kubelt.sdk.proto.http :as proto.http]))
 
 ;; System
 ;; -----------------------------------------------------------------------------
@@ -31,7 +35,9 @@
    :adapter/ipfs {:ipfs/host "127.0.0.1"
                   :ipfs/port 5001}
    ;; Our connection to the Kubelt p2p system.
-   :client/p2p {}})
+   :client/p2p {:p2p/host "127.0.0.1"
+                :p2p/port 9061}
+   :client/http :missing})
 
 ;; :adapter/ipfs
 ;; -----------------------------------------------------------------------------
@@ -65,31 +71,71 @@
 
 (defmethod ig/init-key :client/p2p [_ value]
   (log/debug "init p2p client")
-  {:client/p2p :fixme})
+  ;; If we wanted to initialize a stateful client for the p2p system,
+  ;; this would be the place. Since that system exposes a stateless HTTP
+  ;; API, we'll just keep the coordinates of the service (host, port) in
+  ;; the system configuration map and pull them out when we need to make
+  ;; a call.
+  value)
 
 (defmethod ig/halt-key! :client/p2p [_ value]
   (log/debug "halt p2p client"))
 
+;; :client/http
+;; -----------------------------------------------------------------------------
+;; TODO if possible, we want that when compiling an environment-specific
+;; variant of the SDK that we are optimizing away whichever of these
+;; HttpClient protocol reifications isn't used.
+
+;; We expect the value to be a keyword naming the execution environment
+;; that we are initializing for.
+(defmethod ig/init-key :client/http [_ env]
+  {:post [(not (nil? %))]}
+  (log/debug "init HTTP client [" env "]")
+  (condp = env
+    :platform/browser (http.browser/->HttpClient)
+    :platform/node (http.node/->HttpClient)))
+
+(defmethod ig/halt-key! :client/http [_ client]
+  {:pre [(satisfies? proto.http/HttpClient client)]}
+  (log/debug "halt HTTP client"))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
+;; NB: the configuration map is validated by the exposed SDK methods.
 
 (defn init
   "Initialize the SDK."
-  [{:keys [logging/min-level]}]
+  [{:keys [logging/min-level] :as options}]
   ;; Initialize the logging system.
   (when min-level
     (log/merge-config! {:min-level min-level}))
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
+  (let [system
+        (cond-> system
+          ;; TODO detect current execution environment
+          ;; TODO top-level environment key should be injected into
+          ;; sub-keys that depend on it
+          (contains? options :sys/platform)
+          (assoc :client/http (get options :sys/platform))
 
-  ;; NB: If we provide an additional collection of keys when calling
-  ;; integrant.core/init, only those keys will be initialized.
-  ;;
-  ;; TODO use this mechanism to selectively initialize the system for
-  ;; the current context, i.e. in browser, node cli client, etc.
-  (let [sys-map (ig/init system)]
-    sys-map))
+          ;; If options map contains :p2p/host, set that value in the
+          ;; system map.
+          (contains? options :p2p/host)
+          (assoc-in [:client/p2p :p2p/host] (get options :p2p/host))
+
+          ;; If options map contains :p2p/port, set that value in the
+          ;; system map.
+          (contains? options :p2p/port)
+          (assoc-in [:client/p2p :p2p/port] (get options :p2p/port)))]
+    ;; NB: If we provide an additional collection of keys when calling
+    ;; integrant.core/init, only those keys will be initialized.
+    ;;
+    ;; TODO use this mechanism to selectively initialize the system for
+    ;; the current context, i.e. in browser, node cli client, etc.
+    (ig/init system)))
 
 (defn halt!
   "Clean-up resources used by the SDK."

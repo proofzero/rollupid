@@ -1,6 +1,6 @@
 (ns com.kubelt.cli
   "The entry-point for the Kubelt Development CLI tool."
-  {:author "Kubelt Inc." :copyright "2021" :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require
@@ -8,9 +8,12 @@
    [clojure.string :as str])
   (:require
    [com.kubelt.cli.courtyard :as cli.courtyard]
+   [com.kubelt.cli.crypto :as cli.crypto]
    [com.kubelt.cli.json-ld :as cli.json-ld]
+   [com.kubelt.cli.p2p :as cli.p2p]
    [com.kubelt.cli.rdf :as cli.rdf]
-   [com.kubelt.cli.sdk :as cli.sdk]))
+   [com.kubelt.cli.sdk :as cli.sdk]
+   [com.kubelt.cli.wallet :as cli.wallet]))
 
 ;; NB: when you encounter an error like:
 ;;   "Cannot infer target type in expression"
@@ -26,7 +29,7 @@
 ;; -----------------------------------------------------------------------------
 
 (def copyright-year
-  2021)
+  2022)
 
 (def copyright-author
   "Kubelt Inc.")
@@ -46,12 +49,18 @@
                  ;; $CLI courtyard <command>
                  (.command (clj->js cli.courtyard/command))
 
+                 ;; $CLI crypto <command>
+                 (.command (clj->js cli.crypto/command))
                  ;; $CLI json-ld <command>
                  (.command (clj->js cli.json-ld/command))
+                 ;; $CLI p2p <command>
+                 (.command (clj->js cli.p2p/command))
                  ;; $CLI rdf <command>
                  (.command (clj->js cli.rdf/command))
                  ;; $CLI sdk <command>
                  (.command (clj->js cli.sdk/command))
+                 ;; $CLI wallet <command>
+                 (.command (clj->js cli.wallet/command))
 
                  ;; Display a summary line.
                  (.epilogue epilogue)
