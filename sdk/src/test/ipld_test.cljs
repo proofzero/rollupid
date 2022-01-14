@@ -28,18 +28,18 @@
 
 (deftest hash-test
   (testing "valid hash"
-    (is (ipld/hash? ipld/hash-blake3-256))
-    (is (ipld/hash? ipld/hash-sha2-256))
-    (is (ipld/hash? ipld/default-hash)
+    (is (ipld/hasher? ipld/hasher-blake3-256))
+    (is (ipld/hasher? ipld/hasher-sha2-256))
+    (is (ipld/hasher? ipld/default-hasher)
         "the default IPLD hash passes the check predicate"))
 
   (testing "invalid hash"
-    (is (not (ipld/hash? "foobar")))
-    (is (not (ipld/hash? :foobar)))
-    (is (not (ipld/hash? {})))
-    (is (not (ipld/hash? []))))
+    (is (not (ipld/hasher? "foobar")))
+    (is (not (ipld/hasher? :foobar)))
+    (is (not (ipld/hasher? {})))
+    (is (not (ipld/hasher? []))))
 
   (testing "supported hashes"
-    (is (set? ipld/supported-hashes))
-    (is (contains? ipld/supported-hashes ipld/default-hash)
+    (is (set? ipld/supported-hashers))
+    (is (contains? ipld/supported-hashers ipld/default-hasher)
         "the default IPLD hash is in the set of supported hashes")))

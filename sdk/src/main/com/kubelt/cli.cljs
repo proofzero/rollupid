@@ -7,6 +7,7 @@
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
+   [com.kubelt.cli.courtyard :as cli.courtyard]
    [com.kubelt.cli.json-ld :as cli.json-ld]
    [com.kubelt.cli.rdf :as cli.rdf]
    [com.kubelt.cli.sdk :as cli.sdk]))
@@ -41,6 +42,9 @@
   (let [js-args (clj->js (sequence args))
         args (-> ^js yargs
                  ;; Set up our commands.
+
+                 ;; $CLI courtyard <command>
+                 (.command (clj->js cli.courtyard/command))
 
                  ;; $CLI json-ld <command>
                  (.command (clj->js cli.json-ld/command))
