@@ -1,6 +1,6 @@
 (ns com.kubelt.cli.sdk
   "CLI setup for 'sdk' sub-command."
-  {:copyright "©2021 Kubelt, Inc."}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.cli.sdk.init :as sdk.init]))
 

@@ -53,17 +53,17 @@
   ([]
    {:post [(map? %)]}
    (let [config impl.config/default-config]
-     (if (m/validate spec.config/schema config)
+     (if (m/validate spec.config/config config)
        (impl.init/init config)
-       (explain spec.config/schema config))))
+       (explain spec.config/config config))))
 
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
-   (if (m/validate spec.config/schema config)
+   (if (m/validate spec.config/config config)
      (let [config (merge impl.config/default-config config)]
        (impl.init/init config))
-     (explain spec.config/schema config))))
+     (explain spec.config/config config))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is

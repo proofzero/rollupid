@@ -2,7 +2,7 @@
   "Account management."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
-;; create-account
+;; create!
 ;; -----------------------------------------------------------------------------
 
 ;; TODO test me
