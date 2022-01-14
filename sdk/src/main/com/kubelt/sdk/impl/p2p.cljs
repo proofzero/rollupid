@@ -30,8 +30,7 @@
     ;; (expect a nonce in return, which should be signed and returned to
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
-    (http/request! client request))
-  (println "register! not yet implemented"))
+    (http/request! client request)))
 
 (defn store!
   "Store a key/value pair for the given user account."
@@ -50,8 +49,7 @@
     ;; validate that the request came from the owner of the public key
     ;; that was used to register; prefer an existing web request signing
     ;; standard)
-    (http/request! client request))
-  (println "store! not yet implemented:" key "=>" value))
+    (http/request! client request)))
 
 (defn query!
   "Retrieve the value for a given key for a given user account."
@@ -68,5 +66,4 @@
                  :http/path path}]
     ;; TODO extract user's public key from the account map
     ;; (for use as account identifier)
-    (http/request! client request))
-  (println "query! not yet implemented:" key))
+    (http/request! client request)))
