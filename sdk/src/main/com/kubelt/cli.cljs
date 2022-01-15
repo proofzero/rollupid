@@ -11,6 +11,7 @@
    [com.kubelt.cli.crypto :as cli.crypto]
    [com.kubelt.cli.json-ld :as cli.json-ld]
    [com.kubelt.cli.p2p :as cli.p2p]
+   [com.kubelt.cli.path :as cli.path]
    [com.kubelt.cli.rdf :as cli.rdf]
    [com.kubelt.cli.sdk :as cli.sdk]
    [com.kubelt.cli.wallet :as cli.wallet]))
@@ -55,6 +56,8 @@
                  (.command (clj->js cli.json-ld/command))
                  ;; $CLI p2p <command>
                  (.command (clj->js cli.p2p/command))
+                 ;; $CLI path <command>
+                 (.command (clj->js cli.path/command))
                  ;; $CLI rdf <command>
                  (.command (clj->js cli.rdf/command))
                  ;; $CLI sdk <command>
