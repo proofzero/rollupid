@@ -1,0 +1,18 @@
+(ns com.kubelt.cli.path.temp
+  "Invoke the path > temp method to return the system configuration path."
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:require
+   [com.kubelt.sdk.impl.path :as path]))
+
+(defonce command
+  {:command "temp"
+   :desc "Print the temp path"
+   :requiresArg false
+
+   :builder (fn [^Yargs yargs]
+              yargs)
+
+   :handler (fn [args]
+              (let [{app-name :$0}
+                    (js->clj args :keywordize-keys true)]
+                (println (path/temp app-name))))})

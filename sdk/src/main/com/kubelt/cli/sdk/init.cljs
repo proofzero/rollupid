@@ -1,6 +1,6 @@
 (ns com.kubelt.cli.sdk.init
   "Invoke the SDK (init) method."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    ["fs" :as fs]
    ["path" :as path])
