@@ -38,7 +38,8 @@
    :handler (fn [args]
               (let [{:keys [pack-file out-file]}
                     (js->clj args :keywordize-keys true)
-                    kbt (sdk/init)
+                    ;; TODO check result of init call!
+                    kbt (sdk/init {:sys/platform :platform/node})
                     ;; Read in pack file contents.
                     data (js/JSON.parse (.readFileSync fs pack-file))
                     ;; Construct BAG containing a single DAG, which has a
