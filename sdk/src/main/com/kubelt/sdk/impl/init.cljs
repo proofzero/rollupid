@@ -9,6 +9,7 @@
   (:require
    [com.kubelt.sdk.impl.http.browser :as http.browser]
    [com.kubelt.sdk.impl.http.node :as http.node]
+   [com.kubelt.sdk.impl.util :as util]
    [com.kubelt.sdk.proto.http :as proto.http]))
 
 ;; System
@@ -93,8 +94,8 @@
   {:post [(not (nil? %))]}
   (log/debug "init HTTP client [" env "]")
   (condp = env
-    :platform/browser (http.browser/->HttpClient)
-    :platform/node (http.node/->HttpClient)))
+    :platform.type/browser (http.browser/->HttpClient)
+    :platform.type/node (http.node/->HttpClient)))
 
 (defmethod ig/halt-key! :client/http [_ client]
   {:pre [(satisfies? proto.http/HttpClient client)]}
@@ -110,17 +111,23 @@
   ;; Initialize the logging system.
   (when min-level
     (log/merge-config! {:min-level min-level}))
+
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
-  (let [system
-        (cond-> system
-          ;; TODO detect current execution environment
-          ;; TODO top-level environment key should be injected into
-          ;; sub-keys that depend on it
-          (contains? options :sys/platform)
-          (assoc :client/http (get options :sys/platform))
+  (let [ ;; Possible values for platform:
+        ;; - :platform.type/browser
+        ;; - :platform.type/node
+        platform (or (get options :sys/platform)
+                     (util/platform))
 
+        ;; TODO top-level environment key should be injected into
+        ;; sub-keys that depend on it.
+        system (-> system
+                   (assoc :client/http platform))
+
+        system
+        (cond-> system
           ;; If options map contains :p2p/host, set that value in the
           ;; system map.
           (contains? options :p2p/host)

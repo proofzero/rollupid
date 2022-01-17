@@ -146,3 +146,14 @@ $ npm run test:sdk:web
 #### usage
 
 TODO
+
+## references
+
+### libraries
+
+- [js-multiformats](https://github.com/multiformats/js-multiformats) - multiformat-related interfaces and building blocks
+
+### formats
+
+- [CARv1](https://ipld.io/specs/transport/car/carv1/) - Content ARchive v1 format
+- [JSON-LD 1.1](https://www.w3.org/TR/json-ld11/) - JSON-based serialization for Linked Data

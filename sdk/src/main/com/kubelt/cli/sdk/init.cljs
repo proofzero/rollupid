@@ -16,7 +16,7 @@
               yargs)
 
    :handler (fn [args]
-              (let [kbt (sdk/init)]
+              (let [kbt (sdk/init {:sdk/platform :platform/node})]
                 (println "initializing the SDK")
                 (prn kbt)
                 (sdk/halt! kbt)))})

@@ -38,20 +38,23 @@
    :handler (fn [args]
               (let [{:keys [pack-file out-file]}
                     (js->clj args :keywordize-keys true)
-                    ;; TODO check result of init call!
-                    kbt (sdk/init {:sys/platform :platform/node})
-                    ;; Read in pack file contents.
-                    data (js/JSON.parse (.readFileSync fs pack-file))
-                    ;; Construct BAG containing a single DAG, which has a
-                    ;; single root node containing the pack data.
-                    ;;
-                    ;; TODO FIXME doesn't work (can't ipfs dag import)
-                    ;; with codec-json. Should it? Error message:
-                    ;;   $ ipfs dag import output.car
-                    ;;   Error: unrecognized object type: 297
-                    data-bag (bag/from-json data #_{:ipld/codec ipld/codec-json})]
-                ;; Write the BAG to the given output file.
-                (car/write-to-file! data-bag out-file)
-                ;; TODO this is a no-op for the invocation; don't bother
-                ;; init/halt SDK?
-                (sdk/halt! kbt)))})
+                    ;; Returns an error map if an initialization error
+                    ;; occurred.
+                    kbt (sdk/init)]
+                (if (sdk/error? kbt)
+                  (prn (:error kbt))
+                  (let [;; Read in pack file contents.
+                        data (js/JSON.parse (.readFileSync fs pack-file))
+                        ;; Construct BAG containing a single DAG, which has a
+                        ;; single root node containing the pack data.
+                        ;;
+                        ;; TODO FIXME doesn't work (can't ipfs dag import)
+                        ;; with codec-json. Should it? Error message:
+                        ;;   $ ipfs dag import output.car
+                        ;;   Error: unrecognized object type: 297
+                        data-bag (bag/from-json data #_{:ipld/codec ipld/codec-json})]
+                    ;; Write the BAG to the given output file.
+                    (car/write-to-file! data-bag out-file)
+                    ;; TODO this is a no-op for the invocation; don't bother
+                    ;; init/halt SDK?
+                    (sdk/halt! kbt)))))})
