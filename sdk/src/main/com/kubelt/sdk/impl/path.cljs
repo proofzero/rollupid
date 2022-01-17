@@ -7,7 +7,9 @@
    ["path" :as path]
    ["process" :as process])
   (:require
-   [goog.object]))
+   [goog.object])
+  (:require
+   [com.kubelt.sdk.impl.util :as util]))
 
 ;; TODO test me (all OSes)
 
@@ -16,35 +18,10 @@
 ;; TODO make utility/process/environment namespace and move that
 ;; functionality there.
 
-(defn- obj->clj
-  [obj]
-  (-> (fn [result key]
-        (let [v (goog.object/get obj key)]
-          (if (= "function" (goog/typeOf v))
-            result
-            (assoc result key v))))
-      (reduce {} (.getKeys goog/object obj))))
-
-(defn- environment
-  "Return a map of the process environment."
-  []
-  (obj->clj (.-env process)))
-
-(defn- platform
-  []
-  (let [home-dir (.homedir os)
-        tmp-dir (.tmpdir os)
-        username (.-username (.userInfo os))
-        env-map (environment)]
-    {:home-dir home-dir
-     :tmp-dir tmp-dir
-     :environment env-map
-     :username username}))
-
 (defn- macos
   [name]
   {:pre [(string? name)]}
-  (let [{:keys [home-dir tmp-dir]} (platform)
+  (let [{:keys [home-dir tmp-dir]} (util/node-env)
         library (.join path home-dir "Library")
         data (.join path library "Application Support" name)
         config (.join path library "Preferences" name)
@@ -60,7 +37,7 @@
 (defn- windows
   [name]
   {:pre [(string? name)]}
-  (let [{:keys [environment home-dir tmp-dir]} (platform)
+  (let [{:keys [environment home-dir tmp-dir]} (util/node-env)
         app-data (if-let [app-data (get environment "APPDATA")]
                    app-data
                    (.join path home-dir "AppData" "Roaming"))
@@ -81,7 +58,7 @@
 (defn- linux
   [name]
   {:pre [(string? name)]}
-  (let [{:keys [environment home-dir tmp-dir username]} (platform)
+  (let [{:keys [environment home-dir tmp-dir username]} (util/node-env)
         data (or (get environment "XDG_DATA_HOME")
                  (.join path home-dir ".local" "share" name))
         config (or (get environment "XDG_CONFIG_HOME")
@@ -97,15 +74,15 @@
      :log log
      :temp temp}))
 
+;; Public
+;; -----------------------------------------------------------------------------
+
 (defn paths
   [app-name]
   (condp = (.-platform process)
     "darwin" (macos app-name)
     "win32" (windows app-name)
     "linux" (linux app-name)))
-
-;; Public
-;; -----------------------------------------------------------------------------
 
 (defn cache
   "Return the path for cached data."

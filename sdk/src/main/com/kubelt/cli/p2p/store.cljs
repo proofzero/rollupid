@@ -16,9 +16,7 @@
 
    :handler (fn [args]
               (let [{:keys [key value host port]} (js->clj args :keywordize-keys true)
-                    ;; TODO auto-detect the platform
-                    kbt (sdk/init {:sys/platform :platform/node
-                                   :p2p/host host
+                    kbt (sdk/init {:p2p/host host
                                    :p2p/port port})
                     ;; TODO implement local wallet management for
                     ;; development / testing.

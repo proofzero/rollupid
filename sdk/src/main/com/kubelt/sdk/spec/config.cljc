@@ -11,7 +11,7 @@
 
 (def platform
   "Supported execution environments."
-  [:enum :platform/node :platform/browser])
+  [:enum :platform.type/node :platform.type/browser])
 
 (def logging-level
   "Logging levels defined by the timbre logging library."
@@ -31,7 +31,7 @@
 
 (def config
   [:map
-   [:sys/platform platform]
+   [:sys/platform {:optional true} platform]
    [:logging/min-level {:optional true} logging-level]
    [:p2p/host {:optional true} net-host]
    [:p2p/port {:optional true} net-port]])

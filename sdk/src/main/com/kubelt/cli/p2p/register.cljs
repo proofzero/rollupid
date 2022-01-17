@@ -18,9 +18,7 @@
               ;; TODO pass in URI of p2p service; need to update the
               ;; config map spec to include details of p2p service
               (let [{:keys [host port]} (js->clj args :keywordize-keys true)
-                    ;; TODO auto-detect the platform
-                    kbt (sdk/init {:sys/platform :platform/node
-                                   :p2p/host host
+                    kbt (sdk/init {:p2p/host host
                                    :p2p/port port})
                     ;; TODO local wallet management for dev / testing
                     account {:kubelt/type :kubelt.type/account
