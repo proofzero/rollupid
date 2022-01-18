@@ -101,6 +101,18 @@
   {:pre [(satisfies? proto.http/HttpClient client)]}
   (log/debug "halt HTTP client"))
 
+;; :sys/platform
+;; -----------------------------------------------------------------------------
+
+;; TODO any platform-specific setup.
+(defmethod ig/init-key :sys/platform [_ platform]
+  (log/info {:log/msg "init platform" :sys/platform platform})
+  platform)
+
+;; TODO any platform-specific teardown.
+(defmethod ig/halt-key! :sys/platform [_ platform]
+  (log/debug {:log/msg "halt platform"}))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
 ;; NB: the configuration map is validated by the exposed SDK methods.
@@ -120,6 +132,10 @@
         ;; - :platform.type/node
         platform (or (get options :sys/platform)
                      (util/platform))
+
+        ;; Store the platform type.
+        system (-> system
+                   (assoc :sys/platform platform))
 
         ;; TODO top-level environment key should be injected into
         ;; sub-keys that depend on it.

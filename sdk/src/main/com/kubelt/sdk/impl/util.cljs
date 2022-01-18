@@ -9,8 +9,10 @@
   (:require
    [clojure.string :as str]))
 
+;; Public
+;; -----------------------------------------------------------------------------
 
-(defn- obj->clj
+(defn obj->clj
   "Turn a JavaScript object into a Clojure map."
   [obj]
   (-> (fn [result key]
@@ -18,10 +20,7 @@
           (if (= "function" (goog/typeOf v))
             result
             (assoc result key v))))
-      (reduce {} (.getKeys goog/object obj))))
-
-;; Public
-;; -----------------------------------------------------------------------------
+      (reduce {} (goog.object/getKeys obj))))
 
 (defn environment
   "Return a map of the process environment. In the returned map

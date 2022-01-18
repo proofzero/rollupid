@@ -11,8 +11,10 @@
    [clojure.string :as str])
   (:require
    [malli.core :as malli]
+   [malli.error :as me]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.sdk.impl.http.request :as http.request]
    [com.kubelt.sdk.proto.http :as proto.http]
    [com.kubelt.sdk.spec.http :as spec.http]))
 
@@ -26,31 +28,60 @@
 
 (defn request->host
   [m]
+  {:pre [(map? m)]}
   (:http/host m))
 
 (defn request->port
   [m]
+  {:pre [(map? m)]}
   (:http/port m))
 
 (defn request->path
   [m]
+  {:pre [(map? m)]}
   (:http/path m))
 
+(defn request->headers
+  [m]
+  {:pre [(map? m)]}
+  (clj->js (:http/headers m)))
+
+(defn request->body
+  [m]
+  {:pre [(map? m)]}
+  (:http/body m))
+
+;; TODO test me
 (defn request->options
   "Convert a Kubelt HTTP request map into a Node.js http(s) request
   options map."
   [m]
+  {:pre [(map? m)]}
   (let [method (request->method m)
         host (request->host m)
         port (request->port m)
-        path (request->path m)]
-    #js {"method" method
-         "hostname" host
-         "port" port
-         "path" path}))
+        path (request->path m)
+        headers (request->headers m)
+        body (request->body m)
+        options {:method method
+                 :hostname host
+                 :port port
+                 :path path}]
+    (clj->js
+     (cond-> options
+       ;; body
+       (not (nil? body))
+       (assoc :body body)
+       ;; headers
+       (not (nil? headers))
+       (assoc :headers headers)))))
 
 (defn on-response
   [res]
+  ;; TODO inspect status code
+  ;; TODO inspect result type
+  ;; TODO decode body
+  ;; TODO collect data
   (println (.-statusCode res))
   (.on res "data"
        (fn [d]
@@ -66,19 +97,27 @@
 ;; TODO support https/tls
 ;; TODO support request headers
 ;; TODO put patch post delete
-;; TODO convert resposne to response map
-;; TODO validate reponse map
+;; TODO convert response to response map
+;; TODO validate response map
 ;; TODO return a channel
 
 (defrecord HttpClient []
   proto.http/HttpClient
   (request!
     [this m]
-    {:pre [(malli/validate spec.http/request m)]}
-    (let [options (request->options m)
-          ;; Use https here if TLS required.
-          request (.request http options on-response)]
-      (doto request
-        (.on "error" on-error)
-        ;;(.write data)
-        (.end)))))
+    (if (malli/validate spec.http/request m)
+      (let [options (request->options m)
+            ;; TODO Use https here if TLS required.
+            request (.request http options on-response)]
+        ;;(prn options)
+        (when (http.request/post? m)
+          (if-let [data (get m :http/body)]
+            (.write request data)))
+        (doto request
+          (.on "error" on-error)
+          (.end)))
+      ;; TODO report an error using common error reporting
+      ;; functionality.
+      (let [explain (-> spec.http/request (malli/explain m) me/humanize)]
+        {:com.kubelt/type :kubelt.type/error
+         :error explain}))))

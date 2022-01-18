@@ -101,7 +101,9 @@
   calling (init) as the system to halt."
   [system]
   {:pre [(map? system)]}
-  (impl.init/halt! system))
+  (if-not (error? system)
+    (impl.init/halt! system)
+    true))
 
 (defn halt-js!
   "Shutdown the SDK from a JavaScript context. Takes the system

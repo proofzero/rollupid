@@ -19,3 +19,6 @@
 
 # CAR files
 *.car
+
+# p2p data files
+/p2p-dataset/

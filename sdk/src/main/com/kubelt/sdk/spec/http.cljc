@@ -4,6 +4,8 @@
   (:require
    [malli.core :as m]))
 
+;; TODO test me
+
 (def method
   [:enum :delete :get :patch :post :put])
 
@@ -14,6 +16,12 @@
   int?)
 
 (def path
+  string?)
+
+(def headers
+  [:map-of string? [:or string? number?]])
+
+(def body
   string?)
 
 ;; response
@@ -32,7 +40,9 @@
    [:http/method method]
    [:http/host host]
    [:http/port port]
-   [:http/path path]])
+   [:http/path path]
+   [:http/headers {:optional true} headers]
+   [:http/body {:optional true} body]])
 
 (def request-schema
   [:and
