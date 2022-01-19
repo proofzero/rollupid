@@ -9,7 +9,9 @@
   (:require
    [com.kubelt.cli.courtyard :as cli.courtyard]
    [com.kubelt.cli.crypto :as cli.crypto]
+   [com.kubelt.cli.http :as cli.http]
    [com.kubelt.cli.json-ld :as cli.json-ld]
+   [com.kubelt.cli.jwt :as cli.jwt]
    [com.kubelt.cli.p2p :as cli.p2p]
    [com.kubelt.cli.path :as cli.path]
    [com.kubelt.cli.rdf :as cli.rdf]
@@ -52,8 +54,12 @@
 
                  ;; $CLI crypto <command>
                  (.command (clj->js cli.crypto/command))
+                 ;; $CLI http <command>
+                 (.command (clj->js cli.http/command))
                  ;; $CLI json-ld <command>
                  (.command (clj->js cli.json-ld/command))
+                 ;; $CLI jwt <command>
+                 (.command (clj->js cli.jwt/command))
                  ;; $CLI p2p <command>
                  (.command (clj->js cli.p2p/command))
                  ;; $CLI path <command>

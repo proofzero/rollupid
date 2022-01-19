@@ -1,6 +1,10 @@
 (ns com.kubelt.cli.p2p.store
   "Invoke the p2p (store) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:require-macros
+   [cljs.core.async.macros :refer [go]])
+  (:require
+   [cljs.core.async :refer [<!]])
   (:require
    [com.kubelt.cli.p2p.options :as cli.p2p]
    [com.kubelt.sdk.impl.p2p :as p2p]
@@ -17,11 +21,17 @@
    :handler (fn [args]
               (let [{:keys [key value host port]} (js->clj args :keywordize-keys true)
                     kbt (sdk/init {:p2p/host host
-                                   :p2p/port port})
-                    ;; TODO implement local wallet management for
-                    ;; development / testing.
-                    account {:kubelt/type :kubelt.type/account
-                             :account/public-key "xyzabc123"}]
-                ;; TODO handle errors
-                (p2p/store! kbt account key value)
-                (sdk/halt! kbt)))})
+                                   :p2p/port port})]
+                (if (sdk/error? kbt)
+                  (prn (:error kbt))
+                  (let [;; TODO implement local wallet management for
+                        ;; development / testing.
+                        account {:kubelt/type :kubelt.type/account
+                                 :account/public-key "xyzabc123"}
+                        res-chan (p2p/store! kbt account key value)]
+                    (go
+                      (let [result (<! res-chan)]
+                        ;; TODO handle errors using common error utilities
+                        (when (= :kubelt.type/error (:com.kubelt/type result))
+                          (prn (:error result)))))
+                    (sdk/halt! kbt)))))})

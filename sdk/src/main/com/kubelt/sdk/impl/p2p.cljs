@@ -2,11 +2,13 @@
   "Wrapper around the external p2p naming system."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require-macros
+   [cljs.core.async.interop :refer [<p!]]
    [cljs.core.async.macros :refer [go]])
   (:require
-   [clojure.string :as str]
-   [cljs.core.async :refer [<!]])
+   [cljs.core.async :refer [<!]]
+   [clojure.string :as str])
   (:require
+   [com.kubelt.sdk.impl.jwt :as jwt]
    [com.kubelt.sdk.proto.http :as http]))
 
 (defn register!
@@ -33,32 +35,49 @@
     (http/request! client request)))
 
 (defn store!
-  "Store a key/value pair for the given user account."
+  "Store a key/value pair for the given user account. Returns a core.async
+  channel."
   [sys account key value]
-  (let [client (get sys :client/http)
-        host (get-in sys [:client/p2p :p2p/host])
-        port (get-in sys [:client/p2p :p2p/port])
-        path (str/join "/" ["" "updatekbt" key value])
-        request {:kubelt/type :kubelt.type/http-request
-                 :http/method :post
-                 :http/host host
-                 :http/port port
-                 :http/path path}]
-    ;; TODO sign request using user key pair
-    ;; (attach a signature to the request that p2p node can use to
-    ;; validate that the request came from the owner of the public key
-    ;; that was used to register; prefer an existing web request signing
-    ;; standard)
-    (http/request! client request)))
+  ;; TODO register public key with initial (register!)
+  ;; call?
+  (go
+    (let [client (get sys :client/http)
+          ;; If you need to know what platform you're running on, you
+          ;;can get the value of :sys/platform from the system map.
+          ;;platform (get sys :sys/platform)
+          host (get-in sys [:client/p2p :p2p/host])
+          port (get-in sys [:client/p2p :p2p/port])
+          path (str/join "/" ["" "updatekbt"])
+          public-key (get account :account/public-key)
+          body {:kbtname key
+                :endpoint value
+                :pubkey public-key}
+          ;; TODO sign request using user key pair
+          body-str (<p! (jwt/sign body))
+          headers {"Content-Type" "text/plain"}
+          request {:kubelt/type :kubelt.type/http-request
+                   :http/method :post
+                   :http/host host
+                   :http/port port
+                   :http/path path
+                   :http/headers headers
+                   :http/body body-str}]
+      ;; (attach a signature to the request that p2p node can use to
+      ;; validate that the request came from the owner of the public key
+      ;; that was used to register; prefer an existing web request signing
+      ;; standard)
+      ;;
+      ;; Returns a core.async channel.
+      (http/request! client request))))
 
 (defn query!
-  "Retrieve the value for a given key for a given user account."
+  "Retrieve the value for a given key for a given user account. Returns a
+  core.async channel."
   [sys account key]
   (let [client (get sys :client/http)
         host (get-in sys [:client/p2p :p2p/host])
         port (get-in sys [:client/p2p :p2p/port])
         path (str/join "/" ["" "kbt" key])
-        url (str "http://" host ":" port path)
         request {:kubelt/type :kubelt.type/http-request
                  :http/method :get
                  :http/host host

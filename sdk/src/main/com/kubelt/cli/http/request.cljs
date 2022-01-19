@@ -1,15 +1,12 @@
-(ns com.kubelt.cli.sdk.init
+(ns com.kubelt.cli.http.request
   "Invoke the SDK (init) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
-   ["fs" :as fs]
-   ["path" :as path])
   (:require
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
-  {:command "init"
-   :desc "Initialize the SDK"
+  {:command "request"
+   :desc "Perform HTTP request"
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
@@ -20,5 +17,5 @@
                 (if (sdk/error? kbt)
                   (prn (:error kbt))
                   (let []
-                    (println "initializing the SDK")
+                    (println "TODO perform request")
                     (sdk/halt! kbt)))))})
