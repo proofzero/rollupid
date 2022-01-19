@@ -25,28 +25,25 @@
 ;; the async block.
 
 (deftest block-test
-  (t/async done
-   (go
-     (let [value {:foo "bar"}
-           value-js (clj->js value)
-           ;; These are the attributes of a Block.
-           bytes (.encode json)
-           hash (<p! (.digest sha256 bytes))
-           cid (.create CID 1 (.-code json) hash)
-           ;; Construct a block using known values. Note that the Block
-           ;; constructor expects JavaScript data.
-           b (Block. #js {"cid" cid
-                          "bytes" bytes
-                          "value" value-js})]
-       (is (= value-js (car.block/block->raw b))
-           "raw return value is correct")
-       (is (= value (car.block/block->edn b))
-           "edn return value is correct")
-       (is (= bytes (car.block/block->bytes b))
-           "returned bytes are correct")
-       (is (= cid (car.block/block->cid b))
-           "return cid is correct")
-       (done)))))
+  (let [value {:foo "bar"}
+        value-js (clj->js value)
+        ;; These are the attributes of a Block.
+        bytes (.encode json)
+        hash (.digest sha256 bytes)
+        cid (.create CID 1 (.-code json) hash)
+        ;; Construct a block using known values. Note that the Block
+        ;; constructor expects JavaScript data.
+        b (Block. #js {"cid" cid
+                       "bytes" bytes
+                       "value" value-js})]
+    (is (= value-js (car.block/block->raw b))
+        "raw return value is correct")
+    (is (= value (car.block/block->edn b))
+        "edn return value is correct")
+    (is (= bytes (car.block/block->bytes b))
+        "returned bytes are correct")
+    (is (= cid (car.block/block->cid b))
+        "return cid is correct")))
 
 (deftest encoder-test
   (t/async done
