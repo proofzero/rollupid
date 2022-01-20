@@ -1,6 +1,6 @@
 (ns com.kubelt.sdk.proto.wallet
   "A protocol for dealing with "
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 
 (defprotocol Wallet

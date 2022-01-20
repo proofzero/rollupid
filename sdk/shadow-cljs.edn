@@ -24,6 +24,8 @@
   [metosin/malli "0.7.5"]
   ;; a fast data-driven router for Clojure(Script)
   [metosin/reitit-core "0.5.15"]
+  ;; http routing with interceptors for reitit
+  [metosin/reitit-http "0.5.15"]
   ;; common interceptors for reitit
   [metosin/reitit-interceptors "0.5.15"]
   ;; malli schema coercion for reitit
