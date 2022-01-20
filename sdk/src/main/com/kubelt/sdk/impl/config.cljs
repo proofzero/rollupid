@@ -1,6 +1,6 @@
 (ns com.kubelt.sdk.impl.config
   "Configuration-related support."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [clojure.string :as str]))
 
@@ -9,8 +9,16 @@
 
 (def log-level :info)
 
-(def default-config
+(def default-p2p
+  {:p2p/read "/ip4/localhost/tcp/9061"
+   :p2p/write "/ip4/localhost/tcp/9061"})
+
+(def default-logging
   {:logging/min-level log-level})
+
+(def default-config
+  (merge default-p2p
+         default-logging))
 
 ;; Internal
 ;; -----------------------------------------------------------------------------

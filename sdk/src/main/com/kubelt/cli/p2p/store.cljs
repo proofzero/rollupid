@@ -20,8 +20,8 @@
 
    :handler (fn [args]
               (let [{:keys [key value host port]} (js->clj args :keywordize-keys true)
-                    kbt (sdk/init {:p2p/host host
-                                   :p2p/port port})]
+                    maddr (str "/ip4/" host "/tcp/" port)
+                    kbt (sdk/init {:p2p/read maddr :p2p/write maddr})]
                 (if (sdk/error? kbt)
                   (prn (:error kbt))
                   (let [;; TODO implement local wallet management for

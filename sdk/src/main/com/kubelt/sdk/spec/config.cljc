@@ -11,7 +11,7 @@
 
 (def platform
   "Supported execution environments."
-  [:enum :platform.type/node :platform.type/browser])
+  [:enum :platform.type/node :platform.type/browser :platform.type/jvm])
 
 (def logging-level
   "Logging levels defined by the timbre logging library."
@@ -19,22 +19,26 @@
    {:default :info}
    [:enum :log :trace :debug :info :warn :error :fatal]])
 
-(def net-host
-  string?)
+#_(def dotted-quad
+  #"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")
 
-(def net-port
-  int?)
+(def dotted-quad
+  #"(\\.|\\d)*")
+
+;; TODO refine this regex to better match a multiaddr
+(def multiaddr
+  [:re #"^(/(\w+)/(\w+|\.)+)+$"])
 
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the the configuration map passed to the sdk/init function.
 
 (def config
-  [:map
+  [:map {:closed true}
    [:sys/platform {:optional true} platform]
    [:logging/min-level {:optional true} logging-level]
-   [:p2p/host {:optional true} net-host]
-   [:p2p/port {:optional true} net-port]])
+   [:p2p/read {:optional true} multiaddr]
+   [:p2p/write {:optional true} multiaddr]])
 
 (def config-schema
   "Schema for SDK configuration map."

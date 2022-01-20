@@ -11,13 +11,13 @@
   ;; a pure Clojure/Script logging library
   [com.taoensso/timbre "5.1.2"]
   ;; immutable database and Datalog query engine
-  [datascript/datascript "1.3.5"]
+  [datascript/datascript "1.3.6"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.25"]
   ;; a micro-framework for building data-driven applications
   [integrant/integrant "0.8.0"]
   ;; facilities for async programming and communication
-  [org.clojure/core.async "1.5.648"]
+  [org.clojure/core.async "1.4.627"]
   ;; fast JSON encoding and decoding
   [metosin/jsonista "0.3.5"]
   ;; data-driven schemas for Clojure/Script

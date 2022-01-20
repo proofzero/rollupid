@@ -2,13 +2,15 @@
   "SDK implementation."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   ["ipfs-http-client" :as ipfs-http])
+   ["ipfs-http-client" :as ipfs-http-client])
   (:require
    [integrant.core :as ig]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.sdk.impl.detect :as detect]
    [com.kubelt.sdk.impl.http.browser :as http.browser]
    [com.kubelt.sdk.impl.http.node :as http.node]
+   [com.kubelt.sdk.impl.multiaddr :as multiaddr]
    [com.kubelt.sdk.impl.util :as util]
    [com.kubelt.sdk.proto.http :as proto.http]))
 
@@ -33,54 +35,68 @@
 
 (def system
   {;; Our connection to IPFS. Uses the ipfs-http-client from node.
-   :adapter/ipfs {:ipfs/host "127.0.0.1"
-                  :ipfs/port 5001}
-   ;; Our connection to the Kubelt p2p system.
-   :client/p2p {:p2p/host "127.0.0.1"
-                :p2p/port 9061}
+   :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"}
+   ;; Our connection to the Kubelt p2p system. Typically write paths
+   ;; will go through a kubelt managed http gateway.
+   :client/p2p {:p2p/read "/ip4/127.0.0.1/tcp/9061"
+                :p2p/write "/ip4/127.0.0.1/tcp/9061"}
    :client/http :missing})
 
-;; :adapter/ipfs
+;; :client/ipfs
 ;; -----------------------------------------------------------------------------
-;; TODO support different URI:
-;; - create("http://127.0.0.1:5002")
-;; other ways to initialize the client:
-;; - create(new URL(...));
-;; - create("/ip4/127.0.0.1/tcp/5001")
-;; - create({host: "localhost", port: "5001", protocol: "http"})
-;; - create({host: "1.1.1.1", port: "80", apiPath: "/ipfs/api/v0"})
-;; send headers with each request:
-;; - create({..., headers: {authorization: "Bearer " + TOKEN}})
-;; set a global timeout for *all* requests:
-;; - create({timeout: '2m'})
-;; use an http.Agent (node-only) to control client behavior:
-;; - create({agent: http.Agent()})
+;; Send headers with each request:
+;;  token "xyzabc123"
+;;  authorization (str "Bearer " token)
+;;  user-agent "X-Kubelt"
+;;  headers {:headers {:authorization authorization
+;;                     :user-agent user-agent}}
+;;
+;; Use an http.Agent (node-only) to control client behavior:
+;;   agent {:agent (.. http Agent.)}
 
-(defmethod ig/init-key :adapter/ipfs [_ value]
-  (log/debug "init IPFS adapter")
-  (let [ipfs-host (get value :ipfs/host)
-        ipfs-port (get value :ipfs/port)
-        options #js {"host" ipfs-host "port" ipfs-port}
-        client (.create ipfs-http options)]
-    {:client/ipfs client}))
+(defmethod ig/init-key :client/ipfs [_ value]
+  (let [;; Set a global timeout for *all* requests:
+        timeout {:timeout "2m"}
+        ;; Supply the address of the IPFS node:
+        maddr-str (get value :ipfs/multiaddr)
+        url {:url maddr-str}
+        ;; Create the options object we pass to client creation fn.
+        options (clj->js (merge url timeout))]
+    (log/debug {:log/msg "init IPFS client" :ipfs/addr maddr-str})
+    (try
+      (.create ipfs-http-client options)
+      (catch js/Error e
+        (log/fatal e))
+      (catch :default e
+        (log/error {:log/msg "unexpected error" :error/value e})))))
 
-(defmethod ig/halt-key! :adapter/ipfs [_ client]
-  (log/debug "halt IPFS adapter"))
+(defmethod ig/halt-key! :client/ipfs [_ client]
+  (log/debug {:log/msg "halt IPFS client"}))
 
 ;; :client/p2p
 ;; -----------------------------------------------------------------------------
 
 (defmethod ig/init-key :client/p2p [_ value]
-  (log/debug "init p2p client")
   ;; If we wanted to initialize a stateful client for the p2p system,
   ;; this would be the place. Since that system exposes a stateless HTTP
-  ;; API, we'll just keep the coordinates of the service (host, port) in
+  ;; API, we'll just convert the multiaddresses we're given for the p2p
+  ;; read/write nodes into more conventional coordinates (host, port) in
   ;; the system configuration map and pull them out when we need to make
   ;; a call.
-  value)
+  (let [;; read; get the multiaddr string and convert into a map
+        ;; containing {:address/host :address/port}.
+        read-maddr (get value :p2p/read)
+        read-address (multiaddr/str->map read-maddr)
+        ;; write
+        write-maddr (get value :p2p/write)
+        write-address (multiaddr/str->map read-maddr)]
+    (log/debug {:log/msg "init p2p client" :net/read read-maddr :net/write write-maddr})
+    (-> value
+        (assoc :p2p/read read-address)
+        (assoc :p2p/write write-address))))
 
 (defmethod ig/halt-key! :client/p2p [_ value]
-  (log/debug "halt p2p client"))
+  (log/debug {:log/msg "halt p2p client"}))
 
 ;; :client/http
 ;; -----------------------------------------------------------------------------
@@ -92,21 +108,22 @@
 ;; that we are initializing for.
 (defmethod ig/init-key :client/http [_ env]
   {:post [(not (nil? %))]}
-  (log/debug "init HTTP client [" env "]")
+  (log/debug {:log/msg "init HTTP client [" env "]"})
   (condp = env
     :platform.type/browser (http.browser/->HttpClient)
+    ;;:platform.type/jvm (http.jvm/->HttpClient)
     :platform.type/node (http.node/->HttpClient)))
 
 (defmethod ig/halt-key! :client/http [_ client]
   {:pre [(satisfies? proto.http/HttpClient client)]}
-  (log/debug "halt HTTP client"))
+  (log/debug {:log/msg "halt HTTP client"}))
 
 ;; :sys/platform
 ;; -----------------------------------------------------------------------------
 
 ;; TODO any platform-specific setup.
 (defmethod ig/init-key :sys/platform [_ platform]
-  (log/info {:log/msg "init platform" :sys/platform platform})
+  (log/debug {:log/msg "init platform" :sys/platform platform})
   platform)
 
 ;; TODO any platform-specific teardown.
@@ -117,42 +134,30 @@
 ;; -----------------------------------------------------------------------------
 ;; NB: the configuration map is validated by the exposed SDK methods.
 
+;; TODO top-level environment key should be injected into sub-keys that
+;; depend on it.
 (defn init
   "Initialize the SDK."
   [{:keys [logging/min-level] :as options}]
   ;; Initialize the logging system.
   (when min-level
     (log/merge-config! {:min-level min-level}))
-
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
-  (let [ ;; Possible values for platform:
-        ;; - :platform.type/browser
-        ;; - :platform.type/node
+  (let [;; Initialize for given platform if specified by user, or detect
+        ;; the current platform and initialize accordingly, otherwise.
         platform (or (get options :sys/platform)
                      (util/platform))
-
-        ;; Store the platform type.
+        ;; Get p2p connection addresses determined by whether or not we
+        ;; can detect a locally-running p2p node.
+        p2p-options (detect/node-or-gateway options)
+        ;; Update the system configuration map before initializing the
+        ;; system.
         system (-> system
-                   (assoc :sys/platform platform))
-
-        ;; TODO top-level environment key should be injected into
-        ;; sub-keys that depend on it.
-        system (-> system
-                   (assoc :client/http platform))
-
-        system
-        (cond-> system
-          ;; If options map contains :p2p/host, set that value in the
-          ;; system map.
-          (contains? options :p2p/host)
-          (assoc-in [:client/p2p :p2p/host] (get options :p2p/host))
-
-          ;; If options map contains :p2p/port, set that value in the
-          ;; system map.
-          (contains? options :p2p/port)
-          (assoc-in [:client/p2p :p2p/port] (get options :p2p/port)))]
+                   (assoc :sys/platform platform)
+                   (assoc :client/http platform)
+                   (assoc :client/p2p p2p-options))]
     ;; NB: If we provide an additional collection of keys when calling
     ;; integrant.core/init, only those keys will be initialized.
     ;;

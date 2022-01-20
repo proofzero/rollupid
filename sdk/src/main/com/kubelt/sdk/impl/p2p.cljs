@@ -8,6 +8,7 @@
    [cljs.core.async :refer [<!]]
    [clojure.string :as str])
   (:require
+   [com.kubelt.sdk.impl.multiaddr :as ma]
    [com.kubelt.sdk.impl.jwt :as jwt]
    [com.kubelt.sdk.proto.http :as http]))
 
@@ -17,8 +18,8 @@
   represents the user's account."
   [sys account]
   (let [client (get sys :client/http)
-        host (get-in sys [:client/p2p :p2p/host])
-        port (get-in sys [:client/p2p :p2p/port])
+        host (get-in sys [:client/p2p :p2p/write :address/host])
+        port (get-in sys [:client/p2p :p2p/write :address/port])
         key (get account :account/public-key)
         path (str/join "/" ["" "register" key])
         request {:kubelt/type :kubelt.type/http-request
@@ -45,8 +46,8 @@
           ;; If you need to know what platform you're running on, you
           ;;can get the value of :sys/platform from the system map.
           ;;platform (get sys :sys/platform)
-          host (get-in sys [:client/p2p :p2p/host])
-          port (get-in sys [:client/p2p :p2p/port])
+          host (get-in sys [:client/p2p :p2p/write :address/host])
+          port (get-in sys [:client/p2p :p2p/write :address/port])
           path (str/join "/" ["" "updatekbt"])
           public-key (get account :account/public-key)
           body {:kbtname key
@@ -75,8 +76,8 @@
   core.async channel."
   [sys account key]
   (let [client (get sys :client/http)
-        host (get-in sys [:client/p2p :p2p/host])
-        port (get-in sys [:client/p2p :p2p/port])
+        host (get-in sys [:client/p2p :p2p/read :address/host])
+        port (get-in sys [:client/p2p :p2p/read :address/port])
         path (str/join "/" ["" "kbt" key])
         request {:kubelt/type :kubelt.type/http-request
                  :http/method :get
