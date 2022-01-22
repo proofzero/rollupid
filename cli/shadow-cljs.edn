@@ -4,9 +4,15 @@
   "src/main"
   "src/test"]
 
+ ;; TODO figure out how to pass credentials to GitHub Packages:
+ ;; > AuthorizationException Not authorized , ReasonPhrase:Unauthorized.
+
+ :repositories {"central" "https://repo1.maven.org/maven2"
+                "clojars" "https://repo.clojars.org"
+                "github" "https://maven.pkg.github.com/kubelt/kubelt"}
+
  :dependencies
- [;; TODO depend on SDK
-  ]
+ [[com.kubelt/sdk "0.0.2"]]
 
  ;; To build:
  ;; $ npx shadow-cljs compile cli

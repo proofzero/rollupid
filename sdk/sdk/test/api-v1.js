@@ -8,9 +8,9 @@
 
 const fs = require('fs');
 const tap = require('tap');
-const kbt = require('../target/sdk.js');
+const kbt = require('../index.js');
 
-// Called before every subsequent descendant test.
+// Called before every subsequent descendent test.
 /*
 tap.beforeEach((t) => {
     // Instantiate the SDK.

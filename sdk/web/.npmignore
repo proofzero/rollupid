@@ -1,0 +1,10 @@
+# sdk/web/.npmignore
+
+# Babashka tasks
+bb.edn
+
+# Node-based tests
+/web-test
+
+# npm packages
+*.tgz

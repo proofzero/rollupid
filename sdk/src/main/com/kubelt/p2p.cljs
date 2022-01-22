@@ -6,6 +6,7 @@
    [goog.object])
   (:require
    ["http" :as http :refer [IncomingMessage ServerResponse]]
+   ["process" :as process]
    ["url" :as url :refer [Url]])
   (:require
    ["hyperbee" :as Hyperbee]
@@ -419,6 +420,12 @@
         environ (get-environment env-prefix)
         system (init-system config environ options)
         sys-map (ig/init system)]
+    (letfn [(on-shutdown []
+              (log/info {:log/msg "shutting down"})
+              (ig/halt! sys-map))]
+      (doto process
+        (.on "SIGINT" on-shutdown)
+        (.on "SIGTERM" on-shutdown)))
     (when-let [log-level (get options :log-level)]
       (let [log-level (keyword log-level)]
         (log/merge-config! {:min-level log-level})

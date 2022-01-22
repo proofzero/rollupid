@@ -1,0 +1,9 @@
+# sdk/p2p/.npmignore
+
+# Local scripts
+/bin
+
+# Hypercore local storage
+/p2p-dataset
+
+Dockerfile

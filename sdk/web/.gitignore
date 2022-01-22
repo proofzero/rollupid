@@ -1,0 +1,7 @@
+# sdk/web/.gitignore
+
+# Compiled application
+/web
+
+# Compiled tests
+/web-test
