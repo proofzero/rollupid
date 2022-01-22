@@ -1,0 +1,19 @@
+# sdk/sdk/.npmignore
+
+# Local scripts
+/bin
+
+# Clojure tooling cache
+/.cpcache
+
+# Babashka tasks
+bb.edn
+
+# Packaging-related dependencies
+deps.edn
+
+# Node-based tests
+test/
+
+# npm packages
+*.tgz

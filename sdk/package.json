@@ -38,8 +38,6 @@
     "@stablelib/ed25519": "1.0.2",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
-    "hyperbee": "1.7.0",
-    "hypercore": "9.12.0",
     "ipfs-http-client": "55.0.0",
     "ipfs-message-port-client": "0.10.3",
     "ipns": "0.16.0",
@@ -53,7 +51,6 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
-    "sd-notify": "2.8.0",
     "yargs": "17.3.1"
   }
 }

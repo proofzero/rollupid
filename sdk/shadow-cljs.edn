@@ -11,7 +11,7 @@
   ;; a pure Clojure/Script logging library
   [com.taoensso/timbre "5.1.2"]
   ;; immutable database and Datalog query engine
-  [datascript/datascript "1.3.6"]
+  [datascript/datascript "1.3.7"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.25"]
   ;; a micro-framework for building data-driven applications
@@ -21,7 +21,7 @@
   ;; fast JSON encoding and decoding
   [metosin/jsonista "0.3.5"]
   ;; data-driven schemas for Clojure/Script
-  [metosin/malli "0.7.5"]
+  [metosin/malli "0.8.0"]
   ;; a fast data-driven router for Clojure(Script)
   [metosin/reitit-core "0.5.15"]
   ;; http routing with interceptors for reitit
@@ -71,7 +71,7 @@
                       :optimizations :advanced
                       :infer-externs :true
                       :output-feature-set :es-next}
-   :output-to "target/sdk.js"}
+   :output-to "sdk/index.js"}
 
   ;; This build target generates a test file but doesn't run it:
   ;; $ npx shadow-cljs compile/release test
@@ -108,7 +108,7 @@
    :main com.kubelt.p2p/main!
    :devtools {:before-load-async com.kubelt.p2p/stop!
               :after-load-async com.kubelt.p2p/start!}
-   :output-to "target/p2p.js"}
+   :output-to "p2p/index.js"}
 
   ;; This is a development CLI used to run various commands for testing,
   ;; preparing data, or performing other non-customer-facing operations.
@@ -118,4 +118,4 @@
    :compiler-options {:optimizations :simple
                       :infer-externs :true
                       :output-feature-set :es-next}
-   :output-to "target/cli.js"}}}
+   :output-to "ddt/index.js"}}}

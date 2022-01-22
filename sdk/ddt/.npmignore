@@ -1,0 +1,4 @@
+# sdk/ddt/.npmignore
+
+# Local scripts
+/bin

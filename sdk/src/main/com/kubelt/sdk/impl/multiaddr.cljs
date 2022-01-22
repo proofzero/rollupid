@@ -2,9 +2,27 @@
   "Multiaddress utilities."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [clojure.string :as str])
+  (:require
    ["multiaddr" :refer [Multiaddr]]))
 
 ;; TODO general multiaddr construction from network address parts / map.
+
+(defn vec->str
+  "Convert a vector of keywords and values into a multiaddress string. For
+  example, the vector [:ip4 \"127.0.0.1\" :tcp 8080] is converted into
+  the multiaddress string /ip4/127.0.0.1/tcp/8080."
+  [v]
+  {:pre [(vector? v)]}
+  (letfn [(name-for [x]
+            (if (number? x)
+              ;; Numbers need to be converted to strings separately
+              ;; as (name) doesn't work on them.
+              (str x)
+              ;; Returns strings unchanged and keywords as strings.
+              (name x)))]
+    (let [parts (cons "" (map name-for v))]
+      (str/join "/" parts))))
 
 ;; TODO test me
 (defn str->map

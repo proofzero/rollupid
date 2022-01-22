@@ -1,0 +1,24 @@
+{
+  "name": "@kubelt/ddt",
+  "version": "0.0.1",
+  "description": "Kubelt development CLI",
+  "private": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": "git://github.com/kubelt/kubelt.git",
+  "bin": {
+    "ddt": "./index.js"
+  },
+  "scripts": {
+    "build:develop": "./bin/develop.sh",
+    "build:release": "./bin/release.sh"
+  },
+  "author": "Kubelt, Inc.",
+  "license": "UNLICENSED",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "yargs": "17.3.1"
+  }
+}

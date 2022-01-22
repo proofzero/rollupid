@@ -1,0 +1,13 @@
+# sdk/sdk/.gitignore
+
+# Compiled application
+index.js
+
+# JAR files (CLJS package format)
+*.jar
+
+# Clojure tooling cache
+.cpcache
+
+# Leiningen build output
+target/
