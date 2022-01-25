@@ -13,6 +13,7 @@
     ;; TODO supply version as argument?
     ;; TODO version increment during releases
     ;; TODO read this version from package.json
+    ;; TODO Check for package.json version discrepancies
     (def cljs-version "0.0.4")
     (def sdk-root (str (fs/canonicalize "..")))
     (defn env [s] (System/getenv s)))
