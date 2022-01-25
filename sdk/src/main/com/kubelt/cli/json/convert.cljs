@@ -1,5 +1,5 @@
-(ns com.kubelt.cli.courtyard.convert
-  "Convert a Courtyard input JSON file to a CAR."
+(ns com.kubelt.cli.json.convert
+  "Convert an input JSON file to a CAR."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    ["fs" :as fs]
