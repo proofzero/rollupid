@@ -10,10 +10,6 @@
   "bin": {
     "p2p": "./index.js"
   },
-  "scripts": {
-    "build:develop": "./bin/develop.sh",
-    "build:release": "./bin/release.sh"
-  },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
   "devDependencies": {
