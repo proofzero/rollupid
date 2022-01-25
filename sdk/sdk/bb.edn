@@ -12,7 +12,8 @@
   (do
     ;; TODO supply version as argument?
     ;; TODO version increment during releases
-    (def cljs-version "0.0.3")
+    ;; TODO read this version from package.json
+    (def cljs-version "0.0.4")
     (def sdk-root (str (fs/canonicalize "..")))
     (defn env [s] (System/getenv s)))
   ;;:enter
@@ -34,7 +35,8 @@
   publish:js
   {:doc "Publish the SDK as an npm package"
    :depends [pack:js]
-   :task (let [pack-file (first (fs/glob "." "kubelt-sdk*.tgz"))]
+   :task (let [tgz-name (str/join "" ["kubelt-sdk-" cljs-version ".tgz"])
+               pack-file (first (fs/glob "." tgz-name))]
            (if-not pack-file
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
