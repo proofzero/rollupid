@@ -49,6 +49,20 @@
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
 
+  ;; These tests require the SDK from JavaScript and exercise the
+  ;; JavaScript version of the API.
+  test:js:develop
+  {:doc "Run tests against JavaScript development version of SDK"
+   :depends [build:js:develop]
+   :task (shell "node test/api-v1.js")}
+
+  ;; These tests require the SDK from JavaScript and exercise the
+  ;; JavaScript version of the API.
+  test:js:release
+  {:doc "Run tests against the JavaScript release version of SDK"
+   :depends [build:js:release]
+   :tasks (shell "node test/api-v1.js")}
+
   ;; Using uberdeps to generate the JAR from a generated deps.edn
   ;; includes Clojure class files, which aren't needed to distribute a
   ;; CLJS library. Try another jar packing tool; in the interim we
