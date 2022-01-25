@@ -10,12 +10,13 @@
    [clojure.string :as str]]
   :init
   (do
+    ;; TODO supply version as argument?
+    ;; TODO version increment during releases
+    (def cljs-version "0.0.3")
     (def sdk-root (str (fs/canonicalize "..")))
     (defn env [s] (System/getenv s)))
   ;;:enter
   ;;:leave
-
-  ;; TODO version increment during releases
 
   build:js:develop
   {:doc "Build a development JavaScript version of the SDK"
@@ -111,9 +112,8 @@
            dependencies (into [] (concat cljs-vec deps-vec))
            ;; Our semantic release version; should probably be a map for
            ;; easy usage and updates.
-           version "0.0.2"
            project-map {:name :com.kubelt/sdk
-                        :version version
+                        :version cljs-version
                         :description "Kubelt SDK"
                         :url "https://github.com/kubelt/kubelt"
                         :source-paths ["src/main"]

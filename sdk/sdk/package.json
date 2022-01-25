@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Kubelt SDK",
   "private": false,
   "publishConfig": {
