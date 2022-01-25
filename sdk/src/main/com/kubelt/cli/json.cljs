@@ -1,5 +1,5 @@
 (ns com.kubelt.cli.json
-  "CLI setup for 'sdk' sub-command."
+  "CLI setup for 'json' sub-command."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.cli.json.convert :as json.convert]))
