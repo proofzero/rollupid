@@ -1,0 +1,114 @@
+---
+name: build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+      # find out what deploy package to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2.10.2
+        id: filter
+        with:
+          filters: |
+            sdk : 'sdk/**'
+  test:
+    if: needs.changes.outputs.packages != '[]'
+    needs: changes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@master
+      
+      # Could use node matrix too https://github.com/marketplace/actions/setup-node-js-environment#matrix-testing
+      - name: Node SDK
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: sdk/package-lock.json
+      - run: npm install
+
+      - run: npm run test:sdk:node
+        with:
+          working-directory: sdk
+
+  # Pull Request
+  #-----------------------------------------------------------------------------
+  build:
+    needs: changes
+    if: >
+      github.event_name == 'pull_request'
+      && needs.changes.outputs.packages != '[]'
+    
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+        targets: ['sdk', 'p2p', 'ddt', 'web']
+
+    steps:
+      - uses: actions/checkout@master
+      
+      # Could use node matrix too https://github.com/marketplace/actions/setup-node-js-environment#matrix-testing
+      - name: Node ${{ matrix.target }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: sdk/${{ matrix.package }}/package-lock.json
+      - run: npm install
+
+      - name: Babashka ${{ matrix.target }}
+        uses: just-sultanov/setup-babashka@v2
+        with:
+          version: '0.7.4'
+      - name: Run ${{ matrix.target }} develop build
+        run: bb run build:develop
+        with:
+          working-directory: sdk/${{ matrix.package }}
+
+  # Merge / Deploy
+  #-----------------------------------------------------------------------------
+  publish:
+    needs: changes
+    if: >
+      github.event_name != 'pull_request'
+      && needs.changes.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1 # ensure the order as defined above
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+        targets: ['sdk', 'p2p', 'ddt', 'web']
+    steps:
+      - uses: actions/checkout@master
+      
+      # Could use node matrix too https://github.com/marketplace/actions/setup-node-js-environment#matrix-testing
+      - name: Node ${{ matrix.target }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: sdk/${{ matrix.package }}/package-lock.json
+      - run: npm install
+
+      - name: Babashka ${{ matrix.target }}
+        uses: just-sultanov/setup-babashka@v2
+        with:
+          version: '0.7.4'
+      - name: Run ${{ matrix.target }} develop release
+        run: bb run publish:develop
+        with:
+          working-directory: sdk/${{ matrix.package }}
+
