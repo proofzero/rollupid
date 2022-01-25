@@ -11,3 +11,6 @@ index.js
 
 # Leiningen build output
 target/
+
+# Maven pom
+pom.xml*

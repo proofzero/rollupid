@@ -17,3 +17,6 @@ test/
 
 # npm packages
 *.tgz
+
+# Maven pom
+pom.xml*
