@@ -7,9 +7,6 @@
     "registry": "https://npm.pkg.github.com"
   },
   "repository": "git://github.com/kubelt/kubelt.git",
-  "bin": {
-    "p2p": "./index.js"
-  },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
   "devDependencies": {
