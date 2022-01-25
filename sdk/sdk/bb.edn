@@ -3,28 +3,52 @@
  :min-bb "0.7.0"
  :tasks
  {:requires
-  [[babashka.fs :as fs]
+  [[babashka.classpath :as cp]
+   [babashka.fs :as fs]
    [babashka.process :as bpr]
    [clojure.edn :as edn]
    [clojure.java.io :as io]
+   [clojure.set :as cs]
    [clojure.string :as str]]
   :init
+  ;; TODO version increment during releases
+  ;; TODO Check for package.json version discrepancies
   (do
-    ;; TODO supply version as argument?
-    ;; TODO version increment during releases
-    ;; TODO read this version from package.json
-    (def cljs-version "0.0.4")
-    (def sdk-root (str (fs/canonicalize "..")))
-    (defn env [s] (System/getenv s)))
+    ;; Add shared build code to classpath.
+    (cp/add-classpath "../bb")
+    (require '[com.kubelt.build :as kb])
+    ;; Extract version from package.json.
+    (def version (kb/package-version "package.json"))
+    ;; Get the path to the SDK root.
+    (def sdk-root (str (fs/canonicalize ".."))))
   ;;:enter
   ;;:leave
 
+  package:version
+  {:doc "Print out the package.json version"
+   :task (println version)}
+
+  ;; Compare the dependencies in parent package.json and local
+  ;; package.json For any deps that intersect, make sure they have the
+  ;; same version. Note that this only detects the error when the
+  ;; necessary dependencies are present in both files; if a dependency
+  ;; is missing we can't currently detect that.
+  package:check
+  {:doc "Check for package.json version discrepancies"
+   :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
+               pkg-local (str (fs/file "." "package.json"))
+               mismatches (kb/package-mismatches pkg-parent pkg-local)]
+           (when (not (empty? mismatches))
+             (throw (ex-info "mismatched versions" mismatches))))}
+
   build:js:develop
   {:doc "Build a development JavaScript version of the SDK"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs compile sdk")}
 
   build:js:release
   {:doc "Build a release JavaScript version of the SDK"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs release sdk")}
 
   pack:js
@@ -35,11 +59,25 @@
   publish:js
   {:doc "Publish the SDK as an npm package"
    :depends [pack:js]
-   :task (let [tgz-name (str/join "" ["kubelt-sdk-" cljs-version ".tgz"])
+   :task (let [tgz-name (str/join "" ["kubelt-sdk-" version ".tgz"])
                pack-file (first (fs/glob "." tgz-name))]
            (if-not pack-file
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
+
+  ;; These tests require the SDK from JavaScript and exercise the
+  ;; JavaScript version of the API.
+  test:js:develop
+  {:doc "Run tests against JavaScript development version of SDK"
+   :depends [build:js:develop]
+   :task (shell "node test/api-v1.js")}
+
+  ;; These tests require the SDK from JavaScript and exercise the
+  ;; JavaScript version of the API.
+  test:js:release
+  {:doc "Run tests against the JavaScript release version of SDK"
+   :depends [build:js:release]
+   :tasks (shell "node test/api-v1.js")}
 
   ;; Using uberdeps to generate the JAR from a generated deps.edn
   ;; includes Clojure class files, which aren't needed to distribute a
@@ -83,47 +121,19 @@
   generate:cljs:project
   {:doc "Generate a project.clj from shadow-cljs.edn"
    :task
-   (letfn [(wrap [s]
-             (str "\"" s "\""))
-           (make-project [m]
-             (let [n-str (name (:name m))
-                   ns-str (namespace (:name m))
-                   name-str (str/join "/" [ns-str n-str])
-                   coords (str "defproject " name-str " " (wrap (:version m)))
-                   description (str/join " " [:description (wrap (:description m))])
-                   url (str/join " " [:url (wrap (:url m))])
-                   source-paths (str/join " " [:source-paths (:source-paths m)])
-                   dependencies (str/join " " [:dependencies (:dependencies m)])
-                   repositories (str/join " " [:deploy-repositories (:repositories m)])
-                   content (str/join " " [coords
-                                          description
-                                          url
-                                          source-paths
-                                          dependencies
-                                          repositories])]
-               (str "(" content ")")))]
-     (let [shadow-path (str (fs/path sdk-root "shadow-cljs.edn"))
-           output-path (str (fs/path "project.clj"))
-           ;; Extract dependencies from shadow-cljs.edn
-           shadow-reader (java.io.PushbackReader. (io/reader shadow-path))
-           shadow-map (edn/read shadow-reader)
-           ;; Combine the extracted dependencies with a "provided"
-           ;; ClojureScript entry.
-           deps-vec (get shadow-map :dependencies [])
-           cljs-vec [['org.clojure/clojurescript "1.10.914" :scope "provided"]]
-           dependencies (into [] (concat cljs-vec deps-vec))
-           ;; Our semantic release version; should probably be a map for
-           ;; easy usage and updates.
-           project-map {:name :com.kubelt/sdk
-                        :version cljs-version
-                        :description "Kubelt SDK"
-                        :url "https://github.com/kubelt/kubelt"
-                        :source-paths ["src/main"]
-                        :dependencies dependencies
-                        :repositories [["github" {:url "https://maven.pkg.github.com/kubelt/kubelt"
-                                                  :creds :gpg}]]}
-           project (make-project project-map)]
-       (spit output-path project)))}
+   (let [project-map
+         {:name :com.kubelt/sdk
+          :version version
+          :description "Kubelt SDK"
+          :url "https://github.com/kubelt/kubelt"
+          :source-paths ["src/main"]
+          :repositories [["github" {:url "https://maven.pkg.github.com/kubelt/kubelt"
+                                    :creds :gpg}]]}
+         shadow-path (str (fs/path sdk-root "shadow-cljs.edn"))
+         output-path (str (fs/path "project.clj"))
+         ;; The Leiningen project.clj file as a string.
+         project-clj (kb/shadow->lein project-map shadow-path)]
+     (spit output-path project-clj))}
 
   pack:cljs:project
   {:doc "Generate a ClojureScript JAR file using Leiningen"

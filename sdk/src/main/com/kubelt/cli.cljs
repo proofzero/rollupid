@@ -7,7 +7,7 @@
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
-   [com.kubelt.cli.courtyard :as cli.courtyard]
+   [com.kubelt.cli.json :as cli.json]
    [com.kubelt.cli.crypto :as cli.crypto]
    [com.kubelt.cli.http :as cli.http]
    [com.kubelt.cli.json-ld :as cli.json-ld]
@@ -49,8 +49,8 @@
         args (-> ^js yargs
                  ;; Set up our commands.
 
-                 ;; $CLI courtyard <command>
-                 (.command (clj->js cli.courtyard/command))
+                 ;; $CLI json <command>
+                 (.command (clj->js cli.json/command))
 
                  ;; $CLI crypto <command>
                  (.command (clj->js cli.crypto/command))
