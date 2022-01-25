@@ -1,8 +1,5 @@
 # sdk/sdk/.npmignore
 
-# Local scripts
-/bin
-
 # Clojure tooling cache
 /.cpcache
 
