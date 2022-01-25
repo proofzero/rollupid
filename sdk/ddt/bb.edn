@@ -19,7 +19,9 @@
 
   build:chmod
   {:doc "Make CLI executable"
-   :task (shell "chmod +x index.js")}
+   :task (let [file-name "index.js"
+               permissions "rwxrwxr-x"]
+           (fs/set-posix-file-permissions file-name permissions))}
 
   npm:link
   {:doc "Make CLI locally runnable"
