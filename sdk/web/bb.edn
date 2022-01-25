@@ -9,6 +9,7 @@
   :init
   (do
     ;; TODO generate $HOME/.npmrc configuration
+    ;; TODO run HTTP server for tests
     ;; TODO supply version as argument?
     ;; TODO version increment during releases
     (def web-version "0.0.3")
@@ -37,11 +38,13 @@
    :depends [build:web]
    :task (shell "npm pack")}
 
+  ;; TODO run tests
+
   ;; TODO
   publish:web
   {:doc "Publish the SDK as an npm package"
-   :depends [pack:js]
-   :task (let [pack-file (first (fs/glob "." "kubelt-sdk*.tgz"))]
+   :depends [pack:web]
+   :task (let [pack-file (first (fs/glob "." "kubelt-web*.tgz"))]
            (if-not pack-file
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}}}
