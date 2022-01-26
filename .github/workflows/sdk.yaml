@@ -37,7 +37,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: sdk/package-lock.json
       - run: npm install
-        working-directory: sdk/${{ matrix.package }}
+        working-directory: sdk
       - run: npm run test:sdk:node
         working-directory: sdk
 
