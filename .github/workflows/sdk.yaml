@@ -37,10 +37,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: sdk/package-lock.json
       - run: npm install
-
+        working-directory: sdk/${{ matrix.package }}
       - run: npm run test:sdk:node
-        with:
-          working-directory: sdk
+        working-directory: sdk
 
   # Pull Request
   #-----------------------------------------------------------------------------
@@ -75,8 +74,7 @@ jobs:
           version: '0.7.4'
       - name: Run ${{ matrix.target }} develop build
         run: bb run build:develop
-        with:
-          working-directory: sdk/${{ matrix.package }}
+        working-directory: sdk/${{ matrix.package }}
 
   # Merge / Deploy
   #-----------------------------------------------------------------------------
@@ -102,6 +100,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: sdk/${{ matrix.package }}/package-lock.json
       - run: npm install
+        working-directory: sdk/${{ matrix.package }}
 
       - name: Babashka ${{ matrix.target }}
         uses: just-sultanov/setup-babashka@v2
@@ -109,6 +108,5 @@ jobs:
           version: '0.7.4'
       - name: Run ${{ matrix.target }} develop release
         run: bb run publish:develop
-        with:
-          working-directory: sdk/${{ matrix.package }}
+        working-directory: sdk/${{ matrix.package }}
 
