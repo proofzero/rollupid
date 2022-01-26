@@ -164,11 +164,11 @@
    :task
    (do
      (println "not yet implemented")
-     (System/exit 1))}}})
+     (System/exit 1))}
 
 ;; All
 
   publish:all
   {:doc "Publish all the SDK targets"
-   :depends [publish:js, publish:cljs]}
+   :depends [publish:js, publish:cljs]}}}
 
