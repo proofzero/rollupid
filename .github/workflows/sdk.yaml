@@ -109,6 +109,6 @@ jobs:
         with:
           version: '0.7.4'
       - name: Run ${{ matrix.target }} develop release
-        run: bb run publish:release
+        run: bb run publish:all
         working-directory: sdk/${{ matrix.package }}
 

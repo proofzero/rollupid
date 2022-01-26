@@ -69,7 +69,7 @@
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}}}
 
-  publish
+  publish:all
   {:doc "Publish all the DDT targets"
    :depends [publish:js]}
 

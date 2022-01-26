@@ -73,7 +73,7 @@
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
 
-  publish
+  publish:all
   {:doc "Publish all the p2p targets."
    :depends [publish:js]}
 
