@@ -1,0 +1,51 @@
+{:min-bb "0.7.0"
+ :tasks
+ {:requires
+  [[babashka.classpath :as cp]
+   [babashka.fs :as fs]
+   [babashka.process :as bpr]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.set :as cs]
+   [clojure.string :as str]]
+  :init
+  (do
+    ;; Add shared build code to classpath.
+    (cp/add-classpath "./bb")
+    (require '[com.kubelt.cli :as cli])
+    (require '[com.kubelt.environ :as environ])
+    (require '[com.kubelt.package :as package])
+    (require '[com.kubelt.semver :as semver])
+    (require '[com.kubelt.shadow :as shadow])
+    (require '[com.kubelt.time :as time])
+    ;; Extract version from package.json.
+    (def version (cli/release-version "package.json" *command-line-args*)))
+
+  ;; Development
+  ;; ---------------------------------------------------------------------------
+
+  semver:parse
+  (let [version-map (semver/parse version)]
+    (println (semver/to-str version-map)))
+
+  package:version
+  {:doc "Print out the package.json version"
+   :task (println version)}
+
+  package:options
+  {:doc "Print out the CLI options."
+   :task (prn (cli/parse-options *command-line-args*))}
+
+  timestamp:iso-date
+  (println (time/iso-date))
+
+  ;; Tasks
+  ;; ---------------------------------------------------------------------------
+
+  ;; TODO generate Apache Maven .m2/settings.xml include GitHub package
+  ;; repository setup. User will have to specify their username and
+  ;; personal access token and put the file into the right spot.
+
+  ;; TODO generate $HOME/.npmrc configuration
+
+  }}
