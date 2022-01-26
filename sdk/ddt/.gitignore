@@ -1,0 +1,4 @@
+# sdk/ddt/.gitignore
+
+# Compiled application
+index.js

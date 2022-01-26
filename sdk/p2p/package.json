@@ -1,0 +1,27 @@
+{
+  "name": "@kubelt/p2p",
+  "version": "0.1.4",
+  "description": "Kubelt p2p",
+  "private": false,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": "git://github.com/kubelt/kubelt.git",
+  "bin": {
+    "p2p": "./index.js"
+  },
+  "scripts": {
+    "build:develop": "./bin/develop.sh",
+    "build:release": "./bin/release.sh"
+  },
+  "author": "Kubelt, Inc.",
+  "license": "UNLICENSED",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "hyperbee": "1.7.0",
+    "hypercore": "9.12.0",
+    "sd-notify": "2.8.0",
+    "yargs": "17.3.1"
+  }
+}
