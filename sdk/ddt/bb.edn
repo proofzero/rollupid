@@ -1,7 +1,8 @@
 {:min-bb "0.7.0"
  :tasks
  {:requires
-  [[babashka.fs :as fs]]
+  [[babashka.classpath :as cp]
+   [babashka.fs :as fs]]
   :init
   ;; TODO version increment during releases
   (do
@@ -13,12 +14,27 @@
     ;; Get the path to the SDK root.
     (def sdk-root (str (fs/canonicalize ".."))))
 
+  ;; Compare the dependencies in parent package.json and local
+  ;; package.json For any deps that intersect, make sure they have the
+  ;; same version. Note that this only detects the error when the
+  ;; necessary dependencies are present in both files; if a dependency
+  ;; is missing we can't currently detect that.
+  package:check
+  {:doc "Check for package.json version discrepancies"
+   :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
+               pkg-local (str (fs/file "." "package.json"))
+               mismatches (kb/package-mismatches pkg-parent pkg-local)]
+           (when (not (empty? mismatches))
+             (throw (ex-info "mismatched versions" mismatches))))}
+
   compile:develop
   {:doc "Build a development version of the development CLI"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs compile cli")}
 
   compile:release
   {:doc "Build a release version of the development CLI"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs release cli")}
 
   build:chmod

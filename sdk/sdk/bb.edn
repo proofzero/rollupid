@@ -28,8 +28,11 @@
   {:doc "Print out the package.json version"
    :task (println version)}
 
-  ;; Compare the dependencies in parent package.json and local package.json
-  ;; For any deps that intersect, make sure they have the same version
+  ;; Compare the dependencies in parent package.json and local
+  ;; package.json For any deps that intersect, make sure they have the
+  ;; same version. Note that this only detects the error when the
+  ;; necessary dependencies are present in both files; if a dependency
+  ;; is missing we can't currently detect that.
   package:check
   {:doc "Check for package.json version discrepancies"
    :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
