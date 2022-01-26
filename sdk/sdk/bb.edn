@@ -18,7 +18,7 @@
     (cp/add-classpath "../bb")
     (require '[com.kubelt.build :as kb])
     ;; Extract version from package.json.
-    (def version (kb/package-version "package.json"))
+    (def version (kb/release-version "package.json" *command-line-args*))
     ;; Get the path to the SDK root.
     (def sdk-root (str (fs/canonicalize ".."))))
   ;;:enter
@@ -27,6 +27,10 @@
   package:version
   {:doc "Print out the package.json version"
    :task (println version)}
+  
+  package:options
+  {:doc "Print out the options"
+   :task (println (kb/parse-options *command-line-args*))}
 
   ;; Compare the dependencies in parent package.json and local
   ;; package.json For any deps that intersect, make sure they have the
@@ -72,10 +76,6 @@
            (if-not pack-file
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
-
-  publish:all
-  {:doc "Publish all the SDK targets"
-   :depends [publish:js]}
 
   ;; These tests require the SDK from JavaScript and exercise the
   ;; JavaScript version of the API.
@@ -165,3 +165,14 @@
    (do
      (println "not yet implemented")
      (System/exit 1))}}}
+
+;; All
+
+  publish:rc
+  {:doc "Publish release candidate"
+   :depends [publish:js]}
+
+  publish:all
+  {:doc "Publish all the SDK targets"
+   :depends [publish:js]}
+

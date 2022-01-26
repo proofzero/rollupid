@@ -5,7 +5,8 @@
    [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.set :as cs]
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [clojure.tools.cli :as cli]))
 
 (defn get-env
   "Return an environment variable value."
@@ -91,3 +92,22 @@
           ;; Store the updated dependencies in the project map.
           project-map (assoc project-map :dependencies dependencies)]
       (make-project project-map))))
+
+(def cli-options
+  [["-r" "--release-candidate Git hash" "Git hash"
+    :default nil]
+   ["-h" "--help"]])
+
+(defn parse-options [args] (:options (cli/parse-opts args cli-options)))
+
+(defn use-version 
+  "Generate a release candidate or release version"
+  [version opts]
+  (if-let [rc (get opts :release-candidate)]
+          (str version "-rc-" rc)
+          version))
+
+(defn release-version 
+  [package-file, cli-opts-args] 
+  (use-version (package-version package-file) (parse-options cli-opts-args)))
+
