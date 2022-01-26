@@ -68,3 +68,10 @@
            (if-not pack-file
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}}}
+
+;; ALL
+
+  publish:all
+  {:doc "Publish all the DDT targets"
+   :depends [publish:js]}
+

@@ -79,3 +79,10 @@
    :task (let [image-tag (str/join ":" ["kubelt-p2p" version])
                command (str/join " " ["docker" "build" "-t" image-tag "."])]
            (shell command))}}}
+
+;; ALL
+
+  publish:all
+  {:doc "Publish all the p2p targets."
+   :depends [publish:js]}
+
