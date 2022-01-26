@@ -12,6 +12,9 @@ deps.edn
 # Node-based tests
 test/
 
+# JAR builds
+target/
+
 # npm packages
 *.tgz
 
