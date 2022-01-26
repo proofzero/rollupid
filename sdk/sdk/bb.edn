@@ -8,6 +8,7 @@
    [babashka.process :as bpr]
    [clojure.edn :as edn]
    [clojure.java.io :as io]
+   [clojure.set :as cs]
    [clojure.string :as str]]
   :init
   ;; TODO version increment during releases
@@ -27,12 +28,24 @@
   {:doc "Print out the package.json version"
    :task (println version)}
 
+  ;; Compare the dependencies in parent package.json and local package.json
+  ;; For any deps that intersect, make sure they have the same version
+  package:check
+  {:doc "Check for package.json version discrepancies"
+   :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
+               pkg-local (str (fs/file "." "package.json"))
+               mismatches (kb/package-mismatches pkg-parent pkg-local)]
+           (when (not (empty? mismatches))
+             (throw (ex-info "mismatched versions" mismatches))))}
+
   build:js:develop
   {:doc "Build a development JavaScript version of the SDK"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs compile sdk")}
 
   build:js:release
   {:doc "Build a release JavaScript version of the SDK"
+   :depends [package:check]
    :task (shell {:dir sdk-root} "npx shadow-cljs release sdk")}
 
   pack:js

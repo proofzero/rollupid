@@ -4,6 +4,7 @@
    [cheshire.core :as json]
    [clojure.edn :as edn]
    [clojure.java.io :as io]
+   [clojure.set :as cs]
    [clojure.string :as str]))
 
 (defn get-env
@@ -11,13 +12,47 @@
   [s]
   (System/getenv s))
 
+(defn package-read
+  "Return a package.json file as a map."
+  [file-name]
+  (let [pkg-reader (io/reader file-name)]
+    (json/parse-stream pkg-reader)))
+
 (defn package-version
   "Extract and return the version attribute from a package.json file."
   [file-name]
-  (let [pkg-reader (io/reader file-name)
-        pkg-map (json/parse-stream pkg-reader)
-        version (get pkg-map "version" "")]
-    version))
+  (let [pkg-map (package-read file-name)]
+    (get pkg-map "version" "")))
+
+(defn package-common-versions
+  "Given paths to two package.json file, return a map of the common
+  dependencies to the versions in each file."
+  [a-file b-file]
+  (let [map-a (package-read a-file)
+        dep-a (get map-a "dependencies")
+        set-a (set (keys dep-a))
+
+        map-b (package-read b-file)
+        dep-b (get map-b "dependencies")
+        set-b (set (keys dep-b))
+
+        in-both (cs/intersection set-a set-b)]
+    (letfn [(reduce-fn [m dep-name]
+              (let [a-version (get-in map-a ["dependencies" dep-name])
+                    b-version (get-in map-b ["dependencies" dep-name])]
+                (assoc m dep-name [a-version b-version])))]
+      (reduce reduce-fn {} in-both))))
+
+(defn package-mismatches
+  "Return a map of dependencies common to the two given package.json files
+  where the versions don't match."
+  [a-file b-file]
+  (let [versions (package-common-versions a-file b-file)
+        match? (fn [m k [a b]]
+                 (if (not= a b)
+                   (assoc m k [a b])
+                   m))]
+    (reduce-kv match? {} versions)))
 
 (defn shadow->lein
   "Convert a shadow-cljs.edn file into a Leiningen project.clj file. This
