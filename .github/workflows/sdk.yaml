@@ -75,7 +75,7 @@ jobs:
         with:
           version: '0.7.4'
       - name: Run ${{ matrix.target }} develop build
-        run: bb run build:develop
+        run: bb run build:release
         working-directory: sdk/${{ matrix.package }}
 
   # Merge / Deploy
@@ -109,6 +109,6 @@ jobs:
         with:
           version: '0.7.4'
       - name: Run ${{ matrix.target }} develop release
-        run: bb run publish:develop
+        run: bb run publish:release
         working-directory: sdk/${{ matrix.package }}
 

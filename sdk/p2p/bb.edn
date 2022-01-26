@@ -73,6 +73,10 @@
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}
 
+  publish
+  {:doc "Publish all the p2p targets."
+   :depends [publish:js]}
+
   docker:build
   {:doc "Build a docker image containing the application"
    :depends [build:release]
