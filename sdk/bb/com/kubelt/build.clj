@@ -93,6 +93,7 @@
           project-map (assoc project-map :dependencies dependencies)]
       (make-project project-map))))
 
+;; TODO: put CLI in it's own namespace
 (def cli-options
   [["-r" "--release-candidate Git hash" "Git hash"
     :default nil]

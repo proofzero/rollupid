@@ -65,6 +65,8 @@
              (throw (ex-info "missing npm package.tgz")))
            (shell "npm publish" pack-file))}}}
 
+;; ALL
+
   publish:all
   {:doc "Publish all task for convenience"
    :depends [publish:web]}

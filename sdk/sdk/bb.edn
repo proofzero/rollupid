@@ -168,11 +168,7 @@
 
 ;; All
 
-  publish:rc
-  {:doc "Publish release candidate"
-   :depends [publish:js]}
-
   publish:all
   {:doc "Publish all the SDK targets"
-   :depends [publish:js]}
+   :depends [publish:js, publish:cljs]}
 
