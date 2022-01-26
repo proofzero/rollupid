@@ -164,7 +164,7 @@
    :task
    (do
      (println "not yet implemented")
-     (System/exit 1))}}}
+     (System/exit 1))}}})
 
 ;; All
 
