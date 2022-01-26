@@ -67,6 +67,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: sdk/${{ matrix.package }}/package-lock.json
       - run: npm install
+        working-directory: sdk/${{ matrix.package }}
 
       - name: Babashka ${{ matrix.target }}
         uses: just-sultanov/setup-babashka@v2
