@@ -16,9 +16,10 @@
   (do
     ;; Add shared build code to classpath.
     (cp/add-classpath "../bb")
-    (require '[com.kubelt.build :as kb])
+    (require '[com.kubelt.cli :as cli])
+    (require '[com.kubelt.package :as package])
     ;; Extract version from package.json.
-    (def version (kb/package-version "package.json"))
+    (def version (cli/release-version "package.json" *command-line-args*))
     ;; Get the path to the SDK root.
     (def sdk-root (str (fs/canonicalize ".."))))
   ;;:enter
@@ -33,7 +34,7 @@
   {:doc "Check for package.json version discrepancies"
    :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
                pkg-local (str (fs/file "." "package.json"))
-               mismatches (kb/package-mismatches pkg-parent pkg-local)]
+               mismatches (package/mismatches pkg-parent pkg-local)]
            (when (not (empty? mismatches))
              (throw (ex-info "mismatched versions" mismatches))))}
 
@@ -70,4 +71,3 @@
   publish:all
   {:doc "Publish all task for convenience"
    :depends [publish:web]}}}
-
