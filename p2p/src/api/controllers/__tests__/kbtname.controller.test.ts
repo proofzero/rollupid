@@ -57,7 +57,17 @@ describe("kbt Controller", () => {
 
 
 	it("should get kbt name by kbtid", async () => {
-		const res = await request(app).get("/kbt/052k5eDIiFXfWOTk0M_iM6npF_WhKKeP1RcBGO3ghkY=");
+		const res = await request(app).get("/kbt/" + payload.kbtname);
 		expect(res.status).toEqual(200);
 	});
+
+	// test no security route
+	it("should update kbt key/value ", async () => {
+		const res = await request(app).post('/updatekbtnosec')
+			.send({kbtname: payload.kbtname, endpoint: payload.endpoint })
+		//console.log(res.body);
+		expect(res.status).toEqual(200);
+	});
+
+
 });
