@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "main": "lib/ddt.js",
   "bin": {
-    "ddt": "./index.js"
+    "ddt": "./lib/ddt.js"
   },
   "directories": {
     "lib": "lib",
