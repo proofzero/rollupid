@@ -2,7 +2,7 @@
   "Invoke the path > log method to return the system configuration path."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.sdk.impl.path :as path]))
+   [com.kubelt.lib.path :as path]))
 
 (defonce command
   {:command "log"

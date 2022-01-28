@@ -2,7 +2,7 @@
   "Invoke the SDK (init) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.misc.kdf :as kdf]))
+   [com.kubelt.lib.kdf :as kdf]))
 
 (defonce command
   {:command "kdf"

@@ -2,8 +2,8 @@
   "Invoke the JWT (sign) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.impl.jwt :as jwt]))
+   [com.kubelt.lib.jwt :as jwt]
+   [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
   {:command "sign"

@@ -5,7 +5,7 @@
    ["fs" :as fs]
    ["path" :as path])
   #_(:require
-   [com.kubelt.sdk.car.rdf :as car.rdf]))
+     [com.kubelt.lib.car.rdf :as car.rdf]))
 
 (defonce command
   {:command "vocab <rdf-file>"

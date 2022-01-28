@@ -8,7 +8,7 @@
    [clojure.pprint :refer [pprint]]
    [fipp.edn :as pp])
   (:require
-   [com.kubelt.sdk.impl.rdf.json-ld :as rdf.json-ld]
+   [com.kubelt.lib.rdf.json-ld :as rdf.json-ld]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command

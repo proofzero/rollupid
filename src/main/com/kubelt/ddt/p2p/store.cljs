@@ -7,7 +7,7 @@
    [cljs.core.async :refer [<!]])
   (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
-   [com.kubelt.sdk.impl.p2p :as p2p]
+   [com.kubelt.lib.p2p :as p2p]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
