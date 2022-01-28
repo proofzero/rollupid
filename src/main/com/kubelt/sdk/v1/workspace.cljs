@@ -1,6 +1,6 @@
 (ns com.kubelt.sdk.v1.workspace
   "Defines the API for Kubelt workspaces."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 
 (defn available

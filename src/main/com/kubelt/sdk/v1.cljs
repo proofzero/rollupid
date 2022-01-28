@@ -1,14 +1,14 @@
 (ns com.kubelt.sdk.v1
   "Defines the interface of the Kubelt SDK, v1."
-  {:copyright "©2021 Kubelt, Inc" :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc" :license "UNLICENSED"}
   (:require
    [malli.core :as m]
    [malli.error :as me])
   (:require
    [com.kubelt.sdk.spec.config :as spec.config]
-   [com.kubelt.sdk.impl.config :as impl.config]
-   [com.kubelt.sdk.impl.promise :as impl.promise :refer [promise promise?]]
-   [com.kubelt.sdk.impl.init :as impl.init]))
+   [com.kubelt.lib.config :as impl.config]
+   [com.kubelt.lib.promise :as impl.promise :refer [promise promise?]]
+   [com.kubelt.lib.init :as impl.init]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
