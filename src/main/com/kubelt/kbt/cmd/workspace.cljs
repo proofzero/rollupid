@@ -1,8 +1,8 @@
-(ns com.kubelt.cli.cmd.workspace
+(ns com.kubelt.kbt.cmd.workspace
   "Sets up the CLI 'workspace' command group."
-  {:author "Kubelt Inc." :copyright 2021 :license "UNLICENSED"}
+  {:copyright "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.cli.cmd.workspace.list :as workspace.list]))
+   [com.kubelt.kbt.cmd.workspace.list :as workspace.list]))
 
 
 (defonce command

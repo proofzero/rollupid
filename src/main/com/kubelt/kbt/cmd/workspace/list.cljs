@@ -1,10 +1,9 @@
-(ns com.kubelt.cli.cmd.workspace.list
+(ns com.kubelt.kbt.cmd.workspace.list
   "Define the CLI 'workspace list' command. This command lists the
   available workspaces."
-  {:author "Kubelt Inc." :copyright 2021 :license "UNLICENSED"}
+  {:copyright "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
   (:require
-   ;; TODO require SDK
-   ))
+   [com.kubelt.sdk.v1 :as sdk.v1]))
 
 
 (defonce command

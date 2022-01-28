@@ -1,13 +1,13 @@
-(ns com.kubelt.cli
+(ns com.kubelt.kbt
   "The entry-point for the Kubelt CLI tool."
-  {:author "Kubelt Inc." :copyright "2021" :license "UNLICENSED"}
+  {:author "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
-   [com.kubelt.cli.cmd.workspace :as cmd.workspace]))
+   [com.kubelt.kbt.cmd.workspace :as cmd.workspace]))
 
 ;; NB: when you encounter an error like:
 ;;   "Cannot infer target type in expression"
@@ -23,7 +23,7 @@
 ;; -----------------------------------------------------------------------------
 
 (def copyright-year
-  2021)
+  2022)
 
 (def copyright-author
   "Kubelt Inc.")

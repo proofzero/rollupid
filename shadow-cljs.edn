@@ -130,7 +130,7 @@
 
   :kbt
   {:target :node-script
-   :main com.kubelt.cli/main
+   :main com.kubelt.kbt/main
    :compiler-options {:optimizations :simple
                       :infer-externs :auto
                       :output-feature-set :es-next}
