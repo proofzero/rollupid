@@ -37,7 +37,12 @@
    :task (prn (cli/parse-options *command-line-args*))}
 
   timestamp:iso-date
-  (println (time/iso-date))
+  {:doc "Print out the date in ISO format"
+   :task (println (time/iso-date))}
+
+  cmd:example
+  {:doc "Invoke Clojure build script via shadow-cljs."
+   :task (shell "npx shadow-cljs run build.command/example")},
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------
@@ -48,4 +53,100 @@
 
   ;; TODO generate $HOME/.npmrc configuration
 
-  }}
+  lint:init
+  {:doc "Initialize the linter"
+   :task (do
+           ;; Create the .clj-kondo directory if it doesn't exist.
+           (let [kondo-dir ".clj-kondo"]
+             (if-not (fs/directory? kondo-dir)
+               (fs/create-dir kondo-dir)))
+           ;; Pre-populate linter directory with analysis results.
+           (let [args ["-M:kondo" "--parallel" "--dependencies" "--copy-configs" "--lint" "src/"]
+                 command (str/join " " args)]
+             (clojure command)))}
+
+  lint:dev
+  {:doc ""
+   :task (let [dir "src/dev"]
+           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+
+  lint:main
+  {:doc ""
+   :task (let [dir "src/main"]
+           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+
+  lint:test
+  {:doc ""
+   :task (let [dir "src/test"]
+           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+
+  lint:all
+  {:doc ""
+   :task (let [dir "src/all"]
+           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+
+  build:ddt:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile ddt")}
+
+  build:ddt:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release ddt")}
+
+  build:kbt:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile kbt")}
+
+  build:kbt:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release kbt")}
+
+  build:p2p:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile p2p")}
+
+  build:p2p:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release p2p")}
+
+  build:sdk:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile sdk")}
+
+  build:sdk:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release sdk")}
+
+  build:web:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile web")}
+
+  build:web:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release web")}
+
+  test:sdk:cljs:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile sdk-test")}
+
+  test:sdk:cljs:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release sdk-test")}
+
+  test:sdk:js:develop
+  {:doc ""
+   :depends [build:sdk:develop]
+   :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
+
+  test:sdk:js:release
+  {:doc ""
+   :depends [build:sdk:release]
+   :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
+
+  test:web:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile web-test")}
+
+  test:web:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release web-test")}}}
