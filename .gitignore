@@ -170,6 +170,7 @@ project.clj
 
 # clj-kondo cache
 /.clj-kondo/.cache
+.clj-kondo
 
 # build cache
 .cpcache
