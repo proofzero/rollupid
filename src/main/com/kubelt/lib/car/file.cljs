@@ -12,7 +12,7 @@
    [com.kubelt.lib.bag.check :as bag.check]
    [com.kubelt.lib.car.build :as car.build]
    [com.kubelt.lib.promise :as promise]
-   [com.kubelt.sdk.proto.bag-io :as bag-io]))
+   [com.kubelt.proto.bag-io :as bag-io]))
 
 ;; Internal
 ;; -----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.proto.key
+(ns com.kubelt.proto.key
   "Protocol for various types of keys."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 

@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.proto.wallet
+(ns com.kubelt.proto.wallet
   "A protocol for dealing with "
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 

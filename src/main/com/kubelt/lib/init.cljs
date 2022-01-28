@@ -12,7 +12,7 @@
    [com.kubelt.lib.http.node :as http.node]
    [com.kubelt.lib.multiaddr :as multiaddr]
    [com.kubelt.lib.util :as util]
-   [com.kubelt.sdk.proto.http :as proto.http]))
+   [com.kubelt.proto.http :as proto.http]))
 
 ;; System
 ;; -----------------------------------------------------------------------------

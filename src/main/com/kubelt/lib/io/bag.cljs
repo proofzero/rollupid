@@ -2,7 +2,7 @@
   "Implementations of the BagReader and BagWriter protocols."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.sdk.proto.bag-io :as bag-io]))
+   [com.kubelt.proto.bag-io :as bag-io]))
 
 ;; CAR File
 ;; -----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
   "Do stuff with Content ARchives."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.sdk.proto.bag-io :as bag-io]
+   [com.kubelt.proto.bag-io :as bag-io]
    [com.kubelt.lib.car.file :as car.file]
    [com.kubelt.lib.bag.check :as bag.check]))
 

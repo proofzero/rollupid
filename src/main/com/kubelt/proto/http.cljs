@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.proto.http
+(ns com.kubelt.proto.http
   "A protocol for making HTTP requests."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 

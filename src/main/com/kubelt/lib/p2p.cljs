@@ -10,7 +10,7 @@
   (:require
    [com.kubelt.lib.multiaddr :as ma]
    [com.kubelt.lib.jwt :as jwt]
-   [com.kubelt.sdk.proto.http :as http]))
+   [com.kubelt.proto.http :as http]))
 
 (defn register!
   "Register an account, performing any initial setup that is required. The

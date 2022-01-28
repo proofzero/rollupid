@@ -4,7 +4,7 @@
    ["crypto" :as crypto :refer [KeyObject]])
   (:require
    [com.kubelt.lib.util :as util]
-   [com.kubelt.sdk.proto.key :as proto.key]))
+   [com.kubelt.proto.key :as proto.key]))
 
 ;; SymmetricKey
 ;; -----------------------------------------------------------------------------

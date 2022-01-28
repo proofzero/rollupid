@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.proto.bag-io
+(ns com.kubelt.proto.bag-io
   "A protocol for reading and writing BAGs."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
