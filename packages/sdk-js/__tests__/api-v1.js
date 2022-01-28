@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const tap = require('tap');
-const kbt = require('../index.js');
+const kbt = require('../');
 
 // Called before every subsequent descendent test.
 /*

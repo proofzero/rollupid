@@ -84,7 +84,7 @@
                       :optimizations :advanced
                       :infer-externs :true
                       :output-feature-set :es-next}
-   :output-to "packages/sdk/lib/sdk.js"}
+   :output-to "packages/sdk-js/lib/sdk.js"}
 
   :sdk-test
   {:target :node-test
