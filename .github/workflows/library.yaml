@@ -31,8 +31,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@master
-      
-      # Could use node matrix too https://github.com/marketplace/actions/setup-node-js-environment#matrix-testing
       - name: Source Builds
         uses: actions/setup-node@v2
         with:
@@ -55,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Build & Test ${{ matrix.target }}
+      - name: Build & Test
         uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -78,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Build & Test ${{ matrix.target }}
+      - name: Build & Test
         uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -93,27 +91,3 @@ jobs:
       - name: Publish Next
         run: npx lerna publish --dist-tag next
 
-  # Bump on tag
-  #-----------------------------------------------------------------------------
-  next:
-    needs: changes
-    if: >
-      github.event_name != 'pull_request'
-      && needs.changes.outputs.packages != '[]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build & Test ${{ matrix.target }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - name: Install
-        run: npm install
-      - name: Tests
-        run: npx lerna run test
-      - name: Build
-        run: npx lerna run build
-      - name: Publish Next
-        run: npx lerna publish --dist-tag next
