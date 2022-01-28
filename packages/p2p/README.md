@@ -2,6 +2,14 @@
 
 > TODO: description
 
+## Install
+
+Ensure that the `libsystemd-dev` dependency is installed:
+
+```
+$ apt-get install libsystemd-dev
+```
+
 ## Usage
 
 ```
