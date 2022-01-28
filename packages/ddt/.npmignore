@@ -1,4 +1,4 @@
-# sdk/ddt/.npmignore
+# packages/ddt/.npmignore
 
-# Local scripts
-/bin
+# Babashka tasks
+bb.edn

@@ -1,4 +1,4 @@
 # packages/sdk/.gitignore
 
 # Compiled application.
-lib/sdk.js
+/lib

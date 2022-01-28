@@ -96,7 +96,7 @@
   ;; compiled for use in the browser.
   :web
   {:target :browser
-   :output-dir "target/web"
+   :output-dir "packages/web/lib"
    :asset-path "/js"
    :modules {:base {:entries [com.kubelt.sdk]
                     :init-fn com.kubelt.sdk/web-v1}}

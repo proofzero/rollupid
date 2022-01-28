@@ -1,4 +1,4 @@
 # packages/kbt/.gitignore
 
 # Compiled application
-lib/kbt.js
+/lib

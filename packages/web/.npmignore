@@ -1,0 +1,4 @@
+# packages/web/.npmignore
+
+# Babashka tasks
+bb.edn

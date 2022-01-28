@@ -1,4 +1,4 @@
 # packages/ddt/.gitignore
 
 # Compiled application.
-lib/ddt.js
+/lib
