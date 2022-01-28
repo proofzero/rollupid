@@ -1,0 +1,40 @@
+{
+  "name": "@kubelt/p2p",
+  "version": "0.0.0",
+  "description": "Kubelt p2p",
+  "author": "Kubelt, Inc.",
+  "homepage": "https://github.com/kubelt/kubelt#readme",
+  "license": "Apache-2.0",
+  "main": "lib/p2p.js",
+  "bin": {
+    "p2p": "./lib/p2p.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kubelt/kubelt.git"
+  },
+  "scripts": {
+    "build": "bb run build:release",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/kubelt/kubelt/issues"
+  },
+  "dependencies": {
+    "hyperbee": "1.7.0",
+    "hypercore": "9.12.0",
+    "sd-notify": "2.8.0",
+    "yargs": "17.3.1"
+  }
+}

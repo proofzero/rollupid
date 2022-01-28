@@ -1,0 +1,33 @@
+---
+name: release
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  # Publish and release
+  #-----------------------------------------------------------------------------
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Build & Test
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - name: Install
+        run: npm install
+      - name: Tests
+        run: npx lerna run test
+      - name: Build
+        run: npx lerna run build
+      - name: Get tag
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - name: Release
+        run: npx lerna version ${{ env.RELEASE_VERSION }} 
+      - name: Publish Next
+        run: npx lerna publish
+

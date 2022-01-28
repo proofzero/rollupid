@@ -29,7 +29,7 @@
 
  :dependencies
  [;; Immutable in-memory database and Datalog query engine
-  [datascript "1.3.5"]
+  [datascript "1.3.7"]
   ;; Render CSS in Clojure and ClojureScript
   [garden "1.3.10"]
   ;; Fast HTML generation from Clojure data

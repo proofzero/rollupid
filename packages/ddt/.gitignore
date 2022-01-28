@@ -1,0 +1,4 @@
+# packages/ddt/.gitignore
+
+# Compiled application.
+/lib

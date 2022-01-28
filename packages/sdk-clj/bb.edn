@@ -1,0 +1,104 @@
+;; packages/sdk-clj/bb.edn
+{:paths []
+ :deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
+ :min-bb "0.7.0"
+ :tasks
+ {:requires
+  [[babashka.classpath :as cp]
+   [babashka.fs :as fs]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.set :as cs]
+   [clojure.string :as str]]
+  :init
+  (do
+    ;; Get the path to the SDK root.
+    (def sdk-root (str (fs/canonicalize (fs/path ".." ".."))))
+    ;; Add shared build code to classpath.
+    (cp/add-classpath (str (fs/path sdk-root "bb")))
+    (require '[com.kubelt.cli :as cli])
+    (require '[com.kubelt.environ :as environ])
+    (require '[com.kubelt.package :as package])
+    (require '[com.kubelt.semver :as semver])
+    (require '[com.kubelt.shadow :as shadow])
+    (require '[com.kubelt.time :as time])
+    ;; Extract version from package.json.
+    (def version (cli/release-version "package.json" *command-line-args*)))
+
+  ;; Tasks
+  ;; ---------------------------------------------------------------------------
+
+  ;; Compare the dependencies in parent package.json and local
+  ;; package.json For any deps that intersect, make sure they have the
+  ;; same version. Note that this only detects the error when the
+  ;; necessary dependencies are present in both files; if a dependency
+  ;; is missing we can't currently detect that.
+  package:check
+  {:doc "Check for package.json version discrepancies"
+   :task (let [pkg-parent (str (fs/file sdk-root "package.json"))
+               pkg-local (str (fs/file "." "package.json"))
+               mismatches (package/mismatches pkg-parent pkg-local)]
+           (when (not (empty? mismatches))
+             (throw (ex-info "mismatched versions" mismatches))))}
+
+  ;; Using uberdeps to generate the JAR from a generated deps.edn
+  ;; includes Clojure class files, which aren't needed to distribute a
+  ;; CLJS library. Try another jar packing tool; in the interim we
+  ;; generate a project.clj and rely on lein.
+  generate:clj:deps
+  {:doc "Generate a deps.edn from shadow-cljs.edn"
+   :task
+   (letfn [(to-deps-edn [[k v]]
+             [k {:mvn/version v}])]
+     (let [shadow-path (str (fs/path sdk-root "shadow-cljs.edn"))
+           output-path (str (fs/path sdk-root "deps.edn"))
+           ;; Extract dependencies from shadow-cljs.edn
+           shadow-reader (java.io.PushbackReader. (io/reader shadow-path))
+           shadow-map (edn/read shadow-reader)
+           deps-vec (get shadow-map :dependencies [])
+           deps-map (into {} (map to-deps-edn deps-vec))
+           ;; Build a deps.edn file
+           deps-edn {:paths ["src/main"]
+                     :dependencies deps-map}]
+       (spit output-path (pr-str deps-edn))))}
+
+  ;; This is pretty gross. Prefer the deps.edn-based solution once we
+  ;; figure out how to generate a JAR with no Clojure dependencies.
+  generate:clj:project
+  {:doc "Generate a project.clj from shadow-cljs.edn"
+   :task
+   (let [project-map
+         {:name :com.kubelt/sdk
+          :version version
+          :description "Kubelt SDK"
+          :url "https://github.com/kubelt/kubelt"
+          :source-paths ["src/main"]
+          :repositories [["github" {:url "https://maven.pkg.github.com/kubelt/kubelt"
+                                    :creds :gpg}]]}
+         shadow-path (str (fs/path sdk-root "shadow-cljs.edn"))
+         output-path (str (fs/path "project.clj"))
+         ;; The Leiningen project.clj file as a string.
+         project-clj (shadow/shadow->lein project-map shadow-path)]
+     (spit output-path project-clj))}
+
+  pack:clj:deps
+  {:doc "Generate a Clojure JAR file using Uberdeps"
+   :depends [generate:clj:deps]
+   :task
+   (let [deps-file (str (fs/path sdk-root "deps.edn"))
+         output-file "target/sdk-0.0.0.jar"
+         parts ["-M" "-m" "uberdeps.uberjar" "--deps-file" deps-file "--target" output-file]
+         command (str/join " " parts)]
+     (clojure command))}
+
+  pack:clj:project
+  {:doc "Generate a Clojure JAR file using Leiningen"
+   :depends [generate:clj:project]
+   :task
+   (let [project-file (str (fs/path "project.clj"))]
+     (shell "lein jar"))}
+
+  publish:clj
+  {:doc "Publish the SDK as a Clojure package"
+   :depends [pack:clj:project #_pack:clj:deps]
+   :task (shell "lein deploy github")}}}

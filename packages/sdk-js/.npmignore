@@ -1,0 +1,4 @@
+# packages/sdk-js/.npmignore
+
+# Babashka tasks
+bb.edn

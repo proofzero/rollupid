@@ -1,0 +1,4 @@
+# packages/kbt/.gitignore
+
+# Compiled application
+/lib

@@ -1,7 +1,0 @@
-# sdk/p2p/.gitignore
-
-# Hypercore local storage
-/p2p-dataset
-
-# Compiled application
-index.js

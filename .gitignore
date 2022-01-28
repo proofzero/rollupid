@@ -94,6 +94,9 @@ web_modules/
 .rts2_cache_es/
 .rts2_cache_umd/
 
+# shadow-cljs cache
+/.shadow-cljs/
+
 # Optional REPL history
 .node_repl_history
 
@@ -156,3 +159,27 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Leiningen
+/.lein-*
+/.nrepl-port
+# We use the leiningen project file only to aid in packing up a CLJS
+# library (as a JAR). The project.clj is generated from shadow-cljs.edn
+# so no need to check it in.
+project.clj
+
+# clj-kondo cache
+/.clj-kondo/.cache
+.clj-kondo
+
+# build cache
+.cpcache
+
+# CAR files
+*.car
+
+# Build output
+/target/
+
+# p2p data files
+/p2p-dataset/
