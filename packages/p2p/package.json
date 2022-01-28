@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "main": "lib/p2p.js",
   "bin": {
-    "p2p": "./index.js"
+    "p2p": "./lib/p2p.js"
   },
   "directories": {
     "lib": "lib",
