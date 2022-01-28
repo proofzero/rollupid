@@ -1,6 +1,7 @@
 (ns com.kubelt.cli
   (:require
-   [clojure.tools.cli :as cli])
+   [clojure.tools.cli :as cli]
+   [clojure.string :as str])
   (:require
    [com.kubelt.package :as package]
    [com.kubelt.semver :as semver]))
@@ -40,18 +41,20 @@
   -rcN. If the options map has a :revision key, the corresponding value
   is appended to the version string as-is."
   [version opts]
-  (let [version-map
-        (cond
-          (contains? opts :release-candidate)
-          (let [rc (get opts :release-candidate)]
-            (-> version semver/parse (semver/release-candidate rc)))
+  (if (str/blank? version)
+    version
+    (let [version-map
+          (cond
+            (contains? opts :release-candidate)
+            (let [rc (get opts :release-candidate)]
+              (-> version semver/parse (semver/release-candidate rc)))
 
-          (contains? opts :revision)
-          (let [rev (get opts :revision)]
-            (-> version semver/parse (semver/revision rev)))
+            (contains? opts :revision)
+            (let [rev (get opts :revision)]
+              (-> version semver/parse (semver/revision rev)))
 
-          :else (semver/parse version))]
-    (semver/to-str version-map)))
+            :else (semver/parse version))]
+      (semver/to-str version-map))))
 
 (defn release-version
   "Extract version"

@@ -6,15 +6,17 @@
 (defn parse
   "Parse a semantic version string into a map."
   [s]
-  (let [[major minor patch & rev] (str/split s #"\.|-")
-        major (Integer/parseInt major)
-        minor (Integer/parseInt minor)
-        patch (Integer/parseInt patch)
-        rev-map (if rev {:revision (str/join "" rev)} {})]
-    (merge {:major major
-            :minor minor
-            :patch patch}
-           rev-map)))
+  (if (str/blank? s)
+    {}
+    (let [[major minor patch & rev] (str/split s #"\.|-")
+          major (Integer/parseInt major)
+          minor (Integer/parseInt minor)
+          patch (Integer/parseInt patch)
+          rev-map (if rev {:revision (str/join "" rev)} {})]
+      (merge {:major major
+              :minor minor
+              :patch patch}
+             rev-map))))
 
 (defn major
   "Increment the major version."
@@ -48,7 +50,9 @@
 
 (defn to-str
   [{:keys [major minor patch revision] :as m}]
-  (let [prefix (str/join "." [major minor patch])]
-    (if revision
-      (str/join "-" [prefix revision])
-      prefix)))
+  (if (empty? m)
+    ""
+    (let [prefix (str/join "." [major minor patch])]
+      (if revision
+        (str/join "-" [prefix revision])
+        prefix))))
