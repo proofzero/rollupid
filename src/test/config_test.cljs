@@ -6,8 +6,8 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.sdk.spec.config :as spec.config]
-   [com.kubelt.sdk.impl.config :as config]))
+   [com.kubelt.spec.config :as spec.config]
+   [com.kubelt.lib.config :as config]))
 
 (deftest config-test
   (testing "default config is valid"

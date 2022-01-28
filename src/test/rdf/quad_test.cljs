@@ -6,7 +6,7 @@
    ["rdf-data-factory" :refer
     [Quad]])
   (:require
-   [com.kubelt.sdk.impl.rdf.quad :as rdf.quad]))
+   [com.kubelt.lib.rdf.quad :as rdf.quad]))
 
 ;; TODO rename to reflect namespace where RDF store quads are
 ;; implemented.

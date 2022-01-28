@@ -7,11 +7,11 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.sdk.impl.bag :as bag]
-   [com.kubelt.sdk.impl.bag.dag :as bag.dag]
-   [com.kubelt.sdk.impl.bag.node :as bag.node]
-   [com.kubelt.sdk.impl.ipld :as ipld]
-   [com.kubelt.sdk.spec.bag :as spec.bag]))
+   [com.kubelt.lib.bag :as bag]
+   [com.kubelt.lib.bag.dag :as bag.dag]
+   [com.kubelt.lib.bag.node :as bag.node]
+   [com.kubelt.lib.ipld :as ipld]
+   [com.kubelt.spec.bag :as spec.bag]))
 
 (deftest make-bag-test
   (testing "with defaults"

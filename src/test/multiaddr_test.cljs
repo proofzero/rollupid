@@ -6,7 +6,7 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.sdk.impl.multiaddr :as multiaddr]))
+   [com.kubelt.lib.multiaddr :as multiaddr]))
 
 (deftest vec->multiaddr-str-test
   (testing "convert valid vector"

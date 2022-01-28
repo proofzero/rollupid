@@ -1,7 +1,7 @@
 (ns rdf.data-factory-test
   "Test the conversion of RDF/js data factory instances into RDF/cljs data
   values."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    ["rdf-data-factory" :refer
     [DataFactory
@@ -13,13 +13,13 @@
      Variable
      Quad]])
   (:require
-   [clojure.string :as str]
-   [cljs.test :as t :refer [deftest is testing use-fixtures]])
+   [cljs.test :as t :refer [deftest is testing use-fixtures]]
+   [clojure.string :as str])
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.sdk.spec.quad :as spec.quad]
-   [com.kubelt.sdk.impl.rdf.data-factory :as rdf.df]))
+   [com.kubelt.lib.rdf.data-factory :as rdf.df]
+   [com.kubelt.spec.quad :as spec.quad]))
 
 ;; Data
 ;; -----------------------------------------------------------------------------

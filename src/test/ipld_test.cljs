@@ -4,7 +4,7 @@
    [cljs.test :as t :refer [deftest is testing use-fixtures]]
    [clojure.string :as str])
   (:require
-   [com.kubelt.sdk.impl.ipld :as ipld]))
+   [com.kubelt.lib.ipld :as ipld]))
 
 
 (deftest codec-test

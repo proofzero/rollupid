@@ -6,8 +6,8 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.sdk.impl.key.node :as key]
-   [com.kubelt.sdk.proto.key :as proto.key]))
+   [com.kubelt.lib.key.node :as key]
+   [com.kubelt.proto.key :as proto.key]))
 
 ;; utilities
 ;; -----------------------------------------------------------------------------

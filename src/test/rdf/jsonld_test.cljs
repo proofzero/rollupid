@@ -6,8 +6,8 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.sdk.spec.quad :as spec.quad]
-   [com.kubelt.sdk.impl.rdf.json-ld :as rdf.json-ld]))
+   [com.kubelt.lib.rdf.json-ld :as rdf.json-ld]
+   [com.kubelt.spec.quad :as spec.quad]))
 
 ;; Utilities
 ;; -----------------------------------------------------------------------------
