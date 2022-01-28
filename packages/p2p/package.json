@@ -25,6 +25,7 @@
     "url": "git+ssh://git@github.com/kubelt/kubelt.git"
   },
   "scripts": {
+    "build": "bb run build:release",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "bugs": {

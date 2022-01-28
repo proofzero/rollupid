@@ -2,5 +2,12 @@
   "packages": [
     "packages/*"
   ],
-  "version": "0.0.0"
+  "version": "0.0.0",
+  "command": {
+    "publish": {
+      "ignoreChanges": [],
+      "message": "chore(release): publish",
+      "registry": "https://npm.pkg.github.com"
+    }
+  }
 }
