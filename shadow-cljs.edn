@@ -96,7 +96,7 @@
   ;; compiled for use in the browser.
   :web
   {:target :browser
-   :output-dir "web/web"
+   :output-dir "target/web"
    :asset-path "/js"
    :modules {:base {:entries [com.kubelt.sdk]
                     :init-fn com.kubelt.sdk/web-v1}}
@@ -105,7 +105,7 @@
 
   :web-test
   {:target :browser-test
-   :test-dir "web/web-test"
+   :test-dir "target/web-test"
    :ns-regexp "-test$"}
 
   :p2p
