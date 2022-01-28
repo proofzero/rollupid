@@ -23,7 +23,8 @@
   },
   "scripts": {
     "build": "bb run build:release",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "nft": "echo \"Error: impl non functional tests \" && exit 1"
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
