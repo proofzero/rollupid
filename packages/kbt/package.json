@@ -9,7 +9,7 @@
     "ipfs",
     "metadata"
   ],
-  "author": "Adrian Maurer <adrianmaurer+github@fastmail.com>",
+  "author": "Kubelt Inc.",
   "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
   "main": "lib/kbt.js",
@@ -21,7 +21,8 @@
     "lib"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",

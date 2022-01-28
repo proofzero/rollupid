@@ -94,6 +94,9 @@ web_modules/
 .rts2_cache_es/
 .rts2_cache_umd/
 
+# shadow-cljs cache
+/.shadow-cljs/
+
 # Optional REPL history
 .node_repl_history
 
@@ -156,3 +159,16 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Leiningen
+/.lein-*
+/.nrepl-port
+
+# clj-kondo cache
+/.clj-kondo/.cache
+
+# CAR files
+*.car
+
+# Build output
+/target/

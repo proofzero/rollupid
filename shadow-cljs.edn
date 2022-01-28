@@ -128,7 +128,7 @@
                       :output-feature-set :es-next}
    :output-to "packages/ddt/lib/ddt.js"}
 
-  :cli
+  :kbt
   {:target :node-script
    :main com.kubelt.cli/main
    :compiler-options {:optimizations :simple
@@ -136,8 +136,8 @@
                       :output-feature-set :es-next}
    :output-to "packages/kbt/lib/kbt.js"}
 
-  :cli-test
+  :kbt-test
   {:target :node-test
-   :output-to "target/cli-test.js"
+   :output-to "target/kbt-test.js"
    :ns-regexp "-test$"
    :autorun true}}}
