@@ -1,14 +1,17 @@
 {
   "name": "@kubelt/ddt",
   "version": "0.0.0",
-  "description": "kubelt debug cli",
+  "description": "Kubelt development CLI",
   "keywords": [
     "kubelt"
   ],
-  "author": "Adrian Maurer <adrianmaurer+github@fastmail.com>",
+  "author": "Kubelt, Inc.",
   "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
   "main": "lib/ddt.js",
+  "bin": {
+    "ddt": "./index.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -17,7 +20,8 @@
     "lib"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
@@ -28,5 +32,29 @@
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
+  },
+  "dependencies": {
+    "@ipld/car": "3.2.3",
+    "@ipld/dag-cbor": "7.0.0",
+    "@ipld/dag-json": "8.0.7",
+    "@multiformats/blake2": "1.0.8",
+    "@multiformats/sha3": "2.0.7",
+    "@stablelib/ed25519": "1.0.2",
+    "blake3": "2.1.7",
+    "event-stream": "4.0.1",
+    "ipfs-http-client": "55.0.0",
+    "ipfs-message-port-client": "0.10.3",
+    "ipns": "0.16.0",
+    "jose": "4.4.0",
+    "jsonld": "5.2.0",
+    "levelup": "5.1.1",
+    "libp2p-crypto": "0.21.2",
+    "memdown": "6.1.1",
+    "multiaddr": "10.0.1",
+    "multiformats": "9.6.2",
+    "n3": "1.13.0",
+    "quadstore": "9.1.0",
+    "rdf-parse": "1.9.1",
+    "yargs": "17.3.1"
   }
 }
