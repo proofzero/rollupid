@@ -163,12 +163,22 @@ dist
 # Leiningen
 /.lein-*
 /.nrepl-port
+# We use the leiningen project file only to aid in packing up a CLJS
+# library (as a JAR). The project.clj is generated from shadow-cljs.edn
+# so no need to check it in.
+project.clj
 
 # clj-kondo cache
 /.clj-kondo/.cache
+
+# build cache
+.cpcache
 
 # CAR files
 *.car
 
 # Build output
 /target/
+
+# p2p data files
+/p2p-dataset/
