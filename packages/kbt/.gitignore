@@ -1,21 +1,4 @@
-/out/
-/public/js/compiled/
-/target/
-/*-init.clj
-/*.log
+# packages/kbt/.gitignore
 
-# Leiningen
-/.lein-*
-/.nrepl-port
-
-# Node.js dependencies
-/node_modules/
-
-# shadow-cljs cache, port files
-/.shadow-cljs/
-
-# clj-kondo cache
-/.clj-kondo/.cache
-
-# CAR files
-*.car
+# Compiled application
+lib/kbt.js
