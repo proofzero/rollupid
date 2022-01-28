@@ -1,4 +1,4 @@
-# sdk/ddt/.gitignore
+# packages/ddt/.gitignore
 
-# Compiled application
-index.js
+# Compiled application.
+lib/ddt.js
