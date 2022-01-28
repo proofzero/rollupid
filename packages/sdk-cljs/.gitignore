@@ -1,7 +1,7 @@
-# sdk/sdk/.gitignore
+# packages/sdk-cljs/.gitignore
 
 # Compiled application
-index.js
+/lib
 
 # JAR files (CLJS package format)
 *.jar

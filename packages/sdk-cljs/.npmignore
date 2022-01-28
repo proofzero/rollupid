@@ -1,4 +1,4 @@
-# sdk/sdk/.npmignore
+# packages/sdk-cljs/.npmignore
 
 # Clojure tooling cache
 /.cpcache
@@ -10,7 +10,7 @@ bb.edn
 deps.edn
 
 # Node-based tests
-test/
+__test__/
 
 # JAR builds
 target/
