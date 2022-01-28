@@ -97,7 +97,7 @@
   (:config (paths app-name)))
 
 (defn data
-  "Return the path from application data."
+  "Return the path for application data."
   [app-name]
   {:pre [(string? app-name)]}
   (:data (paths app-name)))

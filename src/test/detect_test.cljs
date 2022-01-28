@@ -19,7 +19,8 @@
     (testing "default options"
       (let [p2p-read (get config/default-p2p :p2p/read)
             p2p-write (get config/default-p2p :p2p/write)
-            settings (detect/node-or-gateway config/default-p2p)]
+            options {}
+            settings (detect/node-or-gateway config/default-p2p options)]
         (is (= p2p-read (get settings :p2p/read))
             "read host should be default local node")
         (is (= p2p-write (get settings :p2p/write))

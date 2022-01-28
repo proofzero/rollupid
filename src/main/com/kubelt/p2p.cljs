@@ -20,20 +20,18 @@
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
-   [cognitect.transit :as transit]
    [datascript.core :as ds]
    [integrant.core :as ig]
    [reitit.core :as route]
    [sieppari.core :as sieppari]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.lib.path :as lib.path]
+   [com.kubelt.lib.util :as lib.util]
    [com.kubelt.p2p.execute :as p2p.execute]
-   [com.kubelt.p2p.interceptor :as p2p.interceptor]
-   [com.kubelt.p2p.request :as p2p.request]
-   [com.kubelt.sdk.impl.util :as sdk.util]))
+   [com.kubelt.p2p.interceptor :as p2p.interceptor]))
 
 ;; TODO D-Bus integration
-;; TODO notify on successful startup via sd-notify
 ;; TODO tracing with riemann? jaeger?
 ;; TODO error reporting using anomalies
 ;; TODO websocket support using sente
@@ -44,13 +42,6 @@
 ;; TODO integrate with SDK wallet implementation
 ;; TODO integrate with SDK jwt implementation
 ;; TODO integrate with SDK multiaddr implementation
-
-(comment
-  (def r (transit/reader :json))
-  (def w (transit/writer :json))
-  (transit/write w [1 2 3])
-  (transit/write w {:foo "bar"})
-  (transit/read r "[1,2,3]"))
 
 (comment
   (d/transact! conn [{:db/id -1
@@ -89,7 +80,7 @@
   "127.0.0.1")
 
 (def network-port
-  8081)
+  9061)
 
 ;; Timeout value in milliseconds for receiving the entire request from
 ;; the client.
@@ -110,13 +101,32 @@
 ;; TODO use top-level data to inject for all routes
 ;; TODO malli-based coercion of path params
 ;; TODO validate requests and responses
+;; TODO JWT validate
+;; TODO response type conversion
 (def routes
   [["/kbt/:id"
-    {:name ::kbt}]
+    {:name ::kbt
+     :http.method/all [p2p.interceptor/validate-jwt
+                       p2p.interceptor/status-ok]
+     :http.method/get {:interceptors [p2p.interceptor/get-value-for-kbtname]}
+     :http.method/post {:interceptors [p2p.interceptor/update-kbt-value]}}]
+   ;; TODO user registration
+   ["/register"
+    {:name ::register
+     :http.method/all [p2p.interceptor/status-ok]
+     :http.method/post [p2p.interceptor/register]}]
+   ;; TODO collect metrics
    ["/metrics"
-    {:name ::metrics}]
+    {:name ::metrics
+     :http.method/all [p2p.interceptor/validate-jwt
+                       p2p.interceptor/status-ok]
+     :http.method/get [p2p.interceptor/metrics]}]
+   ;; TODO return API version
    ["/version"
-    {:name ::version}]
+    {:name ::version
+     :http.method/all [p2p.interceptor/validate-jwt
+                       p2p.interceptor/status-ok]
+     :http.method/get [p2p.interceptor/version]}]
    ["" {:no-doc true}
     ;; TODO set up swagger docs
     ["/api-docs" ::api-docs]
@@ -125,12 +135,13 @@
      ;; TODO kubernetes liveness check
      ["/live"
       {:name ::liveness-check
-       :chain/all [p2p.interceptor/status-ok]}]
+       :http.method/all [p2p.interceptor/status-no-content]
+       :http.method/get [p2p.interceptor/health-live]}]
      ;; TODO kubernetes readiness check
      ["/ready"
       {:name ::readiness-check
-       :chain/all [p2p.interceptor/example p2p.interceptor/status-ok]
-       :chain/get {:interceptors [p2p.interceptor/example]}}]]]])
+       :http.method/all [p2p.interceptor/status-no-content]
+       :http.method/get [p2p.interceptor/health-ready]}]]]])
 
 ;; System
 ;; -----------------------------------------------------------------------------
@@ -171,60 +182,30 @@
   ;; Extract parameters from the given configuration.
   (let [host (get value :net/host)
         port (get value :net/port)
-        router (get value :http/router)
-        database (get value :db/memory)
-        hyperbee (get value :hyper/bee)
         request-timeout (get value :request/timeout)
-        max-socket-requests (get value :request/max-socket)]
-    (letfn [;; Invoked on each HTTP request handled by the server.
-            (on-request [^IncomingMessage req ^ServerResponse res]
-              (let [;; TODO convert entire request into map
-                    request-map (p2p.request/req->uri-map req)
-                    request-method (:uri/method request-map)
-                    request-path (:uri/path request-map)]
-                (if-let [match (route/match-by-path router request-path)]
-                  (if-let [int-chain (get-in match [:data :chain/all])]
-                    ;; TODO handle match :path-params (+ :path :result :template)
-                    ;; TODO convert request to map, send along interceptor chain
-                    ;; TODO log from interceptor
-                    (let [context {:request request-map
-                                   :response {}
-                                   :p2p/hyperbee hyperbee
-                                   :p2p/database database}
-                          on-complete (fn [result]
-                                        (let [status (-> result :response :http/status)
-                                              request-path (get-in result [:request :uri/path])]
-                                          (log/info {:log/msg "request received"
-                                                     :request/path request-path
-                                                     :response/status status})
-                                          ;; TODO convert response map and send it.
-                                          (doto res
-                                            (.writeHead 200 #js {"Content-Type" "text/html"})
-                                            (.end "<html><body><h1>Hello</h1></body></html>"))))
-                          on-error (fn [result]
-                                     (log/error "error"))]
-                      ;; Execute the interceptor chain, calling either the
-                      ;; completion or error callbacks.
-                      (sieppari/execute-context int-chain context on-complete on-error))
-                    ;; TODO no interceptors found, do something sensible here!
-                    )
-                  ;; TODO no matching route found, return 404
-                  )))
-            ;; Invoked when the server starts listening for connections.
-            (on-listen []
-              (log/info {:log/msg "listening for connections"}))]
-      (let [server (.createServer http on-request)]
-        ;; TODO Are there other server values we should set explicitly?
-        ;; - headersTimeout
-        ;; - maxHeadersCount
-        ;; - timeout
-        ;; - keepAliveTimeout
-        (set! (.-requestTimeout server) request-timeout)
-        (set! (.-maxRequestsPerSocket server) max-socket-requests)
-        (log/info {:log/msg "init HTTP server" :net/host host :net/port port})
-        (let [options #js {"host" host "port" port}]
-          (doto server
-            (.listen options on-listen)))))))
+        max-socket-requests (get value :request/max-socket)
+        ;; Invoked on each HTTP request handled by the server. This fn
+        ;; looks for a matching route in the route table and, if it
+        ;; finds one, sets up and executes the corresponding interceptor
+        ;; chain. The argument map contains values that will be set on
+        ;; the execution context for use by the interceptors.
+        on-request (p2p.execute/make-request-handler
+                    (select-keys value [:db/memory :http/router :hyper/bee]))
+        server (.createServer http on-request)]
+    ;; TODO Are there other server values we should set explicitly?
+    ;; - TLS certificate!
+    ;; - headersTimeout
+    ;; - maxHeadersCount
+    ;; - timeout
+    ;; - keepAliveTimeout
+    (set! (.-requestTimeout server) request-timeout)
+    (set! (.-maxRequestsPerSocket server) max-socket-requests)
+    (log/info {:log/msg "init HTTP server" :net/host host :net/port port})
+    (let [options #js {"host" host "port" port}]
+      (letfn [(on-listen []
+                (log/info {:log/msg "listening for connections"}))]
+        (doto server
+          (.listen options on-listen))))))
 
 (defmethod ig/halt-key! :http/server [_ server]
   (letfn [(on-close []
@@ -279,21 +260,17 @@
     "h" {:alias "host"
          :describe "The host address to bind to"
          :type "string"
-         :nargs 1
-         :default network-host}
+         :nargs 1}
     "p" {:alias "port"
          :describe "The port to listen on"
-         :default network-port
          :type "number"
          :nargs 1}
     "t" {:alias "timeout-ms"
          :describe "Duration in ms to wait for requests to complete"
-         :default timeout-ms
          :type "number"
          :nargs 1}
     "s" {:alias "max-socket"
          :describe "Maximum number of socket requests"
-         :default max-socket
          :type "number"
          :nargs 1}}))
 
@@ -331,30 +308,31 @@
 
 ;; TODO load configuration from file? Should we use ig/read-string?
 (defn load-config
-  []
-  {:db/memory
-   {:db/schema db-schema}
+  [app-name]
+  (let [data-dir (lib.path/data app-name)]
+    {:db/memory
+     {:db/schema db-schema}
 
-   :http/router
-   {:http/routes routes}
+     :http/router
+     {:http/routes routes}
 
-   :http/server
-   {:net/host network-host
-    :net/port network-port
-    :request/timeout timeout-ms
-    :request/max-socket max-socket
-    :http/router (ig/ref :http/router)
-    :db/memory (ig/ref :db/memory)
-    :hyper/bee (ig/ref :hyper/bee)}
+     :http/server
+     {:net/host network-host
+      :net/port network-port
+      :request/timeout timeout-ms
+      :request/max-socket max-socket
+      :http/router (ig/ref :http/router)
+      :db/memory (ig/ref :db/memory)
+      :hyper/bee (ig/ref :hyper/bee)}
 
-   :hyper/bee
-   {:hyper/core (ig/ref :hyper/core)
-    :key/encoding "utf-8"
-    :value/encoding "binary"}
+     :hyper/bee
+     {:hyper/core (ig/ref :hyper/core)
+      :key/encoding "utf-8"
+      :value/encoding "binary"}
 
-   :hyper/core
-   {:value/encoding "utf-8"
-    :path/dataset "./p2p-dataset"}})
+     :hyper/core
+     {:value/encoding "utf-8"
+      :path/dataset data-dir}}))
 
 (defn get-environment
   "Return a map of application environment variables. These are the
@@ -371,7 +349,7 @@
             [(str/lower-case k) v])
           (to-keyword [[k v]]
             [(keyword k) v])]
-    (let [environment (sdk.util/environment)
+    (let [environment (lib.util/environment)
           xf (comp
               (filter has-prefix?)
               (map strip-prefix)
@@ -390,21 +368,30 @@
   {:pre [(every? map? [config environment options])]}
   (let [host
         (or (get environment :host)
-            (get options :host))
+            (get options :host)
+            (get-in config [:http/server :net/host]))
         port
         (or (get environment :port)
-            (get options :port))
+            (get options :port)
+            (get-in config [:http/server :net/port]))
         timeout-ms
         (or (get environment :timeout-ms)
-            (get options :timeout-ms))
+            (get options :timeout-ms)
+            (get-in config [:http/server :request/timeout]))
         max-socket
         (or (get environment :max-socket)
-            (get options :max-socket))]
+            (get options :max-socket)
+            (get-in config [:http/server :request/max-socket]))
+        path-dataset
+        (or (get environment :path-dataset)
+            (get options :path-dataset)
+            (get-in config [:hyper/core :path/dataset]))]
     (-> config
         (assoc-in [:http/server :net/host] host)
         (assoc-in [:http/server :net/port] port)
         (assoc-in [:http/server :request/timeout] timeout-ms)
-        (assoc-in [:http/server :request/max-socket] max-socket))))
+        (assoc-in [:http/server :request/max-socket] max-socket)
+        (assoc-in [:hyper/core :path/dataset] path-dataset))))
 
 (defn stop! []
   (log/warn {:log/type :app/stop :log/msg "stopping"}))
@@ -416,7 +403,8 @@
 ;; teardown
 (defn main! [& cli-args]
   (let [options (parse-args cli-args)
-        config (load-config)
+        app-name (get options :$0)
+        config (load-config app-name)
         environ (get-environment env-prefix)
         system (init-system config environ options)
         sys-map (ig/init system)]

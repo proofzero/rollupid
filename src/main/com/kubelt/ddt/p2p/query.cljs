@@ -2,6 +2,10 @@
   "Invoke the p2p (query) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [cljs.core.async :as async :refer [<!]])
+  (:require
+   [cognitect.transit :as transit])
+  (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
    [com.kubelt.lib.p2p :as p2p]
    [com.kubelt.sdk.v1 :as sdk]))
@@ -24,7 +28,12 @@
                     account {:kubelt/type :kubelt.type/account
                              :account/public-key "xyzabc123"}]
                 ;; TODO error handling
-                (let [result (p2p/query! kbt account key)]
-                  (prn result)
+                (let [result-chan (p2p/query! kbt account key)]
+                  (println "xxx")
+                  (async/go
+                    (let [result (<! result-chan)]
+                      (prn result)
+                      ))
+                  (println "yyy")
                   )
                 (sdk/halt! kbt)))})

@@ -1,6 +1,16 @@
 (ns com.kubelt.lib.http.request
   "Miscellaneous HTTP request utilties."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:require
+   [goog.Uri]
+   [goog.object])
+  (:require
+   ["stream" :refer [Duplex]]
+   ["http" :as http :refer [IncomingMessage]])
+  (:require
+   [clojure.string :as str]))
+
+;; TODO malli schemas for request and response maps
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -29,3 +39,45 @@
 (defn delete?
   [m]
   (= :delete (:http/method m)))
+
+;; TODO test me
+(defn req->map
+  "Convert a Node.js HTTP request (an IncomingMessage instance) into a
+  data map of its component parts."
+  [^IncomingMessage req]
+  (let [method (keyword (str/lower-case (.-method req)))
+        version (.-httpVersion req)
+        headers (.-headers req)
+        trailers (.-trailers req)
+        status (.-statusCode req)
+        ;; Extract data from the request URL.
+        req-url (goog.Uri. (.-url req))
+        req-host (goog.object/getValueByKeys req #js ["headers" "host"])
+        ;; Use the request's socket "encrypted" flag to determine we the
+        ;; request was transmitted via TLS or not.
+        req-scheme (if (. ^Duplex (. req -socket) -encrypted) "https://" "http://")
+        req-base (goog.Uri. (str req-scheme req-host))
+        uri (goog.Uri.resolve req-base req-url)
+        ;; Extract components from the URI.
+        port (.getPort uri)
+        path (.getPath uri)
+        fragment (.getFragment uri)
+        ;; TODO turn into map (query-data->map)
+        ;;query-data (.getQueryData uri) -> goog.Uri.QueryData
+        query (.getDecodedQuery uri)
+        scheme (.getScheme uri)
+        domain (.getDomain uri)
+        user (.getUserInfo uri)]
+    {:kubelt/type :kubelt.type/uri
+     :http/method method
+     :http/version version
+     :http/headers headers
+     :http/trailers trailers
+     :http/status status
+     :uri/scheme scheme
+     :uri/port port
+     :uri/path path
+     :uri/fragment fragment
+     :uri/query query
+     :uri/domain domain
+     :uri/user user}))

@@ -18,12 +18,14 @@
   represents the user's account."
   [sys account]
   (let [client (get sys :client/http)
+        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
         key (get account :account/public-key)
         path (str/join "/" ["" "register" key])
         request {:kubelt/type :kubelt.type/http-request
                  :http/method :get
+                 :http/scheme scheme
                  :http/host host
                  :http/port port}]
     ;; TODO extract the user's public key from the account map
@@ -46,6 +48,7 @@
           ;; If you need to know what platform you're running on, you
           ;;can get the value of :sys/platform from the system map.
           ;;platform (get sys :sys/platform)
+          scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
           host (get-in sys [:client/p2p :p2p/write :address/host])
           port (get-in sys [:client/p2p :p2p/write :address/port])
           path (str/join "/" ["" "updatekbt"])
@@ -58,6 +61,7 @@
           headers {"Content-Type" "text/plain"}
           request {:kubelt/type :kubelt.type/http-request
                    :http/method :post
+                   :http/scheme scheme
                    :http/host host
                    :http/port port
                    :http/path path
@@ -76,11 +80,13 @@
   core.async channel."
   [sys account key]
   (let [client (get sys :client/http)
+        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/read :address/host])
         port (get-in sys [:client/p2p :p2p/read :address/port])
         path (str/join "/" ["" "kbt" key])
         request {:kubelt/type :kubelt.type/http-request
                  :http/method :get
+                 :http/scheme scheme
                  :http/host host
                  :http/port port
                  :http/path path}]
