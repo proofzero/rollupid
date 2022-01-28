@@ -2,10 +2,13 @@
   "name": "@kubelt/p2p",
   "version": "0.0.0",
   "description": "Kubelt p2p",
-  "author": "Robert Medeiros <robert@crimeminister.org>",
+  "author": "Kubelt, Inc.",
   "homepage": "https://github.com/kubelt/kubelt#readme",
   "license": "Apache-2.0",
   "main": "lib/p2p.js",
+  "bin": {
+    "p2p": "./index.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -14,7 +17,8 @@
     "lib"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
@@ -25,5 +29,11 @@
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
+  },
+  "dependencies": {
+    "hyperbee": "1.7.0",
+    "hypercore": "9.12.0",
+    "sd-notify": "2.8.0",
+    "yargs": "17.3.1"
   }
 }
