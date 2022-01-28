@@ -37,6 +37,11 @@
 ;;   kbt.v1.workspace.available(sdk);
 ;;   kbt.v1.halt(sdk);
 
+(defn web-v1
+  []
+  ;; TODO
+  (println "web-v1"))
+
 (def node-v1
   #js {:init sdk.v1/init-js
        :halt sdk.v1/halt-js!
