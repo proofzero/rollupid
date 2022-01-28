@@ -9,7 +9,7 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.sdk.proto.http :as proto.http]
-   [com.kubelt.sdk.spec.http :as spec.http]))
+   [com.kubelt.spec.http :as spec.http]))
 
 
 ;; Public

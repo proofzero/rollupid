@@ -5,7 +5,7 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.sdk.spec.config :as spec.config]
+   [com.kubelt.spec.config :as spec.config]
    [com.kubelt.lib.config :as impl.config]
    [com.kubelt.lib.promise :as impl.promise :refer [promise promise?]]
    [com.kubelt.lib.init :as impl.init]))

@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.spec.http
+(ns com.kubelt.spec.http
   "Schema for HTTP requests and responses."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.spec.config
+(ns com.kubelt.spec.config
   "Schema for SDK configuration data."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

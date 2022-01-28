@@ -16,7 +16,7 @@
   (:require
    [com.kubelt.lib.http.request :as http.request]
    [com.kubelt.sdk.proto.http :as proto.http]
-   [com.kubelt.sdk.spec.http :as spec.http]))
+   [com.kubelt.spec.http :as spec.http]))
 
 
 (defn request->method

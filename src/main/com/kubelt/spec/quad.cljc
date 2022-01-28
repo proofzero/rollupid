@@ -1,6 +1,6 @@
-(ns com.kubelt.sdk.spec.quad
+(ns com.kubelt.spec.quad
   "Defines a spec for RDF/cljs to enable validation."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [malli.core :as m]))
 

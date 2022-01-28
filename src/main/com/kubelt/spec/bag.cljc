@@ -1,10 +1,10 @@
-(ns com.kubelt.sdk.spec.bag
+(ns com.kubelt.spec.bag
   "Defines a spec for the kubelt BAG (Bundle of Acyclic Graphs) type."
-  {:copyright "©2021 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [malli.core :as m])
   (:require
-   [com.kubelt.sdk.impl.ipld :as ipld]))
+   [com.kubelt.lib.ipld :as ipld]))
 
 ;; Data
 ;; -----------------------------------------------------------------------------
