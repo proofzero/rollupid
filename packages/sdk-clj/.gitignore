@@ -1,0 +1,16 @@
+# packages/sdk-clj/.gitignore
+
+# Compiled application
+/lib
+
+# JAR files (CLJS package format)
+*.jar
+
+# Clojure tooling cache
+.cpcache
+
+# Leiningen build output
+target/
+
+# Maven pom
+pom.xml*
