@@ -1,0 +1,4 @@
+# packages/p2p/.gitignore
+
+# Compiled application
+lib/p2p.js
