@@ -30,7 +30,7 @@
    [com.kubelt.p2p.execute :as p2p.execute]
    [com.kubelt.p2p.interceptor :as p2p.interceptor]
    [com.kubelt.p2p.request :as p2p.request]
-   [com.kubelt.sdk.impl.util :as sdk.util]))
+   [com.kubelt.lib.util :as sdk.util]))
 
 ;; TODO D-Bus integration
 ;; TODO notify on successful startup via sd-notify
@@ -112,7 +112,14 @@
 ;; TODO validate requests and responses
 (def routes
   [["/kbt/:id"
-    {:name ::kbt}]
+    {:name ::kbt
+     :chain/all [p2p.interceptor/kbt-resolve]}]
+   ["/kbt-update/:id/:target"
+    {:name ::kbt-update
+     :chain/all [p2p.interceptor/kbt-update]}]
+   ["/account-register"
+    {:name ::account-register
+     :chain/all [p2p.interceptor/account-register]}]
    ["/metrics"
     {:name ::metrics}]
    ["/version"
@@ -123,9 +130,9 @@
     ["/swagger.json" ::swagger]
     ["/health"
      ;; TODO kubernetes liveness check
-     ["/live"
-      {:name ::liveness-check
-       :chain/all [p2p.interceptor/status-ok]}]
+;;  ["/live"
+;;      {:name ::liveness-check
+;;       :chain/all [p2p.interceptor/status-ok]}]
      ;; TODO kubernetes readiness check
      ["/ready"
       {:name ::readiness-check
@@ -182,13 +189,14 @@
                     request-map (p2p.request/req->uri-map req)
                     request-method (:uri/method request-map)
                     request-path (:uri/path request-map)]
+              (log/info {:log/msg request-map})
                 (if-let [match (route/match-by-path router request-path)]
                   (if-let [int-chain (get-in match [:data :chain/all])]
                     ;; TODO handle match :path-params (+ :path :result :template)
                     ;; TODO convert request to map, send along interceptor chain
                     ;; TODO log from interceptor
                     (let [context {:request request-map
-                                   :response {}
+                                   :response res
                                    :p2p/hyperbee hyperbee
                                    :p2p/database database}
                           on-complete (fn [result]
@@ -198,9 +206,10 @@
                                                      :request/path request-path
                                                      :response/status status})
                                           ;; TODO convert response map and send it.
-                                          (doto res
-                                            (.writeHead 200 #js {"Content-Type" "text/html"})
-                                            (.end "<html><body><h1>Hello</h1></body></html>"))))
+;;                                          (doto res
+;;                                            (.writeHead 200 #js {"Content-Type" "text/html"})
+;;                                            (.end "<html><body><h1>Hello</h1></body></html>"))))
+                                    )) ;; end on-complete
                           on-error (fn [result]
                                      (log/error "error"))]
                       ;; Execute the interceptor chain, calling either the

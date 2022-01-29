@@ -2,6 +2,7 @@
   "HTTP request utilities."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [clojure.string :as str]
    [goog.Uri]
    [goog.object])
   (:require
@@ -23,6 +24,7 @@
         port (.getPort uri)
         path (.getPath uri)
         fragment (.getFragment uri)
+        path-components (str/split (.getPath uri) "/")
         ;; TODO turn into map (query-data->map)
         ;;query-data (.getQueryData uri) -> goog.Uri.QueryData
         query (.getDecodedQuery uri)
@@ -32,6 +34,7 @@
     {:kubelt/type :kubelt.type/uri
      :uri/port port
      :uri/path path
+     :uri/path-components path-components
      :uri/fragment fragment
      :uri/query query
      :uri/scheme scheme
