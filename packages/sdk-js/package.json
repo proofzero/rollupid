@@ -37,6 +37,7 @@
     "@multiformats/sha3": "2.0.7",
     "@stablelib/ed25519": "1.0.2",
     "blake3": "2.1.7",
+    "electron": "^17.0.0",
     "event-stream": "4.0.1",
     "ipfs-http-client": "56.0.0",
     "ipfs-message-port-client": "0.11.0",
@@ -51,6 +52,7 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
+    "supports-color": "^9.2.1",
     "yargs": "17.3.1"
   }
 }

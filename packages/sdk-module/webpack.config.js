@@ -1,22 +1,45 @@
 const path = require("path");
+const webpack = require("webpack");
 const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
+const paths = {
+  // Source files
+  src: path.resolve(__dirname, "./lib/com.kubelt.sdk.v1.js"),
+
+  // Production build files
+  build: path.resolve(__dirname, "./lib"),
+};
+
 module.exports = {
-  entry: "../sdk-js/lib/sdk.js",
+  entry: paths.src,
   mode: "development",
   devtool: "source-map",
   output: {
-    path: path.resolve(__dirname, "lib"),
+    path: paths.build,
     filename: "index.js",
   },
-  plugins: [new NodePolyfillPlugin()],
+  plugins: [
+    new NodePolyfillPlugin(),
+
+    //new webpack.ProvidePlugin({
+      //Buffer: ["buffer", "Buffer"],
+      //process: "process/browser",
+    //}),
+  ],
+  devtool: 'inline-source-map',
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    modules: [paths.src, "node_modules"],
+    extensions: [".tsx", ".ts", ".js", ".json"],
+    //alias: {
+      //"@": paths.src,
+    //},
   },
+  //target: "node",
   module: {
     rules: [
       {
         test: /\.(ts|tsx|js)$/,
+        exclude: /node_modules/,
         use: {
           loader: "babel-loader",
           options: {
@@ -30,6 +53,7 @@ module.exports = {
                 },
               ],
             ],
+            plugins: [["@babel/plugin-transform-runtime"],],
           },
         },
       },

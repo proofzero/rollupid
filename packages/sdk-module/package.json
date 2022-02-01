@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/sdk-module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Kubelt SDK for CommonJS",
   "keywords": [
     "kubelt",
@@ -27,7 +27,8 @@
     "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "bb run build:release",
+    "pack": "webpack --config webpack.config.js",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "nft": "echo \"Error: impl non functional tests \" && exit 1"
   },
@@ -59,9 +60,13 @@
     "yargs": "17.3.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.16.10",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
+    "@babel/runtime": "^7.16.7",
     "babel-loader": "^8.2.3",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "webpack": "^5.68.0",
     "webpack-cli": "^4.9.2"

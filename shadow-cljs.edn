@@ -81,8 +81,8 @@
    ;; library with that name.
    :exports {:v1 com.kubelt.sdk/node-v1}
    :compiler-options {;; :none :simple :advanced
-                      :optimizations :advanced
-                      :infer-externs :true
+                      ;:optimizations :advanced
+                      ;:infer-externs :true
                       :output-feature-set :es-next}
    :output-to "packages/sdk-js/lib/sdk.js"}
 
