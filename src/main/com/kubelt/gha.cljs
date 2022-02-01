@@ -13,14 +13,16 @@
   []
   (try
     (let [ms (.getInput core "milliseconds")
-          message (str "Waiting" ms "milliseconds…")]
+          message (str "Waiting " ms " milliseconds…")]
       (.info core message)
 
       ;; NB: debug is only output if you set the secret ACTIONS_RUNNER_DEBUG to true
       (.debug core (.toTimeString (js/Date.)))
       (let [milliseconds (js/parseInt ms)]
-        (go (<p! (gha.util/wait milliseconds))))
+        (<p! (gha.util/wait milliseconds)))
 
       (.setOutput core "time" (.toTimeString (js/Date.))))
     (catch js/Exception e
       (.setFailed core (.-message e)))))
+
+(go (run))
