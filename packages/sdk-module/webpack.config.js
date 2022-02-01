@@ -4,7 +4,7 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 const paths = {
   // Source files
-  src: path.resolve(__dirname, "./lib/com.kubelt.sdk.v1.js"),
+  src: path.resolve(__dirname, "./lib/com.kubelt.sdk.js"),
 
   // Production build files
   build: path.resolve(__dirname, "./lib"),

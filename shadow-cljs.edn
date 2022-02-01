@@ -81,8 +81,8 @@
    ;; library with that name.
    :exports {:v1 com.kubelt.sdk/node-v1}
    :compiler-options {;; :none :simple :advanced
-                      ;:optimizations :advanced
-                      ;:infer-externs :true
+                      :optimizations :advanced
+                      :infer-externs :true
                       :output-feature-set :es-next}
    :output-to "packages/sdk-js/lib/sdk.js"}
 
@@ -108,10 +108,13 @@
   ;; compiled for use in the browser.
   :web
   {:target :browser
+   :js-options {:entry-keys ["module" "browser" "main"]}
    :output-dir "packages/web/lib"
    :asset-path "/js"
-   :modules {:base {:entries [com.kubelt.sdk]
-                    :init-fn com.kubelt.sdk/web-v1}}
+   :modules {:base {:entries [com.kubelt.sdk]}
+             :npm {:depends-on #{:base}}
+             :web {:depends-on #{:base}
+                   :init-fn com.kubelt.sdk/web-v1}}
    :compiler-options {:output-feature-set :browser-2021
                       :optimizations :advanced}}
 
