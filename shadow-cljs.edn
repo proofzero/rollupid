@@ -30,7 +30,7 @@
   [metosin/reitit-interceptors "0.5.15"]
   ;; malli schema coercion for reitit
   [metosin/reitit-malli "0.5.15"]
-  ;; support for sieppari interceptors for reitit
+  ;dj- support for sieppari interceptors for reitit
   [metosin/reitit-sieppari "0.5.15"]
   ;; generate swagger2 apidocs for reitit
   [metosin/reitit-swagger "0.5.15"]
