@@ -205,10 +205,6 @@
                                           (log/info {:log/msg "request received"
                                                      :request/path request-path
                                                      :response/status status})
-                                          ;; TODO convert response map and send it.
-;;                                          (doto res
-;;                                            (.writeHead 200 #js {"Content-Type" "text/html"})
-;;                                            (.end "<html><body><h1>Hello</h1></body></html>"))))
                                     )) ;; end on-complete
                           on-error (fn [result]
                                      (log/error "error"))]

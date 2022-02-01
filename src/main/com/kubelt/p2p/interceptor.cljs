@@ -29,23 +29,27 @@
    :enter (fn [ctx]
             (log/info {:log/msg "enter kbt resolve"})
 
-            ( let [
-                    reqmap (get ctx :request)
-                    kbtname (nth (get reqmap :uri/path-components) 2)
-                    kbtvalue (.get (get ctx :p2p/hyperbee) [kbtname])
+            (let [reqmap (get ctx :request)
+                  kbtname (nth (get reqmap :uri/path-components) 2)
+                  kbtvalue (.get (get ctx :p2p/hyperbee) kbtname)
                    ]
               ;; TODO resolve this promise before writing response
 ;;              (go (promise/all-map [(hash-map "query" kbtvalue)]))
+              
               (log/info {:log/msg kbtname})
-              (doto (get ctx :response)
-                (.writeHead 200 #js {"content-type" "text/html"})
-                (.write (reduce str ["<html><body><h1>" kbtname ": " kbtvalue " </h1></body></html>"]) )
+
+              (.then kbtvalue (fn [kval] 
+                  (let [kval (str (get (js->clj kval :keywordize-keys true) :value))]
+                    (log/info {:log/msg kval})
+                                (doto (get ctx :response)
+                                  (.writeHead 200 #js {"content-type" "text/html"})
+                                  (.write (reduce str ["<html><body><h1>" kbtname ": " kval " </h1></body></html>"]) )
+                                  )
                 )
+             )))
 
-              )
 
-
-            ctx)
+   ctx)
    :leave (fn [ctx]
             (log/info {:log/msg "leaving kbt resolve"})
             ctx)
@@ -59,24 +63,30 @@
    :enter (fn [ctx]
             (log/info {:log/msg "enter kbt update"})
 
+            ;; get relevant values from request
             (let [
-                    reqmap (get ctx :request)
-                    kbtname (nth (get reqmap :uri/path-components) 2)
-                    kbtvalue (nth (get reqmap :uri/path-components) 3)
-                   ]
- 
-            ;; todo save value in hyperbee
-            (.put (get ctx :p2p/hyperbee) [kbtname kbtvalue]) 
+                  reqmap (get ctx :request)
+                  kbtname (nth (get reqmap :uri/path-components) 2)
+                  kbtvalue (nth (get reqmap :uri/path-components) 3)
+                  ]
 
-            (log/info {:log/msg kbtname})
-            (log/info {:log/msg (get ctx :response)})
-            (doto (get ctx :response)
+                (log/info {:log/msg kbtname})
+                (log/info {:log/msg kbtvalue})
+                (log/info {:log/msg (get ctx :p2p/hyperbee)})
+                (.put (get ctx :p2p/hyperbee) kbtname kbtvalue)
+              ;; todo save value in hyperbee
+;;              (let [kbtsaveresult (.put (get ctx :p2p/hyperbee) [kbtname kbtvalue])]
+;;                (.put (get ctx :p2p/hyperbee) [kbtname kbtvalue])
 
-              (.writeHead 200 #js {"content-type" "text/html"})
-              (.write (reduce str ["<html><body><h1>SETTING " kbtname " = " kbtvalue " </h1></body></html>"]) )
-              )
-            )
+               
+;; (.then kbtsaveresult (fn [ksval] 
+                                       (doto (get ctx :response)
 
+                                         (.writeHead 200 #js {"content-type" "text/html"})
+                                        (.write (reduce str ["<html><body><h1>SETTING " kbtname " = " kbtvalue " </h1></body></html>"]) )
+                                         )
+                                       )
+            
             ctx)
    :leave (fn [ctx]
             (log/info {:log/msg "leaving kbt update"})
