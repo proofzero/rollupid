@@ -115,29 +115,34 @@
   proto.http/HttpClient
   (request!
     [this m]
-    (if (malli/validate spec.http/request m)
+    (if-not (malli/validate spec.http/request m)
+      ;; TODO report an error using common error reporting
+      ;; functionality.
+      (let [explain (-> spec.http/request (malli/explain m) me/humanize)
+            error {:com.kubelt/type :kubelt.type/error
+                   :error explain}
+            response-chan (async/chan)]
+        (async/put! response-chan error)
+        response-chan)
+      ;; The request map is valid, so fire off the request.
       (let [scheme (get m :http/scheme :http)
             request-map (dissoc m :http/scheme)
             options (request->options request-map)
             ;; Use an unbuffered channel for the response.
             response-chan (async/chan)
             ;; If user specified :https as the request scheme, use the
-            ;; Node.js "https" module to fire off the request. Default to
-            ;; using the "http" module otherwise.
+            ;; Node.js "https" module to fire off the request. Default
+            ;; to using the "http" module otherwise.
             request-mod (if (= :https scheme) https http)
             on-response (partial on-response response-chan)
             request (.request request-mod options on-response)]
         ;;(prn options)
-        (when (http.request/post? m)
+        (when (or (http.request/post? m)
+                  (http.request/put? m))
           (if-let [data (get m :http/body)]
             (.write request data)))
         (doto request
           (.on "error" on-error)
           (.end))
         ;; Return the channel on which the response will be placed.
-        response-chan)
-      ;; TODO report an error using common error reporting
-      ;; functionality.
-      (let [explain (-> spec.http/request (malli/explain m) me/humanize)]
-        {:com.kubelt/type :kubelt.type/error
-         :error explain}))))
+        response-chan))))

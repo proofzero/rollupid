@@ -29,11 +29,9 @@
                              :account/public-key "xyzabc123"}]
                 ;; TODO error handling
                 (let [result-chan (p2p/query! kbt account key)]
-                  (println "xxx")
                   (async/go
                     (let [result (<! result-chan)]
-                      (prn result)
-                      ))
-                  (println "yyy")
-                  )
+                      (if (= :kubelt.type/error (:com.kubelt/type result))
+                        (prn (:error result))
+                        (println result)))))
                 (sdk/halt! kbt)))})

@@ -26,6 +26,7 @@
 ;; Handlers
 ;; -----------------------------------------------------------------------------
 ;; TODO support transit as default format
+;; TODO support edn as optional format
 ;; TODO support JSON as optional format
 ;; TODO content negotiation
 
