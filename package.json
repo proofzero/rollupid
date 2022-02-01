@@ -10,6 +10,8 @@
     "lint:all": "bb lint:all",
     "build:ddt:develop": "bb build:ddt:develop",
     "build:ddt:release": "bb build:ddt:release",
+    "build:gha:develop": "bb build:gha:develop",
+    "build:gha:release": "bb build:gha:release",
     "build:kbt:develop": "bb build:kbt:develop",
     "build:kbt:release": "bb build:kbt:release",
     "build:p2p:develop": "bb build:p2p:develop",

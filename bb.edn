@@ -93,6 +93,14 @@
   {:doc "Build release version of ddt command line application"
    :task (shell "npx shadow-cljs release ddt")}
 
+  build:gha:develop
+  {:doc ""
+   :task (shell "npx shadow-cljs compile gha")}
+
+  build:gha:release
+  {:doc ""
+   :task (shell "npx shadow-cljs release gha")}
+
   build:kbt:develop
   {:doc "Build development version of kbt command line application"
    :task (shell "npx shadow-cljs compile kbt")}
