@@ -16,6 +16,7 @@
   string?)
 
 (def port
+  ;; TODO constrain to valid port range
   int?)
 
 (def path
@@ -36,18 +37,11 @@
 (def scheme
   [:enum :http :https])
 
-(def port
-  ;; TODO constrain to valid port range
-  int?)
-
-(def path
-  string?)
-
 (def fragment
   string?)
 
 (def query
-  [map-of string? string?])
+  [:map-of string? string?])
 
 (def domain
   string?)
