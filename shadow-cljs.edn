@@ -218,6 +218,17 @@
    :compiler-options {:reader-features #{:node}}
    :autorun true}
 
+  ;; GitHub Action
+  ;; ---------------------------------------------------------------------------
+  
+  :gha
+  {:target :node-script
+   :main com.kubelt.gha/run
+   :compiler-options {:optimizations :simple
+                      :infer-externs :auto
+                      :output-feature-set :es-next}
+   :output-to "gha/index.js"}
+
   ;; IPFS Client
   ;; ---------------------------------------------------------------------------
 
