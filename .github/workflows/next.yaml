@@ -18,5 +18,9 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - name: bb shell
-        uses: tzafrirben/babashka-docker-action@v1
+      - name: Setup Babashka
+        uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.4
+      - name: Publish Next
+        run: npx lerna publish --canary
