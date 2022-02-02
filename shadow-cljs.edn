@@ -108,13 +108,9 @@
   ;; compiled for use in the browser.
   :web
   {:target :browser
-   :js-options {:entry-keys ["module" "browser" "main"]}
    :output-dir "packages/web/lib"
    :asset-path "/js"
-   :modules {:base {:entries [com.kubelt.sdk]}
-             :npm {:depends-on #{:base}}
-             :web {:depends-on #{:base}
-                   :init-fn com.kubelt.sdk/web-v1}}
+   :modules {:base {:entries [com.kubelt.sdk]}}
    :compiler-options {:output-feature-set :browser-2021
                       :optimizations :advanced}}
 
