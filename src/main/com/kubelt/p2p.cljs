@@ -118,7 +118,8 @@
    ;; TODO user registration
    ["/register"
     {:name ::register
-     :http.method/all [p2p.interceptor/status-ok]
+     :http.method/all [p2p.interceptor/validate-jwt
+                       p2p.interceptor/status-ok]
      :http.method/post [p2p.interceptor/register]}]
    ;; TODO collect metrics
    ["/metrics"
@@ -129,8 +130,7 @@
    ;; TODO return API version
    ["/version"
     {:name ::version
-     :http.method/all [p2p.interceptor/validate-jwt
-                       p2p.interceptor/status-ok]
+     :http.method/all [p2p.interceptor/status-ok]
      :http.method/get [p2p.interceptor/version]}]
    ["" {:no-doc true}
     ;; TODO set up swagger docs
