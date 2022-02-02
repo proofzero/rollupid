@@ -111,6 +111,10 @@
                        p2p.interceptor/status-ok]
      :http.method/get {:interceptors [p2p.interceptor/kbt-resolve]}
      :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
+   ["/kbt-update/:id/:endpoint"
+    {:name ::kbt-update
+     :http.method/all [p2p.interceptor/status-ok]
+     :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
    ;; TODO user registration
    ["/register"
     {:name ::register
@@ -329,10 +333,10 @@
      :hyper/bee
      {:hyper/core (ig/ref :hyper/core)
       :key/encoding "utf-8"
-      :value/encoding "utf-8"}
+      :value/encoding "binary"}
 
      :hyper/core
-     {:value/encoding "utf-8"
+     {:value/encoding "binary"
       :path/dataset data-dir}}))
 
 (defn get-environment

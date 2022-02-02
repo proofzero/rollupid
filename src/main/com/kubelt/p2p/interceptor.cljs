@@ -2,7 +2,10 @@
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [taoensso.timbre :as log])
+   [goog.object])
+  (:require
+   [taoensso.timbre :as log]
+   [clojure.string :as str])
   (:require
    [com.kubelt.lib.http.status :as http.status]))
 
@@ -75,8 +78,12 @@
               ;; that js/Promise is an AsyncContext, so execution pauses
               ;; until the promise resolves.
               (-> (.get hyperbee kbt-name)
-                  (.then (fn [kbt-value]
-                           (if-not (nil? kbt-value)
+                  (.then (fn [kbt-object]
+                           (let [;; Hyperbee returns an object that
+                                 ;; includes sequence number, etc.
+                                 m (js->clj kbt-object :keywordize-keys true)
+                                 kbt-value (str (get m :value))]
+                           (if-not (str/blank? nil? kbt-value)
                              (do
                                (log/info {:log/msg "found name"
                                           :kbt/name kbt-name
@@ -84,7 +91,7 @@
                                (let [body {:name kbt-name :value kbt-value}]
                                  (assoc-in ctx [:response :http/body] body)))
                              ;; No result found, return a 404.
-                             (assoc-in ctx [:response :http/status] http.status/not-found)))))))
+                             (assoc-in ctx [:response :http/status] http.status/not-found))))))))
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
@@ -96,17 +103,21 @@
    :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
             (let [request (get ctx :request)
                   kbt-name (get-in match [:path-params :id])
+                  ;; TODO get from body
                   ;;kbt-value (get request )
+                  ;;kbt-value (get-in match [:path-params :endpoint])
                   kbt-value "fixme"]
               (prn request)
               (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
               (-> (.put hyperbee kbt-name kbt-value)
                   (.then (fn []
                            (assoc-in ctx [:response :http/status] http.status/created))))))
-
-   :error (fn [{:keys [error] :as ctx}]
-            (log/error {:log/error error})
-            ctx)})
+     :leave (fn [ctx]
+              (log/info {:log/msg "leaving kbt update"})
+              ctx)
+     :error (fn [{:keys [error] :as ctx}]
+              (log/error {:log/error error})
+              ctx)})
 
 (def health-ready
   {:name ::health-ready
