@@ -2,7 +2,6 @@
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [goog.crypt.base64 :as base64]
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.http.status :as http.status]))
@@ -77,7 +76,7 @@
               ;; until the promise resolves.
               (-> (.get hyperbee kbt-name)
                   (.then (fn [kbt-value-map]
-                           (let [kbt-value (:base64/decodeString (get (js->clj kbt-value-map :keywordize-keys true) :value))]
+                             (let [kbt-value (str (get (js->clj kbt-value-map :keywordize-keys true) :value))]
                            (if-not (nil? kbt-value)
                              (do
                                (log/info {:log/msg "found name"
