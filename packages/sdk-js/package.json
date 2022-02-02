@@ -52,7 +52,7 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
-    "supports-color": "^9.2.1",
+    "supports-color": "9.2.1",
     "yargs": "17.3.1"
   }
 }
