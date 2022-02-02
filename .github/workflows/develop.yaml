@@ -1,34 +1,13 @@
 ---
 name: test and build
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.filter.outputs.changes }}
-    steps:
-      # find out what deploy package to use
-      - uses: actions/checkout@master
-      - uses: dorny/paths-filter@v2.10.2
-        id: filter
-        with:
-          filters: |
-            src : 'src/**'
-  
-  # Test
-  #-----------------------------------------------------------------------------
   test:
-    if: needs.changes.outputs.packages != '[]'
-    needs: changes
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@master
       - name: Source Builds
@@ -43,52 +22,3 @@ jobs:
         uses: tzafrirben/babashka-docker-action@v1
         with:
           bb_cmd: npm run test:all:develop
-
-  # Pull Request
-  #-----------------------------------------------------------------------------
-  build:
-    needs: changes
-    if: >
-      github.event_name == 'pull_request'
-      && needs.changes.outputs.packages != '[]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build & Test
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - name: Install
-        run: npm install
-      - name: Tests
-        run: npx lerna run test
-      - name: Build
-        run: npx lerna run build
-
-  # Publish next on merge
-  #-----------------------------------------------------------------------------
-  next:
-    needs: changes
-    if: >
-      github.event_name != 'pull_request'
-      && needs.changes.outputs.packages != '[]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Build & Test
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - name: Install
-        run: npm install
-      - name: Tests
-        run: npx lerna run test
-      - name: Build
-        run: npx lerna run build
-      - name: Publish Next
-        run: npx lerna publish --dist-tag next
-
