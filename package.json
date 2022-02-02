@@ -18,6 +18,8 @@
     "build:sdk:release": "bb build:sdk:release",
     "build:web:develop": "bb build:web:develop",
     "build:web:release": "bb build:web:release",
+    "test:all:develop": "bb test:all:develop",
+    "test:all:release": "bb test:all:release",
     "test:sdk:cljs:develop": "bb test:sdk:cljs:develop",
     "test:sdk:cljs:release": "bb test:sdk:cljs:release",
     "test:sdk:js:develop": "bb test:sdk:js:develop",
