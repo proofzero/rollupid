@@ -103,6 +103,7 @@
 ;; TODO validate requests and responses
 ;; TODO JWT validate
 ;; TODO response type conversion
+;; TODO correlation ID (from header, or assign ULID)
 (def routes
   [["/kbt/:id"
     {:name ::kbt

@@ -32,6 +32,8 @@
                     (go
                       (let [result (<! res-chan)]
                         ;; TODO handle errors using common error utilities
-                        (when (= :kubelt.type/error (:com.kubelt/type result))
-                          (prn (:error result)))))
-                    (sdk/halt! kbt)))))})
+                        ;; TODO use utility fn to detect error result
+                        (if (= :kubelt.type/error (:com.kubelt/type result))
+                          (prn (:error result))
+                          (println result)))
+                      (sdk/halt! kbt))))))})
