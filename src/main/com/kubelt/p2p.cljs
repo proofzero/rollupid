@@ -328,7 +328,7 @@
      :hyper/bee
      {:hyper/core (ig/ref :hyper/core)
       :key/encoding "utf-8"
-      :value/encoding "binary"}
+      :value/encoding "utf-8"}
 
      :hyper/core
      {:value/encoding "utf-8"
