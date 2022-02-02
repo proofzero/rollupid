@@ -63,7 +63,7 @@
     "rdf-parse": "1.9.1",
     "react-app-rewired": "2.1.11",
     "stream-browserify": "3.0.0",
-    "stream-http": "^3.2.0",
+    "stream-http": "3.2.0",
     "yargs": "17.3.1"
   },
   "devDependencies": {
