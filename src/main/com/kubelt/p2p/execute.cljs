@@ -128,6 +128,7 @@
                    int-chain (seq (extract-chain request-method (:data match)))]
             (let [on-complete (partial on-complete res)
                   on-error (partial on-error res)
+                  context (assoc context :match match)
                   ;; Need to convert for processing by sieppari; doesn't
                   ;; appear to accept a seq.
                   int-chain (into [] int-chain)]

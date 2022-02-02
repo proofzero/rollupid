@@ -54,13 +54,19 @@
                   body {:version version}]
               (assoc-in ctx [:response :http/body] body)))})
 
+;; TODO confirm that an error in the promise chain triggers execution
+;; of :error handler; otherwise use .catch().
 (def kbt-resolve
   {:name ::kbt-resolve
-   :enter (fn [{:keys [id p2p/hyperbee] :as ctx}]
-            (log/trace {:log/msg "enter kbt-resolve" :kbt/id id})
+   :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
             (let [request (get ctx :request)
-                  kbt-name (nth (get request :uri/path-components) 2)]
-              ;; The Hyperbee .get() request returns a promise.
+                  ;; Context has a :match key containing the routing
+                  ;; table match data.
+                  kbt-name (get-in match [:path-params :id])]
+              (log/trace {:log/msg "enter kbt-resolve" :kbt/name kbt-name})
+              ;; The Hyperbee .get() request returns a promise. Note
+              ;; that js/Promise is an AsyncContext, so execution pauses
+              ;; until the promise resolves.
               (-> (.get hyperbee kbt-name)
                   (.then (fn [kbt-value]
                            (if-let [body {:name kbt-name :value kbt-value}]
