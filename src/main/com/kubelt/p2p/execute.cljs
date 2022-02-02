@@ -16,6 +16,7 @@
 
 ;; Media Types
 ;; -----------------------------------------------------------------------------
+;; TODO migrate to media types library
 
 (def transit-json
   "application/transit+json")

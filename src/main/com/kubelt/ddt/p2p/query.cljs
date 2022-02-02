@@ -21,17 +21,20 @@
    :handler (fn [args]
               (let [{:keys [key host port]} (js->clj args :keywordize-keys true)
                     maddr (str "/ip4/" host "/tcp/" port)
-                    kbt (sdk/init {:p2p/read maddr :p2p/write maddr})
-                    ;; TODO supply account details from somewhere;
-                    ;; should we have a local wallet for development /
-                    ;; testing?
-                    account {:kubelt/type :kubelt.type/account
-                             :account/public-key "xyzabc123"}]
-                ;; TODO error handling (anomalies?)
-                (let [result-chan (p2p/query! kbt account key)]
-                  (async/go
-                    (let [result (<! result-chan)]
-                      (if (= :kubelt.type/error (:com.kubelt/type result))
-                        (prn (:error result))
-                        (println result)))))
+                    kbt (sdk/init {:p2p/read maddr :p2p/write maddr})]
+                (if (sdk/error? kbt)
+                  (prn (:error kbt))
+                  ;; TODO error handling (anomalies?)
+                  (let [;; TODO supply account details from somewhere;
+                        ;; should we have a local wallet for development /
+                        ;; testing?
+                        account {:kubelt/type :kubelt.type/account
+                                 :account/public-key "xyzabc123"}
+                        result-chan (p2p/query! kbt account key)]
+                    (async/go
+                      (let [result (<! result-chan)]
+                        ;; TODO use utility fn to detect error result
+                        (if (= :kubelt.type/error (:com.kubelt/type result))
+                          (prn (:error result))
+                          (println result))))))
                 (sdk/halt! kbt)))})

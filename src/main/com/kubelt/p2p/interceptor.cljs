@@ -100,10 +100,10 @@
 (def kbt-update
   {:name ::kbt-update
    :enter (fn [ctx]
-            (log/trace {:log/msg "enter update-kbt-value"})
+            (log/trace {:log/msg "enter kbt-update"})
             ctx)
    :leave (fn [ctx]
-            (log/info {:log/msg "leaving update-kbt-value"})
+            (log/trace {:log/msg "leaving kbt-update"})
             ctx)
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
