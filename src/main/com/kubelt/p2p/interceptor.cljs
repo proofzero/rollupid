@@ -2,6 +2,7 @@
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [goog.crypt.base64 :as base64]
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.http.status :as http.status]))
@@ -75,7 +76,8 @@
               ;; that js/Promise is an AsyncContext, so execution pauses
               ;; until the promise resolves.
               (-> (.get hyperbee kbt-name)
-                  (.then (fn [kbt-value]
+                  (.then (fn [kbt-value-map]
+                           (let [kbt-value (:base64/decodeString (get (js->clj kbt-value-map :keywordize-keys true) :value))]
                            (if-not (nil? kbt-value)
                              (do
                                (log/info {:log/msg "found name"
@@ -84,7 +86,7 @@
                                (let [body {:name kbt-name :value kbt-value}]
                                  (assoc-in ctx [:response :http/body] body)))
                              ;; No result found, return a 404.
-                             (assoc-in ctx [:response :http/status] http.status/not-found)))))))
+                             (assoc-in ctx [:response :http/status] http.status/not-found))))))))
    :leave (fn [ctx]
             (log/trace {:log/msg "leaving kbt-resolve"})
             ctx)
