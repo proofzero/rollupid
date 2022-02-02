@@ -89,6 +89,7 @@
 ;; TODO extract payload from JWT
 ;; TODO update value in hyperbee for kbtname
 ;; TODO return response
+(comment
 (def kbt-update
   {:name ::kbt-update
    :enter (fn [ctx]
@@ -100,32 +101,37 @@
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
             ctx)})
-
-(comment
+)
   (def kbt-update
     {:name ::kbt-update
-     :enter (fn [ctx]
+;;     :enter (fn [ctx]
+     :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
               (log/info {:log/msg "enter kbt update"})
+              (log/info {:log/msg (get ctx :request)})
 
               ;; get relevant values from request
               (let [reqmap (get ctx :request)
-                    kbtname (nth (get reqmap :uri/path-components) 2)
-                    kbtvalue (nth (get reqmap :uri/path-components) 3)]
+                  kbt-name (get-in match [:path-params :id])
+                  kbt-value (get-in match [:path-params :endpoint])
+                  hyperbee (get ctx :p2p/hyperbee)]
+                    
 
-                (log/info {:log/msg kbtname})
-                (log/info {:log/msg kbtvalue})
+                (log/info {:log/msg kbt-name})
+                (log/info {:log/msg kbt-value})
                 (log/info {:log/msg (get ctx :p2p/hyperbee)})
-                (.put (get ctx :p2p/hyperbee) kbtname kbtvalue)
-                (doto (get ctx :response)
-                  (.writeHead 200 #js {"content-type" "text/html"})
-                  (.end (reduce str ["<html><body><h1>SETTING " kbtname " = " kbtvalue " </h1></body></html>"]))))
+
+                (-> (.put hyperbee kbt-name kbt-value)
+                    (.then (fn [kbt-save-result] 
+                             (log/info kbt-save-result)
+                             ))))
+
               ctx)
      :leave (fn [ctx]
               (log/info {:log/msg "leaving kbt update"})
               ctx)
      :error (fn [{:keys [error] :as ctx}]
               (log/error {:log/error error})
-              ctx)}))
+              ctx)})
 
 (def health-ready
   {:name ::health-ready
