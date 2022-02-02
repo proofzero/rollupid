@@ -44,7 +44,7 @@
     "assert": "^2.0.0",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
-    "fs": "^0.0.1-security",
+    "fs": "0.0.1-security",
     "https-browserify": "^1.0.0",
     "ipfs-http-client": "56.0.0",
     "ipfs-message-port-client": "0.11.0",
