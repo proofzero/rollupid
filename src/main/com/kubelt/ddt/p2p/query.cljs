@@ -27,7 +27,7 @@
                     ;; testing?
                     account {:kubelt/type :kubelt.type/account
                              :account/public-key "xyzabc123"}]
-                ;; TODO error handling
+                ;; TODO error handling (anomalies?)
                 (let [result-chan (p2p/query! kbt account key)]
                   (async/go
                     (let [result (<! result-chan)]
