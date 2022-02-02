@@ -22,17 +22,24 @@
 (def status-ok
   {:name ::status-ok
    :leave (fn [ctx]
-            (assoc-in ctx [:response :http/status] http.status/ok))})
+            ;; If status is already set, nothing to do.
+            (if-let [status (get-in ctx [:response :http/status])]
+              ctx
+              (assoc-in ctx [:response :http/status] http.status/ok)))})
 
 (def status-no-content
-  {:name ::status-ok
+  {:name ::status-no-content
    :leave (fn [ctx]
-            (assoc-in ctx [:response :http/status] http.status/no-content))})
+            ;; If status is already set, nothing to do.
+            (if-let [status (get-in ctx [:response :http/status])]
+              ctx
+              (assoc-in ctx [:response :http/status] http.status/no-content)))})
 
 (def validate-jwt
   {:name ::validate-jwt
    :enter (fn [ctx]
-            ;; TODO extract and validate JWT
+            ;; TODO extract and validate JWT. Throw an error to
+            ;; interrupt chain processing if token is invalid.
             ctx)})
 
 (def register
@@ -69,12 +76,13 @@
               ;; until the promise resolves.
               (-> (.get hyperbee kbt-name)
                   (.then (fn [kbt-value]
-                           (if-let [body {:name kbt-name :value kbt-value}]
+                           (if-not (nil? kbt-value)
                              (do
                                (log/info {:log/msg "found name"
                                           :kbt/name kbt-name
                                           :kbt/value kbt-value})
-                               (assoc-in ctx [:response :http/body] body))
+                               (let [body {:name kbt-name :value kbt-value}]
+                                 (assoc-in ctx [:response :http/body] body)))
                              ;; No result found, return a 404.
                              (assoc-in ctx [:response :http/status] http.status/not-found)))))))
    :leave (fn [ctx]
