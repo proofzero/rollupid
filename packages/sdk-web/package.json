@@ -1,11 +1,20 @@
 {
-  "name": "@kubelt/sdk-js",
+  "name": "@kubelt/sdk-web",
   "version": "0.0.0",
-  "description": "Kubelt SDK (for JavaScript)",
+  "description": "Kubelt SDK for CommonJS",
+  "keywords": [
+    "kubelt",
+    "sdk",
+    "web3",
+    "cms",
+    "ipfs",
+    "ipld",
+    "rdf"
+  ],
   "author": "Kubelt, Inc.",
-  "homepage": "https://github.com/kubelt/kubelt#readme",
+  "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
-  "main": "lib/sdk.js",
+  "main": "lib/index.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -13,16 +22,12 @@
   "files": [
     "lib"
   ],
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
-  },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/kubelt/kubelt.git"
+    "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "build": "bb run build:release",
+    "build": "webpack --config webpack.config.js",
     "test": "echo \"Error: run tests from root\" && exit 1",
     "nft": "echo \"Error: impl non functional tests \" && exit 1"
   },
@@ -36,9 +41,11 @@
     "@multiformats/blake2": "1.0.8",
     "@multiformats/sha3": "2.0.7",
     "@stablelib/ed25519": "1.0.2",
+    "assert": "2.0.0",
     "blake3": "2.1.7",
-    "electron": "17.0.0",
     "event-stream": "4.0.1",
+    "fs": "0.0.1-security",
+    "https-browserify": "1.0.0",
     "ipfs-http-client": "56.0.0",
     "ipfs-message-port-client": "0.11.0",
     "ipns": "0.16.0",
@@ -50,9 +57,25 @@
     "multiaddr": "10.0.1",
     "multiformats": "9.6.2",
     "n3": "1.13.0",
+    "os": "0.1.2",
+    "os-browserify": "0.3.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
-    "supports-color": "9.2.1",
+    "react-app-rewired": "2.1.11",
+    "stream-browserify": "3.0.0",
+    "stream-http": "3.2.0",
     "yargs": "17.3.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "7.16.10",
+    "@babel/preset-env": "7.16.11",
+    "@babel/preset-react": "7.16.7",
+    "@babel/runtime": "7.16.7",
+    "babel-loader": "8.2.3",
+    "babel-plugin-transform-async-to-generator": "6.24.1",
+    "babel-plugin-transform-runtime": "6.23.0",
+    "node-polyfill-webpack-plugin": "1.1.4",
+    "webpack": "5.68.0",
+    "webpack-cli": "4.9.2"
   }
 }

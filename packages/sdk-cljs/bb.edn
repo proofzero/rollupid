@@ -40,6 +40,16 @@
                mismatches (package/mismatches pkg-parent pkg-local)]
            (when (not (empty? mismatches))
              (throw (ex-info "mismatched versions" mismatches))))}
+  
+  build:develop
+  {:doc "Build a development JavaScript version of the JS CLI"
+   :depends [package:check]
+   :task (println "Not implemented")}
+
+  build:release
+  {:doc "Build a release JavaScript version of the JS CLI"
+   :depends [package:check]
+   :task (println "Not implemented")}
 
   test:develop
   {:doc "Run ClojureScript tests against development build of SDK"
