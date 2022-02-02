@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/sdk-js",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.47+167acfa",
   "description": "Kubelt SDK (for JavaScript)",
   "author": "Kubelt, Inc.",
   "homepage": "https://github.com/kubelt/kubelt#readme",
@@ -54,5 +54,6 @@
     "rdf-parse": "1.9.1",
     "supports-color": "9.2.1",
     "yargs": "17.3.1"
-  }
+  },
+  "gitHead": "167acfadf15a001037a028564cf046d9b3889d87"
 }

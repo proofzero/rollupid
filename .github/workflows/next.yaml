@@ -23,4 +23,4 @@ jobs:
         with:
           babashka-version: 0.7.4
       - name: Publish Next
-        run: npx lerna publish --canary
+        run: npx lerna publish --canary --pre-dist-tag snapshot --yes

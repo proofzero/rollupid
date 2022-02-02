@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/kbt",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.47+167acfa",
   "description": "Kubelt CLI",
   "keywords": [
     "kubelt",
@@ -37,5 +37,6 @@
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
-  }
+  },
+  "gitHead": "167acfadf15a001037a028564cf046d9b3889d87"
 }
