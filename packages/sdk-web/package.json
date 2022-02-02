@@ -58,7 +58,7 @@
     "multiformats": "9.6.2",
     "n3": "1.13.0",
     "os": "0.1.2",
-    "os-browserify": "^0.3.0",
+    "os-browserify": "0.3.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
     "react-app-rewired": "^2.1.11",
