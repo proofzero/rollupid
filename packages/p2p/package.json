@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/p2p",
-  "version": "0.0.1-alpha.47+167acfa",
+  "version": "0.0.1-next.49+59d5010",
   "description": "Kubelt p2p",
   "author": "Kubelt, Inc.",
   "homepage": "https://github.com/kubelt/kubelt#readme",
@@ -37,5 +37,5 @@
     "sd-notify": "2.8.0",
     "yargs": "17.3.1"
   },
-  "gitHead": "167acfadf15a001037a028564cf046d9b3889d87"
+  "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }

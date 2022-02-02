@@ -2,4 +2,4 @@
 
 # Assocate our scope with the GitHub package registry.
 registry=https://registry.npmjs.org/
-@kubelt:registry=https://npm.pkg.github.com/
+@kubelt:registry=https://npm.pkg.github.com/:_authToken=TOKEN
