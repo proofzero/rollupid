@@ -50,6 +50,7 @@
         headers (.-headers req)
         trailers (.-trailers req)
         status (.-statusCode req)
+        body "fixme"
         ;; Extract data from the request URL.
         req-url (goog.Uri. (.-url req))
         req-host (goog.object/getValueByKeys req #js ["headers" "host"])
@@ -74,6 +75,7 @@
      :http/headers headers
      :http/trailers trailers
      :http/status status
+     :http/body body
      :uri/scheme scheme
      :uri/port port
      :uri/path path

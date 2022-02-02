@@ -10,18 +10,6 @@
    [com.kubelt.lib.http.status :as http.status]))
 
 
-(def example
-  {:name ::example
-   :enter (fn [ctx]
-            (log/info {:log/msg "enter"})
-            ctx)
-   :leave (fn [ctx]
-            (log/info {:log/msg "leaving"})
-            ctx)
-   :error (fn [{:keys [error] :as ctx}]
-            (log/error {:log/error error})
-            ctx)})
-
 (def status-ok
   {:name ::status-ok
    :leave (fn [ctx]
@@ -81,9 +69,8 @@
                   (.then (fn [kbt-object]
                            (let [;; Hyperbee returns an object that
                                  ;; includes sequence number, etc.
-                                 m (js->clj kbt-object :keywordize-keys true)
-                                 kbt-value (str (get m :value))]
-                           (if-not (str/blank? nil? kbt-value)
+                                 kbt-value (str (.-value kbt-object))]
+                           (if-not (str/blank? kbt-value)
                              (do
                                (log/info {:log/msg "found name"
                                           :kbt/name kbt-name
@@ -107,7 +94,6 @@
                   ;;kbt-value (get request )
                   ;;kbt-value (get-in match [:path-params :endpoint])
                   kbt-value "fixme"]
-              (prn request)
               (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
               (-> (.put hyperbee kbt-name kbt-value)
                   (.then (fn []

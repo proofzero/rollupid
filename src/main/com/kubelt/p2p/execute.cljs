@@ -4,6 +4,8 @@
   (:require
    ["http" :as http :refer [IncomingMessage ServerResponse]])
   (:require
+   [clojure.string :as str])
+  (:require
    [cognitect.transit :as transit]
    [reitit.core :as route]
    [reitit.interceptor :as interceptor]
@@ -107,34 +109,49 @@
     ;; triggers the execution of the chain.
     (fn on-request
       [^IncomingMessage req ^ServerResponse res]
-      (let [request-map (http.request/req->map req)
-            request-method (:http/method request-map)
-            request-path (:uri/path request-map)
-            context {:request request-map
-                     :response {}
-                     :p2p/hyperbee hyperbee
-                     :p2p/database database}]
-        ;; TODO handle match :path-params (+ :path :result :template)
-        (if-let [match (route/match-by-path router request-path)]
-          (if-let [;; NB: (seq) returns nil for empty collections.
-                   int-chain (seq (extract-chain request-method (:data match)))]
-            (let [on-complete (partial on-complete res)
-                  on-error (partial on-error res)
-                  context (assoc context :match match)
-                  ;; Need to convert for processing by sieppari; doesn't
-                  ;; appear to accept a seq.
-                  int-chain (into [] int-chain)]
-              ;; Execute the interceptor chain, calling either the
-              ;; completion or error callbacks.
-              (sieppari/execute-context int-chain context on-complete on-error))
-            ;; The route was matched but no interceptors found; tell the
-            ;; user they requested an unsupported method with a 405
-            ;; Method Not Allowed response.
-            (let [result (set-status context http.status/method-not-allowed)]
-              (on-complete res result)))
-          ;; No matching route found, return 404.
-          (let [result (set-status context http.status/not-found)]
-            (on-complete res result)))))))
+      (let [chunks #js []]
+        (.on req "data"
+             (fn [chunk]
+               ;; Accumulate an array of request body data
+               ;; chunks (Buffers).
+               (.push chunks chunk)))
+        (.on req "end"
+             (fn []
+               ;; We have accumulated the entire request body. Coalesce
+               ;; into a single string/buffer and store as the raw request
+               ;; body on the context. This makes the request body
+               ;; available for content negotiation in interceptors.
+               (let [;; TODO should this be stored as Buffer for raw?
+                     raw-body (js/Buffer.concat chunks)
+                     request-map (http.request/req->map req)
+                     request-method (:http/method request-map)
+                     request-path (:uri/path request-map)
+                     context {:request request-map
+                              :response {}
+                              :body/raw raw-body
+                              :p2p/hyperbee hyperbee
+                              :p2p/database database}]
+                 ;; TODO handle match :path-params (+ :path :result :template)
+                 (if-let [match (route/match-by-path router request-path)]
+                   (if-let [;; NB: (seq) returns nil for empty collections.
+                            int-chain (seq (extract-chain request-method (:data match)))]
+                     (let [on-complete (partial on-complete res)
+                           on-error (partial on-error res)
+                           context (assoc context :match match)
+                           ;; Need to convert for processing by sieppari; doesn't
+                           ;; appear to accept a seq.
+                           int-chain (into [] int-chain)]
+                       ;; Execute the interceptor chain, calling either the
+                       ;; completion or error callbacks.
+                       (sieppari/execute-context int-chain context on-complete on-error))
+                     ;; The route was matched but no interceptors found; tell the
+                     ;; user they requested an unsupported method with a 405
+                     ;; Method Not Allowed response.
+                     (let [result (set-status context http.status/method-not-allowed)]
+                       (on-complete res result)))
+                   ;; No matching route found, return 404.
+                   (let [result (set-status context http.status/not-found)]
+                     (on-complete res result))))))))))
 
 ;; TEMP
 ;; -----------------------------------------------------------------------------
