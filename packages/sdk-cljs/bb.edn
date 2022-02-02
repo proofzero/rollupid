@@ -44,7 +44,7 @@
   build:develop
   {:doc "Build a development JavaScript version of the JS CLI"
    :depends [package:check]
-   :task (shell "echo 'Not implemented'")}
+   :task (println "Not implemented")}
 
   build:release
   {:doc "Build a release JavaScript version of the JS CLI"
