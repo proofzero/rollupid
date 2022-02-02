@@ -108,8 +108,8 @@
     {:name ::kbt
      :http.method/all [p2p.interceptor/validate-jwt
                        p2p.interceptor/status-ok]
-     :http.method/get {:interceptors [p2p.interceptor/get-value-for-kbtname]}
-     :http.method/post {:interceptors [p2p.interceptor/update-kbt-value]}}]
+     :http.method/get {:interceptors [p2p.interceptor/kbt-resolve]}
+     :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
    ;; TODO user registration
    ["/register"
     {:name ::register
