@@ -49,7 +49,7 @@
   build:release
   {:doc "Build a release JavaScript version of the JS CLI"
    :depends [package:check]
-   :task (shell "echo 'Not implemented'")}
+   :task (println "Not implemented")}
 
   test:develop
   {:doc "Run ClojureScript tests against development build of SDK"
