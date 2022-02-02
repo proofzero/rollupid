@@ -4,25 +4,16 @@
   (:require
    ["http" :as http :refer [IncomingMessage ServerResponse]])
   (:require
+   [cognitect.transit :as transit]
    [reitit.core :as route]
    [reitit.interceptor :as interceptor]
    [sieppari.core :as sieppari]
    [sieppari.queue :as queue]
-   [taoensso.timbre :as log]
-   [cognitect.transit :as transit])
+   [taoensso.timbre :as log])
   (:require
+   [com.kubelt.lib.http.media-type :as http.media-type]
    [com.kubelt.lib.http.request :as http.request]
    [com.kubelt.lib.http.status :as http.status]))
-
-;; Media Types
-;; -----------------------------------------------------------------------------
-;; TODO migrate to media types library
-
-(def transit-json
-  "application/transit+json")
-
-(def transit-msgpack
-  "application/transit+msgpack")
 
 ;; Handlers
 ;; -----------------------------------------------------------------------------
@@ -52,7 +43,7 @@
       ;; the response headers accordingly.
       (let [writer (transit/writer :json)
             response-body (transit/write writer body-edn)
-            headers #js {"Content-Type" transit-json}]
+            headers #js {"Content-Type" http.media-type/transit-json}]
         (doto res
           (.writeHead status headers)
           (.end response-body)))
