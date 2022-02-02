@@ -1,7 +1,7 @@
 'use strict';
 
-const sdkModule = require('..');
+const kubelt = require('..');
 
-describe('sdk-module', () => {
+describe('sdk-web', () => {
     it('needs tests');
 });

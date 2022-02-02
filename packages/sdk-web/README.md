@@ -1,11 +1,11 @@
-# `sdk-module`
+# `sdk-web`
 
-> TODO: description
+SDK Web is a node module that can be used in browser projects.
 
 ## Usage
 
 ```
-const sdkModule = require('sdk-module');
+const kubelt = require('sdk-web');
 
 // TODO: DEMONSTRATE API
 ```

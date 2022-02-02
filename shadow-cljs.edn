@@ -92,25 +92,14 @@
    :ns-regexp "-test$"
    :autorun true}
   
-  ;; This is the CommonJS module target
-  :sdk-module
-  {:target :npm-module
-   :output-dir "packages/sdk-module/lib/"
-   :entries [ com.kubelt.sdk ] }
-
-  ;:sdk-module
-  ;{:target :node-test
-   ;:output-to "target/sdk-test.js"
-   ;:ns-regexp "-test$"
-   ;:autorun true}
-
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use in the browser.
   :web
   {:target :browser
    :output-dir "packages/web/lib"
    :asset-path "/js"
-   :modules {:base {:entries [com.kubelt.sdk]}}
+   :modules {:base {:entries [com.kubelt.sdk]
+                    :init-fn com.kubelt.sdk/web-v1}}
    :compiler-options {:output-feature-set :browser-2021
                       :optimizations :advanced}}
 
