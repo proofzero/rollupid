@@ -85,55 +85,28 @@
                                  (assoc-in ctx [:response :http/body] body)))
                              ;; No result found, return a 404.
                              (assoc-in ctx [:response :http/status] http.status/not-found)))))))
-   :leave (fn [ctx]
-            (log/trace {:log/msg "leaving kbt-resolve"})
-            ctx)
+
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
             ctx)})
 
-
-;; TODO verify JWT
 ;; TODO extract payload from JWT
-;; TODO update value in hyperbee for kbtname
-;; TODO return response
 (def kbt-update
   {:name ::kbt-update
-   :enter (fn [ctx]
-            (log/trace {:log/msg "enter kbt-update"})
-            ctx)
-   :leave (fn [ctx]
-            (log/trace {:log/msg "leaving kbt-update"})
-            ctx)
+   :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
+            (let [request (get ctx :request)
+                  kbt-name (get-in match [:path-params :id])
+                  ;;kbt-value (get request )
+                  kbt-value "fixme"]
+              (prn request)
+              (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
+              (-> (.put hyperbee kbt-name kbt-value)
+                  (.then (fn []
+                           (assoc-in ctx [:response :http/status] http.status/created))))))
+
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
             ctx)})
-
-(comment
-  (def kbt-update
-    {:name ::kbt-update
-     :enter (fn [ctx]
-              (log/info {:log/msg "enter kbt update"})
-
-              ;; get relevant values from request
-              (let [reqmap (get ctx :request)
-                    kbtname (nth (get reqmap :uri/path-components) 2)
-                    kbtvalue (nth (get reqmap :uri/path-components) 3)]
-
-                (log/info {:log/msg kbtname})
-                (log/info {:log/msg kbtvalue})
-                (log/info {:log/msg (get ctx :p2p/hyperbee)})
-                (.put (get ctx :p2p/hyperbee) kbtname kbtvalue)
-                (doto (get ctx :response)
-                  (.writeHead 200 #js {"content-type" "text/html"})
-                  (.end (reduce str ["<html><body><h1>SETTING " kbtname " = " kbtvalue " </h1></body></html>"]))))
-              ctx)
-     :leave (fn [ctx]
-              (log/info {:log/msg "leaving kbt update"})
-              ctx)
-     :error (fn [{:keys [error] :as ctx}]
-              (log/error {:log/error error})
-              ctx)}))
 
 (def health-ready
   {:name ::health-ready
