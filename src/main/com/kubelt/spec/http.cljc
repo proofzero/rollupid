@@ -63,7 +63,7 @@
   [:map
    [:kubelt/type [:enum :kubelt.type/http-request]]
    [:http/method method]
-   [:http/version version]
+   [:http/version {:optional true} version]
    [:http/headers {:optional true} headers]
    [:http/trailers {:optional true} trailers]
    [:http/status {:optional true} status]

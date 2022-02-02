@@ -85,11 +85,15 @@
         port (get-in sys [:client/p2p :p2p/read :address/port])
         path (str/join "/" ["" "kbt" key])
         request {:kubelt/type :kubelt.type/http-request
+                 ;; TODO make this a default
+                 ;;:http/version "1.1"
+                 ;; TODO make this a default
                  :http/method :get
-                 :http/scheme scheme
-                 :http/host host
-                 :http/port port
-                 :http/path path}]
+                 ;;:uri/scheme scheme
+                 :uri/scheme :http
+                 :uri/domain host
+                 :uri/port port
+                 :uri/path path}]
     ;; TODO extract user's public key from the account map
     ;; (for use as account identifier)
     (http/request! client request)))

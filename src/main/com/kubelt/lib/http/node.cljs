@@ -26,25 +26,25 @@
   {:pre [(map? m)]}
   (str/upper-case (name (:http/method m))))
 
-(defn request->host
+(defn request->domain
   [m]
   {:pre [(map? m)]}
-  (:http/host m))
+  (:uri/domain m))
 
 (defn request->port
   [m]
   {:pre [(map? m)]}
-  (:http/port m))
+  (:uri/port m))
 
 (defn request->path
   [m]
   {:pre [(map? m)]}
-  (:http/path m))
+  (:uri/path m))
 
 (defn request->headers
   [m]
   {:pre [(map? m)]}
-  (clj->js (:http/headers m)))
+  (:http/headers m))
 
 (defn request->body
   [m]
@@ -58,13 +58,13 @@
   [m]
   {:pre [(map? m)]}
   (let [method (request->method m)
-        host (request->host m)
+        domain (request->domain m)
         port (request->port m)
         path (request->path m)
         headers (request->headers m)
         body (request->body m)
         options {:method method
-                 :hostname host
+                 :hostname domain
                  :port port
                  :path path}]
     (clj->js
@@ -117,7 +117,7 @@
     [this m]
     (if-not (malli/validate spec.http/request m)
       ;; TODO report an error using common error reporting
-      ;; functionality.
+      ;; functionality (anomalies).
       (let [explain (-> spec.http/request (malli/explain m) me/humanize)
             error {:com.kubelt/type :kubelt.type/error
                    :error explain}
@@ -125,8 +125,8 @@
         (async/put! response-chan error)
         response-chan)
       ;; The request map is valid, so fire off the request.
-      (let [scheme (get m :http/scheme :http)
-            request-map (dissoc m :http/scheme)
+      (let [scheme (get m :uri/scheme :http)
+            request-map (dissoc m :uri/scheme)
             options (request->options request-map)
             ;; Use an unbuffered channel for the response.
             response-chan (async/chan)
