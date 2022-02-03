@@ -34,19 +34,22 @@
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
-            (try 
+            (prn (get-in ctx [:request :http/body]))
             (let [payload "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwdWJrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUEwRmFqOVdFMGJkcFVvWlJWbGM5VlxuKzdRb0VVT0srcGlYSlFHaCs4MldjZWZWYk1LYkVRWDVvVTFkZ2p1M1gvcXVOSlF4MDVqVU92VXRrZFRZNXlEUVxuaWdVV2tHeHNLR3Z0bGJZdENsWW1ZeFVYeG1UKzZXR3lHZ0xpbzJQczFVRXRFMVlHQWlnczJmcXNKaWdGZ3FhN1xuaDVkRXF1TXo0RkNCd0xlVVBObUczcFBTNDdsaTlXSDdyM2M3WmhjNUNJZmRKcmZXSlJnSzNscVg0WldrdlJEblxuMk14NFA2MTRISTZDR09uVDU1Qjlyd1VmL0tISEJabGZtb1NvUEFXNkdUNkRCR0w0YVNEbjE0UkVSQnkrUE00cVxuL3FKWkhuT3VGdWE4RTByRGNwMjgvZVovS0dhbDg4eFBzVjhZQ2NHYklnSUZ3TUViVFZNRTNrT2c4ZmNTeUZBd1xucVFJREFRQUJcbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLVxuIiwiZW5kcG9pbnQiOiJiYWZ5eDB4MHgweDB4MCIsImtidG5hbWUiOiJpR1dvUjZkRVNCaE52SGRuU09kRXpkV0Rqamxibm1RbXZZMWpyY2ZVdmZrPSIsImlhdCI6MTY0MzkwNjQ1MywiZXhwIjoxNjQzOTQ5NjUzfQ.y66_Z8AdRkUbu28JJ4P4XtmQ5zZ-SNLckc5FOjSRBEbmyOH3GWFCXRo1I-RvtJB4-qUu8xf8tB-LL3TSxFNzqTJf26We9oNEZ9frlmsYQ6q5F5RWUnaliqtvtDAqBrRxnrfhBEeouTSYaneLEkr5JvmgMN9zu7RHD1p3C2Gj-RMUbVJ55Wk_ur3EO_pkW6EMX8bxwVV6U1z34eZ5hlJ7TWSmL1caaTBlIN-CQ0MPTqx7U7Nd7ZsBGPPFSogDh0cVQJrxiuDhgRFIzm3QeFiT9Gire-asiijgcA_WuBFiOYIRa2N5BGGRlDnpLTMLWnS1p04RH2vx7gnT_3ynmt3T8Q" ;; TODO retrieve from request
                   decoded (jwt/decode payload)
                   pubkey (str (.-pubkey decoded))]
               (let [jwt-valid (jwt/verify payload pubkey)] 
-
-                (let [newctx 
                 (-> ctx
-                    (assoc-in [:response :http/jwt-raw] payload)
-                    (assoc-in [:response :http/jwt-pubkey] pubkey)
-                    (assoc-in [:response :http/jwt-valid] jwt-valid))
-               ] 
-                newctx )))))})
+                    (assoc-in [:request :jwt/raw] payload)
+                    (assoc-in [:request :jwt/pubkey] pubkey)
+                    (assoc-in [:request :jwt/valid] jwt-valid))
+                
+                )))
+
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
+            ctx)})
+
 
 
             ;; TODO check and throw error
@@ -109,23 +112,12 @@
   {:name ::kbt-update
    :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
             
-            (prn "entered kbt-update")    
-            (prn (get ctx :response) )
-            (prn (get (get ctx :response) :http/jwt-valid) )
-
             (let [request (get ctx :request)
                   kbt-name (get-in match [:path-params :id])
-                  ;; TODO get from body
-                  ;;kbt-value (get request )
-                  ;;kbt-value (get-in match [:path-params :endpoint])
-                  kbt-value "fixme"]
-;;                  kbt-value  (get-in (get-in ctx [:response :http/jwt-valid]) [:endpoint])]
-              (prn (get ctx :response))
-              (log/info { :valid (get (get ctx [:response]) [:http/jwt-valid])})
+                  kbt-value  (get (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true) :endpoint)]
 
-
-;;                  kbt-value "fixme"]
               (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
+
               (-> (.put hyperbee kbt-name kbt-value)
                   (.then (fn []
                            (assoc-in ctx [:response :http/status] http.status/created))))))

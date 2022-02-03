@@ -113,7 +113,8 @@
      :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
    ["/kbt-update/:id/:endpoint"
     {:name ::kbt-update
-     :http.method/all [p2p.interceptor/status-ok]
+     :http.method/all [p2p.interceptor/validate-jwt 
+                       p2p.interceptor/status-ok]
      :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
    ;; TODO user registration
    ["/register"
