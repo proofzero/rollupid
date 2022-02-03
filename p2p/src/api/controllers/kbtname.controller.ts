@@ -13,6 +13,32 @@ const db = new Hyperbee(feed, {
 	valueEncoding: 'binary' // same options as above
 })
 
+export const postSaveNameByKbtIdNosec = async (req: Request, res: Response) => {
+
+	//TODO: add authentication, verification that you own the key via keypair signature 
+	//TODO: validate key format 
+
+	let kbtname : string = ""
+	let kbtendpoint : string = ""
+
+	try {
+		kbtname = req.body.kbtname
+		kbtendpoint = req.body.endpoint
+		//console.log("saving " + kbtendpoint + " to name key " + kbtname);
+		await db.put(kbtname, kbtendpoint);
+		//console.log("\nJWT verification result: " + JSON.stringify(legit));
+
+		res.status(200).json({ success: true, operation: 'save', 'kbtname': kbtname, endpoint: kbtendpoint});
+	} catch {
+		// error
+		//console.log("bad token");
+		res.status(500).json({success: false, error: "missing fields"});
+	}
+
+
+};
+
+
 export const postSaveNameByKbtId = async (req: Request, res: Response) => {
 
 	//TODO: add authentication, verification that you own the key via keypair signature 

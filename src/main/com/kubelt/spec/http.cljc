@@ -12,7 +12,11 @@
 (def host
   string?)
 
+(def version
+  string?)
+
 (def port
+  ;; TODO constrain to valid port range
   int?)
 
 (def path
@@ -21,7 +25,28 @@
 (def headers
   [:map-of string? [:or string? number?]])
 
+(def trailers
+  [:map-of string? [:or string? number?]])
+
+(def status
+  number?)
+
 (def body
+  string?)
+
+(def scheme
+  [:enum :http :https])
+
+(def fragment
+  string?)
+
+(def query
+  [:map-of string? string?])
+
+(def domain
+  string?)
+
+(def user
   string?)
 
 ;; response
@@ -38,11 +63,18 @@
   [:map
    [:kubelt/type [:enum :kubelt.type/http-request]]
    [:http/method method]
-   [:http/host host]
-   [:http/port port]
-   [:http/path path]
+   [:http/version {:optional true} version]
    [:http/headers {:optional true} headers]
-   [:http/body {:optional true} body]])
+   [:http/trailers {:optional true} trailers]
+   [:http/status {:optional true} status]
+   [:http/body {:optional true} body]
+   [:uri/scheme scheme]
+   [:uri/port port]
+   [:uri/path path]
+   [:uri/fragment {:optional true} fragment]
+   [:uri/query {:optional true} query]
+   [:uri/domain domain]
+   [:uri/user {:optional true} user]])
 
 (def request-schema
   [:and

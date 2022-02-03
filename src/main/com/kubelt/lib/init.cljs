@@ -38,8 +38,10 @@
    :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"}
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
-   :client/p2p {:p2p/read "/ip4/127.0.0.1/tcp/9061"
-                :p2p/write "/ip4/127.0.0.1/tcp/9061"}
+   :client/p2p {:p2p/read {:http/scheme :https
+                           :http/address "/ip4/127.0.0.1/tcp/9061"}
+                :p2p/write {:http/scheme :https
+                            :http/address "/ip4/127.0.0.1/tcp/9061"}}
    :client/http :missing})
 
 ;; :client/ipfs
@@ -76,7 +78,7 @@
 ;; :client/p2p
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :client/p2p [_ value]
+(defmethod ig/init-key :client/p2p [_ {:keys [p2p/read p2p/write] :as value}]
   ;; If we wanted to initialize a stateful client for the p2p system,
   ;; this would be the place. Since that system exposes a stateless HTTP
   ;; API, we'll just convert the multiaddresses we're given for the p2p
@@ -85,12 +87,21 @@
   ;; a call.
   (let [;; read; get the multiaddr string and convert into a map
         ;; containing {:address/host :address/port}.
-        read-maddr (get value :p2p/read)
-        read-address (multiaddr/str->map read-maddr)
+        read-maddr (get read :http/address)
+        read-scheme (get read :http/scheme)
+        read-address (-> read-maddr
+                         multiaddr/str->map
+                         (assoc :http/scheme read-scheme))
         ;; write
-        write-maddr (get value :p2p/write)
-        write-address (multiaddr/str->map read-maddr)]
-    (log/debug {:log/msg "init p2p client" :net/read read-maddr :net/write write-maddr})
+        write-maddr (get write :http/address)
+        write-scheme (get write :http/scheme)
+        write-address (-> write-maddr
+                          multiaddr/str->map
+                          (assoc :http/scheme write-scheme))
+        ;; Format log messages.
+        log-read (str (name read-scheme) "::" read-maddr)
+        log-write (str (name write-scheme) "::" write-maddr)]
+    (log/debug {:log/msg "init p2p client" :read/addr log-read :write/addr log-write})
     (-> value
         (assoc :p2p/read read-address)
         (assoc :p2p/write write-address))))
@@ -151,7 +162,8 @@
                      (util/platform))
         ;; Get p2p connection addresses determined by whether or not we
         ;; can detect a locally-running p2p node.
-        p2p-options (detect/node-or-gateway options)
+        default (:client/p2p system)
+        p2p-options (detect/node-or-gateway default options)
         ;; Update the system configuration map before initializing the
         ;; system.
         system (-> system
