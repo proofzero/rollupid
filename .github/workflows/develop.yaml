@@ -1,16 +1,16 @@
 ---
-name: release
+name: test and build
 on:
-  push:
-    tags:
-      - "*"
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Build & Test
+      - name: Source Builds
         uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -18,15 +18,8 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - name: Setup & Run Build
+      - name: Setup Babashka
         uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.4
-      - run: npm run test:all:release
-      - name: Get tag
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Release
-        run: npx lerna version ${{ env.RELEASE_VERSION }} 
-      - name: Publish
-        run: npx lerna publish
-
+      - run: npm run test:all:develop

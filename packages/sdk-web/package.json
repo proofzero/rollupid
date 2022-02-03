@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/sdk-web",
-  "version": "0.0.0",
+  "version": "0.0.1-next.49+59d5010",
   "description": "Kubelt SDK for CommonJS",
   "keywords": [
     "kubelt",
@@ -28,8 +28,8 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "nft": "echo \"Error: impl non functional tests \" && exit 1"
+    "test": "echo \"Error: run tests from root\"",
+    "nft": "echo \"Error: impl non functional tests \""
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
@@ -77,5 +77,6 @@
     "node-polyfill-webpack-plugin": "1.1.4",
     "webpack": "5.68.0",
     "webpack-cli": "4.9.2"
-  }
+  },
+  "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }

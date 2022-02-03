@@ -1,16 +1,16 @@
 ---
-name: release
+name: test and build
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Build & Test
+      - name: Source Builds
         uses: actions/setup-node@v2
         with:
           node-version: '16'
@@ -23,10 +23,6 @@ jobs:
         with:
           babashka-version: 0.7.4
       - run: npm run test:all:release
-      - name: Get tag
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Release
-        run: npx lerna version ${{ env.RELEASE_VERSION }} 
-      - name: Publish
-        run: npx lerna publish
-
+      # TODO: Do we want to replease a @kubelt/package@prerelease to github registry or npm?
+      #- name: Publish Next
+        #run: npx lerna publish --canary --preid next --yes 

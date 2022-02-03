@@ -116,6 +116,14 @@
   build:sdk:release
   {:doc ""
    :task (shell "npx shadow-cljs release sdk")}
+  
+  build:sdk-web:develop
+  {:doc ""
+   :task (shell "npx lerna build build --scope @kubelt/sdk-web")}
+  
+  build:sdk-web:release
+  {:doc ""
+   :task (shell "npx lerna build build --scope @kubelt/sdk-web")}
 
   build:web:develop
   {:doc ""
@@ -143,10 +151,34 @@
    :depends [build:sdk:release]
    :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
 
+  test:sdk-web:develop
+  {:doc ""
+   :depends-on [build:sdk-web:develop]
+   :task (shell "npx lerna run test --scope @kubelt/sdk-web")}
+  
+  test:sdk-web:release
+  {:doc ""
+   :depends-on [build:sdk-web:release]
+   :task (shell "npx lerna run test --scope @kubelt/sdk-web")}
+
   test:web:develop
   {:doc ""
    :task (shell "npx shadow-cljs compile web-test")}
 
   test:web:release
   {:doc ""
-   :task (shell "npx shadow-cljs release web-test")}}}
+   :task (shell "npx shadow-cljs release web-test")}
+  
+  test:all:develop
+  {:doc "build and test all develop"
+   :depends [test:sdk:cljs:develop
+             test:sdk:js:develop
+             test:web:develop
+             test:sdk-web:develop]}
+
+  test:all:release
+  {:doc "build and test all release"
+   :depends [test:sdk:cljs:release
+             test:sdk:js:release
+             test:web:release
+             test:web-sdk:release]}}}

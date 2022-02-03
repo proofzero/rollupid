@@ -1,6 +1,6 @@
 {
   "name": "@kubelt/sdk-cljs",
-  "version": "0.0.0",
+  "version": "0.0.1-next.49+59d5010",
   "description": "Kubelt SDK (for ClojureScript)",
   "author": "Kubelt, Inc.",
   "homepage": "https://github.com/kubelt/kubelt#readme",
@@ -51,5 +51,6 @@
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
     "yargs": "17.3.1"
-  }
+  },
+  "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }
