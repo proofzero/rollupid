@@ -4,6 +4,8 @@
   (:require
    ["crypto" :as crypto])
   (:require
+   ["jsonwebtoken" :as jwt]
+   [taoensso.timbre :as log]
    ["jose" :as jose :refer [SignJWT]]))
 
 ;; - iss (issuer): Issuer of the JWT
@@ -57,17 +59,19 @@
     ;; Returns a promise that resolves to the JWT.
     (.sign sign-jwt key-like)))
 
-#_(defn verify
-  []
-  ;; TODO
-  )
+(defn verify
+  [token public-key]
+  (let [tokenjs (clj->js token)
+        public-keyjs (clj->js public-key)]
+    (.verify jwt tokenjs public-keyjs)
+    ))
 
 #_(defn encode
-  []
-  ;; TODO
-  )
+    []
+    ;; TODO
+    )
 
-#_(defn decode
-  []
-  ;; TODO
+(defn decode
+  [token]
+  (.decode jwt token) 
   )

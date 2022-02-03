@@ -5,6 +5,9 @@
    [goog.object])
   (:require
    [taoensso.timbre :as log]
+   [cljs.test :as t :refer [deftest is testing use-fixtures]]
+
+   [com.kubelt.lib.jwt :as jwt]
    [clojure.string :as str])
   (:require
    [com.kubelt.lib.http.status :as http.status]))
@@ -31,7 +34,24 @@
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
-            ctx)})
+            (try 
+            (let [payload "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwdWJrZXkiOiItLS0tLUJFR0lOIFBVQkxJQyBLRVktLS0tLVxuTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUEwRmFqOVdFMGJkcFVvWlJWbGM5VlxuKzdRb0VVT0srcGlYSlFHaCs4MldjZWZWYk1LYkVRWDVvVTFkZ2p1M1gvcXVOSlF4MDVqVU92VXRrZFRZNXlEUVxuaWdVV2tHeHNLR3Z0bGJZdENsWW1ZeFVYeG1UKzZXR3lHZ0xpbzJQczFVRXRFMVlHQWlnczJmcXNKaWdGZ3FhN1xuaDVkRXF1TXo0RkNCd0xlVVBObUczcFBTNDdsaTlXSDdyM2M3WmhjNUNJZmRKcmZXSlJnSzNscVg0WldrdlJEblxuMk14NFA2MTRISTZDR09uVDU1Qjlyd1VmL0tISEJabGZtb1NvUEFXNkdUNkRCR0w0YVNEbjE0UkVSQnkrUE00cVxuL3FKWkhuT3VGdWE4RTByRGNwMjgvZVovS0dhbDg4eFBzVjhZQ2NHYklnSUZ3TUViVFZNRTNrT2c4ZmNTeUZBd1xucVFJREFRQUJcbi0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLVxuIiwiZW5kcG9pbnQiOiJiYWZ5eDB4MHgweDB4MCIsImtidG5hbWUiOiJpR1dvUjZkRVNCaE52SGRuU09kRXpkV0Rqamxibm1RbXZZMWpyY2ZVdmZrPSIsImlhdCI6MTY0MzkwNjQ1MywiZXhwIjoxNjQzOTQ5NjUzfQ.y66_Z8AdRkUbu28JJ4P4XtmQ5zZ-SNLckc5FOjSRBEbmyOH3GWFCXRo1I-RvtJB4-qUu8xf8tB-LL3TSxFNzqTJf26We9oNEZ9frlmsYQ6q5F5RWUnaliqtvtDAqBrRxnrfhBEeouTSYaneLEkr5JvmgMN9zu7RHD1p3C2Gj-RMUbVJ55Wk_ur3EO_pkW6EMX8bxwVV6U1z34eZ5hlJ7TWSmL1caaTBlIN-CQ0MPTqx7U7Nd7ZsBGPPFSogDh0cVQJrxiuDhgRFIzm3QeFiT9Gire-asiijgcA_WuBFiOYIRa2N5BGGRlDnpLTMLWnS1p04RH2vx7gnT_3ynmt3T8Q" ;; TODO retrieve from request
+                  decoded (jwt/decode payload)
+                  pubkey (str (.-pubkey decoded))]
+              (let [jwt-valid (jwt/verify payload pubkey)] 
+
+                (let [newctx 
+                (-> ctx
+                    (assoc-in [:response :http/jwt-raw] payload)
+                    (assoc-in [:response :http/jwt-pubkey] pubkey)
+                    (assoc-in [:response :http/jwt-valid] jwt-valid))
+               ] 
+                newctx )))))})
+
+
+            ;; TODO check and throw error
+
+            ;; TODO add to context 
 
 (def register
   {:name ::register
@@ -61,7 +81,7 @@
                   ;; Context has a :match key containing the routing
                   ;; table match data.
                   kbt-name (get-in match [:path-params :id])]
-              (log/trace {:log/msg "enter kbt-resolve" :kbt/name kbt-name})
+              
               ;; The Hyperbee .get() request returns a promise. Note
               ;; that js/Promise is an AsyncContext, so execution pauses
               ;; until the promise resolves.
@@ -70,15 +90,15 @@
                            (let [;; Hyperbee returns an object that
                                  ;; includes sequence number, etc.
                                  kbt-value (str (.-value kbt-object))]
-                           (if-not (str/blank? kbt-value)
-                             (do
-                               (log/info {:log/msg "found name"
-                                          :kbt/name kbt-name
-                                          :kbt/value kbt-value})
-                               (let [body {:name kbt-name :value kbt-value}]
-                                 (assoc-in ctx [:response :http/body] body)))
-                             ;; No result found, return a 404.
-                             (assoc-in ctx [:response :http/status] http.status/not-found))))))))
+                             (if-not (str/blank? kbt-value)
+                               (do
+                                 (log/info {:log/msg "found name"
+                                            :kbt/name kbt-name
+                                            :kbt/value kbt-value})
+                                 (let [body {:name kbt-name :value kbt-value}]
+                                   (assoc-in ctx [:response :http/body] body)))
+                               ;; No result found, return a 404.
+                               (assoc-in ctx [:response :http/status] http.status/not-found))))))))
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
@@ -88,22 +108,33 @@
 (def kbt-update
   {:name ::kbt-update
    :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
+            
+            (prn "entered kbt-update")    
+            (prn (get ctx :response) )
+            (prn (get (get ctx :response) :http/jwt-valid) )
+
             (let [request (get ctx :request)
                   kbt-name (get-in match [:path-params :id])
                   ;; TODO get from body
                   ;;kbt-value (get request )
                   ;;kbt-value (get-in match [:path-params :endpoint])
                   kbt-value "fixme"]
+;;                  kbt-value  (get-in (get-in ctx [:response :http/jwt-valid]) [:endpoint])]
+              (prn (get ctx :response))
+              (log/info { :valid (get (get ctx [:response]) [:http/jwt-valid])})
+
+
+;;                  kbt-value "fixme"]
               (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
               (-> (.put hyperbee kbt-name kbt-value)
                   (.then (fn []
                            (assoc-in ctx [:response :http/status] http.status/created))))))
-     :leave (fn [ctx]
-              (log/info {:log/msg "leaving kbt update"})
-              ctx)
-     :error (fn [{:keys [error] :as ctx}]
-              (log/error {:log/error error})
-              ctx)})
+   :leave (fn [ctx]
+            (log/info {:log/msg "leaving kbt update"})
+            ctx)
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
+            ctx)})
 
 (def health-ready
   {:name ::health-ready
