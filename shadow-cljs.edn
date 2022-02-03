@@ -30,6 +30,8 @@
   [com.github.mainej/headlessui-reagent "1.5.0.47"]
   ;; assertions API for Clojure/Script
   [com.taoensso/truss "1.6.0"]
+  ;; generate sequential UUIDs
+  [com.yetanalytics/colossal-squuid "0.1.4"]
   ;; immutable database and Datalog query engine
   [datascript/datascript "1.3.10"]
   ;; fast, idiomatic pretty-printer
