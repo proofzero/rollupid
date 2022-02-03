@@ -31,6 +31,10 @@ var token = jwt.sign(payload, privateKEY, signOptions);
 var badtoken = jwt.sign(payload, privateKEYbad, signOptions);
 
 
+console.log("start token")
+console.log(token)
+console.log("end token")
+
 describe("kbt Controller", () => {
 
 	//TODO: generate and send JWT with save request. verify endpoint is hash of pubkey

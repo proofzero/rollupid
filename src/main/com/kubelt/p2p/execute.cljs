@@ -128,7 +128,7 @@
                      request-path (:uri/path request-map)
                      context {:request request-map
                               :response {}
-                              :body/raw raw-body
+                              :body/raw (str raw-body)
                               :p2p/hyperbee hyperbee
                               :p2p/database database}]
                  ;; TODO handle match :path-params (+ :path :result :template)

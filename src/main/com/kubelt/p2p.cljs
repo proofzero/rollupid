@@ -105,17 +105,14 @@
 ;; TODO response type conversion
 ;; TODO correlation ID (from header, or assign ULID)
 (def routes
+  ;; TODO consider public name resolution vs per-user/namespaced name resolution
+  ;; TODO move validate-jwt to method/all ? 
   [["/kbt/:id"
     {:name ::kbt
-     :http.method/all [p2p.interceptor/validate-jwt
-                       p2p.interceptor/status-ok]
+     :http.method/all [p2p.interceptor/status-ok]
      :http.method/get {:interceptors [p2p.interceptor/kbt-resolve]}
-     :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
-   ["/kbt-update/:id/:endpoint"
-    {:name ::kbt-update
-     :http.method/all [p2p.interceptor/validate-jwt 
-                       p2p.interceptor/status-ok]
-     :http.method/post {:interceptors [p2p.interceptor/kbt-update]}}]
+     :http.method/post {:interceptors [p2p.interceptor/validate-jwt 
+                                       p2p.interceptor/kbt-update]}}]
    ;; TODO user registration
    ["/register"
     {:name ::register
