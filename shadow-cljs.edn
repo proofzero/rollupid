@@ -28,6 +28,8 @@
   [com.taoensso/timbre "5.1.2"]
   ;; tailwind components for dapp
   [com.github.mainej/headlessui-reagent "1.5.0.47"]
+  ;; assertions API for Clojure/Script
+  [com.taoensso/truss "1.6.0"]
   ;; immutable database and Datalog query engine
   [datascript/datascript "1.3.10"]
   ;; fast, idiomatic pretty-printer

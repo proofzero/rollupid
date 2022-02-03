@@ -45,7 +45,7 @@
       ;; the response headers accordingly.
       (let [writer (transit/writer :json)
             response-body (transit/write writer body-edn)
-            headers #js {"Content-Type" http.media-type/transit-json}]
+            headers #js {"Content-Type" http.media-type/transit+json}]
         (doto res
           (.writeHead status headers)
           (.end response-body)))

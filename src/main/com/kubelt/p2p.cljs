@@ -32,6 +32,7 @@
 ;; TODO D-Bus integration
 ;; TODO tracing with riemann? jaeger?
 ;; TODO error reporting using anomalies
+;; TODO further assertions using truss
 ;; TODO websocket support using sente
 ;; TODO generate API docs via reitit-swagger
 ;; TODO refer buddy-auth for jwt
