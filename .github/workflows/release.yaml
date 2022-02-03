@@ -6,8 +6,6 @@ on:
       - "*"
 
 jobs:
-  # Publish and release
-  #-----------------------------------------------------------------------------
   release:
     runs-on: ubuntu-latest
     steps:
@@ -18,16 +16,17 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - name: Install
-        run: npm install
-      - name: Tests
-        run: npx lerna run test
-      - name: Build
-        run: npx lerna run build
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - name: Setup & Run Build
+        uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.4
+      - run: npm run test:all:release
       - name: Get tag
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Release
         run: npx lerna version ${{ env.RELEASE_VERSION }} 
-      - name: Publish Next
+      - name: Publish
         run: npx lerna publish
 

@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  next:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -18,9 +18,11 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - name: Setup Babashka
+      - name: Setup & Run Build
         uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.4
-      - name: Publish Next
-        run: npx lerna publish --canary --preid next --yes --registry https://npm.pkg.github.com
+      - run: npm run test:all:release
+      # TODO: Do we want to replease a @kubelt/package@prerelease to github registry or npm?
+      #- name: Publish Next
+        #run: npx lerna publish --canary --preid next --yes 
