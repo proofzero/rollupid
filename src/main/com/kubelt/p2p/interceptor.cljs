@@ -1,12 +1,15 @@
 (ns com.kubelt.p2p.interceptor
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:import
+   [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require
+   [goog.crypt.base64 :as base64]
    [goog.object])
   (:require
    [taoensso.timbre :as log]
    [cljs.test :as t :refer [deftest is testing use-fixtures]]
-
+   [com.kubelt.lib.kdf :as kdf]
    [com.kubelt.lib.jwt :as jwt]
    [clojure.string :as str])
   (:require
@@ -28,6 +31,23 @@
             (if-let [status (get-in ctx [:response :http/status])]
               ctx
               (assoc-in ctx [:response :http/status] http.status/no-content)))})
+(def user-namespace
+  {:name ::user-namespace
+   :enter (fn [ctx]
+            ;; TODO use hash of pubkey for namespace? 
+            (let [pubkey (get (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true) :pubkey)
+                  hasher (Sha256.)]
+                (.update hasher pubkey)
+                (let [key-hash (.digest hasher)
+                  pubkey-hash (.encodeString base64 key-hash goog.crypt.base64.BASE_64_URL_SAFE)]
+
+              ;; set hyperbee ns
+              (.sub (get ctx :p2p/hyperbee) pubkey-hash)
+             
+            ctx)))
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
+            ctx)})
 
 (def validate-jwt
   {:name ::validate-jwt
@@ -43,18 +63,12 @@
                     (assoc-in [:request :jwt/raw] payload)
                     (assoc-in [:request :jwt/pubkey] pubkey)
                     (assoc-in [:request :jwt/valid] jwt-valid))
-                
                 )))
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
             ctx)})
-
-
-
             ;; TODO check and throw error
-
-            ;; TODO add to context 
 
 (def register
   {:name ::register
