@@ -124,6 +124,11 @@
    :output-to "packages/p2p/lib/p2p.js"}
 
   ;; TODO p2p-test
+  :p2p-test
+  {:target :node-test
+   :ns-regexp "-p2p-test$"
+   :output-to "target/p2p-test/p2p-test.js"}
+
 
   ;; This is a development CLI used to run various commands for testing,
   ;; preparing data, or performing other non-customer-facing operations.
