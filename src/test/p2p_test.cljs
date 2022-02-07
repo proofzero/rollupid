@@ -1,5 +1,5 @@
 (ns p2p-test
-  "Test p2p operations"
+  "Test p2p operations."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]
    [clojure.string :as str])
@@ -9,13 +9,11 @@
    [com.kubelt.p2p :as p2p]))
 
 
-(deftest 
-
+(deftest example-test
   (testing "example test routine"
     (let [mytestval p2p/copyright-year]
       ;;(is (= mytestval 2022)))))
       (is (= 2021 2022)))))
-
 
 #_(deftest vec->multiaddr-str-test
   (testing "convert valid vector"
