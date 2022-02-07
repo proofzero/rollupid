@@ -8,7 +8,7 @@
 ;; TODO test me
 (defn add!
   "Add a resource."
-  [sys meta data]
+  [sys meta-data data]
   ;; ARGS
   ;; - sys: our system map resulting from SDK initialization.
   ;;
@@ -39,6 +39,6 @@
 ;; TODO test me
 (defn add-js!
   "Create an account from a JavaScript context."
-  [sys meta data]
+  [sys meta-data data]
   ;; TODO convert args to edn.
-  (add! sys meta data))
+  (add! sys meta-data data))
