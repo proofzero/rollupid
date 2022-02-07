@@ -4,6 +4,7 @@
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
    [com.kubelt.sdk.v1.account :as sdk.v1.account]
+   [com.kubelt.sdk.v1.resource :as sdk.v1.resource]
    [com.kubelt.sdk.v1.workspace :as sdk.v1.workspace]))
 
 ;; Entrypoint
@@ -51,6 +52,7 @@
                      :create sdk.v1.account/create-js!}
 
        ;; resource
+       :resource #js {:add sdk.v1.resource/add-js!}
 
        ;; workspace
        :workspace #js {:available sdk.v1.workspace/available-js}})
