@@ -9,17 +9,27 @@
 (def method
   [:enum :delete :get :patch :post :put])
 
-(def host
-  string?)
-
-(def version
-  string?)
-
-(def port
-  ;; TODO constrain to valid port range
-  int?)
+(def scheme
+  [:enum :http :https])
 
 (def path
+  [:and
+   {:example "/example"}
+   :string])
+
+(def host
+  [:and
+   {:example "127.0.0.1"}
+   :string])
+
+(def port
+  [:and
+   {:example 5001
+    :min 0
+    :max 65535}
+   :int])
+
+(def version
   string?)
 
 (def headers
@@ -31,8 +41,41 @@
 (def status
   number?)
 
+(def param-name
+  :string)
+
+(def media-type
+  :string)
+
+(def multipart-name
+  :string)
+
+;; clj: String, InputStream, Reader, File, char-array, byte-array
+(def multipart-content
+  :any)
+
+(def multipart-file-name
+  :string)
+
+(def multipart-parts
+  [:vector
+   [:map
+    [:param/name param-name]
+    [:part/name {:optional true} multipart-name]
+    [:part/content multipart-content]
+    [:part/file-name {:optional true} multipart-file-name]
+    [:part/media-type {:optional true} media-type]]])
+
+(def multipart
+  [:map
+   [:com.kubelt/type [:enum :kubelt.type/multipart]]
+   [:multipart multipart-parts]])
+
 (def body
-  string?)
+  [:or
+   bytes?
+   string?
+   multipart])
 
 (def scheme
   [:enum :http :https])
@@ -61,7 +104,7 @@
 
 (def request
   [:map
-   [:kubelt/type [:enum :kubelt.type/http-request]]
+   [:com.kubelt/type [:enum :kubelt.type/http-request]]
    [:http/method method]
    [:http/version {:optional true} version]
    [:http/headers {:optional true} headers]

@@ -6,6 +6,8 @@
   (:require
    ["multiaddr" :refer [Multiaddr]]))
 
+;; TODO move to com.kubelt.lib.multi.addr
+
 ;; TODO general multiaddr construction from network address parts / map.
 
 (defn vec->str

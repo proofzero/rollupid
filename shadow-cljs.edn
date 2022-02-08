@@ -5,37 +5,42 @@
   "src/main"
   "src/test"]
 
+ ;; NB: we depend on the shadow-cljs provided version of core.async;
+ ;; adding an explicit dependency on same causes a warning to be
+ ;; generated and the pinned version support by shadow-cljs to replace
+ ;; it in any case.
+
  :dependencies
- [;; errors as simple, actionable, generic information
+ [;; a Clojure/Script library for word case conversions
+  [camel-snake-kebab/camel-snake-kebab "0.4.2"]
+  ;; errors as simple, actionable, generic information
   [com.cognitect/anomalies "0.1.12"]
   ;; data format for conveying values between applications
   [com.cognitect/transit-cljs "0.8.269"]
   ;; a pure Clojure/Script logging library
   [com.taoensso/timbre "5.1.2"]
   ;; immutable database and Datalog query engine
-  [datascript/datascript "1.3.8"]
+  [datascript/datascript "1.3.10"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.25"]
   ;; a micro-framework for building data-driven applications
   [integrant/integrant "0.8.0"]
-  ;; facilities for async programming and communication
-  [org.clojure/core.async "1.4.627"]
   ;; fast JSON encoding and decoding
   [metosin/jsonista "0.3.5"]
   ;; data-driven schemas for Clojure/Script
-  [metosin/malli "0.8.0"]
+  [metosin/malli "0.8.3"]
   ;; a fast data-driven router for Clojure(Script)
-  [metosin/reitit-core "0.5.15"]
+  [metosin/reitit-core "0.5.16"]
   ;; http routing with interceptors for reitit
-  [metosin/reitit-http "0.5.15"]
+  [metosin/reitit-http "0.5.16"]
   ;; common interceptors for reitit
-  [metosin/reitit-interceptors "0.5.15"]
+  [metosin/reitit-interceptors "0.5.16"]
   ;; malli schema coercion for reitit
-  [metosin/reitit-malli "0.5.15"]
+  [metosin/reitit-malli "0.5.16"]
   ;; support for sieppari interceptors for reitit
-  [metosin/reitit-sieppari "0.5.15"]
+  [metosin/reitit-sieppari "0.5.16"]
   ;; generate swagger2 apidocs for reitit
-  [metosin/reitit-swagger "0.5.15"]
+  [metosin/reitit-swagger "0.5.16"]
   ;; tools for working with command line arguments
   [org.clojure/tools.cli "1.0.206"]]
 
@@ -93,7 +98,7 @@
    :output-to "target/sdk-test.js"
    :ns-regexp "-test$"
    :autorun true}
-  
+
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use in the browser.
   :web
@@ -130,6 +135,8 @@
                       :output-feature-set :es-next}
    :output-to "packages/ddt/lib/ddt.js"}
 
+  ;; Kubelt CLI
+
   :kbt
   {:target :node-script
    :main com.kubelt.kbt/main
@@ -142,4 +149,20 @@
   {:target :node-test
    :output-to "target/kbt-test.js"
    :ns-regexp "-test$"
+   :autorun true}
+
+  ;; IPFS Client
+
+  :ipfs
+  {:target :node-library
+   :exports {:v0 com.kubelt.ipfs/node-v0}
+   :compiler-options {:optimizations :advanced
+                      :infer-externs :true
+                      :output-feature-set :es-next}
+   :output-to "packages/ipfs-js/lib/ipfs.js"}
+
+  :ipfs-test
+  {:target :node-test
+   :output-to "target/ipfs-test.js"
+   :ns-regex "ipfs-test$"
    :autorun true}}}
