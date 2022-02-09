@@ -73,7 +73,6 @@
         kbt-name (get-in match [:path-params :id])
         kbt-value  (get (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true) :endpoint)]
 
-
     (-> (p2p.proto/store hyperbee kbt-name kbt-value)
         (.then (fn []
                  (assoc-in ctx [:response :http/status] http.status/created))))))
