@@ -37,26 +37,23 @@
    :jwt/subject "bees"}
 
 ;; TODO test me
-(defn sign-payload 
+(defn sign-payload
   "Return a Compact JWS formatted JWT string."
   ;; options {:expires "1h" :alg "HS256"}
   [payload key-private options]
-  (let [sign-jwt (doto (SignJWT. payload)
-                   (.setProtectedHeader #js {"alg" (get options :alg)})
-                   ;;(.setIssuedAt)
-                   ;;(.setJti "xxx")
-                   ;;(.setIssuer "urn:example:issuer")
-                   ;;(.setAudience "urn:example:audience")
-                   (.setExpirationTime (get options :expires))
-                   ;;(.setNotBefore)
-                   ;;(.setSubject "")
-                   )]
-    ;; Returns a promise that resolves to the JWT.
-    (.sign sign-jwt key-private)))
-              
+  (-> (SignJWT. payload)
+      (.setProtectedHeader #js {"alg" (get options :alg)})
+      ;;(.setIssuedAt)
+      ;;(.setJti "xxx")
+      ;;(.setIssuer "urn:example:issuer")
+      ;;(.setAudience "urn:example:audience")
+      (.setExpirationTime (get options :expires))
+      ;;(.setNotBefore)
+      ;;(.setSubject "")
+      ;; Returns a promise that resolves to the JWT.
+      (.sign key-private)))
 
 
-  
 (defn sign
   "Return a Compact JWS formatted JWT string."
   [payload]
@@ -93,5 +90,5 @@
 
 (defn decode
   [token]
-  (.decode jwt token) 
+  (.decode jwt token)
   )

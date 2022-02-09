@@ -4,8 +4,8 @@
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
-    [cljs.core.async :as async :refer [chan go <! >!]]        
-    [cljs.core.async.interop :refer-macros [<p!]]             
+    [cljs.core.async :as async :refer [chan go <! >!]]
+    [cljs.core.async.interop :refer-macros [<p!]]
     [goog.object]
     [clojure.string :as str])
 
@@ -15,7 +15,7 @@
     [malli.core :as malli]
     [com.kubelt.p2p :as p2p]))
 
-;; test fixtures 
+;; test fixtures
 #_(
    (select-keys value [:db/memory :http/router :hyper/bee])
    [config]
@@ -73,9 +73,9 @@
                 -----END PUBLIC KEY-----")
 
 
-(def key-hash 
+(def key-hash
   (doto (Sha256.)
-    (.update  key-public) 
+    (.update  key-public)
     (.digest)))
 
 (def pubkey-hash (.encodeString base64 key-hash goog.crypt.base64.BASE_64_URL_SAFE))
@@ -90,7 +90,7 @@
 ;;const sha256 = require('@stablelib/sha256')
 ;;beforeAll(() => {});
 
-;;//TODO: set key to random value, check random value is returned 
+;;//TODO: set key to random value, check random value is returned
 
 ;;// JWT reference
 
@@ -104,7 +104,7 @@
 ;;var payload = {
 ;;               pubkey: publicKEY,
 ;;               endpoint: 'bafyx0x0x0x0x0',
-;;               kbtname: encodeURLSafe(sha256.hash(publicKEY)) 
+;;               kbtname: encodeURLSafe(sha256.hash(publicKEY))
 ;;               };
 ;;var signOptions = {
 ;;                   expiresIn:  "12h",
@@ -119,12 +119,14 @@
 (deftest validate-jwt-test
   ;; TODO test p2p.handlerequest.validate-jwt
   ;;(testing "validate-jwt-test"
-    (t/async done                                                        
-             (go                                                                 
+    (t/async done
+             (go
 ;;               (let [token (<p! (jwt/sign-payload payload key-private sign-options))]
                ;;(let [token ((jwt/sign-payload payload key-private sign-options))]
 
-               (let [token (jwt/sign-payload payload key-private sign-options)]
+               (let [token (try
+                             (<p! (jwt/sign-payload payload key-private sign-options))
+                             (catch js/Error err (ex-cause err)))]
                  (prn "hereiam")
                  (prn token)
                  (let [
@@ -169,11 +171,11 @@
   (testing "example test routine"
 
     ;; check invalid kbt-name
-    ;; check bad request 
+    ;; check bad request
 
     ))
 
-;;(deftest 
+;;(deftest
 
 #_(deftest vec->multiaddr-str-test
 
