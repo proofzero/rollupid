@@ -9,7 +9,6 @@
    ["process" :as process]
    ["url" :as url :refer [Url]])
   (:require
-   ["hyperbee" :as Hyperbee]
    ["hypercore" :as Hypercore]
    ["sd-notify" :as sd-notify]
    ["yargs" :as yargs :refer [Yargs]])
@@ -28,6 +27,7 @@
   (:require
    [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.util :as lib.util]
+   [com.kubelt.p2p.proto :as p2p.proto]
    [com.kubelt.p2p.execute :as p2p.execute]
    [com.kubelt.p2p.interceptor :as p2p.interceptor]))
 
@@ -221,15 +221,15 @@
 ;;
 
 (defmethod ig/init-key :hyper/bee [_ value]
-  (let [feed (get value :hyper/core)
-        key-encoding (get value :key/encoding)
-        value-encoding (get value :value/encoding)
-        options #js {:keyEncoding key-encoding
-                     :valueEncoding value-encoding}]
-    (log/info {:log/msg "init hyperbee"
-               :key/encoding key-encoding
-               :value/encoding value-encoding})
-    (Hyperbee. feed options)))
+   (let [feed (get value :hyper/core)
+         key-encoding (get value :key/encoding)
+         value-encoding (get value :value/encoding)
+         options #js {:keyEncoding key-encoding
+                      :valueEncoding value-encoding}]
+ 
+(p2p.proto/makeKVStore feed options))
+;;  (p2p.proto/makeKVStore nil nil))
+   )
 
 (defmethod ig/halt-key! :hyper/bee [_ bee]
   (log/info {:log/msg "halt hyperbee"}))
