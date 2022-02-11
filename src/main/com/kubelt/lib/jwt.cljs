@@ -2,11 +2,12 @@
   "Wrapper around jose JWT library."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   ["crypto" :as crypto])
-  (:require
-   ["jsonwebtoken" :as jwt]
-   [taoensso.timbre :as log]
-   ["jose" :as jose :refer [SignJWT]]))
+    [cljs.test :as t :refer [deftest is testing use-fixtures]]
+    [cljs.core.async :as async :refer [chan go <! >!]]
+    [cljs.core.async.interop :refer-macros [<p!]]
+    ["crypto" :as crypto]
+    [taoensso.timbre :as log]
+    ["jose" :as jose :refer [SignJWT GetKeyFunction ]]))
 
 ;; - iss (issuer): Issuer of the JWT
 ;; - sub (subject): Subject of the JWT (the user)
@@ -76,12 +77,25 @@
     ;; Returns a promise that resolves to the JWT.
     (.sign sign-jwt key-like)))
 
+;; subroutine 
 (defn verify
-  [token public-key]
-  (let [tokenjs (clj->js token)
-        public-keyjs (clj->js public-key)]
-    (.verify jwt tokenjs public-keyjs)
-    ))
+  [token]
+
+  (prn "hereiam in verify")
+  (let [decoded (js->clj (.decodeJwt jose (clj->js token)) :keywordize-keys true)
+    public-key (.createPublicKey crypto (str (get-in decoded [:pubkey])))
+    verified (.jwtVerify jose token public-key )]
+                   (prn verified)
+                   (prn decoded)
+                     (-> verified 
+                         (.then (fn[y] 
+                                  (prn y)
+                                  y)))))
+
+  #_(let [tokenjs (clj->js token)
+          public-keyjs (clj->js public-key)]
+      ;;(.verify jwt tokenjs public-keyjs)
+      )
 
 #_(defn encode
     []
@@ -90,5 +104,9 @@
 
 (defn decode
   [token]
-  (.decode jwt token)
-  )
+  ;;(.decode jwt token)
+  (let [decoded (.decodeJwt jose (clj->js token))]
+    decoded))
+
+
+

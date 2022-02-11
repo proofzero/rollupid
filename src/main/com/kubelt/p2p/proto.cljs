@@ -19,23 +19,22 @@
 (defrecord HyperbeeMock []
   KVStore
   (store [self index value]
-    (js/Promise.resolve "" ))
+    (js/Promise.resolve "fixme" ))
   (query [self index]
     (js/Promise.resolve #js {"value" "sup"})
-  ))
+    ))
 
 ;; feed and options 
 (defn makeKVStore [feed, options] 
 
   (if
     (nil? feed)
-      (do 
-        (HyperbeeMock.))
-      (do 
-       ;; make a js hyperbee client
-       (let [client (Hyperbee. feed options)]
-         (prn client)
-         (HyperbeeProd. client)))))
-         ;; (Hyperbee. feed options)))))
-         ;; use the js object for production record
+    (do 
+      (HyperbeeMock.))
+    (do 
+      ;; make a js hyperbee client
+      (let [client (Hyperbee. feed options)]
+        (HyperbeeProd. client)))))
+;; (Hyperbee. feed options)))))
+;; use the js object for production record
 

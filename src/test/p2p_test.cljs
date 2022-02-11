@@ -3,10 +3,12 @@
   (:import
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require
+    [com.kubelt.p2p.handlerequest :as p2p.handlerequest]
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
     [cljs.core.async :as async :refer [chan go <! >!]]
     [cljs.core.async.interop :refer-macros [<p!]]
     [goog.object]
+    ["crypto" :as crypto]
     [clojure.string :as str])
 
 
@@ -35,42 +37,43 @@
 
        )))
 
-(def key-private "-----BEGIN RSA PRIVATE KEY-----
-                 MIIEowIBAAKCAQEA0Faj9WE0bdpUoZRVlc9V+7QoEUOK+piXJQGh+82WcefVbMKb
-                 EQX5oU1dgju3X/quNJQx05jUOvUtkdTY5yDQigUWkGxsKGvtlbYtClYmYxUXxmT+
-                 6WGyGgLio2Ps1UEtE1YGAigs2fqsJigFgqa7h5dEquMz4FCBwLeUPNmG3pPS47li
-                 9WH7r3c7Zhc5CIfdJrfWJRgK3lqX4ZWkvRDn2Mx4P614HI6CGOnT55B9rwUf/KHH
-                 BZlfmoSoPAW6GT6DBGL4aSDn14RERBy+PM4q/qJZHnOuFua8E0rDcp28/eZ/KGal
-                 88xPsV8YCcGbIgIFwMEbTVME3kOg8fcSyFAwqQIDAQABAoIBACFkQZMqqUSSIc5j
-                 //Oq75UQIvvhX30ax97ejB/Xq61GAycTadcopgH8bGhbOeDgRNuYhQPtEtcARPWC
-                 r+EbmVEFz8AGIK+53LKKKF3nwO9Qiib6OQEe73TL0ZduhJ8JezgGKaBe4BFv4/eZ
-                 ooh2QMhSrmbVU5M4VBOXWOMH2l4B+R5gJa5xZga6SA0Jh1nnZstIkAndBMmPdRto
-                 LRjKWriFbbD1LStLs9aSRgnM+pLZAwx0x2ZZnFJwpTOjGTzszpn39w7fRNOhN8bS
-                 +3/W/lQzlpVafCune3WAErE2+1mnHRYEbjSjSs2FT/2tVhU1PVoqRLPBL8iI2r5N
-                 SdrJpCECgYEA+jlA0lyPHQdddixkGUZ8WLOPksRMuHscqFjeV549pQ+PYPbvcEjS
-                 ki5pDVIOMeaIYje89O0exBh6x9CtVwnVJ/7G8MEXIsry7rt0MTpc+NUHYVKfx1Fq
-                 DcDVNw9e7yR3jTBarbxgaMD1XLW0kw1HjgVpAHVQlGPB059zFi1T6usCgYEA1SXb
-                 tRdiQt6viipCIKYxtxPUu9AAMUbeCpDGsR5A8f8+HAC6LUAeOY9/GoSq8FhKS2Go
-                 Fwo4pC7b3yUlxSGXenFFC/liAKPqKLBdn9ppcQ+gjecZFHDHkoOzi5OO067egCyn
-                 EMHQ6XQ2UcZe1CfzJH4hvCKKcc0pAmAptdQHBbsCgYEA0dA6K2oTUqr/UnzMfmkd
-                 ER+XbuCM2E/a6sqBvYRhekt+1TaZ9VQKxSqHSfUZE/yTNZA5MEK3/oPsSCoRfx8u
-                 jffThsLSDImShF3IgxLGLJwsMQ4gDfiVbezYm++Wkf3JBSmbj3yadpv94Xw3aurC
-                 qjKdJhY4uASh3TohPWJKsHsCgYB7F0TdPKbTRTSMjsDnh/KX7ozg9UrXKjzaTydf
-                 a8BHwIZGt6jMrwWFajgVwV3SNLqa88eVnqJ9Nk5lfFdmk3KeFEGym48cHY0BeHBo
-                 +0H/N+4ZZMcYBdVK6GHMjidiWc9GqALG65bQ6vrfmLZ0wKlqfqjOtAfNlpRDOfN8
-                 fPidNwKBgHOFjFanY4O/WzgGb6dzrgH0iUuKfFBxb6z8YYyKBzeW2EPET9bczQma
-                 eI77+RDztNrqx2p4xF4B/yTEIMV7EOA0gS2a5oN31BEsoZsjJNx+9vBddJXO6LB/
-                 D73WF6asd+xd1A8ESz5pnoKhpecoM3W/KRVAwpkTby2/ftzmNriZ
-                 -----END RSA PRIVATE KEY-----")
+(def key-private (crypto/createSecretKey (js/Buffer.from "-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEA0Faj9WE0bdpUoZRVlc9V+7QoEUOK+piXJQGh+82WcefVbMKb
+EQX5oU1dgju3X/quNJQx05jUOvUtkdTY5yDQigUWkGxsKGvtlbYtClYmYxUXxmT+
+6WGyGgLio2Ps1UEtE1YGAigs2fqsJigFgqa7h5dEquMz4FCBwLeUPNmG3pPS47li
+9WH7r3c7Zhc5CIfdJrfWJRgK3lqX4ZWkvRDn2Mx4P614HI6CGOnT55B9rwUf/KHH
+BZlfmoSoPAW6GT6DBGL4aSDn14RERBy+PM4q/qJZHnOuFua8E0rDcp28/eZ/KGal
+88xPsV8YCcGbIgIFwMEbTVME3kOg8fcSyFAwqQIDAQABAoIBACFkQZMqqUSSIc5j
+//Oq75UQIvvhX30ax97ejB/Xq61GAycTadcopgH8bGhbOeDgRNuYhQPtEtcARPWC
+r+EbmVEFz8AGIK+53LKKKF3nwO9Qiib6OQEe73TL0ZduhJ8JezgGKaBe4BFv4/eZ
+ooh2QMhSrmbVU5M4VBOXWOMH2l4B+R5gJa5xZga6SA0Jh1nnZstIkAndBMmPdRto
+LRjKWriFbbD1LStLs9aSRgnM+pLZAwx0x2ZZnFJwpTOjGTzszpn39w7fRNOhN8bS
++3/W/lQzlpVafCune3WAErE2+1mnHRYEbjSjSs2FT/2tVhU1PVoqRLPBL8iI2r5N
+SdrJpCECgYEA+jlA0lyPHQdddixkGUZ8WLOPksRMuHscqFjeV549pQ+PYPbvcEjS
+ki5pDVIOMeaIYje89O0exBh6x9CtVwnVJ/7G8MEXIsry7rt0MTpc+NUHYVKfx1Fq
+DcDVNw9e7yR3jTBarbxgaMD1XLW0kw1HjgVpAHVQlGPB059zFi1T6usCgYEA1SXb
+tRdiQt6viipCIKYxtxPUu9AAMUbeCpDGsR5A8f8+HAC6LUAeOY9/GoSq8FhKS2Go
+Fwo4pC7b3yUlxSGXenFFC/liAKPqKLBdn9ppcQ+gjecZFHDHkoOzi5OO067egCyn
+EMHQ6XQ2UcZe1CfzJH4hvCKKcc0pAmAptdQHBbsCgYEA0dA6K2oTUqr/UnzMfmkd
+ER+XbuCM2E/a6sqBvYRhekt+1TaZ9VQKxSqHSfUZE/yTNZA5MEK3/oPsSCoRfx8u
+jffThsLSDImShF3IgxLGLJwsMQ4gDfiVbezYm++Wkf3JBSmbj3yadpv94Xw3aurC
+qjKdJhY4uASh3TohPWJKsHsCgYB7F0TdPKbTRTSMjsDnh/KX7ozg9UrXKjzaTydf
+a8BHwIZGt6jMrwWFajgVwV3SNLqa88eVnqJ9Nk5lfFdmk3KeFEGym48cHY0BeHBo
++0H/N+4ZZMcYBdVK6GHMjidiWc9GqALG65bQ6vrfmLZ0wKlqfqjOtAfNlpRDOfN8
+fPidNwKBgHOFjFanY4O/WzgGb6dzrgH0iUuKfFBxb6z8YYyKBzeW2EPET9bczQma
+eI77+RDztNrqx2p4xF4B/yTEIMV7EOA0gS2a5oN31BEsoZsjJNx+9vBddJXO6LB/
+D73WF6asd+xd1A8ESz5pnoKhpecoM3W/KRVAwpkTby2/ftzmNriZ
+-----END RSA PRIVATE KEY-----") "utf8"))
+
 (def key-public "-----BEGIN PUBLIC KEY-----
-                MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Faj9WE0bdpUoZRVlc9V
-                +7QoEUOK+piXJQGh+82WcefVbMKbEQX5oU1dgju3X/quNJQx05jUOvUtkdTY5yDQ
-                igUWkGxsKGvtlbYtClYmYxUXxmT+6WGyGgLio2Ps1UEtE1YGAigs2fqsJigFgqa7
-                h5dEquMz4FCBwLeUPNmG3pPS47li9WH7r3c7Zhc5CIfdJrfWJRgK3lqX4ZWkvRDn
-                2Mx4P614HI6CGOnT55B9rwUf/KHHBZlfmoSoPAW6GT6DBGL4aSDn14RERBy+PM4q
-                /qJZHnOuFua8E0rDcp28/eZ/KGal88xPsV8YCcGbIgIFwMEbTVME3kOg8fcSyFAw
-                qQIDAQAB
-                -----END PUBLIC KEY-----")
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0Faj9WE0bdpUoZRVlc9V
++7QoEUOK+piXJQGh+82WcefVbMKbEQX5oU1dgju3X/quNJQx05jUOvUtkdTY5yDQ
+igUWkGxsKGvtlbYtClYmYxUXxmT+6WGyGgLio2Ps1UEtE1YGAigs2fqsJigFgqa7
+h5dEquMz4FCBwLeUPNmG3pPS47li9WH7r3c7Zhc5CIfdJrfWJRgK3lqX4ZWkvRDn
+2Mx4P614HI6CGOnT55B9rwUf/KHHBZlfmoSoPAW6GT6DBGL4aSDn14RERBy+PM4q
+/qJZHnOuFua8E0rDcp28/eZ/KGal88xPsV8YCcGbIgIFwMEbTVME3kOg8fcSyFAw
+qQIDAQAB
+-----END PUBLIC KEY-----")
 
 
 (def key-hash
@@ -82,60 +85,21 @@
 
 (def payload #js { "pubkey" key-public "endpoint" "bafylmao" "kbtname" pubkey-hash})
 
-(def sign-options {:expires "1h" :alg "RS256"})
-
-;; options {:expires "1h" :alg "HS256"}
-
-;;const { encodeURLSafe, decodeURLSafe } = require('@stablelib/base64')
-;;const sha256 = require('@stablelib/sha256')
-;;beforeAll(() => {});
-
-;;//TODO: set key to random value, check random value is returned
-
-;;// JWT reference
-
-;;var privateKEY  = fs.readFileSync('./test/private.key', 'utf8');
-;;var publicKEY  = fs.readFileSync('./test/public.key', 'utf8');
-
-;;var privateKEYbad  = fs.readFileSync('./test/private_bad.key', 'utf8');
-;;var publicKEYbad  = fs.readFileSync('./test/public_bad.key', 'utf8');
-
-
-;;var payload = {
-;;               pubkey: publicKEY,
-;;               endpoint: 'bafyx0x0x0x0x0',
-;;               kbtname: encodeURLSafe(sha256.hash(publicKEY))
-;;               };
-;;var signOptions = {
-;;                   expiresIn:  "12h",
-;;                   algorithm:  "RS256"   // RSASSA [ "RS256", "RS384", "RS512" ]
-;;                   };
-;;var token = jwt.sign(payload, privateKEY, signOptions);
-;;var badtoken = jwt.sign(payload, privateKEYbad, signOptions);
-
-
-
+(def sign-options {:expires "1h" :alg "HS256"})
 
 (deftest validate-jwt-test
-  ;; TODO test p2p.handlerequest.validate-jwt
-  ;;(testing "validate-jwt-test"
-    (t/async done
-             (go
-;;               (let [token (<p! (jwt/sign-payload payload key-private sign-options))]
-               ;;(let [token ((jwt/sign-payload payload key-private sign-options))]
-
-               (let [token (try
-                             (<p! (jwt/sign-payload payload key-private sign-options))
-                             (catch js/Error err (ex-cause err)))]
-                 (prn "hereiam")
-                 (prn token)
-                 (let [
-                      ;; TODO uncomment the line below to see error
-                      ;; token-signed (<p! (token))
-                       ]
-                   #_(prn token-signed)
-                   (done))))))
-
+  (t/async done
+           (go
+             (let [ token-p  (jwt/sign-payload payload key-private sign-options)]
+               (is (not= token-p nil))
+               (-> token-p
+                   (.then (fn[token]
+                            (let [validated-p (p2p.handlerequest/validate-jwt (js->clj token))]
+                              (is (not= validated-p nil))
+                              (-> validated-p
+                                      (.then (fn[validated]
+                                               (prn validated)))
+                                      )))))))))
 
 ;; create jwt
 ;; check invalid payload

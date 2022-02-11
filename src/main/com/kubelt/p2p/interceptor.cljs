@@ -11,6 +11,7 @@
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
     [com.kubelt.p2p.proto :as p2p.proto]
     [com.kubelt.p2p.handlerequest :as p2p.handlerequest]
+    [com.kubelt.lib.jwt :as jwt]
     [clojure.string :as str])
   (:require
     [com.kubelt.lib.http.status :as http.status]))
@@ -34,8 +35,11 @@
 (def user-namespace
   {:name ::user-namespace
    :enter (fn [ctx]
+            (let [validated (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)
+                  pubkey (get-in  validated [:payload :pubkey])]
 
-            (p2p.handlerequest/user-namespace ctx))
+              (p2p.handlerequest/set-user-namespace pubkey))
+            ctx)
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
@@ -46,8 +50,16 @@
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
-
-            (p2p.handlerequest/validate-jwt ctx))
+            (let [payload (get ctx :body/raw) ;; TODO retrieve from request
+                  decoded (jwt/decode payload)
+                  pubkey (str (.-pubkey decoded))]
+              (let [payload (get ctx :body/raw)]
+                (-> (p2p.handlerequest/validate-jwt payload)
+                    (.then (fn [x] 
+                             (-> ctx
+                                 (assoc-in [:request :jwt/raw] payload)
+                                 (assoc-in [:request :jwt/pubkey] pubkey)
+                                 (assoc-in [:request :jwt/valid] x))))))))
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
@@ -78,8 +90,19 @@
 (def kbt-resolve
   {:name ::kbt-resolve
    :enter (fn [ctx]
-            (let [newctx (p2p.handlerequest/kbt-resolve ctx)]
-              newctx))
+            (let [bee (get ctx :p2p/hyperbee)
+                  match (get ctx :match)
+                  kbt-name (get-in match [:path-params :id])]
+
+
+              (let [kvresult (p2p.handlerequest/kbt-resolve bee kbt-name)]
+                (-> kvresult
+                    (.then (fn[x] 
+                             (if-not (nil? x)
+                               (assoc-in ctx [:response :http/body] x)
+                               ;; No result found, return a 404.
+                               (assoc-in ctx [:response :http/status] http.status/not-found))))))))
+
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
             ctx)})
@@ -88,11 +111,17 @@
 (def kbt-update
   {:name ::kbt-update
    :enter (fn [ctx]
-            (log/info {:log/msg "hereiam1"})
-            (try
-              (let [newctx (p2p.handlerequest/kbt-update ctx)]
-                newctx)
-              (catch js/Error e (prn e))))
+            (let [request (get ctx :request)
+                  hyperbee (get ctx :p2p/hyperbee)
+                  match (get ctx :match)
+                  kbt-name (get-in match [:path-params :id])
+                  valid-jwt (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)
+                  kbt-value  (get-in valid-jwt [:payload :endpoint])]
+              (let [
+                    update-result (p2p.handlerequest/kbt-update hyperbee kbt-name kbt-value)]
+                (-> update-result
+                    (.then (fn[x] 
+                             (assoc-in ctx [:response :http/status] http.status/created)))))))
 
    :leave (fn [ctx]
             (log/info {:log/msg "leaving kbt update"})
