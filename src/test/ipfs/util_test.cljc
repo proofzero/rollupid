@@ -1,7 +1,12 @@
 (ns ipfs.util-test
   "Test the IPFS client-related utilities."
+  #?(:cljs
+     (:require
+      [cljs.test :as t :refer [deftest is testing use-fixtures]])
+     :clj
+     (:require
+      [clojure.test :as t :refer [deftest is testing use-fixtures]]))
   (:require
-   [cljs.test :as t :refer [deftest is testing use-fixtures]]
    [clojure.string :as str])
   (:require
    [malli.core :as malli])
@@ -26,5 +31,6 @@
            :response/spec
            [:map
             [:name :string]]}]
+      (prn ipfs.spec/api-resource)
       (is (malli/validate ipfs.spec/api-resource resource)
           "api resource schema is correct"))))

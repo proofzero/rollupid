@@ -65,7 +65,9 @@
    [:response/types media-types]
    [:response/spec api-spec]
    [:response/body-fn {:optional true}
-    [:=> [:cat api-resource :any] :any]]
+    ;; TODO replace :map argument with recursive reference to
+    ;; api-resource (using registry?).
+    [:=> [:cat :map :any] :any]]
    ;; Added by parameter checking functions.
    ;; TODO Should we create a separate spec for this enriched data?
    ;; TODO flesh out these specs.
