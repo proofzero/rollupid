@@ -12,7 +12,8 @@
 (deftest api-resource-test
   (testing "valid api resource"
     (let [resource
-          {:resource/description "test resource"
+          {:com.kubelt/type :kubelt.type/api-resource
+           :resource/description "test resource"
            :resource/methods [:post]
            :resource/path "/foo"
            :resource/params
@@ -21,6 +22,7 @@
              :description "example parameter"
              :required false
              :spec :boolean}}
+           :response/types ["text/plain"]
            :response/spec
            [:map
             [:name :string]]}]
