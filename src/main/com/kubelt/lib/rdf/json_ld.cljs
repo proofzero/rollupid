@@ -1,7 +1,8 @@
 (ns com.kubelt.lib.rdf.json-ld
   "Generate RDF/cljs quads from JSON-LD."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
+  ;; This breaks web build
+  #_(:require
    ["jsonld" :as jsonld])
   (:require
    [clojure.string :as str])
@@ -114,9 +115,11 @@
   to a vector of quad maps."
   [doc]
   (let [options (clj->js {})]
+    ;; TODO replace jsonld dependency with something else; home grown?
+    (js/Promise.resolve #js [])
     ;; jsonld.toRDF() returns a promise that resolves to a string
     ;; containing RDF triples.
-    (-> (.toRDF jsonld doc options)
+    #_(-> (.toRDF jsonld doc options)
         (.then (fn [dataset]
                  (js->clj dataset :keywordize-keys true)))
         (.then (fn [dataset]

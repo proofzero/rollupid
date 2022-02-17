@@ -1,8 +1,9 @@
 (ns com.kubelt.lib.util
   "Miscellaneous utilities."
-  (:require
-   ["os" :as os]
-   ["process" :as process])
+  #?(:node
+     (:require
+      ["os" :as os]
+      ["process" :as process]))
   (:require
    [goog.object]
    [goog.userAgent])
@@ -22,25 +23,27 @@
             (assoc result key v))))
       (reduce {} (goog.object/getKeys obj))))
 
-(defn environment
-  "Return a map of the process environment. In the returned map
+#?(:node
+   (defn environment
+     "Return a map of the process environment. In the returned map
   environment variable names and values are the map keys and values."
-  []
-  (obj->clj (.-env process)))
+     []
+     (obj->clj (.-env process))))
 
-(defn node-env
-  "Return a map describing the node environment, including details such as
+#?(:node
+   (defn node-env
+     "Return a map describing the node environment, including details such as
   the user's home directory, temp directory, username, and a map of
   environment variables."
-  []
-  (let [home-dir (.homedir os)
-        tmp-dir (.tmpdir os)
-        username (.-username (.userInfo os))
-        env-map (environment)]
-    {:home-dir home-dir
-     :tmp-dir tmp-dir
-     :environment env-map
-     :username username}))
+     []
+     (let [home-dir (.homedir os)
+           tmp-dir (.tmpdir os)
+           username (.-username (.userInfo os))
+           env-map (environment)]
+       {:home-dir home-dir
+        :tmp-dir tmp-dir
+        :environment env-map
+        :username username})))
 
 ;; TODO test me
 (defn browser?
