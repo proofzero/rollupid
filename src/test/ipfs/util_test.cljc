@@ -31,6 +31,5 @@
            :response/spec
            [:map
             [:name :string]]}]
-      (prn ipfs.spec/api-resource)
       (is (malli/validate ipfs.spec/api-resource resource)
           "api resource schema is correct"))))
