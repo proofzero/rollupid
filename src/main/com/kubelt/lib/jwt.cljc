@@ -10,6 +10,10 @@
     ["crypto" :as crypto]
     [taoensso.timbre :as log]
     [clojure.string :as str]
+    [goog.json :as json]
+    [clojure.walk :as walk]
+    [goog.crypt.base64 :refer [encodeString decodeString]]
+
     ["jose" :as jose :refer [SignJWT GetKeyFunction ]]))
 
 ;; - iss (issuer): Issuer of the JWT
@@ -37,17 +41,6 @@
 ;; TODO spec for JWT + validation
 
 ;;;;;;;;;; helpers ;;;;;;;;;;;;;;;;;;;
-(defn create-header [alg exp]
-  (str/join "" ["{\"alg\":\"" alg "\", \"exp\":\"" exp \""}"]))
-
-(defn prepare-key [key-material] 
-  ;; return key object
-  key-material
-  )
-(defn prepare-payload [claims]
-  claims
-  )
-
 (defn encode [target]
   (.encodeString base64 target goog.crypt.base64.BASE_64_URL_SAFE))
 
@@ -59,15 +52,45 @@
     (.replace "/=/g" "")
     (.replace "/\\+/g" "-")
     (.replace "/\\//g" "_")))
-      
 
+ (defn create-header [alg exp]
+   {:alg alg :exp exp})
+
+;;  (str/join "" ["{\"alg\":\"" alg "\", \"exp\":\"" exp \""}"]))
+(defn get-payload [token]
+  (prn "enter get-payload")
+  (let [dtoken (decode token)]
+    (prn {:decoded-token token})
+    (get dtoken :pubkey)))
+
+(defn prepare-key [key-material] 
+  ;; return key object
+  key-material
+  )
+(defn prepare-payload [claims]
+ claims
+ )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn sign-jwt [secret-key header-enc payload-enc] 
+  (prn "enter sign-jwt")
+  (let [
+        b6header (decode header-enc)
+        jheader (json/parse b6header)
+        alg (.. jheader -alg)
+
+       ;; header-dec (js->clj header)
+       ;; algorithm (get header-dec :alg)
+       ]
+    (prn {:b6header b6header :jheader jheader})
+    (prn {:alg alg})
+
+;;  (prn {:header-enc header-enc :b6header b6header :bdheader bdheader :jheader jheader :header header :algorithm algorithm :header-dec header-dec})
 
   ;; sign payload+header
   (def signature-target (str/join "" [header-enc payload-enc]))
   
+
   ;; TODO: algorithm detection
   (if (not= (get header-enc :alg) "RS256") (prn "fixme: error"))
 
@@ -76,30 +99,57 @@
                  (.sign secret-key "base64"))
         signature-digest (fromBase64 sig64)]
 
-    (encode signature-digest)))
+    (encode signature-digest))))
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn create-jwt [secret-key header payload] 
+  (let [
+        header-enc (encode (json/serialize (clj->js header)))
+        payload-enc (encode (json/serialize (clj->js payload)))
+        
+        signature-enc  (encode (sign-jwt secret-key header-enc payload-enc))]
 
-  ;; base64url encode header
-  (def header-enc (encode header))
-  ;; base64url encode payload
-  (def payload-enc (encode payload))
-
-  (let [signature-enc  (encode (sign-jwt secret-key header-enc payload-enc))]
     (str/join "." [header-enc payload-enc signature-enc])))
+
+
+;;;; REF
+#_(
+   "encode to JWT"
+   [payload key & [algo extra-headers]]
+   (let [algo (or algo "HS256")
+         extra-headers (or extra-headers {})
+         signing-method (get signing-algorithm-map algo)
+         signing-type (get  signing-type-map algo)]
+
+     (if-not (map? payload)
+       (throw (js/Error. "payload should be in JSON format")))
+
+     (if-not (map? extra-headers)
+       (throw (js/Error. "extra-headers should be a map")))
+
+     (if-not (and signing-method signing-type)
+       (throw (js/Error. "algorithm not supported")))
+
+     (let [header (base64-url-encode (json/serialize (clj->js (apply conj extra-headers {:alg algo :typ "JWT"}))))
+           payload (base64-url-encode (json/serialize (clj->js payload)))
+           signature (sign (str header "." payload) key signing-method signing-type)]
+       (str header "." payload "." signature))))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn validate-jwt [token pubkey] 
+  (prn "enter validate-jwt")
   (let [
         token-pieces (str/split token #"\.")
         pheader (get token-pieces 0)
-        ppayload (get token-pieces 1)
+        ppayload (decode (get token-pieces 1))
         psig (get token-pieces 2)
         verified (-> (.createVerify crypto "RSA-SHA256")
                      (.update (str/join "." [pheader ppayload]))
-                     (.verify pubkey, psig, "base64"))]
-    verified))
+                     ;;(.verify pubkey, psig, "base64"))]
+                     (.verify "asdlkjad", psig, "base64"))]
+    ))
 

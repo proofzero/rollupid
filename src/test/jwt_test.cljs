@@ -69,47 +69,26 @@ qQIDAQAB
       (let [verified (-> (.createVerify crypto "RSA-SHA256")
                          (.update claims)
                          (.verify key-public, digest, "base64"))]
-        (prn "verified: ")
-        (prn verified)
 
         (is (= verified true))))))
 
 
 ;;;;;;;;; helper ;;;;;;;;;;;;;;;;;;;;
-(defn create-test-jwt []
+(deftest create-test-jwt 
+  (testing "create and verify jwt"
   (let [
-          ;;signing-key (jwt/prepare-key key-private)
-          ]
-      (let [
-            header (jwt/create-header "RS256" "1h")
-            payload (jwt/prepare-payload claims)
-            ;; sign and produce token
-            token (jwt/create-jwt key-public header claims)
-            validated (jwt/validate-jwt token key-public)]
+        signing-key (jwt/prepare-key key-private)
+        header (jwt/create-header "RS256" "1h")
+        payload (jwt/prepare-payload claims)
+        ;; sign and produce token
+        token (jwt/create-jwt key-public header payload)
+        ;; extract public key
+        dpl (get (jwt/get-payload token) :pubkey)
+        ;; validate token 
+        validated (jwt/validate-jwt token key-public)]
+    (prn "header")
+    (prn header)
         (prn "validated:")
         (prn validated)
         (is (= validated true))
-        )))
-
-;; create JWT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(deftest test-create-jwt 
-  #_(testing "create a jwt"
-      (let [token (create-test-jwt)]
-        #_(is (not= token nil))
-        ;; check if not null
-        )))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(deftest test-verify-jwt
-  #_(testing "validate jwt integrity"
-      (prn "hereiam in test-verify-jwt")
-
-      (let [token (create-test-jwt)
-            ;; call validate 
-            validated (jwt/validate-jwt token key-public)]
-        ;; check validated
-        #_(is (not= validated nil))
-        (prn "validated:")
-        (prn validated)
         )))
