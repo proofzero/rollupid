@@ -3,7 +3,8 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [clojure.core.async :as async :refer [>! go]]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [com.kubelt.lib.json :as lib.json])
   (:require
    [camel-snake-kebab.core :as csk]
    [hato.client :as hc]
@@ -13,6 +14,7 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.http.shared :as http.shared]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.spec.http :as spec.http]))
 
@@ -83,18 +85,6 @@
      (if-let [body-data (get m :http/body)]
        (to-body body-data)
        {}))))
-
-;; Replaces default json/keyword-keys-object-mapper.
-(def keyword-mapper
-  (json/object-mapper
-   {:encode-key-fn csk/->camelCaseString
-    :decode-key-fn csk/->kebab-case-keyword}))
-
-(defn from-json
-  [body keywordize?]
-  (if keywordize?
-    (json/read-value body keyword-mapper)
-    (json/read-value body)))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -174,7 +164,7 @@
                 keywordize? (get request :response/keywordize? true)]
             (condp = content-type
               ;; TODO use media type constant.
-              :application/json (from-json body keywordize?)
+              :application/json (lib.json/from-json body keywordize?)
               ;; If no match, return body unchanged.
               body))))))
 
@@ -203,7 +193,7 @@
                         (let [content-type (get response :content-type)
                               body (get response :body)
                               data (condp = content-type
-                                     "application/json" (from-json body)
+                                     "application/json" (lib.json/from-json body)
                                      ;; If no match, return body unchanged.
                                      body)]
                           ;; TODO convert map keywords (optional?)

@@ -5,13 +5,14 @@
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]
    [com.kubelt.ipfs.util :as ipfs.util]
-   [com.kubelt.ipfs.v0 :as ipfs.v0]))
+   [com.kubelt.ipfs.v0 :as ipfs.v0]
+   [com.kubelt.lib.json :as lib.json]))
 
 ;; TODO Extract into shared utility method.
 (defn- multipart-body
   [param-name data]
   (let [part-data (if (coll? data)
-                    (ipfs.util/edn->json-str data)
+                    (lib.json/edn->json-str data)
                     data)
         ;; TODO use media type from library.
         media-type (if (string? part-data)
@@ -82,7 +83,7 @@
          body
          ;; If :output/codec not specified, IPFS outputs using dag-json
          ;; codec; parse JSON string into edn.
-         (ipfs.util/json-str->edn body))))})
+         (lib.json/json-str->edn body))))})
 
 (def get
   (ipfs.util/make-http ipfs.v0/api-base get-desc))

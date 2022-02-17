@@ -8,11 +8,6 @@
    [malli.core :as malli]
    [malli.error]
    [malli.util])
-  ;; Migrate to lib.json utility namespace
-  (:require
-   #?(:clj
-      [camel-snake-kebab.core :as csk]
-      [jsonista.core :as json]))
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]))
 
@@ -115,23 +110,6 @@
     x
     #?(:clj (into {} x)
        :cljs (js->clj x :keywordize true))))
-
-;; TODO move into com.kubelt.lib.json
-;; TODO conditional JS
-(defn edn->json-str
-  [x]
-  #?(:clj (json/write-value-as-string x)))
-
-;; TODO move into com.kubelt.lib.json
-(defn json-str->edn
-  [s]
-  #?(:clj
-     ;; TODO unify with the implementation in lib.http.jvm. Separate
-     ;; lib.json utility namespace?
-     (let [mapper (json/object-mapper
-                   {:encode-key-fn csk/->camelCaseString
-                    :decode-key-fn csk/->kebab-case-keyword})]
-       (json/read-value s mapper))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
