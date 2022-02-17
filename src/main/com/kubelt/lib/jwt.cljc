@@ -38,15 +38,14 @@
 
 ;;;;;;;;;; helpers ;;;;;;;;;;;;;;;;;;;
 (defn create-header [alg exp]
-  [:alg alg :exp exp])
+  (str/join "" ["{\"alg\":\"" alg "\", \"exp\":\"" exp \""}"]))
 
 (defn prepare-key [key-material] 
   ;; return key object
-  (key-material)
+  key-material
   )
 (defn prepare-payload [claims]
-
-  (claims)
+  claims
   )
 
 (defn encode [target]
@@ -55,42 +54,52 @@
 (defn decode [target]
   (.decodeString base64 target))
 
+(defn fromBase64 [target]
+  (doto target
+    (.replace "/=/g" "")
+    (.replace "/\\+/g" "-")
+    (.replace "/\\//g" "_")))
+      
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn sign-jwt [secret-key header payload] 
+(defn sign-jwt [secret-key header-enc payload-enc] 
+
+  ;; sign payload+header
+  (def signature-target (str/join "" [header-enc payload-enc]))
+  
+  ;; TODO: algorithm detection
+  (if (not= (get header-enc :alg) "RS256") (prn "fixme: error"))
+
+  (let [signer (.createSign crypto "RSA-SHA256")
+        sig64 ( -> (.update signer payload-enc)
+                 (.sign secret-key "base64"))
+        signature-digest (fromBase64 sig64)]
+
+    (encode signature-digest)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn create-jwt [secret-key header payload] 
 
   ;; base64url encode header
   (def header-enc (encode header))
   ;; base64url encode payload
   (def payload-enc (encode payload))
 
-  ;; sign payload+header
-  (def signature-target (str/join "" [header payload]))
-  (def signature-digest "fixme")
-  
-
-  (def signature-enc (encode signature-digest))
-
-  (str/join "." [header-enc payload-enc signature-enc]))
-
+  (let [signature-enc  (encode (sign-jwt secret-key header-enc payload-enc))]
+    (str/join "." [header-enc payload-enc signature-enc])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn create-jwt [secret-key header claims] 
-
-  (def payload {:fixmelol "fixme"}) ;; TODO convert claims to payload
-
-  (sign-jwt secret-key header payload))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn validate-jwt [token] 
-
-  (def claims "fixme")
-  (def header (create-header "RS256" "1h"))
-
-  (def token-pieces (str/split "." token))
-  (prn token-pieces)
-
-  ;; return [:header :payload :signature]
-
-  ) 
+(defn validate-jwt [token pubkey] 
+  (let [
+        token-pieces (str/split token #"\.")
+        pheader (get token-pieces 0)
+        ppayload (get token-pieces 1)
+        psig (get token-pieces 2)
+        verified (-> (.createVerify crypto "RSA-SHA256")
+                     (.update (str/join "." [pheader ppayload]))
+                     (.verify pubkey, psig, "base64"))]
+    verified))
 
