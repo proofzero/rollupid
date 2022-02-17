@@ -227,7 +227,7 @@
 (def dag-cbor
   [:or
    {:description "CBOR-encoded binary data."}
-   bytes?])
+   spec.http/uint8-array])
 
 (def dag-hash
   [:and

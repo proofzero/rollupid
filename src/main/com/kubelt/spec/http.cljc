@@ -71,14 +71,15 @@
    [:com.kubelt/type [:enum :kubelt.type/multipart]]
    [:multipart multipart-parts]])
 
+;; TODO specify Buffer/Uint8Array for CLJS?
+(def uint8-array
+  #?(:clj bytes?))
+
 (def body
   [:or
-   bytes?
+   uint8-array
    string?
    multipart])
-
-(def scheme
-  [:enum :http :https])
 
 (def fragment
   string?)
