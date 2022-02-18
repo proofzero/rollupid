@@ -4,9 +4,12 @@
   (:require
    [goog.Uri]
    [goog.object])
-  (:require
-   ["stream" :refer [Duplex]]
-   ["http" :as http :refer [IncomingMessage]])
+  ;; NB: extra per-target reader conditionals are a shadow-cljs *only*
+  ;; feature.
+  #?(:node
+     (:require
+      ["stream" :refer [Duplex]]
+      ["http" :as http :refer [IncomingMessage]]))
   (:require
    [clojure.string :as str]))
 
@@ -40,6 +43,7 @@
   [m]
   (= :delete (:http/method m)))
 
+;; TODO convert to .cljc
 ;; TODO test me
 (defn req->map
   "Convert a Node.js HTTP request (an IncomingMessage instance) into a

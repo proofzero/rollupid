@@ -143,7 +143,7 @@
 ;; TODO test export of secret key as buffer
 ;; TODO test export of secret key as jwk
 
-(deftest secret-key-test
+#_(deftest secret-key-test
   (testing "make secret key from string"
     (let [secret-key (key/make-secret-key secret-string)
           key-length (count secret-string)]

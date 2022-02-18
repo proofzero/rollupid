@@ -1,0 +1,10 @@
+;; tests.edn
+;;
+;; kaocha test runner configuration
+;;
+;; $ clj -M:kaocha unit
+
+#kaocha/v1
+{:tests [{:id :unit
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]}]}

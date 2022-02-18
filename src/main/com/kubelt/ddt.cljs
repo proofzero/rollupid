@@ -7,9 +7,10 @@
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
-   [com.kubelt.ddt.json :as ddt.json]
    [com.kubelt.ddt.crypto :as ddt.crypto]
    [com.kubelt.ddt.http :as ddt.http]
+   [com.kubelt.ddt.ipfs :as ddt.ipfs]
+   [com.kubelt.ddt.json :as ddt.json]
    [com.kubelt.ddt.json-ld :as ddt.json-ld]
    [com.kubelt.ddt.jwt :as ddt.jwt]
    [com.kubelt.ddt.p2p :as ddt.p2p]
@@ -56,6 +57,8 @@
                  (.command (clj->js ddt.crypto/command))
                  ;; $DDT http <command>
                  (.command (clj->js ddt.http/command))
+                 ;; $DDT ipfs <command>
+                 (.command (clj->js ddt.ipfs/command))
                  ;; $DDT json-ld <command>
                  (.command (clj->js ddt.json-ld/command))
                  ;; $DDT jwt <command>

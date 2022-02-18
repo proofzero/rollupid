@@ -1,15 +1,19 @@
 (ns com.kubelt.lib.key.node
   "Implementation of key-related protocols for Node.js."
-  (:require
+  ;; TODO this breaks compile web-test
+  #_(:require
    ["crypto" :as crypto :refer [KeyObject]])
   (:require
    [com.kubelt.lib.util :as util]
    [com.kubelt.proto.key :as proto.key]))
 
+;; TODO requiring "crypto" here breaks the web-test build. Implement in
+;; a better way for cross-platform support.
+
 ;; SymmetricKey
 ;; -----------------------------------------------------------------------------
 
-(defrecord SymmetricKey [^KeyObject key-obj]
+#_(defrecord SymmetricKey [^KeyObject key-obj]
   proto.key/SymmetricKey
 
   (key-size [this]
@@ -25,7 +29,7 @@
       )))
 
 ;; data is <string>|<ArrayBuffer>|<Buffer>|<TypedArray>|<DataView>
-(defn make-secret-key
+#_(defn make-secret-key
   ([data]
    (let [key-obj (.createSecretKey crypto data)]
      (->SymmetricKey key-obj)))
@@ -36,7 +40,7 @@
 ;; AsymmetricKey
 ;; -----------------------------------------------------------------------------
 
-(defrecord AsymmetricKey [^KeyObject key-obj]
+#_(defrecord AsymmetricKey [^KeyObject key-obj]
   proto.key/AsymmetricKey
 
   (key-type [this]
@@ -47,7 +51,7 @@
     (let [details (.-asymmetricKeyDetails key-obj)]
       (util/obj->clj details))))
 
-(defn make-private-key
+#_(defn make-private-key
   "Make a private key from existing JWK key material."
   ([data]
    (let [options #js {:key data
@@ -63,7 +67,7 @@
          key-obj (.createPrivateKey crypto options)]
      (->AsymmetricKey key-obj))))
 
-(defn make-public-key
+#_(defn make-public-key
   "Make a public key from existing JWK key material."
   ([data]
    (let [options #js {:key data
@@ -82,7 +86,7 @@
 ;; KeyPair
 ;; -----------------------------------------------------------------------------
 
-(defrecord KeyPair [^KeyObject priv-obj ^KeyObject pub-obj]
+#_(defrecord KeyPair [^KeyObject priv-obj ^KeyObject pub-obj]
   proto.key/KeyPair
 
   (private [this]
@@ -91,7 +95,7 @@
   (public [this]
     (->AsymmetricKey pub-obj)))
 
-(defn make-key-pair
+#_(defn make-key-pair
   "Make a key pair from existing key material."
   [data]
   (let [options #js {:key data
@@ -101,7 +105,7 @@
         public (.createPublicKey crypto private)]
     (->KeyPair private public)))
 
-(defn generate-key-pair
+#_(defn generate-key-pair
   "Generate a new key pair."
   []
   ;; TODO

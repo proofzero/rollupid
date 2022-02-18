@@ -170,7 +170,6 @@ dist
 # library (as a JAR). The project.clj is generated from shadow-cljs.edn
 # so no need to check it in.
 project.clj
-deps.edn
 
 # clj-kondo cache
 /.clj-kondo/.cache
