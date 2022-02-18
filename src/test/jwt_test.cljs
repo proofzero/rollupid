@@ -51,13 +51,17 @@ h5dEquMz4FCBwLeUPNmG3pPS47li9WH7r3c7Zhc5CIfdJrfWJRgK3lqX4ZWkvRDn
 qQIDAQAB
 -----END PUBLIC KEY-----")
 
-(def claims (str/join "" ["endpoint=bafylmao&kbtname=bafybafy&pubkey=" (jwt/encode key-public)]))
+(def claims  {:endpoint "bafylmao" 
+              :kbtname "bafybafy"  
+              :pubkey (jwt/encode key-public)})
 
+;;;;;;;;; low level tests ;;;;;;;
 (deftest base64-roundtrip
   (testing "base64 encode and decode"
-    (let [encoded (jwt/encode claims)
+    (let [challenge "Test me !@#/=34@#$"
+          encoded (jwt/encode challenge)
           decoded (jwt/decode encoded)]
-      (is (= claims decoded)))))
+      (is (= challenge decoded)))))
 
 (deftest low-level-crypto-sign-verify
   (testing "low level crypto sign and verify"
@@ -73,22 +77,22 @@ qQIDAQAB
         (is (= verified true))))))
 
 
-;;;;;;;;; helper ;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;; unit test ;;;;;;;;;;;;
+;; covers create, sign and validate
 (deftest create-test-jwt 
   (testing "create and verify jwt"
-  (let [
-        signing-key (jwt/prepare-key key-private)
-        header (jwt/create-header "RS256" "1h")
-        payload (jwt/prepare-payload claims)
-        ;; sign and produce token
-        token (jwt/create-jwt key-public header payload)
-        ;; extract public key
-        dpl (get (jwt/get-payload token) :pubkey)
-        ;; validate token 
-        validated (jwt/validate-jwt token key-public)]
-    (prn "header")
-    (prn header)
-        (prn "validated:")
-        (prn validated)
-        (is (= validated true))
-        )))
+    (let [
+          signing-key (jwt/prepare-key key-private)
+          header (jwt/create-header "RS256" "1h")
+           payload (jwt/prepare-payload claims)
+                      ;; sign and produce token
+                     token (jwt/create-jwt key-private header payload)
+                      ;; extract public key
+                      pbk (jwt/get-public-key token) 
+                      ;; validate token 
+                       validated (jwt/validate-jwt token pbk)
+                     ;;validated true
+                       ]
+      (is (= pbk key-public))
+      (is (= validated true))
+      )))
