@@ -31,9 +31,22 @@
 ;; returns a promise
 (defn validate-jwt [payload]
 
-    (jwt/verify (clj->js payload))
-    
-    )
+#_(  signing-key (jwt/prepare-key key-private)
+  header (jwt/create-header "RS256" "1h")
+  payload (jwt/prepare-payload claims)
+
+  ;; sign and produce token
+  token (jwt/create-jwt key-private header payload)
+
+  ;; extract public key
+  pbk (jwt/get-public-key token) 
+
+  ;; validate token 
+  validated (jwt/validate-jwt token pbk)
+)
+ (let [pubkey (jwt/get-public-key payload )]
+  ;;validated true
+  (jwt/validate-jwt (clj->js payload) pubkey)))
 
 
 (defn kbt-resolve [kvstore kbt-name]

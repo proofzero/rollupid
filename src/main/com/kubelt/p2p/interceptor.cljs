@@ -51,10 +51,11 @@
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
             (let [payload (get ctx :body/raw) ;; TODO retrieve from request
-                  decoded (jwt/decode payload)
-                  pubkey (str (.-pubkey decoded))]
+                  pubkey (jwt/get-public-key payload)
+                  ;;decoded (jwt/decode payload)
+                  ]
               (let [payload (get ctx :body/raw)]
-                (-> (p2p.handlerequest/validate-jwt payload)
+                (-> (p2p.handlerequest/validate-jwt payload )
                     (.then (fn [x] 
                              (-> ctx
                                  (assoc-in [:request :jwt/raw] payload)
