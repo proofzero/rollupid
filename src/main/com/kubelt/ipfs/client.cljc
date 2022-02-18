@@ -171,7 +171,7 @@
      :v0 (ipfs.api/paths ipfs.api/v0)
      {}))
   ([version path]
-   (let [m (api version)]
+   #_(let [m (api version)]
      (get-in m path)))
   ([version path options]
    ))
