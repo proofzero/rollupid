@@ -32,6 +32,8 @@
   [datascript/datascript "1.3.10"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.25"]
+  ;; parser combinators for Clojure/Script
+  [instaparse/instaparse "1.4.10"]
   ;; a micro-framework for building data-driven applications
   [integrant/integrant "0.8.0"]
   ;; fast JSON encoding and decoding

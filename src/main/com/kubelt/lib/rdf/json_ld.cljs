@@ -127,3 +127,15 @@
         (.then (fn [quads]
                  {:rdf/type :rdf.type/graph
                   :quads quads})))))
+
+(defn to-rdf
+  "Convert a JSON-LD document (provided as edn data) into RDF/clj format
+  triples."
+  [m]
+  {}
+  )
+
+(defn from-rdf
+  ""
+  [v]
+  {})
