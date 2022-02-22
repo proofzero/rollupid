@@ -24,4 +24,3 @@
           output (lib.hexify/hex-string input)]
       (is (= expected output)
           "hex string has expected value"))))
-
