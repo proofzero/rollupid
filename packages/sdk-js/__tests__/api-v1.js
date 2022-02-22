@@ -53,6 +53,7 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, [], 'v1');
     check(kbt, ['v1'], 'init');
     check(kbt, ['v1'], 'halt');
+    check(kbt, ['v1', 'account'], 'authenticate'),
     check(kbt, ['v1'], 'workspace');
     check(kbt, ['v1', 'workspace'], 'available');
 
@@ -104,6 +105,20 @@ tap.test('sdk init', (t) => {
     });
 
     t.end();
+});
+
+
+tap.test('account authenticate', (t) => {
+    return kbt.v1.init()
+        .then((sdk) => {
+            const publicKey = "foobar";
+            const wallet = {
+                "foo": "bar"
+            };
+            kbt.v1.account.authenticate(
+                sdk, publicKey, wallet
+            );
+        });
 });
 
 // TODO do we actually want to invoke the function? Prefer to use

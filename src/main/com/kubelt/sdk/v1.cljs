@@ -5,10 +5,11 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.spec.config :as spec.config]
-   [com.kubelt.lib.config :as impl.config]
-   [com.kubelt.lib.promise :as impl.promise :refer [promise promise?]]
-   [com.kubelt.lib.init :as impl.init]))
+   [com.kubelt.lib.config :as lib.config]
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.init :as lib.init]
+   [com.kubelt.lib.promise :refer [promise promise?]]
+   [com.kubelt.spec.config :as spec.config]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
@@ -21,28 +22,6 @@
 ;; - generate outputs in a suitable format for the caller's execution
 ;;   context, i.e. JavaScript or ClojureScript
 
-;; TODO move to error utility namespace.
-(defn explain
-  "Return human-friendly description of why some value doesn't conform to
-  the provided schema."
-  [schema value]
-  (let [explain (-> schema (m/explain value) me/humanize)]
-    {:com.kubelt/type :kubelt.type/error
-     :error explain}))
-
-;; TODO move to error utility namespace.
-(defn error?
-  ""
-  [x]
-  (and
-   (map? x)
-   (= :kubelt.type/error (get x :com.kubelt/type))))
-
-;; TODO define catalog of errors
-;; TODO use cognitect.anomalies
-;; TODO examine truss
-;; https://github.com/ptaoussanis/truss
-
 ;; init
 ;; -----------------------------------------------------------------------------
 
@@ -52,18 +31,18 @@
   ;; The 0-arity implementation uses the default configuration.
   ([]
    {:post [(map? %)]}
-   (let [config impl.config/default-config]
+   (let [config lib.config/default-config]
      (if (m/validate spec.config/config config)
-       (impl.init/init config)
-       (explain spec.config/config config))))
+       (lib.init/init config)
+       (lib.error/explain spec.config/config config))))
 
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
    (if (m/validate spec.config/config config)
-     (let [config (merge impl.config/default-config config)]
-       (impl.init/init config))
-     (explain spec.config/config config))))
+     (let [config (merge lib.config/default-config config)]
+       (lib.init/init config))
+     (lib.error/explain spec.config/config config))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
@@ -78,18 +57,18 @@
    (promise
     (fn [resolve reject]
       (let [result (init)]
-        (if (error? result)
+        (if (lib.error/error? result)
           (reject (clj->js result))
           (resolve result))))))
 
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
-   (let [config (impl.config/obj->map config)]
+   (let [config (lib.config/obj->map config)]
      (promise
       (fn [resolve reject]
         (let [result (init config)]
-          (if (error? result)
+          (if (lib.error/error? result)
             (reject (clj->js result))
             (resolve result))))))))
 
@@ -101,8 +80,8 @@
   calling (init) as the system to halt."
   [system]
   {:pre [(map? system)]}
-  (if-not (error? system)
-    (impl.init/halt! system)
+  (if-not (lib.error/error? system)
+    (lib.init/halt! system)
     true))
 
 (defn halt-js!
@@ -113,6 +92,6 @@
   (promise
    (fn [resolve reject]
      (let [result (halt! system)]
-       (if (error? result)
+       (if (lib.error/error? result)
          (reject (clj->js result))
          (resolve result))))))

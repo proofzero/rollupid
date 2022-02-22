@@ -3,12 +3,12 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 
-(defn available
+(defn available!
   "Return a list of available workspaces."
   [sys]
   (println "listing available workspaces"))
 
-(defn available-js
+(defn available-js!
   ""
   [sys]
-  (available sys))
+  (available! sys))

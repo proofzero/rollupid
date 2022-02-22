@@ -122,7 +122,9 @@
     {:name "key"
      :description "PEM-encoded key data to send."
      :required true
-     :spec bytes?}}
+     :spec #?@(:clj [bytes?]
+               ;; TODO find better constraint than :any
+               :cljs [:any])}}
    :resource/body-fn key-body
    :response/types ["application/json"]
    :response/spec

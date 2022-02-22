@@ -2,6 +2,7 @@
 {:paths ["src/main"]
  :deps
  {camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
+  commons-codec/commons-codec {:mvn/version "1.15"}
   com.cognitect/transit-clj {:mvn/version "1.0.329"}
   com.taoensso/timbre {:mvn/version "5.1.2"}
   datascript/datascript {:mvn/version "1.3.10"}
@@ -16,6 +17,7 @@
   ;;metosin/reitit-malli {:mvn/version "0.5.15"}
   ;;metosin/reitit-sieppari {:mvn/version "0.5.15"}
   ;;metosin/reitit-swagger {:mvn/version "0.5.15"}
+  org.bouncycastle/bcprov-jdk15on {:mvn/version "1.70"}
   org.clojure/core.async {:mvn/version "1.5.648"}
   ;;org.clojure/tools.cli {:mvn/version "1.0.206"}
   }
