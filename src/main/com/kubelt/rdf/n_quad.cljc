@@ -21,17 +21,12 @@
 (def string+lang-uri
   "http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")
 
-
 ;; Notes:
 ;; - we use production "named-node" for what is referred to in the
 ;;   grammar as an "iri-ref" to make the parsed output clearer
 ;; - we use < and > around characters to avoid including those
 ;;   characters in the parsed output. Confusingly, some of the the
 ;;   characters we want to exclude are '<' and '>'.
-;;
-;; TODO support comments beginning with '#' at end of line or at beginning:
-;; <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> <http://example.org/graph3> . # comments here
-;; # or on a line by themselves
 (defparser nq-parser
   "n-quads = quad? (<eol> quad)* <eol?>
    quad = subject <ws> predicate <ws> object <ws> graph? <ws>? <'.'>
@@ -44,7 +39,7 @@
    <ws> = #'\\s+'
    <eol> = #'\\s*[\r\n]+'
    language = <'@'> #'[a-zA-Z]+(-[a-zA-Z0-9]+)*'
-   named-node = <'<'> #'[^\u0000-\u0020<>{}\"|^`]*' <'>'>
+   named-node = <'<'> #'[^\\x{00}-\\x{20}<>{}\"|^`]*' <'>'>
    string = <'\"'> #'[^\\x{22}\\x{5c}\\x{a}\\x{d}]*' <'\"'>
    blank-node = <'_:'> #'[a-z][0-9]+'
 
@@ -130,6 +125,98 @@
                   :blank-node (blank-node (second v)))]
       {:rdf.quad/graph graph})))
 
+;; TODO support comments beginning with '#' at end of line or at beginning:
+;; <http://one.example/subject1> <http://one.example/predicate1> <http://one.example/object1> <http://example.org/graph3> . # comments here
+;; # or on a line by themselves
+(defn- remove-comments
+  [s]
+  s
+  )
+
+;; TODO move into shared namespace for RDF/cljc
+
+;; {:rdf/type :rdf.term/named-node,
+;;  :value "http://www.w3.org/2000/01/rdf-schema#Resource"}
+(defn named-node->str
+  [m]
+  (let [value (get m :value)]
+    (str "<" value ">")))
+
+;; {:rdf/type :rdf.term/blank-node, :value "b0"}
+(defn blank-node->str
+  [m]
+  (let [value (get m :value)]
+    (str "_:" value)))
+
+;; {:rdf/type :rdf.term/literal,
+;;  :datatype
+;;  {:rdf/type :rdf.term/named-node,
+;;   :value "http://www.w3.org/2001/XMLSchema#integer"},
+;;  :value "7000000"}
+(defn literal->str
+  [m]
+  (let [value (get m :value)
+        datatype (get-in m [:datatype :value])]
+    (condp = datatype
+      ;; Value is originally a string without language.
+      string-uri
+      (str "\"" value "\"")
+      ;; Value is originally a string with language.
+      string+lang-uri
+      (let [language (get m :language) ]
+        (str "\"" value "\"@" language))
+      ;; Value has another datatype.
+      (let [datatype (named-node->str (get m :datatype))]
+        (str "\"" value "\"^^" datatype)))))
+
+(defn graph->str
+  [m]
+  (let [value (get m :value)]
+    value))
+
+
+(defn subject->str
+  [m]
+  (let [term-type (get m :rdf/type)]
+    (condp = term-type
+      :rdf.term/named-node (named-node->str m)
+      :rdf.term/blank-node (blank-node->str m))))
+
+(defn- predicate->str
+  [m]
+  (let [term-type (get m :rdf/type)]
+    (when (= term-type :rdf.term/named-node)
+      (named-node->str m))))
+
+(defn- object->str
+  [m]
+  (let [term-type (get m :rdf/type)]
+    (condp = term-type
+      :rdf.term/named-node (named-node->str m)
+      :rdf.term/blank-node (blank-node->str m)
+      :rdf.term/literal (literal->str m))))
+
+(defn- graph->str
+  [m]
+  (let [term-type (get m :rdf/type)]
+    (condp = term-type
+      :rdf.term/named-node (named-node->str m)
+      :rdf.term/blank-node (blank-node->str m)
+      :rdf.term/default-graph "")))
+
+(defn quad->str
+  [m]
+  (let [subject (-> m (get :rdf.quad/subject) subject->str)
+        predicate (-> m (get :rdf.quad/predicate) predicate->str)
+        object (-> m (get :rdf.quad/object) object->str)
+        graph (-> m (get :rdf.quad/graph) graph->str)]
+    (cstr/join " "
+               (cond-> [subject predicate object]
+                 (not (cstr/blank? graph))
+                 (conj graph)
+                 :also
+                 (conj ".")))))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
 
@@ -139,7 +226,8 @@
 
 (defn parse-string
   [s]
-  (let [result (nq-parser s)]
+  (let [s (remove-comments s)
+        result (nq-parser s)]
     (if (= :n-quads (first result))
       (mapv (fn [[_ s p o g]]
               (merge
@@ -152,7 +240,8 @@
       {:com.kubelt/type :kubelt.type/error
        :error result})))
 
-(defn parse-file
+#_(defn parse-file
   [path]
-  ;; TODO
+    ;; TODO jvm version
+    ;; TODO node version
   )
