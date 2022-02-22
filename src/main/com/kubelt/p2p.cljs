@@ -1,35 +1,33 @@
 (ns com.kubelt.p2p
   "Entry point for p2p naming service."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
-   [goog.Uri]
-   [goog.object])
-  (:require
-   ["http" :as http :refer [IncomingMessage ServerResponse]]
-   ["process" :as process]
-   ["url" :as url :refer [Url]])
-  (:require
-   ["hypercore" :as Hypercore]
-   ["sd-notify" :as sd-notify]
-   ["yargs" :as yargs :refer [Yargs]])
   (:require-macros
-   [cljs.core.async.macros :refer [go]])
+    [cljs.core.async.macros :refer [go]])
   (:require
-   [cljs.core.async :as async :refer [<! >! put! chan sliding-buffer]]
-   [clojure.set :as cset]
-   [clojure.string :as str])
+    ["http" :as http :refer [IncomingMessage ServerResponse]]
+    ["process" :as process]
+    ["url" :as url :refer [Url]]
+    ["hypercore" :as Hypercore]
+    ["sd-notify" :as sd-notify]
+    ["yargs" :as yargs :refer [Yargs]])
   (:require
-   [datascript.core :as ds]
-   [integrant.core :as ig]
-   [reitit.core :as route]
-   [sieppari.core :as sieppari]
-   [taoensso.timbre :as log])
+    [cljs.core.async :as async :refer [<! >! put! chan sliding-buffer]]
+    [clojure.set :as cset]
+    [clojure.string :as str])
+  (:require 
+    [datascript.core :as ds]
+    [goog.Uri]
+    [goog.object]
+    [integrant.core :as ig]
+    [reitit.core :as route]
+    [sieppari.core :as sieppari]
+    [taoensso.timbre :as log])
   (:require
-   [com.kubelt.lib.path :as lib.path]
-   [com.kubelt.lib.util :as lib.util]
-   [com.kubelt.p2p.proto :as p2p.proto]
-   [com.kubelt.p2p.execute :as p2p.execute]
-   [com.kubelt.p2p.interceptor :as p2p.interceptor]))
+    [com.kubelt.p2p.execute :as p2p.execute]
+    [com.kubelt.p2p.interceptor :as p2p.interceptor]
+    [com.kubelt.lib.path :as lib.path]
+    [com.kubelt.p2p.proto :as p2p.proto]
+    [com.kubelt.lib.util :as lib.util]))
 
 ;; TODO D-Bus integration
 ;; TODO tracing with riemann? jaeger?
@@ -194,7 +192,7 @@
         ;; chain. The argument map contains values that will be set on
         ;; the execution context for use by the interceptors.
         on-request (p2p.execute/make-request-handler
-                    (select-keys value [:db/memory :http/router :hyper/bee]))
+                     (select-keys value [:db/memory :http/router :hyper/bee]))
         server (.createServer http on-request)]
     ;; TODO Are there other server values we should set explicitly?
     ;; - TLS certificate!
@@ -221,15 +219,14 @@
 ;;
 
 (defmethod ig/init-key :hyper/bee [_ value]
-   (let [feed (get value :hyper/core)
-         key-encoding (get value :key/encoding)
-         value-encoding (get value :value/encoding)
-         options #js {:keyEncoding key-encoding
-                      :valueEncoding value-encoding}]
- 
-(p2p.proto/makeKVStore feed options))
+  (let [feed (get value :hyper/core)
+        key-encoding (get value :key/encoding)
+        value-encoding (get value :value/encoding)
+        options #js {:keyEncoding key-encoding
+                     :valueEncoding value-encoding}]
+
+    (p2p.proto/make-kv-store feed options)))
 ;;  (p2p.proto/makeKVStore nil nil))
-   )
 
 (defmethod ig/halt-key! :hyper/bee [_ bee]
   (log/info {:log/msg "halt hyperbee"}))
@@ -255,28 +252,28 @@
 
 (def cli-options
   (clj->js
-   {"l" {:alias "log-level"
-         :describe "The level of log message to output"
-         :type "string"
-         :choices #js ["info" "debug" "error"]
-         :nargs 1
-         :default "info"}
-    "h" {:alias "host"
-         :describe "The host address to bind to"
-         :type "string"
-         :nargs 1}
-    "p" {:alias "port"
-         :describe "The port to listen on"
-         :type "number"
-         :nargs 1}
-    "t" {:alias "timeout-ms"
-         :describe "Duration in ms to wait for requests to complete"
-         :type "number"
-         :nargs 1}
-    "s" {:alias "max-socket"
-         :describe "Maximum number of socket requests"
-         :type "number"
-         :nargs 1}}))
+    {"l" {:alias "log-level"
+          :describe "The level of log message to output"
+          :type "string"
+          :choices #js ["info" "debug" "error"]
+          :nargs 1
+          :default "info"}
+     "h" {:alias "host"
+          :describe "The host address to bind to"
+          :type "string"
+          :nargs 1}
+     "p" {:alias "port"
+          :describe "The port to listen on"
+          :type "number"
+          :nargs 1}
+     "t" {:alias "timeout-ms"
+          :describe "Duration in ms to wait for requests to complete"
+          :type "number"
+          :nargs 1}
+     "s" {:alias "max-socket"
+          :describe "Maximum number of socket requests"
+          :type "number"
+          :nargs 1}}))
 
 ;; TODO expose additional configuration options, e.g. timeout.
 (defn parse-args
@@ -355,10 +352,10 @@
             [(keyword k) v])]
     (let [environment (lib.util/environment)
           xf (comp
-              (filter has-prefix?)
-              (map strip-prefix)
-              (map to-lower)
-              (map to-keyword))]
+               (filter has-prefix?)
+               (map strip-prefix)
+               (map to-lower)
+               (map to-keyword))]
       (into {} xf environment))))
 
 ;; Implementation

@@ -6,19 +6,20 @@
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
     [cljs.core.async :as async :refer [chan go <! >!]]
     [cljs.core.async.interop :refer-macros [<p!]]
+    [clojure.string :as str])
+  (:require 
     [goog.object]
-    ["crypto" :as crypto]
-    [clojure.string :as str]
-    [com.kubelt.lib.jwt :as jwt]
-    [malli.core :as malli]))
+    [malli.core :as malli])
+  (:require
+    ["crypto" :as crypto])
+  (:require
+    [com.kubelt.lib.jwt :as jwt]))
 
 (def keypair (.generateKeyPairSync crypto "rsa" 
-                                   (js-obj 
-                                     "modulusLength" 2048
-                                     "publicKeyEncoding" (js-obj "type" "spki" "format" "pem"
-                                     "privateKeyEncoding" (js-obj  "format" "pem"
-                                                                 ))
-                                           )))
+  (js-obj 
+    "modulusLength" 2048
+    "publicKeyEncoding" (js-obj "type" "spki" "format" "pem"
+    "privateKeyEncoding" (js-obj  "format" "pem")))))
 
 (def key-private (.-privateKey keypair))
 (def key-public (.-publicKey keypair))
@@ -62,9 +63,7 @@
           ;; extract public key
           pbk (jwt/get-public-key token) 
           ;; validate token 
-          validated (jwt/validate-jwt token pbk)
+          validated (jwt/validate-jwt token)]
           ;;validated true
-          ]
       (is (= pbk key-public))
-      (is (= validated true))
-      )))
+      (is (= validated true)))))

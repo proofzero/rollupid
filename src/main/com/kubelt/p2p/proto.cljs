@@ -1,6 +1,7 @@
 (ns com.kubelt.p2p.proto
   (:require 
-    [taoensso.timbre :as log]
+    [taoensso.timbre :as log])
+  (:require 
     ["hyperbee" :as Hyperbee]))
 
 (defprotocol KVStore
@@ -25,16 +26,14 @@
     ))
 
 ;; feed and options 
-(defn makeKVStore [feed, options] 
+(defn make-kv-store [feed, options] 
 
   (if
     (nil? feed)
-    (do 
-      (HyperbeeMock.))
-    (do 
-      ;; make a js hyperbee client
-      (let [client (Hyperbee. feed options)]
-        (HyperbeeProd. client)))))
+    (HyperbeeMock.)
+    ;; make a js hyperbee client
+    (let [client (Hyperbee. feed options)]
+      (HyperbeeProd. client))))
 ;; (Hyperbee. feed options)))))
 ;; use the js object for production record
 

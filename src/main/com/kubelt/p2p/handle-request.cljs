@@ -1,4 +1,4 @@
-(ns com.kubelt.p2p.handlerequest
+(ns com.kubelt.p2p.handle-request
   "interceptor business logic" 
   (:import
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])

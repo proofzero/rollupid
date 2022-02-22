@@ -5,15 +5,15 @@
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require
     [goog.crypt.base64 :as base64]
-    [goog.object])
+    [goog.object]
+    [taoensso.timbre :as log])
   (:require
-    [taoensso.timbre :as log]
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
-    [com.kubelt.p2p.proto :as p2p.proto]
-    [com.kubelt.p2p.handlerequest :as p2p.handlerequest]
-    [com.kubelt.lib.jwt :as jwt]
     [clojure.string :as str])
   (:require
+    [com.kubelt.p2p.proto :as p2p.proto]
+    [com.kubelt.p2p.handle-request :as p2p.handle-request]
+    [com.kubelt.lib.jwt :as jwt]
     [com.kubelt.lib.http.status :as http.status]))
 
 
@@ -38,7 +38,7 @@
             (let [validated (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)
                   pubkey (get-in  validated [:payload :pubkey])]
 
-              (p2p.handlerequest/set-user-namespace pubkey))
+              (p2p.handle-request/set-user-namespace pubkey))
             ctx)
 
    :error (fn [{:keys [error] :as ctx}]
@@ -50,13 +50,10 @@
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
-            (let [payload (get ctx :body/raw) ;; TODO retrieve from request
-                  pubkey (jwt/get-public-key payload)
-                  ;;decoded (jwt/decode payload)
-                  ]
-              (let [payload (get ctx :body/raw)]
-                (-> (p2p.handlerequest/validate-jwt payload )
-                    (.then (fn [x] 
+            (let [payload (get ctx :body/raw)]
+              (-> (p2p.handle-request/validate-jwt payload )
+                  (.then (fn [x] 
+                           (let [pubkey (get-in  validated [:payload :pubkey])]
                              (-> ctx
                                  (assoc-in [:request :jwt/raw] payload)
                                  (assoc-in [:request :jwt/pubkey] pubkey)
@@ -96,7 +93,7 @@
                   kbt-name (get-in match [:path-params :id])]
 
 
-              (let [kvresult (p2p.handlerequest/kbt-resolve bee kbt-name)]
+              (let [kvresult (p2p.handle-request/kbt-resolve bee kbt-name)]
                 (-> kvresult
                     (.then (fn[x] 
                              (if-not (nil? x)
@@ -116,13 +113,13 @@
                   hyperbee (get ctx :p2p/hyperbee)
                   match (get ctx :match)
                   kbt-name (get-in match [:path-params :id])
-                  valid-jwt (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)
-                  kbt-value  (get-in valid-jwt [:payload :endpoint])]
-              (let [
-                    update-result (p2p.handlerequest/kbt-update hyperbee kbt-name kbt-value)]
+                  jwt-json (get-in ctx [:request :jwt/valid])
+                  valid-jwt (js->clj jwt-json :keywordize-keys true)
+                  kbt-value  (get-in valid-jwt [:payload :endpoint])
+                    update-result (p2p.handle-request/kbt-update hyperbee kbt-name kbt-value)]
                 (-> update-result
                     (.then (fn[x] 
-                             (assoc-in ctx [:response :http/status] http.status/created)))))))
+                             (assoc-in ctx [:response :http/status] http.status/created))))))
 
    :leave (fn [ctx]
             (log/info {:log/msg "leaving kbt update"})
