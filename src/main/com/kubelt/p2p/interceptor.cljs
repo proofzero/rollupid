@@ -2,9 +2,8 @@
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:import
-    [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
+    [goog.crypt Aes Arc4 Cbc Hmac Sha256 ])
   (:require
-    [goog.crypt.base64 :as base64]
     [goog.object]
     [taoensso.timbre :as log])
   (:require

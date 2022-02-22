@@ -14,8 +14,7 @@
     [goog.crypt.base64 :refer [encodeString decodeString]]
     [taoensso.timbre :as log])
   (:require
-    ["crypto" :as crypto]
-    ["jose" :as jose :refer [SignJWT GetKeyFunction ]]))
+    ["crypto" :as crypto]))
 
 ;; - iss (issuer): Issuer of the JWT
 ;; - sub (subject): Subject of the JWT (the user)
@@ -77,6 +76,15 @@
   "import raw private key string"
   (encode (json/serialize (clj->js claims))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn- sign-jwt [alg secret-key header-enc payload-enc] 
+  "Sign encoded payload and header using secret key, return digest"
+  ;; sign payload+header
+  (def signature-target (str/join "" [header-enc payload-enc]))
+  (let [signature-digest (-> (.createSign crypto "RSA-SHA256")
+                             (.update (str/join "." [header-enc payload-enc]))
+                             (.sign secret-key "base64"))]
+    signature-digest))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn create-jwt [secret-key header payload] 
@@ -103,12 +111,3 @@
                      ;;(.verify pubkey, psig, "base64"))]
                      (.verify pubkey (decode psig) "base64"))]
     verified))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- sign-jwt [alg secret-key header-enc payload-enc] 
-  "Sign encoded payload and header using secret key, return digest"
-  ;; sign payload+header
-  (def signature-target (str/join "" [header-enc payload-enc]))
-  (let [signature-digest (-> (.createSign crypto "RSA-SHA256")
-                             (.update (str/join "." [header-enc payload-enc]))
-                             (.sign secret-key "base64"))]
-    signature-digest))
