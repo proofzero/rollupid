@@ -49,7 +49,8 @@
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
-            (let [payload (get ctx :body/raw)]
+            (let [payload (get ctx :body/raw)
+                  validated (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)]
               (-> (p2p.handle-request/validate-jwt payload )
                   (.then (fn [x] 
                            (let [pubkey (get-in  validated [:payload :pubkey])]

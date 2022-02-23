@@ -38,15 +38,12 @@
   ;; sign and produce token
   token (jwt/create-jwt key-private header payload)
 
-  ;; extract public key
-  pbk (jwt/get-public-key token) 
-
   ;; validate token 
-  validated (jwt/validate-jwt token pbk)
+  validated (jwt/validate-jwt token)
 )
  (let [pubkey (jwt/get-public-key payload )]
   ;;validated true
-  (jwt/validate-jwt (clj->js payload) pubkey)))
+  (jwt/validate-jwt (clj->js payload))))
 
 
 (defn kbt-resolve [kvstore kbt-name]

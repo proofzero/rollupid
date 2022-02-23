@@ -3,19 +3,22 @@
   (:import
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require
-    [com.kubelt.p2p.handlerequest :as p2p.handlerequest]
     [cljs.test :as t :refer [deftest is testing use-fixtures]]
     [cljs.core.async :as async :refer [chan go <! >!]]
     [cljs.core.async.interop :refer-macros [<p!]]
-    [goog.object]
-    ["crypto" :as crypto]
     [clojure.string :as str])
 
+  (:require 
+    [goog.object]
+    [malli.core :as malli])
+  
+  (:require
+    ["crypto" :as crypto])
 
   (:require
     [com.kubelt.lib.jwt :as jwt]
-    [malli.core :as malli]
-    [com.kubelt.p2p :as p2p]))
+    [com.kubelt.p2p :as p2p]
+    [com.kubelt.p2p.handle-request :as p2p.handle-request]))
 
 ;; test fixtures
 #_(
@@ -69,6 +72,7 @@
 (deftest user-namespace-test
   ;; TODO test p2p.handlerequest.user-namespace
   (testing "user-namespace-test"
+
 
     ;; use jwt
     ;; run p2p.handlerequest.user-namespace

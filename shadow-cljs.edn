@@ -120,13 +120,18 @@
    :main com.kubelt.p2p/main!
    :devtools {:before-load-async com.kubelt.p2p/stop!
               :after-load-async com.kubelt.p2p/start!}
-   :compiler-options {:optimizations :advanced}
+   :compiler-options {:reader-features 
+                       #{:node}
+                       :optimizations 
+                       :advanced}
    :output-to "packages/p2p/lib/p2p.js"}
 
   :p2p-test
   {:target :node-test
    :ns-regexp "p2p-test$"
-   :output-to "target/p2p-test/p2p-test.js"}
+   :compiler-options {:reader-features #{:node}}
+   :output-to "target/p2p-test/p2p-test.js"
+   }
 
   :jwt-test
   {:target :node-test
