@@ -1,4 +1,4 @@
-(ns config-test
+(ns lib.config-test
   "Test SDK configuration maps."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

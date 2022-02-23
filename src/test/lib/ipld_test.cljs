@@ -1,4 +1,4 @@
-(ns ipld-test
+(ns lib.ipld-test
   "Test the IPLD-related utilities."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

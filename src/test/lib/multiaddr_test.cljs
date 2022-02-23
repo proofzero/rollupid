@@ -1,4 +1,4 @@
-(ns multiaddr-test
+(ns lib.multiaddr-test
   "Test multiaddr utilities."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

@@ -2,19 +2,19 @@
   "Entry point for p2p naming service."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require-macros
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]])
   (:require
-    ["http" :as http :refer [IncomingMessage ServerResponse]]
-    ["process" :as process]
-    ["url" :as url :refer [Url]]
-    ["hypercore" :as Hypercore]
-    ["sd-notify" :as sd-notify]
-    ["yargs" :as yargs :refer [Yargs]])
+   ["http" :as http :refer [IncomingMessage ServerResponse]]
+   ["process" :as process]
+   ["url" :as url :refer [Url]]
+   ["hypercore" :as Hypercore]
+   ["sd-notify" :as sd-notify]
+   ["yargs" :as yargs :refer [Yargs]])
   (:require
     [cljs.core.async :as async :refer [<! >! put! chan sliding-buffer]]
     [clojure.set :as cset]
     [clojure.string :as str])
-  (:require 
+  (:require
     [datascript.core :as ds]
     [goog.Uri]
     [goog.object]
@@ -104,12 +104,12 @@
 ;; TODO correlation ID (from header, or assign ULID)
 (def routes
   ;; TODO consider public name resolution vs per-user/namespaced name resolution
-  ;; TODO move validate-jwt to method/all ? 
+  ;; TODO move validate-jwt to method/all ?
   [["/kbt/:id"
     {:name ::kbt
      :http.method/all [p2p.interceptor/status-ok]
      :http.method/get {:interceptors [p2p.interceptor/kbt-resolve]}
-     :http.method/post {:interceptors [p2p.interceptor/validate-jwt 
+     :http.method/post {:interceptors [p2p.interceptor/validate-jwt
                                        p2p.interceptor/user-namespace
                                        p2p.interceptor/kbt-update]}}]
    ;; TODO user registration

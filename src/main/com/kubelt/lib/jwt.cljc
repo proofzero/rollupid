@@ -64,8 +64,7 @@
   "Extract public key from the JWT payload"
   (let [payload-part (decode (get (str/split token #"\.") 1))
         payload-json (str/replace payload-part "\"" "")
-        payload-map (js->clj (json/parse (decode (js->clj payload-json))) :keywordize-keys true)
-        ]
+        payload-map (js->clj (json/parse (decode (js->clj payload-json))) :keywordize-keys true)]
     (decode (get payload-map :pubkey))))
 
 (defn prepare-key [key-material]
@@ -78,37 +77,36 @@
   (encode (json/serialize (clj->js claims))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- sign-jwt [alg secret-key header-enc payload-enc]
-  "Sign encoded payload and header using secret key, return digest"
-  ;; sign payload+header
-  (def signature-target (str/join "" [header-enc payload-enc]))
-  (let [signature-digest (-> (.createSign crypto "RSA-SHA256")
-                             (.update (str/join "." [header-enc payload-enc]))
-                             (.sign secret-key "base64"))]
-    signature-digest))
+#?(:node
+   (defn- sign-jwt [alg secret-key header-enc payload-enc]
+     "Sign encoded payload and header using secret key, return digest"
+     ;; sign payload+header
+     (let [signature-target (str/join "" [header-enc payload-enc])
+           signature-digest (-> (.createSign crypto "RSA-SHA256")
+                                (.update (str/join "." [header-enc payload-enc]))
+                                (.sign secret-key "base64"))]
+       signature-digest)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn create-jwt [secret-key header payload]
-  "Create a JWT token from key, header and payload"
-  (let [
-        alg (get header :alg)
-        header-enc (encode (json/serialize (clj->js header)))
-        payload-enc (encode (json/serialize (clj->js payload)))
+#?(:node
+   (defn create-jwt [secret-key header payload]
+     "Create a JWT token from key, header and payload"
+     (let [alg (get header :alg)
+           header-enc (encode (json/serialize (clj->js header)))
+           payload-enc (encode (json/serialize (clj->js payload)))
+           signature-enc  (encode (sign-jwt alg secret-key header-enc payload-enc))]
+       (str/join "." [header-enc payload-enc signature-enc]))))
 
-        signature-enc  (encode (sign-jwt alg secret-key header-enc payload-enc))]
-
-    (str/join "." [header-enc payload-enc signature-enc])))
-
-  ;; TODO this can probably extract the pubkey internally
-(defn validate-jwt [token]
-  "Validate a token against a given public key"
-  (let [
-        ;; extract public key
-        pubkey (get-public-key token)
-        token-pieces (str/split token #"\.")
-        psig (get token-pieces 2)
-        verified (-> (.createVerify crypto "RSA-SHA256")
-                     (.update (str/join "." [(get token-pieces 0) (get token-pieces 1)]))
-                     ;;(.verify pubkey, psig, "base64"))]
-                     (.verify pubkey (decode psig) "base64"))]
-    verified))
+;; TODO this can probably extract the pubkey internally
+#?(:node
+   (defn validate-jwt [token]
+     "Validate a token against a given public key"
+     (let [;; extract public key
+           pubkey (get-public-key token)
+           token-pieces (str/split token #"\.")
+           psig (get token-pieces 2)
+           verified (-> (.createVerify crypto "RSA-SHA256")
+                        (.update (str/join "." [(get token-pieces 0) (get token-pieces 1)]))
+                        ;;(.verify pubkey, psig, "base64"))]
+                        (.verify pubkey (decode psig) "base64"))]
+       verified)))

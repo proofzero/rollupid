@@ -1,4 +1,4 @@
-(ns key.key-test
+(ns lib.key.key-test
   "Test the key-related protocol implementations."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

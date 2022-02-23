@@ -1,4 +1,4 @@
-(ns bag.dag-test
+(ns lib.bag.dag-test
   "Test the BAG dag implementation."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

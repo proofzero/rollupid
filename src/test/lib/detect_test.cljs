@@ -1,4 +1,4 @@
-(ns detect-test
+(ns lib.detect-test
   "Test node and gateway detection utilities."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]

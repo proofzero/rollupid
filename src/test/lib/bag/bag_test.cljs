@@ -1,4 +1,4 @@
-(ns bag.bag-test
+(ns lib.bag.bag-test
   "Test the BAG data abstraction."
   (:require
    [cljs.test :as t :refer [deftest is testing use-fixtures]]
