@@ -23,4 +23,8 @@
  {:dev {:extra-paths ["src/dev"]
         :extra-deps {}}
   :test {:extra-paths ["src/test"]
-         :extra-deps {}}}}
+         :extra-deps {}}
+
+  ;; $ clojure -M:lint --lint src/
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.02.09"}}
+         :main-opts ["-m" "clj-kondo.main"]}}}
