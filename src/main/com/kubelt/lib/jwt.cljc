@@ -13,8 +13,9 @@
     [goog.json :as json]
     [goog.crypt.base64 :refer [encodeString decodeString]]
     [taoensso.timbre :as log])
-  (:require
-    ["crypto" :as crypto]))
+  #?(:node
+     (:require
+      ["crypto" :as crypto])))
 
 ;; - iss (issuer): Issuer of the JWT
 ;; - sub (subject): Subject of the JWT (the user)
@@ -67,7 +68,7 @@
         ]
     (decode (get payload-map :pubkey))))
 
-(defn prepare-key [key-material] 
+(defn prepare-key [key-material]
   "import raw private key string"
   ;; return key object
   key-material)
@@ -77,7 +78,7 @@
   (encode (json/serialize (clj->js claims))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- sign-jwt [alg secret-key header-enc payload-enc] 
+(defn- sign-jwt [alg secret-key header-enc payload-enc]
   "Sign encoded payload and header using secret key, return digest"
   ;; sign payload+header
   (def signature-target (str/join "" [header-enc payload-enc]))
@@ -87,7 +88,7 @@
     signature-digest))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn create-jwt [secret-key header payload] 
+(defn create-jwt [secret-key header payload]
   "Create a JWT token from key, header and payload"
   (let [
         alg (get header :alg)
@@ -98,12 +99,12 @@
 
     (str/join "." [header-enc payload-enc signature-enc])))
 
-  ;; TODO this can probably extract the pubkey internally 
-(defn validate-jwt [token] 
+  ;; TODO this can probably extract the pubkey internally
+(defn validate-jwt [token]
   "Validate a token against a given public key"
   (let [
         ;; extract public key
-        pubkey (get-public-key token) 
+        pubkey (get-public-key token)
         token-pieces (str/split token #"\.")
         psig (get token-pieces 2)
         verified (-> (.createVerify crypto "RSA-SHA256")
