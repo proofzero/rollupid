@@ -1,13 +1,19 @@
 (ns com.kubelt.p2p.interceptor
   "Interceptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:import
+    [goog.crypt Aes Arc4 Cbc Hmac Sha256 ])
   (:require
-   [goog.object])
+    [goog.object]
+    [taoensso.timbre :as log])
   (:require
-   [taoensso.timbre :as log]
-   [clojure.string :as str])
+    [cljs.test :as t :refer [deftest is testing use-fixtures]]
+    [clojure.string :as str])
   (:require
-   [com.kubelt.lib.http.status :as http.status]))
+    [com.kubelt.p2p.proto :as p2p.proto]
+    [com.kubelt.p2p.handle-request :as p2p.handle-request]
+    [com.kubelt.lib.jwt :as jwt]
+    [com.kubelt.lib.http.status :as http.status]))
 
 
 (def status-ok
@@ -25,13 +31,38 @@
             (if-let [status (get-in ctx [:response :http/status])]
               ctx
               (assoc-in ctx [:response :http/status] http.status/no-content)))})
+(def user-namespace
+  {:name ::user-namespace
+   :enter (fn [ctx]
+            (let [validated (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)
+                  pubkey (get-in  validated [:payload :pubkey])]
+
+              (p2p.handle-request/set-user-namespace pubkey))
+            ctx)
+
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
+            ctx)})
 
 (def validate-jwt
   {:name ::validate-jwt
    :enter (fn [ctx]
             ;; TODO extract and validate JWT. Throw an error to
             ;; interrupt chain processing if token is invalid.
+            (let [payload (get ctx :body/raw)
+                  validated (js->clj (get-in ctx [:request :jwt/valid]) :keywordize-keys true)]
+              (-> (p2p.handle-request/validate-jwt payload )
+                  (.then (fn [x] 
+                           (let [pubkey (get-in  validated [:payload :pubkey])]
+                             (-> ctx
+                                 (assoc-in [:request :jwt/raw] payload)
+                                 (assoc-in [:request :jwt/pubkey] pubkey)
+                                 (assoc-in [:request :jwt/valid] x))))))))
+
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
             ctx)})
+;; TODO check and throw error
 
 (def register
   {:name ::register
@@ -56,29 +87,19 @@
 ;; of :error handler; otherwise use .catch().
 (def kbt-resolve
   {:name ::kbt-resolve
-   :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
-            (let [request (get ctx :request)
-                  ;; Context has a :match key containing the routing
-                  ;; table match data.
+   :enter (fn [ctx]
+            (let [bee (get ctx :p2p/hyperbee)
+                  match (get ctx :match)
                   kbt-name (get-in match [:path-params :id])]
-              (log/trace {:log/msg "enter kbt-resolve" :kbt/name kbt-name})
-              ;; The Hyperbee .get() request returns a promise. Note
-              ;; that js/Promise is an AsyncContext, so execution pauses
-              ;; until the promise resolves.
-              (-> (.get hyperbee kbt-name)
-                  (.then (fn [kbt-object]
-                           (let [;; Hyperbee returns an object that
-                                 ;; includes sequence number, etc.
-                                 kbt-value (str (.-value kbt-object))]
-                           (if-not (str/blank? kbt-value)
-                             (do
-                               (log/info {:log/msg "found name"
-                                          :kbt/name kbt-name
-                                          :kbt/value kbt-value})
-                               (let [body {:name kbt-name :value kbt-value}]
-                                 (assoc-in ctx [:response :http/body] body)))
-                             ;; No result found, return a 404.
-                             (assoc-in ctx [:response :http/status] http.status/not-found))))))))
+
+
+              (let [kvresult (p2p.handle-request/kbt-resolve bee kbt-name)]
+                (-> kvresult
+                    (.then (fn[x] 
+                             (if-not (nil? x)
+                               (assoc-in ctx [:response :http/body] x)
+                               ;; No result found, return a 404.
+                               (assoc-in ctx [:response :http/status] http.status/not-found))))))))
 
    :error (fn [{:keys [error] :as ctx}]
             (log/error {:log/error error})
@@ -87,23 +108,25 @@
 ;; TODO extract payload from JWT
 (def kbt-update
   {:name ::kbt-update
-   :enter (fn [{:keys [match p2p/hyperbee] :as ctx}]
+   :enter (fn [ctx]
             (let [request (get ctx :request)
+                  hyperbee (get ctx :p2p/hyperbee)
+                  match (get ctx :match)
                   kbt-name (get-in match [:path-params :id])
-                  ;; TODO get from body
-                  ;;kbt-value (get request )
-                  ;;kbt-value (get-in match [:path-params :endpoint])
-                  kbt-value "fixme"]
-              (log/trace {:log/msg "enter kbt-update" :kbt/name kbt-name :kbt/value kbt-value})
-              (-> (.put hyperbee kbt-name kbt-value)
-                  (.then (fn []
-                           (assoc-in ctx [:response :http/status] http.status/created))))))
-     :leave (fn [ctx]
-              (log/info {:log/msg "leaving kbt update"})
-              ctx)
-     :error (fn [{:keys [error] :as ctx}]
-              (log/error {:log/error error})
-              ctx)})
+                  jwt-json (get-in ctx [:request :jwt/valid])
+                  valid-jwt (js->clj jwt-json :keywordize-keys true)
+                  kbt-value  (get-in valid-jwt [:payload :endpoint])
+                    update-result (p2p.handle-request/kbt-update hyperbee kbt-name kbt-value)]
+                (-> update-result
+                    (.then (fn[x] 
+                             (assoc-in ctx [:response :http/status] http.status/created))))))
+
+   :leave (fn [ctx]
+            (log/info {:log/msg "leaving kbt update"})
+            ctx)
+   :error (fn [{:keys [error] :as ctx}]
+            (log/error {:log/error error})
+            ctx)})
 
 (def health-ready
   {:name ::health-ready

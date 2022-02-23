@@ -1,4 +1,4 @@
-(ns http.request-test
+(ns lib.http.request-test
   "Test various http request-related functionality."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

@@ -1,4 +1,4 @@
-(ns car.build-test
+(ns lib.car.build-test
   "Test the creation of a car-map from a BAG."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

@@ -89,15 +89,19 @@
    :exports {:v1 com.kubelt.sdk/node-v1}
    :compiler-options {;; :none :simple :advanced
                       :optimizations :advanced
+                      :reader-features #{:node}
                       :infer-externs :true
                       :output-feature-set :es-next}
    :output-to "packages/sdk-js/lib/sdk.js"}
 
   :sdk-test
   {:target :node-test
+   :compiler-options {:reader-features #{:node}}
    :output-to "target/sdk-test.js"
-   :ns-regexp "-test$"
+   :ns-regexp "(lib|sdk)\\..*-test$"
    :autorun true}
+
+  ;; Web
 
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use in the browser.
@@ -108,22 +112,36 @@
    :modules {:base {:entries [com.kubelt.sdk]
                     :init-fn com.kubelt.sdk/web-v1}}
    :compiler-options {:output-feature-set :browser-2021
-                      :optimizations :advanced}}
+                      :optimizations :advanced
+                      :reader-features #{:browser}}}
 
   :web-test
   {:target :browser-test
    :test-dir "target/web-test"
-   :ns-regexp "-test$"}
+   :ns-regexp "(lib|sdk|web)\\..*-test$"
+   :compiler-options {:reader-features #{:browser}}}
+
+  ;; P2P
 
   :p2p
   {:target :node-script
    :main com.kubelt.p2p/main!
    :devtools {:before-load-async com.kubelt.p2p/stop!
               :after-load-async com.kubelt.p2p/start!}
-   :compiler-options {:optimizations :advanced}
+   :compiler-options {:reader-features #{:node}
+                      :optimizations :advanced}
    :output-to "packages/p2p/lib/p2p.js"}
 
-  ;; TODO p2p-test
+  :p2p-test
+  {:target :node-test
+   :ns-regexp "p2p\\..*-test$"
+   :compiler-options {:reader-features #{:node}}
+   :output-to "target/p2p-test/p2p-test.js"}
+
+  ;; :jwt-test
+  ;; {:target :node-test
+  ;;  :ns-regexp "jwt-test$"
+  ;;  :output-to "target/jwt-test/jwt-test.js"}
 
   ;; This is a development CLI used to run various commands for testing,
   ;; preparing data, or performing other non-customer-facing operations.
@@ -132,6 +150,7 @@
    :main com.kubelt.ddt/main
    :compiler-options {:optimizations :simple
                       :infer-externs :true
+                      :reader-features #{:node}
                       :output-feature-set :es-next}
    :output-to "packages/ddt/lib/ddt.js"}
 
@@ -142,6 +161,7 @@
    :main com.kubelt.kbt/main
    :compiler-options {:optimizations :simple
                       :infer-externs :auto
+                      :reader-features #{:node}
                       :output-feature-set :es-next}
    :output-to "packages/kbt/lib/kbt.js"}
 
@@ -149,6 +169,7 @@
   {:target :node-test
    :output-to "target/kbt-test.js"
    :ns-regexp "-test$"
+   :compiler-options {:reader-features #{:node}}
    :autorun true}
 
   ;; IPFS Client
@@ -164,5 +185,5 @@
   :ipfs-test
   {:target :node-test
    :output-to "target/ipfs-test.js"
-   :ns-regex "ipfs-test$"
+   :ns-regexp "ipfs\\..*-test$"
    :autorun true}}}
