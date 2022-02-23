@@ -10,8 +10,9 @@
   (:require 
     [goog.object]
     [malli.core :as malli])
+  #?(:node 
   (:require
-    ["crypto" :as crypto])
+    ["crypto" :as crypto]))
   (:require
     [com.kubelt.lib.jwt :as jwt]))
 
@@ -38,6 +39,7 @@
 
 (deftest low-level-crypto-sign-verify
   (testing "low level crypto sign and verify"
+    #?(:node
     (let [claims "test-payload"
           digest (-> (.createSign crypto "RSA-SHA256")
                      (.update claims)
@@ -47,13 +49,14 @@
                          (.update claims)
                          (.verify key-public, digest, "base64"))]
 
-        (is (= verified true))))))
+        (is (= verified true)))))))
 
 
 ;;;;;;;;; unit test ;;;;;;;;;;;;
 ;; covers create, sign and validate
 (deftest create-test-jwt 
   (testing "create and verify jwt"
+    #?(:node
     (let [
           signing-key (jwt/prepare-key key-private)
           header (jwt/create-header "RS256" "1h")
@@ -66,4 +69,4 @@
           validated (jwt/validate-jwt token)]
           ;;validated true
       (is (= pbk key-public))
-      (is (= validated true)))))
+      (is (= validated true))))))
