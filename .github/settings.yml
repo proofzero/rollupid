@@ -9,6 +9,9 @@ repository:
   # A short description of the repository that will show up on GitHub
   description: Kubelt -- web3 CMS
 
+  # A URL with more information about the repository
+  homepage: https://kubelt.com
+
   # A comma-separated list of topics to set on the repository
   topics: web3, crypto, blockchain, decentralized, kubelt, dapp, federated
 
