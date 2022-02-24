@@ -1,4 +1,0 @@
-(ns kubelt.db)
-
-(def default-db
-  {:name "re-frame"})
