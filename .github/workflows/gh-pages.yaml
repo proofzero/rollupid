@@ -25,15 +25,7 @@ jobs:
           cache: 'npm'
 
       - run: npm install
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: 'latest'
-          # extended: true
-
-      - name: Build
-        run: hugo --minify
+      - run: npm run build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
