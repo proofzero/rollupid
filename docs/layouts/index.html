@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ .Site.LanguageCode | default "en" }}">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {{ $css := resources.Get "css/main.css" }}
+    {{ $styles := $css | resources.PostCSS }}
+
+    {{ if .Site.IsServer }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}"/>
+    {{ else }}
+      {{ $styles := $styles | minify | fingerprint | resources.PostProcess }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}"/>
+    {{ end }}
+    {{ block "head/seo" . }}{{ partial "head/seo.html" . }}{{ end }}
+    {{ block "head/favicons" . }}{{ partial "head/favicons.html" . }}{{ end }}
+  </head>
+  <body class="{{ .Scratch.Get "class" }} bg-white">
+    <main>
+      {{ partial "homepage/hero.html" . }}
+    </main>
+  </body>
+</html>
