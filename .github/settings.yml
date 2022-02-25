@@ -60,15 +60,44 @@ repository:
 # Labels: define labels for Issues and Pull Requests
 labels:
   - name: bug
-    color: CC0000
-    description: An issue with the system 🐛.
+    color: "#d73a4a"
+    description: Indicates an unexpected problem or unintended behavior
 
-  - name: feature
-    # If including a `#`, make sure to wrap it with quotes!
-    color: '#336699'
-    description: New functionality.
+  - name: question
+    color: '#d876e3'
+    description: Indicates that an issue, pull request, or discussion needs more information
 
-  - name: first-timers-only
+  - name: enhancement:
+    color: '#a2eeef'
+    description: Indicates new feature requests
+  
+  - name: good-first-issue
+    color: '#7057ff'
+    description: Indicates a good issue for first-time contributors
+  
+  - name: documentation
+    color: '#0075ca'
+    description: Indicates a need for improvements or additions to documentation
+  
+  - name: help-wanted
+    color: '#008672'
+    description: Indicates that a maintainer wants help on an issue or pull request
+
+  - name: invalid
+    color: '#e4e669'
+    description: Indicates that an issue, pull request, or discussion is no longer relevant
+
+  - name: wontfix
+    color: '#FFFFFF'
+    description: Indicates that work won't continue on an issue, pull request, or discussion
+
+  - name: duplicate
+    color: '#cfd3d7'
+    description: Indicates similar issues, pull requests, or discussions
+  
+  - name: security
+    color: '#D93F0B'
+    description: Indicates a security issue
 
 # Milestones: define milestones for Issues and Pull Requests
 milestones:
