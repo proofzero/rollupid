@@ -1,59 +1,29 @@
 {:nrepl {:port 8777}
 
- :jvm-opts ["-Xmx1G"]
+ 
 
  :source-paths ["src" "test"]
 
  :dependencies
  [[reagent "1.1.0"]
   [re-frame "1.2.0"]
-  [bidi "2.1.6"]
-  [clj-commons/pushy "0.3.10"]
-  [re-pressed "0.3.1"]
-  [breaking-point "0.1.2"]
-  [binaryage/devtools "1.0.4"]
-  [cider/cider-nrepl "0.27.4"]]
+
+  [binaryage/devtools "1.0.4"]]
 
  :dev-http
- {8280 "public"
+ {8280 "resources/public"
   8290 "target/browser-test"}
-
- ;; To build the web application:
- ;; $ npx shadow-cljs compile app
 
  :builds
  {:app
   {:target     :browser
-   :output-dir "public/js/compiled"
+   :output-dir "resources/public/js/compiled"
    :asset-path "/js/compiled"
    :modules
-   {:shared
-    {:entries []}
-    :main
-    {:init-fn kubelt.core/init
-     :depends-on #{:shared}}
-    ;; :wasm
-    ;; {:output-dir "public/js/compiled"
-    ;;  :externs ["wasm/example/kubelt_example.js"]
-    ;;  :depends-on #{:shared}}
-    :worker
-    {:init-fn worker.core/init
-     :depends-on #{:shared}
-     :web-worker true}}
+   {:app {:init-fn dapp.core/init}}
    :devtools
    {:preloads []}
    :dev
    {:compiler-options
     {:closure-defines
-     { }}}}
-
-  :browser-test
-  {:target    :browser-test
-   :ns-regexp "-test$"
-   :runner-ns shadow.test.browser
-   :test-dir  "target/browser-test"}
-
-  :karma-test
-  {:target    :karma
-   :ns-regexp "-test$"
-   :output-to "target/karma-test.js"}}}
+     { }}}}}}

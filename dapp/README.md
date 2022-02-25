@@ -1,6 +1,7 @@
-# kubelt
+# dapp
 
-This is a [re-frame](https://github.com/day8/re-frame) application used for development. For production, our SDK is embedded into a third-party CMS.
+A [re-frame](https://github.com/day8/re-frame) application designed to ... well, that part is up to
+you.
 
 ## Getting Started
 
@@ -16,29 +17,20 @@ This is a [re-frame](https://github.com/day8/re-frame) application used for deve
   [FAQs](https://github.com/day8/re-frame/blob/master/docs/FAQs/README.md)) ->
   [Reagent](https://github.com/reagent-project/reagent) ->
   [React](https://github.com/facebook/react)
-  - Client-side routing: [bidi](https://github.com/juxt/bidi) and [pushy](https://github.com/kibu-australia/pushy)
-  - Keyboard event handler: [re-pressed](https://github.com/gadfly361/re-pressed)
-  - Screen breakpoints tool: [BREAKING-POINT](https://github.com/gadfly361/breaking-point)
 * Build tools
   - CLJS compilation, dependency management, REPL, & hot reload: [`shadow-cljs`](https://github.com/thheller/shadow-cljs)
-  - Test framework: [cljs.test](https://clojurescript.org/tools/testing)
-  - Test runner: [Karma](https://github.com/karma-runner/karma)
 * Development tools
   - Debugging: [CLJS DevTools](https://github.com/binaryage/cljs-devtools)
-  - Emacs integration: [CIDER](https://github.com/clojure-emacs/cider)
-  - Linter: [clj-kondo](https://github.com/borkdude/clj-kondo)
 
 #### Directory structure
 
 * [`/`](/../../): project config files
-* [`.clj-kondo/`](.clj-kondo/): lint config and cache files (cache files are not tracked; see
-[`.gitignore`](.gitignore))
 * [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
   - [`user.cljs`](dev/cljs/user.cljs): symbols for use during development in the
 [ClojureScript REPL](#connecting-to-the-browser-repl-from-a-terminal)
-* [`public/`](public/): SPA root directory;
+* [`resources/public/`](resources/public/): SPA root directory;
 [dev](#running-the-app) / [prod](#production) profile depends on the most recent build
-  - [`index.html`](public/index.html): SPA home page
+  - [`index.html`](resources/public/index.html): SPA home page
     - Dynamic SPA content rendered in the following `div`:
         ```html
         <div id="app"></div>
@@ -48,12 +40,9 @@ This is a [re-frame](https://github.com/day8/re-frame) application used for deve
     - Created on build with either the [dev](#running-the-app) or [prod](#production) profile
     - `js/compiled/`: compiled CLJS (`shadow-cljs`)
       - Not tracked in source control; see [`.gitignore`](.gitignore)
-* [`src/kubelt/`](src/kubelt/): SPA source files (ClojureScript,
+* [`src/dapp/`](src/dapp/): SPA source files (ClojureScript,
 [re-frame](https://github.com/Day8/re-frame))
-  - [`core.cljs`](src/kubelt/core.cljs): contains the SPA entry point, `init`
-* [`test/kubelt/`](test/kubelt/): test files (ClojureScript,
-[cljs.test](https://clojurescript.org/tools/testing))
-  - Only namespaces ending in `-test` (files `*_test.cljs`) are compiled and sent to the test runner
+  - [`core.cljs`](src/dapp/core.cljs): contains the SPA entry point, `init`
 * [`.github/workflows/`](.github/workflows/): contains the
 [github actions](https://github.com/features/actions) pipelines.
   - [`test.yaml`](.github/workflows/test.yaml): Pipeline for testing.
@@ -69,22 +58,7 @@ Use your preferred editor or IDE that supports Clojure/ClojureScript development
 1. Install [JDK 8 or later](https://openjdk.java.net/install/) (Java Development Kit)
 2. Install [Node.js](https://nodejs.org/) (JavaScript runtime environment) which should include
    [NPM](https://docs.npmjs.com/cli/npm) or if your Node.js installation does not include NPM also install it.
-3. Install [Chrome](https://www.google.com/chrome/) or
-[Chromium](https://www.chromium.org/getting-involved/download-chromium) version 59 or later
-(headless test environment)
-    * For Chromium, set the `CHROME_BIN` environment variable in your shell to the command that
-    launches Chromium. For example, in Ubuntu, add the following line to your `.bashrc`:
-        ```bash
-        export CHROME_BIN=chromium-browser
-       ```
-4. Install [clj-kondo](https://github.com/borkdude/clj-kondo/blob/master/doc/install.md) (linter)
-5. Clone this repo and open a terminal in the `kubelt` project root directory
-6. (Optional) Setup [lint cache](https://github.com/borkdude/clj-kondo#project-setup):
-    ```sh
-    clj-kondo --lint "$(npx shadow-cljs classpath)"
-    ```
-7. Setup
-[linting in your editor](https://github.com/borkdude/clj-kondo/blob/master/doc/editor-integration.md)
+5. Clone this repo and open a terminal in the `dapp` project root directory
 
 ### Browser Setup
 
@@ -142,24 +116,7 @@ Opening the app in your browser starts a
 [ClojureScript browser REPL](https://clojurescript.org/reference/repl#using-the-browser-as-an-evaluation-environment),
 to which you may now connect.
 
-#### Connecting to the browser REPL from Emacs with CIDER
-
-Connect to the browser REPL:
-```
-M-x cider-jack-in-cljs
-```
-
-See
-[Shadow CLJS User's Guide: Emacs/CIDER](https://shadow-cljs.github.io/docs/UsersGuide.html#cider)
-for more information. Note that the mentioned [`.dir-locals.el`](.dir-locals.el) file has already
-been created for you.
-
-#### Connecting to the browser REPL from VS Code with Calva
-
-See the [re-frame-template README](https://github.com/day8/re-frame-template) for [Calva](https://github.com/BetterThanTomorrow/calva) instuctions. See also https://calva.io for Calva documentation.
-
-
-#### Connecting to the browser REPL from other editors
+#### Connecting to the browser REPL from your editor
 
 See
 [Shadow CLJS User's Guide: Editor Integration](https://shadow-cljs.github.io/docs/UsersGuide.html#_editor_integration).
@@ -192,29 +149,6 @@ For example, in Vim / Neovim with `fireplace.vim`
 3. See [`user.cljs`](dev/cljs/user.cljs) for symbols that are immediately accessible in the REPL
 without needing to `require`.
 
-### Running Tests
-
-Build the app with the `prod` profile, start a temporary local web server, launch headless
-Chrome/Chromium, run tests, and stop the web server:
-
-```sh
-npm install
-npm run ci
-```
-
-Please be patient; it may take over 15 seconds to see any output, and over 25 seconds to complete.
-
-Or, for auto-reload:
-```sh
-npm install
-npm run watch
-```
-
-Then in another terminal:
-```sh
-karma start
-```
-
 ### Running `shadow-cljs` Actions
 
 See a list of [`shadow-cljs CLI`](https://shadow-cljs.github.io/docs/UsersGuide.html#_command_line)
@@ -232,14 +166,14 @@ npx shadow-cljs <action> app
 ```
 ### Debug Logging
 
-The `debug?` variable in [`config.cljs`](src/cljs/kubelt/config.cljs) defaults to `true` in
+The `debug?` variable in [`config.cljs`](src/cljs/dapp/config.cljs) defaults to `true` in
 [`dev`](#running-the-app) builds, and `false` in [`prod`](#production) builds.
 
 Use `debug?` for logging or other tasks that should run only on `dev` builds:
 
 ```clj
-(ns kubelt.example
-  (:require [kubelt.config :as config])
+(ns dapp.example
+  (:require [dapp.config :as config])
 
 (when config/debug?
   (println "This message will appear in the browser console only on dev builds."))
@@ -256,5 +190,5 @@ npm run release
 
 Please be patient; it may take over 15 seconds to see any output, and over 30 seconds to complete.
 
-The `public/js/compiled` directory is created, containing the compiled `app.js` and
+The `resources/public/js/compiled` directory is created, containing the compiled `app.js` and
 `manifest.edn` files.

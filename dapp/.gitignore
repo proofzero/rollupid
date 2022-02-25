@@ -1,5 +1,5 @@
 /out/
-/public/js/compiled/
+/resources/public/js/compiled/
 /target/
 /*-init.clj
 /*.log
@@ -13,6 +13,3 @@
 
 # shadow-cljs cache, port files
 /.shadow-cljs/
-
-# clj-kondo cache
-/.clj-kondo/.cache

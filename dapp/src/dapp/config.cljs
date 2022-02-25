@@ -1,4 +1,4 @@
-(ns kubelt.config)
+(ns dapp.config)
 
 (def debug?
   ^boolean goog.DEBUG)

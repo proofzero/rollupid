@@ -1,5 +1,5 @@
 module.exports = function (config) {
-  var junitOutputDir = process.env.CIRCLE_TEST_REPORTS || "target/junit";
+  var junitOutputDir = process.env.CIRCLE_TEST_REPORTS || "target/junit"
 
   config.set({
     browsers: ['ChromeHeadless'],
@@ -23,5 +23,5 @@ module.exports = function (config) {
       outputFile: undefined, // if included, results will be saved as outputDir/browserName/outputFile
       suite: '' // suite will become the package name attribute in xml testsuite element
     }
-  });
-};
+  })
+}
