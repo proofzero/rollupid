@@ -67,7 +67,7 @@ labels:
     color: '#d876e3'
     description: Indicates that an issue, pull request, or discussion needs more information
 
-  - name: enhancement:
+  - name: enhancement
     color: '#a2eeef'
     description: Indicates new feature requests
   
