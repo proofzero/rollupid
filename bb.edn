@@ -132,6 +132,14 @@
   build:web:release
   {:doc ""
    :task (shell "npx shadow-cljs release web")}
+  
+  build:dapp:develop
+  {:doc ""
+   :task (shell {:dir "dapp"} "npm run shadow:build")}
+
+  build:dapp:release
+  {:doc ""
+   :task (shell {:dir "dapp"} "npm run shadow:release")}
 
   test:sdk:cljs:develop
   {:doc ""
@@ -168,17 +176,28 @@
   test:web:release
   {:doc ""
    :task (shell "npx shadow-cljs release web-test")}
+
+  test:dapp:develop
+  {:doc ""
+   :depends-on [build:dapp:develop]
+   :task (shell {:dir "dapp"} "npm run shadow:test")}
   
+  test:dapp:release
+  {:doc ""
+   :task (shell {:dir "dapp"} "npm run shadow:release")}
+
   test:all:develop
   {:doc "build and test all develop"
    :depends [test:sdk:cljs:develop
              test:sdk:js:develop
              test:web:develop
-             test:sdk-web:develop]}
+             test:sdk-web:develop
+             test:dapp:develop]}
 
   test:all:release
   {:doc "build and test all release"
    :depends [test:sdk:cljs:release
              test:sdk:js:release
              test:web:release
-             test:web-sdk:release]}}}
+             test:web-sdk:release
+             test:dapp:release]}}}
