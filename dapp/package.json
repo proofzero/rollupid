@@ -2,6 +2,8 @@
 	"name": "dapp",
 	"scripts": {
 		"ancient": "clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version \"RELEASE\"}}}' -m antq.core",
+		"shadow:build": "npx shadow-cljs compile",
+		"shadow:test": "npx shadow-cljs test",
 		"shadow:watch": "npx shadow-cljs watch app browser-test karma-test",
 		"css:watch": "npx tailwindcss -i ./src/css/app.css -o ./resources/public/app.css --watch",
 		"dev": "run-p -l *:watch",
