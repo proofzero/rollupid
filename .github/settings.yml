@@ -94,6 +94,10 @@ labels:
   - name: duplicate
     color: '#cfd3d7'
     description: Indicates similar issues, pull requests, or discussions
+  
+  - name: security
+    color: '#D93F0B'
+    description: Indicates a security issue
 
 # Milestones: define milestones for Issues and Pull Requests
 milestones:
