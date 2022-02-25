@@ -29,4 +29,3 @@ jobs:
         run: npx lerna version ${{ env.RELEASE_VERSION }} 
       - name: Publish
         run: npx lerna publish
-
