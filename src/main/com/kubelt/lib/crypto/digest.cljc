@@ -80,8 +80,8 @@
      (let [digest (SHA256Digest.)]
        (compute-digest digest data))
      :cljs
-       (let [digest (sha256/SHA256.)]
-         (compute-digest digest data))))
+     (let [digest (sha256/SHA256.)]
+       (compute-digest digest data))))
 
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."
