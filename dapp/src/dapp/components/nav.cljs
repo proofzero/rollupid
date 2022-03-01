@@ -1,22 +1,42 @@
-(ns dapp.components.layout
+(ns dapp.components.nav
   (:require
    [reagent.core :as r]
+   [reitit.core :as rt]
    [dapp.utils :as utils]
-   [reitit.frontend.easy :as rfe]
-   ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon, InboxIcon, MenuIcon, XIcon)]
+   [dapp.routes :as routes]
+   ["@heroicons/react/outline" :refer (MenuIcon, XIcon)]
    [headlessui-reagent.core :as ui]))
 
-(def navigation
-  [{:name "Dashboard" :href (rfe/href :dapp.views/dashboard) :icon HomeIcon :current true}
-   {:name "Team" :href "#" :icon FolderIcon :current false}
-   {:name "Documents" :href "#" :icon InboxIcon :current false}
-   {:name "Settings" :href (rfe/href :dapp.views/settings) :icon ChartBarIcon :current false}])
+(defn nav-items [router current-route]
+   (for [route-name (rt/route-names router)
+         :let       [route (rt/match-by-name router route-name)
+                     icon (-> route :data :icon)
+                     text (-> route :data :link-text)]]
+     [:a {:key route-name
+          :href (routes/href route-name)
+          :class (utils/classnames
+            (if 
+              (= route-name (-> current-route :data :name))
+              "bg-gray-900 text-white"
+              "text-gray-300 hover:bg-gray-700 hover:text-white")
+             "group flex items-center px-2 py-2 text-base font-medium rounded-md")}
+        [(r/adapt-react-class icon) {:class
+                                     (utils/classnames
+                                       (if
+                                        (= route-name (-> current-route :data :name))
+                                        "text-gray-300"
+                                        "text-gray-400 group-hover:text-gray-300")
+                                        "mr-4 flex-shrink-0 h-6 w-6"),
+                                     :aria-hidden "true"}]
 
-(defn render [view match]
+        text]))
+
+
+(defn render [{:keys [router current-route]}]
   (r/with-let [!open? (r/atom false)
                open #(reset! !open? true)
                close #(reset! !open? false)]
-[:div
+[:<>
  [ui/transition
   {:show @!open?}
   [ui/dialog
@@ -62,30 +82,8 @@
          "https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg",
          :alt "Workflow"}]]
       [:nav.mt-5.px-2.space-y-1
-       (map
-        (fn
-         [item]
-         [:a
-         {:key (:name item),
-          :href (:href item),
-          :class
-          (utils/classnames
-           (if
-            (:current item)
-            "bg-gray-900 text-white"
-            "text-gray-300 hover:bg-gray-700 hover:text-white")
-           "group flex items-center px-2 py-2 text-base font-medium rounded-md")}
-          [(r/adapt-react-class (:icon item))
-          {:class
-           (utils/classnames
-            (if
-             (= (:path match) (clojure.string/replace (:href item) #"#" ""))
-             "text-gray-300"
-             "text-gray-400 group-hover:text-gray-300")
-            "mr-4 flex-shrink-0 h-6 w-6"),
-           :aria-hidden "true"}]
-         (:name item)])
-        navigation)]]
+       (nav-items router current-route)
+       ]]
      [:div.flex-shrink-0.flex.bg-gray-700.p-4
       [:a.flex-shrink-0.group.block
        {:href "#"}
@@ -111,30 +109,8 @@
        "https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg",
        :alt "Workflow"}]]
     [:nav.mt-5.flex-1.px-2.space-y-1
-     (map
-      (fn
-       [item]
-       [:a
-       {:key (:name item),
-        :href (:href item),
-        :class
-        (utils/classnames
-         (if
-          (= (:path match) (clojure.string/replace (:href item) #"#" ""))
-          "bg-gray-900 text-white"
-          "text-gray-300 hover:bg-gray-700 hover:text-white")
-         "group flex items-center px-2 py-2 text-sm font-medium rounded-md")}
-       [(r/adapt-react-class (:icon item))
-        {:class
-         (utils/classnames
-          (if
-           (:current item)
-           "text-gray-300"
-           "text-gray-400 group-hover:text-gray-300")
-          "mr-3 flex-shrink-0 h-6 w-6"),
-         :aria-hidden "true"}]
-       (:name item)])
-      navigation)]]
+     (nav-items router current-route)  
+     ]]
    [:div.flex-shrink-0.flex.bg-gray-700.p-4
     [:a.flex-shrink-0.w-full.group.block
      {:href "#"}
@@ -153,7 +129,5 @@
    [:button.-ml-0.5.-mt-0.5.h-12.w-12.inline-flex.items-center.justify-center.rounded-md.text-gray-500.hover:text-gray-900.focus:outline-none.focus:ring-2.focus:ring-inset.focus:ring-indigo-500
     {:type "button", :on-click open}
     [:span.sr-only "Open sidebar"]
-    [MenuIcon {:aria-hidden "true"}]]]
-  [:main.flex-1
-   [view]]]]))
+    [MenuIcon {:aria-hidden "true"}]]]]]))
 

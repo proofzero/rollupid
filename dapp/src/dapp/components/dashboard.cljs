@@ -1,6 +1,5 @@
 (ns dapp.components.dashboard
   (:require
-   [dapp.components.layout :as layout]
    [dapp.utils :as utils]))
 
 (defn render

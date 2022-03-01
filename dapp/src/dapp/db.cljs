@@ -1,4 +1,6 @@
 (ns dapp.db)
 
 (def default-db
-  {:name "re-frame"})
+  {
+   :name "kubelt"
+   :current-route nil })
