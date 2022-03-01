@@ -7,12 +7,12 @@
    [headlessui-reagent.core :as ui]))
 
 (def navigation
-  [{:name "Dashboard" :href (rfe/href ::dashboard) :icon HomeIcon :current true}
+  [{:name "Dashboard" :href (rfe/href :dapp.views/dashboard) :icon HomeIcon :current true}
    {:name "Team" :href "#" :icon FolderIcon :current false}
    {:name "Documents" :href "#" :icon InboxIcon :current false}
-   {:name "Settings" :href (rfe/href ::settings) :icon ChartBarIcon :current false}])
+   {:name "Settings" :href (rfe/href :dapp.views/settings) :icon ChartBarIcon :current false}])
 
-(defn render [view]
+(defn render [view match]
   (r/with-let [!open? (r/atom false)
                open #(reset! !open? true)
                close #(reset! !open? false)]
@@ -25,7 +25,6 @@
     :class "fixed inset-0 flex z-40 md:hidden"}
    [ui/transition-child
     {
-     ;:as fragment
      :enter "transition-opacity ease-linear duration-300",
      :enter-from "opacity-0",
      :enter-to "opacity-100",
@@ -35,7 +34,6 @@
     [ui/dialog-overlay {:class "fixed inset-0 bg-gray-600 bg-opacity-75"}]]
    [ui/transition-child
     {
-     ;:as fragment
      :class "z-50 fixed inset-0 flex"
      :enter "transition ease-in-out duration-300 transform",
      :enter-from "-translate-x-full", 
@@ -46,7 +44,6 @@
     [:div.flex-1.flex.flex-col.max-w-xs.w-full.bg-gray-800.z-50.top-0.absolute.min-h-full
      [ui/transition-child
       {
-        ;:as fragment
        :enter "ease-in-out duration-300",
        :enter-from "opacity-0",
        :enter-to "opacity-100",
@@ -82,7 +79,7 @@
           {:class
            (utils/classnames
             (if
-             (:current item)
+             (= (:path match) (clojure.string/replace (:href item) #"#" ""))
              "text-gray-300"
              "text-gray-400 group-hover:text-gray-300")
             "mr-4 flex-shrink-0 h-6 w-6"),
@@ -123,7 +120,7 @@
         :class
         (utils/classnames
          (if
-          (:current item)
+          (= (:path match) (clojure.string/replace (:href item) #"#" ""))
           "bg-gray-900 text-white"
           "text-gray-300 hover:bg-gray-700 hover:text-white")
          "group flex items-center px-2 py-2 text-sm font-medium rounded-md")}
@@ -158,5 +155,5 @@
     [:span.sr-only "Open sidebar"]
     [MenuIcon {:aria-hidden "true"}]]]
   [:main.flex-1
-   (view nil)]]]))
+   [view]]]]))
 

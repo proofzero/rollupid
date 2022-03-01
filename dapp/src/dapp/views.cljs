@@ -2,6 +2,7 @@
   (:require
    [reagent.core :as r]
    [reitit.frontend :as rf]
+   [reitit.coercion.schema :as rsc]
    [re-frame.core :as re-frame]
    [dapp.subs :as subs]
    [dapp.components.layout :as layout]
@@ -11,15 +12,24 @@
 ;; match routes atom
 (defonce match (r/atom nil))
 
+(defn log-fn [& params]
+  (fn [_]
+    (prn params)))
+
 (def routes
   (rf/router
     ["/"
       ["" 
         {:name ::dashboard
-        :view dashboard/render}]
-      ["/settings"
+        :view dashboard/render
+        :controllers [{:start (log-fn "start" "dashboad controller")
+                       :stop (log-fn "stop" "dashboard controller")}]}]
+      ["settings"
         {:name ::settings
-        :view settings/render}]]))
+        :view settings/render}]]
+    {:data {:controllers [{:start (log-fn "start" "root-controller")
+                           :stop (log-fn "stop" "root controller")}]
+            :coercion rsc/coercion}}))
 
 (defn header
   []
@@ -31,4 +41,6 @@
     [:div
      (if @match
        (let [view (:view (:data @match))]
-         (layout/render view)))])
+         (layout/render view @match)))])
+
+

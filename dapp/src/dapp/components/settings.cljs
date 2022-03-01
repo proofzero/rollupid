@@ -4,7 +4,6 @@
 
 (defn render
   [props]
-  ["render dashboard"]
   [:div.py-6
     [:div.max-w-7xl.mx-auto.px-4.sm:px-6.lg:px-8
      [:h-1.text-2xl.font-semibold.text-gray-900 "Settings"]]
