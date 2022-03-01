@@ -54,8 +54,8 @@
      :cljs
      ;; Wrap the invocation of a StableLib digest.
      ;; TODO Convert data to Uint8Array
-     (let []
-       (.update digest data)
+     (let [data-bytes (js/Buffer.from data)]
+       (.update digest data-bytes)
        (let [;; Returns a Uint8Array.
              result (.digest digest)]
          ;; FIXME Ensure works for browser also.
@@ -81,9 +81,8 @@
      (let [digest (SHA256Digest.)]
        (compute-digest digest data))
      :cljs
-     (lib.hexify/hex-string (-> (sha256/SHA256.)
-                                (.update (js/Buffer.from data))
-                                (.digest)))))
+       (let [digest (sha256/SHA256.)]
+         (compute-digest digest data))))
 
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."

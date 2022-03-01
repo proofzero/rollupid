@@ -23,7 +23,7 @@
   (testing "sha3 digest"
     (let [input "foobar"
           expected #?(:clj "fixme"
-                      :cljs "c1545e05e6777d834652396ad104e7e971a78d084a9b9df34f7a16fd493bf2b0")
+                      :cljs "09234807e4af85f17c66b48ee3bca89dffd1f1233659f9f940a2b17b0b8c6bc5")
           output (lib.digest/sha3-256 input)]
       (is (= expected output)
           "hash of string has expected output"))))
