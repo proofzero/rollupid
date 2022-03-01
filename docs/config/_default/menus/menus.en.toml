@@ -10,6 +10,25 @@
   identifier = "help"
   url = "/docs/help/"
 
+[[docs]]
+  name = "Tutorials"
+  weight = 70
+  identifier = "tutorials"
+  url = "/docs/tutorials/"
+
+[[docs]]
+  name = "Guides"
+  weight = 70
+  identifier = "guides"
+  url = "/docs/guides/"
+
+[[docs]]
+  name = "Reference"
+  weight = 70
+  identifier = "references"
+  url = "/docs/references/"
+
+
 # [[docs]]
 #   name = "Lorem"
 #   weight = 70
@@ -30,7 +49,7 @@
 
 [[main]]
   name = "Docs"
-  url = "/docs/prologue/introduction/"
+  url = "/docs"
 # url = "/docs/1.0/prologue/introduction/"
   weight = 10
 
