@@ -2,6 +2,8 @@
   (:require
    [re-frame.core :as re-frame]
    [dapp.subs :as subs]
+   [dapp.components.layout :as layout]
+   [dapp.components.dashboard :as dashboard]
    ))
 
 (defn header
@@ -12,7 +14,7 @@
 (defn main-panel []
   (let [name (re-frame/subscribe [::subs/name])]
     [:div
-     (header)
-     [:h1
+     (layout/render (dashboard/render nil))
+     #_[:h1
       "Hello there from " @name]
      ]))
