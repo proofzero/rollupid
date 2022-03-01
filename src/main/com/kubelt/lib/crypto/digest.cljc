@@ -81,8 +81,9 @@
      (let [digest (SHA256Digest.)]
        (compute-digest digest data))
      :cljs
-     (let [digest (sha256/SHA256.)]
-       (compute-digest digest data))))
+     (lib.hexify/hex-string (-> (sha256/SHA256.)
+                                (.update (js/Buffer.from data))
+                                (.digest)))))
 
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."
