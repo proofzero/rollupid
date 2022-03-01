@@ -1,5 +1,6 @@
 /out/
 /resources/public/js/compiled/
+/resources/public/app.css
 /target/
 /*-init.clj
 /*.log
