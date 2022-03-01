@@ -10,7 +10,7 @@
   (let [current-route @(re-frame/subscribe [::subs/current-route])]
     [:div
       (nav/render {:router router :current-route current-route})
-      [:main.flex-1
+      [:main.flex-1.md:ml-64
        (when current-route
         [(-> current-route :data :view)])]]))
 
