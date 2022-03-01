@@ -33,8 +33,7 @@
 ;;         - associate name with user record
 (defn register!
   ([sys pub-key]
-   sys
-   )
+   sys)
   ([sys pub-key options]
    ;; TODO add p2p option:
    ;; - key-name: arbitrary human-readable string
@@ -42,8 +41,7 @@
    ;; - wallet address? etc.
    ;; NB: potentially multiple (many!) types of names associated with
    ;; user record (public key)
-   sys
-   ))
+   sys))
 
 (defn register-js!
   [sys pub-key name]
@@ -69,7 +67,7 @@
   capability is used to confirm ownership of the private key associated
   with the given public key. The callback will be passed an encrypted
   nonce and must return the corresponding plaintext."
-  [sys public-key wallet]
+  [sys wallet]
   ;; TODO validate system map
   ;; TODO validate public-key
   ;; TODO validate wallet map
@@ -78,10 +76,15 @@
     ;; from SDK by closing over it, while enabling crypto operations
     ;; within the SDK.
     )
+
   ;; a flow for validating keypair ownership:
   ;; - sdk -> p2p: send nonce for public key <key>
   ;; - p2p -> sdk: <encrypted nonce>
   ;; - sdk -> p2p: <decrypted, signed nonce>
+  (let
+   [messageToSign "Foo"]
+    (let
+     [signedMessage ((:wallet/sign-fn wallet) messageToSign)]
   ;; - p2p: lookup(pub-key) => cid / nil
   ;;   - if cid, user's me-dag already exists; hurray
   ;;   - if nil, we have a new user; create p2p context
@@ -95,18 +98,18 @@
   ;; - sdk -> p2p: update(jwt, me-dag cid)
   ;;   => refreshed JWT session token
   ;; <= return updated system map
-  sys)
+      sys)))
 
 ;; TODO test me
 (defn authenticate-js!
   "Create an account from a JavaScript context."
-  [sys public-key wallet]
+  [sys wallet]
   (promise
    (fn [resolve reject]
-     (let [result (lib.wallet/to-edn wallet)]
-       (if (lib.error/error? result)
-         (reject result)
-         (resolve (authenticate! sys public-key wallet)))))))
+     (let [walletMap (lib.wallet/to-edn wallet)]
+       (if (lib.error/error? walletMap)
+         (reject walletMap)
+         (resolve (authenticate! sys walletMap)))))))
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------
