@@ -53,9 +53,8 @@
          (lib.hexify/hex-string result)))
      :cljs
      ;; Wrap the invocation of a StableLib digest.
-     ;; TODO Convert data to Uint8Array
-     (let []
-       (.update digest data)
+     (let [data-bytes (js/Buffer.from data)]
+       (.update digest data-bytes)
        (let [;; Returns a Uint8Array.
              result (.digest digest)]
          ;; FIXME Ensure works for browser also.
