@@ -8,6 +8,8 @@
  [[reagent "1.1.0"]
   [re-frame "1.2.0"]
 
+  [com.github.mainej/headlessui-reagent "1.5.0.47"]
+  [metosin/reitit "0.5.16"]
   [binaryage/devtools "1.0.4"]]
 
  :dev-http

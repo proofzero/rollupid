@@ -2,11 +2,12 @@
   (:require
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
+   [reitit.frontend.easy :as rfe]
+   [reitit.frontend.controllers :as rfc]
    [dapp.events :as events]
    [dapp.views :as views]
    [dapp.config :as config]
    ))
-
 
 (defn dev-setup []
   (when config/debug?
@@ -21,5 +22,13 @@
 (defn init []
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
+  ;; router setup
+  (rfe/start!
+    views/routes
+    (fn [new-match]
+      (swap! views/match (fn [old-match]
+                     (if new-match
+                       (assoc new-match :controllers (rfc/apply-controllers (:controllers old-match) new-match))))))
+    {:use-fragment true})
   (mount-root))
 

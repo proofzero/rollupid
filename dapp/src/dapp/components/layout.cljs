@@ -2,17 +2,17 @@
   (:require
    [reagent.core :as r]
    [dapp.utils :as utils]
+   [reitit.frontend.easy :as rfe]
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon, InboxIcon, MenuIcon, XIcon)]
    [headlessui-reagent.core :as ui]))
 
 (def navigation
-  [{:name "Dashboard" :href "#" :icon HomeIcon :current true}
+  [{:name "Dashboard" :href (rfe/href ::dashboard) :icon HomeIcon :current true}
    {:name "Team" :href "#" :icon FolderIcon :current false}
    {:name "Documents" :href "#" :icon InboxIcon :current false}
-   {:name "Reports" :href "#" :icon ChartBarIcon :current false}])
+   {:name "Settings" :href (rfe/href ::settings) :icon ChartBarIcon :current false}])
 
 (defn render [view]
-  ["layout component"]
   (r/with-let [!open? (r/atom false)
                open #(reset! !open? true)
                close #(reset! !open? false)]
@@ -158,5 +158,5 @@
     [:span.sr-only "Open sidebar"]
     [MenuIcon {:aria-hidden "true"}]]]
   [:main.flex-1
-   view]]]))
+   (view nil)]]]))
 

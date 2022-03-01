@@ -6,3 +6,4 @@
  ::name
  (fn [db]
    (:name db)))
+
