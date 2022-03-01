@@ -71,34 +71,32 @@
   ;; TODO validate system map
   ;; TODO validate public-key
   ;; TODO validate wallet map
-  (let [{:keys [sign-fn]} wallet]
+  (let [{:keys [sign-fn]} wallet
+        message-to-sign "Foo"
+        signedMessage (sign-fn message-to-sign)]
     ;; Wallet is a collection of crypto fns that hide the private key
     ;; from SDK by closing over it, while enabling crypto operations
     ;; within the SDK.
-    )
 
-  ;; a flow for validating keypair ownership:
-  ;; - sdk -> p2p: send nonce for public key <key>
-  ;; - p2p -> sdk: <encrypted nonce>
-  ;; - sdk -> p2p: <decrypted, signed nonce>
-  (let
-   [messageToSign "Foo"]
-    (let
-     [signedMessage ((:wallet/sign-fn wallet) messageToSign)]
-  ;; - p2p: lookup(pub-key) => cid / nil
-  ;;   - if cid, user's me-dag already exists; hurray
-  ;;   - if nil, we have a new user; create p2p context
-  ;;     - store public key?
-  ;;     - store registration timestamp?
-  ;;     - set up billing context?
-  ;; - p2p -> sdk: JWT session (include me-dag root CID in body)
-  ;; - sdk: if nil, create and store me-dag:
-  ;;   - populate triple store with initial user account info
-  ;;   - sdk -> ipfs: store(me-dag) => cid
-  ;; - sdk -> p2p: update(jwt, me-dag cid)
-  ;;   => refreshed JWT session token
-  ;; <= return updated system map
-      sys)))
+    ;; a flow for validating keypair ownership:
+    ;; - sdk -> p2p: send nonce for public key <key>
+    ;; - p2p -> sdk: <encrypted nonce>
+    ;; - sdk -> p2p: <decrypted, signed nonce>
+
+    ;; - p2p: lookup(pub-key) => cid / nil
+    ;;   - if cid, user's me-dag already exists; hurray
+    ;;   - if nil, we have a new user; create p2p context
+    ;;     - store public key?
+    ;;     - store registration timestamp?
+    ;;     - set up billing context?
+    ;; - p2p -> sdk: JWT session (include me-dag root CID in body)
+    ;; - sdk: if nil, create and store me-dag:
+    ;;   - populate triple store with initial user account info
+    ;;   - sdk -> ipfs: store(me-dag) => cid
+    ;; - sdk -> p2p: update(jwt, me-dag cid)
+    ;;   => refreshed JWT session token
+    ;; <= return updated system map
+    sys))
 
 ;; TODO test me
 (defn authenticate-js!
