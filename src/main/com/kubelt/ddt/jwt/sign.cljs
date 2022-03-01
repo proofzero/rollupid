@@ -2,6 +2,7 @@
   "Invoke the JWT (sign) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.jwt :as jwt]
    [com.kubelt.sdk.v1 :as sdk]))
 
@@ -15,7 +16,7 @@
 
    :handler (fn [args]
               (let [kbt (sdk/init)]
-                (if (sdk/error? kbt)
+                (if (lib.error/error? kbt)
                   (prn (:error kbt))
                   (let [payload {:foo "bar"}]
                       (println "TODO Sign payload to get JWT")

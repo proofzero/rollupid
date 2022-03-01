@@ -1,4 +1,4 @@
-(ns com.kubelt.ipfs.v0.swarm.addrs
+(ns com.kubelt.ipfs.v0.swarm.address
   "Methods for investigating a libp2p swarm."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

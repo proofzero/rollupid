@@ -7,6 +7,7 @@
    [cljs.core.async :refer [<!]])
   (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.p2p :as p2p]
    [com.kubelt.sdk.v1 :as sdk]))
 
@@ -22,7 +23,7 @@
               (let [{:keys [key value host port]} (js->clj args :keywordize-keys true)
                     maddr (str "/ip4/" host "/tcp/" port)
                     kbt (sdk/init {:p2p/read maddr :p2p/write maddr})]
-                (if (sdk/error? kbt)
+                (if (lib.error/error? kbt)
                   (prn (:error kbt))
                   (let [;; TODO implement local wallet management for
                         ;; development / testing.

@@ -1,4 +1,4 @@
-(ns com.kubelt.lib.car.build
+(ns com.kubelt.car.build
   "Build Content Archives."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
@@ -7,8 +7,8 @@
    ["multiformats/codecs/raw" :as codec-raw :refer [TextEncoder]]
    ["multiformats/hashes/sha2" :as hashes.sha2])
   (:require
+   [com.kubelt.car.block :as car.block]
    [com.kubelt.lib.bag.check :as bag.check]
-   [com.kubelt.lib.car.block :as car.block]
    [com.kubelt.lib.ipld :as ipld]
    [com.kubelt.lib.promise :as promise]))
 

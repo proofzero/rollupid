@@ -1,4 +1,4 @@
-(ns com.kubelt.lib.car.file
+(ns com.kubelt.car.file
   "Support for working with CAR-format files."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   #_(:require
@@ -9,8 +9,8 @@
    [cljs.core.async :as async :refer [chan go <! >!]]
    [cljs.core.async.interop :refer-macros [<p!]])
   (:require
+   [com.kubelt.car.build :as car.build]
    [com.kubelt.lib.bag.check :as bag.check]
-   [com.kubelt.lib.car.build :as car.build]
    [com.kubelt.lib.promise :as promise]
    [com.kubelt.proto.bag-io :as bag-io]))
 

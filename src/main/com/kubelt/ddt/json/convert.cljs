@@ -5,10 +5,11 @@
    ["fs" :as fs]
    ["path" :as path])
   (:require
+   [com.kubelt.car :as car]
    [com.kubelt.lib.bag :as bag]
    [com.kubelt.lib.bag.dag :as bag.dag]
    [com.kubelt.lib.bag.node :as bag.node]
-   [com.kubelt.lib.car :as car]
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.ipld :as ipld]
    [com.kubelt.sdk.v1 :as sdk]))
 
@@ -41,7 +42,7 @@
                     ;; Returns an error map if an initialization error
                     ;; occurred.
                     kbt (sdk/init)]
-                (if (sdk/error? kbt)
+                (if (lib.error/error? kbt)
                   (prn (:error kbt))
                   (let [;; Read in pack file contents.
                         data (js/JSON.parse (.readFileSync fs pack-file))

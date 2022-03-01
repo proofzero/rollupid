@@ -1,4 +1,4 @@
-(ns lib.car.block-test
+(ns car.block-test
   "Test the encoding and decoding of IPLD blocks."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

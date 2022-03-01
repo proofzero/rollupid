@@ -1,4 +1,4 @@
-(ns com.kubelt.ipfs.v0.swarm.filters
+(ns com.kubelt.ipfs.v0.swarm.filter
   "Manipulate address filters."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
