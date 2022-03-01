@@ -7,17 +7,21 @@
      (:require
       [jsonista.core :as json])))
 
-;; TODO support node / browser.
 ;; TODO test me
 
 ;; Internal
 ;; -----------------------------------------------------------------------------
 
 ;; Replaces default json/keyword-keys-object-mapper.
-(def keyword-mapper
-  (json/object-mapper
-   {:encode-key-fn csk/->camelCaseString
-    :decode-key-fn csk/->kebab-case-keyword}))
+#?(:clj
+   (def keyword-mapper
+     (json/object-mapper
+      {:encode-key-fn csk/->camelCaseString
+       :decode-key-fn csk/->kebab-case-keyword}))
+   :cljs
+   (def keyword-mapper
+     {:encode-key-fn csk/->camelCaseString
+      :decode-key-fn csk/->kebab-case-keyword}))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -25,14 +29,22 @@
 (defn edn->json-str
   "Write edn data as a JSON string."
   [x]
-  #?(:clj (json/write-value-as-string x)))
+  #?(:clj (json/write-value-as-string x)
+     :cljs (js/JSON.stringify (clj->js x))))
 
 (defn json-str->edn
   "Parse a JSON string into edn data."
   ([s]
-   #?(:clj (json/read-value s)))
+   #?(:clj
+      (json/read-value s)
+      :cljs
+      (js->clj (js/JSON.parse s))))
   ([s mapper]
-   #?(:clj (json/read-value s keyword-mapper))))
+   #?(:clj
+      (json/read-value s keyword-mapper)
+      ;; TODO use mapper fns to transform keys to kebab-case keywords
+      :cljs
+      (js/JSON.parse s :keywordize-keys true))))
 
 (defn from-json
   "Parse a JSON string into edn data. If the keywordize? flag is set,

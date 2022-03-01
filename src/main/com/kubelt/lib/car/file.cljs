@@ -1,7 +1,7 @@
 (ns com.kubelt.lib.car.file
   "Support for working with CAR-format files."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
+  #_(:require
    ["@ipld/car" :as ipld.car :refer [CarReader CarWriter]]
    ["fs" :as fs]
    ["stream" :as stream :refer [Readable]])
@@ -18,44 +18,44 @@
 ;; -----------------------------------------------------------------------------
 
 ;; TODO test me
-(defn- make-writer
-  "Return a CarWriter 'channel'. A channel is a { writer:CarWriter,
-  out:AsyncIterable<Uint8Array> } pair. The writer side can be used to
-  put() blocks, while the out side of the channel emits the bytes that
-  form the encoded CAR archive.
+;; (defn- make-writer
+;;   "Return a CarWriter 'channel'. A channel is a { writer:CarWriter,
+;;   out:AsyncIterable<Uint8Array> } pair. The writer side can be used to
+;;   put() blocks, while the out side of the channel emits the bytes that
+;;   form the encoded CAR archive.
 
-  NB: in Node.js you can use the Readable.from() API to convert the out
-  AsyncIterable to a standard Node.js stream, or it can be directly fed
-  to a stream.pipeline()."
-  [roots]
-  {:pre [(sequential? roots)]}
-  (let [roots (clj->js roots)
-        car-writer (.create CarWriter roots)]
-    ;; Convert to map to allow destructuring in the caller.
-    (js->clj car-writer :keywordize-keys true)))
+;;   NB: in Node.js you can use the Readable.from() API to convert the out
+;;   AsyncIterable to a standard Node.js stream, or it can be directly fed
+;;   to a stream.pipeline()."
+;;   [roots]
+;;   {:pre [(sequential? roots)]}
+;;   (let [roots (clj->js roots)
+;;         car-writer (.create CarWriter roots)]
+;;     ;; Convert to map to allow destructuring in the caller.
+;;     (js->clj car-writer :keywordize-keys true)))
 
-;; TODO figure out how we're writing CAR in-browser.
-;; TODO test me
-(defn- make-file-writer
-  [roots file-name]
-  {:pre [(sequential? roots)
-         (string? file-name)]}
-  (let [{:keys [writer out]} (make-writer roots)
-        ;; NB: Node.js *only*.
-        write-stream (.createWriteStream fs file-name)]
-    ;; Pipe the out side of channel to a write stream.
-    (.pipe (.from Readable out) write-stream)
-    writer))
+;; ;; TODO figure out how we're writing CAR in-browser.
+;; ;; TODO test me
+;; (defn- make-file-writer
+;;   [roots file-name]
+;;   {:pre [(sequential? roots)
+;;          (string? file-name)]}
+;;   (let [{:keys [writer out]} (make-writer roots)
+;;         ;; NB: Node.js *only*.
+;;         write-stream (.createWriteStream fs file-name)]
+;;     ;; Pipe the out side of channel to a write stream.
+;;     (.pipe (.from Readable out) write-stream)
+;;     writer))
 
-;; TODO test me
-(defn write-car!
-  "Write a CAR map to the given output file."
-  [{:keys [kubelt.car/blocks :kubelt.car/roots] :as car} file-name]
-  (go
-    (let [writer (make-file-writer roots file-name)]
-      (doseq [block blocks]
-        (<p! (.put writer block)))
-      (<p! (.close writer)))))
+;; ;; TODO test me
+;; (defn write-car!
+;;   "Write a CAR map to the given output file."
+;;   [{:keys [kubelt.car/blocks :kubelt.car/roots] :as car} file-name]
+;;   (go
+;;     (let [writer (make-file-writer roots file-name)]
+;;       (doseq [block blocks]
+;;         (<p! (.put writer block)))
+;;       (<p! (.close writer)))))
 
 ;; CarFile
 ;; -----------------------------------------------------------------------------
@@ -73,4 +73,6 @@
     (-> (car.build/car bag)
         (promise/then
          (fn [car]
-           (write-car! car file-name))))))
+           ;; TODO do something nice and cross platform here
+           ;;(write-car! car file-name)
+           )))))

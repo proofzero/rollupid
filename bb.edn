@@ -66,73 +66,75 @@
              (clojure command)))}
 
   lint:dev
-  {:doc ""
+  {:doc "Lint development source code"
    :task (let [dir "src/dev"]
            (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
 
   lint:main
-  {:doc ""
+  {:doc "Lint application source code"
    :task (let [dir "src/main"]
            (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
 
   lint:test
-  {:doc ""
+  {:doc "Lint test source code"
    :task (let [dir "src/test"]
            (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
 
   lint:all
-  {:doc ""
-   :task (let [dir "src/all"]
+  {:doc "Lint all source code"
+   :task (let [dir "src/"]
            (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
 
   build:ddt:develop
-  {:doc ""
+  {:doc "Build development version of ddt command line application"
    :task (shell "npx shadow-cljs compile ddt")}
 
   build:ddt:release
-  {:doc ""
+  {:doc "Build release version of ddt command line application"
    :task (shell "npx shadow-cljs release ddt")}
 
   build:kbt:develop
-  {:doc ""
+  {:doc "Build development version of kbt command line application"
    :task (shell "npx shadow-cljs compile kbt")}
 
   build:kbt:release
-  {:doc ""
+  {:doc "Build release version of kbt command line application"
    :task (shell "npx shadow-cljs release kbt")}
 
   build:p2p:develop
-  {:doc ""
+  {:doc "Build development version of the p2p service"
    :task (shell "npx shadow-cljs compile p2p")}
 
   build:p2p:release
-  {:doc ""
+  {:doc "Build release version of the p2p service"
    :task (shell "npx shadow-cljs release p2p")}
 
   build:sdk:develop
-  {:doc ""
+  {:doc "Build development version of the sdk for node"
    :task (shell "npx shadow-cljs compile sdk")}
 
   build:sdk:release
-  {:doc ""
+  {:doc "Build release version of the sdk for node"
    :task (shell "npx shadow-cljs release sdk")}
-  
+
   build:sdk-web:develop
-  {:doc ""
-   :task (shell "npx lerna build build --scope @kubelt/sdk-web")}
-  
+  {:doc "Build development version of the sdk using webpack"
+   :depends [build:sdk:develop]
+   :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
+
   build:sdk-web:release
-  {:doc ""
-   :task (shell "npx lerna build build --scope @kubelt/sdk-web")}
+  {:doc "Build release version of the sdk using webpack"
+   :depends [build:sdk:release]
+   :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
 
   build:web:develop
-  {:doc ""
+  {:doc "Build development version of sdk for web"
    :task (shell "npx shadow-cljs compile web")}
 
   build:web:release
-  {:doc ""
+  {:doc "Build release version of sdk for web"
    :task (shell "npx shadow-cljs release web")}
-  
+
   build:dapp:develop
   {:doc ""
    :task (shell {:dir "dapp"} "npm run shadow:build")}
@@ -142,20 +144,20 @@
    :task (shell {:dir "dapp"} "npm run shadow:release")}
 
   test:sdk:cljs:develop
-  {:doc ""
+  {:doc "Build and run development version of sdk tests"
    :task (shell "npx shadow-cljs compile sdk-test")}
 
   test:sdk:cljs:release
-  {:doc ""
+  {:doc "Build and run release version of sdk tests"
    :task (shell "npx shadow-cljs release sdk-test")}
 
   test:sdk:js:develop
-  {:doc ""
+  {:doc "Run JavaScript tests against development sdk"
    :depends [build:sdk:develop]
    :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
 
   test:sdk:js:release
-  {:doc ""
+  {:doc "Run JavaScript tests against release sdk"
    :depends [build:sdk:release]
    :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
 
@@ -163,7 +165,7 @@
   {:doc ""
    :depends-on [build:sdk-web:develop]
    :task (shell "npx lerna run test --scope @kubelt/sdk-web")}
-  
+
   test:sdk-web:release
   {:doc ""
    :depends-on [build:sdk-web:release]
@@ -181,13 +183,13 @@
   {:doc ""
    :depends-on [build:dapp:develop]
    :task (shell {:dir "dapp"} "npm run shadow:test")}
-  
+
   test:dapp:release
   {:doc ""
    :task (shell {:dir "dapp"} "npm run shadow:release")}
 
   test:all:develop
-  {:doc "build and test all develop"
+  {:doc "Build and test all develop"
    :depends [test:sdk:cljs:develop
              test:sdk:js:develop
              test:web:develop
@@ -195,7 +197,7 @@
              test:dapp:develop]}
 
   test:all:release
-  {:doc "build and test all release"
+  {:doc "Build and test all release"
    :depends [test:sdk:cljs:release
              test:sdk:js:release
              test:web:release

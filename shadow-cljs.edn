@@ -80,8 +80,12 @@
  ;; you'll need to specify a new entrypoint by setting :main.
 
  :builds
- {;; This is the core Node.js library that provides the Kubelt SDK,
+ {;; SDK (Node.js)
+  ;; ---------------------------------------------------------------------------
+  ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use with Node.js.
+
+  ;; TODO rename to :sdk-node?
   :sdk
   {:target :node-library
    ;; Each keyword in the :exports map is available in the generated
@@ -94,6 +98,22 @@
                       :output-feature-set :es-next}
    :output-to "packages/sdk-js/lib/sdk.js"}
 
+  ;; SDK (npm)
+  ;; ---------------------------------------------------------------------------
+  ;; Experimental: this build target for the SDK generates an npm module.
+  ;; TODO see if we get a better result from webpacking this build output.
+
+  :sdk-npm
+  {:target :npm-module
+   :entries [com.kubelt.sdk]
+   :compiler-options {:optimizations :advanced
+                      :infer-externs :true
+                      :output-feature-set :es5}
+   :output-dir "packages/sdk-npm/lib"}
+
+  ;; SDK tests
+  ;; ---------------------------------------------------------------------------
+
   :sdk-test
   {:target :node-test
    :compiler-options {:reader-features #{:node}}
@@ -101,10 +121,12 @@
    :ns-regexp "(lib|sdk)\\..*-test$"
    :autorun true}
 
-  ;; Web
-
+  ;; SDK (web)
+  ;; ---------------------------------------------------------------------------
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use in the browser.
+
+  ;; TODO rename to :sdk-web
   :web
   {:target :browser
    :output-dir "packages/web/lib"
@@ -122,6 +144,7 @@
    :compiler-options {:reader-features #{:browser}}}
 
   ;; P2P
+  ;; ---------------------------------------------------------------------------
 
   :p2p
   {:target :node-script
@@ -143,8 +166,11 @@
   ;;  :ns-regexp "jwt-test$"
   ;;  :output-to "target/jwt-test/jwt-test.js"}
 
+  ;; Kubelt Debug CLI
+  ;; ---------------------------------------------------------------------------
   ;; This is a development CLI used to run various commands for testing,
   ;; preparing data, or performing other non-customer-facing operations.
+
   :ddt
   {:target :node-script
    :main com.kubelt.ddt/main
@@ -155,6 +181,7 @@
    :output-to "packages/ddt/lib/ddt.js"}
 
   ;; Kubelt CLI
+  ;; ---------------------------------------------------------------------------
 
   :kbt
   {:target :node-script
@@ -173,6 +200,7 @@
    :autorun true}
 
   ;; IPFS Client
+  ;; ---------------------------------------------------------------------------
 
   :ipfs
   {:target :node-library

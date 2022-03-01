@@ -36,8 +36,6 @@
     "@stablelib/ed25519": "1.0.2",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
-    "ipfs-http-client": "56.0.0",
-    "ipfs-message-port-client": "0.11.0",
     "ipns": "0.16.0",
     "jose": "4.4.0",
     "jsonld": "5.2.0",

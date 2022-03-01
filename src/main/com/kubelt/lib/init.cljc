@@ -2,17 +2,18 @@
   "SDK implementation."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   ["ipfs-http-client" :as ipfs-http-client])
-  (:require
    [integrant.core :as ig]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.ipfs.client :as ipfs.client]
    [com.kubelt.lib.detect :as detect]
-   [com.kubelt.lib.http.browser :as http.browser]
-   [com.kubelt.lib.http.node :as http.node]
    [com.kubelt.lib.multiaddr :as multiaddr]
    [com.kubelt.lib.util :as util]
-   [com.kubelt.proto.http :as proto.http]))
+   [com.kubelt.proto.http :as proto.http])
+  (:require
+   #?@(:browser [[com.kubelt.lib.http.browser :as http.browser]]
+       :node [[com.kubelt.lib.http.node :as http.node]]
+       :clj [[com.kubelt.lib.http.jvm :as http.jvm]])))
 
 ;; System
 ;; -----------------------------------------------------------------------------
@@ -34,15 +35,15 @@
 ;; Cf. https://github.com/weavejester/integrant.
 
 (def system
-  {;; Our connection to IPFS. Uses the ipfs-http-client from node.
-   :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"}
+  {;; Our connection to IPFS.
+   :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"
+                 :client/http {}}
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
    :client/p2p {:p2p/read {:http/scheme :https
                            :http/address "/ip4/127.0.0.1/tcp/9061"}
                 :p2p/write {:http/scheme :https
-                            :http/address "/ip4/127.0.0.1/tcp/9061"}}
-   :client/http :missing})
+                            :http/address "/ip4/127.0.0.1/tcp/9061"}}})
 
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------
@@ -63,10 +64,22 @@
         maddr-str (get value :ipfs/multiaddr)
         url {:url maddr-str}
         ;; Create the options object we pass to client creation fn.
-        options (clj->js (merge url timeout))]
+        options (clj->js (merge url timeout))
+        ;; Get the platform-specific HTTP client.
+        http-client (get value :client/http)]
     (log/debug {:log/msg "init IPFS client" :ipfs/addr maddr-str})
     (try
-      (.create ipfs-http-client options)
+      (let [;; TODO convert multiaddress to URL parts and pass in
+            ;; options map to IPFS client.
+            ;; http-scheme ""
+            ;; http-host ""
+            ;; http-port ""
+            ;; options {:http/scheme http-scheme
+            ;;          :http/host http-host
+            ;;          :http/port http-port}
+            options {:http/client http-client}]
+        ;;(.create ipfs-http-client options)
+        (ipfs.client/init options))
       (catch js/Error e
         (log/fatal e))
       (catch :default e
@@ -120,7 +133,10 @@
 (defmethod ig/init-key :client/http [_ env]
   {:post [(not (nil? %))]}
   (log/debug {:log/msg "init HTTP client [" env "]"})
-  (condp = env
+  #?(:browser (http.browser/->HttpClient)
+     :node (http.node/->HttpClient)
+     :clj (http.jvm/->HttpClient))
+  #_(condp = env
     :platform.type/browser (http.browser/->HttpClient)
     ;;:platform.type/jvm (http.jvm/->HttpClient)
     :platform.type/node (http.node/->HttpClient)))
