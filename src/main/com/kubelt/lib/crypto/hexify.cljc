@@ -6,7 +6,6 @@
       [org.bouncycastle.util.encoders Hex])))
 
 ;; TODO browser
-;; TODO test me
 (defn hex-string
   [byte-data]
   #?(:clj

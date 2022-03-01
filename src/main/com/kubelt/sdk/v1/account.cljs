@@ -71,9 +71,9 @@
   ;; TODO validate system map
   ;; TODO validate public-key
   ;; TODO validate wallet map
-  (let [{:keys [sign-fn]} wallet
+  (let [{:keys [wallet/sign-fn]} wallet
         message-to-sign "Foo"
-        signedMessage (sign-fn message-to-sign)]
+        signed-message (sign-fn message-to-sign)]
     ;; Wallet is a collection of crypto fns that hide the private key
     ;; from SDK by closing over it, while enabling crypto operations
     ;; within the SDK.
@@ -104,10 +104,10 @@
   [sys wallet]
   (promise
    (fn [resolve reject]
-     (let [walletMap (lib.wallet/to-edn wallet)]
-       (if (lib.error/error? walletMap)
-         (reject walletMap)
-         (resolve (authenticate! sys walletMap)))))))
+     (let [wallet-map (lib.wallet/to-edn wallet)]
+       (if (lib.error/error? wallet-map)
+         (reject wallet-map)
+         (resolve (authenticate! sys wallet-map)))))))
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------

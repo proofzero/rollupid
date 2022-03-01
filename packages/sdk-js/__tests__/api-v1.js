@@ -111,13 +111,12 @@ tap.test('sdk init', (t) => {
 tap.test('account authenticate', (t) => {
     return kbt.v1.init()
         .then((sdk) => {
-            const publicKey = "foobar";
             const wallet = {
-                "foo": "bar"
+                signFn: (data) => {
+                    return "fake";
+                },
             };
-            kbt.v1.account.authenticate(
-                sdk, publicKey, wallet
-            );
+            kbt.v1.account.authenticate(sdk, wallet);
         });
 });
 
