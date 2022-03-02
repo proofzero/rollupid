@@ -36,10 +36,21 @@
 ;; Internal
 ;; -----------------------------------------------------------------------------
 
+(defn- digest-map
+  "Takes some digest bytes and a map describing the digest, and returns a
+  standard digest map."
+  [digest-bytes desc-map]
+  (let [hex-string (lib.hexify/hex-string digest-bytes)]
+    (merge desc-map
+           {:com.kubelt/type :kubelt.type/digest
+            :digest/bytes digest-bytes
+            :digest/hex-string hex-string})))
+
 (defn- compute-digest
   "Invoke the passed-in hash digest implementation to compute the hash of
-  some data."
-  [digest data]
+  some data. The description map describes the algorithm being passed in."
+  [digest description data]
+  {:pre [(map? description)]}
   #?(:clj
      ;; Wrap the invocation of a BouncyCastle digest.
      (let [offset 0
@@ -50,20 +61,20 @@
        (let [;; Final hash bytes written into this byte array.
              result (byte-array (.getDigestSize digest))
              digest-bytes (.doFinal digest result 0)]
-         (lib.hexify/hex-string result)))
+         (digest-map digest-bytes description)))
      :browser
      (let [data-bytes (js/Uint8Array.from data)]
        (.update digest data-bytes)
        (let [;; Returns a Uint8Array.
-             result (.digest digest)]
-         (lib.hexify/hex-string result)))
+             digest-bytes (.digest digest)]
+         (digest-map digest-bytes description)))
      :node
      ;; Wrap the invocation of a StableLib digest.
      (let [data-bytes (js/Buffer.from data)]
        (.update digest data-bytes)
        (let [;; Returns a Uint8Array.
-             result (.digest digest)]
-         (lib.hexify/hex-string result)))))
+             digest-bytes (.digest digest)]
+         (digest-map digest-bytes description)))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -71,29 +82,32 @@
 #_(defn blake3
   "Compute the Blake3 digest of some data."
   [data]
-  #?(:clj
-     (let [digest (Blake3Digest.)]
-       (compute-digest digest data))
-     :cljs
-     ;; TODO waiting for StableLib implementation of Blake3.
-     :not-yet-implemented))
+  (let [description {:digest/algorithm :digest.algorithm/blake3}]
+    #?(:clj
+       (let [digest (Blake3Digest.)]
+         (compute-digest digest description data))
+       :cljs
+       ;; TODO waiting for StableLib implementation of Blake3.
+       :not-yet-implemented)))
 
 (defn sha2-256
   "Compute the SHA2-256 digest of some data."
   [data]
-  #?(:clj
-     (let [digest (SHA256Digest.)]
-       (compute-digest digest data))
-     :cljs
-     (let [digest (sha256/SHA256.)]
-       (compute-digest digest data))))
+  (let [description {:digest/algorithm :digest.algorithm/sha2-256}]
+    #?(:clj
+       (let [digest (SHA256Digest.)]
+         (compute-digest digest description data))
+       :cljs
+       (let [digest (sha256/SHA256.)]
+         (compute-digest digest description data)))))
 
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."
   [data]
-  #?(:clj
-     (let [digest (SHA3Digest.)]
-       (compute-digest digest data))
-     :cljs
-     (let [digest (sha3/SHA3256.)]
-       (compute-digest digest data))))
+  (let [description {:digest/algorithm :digest.algorithm/sha3-256}]
+    #?(:clj
+       (let [digest (SHA3Digest.)]
+         (compute-digest digest description data))
+       :cljs
+       (let [digest (sha3/SHA3256.)]
+         (compute-digest digest description data)))))

@@ -6,26 +6,41 @@
        :cljs
        [[cljs.test :as t :refer [deftest is testing use-fixtures]]]))
   (:require
-   [clojure.string :as str])
-  (:require
    [com.kubelt.lib.crypto.digest :as lib.digest]))
 
+;; To generate expected hashes use openssl:
+;; (SHA2-256) $ echo -n foobar | openssl dgst -sha256
+;; (SHA3-256) $ echo -n foobar | openssl dgst -sha3-256
+
 (deftest sha2-256-test
-  (testing "sha256 digest"
-    (let [input [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15]
-          ;; TODO Verify this hash with external tool 
-          expected #?(:clj "be45cb2605bf36bebde684841a28f0fd43c69850a3dce5fedba69928ee3a8991"
-                      :cljs "be45cb2605bf36bebde684841a28f0fd43c69850a3dce5fedba69928ee3a8991")
+  (testing "sha2-256 digest of string"
+    (let [input "foobar"
+          hex-string "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+          ;; TODO use hexify/as-bytes?
+          digest-bytes #?(:clj (byte-array 10)
+                          :cljs (js/Uint8Array.from "fixme"))
           output (lib.digest/sha2-256 input)]
-      (is (= expected output)
-          "hash of string has expected output"))))
+      ;; TODO validate with malli schema.
+      (is (map? output)
+          "digest is a map")
+      (is (= :kubelt.type/digest (get output :com.kubelt/type))
+          "digest has expected type keyword")
+      (is (= :digest.algorithm/sha2-256 (get output :digest/algorithm))
+          "digest has expected algorithm keyword")
+      (is (= hex-string (get output :digest/hex-string))))))
 
 (deftest sha3-256-test
-  (testing "sha3 digest"
-    (let [input [0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15]
-          ;; TODO verify this hash with external tool 
-          expected #?(:clj "39462d2a2320f8da572a97b0b39473d4312e0228b23e2c2fe0ae9b6c67f2343c"
-                      :cljs "39462d2a2320f8da572a97b0b39473d4312e0228b23e2c2fe0ae9b6c67f2343c")
+  (testing "sha3-256 digest of string"
+    (let [input "foobar"
+          hex-string "9c5bbf00bb6103c7f3d91fe598489725341010b8d0785274029d4645c34ebe9c"
+          ;; TODO use hexify/as-bytes?
+          digest-bytes #?(:clj (byte-array 10)
+                          :cljs (js/Uint8Array.from "fixme"))
           output (lib.digest/sha3-256 input)]
-      (is (= expected output)
-          "hash of string has expected output"))))
+      ;; TODO validate digest with malli schema
+      (is (map? output)
+          "digest is a map")
+      (is (= :kubelt.type/digest (get output :com.kubelt/type))
+          "digest has expected type keyword")
+      (is (= :digest.algorithm/sha3-256 (get output :digest/algorithm))
+          "digest has expected algorithm keyword"))))
