@@ -45,6 +45,7 @@
     "@stablelib/hex": "1.0.1",
     "@stablelib/sha256": "1.0.1",
     "@stablelib/sha3": "1.0.1",
+    "@stablelib/uuid": "1.0.1",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
     "hyperbee": "1.7.0",

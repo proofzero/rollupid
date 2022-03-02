@@ -14,8 +14,7 @@
   #?(:clj
      (Hex/toHexString byte-data)
      :browser
-
-     (let [buffer (js/Uint8Array.from byte-data) 
+     (let [buffer (js/Uint8Array.from byte-data)
            lower-case? true]
        (.encode hex buffer lower-case?))
      :node
@@ -26,4 +25,3 @@
 #_(if (string? byte-data)
     (js/Uint8Array.from (.split byte-data ""))
     (js/Uint8Array.from byte-data))
-

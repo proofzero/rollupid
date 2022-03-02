@@ -1,13 +1,13 @@
 (ns com.kubelt.lib.crypto.seed
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.lib.crypto.digest :as lib.digest]))
+   [com.kubelt.lib.crypto.digest :as lib.digest]
+   [com.kubelt.lib.uuid :as lib.uuid]))
 
 
 (defn- seed->map
   [passphrase]
   (let [digest (lib.digest/sha3-256 passphrase)
-        byte-length 32
         data-bytes (get digest :digest/bytes)
         hex-string (get digest :digest/hex-string)]
     (merge
@@ -18,8 +18,18 @@
       :seed/bytes data-bytes
       :seed/hex-string hex-string})))
 
+(defn- random-passphrase
+  []
+  (lib.uuid/random))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
+
+(defn random
+  "Return a random seed."
+  []
+  (let [passphrase (random-passphrase)]
+    (seed->map passphrase)))
 
 (defn from-passphrase
   "Return a seed derived from a passphrase. If a signing function is

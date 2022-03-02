@@ -4,7 +4,6 @@
   #?(:clj
      (:import
       [java.security MessageDigest]
-      [org.bouncycastle.util.encoders Hex]
       [org.bouncycastle.crypto.digests
        Blake3Digest
        KeccakDigest
@@ -59,8 +58,8 @@
        ;; Compute the digest of all the passed in bytes.
        (.update digest data-bytes offset data-length)
        (let [;; Final hash bytes written into this byte array.
-             result (byte-array (.getDigestSize digest))
-             digest-bytes (.doFinal digest result 0)]
+             digest-bytes (byte-array (.getDigestSize digest))
+             byte-count (.doFinal digest result 0)]
          (digest-map digest-bytes description)))
      :browser
      (let [data-bytes (js/Uint8Array.from data)]
@@ -97,23 +96,17 @@
   [data]
   (let [description {:digest/algorithm :digest.algorithm/sha2-256
                      :digest/byte-length 32
-                     :digest/bit-length 256}]
-    #?(:clj
-       (let [digest (SHA256Digest.)]
-         (compute-digest digest description data))
-       :cljs
-       (let [digest (sha256/SHA256.)]
-         (compute-digest digest description data)))))
+                     :digest/bit-length 256}
+        digest #?(:clj (SHA256Digest.)
+                  :cljs (sha256/SHA256.))]
+    (compute-digest digest description data)))
 
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."
   [data]
   (let [description {:digest/algorithm :digest.algorithm/sha3-256
                      :digest/byte-length 32
-                     :digest/bit-length 256}]
-    #?(:clj
-       (let [digest (SHA3Digest.)]
-         (compute-digest digest description data))
-       :cljs
-       (let [digest (sha3/SHA3256.)]
-         (compute-digest digest description data)))))
+                     :digest/bit-length 256}
+        digest #?(:clj (SHA3Digest.)
+                  :cljs (sha3/SHA3256.))]
+    (compute-digest digest description data)))
