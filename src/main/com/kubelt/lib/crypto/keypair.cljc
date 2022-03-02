@@ -13,9 +13,9 @@
      :cljs
      (:require
       ["@stablelib/ed25519" :as ed25519]
-      [goog.array]
-      [goog.crypt.hash32 :as hash32]
-      [goog.crypt.pbkdf2 :as pbkdf2])))
+      [goog.array]))
+  (:require
+   [com.kubelt.lib.crypto.seed :as lib.seed]))
 
  ;; // Test case defined in https://www.rfc-editor.org/rfc/rfc8037
  ;;        var msg = "eyJhbGciOiJFZERTQSJ9.RXhhbXBsZSBvZiBFZDI1NTE5IHNpZ25pbmc".getBytes(StandardCharsets.UTF_8);
@@ -64,7 +64,7 @@
 #?(:clj
    (defn make-keypair
      ([]
-      (let [random-seed (seed/random)]
+      (let [random-seed (lib.seed/random)]
         (make-keypair random-seed)))
      ([seed]
       (let [secret-bytes (get seed :seed/bytes)
