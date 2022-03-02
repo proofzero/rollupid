@@ -2,6 +2,7 @@
   "Invoke the SDK (init) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
@@ -14,7 +15,7 @@
 
    :handler (fn [args]
               (let [kbt (sdk/init)]
-                (if (sdk/error? kbt)
+                (if (lib.error/error? kbt)
                   (prn (:error kbt))
                   (let []
                     (println "TODO perform request")

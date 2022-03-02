@@ -1,4 +1,4 @@
-(ns lib.car.build-test
+(ns car.build-test
   "Test the creation of a car-map from a BAG."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
@@ -87,14 +87,19 @@
 ;; Test the function that maps from the keywords used in BAGs to
 ;; represent the hash algorithm that should be used for hashing, into
 ;; the implementation object that will be used to do the work.
-(deftest kw->hasher-test
+;;
+;; TODO replace with hash fn from com.kubelt.lib.crypt.digest. Currently
+;; in com.kubelt.lib.car.build these use the npm packages:
+;; - "multiformats/hashes/sha2"
+#_(deftest kw->hasher-test
   (letfn [;; Use the given hasher to hash the input and return a hex
           ;; string. Use to check that a test vector has expected hash
           ;; output.
           (hash-encode [hasher input]
             (-> hasher
                 (.encode input)
-                js/Buffer.from
+                #?(:node js/Buffer.from
+                   :browser js/Uint8Array.from)
                 (.toString "hex")))
 
           (test-hasher [hasher code name sum]

@@ -14,8 +14,8 @@
    [com.kubelt.ipfs.v0.pin.remote.service :as v0.pin.remote.service]
    [com.kubelt.ipfs.v0.stats :as v0.stats]
    [com.kubelt.ipfs.v0.swarm :as v0.swarm]
-   [com.kubelt.ipfs.v0.swarm.addrs :as v0.swarm.addrs]
-   [com.kubelt.ipfs.v0.swarm.filters :as v0.swarm.filters]
+   [com.kubelt.ipfs.v0.swarm.address :as v0.swarm.address]
+   [com.kubelt.ipfs.v0.swarm.filter :as v0.swarm.filter]
    [com.kubelt.ipfs.v0.swarm.peering :as v0.swarm.peering]))
 
 
@@ -60,13 +60,13 @@
            :provide v0.stats/provide-desc
            :repo v0.stats/repo-desc}
    :swarm {:addrs [v0.swarm/addrs-desc
-                   {:listen v0.swarm.addrs/listen-desc
-                    :local v0.swarm.addrs/local-desc}]
+                   {:listen v0.swarm.address/listen-desc
+                    :local v0.swarm.address/local-desc}]
            :connect v0.swarm/connect-desc
            :disconnect v0.swarm/disconnect-desc
            :filters [v0.swarm/filters-desc
-                     {:add v0.swarm.filters/add-desc
-                      :rm v0.swarm.filters/rm-desc}]
+                     {:add v0.swarm.filter/add-desc
+                      :rm v0.swarm.filter/rm-desc}]
            :peering {:add v0.swarm.peering/add-desc
                      :ls v0.swarm.peering/ls-desc
                      :rm v0.swarm.peering/rm-desc}

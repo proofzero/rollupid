@@ -1,4 +1,4 @@
-(ns com.kubelt.lib.car.block
+(ns com.kubelt.car.block
   "Block utilities for producing Content Archives"
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

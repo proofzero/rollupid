@@ -51,13 +51,18 @@
              result (byte-array (.getDigestSize digest))
              digest-bytes (.doFinal digest result 0)]
          (lib.hexify/hex-string result)))
-     :cljs
+     :browser
+     (let [data-bytes (js/Uint8Array.from data)]
+       (.update digest data-bytes)
+       (let [;; Returns a Uint8Array.
+             result (.digest digest)]
+         (lib.hexify/hex-string result)))
+     :node
      ;; Wrap the invocation of a StableLib digest.
      (let [data-bytes (js/Buffer.from data)]
        (.update digest data-bytes)
        (let [;; Returns a Uint8Array.
              result (.digest digest)]
-         ;; FIXME Ensure works for browser also.
          (lib.hexify/hex-string result)))))
 
 ;; Public

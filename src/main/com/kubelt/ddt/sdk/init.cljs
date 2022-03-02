@@ -5,6 +5,7 @@
    ["fs" :as fs]
    ["path" :as path])
   (:require
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
@@ -17,7 +18,7 @@
 
    :handler (fn [args]
               (let [kbt (sdk/init)]
-                (if (sdk/error? kbt)
+                (if (lib.error/error? kbt)
                   (prn (:error kbt))
                   (let []
                     (println "initializing the SDK")

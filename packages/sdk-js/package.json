@@ -35,9 +35,12 @@
     "@ipld/dag-json": "8.0.7",
     "@multiformats/blake2": "1.0.8",
     "@multiformats/sha3": "2.0.7",
+    "@noble/secp256k1": "1.5.5",
     "@stablelib/ed25519": "1.0.2",
+    "@stablelib/hex": "1.0.1",
+    "@stablelib/sha256": "1.0.1",
+    "@stablelib/sha3": "1.0.1",
     "blake3": "2.1.7",
-    "electron": "17.0.0",
     "event-stream": "4.0.1",
     "ipns": "0.16.0",
     "jose": "4.5.1",
@@ -50,7 +53,6 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
-    "supports-color": "9.2.1",
     "yargs": "17.3.1"
   },
   "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
