@@ -2,4 +2,5 @@
 
 (def default-db
   {:name "kubelt"
-   :current-route nil })
+   :current-route nil
+   :user nil})

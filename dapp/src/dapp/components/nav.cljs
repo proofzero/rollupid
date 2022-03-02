@@ -4,8 +4,9 @@
    [reitit.core :as rt]
    [dapp.utils :as utils]
    [dapp.routes :as routes]
-   ["@heroicons/react/outline" :refer (MenuIcon, XIcon)]
-   [headlessui-reagent.core :as ui]))
+   [headlessui-reagent.core :as ui])
+  (:require
+    ["@heroicons/react/outline" :refer (MenuIcon, XIcon)]))
 
 (defn nav-items [router current-route]
    (for [route-name (rt/route-names router)
@@ -32,7 +33,7 @@
         text]))
 
 
-(defn render [{:keys [router current-route]}]
+(defn render [router current-route]
   (r/with-let [!open? (r/atom false)
                open #(reset! !open? true)
                close #(reset! !open? false)]

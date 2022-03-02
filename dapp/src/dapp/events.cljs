@@ -31,3 +31,9 @@
     (let [old-match   (:current-route db)
           controllers (rfc/apply-controllers (:controllers old-match) new-match)]
       (assoc db :current-route (assoc new-match :controllers controllers)))))
+
+
+;(re-frame/reg-event-db ::connect-user
+  ;(fn [db user]
+    ;(assoc db :current-user user)))
+    

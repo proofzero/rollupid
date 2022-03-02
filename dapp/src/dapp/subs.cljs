@@ -8,3 +8,8 @@
   (fn [db]
     (:current-route db)))
 
+(re-frame/reg-sub ::current-user
+  (fn [db]
+    (:current-user db)))
+
+
