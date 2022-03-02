@@ -2,17 +2,16 @@
   (:require
    [re-frame.core :as re-frame]
    [dapp.subs :as subs]
+   [dapp.components.nav :as nav]
    ))
 
-(defn header
-  []
-  [:div.px-6
-   [:h1.text-2xl.mt-6 "Reagent + Tailwind starter"]])
 
-(defn main-panel []
-  (let [name (re-frame/subscribe [::subs/name])]
+(defn main-panel [{:keys [router]}]
+  (let [current-route @(re-frame/subscribe [::subs/current-route])]
     [:div
-     (header)
-     [:h1
-      "Hello there from " @name]
-     ]))
+      (nav/render {:router router :current-route current-route})
+      [:main.flex-1.md:ml-64
+       (when current-route
+        [(-> current-route :data :view)])]]))
+
+
