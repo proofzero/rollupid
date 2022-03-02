@@ -1,6 +1,4 @@
-(ns dapp.utils
-  (:require
-   ))
+(ns dapp.utils)
 
 (defn classnames 
   [& classes]

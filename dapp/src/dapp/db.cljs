@@ -1,6 +1,5 @@
 (ns dapp.db)
 
 (def default-db
-  {
-   :name "kubelt"
+  {:name "kubelt"
    :current-route nil })

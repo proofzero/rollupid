@@ -1,6 +1,4 @@
-(ns dapp.components.dashboard
-  (:require
-   [dapp.utils :as utils]))
+(ns dapp.components.dashboard)
 
 (defn render
   [props]

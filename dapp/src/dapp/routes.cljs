@@ -6,7 +6,8 @@
    [reitit.frontend.easy :as rfe]
    [dapp.events :as events]
    [dapp.components.dashboard :as dashboard]
-   [dapp.components.settings :as settings]
+   [dapp.components.settings :as settings])
+   (:require
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
    ))
 
