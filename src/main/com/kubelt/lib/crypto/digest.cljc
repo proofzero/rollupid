@@ -59,7 +59,7 @@
        (.update digest data-bytes offset data-length)
        (let [;; Final hash bytes written into this byte array.
              digest-bytes (byte-array (.getDigestSize digest))
-             byte-count (.doFinal digest result 0)]
+             byte-count (.doFinal digest digest-bytes 0)]
          (digest-map digest-bytes description)))
      :browser
      (let [data-bytes (js/Uint8Array.from data)]
