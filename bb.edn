@@ -135,13 +135,33 @@
   {:doc "Build release version of sdk for web"
    :task (shell "npx shadow-cljs release web")}
 
+  ;; TODO: use varaibles for paths
+  build:dapp:css
+  {:doc ""
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js")}
+
   build:dapp:develop
   {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:build")}
+   :task (shell "npx shadow-cljs dapp browser-test karma-test")}
+  
+  build:dapp:css-watch
+  {:doc ""
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js --watch")}
+
+  build:dapp:develop-watch
+  {:doc ""
+   :task (shell "npx shadow-cljs watch dapp browser-test karma-test")}
+
+  -build:dapp:watch
+  {:doc ""
+   :depends [build:dapp:css-watch build:dapp:develop-watch]}
+  
+  build:dapp:watch
+  {:task (run '-build:dapp:watch {:parallel true})}
 
   build:dapp:release
   {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:release")}
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release app")}
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"

@@ -1,6 +1,7 @@
 module.exports = {
   content: [
     "./src/**/**/*.cljs",
+    "./dapp/src/**/**/*.cljs",
   ],
   theme: {
     extend: {},
