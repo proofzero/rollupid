@@ -82,7 +82,9 @@
 #_(defn blake3
   "Compute the Blake3 digest of some data."
   [data]
-  (let [description {:digest/algorithm :digest.algorithm/blake3}]
+  (let [description {:digest/algorithm :digest.algorithm/blake3
+                     :digest/byte-length 32
+                     :digest/bit-length 256}]
     #?(:clj
        (let [digest (Blake3Digest.)]
          (compute-digest digest description data))
@@ -93,7 +95,9 @@
 (defn sha2-256
   "Compute the SHA2-256 digest of some data."
   [data]
-  (let [description {:digest/algorithm :digest.algorithm/sha2-256}]
+  (let [description {:digest/algorithm :digest.algorithm/sha2-256
+                     :digest/byte-length 32
+                     :digest/bit-length 256}]
     #?(:clj
        (let [digest (SHA256Digest.)]
          (compute-digest digest description data))
@@ -104,7 +108,9 @@
 (defn sha3-256
   "Compute the SHA3-256 (Keccak) digest of some data."
   [data]
-  (let [description {:digest/algorithm :digest.algorithm/sha3-256}]
+  (let [description {:digest/algorithm :digest.algorithm/sha3-256
+                     :digest/byte-length 32
+                     :digest/bit-length 256}]
     #?(:clj
        (let [digest (SHA3Digest.)]
          (compute-digest digest description data))

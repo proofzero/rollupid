@@ -10,11 +10,13 @@
         byte-length 32
         data-bytes (get digest :digest/bytes)
         hex-string (get digest :digest/hex-string)]
-    {:com.kubelt/type :kubelt.type/seed
-     :seed/algorithm :seed.algorithm/sha3-256
-     :seed/byte-length byte-length
-     :seed/bytes data-bytes
-     :seed/hex-string hex-string}))
+    (merge
+     (select-keys digest [:digest/algorithm
+                          :digest/byte-length
+                          :digest/bit-length])
+     {:com.kubelt/type :kubelt.type/seed
+      :seed/bytes data-bytes
+      :seed/hex-string hex-string})))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
