@@ -18,13 +18,13 @@
   "Register an account, performing any initial setup that is required. The
   account is a map that contains the public key from the keypair that
   represents the user's account."
-  [sys account]
+  [sys wallet]
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
-        key (get account :account/public-key)
-        path (str/join "/" ["" "register" key])
+        public-key (get wallet :wallet/public-key)
+        path (str/join "/" ["" "register" public-key])
         request {:kubelt/type :kubelt.type/http-request
                  :http/method :get
                  :http/scheme scheme
@@ -42,7 +42,7 @@
 (defn store!
   "Store a key/value pair for the given user account. Returns a core.async
   channel."
-  [sys account key value]
+  [sys wallet key value]
   ;; TODO register public key with initial (register!)
   ;; call?
   (let [client (get sys :client/http)
@@ -53,7 +53,7 @@
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
         path (str/join "/" ["" "kbt" key])
-        public-key (get account :account/public-key)
+        public-key (get wallet :account/public-key)
         body {:kbt/name key
               :kbt/value value
               :key/public public-key}
@@ -82,12 +82,13 @@
 (defn query!
   "Retrieve the value for a given key for a given user account. Returns a
   core.async channel."
-  [sys account key]
+  [sys wallet key]
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/read :address/host])
         port (get-in sys [:client/p2p :p2p/read :address/port])
-        path (str/join "/" ["" "kbt" key])
+        public-key (get wallet :wallet/public-key)
+        path (str/join "/" ["" "kbt" public-key])
         ;; TODO JWT sign request?
         request {:kubelt/type :kubelt.type/http-request
                  ;; TODO make this a default

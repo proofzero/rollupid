@@ -8,7 +8,7 @@
   (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.p2p :as p2p]
+   [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
@@ -29,13 +29,14 @@
                   (let [;; TODO supply account details from somewhere;
                         ;; should we have a local wallet for development /
                         ;; testing?
-                        account {:kubelt/type :kubelt.type/account
-                                 :account/public-key "xyzabc123"}
-                        result-chan (p2p/query! kbt account key)]
+                        wallet {:com.kubelt/type :kubelt.type/wallet
+                                :wallet/public-key "xyzabc123"
+                                :wallet/sign-fn (fn [x] :fixme)}
+                        result-chan (lib.p2p/query! kbt wallet key)]
                     (async/go
                       (let [result (<! result-chan)]
                         ;; TODO use utility fn to detect error result
-                        (if (= :kubelt.type/error (:com.kubelt/type result))
+                        (if (lib.error/error? result)
                           (prn (:error result))
                           (println result))))))
                 (sdk/halt! kbt)))})

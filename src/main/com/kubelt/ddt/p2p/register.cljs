@@ -3,7 +3,8 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
-   [com.kubelt.lib.p2p :as p2p]
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
@@ -21,8 +22,11 @@
                     maddr (str "/ip4/" host "/tcp/" port)
                     kbt (sdk/init {:p2p/read maddr :p2p/write maddr})
                     ;; TODO local wallet management for dev / testing
-                    account {:kubelt/type :kubelt.type/account
-                             :account/public-key "xyzabc123"}]
-                ;; TODO handle errors
-                (p2p/register! kbt account)
+                    wallet {:com.kubelt/type :kubelt.type/wallet
+                            :wallet/public-key "xyzabc123"
+                            :wallet/sign-fn (fn [x] :fixme)}
+                    result (lib.p2p/register! kbt wallet)]
+                (if (lib.error/error? result)
+                  (prn (:error result))
+                  (println result))
                 (sdk/halt! kbt)))})

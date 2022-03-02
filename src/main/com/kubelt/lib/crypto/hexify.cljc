@@ -4,26 +4,23 @@
   #?(:clj
      (:import
       [org.bouncycastle.util.encoders Hex]))
-  #?(:browser
+  #?(:cljs
      (:require
-      ["@stablelib/hex" :as hex])))
+      ["@stablelib/hex" :as hex]))
+  (:require
+   [com.kubelt.lib.octet :as lib.octet]))
 
-;; TODO browser
+
 (defn hex-string
   [byte-data]
-  #?(:clj
-     (Hex/toHexString byte-data)
-     :browser
-
-     (let [buffer (js/Uint8Array.from byte-data) 
-           lower-case? true]
-       (.encode hex buffer lower-case?))
-     :node
-     (let [buffer (js/Buffer.from byte-data)]
-       (.toString buffer "hex"))))
+  (let [byte-data (lib.octet/as-bytes byte-data)]
+    #?(:clj
+       (Hex/toHexString byte-data)
+       :cljs
+       (let [lower-case? true]
+         (.encode hex byte-data lower-case?)))))
 
 ;; TODO conditionally handle strings if necessary
 #_(if (string? byte-data)
     (js/Uint8Array.from (.split byte-data ""))
     (js/Uint8Array.from byte-data))
-
