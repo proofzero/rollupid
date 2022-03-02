@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  min-height: 100%;
+}
+
 #app {
-  /*background-color: red;*/
+  min-height: 100%;
 }

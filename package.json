@@ -34,14 +34,15 @@
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.0",
     "lerna": "4.0.0",
     "shadow-cljs": "2.17.5",
-		"tailwindcss": "^3.0.23",
+    "tailwindcss": "^3.0.23",
     "tap": "15.1.6"
   },
   "dependencies": {
-		"@headlessui/react": "1.5.0",
-		"@heroicons/react": "1.0.5",
+    "@headlessui/react": "1.5.0",
+    "@heroicons/react": "1.0.5",
     "@ipld/car": "3.2.3",
     "@ipld/dag-cbor": "7.0.0",
     "@ipld/dag-json": "8.0.7",
@@ -67,8 +68,8 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
-		"react": "17.0.2",
-		"react-dom": "17.0.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "sd-notify": "2.8.0",
     "yargs": "17.3.1"
   }

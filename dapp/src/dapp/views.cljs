@@ -10,9 +10,8 @@
 (defn main-panel [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::subs/current-route])
         current-user @(re-frame/subscribe [::subs/current-user])]
-    [:div
      (if current-user
       (layout/render {:router router :current-route current-route})
-      (login/render nil))]))
+      (login/render nil))))
 
 
