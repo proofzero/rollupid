@@ -41,9 +41,9 @@
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
    :client/p2p {:p2p/read {:http/scheme :https
-                           :http/address "/ip4/127.0.0.1/tcp/9061"}
+                           :http/address "/ip4/127.0.0.1/tcp/8787"}
                 :p2p/write {:http/scheme :https
-                            :http/address "/ip4/127.0.0.1/tcp/9061"}}})
+                            :http/address "/ip4/127.0.0.1/tcp/8787"}}})
 
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------

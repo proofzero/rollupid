@@ -5,31 +5,41 @@
    [cljs.core.async.interop :refer [<p!]]
    [cljs.core.async.macros :refer [go]])
   (:require
-   [cljs.core.async :refer [<!]]
+   [cljs.core.async :as async :refer [<!]]
    [clojure.string :as str])
   (:require
    [cognitect.transit :as transit])
   (:require
-   [com.kubelt.lib.multiaddr :as ma]
+   [com.kubelt.lib.base64 :as lib.base64]
+   [com.kubelt.lib.crypto.digest :as lib.crypto.digest]
+   [com.kubelt.lib.crypto.hexify :as lib.hexify]
+   [com.kubelt.proto.http :as http]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
-   [com.kubelt.proto.http :as http]))
+   [com.kubelt.lib.multiaddr :as ma]
+   [com.kubelt.lib.util :as lib.util]))
 
 (defn register!
   "Register an account, performing any initial setup that is required. The
   account is a map that contains the public key from the keypair that
   represents the user's account."
   [sys wallet]
+  ;; TODO get nonce
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
         public-key (get wallet :wallet/public-key)
-        path (str/join "/" ["" "register" public-key])
-        request {:kubelt/type :kubelt.type/http-request
-                 :http/method :get
-                 :http/scheme scheme
-                 :http/host host
-                 :http/port port}]
+        ;;path (str/join "/" ["" "register" public-key])
+        path "/auth"
+        request {:com.kubelt/type :kubelt.type/http-request
+                 :http/method :post
+                 :http/body (str "{\"pk\": \"" public-key "\"}")
+                 ;; TODO read scheme from sys
+                 :uri/scheme :http
+                 :uri/domain host
+                 :uri/path path
+                 :uri/port port}]
     ;; TODO extract the user's public key from the account map
     ;; (for use as an account identifier)
 
@@ -37,7 +47,79 @@
     ;; (expect a nonce in return, which should be signed and returned to
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
-    (http/request! client request)))
+    (let [message-to-sign (http/request! client request)
+          signed-message (:wallet/sign-fn message-to-sign)]
+      (prn signed-message))))
+
+
+
+(defn prepare-nonce-
+  "internal prep function for nonce"
+  [nonce-b64 client-nonce]
+  (let [decoded-bytes (lib.base64/decode-bytes nonce-b64)
+        digest-input (lib.util/append-array decoded-bytes client-nonce)]
+    (let [digest-output (lib.crypto.digest/sha2-256 digest-input)]
+      digest-output)))
+
+
+
+(defn authenticate!
+  "log into remote peer with keypair"
+  [sys wallet]
+  (let [writer (transit/writer :json)
+        client (get sys :client/http)
+        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
+        host (get-in sys [:client/p2p :p2p/write :address/host])
+        port (get-in sys [:client/p2p :p2p/write :address/port])
+        public-key (get wallet :wallet/public-key)
+        ;;path (str/join "/" ["" "register" public-key])
+        path "/auth"
+        request-body {:pk public-key :hereiam 1}
+        payload (lib.json/edn->json-str request-body)
+        request {:com.kubelt/type :kubelt.type/http-request
+                 :http/method :post
+                 :http/body payload
+                 ;; TODO read scheme from sys
+                 :uri/scheme :http
+                 :uri/domain host
+                 :uri/path path
+                 :uri/port port}]
+    ;; TODO extract the user's public key from the account map
+    ;; (for use as an account identifier)
+
+    ;; TODO make an HTTP request to p2p system, passing along the pub key
+    ;; (expect a nonce in return, which should be signed and returned to
+    ;; prove ownership of provided key and complete registration? to what
+    ;; extent is this flow already defined by OAuth, JWT, etc.?)
+    (let [token-chan (http/request! client request)]
+      (async/go
+        (async/take! token-chan (fn [x]
+                                  (let [client-nonce (lib.hexify/str->bytes "abcdabcd")
+                                        digest-output (prepare-nonce- (str x) client-nonce)]
+
+                                    (let [verify-path "/auth/verify"
+                                          cnonce (lib.base64/encode-unsafe client-nonce)
+                                          cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))
+                                          headers {"Content-Type" "application/json"}
+                                          verify-body {:pk public-key
+                                                       :nonce cnonce
+                                                       :digest cdigest}
+                                          verify-payload (lib.json/edn->json-str verify-body)
+                                          verify-request {:com.kubelt/type :kubelt.type/http-request
+                                                          :http/method :post
+                                                          :http/headers headers
+                                                          :http/body verify-payload
+                                                          :uri/scheme :http
+                                                          :uri/domain host
+                                                          :uri/path verify-path
+                                                          :uri/port port}
+                                          verify-result (http/request! client verify-request)]
+                                      (async/go
+                                        (async/take! verify-result (fn [y]
+                                                                     (prn {:verify-result y :request verify-request})
+                                                                     y)))))))))))
+
+
 
 (defn store!
   "Store a key/value pair for the given user account. Returns a core.async

@@ -39,6 +39,24 @@
        (= (.. x -constructor -name) "Uint8Array")
        (base64/encodeByteArray x base64/BASE_64_URL_SAFE))))
 
+(defn encode-unsafe
+  "Encode some data using base64 encoding (with a URL-unsafe
+  alphabet). Returns a string."
+  [x]
+  #?(:clj
+     (let [b64-encoder (Base64/getUrlEncoder)
+           data (if-not (bytes? x) (.getBytes x) x)]
+       (.encodeToString b64-encoder data))
+     :cljs
+     (cond
+       ;; string
+       (string? x)
+       (base64/encodeString x )
+       ;; uint8array
+       (= (.. x -constructor -name) "Uint8Array")
+       (base64/encodeByteArray x ))))
+
+
 (defn decode-string
   [s]
   #?(:clj
