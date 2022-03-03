@@ -5,12 +5,6 @@
   url = "/docs/prologue/"
 
 [[docs]]
-  name = "Help"
-  weight = 60
-  identifier = "help"
-  url = "/docs/help/"
-
-[[docs]]
   name = "Tutorials"
   weight = 70
   identifier = "tutorials"
@@ -27,6 +21,13 @@
   weight = 70
   identifier = "references"
   url = "/docs/references/"
+
+[[docs]]
+  name = "Help"
+  weight = 60
+  identifier = "help"
+  url = "/docs/help/"
+
 
 
 # [[docs]]
