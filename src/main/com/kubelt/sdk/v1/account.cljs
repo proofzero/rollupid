@@ -92,7 +92,7 @@
     ;; TODO add authenticate! call to lib.p2p?
     ;; TODO store public key in wallet as :wallet/public-key
     ;; TODO change register! to pull out public key from :wallet/public-key
-    (p2p/register! sys wallet)
+    (lib.p2p/register! sys wallet)
 
     ;; - p2p: lookup(pub-key) => cid / nil
     ;;   - if cid, user's me-dag already exists; hurray
