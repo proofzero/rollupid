@@ -5,11 +5,12 @@
    [cljs.core.async.interop :refer [<p!]]
    [cljs.core.async.macros :refer [go]])
   (:require
-   [cljs.core.async :refer [<!]]
+   [cljs.core.async :as async :refer [<!]]
    [clojure.string :as str])
   (:require
    [cognitect.transit :as transit])
   (:require
+   [com.kubelt.lib.base64 :as base64]
    [com.kubelt.lib.multiaddr :as ma]
    [com.kubelt.lib.jwt :as jwt]
    [com.kubelt.proto.http :as http]))
@@ -43,6 +44,39 @@
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
     (http/request! client request)))
+
+(defn authenticate!
+  "log into remote peer with keypair"
+  [sys wallet]
+  (let [client (get sys :client/http)
+        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
+        host (get-in sys [:client/p2p :p2p/write :address/host])
+        port (get-in sys [:client/p2p :p2p/write :address/port])
+        public-key (get wallet :wallet/public-key)
+        ;;path (str/join "/" ["" "register" public-key])
+        path "/auth"
+        request {:com.kubelt/type :kubelt.type/http-request
+                 :http/method :post
+                 :http/body "{\"pk\": \"hereiam\"}"
+                 ;; TODO read scheme from sys
+                 :uri/scheme :http
+                 :uri/domain host
+                 :uri/path path
+                 :uri/port port}]
+    ;; TODO extract the user's public key from the account map
+    ;; (for use as an account identifier)
+
+    ;; TODO make an HTTP request to p2p system, passing along the pub key
+    ;; (expect a nonce in return, which should be signed and returned to
+    ;; prove ownership of provided key and complete registration? to what
+    ;; extent is this flow already defined by OAuth, JWT, etc.?)
+    (let [token-chan (http/request! client request)]
+           (async/go 
+             (async/take! token-chan (fn [x] 
+              (let [input-bytes (str x)
+                    decoded-bytes (base64/decode-bytes input-bytes)]
+                (prn {:token decoded-bytes}))))))))
+ 
 
 (defn store!
   "Store a key/value pair for the given user account. Returns a core.async

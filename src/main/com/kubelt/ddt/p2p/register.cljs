@@ -28,7 +28,7 @@
                     wallet {:com.kubelt/type :kubelt.type/wallet
                             :wallet/public-key "xyzabc123"
                             :wallet/sign-fn (fn [x] :fixme)}
-                    result (lib.p2p/register! kbt wallet)]
+                    result (lib.p2p/authenticate! kbt wallet)]
                 (if (lib.error/error? result)
                   (prn (:error result)))
            (async/go 
