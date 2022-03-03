@@ -12,6 +12,7 @@
   (:require
    [com.kubelt.lib.base64 :as base64]
    [com.kubelt.lib.multiaddr :as ma]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
    [com.kubelt.proto.http :as http]))
 
@@ -48,21 +49,25 @@
 (defn authenticate!
   "log into remote peer with keypair"
   [sys wallet]
-  (let [client (get sys :client/http)
+  (let [writer (transit/writer :json)                  
+        client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
         public-key (get wallet :wallet/public-key)
         ;;path (str/join "/" ["" "register" public-key])
         path "/auth"
+        request-body {:pk "hereiam" :hereiam 1}
+        payload (lib.json/edn->json-str request-body) 
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
-                 :http/body "{\"pk\": \"hereiam\"}"
+                 :http/body payload
                  ;; TODO read scheme from sys
                  :uri/scheme :http
                  :uri/domain host
                  :uri/path path
                  :uri/port port}]
+    (prn {:hereiam 6 :request request})
     ;; TODO extract the user's public key from the account map
     ;; (for use as an account identifier)
 
@@ -73,10 +78,27 @@
     (let [token-chan (http/request! client request)]
            (async/go 
              (async/take! token-chan (fn [x] 
+                (prn {:hereiam 7 :raw-token x})
               (let [input-bytes (str x)
                     decoded-bytes (base64/decode-bytes input-bytes)]
-                (prn {:token decoded-bytes}))))))))
- 
+                (prn {:hereiam 8 :token decoded-bytes})
+                
+                (let [verify-path "/auth/verify"
+                      verify-body {:pk "hereiam" :nonce input-bytes :digest "fixme"}
+                      verify-payload (lib.json/edn->json-str verify-body)
+                      verify-request {:com.kubelt/type :kubelt.type/http-request
+                                      :http/method :post
+                                      :http/body verify-payload
+                                      :uri/scheme :http
+                                      :uri/domain host
+                                      :uri/path verify-path
+                                      :uri/port port}
+                      verify-result (http/request! client verify-request)]
+                  (async/go
+                    (async/take! verify-result (fn[y]
+                                                 (prn {:hereiam 9 :verify-result y :request verify-request}))))))))))))
+
+                
 
 (defn store!
   "Store a key/value pair for the given user account. Returns a core.async
