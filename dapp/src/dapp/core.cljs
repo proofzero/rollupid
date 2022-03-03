@@ -6,6 +6,7 @@
    [dapp.events :as events]
    [dapp.views :as views]
    [dapp.config :as config]
+   [dapp.wallet :as wallet]
    ))
 
 
@@ -23,6 +24,7 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
+  (wallet/provider-setup)
   (routes/init-routes!)
   (mount-root))
 
