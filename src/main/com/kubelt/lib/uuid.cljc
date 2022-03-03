@@ -6,7 +6,7 @@
       [java.util UUID])
      :cljs
      (:require
-      ["@stablelib/uuid" :as uuid])))
+      ["@stablelib/uuid" :as stable-uuid])))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -14,4 +14,4 @@
 (defn random
   []
   #?(:clj (str (UUID/randomUUID))
-     :cljs (.uuid uuid)))
+     :cljs (.uuid stable-uuid)))
