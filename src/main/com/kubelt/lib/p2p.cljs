@@ -19,14 +19,16 @@
   account is a map that contains the public key from the keypair that
   represents the user's account."
   [sys wallet]
+  ;; TODO get nonce
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
         port (get-in sys [:client/p2p :p2p/write :address/port])
         public-key (get wallet :wallet/public-key)
-        path (str/join "/" ["" "register" public-key])
+        ;;path (str/join "/" ["" "register" public-key])
+        path (str/join "/" ["auth" "get-nonce"])
         request {:kubelt/type :kubelt.type/http-request
-                 :http/method :get
+                 :http/method :post
                  :http/scheme scheme
                  :http/host host
                  :http/port port}]

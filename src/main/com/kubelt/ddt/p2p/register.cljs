@@ -28,5 +28,5 @@
                     result (lib.p2p/register! kbt wallet)]
                 (if (lib.error/error? result)
                   (prn (:error result))
-                  (println result))
+                  (println {:hereiam result}))
                 (sdk/halt! kbt)))})
