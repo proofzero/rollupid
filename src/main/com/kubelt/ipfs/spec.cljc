@@ -257,3 +257,27 @@
    {:description "A multiformat content identifier."
     :example "bagiacgzah24drzou2jlkixpblbgbg6nxfrasoklzttzoht5hixhxz3rlncyq"}
    :string])
+
+(def dht
+  [:and
+   {:description "An IPFS DHT table name."
+    :example "lan"}
+   [:enum "wanserver" "lanserver" "wan" "lan"]])
+
+(def api-endpoint
+  [:and
+   {:description "A remote pinning service endpoint."
+    :example "https://api.pinata.cloud/psa"}
+   :string])
+
+(def codec-code
+  [:and
+   {:description "A CID multibase code identifier"
+    :example 70}
+   :int])
+
+(def codec-name
+  [:and
+   {:description "A CID multibase code name"
+    :example "base58btc"}
+   :string])

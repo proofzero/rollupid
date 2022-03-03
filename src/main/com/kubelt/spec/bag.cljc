@@ -2,8 +2,6 @@
   "Defines a spec for the kubelt BAG (Bundle of Acyclic Graphs) type."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [malli.core :as m])
-  (:require
    [com.kubelt.lib.ipld :as ipld]))
 
 ;; Data

@@ -4,7 +4,7 @@
 
 
 (defprotocol Wallet
-  ""
+  "A crypto wallet."
   ;; ethereum.request({ method: "eth_requestAccounts" });
   ;; -> returns a promise
   ;; -> resolves with an array of of hex-prefixed Ethereum addresses
@@ -26,14 +26,14 @@
   )
 
 (defprotocol Network
-  ""
+  "A crypto network."
   ;; NB: available as ethereum.networkVersion().
   (version [this]
     "Returns the current network version."))
 
 (defprotocol Account
-  ""
-  (name [this]
+  "A wallet account."
+  (label [this]
     "Return the human-readable name of the account.")
 
   ;; NB: available as ethereum.selectedAddress().

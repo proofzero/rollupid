@@ -78,7 +78,7 @@
     "RemoteServices"
     [:vector
      [:map
-      ["ApiEndpoint" :string]
+      ["ApiEndpoint" ipfs.spec/api-endpoint]
       ["Service" :string]
       ["Stat" {:optional true}
        [:map

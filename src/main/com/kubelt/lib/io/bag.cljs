@@ -19,14 +19,12 @@
 
 (defrecord DagAPI [sys]
   BagReader
-  (read [this cid]
-    (println "reading BAG from IPFS DAG API")
-    )
+  (read-bag [this cid]
+    (println "reading BAG from IPFS DAG API"))
 
   BagWriter
-  (write [this bag]
-    (println "writing BAG to IPFS DAG API")
-    ))
+  (write-bag [this bag]
+    (println "writing BAG to IPFS DAG API")))
 
 ;; IPFS (message port)
 ;; -----------------------------------------------------------------------------

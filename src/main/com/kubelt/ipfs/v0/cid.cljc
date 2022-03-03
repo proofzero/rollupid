@@ -69,8 +69,8 @@
    :response/spec
    [:vector
     [:map
-     ["Code" :string]
-     ["Name" :string]]]})
+     ["Code" ipfs.spec/codec-code]
+     ["Name" ipfs.spec/codec-name]]]})
 
 (def bases
   (ipfs.util/make-http ipfs.v0/api-base bases-desc))

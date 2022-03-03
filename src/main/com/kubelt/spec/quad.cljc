@@ -1,8 +1,6 @@
 (ns com.kubelt.spec.quad
   "Defines a spec for RDF/cljs to enable validation."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
-   [malli.core :as m]))
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 ;; We use the default vector-based format for ease of authoring, but if
 ;; performance issues arise it may be more efficient to switch to

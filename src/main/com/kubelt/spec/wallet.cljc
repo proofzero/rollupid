@@ -1,9 +1,7 @@
 (ns com.kubelt.spec.wallet
   "Defines a spec for a wallet data structure representing the available
   cross-platform key management and crypto facilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
-   [malli.core :as m]))
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 ;; Operations
 ;; -----------------------------------------------------------------------------

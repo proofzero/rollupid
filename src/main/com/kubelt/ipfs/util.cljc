@@ -3,8 +3,6 @@
   that accept resource parameters and return resource descriptors."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [clojure.string :as str])
-  (:require
    [malli.core :as malli]
    [malli.error]
    [malli.util])
@@ -125,10 +123,10 @@
   another."
   [base method]
   {:pre [(every? map? [base method])]}
-  (if-not (malli/validate ipfs.spec/api-base base)
+  (when-not (malli/validate ipfs.spec/api-base base)
     (let [error (-> ipfs.spec/api-base (malli/explain base) malli.error/humanize)]
       (throw (ex-info "invalid api base configuration" error))))
-  (if-not (malli/validate ipfs.spec/api-resource method)
+  (when-not (malli/validate ipfs.spec/api-resource method)
     ;; Return a human-readable explanation of the schema failure.
     (let [error (-> ipfs.spec/api-resource (malli/explain method) malli.error/humanize)]
       (throw (ex-info "invalid resource configuration" error))))

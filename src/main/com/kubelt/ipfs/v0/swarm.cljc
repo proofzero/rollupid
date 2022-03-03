@@ -173,7 +173,7 @@
                ["Direction" :string]
                ["Latency" :string]
                ["Muxer" :string]
-               ["Peer" :string]
+               ["Peer" ipfs.spec/peer-id]
                ["Streams" [:vector
                            [:map
                             ["Protocol" :string]]]]]]]]})
