@@ -47,19 +47,6 @@
   #js {:init sdk.v1/init-js
        :halt sdk.v1/halt-js!
 
-       ;; sanity
-       ;;
-       ;; Temporarily expose a Sanity-specific interface. The plan is
-       ;; that eventually these capabilities will be integrated into the
-       ;; SDK core.
-       ;; :sanity #js {;; Takes a JSON document, returns a CID of the
-       ;;              ;; published document.
-       ;;              :publish sdk.v1.sanity/publish-js!
-       ;;              :generate #js {;; Generate a keypair.
-       ;;                             :keypair sdk
-       ;;                             ;; Generate seed from a phrase.
-       ;;                             :seed sdk.}}
-
        ;; account
        :account #js {:register sdk.v1.account/register-js!
                      :authenticate sdk.v1.account/authenticate-js!
