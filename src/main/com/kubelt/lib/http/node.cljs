@@ -60,13 +60,11 @@
         body []]
     (.on res "data"
          (fn [data]
-          (prn {:hereiam2 "writing data" :data data})
            (async/go
            (async/>! body-chan data))
            ;; FIXME
     (.on res "end"
          (fn []
-          (prn {:hereiam3 "sending data" })
            (async/go 
              (async/take! body-chan (fn [x] 
               (async/go

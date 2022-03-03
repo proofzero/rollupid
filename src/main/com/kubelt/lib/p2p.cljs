@@ -42,7 +42,6 @@
     ;; (expect a nonce in return, which should be signed and returned to
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
-    (prn {:request request})
     (http/request! client request)))
 
 (defn store!
@@ -83,8 +82,6 @@
     ;; standard)
     ;;
     ;; Returns a core.async channel.
-    (prn {:client client :request request})
-
     (http/request! client request)))
 
 (defn query!
