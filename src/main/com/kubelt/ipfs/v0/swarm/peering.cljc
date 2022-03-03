@@ -29,7 +29,7 @@
    :response/types ["application/json"]
    :response/spec
    [:map
-    ["ID" :string]
+    ["ID" ipfs.spec/peer-id]
     ["Status" :string]]})
 
 (def add
@@ -62,8 +62,8 @@
    [:map
     ["Peers" [:vector
               [:map
-               ["Addrs" [:vector :string]]
-               ["ID" :string]]]]]})
+               ["ID" ipfs.spec/peer-id]
+               ["Addrs" [:vector :string]]]]]]})
 
 (def ls
   (ipfs.util/make-http ipfs.v0/api-base ls-desc))
@@ -91,7 +91,7 @@
    :response/types ["application/json"]
    :response/spec
    [:map
-    ["ID" :string]
+    ["ID" ipfs.spec/peer-id]
     ["Status" :string]]})
 
 (def rm

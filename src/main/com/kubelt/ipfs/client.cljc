@@ -10,7 +10,6 @@
    [com.kubelt.ipfs.api :as ipfs.api]
    [com.kubelt.ipfs.v0.node :as v0.node]
    [com.kubelt.ipfs.spec :as ipfs.spec]
-   [com.kubelt.ipfs.util :as ipfs.util]
    [com.kubelt.proto.http :as proto.http])
   #?(:cljs
      (:require
@@ -167,19 +166,26 @@
    ;; Return the available API versions.
    [:v0])
   ([version]
+   {:pre [(keyword? version)]}
    (condp = version
      :v0 (ipfs.api/paths ipfs.api/v0)
      {}))
   ([version path]
+   {:pre [(keyword? version)
+          (vector? path) (every? keyword? path)]}
    #_(let [m (api version)]
      (get-in m path)))
   ([version path options]
+   {:pre [(keyword? version)
+          (vector? path) (every? keyword? path)
+          (map? options)]}
    ))
 
 (defn doc
   "Given a vector representing an available API call, return a map that
   describes it."
   [v]
+  {:pre [(vector? v)]}
   ;; TODO
   )
 
@@ -234,7 +240,7 @@
          {:com.kubelt/type :kubelt.type/error
           :error explain})
        ;; Options are valid, return the client.
-       (let [{:keys [http/client] :as client-map}
+       (let [{:keys [http/client]}
              (if (contains? options :http/client)
                (let [http-client (get options :http/client)]
                  {:http/client http-client})
@@ -365,9 +371,16 @@
                       (assoc :uri/scheme request-scheme)
                       (assoc :uri/domain request-domain)
                       (assoc :uri/port request-port)
-                      ;; Ask for the response body to be keywordized (or
-                      ;; not).
-                      (assoc :response/keywordize? keywordize?))]
+                      ;; Should response body be keywordized?
+                      (assoc :response/keywordize? keywordize?)
+                      ;; Should response body be validated?
+                      (assoc :response/validate? validate?))
+          ;; TODO invoke callbacks if provided
+          ;; TODO supply promise/channel if requested
+          http-client (get client :http/client)
+          ;; By default perform synchronous request.
+          response (proto.http/request-sync http-client request)]
+
       ;; TODO promise, channel
       ;; TODO callback fns:
       ;; - :on/response (fn [x] )
@@ -379,14 +392,9 @@
       ;; TODO transform response body, cf. :client/keywordize?
       ;;@(proto.http/request-sync http-client request on-response)
 
-      ;; TODO invoke callbacks if provided
-      ;; TODO supply promise/channel if requested
-      (let [http-client (get client :http/client)
-            ;; By default perform synchronous request.
-            response (proto.http/request-sync http-client request)]
-        (if-let [body-fn (get request-map :response/body-fn)]
+      (if-let [body-fn (get request-map :response/body-fn)]
           (body-fn request-map response)
-          response)))))
+          response))))
 
 #?(:cljs
    (defn request-js

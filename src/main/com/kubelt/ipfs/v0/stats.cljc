@@ -143,7 +143,7 @@
     {:name "arg"
      :description "The DHT whose table should be listed (wanserver, lanserver, wan, lan). 'wan' and 'lan' refer to client routing tables. When using the experimental DHT client only WAN is supported. Default: 'wan', 'lan'."
      :required false
-     :spec [:enum "wanserver" "lanserver" "wan" "lan"]}}
+     :spec ipfs.spec/dht}}
    :response/types ["application/json"]
    :response/spec
    [:map

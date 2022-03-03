@@ -2,7 +2,6 @@
   "Methods for investigating a libp2p swarm."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [com.kubelt.ipfs.spec :as ipfs.spec]
    [com.kubelt.ipfs.util :as ipfs.util]
    [com.kubelt.ipfs.v0 :as ipfs.v0]))
 

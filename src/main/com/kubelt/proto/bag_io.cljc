@@ -5,8 +5,8 @@
 
 (defprotocol BagReader
   "Read BAGs (Bundle of Acyclic Graph)."
-  (read [this cid] "Read a BAG"))
+  (read-bag [this cid] "Read a BAG"))
 
 (defprotocol BagWriter
   "Write a BAG."
-  (write [this bag] "Write a BAG"))
+  (write-bag [this bag] "Write a BAG"))

@@ -1,8 +1,6 @@
 (ns com.kubelt.spec.http
   "Schema for HTTP requests and responses."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
-  (:require
-   [malli.core :as m]))
+  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
 ;; TODO test me
 
