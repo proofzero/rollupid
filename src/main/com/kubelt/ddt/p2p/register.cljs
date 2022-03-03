@@ -2,6 +2,8 @@
   "Invoke the p2p (register) method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
+   [cljs.core.async :as async])
+  (:require
    [com.kubelt.ddt.p2p.options :as cli.p2p]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.p2p :as lib.p2p]
@@ -28,5 +30,11 @@
                     result (lib.p2p/register! kbt wallet)]
                 (if (lib.error/error? result)
                   (prn (:error result))
-                  (println {:hereiam result}))
+                  (prn {:request-result result}))
+
+                (async/go 
+                  (async/take! result (fn [x] (
+                                             (prn {:hereiam 10
+                                                   :result x})))
+                               (async/close! result)))
                 (sdk/halt! kbt)))})

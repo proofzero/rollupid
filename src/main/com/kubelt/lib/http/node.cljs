@@ -55,18 +55,23 @@
         headers (.-headers res)
         response {:http/status status-code
                   :http/headers headers}
+        body-chan (async/chan)
         ;; TODO collect data
         body []]
     (.on res "data"
          (fn [data]
+          (prn {:hereiam2 "writing data" :data data})
+           (async/go
+           (async/>! body-chan data))
            ;; FIXME
-           (conj body data)))
     (.on res "end"
          (fn []
-           (let [response (assoc response :http/body body)]
-             (async/go
-               (async/>! c response)
-               (async/close! c)))))))
+          (prn {:hereiam3 "sending data" })
+           (async/go 
+             (async/take! body-chan (fn [x] 
+              (async/go
+               (async/>! c x)
+               (async/close! c)))))))))))
 
 (defn on-error
   [error]

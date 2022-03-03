@@ -26,12 +26,15 @@
         port (get-in sys [:client/p2p :p2p/write :address/port])
         public-key (get wallet :wallet/public-key)
         ;;path (str/join "/" ["" "register" public-key])
-        path (str/join "/" ["auth" "get-nonce"])
-        request {:kubelt/type :kubelt.type/http-request
+        path "/auth"
+        request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
-                 :http/scheme scheme
-                 :http/host host
-                 :http/port port}]
+                 :http/body "{\"pk\": \"hereiam\"}"
+                 ;; TODO read scheme from sys
+                 :uri/scheme :http
+                 :uri/domain host
+                 :uri/path path
+                 :uri/port port}]
     ;; TODO extract the user's public key from the account map
     ;; (for use as an account identifier)
 
@@ -39,6 +42,7 @@
     ;; (expect a nonce in return, which should be signed and returned to
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
+    (prn {:request request})
     (http/request! client request)))
 
 (defn store!
@@ -79,6 +83,8 @@
     ;; standard)
     ;;
     ;; Returns a core.async channel.
+    (prn {:client client :request request})
+
     (http/request! client request)))
 
 (defn query!
