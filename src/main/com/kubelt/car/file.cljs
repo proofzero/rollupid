@@ -68,7 +68,7 @@
 
 (defrecord CarFile [^String file-name]
   bag-io/BagWriter
-  (write [this bag]
+  (write-bag [this bag]
     {:pre [(bag.check/bag? bag)]}
     (-> (car.build/car bag)
         (promise/then

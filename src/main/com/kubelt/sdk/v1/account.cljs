@@ -3,6 +3,7 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.lib.promise :refer [promise]]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
@@ -71,7 +72,12 @@
   ;; TODO validate system map
   ;; TODO validate public-key
   ;; TODO validate wallet map
-  (let [{:keys [wallet/sign-fn]} wallet
+  (let [;; The signing function generates a signature using user's
+        ;; external wallet private key.
+        sign-fn (get wallet :wallet/sign-fn)
+        ;; The public key associated with external wallet keypair.
+        public-key (get wallet :wallet/public-key)
+
         message-to-sign "Foo"
         signed-message (sign-fn message-to-sign)]
     ;; Wallet is a collection of crypto fns that hide the private key
@@ -82,6 +88,11 @@
     ;; - sdk -> p2p: send nonce for public key <key>
     ;; - p2p -> sdk: <encrypted nonce>
     ;; - sdk -> p2p: <decrypted, signed nonce>
+
+    ;; TODO add authenticate! call to lib.p2p?
+    ;; TODO store public key in wallet as :wallet/public-key
+    ;; TODO change register! to pull out public key from :wallet/public-key
+    (p2p/register! sys wallet)
 
     ;; - p2p: lookup(pub-key) => cid / nil
     ;;   - if cid, user's me-dag already exists; hurray

@@ -27,14 +27,15 @@
                   (prn (:error kbt))
                   (let [;; TODO implement local wallet management for
                         ;; development / testing.
-                        account {:kubelt/type :kubelt.type/account
-                                 :account/public-key "xyzabc123"}
-                        res-chan (p2p/store! kbt account key value)]
+                        wallet {:com.kubelt/type :kubelt.type/wallet
+                                :wallet/public-key "xyzabc123"
+                                :wallet/sign-fn (fn [x] :fixme)}
+                        res-chan (p2p/store! kbt wallet key value)]
                     (go
                       (let [result (<! res-chan)]
                         ;; TODO handle errors using common error utilities
                         ;; TODO use utility fn to detect error result
-                        (if (= :kubelt.type/error (:com.kubelt/type result))
+                        (if (lib.error/error? result)
                           (prn (:error result))
                           (println result)))
                       (sdk/halt! kbt))))))})

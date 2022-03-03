@@ -29,13 +29,14 @@
                   (let [;; TODO supply account details from somewhere;
                         ;; should we have a local wallet for development /
                         ;; testing?
-                        account {:kubelt/type :kubelt.type/account
-                                 :account/public-key "xyzabc123"}
-                        result-chan (p2p/query! kbt account key)]
+                        wallet {:com.kubelt/type :kubelt.type/wallet
+                                :wallet/public-key "xyzabc123"
+                                :wallet/sign-fn (fn [x] :fixme)}
+                        result-chan (p2p/query! kbt wallet key)]
                     (async/go
                       (let [result (<! result-chan)]
                         ;; TODO use utility fn to detect error result
-                        (if (= :kubelt.type/error (:com.kubelt/type result))
+                        (if (lib.error/error? result)
                           (prn (:error result))
                           (println result))))))
                 (sdk/halt! kbt)))})
