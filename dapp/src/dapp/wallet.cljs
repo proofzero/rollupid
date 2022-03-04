@@ -1,33 +1,44 @@
 (ns dapp.wallet
   (:require
    [promesa.core :as p]
-   [re-frame.core :as re-frame]
-   [dapp.events :as events])
+   [re-frame.core :as re-frame])
   (:require
+    ;["@metamask/detect-provider" :as detectEthereumProvider]
     ["web3" :as Web3]))
 
 (defn accounts-changed
   [event]
   (prn "accounts-changed")
   (js/console.log event)
-  (re-frame/dispatch :events/accounts-changed))
+  (re-frame/dispatch ::accounts-changed))
 
 (defn chain-changed
   [event]
   (prn "chain-changed")
   (js/console.log event)
-  (re-frame/dispatch :events/chain-changed))
+  (re-frame/dispatch ::chain-changed))
 
 
 (defn provider-setup []
   (prn "provider")
-  (js/console.log Web3/givenProvider))
-  ;; TODO: FIX THIS LISTENER
-  ;((.on Web3/givenProvider) "accountsChanged" accounts-changed)
-  ;((.on Web3/givenProvider) "chainChanged" chain-changed))
+  (if Web3/givenProvider
+    (re-frame/dispatch [::provider-detected Web3/givenProvider])
+    (throw (js/Error "No wallet provider detected"))))
+
+
+
+;; TODO: subscribe to accounts changed after connected
+;(p/let [provider (detectEthereumProvider)]
+    ;((.on provider) "accountsChanged" accounts-changed)
+    ;((.on provider) "chainChanged" chain-changed)))
 
 
 ;; Events
+
+(re-frame/reg-event-db ::provider-detected
+  (fn [db [_ provider]]
+    (prn "provider-detected")
+    (update db :provider assoc :provider provider :web3 (Web3. provider))))
 
 (re-frame/reg-event-fx ::connect-metamask
   (fn [coeffects event]
@@ -56,3 +67,17 @@
     (prn coeffects)
     (prn event)
     ))
+
+
+(re-frame/reg-event-fx ::accounts-changed
+  (fn [coeffects event]))
+
+(re-frame/reg-event-fx ::chain-changed
+  (fn [coeffects event]))
+
+;;; Subs ;;;
+
+(re-frame/reg-sub ::current-account
+  (fn [db]
+    (:current-account db)))
+
