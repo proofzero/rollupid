@@ -13,6 +13,18 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
+(defn append-array
+  "return a new array concatenating a and b"
+  [a b]
+  (let [alen (alength a)
+        blen (alength b)
+        ;; TODO add jvm naming conditional 
+        tmp (js/ArrayBuffer. (+ alen blen))
+        tmp8 (js/Uint8Array. tmp)]
+    (.set tmp8 a, 0)
+    (.set tmp8 b, alen)
+    tmp8))
+
 (defn obj->clj
   "Turn a JavaScript object into a Clojure map."
   [obj]
