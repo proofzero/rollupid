@@ -10,7 +10,8 @@
   (:require
    [cognitect.transit :as transit])
   (:require
-   [com.kubelt.lib.base64 :as base64]
+   [com.kubelt.lib.base64 :as lib.base64]
+   [com.kubelt.lib.crypto.digest :as lib.crypto.digest]
    [com.kubelt.lib.multiaddr :as ma]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
@@ -46,6 +47,41 @@
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
     (http/request! client request)))
 
+
+(defn str->bytes
+  "Convert a string into a byte array. In Clojure this is a [B, while in
+  ClojureScript it returns a Uint8Array."
+  [s]
+     (let [text-encoder (js/TextEncoder.)]
+             (.encode text-encoder s)))
+
+(defn append-array
+  [a b]
+  (prn {:a a :b b})
+  (let [alen (alength a)
+        blen (alength b)
+        tmp (js/ArrayBuffer. (+ alen blen))
+        tmp8 (js/Uint8Array. tmp)]
+
+    (.set tmp8 a, 0)
+    (.set tmp8 b, alen)
+
+    tmp8))
+
+(defn prepare-nonce-
+  "internal prep function for nonce"
+  [nonce-b64 client-nonce]
+(prn {:hereiam 1025 :n64 nonce-b64 :cn client-nonce})
+  (let [decoded-bytes (lib.base64/decode-bytes nonce-b64)
+        digest-input (append-array decoded-bytes client-nonce)]
+        (prn {:hereiam 1026 :dbytes decoded-bytes :cn client-nonce :di digest-input})
+    (let [
+        digest-output (lib.crypto.digest/sha2-256 digest-input)]
+    (prn :hereiam 1024 :digest-in digest-input :digest-out digest-output)
+    digest-output)))
+
+
+
 (defn authenticate!
   "log into remote peer with keypair"
   [sys wallet]
@@ -78,13 +114,13 @@
     (let [token-chan (http/request! client request)]
            (async/go 
              (async/take! token-chan (fn [x] 
-                (prn {:hereiam 7 :raw-token x})
-              (let [input-bytes (str x)
-                    decoded-bytes (base64/decode-bytes input-bytes)]
-                (prn {:hereiam 8 :token decoded-bytes})
+              (let [client-nonce (str->bytes "abcdabcd")
+                    digest-output (prepare-nonce- (str x) client-nonce)]
                 
                 (let [verify-path "/auth/verify"
-                      verify-body {:pk "hereiam" :nonce input-bytes :digest "fixme"}
+                      verify-body {:pk "hereiam" 
+                                   :cnonce (lib.base64/encode-unsafe client-nonce)
+                                   :cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))}
                       verify-payload (lib.json/edn->json-str verify-body)
                       verify-request {:com.kubelt/type :kubelt.type/http-request
                                       :http/method :post
