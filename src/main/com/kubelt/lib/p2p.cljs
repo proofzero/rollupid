@@ -34,6 +34,7 @@
         path "/auth"
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
+                 ;; FIXME use wallet public key below
                  :http/body "{\"pk\": \"hereiam5\"}"
                  ;; TODO read scheme from sys
                  :uri/scheme :http
@@ -73,6 +74,7 @@
         public-key (get wallet :wallet/public-key)
         ;;path (str/join "/" ["" "register" public-key])
         path "/auth"
+        ;; FIXME use wallet public key below
         request-body {:pk "hereiam6" :hereiam 1}
         payload (lib.json/edn->json-str request-body) 
         request {:com.kubelt/type :kubelt.type/http-request
@@ -100,6 +102,7 @@
                       cnonce (lib.base64/encode-unsafe client-nonce)
                       cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))
                       headers {"Content-Type" "application/json"}
+                      ;; FIXME use wallet public key below
                       verify-body {:pk "hereiam7" 
                                    :nonce cnonce
                                    :digest cdigest }
