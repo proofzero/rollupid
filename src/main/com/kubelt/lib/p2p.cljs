@@ -32,7 +32,7 @@
         path "/auth"
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
-                 :http/body "{\"pk\": \"hereiam\"}"
+                 :http/body "{\"pk\": \"hereiam5\"}"
                  ;; TODO read scheme from sys
                  :uri/scheme :http
                  :uri/domain host
@@ -93,8 +93,9 @@
         public-key (get wallet :wallet/public-key)
         ;;path (str/join "/" ["" "register" public-key])
         path "/auth"
-        request-body {:pk "hereiam" :hereiam 1}
+        request-body {:pk "hereiam6" :hereiam 1}
         payload (lib.json/edn->json-str request-body) 
+        _ (prn {:hereiam 332 :payload payload :req-body request-body})
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body payload
@@ -103,7 +104,7 @@
                  :uri/domain host
                  :uri/path path
                  :uri/port port}]
-    (prn {:hereiam 6 :request request})
+    (prn {:hereiam 61 :request request})
     ;; TODO extract the user's public key from the account map
     ;; (for use as an account identifier)
 
@@ -114,16 +115,25 @@
     (let [token-chan (http/request! client request)]
            (async/go 
              (async/take! token-chan (fn [x] 
+                                       (prn {:hereiam 333 :x x})
               (let [client-nonce (str->bytes "abcdabcd")
+                    _ (prn {:hereiam 443 :cnonce client-nonce })
                     digest-output (prepare-nonce- (str x) client-nonce)]
                 
                 (let [verify-path "/auth/verify"
-                      verify-body {:pk "hereiam" 
-                                   :cnonce (lib.base64/encode-unsafe client-nonce)
-                                   :cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))}
+                      _ (prn {:hereiam 444 :cnonce client-nonce :cdigest digest-output})
+                      cnonce (lib.base64/encode-unsafe client-nonce)
+                      cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))
+                      _ (prn {:hereiam 445 :cnonce2 cnonce :cdigest2 cdigest})
+                      headers {"Content-Type" "application/json"}
+                      verify-body {:pk "hereiam7" 
+                                   :nonce cnonce
+                                   :digest cdigest }
                       verify-payload (lib.json/edn->json-str verify-body)
+                      _ (prn {:hereiam 447 :pay verify-payload})
                       verify-request {:com.kubelt/type :kubelt.type/http-request
                                       :http/method :post
+                                      :http/headers headers
                                       :http/body verify-payload
                                       :uri/scheme :http
                                       :uri/domain host
