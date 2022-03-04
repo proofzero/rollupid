@@ -82,7 +82,6 @@
     {:data {:coercion rss/coercion}}))
 
 (defn init-routes! []
-  (js/console.log "initializing routes")
   (rfe/start!
     router
     on-navigate

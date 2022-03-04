@@ -24,7 +24,6 @@
   {:name "kubelt"
    :user nil})
 
-
 ;;; Events ;;;
 
 (re-frame/reg-event-db ::initialize-db

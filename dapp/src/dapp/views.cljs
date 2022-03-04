@@ -18,6 +18,6 @@
        (and provider (not current-account))
           (login/render nil)
        :else
-          "Loading...")))
+          (login/render nil))))
 
 

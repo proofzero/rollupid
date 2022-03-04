@@ -1,3 +1,4 @@
+; Wallet
 (ns dapp.wallet
   (:require
    [promesa.core :as p]
@@ -6,63 +7,82 @@
     ;["@metamask/detect-provider" :as detectEthereumProvider]
     ["web3" :as Web3]))
 
+; The wallet ns manages events and effects related to wallet based auth
+; and interacts with the SDK to fulfill a full ZK-Auth
+; NOTE:
+; - Should we port this entire thing the SDK to as part of the web targets?
+; - The node and other headless targets should be have a facility to bootstrap itself via API TOKEN / JWT
+
 (defn accounts-changed
+  "Helper function that dispatches an account changed event"
   [event]
   (prn "accounts-changed")
   (js/console.log event)
   (re-frame/dispatch ::accounts-changed))
 
 (defn chain-changed
+  "Helper function that dispatches a chain changed event"
   [event]
   (prn "chain-changed")
   (js/console.log event)
   (re-frame/dispatch ::chain-changed))
 
 
-(defn provider-setup []
+(defn provider-setup
+  "Setup the wallet db or throw an error if no provider is available"
+  []
   (prn "provider")
   (if Web3/givenProvider
     (re-frame/dispatch [::provider-detected Web3/givenProvider])
     (throw (js/Error "No wallet provider detected")))) ;; TODO: decide on an effect for no metamask
-
-
 
 ;; TODO: subscribe to accounts changed after connected
 ;(p/let [provider (detectEthereumProvider)]
     ;((.on provider) "accountsChanged" accounts-changed)
     ;((.on provider) "chainChanged" chain-changed)))
 
-
 ;; Events
 
+; Bootstrap the db when a provider is detected
 (re-frame/reg-event-db ::provider-detected
   (fn [db [_ provider]]
     (prn "provider-detected")
     (let [web3 (Web3. provider)
-          current-account (.-defaultAccount (.-eth web3))]
+          ; TODO: replace with check for JWT session
+          current-account (.-defaultAccount (.-eth web3))] 
       (prn "current-account")
       (prn current-account)
       (assoc db :provider provider :web3 web3 :current-account current-account))))
 
+;Handle a connection to different wallets and kick off the zk-auth
 (re-frame/reg-event-db ::connect-account
-  (fn [{:keys [^js/Web3 web3]} [_ wallet]]
+  (fn [db [_ wallet]]
     (prn wallet)
-    (let [eth (.-eth web3)]
+    (let [web3 ^js/Web3 (:web3 db)
+          eth (.-eth web3)]
     (-> (.requestAccounts eth) 
-        (.then #(js/console.log %)))
-    {})))
+        (.then (fn [accounts] 
+                 ; TODO: 
+                 ; - check for which account is selected
+                 ; - call the SDK "login"
+                 (prn "accounts")
+                 (js/console.log (first accounts))
+                 (assoc db :current-account (first accounts))))))))
 
+; TODO
+; Handle the account changed event
 (re-frame/reg-event-fx ::accounts-changed
-  (fn [coeffects event]))
+  (fn [coeffects event]
+    ))
 
+; TODO
+; Handle the chain changed event
 (re-frame/reg-event-fx ::chain-changed
-  (fn [coeffects event]))
+  (fn [coeffects event]
+    ))
 
 ;;; Effects ;;;
 
-;(re-frame/reg-fx ::metamask
-  ;(fn []
-    ;(prn "
 
 ;;; Subs ;;;
 
