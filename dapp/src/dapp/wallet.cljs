@@ -44,12 +44,13 @@
       (prn current-account)
       (assoc db :provider provider :web3 web3 :current-account current-account))))
 
-(re-frame/reg-event-fx ::connect-account
-  (fn [cofx [_ wallet]]
+(re-frame/reg-event-db ::connect-account
+  (fn [{:keys [^js/Web3 web3]} [_ wallet]]
     (prn wallet)
-      ;(-> (.requestAccounts eth) 
-          ;(.then #(js/console.log %)))
-      {}))
+    (let [eth (.-eth web3)]
+    (-> (.requestAccounts eth) 
+        (.then #(js/console.log %)))
+    {})))
 
 (re-frame/reg-event-fx ::accounts-changed
   (fn [coeffects event]))
