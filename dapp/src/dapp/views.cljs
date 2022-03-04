@@ -10,9 +10,14 @@
 
 (defn main-panel [{:keys [router]}]
   (let [current-route @(re-frame/subscribe [::routes/current-route])
-        current-account @(re-frame/subscribe [::wallet/current-account])]
-     (if current-account
-      (layout/render {:router router :current-route current-route})
-      (login/render nil))))
+        current-account @(re-frame/subscribe [::wallet/current-account])
+        provider @(re-frame/subscribe [::wallet/provider])]
+     (cond 
+       current-account
+          (layout/render {:router router :current-route current-route})
+       (and provider (not current-account))
+          (login/render nil)
+       :else
+          "Loading...")))
 
 

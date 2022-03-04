@@ -22,7 +22,6 @@
 
 (def kubelt-db
   {:name "kubelt"
-   :current-route nil
    :user nil})
 
 
@@ -43,6 +42,6 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [::initialize-db])
   (dev-setup)
-  (routes/init-routes!)
   (wallet/provider-setup)
+  (routes/init-routes!)
   (mount-root))

@@ -23,7 +23,7 @@
   (prn "provider")
   (if Web3/givenProvider
     (re-frame/dispatch [::provider-detected Web3/givenProvider])
-    (throw (js/Error "No wallet provider detected"))))
+    (throw (js/Error "No wallet provider detected")))) ;; TODO: decide on an effect for no metamask
 
 
 
@@ -38,36 +38,18 @@
 (re-frame/reg-event-db ::provider-detected
   (fn [db [_ provider]]
     (prn "provider-detected")
-    (update db :provider assoc :provider provider :web3 (Web3. provider))))
+    (let [web3 (Web3. provider)
+          current-account (.-defaultAccount (.-eth web3))]
+      (prn "current-account")
+      (prn current-account)
+      (assoc db :provider provider :web3 web3 :current-account current-account))))
 
-(re-frame/reg-event-fx ::connect-metamask
-  (fn [coeffects event]
-    (prn "metamask")
-    (prn coeffects)
-    (prn event)
-    
-
-
-
-    (let [web3 (Web3. Web3/givenProvider)
-          eth (.-eth web3)]
-      (prn "provider")
-      ;(js/console.log (.getAccounts eth))
-      ;; web.eth.getAccounts(console.log)
-      ;(js/console.log (.getAccounts eth))
-      ;; web3.eth.getAccount().then(...)
-      (-> (.requestAccounts eth) 
-          (.then #(js/console.log %)))
-      {}
-    )))
-
-(re-frame/reg-event-fx ::connect-coinbase
-  (fn [coeffects event]
-    (prn "coinnbase")
-    (prn coeffects)
-    (prn event)
-    ))
-
+(re-frame/reg-event-fx ::connect-account
+  (fn [cofx [_ wallet]]
+    (prn wallet)
+      ;(-> (.requestAccounts eth) 
+          ;(.then #(js/console.log %)))
+      {}))
 
 (re-frame/reg-event-fx ::accounts-changed
   (fn [coeffects event]))
@@ -75,9 +57,18 @@
 (re-frame/reg-event-fx ::chain-changed
   (fn [coeffects event]))
 
+;;; Effects ;;;
+
+;(re-frame/reg-fx ::metamask
+  ;(fn []
+    ;(prn "
+
 ;;; Subs ;;;
+
+(re-frame/reg-sub ::provider
+  (fn [db]
+    (:provider db)))
 
 (re-frame/reg-sub ::current-account
   (fn [db]
     (:current-account db)))
-
