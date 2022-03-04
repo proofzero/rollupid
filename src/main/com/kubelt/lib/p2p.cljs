@@ -12,10 +12,11 @@
   (:require
    [com.kubelt.lib.base64 :as lib.base64]
    [com.kubelt.lib.crypto.digest :as lib.crypto.digest]
-   [com.kubelt.lib.multiaddr :as ma]
+   [com.kubelt.lib.hexify :as lib.hexify]
+   [com.kubelt.proto.http :as http]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
-   [com.kubelt.proto.http :as http]))
+   [com.kubelt.lib.multiaddr :as ma]))
 
 (defn register!
   "Register an account, performing any initial setup that is required. The
@@ -46,14 +47,6 @@
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
     (http/request! client request)))
-
-
-(defn str->bytes
-  "Convert a string into a byte array. In Clojure this is a [B, while in
-  ClojureScript it returns a Uint8Array."
-  [s]
-     (let [text-encoder (js/TextEncoder.)]
-             (.encode text-encoder s)))
 
 (defn append-array
   [a b]
@@ -116,7 +109,7 @@
            (async/go 
              (async/take! token-chan (fn [x] 
                                        (prn {:hereiam 333 :x x})
-              (let [client-nonce (str->bytes "abcdabcd")
+              (let [client-nonce (lib.hexify/str->bytes "abcdabcd")
                     _ (prn {:hereiam 443 :cnonce client-nonce })
                     digest-output (prepare-nonce- (str x) client-nonce)]
                 
