@@ -161,7 +161,7 @@
 
   build:dapp:release
   {:doc ""
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release app")}
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
@@ -202,11 +202,11 @@
   test:dapp:develop
   {:doc ""
    :depends-on [build:dapp:develop]
-   :task (shell {:dir "dapp"} "npm run shadow:test")}
+   :task (shell "npx shadow-cljs compile dapp browser-test karma-test")}
 
   test:dapp:release
   {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:release")}
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
   test:all:develop
   {:doc "Build and test all develop"
