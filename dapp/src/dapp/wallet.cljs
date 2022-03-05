@@ -4,14 +4,22 @@
    [promesa.core :as p]
    [re-frame.core :as re-frame])
   (:require
-    ;["@metamask/detect-provider" :as detectEthereumProvider]
+    ["web3modal$default" :as Web3Modal]
+    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
+    ["walletlink" :as WalletLink]
     ["web3" :as Web3]))
 
 ; The wallet ns manages events and effects related to wallet based auth
 ; and interacts with the SDK to fulfill a full ZK-Auth
 ; NOTE:
-; - Should we port this entire thing the SDK to as part of the web targets?
+; - Should we port this entire thing the SDK to as part of the web targets?n accounts-changed
 ; - The node and other headless targets should be have a facility to bootstrap itself via API TOKEN / JWT
+
+(def provider-options
+  {:network "mainnet"
+   :cacheProvider false
+   :theme "dark"
+   :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
 
 (defn accounts-changed
   "Helper function that dispatches an account changed event"
@@ -31,10 +39,14 @@
 (defn provider-setup
   "Setup the wallet db or throw an error if no provider is available"
   []
-  (prn "provider")
-  (if Web3/givenProvider
-    (re-frame/dispatch [::provider-detected Web3/givenProvider])
-    (throw (js/Error "No wallet provider detected")))) ;; TODO: decide on an effect for no metamask
+  (prn "provider-setup")
+  (let [web3-modal (Web3Modal. (clj->js provider-options))]
+    (let [provider (Web3/givenProvider)]
+      (if provider
+        (do
+          (re-frame/dispatch [::provider-detected provider])
+          (re-frame/dispatch [::modal-ready web3-modal]))
+        (throw (js/Error "No wallet provider detected")))))) ;; TODO: decide on an effect for no metamask
 
 ;; TODO: subscribe to accounts changed after connected
 ;(p/let [provider (detectEthereumProvider)]
@@ -54,13 +66,35 @@
       (prn current-account)
       (assoc db :provider provider :web3 web3 :current-account current-account))))
 
+; Bootstrap the db when a provider is detected
+(re-frame/reg-event-db ::modal-ready
+  (fn [db [_ web3-modal]]
+    (prn "modal-ready")
+    (js/console.log web3-modal)
+    (assoc db :modal web3-modal)))
+
+; Pop up the modal
+(re-frame/reg-event-db ::web3-modal
+  (fn [db _]
+    (prn "pop open modal")
+    (js/console.log (clj->js provider-options))
+    (let [modal (Web3Modal. (clj->js provider-options))]
+      (.clearCachedProvider modal)
+      (p/let [provider (.connect modal)]
+        (js/console.log provider)
+        (js/console.log modal)
+        ))))
+
+
 ;Handle a connection to different wallets and kick off the zk-auth
 (re-frame/reg-event-db ::connect-account
   (fn [db [_ wallet]]
     (prn wallet)
     (let [web3 ^js/Web3 (:web3 db)
           eth (.-eth web3)]
-    (-> (.requestAccounts eth) 
+      (prn "providers list") 
+      (js/console.log (.-providers eth))
+      (-> (.requestAccounts eth) 
         (.then (fn [accounts] 
                  ; TODO: 
                  ; - check for which account is selected

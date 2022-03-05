@@ -41,6 +41,7 @@
     "tap": "15.1.6"
   },
   "dependencies": {
+    "@coinbase/wallet-sdk": "^3.0.1",
     "@headlessui/react": "1.5.0",
     "@heroicons/react": "1.0.5",
     "@ipld/car": "3.2.3",
@@ -54,6 +55,7 @@
     "@stablelib/hex": "1.0.1",
     "@stablelib/sha256": "1.0.1",
     "@stablelib/sha3": "1.0.1",
+    "@walletconnect/web3-provider": "^1.7.3",
     "blake3": "2.1.7",
     "ethers": "^5.5.4",
     "event-stream": "4.0.1",
@@ -73,7 +75,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "sd-notify": "2.8.0",
+    "walletlink": "^2.5.0",
     "web3": "1.7.1",
+    "web3modal": "^1.9.5",
     "yargs": "17.3.1"
   }
 }

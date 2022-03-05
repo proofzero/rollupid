@@ -41,6 +41,6 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [::initialize-db])
   (dev-setup)
-  (wallet/provider-setup)
+  ;(wallet/provider-setup)
   (routes/init-routes!)
   (mount-root))
