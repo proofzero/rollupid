@@ -10,7 +10,7 @@ menu:
   docs:
     parent: "prologue"
 weight: 100
-toc: false
+toc: true
 ---
 
 ## What is Kubelt?
