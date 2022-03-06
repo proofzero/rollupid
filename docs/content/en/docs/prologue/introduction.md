@@ -7,8 +7,8 @@ images: []
 menu:
   docs:
     parent: "prologue"
-weight: 100
-toc: true
+weight: 810
+toc: false
 ---
 
 ## What is Kubelt?
@@ -35,19 +35,15 @@ Read our [whitepaper](http://ipfs.io/ipfs/QmNfXy5uCQjEWabnAsvJJPGkKNc6wSZu9M9w2c
 
 ### User Centric and Local First
 
-[](#user-centric)
-
 Get instructions on how to accomplish common tasks with Doks. [Recipes →](https://getdoks.org/docs/recipes/project-configuration/)
 
 ### Decentralized Content Delivery
-
-[](#decentralized-cdn)
 
 Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
 
 ### Cores
 
-[](#cores)
+![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)
 
 Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
 
