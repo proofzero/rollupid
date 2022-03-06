@@ -9,6 +9,6 @@ images: []
 menu:
   docs:
     parent: "guides"
-weight: 600
+weight: 700
 toc: true
 ---

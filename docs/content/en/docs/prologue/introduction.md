@@ -2,12 +2,14 @@
 title: "Introduction"
 description: "An introduction to Kubelt"
 lead: "Ku·belt (Kuiper Belt); is a circumstellar disc in the outer Solar System, extending from the orbit of Neptune at 30 astronomical units to approximately 50 AU from the Sun."
+date: 2020-10-06T08:48:45+00:00
+lastmod: 2020-10-06T08:48:45+00:00
 draft: false
 images: []
 menu:
   docs:
     parent: "prologue"
-weight: 810
+weight: 100
 toc: false
 ---
 
