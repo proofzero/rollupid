@@ -142,7 +142,7 @@
 
   build:dapp:develop
   {:doc ""
-   :task (shell "npx shadow-cljs dapp browser-test karma-test")}
+   :task (shell "npx shadow-cljs compile dapp browser-test karma-test")}
   
   build:dapp:css-watch
   {:doc ""

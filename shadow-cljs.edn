@@ -30,8 +30,6 @@
   [com.github.mainej/headlessui-reagent "1.5.0.47"]
   ;; immutable database and Datalog query engine
   [datascript/datascript "1.3.10"]
-  ;; await es6 lib
-  [funcool/promesa "8.0.446"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.25"]
   ;; a micro-framework for building data-driven applications
