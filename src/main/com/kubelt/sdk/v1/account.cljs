@@ -76,10 +76,7 @@
         ;; external wallet private key.
         sign-fn (get wallet :wallet/sign-fn)
         ;; The public key associated with external wallet keypair.
-        public-key (get wallet :wallet/public-key)
-
-        message-to-sign "Foo"
-        signed-message (sign-fn message-to-sign)]
+        public-key (get wallet :wallet/public-key)]
     ;; Wallet is a collection of crypto fns that hide the private key
     ;; from SDK by closing over it, while enabling crypto operations
     ;; within the SDK.

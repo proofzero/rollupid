@@ -12,7 +12,7 @@
   (:require
    [com.kubelt.lib.base64 :as lib.base64]
    [com.kubelt.lib.crypto.digest :as lib.crypto.digest]
-   [com.kubelt.lib.hexify :as lib.hexify]
+   [com.kubelt.lib.crypto.hexify :as lib.hexify]
    [com.kubelt.proto.http :as http]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
@@ -34,8 +34,7 @@
         path "/auth"
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
-                 ;; FIXME use wallet public key below
-                 :http/body "{\"pk\": \"hereiam5\"}"
+                 :http/body (str "{\"pk\": \"" public-key "\"}")
                  ;; TODO read scheme from sys
                  :uri/scheme :http
                  :uri/domain host
@@ -48,7 +47,9 @@
     ;; (expect a nonce in return, which should be signed and returned to
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
-    (http/request! client request)))
+    (let [message-to-sign (http/request! client request)
+          signed-message (:wallet/sign-fn message-to-sign)]
+      (prn signed-message))))
 
 
 
@@ -57,16 +58,15 @@
   [nonce-b64 client-nonce]
   (let [decoded-bytes (lib.base64/decode-bytes nonce-b64)
         digest-input (lib.util/append-array decoded-bytes client-nonce)]
-    (let [
-        digest-output (lib.crypto.digest/sha2-256 digest-input)]
-    digest-output)))
+    (let [digest-output (lib.crypto.digest/sha2-256 digest-input)]
+      digest-output)))
 
 
 
 (defn authenticate!
   "log into remote peer with keypair"
   [sys wallet]
-  (let [writer (transit/writer :json)                  
+  (let [writer (transit/writer :json)
         client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
@@ -74,9 +74,8 @@
         public-key (get wallet :wallet/public-key)
         ;;path (str/join "/" ["" "register" public-key])
         path "/auth"
-        ;; FIXME use wallet public key below
-        request-body {:pk "hereiam6" :hereiam 1}
-        payload (lib.json/edn->json-str request-body) 
+        request-body {:pk public-key :hereiam 1}
+        payload (lib.json/edn->json-str request-body)
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body payload
@@ -93,35 +92,34 @@
     ;; prove ownership of provided key and complete registration? to what
     ;; extent is this flow already defined by OAuth, JWT, etc.?)
     (let [token-chan (http/request! client request)]
-           (async/go 
-             (async/take! token-chan (fn [x] 
-              (let [client-nonce (lib.hexify/str->bytes "abcdabcd")
-                    digest-output (prepare-nonce- (str x) client-nonce)]
-                
-                (let [verify-path "/auth/verify"
-                      cnonce (lib.base64/encode-unsafe client-nonce)
-                      cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))
-                      headers {"Content-Type" "application/json"}
-                      ;; FIXME use wallet public key below
-                      verify-body {:pk "hereiam7" 
-                                   :nonce cnonce
-                                   :digest cdigest }
-                      verify-payload (lib.json/edn->json-str verify-body)
-                      verify-request {:com.kubelt/type :kubelt.type/http-request
-                                      :http/method :post
-                                      :http/headers headers
-                                      :http/body verify-payload
-                                      :uri/scheme :http
-                                      :uri/domain host
-                                      :uri/path verify-path
-                                      :uri/port port}
-                      verify-result (http/request! client verify-request)]
-                  (async/go
-                    (async/take! verify-result (fn[y]
-                                                 (prn {:verify-result y :request verify-request})
-                                                 y)))))))))))
+      (async/go
+        (async/take! token-chan (fn [x]
+                                  (let [client-nonce (lib.hexify/str->bytes "abcdabcd")
+                                        digest-output (prepare-nonce- (str x) client-nonce)]
 
-                
+                                    (let [verify-path "/auth/verify"
+                                          cnonce (lib.base64/encode-unsafe client-nonce)
+                                          cdigest (lib.base64/encode-unsafe (get digest-output :digest/bytes))
+                                          headers {"Content-Type" "application/json"}
+                                          verify-body {:pk public-key
+                                                       :nonce cnonce
+                                                       :digest cdigest}
+                                          verify-payload (lib.json/edn->json-str verify-body)
+                                          verify-request {:com.kubelt/type :kubelt.type/http-request
+                                                          :http/method :post
+                                                          :http/headers headers
+                                                          :http/body verify-payload
+                                                          :uri/scheme :http
+                                                          :uri/domain host
+                                                          :uri/path verify-path
+                                                          :uri/port port}
+                                          verify-result (http/request! client verify-request)]
+                                      (async/go
+                                        (async/take! verify-result (fn [y]
+                                                                     (prn {:verify-result y :request verify-request})
+                                                                     y)))))))))))
+
+
 
 (defn store!
   "Store a key/value pair for the given user account. Returns a core.async
