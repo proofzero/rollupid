@@ -15,29 +15,54 @@ toc: true
 
 ---
 
-#### Creating new/overwriting existing stubs & proxy configs
+### Zero-knowledge authentication flow
 
 <details>
- <summary><code>POST</code> <code><b>/</b></code> <code>(overwrites all in-memory stub and/or proxy-config)</code></summary>
+ <summary><code>POST</code> <code><b>/auth</b></code> <code>(start a zk-auth flow)</code></summary>
 
 ##### Parameters
 
-> | name | type     | data type             | description |
-> | ---- | -------- | --------------------- | ----------- |
-> | None | required | object (JSON or YAML) | N/A         |
+> | name       | type     | data type | description                                           |
+> | ---------- | -------- | --------- | ----------------------------------------------------- |
+> | account_id | required | string    | wallet account id                                     |
+> | public_key | required | string    | base64 encoded public key derived from user signature |
 
 ##### Responses
 
-> | http code | content-type               | response                                 |
-> | --------- | -------------------------- | ---------------------------------------- |
-> | `201`     | `text/plain;charset=UTF-8` | `Configuration created successfully`     |
-> | `400`     | `application/json`         | `{"code":"400","message":"Bad Request"}` |
-> | `405`     | `text/html;charset=utf-8`  | None                                     |
+> | http code | content-type       | response                                   |
+> | --------- | ------------------ | ------------------------------------------ |
+> | `201`     | `application/json` | `{"encrypted_nonce": "<encrypted_nonce>"}` |
+> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}`   |
 
 ##### Example cURL
 
 > ```javascript
->  curl -X POST -H "Content-Type: application/json" --data @post.json http://localhost:8889/
+>  curl -X POST -H "Content-Type: application/json" --data @post.json http://api.kubelt.com/auth
+> ```
+
+</details>
+
+<details>
+ <summary><code>POST</code> <code><b>/verify</b></code> <code>(complete zk-auth flow)</code></summary>
+
+##### Parameters
+
+> | name            | type     | data type | description       |
+> | --------------- | -------- | --------- | ----------------- |
+> | account_id      | required | string    | wallet account id |
+> | decrypted_nonce | required | string    | decrypted nonce   |
+
+##### Responses
+
+> | http code | content-type       | response                                 |
+> | --------- | ------------------ | ---------------------------------------- |
+> | `201`     | `application/json` | `Signed JSON Web Token`                  |
+> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}` |
+
+##### Example cURL
+
+> ```javascript
+>  curl -X POST -H "Content-Type: application/json" --data @post.json http://api.kubelt.com/verify
 > ```
 
 </details>
