@@ -1,7 +1,6 @@
 ; Wallet
 (ns dapp.wallet
   (:require
-   [promesa.core :as p]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
@@ -14,12 +13,6 @@
 ; NOTE:
 ; - Should we port this entire thing the SDK to as part of the web targets?n accounts-changed
 ; - The node and other headless targets should be have a facility to bootstrap itself via API TOKEN / JWT
-
-(def provider-options
-  {:network "mainnet"
-   :cacheProvider false
-   :theme "dark"
-   :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
 
 (defn accounts-changed
   "Helper function that dispatches an account changed event"
@@ -35,18 +28,6 @@
   (js/console.log event)
   (re-frame/dispatch ::chain-changed))
 
-
-(defn provider-setup
-  "Setup the wallet db or throw an error if no provider is available"
-  []
-  (prn "provider-setup")
-  (let [web3-modal (Web3Modal. (clj->js provider-options))]
-    (let [provider (Web3/givenProvider)]
-      (if provider
-        (do
-          (re-frame/dispatch [::provider-detected provider])
-          (re-frame/dispatch [::modal-ready web3-modal]))
-        (throw (js/Error "No wallet provider detected")))))) ;; TODO: decide on an effect for no metamask
 
 ;; TODO: subscribe to accounts changed after connected
 ;(p/let [provider (detectEthereumProvider)]
@@ -75,15 +56,9 @@
 
 ; Pop up the modal
 (re-frame/reg-event-db ::web3-modal
-  (fn [db _]
-    (prn "pop open modal")
-    (js/console.log (clj->js provider-options))
-    (let [modal (Web3Modal. (clj->js provider-options))]
-      (.clearCachedProvider modal)
-      (p/let [provider (.connect modal)]
-        (js/console.log provider)
-        (js/console.log modal)
-        ))))
+  (fn [db _ provider]
+    (prn "provider received")
+    (assoc db :provider provider)))
 
 
 ;Handle a connection to different wallets and kick off the zk-auth

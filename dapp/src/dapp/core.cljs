@@ -3,7 +3,6 @@
    [reagent.dom :as rdom]
    [re-frame.core :as re-frame]
    [dapp.config :as config]
-   [dapp.wallet :as wallet]
    [dapp.views :as views]
    [dapp.routes :as routes]))
 
@@ -41,6 +40,5 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [::initialize-db])
   (dev-setup)
-  ;(wallet/provider-setup)
   (routes/init-routes!)
   (mount-root))

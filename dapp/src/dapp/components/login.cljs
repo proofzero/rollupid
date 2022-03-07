@@ -3,7 +3,34 @@
    [re-frame.core :as re-frame]
    [reitit.frontend.easy :as rfe]
    [dapp.wallet :as wallet]
-   ))
+   )
+  (:require
+    ["web3modal$default" :as Web3Modal]
+    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
+
+
+(def provider-options
+  {:network "mainnet"
+   :cacheProvider true
+   :theme "dark"
+   :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
+
+
+(defn open-modal []
+  (prn "open the modal")
+  (let [modal (Web3Modal. (clj->js provider-options))]
+    ;(.clearCachedProvider modal)
+    (-> (.connect modal)
+        ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
+         (.then (fn [provider]
+                  ;; dispatch the provider
+                  (prn "provider")
+                  #(re-frame/dispatch [::wallet/web3-modal provider])))
+         (.catch (fn [error]
+                   (.clearCachedProvider modal)
+                   (js/console.log error))))))
+
+
 
 (defn render
   [props]
@@ -16,24 +43,8 @@
      [:li
       [:div.flex.items-center.p-3.text-base.font-bold.text-gray-900.bg-gray-50.rounded-lg.hover:bg-gray-100.group.hover:shadow.dark:bg-gray-600.dark:hover:bg-gray-500.dark:text-white
        ;; metamask
-       {:on-click #(re-frame/dispatch [::wallet/web3-modal])}
-       [:span.flex-1.ml-3.whitespace-nowrap "CONNECT"]
-       [:span.inline-flex.items-center.justify-center.px-2.py-0.5.ml-3.text-xs.font-medium.text-gray-500.bg-gray-200.rounded.dark:bg-gray-700.dark:text-gray-400
-        "Popular"]]]
-     [:li
-      [:div.flex.items-center.p-3.text-base.font-bold.text-gray-900.bg-gray-50.rounded-lg.hover:bg-gray-100.group.hover:shadow.dark:bg-gray-600.dark:hover:bg-gray-500.dark:text-white
-       ;; metamask
-       {:on-click #(re-frame/dispatch [::wallet/connect-account "metamask"])}
-       [:img.h-4 {:src "/images/metamask.webp"}]
-       [:span.flex-1.ml-3.whitespace-nowrap "MetaMask"]
-       [:span.inline-flex.items-center.justify-center.px-2.py-0.5.ml-3.text-xs.font-medium.text-gray-500.bg-gray-200.rounded.dark:bg-gray-700.dark:text-gray-400
-        "Popular"]]]
-     [:li
-      [:div.flex.items-center.p-3.text-base.font-bold.text-gray-900.bg-gray-50.rounded-lg.hover:bg-gray-100.group.hover:shadow.dark:bg-gray-600.dark:hover:bg-gray-500.dark:text-white
-       {:on-click #(re-frame/dispatch [::wallet/connect-account "coinbase"])}
-       ;; coinbase
-       [:img.h-4 {:src "/images/coinbase.webp"}]
-       [:span.flex-1.ml-3.whitespace-nowrap "Coinbase Wallet"]]]]
+       {:on-click #(open-modal)}
+       [:span.flex-1.ml-3.whitespace-nowrap.text-center "CONNECT"]]]]
     [:div
      [:a.inline-flex.items-center.text-xs.font-normal.text-gray-500.hover:underline.dark:text-gray-400
       {:href "#"}
