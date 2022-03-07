@@ -15,6 +15,14 @@ toc: true
 
 ---
 
+### Definitions
+
+#### JWT
+
+> ```
+> TODO
+> ```
+
 ### Zero-knowledge authentication flow
 
 <details>
@@ -54,10 +62,10 @@ toc: true
 
 ##### Responses
 
-> | http code | content-type       | response                                 |
-> | --------- | ------------------ | ---------------------------------------- |
-> | `201`     | `application/json` | `Signed JSON Web Token`                  |
-> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}` |
+> | http code | content-type       | response                                       |
+> | --------- | ------------------ | ---------------------------------------------- |
+> | `201`     | `application/json` | `Signed JSON Web Token with user root address` |
+> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}`       |
 
 ##### Example cURL
 
@@ -69,25 +77,40 @@ toc: true
 
 ---
 
-#### Listing existing stubs & proxy configs as YAML string
+## Content
+
+### Definitions
+
+#### Metadata
+
+> ```
+> TODO
+> ```
+
+#### Request named content address
 
 <details>
- <summary><code>GET</code> <code><b>/</b></code> <code>(gets all in-memory stub & proxy configs)</code></summary>
+ <summary><code>GET</code> <code><b>/:core/:name</b></code> <code>(fetch CID for name address)</code></summary>
 
 ##### Parameters
 
-> None
+> | name    | type     | data type | description                             |
+> | ------- | -------- | --------- | --------------------------------------- |
+> | core    | required | string    | the content core (e.g. user account id) |
+> | address | required | string    | the name hash for the managed content   |
 
 ##### Responses
 
-> | http code | content-type               | response    |
-> | --------- | -------------------------- | ----------- |
-> | `200`     | `text/plain;charset=UTF-8` | YAML string |
+> | http code | content-type       | response                                          |
+> | --------- | ------------------ | ------------------------------------------------- |
+> | `200`     | `application/json` | `{"cid": "<IPFS CID>", "metadata": "<metadata>"}` |
+> | `401`     | `application/json` | `{"code":"401","message": "Content Not Found"}`   |
+> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}`          |
 
 ##### Example cURL
 
 > ```javascript
->  curl -X GET -H "Content-Type: application/json" http://localhost:8889/
+>  curl -X GET -H "Content-Type: application/json" http://<cname or content.kubelt.com>/crt/bb48bdae67206a493787b69821008fcd6249d013125972db3660e75ab6f3c884
 > ```
 
 </details>
