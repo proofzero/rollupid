@@ -30,17 +30,16 @@ toc: true
 
 ##### Parameters
 
-> | name       | type     | data type | description                                           |
-> | ---------- | -------- | --------- | ----------------------------------------------------- |
-> | account_id | required | string    | wallet account id                                     |
-> | public_key | required | string    | base64 encoded public key derived from user signature |
+> | name       | type     | data type | description       |
+> | ---------- | -------- | --------- | ----------------- |
+> | account_id | required | string    | wallet account id |
 
 ##### Responses
 
-> | http code | content-type       | response                                   |
-> | --------- | ------------------ | ------------------------------------------ |
-> | `201`     | `application/json` | `{"encrypted_nonce": "<encrypted_nonce>"}` |
-> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}`   |
+> | http code | content-type       | response                                 |
+> | --------- | ------------------ | ---------------------------------------- |
+> | `201`     | `application/json` | `{"nonce": "<nonce>"}`                   |
+> | `400`     | `application/json` | `{"code":"400","message":"Bad Request"}` |
 
 ##### Example cURL
 
@@ -55,10 +54,9 @@ toc: true
 
 ##### Parameters
 
-> | name            | type     | data type | description       |
-> | --------------- | -------- | --------- | ----------------- |
-> | account_id      | required | string    | wallet account id |
-> | decrypted_nonce | required | string    | decrypted nonce   |
+> | name         | type     | data type | description  |
+> | ------------ | -------- | --------- | ------------ |
+> | signed_nonce | required | string    | signed nonce |
 
 ##### Responses
 
