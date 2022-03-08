@@ -14,14 +14,14 @@
   [bag-writer bag]
   {:pre [(satisfies? bag-io/BagWriter bag-writer)
          (bag.check/bag? bag)]}
-  (bag-io/write bag-writer bag))
+  (bag-io/write-bag bag-writer bag))
 
 (defn write-to-file!
   "Write a BAG to a CAR file."
   [bag file-name]
   {:pre [(string? file-name)]}
   (let [car-writer (car.file/->CarFile file-name)]
-    (bag-io/write car-writer bag)))
+    (bag-io/write-bag car-writer bag)))
 
 (defn write-to-ipfs!
   "Write a BAG to IPFS, returning a CID."

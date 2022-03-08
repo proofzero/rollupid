@@ -5,6 +5,47 @@
 ;; $ clj -M:kaocha unit
 
 #kaocha/v1
-{:tests [{:id :unit
+{:tests [;; [unit] all unit tests
+         {:id :unit
           :source-paths ["src/main"]
-          :test-paths ["src/test"]}]}
+          :test-paths ["src/test"]}
+         ;; [unit.car] only car unit tests
+         {:id :unit.car
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["car.*-test$"]}
+         ;; [unit.lib] only library unit tests
+         {:id :unit.lib
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["lib.*-test$"]}
+         ;; [unit.lib/crypto] only crypto unit tests
+         {:id :unit.lib/crypto
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["lib.crypto.*-test$"]}
+         ;; [unit.lib/jwt] only jwt unit tests
+         {:id :unit.lib/jwt
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["lib.jwt.*-test$"]}
+         ;; [unit.ipfs] only ipfs unit tests
+         {:id :unit.ipfs
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["ipfs.*-test$"]}
+         ;; [unit.p2p] only p2p unit tests
+         {:id :unit.p2p
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["p2p.*-test$"]}
+         ;; [unit.rdf] only rdf unit tests
+         {:id :unit.rdf
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["rdf.*-test$"]}
+         ;; [unit.sdk] only sdk unit tests
+         {:id :unit.sdk
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["sdk.*-test$"]}]}

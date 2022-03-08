@@ -37,7 +37,7 @@
   ;; fast JSON encoding and decoding
   [metosin/jsonista "0.3.5"]
   ;; data-driven schemas for Clojure/Script
-  [metosin/malli "0.8.3"]
+  [metosin/malli "0.8.4"]
   ;; request router for dapp
   [metosin/reitit "0.5.16"]
   ;; tools for working with command line arguments
@@ -45,9 +45,7 @@
   ;; react for clojure
   [reagent "1.1.0"]
   ;; redux for reagent
-  [re-frame "1.2.0"]
-  ]
-  
+  [re-frame "1.2.0"]]
 
  ;;:nrepl {:init-ns user.shared}
 

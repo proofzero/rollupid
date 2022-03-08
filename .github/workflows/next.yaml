@@ -25,4 +25,4 @@ jobs:
       - run: npm run test:all:release
       # TODO: Do we want to replease a @kubelt/package@prerelease to github registry or npm?
       #- name: Publish Next
-        #run: npx lerna publish --canary --preid next --yes 
+        #run: npx lerna publish --canary --preid next --yes
