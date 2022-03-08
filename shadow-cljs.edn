@@ -40,18 +40,6 @@
   [metosin/malli "0.8.3"]
   ;; request router for dapp
   [metosin/reitit "0.5.16"]
-  ;; a fast data-driven router for Clojure(Script)
-  [metosin/reitit-core "0.5.16"]
-  ;; http routing with interceptors for reitit
-  [metosin/reitit-http "0.5.16"]
-  ;; common interceptors for reitit
-  [metosin/reitit-interceptors "0.5.16"]
-  ;; malli schema coercion for reitit
-  [metosin/reitit-malli "0.5.16"]
-  ;; support for sieppari interceptors for reitit
-  [metosin/reitit-sieppari "0.5.16"]
-  ;; generate swagger2 apidocs for reitit
-  [metosin/reitit-swagger "0.5.16"]
   ;; tools for working with command line arguments
   [org.clojure/tools.cli "1.0.206"]
   ;; react for clojure
