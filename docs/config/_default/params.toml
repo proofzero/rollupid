@@ -7,7 +7,7 @@ titleAddition = "Decentralized Content Management"
 description = ""
 
 ## Documentation
-# docsVersion = "0.3"
+docsVersion = "0.1"
 
 ## Open Graph
 images = ["doks.png"]
@@ -22,7 +22,7 @@ twitterCreator = "@henkverlinde"
 ## JSON-LD
 # schemaType = "Person"
 schemaType = "Organization"
-schemaName = "Doks"
+schemaName = "Kubelt"
 schemaAuthor = "Henk Verlinde"
 schemaAuthorTwitter = "https://twitter.com/henkverlinde"
 schemaAuthorLinkedIn = "https://www.linkedin.com/in/henkverlinde/"
@@ -86,7 +86,7 @@ lastMod = false
   highLight = true
   kaTex = false
   multilingualMode = false
-  docsVersioning = false
+  docsVersioning = true
   fullWidth = false
 
 [menu]

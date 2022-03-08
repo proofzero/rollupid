@@ -135,13 +135,33 @@
   {:doc "Build release version of sdk for web"
    :task (shell "npx shadow-cljs release web")}
 
+  ;; TODO: use varaibles for paths
+  build:dapp:css
+  {:doc "Generate CSS for the dapp"
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js")}
+
   build:dapp:develop
-  {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:build")}
+  {:doc "Build a development version of dapp"
+   :task (shell "npx shadow-cljs compile dapp")} ;; TODO: add tests
+  
+  build:dapp:css-watch
+  {:doc "Watch dapp CSS and rebuild when changed"
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js --watch")}
+
+  build:dapp:develop-watch
+  {:doc "Watch dapp sources and build development version when changed"
+   :task (shell "npx shadow-cljs watch dapp browser-test karma-test")}
+
+  -build:dapp:watch
+  {:doc "Watch all dapp sources and rebuild development version when changed"
+   :depends [build:dapp:css-watch build:dapp:develop-watch]}
+  
+  build:dapp:watch
+  {:task (run '-build:dapp:watch {:parallel true})}
 
   build:dapp:release
-  {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:release")}
+  {:doc "Build release version of dapp CSS"
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
@@ -180,13 +200,13 @@
    :task (shell "npx shadow-cljs release web-test")}
 
   test:dapp:develop
-  {:doc ""
+  {:doc "Run dapp tests against development version"
    :depends-on [build:dapp:develop]
-   :task (shell {:dir "dapp"} "npm run shadow:test")}
+   :task (shell "npx shadow-cljs compile dapp")} ;; TODO: add test
 
   test:dapp:release
-  {:doc ""
-   :task (shell {:dir "dapp"} "npm run shadow:release")}
+  {:doc "Run dapp tests against release version"
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
   test:all:develop
   {:doc "Build and test all develop"

@@ -1,5 +1,5 @@
 ---
-title: "Commands"
+title: "CLI"
 description: "Doks comes with commands for common tasks."
 lead: "Doks comes with commands for common tasks."
 date: 2020-10-13T15:21:01+02:00
@@ -9,7 +9,7 @@ images: []
 menu:
   docs:
     parent: "prologue"
-weight: 130
+weight: 420
 toc: true
 ---
 

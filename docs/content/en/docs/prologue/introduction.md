@@ -1,9 +1,9 @@
 ---
 title: "Introduction"
-description: "Doks is a Hugo theme for building secure, fast, and SEO-ready documentation websites, which you can easily update and customize."
-lead: "Doks is a Hugo theme for building secure, fast, and SEO-ready documentation websites, which you can easily update and customize."
-date: 2020-10-06T08:48:57+00:00
-lastmod: 2020-10-06T08:48:57+00:00
+description: "An introduction to Kubelt"
+lead: "Ku·belt (Kuiper Belt); is a circumstellar disc in the outer Solar System, extending from the orbit of Neptune at 30 astronomical units to approximately 50 AU from the Sun."
+date: 2020-10-06T08:48:45+00:00
+lastmod: 2020-10-06T08:48:45+00:00
 draft: false
 images: []
 menu:
@@ -13,46 +13,48 @@ weight: 100
 toc: true
 ---
 
-## Get started
+## What is Kubelt?
 
-There are two main ways to get started with Doks:
+Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.
 
-### Tutorial
+Curent problems..
 
-{{< alert icon="👉" text="The Tutorial is intended for novice to intermediate users." />}}
+- [ ] Discuss the choke point in the middle with graphic
+- [ ] Discuss how smart contracts are like "stored procedures" and not great for application logic
+- [ ] Discuss the permaweb
 
-Step-by-step instructions on how to start a new Doks project. [Tutorial →](https://getdoks.org/tutorial/introduction/)
+Our mission at Kubelt is to disrupt and decentralize the middle-tier by providing developers with a traditional DX in a fully localized context.
 
-### Quick Start
+## How does it work?
 
-{{< alert icon="👉" text="The Quick Start is intended for intermediate to advanced users." />}}
+Kubelt works by providing a local first, full stack developer experience that includes user management, content management, cryptographic utlities and more.
 
-One page summary of how to start a new Doks project. [Quick Start →]({{< relref "quick-start" >}})
+With Kubelt, your application metadata is organized into a [semantic graph](https://en.wikipedia.org/wiki/Abstract_semantic_graph), distrubuted over [IPFS](https://ipfs.io) and [re-materalized](#decentralized-cdn) into any application context (e.g. browsers, servers, etc) via [user centric](#user-centric) cyrptophy/wallets.
 
-## Go further
+Access and permissioning to this data is goverened by an end-user cryptography and deterministacally defrenced through what we call ["Kubelt Cores"](#cores)
 
-Recipes, Reference Guides, Extensions, and Showcase.
+Read our [whitepaper](http://ipfs.io/ipfs/QmNfXy5uCQjEWabnAsvJJPGkKNc6wSZu9M9w2cNxQ8WTo8) to learn more.
 
-### Recipes
+### User Centric and Local First
 
 Get instructions on how to accomplish common tasks with Doks. [Recipes →](https://getdoks.org/docs/recipes/project-configuration/)
 
-### Reference Guides
+### Decentralized Content Delivery
 
 Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
 
-### Extensions
+### Cores
 
-Get instructions on how to add even more to Doks. [Extensions →](https://getdoks.org/docs/extensions/breadcrumb-navigation/)
+![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)
 
-### Showcase
+Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
+
+## Use Cases
+
+## Showcase
 
 See what others have build with Doks. [Showcase →](https://getdoks.org/showcase/electric-blocks/)
 
 ## Contributing
 
 Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/contributing/how-to-contribute/)
-
-## Help
-
-Get help on Doks. [Help →]({{< relref "how-to-update" >}})

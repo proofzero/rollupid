@@ -3,7 +3,12 @@
 {:source-paths
  ["src/dev"
   "src/main"
-  "src/test"]
+  "src/test"
+  "dapp/src"
+  "dapp/test"]
+
+ ;; dapp dev configs
+ :nrepl {:port 8777}
 
  ;; NB: we depend on the shadow-cljs provided version of core.async;
  ;; adding an explicit dependency on same causes a warning to be
@@ -11,7 +16,9 @@
  ;; it in any case.
 
  :dependencies
- [;; a Clojure/Script library for word case conversions
+ [;; needed for dapp
+  [binaryage/devtools "1.0.4"]
+  ;; a Clojure/Script library for word case conversions
   [camel-snake-kebab/camel-snake-kebab "0.4.2"]
   ;; errors as simple, actionable, generic information
   [com.cognitect/anomalies "0.1.12"]
@@ -19,6 +26,8 @@
   [com.cognitect/transit-cljs "0.8.269"]
   ;; a pure Clojure/Script logging library
   [com.taoensso/timbre "5.1.2"]
+  ;; tailwind components for dapp
+  [com.github.mainej/headlessui-reagent "1.5.0.47"]
   ;; immutable database and Datalog query engine
   [datascript/datascript "1.3.10"]
   ;; fast, idiomatic pretty-printer
@@ -29,25 +38,23 @@
   [metosin/jsonista "0.3.5"]
   ;; data-driven schemas for Clojure/Script
   [metosin/malli "0.8.3"]
-  ;; a fast data-driven router for Clojure(Script)
-  [metosin/reitit-core "0.5.16"]
-  ;; http routing with interceptors for reitit
-  [metosin/reitit-http "0.5.16"]
-  ;; common interceptors for reitit
-  [metosin/reitit-interceptors "0.5.16"]
-  ;; malli schema coercion for reitit
-  [metosin/reitit-malli "0.5.16"]
-  ;; support for sieppari interceptors for reitit
-  [metosin/reitit-sieppari "0.5.16"]
-  ;; generate swagger2 apidocs for reitit
-  [metosin/reitit-swagger "0.5.16"]
+  ;; request router for dapp
+  [metosin/reitit "0.5.16"]
   ;; tools for working with command line arguments
-  [org.clojure/tools.cli "1.0.206"]]
+  [org.clojure/tools.cli "1.0.206"]
+  ;; react for clojure
+  [reagent "1.1.0"]
+  ;; redux for reagent
+  [re-frame "1.2.0"]
+  ]
+  
 
  ;;:nrepl {:init-ns user.shared}
 
  ;; Configuration for development-time HTTP server.
- :dev-http {8021 "web/web-test"}
+ :dev-http {8021 "web/web-test"
+            8280 "dapp/resources/public"
+            8290 "dapp/target/browser-test"}
 
  ;; Built-in targets include:
  ;; :browser
@@ -80,7 +87,21 @@
  ;; you'll need to specify a new entrypoint by setting :main.
 
  :builds
- {;; SDK (Node.js)
+ {;; DAPP (Kubelt React App)
+  :dapp
+  {:target     :browser
+   :output-dir "dapp/resources/public/js/compiled"
+   :asset-path "/js/compiled"
+   :modules
+   {:app {:init-fn dapp.core/init}}
+   :devtools
+   {:preloads []}
+   :dev
+   {:compiler-options
+    {:closure-defines
+     { }}}}
+
+  ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use with Node.js.

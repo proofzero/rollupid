@@ -18,6 +18,8 @@
     "build:sdk:release": "bb build:sdk:release",
     "build:web:develop": "bb build:web:develop",
     "build:web:release": "bb build:web:release",
+    "build:dapp:develop": "bb build:dapp:develop",
+    "build:dapp:release": "bb build:dapp:release",
     "test:all:develop": "bb test:all:develop",
     "test:all:release": "bb test:all:release",
     "test:sdk:cljs:develop": "bb test:sdk:cljs:develop",
@@ -25,19 +27,27 @@
     "test:sdk:js:develop": "bb test:sdk:js:develop",
     "test:sdk:js:release": "bb test:sdk:js:release",
     "test:web:develop": "bb test:web:develop",
-    "test:web:release": "bb test:web:release"
+    "test:web:release": "bb test:web:release",
+    "test:dapp:develop": "bb test:dapp:develop",
+    "test:dapp:release": "bb test:dapp:release"
   },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@tailwindcss/forms": "0.5.0",
     "lerna": "4.0.0",
     "shadow-cljs": "2.17.5",
+    "tailwindcss": "3.0.23",
     "tap": "15.1.6"
   },
   "dependencies": {
+    "@coinbase/wallet-sdk": "3.0.1",
+    "@headlessui/react": "1.5.0",
+    "@heroicons/react": "1.0.5",
     "@ipld/car": "3.2.3",
     "@ipld/dag-cbor": "7.0.0",
     "@ipld/dag-json": "8.0.7",
+    "@metamask/detect-provider": "1.2.0",
     "@multiformats/blake2": "1.0.8",
     "@multiformats/sha3": "2.0.7",
     "@noble/secp256k1": "1.5.5",
@@ -45,7 +55,9 @@
     "@stablelib/hex": "1.0.1",
     "@stablelib/sha256": "1.0.1",
     "@stablelib/sha3": "1.0.1",
+    "@walletconnect/web3-provider": "1.7.3",
     "blake3": "2.1.7",
+    "ethers": "5.5.4",
     "event-stream": "4.0.1",
     "hyperbee": "1.7.0",
     "hypercore": "9.12.0",
@@ -60,7 +72,12 @@
     "n3": "1.13.0",
     "quadstore": "9.1.0",
     "rdf-parse": "1.9.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "sd-notify": "2.8.0",
+    "walletlink": "2.5.0",
+    "web3": "1.7.1",
+    "web3modal": "1.9.5",
     "yargs": "17.3.1"
   }
 }
