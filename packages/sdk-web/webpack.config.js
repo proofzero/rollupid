@@ -1,25 +1,31 @@
+// packages/sdk-web/webpack.config.js
+
 const path = require("path");
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const webpack = require("webpack");
 
 const isProduction = process.env.NODE_ENV == "production";
 
 const config = {
-  entry: path.resolve(__dirname, "../sdk-js/lib/sdk.js"),
+  entry: path.resolve(__dirname, "./lib/com.kubelt.sdk.js"),
   output: {
     path: path.resolve(__dirname, "./lib/"),
     filename: "index.js",
     library: "sdk",
     libraryTarget: "amd",
   },
+  /*
   resolve: {
     fallback: {
       fs: false,
     },
   },
+  */
   plugins: [
-    // Add your plugins here
-    // Learn more about plugins from https://webpack.js.org/configuration/plugins/
-    new NodePolyfillPlugin(),
+    //new NodePolyfillPlugin(),
+    //new webpack.ProvidePlugin({
+    //  Buffer: ["buffer", "Buffer"],
+    //  process: "process/browser",
+    //}),
   ],
 };
 
