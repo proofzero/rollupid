@@ -70,23 +70,7 @@ jobs:
           babashka-version: 0.7.8
       - run: npm run build:sdk:develop
 
-  # build-sdk-web:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '16'
-  #         cache: 'npm'
-  #         cache-dependency-path: package-lock.json
-  #     - run: sudo apt-get install -y libsystemd-dev
-  #     - run: npm install
-  #     - uses: turtlequeue/setup-babashka@v1.3.0
-  #       with:
-  #         babashka-version: 0.7.8
-  #     - run: npm run build:sdk-web:develop
-
-  build-dapp:
+  build-sdk-web:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -100,7 +84,7 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: npm run build:dapp:develop
+      - run: npm run build:sdk-web:develop
 
   test-sdk-cljs:
     runs-on: ubuntu-latest
@@ -116,7 +100,7 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: bb run test:sdk:cljs:develop
+      - run: npm run test:sdk:cljs:develop
 
   test-sdk-js:
     runs-on: ubuntu-latest
@@ -132,10 +116,12 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: bb run test:sdk:js:develop
+      - run: npm run test:sdk:js:develop
 
   test-web:
     runs-on: ubuntu-latest
+    env:
+      CHROME_BIN: /snap/bin/chromium
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -143,29 +129,29 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
+      - run: sudo apt-get install -y libsystemd-dev chromium-browser
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: bb run test:web:develop
-        # TODO load in headless browser to execute tests
+        # Run the CI version of the web tests using headless Chrome.
+      - run: npm run test:web:ci
 
-  test-sdk-web:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
-      - run: npm install
-      - uses: turtlequeue/setup-babashka@v1.3.0
-        with:
-          babashka-version: 0.7.8
-      - run: bb run test:sdk-web:develop
+  # test-sdk-web:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16'
+  #         cache: 'npm'
+  #         cache-dependency-path: package-lock.json
+  #     - run: sudo apt-get install -y libsystemd-dev
+  #     - run: npm install
+  #     - uses: turtlequeue/setup-babashka@v1.3.0
+  #       with:
+  #         babashka-version: 0.7.8
+  #     - run: npm run test:sdk-web:develop
 
   test-dapp:
     runs-on: ubuntu-latest
@@ -181,7 +167,7 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: bb run test:sdk-web:develop
+      - run: npm run test:dapp:develop
 
   test-plugin-sanity:
     runs-on: ubuntu-latest
@@ -197,4 +183,4 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: bb run test:plugin:sanity
+      - run: npm run test:plugin:sanity
