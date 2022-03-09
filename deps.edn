@@ -33,5 +33,5 @@
          :extra-deps {}}
 
   ;; $ clojure -M:lint --lint src/
-  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.03.04"}}
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.03.09"}}
          :main-opts ["-m" "clj-kondo.main"]}}}
