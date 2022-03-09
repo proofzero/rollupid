@@ -11,12 +11,15 @@
    [com.kubelt.ipfs.v0.node :as v0.node]
    [com.kubelt.ipfs.spec :as ipfs.spec]
    [com.kubelt.proto.http :as proto.http])
-  #?(:cljs
+  #?(:browser
      (:require
-      [com.kubelt.lib.http.node :as http.impl])
+      [com.kubelt.lib.http.browser :as lib.http])
+     :node
+     (:require
+      [com.kubelt.lib.http.node :as lib.http])
      :clj
      (:require
-      [com.kubelt.lib.http.jvm :as http.impl])))
+      [com.kubelt.lib.http.jvm :as lib.http])))
 
 ;; TODO
 ;; -----------------------------------------------------------------------------
@@ -244,7 +247,7 @@
              (if (contains? options :http/client)
                (let [http-client (get options :http/client)]
                  {:http/client http-client})
-               (let [http-client (http.impl/->HttpClient)]
+               (let [http-client (lib.http/->HttpClient)]
                  {:http/client http-client}))]
          (if-not (satisfies? proto.http/HttpClient client)
            {:com.kubelt/type :kubelt.type/error
