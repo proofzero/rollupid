@@ -19,6 +19,10 @@
 ;; (SHA2-256) $ echo -n foobar | openssl dgst -sha256
 ;; (SHA3-256) $ echo -n foobar | openssl dgst -sha3-256
 
+;; To generate expected hashes use openssl:
+;; (SHA2-256) $ echo -n foobar | openssl dgst -sha256
+;; (SHA3-256) $ echo -n foobar | openssl dgst -sha3-256
+
 (deftest sha2-256-test
   (testing "sha2-256 digest of string"
     (let [input "foobar"

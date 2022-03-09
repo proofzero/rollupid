@@ -27,6 +27,13 @@
      (let [text-encoder (js/TextEncoder.)]
              (.encode text-encoder s)))
 
+(defn str->bytes
+  "Convert a string into a byte array. In Clojure this is a [B, while in
+  ClojureScript it returns a Uint8Array."
+  [s]
+     (let [text-encoder (js/TextEncoder.)]
+             (.encode text-encoder s)))
+
 ;; TODO conditionally handle strings if necessary
 #_(if (string? byte-data)
     (js/Uint8Array.from (.split byte-data ""))
