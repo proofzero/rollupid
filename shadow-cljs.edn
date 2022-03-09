@@ -17,7 +17,7 @@
 
  :dependencies
  [;; needed for dapp
-  [binaryage/devtools "1.0.4"]
+  [binaryage/devtools "1.0.5"]
   ;; a Clojure/Script library for word case conversions
   [camel-snake-kebab/camel-snake-kebab "0.4.2"]
   ;; errors as simple, actionable, generic information
