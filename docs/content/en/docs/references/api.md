@@ -30,10 +30,9 @@ toc: true
 
 ##### Parameters
 
-> | name            | type     | data type | description                  |
-> | --------------- | -------- | --------- | ---------------------------- |
-> | account_address | required | string    | wallet account address       |
-> | encryption_key  | required | string    | wallet public encryption key |
+> | name            | type     | data type | description            |
+> | --------------- | -------- | --------- | ---------------------- |
+> | account_address | required | string    | wallet account address |
 
 ##### Responses
 

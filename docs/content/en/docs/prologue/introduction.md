@@ -43,7 +43,13 @@ Get instructions on how to accomplish common tasks with Doks. [Recipes →](http
 
 Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
 
-### Cores
+### Kubelt Cores
+
+A Kubelt Core is made up of two parts. The `@scope` which represents a user, organization, or use case that governs a `namespace` or collection of content. A core will always be represented as `@<scope>/<namespace>` within this documentation.
+
+### Scopes
+
+### Namespaces
 
 ![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)
 
@@ -58,3 +64,8 @@ See what others have build with Doks. [Showcase →](https://getdoks.org/showcas
 ## Contributing
 
 Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/contributing/how-to-contribute/)
+
+## Resources
+
+- [Cores SDK Reference]({{< relref "JS#kubelt-cores" >}})
+- [Cores API Reference]({{< relref "API#kubelt-cores" >}})

@@ -1,6 +1,6 @@
 ---
-title: "SDK"
-description: ""
+title: "Kubelt JS"
+description: "JavaScript API Reference"
 lead: ""
 draft: false
 images: []
@@ -11,9 +11,100 @@ weight: 430
 toc: true
 ---
 
-## Core
+This reference documents every object and method available in Stripe's JavaScript library, kbt.js. Take a look at our [Kubelt dApp]() or [Kubelt Sanity Plugin]() packages as a reference for how to use this library.
 
-@<scope>/<namespace>
+#### Looking for a step-by-step guide?
+
+Learn to setup [Dynamic NFT Content]({{< relref "NFT" >}}) and [Kubelt dApp]({{< relref "dapp" >}}) guides.
+
+#### Not a developer?
+
+Try our [Kubelt Sanity Plugin]() instead.
+
+---
+
+## Installation
+
+```
+npm install --save @kubelt/kubelt-js
+
+OR
+
+yarn install --save @kubelt/kubelt-js
+```
+
+Or use our CDN
+
+```html
+<script src="https://js.kubelt.com/alpha"></script>
+```
+
+#### Including
+
+<details open>
+  <summary>ES Next</summary>
+  <pre><code class="javascript">import Kubelt from 'kubelt'</code></pre>
+
+</details>
+
+<details>
+  <summary>Common JS</summary>
+  <pre><code class="javascript">const Kubelt = require('kubelt')</code></pre>
+</details>
+
+---
+
+## Initialization
+
+#### Kubelt(config?)
+
+Use `Kubelt(config?)` to create an instance of the **Kubelt object**. The Kubelt object is your entrypoint to the rest of the Kubelt JS SDK.
+
+##### Method parameters
+
+| name              | type     | data type | description                       |
+| ----------------- | -------- | --------- | --------------------------------- |
+| options           | optional | object    | Kubelt SDK configuration options  |
+| options.p2p       | optional | object    | Node configuration options        |
+| options.p2p.read  | optional | string    | Multiaddress for read operations  |
+| options.p2p.write | optional | string    | Multiaddress for write operations |
+| options.logging   | optional | enum      | Log level setting                 |
+
+##### Example
+
+```javascript
+const kubelt = Kubelt({
+  p2p: {
+    read: "/ip4/127.0.0.1/tcp/9061",
+    write: "/dns/api.kubelt.com"
+  },
+  logging: Kubelt.logging.INFO
+}
+```
+
+{{< alert icon="⚠️" text="NOTE: Kubelt only supports p2p.write operations through API gateway." />}}
+
+---
+
+## The Wallet object
+
+Kubelt uses a wallet object to inject and accounts.
+
+#### Properties
+
+| name              | type     | data type | description                       |
+| ----------------- | -------- | --------- | --------------------------------- |
+| options           | optional | object    | Kubelt SDK configuration options  |
+| options.p2p       | optional | object    | Node configuration options        |
+| options.p2p.read  | optional | string    | Multiaddress for read operations  |
+| options.p2p.write | optional | string    | Multiaddress for write operations |
+| options.logging   | optional | enum      | Log level setting                 |
+
+---
+
+## Authentication
+
+#### kubelt.autenticate(wallet)
 
 Scope:
 
@@ -38,12 +129,7 @@ E.g.
 @courtyard.io/pokemon
 @courtyard.io/baseball
 
-@twitter/register
-@twitter/maurerbot
-@twitter/alfl
-@twitter/crimeminster
-
-@kubelt/alice
+@maurerbot/twitter
 
 @kubelt:
 
@@ -90,7 +176,7 @@ const ok = kbt.authenticate!(wallet) // setup @cosmin
 
 ```
 GET api.kubelt.com/:account-address/
-POST api.kubelt.com/:account-address/ -p {"cid"} -H "kbt-access-assertion....: {JWT}"
+POST api.kubelt.com/:account-address/ -p {"...configs"} -H "kbt-access-assertion....: {JWT}"
 
 const core =  CORE.byId(account-adddress)
 const stub = core.getInstance()
@@ -118,6 +204,8 @@ const scope = kbt.scope.add("@courtyard.io", ...configs) @0xabc123 -> @courtyard
 kbt.scope("@courtyard.io") // switch scope
 
 // TODO: config scopes
+
+kbt.scope.namespace.add("pokemon")
 
 ---
 

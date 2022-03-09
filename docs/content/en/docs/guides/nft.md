@@ -1,5 +1,5 @@
 ---
-title: "Guide1"
+title: "Dynamic NFT content mangement"
 description: ""
 lead: ""
 date: 2022-03-01T09:44:41-08:00
