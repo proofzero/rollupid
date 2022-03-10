@@ -62,13 +62,14 @@ Use `Kubelt(config?)` to create an instance of the **Kubelt object**. The Kubelt
 
 ##### Method parameters
 
-| name              | type     | data type | description                       |
-| ----------------- | -------- | --------- | --------------------------------- |
-| options           | optional | object    | Kubelt SDK configuration options  |
-| options.p2p       | optional | object    | Node configuration options        |
-| options.p2p.read  | optional | string    | Multiaddress for read operations  |
-| options.p2p.write | optional | string    | Multiaddress for write operations |
-| options.logging   | optional | enum      | Log level setting                 |
+| name              | type     | data type | description                                     |
+| ----------------- | -------- | --------- | ----------------------------------------------- |
+| options           | optional | object    | Kubelt SDK configuration options                |
+| options.scope     | options  | string    | Kubelt Core scope. Default is the user's scope. |
+| options.p2p       | optional | object    | Node configuration options                      |
+| options.p2p.read  | optional | string    | Multiaddress for read operations                |
+| options.p2p.write | optional | string    | Multiaddress for write operations               |
+| options.logging   | optional | enum      | Log level setting                               |
 
 ##### Example
 
@@ -82,29 +83,87 @@ const kubelt = Kubelt({
 }
 ```
 
+**TODO: some kind of multiaddress for cores?**
+
 {{< alert icon="⚠️" text="NOTE: Kubelt only supports p2p.write operations through API gateway." />}}
+
+---
+
+## Kubelt Cores
+
+Requests made by the Kubelt JS SDK will be made to the dns addresses configured in the p2p options object during the initilziation process. The hostname of the DNS address represents the Kubelt Core scope or host.
+
+For instance, requests made to `api.kubelt.com` will be received by the **@kubelt** core.
+
+{{< alert icon="👉" text="Kubelt allows CNAME configurations to the gateway to cores provisioned on the network." />}}
 
 ---
 
 ## The Wallet object
 
-Kubelt uses a wallet object to inject and accounts.
+Kubelt uses a wallet object to that represent the current selected account and a reference to signing and decryption functions.
 
-#### Properties
+##### Properties
 
-| name              | type     | data type | description                       |
-| ----------------- | -------- | --------- | --------------------------------- |
-| options           | optional | object    | Kubelt SDK configuration options  |
-| options.p2p       | optional | object    | Node configuration options        |
-| options.p2p.read  | optional | string    | Multiaddress for read operations  |
-| options.p2p.write | optional | string    | Multiaddress for write operations |
-| options.logging   | optional | enum      | Log level setting                 |
+| name         | type     | data type | description                         |
+| ------------ | -------- | --------- | ----------------------------------- |
+| type         | required | enum      | Kubelt wallet type                  |
+| address      | required | string    | Selected wallet account address     |
+| sign-func    | required | function  | Wallet provider signing function    |
+| encrypt-key  | optional | string    | Encryption key for selected account |
+| decrypt-func | optional | function  | Wallet proider decryption function  |
 
 ---
 
 ## Authentication
 
 #### kubelt.autenticate(wallet)
+
+Use `kubelt.authenticate(wallet)` to perform a zero-knowledge proof to authenticate against the Kubelt peer-to-peer network.
+
+The authentication method will request a nonce from the user's core, indicated by their wallet address, for the client to sign and return. In doing so, the user's core will validate the proof and issue a JWT token representing the users identity for subsequent requests. The JWT will be signed by the host core configured in the initialization step.
+
+##### Method Properties
+
+| name   | type     | data type | description          |
+| ------ | -------- | --------- | -------------------- |
+| wallet | optional | required  | Kubelt Wallet object |
+
+##### Example
+
+```javascript
+import Web3 from "web3"
+
+const web3 = Web3(provider)
+const accounts = await web3.eth.getAccounts()
+
+const wallet = {
+  type: "Metamask",
+  address: accounts[0],
+  sign-func: web3.eth.sign,
+}
+
+const error = await kubelt.authenticate(wallet)
+
+```
+
+---
+
+## Scope
+
+#### kubelt.scope.add(name)
+
+Creating scopes is typically to permission other scopes into it for collaboration.
+
+#### kubelt.selectScope(name)
+
+#### kubelt.permissionToScope(
+
+#### kubelt.core.deleteScope(name)
+
+#### kubelt.core.scope.selectByID(name)
+
+Use `kubelt.scope(name)` to switch cires
 
 Scope:
 
@@ -165,8 +224,6 @@ const kbt = Kubelt.Init.v1(...config) // e.g. top level @scope / hostname
 const ok = kbt.authenticate!(wallet) // setup @cosmin
 
 ---
-
-## Scope
 
 // 1. Send a request to the API to get the CID for "account-address")
 // 2. API created DO instance tied to "account id" (using the JWT info)
