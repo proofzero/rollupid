@@ -62,18 +62,17 @@ Use `Kubelt(config?)` to create an instance of the **Kubelt object**. The Kubelt
 
 ##### Method parameters
 
-| name              | type     | data type | description                                     |
-| ----------------- | -------- | --------- | ----------------------------------------------- |
-| options           | optional | object    | Kubelt SDK configuration options                |
-| options.scope     | options  | string    | Kubelt Core scope. Default is the user's scope. |
-| options.p2p       | optional | object    | Node configuration options                      |
-| options.p2p.read  | optional | string    | Multiaddress for read operations                |
-| options.p2p.write | optional | string    | Multiaddress for write operations               |
-| options.logging   | optional | enum      | Log level setting                               |
+| name              | type     | data type | description                       |
+| ----------------- | -------- | --------- | --------------------------------- |
+| options           | optional | object    | Kubelt SDK configuration options  |
+| options.p2p       | optional | object    | Node configuration options        |
+| options.p2p.read  | optional | string    | Multiaddress for read operations  |
+| options.p2p.write | optional | string    | Multiaddress for write operations |
+| options.logging   | optional | enum      | Log level setting                 |
 
 ##### Example
 
-```javascript
+```JavaScript
 const kubelt = Kubelt({
   p2p: {
     read: "/ip4/127.0.0.1/tcp/9061",
@@ -93,7 +92,13 @@ const kubelt = Kubelt({
 
 Requests made by the Kubelt JS SDK will be made to the dns addresses configured in the p2p options object during the initilziation process. The hostname of the DNS address represents the Kubelt Core scope or host.
 
-For instance, requests made to `api.kubelt.com` will be received by the **@kubelt** core.
+For instance, requests made to `api.kubelt.com/@alice/` will be received by the **@kubelt** core and routed to the **@alice** core with identity asserations made by the requester via JWT. The general pattern with scope is:
+
+```
+https://<host core>/<routing core>/<some/standard/core/endpoint> -H "kbt-identity-assertion-token: JWT"
+```
+
+In doing so, cores can be organized by user, organization, application and/or any other use case.
 
 {{< alert icon="👉" text="Kubelt allows CNAME configurations to the gateway to cores provisioned on the network." />}}
 
@@ -149,13 +154,19 @@ const error = await kubelt.authenticate(wallet)
 
 ---
 
+\*\*NOTE: design goal is that billing actions should always be is delegate to host and/or routed cores by some indexed relationship between cores"
+
 ## Scope
+
+#### kubelt.scope.idFromName(name)
+
+#### kubelt.scope.select(id)
+
+Checks for the scope existence and sets the scope context from the results
 
 #### kubelt.scope.add(name)
 
 Creating scopes is typically to permission other scopes into it for collaboration.
-
-#### kubelt.selectScope(name)
 
 #### kubelt.permissionToScope(
 
