@@ -7,7 +7,7 @@ images: []
 menu:
   docs:
     parent: "references"
-weight: 430
+weight: 410
 toc: true
 ---
 
@@ -90,23 +90,25 @@ const kubelt = Kubelt({
 
 ## Kubelt Cores
 
-Requests made by the Kubelt JS SDK will be made to the dns addresses configured in the p2p options object during the initilziation process. The hostname of the DNS address represents the Kubelt Core scope or host.
+Requests made by the Kubelt JS SDK will be made to the dns addresses configured in the p2p options object during the initilziation process. The hostname of the DNS address represents the Kubelt Core scope.
 
-For instance, requests made to `api.kubelt.com/@alice/` will be received by the **@kubelt** core and routed to the **@alice** core with identity asserations made by the requester via JWT. The general pattern with scope is:
+For instance, requests made to `api.kubelt.com/@alice/` will be routed to the **@alice** core with identity asserations made by the requester via JWT. The general pattern with scope is:
 
 ```
-https://<host core>/<routing core>/<some/standard/core/endpoint> -H "kbt-identity-assertion-token: JWT"
+https://<api.kubelt.com | CNAME>/@{core}/<some/standard/core/endpoint> -H "kbt-identity-assertion-token: JWT"
 ```
 
 In doing so, cores can be organized by user, organization, application and/or any other use case.
 
-{{< alert icon="👉" text="Kubelt allows CNAME configurations to the gateway to cores provisioned on the network." />}}
+{{< alert icon="👉" text="Kubelt allows CNAME configurations to help dApps access the network." />}}
+
+For more, see [Cores API →]({{< relref "api" >}})
 
 ---
 
 ## The Wallet object
 
-Kubelt uses a wallet object to that represent the current selected account and a reference to signing and decryption functions.
+Kubelt uses a wallet object to that represent the current selected core and a reference to signing and decryption functions. This allows the developer to use they library of their choice (e.g. web3.js or ethers.js) as well as select an RPC signer or in memoery wallet (e.g. web3.eth.personal or web.eth.accounts).
 
 ##### Properties
 
@@ -118,49 +120,65 @@ Kubelt uses a wallet object to that represent the current selected account and a
 | encrypt-key  | optional | string    | Encryption key for selected account |
 | decrypt-func | optional | function  | Wallet proider decryption function  |
 
+#### kubelt.wallet(wallet)
+
+The Kubelt JS SDK requires a wallet to be set to perform spcific actions like authentication.
+
+```javascript
+provider.on("accountsChanged", (accounts) =>
+
+  kubelt.wallet({
+    type: "Metamask",
+    address: accounts[0],
+    sign_func: web.eth.sign
+  })
+
+})
+```
+
 ---
 
 ## Authentication
 
-#### kubelt.autenticate(wallet)
+#### kubelt.autenticate(core)
 
 Use `kubelt.authenticate(wallet)` to perform a zero-knowledge proof to authenticate against the Kubelt peer-to-peer network.
 
-The authentication method will request a nonce from the user's core, indicated by their wallet address, for the client to sign and return. In doing so, the user's core will validate the proof and issue a JWT token representing the users identity for subsequent requests. The JWT will be signed by the host core configured in the initialization step.
+The authentication method will request a nonce from the selected core, as indicated by their wallet object, for the client to sign and return. In doing so, the selected core will validate the proof and issue a signed JWT token representing the user's authoirzation to and identity to the core for subsequent requests.
+
+{{< alert icon="👉" text="The selected core and entrypoint for when first authenticating is typically a core configured for the user's wallet adress." />}}
 
 ##### Method Properties
 
-| name   | type     | data type | description          |
-| ------ | -------- | --------- | -------------------- |
-| wallet | optional | required  | Kubelt Wallet object |
+| name | type     | data type | description                                   |
+| ---- | -------- | --------- | --------------------------------------------- |
+| core | optional | string    | Kubelt Core name (defaults to wallet address) |
+
+##### Returns
+
+| name | data type | description |
+| ---- | --------- | ----------- |
+| core | object    | Kubelt Core |
 
 ##### Example
 
 ```javascript
-import Web3 from "web3"
-
-const web3 = Web3(provider)
-const accounts = await web3.eth.getAccounts()
-
-const wallet = {
-  type: "Metamask",
-  address: accounts[0],
-  sign-func: web3.eth.sign,
-}
-
-const error = await kubelt.authenticate(wallet)
-
+const core = await kubelt.authenticate();
 ```
 
 ---
 
 \*\*NOTE: design goal is that billing actions should always be is delegate to host and/or routed cores by some indexed relationship between cores"
 
-## Scope
+## Core
 
-#### kubelt.scope.idFromName(name)
+#### core.describe()
 
-#### kubelt.scope.select(id)
+#### core.config(config)
+
+#### core.add(core)
+
+#### core.listLinkedCores()
 
 Checks for the scope existence and sets the scope context from the results
 
