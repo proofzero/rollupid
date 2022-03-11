@@ -30,7 +30,7 @@ toc: true
 
 ## Requests
 
-NOTE: Cores will need middleware to do internal authentication/authoriazation.
+NOTE: Cores will need middleware to do internal authentication/authorization.
 
 ### Auth
 

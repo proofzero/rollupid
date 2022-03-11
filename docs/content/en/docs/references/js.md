@@ -125,14 +125,35 @@ Kubelt uses a wallet object to that represent the current selected core and a re
 The Kubelt JS SDK requires a wallet to be set to perform spcific actions like authentication.
 
 ```javascript
-provider.on("accountsChanged", (accounts) =>
 
-  kubelt.wallet({
+  const signFunc = async (msg) => {
+    const accounts = await web.eth.getAccounts()
+    return await web.eth.sign(msg, accounts[0])
+  }
+
+  const currentAddress = async () => {
+    const accounts = await web.eth.getAccounts()
+    return accounts[0]
+  }
+
+  const wallet = Kubelt.wallet({
     type: "Metamask",
-    address: accounts[0],
-    sign_func: web.eth.sign
+    account_func:  currentAddress, // if this changes we reset
+    sign_func: signFunc
   })
 
+  wallet.on("logout"), () => {
+   // yo, you're logged out
+  })
+
+
+  // inside the SDK
+
+  const address = await wallet.account_func()
+
+  if (address != current_address) {
+    // reset the SDK (emit some event)
+  }
 })
 ```
 
@@ -142,7 +163,7 @@ provider.on("accountsChanged", (accounts) =>
 
 #### kubelt.autenticate(core)
 
-Use `kubelt.authenticate(wallet)` to perform a zero-knowledge proof to authenticate against the Kubelt peer-to-peer network.
+Use `kubelt.authenticate(wallet?)` to perform a zero-knowledge proof to authenticate against the Kubelt peer-to-peer network.
 
 The authentication method will request a nonce from the selected core, as indicated by their wallet object, for the client to sign and return. In doing so, the selected core will validate the proof and issue a signed JWT token representing the user's authoirzation to and identity to the core for subsequent requests.
 
@@ -172,27 +193,19 @@ const core = await kubelt.authenticate();
 
 ## Core
 
+### Config
+
 #### core.describe()
 
 #### core.config(config)
 
-#### core.add(core)
+#### core.permission(signer, role)
 
-#### core.listLinkedCores()
+#### core.add(config)
 
-Checks for the scope existence and sets the scope context from the results
+#### core.listCores()
 
-#### kubelt.scope.add(name)
-
-Creating scopes is typically to permission other scopes into it for collaboration.
-
-#### kubelt.permissionToScope(
-
-#### kubelt.core.deleteScope(name)
-
-#### kubelt.core.scope.selectByID(name)
-
-Use `kubelt.scope(name)` to switch cires
+### Content
 
 Scope:
 
