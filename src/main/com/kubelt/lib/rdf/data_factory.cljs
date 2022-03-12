@@ -14,7 +14,7 @@
   (:require
    [clojure.string :as str])
   (:require
-   [com.kubelt.lib.rdf.util :as rdf.util]))
+   [com.kubelt.rdf.util :as rdf.util]))
 
 ;; Predicates
 ;; -----------------------------------------------------------------------------

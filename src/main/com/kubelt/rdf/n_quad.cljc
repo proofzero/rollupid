@@ -137,13 +137,13 @@
 
 ;; {:rdf/type :rdf.term/named-node,
 ;;  :value "http://www.w3.org/2000/01/rdf-schema#Resource"}
-(defn named-node->str
+(defn- named-node->str
   [m]
   (let [value (get m :value)]
     (str "<" value ">")))
 
 ;; {:rdf/type :rdf.term/blank-node, :value "b0"}
-(defn blank-node->str
+(defn- blank-node->str
   [m]
   (let [value (get m :value)]
     (str "_:" value)))
@@ -153,7 +153,7 @@
 ;;  {:rdf/type :rdf.term/named-node,
 ;;   :value "http://www.w3.org/2001/XMLSchema#integer"},
 ;;  :value "7000000"}
-(defn literal->str
+(defn- literal->str
   [m]
   (let [value (get m :value)
         datatype (get-in m [:datatype :value])]
@@ -169,13 +169,13 @@
       (let [datatype (named-node->str (get m :datatype))]
         (str "\"" value "\"^^" datatype)))))
 
-(defn graph->str
+(defn- graph->str
   [m]
   (let [value (get m :value)]
     value))
 
 
-(defn subject->str
+(defn- subject->str
   [m]
   (let [term-type (get m :rdf/type)]
     (condp = term-type
@@ -204,7 +204,7 @@
       :rdf.term/blank-node (blank-node->str m)
       :rdf.term/default-graph "")))
 
-(defn quad->str
+(defn- quad->str
   [m]
   (let [subject (-> m (get :rdf.quad/subject) subject->str)
         predicate (-> m (get :rdf.quad/predicate) predicate->str)
@@ -221,7 +221,6 @@
 ;; -----------------------------------------------------------------------------
 
 ;; TODO ask for raw output, RDF/cljc (map), RDF/cljc (vec).
-;; TODO convert parse errors into our standard error format.
 ;; TODO create lib.error namespace for constructing error maps (anomalies?)
 
 (defn parse-string
@@ -239,9 +238,3 @@
             (rest result))
       {:com.kubelt/type :kubelt.type/error
        :error result})))
-
-#_(defn parse-file
-  [path]
-    ;; TODO jvm version
-    ;; TODO node version
-  )

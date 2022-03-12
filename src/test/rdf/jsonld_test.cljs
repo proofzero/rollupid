@@ -7,7 +7,7 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.rdf.json-ld :as rdf.json-ld]
-   [com.kubelt.spec.quad :as spec.quad]))
+   [com.kubelt.spec.rdf :as spec.rdf]))
 
 ;; Utilities
 ;; -----------------------------------------------------------------------------
@@ -141,7 +141,7 @@
         node (named-node value)
         term (rdf.json-ld/named-node->value node)]
     (is (map? term))
-    (is (malli/validate spec.quad/named-node term))
+    (is (malli/validate spec.rdf/named-node term))
     (is (= (:rdf/type term) :rdf.term/named-node))
     (is (= (:value term) value))))
 
@@ -152,7 +152,7 @@
         node (literal value language datatype-string)
         term (rdf.json-ld/literal->value node)]
     (is (map? term))
-    (is (malli/validate spec.quad/literal term))
+    (is (malli/validate spec.rdf/literal term))
     (is (= (:rdf/type term) :rdf.term/literal))
     (is (= (:language term) language))
     (is (= (:value term) value))
@@ -161,7 +161,7 @@
     (let [string-uri (:value datatype-string)
           term-datatype (:datatype term)]
       (is (map? term-datatype))
-      (is (malli/validate spec.quad/named-node term-datatype))
+      (is (malli/validate spec.rdf/named-node term-datatype))
       (is (= (:rdf/type term-datatype) :rdf.term/named-node))
       (is (= (:value term-datatype) string-uri)))))
 
@@ -171,7 +171,7 @@
   (let [node (default-graph)
         term (rdf.json-ld/default-graph->value node)]
     (is (map? term))
-    (is (malli/validate spec.quad/default-graph term))
+    (is (malli/validate spec.rdf/default-graph term))
     (is (= (:rdf/type term) :rdf.term/default-graph))
     (is (= (:value term) ""))))
 
@@ -183,7 +183,7 @@
           node (blank-node value)
           term (rdf.json-ld/blank-node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/blank-node term))
+      (is (malli/validate spec.rdf/blank-node term))
       (is (= (:rdf/type term) :rdf.term/blank-node))
       (is (= (:value term) value))))
 
@@ -195,7 +195,7 @@
           node (blank-node prefixed)
           term (rdf.json-ld/blank-node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/blank-node term))
+      (is (malli/validate spec.rdf/blank-node term))
       (is (= (:rdf/type term) :rdf.term/blank-node))
       (is (= (:value term) name)))))
 
@@ -205,7 +205,7 @@
         node (variable value)
         term (rdf.json-ld/variable->value node)]
     (is (map? term))
-    (is (malli/validate spec.quad/variable term))
+    (is (malli/validate spec.rdf/variable term))
     (is (= (:rdf/type term) :rdf.term/variable))
     (is (= (:value term) value))))
 
@@ -216,7 +216,7 @@
               :graph graph}
         term (rdf.json-ld/quad->value quad)]
     (is (map? term))
-    (is (malli/validate spec.quad/quad term))))
+    (is (malli/validate spec.rdf/quad term))))
 
 (deftest node-test
   (testing "with blank node"
@@ -224,7 +224,7 @@
           node (blank-node value)
           term (rdf.json-ld/node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/blank-node term))
+      (is (malli/validate spec.rdf/blank-node term))
       (is (= (:rdf/type term) :rdf.term/blank-node))
       (is (= (:value term) value))))
 
@@ -232,7 +232,7 @@
     (let [node (default-graph)
           term (rdf.json-ld/node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/default-graph term))
+      (is (malli/validate spec.rdf/default-graph term))
       (is (= (:rdf/type term) :rdf.term/default-graph))
       (is (= (:value term) ""))))
 
@@ -241,7 +241,7 @@
           node (literal value datatype-string)
           term (rdf.json-ld/node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/literal term))
+      (is (malli/validate spec.rdf/literal term))
       (is (= (:rdf/type term) :rdf.term/literal))
       (is (= (:value term) value))))
 
@@ -250,7 +250,7 @@
           node (named-node value)
           term (rdf.json-ld/node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/named-node term))
+      (is (malli/validate spec.rdf/named-node term))
       (is (= (:rdf/type term) :rdf.term/named-node))
       (is (= (:value term) value))))
 
@@ -259,7 +259,7 @@
           node (variable value)
           term (rdf.json-ld/node->value node)]
       (is (map? term))
-      (is (malli/validate spec.quad/variable term))
+      (is (malli/validate spec.rdf/variable term))
       (is (= (:rdf/type term) :rdf.term/variable))
       (is (= (:value term) value))))
 
@@ -267,7 +267,7 @@
     (let [quad quad-one
           term (rdf.json-ld/node->value quad)]
       (is (map? term))
-      (is (malli/validate spec.quad/quad term))
+      (is (malli/validate spec.rdf/quad term))
 
       (is (= :rdf.term/quad (:rdf/type term)))
 
@@ -294,7 +294,7 @@
                  (is (map? graph))
                  (is (= :rdf.type/graph (:rdf/type graph)))
                  ;; Validate result is a RDF/cljs knowledge graph.
-                 (is (malli/validate spec.quad/knowledge-graph graph))
+                 (is (malli/validate spec.rdf/knowledge-graph graph))
                  (let [quads (:quads graph)]
                    (is (vector? quads))
                    ;; Three quads * 4 components.

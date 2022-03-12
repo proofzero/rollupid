@@ -19,7 +19,7 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.rdf.data-factory :as rdf.df]
-   [com.kubelt.spec.quad :as spec.quad]))
+   [com.kubelt.spec.rdf :as spec.rdf]))
 
 ;; Data
 ;; -----------------------------------------------------------------------------
@@ -192,7 +192,7 @@
       (is (map? term))
       (is (= :rdf.term/blank-node (:rdf/type term)))
       (is (= value (:value term)))
-      (is (malli/validate spec.quad/blank-node term))))
+      (is (malli/validate spec.rdf/blank-node term))))
 
   (testing "with a prefixed blank node name"
     ;; Test using a prefixed node name (having a prefix of "_:"). The
@@ -204,7 +204,7 @@
       (is (map? term))
       (is (= :rdf.term/blank-node (:rdf/type term)))
       (is (= name (:value term)))
-      (is (malli/validate spec.quad/blank-node term)))))
+      (is (malli/validate spec.rdf/blank-node term)))))
 
 ;; Ensure that an RDF/js NamedNode instance is correctly converted to
 ;; RDF/cljs.
@@ -215,7 +215,7 @@
     (is (map? term))
     (is (= :rdf.term/named-node (:rdf/type term)))
     (is (= value (:value term)))
-    (is (malli/validate spec.quad/named-node term))))
+    (is (malli/validate spec.rdf/named-node term))))
 
 ;; Ensure that an RDF/js Literal instance is correctly converted to
 ;; RDF/cljs.
@@ -236,14 +236,14 @@
       (is (= :rdf.term/literal (:rdf/type term)))
       (is (= language (:language term)))
       (is (= value (:value term)))
-      (is (malli/validate spec.quad/literal term))
+      (is (malli/validate spec.rdf/literal term))
       ;; Check that the datatype is converted to a RDF/cljs named node map
       ;; with the expected type URI (in this case, of an XML String).
       (let [term-datatype (:datatype term)]
         (is (map? term-datatype))
         (is (= :rdf.term/named-node (:rdf/type term-datatype)))
         (is (= rdf-lang-uri (:value term-datatype)))
-        (is (malli/validate spec.quad/named-node term-datatype)))))
+        (is (malli/validate spec.rdf/named-node term-datatype)))))
 
   ;; No language or datatype provided; the datatype URI should be
   ;; xml-string-uri.
@@ -255,14 +255,14 @@
       (is (= :rdf.term/literal (:rdf/type term)))
       (is (= value (:value term)))
       (is (not (contains? term :language)))
-      (is (malli/validate spec.quad/literal term))
+      (is (malli/validate spec.rdf/literal term))
       ;; Check that the datatype is converted to a RDF/cljs named node
       ;; map with the expected type URI (in this case, xml-string-uri).
       (let [term-datatype (:datatype term)]
         (is (map? term-datatype))
         (is (= :rdf.term/named-node (:rdf/type term-datatype)))
         (is (= xml-string-uri (:value term-datatype)))
-        (is (malli/validate spec.quad/named-node term-datatype)))))
+        (is (malli/validate spec.rdf/named-node term-datatype)))))
 
   ;; An explicit datatype is provided; the datatype URI must match the
   ;; provided value.
@@ -276,14 +276,14 @@
       (is (= :rdf.term/literal (:rdf/type term)))
       (is (= value (:value term)))
       (is (not (contains? term :language)))
-      (is (malli/validate spec.quad/literal term))
+      (is (malli/validate spec.rdf/literal term))
       ;; Check that the datatype is converted to a RDF/cljs named node
       ;; map with the expected type URI (in this case, example-uri).
       (let [term-datatype (:datatype term)]
         (is (map? term-datatype))
         (is (= :rdf.term/named-node (:rdf/type term-datatype)))
         (is (= example-uri (:value term-datatype)))
-        (is (malli/validate spec.quad/named-node term-datatype))))))
+        (is (malli/validate spec.rdf/named-node term-datatype))))))
 
 (deftest variable-test
   ;; The variable is stored with any leading "?" stripped off.
@@ -295,7 +295,7 @@
       (is (map? term))
       (is (= :rdf.term/variable (:rdf/type term)))
       (is (= name (:value term)))
-      (is (malli/validate spec.quad/variable term))))
+      (is (malli/validate spec.rdf/variable term))))
 
   ;; Handle variable names that are provided without a leading "?".
   (testing "without leading '?'"
@@ -305,7 +305,7 @@
       (is (map? term))
       (is (= :rdf.term/variable (:rdf/type term)))
       (is (= name (:value term)))
-      (is (malli/validate spec.quad/variable term)))))
+      (is (malli/validate spec.rdf/variable term)))))
 
 (deftest default-graph-test
   (let [graph-term (default-graph)
@@ -313,7 +313,7 @@
     (is (map? term))
     (is (= :rdf.term/default-graph (:rdf/type term)))
     (is (= "" (:value term)))
-    (is (malli/validate spec.quad/default-graph term))))
+    (is (malli/validate spec.rdf/default-graph term))))
 
 (deftest subject-test
   (testing "with blank node"
@@ -381,4 +381,4 @@
     (is (= predicate-value (get-in term [:rdf.quad/predicate :value])))
     (is (= var-name (get-in term [:rdf.quad/object :value])))
     (is (= "" (get-in term [:rdf.quad/graph :value])))
-    (malli/validate spec.quad/quad-schema term)))
+    (malli/validate spec.rdf/quad-schema term)))

@@ -7,7 +7,7 @@
   (:require
    [clojure.string :as str])
   (:require
-   [com.kubelt.lib.rdf.util :as util]))
+   [com.kubelt.rdf.util :as util]))
 
 ;; We use JavaScript package "jsonld" to parse JSON-LD data.
 ;; https://github.com/digitalbazaar/jsonld.js
