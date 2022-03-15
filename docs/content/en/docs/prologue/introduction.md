@@ -51,7 +51,7 @@ A Kubelt Core is made up of two parts. The `@scope` which represents a user, org
 
 ### Namespaces
 
-![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)
+<!--![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)-->
 
 Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
 
