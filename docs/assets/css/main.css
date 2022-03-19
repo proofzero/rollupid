@@ -1,7 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "normalize.css";
+@import "base.css";
+@import "kubeltbeta.css";
 
-h1 {
-  @apply text-5xl font-bold mt-12 mb-2;
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat.ttf");
 }

@@ -59,6 +59,7 @@ rel  = "sitemap"
 
 [taxonomies]
   contributor = "contributors"
+  contributor = "case-studies"
 
 [permalinks]
   blog = "/blog/:title/"
