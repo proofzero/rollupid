@@ -2934,6 +2934,11 @@ figcaption {
 }
 
 @media screen and (max-width: 479px) {
+  [data-words] {
+    vertical-align: middle;
+    margin-top: -4px;
+  }
+
   h1 {
     font-size: 36px;
     line-height: 52px;
