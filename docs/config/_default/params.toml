@@ -3,17 +3,17 @@
 ## Homepage
 title = "Kubelt"
 titleSeparator = "-"
-titleAddition = "Decentralized Content Management"
-description = "Decentralized Content Management"
+titleAddition = "Decentralized content management"
+description = "Decentralized content management"
 
 ## Documentation
 docsVersion = "0.1"
 
 ## Open Graph
-images = ["images/newlogowithtext.png"]
+images = ["images/sociallogo.png"]
 ogLocale = "en_US"
 domainTLD = "kubelt.com"
-titleHome = "Kubelt - Decentralized CMS"
+titleHome = "Kubelt - Decentralized content management"
 
 ## Twitter Cards
 twitterSite = "@kubeltcms"
@@ -28,7 +28,7 @@ schemaAuthorTwitter = "https://twitter.com/kubeltcms"
 schemaAuthorLinkedIn = "https://www.linkedin.com/company/kubelt/"
 schemaAuthorGitHub = "https://github.com/kubelt"
 schemaLocale = "en-US"
-schemaLogo = "images/newlogowithtext.png"
+schemaLogo = "images/sociallogo.png"
 schemaLogoWidth = 512
 schemaLogoHeight = 512
 schemaImage = "doks.png"
