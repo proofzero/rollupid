@@ -1,6 +1,6 @@
 @import "normalize.css";
-@import "webflow.css";
-@import "kubeltbeta.webflow.css";
+@import "base.css";
+@import "kubeltbeta.css";
 
 @font-face {
   font-family: "Montserrat";
