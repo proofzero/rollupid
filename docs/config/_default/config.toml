@@ -19,6 +19,16 @@ disableLanguages = ["de", "nl"]
 home = ["HTML", "RSS", "REDIRECTS", "HEADERS"]
 section = ["HTML", "RSS", "SITEMAP"]
 
+[outputFormats.REDIRECTS]
+baseName = "_redirects"
+isPlainText = true
+notAlternative = true
+
+[outputFormats.HEADERS]
+baseName = "_headers"
+isPlainText = true
+notAlternative = true
+
 # add output format for section sitemap.xml
 [outputFormats.SITEMAP]
 mediaType = "application/xml"
