@@ -1,21 +1,10 @@
-#words {
-  /*margin-left: -240px;*/
-  /*position: absolute;*/
-}
-#content {
-  /*position: absolute;*/
-}
 [data-words] {
   vertical-align: top;
   position: static;
-  /*margin-left: -275px;*/
 }
 [data-words] > span {
   margin-left: 12px;
   display: none;
-  /*position: absolute;*/
-  /*left: 386px;*/
-  /*min-width: 360px;*/
 }
 
 .w-layout-grid {
@@ -2935,8 +2924,12 @@ figcaption {
 
 @media screen and (max-width: 479px) {
   [data-words] {
-    vertical-align: middle;
-    margin-top: -4px;
+    vertical-align: top;
+    margin-left: 7px;
+  }
+
+  #content {
+    vertical-align: top;
   }
 
   h1 {
