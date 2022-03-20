@@ -7,6 +7,10 @@
   display: none;
 }
 
+#content-mobile {
+  display: none;
+}
+
 .w-layout-grid {
   display: -ms-grid;
   display: grid;
@@ -2924,12 +2928,19 @@ figcaption {
 
 @media screen and (max-width: 479px) {
   [data-words] {
+    display: none;
     vertical-align: top;
     margin-left: 7px;
   }
 
   #content {
     vertical-align: top;
+    display: none;
+  }
+
+  #content-mobile {
+    vertical-align: top;
+    display: block;
   }
 
   h1 {
