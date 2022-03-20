@@ -2,6 +2,7 @@
   vertical-align: top;
   position: static;
 }
+
 [data-words] > span {
   margin-left: 12px;
   display: none;
@@ -2927,6 +2928,9 @@ figcaption {
 }
 
 @media screen and (max-width: 479px) {
+  .whitepaper {
+    margin-top: 24px;
+  }
   [data-words] {
     display: none;
     vertical-align: top;
