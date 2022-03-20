@@ -253,7 +253,7 @@
 };
 
         if (deviceType() !== 'mobile') {
-                  console.log("here")
+$("#content-mobile").remove(); 
         $("[data-words]").attr("data-words", function(i, words) {
 
           var $self = $(this).text(""),
@@ -287,7 +287,11 @@
 
           
       });
-                }
+                } else {
+$("[data-words]").remove(); 
+$("#content").remove(); 
+
+                        }
                   $(function() {
     var rotation = 0, 
         scrollLoc = $(document).scrollTop();
