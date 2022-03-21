@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.v1.account
+(ns com.kubelt.sdk.v1.core
   "Account management."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require

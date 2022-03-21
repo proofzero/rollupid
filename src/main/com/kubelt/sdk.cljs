@@ -3,7 +3,7 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
-   [com.kubelt.sdk.v1.account :as sdk.v1.account]
+   [com.kubelt.sdk.v1.core :as sdk.v1.core]
    [com.kubelt.sdk.v1.resource :as sdk.v1.resource]
    [com.kubelt.sdk.v1.workspace :as sdk.v1.workspace]))
 
@@ -47,10 +47,10 @@
   #js {:init sdk.v1/init-js
        :halt sdk.v1/halt-js!
 
-       ;; account
-       :account #js {:authenticate sdk.v1.account/authenticate-js!
-                     :isLoggedIn sdk.v1.account/logged-in-js?
-                     :setWallet sdk.v1.account/set-wallet-js}
+       ;; core
+       :core #js {:authenticate sdk.v1.core/authenticate-js!
+                  :isLoggedIn sdk.v1.core/logged-in-js?
+                  :setWallet sdk.v1.core/set-wallet-js}
 
        ;; resource
        :resource #js {:add sdk.v1.resource/add-js!}
