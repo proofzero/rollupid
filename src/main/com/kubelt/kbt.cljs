@@ -7,7 +7,7 @@
    [clojure.set :as cset]
    [clojure.string :as str])
   (:require
-   [com.kubelt.kbt.cmd.workspace :as cmd.workspace]))
+   [com.kubelt.kbt.cmds :as kbt.cmds]))
 
 ;; NB: when you encounter an error like:
 ;;   "Cannot infer target type in expression"
@@ -39,10 +39,7 @@
   (let [js-args (clj->js (sequence args))
         args (-> ^js yargs
                  ;; Set up our commands.
-
-                 ;; $CLI workspace <command>
-                 (.command (clj->js cmd.workspace/command))
-
+                 (kbt.cmds/init)
                  ;; Display a summary line.
                  (.epilog epilog)
                  ;; Display help information.
