@@ -4,7 +4,9 @@
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.spec.common :as spec.common]
-   [com.kubelt.spec.crypto :as spec.crypto]))
+   [com.kubelt.spec.core :as spec.core]
+   [com.kubelt.spec.crypto :as spec.crypto]
+   [com.kubelt.spec.jwt :as spec.jwt]))
 
 (def wallet-address
   ;; TODO should be 0x<hex string>
@@ -26,8 +28,8 @@ with the wallet." }
 (def sign-fn
   [:=> {:description "A signing function that takes some data and
 returns a signature generated using the private key associated with the
-wallet." }
-   [:cat :any :string]])
+wallet."}
+   [:cat :any] :string])
 
 ;; Wallet
 ;; -----------------------------------------------------------------------------
@@ -39,8 +41,8 @@ wallet." }
   [:map
    [:com.kubelt/type [:enum :kubelt.type/wallet]]
    [:wallet/address wallet-address]
-   [:wallet/encrypt-key spec.crypto/public-key]
-   [:wallet/decrypt-fn decrypt-fn]
+   ;;[:wallet/encrypt-key spec.crypto/public-key]
+   ;;[:wallet/decrypt-fn decrypt-fn]
    [:wallet/sign-fn sign-fn]])
 
 (def wallet-schema
@@ -50,27 +52,26 @@ wallet." }
     :example {:com.kubelt/type :kubelt.type/wallet
               :wallet/address "0x13235asdasf31312sadfasd"
               :wallet/encrypt-key {:com.kubelt/type :kubelt.type/public-key
-                                   ;; TODO
-                                   }
+                                   :key/data "<key data>"}
               :wallet/sign-fn '(fn [data] "<signature>")}}
    wallet])
 
 ;; Vault
 ;; -----------------------------------------------------------------------------
+;; A vault is a collection of session tokens (JWTs) returned from
+;; authentication calls.
 
 (def vault
   [:map
    [:com.kubelt/type [:enum :kubelt.type/vault]]
-   [:metamask/default {:optional true} wallet]
-   [:metamask/polygon {:optional true} wallet]
-   [:coinbase/default {:optional true} wallet]])
+   [:vault/tokens [:map-of spec.core/id spec.jwt/jwt]]])
 
 (def vault-schema
   [:and
    {:name "vault"
-    :description "A wallet collection"
+    :description "A collection of session tokens"
     :example {:com.kubelt/type :kubelt.type/vault
-              :metamask/default {,,,}
-              :metamask/polygon {,,,}
-              :coinbase/default {,,,}}}
+              ;; TODO is this correct?
+              :vault/tokens {"@acme" {:com.kubelt/type :kubelt.type/jwt
+                                      ,,,}}}}
    vault])

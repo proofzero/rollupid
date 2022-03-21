@@ -39,7 +39,7 @@
         port (.-port address)
         family (.-family address)
         protos (js->clj (.protos ma) :keywordize-keys true)]
-    {:kubelt/type :kubelt.type/node-address
+    {:com.kubelt/type :kubelt.type/node-address
      :address/host host
      :address/port port
      :address/family family

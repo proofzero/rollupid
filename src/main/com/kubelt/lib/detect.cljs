@@ -23,9 +23,15 @@
                  ;; Override p2p read address using options value, if present.
                  (contains? options :p2p/read)
                  (assoc-in [:p2p/read :http/address] (get options :p2p/read))
+                 ;; Override TLS setting for p2p reads, if provided.
+                 (contains? options :p2p.read/scheme)
+                 (assoc-in [:p2p/read :http/scheme] (get options :p2p.read/scheme))
                  ;; Override p2p write address using options value, if present.
                  (contains? options :p2p/write)
-                 (assoc-in [:p2p/write :http/address] (get options :p2p/write)))]
+                 (assoc-in [:p2p/write :http/address] (get options :p2p/write))
+                 ;; Override TLS setting for p2p writes, if provided.
+                 (contains? options :p2p.write/scheme)
+                 (assoc-in [:p2p/write :http/scheme] (get options :p2p.write/scheme)))]
     ;; TODO Use the user-provided settings by default (at this point we
     ;; know the options map is valid).
     ;; If we detect a local p2p node, use it for reads.

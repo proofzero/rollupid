@@ -107,7 +107,7 @@ tap.test('sdk init', (t) => {
     t.end();
 });
 
-
+/*
 tap.test('account authenticate', (t) => {
     return kbt.v1.init()
         .then((sdk) => {
@@ -119,6 +119,7 @@ tap.test('account authenticate', (t) => {
             kbt.v1.account.authenticate(sdk, wallet);
         });
 });
+*/
 
 // TODO do we actually want to invoke the function? Prefer to use
 // mocking....
