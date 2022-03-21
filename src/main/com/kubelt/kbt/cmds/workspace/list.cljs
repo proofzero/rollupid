@@ -1,4 +1,4 @@
-(ns com.kubelt.kbt.cmd.workspace.list
+(ns com.kubelt.kbt.cmds.workspace.list
   "Define the CLI 'workspace list' command. This command lists the
   available workspaces."
   {:copyright "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
