@@ -53,7 +53,7 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, [], 'v1');
     check(kbt, ['v1'], 'init');
     check(kbt, ['v1'], 'halt');
-    check(kbt, ['v1', 'account'], 'authenticate'),
+    check(kbt, ['v1', 'core'], 'authenticate'),
     check(kbt, ['v1'], 'workspace');
     check(kbt, ['v1', 'workspace'], 'available');
 
@@ -116,7 +116,7 @@ tap.test('account authenticate', (t) => {
                     return "fake";
                 },
             };
-            kbt.v1.account.authenticate(sdk, wallet);
+            kbt.v1.core.authenticate(sdk, wallet);
         });
 });
 */

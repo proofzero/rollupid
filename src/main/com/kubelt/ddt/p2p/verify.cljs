@@ -12,8 +12,7 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.lib.wallet :as lib.wallet]
-   [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.v1.account :as sdk.account]))
+   [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
   {:command "verify <core> <nonce>"

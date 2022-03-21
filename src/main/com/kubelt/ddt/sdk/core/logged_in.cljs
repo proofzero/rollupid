@@ -1,13 +1,13 @@
-(ns com.kubelt.ddt.sdk.account.register
-  "Invoke the 'sdk account register method."
+(ns com.kubelt.ddt.sdk.core.logged-in
+  "Invoke the 'sdk core logged-in' method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
-  {:command "init"
-   :desc "Initialize the SDK"
+  {:command "logged-in"
+   :desc "Check if user is logged in"
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
@@ -17,5 +17,6 @@
               (let [kbt (sdk/init)]
                 (if (lib.error/error? kbt)
                   (prn (:error kbt))
-                  (println "register: not yet implemented"))
+                  ;; TODO check if user has a stored JWT for a session.
+                  (println "logged-in: not yet implemented"))
                 (sdk/halt! kbt)))})

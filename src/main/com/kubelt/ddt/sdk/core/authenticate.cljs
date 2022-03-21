@@ -1,5 +1,5 @@
-(ns com.kubelt.ddt.sdk.account.authenticate
-  "Invoke the 'sdk account authenticate' method."
+(ns com.kubelt.ddt.sdk.core.authenticate
+  "Invoke the 'sdk core authenticate' method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [cljs.core.async :as async :refer [<!]]
@@ -11,7 +11,7 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.v1.account :as sdk.account]))
+   [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (defonce command
   {:command "authenticate <core>"
@@ -40,7 +40,7 @@
                                           :p2p.read/scheme scheme
                                           :p2p/write maddr
                                           :p2p.write/scheme scheme})
-                           result (<! (sdk.account/authenticate! kbt core))]
+                           result (<! (sdk.core/authenticate! kbt core))]
                        (if (lib.error/error? result)
                          (prn (:error kbt))
                          ;; TODO encrypt(?) and store returned JWT

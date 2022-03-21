@@ -1,13 +1,13 @@
-(ns com.kubelt.ddt.sdk.account.logged-in
-  "Invoke the 'sdk account logged-in' method."
+(ns com.kubelt.ddt.sdk.core.register
+  "Invoke the 'sdk core register method."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
-  {:command "logged-in"
-   :desc "Check if user is logged in"
+  {:command "init"
+   :desc "Initialize the SDK"
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
@@ -17,5 +17,5 @@
               (let [kbt (sdk/init)]
                 (if (lib.error/error? kbt)
                   (prn (:error kbt))
-                  (println "logged-in: not yet implemented"))
+                  (println "register: not yet implemented"))
                 (sdk/halt! kbt)))})
