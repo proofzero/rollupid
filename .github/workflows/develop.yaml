@@ -15,6 +15,7 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
