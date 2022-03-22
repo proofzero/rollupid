@@ -20,6 +20,8 @@
     "build:web:release": "bb build:web:release",
     "build:dapp:develop": "bb build:dapp:develop",
     "build:dapp:release": "bb build:dapp:release",
+    "build:plugin:sanity:develop": "bb build:plugin:sanity:develop",
+    "build:plugin:sanity:release": "bb build:plugin:sanity:release",
     "test:all:develop": "bb test:all:develop",
     "test:all:release": "bb test:all:release",
     "test:sdk:cljs:develop": "bb test:sdk:cljs:develop",
@@ -29,7 +31,9 @@
     "test:web:develop": "bb test:web:develop",
     "test:web:release": "bb test:web:release",
     "test:dapp:develop": "bb test:dapp:develop",
-    "test:dapp:release": "bb test:dapp:release"
+    "test:dapp:release": "bb test:dapp:release",
+    "test:plugin:sanity:develop": "bb build:plugin:sanity:develop",
+    "test:plugin:sanity:release": "bb build:plugin:sanity:release"
   },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",

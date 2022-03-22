@@ -1,0 +1,82 @@
+{
+  "name": "sanity-plugin-kubelt",
+  "version": "0.0.1-next.49+59d5010",
+  "description": "Kubelt Plugin for Sanity CMS",
+  "keywords": [
+    "kubelt",
+    "sdk",
+    "web3",
+    "cms",
+    "ipfs",
+    "ipld",
+    "rdf",
+    "decentralized",
+    "sanity",
+    "plugin",
+    "sanity-plugin",
+    "dapp",
+    "meta"
+  ],
+  "author": "Kubelt, Inc.",
+  "homepage": "https://kubelt.com",
+  "license": "Apache-2.0",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubelt/kubelt.git"
+  },
+  "scripts": {
+    "build": "sanipack build",
+    "watch": "sanipack build --watch",
+    "test": "echo \"Error: run tests from root\""
+  },
+  "dependencies": {
+    "@kubelt/sdk-web": "file:../sdk-web",
+    "@metamask/detect-provider": "^1.2.0",
+    "@stablelib/ed25519": "^1.0.2",
+    "ethers": "^5.5.2",
+    "notyf": "^3.10.0",
+    "react-icons": "^4.3.1",
+    "rxjs": "^7.5.2",
+    "schema-dts": "^1.0.0",
+    "slugify": "^1.6.5"
+  },
+  "peerDependencies": {
+    "@sanity/base": "^2.26",
+    "@sanity/client": "^3.0.3",
+    "@sanity/icons": "^1.2.2",
+    "@sanity/image-url": "^1.0.1",
+    "@sanity/react-hooks": "^2.24.1",
+    "@sanity/ui": "^0.37.2",
+    "prop-types": "^15.7",
+    "react": "^17",
+    "react-dom": "^17"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.8",
+    "@types/react": "^17.0.38",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-sanity": "^5.1.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "jest": "^27.5.1",
+    "prettier": "2.5.1",
+    "sanipack": "^2.1.0",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.5.4"
+  }
+}
