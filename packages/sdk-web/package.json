@@ -27,9 +27,11 @@
     "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --mode=production --node-env=production",
     "test": "echo \"Error: run tests from root\"",
-    "nft": "echo \"Error: impl non functional tests \""
+    "nft": "echo \"Error: impl non functional tests \"",
+    "build:dev": "webpack --mode=development",
+    "build:prod": "webpack --mode=production --node-env=production"
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
