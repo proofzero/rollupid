@@ -1,14 +1,16 @@
 import {AddIcon, EditIcon} from '@sanity/icons'
 import {useDocumentOperation} from '@sanity/react-hooks'
 import {Button, Flex, Heading, Inline} from '@sanity/ui'
+
+//@ts-ignore
 import sanityClient from 'part:@sanity/base/client'
+
 import React, {useEffect, useState} from 'react'
 import slugify from 'slugify'
 import {VscCode} from 'react-icons/vsc'
 import KubeltPublishModal from '../containers/PublishModal/KubeltPublishModal'
-
-import {sanityService} from '../services'
-import {useAccount} from '../hooks'
+import { useAccount } from '../hooks/useAccount'
+import sanityService from '../services/sanityService'
 
 function PatchButton({
   doc,

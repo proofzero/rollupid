@@ -3,7 +3,7 @@ import {Badge, Box, Button, Inline, Label, Stack, Text} from '@sanity/ui'
 import React from 'react'
 
 import {requestWalletAuth} from '../domain/kubeltWallet'
-import {useAccount} from '../hooks'
+import useAccount from '../hooks/useAccount'
 
 function AuthStep() {
   const account = useAccount()
