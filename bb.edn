@@ -218,6 +218,16 @@
   {:doc "Run dapp tests against release version"
    :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
+  test:plugin:sanity:develop
+  {:doc ""
+   :depends-on [build:plugin:sanity:develop]
+   :task (shell "npx lerna run test --scope sanity-plugin-kubelt")}
+
+  test:plugin:sanity:release
+  {:doc ""
+   :depends-on [build:plugin:sanity:release]
+   :task (shell "npx lerna run test --scope sanity-plugin-kubelt")}
+
   test:all:develop
   {:doc "Build and test all develop"
    :depends [test:sdk:cljs:develop
@@ -231,5 +241,5 @@
    :depends [test:sdk:cljs:release
              test:sdk:js:release
              test:web:release
-             test:web-sdk:release
+             test:sdk-web:release
              test:dapp:release]}}}
