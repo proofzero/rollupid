@@ -1,6 +1,6 @@
 import {generateKeyPairFromSeed, KeyPair} from '@stablelib/ed25519'
 import {ethers} from 'ethers'
-import {checkSessionStorage} from '../utils'
+import {checkSessionStorage} from '../utils/storage'
 
 // TODO: SDK
 const generateSeedFromPhrase = (phrase: string): Uint8Array => {
