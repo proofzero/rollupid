@@ -42,8 +42,9 @@ const asyncMain = async () => {
     method: 'eth_requestAccounts',
   })
   handleAccountsChanged(accounts)
+  console.log(kSdkWeb)
 
-  const initSDK = await kSdkWeb.sdk.v1.init({
+  const initSDK = await kSdkWeb?.v1?.init({
     'p2p/read': '/ip4/127.0.0.1/tcp/8787',
     'p2p/write': '/ip4/127.0.0.1/tcp/8787',
     // 'p2p.read/scheme': ':http',
@@ -99,7 +100,7 @@ export const requestKubeltAuth = async (core: string) => {
     signFn: signFn,
   }
 
-  const authedSdk = await kSdkWeb.sdk.v1.core.authenticate(
+  const authedSdk = await kSdkWeb.v1.core.authenticate(
     {
       ...sdkSubj.getValue(),
       wallet,
