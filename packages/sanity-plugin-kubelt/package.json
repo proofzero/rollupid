@@ -37,6 +37,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@headlessui/react": "1.5.0",
     "@kubelt/sdk-web": "file:../sdk-web",
     "@metamask/detect-provider": "1.2.0",
     "@sanity/base": "2.26",
