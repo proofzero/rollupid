@@ -229,7 +229,8 @@
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
-             test:dapp:develop]}
+             test:dapp:develop
+             test:plugin:sanity]}
 
   test:all:release
   {:doc "Build and test all release"
@@ -237,4 +238,5 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
-             test:dapp:release]}}}
+             test:dapp:release
+             test:plugin:sanity]}}}
