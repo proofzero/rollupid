@@ -1,16 +1,16 @@
-import {LockIcon} from '@sanity/icons'
-import {Badge, Box, Button, Inline, Label, Stack, Text} from '@sanity/ui'
-import React from 'react'
+import { LockIcon } from "@sanity/icons";
+import { Badge, Box, Button, Inline, Label, Stack, Text } from "@sanity/ui";
+import React from "react";
 
-import {requestWalletAuth} from '../domain/kubeltWallet'
-import useAccount from '../hooks/useAccount'
+import { requestWalletAuth } from "../domain/kubeltWallet";
+import useAccount from "../hooks/useAccount";
 
 function AuthStep() {
-  const account = useAccount()
+  const account = useAccount();
 
   const requestLogin = async () => {
-    requestWalletAuth()
-  }
+    requestWalletAuth();
+  };
 
   return (
     <Box padding={2}>
@@ -31,7 +31,7 @@ function AuthStep() {
         {!account && (
           <Stack space={2}>
             <Inline space={1}>
-              <Badge padding={2} tone={'caution'}>
+              <Badge padding={2} tone={"caution"}>
                 Wallet not connected
               </Badge>
               {account && (
@@ -54,7 +54,7 @@ function AuthStep() {
         )}
       </Stack>
     </Box>
-  )
+  );
 }
 
-export default AuthStep
+export default AuthStep;

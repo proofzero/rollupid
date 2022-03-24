@@ -1,13 +1,15 @@
-import {SanityDocument} from '@sanity/client'
-import {Card, Stack, Container, Grid, Flex, Code} from '@sanity/ui'
-import React, {useState} from 'react'
+import { SanityDocument } from "@sanity/client";
+import { Card, Stack, Container, Grid, Flex, Code } from "@sanity/ui";
+import React, { useState } from "react";
 
-import AuthStep from '../../components/AuthStep'
-import ExpandStep from '../../components/ExpandStep'
-import MetadataStep from '../../components/MetadataStep'
-import PublishStep from '../../components/PublishStep'
-import sanityService, {IDocumentStructureCounter} from '../../services/sanityService'
-import SemanticService from '../../services/semanticService'
+import AuthStep from "../../components/AuthStep";
+import ExpandStep from "../../components/ExpandStep";
+import MetadataStep from "../../components/MetadataStep";
+import PublishStep from "../../components/PublishStep";
+import sanityService, {
+  IDocumentStructureCounter,
+} from "../../services/sanityService";
+import SemanticService from "../../services/semanticService";
 
 function KubeltPublishModal({
   published,
@@ -15,30 +17,30 @@ function KubeltPublishModal({
   devMode,
   handleExpansion,
 }: {
-  published: SanityDocument
-  draft: SanityDocument
-  devMode: boolean
-  handleExpansion: any
+  published: SanityDocument;
+  draft: SanityDocument;
+  devMode: boolean;
+  handleExpansion: any;
 }) {
-  const [expandedDocument, setExpandedDocument] = useState(null)
-  const [metadata, setMetadata] = useState(null)
+  const [expandedDocument, setExpandedDocument] = useState(null);
+  const [metadata, setMetadata] = useState(null);
 
-  const [counter, setCounter] = useState(null)
+  const [counter, setCounter] = useState(null);
 
   const handleExpandedDocument = async (
     expandedDocument: any,
     counter: IDocumentStructureCounter
   ) => {
-    setExpandedDocument(expandedDocument)
-    setCounter(counter)
+    setExpandedDocument(expandedDocument);
+    setCounter(counter);
 
-    const semanticService = new SemanticService(sanityService)
-    const semanticDoc = semanticService.semantify(expandedDocument)
+    const semanticService = new SemanticService(sanityService);
+    const semanticDoc = semanticService.semantify(expandedDocument);
 
-    setMetadata(semanticDoc)
+    setMetadata(semanticDoc);
 
-    handleExpansion()
-  }
+    handleExpansion();
+  };
 
   return (
     <Container>
@@ -60,7 +62,7 @@ function KubeltPublishModal({
         columns={2}
         rows={2}
         style={{
-          visibility: devMode ? 'hidden' : 'initial',
+          visibility: devMode ? "hidden" : "initial",
         }}
       >
         <Card>
@@ -72,7 +74,10 @@ function KubeltPublishModal({
         </Card>
 
         <Card>
-          <ExpandStep doc={{...published, ...draft}} docExpHandler={handleExpandedDocument} />
+          <ExpandStep
+            doc={{ ...published, ...draft }}
+            docExpHandler={handleExpandedDocument}
+          />
         </Card>
 
         <Card>
@@ -80,7 +85,7 @@ function KubeltPublishModal({
         </Card>
       </Grid>
     </Container>
-  )
+  );
 }
 
-export default KubeltPublishModal
+export default KubeltPublishModal;

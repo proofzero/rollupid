@@ -1,7 +1,7 @@
-import {Box, Card, Label, Stack, Text} from '@sanity/ui'
-import React from 'react'
+import { Box, Card, Label, Stack, Text } from "@sanity/ui";
+import React from "react";
 
-function MetadataStep({metadata}: {metadata: any}) {
+function MetadataStep({ metadata }: { metadata: any }) {
   return (
     <Box padding={2}>
       <Stack space={4}>
@@ -12,12 +12,12 @@ function MetadataStep({metadata}: {metadata: any}) {
           <Stack space={4}>
             <Stack space={2}>
               <Label>Context</Label>
-              <Text>{metadata['@context']}</Text>
+              <Text>{metadata["@context"]}</Text>
             </Stack>
 
             <Stack space={2}>
               <Label>Type</Label>
-              <Text>{metadata['@type']}</Text>
+              <Text>{metadata["@type"]}</Text>
             </Stack>
 
             {(metadata.itemListElement as any[]).length > 0 && (
@@ -30,7 +30,7 @@ function MetadataStep({metadata}: {metadata: any}) {
         )}
       </Stack>
     </Box>
-  )
+  );
 }
 
-export default MetadataStep
+export default MetadataStep;

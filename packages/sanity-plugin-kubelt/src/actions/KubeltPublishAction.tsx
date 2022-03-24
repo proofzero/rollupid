@@ -1,48 +1,51 @@
-import {AddIcon, EditIcon} from '@sanity/icons'
-import {useDocumentOperation} from '@sanity/react-hooks'
-import {Button, Flex, Heading, Inline} from '@sanity/ui'
+import { AddIcon, EditIcon } from "@sanity/icons";
+import { useDocumentOperation } from "@sanity/react-hooks";
+import { Button, Flex, Heading, Inline } from "@sanity/ui";
 
 //@ts-ignore
-import sanityClient from 'part:@sanity/base/client'
+import sanityClient from "part:@sanity/base/client";
 
-import React, {useEffect, useState} from 'react'
-import slugify from 'slugify'
-import {VscCode} from 'react-icons/vsc'
-import KubeltPublishModal from '../containers/PublishModal/KubeltPublishModal'
-import { useAccount } from '../hooks/useAccount'
-import sanityService from '../services/sanityService'
+import React, { useEffect, useState } from "react";
+import slugify from "slugify";
+import { VscCode } from "react-icons/vsc";
+import KubeltPublishModal from "../containers/PublishModal/KubeltPublishModal";
+import { useAccount } from "../hooks/useAccount";
+import sanityService from "../services/sanityService";
 
 function PatchButton({
   doc,
   enabled,
 }: {
   doc: {
-    _id: string
-    _type: string
-    name: string
-  }
-  enabled: boolean
+    _id: string;
+    _type: string;
+    name: string;
+  };
+  enabled: boolean;
 }) {
-  const {patch} = useDocumentOperation(doc._id, doc._type) as {patch; publish}
+  const { patch } = useDocumentOperation(doc._id, doc._type) as {
+    patch;
+    publish;
+  };
 
   const patchKubeltName = () => {
-    let kuSlug = ''
+    let kuSlug = "";
 
-    const docId = doc._id
-    if (docId.startsWith('drafts.')) {
-      docId.replace('drafts.', '')
+    const docId = doc._id;
+    if (docId.startsWith("drafts.")) {
+      docId.replace("drafts.", "");
     }
 
-    kuSlug = `${doc._type}:${doc._type}_${doc._id}`
+    kuSlug = `${doc._type}:${doc._type}_${doc._id}`;
 
     if (doc.name) {
       kuSlug = `${kuSlug}-${slugify(doc.name, {
         lower: true,
-      })}`
+      })}`;
     }
 
-    patch.execute([{set: {kItem: {name: `${kuSlug}`}}}])
-  }
+    patch.execute([{ set: { kItem: { name: `${kuSlug}` } } }]);
+  };
 
   return (
     <Button
@@ -52,53 +55,53 @@ function PatchButton({
       onClick={() => patchKubeltName()}
       tone="primary"
       style={{
-        marginRight: '0.4em',
+        marginRight: "0.4em",
       }}
     />
-  )
+  );
 }
 
-function KubeltPublishAction({published, draft, onComplete}) {
+function KubeltPublishAction({ published, draft, onComplete }) {
   if (!sanityService.IsInit) {
     // Sanity Client configuration is injected by the part:s system at runtime
     // Sanity Client API expects the current date as best practices
-    const nowDate = new Date().toISOString().split('T')[0]
-    sanityService.init(sanityClient.withConfig({apiVersion: nowDate}))
+    const nowDate = new Date().toISOString().split("T")[0];
+    sanityService.init(sanityClient.withConfig({ apiVersion: nowDate }));
   }
 
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [canPublish, setCanPublish] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [canPublish, setCanPublish] = useState(false);
 
-  const [devMode, setDevMode] = useState(false)
-  const [expanded, setExpanded] = useState(false)
+  const [devMode, setDevMode] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-  const account = useAccount()
+  const account = useAccount();
 
   useEffect(() => {
     if (account) {
       if (devMode || !expanded) {
-        setCanPublish(false)
+        setCanPublish(false);
       } else {
-        setCanPublish(true)
+        setCanPublish(true);
       }
     } else {
-      setCanPublish(false)
+      setCanPublish(false);
     }
-  }, [published, draft, devMode, expanded])
+  }, [published, draft, devMode, expanded]);
 
   const publish = async () => {
-    onComplete()
-  }
+    onComplete();
+  };
 
   const handleExpansion = async () => {
-    setExpanded(true)
-  }
+    setExpanded(true);
+  };
 
   return {
-    label: 'Publish to Kubelt',
+    label: "Publish to Kubelt",
     icon: AddIcon,
     dialog: dialogOpen && {
-      type: 'modal',
+      type: "modal",
       header: <Heading>Kubelt Publisher</Heading>,
       footer: (
         <Flex justify="space-between" align="center">
@@ -131,15 +134,15 @@ function KubeltPublishAction({published, draft, onComplete}) {
         />
       ),
       onClose: () => {
-        setDialogOpen(false)
-        setDevMode(false)
-        setExpanded(false)
+        setDialogOpen(false);
+        setDevMode(false);
+        setExpanded(false);
       },
     },
     onHandle: () => {
-      setDialogOpen(true)
+      setDialogOpen(true);
     },
-  }
+  };
 }
 
-export default KubeltPublishAction
+export default KubeltPublishAction;

@@ -1,25 +1,45 @@
-import {SanityDocument} from '@sanity/client'
-import {Box, Button, Card, Dialog, Flex, Inline, Label, Stack, Text, Tooltip} from '@sanity/ui'
-import React, {useCallback, useEffect, useState} from 'react'
+import { SanityDocument } from "@sanity/client";
+import {
+  Box,
+  Button,
+  Card,
+  Dialog,
+  Flex,
+  Inline,
+  Label,
+  Stack,
+  Text,
+  Tooltip,
+} from "@sanity/ui";
+import React, { useCallback, useEffect, useState } from "react";
 
-import sanityService, {IDocumentStructureCounter, SanityService} from '../services/sanityService'
-import SemanticService from '../services/semanticService'
+import sanityService, {
+  IDocumentStructureCounter,
+  SanityService,
+} from "../services/sanityService";
+import SemanticService from "../services/semanticService";
 
-function ExpandStep({doc, docExpHandler}: {doc: SanityDocument; docExpHandler: any}) {
-  const [expDoc, setExpDoc] = useState(null)
+function ExpandStep({
+  doc,
+  docExpHandler,
+}: {
+  doc: SanityDocument;
+  docExpHandler: any;
+}) {
+  const [expDoc, setExpDoc] = useState(null);
 
-  const [expandedShallow, setExpandedShallow] = useState(false)
-  const [expandedDeep, setExpandedDeep] = useState(false)
+  const [expandedShallow, setExpandedShallow] = useState(false);
+  const [expandedDeep, setExpandedDeep] = useState(false);
 
-  const [deepPromptOpen, setDeepPromptOpen] = useState(false)
-  const [deepPromptAccepted, setDeepPromptAccepted] = useState(false)
+  const [deepPromptOpen, setDeepPromptOpen] = useState(false);
+  const [deepPromptAccepted, setDeepPromptAccepted] = useState(false);
 
   const onClose = useCallback(() => {
-    setDeepPromptOpen(false)
-    expand(true)
-  }, [])
+    setDeepPromptOpen(false);
+    expand(true);
+  }, []);
 
-  const onOpen = useCallback(() => setDeepPromptOpen(true), [])
+  const onOpen = useCallback(() => setDeepPromptOpen(true), []);
 
   const expand = async (deep: boolean) => {
     const counter: IDocumentStructureCounter = {
@@ -28,33 +48,37 @@ function ExpandStep({doc, docExpHandler}: {doc: SanityDocument; docExpHandler: a
       objects: 0,
       primitives: 0,
       references: 0,
-    }
+    };
 
-    const expandedDoc = await sanityService.expandObjectAsync(doc, counter, deep)
+    const expandedDoc = await sanityService.expandObjectAsync(
+      doc,
+      counter,
+      deep
+    );
 
-    setExpDoc(expandedDoc)
-    docExpHandler(expandedDoc, counter)
+    setExpDoc(expandedDoc);
+    docExpHandler(expandedDoc, counter);
 
     if (deep) {
-      setExpandedShallow(false)
-      setExpandedDeep(true)
+      setExpandedShallow(false);
+      setExpandedDeep(true);
     } else {
-      setExpandedShallow(true)
-      setExpandedDeep(false)
+      setExpandedShallow(true);
+      setExpandedDeep(false);
     }
-  }
+  };
 
   const tryExpand = async (deep: boolean) => {
     if (deep) {
       if (!deepPromptAccepted) {
-        onOpen()
+        onOpen();
       } else {
-        expand(deep)
+        expand(deep);
       }
     } else {
-      expand(deep)
+      expand(deep);
     }
-  }
+  };
 
   return (
     <Box padding={2}>
@@ -94,28 +118,28 @@ function ExpandStep({doc, docExpHandler}: {doc: SanityDocument; docExpHandler: a
                 // onClose={onClose}
                 zOffset={1000}
               >
-                <Card padding={4} style={{textAlign: 'center'}}>
+                <Card padding={4} style={{ textAlign: "center" }}>
                   <Stack space={4}>
                     <Text>
-                      Phasellus varius cursus nisi. Integer a laoreet nunc. Donec nec neque vitae
-                      metus imperdiet sodales quis ac elit. Aenean malesuada turpis a blandit
-                      aliquet.{' '}
+                      Phasellus varius cursus nisi. Integer a laoreet nunc.
+                      Donec nec neque vitae metus imperdiet sodales quis ac
+                      elit. Aenean malesuada turpis a blandit aliquet.{" "}
                     </Text>
 
                     <Inline space={2}>
                       <Button
                         text="Shallow"
                         onClick={() => {
-                          setDeepPromptOpen(false)
+                          setDeepPromptOpen(false);
                         }}
                       />
                       <Button
                         text="Deep"
                         tone="primary"
                         onClick={() => {
-                          setDeepPromptAccepted(true)
-                          setDeepPromptOpen(false)
-                          expand(true)
+                          setDeepPromptAccepted(true);
+                          setDeepPromptOpen(false);
+                          expand(true);
                         }}
                       />
                     </Inline>
@@ -127,7 +151,7 @@ function ExpandStep({doc, docExpHandler}: {doc: SanityDocument; docExpHandler: a
         </Stack>
       </Stack>
     </Box>
-  )
+  );
 }
 
-export default ExpandStep
+export default ExpandStep;

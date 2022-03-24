@@ -1,25 +1,28 @@
-import {ClientConfig, SanityDocument} from '@sanity/client'
+import { ClientConfig, SanityDocument } from "@sanity/client";
 
 export interface IDocumentPart {
-  _type: string
-  _id?: string | null | undefined
-  name?: string | null | undefined
+  _type: string;
+  _id?: string | null | undefined;
+  name?: string | null | undefined;
 }
 
 export interface IReferenceDocumentPart extends IDocumentPart {
-  _ref: string
+  _ref: string;
 }
 
 export interface IFileDocumentPart extends IDocumentPart {
   asset: {
-    _ref: string
-    _type: string
-  }
+    _ref: string;
+    _type: string;
+  };
 }
 
 export interface ISanityServiceSanityClient {
-  getDocument<R = any>(id: string, options?: {tag?: string}): Promise<SanityDocument<R> | undefined>
-  config(): ClientConfig
+  getDocument<R = any>(
+    id: string,
+    options?: { tag?: string }
+  ): Promise<SanityDocument<R> | undefined>;
+  config(): ClientConfig;
 }
 
 export interface ISanityService {
@@ -28,7 +31,7 @@ export interface ISanityService {
    * because the dependency on the :parts system should be extracted in order to
    * create a properly testable module
    */
-  init(sanityClient: ISanityServiceSanityClient)
+  init(sanityClient: ISanityServiceSanityClient);
 
   /**
    *
@@ -40,31 +43,31 @@ export interface ISanityService {
     documentPart: any,
     counter?: IDocumentStructureCounter,
     deep?: boolean
-  ): Promise<any>
+  ): Promise<any>;
 
   /**
    * Returns true if the sanity client has been injected elsewhere.
    * Returns false if it has not and exceptions are expected
    */
-  get IsInit(): boolean
+  get IsInit(): boolean;
 
   /**
    * Returns the configuration object for the currently running
    * Sanity instance
    */
-  get Config(): ClientConfig
+  get Config(): ClientConfig;
 }
 
 export interface IDocumentStructureCounter {
-  primitives: number
-  arrays: number
-  objects: number
-  references: number
-  files: number
+  primitives: number;
+  arrays: number;
+  objects: number;
+  references: number;
+  files: number;
 }
 
 export class SanityService implements ISanityService {
-  private _sanityClient: ISanityServiceSanityClient | null
+  private _sanityClient: ISanityServiceSanityClient | null;
 
   /**
    * Contains all different document type handlers.
@@ -75,29 +78,29 @@ export class SanityService implements ISanityService {
       documentPart: IDocumentPart,
       deep: boolean,
       counter: IDocumentStructureCounter
-    ) => Promise<any>
+    ) => Promise<any>;
   } = {
     image: this.handleFile.bind(this),
     file: this.handleFile.bind(this),
-  }
+  };
 
   public init = (sanityClient: ISanityServiceSanityClient) => {
-    this._sanityClient = sanityClient
-  }
+    this._sanityClient = sanityClient;
+  };
 
   public get IsInit(): boolean {
-    return this._sanityClient && this._sanityClient.config() !== null
+    return this._sanityClient && this._sanityClient.config() !== null;
   }
 
   public get Config(): ClientConfig {
-    return this._sanityClient.config()
+    return this._sanityClient.config();
   }
 
   public expandObjectAsync = async (
     documentPart: any,
     counter: IDocumentStructureCounter = null,
     deep = false,
-    endpoint: {valid: boolean} = null
+    endpoint: { valid: boolean } = null
   ): Promise<any> => {
     // Handle null and empty object case
     if (
@@ -105,31 +108,34 @@ export class SanityService implements ISanityService {
       (Object.keys(documentPart).length === 0 &&
         Object.getPrototypeOf(documentPart) === Object.prototype)
     ) {
-      return null
+      return null;
     }
 
     // Handle case where documentPart is an array of other objects
     if (Array.isArray(documentPart)) {
-      return this.handleArray(documentPart, deep, counter)
+      return this.handleArray(documentPart, deep, counter);
     }
 
     if (this.documentPartHandlerDict[documentPart._type]) {
       if (endpoint) {
-        endpoint.valid = true
+        endpoint.valid = true;
       }
 
       return this.documentPartHandlerDict[documentPart._type](
         documentPart as IDocumentPart,
         deep,
         counter
-      )
+      );
     }
 
-    if (documentPart._type === 'reference') {
-      if (counter) counter.references++
+    if (documentPart._type === "reference") {
+      if (counter) counter.references++;
 
       if (deep) {
-        return this.handleReference(documentPart as IReferenceDocumentPart, counter)
+        return this.handleReference(
+          documentPart as IReferenceDocumentPart,
+          counter
+        );
       }
     }
 
@@ -142,7 +148,7 @@ export class SanityService implements ISanityService {
           [key]: documentPart[key],
         }),
         {}
-      )
+      );
 
     // Map all sub-objects in the documentPart, recursively expanding them and mapping them
     // to a new object's keys. After resolving asynchronous methods, similar to the primitive approach
@@ -152,7 +158,12 @@ export class SanityService implements ISanityService {
           .filter((key) => documentPart[key] === Object(documentPart[key]))
           .map(async (key) => ({
             key,
-            object: await this.expandObjectAsync(documentPart[key], counter, deep, endpoint),
+            object: await this.expandObjectAsync(
+              documentPart[key],
+              counter,
+              deep,
+              endpoint
+            ),
           }))
       )
     ).reduce(
@@ -161,20 +172,20 @@ export class SanityService implements ISanityService {
         [kv.key]: kv.object,
       }),
       {}
-    )
+    );
 
     if (counter) {
-      counter.primitives += Object.keys(primitives).length
-      counter.objects += Object.keys(objects).length
+      counter.primitives += Object.keys(primitives).length;
+      counter.objects += Object.keys(objects).length;
     }
 
-    if (endpoint) endpoint.valid = true
+    if (endpoint) endpoint.valid = true;
 
     return {
       ...primitives,
       ...objects,
-    }
-  }
+    };
+  };
 
   /**
    * Hooks into the main studio project & dataset, returning a document that matches the unique identifier provided.
@@ -183,11 +194,11 @@ export class SanityService implements ISanityService {
    */
   private getDocument = async (id: string): Promise<IDocumentPart> => {
     if (!this._sanityClient) {
-      throw new Error()
+      throw new Error();
     }
 
-    return this._sanityClient.getDocument(id)
-  }
+    return this._sanityClient.getDocument(id);
+  };
 
   /**
    * Recursively expands all references encountered on trunk by
@@ -200,7 +211,7 @@ export class SanityService implements ISanityService {
     referenceObject: IReferenceDocumentPart,
     counter: IDocumentStructureCounter
   ): Promise<any> => {
-    if (counter) counter.references++
+    if (counter) counter.references++;
 
     return {
       ...referenceObject,
@@ -209,8 +220,8 @@ export class SanityService implements ISanityService {
         counter,
         true
       )),
-    }
-  }
+    };
+  };
 
   /**
    * Fetches file from Sanity content lake and fills in the asset data.
@@ -223,10 +234,14 @@ export class SanityService implements ISanityService {
     deep: boolean,
     counter: IDocumentStructureCounter
   ) {
-    if (counter) counter.files++
+    if (counter) counter.files++;
 
-    const document = await this.getDocument(fileObject.asset._ref)
-    const destructuredDocument = await this.expandObjectAsync(document, counter, deep)
+    const document = await this.getDocument(fileObject.asset._ref);
+    const destructuredDocument = await this.expandObjectAsync(
+      document,
+      counter,
+      deep
+    );
 
     return {
       ...fileObject,
@@ -234,7 +249,7 @@ export class SanityService implements ISanityService {
         ...fileObject.asset,
         ...destructuredDocument,
       },
-    }
+    };
   }
 
   /**
@@ -242,22 +257,28 @@ export class SanityService implements ISanityService {
    * @param array An array ideally of sanity document parts or objects covered in handlers
    * @returns An array of the expanded objects
    */
-  private async handleArray(array: any[], deep: boolean, counter: IDocumentStructureCounter) {
-    const endpoint = {valid: false}
+  private async handleArray(
+    array: any[],
+    deep: boolean,
+    counter: IDocumentStructureCounter
+  ) {
+    const endpoint = { valid: false };
 
     if (array.length > 0 && counter) {
-      counter.arrays++
+      counter.arrays++;
     }
 
     const expandedArray = await Promise.all(
-      array.map(async (ae) => this.expandObjectAsync(ae, counter, deep, endpoint))
-    )
-    if (!endpoint.valid) return null
+      array.map(async (ae) =>
+        this.expandObjectAsync(ae, counter, deep, endpoint)
+      )
+    );
+    if (!endpoint.valid) return null;
 
-    return expandedArray
+    return expandedArray;
   }
 }
 
-const sanityService = new SanityService()
+const sanityService = new SanityService();
 
-export default sanityService
+export default sanityService;

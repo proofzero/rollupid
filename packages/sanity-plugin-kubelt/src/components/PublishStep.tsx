@@ -1,5 +1,5 @@
-import {Box, Label, Stack, Text} from '@sanity/ui'
-import React from 'react'
+import { Box, Label, Stack, Text } from "@sanity/ui";
+import React from "react";
 
 import {
   VscReferences,
@@ -7,10 +7,16 @@ import {
   VscSymbolNamespace,
   VscFile,
   VscPrimitiveSquare,
-} from 'react-icons/vsc'
-import {IDocumentStructureCounter} from '../services/sanityService'
+} from "react-icons/vsc";
+import { IDocumentStructureCounter } from "../services/sanityService";
 
-function PublishStep({doc, counter}: {doc: any; counter: IDocumentStructureCounter}) {
+function PublishStep({
+  doc,
+  counter,
+}: {
+  doc: any;
+  counter: IDocumentStructureCounter;
+}) {
   return (
     <Box padding={2}>
       <Stack space={4}>
@@ -40,7 +46,7 @@ function PublishStep({doc, counter}: {doc: any; counter: IDocumentStructureCount
         )}
       </Stack>
     </Box>
-  )
+  );
 }
 
-export default PublishStep
+export default PublishStep;

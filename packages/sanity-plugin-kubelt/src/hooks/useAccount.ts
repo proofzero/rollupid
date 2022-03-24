@@ -1,19 +1,21 @@
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from "react";
 
-import {$account} from '../domain/kubeltWallet'
+import { $account } from "../domain/kubeltWallet";
 
 export const useAccount = () => {
-  const [account, setAccount] = useState(null)
+  const [account, setAccount] = useState(null);
 
   useEffect(() => {
-    const accountSub = $account.subscribe((updAccount) => setAccount(updAccount))
+    const accountSub = $account.subscribe((updAccount) =>
+      setAccount(updAccount)
+    );
 
     return () => {
-      accountSub.unsubscribe()
-    }
-  }, [])
+      accountSub.unsubscribe();
+    };
+  }, []);
 
-  return account
-}
+  return account;
+};
 
-export default useAccount
+export default useAccount;

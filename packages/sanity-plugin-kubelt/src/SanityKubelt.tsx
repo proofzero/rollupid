@@ -1,6 +1,6 @@
-import {Stack, studioTheme, ThemeProvider} from '@sanity/ui'
-import React from 'react'
-import KubeltAuth from './components/KubeltAuth'
+import { Stack, studioTheme, ThemeProvider } from "@sanity/ui";
+import React from "react";
+import KubeltAuth from "./components/KubeltAuth";
 
 // Used in Sanity project
 function SanityKubelt() {
@@ -10,7 +10,7 @@ function SanityKubelt() {
         <KubeltAuth />
       </Stack>
     </ThemeProvider>
-  )
+  );
 }
 
-export default SanityKubelt
+export default SanityKubelt;
