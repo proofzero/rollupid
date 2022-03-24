@@ -86,6 +86,8 @@
 
  :builds
  {;; DAPP (Kubelt React App)
+  ;; ---------------------------------------------------------------------------
+
   :dapp
   {:target     :browser
    :output-dir "dapp/resources/public/js/compiled"
@@ -96,8 +98,7 @@
    {:preloads []}
    :dev
    {:compiler-options
-    {:closure-defines
-     { }}}}
+    {:closure-defines {}}}}
 
   ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------
@@ -117,19 +118,21 @@
                       :output-feature-set :es-next}
    :output-to "packages/sdk-js/lib/sdk.js"}
 
-  ;; SDK (npm)
+  ;; SDK (npm + webpack)
   ;; ---------------------------------------------------------------------------
-  ;; Experimental: this build target for the SDK generates an npm module.
-  ;; TODO see if we get a better result from webpacking this build output.
+  ;; Builds an npm-compatible version of the SDK using a :browser
+  ;; conditional build. The output is run through webpack to generate
+  ;; the version of the SDK used in our web tooling, e.g. browser
+  ;; plugins.
 
-  :sdk-npm
+  :sdk-web
   {:target :npm-module
    :entries [com.kubelt.sdk]
    :compiler-options {:optimizations :advanced
                       :infer-externs :true
                       :output-feature-set :es5
                       :reader-features #{:browser}}
-   :output-dir "packages/sdk-npm/lib"}
+   :output-dir "packages/sdk-web/lib"}
 
   ;; SDK tests
   ;; ---------------------------------------------------------------------------
@@ -140,22 +143,6 @@
    :output-to "target/sdk-test.js"
    :ns-regexp "(lib|sdk)\\..*-test$"
    :autorun true}
-
-  ;; SDK (web)
-  ;; ---------------------------------------------------------------------------
-  ;; This is the core Node.js library that provides the Kubelt SDK,
-  ;; compiled for use in the browser.
-
-  ;; TODO rename to :sdk-web
-  :web
-  {:target :browser
-   :output-dir "packages/web/lib"
-   :asset-path "/js"
-   :modules {:base {:entries [com.kubelt.sdk]
-                    :init-fn com.kubelt.sdk/web-v1}}
-   :compiler-options {:output-feature-set :browser-2021
-                      :optimizations :advanced
-                      :reader-features #{:browser}}}
 
   :web-test
   {:target :browser-test
@@ -180,11 +167,6 @@
    :ns-regexp "p2p\\..*-test$"
    :compiler-options {:reader-features #{:node}}
    :output-to "target/p2p-test/p2p-test.js"}
-
-  ;; :jwt-test
-  ;; {:target :node-test
-  ;;  :ns-regexp "jwt-test$"
-  ;;  :output-to "target/jwt-test/jwt-test.js"}
 
   ;; Kubelt Debug CLI
   ;; ---------------------------------------------------------------------------
