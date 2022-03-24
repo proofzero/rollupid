@@ -163,15 +163,15 @@
   {:doc "Build release version of dapp CSS"
    :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
-  build:plugin:sanity:develop
-  {:doc "Build development version of the plugin for Sanity CMS"
-   :depends [build:sdk-web:develop]
-   :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
-
   build:plugin:sanity:release
   {:doc "Build release version of the plugin for Sanity CMS"
    :depends [build:sdk-web:release]
    :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
+
+  watch:plugin:sanity
+  {:doc "Build plugin for Sanity CMS on file change"
+   :depends [build:sdk-web:release]
+   :task (shell "npx lerna run watch --scope sanity-plugin-kubelt")}
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
