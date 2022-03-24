@@ -120,7 +120,7 @@
   build:sdk-web:develop
   {:doc "Build development version of the sdk using webpack"
    :depends [build:sdk:develop]
-   :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
+   :task (shell "npx lerna run develop --scope @kubelt/sdk-web")}
 
   build:sdk-web:release
   {:doc "Build release version of the sdk using webpack"

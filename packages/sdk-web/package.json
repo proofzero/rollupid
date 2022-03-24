@@ -30,8 +30,7 @@
     "build": "webpack --mode=production --node-env=production",
     "test": "echo \"Error: run tests from root\"",
     "nft": "echo \"Error: impl non functional tests \"",
-    "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production"
+    "develop": "webpack --mode=development"
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
