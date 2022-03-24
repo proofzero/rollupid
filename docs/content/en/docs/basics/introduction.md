@@ -1,7 +1,7 @@
 ---
 title: "Introduction"
 description: "An introduction to Kubelt"
-lead: "Ku·belt (Kuiper Belt); is a circumstellar disc in the outer Solar System, extending from the orbit of Neptune at 30 astronomical units to approximately 50 AU from the Sun."
+lead: "Kubelt is a peer-to-peer cloud for truly decentralized applications."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -10,62 +10,33 @@ menu:
   docs:
     parent: "basics"
 weight: 100
-toc: true
+toc: false
 ---
+
+<img src="/images/kubelt-banner.gif" width="{{ .Width }}" height="{{ .Height }}">
 
 ## What is Kubelt?
 
-Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.
+Kubelt's integrated peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave regular crypto wallets with the addition of content enabled APIs. These cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
 
-Curent problems..
+What content means to Kubelt really is anything! Kubelt Cores can host anything from web content, user databases, web assembly (compute), and more. Kubelt Cores are also compatible with popular wallet cryptography algorithims meaning you or your users don't need a new ID protocols to use Kubelt -- **your wallet is your entrypoint into the network!**
 
-- [ ] Discuss the choke point in the middle with graphic
-- [ ] Discuss how smart contracts are like "stored procedures" and not great for application logic
-- [ ] Discuss the permaweb
+### Getting Started
 
-Our mission at Kubelt is to disrupt and decentralize the middle-tier by providing developers with a traditional DX in a fully localized context.
+---
 
-## How does it work?
+#### Learn more
 
-Kubelt works by providing a local first, full stack developer experience that includes user management, content management, cryptographic utlities and more.
+Read about how Kubelt works by checking out our [whitepaper]({{< relref "Guides" >}}), [why kubelt?]({{< relref "why-kubelt" >}}), and our [how it works]({{< relref "How-it-works" >}}) page.
 
-With Kubelt, your application metadata is organized into a [semantic graph](https://en.wikipedia.org/wiki/Abstract_semantic_graph), distrubuted over [IPFS](https://ipfs.io) and [re-materalized](#decentralized-cdn) into any application context (e.g. browsers, servers, etc) via [user centric](#user-centric) cyrptophy/wallets.
+#### Building applications with Kubelt
 
-Access and permissioning to this data is goverened by an end-user cryptography and deterministacally defrenced through what we call ["Kubelt Cores"](#cores)
+Learn how to build applications on Kubelt by reading our [guides]({{< relref "Guides" >}}) or starting with our [quick start]({{< relref "Quick-Start" >}}) page.
 
-Read our [whitepaper](http://ipfs.io/ipfs/QmNfXy5uCQjEWabnAsvJJPGkKNc6wSZu9M9w2cNxQ8WTo8) to learn more.
+You can also login to our configuration [portal dApp](https://app.kubelt.com) to explore the network.
 
-### User Centric and Local First
+#### Join the community
 
-Get instructions on how to accomplish common tasks with Doks. [Recipes →](https://getdoks.org/docs/recipes/project-configuration/)
-
-### Decentralized Content Delivery
-
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
-
-### Kubelt Cores
-
-A Kubelt Core is made up of two parts. The `@scope` which represents a user, organization, or use case that governs a `namespace` or collection of content. A core will always be represented as `@<scope>/<namespace>` within this documentation.
-
-### Scopes
-
-### Namespaces
-
-<!--![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)-->
-
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
-
-## Use Cases
-
-## Showcase
-
-See what others have build with Doks. [Showcase →](https://getdoks.org/showcase/electric-blocks/)
-
-## Contributing
-
-Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/contributing/how-to-contribute/)
-
-## Resources
-
-- [Cores SDK Reference]({{< relref "JS#kubelt-cores" >}})
-- [Cores API Reference]({{< relref "API#kubelt-cores" >}})
+- Join our [Discord](https://discord.gg/UgwAsJf6C5) to ask questions and engage with the community.
+- Follow us on [Twitter](https://twitter.com/kubeltcms) for updates.
+- Check out our [Github](https://github.com/kubelt) and read our [contributors guidelines]({{< relref "contributing" >}}).

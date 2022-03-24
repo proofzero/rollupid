@@ -6,9 +6,6 @@ date: 2022-03-01T09:37:17-08:00
 lastmod: 2022-03-01T09:37:17-08:00
 draft: false
 images: []
-menu:
-  tutorial:
-    parent: "tutorial"
 weight: 300
 toc: true
 ---

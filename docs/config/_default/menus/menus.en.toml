@@ -9,7 +9,7 @@
   name = "Tutorial"
   weight = 15
   identifier = "tutorial"
-  url = "/tutorial/introduction"
+  url = "/tutorial/introduction/"
 
 [[main]]
  name = "Reference"
@@ -35,7 +35,14 @@
   name = "Discord"
   weight = 10
   identifier = "discord"
-  url = "https://discord.gg/K7mS3BAktG"
+  url = "https://discord.gg/UgwAsJf6C5"
+  parent = "community"
+
+[[main]]
+  name = "Discussions"
+  weight = 40
+  identifier = "gh-discussions"
+  url = "https://github.com/kubelt/kubelt/discussions"
   parent = "community"
 
 
@@ -77,25 +84,11 @@
   identifier = "help"
   url = "/docs/help/"
 
-
-
-# [[docs]]
-#   name = "Lorem"
-#   weight = 70
-#   identifier = "lorem"
-#   url = "/docs/lorem/"
-
-[[guide]]
-  name = "Lorem"
-  weight = 10
-  identifier = "lorem"
-  url = "/guide/lorem/"
-
 [[tutorial]]
-  name = "Tutorials"
+  name = "Introduction"
   weight = 10
   identifier = "tutorial-introduction"
-  url = "/tutorial/introduction"
+  url = "/tutorial/introduction/"
 
 # [[footer]]
 #   name = "Privacy"
