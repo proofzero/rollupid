@@ -56,5 +56,11 @@
     "rxjs": "7.5.2",
     "schema-dts": "1.0.0",
     "slugify": "1.6.5"
+  },
+  "devDependencies": {
+    "@types/jest": "27.4.1",
+    "jest": "27.5.1",
+    "sanipack": "2.1.0",
+    "ts-jest": "27.1.4"
   }
 }
