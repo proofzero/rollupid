@@ -7,7 +7,7 @@ images: []
 menu:
   docs:
     parent: "references"
-weight: 410
+weight: 300
 toc: true
 ---
 
@@ -112,8 +112,6 @@ https://<api.kubelt.com | CNAME>/@{core}/<some/standard/core/endpoint> -H "kbt-i
 In doing so, cores can be organized by user, organization, application and/or any other use case.
 
 {{< alert icon="👉" text="Kubelt allows CNAME configurations to help dApps access the network." />}}
-
-For more, see [Cores API →]({{< relref "api" >}})
 
 ---
 

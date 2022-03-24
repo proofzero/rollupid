@@ -1,15 +1,14 @@
 [[main]]
-  name = "Docs"
+  name = "Quick Start"
   weight = 10
-  identifier = "docs"
-  url = "/docs/basics/introduction/"
-
+  identifier = "quick-start"
+  url = "/docs/guides/quick-start/"
 
 [[main]]
-  name = "Tutorial"
+  name = "Docs"
   weight = 15
-  identifier = "tutorial"
-  url = "/tutorial/introduction/"
+  identifier = "docs"
+  url = "/docs/basics/introduction/"
 
 [[main]]
  name = "Reference"

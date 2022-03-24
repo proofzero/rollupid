@@ -68,4 +68,3 @@ Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/
 ## Resources
 
 - [Cores SDK Reference]({{< relref "JS#kubelt-cores" >}})
-- [Cores API Reference]({{< relref "API#kubelt-cores" >}})
