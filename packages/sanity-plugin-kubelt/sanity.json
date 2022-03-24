@@ -1,0 +1,24 @@
+{
+  "paths": {
+    "source": "./src",
+    "compiled": "./lib"
+  },
+  "parts": [
+    {
+      "implements": "part:@sanity/base/document-actions/resolver",
+      "path": "resolvers/actionResolver"
+    },
+    {
+      "implements": "part:@sanity/base/document-badges/resolver",
+      "path": "resolvers/badgeResolver"
+    },
+    {
+      "implements": "part:@sanity/base/tool",
+      "path": "KubeltTool"
+    },
+    {
+      "implements": "part:@sanity/base/schema-type",
+      "path": "schema/kubeltItem"
+    }
+  ]
+}

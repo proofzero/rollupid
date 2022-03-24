@@ -120,7 +120,7 @@
   build:sdk-web:develop
   {:doc "Build development version of the sdk using webpack"
    :depends [build:sdk:develop]
-   :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
+   :task (shell "npx lerna run develop --scope @kubelt/sdk-web")}
 
   build:sdk-web:release
   {:doc "Build release version of the sdk using webpack"
@@ -143,7 +143,7 @@
   build:dapp:develop
   {:doc "Build a development version of dapp"
    :task (shell "npx shadow-cljs compile dapp")} ;; TODO: add tests
-  
+
   build:dapp:css-watch
   {:doc "Watch dapp CSS and rebuild when changed"
    :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js --watch")}
@@ -155,13 +155,23 @@
   -build:dapp:watch
   {:doc "Watch all dapp sources and rebuild development version when changed"
    :depends [build:dapp:css-watch build:dapp:develop-watch]}
-  
+
   build:dapp:watch
   {:task (run '-build:dapp:watch {:parallel true})}
 
   build:dapp:release
   {:doc "Build release version of dapp CSS"
    :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
+
+  build:plugin:sanity
+  {:doc "Build release version of the plugin for Sanity CMS"
+   :depends [build:sdk-web:release]
+   :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
+
+  watch:plugin:sanity
+  {:doc "Build plugin for Sanity CMS on file change"
+   :depends [build:sdk-web:release]
+   :task (shell "npx lerna run watch --scope sanity-plugin-kubelt")}
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
@@ -208,18 +218,25 @@
   {:doc "Run dapp tests against release version"
    :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
 
+  test:plugin:sanity
+  {:doc ""
+   :depends-on [build:plugin:sanity:develop]
+   :task (shell "npx lerna run test --scope sanity-plugin-kubelt")}
+
   test:all:develop
   {:doc "Build and test all develop"
    :depends [test:sdk:cljs:develop
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
-             test:dapp:develop]}
+             test:dapp:develop
+             test:plugin:sanity]}
 
   test:all:release
   {:doc "Build and test all release"
    :depends [test:sdk:cljs:release
              test:sdk:js:release
              test:web:release
-             test:web-sdk:release
-             test:dapp:release]}}}
+             test:sdk-web:release
+             test:dapp:release
+             test:plugin:sanity]}}}

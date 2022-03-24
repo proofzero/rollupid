@@ -27,9 +27,10 @@
     "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --mode=production --node-env=production",
     "test": "echo \"Error: run tests from root\"",
-    "nft": "echo \"Error: impl non functional tests \""
+    "nft": "echo \"Error: impl non functional tests \"",
+    "develop": "webpack --mode=development"
   },
   "bugs": {
     "url": "https://github.com/kubelt/kubelt/issues"
@@ -60,18 +61,6 @@
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
     "web3": "1.7.1"
-  },
-  "devDependencies": {
-    "@babel/plugin-transform-runtime": "7.17.0",
-    "@babel/preset-env": "7.16.11",
-    "@babel/preset-react": "7.16.7",
-    "@babel/runtime": "7.17.2",
-    "babel-loader": "8.2.3",
-    "babel-plugin-transform-async-to-generator": "6.24.1",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "node-polyfill-webpack-plugin": "1.1.4",
-    "webpack": "5.69.1",
-    "webpack-cli": "4.9.2"
   },
   "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }
