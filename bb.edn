@@ -127,14 +127,6 @@
    :depends [build:sdk:release]
    :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
 
-  build:web:develop
-  {:doc "Build development version of sdk for web"
-   :task (shell "npx shadow-cljs compile web")}
-
-  build:web:release
-  {:doc "Build release version of sdk for web"
-   :task (shell "npx shadow-cljs release web")}
-
   ;; TODO: use varaibles for paths
   build:dapp:css
   {:doc "Generate CSS for the dapp"

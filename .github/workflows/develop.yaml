@@ -21,6 +21,21 @@ jobs:
         with:
           babashka-version: 0.7.8
       - run: npm run build:sdk:develop
+  sdk-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: npm run build:sdk-web:develop
   ddt:
     runs-on: ubuntu-latest
     steps:
