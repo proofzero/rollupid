@@ -205,9 +205,11 @@
   {:doc ""
    :task (shell "npx shadow-cljs compile web-test")}
 
+  ;; NB: we don't do a "release" build of :browser-test targets as that
+  ;; optimizes away some of the test machinery.
   test:web:release
   {:doc ""
-   :task (shell "npx shadow-cljs release web-test")}
+   :task (shell "npx shadow-cljs compile web-test")}
 
   test:dapp:develop
   {:doc "Run dapp tests against development version"
