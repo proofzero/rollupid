@@ -90,6 +90,7 @@
 
   :dapp
   {:target     :browser
+   :compiler-options {:reader-features #{:browser}}}
    :output-dir "dapp/resources/public/js/compiled"
    :asset-path "/js/compiled"
    :modules
