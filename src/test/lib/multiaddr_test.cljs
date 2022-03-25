@@ -30,7 +30,7 @@
       (is (map? maddr-map)
           "conversion result must be a map")
       ;; TODO write a schema for this type
-      (is (contains? maddr-map :kubelt/type))
+      (is (contains? maddr-map :com.kubelt/type))
       (is (contains? maddr-map :address/host))
       (is (contains? maddr-map :address/port))
       (is (contains? maddr-map :address/family))
