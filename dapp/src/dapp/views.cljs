@@ -5,6 +5,7 @@
    [dapp.wallet :as wallet]
    [dapp.components.layout :as layout]
    [dapp.components.login :as login]
+   [dapp.components.configure :as configure]
    ))
 
 
@@ -16,7 +17,7 @@
        current-account
           (layout/render {:router router :current-route current-route})
        (and provider (not current-account))
-          (login/render nil)
+          (configure/render nil)
        :else
           (login/render nil)
           #_"Loading...")))

@@ -1,8 +1,6 @@
 (ns dapp.components.login
   (:require
     [re-frame.core :as re-frame]
-    [com.kubelt.sdk.v1 :as sdk.v1]
-    [com.kubelt.sdk.v1.core :as sdk.core]
     [reitit.frontend.easy :as rfe]
     [dapp.wallet :as wallet]
     )
@@ -24,7 +22,7 @@
 
 (defn open-modal []
   (prn "open the modal")
-  (prn (sdk.core version))
+
   (let [modal (Web3Modal. (clj->js provider-options))]
     ;(.clearCachedProvider modal)
     (-> (.connect modal)

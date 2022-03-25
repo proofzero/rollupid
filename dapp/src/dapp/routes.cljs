@@ -37,6 +37,7 @@
 
 (re-frame/reg-sub ::current-route
   (fn [db]
+  (prn {:where "hereiam" :db db})
     (:current-route db)))
 
 ;;; Routes ;;;
