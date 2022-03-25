@@ -1,5 +1,6 @@
 ;; deps.edn
 {:paths ["src/main"]
+
  :deps
  {;; a Clojure/Script library for word case conversions
   camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
@@ -26,11 +27,17 @@
   org.web3j/crypto {:mvn/version "5.0.0"}
   ;; Minimal set of web3 utility classes
   org.web3j/utils {:mvn/version "5.0.0"}}
+
  :aliases
  {:dev {:extra-paths ["src/dev"]
         :extra-deps {fipp/fipp {:mvn/version "0.6.25"}}}
   :test {:extra-paths ["src/test"]
          :extra-deps {}}
+
+  ;; Generate literate docs from the source code using sidenote (a fork
+  ;; of marginalia).
+  :docs {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
+         :main-opts ["-m" "sidenotes.core"]}
 
   ;; $ clojure -M:lint --lint src/
   :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.03.09"}}

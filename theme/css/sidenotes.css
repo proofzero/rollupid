@@ -1,0 +1,83 @@
+body {
+    font-family: 'Montserrat';
+    background-color: #212529;
+}
+
+a, a:link, a:hover, a:visited, a:active {
+    color: #9d74e3;
+    text-decoration: none;
+}
+
+.cljlogo {
+    height: 16px;
+    vertical-align: middle;
+}
+
+.gridlayout {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 40% 58%;
+    overflow: auto;
+}
+
+.box {
+    padding: 3px;
+}
+
+.span {
+    grid-column: span 2;
+}
+
+.header {
+    background-color: #9d74e3;
+    grid-column: 1 / 3;
+}
+
+.subheader {
+    background-color: #74e3cc;
+    grid-column: 1 / 3;
+}
+
+.comment {
+    color: #74e3cc;
+}
+
+.section {
+    color: #9d74e3;
+    background-color: #212529;
+}
+
+.list {
+    color: #74e3cc;
+    background-color: #212529;
+    grid-column: 1 / 3;
+}
+
+.list > a,
+.list > a:link,
+.list > a:hover,
+.list > a:visited,
+.list > a:active {
+	color: #151413;
+}
+
+.header > a,
+.header > a:link,
+.header > a:hover,
+.header > a:visited,
+.header > a:active {
+    color: #89ff82;
+}
+
+.footer > a,
+.footer > a:link,
+.footer > a:hover,
+.footer > a:visited,
+.footer > a:active {
+    color: #89ff82;
+}
+
+.footer {
+    background-color: #9d74e3;
+    grid-column: 1 / 3;
+}

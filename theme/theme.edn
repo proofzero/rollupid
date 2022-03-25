@@ -1,0 +1,12 @@
+{:resources
+ ["css/sidenotes.css"
+  "css/shCore.css"
+  "css/shThemeSidenotes.css"
+  "js/jquery-1.7.1.min.js"
+  "js/xregexp-min.js"
+  "js/shCore.js"
+  "js/shBrushClojure.js"
+  "js/app.js"
+  "img/spacer.svg"
+  "img/cljs-white.svg"
+  "img/Clojure_logo.svg"]}
