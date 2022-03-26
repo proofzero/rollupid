@@ -53,3 +53,19 @@ jobs:
         with:
           babashka-version: 0.7.4
       - run: npm run test:all:develop
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - uses: DeLaGuardo/setup-clojure@4.0
+        with:
+          cli: 1.11.0.1097
+          #lein: latest
+          #boot: latest
+      - name: build literate docs
+        run: clojure -M:docs
+        shell: bash

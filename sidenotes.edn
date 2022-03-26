@@ -1,0 +1,18 @@
+;; sidenotes.edn
+;;
+;; Configuration for sidenotes, a literate documentation generator based
+;; on marginalia.
+;;
+;; Run the command:
+;;   $ clj -M:docs
+;; from the project root to generate the docs.
+;;
+;; The theme that controls the appearance of the generated output is
+;; located in the top-level "theme" directory.
+
+{:projectname "Kubelt"
+ :description ""
+ :output-to "docs/static/literate"
+ :toc-filename "index.html"
+ :include-readme true
+ :theme "theme"}
