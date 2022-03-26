@@ -69,3 +69,10 @@ jobs:
       - name: build literate docs
         run: clojure -M:docs
         shell: bash
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: DeLaGuardo/clojure-lint-action@master
+        with:
+          clj-kondo-args: --lint src/main --fail-level error
