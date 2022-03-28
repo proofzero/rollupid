@@ -6,11 +6,11 @@ on:
       - main
 
 jobs:
-  ddt:
+  build-ddt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
           cache: 'npm'
@@ -21,11 +21,12 @@ jobs:
         with:
           babashka-version: 0.7.8
       - run: npm run build:ddt:develop
-  kbt:
+
+  build-kbt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
           cache: 'npm'
@@ -36,36 +37,164 @@ jobs:
         with:
           babashka-version: 0.7.8
       - run: npm run build:kbt:develop
-  test:
+
+  build-p2p:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Source Builds
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - name: Setup Babashka
-        uses: turtlequeue/setup-babashka@v1.3.0
+      - uses: turtlequeue/setup-babashka@v1.3.0
         with:
-          babashka-version: 0.7.4
-      - run: npm run test:all:develop
-  docs:
+          babashka-version: 0.7.8
+      - run: npm run build:p2p:develop
+
+  build-sdk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-node@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
-      - uses: DeLaGuardo/setup-clojure@4.0
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
         with:
-          cli: 1.11.0.1097
-          #lein: latest
-          #boot: latest
-      - name: build literate docs
-        run: clojure -M:docs
-        shell: bash
+          babashka-version: 0.7.8
+      - run: npm run build:sdk:develop
+
+  # build-sdk-web:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16'
+  #         cache: 'npm'
+  #         cache-dependency-path: package-lock.json
+  #     - run: sudo apt-get install -y libsystemd-dev
+  #     - run: npm install
+  #     - uses: turtlequeue/setup-babashka@v1.3.0
+  #       with:
+  #         babashka-version: 0.7.8
+  #     - run: npm run build:sdk-web:develop
+
+  build-dapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: npm run build:dapp:develop
+
+  test-sdk-cljs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:sdk:cljs:develop
+
+  test-sdk-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:sdk:js:develop
+
+  test-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:web:develop
+        # TODO load in headless browser to execute tests
+
+  test-sdk-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:sdk-web:develop
+
+  test-dapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:sdk-web:develop
+
+  test-plugin-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: sudo apt-get install -y libsystemd-dev
+      - run: npm install
+      - uses: turtlequeue/setup-babashka@v1.3.0
+        with:
+          babashka-version: 0.7.8
+      - run: bb run test:plugin:sanity
