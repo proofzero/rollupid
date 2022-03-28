@@ -21,7 +21,13 @@
    :desc "Authenticate a user"
 
    :builder (fn [^Yargs yargs]
-              (ddt.options/options yargs))
+              (let [;; Enforce string type, otherwise yargs parses a
+                    ;; wallet address starting with "0x" as a big
+                    ;; integer.
+                    core-config #js {:describe "a @core name"
+                                     :string true}]
+                (.options yargs "core" core-config)
+                (ddt.options/options yargs)))
 
    :handler (fn [args]
               (let [args-map (js->clj args :keywordize-keys true)
