@@ -67,6 +67,7 @@
     "webpack-cli": "4.9.2"
   },
   "dependencies": {
+    "@coinbase/wallet-sdk": "3.0.5",
     "@headlessui/react": "1.5.0",
     "@heroicons/react": "1.0.5",
     "@kubelt/ddt": "file:packages\\ddt",
@@ -76,6 +77,8 @@
     "@kubelt/sdk-cljs": "file:packages\\sdk-cljs",
     "@kubelt/sdk-js": "file:packages\\sdk-js",
     "@kubelt/sdk-web": "file:packages\\sdk-web",
-    "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt"
+    "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt",
+    "walletlink": "2.5.0",
+    "web3modal": "1.9.5"
   }
 }
