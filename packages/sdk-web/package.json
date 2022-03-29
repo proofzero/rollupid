@@ -14,7 +14,7 @@
   "author": "Kubelt, Inc.",
   "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
-  "main": "lib/com.kubelt.sdk.js",
+  "main": "lib/index.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
