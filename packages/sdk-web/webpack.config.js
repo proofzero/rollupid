@@ -22,10 +22,6 @@ const config = {
   */
   plugins: [
     //new NodePolyfillPlugin(),
-    //new webpack.ProvidePlugin({
-    //  Buffer: ["buffer", "Buffer"],
-    //  process: "process/browser",
-    //}),
   ],
 };
 

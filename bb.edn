@@ -155,7 +155,13 @@
 
   build:plugin:sanity
   {:doc "Build release version of the plugin for Sanity CMS"
-   :depends [build:sdk-web:release]
+   ;; Rely on the development build of the SDK as Sanity will run the
+   ;; code through webpack and apply the optimization settings that they
+   ;; require.
+   ;;
+   ;; NB: using the release build applies "advanced" optimization that
+   ;; breaks the sanity-webpack transpiled version!
+   :depends [build:sdk-web:develop]
    :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
 
   watch:plugin:sanity
