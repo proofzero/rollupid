@@ -69,9 +69,7 @@
     "webpack-cli": "4.9.2"
   },
   "dependencies": {
-    "@coinbase/wallet-sdk": "3.0.5",
     "@headlessui/react": "1.5.0",
-    "@heroicons/react": "1.0.5",
     "@kubelt/ddt": "file:packages\\ddt",
     "@kubelt/kbt": "file:packages\\kbt",
     "@kubelt/p2p": "file:packages\\p2p",
