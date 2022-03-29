@@ -130,7 +130,7 @@
    :entries [com.kubelt.sdk]
    :compiler-options {:optimizations :advanced
                       :infer-externs :true
-                      :output-feature-set :es5
+                      :output-feature-set :es6
                       :reader-features #{:browser}}
    :output-dir "packages/sdk-web/lib"}
 
