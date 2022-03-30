@@ -1,7 +1,7 @@
 ---
 title: "How it works"
 description: "Kubelt decentralizes applications."
-lead: "Kubelt is a peer-to-peer cloud for local-first decentralized applications."
+lead: "Kubelt decentralizes applications."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -13,60 +13,61 @@ weight: 102
 toc: true
 ---
 
-At Kubelt, we're building a decentralized cloud that is user-centric without compromising usablility. With Kubelt, every user is a stand-alone, local-first, edge application that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
+## Kubelt Cores
 
-## What is Kubelt?
+At the heart of Kubelt is the **"Kubelt Core"**, an application container designed to look and feel just like a supercharged Web3 wallet.
 
-Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.
+The Kubelt Core extends the standard wallet APIs with multi-signer, content, and networking capabilities. These capabilities can be configured and organized in a way to build decentralized applications. Kubelt provides several libraries, tools and applications to work with and manage cores.
 
-Curent problems..
+In essence, Kubelt Cores turns every user is a stand-alone, local-first, edge application that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
 
-- [ ] Discuss the choke point in the middle with graphic
-- [ ] Discuss how smart contracts are like "stored procedures" and not great for application logic
-- [ ] Discuss the permaweb
+### Collaboration
 
-Our mission at Kubelt is to disrupt and decentralize the middle-tier by providing developers with a traditional DX in a fully localized context.
+Kubelt uses your existing wallet accounts as your entrypoint to the network. By signing into our application, a restricted Kubelt Core that matches your wallet address will be created or retrieved from the network. This Kubelt Core is restricted in the sense that it can only have one signer that matches the address of the Kubelt Core.
 
-## How does it work?
+Within your restricted Kubelt Core context you can begin to create or authenticate yourself into other Kubelt Core contexts (imagine having multiple pairs of 👓 that you can wear). These other Kubelt Cores can be configured with multiple signers assigned various role based access controls. In doing so, you've now enabled collaboration applications that are wallet-aware.
 
-Kubelt works by providing a local first, full stack developer experience that includes user management, content management, cryptographic utlities and more.
+Multi-signer Kubelt Cores can expose different network capabilities such as content management APIs, web sockets, web RTC brokering, and more.
 
-With Kubelt, your application metadata is organized into a [semantic graph](https://en.wikipedia.org/wiki/Abstract_semantic_graph), distrubuted over [IPFS](https://ipfs.io) and [re-materalized](#decentralized-cdn) into any application context (e.g. browsers, servers, etc) via [user centric](#user-centric) cyrptophy/wallets.
+### Content Management
 
-Access and permissioning to this data is goverened by an end-user cryptography and deterministacally defrenced through what we call ["Kubelt Cores"](#cores)
+Every Kubelt Core is enabled with content management APIs for publishing and retrieving content and can be configured to be accessible through traditinoal API gateways or with our libraries and tools.
 
-Read our [whitepaper](http://ipfs.io/ipfs/QmNfXy5uCQjEWabnAsvJJPGkKNc6wSZu9M9w2cNxQ8WTo8) to learn more.
+Any type of content can be packed into the Kubelt Cores. For instance, you can publish simple images, documents, and other static content or you can publish user databases, wasm compute, CRDTs, and even semantic graphs. All content also uses a content addresses naming system to ensure compatability with decentralized content networks like IPFS.
 
-### User Centric and Local First
+Kubelt Cores can be utilized in endless ways and even composed to together to create more complex applications.
 
-Get instructions on how to accomplish common tasks with Doks. [Recipes →](https://getdoks.org/docs/recipes/project-configuration/)
+### Composability
 
-### Decentralized Content Delivery
+Kubelt Cores are desigined to be super flexible in configuration and usage. In other words, a core in physical space is just a core but in logical space, these cores can be arranged to behave in any desired way.
 
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
+A simple example would be to create a multi-signer "organization core" called `@acmecorp` that is a gatekeeper to several "`@widget`" cores. The `@acmecorp` gating core can then be configured with a CNAME to expose it over http so that the `@widget` cores are easily queried. By doing so, `api.kubelt.com/@0x123abc/@0x456xyz` becomes `widgets.acme.org/@widget`.
 
-### Kubelt Cores
+A similar configuration can be used so that if `@acmecorp` is a SaaS-like or blockchain application with it's own users, "user cores" can be created and configured on the fly. For example, a `@acmecorp/@<user wallet address>` core can be used to private user content or `@acmecorp/@<smart contract>` core can be used to gate access to NFT content.
 
-A Kubelt Core is made up of two parts. The `@scope` which represents a user, organization, or use case that governs a `namespace` or collection of content. A core will always be represented as `@<scope>/<namespace>` within this documentation.
+Lastly, by using content addresses as the primary naming convention, content can created, signed, and exchanged between cores to solve complex business problems in novel yet simple ways. Imagine creating cores that authorize the creation of a content address to your bank account encrypted to a third-party's public key (e.g. QuickBooks) for easy and better Open Banking.
 
-### Scopes
+### Extendability
 
-### Namespaces
+We are building Kubelt Cores as a decentralized application framework. This framework is intended to be open sourced when stable so that users can self-host and extend standard APIs in a peer-to-peer configuration.
 
-<!--![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)-->
+Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6C5)
 
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
+### Local-first
 
-## Use Cases
+- IPFS
 
 ## Showcase
 
-See what others have build with Doks. [Showcase →](https://getdoks.org/showcase/electric-blocks/)
+See what others have build with Kubelt. [Showcase →]({{< relref "showcase" >}})
 
 ## Contributing
 
-Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/contributing/how-to-contribute/)
+Find out how to contribute to Kubelt. [Contributing →]({{< relref "contributing" >}})
 
 ## Resources
 
-- [Cores SDK Reference]({{< relref "JS#kubelt-cores" >}})
+- Get started with our [quick start]({{< relref "quick-start" >}}) guide.
+- Read our [whitepaper]({{< relref "whitepaper" >}}) to learn more.
+- Check out our [SDK Reference]({{< relref "JS#kubelt-cores" >}}) docs.
+- FAQ and troubleshooting in our [help]({{< relref "help" >}}) section.
