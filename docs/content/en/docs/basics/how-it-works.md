@@ -55,7 +55,9 @@ Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6
 
 ### Local-first
 
-- IPFS
+Kubelt is local-first by default in order to provide a full-stack, local developer experience. In doing so, we ensure applications are user-centric and decentralized.
+
+Kubelt will also always try to deliver and publish content over available decentralized networks like IPFS and fall back to http gatways when needed without.
 
 ## Showcase
 
