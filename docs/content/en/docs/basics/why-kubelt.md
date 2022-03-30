@@ -1,7 +1,7 @@
 ---
 title: "Why Kubelt?"
-description: "Kubelt decentralizes applications."
-lead: "Kubelt is a peer-to-peer cloud for local-first decentralized applications."
+description: "Kubelt decentralizes the middle-tier."
+lead: ""
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -10,10 +10,13 @@ menu:
   docs:
     parent: "basics"
 weight: 101
-toc: true
+toc: false
 ---
 
-## What is Kubelt?
+Kubelt is building the decentralized cloud to provide a better, faster, and cheaper platform for applications, developer and users.
+
+- Switching cost
+- Next billion
 
 Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.
 

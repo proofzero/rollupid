@@ -11,7 +11,7 @@
   url = "/docs/basics/introduction/"
 
 [[main]]
- name = "Reference"
+ name = "SDK"
  url = "https://reference.kubelt.com"
  weight = 20
 
@@ -83,11 +83,11 @@
   identifier = "help"
   url = "/docs/help/"
 
-[[tutorial]]
-  name = "Introduction"
+[[showcase]]
+  name = "Showcase"
   weight = 10
-  identifier = "tutorial-introduction"
-  url = "/tutorial/introduction/"
+  identifier = "showcase"
+  url = "/showcase/"
 
 # [[footer]]
 #   name = "Privacy"

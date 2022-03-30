@@ -1,5 +1,5 @@
 ---
-title: "How it works?"
+title: "How it works"
 description: "Kubelt decentralizes applications."
 lead: "Kubelt is a peer-to-peer cloud for local-first decentralized applications."
 date: 2020-10-06T08:48:45+00:00
