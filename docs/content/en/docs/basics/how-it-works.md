@@ -13,6 +13,8 @@ weight: 102
 toc: true
 ---
 
+At Kubelt, we're building a decentralized cloud that is user-centric without compromising usablility. With Kubelt, every user is a stand-alone, local-first, edge application that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
+
 ## What is Kubelt?
 
 Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.

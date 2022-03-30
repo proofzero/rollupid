@@ -1,5 +1,5 @@
 ---
-title: "Dynamic NFT content mangement"
+title: "Plugins"
 description: ""
 lead: ""
 date: 2022-03-01T09:44:41-08:00
@@ -9,6 +9,6 @@ images: []
 menu:
   docs:
     parent: "guides"
-weight: 200
+weight: 250
 toc: true
 ---

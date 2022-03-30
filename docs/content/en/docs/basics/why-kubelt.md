@@ -1,7 +1,7 @@
 ---
 title: "Why Kubelt?"
 description: "Kubelt decentralizes the middle-tier."
-lead: ""
+lead: "Kubelt is building the decentralized cloud to provide a better, faster, and more fair cloud."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -10,64 +10,56 @@ menu:
   docs:
     parent: "basics"
 weight: 101
-toc: false
+toc: true
 ---
 
-Kubelt is building the decentralized cloud to provide a better, faster, and cheaper platform for applications, developer and users.
+FOCUS ON THE BENEFITS and better than current and new:
+Things to discuss:
 
-- Switching cost
-- Next billion
+- Better for web2 and for web3
+- bring your web2 properities to web3
+- Switching cost / easty to use / dx
+- resiliance, permanance, decentralized
+- interoperable, composable
+- centralized middle tier (includes compute too!)
 
-Kubelt is building the web3 cloud — think “next generation Cloudflare” — leveraging peer-to-peer (p2p) protocols and decentralized platforms.
+### Stop paying the cloud tax\!
 
-Curent problems..
+Existing cloud providers surprise users with **unfair fees** that scale with the success of their applications.
 
-- [ ] Discuss the choke point in the middle with graphic
-- [ ] Discuss how smart contracts are like "stored procedures" and not great for application logic
-- [ ] Discuss the permaweb
+With Kubelt, applications and content are optionally deployed to the edge over a decentralized, local-first content routing and delivery network called IPFS, saving users from egress and other variable cloud fees.
 
-Our mission at Kubelt is to disrupt and decentralize the middle-tier by providing developers with a traditional DX in a fully localized context.
+### Users are the application
 
-## How does it work?
+Traditional applications incentivize data aggregration that require large and expensive databases with complex governance overhead.
 
-Kubelt works by providing a local first, full stack developer experience that includes user management, content management, cryptographic utlities and more.
+With Kubelt, applications are namespaced within our [Kubelt Cores]({{< relref "How-it-works" >}}) permissioned to individual user cryptography and designed to run in a fully local context -- **just like a wallet**. Access to application data, configurations and more is controlled by APIs just like with your favorite web3 wallet.
 
-With Kubelt, your application metadata is organized into a [semantic graph](https://en.wikipedia.org/wiki/Abstract_semantic_graph), distrubuted over [IPFS](https://ipfs.io) and [re-materalized](#decentralized-cdn) into any application context (e.g. browsers, servers, etc) via [user centric](#user-centric) cyrptophy/wallets.
+These applications that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
 
-Access and permissioning to this data is goverened by an end-user cryptography and deterministacally defrenced through what we call ["Kubelt Cores"](#cores)
+### Content management; not content storage
 
-Read our [whitepaper](http://ipfs.io/ipfs/QmNfXy5uCQjEWabnAsvJJPGkKNc6wSZu9M9w2cNxQ8WTo8) to learn more.
+The current state of decentralized storage is a high-touch experience that requires a certain level of knowledge about cryptography, networking, and more.
 
-### User Centric and Local First
+Kubelt abstracts this complexity away with an intuitive headless content management experience for developers and non-techinical users with existing CMS [plugins]({{< relref "plugins" >}}).
 
-Get instructions on how to accomplish common tasks with Doks. [Recipes →](https://getdoks.org/docs/recipes/project-configuration/)
+Content to Kubelt is **everything** from documents, databases, rich media, wasm compute, and more. All content remains encapsualted within a Kubelt Core and distributed over a decentralized network.
 
-### Decentralized Content Delivery
+### Advantages for Web2 apps too
 
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
+Connect and expand your existing application stack with an integrated edge platform to take advantage and benefit from decentralization.
 
-### Kubelt Cores
+Kubelt cores makes your applications wallet-aware to simplify identity protocols and enable novel, user-centric application development.
 
-A Kubelt Core is made up of two parts. The `@scope` which represents a user, organization, or use case that governs a `namespace` or collection of content. A core will always be represented as `@<scope>/<namespace>` within this documentation.
+Our Javascript tools and libraries provide a familiar developer experience to make all of this easy and intuitive.
 
-### Scopes
+### Eventual Consistency + Consensus
 
-### Namespaces
+Blockchain is Web3 but, Web3 is not just blockchain. The middle-tier is still centralized to provide access to bridge decentralized clients with decentralized back-ends. Smart contracts where introduced to address part of this problem but introduce new problems in speed, cost, and cascading effects (you don't want a bug in your business logic to cause a major financial loss).
 
-<!--![kubelt cores](https://ipfs.io/ipfs/QmTwwzAE4rbuYsWK2bjBxVmuJVTTHEuetVDCBHiuhLzgAH?filename=kubeltcores.png)-->
+Kubelt decentralizes the middle-tier, in an eventually consistent network, in the same way as your stateless web framework moved application logic outside of databases and stored procedures while also providing novel capabilities such as:
 
-Learn how to customize Doks to fully make it your own. [Reference Guides →](https://getdoks.org/docs/reference-guides/security/)
-
-## Use Cases
-
-## Showcase
-
-See what others have build with Doks. [Showcase →](https://getdoks.org/showcase/electric-blocks/)
-
-## Contributing
-
-Find out how to contribute to Doks. [Contributing →](https://getdoks.org/docs/contributing/how-to-contribute/)
-
-## Resources
-
-- [Cores SDK Reference]({{< relref "JS#kubelt-cores" >}})
+- Interoperability with tranditional and blockchain applications.
+- Zero-knowledge content management
+- Multi-signing mutations
+- Peer-to-peer collaboration

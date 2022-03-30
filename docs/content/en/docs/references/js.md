@@ -17,7 +17,7 @@ This reference documents every object and method available in Stripe's JavaScrip
 
 #### Looking for a step-by-step guide?
 
-Learn to setup [Dynamic NFT Content]({{< relref "NFT" >}}) and [Kubelt dApp]({{< relref "dapp" >}}) guides.
+Take a look at our guides.
 
 #### Not a developer?
 
