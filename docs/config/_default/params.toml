@@ -7,7 +7,7 @@ titleAddition = "Decentralized content management"
 description = "Decentralized content management"
 
 ## Documentation
-docsVersion = "0.1"
+docsVersion = "next"
 
 ## Open Graph
 images = ["images/sociallogo.png"]

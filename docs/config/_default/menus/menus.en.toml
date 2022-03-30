@@ -2,13 +2,13 @@
   name = "Quick Start"
   weight = 10
   identifier = "quick-start"
-  url = "/docs/guides/quick-start/"
+  url = "/docs/next/guides/quick-start/"
 
 [[main]]
   name = "Docs"
   weight = 15
   identifier = "docs"
-  url = "/docs/basics/introduction/"
+  url = "/docs/next/basics/introduction/"
 
 [[main]]
  name = "SDK"
@@ -63,25 +63,19 @@
   name = "Basics"
   weight = 10
   identifier = "basics"
-  url = "/docs/basics/"
+  url = "/docs/next/basics/"
 
 [[docs]]
   name = "Guides"
   weight = 70
   identifier = "guides"
-  url = "/docs/guides/"
-
-[[docs]]
-  name = "Reference"
-  weight = 70
-  identifier = "references"
-  url = "/docs/references/"
+  url = "/docs/next/guides/"
 
 [[docs]]
   name = "Help"
   weight = 60
   identifier = "help"
-  url = "/docs/help/"
+  url = "/docs/next/help/"
 
 [[showcase]]
   name = "Showcase"
