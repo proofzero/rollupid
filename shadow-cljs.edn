@@ -99,7 +99,8 @@
    {:preloads []}
    :dev
    {:compiler-options
-    {:closure-defines {}}}}
+    {:reader-features #{:browser}}
+     :closure-defines {}}}}
 
   ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------
