@@ -2,21 +2,21 @@
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require-macros
-   [cljs.core.async.macros :refer [go]])
+    [cljs.core.async.macros :refer [go]])
   (:require
-   [cljs.core.async :as async :refer [<!]])
+    [cljs.core.async :as async :refer [<!]])
   (:require
-   [goog.net.XhrIo :as xhrio]
-   [goog.structs :as structs]
-   [goog.Uri.QueryData :as query]
-   [malli.core :as malli]
-   [malli.error :as me])
+    [goog.net.XhrIo :as xhrio]
+    [goog.structs :as structs]
+    [goog.Uri.QueryData :as query]
+    [malli.core :as malli]
+    [malli.error :as me])
   (:require
-   [com.kubelt.lib.http.media-type :as http.media-type]
-   [com.kubelt.lib.http.shared :as http.shared]
-   [com.kubelt.lib.json :as lib.json]
-   [com.kubelt.proto.http :as proto.http]
-   [com.kubelt.spec.http :as spec.http]))
+    [com.kubelt.lib.http.media-type :as http.media-type]
+    [com.kubelt.lib.http.shared :as http.shared]
+    [com.kubelt.lib.json :as lib.json]
+    [com.kubelt.proto.http :as proto.http]
+    [com.kubelt.spec.http :as spec.http]))
 
 
 ;; Public
@@ -71,6 +71,7 @@
         response-chan)
       ;; The request map is valid, so fire off the request.
 
+      ;; FIXME set url, body and header correctly
       (xhrio/send
         (http.shared/request->method m)
         "fixme:urlhere" ; url
@@ -81,4 +82,20 @@
 
       )))
 
-
+(comment 
+  "request map example"
+  {:kubelt/type :kubelt.type/uri
+   :http/method method
+   :http/version version
+   :http/headers headers
+   :http/trailers trailers
+   :http/status status
+   :http/body body
+   :uri/scheme scheme
+   :uri/port port
+   :uri/path path
+   :uri/fragment fragment
+   :uri/query query
+   :uri/domain domain
+   :uri/user user}
+  )
