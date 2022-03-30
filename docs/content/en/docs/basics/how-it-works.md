@@ -71,5 +71,5 @@ Find out how to contribute to Kubelt. [Contributing →]({{< relref "contributin
 
 - Get started with our [quick start]({{< relref "quick-start" >}}) guide.
 - Read our [whitepaper]({{< relref "whitepaper" >}}) to learn more.
-- Check out our [SDK Reference]({{< relref "JS#kubelt-cores" >}}) docs.
+- Check out our [SDK Reference](#) docs.
 - FAQ and troubleshooting in our [help]({{< relref "help" >}}) section.
