@@ -1,15 +1,15 @@
 ---
-title: "Troubleshooting"
-description: "Solutions to common problems."
-lead: "Solutions to common problems."
-date: 2020-11-12T15:22:20+01:00
-lastmod: 2020-11-12T15:22:20+01:00
+title: "Javascript"
+description: ""
+lead: ""
+date: 2022-03-01T09:44:41-08:00
+lastmod: 2022-03-01T09:44:41-08:00
 draft: false
 images: []
 menu:
   docs:
-    parent: "help"
-weight: 800
+    parent: "guides"
+weight: 220
 toc: false
 ---
 

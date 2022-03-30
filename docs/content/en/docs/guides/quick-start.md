@@ -1,15 +1,15 @@
 ---
-title: "Troubleshooting"
-description: "Solutions to common problems."
-lead: "Solutions to common problems."
-date: 2020-11-12T15:22:20+01:00
-lastmod: 2020-11-12T15:22:20+01:00
+title: "Quick Start"
+description: ""
+lead: ""
+date: 2020-11-16T13:59:39+01:00
+lastmod: 2020-11-16T13:59:39+01:00
 draft: false
 images: []
 menu:
   docs:
-    parent: "help"
-weight: 800
+    parent: "guides"
+weight: 200
 toc: false
 ---
 
