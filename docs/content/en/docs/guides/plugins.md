@@ -10,7 +10,11 @@ menu:
   docs:
     parent: "guides"
 weight: 250
-toc: true
+toc: false
 ---
 
-# Coming soon
+### Coming soon
+
+Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6C5)
+
+Request early access. [Get Access →](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf)

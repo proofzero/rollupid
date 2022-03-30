@@ -10,21 +10,11 @@ menu:
   docs:
     parent: "help"
 weight: 800
-toc: true
+toc: false
 ---
 
-## Problems updating npm packages
+### Coming soon
 
-Delete the `./node_modules` folder, and run again:
+Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6C5)
 
-```bash
-npm install
-```
-
-## Problems with cache
-
-Delete the temporary directories:
-
-```bash
-npm run clean
-```
+Request early access. [Get Access →](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf)
