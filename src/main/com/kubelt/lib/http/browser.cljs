@@ -4,6 +4,7 @@
   (:require-macros
     [cljs.core.async.macros :refer [go]])
   (:require
+    [clojure.string :as str]
     [cljs.core.async :as async :refer [<!]])
   (:require
     [goog.net.XhrIo :as xhrio]
@@ -60,27 +61,31 @@
 
     [this m]
     (prn {:hereiam "browser-http" :request m})
-    (if-not (malli/validate spec.http/request m)
+;;    (if-not (malli/validate spec.http/request m)
       ;; TODO report an error using common error reporting
       ;; functionality (anomalies).
       (let [explain (-> spec.http/request (malli/explain m) me/humanize)
             error {:com.kubelt/type :kubelt.type/error
                    :error explain}
-            response-chan (async/chan)]
-        #_(async/put!  response-chanerror)
-        response-chan)
-      ;; The request map is valid, so fire off the request.
+            response-chan (async/chan)
+            ; build url
+            method (http.shared/request->method m)
+            ;; TODO check method and send post or get
+            scheme (http.shared/request->scheme m)
+            domain (http.shared/request->domain m)
+            port (http.shared/request->port m)
+            path (http.shared/request->path m)
+            headers (http.shared/request->headers m)
+            body (http.shared/request->body m)
+            url (str/join "" [scheme "://" domain ":" port path ])]
 
-      ;; FIXME set url, body and header correctly
-      (xhrio/send
-        (http.shared/request->method m)
-        "fixme:urlhere" ; url
-        on-response
-        (http.shared/request->method m)
-        "fixme:postbody" 
-        "fixme:headers")
+        (prn url)
+        (xhrio/send
+          url
+          )
+        response-chan)))
+;; The request map is valid, so fire off the request.
 
-      )))
 
 (comment 
   "request map example"

@@ -10,8 +10,8 @@
 (def log-level :info)
 
 (def default-p2p
-  {:p2p/read "/ip4/127.0.0.1/tcp/9061"
-   :p2p/write "/ip4/127.0.0.1/tcp/9061"})
+  {:p2p/read "/ip4/127.0.0.1/tcp/8787"
+   :p2p/write "/ip4/127.0.0.1/tcp/8787"})
 
 (def default-logging
   {:logging/min-level log-level})
