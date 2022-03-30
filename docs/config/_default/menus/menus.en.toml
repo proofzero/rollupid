@@ -63,7 +63,7 @@
   name = "Basics"
   weight = 10
   identifier = "basics"
-  url = "/docs/next/basics/"
+  url = "/docs/basics/"
 
 [[docs]]
   name = "Guides"
