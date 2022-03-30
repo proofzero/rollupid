@@ -1,5 +1,6 @@
 (ns dapp.core
   (:require
+    [com.kubelt.lib.http.browser :as lib.http]
     [com.kubelt.sdk.v1 :as sdk.v1]
     [com.kubelt.sdk.v1.core :as sdk.core]
     [reagent.dom :as rdom]
@@ -7,7 +8,7 @@
     [dapp.config :as config]
     [dapp.views :as views]
     [dapp.routes :as routes]))
-
+ 
 
 (defn dev-setup []
   (when config/debug?
@@ -29,6 +30,7 @@
 
 (re-frame/reg-event-db ::initialize-db
                        (fn [db _]
+                         
                          (sdk.v1/init)))
 
 (re-frame/reg-sub ::current-user
