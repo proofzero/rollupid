@@ -38,7 +38,6 @@
   proto.http/HttpClient
   (request!
     [this m]
-    ;;{:pre [(malli/validate spec.http/request m)]}
     (prn {:hereiam "browser-http" :request m})
     ;; (if-not (malli/validate spec.http/request m)
     ;; TODO report an error using common error reporting
@@ -85,11 +84,4 @@
    :uri/query query
    :uri/domain domain
    :uri/user user}
-
-  (let []
-    (xhr/send "http://example.com"
-              (fn [^js event]
-                (let [res (-> event .-target .getResponseText)]
-                  (prn res)
-                  ))))
   )
