@@ -33,7 +33,7 @@
         body {:address address}
         body-str (lib.json/edn->json-str body)
 
-        path (cstr/join "/" ["" core "auth"])
+        path (cstr/join "" ["/@" core "/auth"])
 
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
@@ -59,7 +59,7 @@
         port (get-in sys [:client/p2p :p2p/write :address/port])
         body {:nonce nonce :signature signature}
         body-str (lib.json/edn->json-str body)
-        path (cstr/join "/" ["" core "auth" "verify"])
+        path (cstr/join "" ["/@" core "/auth/verify"])
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
