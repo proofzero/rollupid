@@ -46,10 +46,11 @@
 (defn to-edn
   "Given a JavaScript wallet object, return a corresponding Clojure map."
   [wallet-obj]
-  (if-let [sign-fn (goog.object/get wallet-obj "signFn")]
+  (let [address (goog.object/get wallet-obj "address")
+        sign-fn (goog.object/get wallet-obj "signFn")]
     {:com.kubelt/type :kubelt.type/wallet
-     :wallet/sign-fn sign-fn}
-    (lib.error/error "missing wallet signing function")))
+     :wallet/address address
+     :wallet/sign-fn sign-fn}))
 
 (defn no-op
   "Return a no-op wallet that can be used as a placeholder."

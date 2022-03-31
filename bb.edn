@@ -119,21 +119,11 @@
 
   build:sdk-web:develop
   {:doc "Build development version of the sdk using webpack"
-   :depends [build:sdk:develop]
-   :task (shell "npx lerna run develop --scope @kubelt/sdk-web")}
+   :task (shell "npx lerna run build:develop --scope @kubelt/sdk-web")}
 
   build:sdk-web:release
   {:doc "Build release version of the sdk using webpack"
-   :depends [build:sdk:release]
-   :task (shell "npx lerna run build --scope @kubelt/sdk-web")}
-
-  build:web:develop
-  {:doc "Build development version of sdk for web"
-   :task (shell "npx shadow-cljs compile web")}
-
-  build:web:release
-  {:doc "Build release version of sdk for web"
-   :task (shell "npx shadow-cljs release web")}
+   :task (shell "npx lerna run build:release --scope @kubelt/sdk-web")}
 
   ;; TODO: use varaibles for paths
   build:dapp:css
@@ -165,7 +155,13 @@
 
   build:plugin:sanity
   {:doc "Build release version of the plugin for Sanity CMS"
-   :depends [build:sdk-web:release]
+   ;; Rely on the development build of the SDK as Sanity will run the
+   ;; code through webpack and apply the optimization settings that they
+   ;; require.
+   ;;
+   ;; NB: using the release build applies "advanced" optimization that
+   ;; breaks the sanity-webpack transpiled version!
+   :depends [build:sdk-web:develop]
    :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
 
   watch:plugin:sanity
@@ -211,6 +207,19 @@
   {:doc ""
    :task (shell "npx shadow-cljs compile web-test")}
 
+  test:web:ci:compile
+  {:doc "Build web tests for headless execution using karma"
+   :task (shell "npx shadow-cljs compile web-ci")}
+
+  test:web:ci:run
+  {:doc "Run web tests using headless chrome using karma"
+   ;; (shell {:extra-env {"CHROME_BIN" "/snap/bin/chromium"}})
+   :task (shell "npx karma start --single-run --no-fail-on-empty-test-suite")}
+
+  test:web:ci
+  {:doc "Run web tests using headless browser"
+   :depends [test:web:ci:compile test:web:ci:run]}
+
   test:dapp:develop
   {:doc "Run dapp tests against development version"
    :depends-on [build:dapp:develop]
@@ -222,7 +231,7 @@
 
   test:plugin:sanity
   {:doc ""
-   :depends-on [build:plugin:sanity:develop]
+   :depends-on [build:plugin:sanity]
    :task (shell "npx lerna run test --scope sanity-plugin-kubelt")}
 
   test:all:develop

@@ -27,7 +27,8 @@
     "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "build": "webpack --mode=production --node-env=production",
+    "build:develop": "bb run build:develop",
+    "build:release": "bb run build:release",
     "test": "echo \"Error: run tests from root\"",
     "nft": "echo \"Error: impl non functional tests \"",
     "develop": "webpack --mode=development"
