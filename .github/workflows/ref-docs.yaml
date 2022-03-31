@@ -8,7 +8,18 @@ on:
   pull_request:
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            sdk: 'src/**'
   literate:
+    if: steps.changes.outputs.sdk == 'true'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
