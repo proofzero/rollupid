@@ -59,31 +59,28 @@
         (prn url)
         (xhrio/send
           url
-;;          #( (on-response (js->clj (.-target %)) response-chan ) )
-#(js/alert ; callback
-               (str (.getResponseText (.-target %))))
-            "GET" ;; method
-            [] ;; headers
-            0 ;; timeout 
-            )
-        response-chan)))
-;; The request map is valid, so fire off the request.
+          (fn [_ ^js ret]
+            (js/console.log ; callback
+                      (str (.getResponseText (.-target ret))))
+            ))
+          response-chan)))
+  ;; The request map is valid, so fire off the request.
 
 
-(comment 
-  "request map example"
-  {:kubelt/type :kubelt.type/uri
-   :http/method method
-   :http/version version
-   :http/headers headers
-   :http/trailers trailers
-   :http/status status
-   :http/body body
-   :uri/scheme scheme
-   :uri/port port
-   :uri/path path
-   :uri/fragment fragment
-   :uri/query query
-   :uri/domain domain
-   :uri/user user}
-  )
+  (comment 
+    "request map example"
+    {:kubelt/type :kubelt.type/uri
+     :http/method method
+     :http/version version
+     :http/headers headers
+     :http/trailers trailers
+     :http/status status
+     :http/body body
+     :uri/scheme scheme
+     :uri/port port
+     :uri/path path
+     :uri/fragment fragment
+     :uri/query query
+     :uri/domain domain
+     :uri/user user}
+    )
