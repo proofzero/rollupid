@@ -26,5 +26,5 @@
 (defn write-to-ipfs!
   "Write a BAG to IPFS, returning a CID."
   [sys bag]
-  ;; TODO
+  ;; TODO complete
   )
