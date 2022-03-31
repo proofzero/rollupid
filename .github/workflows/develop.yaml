@@ -8,6 +8,8 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
+    outputs:
+      stacks: ${{ steps.filter.outputs.changes }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -23,7 +25,8 @@ jobs:
 
 
   build-ddt:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -40,7 +43,8 @@ jobs:
       - run: npm run build:ddt:develop
 
   build-kbt:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -57,7 +61,8 @@ jobs:
       - run: npm run build:kbt:develop
 
   build-p2p:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -74,7 +79,8 @@ jobs:
       - run: npm run build:p2p:develop
 
   build-sdk:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -91,7 +97,8 @@ jobs:
       - run: npm run build:sdk:develop
 
   build-sdk-web:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -108,7 +115,8 @@ jobs:
       - run: npm run build:sdk-web:develop
 
   test-sdk-cljs:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -125,7 +133,8 @@ jobs:
       - run: npm run test:sdk:cljs:develop
 
   test-sdk-js:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -142,7 +151,8 @@ jobs:
       - run: npm run test:sdk:js:develop
 
   test-web:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     env:
       CHROME_BIN: /snap/bin/chromium
@@ -178,7 +188,8 @@ jobs:
   #     - run: npm run test:sdk-web:develop
 
   test-dapp:
-    if: steps.changes.outputs.dapp == 'true'
+    needs: changes
+    if: needs.changes.outputs.dapp == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -195,7 +206,8 @@ jobs:
       - run: npm run test:dapp:develop
 
   test-plugin-sanity:
-    if: steps.changes.outputs.sanity == 'true'
+    needs: changes
+    if: needs.changes.outputs.sanity == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master

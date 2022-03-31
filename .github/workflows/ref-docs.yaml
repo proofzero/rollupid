@@ -10,6 +10,8 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
+    outputs:
+      stacks: ${{ steps.filter.outputs.changes }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -19,7 +21,8 @@ jobs:
           filters: |
             sdk: 'src/**'
   literate:
-    if: steps.changes.outputs.sdk == 'true'
+    needs: changes
+    if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
