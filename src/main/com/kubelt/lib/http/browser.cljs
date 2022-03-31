@@ -57,7 +57,6 @@
           headers (http.shared/request->headers m)
           body (http.shared/request->body m)
           url (str/join "" [scheme "://" domain ":" port path ])]
-      (prn url)
       (xhrio/send
        url
        ;; #( (on-response (js->clj (.-target %)) response-chan ) )
