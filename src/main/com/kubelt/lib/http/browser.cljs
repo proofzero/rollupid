@@ -2,25 +2,24 @@
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
   (:require
-   [goog.net.XhrIo :as xhr])
+   [goog.Uri.QueryData :as query]
+   [goog.net.XhrIo :as xhrio]
+   [goog.structs :as structs])
   (:require-macros
-    [cljs.core.async.macros :refer [go]])
+   [cljs.core.async.macros :refer [go]])
   (:require
-    [clojure.string :as str]
-    [cljs.core.async :as async :refer [<!]])
+   [cljs.core.async :as async :refer [<!]]
+   [clojure.string :as str])
   (:require
-    [goog.net.XhrIo :as xhrio]
-    [goog.structs :as structs]
-    [goog.Uri.QueryData :as query]
-    [malli.core :as malli]
-    [malli.error :as me])
+   [malli.core :as malli]
+   [malli.error :as me])
   (:require
-    [com.kubelt.lib.http.media-type :as http.media-type]
-    [com.kubelt.lib.http.shared :as http.shared]
-    [com.kubelt.lib.json :as lib.json]
-    [com.kubelt.proto.http :as proto.http]
-    [com.kubelt.spec.http :as spec.http]))
-
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.http.media-type :as http.media-type]
+   [com.kubelt.lib.http.shared :as http.shared]
+   [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.proto.http :as proto.http]
+   [com.kubelt.spec.http :as spec.http]))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
