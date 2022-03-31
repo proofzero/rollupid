@@ -40,7 +40,7 @@
     (prn {:hereiam "browser-http" :request m})
     (if-not (malli/validate spec.http/request m)
       ;; The request map is invalid, return a map describing the error.
-      (lib.error/explain spec.http/request explain m)
+      (lib.error/explain spec.http/request m)
       ;; We have a valid request map, construct a URL from it before
       ;; making a request.
       (let [response-chan (async/chan)
