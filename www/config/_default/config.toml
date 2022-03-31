@@ -49,8 +49,9 @@ rel  = "sitemap"
   priority = 0.5
 
 [taxonomies]
-  contributor = "contributors"
-  contributor = "case-studies"
+  "Case Study" = "Case Studies"
+  category = "categories"
+  tag = "tags"
 
 [permalinks]
   blog = "/blog/:title/"
