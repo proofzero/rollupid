@@ -1,6 +1,8 @@
 (ns com.kubelt.lib.http.browser
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  (:require
+   [goog.net.XhrIo :as xhr])
   (:require-macros
     [cljs.core.async.macros :refer [go]])
   (:require
@@ -35,52 +37,57 @@
 (defrecord HttpClient []
   proto.http/HttpClient
   (request!
-
     [this m]
+    ;;{:pre [(malli/validate spec.http/request m)]}
     (prn {:hereiam "browser-http" :request m})
-;;    (if-not (malli/validate spec.http/request m)
-      ;; TODO report an error using common error reporting
-      ;; functionality (anomalies).
-      (let [explain (-> spec.http/request (malli/explain m) me/humanize)
-            error {:com.kubelt/type :kubelt.type/error
-                   :error explain}
-            response-chan (async/chan)
-            ; build url
-            method (http.shared/request->method m)
-            ;; TODO check method and send post or get
-            scheme (http.shared/request->scheme m)
-            domain (http.shared/request->domain m)
-            port (http.shared/request->port m)
-            path (http.shared/request->path m)
-            headers (http.shared/request->headers m)
-            body (http.shared/request->body m)
-            url (str/join "" [scheme "://" domain ":" port path ])]
-
-        (prn url)
-        (xhrio/send
+    ;; (if-not (malli/validate spec.http/request m)
+    ;; TODO report an error using common error reporting
+    ;; functionality (anomalies).
+    (let [explain (-> spec.http/request (malli/explain m) me/humanize)
+          error {:com.kubelt/type :kubelt.type/error
+                 :error explain}
+          response-chan (async/chan)
+          ;; build url
+          method (http.shared/request->method m)
+          ;; TODO check method and send post or get
+          scheme (http.shared/request->scheme m)
+          domain (http.shared/request->domain m)
+          port (http.shared/request->port m)
+          path (http.shared/request->path m)
+          headers (http.shared/request->headers m)
+          body (http.shared/request->body m)
+          url (str/join "" [scheme "://" domain ":" port path ])]
+      (prn url)
+      (xhrio/send
           url
-          (fn [_ ^js ret]
-            (js/console.log ; callback
-                      (str (.getResponseText (.-target ret))))
-            ))
-          response-chan)))
-  ;; The request map is valid, so fire off the request.
+          (fn [^js event]
+                (let [res (-> event .-target .getResponseText)]
+                  (prn res))))
 
+      response-chan)))
+;; The request map is valid, so fire off the request.
 
-  (comment 
-    "request map example"
-    {:kubelt/type :kubelt.type/uri
-     :http/method method
-     :http/version version
-     :http/headers headers
-     :http/trailers trailers
-     :http/status status
-     :http/body body
-     :uri/scheme scheme
-     :uri/port port
-     :uri/path path
-     :uri/fragment fragment
-     :uri/query query
-     :uri/domain domain
-     :uri/user user}
-    )
+(comment
+  "request map example"
+  {:kubelt/type :kubelt.type/uri
+   :http/method method
+   :http/version version
+   :http/headers headers
+   :http/trailers trailers
+   :http/status status
+   :http/body body
+   :uri/scheme scheme
+   :uri/port port
+   :uri/path path
+   :uri/fragment fragment
+   :uri/query query
+   :uri/domain domain
+   :uri/user user}
+
+  (let []
+    (xhr/send "http://example.com"
+              (fn [^js event]
+                (let [res (-> event .-target .getResponseText)]
+                  (prn res)
+                  ))))
+  )
