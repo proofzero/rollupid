@@ -49,7 +49,7 @@ Blockchain is Web3 but, Web3 is not just blockchain. The middle-tier is still ce
 
 Kubelt decentralizes the middle-tier, in an eventually consistent network, in the same way as your stateless web framework moved application logic outside of databases and stored procedures while also providing novel capabilities such as:
 
-- Interoperability with tranditional and blockchain applications.
+- Interoperability with traditional and blockchain applications.
 - Zero-knowledge content management
 - Multi-signing mutations
 - Peer-to-peer collaboration

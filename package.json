@@ -31,7 +31,8 @@
     "test:web:release": "bb test:web:release",
     "test:dapp:develop": "bb test:dapp:develop",
     "test:dapp:release": "bb test:dapp:release",
-    "test:plugin:sanity": "bb test:plugin:sanity"
+    "test:plugin:sanity": "bb test:plugin:sanity",
+    "sidenotes:http:run": "http-server ./docs"
   },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
@@ -50,6 +51,7 @@
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-runtime": "6.23.0",
     "html-webpack-plugin": "5.5.0",
+    "http-server": "14.1.0",
     "jest": "27.5.1",
     "lerna": "4.0.0",
     "node-polyfill-webpack-plugin": "1.1.4",

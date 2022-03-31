@@ -186,3 +186,8 @@ project.clj
 
 # p2p data files
 /p2p-dataset/
+
+# sidenotes
+/docs/css
+/docs/js
+/docs/*.html

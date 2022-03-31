@@ -36,7 +36,7 @@
 
   ;; Generate literate docs from the source code using sidenote (a fork
   ;; of marginalia).
-  :docs {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
+  :sidenotes {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
          :main-opts ["-m" "sidenotes.core"]}
 
   ;; $ clojure -M:lint --lint src/
