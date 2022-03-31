@@ -95,6 +95,7 @@
   proto.http/HttpClient
   (request!
     [this m]
+    (prn {:hereiam "request" :req m})
     (if-not (malli/validate spec.http/request m)
       ;; TODO report an error using common error reporting
       ;; functionality (anomalies).

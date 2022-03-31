@@ -78,7 +78,7 @@
   "127.0.0.1")
 
 (def network-port
-  9061)
+  8787)
 
 ;; Timeout value in milliseconds for receiving the entire request from
 ;; the client.
