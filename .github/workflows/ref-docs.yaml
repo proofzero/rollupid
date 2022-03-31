@@ -11,7 +11,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      stacks: ${{ steps.filter.outputs.changes }}
+      stacks: ${{ steps.changes.outputs.changes }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
