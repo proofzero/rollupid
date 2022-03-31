@@ -3,5 +3,3 @@ public
 resources
 .netlify
 .hugo_build.lock
-# Ignore generated literate docs
-static/literate
