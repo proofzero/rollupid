@@ -38,36 +38,32 @@
   proto.http/HttpClient
   (request!
     [this m]
-    ;;{:pre [(malli/validate spec.http/request m)]}
     (prn {:hereiam "browser-http" :request m})
-    ;; (if-not (malli/validate spec.http/request m)
-    ;; TODO report an error using common error reporting
-    ;; functionality (anomalies).
-    (let [explain (-> spec.http/request (malli/explain m) me/humanize)
-          error {:com.kubelt/type :kubelt.type/error
-                 :error explain}
-          response-chan (async/chan)
-          ;; build url
-          method (http.shared/request->method m)
-          ;; TODO check method and send post or get
-          scheme (http.shared/request->scheme m)
-          domain (http.shared/request->domain m)
-          port (http.shared/request->port m)
-          path (http.shared/request->path m)
-          headers (http.shared/request->headers m)
-          body (http.shared/request->body m)
-          url (str/join "" [scheme "://" domain ":" port path ])]
-      (xhrio/send
-          url
-          (fn [^js event]
-                (let [res (-> event .-target .getResponseText)]
-                  (prn res)))
-          method
-          body
-          )
-
-      response-chan)))
-;; The request map is valid, so fire off the request.
+    (if-not (malli/validate spec.http/request m)
+      ;; The request map is invalid, return a map describing the error.
+      (lib.error/explain spec.http/request explain m)
+      ;; We have a valid request map, construct a URL from it before
+      ;; making a request.
+      (let [response-chan (async/chan)
+            ;; build url
+            method (http.shared/request->method m)
+            ;; TODO check method and send post or get
+            scheme (http.shared/request->scheme m)
+            domain (http.shared/request->domain m)
+            port (http.shared/request->port m)
+            path (http.shared/request->path m)
+            headers (http.shared/request->headers m)
+            body (http.shared/request->body m)
+            url (str/join "" [scheme "://" domain ":" port path ])]
+        ;; The request map is valid, so fire off the request.
+        (xhrio/send
+         url
+         (fn [^js event]
+           (let [res (-> event .-target .getResponseText)]
+             (prn res)))
+         method
+         body)
+        response-chan))))
 
 (comment
   "request map example"
@@ -85,11 +81,4 @@
    :uri/query query
    :uri/domain domain
    :uri/user user}
-
-  (let []
-    (xhr/send "http://example.com"
-              (fn [^js event]
-                (let [res (-> event .-target .getResponseText)]
-                  (prn res)
-                  ))))
   )
