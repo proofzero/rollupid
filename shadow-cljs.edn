@@ -100,7 +100,7 @@
    :dev
    {:compiler-options
     {:reader-features #{:browser}}
-     :closure-defines {}}}}
+    :closure-defines {}}}
 
   ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------
