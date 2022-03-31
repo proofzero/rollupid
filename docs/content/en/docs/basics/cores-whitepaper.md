@@ -1,147 +1,26 @@
 ---
-title: "Whitepaper"
-description: "."
-lead: "One page summary of how to start a new Doks project."
-date: 2020-11-16T13:59:39+01:00
-lastmod: 2020-11-16T13:59:39+01:00
-draft: false
+title: "Kubelt Cores Whitepaper"
+description: "Kubelt is an open source toolkit for building peer-to-peer dapps. Using a CMS dapp, SDK, and peer node, developers can build dapps quickly using open standards, allowing maximum interoperability, easy scalability, and high availability. This paper describes the full architecture of a system composed from these components and its theoretical foundations."
+lead: "A physical approach to distributed semantic graphs."
+date: 2021-12-01T00:00:00+00:00
 images: []
 menu:
   docs:
     parent: "basics"
 weight: 150
-toc: false
----
-
----
-title: "Whitepaper"
-description: ""
-lead: ""
-date: 2022-03-30T14:59:06-04:00
-lastmod: 2022-03-30T14:59:06-04:00
-draft: false
-images: []
-menu:
-  docs:
-    parent: ""
-weight: 999
 toc: true
+draft: true
 ---
 
-This is a whitepaper test.
+_December 2021. By [Alexander Flanagan](mailto:alex@kubelt.com), [Adrian Maurer](mailto:adrian@kubelt.com), and [Robert Medeiros](mailto:rob@kubelt.com). Special thanks to the team @ [Protocol Labs](https://protocol.ai)._
 
-The average energy of the neutrinos $\langle E \rangle$ emitted during a supernova explosion is of the order of 10MeV, and the neutrino luminosity at the early epoch of the explosion is approximately $10^{52}\mathrm{ergs\cdot s^{-1}}$.
-Therefore, the number density of the neutrinos at the radius $R$ is
+## Abstract
 
-$$
-\begin{equation*}
-   n \sim  10^{18} \mathrm{cm^{-3}} \left(\frac{100\mathrm{km}}{R}\right)^2 \left(\frac{10\mathrm{MeV}}{\langle E \rangle}\right).
-\end{equation*}
-$$
+Kubelt is an open source toolkit for building peer-to-peer dapps. Using a CMS dapp, SDK, and peer node, developers can build dapps quickly using open standards, allowing maximum interoperability, easy scalability, and high availability. This paper describes the full architecture of a system composed from these components and its theoretical foundations.
 
-$$
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Journal Article
-% LaTeX Template
-% Version 1.4 (15/5/16)
-$$
+## Introduction
 
-% This template has been downloaded from:
-% http://www.LaTeXTemplates.com
-%
-% Original author:
-% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
-% Vel (vel@LaTeXTemplates.com)
-%
-% License:
-% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
-
-\documentclass[twoside,twocolumn]{article}
-
-%\usepackage{blindtext} % Package to generate dummy text throughout this template 
-
-\usepackage[sc]{mathpazo} % Use the Palatino font
-\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
-\linespread{1.05} % Line spacing - Palatino needs more space between lines
-\usepackage{microtype} % Slightly tweak font spacing for aesthetics
-
-\usepackage[english]{babel} % Language hyphenation and typographical rules
-
-\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
-\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
-\usepackage{booktabs} % Horizontal rules in tables
-
-\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
-
-\usepackage{enumitem} % Customized lists
-\setlist[itemize]{noitemsep} % Make itemize lists more compact
-
-\usepackage{abstract} % Allows abstract customization
-\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
-\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
-
-\usepackage{titlesec} % Allows customization of titles
-\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
-\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
-\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
-\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
-
-\usepackage{fancyhdr} % Headers and footers
-\pagestyle{fancy} % All pages have headers and footers
-\fancyhead{} % Blank out the default header
-\fancyfoot{} % Blank out the default footer
-\fancyhead[C]{} % Custom header text % Running title $\bullet$ May 2016 $\bullet$ Vol. XXI, No. 1
-\fancyfoot[RO,LE]{\thepage} % Custom footer text
-
-\usepackage{titling} % Customizing the title section
-
-\usepackage{hyperref} % For hyperlinks in the PDF
-
-%----------------------------------------------------------------------------------------
-%	TITLE SECTION
-%----------------------------------------------------------------------------------------
-
-\setlength{\droptitle}{-4\baselineskip} % Move the title up
-
-\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
-\posttitle{\end{center}} % Article title closing formatting
-\title{Kubelt CMS: a physical approach to distributed semantic graphs} % Article title
-\author{%
-\textsc{Alexander Flanagan, Adrian Maurer, Robert Medeiros}\thanks{Special thanks to the teams at Kubelt and Protocol Labs.} \\[1ex] % Your name
-\normalsize \href{https://kubelt.com}{Kubelt} \\ % Your institution
-\normalsize \href{mailto:alex@kubelt.com}{alex@kubelt.com}, \href{mailto:adrian@kubelt.com}{adrian@kubelt.com}, \href{mailto:rob@kubelt.com}{rob@kubelt.com} % Your email address
-%\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
-%\textsc{Jane Smith}\thanks{Corresponding author} \\[1ex] % Second author's name
-%\normalsize University of Utah \\ % Second author's institution
-%\normalsize \href{mailto:jane@smith.com}{jane@smith.com} % Second author's email address
-}
-\date{December 2021} % \today or Leave empty to omit a date
-\renewcommand{\maketitlehookd}{%
-\begin{abstract}
-\noindent Kubelt is an open source toolkit for building peer-to-peer dapps. Using a CMS dapp, SDK, and peer node, developers can build dapps quickly using open standards, allowing maximum interoperability, easy scalability, and high availability. This paper describes the full architecture of a system composed from these components and its theoretical foundations. % Dummy abstract text - replace \blindtext with your abstract text
-\end{abstract}
-}
-
-%----------------------------------------------------------------------------------------
-
-\begin{document}
-
-% Print the title
-\maketitle
-
-%----------------------------------------------------------------------------------------
-%	ARTICLE CONTENTS
-%----------------------------------------------------------------------------------------
-
-\section{Introduction}
-
-\lettrine[nindent=0em,lines=3]{K} ubelt is the web3 CMS, built on top of a distributed semantic graph. This document outlines a set of desired properties, components, a theoretical framework, and a high-level discussion of the system design for Kubelt.
+Kubelt is the web3 CMS, built on top of a distributed semantic graph. This document outlines a set of desired properties, components, a theoretical framework, and a high-level discussion of the system design for Kubelt.
 
 A semantic graph is a data structure that encodes relationships between data points. This lets us add a layer of meaning to the data stored on web3. We can, for instance, tell that a content address like \emph{bafyreiabc123} is actually, for example, the first frame of a video, the configuration for a metaverse object, localized UI text, etc.
 
@@ -151,6 +30,7 @@ The system supports layers for conflict resolution, strong eventual consistency,
 
 Security is further enhanced through standard third-party authentication methods, out-of-band key verification, user ownership of data, and logical and physical network partitions.
 
+$$
 \section{Desired Properties}
 
 \begin{itemize}
