@@ -39,6 +39,12 @@
   :sidenotes {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
          :main-opts ["-m" "sidenotes.core"]}
 
+  :codox {:extra-deps {codox/codox {:mvn/version "RELEASE"}}
+        :exec-fn codox.main/generate-docs
+        :exec-args {
+                    :source-paths  ["src/main"]
+                    :language :clojurescript}}
+
   ;; $ clojure -M:lint --lint src/
   :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.03.09"}}
          :main-opts ["-m" "clj-kondo.main"]}}}
