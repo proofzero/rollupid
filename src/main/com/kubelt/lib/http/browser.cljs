@@ -62,7 +62,10 @@
           url
           (fn [^js event]
                 (let [res (-> event .-target .getResponseText)]
-                  (prn res))))
+                  (prn res)))
+          method
+          body
+          )
 
       response-chan)))
 ;; The request map is valid, so fire off the request.

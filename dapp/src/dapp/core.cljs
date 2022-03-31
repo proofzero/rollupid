@@ -55,10 +55,10 @@
                            ;; TODO wip calling http client from browser context
                            #_(lib.p2p/authenticate! ctx "0x00000000000000000000" )
                            #_(lib.p2p/verify! ctx "0x00000000000000000000" "fixmenonce" "fixmesig" )
-                           #_(sdk.core/authenticate! ctx "0x00000000000000000000")
+                           (sdk.core/authenticate! ctx "0x00000000000000000000")
 
                            ;; check version via http client
-                           (check-version ctx)
+                           #_(check-version ctx)
                             ctx
                            )))
 
