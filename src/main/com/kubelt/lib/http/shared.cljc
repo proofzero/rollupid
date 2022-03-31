@@ -38,7 +38,5 @@
 
 (defn request->scheme
   [m]
-  ;;  {:pre [(map? m)]}
-  ;;  (:uri/scheme m))
-  ;; FIXME support both, disabled for testing
-  "http")
+    {:pre [(map? m)]}
+    (name (:uri/scheme m)))
