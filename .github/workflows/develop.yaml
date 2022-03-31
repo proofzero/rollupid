@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       sdk: ${{ steps.changes.outputs.sdk }}
-      dapp: ${{ steps.changes.outputs.sdk }}
-      www: ${{ steps.changes.outputs.sdk }}
-      sanity: ${{ steps.changes.outputs.sdk }}
-      ext: ${{ steps.changes.outputs.sdk }}
+      dapp: ${{ steps.changes.outputs.dapp }}
+      www: ${{ steps.changes.outputs.www }}
+      sanity: ${{ steps.changes.outputs.sanity }}
+      ext: ${{ steps.changes.outputs.ext }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
