@@ -28,7 +28,14 @@ const handleAccountsChanged = async (accounts: string[]) => {
       signFn: signFn,
     };
 
-    const walletInitSDK = await kSdkWeb?.node_v1?.core.setWallet(sdkSubj.getValue(), wallet);
+    const initSDK = await kSdkWeb?.node_v1?.init();
+    sdkSubj.next(initSDK);
+
+    console.log('SDK initialized')
+    console.log(initSDK);
+    console.log('/SDK initialized')
+
+    const walletInitSDK = await kSdkWeb?.node_v1?.core.setWallet(initSDK, wallet);
     sdkSubj.next(walletInitSDK);
 
     console.log('Wallet initialized')
@@ -52,18 +59,6 @@ const getEthProvider = async () => {
 
 const asyncMain = async () => {
   const ethProvider = await getEthProvider();
-
-  const initSDK = await kSdkWeb?.node_v1?.init({
-    "p2p/read": "/ip4/127.0.0.1/tcp/8787",
-    "p2p/write": "/ip4/127.0.0.1/tcp/8787",
-    'p2p.read/scheme': ':http',
-    'p2p.write/scheme': ':http'
-  });
-  sdkSubj.next(initSDK);
-
-  console.log('SDK initialized')
-  console.log(initSDK);
-  console.log('/SDK initialized')
 
   ethProvider.on("accountsChanged", handleAccountsChanged);
 
