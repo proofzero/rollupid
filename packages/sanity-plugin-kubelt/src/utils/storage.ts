@@ -1,5 +1,10 @@
 import { checkDocument } from "./browserDocument";
 
+/**
+ * Checks if the current browser environment supports 
+ * storing data in session storage. Throws exception
+ * if impossible.
+ */
 export const checkSessionStorage = (): void => {
   checkDocument();
 
