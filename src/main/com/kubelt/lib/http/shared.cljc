@@ -35,3 +35,8 @@
   [m]
   {:pre [(map? m)]}
   (:http/body m))
+
+(defn request->scheme
+  [m]
+    {:pre [(map? m)]}
+    (name (:uri/scheme m)))

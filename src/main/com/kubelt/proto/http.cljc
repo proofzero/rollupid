@@ -2,6 +2,8 @@
   "A protocol for making HTTP requests."
   {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
 
+;; TODO tighten up this protocol
+
 (defprotocol HttpClient
   "A simple data-first HTTP client."
   (request! [this m]

@@ -19,7 +19,13 @@
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
-              (ddt.options/options yargs)
+              (let [;; Enforce string type, otherwise yargs parses a
+                    ;; wallet address starting with "0x" as a big
+                    ;; integer.
+                    core-config #js {:describe "a @core name"
+                                     :string true}]
+                (.options yargs "core" core-config)
+                (ddt.options/options yargs))
               yargs)
 
    :handler (fn [args]
@@ -44,5 +50,5 @@
                        (if (lib.error/error? result)
                          (prn (:error kbt))
                          ;; TODO encrypt(?) and store returned JWT
-                         )
+                         (prn result))
                        (sdk/halt! kbt)))))))})

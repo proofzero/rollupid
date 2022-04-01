@@ -42,7 +42,7 @@
     (prn "provider-detected")
     (let [web3 (Web3. provider)
           ; TODO: replace with check for JWT session
-          current-account (.-defaultAccount (.-eth web3))] 
+          current-account (.-defaultAccount (.-eth web3))]
       (prn "current-account")
       (prn current-account)
       (assoc db :provider provider :web3 web3 :current-account current-account))))
@@ -67,11 +67,11 @@
     (prn wallet)
     (let [web3 ^js/Web3 (:web3 db)
           eth (.-eth web3)]
-      (prn "providers list") 
+      (prn "providers list")
       (js/console.log (.-providers eth))
-      (-> (.requestAccounts eth) 
-        (.then (fn [accounts] 
-                 ; TODO: 
+      (-> (.requestAccounts eth)
+        (.then (fn [accounts]
+                 ; TODO:
                  ; - check for which account is selected
                  ; - call the SDK "login"
                  (prn "accounts")
