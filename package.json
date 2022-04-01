@@ -35,8 +35,9 @@
     "test:plugin:sanity": "bb test:plugin:sanity",
     "sidenotes:http:run": "http-server ./docs"
   },
-  "author": "Kubelt, Inc.",
-  "license": "UNLICENSED",
+  "author": "Proof Zero, Inc.",
+  "license": "Apache 2.0",
+  "engines": { "npm": ">=8.3.0" },
   "devDependencies": {
     "@babel/core": "7.17.5",
     "@babel/plugin-transform-runtime": "7.17.0",
@@ -62,7 +63,7 @@
     "sanipack": "2.1.0",
     "shadow-cljs": "2.17.8",
     "tailwindcss": "3.0.23",
-    "tap": "16.0.0",
+    "tap": "16.0.1",
     "ts-jest": "27.1.4",
     "typescript": "4.5.4",
     "webpack": "5.70.0",
@@ -82,5 +83,9 @@
     "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt",
     "walletlink": "2.5.0",
     "web3modal": "1.9.5"
+  },
+  "overrides": {
+    "glob-parent": "5.1.2",
+    "minimist": "1.2.6"
   }
 }

@@ -64,5 +64,8 @@
   },
   "otherDependencies": {
     "hugo": "0.92.1"
+  },
+  "overrides": {
+    "@braintree/sanitize-url": "^3.1.0"
   }
 }
