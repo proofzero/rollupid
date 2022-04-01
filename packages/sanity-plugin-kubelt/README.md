@@ -22,7 +22,7 @@ npm link
 Inside `/kubelt`
 
 ```
-bb run build:plugin:sanity:release
+bb run build:plugin:sanity
 ```
 
 ### 3. Link Sanity Studio to plugin

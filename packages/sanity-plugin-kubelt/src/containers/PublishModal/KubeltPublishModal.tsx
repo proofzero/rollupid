@@ -6,6 +6,7 @@ import AuthStep from "../../components/AuthStep";
 import ExpandStep from "../../components/ExpandStep";
 import MetadataStep from "../../components/MetadataStep";
 import PublishStep from "../../components/PublishStep";
+
 import sanityService, {
   IDocumentStructureCounter,
 } from "../../services/sanityService";

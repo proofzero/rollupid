@@ -10,9 +10,7 @@ function KubeltAuth() {
     requestWalletAuth();
   };
   const kubeltLogin = async () => {
-    const core = "foo";
-
-    requestKubeltAuth(core);
+    requestKubeltAuth();
   };
 
   return (

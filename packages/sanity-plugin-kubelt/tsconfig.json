@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "jsx": "react",
+    "target": "ES5",
     "esModuleInterop": true
   }
 }
