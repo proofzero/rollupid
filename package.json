@@ -83,5 +83,9 @@
     "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt",
     "walletlink": "2.5.0",
     "web3modal": "1.9.5"
+  },
+  "overrides": {
+    "fast-glob": "^3.2.11",
+    "minimist": "^1.2.6"
   }
 }
