@@ -1,5 +1,5 @@
 import { Notyf } from "notyf";
-import { checkDocument } from "../utils";
+import { checkDocument } from "../utils/browserDocument";
 
 const notyf = new Notyf({
   duration: 5000,
@@ -24,6 +24,9 @@ const notyf = new Notyf({
 
 let initializedNotyfCss = false;
 
+/**
+ * Currently not so useful, might be removed in the future
+ */
 const toastNotif = (toast: {
   type: "success" | "error" | "warning";
   message: string;

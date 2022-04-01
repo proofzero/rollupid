@@ -14,7 +14,7 @@ export interface ISemanticService {
    * and flattens resulting hierarchical structure
    * for easier transformation into quads
    */
-  semantify(destructuredObject: any);
+  semantify(destructuredObject: any): any;
 }
 
 export class SemanticService implements ISemanticService {
