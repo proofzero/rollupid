@@ -37,7 +37,9 @@
   },
   "author": "Proof Zero, Inc.",
   "license": "Apache 2.0",
-  "engines": { "npm": ">=8.3.0" },
+  "engines": {
+    "npm": ">=8.3.0"
+  },
   "devDependencies": {
     "@babel/core": "7.17.5",
     "@babel/plugin-transform-runtime": "7.17.0",
@@ -80,6 +82,7 @@
     "@kubelt/sdk-cljs": "file:packages\\sdk-cljs",
     "@kubelt/sdk-js": "file:packages\\sdk-js",
     "@kubelt/sdk-web": "file:packages\\sdk-web",
+    "aes-js": "^3.0.0",
     "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt",
     "walletlink": "2.5.0",
     "web3modal": "1.9.5"
