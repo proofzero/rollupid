@@ -70,6 +70,6 @@ Find out how to contribute to Kubelt. [Contributing →]({{< relref "contributin
 ## Resources
 
 - Get started with our [quick start]({{< relref "quick-start" >}}) guide.
-- Read our [whitepaper]({{< relref "whitepaper" >}}) to learn more.
+- Read our [whitepaper]({{< relref "cms-whitepaper" >}}) to learn more.
 - Check out our [SDK Reference](#) docs.
 - FAQ and troubleshooting in our [help]({{< relref "help" >}}) section.
