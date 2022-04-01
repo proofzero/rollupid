@@ -25,7 +25,7 @@
          (.then (fn [provider]
                   ;; dispatch the provider
                   (prn "provider")
-                  #(re-frame/dispatch [::wallet/web3-modal provider])))
+                  (re-frame/dispatch [::wallet/web3-modal provider])))
          (.catch (fn [error]
                    (.clearCachedProvider modal)
                    (js/console.log error))))))

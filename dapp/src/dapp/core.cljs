@@ -5,6 +5,7 @@
     [com.kubelt.sdk.v1 :as sdk.v1]
     [com.kubelt.sdk.v1.core :as sdk.core]
     [com.kubelt.proto.http :as http]
+    [com.kubelt.proto.http :as lib.wallet]
     [reagent.dom :as rdom]
     [re-frame.core :as re-frame]
     [dapp.config :as config]
@@ -33,7 +34,6 @@
 ;; temp
 (defn check-version
   [sys]
-
  (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
@@ -55,11 +55,11 @@
                            ;; TODO wip calling http client from browser context
                            #_(lib.p2p/authenticate! ctx "0x00000000000000000000" )
                            #_(lib.p2p/verify! ctx "0x00000000000000000000" "fixmenonce" "fixmesig" )
-                           (sdk.core/authenticate! ctx "0x00000000000000000000")
+                           #(sdk.core/authenticate! ctx "0x00000000000000000000")
 
                            ;; check version via http client
-                           #_(check-version ctx)
-                            ctx
+                           #(check-version ctx)
+                           ctx
                            )))
 
 (re-frame/reg-sub ::current-user
