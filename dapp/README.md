@@ -1,5 +1,9 @@
 # dapp
 
+![Build](https://img.shields.io/github/workflow/status/kubelt/kubelt/next)
+![License](https://img.shields.io/github/license/kubelt/kubelt?label=Apache%202.0)
+[![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/m8NbsgByA9)
+
 A [re-frame](https://github.com/day8/re-frame) application designed to ... well, that part is up to
 you.
 
@@ -7,46 +11,45 @@ you.
 
 ### Project Overview
 
-* Architecture:
-[Single Page Application (SPA)](https://en.wikipedia.org/wiki/Single-page_application)
-* Languages
+- Architecture:
+  [Single Page Application (SPA)](https://en.wikipedia.org/wiki/Single-page_application)
+- Languages
   - Front end is [ClojureScript](https://clojurescript.org/) with ([re-frame](https://github.com/day8/re-frame))
-* Dependencies
+- Dependencies
   - UI framework: [re-frame](https://github.com/day8/re-frame)
-  ([docs](https://github.com/day8/re-frame/blob/master/docs/README.md),
-  [FAQs](https://github.com/day8/re-frame/blob/master/docs/FAQs/README.md)) ->
-  [Reagent](https://github.com/reagent-project/reagent) ->
-  [React](https://github.com/facebook/react)
-* Build tools
+    ([docs](https://github.com/day8/re-frame/blob/master/docs/README.md),
+    [FAQs](https://github.com/day8/re-frame/blob/master/docs/FAQs/README.md)) ->
+    [Reagent](https://github.com/reagent-project/reagent) ->
+    [React](https://github.com/facebook/react)
+- Build tools
   - CLJS compilation, dependency management, REPL, & hot reload: [`shadow-cljs`](https://github.com/thheller/shadow-cljs)
-* Development tools
+- Development tools
   - Debugging: [CLJS DevTools](https://github.com/binaryage/cljs-devtools)
 
 #### Directory structure
 
-* [`/`](/../../): project config files
-* [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
+- [`/`](/../../): project config files
+- [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
   - [`user.cljs`](dev/cljs/user.cljs): symbols for use during development in the
-[ClojureScript REPL](#connecting-to-the-browser-repl-from-a-terminal)
-* [`resources/public/`](resources/public/): SPA root directory;
-[dev](#running-the-app) / [prod](#production) profile depends on the most recent build
+    [ClojureScript REPL](#connecting-to-the-browser-repl-from-a-terminal)
+- [`resources/public/`](resources/public/): SPA root directory;
+  [dev](#running-the-app) / [prod](#production) profile depends on the most recent build
   - [`index.html`](resources/public/index.html): SPA home page
     - Dynamic SPA content rendered in the following `div`:
-        ```html
-        <div id="app"></div>
-        ```
+      ```html
+      <div id="app"></div>
+      ```
     - Customizable; add headers, footers, links to other scripts and styles, etc.
   - Generated directories and files
     - Created on build with either the [dev](#running-the-app) or [prod](#production) profile
     - `js/compiled/`: compiled CLJS (`shadow-cljs`)
       - Not tracked in source control; see [`.gitignore`](.gitignore)
-* [`src/dapp/`](src/dapp/): SPA source files (ClojureScript,
-[re-frame](https://github.com/Day8/re-frame))
+- [`src/dapp/`](src/dapp/): SPA source files (ClojureScript,
+  [re-frame](https://github.com/Day8/re-frame))
   - [`core.cljs`](src/dapp/core.cljs): contains the SPA entry point, `init`
-* [`.github/workflows/`](.github/workflows/): contains the
-[github actions](https://github.com/features/actions) pipelines.
+- [`.github/workflows/`](.github/workflows/): contains the
+  [github actions](https://github.com/features/actions) pipelines.
   - [`test.yaml`](.github/workflows/test.yaml): Pipeline for testing.
-
 
 ### Editor/IDE
 
@@ -58,7 +61,7 @@ Use your preferred editor or IDE that supports Clojure/ClojureScript development
 1. Install [JDK 8 or later](https://openjdk.java.net/install/) (Java Development Kit)
 2. Install [Node.js](https://nodejs.org/) (JavaScript runtime environment) which should include
    [NPM](https://docs.npmjs.com/cli/npm) or if your Node.js installation does not include NPM also install it.
-5. Clone this repo and open a terminal in the `dapp` project root directory
+3. Clone this repo and open a terminal in the `dapp` project root directory
 
 ### Browser Setup
 
@@ -72,7 +75,7 @@ console in a more readable way.
 #### Chrome/Chromium
 
 1. Open [DevTools](https://developers.google.com/web/tools/chrome-devtools/) (Linux/Windows: `F12`
-or `Ctrl-Shift-I`; macOS: `⌘-Option-I`)
+   or `Ctrl-Shift-I`; macOS: `⌘-Option-I`)
 2. Open DevTools Settings (Linux/Windows: `?` or `F1`; macOS: `?` or `Fn+F1`)
 3. Select `Preferences` in the navigation menu on the left, if it is not already selected
 4. Under the `Network` heading, enable the `Disable cache (while DevTools is open)` option
@@ -81,11 +84,11 @@ or `Ctrl-Shift-I`; macOS: `⌘-Option-I`)
 #### Firefox
 
 1. Open [Developer Tools](https://developer.mozilla.org/en-US/docs/Tools) (Linux/Windows: `F12` or
-`Ctrl-Shift-I`; macOS: `⌘-Option-I`)
+   `Ctrl-Shift-I`; macOS: `⌘-Option-I`)
 2. Open [Developer Tools Settings](https://developer.mozilla.org/en-US/docs/Tools/Settings)
-(Linux/macOS/Windows: `F1`)
+   (Linux/macOS/Windows: `F1`)
 3. Under the `Advanced settings` heading, enable the `Disable HTTP Cache (when toolbox is open)`
-option
+   option
 
 Unfortunately, Firefox does not yet support custom formatters in their devtools. For updates, follow
 the enhancement request in their bug tracker:
@@ -127,32 +130,36 @@ Alternatively, search the web for info on connecting to a `shadow-cljs` ClojureS
 from your editor and configuration.
 
 For example, in Vim / Neovim with `fireplace.vim`
+
 1. Open a `.cljs` file in the project to activate `fireplace.vim`
 2. In normal mode, execute the `Piggieback` command with this project's running build id, `:app`:
-    ```vim
-    :Piggieback :app
-    ```
+   ```vim
+   :Piggieback :app
+   ```
 
 #### Connecting to the browser REPL from a terminal
 
 1. Connect to the `shadow-cljs` nREPL:
-    ```sh
-    lein repl :connect localhost:8777
-    ```
-    The REPL prompt, `shadow.user=>`, indicates that is a Clojure REPL, not ClojureScript.
+
+   ```sh
+   lein repl :connect localhost:8777
+   ```
+
+   The REPL prompt, `shadow.user=>`, indicates that is a Clojure REPL, not ClojureScript.
 
 2. In the REPL, switch the session to this project's running build id, `:app`:
-    ```clj
-    (shadow.cljs.devtools.api/nrepl-select :app)
-    ```
-    The REPL prompt changes to `cljs.user=>`, indicating that this is now a ClojureScript REPL.
+   ```clj
+   (shadow.cljs.devtools.api/nrepl-select :app)
+   ```
+   The REPL prompt changes to `cljs.user=>`, indicating that this is now a ClojureScript REPL.
 3. See [`user.cljs`](dev/cljs/user.cljs) for symbols that are immediately accessible in the REPL
-without needing to `require`.
+   without needing to `require`.
 
 ### Running `shadow-cljs` Actions
 
 See a list of [`shadow-cljs CLI`](https://shadow-cljs.github.io/docs/UsersGuide.html#_command_line)
 actions:
+
 ```sh
 npx shadow-cljs --help
 ```
@@ -161,9 +168,11 @@ Please be patient; it may take over 10 seconds to see any output. Also note that
 may not actually be supported, outputting "Unknown action." when run.
 
 Run a shadow-cljs action on this project's build id (without the colon, just `app`):
+
 ```sh
 npx shadow-cljs <action> app
 ```
+
 ### Debug Logging
 
 The `debug?` variable in [`config.cljs`](src/cljs/dapp/config.cljs) defaults to `true` in
