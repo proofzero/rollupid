@@ -82,7 +82,7 @@
     "@kubelt/sdk-cljs": "file:packages\\sdk-cljs",
     "@kubelt/sdk-js": "file:packages\\sdk-js",
     "@kubelt/sdk-web": "file:packages\\sdk-web",
-    "aes-js": "^3.0.0",
+    "aes-js": "3.0.0",
     "sanity-plugin-kubelt": "file:packages\\sanity-plugin-kubelt",
     "walletlink": "2.5.0",
     "web3modal": "1.9.5"
