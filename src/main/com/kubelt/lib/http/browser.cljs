@@ -34,7 +34,6 @@
 
   (request-cb
     [this m cb]
-    (prn {:hereiam "browser-http" :request m})
     (if-not (malli/validate spec.http/request m)
       ;; The request map is invalid, return a map describing the error.
       (lib.error/explain spec.http/request m)
