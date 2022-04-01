@@ -85,7 +85,7 @@
     "web3modal": "1.9.5"
   },
   "overrides": {
-    "glob-parent": "5.1.2",
-    "minimist": "1.2.6"
+    "fast-glob": "^3.2.11",
+    "minimist": "^1.2.6"
   }
 }
