@@ -3,8 +3,8 @@
 ## Homepage
 title = "Kubelt"
 titleSeparator = "-"
-titleAddition = "Decentralized content management"
-description = "Decentralized content management"
+titleAddition = "Decentralizes applications."
+description = "Kubelt decentralizes applications."
 
 ## Social
 githubUrl = 'https://github.com/kubelt'
@@ -23,7 +23,7 @@ docsVersion = "next"
 images = ["images/sociallogo.png"]
 ogLocale = "en_US"
 domainTLD = "kubelt.com"
-titleHome = "Kubelt - Decentralized content management"
+titleHome = "Kubelt - Decentralizes applications."
 
 ## Twitter Cards
 twitterSite = "@kubelt"
@@ -94,7 +94,7 @@ alertText = "Introducing the Doks child theme, several DX + UX updates, and more
 # repoHost [Github | Gitea | GitLab | Bitbucket | BitbucketServer ] is used for building the edit link based on git hoster
 repoHost = "GitHub"
 #repoHost = "Gitea"
-docsRepo = "https://github.com/kubelt"
+docsRepo = "https://github.com/kubelt/kubelt"
 docsRepoBranch = "main"
 docsRepoSubPath = ""
 editPage = false
