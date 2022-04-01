@@ -45,8 +45,7 @@
   ;; react for clojure
   [reagent "1.1.0"]
   ;; redux for reagent
-  [re-frame "1.2.0"]
-  [day8.re-frame/http-fx "0.2.4"]]
+  [re-frame "1.2.0"]]
 
  ;;:nrepl {:init-ns user.shared}
 
@@ -99,8 +98,7 @@
    {:preloads []}
    :dev
    {:compiler-options
-    {:reader-features #{:browser}}
-    :closure-defines {}}}
+    {:closure-defines {}}}}
 
   ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------

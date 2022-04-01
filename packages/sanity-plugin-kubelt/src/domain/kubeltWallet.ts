@@ -3,7 +3,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import kSdkWeb from "@kubelt/sdk-web";
 import { hexlify } from "@ethersproject/bytes";
 
-export interface IKubeltError extends String {}
+export interface IKubeltError extends String { }
 
 export interface IKubeltSdkWallet {
   address: string;
@@ -11,17 +11,36 @@ export interface IKubeltSdkWallet {
   signFn: (signable: string) => Promise<string>;
 }
 
-export interface IKubeltSdk extends IKubeltSdkWallet {}
+export interface IKubeltSdk extends IKubeltSdkWallet { }
 
 const sdkSubj = new BehaviorSubject<IKubeltSdk>(null);
 const accountSubj = new BehaviorSubject<string>(null);
 
-const handleAccountsChanged = (accounts: string[]) => {
+const handleAccountsChanged = async (accounts: string[]) => {
   if (accounts.length === 0) {
     accountSubj.next(null);
   } else {
     const account = accounts[0];
     accountSubj.next(account);
+
+    const wallet: IKubeltSdkWallet = {
+      address: account,
+      signFn: signFn,
+    };
+
+    const initSDK = await kSdkWeb?.node_v1?.init();
+    sdkSubj.next(initSDK);
+
+    console.log('SDK initialized')
+    console.log(initSDK);
+    console.log('/SDK initialized')
+
+    const walletInitSDK = await kSdkWeb?.node_v1?.core.setWallet(initSDK, wallet);
+    sdkSubj.next(walletInitSDK);
+
+    console.log('Wallet initialized')
+    console.log(walletInitSDK);
+    console.log('/Wallet initialized')
   }
 };
 
@@ -40,22 +59,13 @@ const getEthProvider = async () => {
 
 const asyncMain = async () => {
   const ethProvider = await getEthProvider();
+
   ethProvider.on("accountsChanged", handleAccountsChanged);
 
   const accounts = await ethProvider.request({
     method: "eth_requestAccounts",
   });
   handleAccountsChanged(accounts);
-  console.log(kSdkWeb);
-
-  const initSDK = await kSdkWeb?.v1?.init({
-    "p2p/read": "/ip4/127.0.0.1/tcp/8787",
-    "p2p/write": "/ip4/127.0.0.1/tcp/8787",
-    // 'p2p.read/scheme': ':http',
-    // 'p2p.write/scheme': ':http'
-  });
-
-  sdkSubj.next(initSDK);
 };
 
 asyncMain();
@@ -99,19 +109,13 @@ export const requestKubeltAuth = async (core: string) => {
     throw new Error("No account available for signing");
   }
 
-  const wallet: IKubeltSdkWallet = {
-    address: currentAccount,
-    signFn: signFn,
-  };
+  core = currentAccount
 
-  const authedSdk = await kSdkWeb.v1.core.authenticate(
-    {
-      ...sdkSubj.getValue(),
-      wallet,
-    },
+  const authedSdk = await kSdkWeb.node_v1.core.authenticate(
+    sdkSubj.getValue(),
     core
   );
 
-  console.log(authedSdk);
   console.log(`Async Authenticated vs. Kubelt SDK and Kubelt Core ${core}`);
+  console.log(authedSdk);
 };

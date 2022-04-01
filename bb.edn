@@ -61,29 +61,29 @@
              (if-not (fs/directory? kondo-dir)
                (fs/create-dir kondo-dir)))
            ;; Pre-populate linter directory with analysis results.
-           (let [args ["-M:kondo" "--parallel" "--dependencies" "--copy-configs" "--lint" "src/"]
+           (let [args ["-M:lint" "--parallel" "--dependencies" "--copy-configs" "--lint" "src/"]
                  command (str/join " " args)]
              (clojure command)))}
 
   lint:dev
   {:doc "Lint development source code"
    :task (let [dir "src/dev"]
-           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+           (clojure (str/join " " ["-M:lint" "--parallel" "--lint" dir])))}
 
   lint:main
   {:doc "Lint application source code"
    :task (let [dir "src/main"]
-           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+           (clojure (str/join " " ["-M:lint" "--parallel" "--lint" dir])))}
 
   lint:test
   {:doc "Lint test source code"
    :task (let [dir "src/test"]
-           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+           (clojure (str/join " " ["-M:lint" "--parallel" "--lint" dir])))}
 
   lint:all
   {:doc "Lint all source code"
    :task (let [dir "src/"]
-           (clojure (str/join " " ["-M:kondo" "--parallel" "--lint" dir])))}
+           (clojure (str/join " " ["-M:lint" "--parallel" "--lint" dir])))}
 
   build:ddt:develop
   {:doc "Build development version of ddt command line application"

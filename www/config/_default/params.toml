@@ -1,0 +1,95 @@
+# Meta Data for SEO
+
+## Homepage
+title = "Kubelt"
+titleSeparator = "-"
+titleAddition = "Decentralized content management"
+description = "Decentralized content management"
+
+## Documentation
+docsVersion = "next"
+
+## Open Graph
+images = ["images/sociallogo.png"]
+ogLocale = "en_US"
+domainTLD = "kubelt.com"
+titleHome = "Kubelt - Decentralized content management"
+
+## Twitter Cards
+twitterSite = "@kubeltcms"
+twitterCreator = "@kubeltcms"
+
+## JSON-LD
+# schemaType = "Person"
+schemaType = "Organization"
+schemaName = "Kubelt"
+schemaAuthor = "Kubelt"
+schemaAuthorTwitter = "https://twitter.com/kubeltcms"
+schemaAuthorLinkedIn = "https://www.linkedin.com/company/kubelt/"
+schemaAuthorGitHub = "https://github.com/kubelt"
+schemaLocale = "en-US"
+schemaLogo = "images/sociallogo.png"
+schemaLogoWidth = 512
+schemaLogoHeight = 512
+schemaImage = "doks.png"
+schemaImageWidth = 1280
+schemaImageHeight = 640
+schemaTwitter = "https://twitter.com/kubelt"
+schemaLinkedIn = ""
+schemaGitHub = "https://github.com/kubelt"
+schemaSection = "blog"
+
+## Sitelinks Search Box
+siteLinksSearchBox = false
+
+## Chrome Browser
+themeColor = "#fff"
+
+# Images
+quality = 85
+bgColor = "#fff"
+landscapePhotoWidths = [900, 800, 700, 600, 500]
+portraitPhotoWidths = [800, 700, 600, 500]
+lqipWidth = "20x"
+smallLimit = "300"
+
+# Footer
+footer = "Powered by Hugo and Kubelt"
+
+# Feed
+copyRight = "Copyright (c) 2022 Proof Zero, Inc."
+
+# Alert
+alert = false
+alertDismissable = true
+# alertText = "Introducing the Doks child theme, several DX + UX updates, and more! <a class=\"alert-link stretched-link\" href=\"https://getdoks.org/blog/doks-v0.2/\" target=\"_blank\" rel=\"noopener\">Check out Doks v0.2</a>"
+alertText = "Introducing the Doks child theme, several DX + UX updates, and more! <a class=\"alert-link stretched-link\" href=\"https://getdoks.org/blog/doks-v0.2/\">Check out Doks v0.2</a>"
+
+# Edit Page
+# repoHost [Github | Gitea | GitLab | Bitbucket | BitbucketServer ] is used for building the edit link based on git hoster
+repoHost = "GitHub"
+#repoHost = "Gitea"
+docsRepo = "https://github.com/kubelt"
+docsRepoBranch = "main"
+docsRepoSubPath = ""
+editPage = false
+lastMod = false
+
+[options]
+  lazySizes = true
+  clipBoard = true
+  instantPage = true
+  flexSearch = true
+  darkMode = true
+  bootStrapJs = true
+  breadCrumb = false
+  highLight = true
+  kaTex = false
+  multilingualMode = false
+  docsVersioning = true
+  fullWidth = false
+
+[menu]
+  [menu.section]
+    auto = true
+    collapsibleSidebar = false

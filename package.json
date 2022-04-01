@@ -32,7 +32,8 @@
     "test:web:ci": "bb test:web:ci",
     "test:dapp:develop": "bb test:dapp:develop",
     "test:dapp:release": "bb test:dapp:release",
-    "test:plugin:sanity": "bb test:plugin:sanity"
+    "test:plugin:sanity": "bb test:plugin:sanity",
+    "sidenotes:http:run": "http-server ./docs"
   },
   "author": "Kubelt, Inc.",
   "license": "UNLICENSED",
@@ -51,6 +52,7 @@
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-runtime": "6.23.0",
     "html-webpack-plugin": "5.5.0",
+    "http-server": "14.1.0",
     "jest": "27.5.1",
     "karma": "6.3.17",
     "karma-chrome-launcher": "3.1.1",
