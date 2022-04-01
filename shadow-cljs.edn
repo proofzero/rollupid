@@ -99,7 +99,7 @@
    :dev
    {:compiler-options
     {:reader-features #{:browser}}
-     :closure-defines {}}}}
+     :closure-defines {}}}
 
   ;; SDK (Node.js)
   ;; ---------------------------------------------------------------------------
@@ -230,4 +230,4 @@
   {:target :node-test
    :output-to "target/ipfs-test.js"
    :ns-regexp "ipfs\\..*-test$"
-   :autorun true}}
+   :autorun true}}}
