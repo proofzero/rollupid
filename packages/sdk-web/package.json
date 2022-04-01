@@ -58,7 +58,6 @@
     "os": "0.1.2",
     "os-browserify": "0.3.0",
     "quadstore": "9.1.0",
-    "react-app-rewired": "2.2.1",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
     "web3": "1.7.1"
