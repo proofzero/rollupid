@@ -56,12 +56,21 @@ The Kubelt monorepo tooling configuration and scripts:
 - [rdf/](rdf/) directory contains various RDF vocabularies, examples, and data fixtures used during development.
 - [fix/](fix/) directory contains fixture data for testing.
 
-## Configuration
+## Develop
 
-If you use [nvm](https://github.com/creationix/nvm/) to manage your local node versions, you can set up the supported version by running:
+### Configuration
 
-```shell
-$ nvm use
-```
+Please use the following tools and versions when developing with this repository:
+- Node.js v17+
+- Java SDK v8+
+- Babashaka 0.7.x
 
-Otherwise, please install the version of node indicated in `.nvmrc` using your preferred method.
+### Build
+
+Run `bb run test:all:develop` to make sure everything is setup correctly. Then use `bb tasks` to see what other build and test tasks are available.
+
+## Contributing
+
+We are happy to accept contributions of all sized. Feel free to submit a pull request.
+
+Also checkout our [contributing guidelines](https://kubelt.com/docs).
