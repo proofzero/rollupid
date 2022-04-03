@@ -40,11 +40,11 @@ The [www/](www/) directory contains the Kubelt.com static website documentation 
 
 The [dapp/](dapp/) directory contains a web application for interacting with Kubelt as a customer.
 
-### Browser Extension
+## Browser Extension
 
 The [ext/](ext/) directory contains an experimental browser extension.
 
-### Tooling
+## Tooling
 
 ### bb
 
