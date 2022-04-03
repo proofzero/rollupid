@@ -17,7 +17,7 @@ toc: false
 
 ## What is Kubelt?
 
-Kubelt's integrated peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave any crypto wallets with the addition of content enabled APIs. These cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
+Kubelt's integrated peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave like any crypto wallets with the addition of content enabled APIs. These cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
 
 What content means to Kubelt really is anything! Kubelt Cores can host anything from web content, user databases, web assembly (compute), and more. Kubelt Cores are also compatible with popular wallet cryptography algorithms meaning you or your users don't need new ID protocols to use Kubelt -- **your wallet is your entrypoint into the network!**
 

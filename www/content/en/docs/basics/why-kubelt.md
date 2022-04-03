@@ -45,7 +45,7 @@ Our Javascript tools and libraries provide a familiar developer experience to ma
 
 ## Eventual Consistency + Consensus
 
-Blockchain is Web3 but, Web3 is not just blockchain. The middle-tier is still centralized to provide access to bridge decentralized clients with decentralized back-ends. Smart contracts where introduced to address part of this problem but introduce new problems in speed, cost, and cascading effects (you don't want a bug in your business logic to cause a major financial loss).
+Blockchain is Web3 but, Web3 is not just blockchain. The middle-tier is still centralized to provide access to bridge decentralized clients with decentralized back-ends. Smart contracts were introduced to address part of this problem but introduce new problems in speed, cost, and cascading effects (you don't want a bug in your business logic to cause a major financial loss).
 
 Kubelt decentralizes the middle-tier, in an eventually consistent network, in the same way as your stateless web framework moved application logic outside of databases and stored procedures while also providing novel capabilities such as:
 

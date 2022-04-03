@@ -19,7 +19,7 @@ At the heart of Kubelt is the **"Kubelt Core"**, an application container design
 
 The Kubelt Core extends the standard wallet APIs with multi-signer, content, and networking capabilities. These capabilities can be configured and organized in a way to build decentralized applications. Kubelt provides several libraries, tools and applications to work with and manage cores.
 
-In essence, Kubelt Cores turns every user is a stand-alone, local-first, edge application that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
+In essence, Kubelt Cores turn every user into a stand-alone, local-first, edge application that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
 
 ### Collaboration
 
@@ -31,7 +31,7 @@ Multi-signer Kubelt Cores can expose different network capabilities such as cont
 
 ### Content Management
 
-Every Kubelt Core is enabled with content management APIs for publishing and retrieving content and can be configured to be accessible through traditinoal API gateways or with our libraries and tools.
+Every Kubelt Core is enabled with content management APIs for publishing and retrieving content and can be configured to be accessible through traditional API gateways or with our libraries and tools.
 
 Any type of content can be packed into the Kubelt Cores. For instance, you can publish simple images, documents, and other static content or you can publish user databases, wasm compute, CRDTs, and even semantic graphs. All content also uses a content addresses naming system to ensure compatability with decentralized content networks like IPFS.
 
@@ -45,7 +45,7 @@ A simple example would be to create a multi-signer "organization core" called `@
 
 A similar configuration can be used so that if `@acmecorp` is a SaaS-like or blockchain application with it's own users, "user cores" can be created and configured on the fly. For example, a `@acmecorp/@<user wallet address>` core can be used to private user content or `@acmecorp/@<smart contract>` core can be used to gate access to NFT content.
 
-Lastly, by using content addresses as the primary naming convention, content can created, signed, and exchanged between cores to solve complex business problems in novel yet simple ways. Imagine creating cores that authorize the creation of a content address to your bank account encrypted to a third-party's public key (e.g. QuickBooks) for easy and better Open Banking.
+Lastly, by using content addresses as the primary naming convention, content can be created, signed, and exchanged between cores to solve complex business problems in novel yet simple ways. Imagine creating cores that authorize the creation of a content address to your bank account encrypted to a third-party's public key (e.g. QuickBooks) for easy and better Open Banking.
 
 ### Extendability
 
@@ -57,7 +57,7 @@ Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6
 
 Kubelt is local-first by default in order to provide a full-stack, local developer experience. In doing so, we ensure applications are user-centric and decentralized.
 
-Kubelt will also always try to deliver and publish content over available decentralized networks like IPFS and fall back to http gatways when needed without.
+Kubelt will also always try to deliver and publish content over available decentralized networks like IPFS and fall back to HTTP gateways when needed without.
 
 ## Showcase
 
