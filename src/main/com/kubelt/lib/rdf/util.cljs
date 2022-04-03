@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.rdf.util
   "Shared RDF-related utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as str]))
 

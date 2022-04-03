@@ -1,6 +1,6 @@
 (ns main.com.kubelt.lib.jwk
   "JSON Web Key implementation"
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; TODO NB! this is just an experiment that might be thrown out. Don't
 ;; rely on this for anything unless this warning is removed.

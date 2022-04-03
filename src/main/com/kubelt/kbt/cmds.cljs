@@ -1,6 +1,6 @@
 (ns com.kubelt.kbt.cmds
   "Define the kbt command hierarchy."
-  {:author "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
+  {:author "ⓒ2022 Kubelt Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.kbt.cmds.workspace :as cmds.workspace]))
 

@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.rdf.data
   "Convert a JSON-LD data file into a CAR file."
-  {:copyright "ⓒ2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "ⓒ2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["fs" :as fs]
    ["path" :as path]))

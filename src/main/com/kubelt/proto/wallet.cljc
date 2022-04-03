@@ -1,6 +1,6 @@
 (ns com.kubelt.proto.wallet
   "A protocol for dealing with "
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 
 (defprotocol Wallet

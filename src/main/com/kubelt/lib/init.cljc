@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.init
   "SDK implementation."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [integrant.core :as ig]
    [taoensso.timbre :as log])

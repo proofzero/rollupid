@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.quad
   "Defines a spec for RDF/cljs to enable validation."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; We use the default vector-based format for ease of authoring, but if
 ;; performance issues arise it may be more efficient to switch to

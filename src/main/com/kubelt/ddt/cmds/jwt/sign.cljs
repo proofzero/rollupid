@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.jwt.sign
   "Invoke the JWT (sign) method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.jwt :as jwt]

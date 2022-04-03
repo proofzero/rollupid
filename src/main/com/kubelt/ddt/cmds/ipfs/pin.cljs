@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.ipfs.pin
   "CLI setup for 'ipfs pin' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.ipfs.pin.local :as pin.local]
    [com.kubelt.ddt.cmds.ipfs.pin.remote :as pin.remote]

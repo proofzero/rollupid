@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.crypto.keypair
   "Keypair."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   #?(:clj
      (:import
       [org.bouncycastle.crypto CryptoException Signer]

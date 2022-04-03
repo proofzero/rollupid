@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.p2p.query
   "Invoke the p2p (query) method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [<!]])
   (:require

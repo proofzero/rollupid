@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.p2p.authenticate
   "Invoke the p2p > authenticate method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require

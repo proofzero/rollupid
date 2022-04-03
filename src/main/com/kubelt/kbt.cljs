@@ -1,6 +1,6 @@
 (ns com.kubelt.kbt
   "The entry-point for the Kubelt CLI tool."
-  {:author "ⓒ2022 Kubelt Inc." :license "UNLICENSED"}
+  {:author "ⓒ2022 Kubelt Inc." :license "Apache 2.0"}
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require

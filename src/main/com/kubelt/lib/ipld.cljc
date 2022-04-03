@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.ipld
   "IPLD-related data and utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; Codecs
 ;; -----------------------------------------------------------------------------

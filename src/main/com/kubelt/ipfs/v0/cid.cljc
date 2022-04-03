@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.cid
   "Methods for obtaining information about CIDs."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [bases format])
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]

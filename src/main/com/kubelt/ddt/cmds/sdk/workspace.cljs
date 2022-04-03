@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.workspace
   "CLI setup for 'workspace' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.sdk.workspace.available :as workspace.available]))
 

@@ -1,6 +1,6 @@
 (ns com.kubelt.p2p.execute
-  "Exploratory work towards using reitit.http."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  "Exploratory work towards using reitit.http wrapped around hypercores."
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["http" :as http :refer [IncomingMessage ServerResponse]])
   (:require

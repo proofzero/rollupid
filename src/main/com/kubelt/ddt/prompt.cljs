@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.prompt
   "Configuration for prompt."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["prompt" :as prompt])
   (:require

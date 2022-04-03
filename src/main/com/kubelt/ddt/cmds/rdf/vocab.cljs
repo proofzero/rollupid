@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.rdf.vocab
   "Convert an RDF vocabulary into a CAR file."
-  {:copyright "ⓒ2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "ⓒ2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["fs" :as fs]
    ["path" :as path])

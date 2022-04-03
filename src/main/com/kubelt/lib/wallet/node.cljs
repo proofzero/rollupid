@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.wallet.node
   "The Node.js implementation of a crypto wallet wrapper."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [goog.object :as gobj])
   (:require

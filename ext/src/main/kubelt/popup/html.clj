@@ -1,6 +1,6 @@
 (ns kubelt.popup.html
   "Generate the popup window HTML."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.tools.cli :refer [parse-opts]]
    [hiccup.core :as h]

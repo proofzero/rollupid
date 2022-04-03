@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt
   "The entry-point for the Kubelt Development CLI tool."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require

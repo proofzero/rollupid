@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.client
   "IPFS cross-platform client."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as cstr])
   (:require
