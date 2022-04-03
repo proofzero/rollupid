@@ -16,15 +16,15 @@ domainTLD = "kubelt.com"
 titleHome = "Kubelt - Decentralized content management"
 
 ## Twitter Cards
-twitterSite = "@kubeltcms"
-twitterCreator = "@kubeltcms"
+twitterSite = "@kubelt"
+twitterCreator = "@kubelt"
 
 ## JSON-LD
 # schemaType = "Person"
 schemaType = "Organization"
 schemaName = "Kubelt"
 schemaAuthor = "Kubelt"
-schemaAuthorTwitter = "https://twitter.com/kubeltcms"
+schemaAuthorTwitter = "https://twitter.com/kubelt"
 schemaAuthorLinkedIn = "https://www.linkedin.com/company/kubelt/"
 schemaAuthorGitHub = "https://github.com/kubelt"
 schemaLocale = "en-US"
