@@ -44,25 +44,17 @@ The [dapp/](dapp/) directory contains a web application for interacting with Kub
 
 The [ext/](ext/) directory contains an experimental browser extension.
 
-### Tooling
+### Tooling / Scripts
 
-#### bb
+The Kubelt monorepo tooling configuration and scripts:
 
-The [bb/](bb/) directory contains some build tooling for use with [babashka](https://babashka.org).
-
-#### bzl
-
-The [bzl/](bzl/) directory contains miscellaneous tooling for [Bazel](https://bazel.build/), one of the build tools that we use.
+- [bb/](bb/) directory contains some build tooling for use with [babashka](https://babashka.org).
+- [bzl/](bzl/) directory contains miscellaneous tooling for [Bazel](https://bazel.build/), one of the build tools that we use.
 
 ### Other
 
-#### rdf
-
-The [rdf/](rdf/) directory contains various RDF vocabularies, examples, and data fixtures used during development.
-
-#### fix
-
-The [fix/](fix/) directory contains fixture data for testing.
+- [rdf/](rdf/) directory contains various RDF vocabularies, examples, and data fixtures used during development.
+- [fix/](fix/) directory contains fixture data for testing.
 
 ## Configuration
 
