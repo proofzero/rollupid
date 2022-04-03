@@ -19,7 +19,7 @@ Let's take a look around at the Kubelt Monorepo layout...
 
 The [/src](src/) directory contains the Kubelt SDK source code. The Kubelt SDK is written in Clojurescript and use to build the Kubelt client libraries and tools.
 
-## Packages
+### Packages
 
 The [packages/](packages/) directory contains package configuration for the things we release to package repository sites like [npm](https://npmjs.com). The current target packages are:
 
@@ -32,35 +32,35 @@ The [packages/](packages/) directory contains package configuration for the thin
 - [Kubelt Debug CLI](packages/ddt): Kubelt debug command line tool.
 - [Sanity.io Plugin](packages/sanity-plugin-kubelt): Kubelt Plugin for Sanity.io CMS.
 
-## Website / Docs
+### Website / Docs
 
 The [www/](www/) directory contains the Kubelt.com static website documentation portal.
 
-## dApp
+### dApp
 
 The [dapp/](dapp/) directory contains a web application for interacting with Kubelt as a customer.
 
-## Browser Extension
+### Browser Extension
 
 The [ext/](ext/) directory contains an experimental browser extension.
 
-## Tooling
+### Tooling
 
-### bb
+#### bb
 
 The [bb/](bb/) directory contains some build tooling for use with [babashka](https://babashka.org).
 
-### bzl
+#### bzl
 
 The [bzl/](bzl/) directory contains miscellaneous tooling for [Bazel](https://bazel.build/), one of the build tools that we use.
 
-## Other
+### Other
 
-### rdf
+#### rdf
 
 The [rdf/](rdf/) directory contains various RDF vocabularies, examples, and data fixtures used during development.
 
-### fix
+#### fix
 
 The [fix/](fix/) directory contains fixture data for testing.
 
