@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.http.jvm
   "Support for HTTP requests from a JVM execution context."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.core.async :as async :refer [>! go]]
    [clojure.string :as str]

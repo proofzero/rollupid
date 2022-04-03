@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.dag
   "Methods for working with DAGs."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [get import resolve])
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]

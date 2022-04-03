@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.http.browser
   "Support for HTTP requests from a browser execution context."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [goog.Uri.QueryData :as query]
    [goog.net.XhrIo :as xhrio]

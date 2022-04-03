@@ -1,6 +1,6 @@
 (ns com.kubelt.proto.http
   "A protocol for making HTTP requests."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; TODO tighten up this protocol
 

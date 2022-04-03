@@ -1,6 +1,6 @@
 (ns kubelt.sidebar.style
   "Generate the sidebar panel CSS."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.tools.cli :refer [parse-opts]]
    [garden.core :as g]

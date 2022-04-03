@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.pin.remote.service
   "Methods for managing remote pinning services."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]
    [com.kubelt.ipfs.util :as ipfs.util]

@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.jwt
   "Wrapper around jose JWT library."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:import
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
   (:require

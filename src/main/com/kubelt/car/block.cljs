@@ -1,6 +1,6 @@
 (ns com.kubelt.car.block
   "Block utilities for producing Content Archives"
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["multiformats/block" :as block :refer [Block]]
    ["multiformats/cid" :as cid :refer [CID]]))

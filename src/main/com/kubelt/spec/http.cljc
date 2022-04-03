@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.http
   "Schema for HTTP requests and responses."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; TODO test me
 

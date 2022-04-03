@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.uuid
   "UUID utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   #?(:clj
      (:import
       [java.util UUID])

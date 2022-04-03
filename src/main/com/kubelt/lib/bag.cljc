@@ -1,7 +1,7 @@
 (ns com.kubelt.lib.bag
   "Defines the Bundle of Acyclic Graphs, a data structure representing a
   collection of DAGs that maps onto the IPLD DAG."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.bag.check :as bag.check]
    [com.kubelt.lib.bag.dag :as bag.dag]

@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.p2p.store
   "Invoke the p2p (store) method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require-macros
    [cljs.core.async.macros :refer [go]])
   (:require

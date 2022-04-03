@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.p2p
   "Wrapper around the external p2p naming system."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require-macros
    [cljs.core.async.interop :refer [<p!]]
    [cljs.core.async.macros :refer [go]])

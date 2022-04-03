@@ -1,6 +1,6 @@
 (ns com.kubelt.p2p
   "Entry point for p2p naming service."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require-macros
    [cljs.core.async.macros :refer [go]])
   (:require

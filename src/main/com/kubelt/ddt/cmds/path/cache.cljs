@@ -1,7 +1,7 @@
 (ns com.kubelt.ddt.cmds.path.cache
   "Invoke the path > cache method to return the system configuration
   path."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.path :as path]))
 

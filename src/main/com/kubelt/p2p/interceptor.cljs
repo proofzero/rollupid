@@ -1,6 +1,6 @@
 (ns com.kubelt.p2p.interceptor
   "Interceptors."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:import
     [goog.crypt Aes Arc4 Cbc Hmac Sha256 ])
   (:require
@@ -64,17 +64,6 @@
             ctx)})
 ;; TODO check and throw error
 
-(def register
-  {:name ::register
-   :enter (fn [ctx]
-            ;; TODO register the user
-            ctx)})
-
-(def metrics
-  {:name ::metrics
-   :leave (fn [ctx]
-            ;; TODO return accumulated metrics.
-            ctx)})
 
 (def version
   {:name ::version

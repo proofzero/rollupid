@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.ipfs.dag
   "CLI setup for 'ipfs dag' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.ipfs.dag.get :as dag.get]
    [com.kubelt.ddt.cmds.ipfs.dag.export :as dag.export]

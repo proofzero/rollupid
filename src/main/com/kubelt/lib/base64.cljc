@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.base64
   "Base64 encoding and decoding."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   #?(:clj
      (:import
       [java.util Base64]))

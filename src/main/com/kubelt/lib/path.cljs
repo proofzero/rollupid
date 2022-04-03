@@ -1,7 +1,7 @@
 (ns com.kubelt.lib.path
   "Path-related methods for getting OS-specific locations to store data,
   configuration, etc."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["os" :as os]
    ["path" :as path]

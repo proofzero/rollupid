@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds
   "Define ddt command hierarchy."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.http :as ddt.http]
    [com.kubelt.ddt.cmds.ipfs :as ddt.ipfs]

@@ -1,6 +1,6 @@
 (ns com.kubelt.proto.key
   "Protocol for various types of keys."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 (defprotocol SymmetricKey
   "A symmetric key."

@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.wallet.sign
   "Sign data using the wallet."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require

@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.http.node
   "Support for HTTP requests from a Node.js execution context."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["http" :as http :refer [IncomingMessage ServerResponse]]
    ["https" :as https])

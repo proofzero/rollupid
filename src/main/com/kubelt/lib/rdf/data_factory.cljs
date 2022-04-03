@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.rdf.data-factory
   "Generate RDF/cljs quads from RDF/js data factory instances."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["rdf-data-factory" :refer
     [DataFactory

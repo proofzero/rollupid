@@ -1,6 +1,6 @@
 (ns com.kubelt.car.build
   "Build Content Archives."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["@ipld/dag-cbor" :as codec-cbor]
    ["@ipld/dag-json" :as codec-json]

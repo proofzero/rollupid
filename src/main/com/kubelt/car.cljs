@@ -1,6 +1,6 @@
 (ns com.kubelt.car
   "Do stuff with Content ARchives."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.car.file :as car.file]
    [com.kubelt.lib.bag.check :as bag.check]

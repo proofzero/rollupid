@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.stats
   "Obtain statistics from an IPFS daemon."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [format])
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]
