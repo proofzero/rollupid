@@ -13,6 +13,14 @@ Kubelt’s integrated peer-to-peer edge architecture decentralizes any applicati
 For more please see the [Kubelt Docs](https://kubelt.com/docs).
 
 
+## Kubelt Monorepo
+
+This repository contains the following:
+
+### SDK
+
+The [/src](src/) directory contains the Kubelt SDK source code. The Kubelt SDK is written in Clojurescript and use to build the Kubelt client libraries and tools.
+
 
 ## develop
 
