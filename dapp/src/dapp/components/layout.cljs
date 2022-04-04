@@ -1,11 +1,15 @@
 (ns dapp.components.layout
   (:require
-   [dapp.components.nav :as nav]))
+   [dapp.components.sidebar :as sidebar]))
 
 (defn render [{:keys [router current-route]}]
-  [:div
-   (nav/render router current-route)
-   [:main.flex-1.md:ml-64
+  [:div.main-container
+   {:class "w-full flex flex-row"}
+
+   ;; Sidebar
+   [sidebar/render router current-route]
+
+   ;; App page
+   [:<>
     (when current-route
       [(-> current-route :data :view)])]])
-
