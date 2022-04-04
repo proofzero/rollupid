@@ -1,0 +1,39 @@
+<div
+  data-collapse="medium"
+  data-animation="default"
+  data-duration="400"
+  data-easing="ease"
+  data-easing2="ease"
+  data-doc-height="1"
+  role="banner"
+  class="navigation white black w-nav"
+>
+  <div class="navigation-wrap">
+    <a
+      href="index.html"
+      aria-current="page"
+      class="logo-link w-nav-brand w--current"
+      ><img
+        src="{{ .Site.Params.navbarIcon }}"
+        width="180"
+        alt=""
+        class="logo-image black"
+    /></a>
+    <div class="div-block-19">
+      <a
+        href="{{ .Site.Params.navbarHiringUrl }}"
+        target="_blank"
+        class="button cc-contact-us grey ttt w-inline-block"
+      >
+        <div class="text-block _33">{{ .Site.Params.navbarHiringCopy }}</div>
+      </a>
+      <a
+        href="{{ .Site.Params.accessUrl }}"
+        target="_blank"
+        class="button cc-contact-us b w-inline-block"
+      >
+        <div class="text-block">{{ .Site.Params.accessCopy }}</div>
+      </a>
+    </div>
+  </div>
+</div>
