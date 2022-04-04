@@ -52,12 +52,12 @@
       ;; FIXME support non-json and pass headers properly
       (let [response {:http/status status :http/headers "" }]
         (case (str/lower-case content-type)
-          "application/json; charset=utf-8" 
+          "application/json; charset=utf-8"
           (resolve (assoc response :http/body (lib.json/from-json res true)))
-          
+
           "text/plain;charset=utf-8"
           (resolve (assoc response :http/body res))
-          
+
           (resolve (assoc response :http/body res)))))))
       ;;(resolve (res)
 

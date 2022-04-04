@@ -15,10 +15,5 @@
               yargs)
 
    :handler (fn [args]
-              (let [kbt (sdk/init)]
-                (if (lib.error/error? kbt)
-                  (prn (:error kbt))
-                  (let [payload {:foo "bar"}]
-                      (println "TODO Sign payload to get JWT")
-                      ;;(jwt/sign payload)
-                      (sdk/halt! kbt)))))})
+              (println "TODO Sign payload to get JWT")
+              #_(jwt/sign payload))})

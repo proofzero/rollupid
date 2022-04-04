@@ -48,3 +48,9 @@
     (string? x) (str->bytes x)
     ;; TODO if given bytes, return bytes. Need x-platform (bytes?).
     :else x))
+
+(defn size
+  [x]
+  ;; TODO CLJS (node, browser)
+  #?(:clj
+     (count (.getBytes x))))

@@ -10,7 +10,34 @@
    :desc "List all local keypairs."
 
    :builder (fn [^Yargs yargs]
+              (let [config #js {:description "Encoding used for keys"
+                                :choices #js ["b58mh" "base32" "base36"]}]
+                (.option yargs "ipns-base" config))
+              (let [config #js {:description "Show extra information"
+                                :type "boolean"}]
+                (.option yargs "verbose" config))
               yargs)
 
    :handler (fn [args]
-              (println "not yet implemented"))})
+              (let [args (js->clj args :keywordize-keys true)
+                    ipns-base (get args :ipns-base)
+                    verbose? (get args :verbose)
+                    params (cond-> {}
+                             (not (nil? ipns-base))
+                             (assoc :ipns/base ipns-base)
+                             (not (nil? verbose?))
+                             (assoc :verbose verbose?))
+                    request (v0.key/list params)
+                    client (ipfs.client/init)
+                    response-p (ipfs.client/request client request)]
+                (-> response-p
+                    (.then (fn [body]
+                             ;; Convert result from edn to JSON and pretty print.
+                             (let [data (clj->js body)
+                                   indent 2
+                                   data-str (js/JSON.stringify data nil indent)]
+                               (println data-str))))
+                    (.catch (fn [error]
+                              (println error))))
+                ;; Returning a promise breaks things.
+                args))})

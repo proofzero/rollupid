@@ -2,10 +2,7 @@
   "Sign data using the wallet."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
-   ["process" :as process])
-  (:require
-   [cljs.core.async :as async :refer [<!]]
-   [clojure.string :as cstr])
+   [cljs.core.async :as async :refer [<!]])
   (:require
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
@@ -25,7 +22,7 @@
                     {:keys [wallet data]} args-map
                     app-name (get args-map :$0)]
                 ;; Check to see if named wallet exists.
-                (if-not (lib.wallet/has-wallet? app-name wallet)
+                (when-not (lib.wallet/has-wallet? app-name wallet)
                   (let [message (str "wallet '" wallet "' doesn't exist")]
                     (ddt.util/exit-if message)))
                 (ddt.prompt/ask-password!

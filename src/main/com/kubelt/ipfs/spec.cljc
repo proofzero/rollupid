@@ -31,13 +31,27 @@
 (def media-types
   [:vector spec.http/media-type])
 
+(def param-status
+  [:enum :experimental])
+
+(def param-description
+  :string)
+
+(def param-default
+  :any)
+
+(def param-required
+  :boolean)
+
 (def api-params
   [:map-of {:closed true}
    :keyword
    [:map
     [:name spec.http/param-name]
-    [:description :string]
-    [:required :boolean]
+    [:description param-description]
+    [:status {:optional true} param-status]
+    [:default {:optional true} param-default]
+    [:required param-required]
     [:spec api-spec]]])
 
 (def param-conflicts
@@ -81,10 +95,6 @@
 ;; Options for (client/init).
 (def init-options
   [:map {:closed true}
-   [:client/keywordize?
-    {:optional true
-     :description "Convert response keys to keywords?"}
-    :boolean]
    [:client/validate?
     {:optional true
      :description "Validate the parsed response body?"}
@@ -140,7 +150,7 @@
      "/ip4/206.248.184.135/udp/63760/quic/p2p/12D3KooWGn8esyGN8DB1UCsVTZPWxkr6ELGBP9AffLNQqbrfejv7"
      "/ip6/::1/tcp/4001/p2p/12D3KooWGn8esyGN8DB1UCsVTZPWxkr6ELGBP9AffLNQqbrfejv7"
      "/ip6/::1/udp/4001/quic/p2p/12D3KooWGn8esyGN8DB1UCsVTZPWxkr6ELGBP9AffLNQqbrfejv7"]}
-   :vector])
+   [:vector :string]])
 
 (def agent-version
   [:and
@@ -170,7 +180,7 @@
      "/libp2p/circuit/relay/0.2.0/stop"
      "/p2p/id/delta/1.0.0"
      "/x/"]}
-   :vector])
+   [:vector :string]])
 
 (def key-name
   [:and
@@ -281,3 +291,9 @@
    {:description "A CID multibase code name"
     :example "base58btc"}
    :string])
+
+(def cid-version
+  [:and
+   {:description "The CID version"
+    :example 1}
+   [:enum 0 1]])

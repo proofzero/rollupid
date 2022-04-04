@@ -2,9 +2,6 @@
   "Invoke the SDK (init) method."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
-   ["fs" :as fs]
-   ["path" :as path])
-  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 
@@ -17,9 +14,8 @@
               yargs)
 
    :handler (fn [args]
+              (println "initializing the SDK")
               (let [kbt (sdk/init)]
                 (if (lib.error/error? kbt)
                   (prn (:error kbt))
-                  (let []
-                    (println "initializing the SDK")
-                    (sdk/halt! kbt)))))})
+                  (sdk/halt! kbt))))})

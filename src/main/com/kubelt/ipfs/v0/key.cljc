@@ -91,7 +91,7 @@
 ;;   "Name": "<string>"
 ;; }
 
-;; TODO Extract into shared utility method.
+;; TODO Extract into shared utility method. Cf. v0.node/add-body.
 (defn- key-body
   [param-name part-data]
   {:com.kubelt/type :kubelt.type/multipart
@@ -168,11 +168,11 @@
    :response/types ["application/json"]
    :response/spec
    [:map
-    ["Keys"
+    [:keys
      [:vector
       [:map
-       ["Name" ipfs.spec/key-name]
-       ["Id" ipfs.spec/key-id]]]]]})
+       [:name ipfs.spec/key-name]
+       [:id ipfs.spec/key-id]]]]]})
 
 (def list
   (ipfs.util/make-http ipfs.v0/api-base list-desc))
@@ -262,11 +262,11 @@
    :response/types ["application/json"]
    :response/spec
    [:map
-    ["Keys"
+    [:keys
      [:vector
       [:map
-       ["Name" ipfs.spec/key-name]
-       ["Id" ipfs.spec/key-id]]]]]})
+       [:name ipfs.spec/key-name]
+       [:id ipfs.spec/key-id]]]]]})
 
 (def rm
   (ipfs.util/make-http ipfs.v0/api-base rm-desc))

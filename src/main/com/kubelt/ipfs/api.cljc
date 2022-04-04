@@ -42,7 +42,8 @@
    :node {:id v0.node/id-desc
           :ping v0.node/ping-desc
           :version v0.node/version-desc
-          :deps v0.node/deps-desc}
+          :deps v0.node/deps-desc
+          :add v0.node/add-desc}
    :pin {:add v0.pin/add-desc
          :ls v0.pin/ls-desc
          :rm v0.pin/rm-desc

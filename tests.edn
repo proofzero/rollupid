@@ -29,6 +29,11 @@
           :source-paths ["src/main"]
           :test-paths ["src/test"]
           :ns-patterns ["lib.jwt.*-test$"]}
+         ;; [unit.lib/multipart] only multipart unit tests
+         {:id :unit.lib/multipart
+          :source-paths ["src/main"]
+          :test-paths ["src/test"]
+          :ns-patterns ["lib.multipart.*-test$"]}
          ;; [unit.ipfs] only ipfs unit tests
          {:id :unit.ipfs
           :source-paths ["src/main"]

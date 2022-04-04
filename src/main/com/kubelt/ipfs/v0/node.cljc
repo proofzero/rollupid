@@ -47,15 +47,154 @@
    :response/types ["application/json"]
    :response/spec
    [:map
-    ["ID" ipfs.spec/peer-id]
-    ["PublicKey" ipfs.spec/public-key]
-    ["Addresses" ipfs.spec/addresses]
-    ["AgentVersion" ipfs.spec/agent-version]
-    ["ProtocolVersion" ipfs.spec/protocol-version]
-    ["Protocols" ipfs.spec/protocols]]})
+    [:id ipfs.spec/peer-id]
+    [:public-key ipfs.spec/public-key]
+    [:addresses ipfs.spec/addresses]
+    [:agent-version ipfs.spec/agent-version]
+    [:protocol-version ipfs.spec/protocol-version]
+    [:protocols ipfs.spec/protocols]]})
 
 (def id
   (ipfs.util/make-http ipfs.v0/api-base id-desc))
+
+;; /api/v0/add
+;; -----------------------------------------------------------------------------
+;; On success returns 200 status and the following body:
+;;
+;; {
+;;   "Bytes": "<int64>",
+;;   "Hash": "<string>",
+;;   "Name": "<string>",
+;;   "Size": "<string>"
+;; }
+
+;; TODO Extract into shared utility method. Cf. v0.key/key-body.
+(defn- add-body
+  [param-name part-data]
+  {:com.kubelt/type :kubelt.type/multipart
+   :multipart
+   [{:param/name param-name
+     :part/content part-data
+     ;; TODO use media type from library.
+     :part/media-type "application/octet-stream"}]})
+
+(def add-desc
+  {:com.kubelt/type :kubelt.type/api-resource
+   :resource/description "Add a file or directory to IPFS."
+   :resource/methods [:post]
+   :resource/path "/add"
+   :resource/params
+   {:node/quiet?
+    {:name "quiet"
+     :description "Write minimal output."
+     :required false
+     :spec :boolean}
+    :node/quieter?
+    {:name "quieter"
+     :description "Write only final hash."
+     :required false
+     :spec :boolean}
+    :node/silent?
+    {:name "silent"
+     :description "Write no output."
+     :required false
+     :spec :boolean}
+    :node/progress?
+    {:name "progress"
+     :description "Stream progress data."
+     :required false
+     :spec :boolean}
+    :node/trickle?
+    {:name "trickle"
+     :description "Use trickle-dag format for dag generation."
+     :required false
+     :spec :boolean}
+    :node/only-hash?
+    {:name "only-hash"
+     :description "Only chunk and hash; do not write to disk."
+     :required false
+     :spec :boolean}
+    :node/wrap-directory?
+    {:name "wrap-with-directory"
+     :description "Wrap files with a directory object."
+     :required false
+     :spec :boolean}
+    :node/chunker
+    {:name "chunker"
+     :description "Chunking algorithm. Options: size-[bytes], rabin-[min]-[avg]-[max] or buzhash."
+     :default "size-262144"
+     :required false
+     :spec :string}
+    :node/pin?
+    {:name "pin"
+     :description "Pin this object when adding."
+     :default true
+     :required false
+     :spec :boolean}
+    :node/raw-leaves?
+    {:name "raw-leaves"
+     :description "Use raw blocks for leaf nodes."
+     :required false
+     :spec :boolean}
+    :node/no-copy?
+    {:name "nocopy"
+     :description "Add the file using filestore. Implies raw-leaves."
+     :status :experimental
+     :implies :node/raw-leaves?
+     :required false
+     :spec :boolean}
+    :node/fs-cache?
+    {:name "fscache"
+     :description "Check the filestore for pre-existing blocks."
+     :status :experimental
+     :required false
+     :spec :boolean}
+    :cid/version
+    {:name "cid-version"
+     :description "CID version. Defaults to 0 unless an option that depends on CIDv1 is passed. Passing version 1 will cause the raw-leaves option to default to true."
+     :required false
+     :spec ipfs.spec/cid-version}
+    :hash/fn
+    {:name "hash"
+     :description "Hash function to use. Implies CIDv1 if not sha2-256."
+     :status :experimental
+     :default "sha2-256"
+     :required false
+     :spec ipfs.spec/dag-hash}
+    :node/inline?
+    {:name "inline"
+     :description "Inline small blocks into CIDs."
+     :status :experimental
+     :required false
+     :spec :boolean}
+    :inline/limit
+    {:name "inline-limit"
+     :description "Maximum block size to inline."
+     :status :experimental
+     :default 32
+     :required false
+     :spec :int}}
+
+   :resource/body
+   {:key/data
+    {:name "key"
+     :description "PEM-encoded key data to send."
+     :required true
+     :spec #?@(:clj [bytes?]
+               ;; TODO find better constraint than :any
+               :cljs [:any])}}
+   :resource/body-fn add-body
+
+   :response/types ["application/json"]
+   :response/spec
+   [:map
+    ["Bytes" :string]
+    ["Hash" :string]
+    ["Name" :string]
+    ["Size" :string]]})
+
+(def add
+  (ipfs.util/make-http ipfs.v0/api-base add-desc))
 
 ;; /api/v0/ping
 ;; -----------------------------------------------------------------------------

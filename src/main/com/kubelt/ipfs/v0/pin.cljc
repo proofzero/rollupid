@@ -96,17 +96,11 @@
    ;; TODO this spec doesn't appear to be correct
    :response/spec
    [:map
-    ["PinLsList"
-     [:map
-      ["Keys"
-       [:map-of
-        :string
-        [:map
-         ["Type" :string]]]]]]
-    ["PinLsObject"
-     [:map
-      ["Cid" :string]
-      ["Type" :string]]]]})
+    [:keys
+     [:map-of
+      :keyword
+      [:map
+       [:type [:enum "direct" "indirect" "recursive"]]]]]]})
 
 (def ls
   (ipfs.util/make-http ipfs.v0/api-base ls-desc))

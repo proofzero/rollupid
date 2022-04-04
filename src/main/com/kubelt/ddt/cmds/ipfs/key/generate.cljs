@@ -2,8 +2,9 @@
   "Invoke the 'ipfs key generate' method."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.ipfs.client :as ipfs.client]
-   [com.kubelt.ipfs.v0.key :as v0.key]))
+   ;;[com.kubelt.ipfs.client :as ipfs.client]
+   ;;[com.kubelt.ipfs.v0.key :as v0.key]
+   ))
 
 (defonce command
   {:command "generate <name>"
@@ -12,5 +13,5 @@
    :builder (fn [^Yargs yargs]
               yargs)
 
-   :handler (fn [args]
+   :handler (fn [#_args]
               (println "not yet implemented"))})

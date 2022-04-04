@@ -5,7 +5,7 @@
    ["http" :as http :refer [IncomingMessage ServerResponse]]
    ["https" :as https])
   (:require
-   [clojure.string :as str])
+   [clojure.string :as cstr])
   (:require
    [malli.core :as malli]
    [malli.error :as me]
@@ -31,6 +31,10 @@
         domain (http.shared/request->domain m)
         port (http.shared/request->port m)
         path (http.shared/request->path m)
+        params (http.shared/request->params m)
+        ;; Node http module "path" argument is also expected to contain
+        ;; any query parameters.
+        path (cstr/join "" [path params])
         headers (http.shared/request->headers m)
         options {:method method
                  :hostname domain
@@ -60,17 +64,18 @@
          (fn []
            (let [headers (js->clj headers)
                  body (.join chunks "")
+                 keywordize? true
                  data-edn (cond
                             (http.media-type/text? headers)
                             body
                             (http.media-type/json? headers)
-                            (lib.json/from-json body true)
+                            (lib.json/from-json body keywordize?)
                             :else body)]
              (resolve (assoc response :http/body data-edn)))))))
 
 (defn on-error
-  [error]
-  (log/error error))
+  [reject error]
+  (reject (lib.error/error error)))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -78,6 +83,7 @@
 ;; TODO put patch post delete
 ;; TODO convert response to response map
 ;; TODO validate response map
+;; TODO support request timeout (:request/timeout)
 
 (defrecord HttpClient []
   proto.http/HttpClient
@@ -96,6 +102,7 @@
                ;; to using the "http" module otherwise.
                request-mod (if (= :https scheme) https http)
                on-response (partial on-response resolve)
+               on-error (partial on-error reject)
                node-req (.request request-mod options on-response)]
            (when (or (http.request/post? request)
                      (http.request/put? request))

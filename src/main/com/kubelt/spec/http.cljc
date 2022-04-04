@@ -91,6 +91,12 @@
 (def user
   string?)
 
+(def timeout
+  [:and
+   {:description "Request timeout in milliseconds"
+    :example 5000}
+   :int])
+
 ;; response
 ;; -----------------------------------------------------------------------------
 
@@ -116,7 +122,8 @@
    [:uri/user {:optional true} user]
    [:uri/scheme scheme]
    [:uri/domain domain]
-   [:uri/path path]])
+   [:uri/path path]
+   [:client/timeout {:optional true} timeout]])
 
 (def request-schema
   [:and

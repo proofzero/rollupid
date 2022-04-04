@@ -9,6 +9,9 @@
 ;; Media Types
 ;; -----------------------------------------------------------------------------
 
+(def octet-stream
+  "application/octet-stream")
+
 (def transit-json
   "application/transit+json")
 

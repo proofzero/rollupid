@@ -7,6 +7,7 @@
    [malli.core :as malli]
    [malli.error :as me])
   (:require
+   [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.ipfs.api :as ipfs.api]
    [com.kubelt.ipfs.v0.node :as v0.node]
@@ -130,6 +131,47 @@
     protocol-version
     :unknown))
 
+(defn- handle-response
+  [client request response]
+  {:pre [(every? map? [client request])]}
+  #?(:cljs
+     ;; In node/browser environment we expect a promise as the result of
+     ;; performing an HTTP request.
+     (-> response
+         (.then (fn [{:keys [http/status http/body]}]
+                  (if (http.status/success? status)
+                    (let [body-fn (get request :response/body-fn)
+                          ;; TODO allow per-request override of validation?
+                          validate? (get client :client/validate? false)
+                          ;; The malli schema for the response.
+                          spec (get request :response/spec)]
+                      ;; Validate the response if that is configured.
+                      (if validate?
+                        (if-not (malli/validate spec body)
+                          (lib.error/explain spec body)
+                          ;; Response is valid, process it further.
+                          (if (fn? body-fn)
+                            (body-fn request body)
+                            body))
+                        (if (fn? body-fn)
+                          (body-fn request body)
+                          body)))
+                    ;; Got a non-success error status.
+                    (lib.error/error body))))
+         (.catch (fn [error]
+                   (lib.error/error error))))
+     :clj
+     (let [body-fn (get request :response/body-fn)
+           validate? (get client :client/validate? false)
+           spec (get request :response/spec)]
+       (if validate?
+         (if-not (malli/validate spec response)
+           (lib.error/explain spec response)
+           ;; Response is valid, process it further.
+           (if (fn? body-fn)
+             (body-fn request response)
+             response))))))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
 
@@ -220,7 +262,6 @@
   used to control various aspects of the interaction with a remote IPFS
   daemon or pinning service. Available options include:
   :client/validate? - check that response conforms to expected schema
-  :client/keywordize? - make response map keys into idiomatic keywords
   :client/node-info? - fetch and store node information in client
   :client/timeout - request timeout in milliseconds
   :http/client - a pre-created HTTP client (must satisfy HttpClient)
@@ -234,7 +275,7 @@
                           :http/host default-host
                           :http/port default-port
                           :client/validate? true
-                          :client/keywordize? true}
+                          :client/timeout 5000}
          options (merge default-options options)]
      ;; Validate the options.
      (if-not (malli/validate ipfs.spec/init-options options)
@@ -272,8 +313,7 @@
                            id-request (-> id-request
                                           (assoc :uri/scheme request-scheme)
                                           (assoc :uri/domain request-domain)
-                                          (assoc :uri/port request-port)
-                                          (assoc :response/keywordize? true))
+                                          (assoc :uri/port request-port))
                            ;; TODO validate response
                            info (proto.http/request! client id-request)
                            ;; Extract some information from the response and
@@ -299,7 +339,7 @@
 #?(:cljs
    (defn init-js
      [options-obj]
-     (let [options (js->clj options-obj :keywordize true)]
+     (let [options (js->clj options-obj :keywordize-keys true)]
        (init options))))
 
 (defn request
@@ -319,23 +359,15 @@
   :http/host - override the IPFS daemon host
   :http/port - override the IPFS daemon port
   :client/validate? - perform validation of the response
-  :client/keywordize? - convert response data into idiomatic maps
   :client/timeout - request timeout in milliseconds
 
-  Notably, you can provide callbacks to handle the response or any
-  errors that might occur:
-  :on/response - a function to invoke with processed response data
-  :on/error - a function to invoke when an error occurs
-
-  By default, without supplying any callbacks, you'll receive a
-  future (in Clojure) or a promise (in ClojureScript) that resolves to
-  the result of the request."
+  The return value is a future (in Clojure) or a promise (in
+  ClojureScript) that resolves to the result of the request."
   [client request-map]
   (cond
     ;; Validate that we've been given a IPFS client to make a call with.
     (not (client? client))
-    {:com.kubelt/type :kubelt.type/error
-     :error "invalid client"}
+    (lib.error/error "invalid client")
     ;; If user doesn't check the resource map to see that no error
     ;; occurred, we'll catch it here.
     (error? request-map)
@@ -345,12 +377,7 @@
     (lib.error/explain ipfs.spec/api-resource request-map)
     ;; Perform the request!
     :else
-    (let [;; TODO allow per-request override of keywordizing?
-          keywordize? (get client :client/keywordize? true)
-          ;; TODO perform validation if asked for.
-          ;; TODO allow per-request override of validation?
-          validate? (get client :client/validate? false)
-          ;; This stored map contains the HTTP request parameters we can
+    (let [;; This stored map contains the HTTP request parameters we can
           ;; pass to our HTTP client (once we've added a few missing
           ;; bits).
           request (get request-map :http/request)
@@ -360,6 +387,8 @@
           request-domain (request->domain client request)
           ;; Get the HTTP port for the request.
           request-port (request->port client request)
+          ;; The request timeout.
+          timeout (get client :client/timeout)
           ;; Add the request target details to the request map, along
           ;; with any additional parameters that control how the result
           ;; will be performed and/or the response processed.
@@ -367,30 +396,14 @@
                       (assoc :uri/scheme request-scheme)
                       (assoc :uri/domain request-domain)
                       (assoc :uri/port request-port)
-                      ;; Should response body be keywordized?
-                      (assoc :response/keywordize? keywordize?)
-                      ;; Should response body be validated?
-                      (assoc :response/validate? validate?))
-          ;; TODO invoke callbacks if provided
-          ;; TODO supply promise/channel if requested
+                      (assoc :client/timeout timeout))
           http-client (get client :http/client)
-          ;; By default perform synchronous request.
+          ;; cljs: returns a promise.
           response (proto.http/request! http-client request)]
-
-      ;; TODO promise, channel
-      ;; TODO callback fns:
-      ;; - :on/response (fn [x] )
-      #_on-response #_(fn [x]
-                        (prn x))
-      ;; - :on/error (fn [x] )
-      ;; TODO parse response body
-      ;; TODO validate response body, cf. :client/validate?
-      ;; TODO transform response body, cf. :client/keywordize?
-      ;;@(proto.http/request http-client request on-response)
-
-      (if-let [body-fn (get request-map :response/body-fn)]
-          (body-fn request-map response)
-          response))))
+      ;; The response type will vary by platform, so there are multiple
+      ;; platform-specific handlers to process it conditionally.
+      ;; TODO invoke callbacks if provided [on/response on/error]
+      (handle-response client request-map response))))
 
 #?(:cljs
    (defn request-js

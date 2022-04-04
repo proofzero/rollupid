@@ -7,7 +7,8 @@
    [malli.error]
    [malli.util])
   (:require
-   [com.kubelt.ipfs.spec :as ipfs.spec]))
+   [com.kubelt.ipfs.spec :as ipfs.spec]
+   [com.kubelt.lib.error :as lib.error]))
 
 ;; Definitions
 ;; -----------------------------------------------------------------------------
@@ -176,11 +177,7 @@
              options (ensure-map options)]
          ;; Validate the input options using parameter schema.
          (if-not (malli/validate parameter-spec options)
-           (let [explain (-> parameter-spec
-                             (malli/explain options)
-                             malli.error/humanize)]
-             {:com.kubelt/type :kubelt.type/error
-              :error explain})
+           (lib.error/explain parameter-spec options)
            ;; We have a valid options map, so use it to construct our
            ;; resource configuration map describing an IPFS RESTful API
            ;; resource.
