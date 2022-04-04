@@ -6,8 +6,10 @@
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [reitit.frontend.easy :as rfe]
-   [dapp.components.dashboard :as dashboard]
    [dapp.components.settings :as settings]
+   [dapp.pages.cores :as cores]
+   [dapp.pages.dashboard :as dashboard]
+   [dapp.pages.reports :as reports]
    [dapp.utils :as utils])
    (:require
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
@@ -63,6 +65,22 @@
        :start (fn [& params](utils/log-fn "Entering home page"))
        ;; Teardown can be done here.
        :stop  (fn [& params] (utils/log-fn "Leaving home page"))}]}]
+   ["cores"
+    {:name      ::cores
+     :view      cores/render
+     :controllers
+     [{;; Initialization
+       :start (fn [& _params](utils/log-fn "Entering Cores page"))
+       ;; Teardown
+       :stop  (fn [& _params] (utils/log-fn "Leaving Cores page"))}]}]
+   ["reports"
+    {:name      ::reports
+     :view      reports/render
+     :controllers
+     [{;; Initialization
+       :start (fn [& _params](utils/log-fn "Entering Reports page"))
+       ;; Teardown
+       :stop  (fn [& _params] (utils/log-fn "Leaving Reports page"))}]}]
    ["settings"
     {:name      ::settings
      :view      settings/render
@@ -86,4 +104,3 @@
     router
     on-navigate
     {:use-fragment true}))
-
