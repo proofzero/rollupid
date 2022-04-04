@@ -69,8 +69,9 @@ navbarIcon = "images/Asset-4.svg"
 navbarHiringUrl = "https://kubelt.notion.site/Jobs-4c1b8408d2244797924e53c9eae65f43"
 navbarHiringCopy = "We’re hiring"
 
-navbarAccessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
-navbarAccessCopy = "Get Access"
+# Access
+accessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
+accessCopy = "Get Access"
 
 # Footer
 footer = "Powered by Hugo and Kubelt"
