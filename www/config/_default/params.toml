@@ -82,7 +82,7 @@ footerIcon = "images/Asset-4.svg"
 footerCopy = "Decentralized content management, content delivery and content applications."
 
 # Feed
-copyrightHolder = "Kubelt, Inc."
+copyrightHolder = "Kubelt"
 
 # Alert
 alert = false
