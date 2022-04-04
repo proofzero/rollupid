@@ -57,58 +57,9 @@
 
     {{ block "homepage/users" . }}{{ partial "homepage/users.html" . }}{{ end }}
 
-    <div class="bluesection wf-section">
-      <div class="div-block-7">
-        <div class="w-clearfix">
-          <img src="images/07.svg" loading="lazy" height="120" alt="" class="image-4 globe" />
-          <div class="div-block-8">
-            <h1 class="heading-5">
-              Stop paying the cloud tax.<br />‍Start using Kubelt today.
-            </h1>
-            <div class="text-block-8">
-              Get early access to the Kubelt docs and platform.
-            </div>
-            <br />
-            <a href="https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf" target="_blank"
-              class="whitepaper button cc-jumbo-button cc-jumbo-white second bff w-inline-block">
-              <div class="text-block-3">Get Access</div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="bluesection footer wf-section">
-      <div class="div-block-9">
-        <div class="footerwraper">
-          <div class="w-layout-grid grid-3">
-            <div id="w-node-ced23e2a-e3e1-6a40-58c2-ee03a104e335-ddcae6f4">
-              <div class="div-block-10">
-                <img src="images/Asset-4.svg" height="40px" loading="lazy" alt="" />
-                <p class="paragraph">
-                  Decentralized content management, content delivery and
-                  content applications.
-                </p>
-              </div>
-              <div class="lunkswraper footer">
-                <a href="https://github.com/kubelt" target="_blank" class="w-inline-block w-clearfix"><img
-                    src="images/Social-link4.svg" loading="lazy" alt="" class="image-6" /></a>
-                <a href="https://twitter.com/kubelt" target="_blank" class="w-inline-block w-clearfix"><img
-                    src="images/Social-link3.svg" loading="lazy" alt="" class="image-6" /></a>
-                <a href="https://discord.gg/UgwAsJf6C5" target="_blank" class="w-inline-block w-clearfix"><img
-                    src="images/discord-icon.svg" loading="lazy" width="24" alt="" class="image-6" /></a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="copirating">
-          <div class="div-block-11"></div>
-          <p class="paragraph-2">
-            © 2022 Proof Zero, Inc. All rights reserved.
-          </p>
-        </div>
-      </div>
-    </div>
+    {{ block "homepage/cta" . }}{{ partial "homepage/cta.html" . }}{{ end }}
+
+    {{ block "homepage/footer" . }}{{ partial "homepage/footer.html" . }}{{ end }}
   </div>
 
   <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=62271ade3cdbb453dccae6f1"
