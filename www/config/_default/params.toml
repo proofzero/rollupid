@@ -74,7 +74,7 @@ accessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
 accessCopy = "Get Access"
 
 # Whitepaper
-whitepaperUrl = "https://github.com/kubelt/whitepaper/blob/main/kubelt_whitepaper.pdf"
+whitepaperUrl = "https://kubelt.com/docs/next/basics/kubelt-cms-whitepaper"
 
 # Footer
 footer = "Powered by Hugo and Kubelt"
