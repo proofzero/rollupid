@@ -14,25 +14,25 @@
       aria-current="page"
       class="logo-link w-nav-brand w--current"
       ><img
-        src="images/Asset-4.svg"
+        src="{{ .Site.Params.navbarIcon }}"
         width="180"
         alt=""
         class="logo-image black"
     /></a>
     <div class="div-block-19">
       <a
-        href="https://kubelt.notion.site/Jobs-4c1b8408d2244797924e53c9eae65f43"
+        href="{{ .Site.Params.navbarHiringUrl }}"
         target="_blank"
         class="button cc-contact-us grey ttt w-inline-block"
       >
-        <div class="text-block _33">We’re hiring</div>
+        <div class="text-block _33">{{ .Site.Params.navbarHiringCopy }}</div>
       </a>
       <a
-        href="https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
+        href="{{ .Site.Params.navbarAccessUrl }}"
         target="_blank"
         class="button cc-contact-us b w-inline-block"
       >
-        <div class="text-block">Get Access</div>
+        <div class="text-block">{{ .Site.Params.navbarAccessCopy }}</div>
       </a>
     </div>
   </div>

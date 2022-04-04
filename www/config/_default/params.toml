@@ -6,6 +6,16 @@ titleSeparator = "-"
 titleAddition = "Decentralized content management"
 description = "Decentralized content management"
 
+## Social
+githubUrl = 'https://github.com/kubelt'
+githubIcon = 'images/Social-link4.svg'
+
+twitterUrl = 'https://twitter.com/kubelt'
+twitterIcon = 'images/Social-link3.svg'
+
+discordUrl = 'https://discord.gg/UgwAsJf6C5'
+discordIcon = 'images/discord-icon.svg'
+
 ## Documentation
 docsVersion = "next"
 
@@ -53,8 +63,19 @@ portraitPhotoWidths = [800, 700, 600, 500]
 lqipWidth = "20x"
 smallLimit = "300"
 
+# Navbar
+navbarIcon = "images/Asset-4.svg"
+
+navbarHiringUrl = "https://kubelt.notion.site/Jobs-4c1b8408d2244797924e53c9eae65f43"
+navbarHiringCopy = "We’re hiring"
+
+navbarAccessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
+navbarAccessCopy = "Get Access"
+
 # Footer
 footer = "Powered by Hugo and Kubelt"
+footerIcon = "images/Asset-4.svg"
+footerCopy = "Decentralized content management, content delivery and content applications."
 
 # Feed
 copyright = "Copyright (c) 2022 Kubelt, Inc."

@@ -4,39 +4,38 @@
       <div class="w-layout-grid grid-3">
         <div id="w-node-ced23e2a-e3e1-6a40-58c2-ee03a104e335-ddcae6f4">
           <div class="div-block-10">
-            <img src="images/Asset-4.svg" height="40px" loading="lazy" alt="" />
+            <img src="{{ .Site.Params.footerIcon }}" height="40px" loading="lazy" alt="" />
             <p class="paragraph">
-              Decentralized content management, content delivery and content
-              applications.
+              {{ .Site.Params.footerCopy }}
             </p>
           </div>
           <div class="lunkswraper footer">
             <a
-              href="https://github.com/kubelt"
+              href="{{ .Site.Params.githubUrl }}"
               target="_blank"
               class="w-inline-block w-clearfix"
               ><img
-                src="images/Social-link4.svg"
+                src="{{ .Site.Params.githubIcon }}"
                 loading="lazy"
                 alt=""
                 class="image-6"
             /></a>
             <a
-              href="https://twitter.com/kubelt"
+              href="{{ .Site.Params.twitterUrl }}"
               target="_blank"
               class="w-inline-block w-clearfix"
               ><img
-                src="images/Social-link3.svg"
+                src="{{ .Site.Params.twitterIcon }}"
                 loading="lazy"
                 alt=""
                 class="image-6"
             /></a>
             <a
-              href="https://discord.gg/UgwAsJf6C5"
+              href="{{ .Site.Params.discordUrl }}"
               target="_blank"
               class="w-inline-block w-clearfix"
               ><img
-                src="images/discord-icon.svg"
+                src="{{ .Site.Params.discordIcon }}"
                 loading="lazy"
                 width="24"
                 alt=""
