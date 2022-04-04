@@ -17,6 +17,8 @@ The following list contains features and capabilities the Kubelt team is targeti
 
 ## In Development
 
+The following features are currently in development.
+
 ### alpha
 
 - [x] Restricted Kubelt Core (aka "user core" with no multisig)
@@ -30,11 +32,14 @@ The following list contains features and capabilities the Kubelt team is targeti
 
 ## Optimistic Roadmap
 
+The following roadmap may change at any point in time before entering the development phase.
+
 ### beta
 
 - [ ] Kubelt dashboard and UI integrate to Kubelt Core API
 - [ ] Kubelt CLI integrated with Kubelt Core API
 - [ ] IPFS storage and pinning
+- [ ] Local IPFS node detection
 - [ ] Kubelt gateway IPFS CDN routing
 - [ ] Trusted Kubelt Core auth flow
 
@@ -45,3 +50,5 @@ The following list contains features and capabilities the Kubelt team is targeti
 - [ ] Kubelt core deplopyment and configuration automation (with CUElang)
 
 ### Future
+
+- [ ] Hypercore peer-to-peer application framework
