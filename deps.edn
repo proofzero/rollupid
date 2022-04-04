@@ -9,7 +9,7 @@
   ;; A data format and set of libraries for conveying values
   com.cognitect/transit-clj {:mvn/version "1.0.329"}
   ;; Pure Clojure/Script logging library
-  com.taoensso/timbre {:mvn/version "5.1.2"}
+  com.taoensso/timbre {:mvn/version "5.2.1"}
   ;; An http client for Clojure wrapping jdk 11's HttpClient
   hato/hato {:mvn/version "0.8.2"}
   ;; Micro-framework for data-driven architecture
