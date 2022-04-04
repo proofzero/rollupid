@@ -25,7 +25,7 @@
   ;; data format for conveying values between applications
   [com.cognitect/transit-cljs "0.8.269"]
   ;; a pure Clojure/Script logging library
-  [com.taoensso/timbre "5.1.2"]
+  [com.taoensso/timbre "5.2.1"]
   ;; tailwind components for dapp
   [com.github.mainej/headlessui-reagent "1.5.0.47"]
   ;; immutable database and Datalog query engine
