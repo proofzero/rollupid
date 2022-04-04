@@ -13,7 +13,9 @@
    [malli.error :as me]
    [taoensso.timbre :as log])
   (:require
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.http.shared :as http.shared]
+   [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.spec.http :as spec.http]))
@@ -99,62 +101,29 @@
 (defrecord HttpClient []
   proto.http/HttpClient
   (request!
-    [this m]
-    (if-not (malli/validate spec.http/request m)
-      ;; TODO report an error using common error reporting
-      ;; functionality (anomalies).
-      (let [explain (-> spec.http/request (malli/explain m) me/humanize)
-            error {:com.kubelt/type :kubelt.type/error
-                   :error explain}
-            response-chan (async/chan)]
-        (async/put! response-chan error)
-        response-chan)
+    [this request]
+    (if-not (malli/validate spec.http/request request)
+      (lib.error/explain spec.http/request request)
       ;; The request map is valid, so fire off the request.
-      (let [scheme (get m :uri/scheme :http)
-            request-map (dissoc m :uri/scheme)
-            ;; Convert our incoming request map (matching our internal
+      (let [;; Convert our incoming request map (matching our internal
             ;; format for describing HTTP requests) into a ring-format
             ;; map understood by the HTTP client.
-            options (request->ring request-map)
+            options (request->ring request)
             ;; Configure how the request is executed.
             default-options {:async? true
                              :timeout 10000}
             options (merge default-options options)
-            ;; Use an unbuffered channel for the response.
-            response-chan (async/chan)
-            on-response (fn [resp] (go (async/put! response-chan resp)))]
-        ;; Perform the request, returning a completable future. The
-        ;; callback puts the response on the channel that is returned
-        ;; from this function.
-        (hc/request options on-response identity)
-        ;; Return the channel on which the response will be placed.
-        response-chan)))
-
-  (request-sync
-    [this request]
-    (if-not (malli/validate spec.http/request request)
-      (let [explain (-> spec.http/request (malli/explain request) me/humanize)
-            error {:com.kubelt/type :kubelt.type/error
-                   :error explain}]
-        error)
-      ;; The request map is valid, so fire off the request.
-      (let [default-options {:timeout 10000}
-            ;; Convert our incoming request map (matching our internal
-            ;; format for describing HTTP requests) into a Ring-format
-            ;; map understood by the HTTP client.
-            ring-request (request->ring request)
-            options (merge default-options ring-request)
 
             ;; TODO :as :byte-array, :stream (returns InputStream)
             ;; Look at preferred response media type?
             ;;options (assoc options :as :byte-array)
 
-            ;; Perform the request!
-            response (hc/request options)
+            ;; Perform the request, returning a completable future. The
+            ;; callback puts the response on the channel that is returned
+            ;; from this function.
+            response @(hc/request options)
             status (get response :status)]
-        ;; TODO use HTTP status constants/predicates to check for
-        ;; non-error response.
-        (if-not (= 200 status)
+        (if-not (http.status/success? status)
           ;; TODO pass through error returned from server.
           {:com.kubelt/type :kubelt.type/error
            :error {:fixme true}}
@@ -166,46 +135,4 @@
               ;; TODO use media type constant.
               :application/json (lib.json/from-json body keywordize?)
               ;; If no match, return body unchanged.
-              body))))))
-
-  (request-cb
-    [this request callback]
-    ;; Check that we have been given a valid request description.
-    (if-not (malli/validate spec.http/request request)
-      ;; TODO report an error using common error reporting
-      ;; functionality (anomalies).
-      (let [explain (-> spec.http/request (malli/explain request) me/humanize)
-            error {:com.kubelt/type :kubelt.type/error
-                   :error explain}]
-        error))
-    ;; We have a valid request map.
-    (let [;; Configure how request is executed.
-          default-options {:async? true
-                           :timeout 10000}
-          ;; Convert our incoming request map (matching our internal
-          ;; format for describing HTTP requests) into a Ring-format
-          ;; map understood by the HTTP client.
-          ring-request (request->ring request)
-          options (merge default-options ring-request)
-          ;; Define the callback used to process the response.
-          on-response (fn [response]
-                        ;; Extract the body and convert it to edn if we can.
-                        (let [content-type (get response :content-type)
-                              body (get response :body)
-                              data (condp = content-type
-                                     "application/json" (lib.json/from-json body)
-                                     ;; If no match, return body unchanged.
-                                     body)]
-                          ;; TODO convert map keywords (optional?)
-                          ;; TODO validate response (optional?)
-
-                          ;; Call the user supplied callback with the
-                          ;; response data.
-                          (callback data)))
-          on-error (fn [e]
-                     ;; TODO FIXME Do something better here.
-                     (prn (ex-data e)))]
-      ;; Returns a net.http.common.MinimalFuture. Any exceptional status
-      ;; code will result in the on-error handler being called with an
-      ;; ex-info containing the response map.
-      (hc/request options on-response on-error))))
+              body)))))))
