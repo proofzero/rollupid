@@ -57,7 +57,7 @@ smallLimit = "300"
 footer = "Powered by Hugo and Kubelt"
 
 # Feed
-copyRight = "Copyright (c) 2022 Proof Zero, Inc."
+copyright = "Copyright (c) 2022 Kubelt, Inc."
 
 # Alert
 alert = false
