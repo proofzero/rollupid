@@ -61,6 +61,7 @@ The Kubelt monorepo tooling configuration and scripts:
 ### Configuration
 
 Please use the following tools and versions when developing with this repository:
+
 - Node.js v17+
 - Java SDK v8+
 - Babashaka 0.7.x
