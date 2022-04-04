@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang='{{ .Site.LanguageCode | default "en" }}'>
-  {{ block "head/head" . }}{{ partial "head/head.html" . }}{{ end }}
+  {{ block "homepage/head/head" . }}{{ partial "homepage/head/head.html" . }}{{ end }}
 
   <body class='{{ .Scratch.Get "class" }} bg-white'>
     <div class="page-wrapper">
@@ -12,8 +12,8 @@
       {{ block "homepage/footer" . }}{{ partial "homepage/footer.html" . }}{{ end }}
     </div>
 
-    {{ block "body/script" . }} 
-      {{ partial "body/script.html" . }} 
+    {{ block "homepage/body/script" . }} 
+      {{ partial "homepage/body/script.html" . }} 
       {{ partial "homepage/hero-script.html" . }} 
     {{ end }}
   </body>
