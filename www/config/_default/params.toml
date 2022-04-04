@@ -73,6 +73,9 @@ navbarHiringCopy = "We’re hiring"
 accessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
 accessCopy = "Get Access"
 
+# Whitepaper
+whitepaperUrl = "https://github.com/kubelt/whitepaper/blob/main/kubelt_whitepaper.pdf"
+
 # Footer
 footer = "Powered by Hugo and Kubelt"
 footerIcon = "images/Asset-4.svg"
