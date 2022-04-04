@@ -43,7 +43,7 @@
   ;; tools for working with command line arguments
   [org.clojure/tools.cli "1.0.206"]
   ;; react for clojure
-  [reagent "1.1.0"]
+  [reagent "1.1.1"]
   ;; redux for reagent
   [re-frame "1.2.0"]]
 
