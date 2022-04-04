@@ -76,6 +76,9 @@ accessCopy = "Get Access"
 # Whitepaper
 whitepaperUrl = "/docs/next/basics/kubelt-cms-whitepaper"
 
+# Docs
+howItWorks = "/docs/next/basics/how-it-works"
+
 # Footer
 footer = "Powered by Hugo and Kubelt"
 footerIcon = "images/Asset-4.svg"
