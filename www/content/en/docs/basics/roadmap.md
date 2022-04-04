@@ -51,4 +51,7 @@ The following roadmap may change at any point in time before entering the develo
 
 ### Future
 
-- [ ] Hypercore peer-to-peer application framework
+- [ ] Peer-to-peer application framework (extend and self host cores)
+- [ ] Support for WASM applications and WASI pipes
+- [ ] Support for websockets
+- [ ] Support for webrtc
