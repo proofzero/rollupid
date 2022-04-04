@@ -39,7 +39,7 @@
   ;; data-driven schemas for Clojure/Script
   [metosin/malli "0.8.4"]
   ;; request router for dapp
-  [metosin/reitit "0.5.16"]
+  [metosin/reitit "0.5.17"]
   ;; tools for working with command line arguments
   [org.clojure/tools.cli "1.0.206"]
   ;; react for clojure
