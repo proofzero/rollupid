@@ -45,10 +45,12 @@
                                           :p2p/read maddr
                                           :p2p.read/scheme scheme
                                           :p2p/write maddr
-                                          :p2p.write/scheme scheme})
-                           result (<! (sdk.core/authenticate! kbt core))]
-                       (if (lib.error/error? result)
-                         (prn (:error kbt))
-                         ;; TODO encrypt(?) and store returned JWT
-                         (prn result))
-                       (sdk/halt! kbt)))))))})
+                                          :p2p.write/scheme scheme})]
+                       (-> (sdk.core/authenticate! kbt core)
+                           (.then (fn [result]
+                                    (if (lib.error/error? result)
+                                      (prn (:error kbt))
+                                      ;; TODO encrypt(?) and store returned JWT
+                                      (prn result))))
+                           (.then (fn []
+                                    (sdk/halt! kbt))))))))))})
