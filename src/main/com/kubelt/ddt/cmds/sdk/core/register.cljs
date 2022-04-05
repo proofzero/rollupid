@@ -6,8 +6,8 @@
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
-  {:command "init"
-   :desc "Initialize the SDK"
+  {:command "register"
+   :desc "Register with a core"
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
