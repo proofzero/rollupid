@@ -12,55 +12,6 @@ import KubeltPublishModal from "../containers/PublishModal/KubeltPublishModal";
 import { useAccount } from "../hooks/useAccount";
 import sanityService from "../services/sanityService";
 
-function PatchButton({
-  doc,
-  enabled,
-}: {
-  doc: {
-    _id: string;
-    _type: string;
-    name: string;
-  };
-  enabled: boolean;
-}) {
-  const { patch } = useDocumentOperation(doc._id, doc._type) as {
-    patch;
-    publish;
-  };
-
-  const patchKubeltName = () => {
-    let kuSlug = "";
-
-    const docId = doc._id;
-    if (docId.startsWith("drafts.")) {
-      docId.replace("drafts.", "");
-    }
-
-    kuSlug = `${doc._type}:${doc._type}_${doc._id}`;
-
-    if (doc.name) {
-      kuSlug = `${kuSlug}-${slugify(doc.name, {
-        lower: true,
-      })}`;
-    }
-
-    patch.execute([{ set: { kItem: { name: `${kuSlug}` } } }]);
-  };
-
-  return (
-    <Button
-      icon={EditIcon}
-      text="Patch"
-      disabled={!enabled}
-      onClick={() => patchKubeltName()}
-      tone="primary"
-      style={{
-        marginRight: "0.4em",
-      }}
-    />
-  );
-}
-
 function KubeltPublishAction({ published, draft, onComplete }) {
   if (!sanityService.IsInit) {
     // Sanity Client configuration is injected by the part:s system at runtime
