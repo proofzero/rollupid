@@ -1,4 +1,0 @@
-# packages/p2p/.npmignore
-
-# Babashka tasks
-bb.edn
