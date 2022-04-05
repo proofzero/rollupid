@@ -34,11 +34,6 @@
           :source-paths ["src/main"]
           :test-paths ["src/test"]
           :ns-patterns ["ipfs.*-test$"]}
-         ;; [unit.p2p] only p2p unit tests
-         {:id :unit.p2p
-          :source-paths ["src/main"]
-          :test-paths ["src/test"]
-          :ns-patterns ["p2p.*-test$"]}
          ;; [unit.rdf] only rdf unit tests
          {:id :unit.rdf
           :source-paths ["src/main"]
