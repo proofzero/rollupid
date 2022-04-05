@@ -166,7 +166,7 @@
 
   watch:plugin:sanity
   {:doc "Build plugin for Sanity CMS on file change"
-   :depends [build:sdk-web:release]
+   :depends [build:sdk-web:develop]
    :task (shell "npx lerna run watch --scope sanity-plugin-kubelt")}
 
   test:sdk:cljs:develop
