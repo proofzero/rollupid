@@ -1,21 +1,20 @@
 (ns com.kubelt.lib.jwt
   "Wrapper around jose JWT library."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
-  (:import
-    [goog.crypt Aes Arc4 Cbc Hmac Sha256 base64])
-  (:require
-    [cljs.test :as t :refer [deftest is testing use-fixtures]]
-    [cljs.core.async :as async :refer [chan go <! >!]]
-    [cljs.core.async.interop :refer-macros [<p!]]
-    [clojure.string :as str]
-    [clojure.walk :as walk])
-  (:require
-    [goog.json :as json]
-    [goog.crypt.base64 :refer [encodeString decodeString]]
-    [taoensso.timbre :as log])
   #?(:node
      (:require
-      ["crypto" :as crypto])))
+      ["crypto" :as crypto]))
+  #?(:cljs
+     (:import
+      [goog.crypt base64]))
+  #?(:cljs
+     (:require
+      [goog.json :as json]
+      [goog.crypt.base64 :refer [encodeString decodeString]]))
+  (:require
+   [clojure.string :as str])
+  (:require
+   [taoensso.timbre :as log]))
 
 ;; - iss (issuer): Issuer of the JWT
 ;; - sub (subject): Subject of the JWT (the user)
@@ -42,39 +41,39 @@
 ;; TODO spec for JWT + validation
 
 ;;;;;;;;;; helpers ;;;;;;;;;;;;;;;;;;;
-(defn encode [target]
-  "Encode a string with base64 URL Safe"
-  (.encodeString base64 target goog.crypt.base64.BASE_64_URL_SAFE))
 
-(defn decode [target]
-  "Decode a string with base64 URL Safe"
-  (.decodeString base64 target))
+#?(:node
+   (defn encode [target]
+     "Encode a string with base64 URL Safe"
+     (.encodeString base64 target goog.crypt.base64.BASE_64_URL_SAFE)))
 
-#_(defn fromBase64 [target]
-  (doto target
-    (.replace "/=/g" "")
-    (.replace "/\\+/g" "-")
-    (.replace "/\\//g" "_")))
+#?(:node
+   (defn decode [target]
+     "Decode a string with base64 URL Safe"
+     (.decodeString base64 target)))
 
 (defn create-header [alg exp]
   "Create a JWT header specifying the algorithm used and expiry time"
   {:alg alg :exp exp})
 
-(defn get-public-key [token]
-  "Extract public key from the JWT payload"
-  (let [payload-part (decode (get (str/split token #"\.") 1))
-        payload-json (str/replace payload-part "\"" "")
-        payload-map (js->clj (json/parse (decode (js->clj payload-json))) :keywordize-keys true)]
-    (decode (get payload-map :pubkey))))
+#?(:node
+   (defn get-public-key [token]
+     "Extract public key from the JWT payload"
+     (let [payload-part (decode (get (str/split token #"\.") 1))
+           payload-json (str/replace payload-part "\"" "")
+           payload-map (js->clj (json/parse (decode (js->clj payload-json))) :keywordize-keys true)]
+       (decode (get payload-map :pubkey)))))
 
-(defn prepare-key [key-material]
-  "import raw private key string"
-  ;; return key object
-  key-material)
+#?(:node
+   (defn prepare-key [key-material]
+     "import raw private key string"
+     ;; return key object
+     key-material))
 
-(defn prepare-payload [claims]
-  "import raw private key string"
-  (encode (json/serialize (clj->js claims))))
+#?(:node
+   (defn prepare-payload [claims]
+     "import raw private key string"
+     (encode (json/serialize (clj->js claims)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #?(:node

@@ -2,63 +2,19 @@
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
-   [goog.Uri.QueryData :as query]
    [goog.net.XhrIo :as xhrio]
-   [goog.structs :as structs])
-  (:require-macros
-   [cljs.core.async.macros :refer [go]])
+   [goog.url :as gurl])
   (:require
-   [cljs.core.async :as async :refer [<!]]
-   [clojure.string :as str])
-  (:require
-   [malli.core :as malli]
-   [malli.error :as me])
+   [malli.core :as malli])
   (:require
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.http.media-type :as http.media-type]
    [com.kubelt.lib.http.shared :as http.shared]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.spec.http :as spec.http]))
 
-
-(defrecord HttpClient []
-  proto.http/HttpClient
-
-
-
-  (request!
-    [this m]
-    (proto.http/request-cb this m #(fn [rtext] rtext)))
-
-
-  (request-cb
-    [this m cb]
-    (if-not (malli/validate spec.http/request m)
-      ;; The request map is invalid, return a map describing the error.
-      (lib.error/explain spec.http/request m)
-      ;; We have a valid request map, construct a URL from it before
-      ;; making a request.
-      (let [
-            ;; build url
-            method (http.shared/request->method m)
-            ;; TODO check method and send post or get
-            scheme (http.shared/request->scheme m)
-            domain (http.shared/request->domain m)
-            port (http.shared/request->port m)
-            path (http.shared/request->path m)
-            headers (http.shared/request->headers m)
-            body (http.shared/request->body m)
-            url (str/join "" [scheme "://" domain ":" port path ])]
-        ;; The request map is valid, so fire off the request.
-        (xhrio/send
-         url
-         (fn [^js event]                                            
-           (let [res (-> event .-target .getResponseText)]          
-             (cb res)))                                            
-         
-         method
-         body)))))
+;; Internal
+;; -----------------------------------------------------------------------------
 
 (comment
   "request map example"
@@ -75,5 +31,52 @@
    :uri/fragment fragment
    :uri/query query
    :uri/domain domain
-   :uri/user user}
-  )
+   :uri/user user})
+
+
+(defn- make-response-fn
+  "Returns a response handler function for an HTTP request send using
+  XhrIo."
+  [cb]
+  {:pre [(fn? cb)]}
+  (fn [^js event]
+    (let [res (-> event .-target .getResponseText)]
+      ;; TODO Return a structured map containing the response data. The
+      ;; structure needs to be schematized as a spec, e.g.
+      ;; {:body {:text ...}}
+      (cb res))))
+
+;; Public
+;; -----------------------------------------------------------------------------
+
+(defrecord HttpClient []
+  proto.http/HttpClient
+
+  (request!
+    [this m]
+    (proto.http/request-cb this m #(fn [rtext] rtext)))
+
+  (request-cb
+    [this m cb]
+    (if-not (malli/validate spec.http/request m)
+      ;; The request map is invalid, return a map describing the error.
+      (lib.error/explain spec.http/request m)
+      ;; We have a valid request map, construct a URL from it before
+      ;; making a request.
+      (let [url-or-error (http.shared/request->url m)]
+        (if (lib.error/error? url-or-error)
+          ;; Constructed URL wasn't valid, return an error map.
+          url-or-error
+          ;; Perform the HTTP request.
+          (let [method (http.shared/request->method m)
+                body (http.shared/request->body m)
+                headers (http.shared/request->headers m)
+                headers-obj (clj->js headers)
+                ;; 0 means no timeout.
+                timeout-ms 0
+                on-response (make-response-fn cb)]
+            (xhrio/send url-or-error
+                        on-response
+                        method body
+                        headers-obj
+                        timeout-ms)))))))
