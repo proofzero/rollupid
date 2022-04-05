@@ -23,8 +23,8 @@
                     ;; wallet address starting with "0x" as a big
                     ;; integer.
                     core-config #js {:describe "a @core name"
-                                     :string true}]
-                (.options yargs "core" core-config)
+                                     :type "string"}]
+                (.positional yargs "core" core-config)
                 (ddt.options/options yargs))
               yargs)
 
