@@ -1,7 +1,32 @@
 (ns dapp.pages.dashboard
   (:require
+   [re-frame.core :as re-frame]
    [dapp.components.button :as button]
-   [dapp.components.header :as header]))
+   [dapp.components.header :as header]
+   [dapp.wallet :as wallet])
+  (:require
+    ["web3modal$default" :as Web3Modal]
+    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
+
+(def provider-options
+  {:network "mainnet"
+   :cacheProvider true
+   :theme "dark"
+   :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
+
+(defn open-modal []
+  (prn "open the modal")
+  (let [modal (Web3Modal. (clj->js provider-options))]
+    ;(.clearCachedProvider modal)
+    (-> (.connect modal)
+        ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
+         (.then (fn [provider]
+                  ;; dispatch the provider
+                  (prn "provider")
+                  (re-frame/dispatch [::wallet/web3-modal provider])))
+         (.catch (fn [error]
+                   (.clearCachedProvider modal)
+                   (js/console.log error))))))
 
 (defn connect-wallet
   []
@@ -19,6 +44,7 @@
       "Get started by connecting your wallet."]
      [button/render {:class "self-center mt-6"
                      :text "Connect a Wallet"
+                     :on-click #(open-modal)
                      :variant :primary}]]))
 
 (defn dashboard-content
