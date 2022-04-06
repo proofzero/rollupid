@@ -44,7 +44,10 @@
       "Get started by connecting your wallet."]
      [button/render {:class "self-center mt-6"
                      :text "Connect a Wallet"
-                     :on-click #(open-modal)
+                     :on-click (fn [e]
+                                 (.preventDefault e)
+                                 (open-modal)
+                                 (re-frame/dispatch [:dapp.routes/push-state :dapp.routes/cores]))
                      :variant :primary}]]))
 
 (defn dashboard-content
