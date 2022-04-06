@@ -1,14 +1,8 @@
 (ns com.kubelt.lib.p2p
   "Wrapper around the external p2p naming system."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
-  (:require-macros
-   [cljs.core.async.interop :refer [<p!]]
-   [cljs.core.async.macros :refer [go]])
   (:require
-   [cljs.core.async :refer [<!]]
    [clojure.string :as cstr])
-  (:require
-   [cognitect.transit :as transit])
   (:require
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as jwt]
@@ -29,7 +23,7 @@
         port (get-in sys [:client/p2p :p2p/write :address/port])
 
         wallet (get sys :crypto/wallet)
-        address (get wallet :wallet/address)
+        address (cstr/lower-case (get wallet :wallet/address))
         body {:address address}
         body-str (lib.json/edn->json-str body)
 
