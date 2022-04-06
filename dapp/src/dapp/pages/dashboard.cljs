@@ -22,7 +22,7 @@
         ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
          (.then (fn [provider]
                   ;; dispatch the provider
-                  (prn "provider")
+                  (prn {:msg "got provider" :provider provider})
                   (re-frame/dispatch [::wallet/web3-modal provider])))
          (.catch (fn [error]
                    (.clearCachedProvider modal)
