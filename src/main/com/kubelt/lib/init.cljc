@@ -42,9 +42,9 @@
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
    :client/p2p {:p2p/read {:http/scheme :http
-                           :http/address "/ip4/127.0.0.1/tcp/9061"}
+                           :http/address "/ip4/127.0.0.1/tcp/8787"}
                 :p2p/write {:http/scheme :http
-                            :http/address "/ip4/127.0.0.1/tcp/9061"}}
+                            :http/address "/ip4/127.0.0.1/tcp/8787"}}
    ;; A map from scope identifier to session token (JWT). Upon
    ;; successfully authenticating against a core, the returned session
    ;; token is kept here.
