@@ -57,8 +57,9 @@
 ; Pop up the modal
 (re-frame/reg-event-db ::web3-modal
   (fn [db _ provider]
-    (prn "provider received")
-    (assoc db :provider provider)))
+    (prn {:msg "provider received" :provider provider})
+    (let [ctx  (re-frame/dispatch [::provider-detected (assoc db :provider provider)])]
+      (re-frame/dispatch [::connect-account ctx]))))
 
 
 ;Handle a connection to different wallets and kick off the zk-auth
