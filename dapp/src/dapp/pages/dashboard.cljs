@@ -1,12 +1,14 @@
 (ns dapp.pages.dashboard
   (:require
+   [com.kubelt.lib.promise :refer [promise]]
    [dapp.components.button :as button]
    [dapp.components.header :as header]
    [dapp.wallet :as wallet]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
-    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
+    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
+    ["@ethersproject/bytes" :as ethers :refer [hexlify]]))
 
 (def provider-options
   {:network "mainnet"
@@ -14,9 +16,16 @@
    :theme "dark"
    :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
 
-(defn sign-fn
-  [signable]
-  (js/console.log signable))
+(defn make-sign-fn
+  [provider wallet-address]
+  (fn [signable]
+    (promise
+     (fn [resolve _reject]
+       (let [signable-buffer (hexlify (js/Uint8Array.from signable))]
+         (-> (.request provider (clj->js {:method "personal_sign"
+                                          :params [signable-buffer wallet-address]}))
+             (.then (fn [digest]
+                      (resolve digest)))))))))
 
 (defn open-modal []
   (prn "open the modal")
@@ -24,20 +33,21 @@
     ;(.clearCachedProvider modal)
     (-> (.connect modal)
         ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
-         (.then (fn [provider]
-                  ;; dispatch the provider
-                  (prn {:msg "got provider" :provider provider})
-                  (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
-                      (.then (fn [account]
-                               (prn {:web3acct account})
-                               (let [new-wallet {:com.kubelt/type :kubelt.type/wallet
-                                                 :wallet/address (first (js->clj account))
-                                                 :wallet/sign-fn sign-fn}]
-                                 (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))
-                  #_(re-frame/dispatch [::wallet/web3-modal provider])))
-         (.catch (fn [error]
-                   (.clearCachedProvider modal)
-                   (js/console.log error))))))
+        (.then (fn [provider]
+                 ;; dispatch the provider
+                 (prn {:msg "got provider" :provider provider})
+                 (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
+                     (.then (fn [account]
+                              (let [wallet-address (first (js->clj account))
+                                    sign-fn (make-sign-fn provider wallet-address)
+                                    new-wallet {:com.kubelt/type :kubelt.type/wallet
+                                                :wallet/address wallet-address
+                                                :wallet/sign-fn sign-fn}]
+                                (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))
+                 #_(re-frame/dispatch [::wallet/web3-modal provider])))
+        (.catch (fn [error]
+                  (.clearCachedProvider modal)
+                  (js/console.log error))))))
 
 (defn connect-wallet
   []

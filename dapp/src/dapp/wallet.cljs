@@ -82,12 +82,17 @@
                  (js/console.log (first accounts))
                  (assoc db :current-account (first accounts))))))))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  ::set-current-wallet
- (fn [{:sdk/keys [ctx] :as db} [_ wallet]]
-   (assoc db
-          :sdk/ctx
-          (sdk.core/set-wallet ctx wallet))))
+ (fn [{:keys [db]} [_ wallet]]
+   (let [new-ctx (sdk.core/set-wallet (:sdk/ctx db) wallet)]
+     {:dispatch [::authenticate new-ctx]})))
+
+(re-frame/reg-event-db
+ ::authenticate
+ (fn [db [_ new-ctx]]
+   (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
+     (assoc db :sdk/ctx (sdk.core/authenticate! new-ctx wallet-address)))))
 
 ; TODO
 ; Handle the account changed event
