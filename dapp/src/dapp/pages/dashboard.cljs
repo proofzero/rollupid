@@ -1,14 +1,14 @@
 (ns dapp.pages.dashboard
   (:require
    [com.kubelt.lib.promise :refer [promise]]
+   [com.kubelt.lib.crypto.hexify :as hexlify]
    [dapp.components.button :as button]
    [dapp.components.header :as header]
    [dapp.wallet :as wallet]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
-    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
-    ["@ethersproject/bytes" :as ethers :refer [hexlify]]))
+    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
 
 (def provider-options
   {:network "mainnet"
@@ -21,7 +21,8 @@
   (fn [signable]
     (promise
      (fn [resolve _reject]
-       (let [signable-buffer (hexlify (js/Uint8Array.from signable))]
+       (let [signable-buffer (hexlify/hex-string signable)]
+         (prn {:sb signable-buffer :wa wallet-address})
          (-> (.request provider (clj->js {:method "personal_sign"
                                           :params [signable-buffer wallet-address]}))
              (.then (fn [digest]
@@ -44,7 +45,7 @@
                                                 :wallet/address wallet-address
                                                 :wallet/sign-fn sign-fn}]
                                 (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))
-                 #_(re-frame/dispatch [::wallet/web3-modal provider])))
+                 #_(re-frame/dispatch [::web3-modal provider])))
         (.catch (fn [error]
                   (.clearCachedProvider modal)
                   (js/console.log error))))))
