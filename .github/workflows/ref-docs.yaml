@@ -35,9 +35,10 @@ jobs:
           java-version: '17'
       - uses: DeLaGuardo/setup-clojure@5.0
         with:
-          cli: 1.11.0.1107
+          cli: 1.11.0.1105
           #lein: latest
           #boot: latest
+          #bb: latest
       - name: build literate docs
         run: clojure -M:sidenotes
         shell: bash
