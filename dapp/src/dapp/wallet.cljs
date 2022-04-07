@@ -40,12 +40,13 @@
 (re-frame/reg-event-db ::provider-detected
   (fn [db [_ provider]]
     (prn "provider-detected")
+    (prn provider)
     (let [web3 (Web3. provider)
           ; TODO: replace with check for JWT session
           current-account (.-defaultAccount (.-eth web3))]
       (prn "current-account")
       (prn current-account)
-      (assoc db :provider provider :web3 web3 :current-account current-account))))
+     (assoc db :provider provider :web3 web3 :current-account current-account))))
 
 ; Bootstrap the db when a provider is detected
 (re-frame/reg-event-db ::modal-ready
@@ -57,7 +58,7 @@
 ; Pop up the modal
 (re-frame/reg-event-db ::web3-modal
   (fn [db _ provider]
-    (prn {:msg "provider received" :provider provider})
+    (prn {:msg "provider received" :provider provider })
     (let [ctx  (re-frame/dispatch [::provider-detected (assoc db :provider provider)])]
       (re-frame/dispatch [::connect-account ctx]))))
 
@@ -65,8 +66,9 @@
 ;Handle a connection to different wallets and kick off the zk-auth
 (re-frame/reg-event-db ::connect-account
   (fn [db [_ wallet]]
-    (prn wallet)
+    (prn {:wallet wallet})
     (let [web3 ^js/Web3 (:web3 db)
+          _ (prn {:web3 web3 :db db})
           eth (.-eth web3)]
       (prn "providers list")
       (js/console.log (.-providers eth))
