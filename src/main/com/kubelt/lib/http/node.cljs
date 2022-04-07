@@ -32,15 +32,11 @@
         port (http.shared/request->port m)
         path (http.shared/request->path m)
         headers (http.shared/request->headers m)
-        body (http.shared/request->body m)
         options {:method method
                  :hostname domain
                  :port port
                  :path path}
         options (cond-> options
-                  ;; body
-                  (not (nil? body))
-                  (assoc :body body)
                   ;; headers
                   (not (nil? headers))
                   (assoc :headers headers))]
@@ -86,25 +82,25 @@
 (defrecord HttpClient []
   proto.http/HttpClient
   (request!
-    [this m]
+    [this request]
     (promise
      (fn [resolve reject]
-       (if-not (malli/validate spec.http/request m)
-         (reject (lib.error/explain spec.http/request m))
+       (if-not (malli/validate spec.http/request request)
+         (reject (lib.error/explain spec.http/request request))
          ;; The request map is valid, so fire off the request.
-         (let [scheme (get m :uri/scheme :http)
-               request-map (dissoc m :uri/scheme)
+         (let [scheme (get request :uri/scheme :http)
+               request-map (dissoc request :uri/scheme)
                options (request->node-options request-map)
                ;; If user specified :https as the request scheme, use the
                ;; Node.js "https" module to fire off the request. Default
                ;; to using the "http" module otherwise.
                request-mod (if (= :https scheme) https http)
                on-response (partial on-response resolve)
-               request (.request request-mod options on-response)]
-           (when (or (http.request/post? m)
-                     (http.request/put? m))
-             (if-let [data (get m :http/body)]
-               (.write request data)))
-           (doto request
+               node-req (.request request-mod options on-response)]
+           (when (or (http.request/post? request)
+                     (http.request/put? request))
+             (if-let [data (get request-map :http/body)]
+               (.write node-req data)))
+           (doto node-req
              (.on "error" on-error)
              (.end))))))))
