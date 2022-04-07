@@ -1,13 +1,11 @@
 ---
 title: "Moxie & Vitalik & Kubelt"
-description: ""
-lead: ""
+description: "Introducing Kubelt, the future of web3 infrastructure."
+lead: "Introducing Kubelt, the future of web3 infrastructure."
 date: 2022-04-05T14:25:35-04:00
 lastmod: 2022-04-05T14:25:35-04:00
-draft: false
 weight: 50
-images: ["hello-world.jpg"]
-contributors: []
+contributors: ['@alfl']
 ---
 
 Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure. The whole conversation is worth a deep, critical read.
