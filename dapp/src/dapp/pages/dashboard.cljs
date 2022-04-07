@@ -1,9 +1,9 @@
 (ns dapp.pages.dashboard
   (:require
-   [re-frame.core :as re-frame]
    [dapp.components.button :as button]
    [dapp.components.header :as header]
-   [dapp.wallet :as wallet])
+   [dapp.wallet :as wallet]
+   [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
     ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
@@ -13,6 +13,10 @@
    :cacheProvider true
    :theme "dark"
    :providerOptions {:walletlink {:package CoinbaseWalletSDK :options {:appName "Kubelt"}}}})
+
+(defn sign-fn
+  [signable]
+  (js/console.log signable))
 
 (defn open-modal []
   (prn "open the modal")
@@ -24,10 +28,12 @@
                   ;; dispatch the provider
                   (prn {:msg "got provider" :provider provider})
                   (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
-                      (.then (fn [ account]
-                               (prn {:web3acct account}))))
- 
-
+                      (.then (fn [account]
+                               (prn {:web3acct account})
+                               (let [new-wallet {:com.kubelt/type :kubelt.type/wallet
+                                                 :wallet/address (first (js->clj account))
+                                                 :wallet/sign-fn sign-fn}]
+                                 (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))
                   #_(re-frame/dispatch [::wallet/web3-modal provider])))
          (.catch (fn [error]
                    (.clearCachedProvider modal)

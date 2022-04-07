@@ -5,13 +5,11 @@
     [com.kubelt.sdk.v1 :as sdk.v1]
     [com.kubelt.sdk.v1.core :as sdk.core]
     [com.kubelt.proto.http :as http]
-    [com.kubelt.proto.http :as lib.wallet]
     [reagent.dom :as rdom]
     [re-frame.core :as re-frame]
     [dapp.config :as config]
     [dapp.views :as views]
     [dapp.routes :as routes]))
- 
 
 (defn dev-setup []
   (when config/debug?
@@ -59,7 +57,7 @@
 
                            ;; check version via http client
                            #(check-version ctx)
-                           ctx
+                           {:sdk/ctx ctx}
                            )))
 
 (re-frame/reg-sub ::current-user

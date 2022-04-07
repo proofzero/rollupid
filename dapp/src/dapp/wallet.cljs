@@ -1,6 +1,7 @@
 ; Wallet
 (ns dapp.wallet
   (:require
+   [com.kubelt.sdk.v1.core :as sdk.core]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
@@ -80,6 +81,13 @@
                  (prn "accounts")
                  (js/console.log (first accounts))
                  (assoc db :current-account (first accounts))))))))
+
+(re-frame/reg-event-db
+ ::set-current-wallet
+ (fn [{:sdk/keys [ctx] :as db} [_ wallet]]
+   (assoc db
+          :sdk/ctx
+          (sdk.core/set-wallet ctx wallet))))
 
 ; TODO
 ; Handle the account changed event
