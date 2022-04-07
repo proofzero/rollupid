@@ -81,8 +81,14 @@
                  (prn "accounts")
                  (js/console.log (first accounts))
                  (assoc db :current-account (first accounts))))))))
+(re-frame/reg-event-db
+ ::set-current-wallet
+ (fn [db [_ wallet]]
+   (let [new-ctx (sdk.core/set-wallet (:sdk/ctx db) wallet)]
+    (re-frame/dispatch [::authenticate new-ctx]))))
 
-(re-frame/reg-event-fx
+;; TODO remove fx version if not needed? 
+#_(re-frame/reg-event-fx
  ::set-current-wallet
  (fn [{:keys [db]} [_ wallet]]
    (let [new-ctx (sdk.core/set-wallet (:sdk/ctx db) wallet)]
