@@ -1,7 +1,7 @@
 (ns dapp.pages.dashboard
   (:require
    [com.kubelt.lib.promise :refer [promise]]
-   [com.kubelt.lib.crypto.hexify :as hexlify]
+   [com.kubelt.lib.crypto.hexify :as hexify]
    [dapp.components.button :as button]
    [dapp.components.header :as header]
    [dapp.wallet :as wallet]
@@ -21,8 +21,7 @@
   (fn [signable]
     (promise
      (fn [resolve _reject]
-       (let [signable-buffer (hexlify/hex-string signable)]
-         (prn {:sb signable-buffer :wa wallet-address})
+       (let [signable-buffer (hexify/hex-string signable)]
          (-> (.request provider (clj->js {:method "personal_sign"
                                           :params [signable-buffer wallet-address]}))
              (.then (fn [digest]
@@ -36,7 +35,6 @@
         ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
         (.then (fn [provider]
                  ;; dispatch the provider
-                 (prn {:msg "got provider" :provider provider})
                  (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
                      (.then (fn [account]
                               (let [wallet-address (first (js->clj account))
@@ -44,8 +42,7 @@
                                     new-wallet {:com.kubelt/type :kubelt.type/wallet
                                                 :wallet/address wallet-address
                                                 :wallet/sign-fn sign-fn}]
-                                (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))
-                 #_(re-frame/dispatch [::web3-modal provider])))
+                                (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))))
         (.catch (fn [error]
                   (.clearCachedProvider modal)
                   (js/console.log error))))))
@@ -68,8 +65,7 @@
                      :text "Connect a Wallet"
                      :on-click (fn [e]
                                  (.preventDefault e)
-                                 (open-modal)
-                                 (re-frame/dispatch [:dapp.routes/push-state :dapp.routes/cores]))
+                                 (open-modal))
                      :variant :primary}]]))
 
 (defn dashboard-content
