@@ -6,6 +6,7 @@ import getEthProvider from "../utils/ethProvider";
 import kSdkWeb from "@kubelt/sdk-web";
 
 import { hexlify } from "@ethersproject/bytes";
+import { ethers } from "ethers";
 
 /**
  * TODO: Define once API is stable
@@ -19,7 +20,9 @@ const handleAccountsChanged = async (accounts: string[]) => {
   if (accounts.length === 0) {
     accountSubj.next(null);
   } else {
-    const account = accounts[0];
+    // We need to checksum the account
+    // so that it can be properly recovered
+    const account = ethers.utils.getAddress(accounts[0]);
     accountSubj.next(account);
 
     const wallet: IKubeltSdkWallet = {
