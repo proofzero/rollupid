@@ -5,6 +5,7 @@
    [dapp.components.button :as button]
    [dapp.components.header :as header]
    [dapp.wallet :as wallet]
+   [ethers :as ethers]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
@@ -37,7 +38,8 @@
                  ;; dispatch the provider
                  (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
                      (.then (fn [account]
-                              (let [wallet-address (first (js->clj account))
+                              (let [raw-address (first (js->clj account))
+                                    wallet-address (ethers/utils.getAddress raw-address)
                                     sign-fn (make-sign-fn provider wallet-address)
                                     new-wallet {:com.kubelt/type :kubelt.type/wallet
                                                 :wallet/address wallet-address

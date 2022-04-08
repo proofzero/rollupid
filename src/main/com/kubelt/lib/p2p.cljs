@@ -23,7 +23,7 @@
         port (get-in sys [:client/p2p :p2p/write :address/port])
 
         wallet (get sys :crypto/wallet)
-        address (cstr/lower-case (get wallet :wallet/address))
+        address (get wallet :wallet/address)
         body {:address address}
         body-str (lib.json/edn->json-str body)
 
