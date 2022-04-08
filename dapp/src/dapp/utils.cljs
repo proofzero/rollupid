@@ -7,9 +7,3 @@
   [& classes]
   (clojure.string/join " " (remove nil? classes)))
 
-(defn log-fn 
-  "Helper function for logs"
-  [& params]
-  (fn [_]
-    (log/info params)))
-

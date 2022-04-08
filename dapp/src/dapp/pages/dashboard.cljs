@@ -30,7 +30,7 @@
                       (resolve digest)))))))))
 
 (defn open-modal []
-  (log/info "open the modal")
+  (log/trace "open the modal")
   (let [modal (Web3Modal. (clj->js provider-options))]
     ;(.clearCachedProvider modal)
     (-> (.connect modal)
@@ -48,7 +48,7 @@
                                 (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))))
         (.catch (fn [error]
                   (.clearCachedProvider modal)
-                  (js/console.log error))))))
+                  (log/error {:msg "web3 modal error" :error error}))))))
 
 (defn connect-wallet
   []

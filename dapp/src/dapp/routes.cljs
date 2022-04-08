@@ -63,33 +63,33 @@
      :controllers
      [{;; Do whatever initialization needed for dashboard page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
-       :start (fn [& params](log/info "Entering home page"))
+       :start (fn [& params](log/trace "Entering home page"))
        ;; Teardown can be done here.
-       :stop  (fn [& params] (log/info "Leaving home page"))}]}]
+       :stop  (fn [& params] (log/trace "Leaving home page"))}]}]
    ["cores"
     {:name      ::cores
      :view      cores/render
      :controllers
      [{;; Initialization
-       :start (fn [& _params](log/info "Entering Cores page"))
+       :start (fn [& _params](log/trace "Entering Cores page"))
        ;; Teardown
-       :stop  (fn [& _params] (log/info "Leaving Cores page"))}]}]
+       :stop  (fn [& _params] (log/trace "Leaving Cores page"))}]}]
    ["reports"
     {:name      ::reports
      :view      reports/render
      :controllers
      [{;; Initialization
-       :start (fn [& _params](log/info "Entering Reports page"))
+       :start (fn [& _params](log/trace "Entering Reports page"))
        ;; Teardown
-       :stop  (fn [& _params] (log/info "Leaving Reports page"))}]}]
+       :stop  (fn [& _params] (log/trace "Leaving Reports page"))}]}]
    ["settings"
     {:name      ::settings
      :view      settings/render
      :link-text "Settings"
      :icon ChartBarIcon
      :controllers
-     [{:start (fn [& params] (log/info "Entering sub-page 1"))
-       :stop  (fn [& params] (log/info "Leaving sub-page 1"))}]}]])
+     [{:start (fn [& params] (log/trace "Entering sub-page 1"))
+       :stop  (fn [& params] (log/trace "Leaving sub-page 1"))}]}]])
 
 (defn on-navigate [new-match]
   (when new-match
