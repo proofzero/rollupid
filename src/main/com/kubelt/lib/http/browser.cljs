@@ -3,7 +3,8 @@
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [goog.net.XhrIo :as xhrio]
-   [goog.url :as gurl])
+   [goog.url :as gurl]
+   [clojure.string :as str])
   (:require
    [malli.core :as malli])
   (:require
@@ -40,17 +41,25 @@
   XhrIo."
   [resolve]
   (fn [^js event]
-    (let [res (-> event .-target .getResponseText)]
+    (let [res (-> event .-target .getResponseText)
+          status (-> event .-target .getStatus)
+          content-type (-> event .-target (.getResponseHeader "content-type"))
+          ]
       ;; TODO Return a structured map containing the response data. The
       ;; structure needs to be schematized as a spec, e.g.
       ;; {:body {:text ...}}
 
       ;; FIXME support non-json and pass headers properly
-      (let [keywordize? true
-            body (lib.json/from-json res keywordize?)
-            response (-> {:http/status 200 :http/headers {}}
-                         (assoc :http/body body))]
-        (resolve response)))))
+      (let [response {:http/status status :http/headers "" }]
+        (case (str/lower-case content-type)
+          "application/json; charset=utf-8" 
+          (resolve (assoc response :http/body (lib.json/from-json res true)))
+          
+          "text/plain;charset=utf-8"
+          (resolve (assoc response :http/body res))
+          
+          (resolve (assoc response :http/body res)))))))
+      ;;(resolve (res)
 
 ;; Public
 ;; -----------------------------------------------------------------------------

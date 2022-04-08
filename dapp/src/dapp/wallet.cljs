@@ -1,6 +1,7 @@
 ; Wallet
 (ns dapp.wallet
   (:require
+   [com.kubelt.sdk.v1.core :as sdk.core]
    [re-frame.core :as re-frame])
   (:require
     ["web3modal$default" :as Web3Modal]
@@ -40,12 +41,13 @@
 (re-frame/reg-event-db ::provider-detected
   (fn [db [_ provider]]
     (prn "provider-detected")
+    (prn provider)
     (let [web3 (Web3. provider)
           ; TODO: replace with check for JWT session
           current-account (.-defaultAccount (.-eth web3))]
       (prn "current-account")
       (prn current-account)
-      (assoc db :provider provider :web3 web3 :current-account current-account))))
+     (assoc db :provider provider :web3 web3 :current-account current-account))))
 
 ; Bootstrap the db when a provider is detected
 (re-frame/reg-event-db ::modal-ready
@@ -57,15 +59,17 @@
 ; Pop up the modal
 (re-frame/reg-event-db ::web3-modal
   (fn [db _ provider]
-    (prn "provider received")
-    (assoc db :provider provider)))
+    (prn {:msg "provider received" :provider provider })
+    (let [ctx  (re-frame/dispatch [::provider-detected (assoc db :provider provider)])]
+      (re-frame/dispatch [::connect-account ctx]))))
 
 
 ;Handle a connection to different wallets and kick off the zk-auth
 (re-frame/reg-event-db ::connect-account
   (fn [db [_ wallet]]
-    (prn wallet)
+    (prn {:wallet wallet})
     (let [web3 ^js/Web3 (:web3 db)
+          _ (prn {:web3 web3 :db db})
           eth (.-eth web3)]
       (prn "providers list")
       (js/console.log (.-providers eth))
@@ -77,6 +81,18 @@
                  (prn "accounts")
                  (js/console.log (first accounts))
                  (assoc db :current-account (first accounts))))))))
+;; TODO remove fx version if not needed? 
+(re-frame/reg-event-fx
+ ::set-current-wallet
+ (fn [{:keys [db]} [_ wallet]]
+   (let [new-ctx (sdk.core/set-wallet (:sdk/ctx db) wallet)]
+     {:dispatch [::authenticate new-ctx]})))
+
+(re-frame/reg-event-db
+ ::authenticate
+ (fn [db [_ new-ctx]]
+   (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
+     (assoc db :sdk/ctx (sdk.core/authenticate! new-ctx wallet-address)))))
 
 ; TODO
 ; Handle the account changed event

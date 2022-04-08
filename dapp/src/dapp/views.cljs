@@ -16,7 +16,8 @@
       [layout/render {:router router :current-route current-route}]
 
       (and provider (not current-account))
-      [login/render nil]
+      [layout/render {:router router :current-route current-route}]
+      #_[login/render nil]
 
       :else
       [layout/render {:router router :current-route current-route}])))
