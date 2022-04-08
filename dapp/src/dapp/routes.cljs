@@ -10,7 +10,8 @@
    [dapp.pages.cores :as cores]
    [dapp.pages.dashboard :as dashboard]
    [dapp.pages.reports :as reports]
-   [dapp.utils :as utils])
+   [dapp.utils :as utils]
+   [taoensso.timbre :as log])
    (:require
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
    ))
@@ -62,33 +63,33 @@
      :controllers
      [{;; Do whatever initialization needed for dashboard page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
-       :start (fn [& params](utils/log-fn "Entering home page"))
+       :start (fn [& params](log/info "Entering home page"))
        ;; Teardown can be done here.
-       :stop  (fn [& params] (utils/log-fn "Leaving home page"))}]}]
+       :stop  (fn [& params] (log/info "Leaving home page"))}]}]
    ["cores"
     {:name      ::cores
      :view      cores/render
      :controllers
      [{;; Initialization
-       :start (fn [& _params](utils/log-fn "Entering Cores page"))
+       :start (fn [& _params](log/info "Entering Cores page"))
        ;; Teardown
-       :stop  (fn [& _params] (utils/log-fn "Leaving Cores page"))}]}]
+       :stop  (fn [& _params] (log/info "Leaving Cores page"))}]}]
    ["reports"
     {:name      ::reports
      :view      reports/render
      :controllers
      [{;; Initialization
-       :start (fn [& _params](utils/log-fn "Entering Reports page"))
+       :start (fn [& _params](log/info "Entering Reports page"))
        ;; Teardown
-       :stop  (fn [& _params] (utils/log-fn "Leaving Reports page"))}]}]
+       :stop  (fn [& _params] (log/info "Leaving Reports page"))}]}]
    ["settings"
     {:name      ::settings
      :view      settings/render
      :link-text "Settings"
      :icon ChartBarIcon
      :controllers
-     [{:start (fn [& params] (utils/log-fn "Entering sub-page 1"))
-       :stop  (fn [& params] (utils/log-fn "Leaving sub-page 1"))}]}]])
+     [{:start (fn [& params] (log/info "Entering sub-page 1"))
+       :stop  (fn [& params] (log/info "Leaving sub-page 1"))}]}]])
 
 (defn on-navigate [new-match]
   (when new-match

@@ -1,4 +1,6 @@
-(ns dapp.utils)
+(ns dapp.utils
+  (:require 
+    [taoensso.timbre :as log]))
 
 (defn classnames 
   "Selects and creates a set of html classes"
@@ -9,5 +11,5 @@
   "Helper function for logs"
   [& params]
   (fn [_]
-    (prn params)))
+    (log/info params)))
 

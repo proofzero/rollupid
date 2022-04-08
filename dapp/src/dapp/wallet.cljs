@@ -2,7 +2,8 @@
 (ns dapp.wallet
   (:require
    [com.kubelt.sdk.v1.core :as sdk.core]
-   [re-frame.core :as re-frame])
+   [re-frame.core :as re-frame]
+   [taoensso.timbre :as log])
   (:require
     ["web3modal$default" :as Web3Modal]
     ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
@@ -18,14 +19,14 @@
 (defn accounts-changed
   "Helper function that dispatches an account changed event"
   [event]
-  (prn "accounts-changed")
+  (log/info "accounts-changed")
   (js/console.log event)
   (re-frame/dispatch ::accounts-changed))
 
 (defn chain-changed
   "Helper function that dispatches a chain changed event"
   [event]
-  (prn "chain-changed")
+  (log/info "chain-changed")
   (js/console.log event)
   (re-frame/dispatch ::chain-changed))
 
@@ -40,26 +41,26 @@
 ; Bootstrap the db when a provider is detected
 (re-frame/reg-event-db ::provider-detected
   (fn [db [_ provider]]
-    (prn "provider-detected")
-    (prn provider)
+    (log/info "provider-detected")
+    (log/info provider)
     (let [web3 (Web3. provider)
           ; TODO: replace with check for JWT session
           current-account (.-defaultAccount (.-eth web3))]
-      (prn "current-account")
-      (prn current-account)
+      (log/info "current-account")
+      (log/info current-account)
      (assoc db :provider provider :web3 web3 :current-account current-account))))
 
 ; Bootstrap the db when a provider is detected
 (re-frame/reg-event-db ::modal-ready
   (fn [db [_ web3-modal]]
-    (prn "modal-ready")
+    (log/info "modal-ready")
     (js/console.log web3-modal)
     (assoc db :modal web3-modal)))
 
 ; Pop up the modal
 (re-frame/reg-event-db ::web3-modal
   (fn [db _ provider]
-    (prn {:msg "provider received" :provider provider })
+    (log/info {:msg "provider received" :provider provider })
     (let [ctx  (re-frame/dispatch [::provider-detected (assoc db :provider provider)])]
       (re-frame/dispatch [::connect-account ctx]))))
 
@@ -67,18 +68,18 @@
 ;Handle a connection to different wallets and kick off the zk-auth
 (re-frame/reg-event-db ::connect-account
   (fn [db [_ wallet]]
-    (prn {:wallet wallet})
+    (log/info {:wallet wallet})
     (let [web3 ^js/Web3 (:web3 db)
-          _ (prn {:web3 web3 :db db})
+          _ (log/info {:web3 web3 :db db})
           eth (.-eth web3)]
-      (prn "providers list")
+      (log/info "providers list")
       (js/console.log (.-providers eth))
       (-> (.requestAccounts eth)
         (.then (fn [accounts]
                  ; TODO:
                  ; - check for which account is selected
                  ; - call the SDK "login"
-                 (prn "accounts")
+                 (log/info "accounts")
                  (js/console.log (first accounts))
                  (assoc db :current-account (first accounts))))))))
 ;; TODO remove fx version if not needed? 

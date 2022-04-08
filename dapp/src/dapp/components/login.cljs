@@ -3,7 +3,7 @@
    [re-frame.core :as re-frame]
    [reitit.frontend.easy :as rfe]
    [dapp.wallet :as wallet]
-   )
+   [taoensso.timbre :as log])
   (:require
     ["web3modal$default" :as Web3Modal]
     ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
@@ -17,14 +17,14 @@
 
 
 (defn open-modal []
-  (prn "open the modal")
+  (log/info "open the modal")
   (let [modal (Web3Modal. (clj->js provider-options))]
     ;(.clearCachedProvider modal)
     (-> (.connect modal)
         ;; TODO: figure out why this won't re-prompt wallet if password was not entered at prompt
          (.then (fn [provider]
                   ;; dispatch the provider
-                  (prn "provider")
+                  (log/info "provider")
                   (re-frame/dispatch [::wallet/web3-modal provider])))
          (.catch (fn [error]
                    (.clearCachedProvider modal)
