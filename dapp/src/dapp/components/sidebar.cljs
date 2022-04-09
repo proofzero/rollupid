@@ -1,5 +1,6 @@
 (ns dapp.components.sidebar
   (:require
+   [clojure.string :as str]
    [dapp.routes :as routes])
   (:require
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
@@ -28,7 +29,8 @@
            tab-icon
            tab-name] :as _props}]
   [:a.sidebar-tab
-   {:href  (routes/href route-name)
+   {:id    (str/lower-case tab-name)
+    :href  (routes/href route-name)
     :class (str "group flex items-center p-2 rounded-md "
                 (determine-text-color current-route-name route-name))}
    [:> tab-icon

@@ -28,8 +28,8 @@
     "test:web:develop": "bb test:web:develop",
     "test:web:release": "bb test:web:release",
     "test:web:ci": "bb test:web:ci",
-    "test:dapp:develop": "bb test:dapp:develop",
-    "test:dapp:release": "bb test:dapp:release",
+    "test:dapp:ci:run": "bb test:dapp:ci:run",
+    "test:dapp:ci": "bb test:dapp:ci",
     "test:plugin:sanity": "bb test:plugin:sanity",
     "sidenotes:http:run": "http-server ./docs"
   },

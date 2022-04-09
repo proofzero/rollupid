@@ -63,7 +63,8 @@
      [:p
       {:class "text-gray-500 text-sm my-1"}
       "Get started by connecting your wallet."]
-     [button/render {:class "self-center mt-6"
+     [button/render {:id "connect-a-wallet"
+                     :class "self-center mt-6"
                      :text "Connect a Wallet"
                      :on-click (fn [e]
                                  (.preventDefault e)

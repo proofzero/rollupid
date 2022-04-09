@@ -183,7 +183,11 @@ jobs:
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: npm run test:dapp:develop
+      # Compile and run dapp
+      - run: npm run build:dapp:release
+      - run: npm run test:dapp:ci:run
+      # Run tests AFTER since Cypress needs server running
+      - run: npm run test:dapp:ci
 
   test-plugin-sanity:
     needs: changes

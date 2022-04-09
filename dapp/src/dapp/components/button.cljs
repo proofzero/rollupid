@@ -1,9 +1,10 @@
 (ns dapp.components.button)
 
 (defn render
-  [{:keys [class text variant on-click]}]
+  [{:keys [class id on-click text variant]}]
   [:button
-   {:on-click on-click
+   {:id id
+    :on-click on-click
     :class (str "rounded-sm text-white text-sm w-36 px-4 py-2 shadow-md "
                 class
                 (case variant
