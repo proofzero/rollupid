@@ -244,6 +244,12 @@
    ;; can be run against `release` or `development` versions
    :task (shell {:dir "dapp/"} "npx cypress run")}
 
+  -test:dapp:release
+  {:depends [build:dapp:release test:dapp:ci:run test:dapp:ci]}
+
+  test:dapp:release
+  {:task (run '-test:dapp:release)}
+
   test:plugin:sanity
   {:doc ""
    :depends-on [build:plugin:sanity]
