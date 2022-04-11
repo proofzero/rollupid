@@ -31,7 +31,7 @@ you.
 
 - [`/`](/../../): project config files
 - [`dev/`](dev/): source files compiled only with the [dev](#running-the-app) profile
-  - [`user.cljs`](dev/cljs/user.cljs): symbols for use during development in the
+  - [`user.cljs`](dev/user.cljs): symbols for use during development in the
     [ClojureScript REPL](#connecting-to-the-browser-repl-from-a-terminal)
 - [`resources/public/`](resources/public/): SPA root directory;
   [dev](#running-the-app) / [prod](#production) profile depends on the most recent build
