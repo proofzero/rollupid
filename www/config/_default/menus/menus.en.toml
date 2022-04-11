@@ -17,7 +17,7 @@
 
 [[main]]
   name = "Showcase"
-  url = "/showcase"
+  url = "/categories/case-studies/"
   weight = 40
 
 [[main]]
@@ -81,7 +81,7 @@
   name = "Showcase"
   weight = 10
   identifier = "showcase"
-  url = "/showcase/"
+  url = "/categories/case-studies"
 
 # [[footer]]
 #   name = "Privacy"
