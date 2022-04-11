@@ -17,7 +17,7 @@ Let's take a look around at the Kubelt Monorepo layout...
 
 ### SDK
 
-The [/src](src/) directory contains the Kubelt SDK source code. The Kubelt SDK is written in Clojurescript and use to build the Kubelt client libraries and tools.
+The [src/](src/) directory contains the Kubelt SDK source code. The Kubelt SDK is written in Clojurescript and use to build the Kubelt client libraries and tools.
 
 ### Packages
 
