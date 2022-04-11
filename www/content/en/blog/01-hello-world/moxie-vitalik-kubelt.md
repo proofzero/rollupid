@@ -10,6 +10,28 @@ draft: true
 contributors: ["@alfl", "@maurerbot"]
 ---
 
+```
+Notes to cover off Skynet
+- go across all ecoysytems both blockchian and classical
+> Users on Skynet only have to onboard one time. Once you’ve created an account, that account can follow you from your chatroom to your blogger to your banking. Once you’ve uploaded a profile picture, every single app in the Skynet ecosystem can reference and load your profile picture, and you can use the same username across the entire ecosystem.
+- private cores!
+
+- Users and developers alike prefer convenience to security" is a bad assumption
+
+> Developers also enjoy benefits in the decentralized world. Applications don’t have any operational overhead, as the costs are shouldered by the users and the infrastructure is managed by the network. The is no need to create AWS accounts or spin up dedicated servers, and no need to plan for a contingency of hyperbolic growth. The network automatically handles many pain points, and allows the developers to largely focus on writing features and engaging users.
+- I AGREE
+
+- [ details about the Kubelt Cores client-server model ]
+- [more secure and no blockchain fees]
+
+- No browser extension needed; verify against the cores
+
+- Possibilities of cores in hardware in a peer to peer configuration (your crypto hosted locally for 100% local first)
+
+- Future isn't web2 v web3, just a bigger, better, user-centric web.
+
+```
+
 Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure. The whole conversation is worth a deep, critical read.
 
 As a team building the future of web3 infrastructure, here's our take.
