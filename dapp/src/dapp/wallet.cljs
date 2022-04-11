@@ -3,12 +3,7 @@
   (:require
    [com.kubelt.sdk.v1.core :as sdk.core]
    [re-frame.core :as re-frame]
-   [taoensso.timbre :as log])
-  (:require
-    ["web3modal$default" :as Web3Modal]
-    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
-    ["walletlink" :as WalletLink]
-    ["web3" :as Web3]))
+   [taoensso.timbre :as log]))
 
 ; The wallet ns manages events and effects related to wallet based auth
 ; and interacts with the SDK to fulfill a full ZK-Auth
@@ -34,30 +29,11 @@
 
 ;; Events
 
-; Bootstrap the db when a provider is detected
-(re-frame/reg-event-db ::provider-detected
-  (fn [db [_ provider]]
-    (let [web3 (Web3. provider)
-          ; TODO: replace with check for JWT session
-          current-account (.-defaultAccount (.-eth web3))]
-      (log/debug {:msg "current-account" :current-account current-account :provider provider})
-      (assoc db :provider provider :web3 web3 :current-account current-account))))
-
-; Bootstrap the db when a provider is detected
-(re-frame/reg-event-db ::modal-ready
-  (fn [db [_ web3-modal]]
-    (assoc db :modal web3-modal)))
-
-; Pop up the modal
-(re-frame/reg-event-db ::web3-modal
-  (fn [db _ provider]
-    (log/debug {:msg "provider received" :provider provider })
-    (let [ctx  (re-frame/dispatch [::provider-detected (assoc db :provider provider)])]
-      (re-frame/dispatch [::connect-account ctx]))))
-
-
+;; `::connect-account` isn't used but is kept for reference
+;; when working on integrating new providers
 ;Handle a connection to different wallets and kick off the zk-auth
-(re-frame/reg-event-db ::connect-account
+#_(re-frame/reg-event-db
+ ::connect-account
   (fn [db [_ wallet]]
     (let [web3 ^js/Web3 (:web3 db)
           _ (log/debug {:msg "connect-account" :wallet wallet :web3 web3})
@@ -70,17 +46,19 @@
                  ; - call the SDK "login"
                  (log/debug {:msg "found account" :account (first accounts)})
                  (assoc db :current-account (first accounts))))))))
-;; TODO remove fx version if not needed? 
+
 (re-frame/reg-event-fx
  ::set-current-wallet
- (fn [{:keys [db]} [_ wallet]]
-   (let [new-ctx (sdk.core/set-wallet (:sdk/ctx db) wallet)]
+ (fn [{:sdk/keys [ctx] :as _db} [_ wallet]]
+   (let [new-ctx (sdk.core/set-wallet ctx wallet)]
      {:dispatch [::authenticate new-ctx]})))
 
 (re-frame/reg-event-db
  ::authenticate
  (fn [db [_ new-ctx]]
    (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
+     (log/trace {:message (str "Authenticated a new wallet with address: " wallet-address)})
+     ;; Update the entire context to an authenticated one instantiated by the SDK
      (assoc db :sdk/ctx (sdk.core/authenticate! new-ctx wallet-address)))))
 
 ; TODO
