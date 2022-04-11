@@ -4,7 +4,7 @@ description: "Cashback rewards made easy."
 lead: "Cashback rewards made easy"
 draft: false
 images: ["paymi.jpg"]
-link: "http://paymi.com"
+link: "https://www.paymi.com"
 menu:
   showcase:
     parent: "browse"
