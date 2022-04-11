@@ -34,10 +34,16 @@
 			<h1>{{ .Title }}</h1>
 			<p class="lead">{{ .Params.lead | safeHTML }}</p>
 			{{ partial "main/headline-hash.html" .Content }}
-			{{ if .Params.functionalities -}}
-				<h2>Functionalities</h2>
+      {{ if .Params.capabilities -}}
+        <h2>Capabilities</h2>
 				<ul>
-				{{ range $index, $type := .Params.functionalities }}<li><a href="{{ "/showcase/functionalities/" | relURL }}{{ . | urlize }}/">{{ . | title }}</a></li>{{ end -}}
+          {{ range $index, $type := .Params.capabilities }}<li><a href="{{ "/showcase/capabilities/" | relURL }}{{ . | urlize }}/">{{ . | title }}</a></li>{{ end -}}
+				</ul>
+			{{ end -}}
+      {{ if .Params.tools -}}
+        <h2>Tools</h2>
+				<ul>
+				{{ range $index, $type := .Params.tools }}<li><a href="{{ "/showcase/tools/" | relURL }}{{ . | urlize }}/">{{ . | title }}</a></li>{{ end -}}
 				</ul>
 			{{ end -}}
 			<h2>Website</h2>
