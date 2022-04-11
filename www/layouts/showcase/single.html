@@ -33,9 +33,6 @@
 			</div>
 			<h1>{{ .Title }}</h1>
 			<p class="lead">{{ .Params.lead | safeHTML }}</p>
-			{{ if ne (hugo.Environment) "development" -}}
-				{{ partial "main/carbonads.html" . }}
-			{{ end -}}
 			{{ partial "main/headline-hash.html" .Content }}
 			{{ if .Params.functionalities -}}
 				<h2>Functionalities</h2>

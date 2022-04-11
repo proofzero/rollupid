@@ -8,11 +8,6 @@
 	<main class="docs-content col-lg-11 mx-xl-auto">
 		<h1 class="text-center">{{ .Title | title }}</h1>
 		<p class="lead text-center">Showcase {{ .Data.Singular }} {{ .Title }}</p>
-		{{ if ne (hugo.Environment) "development" -}}
-			<div class="d-flex justify-content-center">
-				{{ partial "main/carbonads.html" . }}
-			</div>
-		{{ end -}}
 		<h2>Recent</h2>
 		<div class="row row-cols-1 row-cols-md-2 g-5">
 			{{ range .Data.Pages.ByWeight.Reverse -}}
