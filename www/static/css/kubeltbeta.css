@@ -4,7 +4,7 @@
 }
 
 [data-words] > span {
-  margin-left: 12px;
+  /*margin-left: 12px;*/
   display: none;
 }
 
@@ -2931,6 +2931,9 @@ figcaption {
   .whitepaper {
     margin-top: 12px;
   }
+  .how {
+    margin-bottom: 12px;
+  }
   [data-words] {
     display: none;
     vertical-align: top;
@@ -2945,7 +2948,13 @@ figcaption {
   #content-mobile {
     vertical-align: top;
     display: block;
+    font-size: 36px;
   }
+
+  /*.feature > div {*/
+  /*display: inline-block;*/
+  /*width: auto;*/
+  /*}*/
 
   h1 {
     font-size: 36px;

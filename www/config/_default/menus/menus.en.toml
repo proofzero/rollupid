@@ -17,7 +17,7 @@
 
 [[main]]
   name = "Showcase"
-  url = "/showcase"
+  url = "/showcase/"
   weight = 40
 
 [[main]]
@@ -78,9 +78,9 @@
   url = "/docs/next/help/"
 
 [[showcase]]
-  name = "Showcase"
+  name = "Browse"
   weight = 10
-  identifier = "showcase"
+  identifier = "browse"
   url = "/showcase/"
 
 # [[footer]]

@@ -61,7 +61,7 @@ Kubelt will also always try to deliver and publish content over available decent
 
 ## Showcase
 
-See what others have build with Kubelt. [Showcase →]({{< relref "showcase" >}})
+See what others have build with Kubelt. [Showcase →]({{< relref "/showcase/" >}})
 
 ## Contributing
 

@@ -49,12 +49,19 @@ rel  = "sitemap"
   priority = 0.5
 
 [taxonomies]
+  category = "categories"
+  tag = "tags"
   contributor = "contributors"
-  contributor = "case-studies"
+  type = "types"
+  capabilities = "capabilities"
+  tools = "tools"
 
 [permalinks]
   blog = "/blog/:title/"
   docs = "/docs/next/:sections[1:]/:title/"
+  types = "/showcase/types/:title/"
+  capabilities = "/showcase/capabilities/:title/"
+  tools = "/showcase/tools/:title/"
 
 [minify.tdewolff.html]
   keepWhitespace = false
