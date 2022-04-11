@@ -5,7 +5,8 @@ lead: "Introducing Kubelt, the future of web3 infrastructure."
 date: 2022-04-05T14:25:35-04:00
 lastmod: 2022-04-05T14:25:35-04:00
 weight: 50
-contributors: ['@alfl']
+images: ["kubelt.png"]
+contributors: ["@alfl", "@maurerbot"]
 ---
 
 Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure. The whole conversation is worth a deep, critical read.
@@ -28,11 +29,11 @@ What if the platform itself was decentralized?
 
 [Let's slice Vitalik's list](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/) of ways to inspect chain data (this time **emphasis mine**):
 
->2. Run a piece of code that asks the Infura API endpoint what the blockchain state is, trust the answer. However, keys are still kept locally; the code signs transactions locally and sends them to the Infura API endpoint to be re-broadcasted.
->1. Same as (2), but the code also runs a light client to verify the signatures on the block headers and uses Merkle proofs to verify individual account and storage data.
->1. Same as (3), but the code talks to N different API endpoints run by N different companies, so only 1 of them need to be providing honest answers for the connection to be reliable.
->1. **Same as (4), but instead of pre-specifying N API endpoints the code connects directly to a p2p network**
->1. **Same as (5), but the code also does data availability sampling and accepts fraud proofs, so it can detect and refuse to accept blocks that are invalid.**
+> 2.  Run a piece of code that asks the Infura API endpoint what the blockchain state is, trust the answer. However, keys are still kept locally; the code signs transactions locally and sends them to the Infura API endpoint to be re-broadcasted.
+> 1.  Same as (2), but the code also runs a light client to verify the signatures on the block headers and uses Merkle proofs to verify individual account and storage data.
+> 1.  Same as (3), but the code talks to N different API endpoints run by N different companies, so only 1 of them need to be providing honest answers for the connection to be reliable.
+> 1.  **Same as (4), but instead of pre-specifying N API endpoints the code connects directly to a p2p network**
+> 1.  **Same as (5), but the code also does data availability sampling and accepts fraud proofs, so it can detect and refuse to accept blocks that are invalid.**
 
 Vitalik's argument picks up where Moxie's left off, querying a centralized platform: "call the Infura API". He develops it, adding assurance and availability capabilities, and by points five and six arrives at a decentralized peer-to-peer model.
 
@@ -57,4 +58,3 @@ Moxie winds up with a great point, and we'll end on the same note:
 > We should try to reduce the burden of building software.
 
 Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
-

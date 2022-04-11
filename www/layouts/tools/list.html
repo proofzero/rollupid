@@ -1,0 +1,26 @@
+{{ define "main" }}
+<div class="row flex-xl-nowrap">
+	<div class="col-lg-5 col-xl-4 docs-sidebar d-none d-lg-block">
+		<nav class="docs-links" aria-label="Main navigation">
+			{{ partial "sidebar/showcase-menu.html" . }}
+		</nav>
+	</div>
+	<main class="docs-content col-lg-11 mx-xl-auto">
+		<h1 class="text-center">{{ .Title | title }}</h1>
+		<p class="lead text-center">Showcase {{ .Data.Singular }} {{ .Title }}</p>
+		{{ if ne (hugo.Environment) "development" -}}
+			<div class="d-flex justify-content-center">
+				{{ partial "main/carbonads.html" . }}
+			</div>
+		{{ end -}}
+		<h2>Recent</h2>
+		<div class="row row-cols-1 row-cols-md-2 g-5">
+			{{ range .Data.Pages.ByWeight.Reverse -}}
+				<div class="col">
+					{{ .Render "showcase-card" -}}
+				</div>
+			{{ end }}
+		</div>
+	</main>
+</div>
+{{ end }}

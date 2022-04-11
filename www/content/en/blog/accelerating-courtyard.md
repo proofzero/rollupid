@@ -8,7 +8,8 @@ menu:
   courtyard:
     parent: "showcase"
 weight: 10
-contributors: ['@alfl']
+draft: true
+contributors: ["@alfl"]
 categories: ["Case Studies"]
 tags: ["CMS", "headless", "API", "backend"]
 ---
@@ -35,6 +36,6 @@ One of the benefits of well-designed peer networks is that they're more stable t
 
 **But Kubelt held fast.**
 
-If you want to build 
+If you want to build
 
 Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
