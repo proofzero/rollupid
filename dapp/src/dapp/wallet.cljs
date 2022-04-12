@@ -49,17 +49,21 @@
 
 (re-frame/reg-event-fx
  ::set-current-wallet
- (fn [{:sdk/keys [ctx] :as _db} [_ wallet]]
-   (let [new-ctx (sdk.core/set-wallet ctx wallet)]
+ (fn [{:keys [db]} [_ wallet]]
+   (let [ctx (:sdk/ctx db)
+         ;; `sdk.core/set-wallet` also validates the structure of `wallet`
+         new-ctx (sdk.core/set-wallet ctx wallet)]
      {:dispatch [::authenticate new-ctx]})))
 
 (re-frame/reg-event-db
  ::authenticate
  (fn [db [_ new-ctx]]
    (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
-     (log/trace {:message (str "Authenticated a new wallet with address: " wallet-address)})
-     ;; Update the entire context to an authenticated one instantiated by the SDK
-     (assoc db :sdk/ctx (sdk.core/authenticate! new-ctx wallet-address)))))
+     (.finally (sdk.core/authenticate! new-ctx wallet-address)
+               (fn [auth-ctx]
+                 (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
+                 (log/info {:auth-ctx auth-ctx})))
+     (assoc db :sdk/ctx new-ctx))))
 
 ; TODO
 ; Handle the account changed event
