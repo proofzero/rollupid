@@ -1,12 +1,12 @@
 ---
-title: "Moxie & Vitalik & Kubelt"
+title: "Kubelt's Approach to a Decentralization"
 description: "Introducing Kubelt, the future of web3 infrastructure."
 lead: "Introducing Kubelt, the future of web3 infrastructure."
 date: 2022-04-05T14:25:35-04:00
 lastmod: 2022-04-05T14:25:35-04:00
 weight: 50
 images: ["kubelt.png"]
-draft: true
+draft: false
 contributors: ["@alfl", "@maurerbot"]
 ---
 
@@ -30,11 +30,34 @@ Notes to cover off Skynet
 
 - Future isn't web2 v web3, just a bigger, better, user-centric web.
 
+
+- The answer is right infront of you, the wallets
+
+- why it's better than solid and skynet is you don't have to be just on our ecosystem to get value
+
 ```
 
-Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure. The whole conversation is worth a deep, critical read.
+Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure but also, unknowlingly provided the arguments for why and even how to address them.
 
-As a team building the future of web3 infrastructure, here's our take.
+In summary, Moxie argues people will never run their own servers and we tend to agree. For the majoirty of users, the convenience of centralized services far outweigh any known trade offs in data privacy or other unkown.
+
+The same convenience of centralized platforms applied to developers seems obviously true when you look at the big uptake in platforms like Infura and OpenSea. Ignoring any associated risks, Moxie himself claims **centralized platforms** permit faster innovation than **decentralized protocols** but, is this a valid comparison?
+
+Platforms and protocols are two very different categories. The former is generally built on the latter and layers in complex, opininated technologies and frameworks on top of simple primitives. Ultimately, it is the adoption and conformance of these opinions, paid acquisition or otherwise, what makes centralized services so successful and exploitive.
+
+But what if you could push opinionation to the edge and maintain the simplicity of the protocols?
+
+As a team building a part of the decentralized future, here's our take.
+
+### Local-first, edge
+
+### Convenience and Privacy
+
+The walrus and the carpenter
+
+### Better Outcomes for users and business
+
+### Novelity and examples
 
 ## Enter Moxie
 
