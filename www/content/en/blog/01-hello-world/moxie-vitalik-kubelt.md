@@ -1,7 +1,7 @@
 ---
 title: "Kubelt's Approach to a Decentralization"
-description: "Introducing Kubelt, the future of web3 infrastructure."
-lead: "Introducing Kubelt, the future of web3 infrastructure."
+description: "A bigger, better, user-centric web."
+lead: "A bigger, better, user-centric web."
 date: 2022-04-05T14:25:35-04:00
 lastmod: 2022-04-05T14:25:35-04:00
 weight: 50
@@ -43,33 +43,53 @@ In summary, Moxie argues people will never run their own servers and we tend to 
 
 The same convenience of centralized platforms applied to developers seems obviously true when you look at the big uptake in platforms like Infura and OpenSea. Ignoring any associated risks, Moxie himself claims **centralized platforms** permit faster innovation than **decentralized protocols** but, is this a valid comparison?
 
-Platforms and protocols are two very different categories. The former is generally built on the latter and layers in complex, opininated technologies and frameworks on top of simple primitives. Ultimately, it is the adoption and conformance of these opinions, paid acquisition or otherwise, what makes centralized services so successful and exploitive.
+**Platforms** and **protocols** are two very different categories. The former is generally built on the latter introducing complex, opininated technologies, frameworks or otherwise. Ultimately, conformance to these opinions, through various incentives, is what makes centralized services so sticky and exploitive.
 
-But what if you could push opinionation to the edge and maintain the simplicity of the protocols?
+But what if you could push opinionation to the edge? How could that improve outcomes and experience for both developer and user?
 
 As a team building a part of the decentralized future, here's our take.
 
-### Local-first, edge
+### The Centralization Success Trap
 
-### Convenience and Privacy
+A major selling point of centralization is the convenience of data aggregration and co-location of compute. When data and compute is co-located developing applications becomes very straight forward (more on that later). Overtime, major platforms have rolled out hyper opinionated services that force developers to trade greater optionality for accelerated development.
 
-The walrus and the carpenter
+Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until its not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
+
+### Local-First and User-Centric
+
+If co-location of data and compute makes for a better developer experience and small opinionted services accelerate development, how can we think differently to solve for this in a decentralized manner?
+
+Blockchain seems to be the obvious answer and we agree this is true for many use cases.
+
+Convenience and privacy
+
+### Interopable and Composabie
+
+not ecosytems (e.g.sky net)
+
+pro-blockchain and pro-web2
 
 ### Better Outcomes for users and business
 
 ### Novelity and examples
 
-## Enter Moxie
+## Enter Kubelt
 
-To summarize Moxie's point, he claims that **centralized platforms** permit faster innovation than **decentralized protocols**. He gives an example (emphasis his):
+Web3 does have a ["web2 problem"](https://discord.com/channels/790660849471062046/956202308214095872/961623808958156831). Smart contracts do need upgradable data and business logic. Building on a peer network has significant advantages.
 
-> Likewise, the web3 protocols are slow to evolve. When building First Derivative, it would have been great to price minting derivatives as a percentage of the underlying’s value. That data isn’t on chain, but it’s in an API that OpenSea will give you. People are excited about NFT royalties for the way that they can benefit creators, but royalties aren’t specified in ERC-721, and it’s too late to change it, so OpenSea has its own way of configuring royalties that exists in web2 space. Iterating quickly on centralized platforms is _already outpacing the distributed protocols and consolidating control into platforms_.
+That's why we built Kubelt. Our peers -- "Kubelt Cores" -- offer distributed compute, storage, networking, and cryptography capabilities. They compose into a fully decentralized application platform, the missing middle tier for web3.
 
-Unfortunately this is an apples-to-oranges category error: **protocols are not platforms**. AWS doesn't compete with HTTPS. GCP doesn't compete with SFTP. Azure doesn't compete with gopher.
+You can use Kubelt to run APIs, upgrade their logic, query chain data, run your own oracles, store customer data, authenticate users, all in a fully distributed application model.
 
-Moxie's unspoken assumption is that decentralization must be achieved via protocols rather than platforms. What if you _could_ query an API that gives you underlying value or other aggregated data? What if smart contracts _could_ embed upgradable business logic?
+Imagine your smart contracts being token-gated into your own API ecosystem, more available than OpenSea, cheaper than AWS, and without having to run your own servers. That's Kubelt.
 
-What if the platform itself was decentralized?
+Moxie winds up with a great point, and we'll end on the same note:
+
+> We should try to reduce the burden of building software.
+
+### What's Next?
+
+Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
 
 ## Enter Vitalik
 
@@ -88,19 +108,3 @@ This is how a decentralized platform can achieve the same functional capabilitie
 So: platforms aren't protocols, and decentralized platforms are better than centralized platforms.
 
 If only someone would build a decentralized platform!
-
-## Enter Kubelt
-
-Web3 does have a ["web2 problem"](https://discord.com/channels/790660849471062046/956202308214095872/961623808958156831). Smart contracts do need upgradable data and business logic. Building on a peer network has significant advantages.
-
-That's why we built Kubelt. Our peers -- "Kubelt Cores" -- offer distributed compute, storage, networking, and cryptography capabilities. They compose into a fully decentralized application platform, the missing middle tier for web3.
-
-You can use Kubelt to run APIs, upgrade their logic, query chain data, run your own oracles, store customer data, authenticate users, all in a fully distributed application model.
-
-Imagine your smart contracts being token-gated into your own API ecosystem, more available than OpenSea, cheaper than AWS, and without having to run your own servers. That's Kubelt.
-
-Moxie winds up with a great point, and we'll end on the same note:
-
-> We should try to reduce the burden of building software.
-
-Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!

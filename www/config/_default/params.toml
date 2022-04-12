@@ -72,7 +72,7 @@ howItWorks = "/docs/next/basics/how-it-works"
 # Footer
 footer = "Powered by Hugo and Kubelt"
 footerIcon = "images/Asset-4.svg"
-footerCopy = "Decentralized content management, content delivery and content applications."
+footerCopy = "Decentralize applications."
 
 # Feed
 copyrightHolder = "Kubelt"
