@@ -60,7 +60,7 @@
 (re-frame/reg-event-db ::connect-account
   (fn [db [_ wallet]]
     (let [web3 ^js/Web3 (:web3 db)
-          _ (log/debug {:msg "connect-account" :wallet wallet :web3 web3 :db db})
+          _ (log/debug {:msg "connect-account" :wallet wallet :web3 web3})
           eth (.-eth web3)]
       (log/debug {:msg "eth provider" :provider (.-providers eth)})
       (-> (.requestAccounts eth)
