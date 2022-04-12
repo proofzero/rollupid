@@ -2,7 +2,7 @@
 ;;
 ;; kaocha test runner configuration
 ;;
-;; $ clj -M:kaocha unit
+;; $ clj -M:test <test suite id>
 
 #kaocha/v1
 {:tests [;; [unit] all unit tests

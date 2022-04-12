@@ -31,14 +31,25 @@
  :aliases
  {:dev {:extra-paths ["src/dev"]
         :extra-deps {fipp/fipp {:mvn/version "0.6.25"}}}
-  :test {:extra-paths ["src/test"]
-         :extra-deps {}}
 
   ;; Generate literate docs from the source code using sidenote (a fork
   ;; of marginalia).
   :sidenotes {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
          :main-opts ["-m" "sidenotes.core"]}
 
+  ;; Unit test runner.
+  ;; > https://github.com/lambdaisland/kaocha
+  ;;
+  ;; Execute the tests configured in tests.edn:
+  ;; $ clojure -M:kaocha
+  :test {:extra-paths ["src/test"]
+         :extra-deps {lambdaisland/kaocha {:mvn/version "1.65.1029"}
+                      org.clojure/test.check {:mvn/version "1.1.1"}
+                      org.clojure/test.generative {:mvn/version "1.0.0"}
+                      org.clojure/tools.namespace {:mvn/version "1.2.0"}
+                      org.clojure/tools.trace {:mvn/version "0.7.11"}}
+         :main-opts ["-m" "kaocha.runner"]}
+
   ;; $ clojure -M:lint --lint src/
-  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.03.09"}}
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.04.08"}}
          :main-opts ["-m" "clj-kondo.main"]}}}
