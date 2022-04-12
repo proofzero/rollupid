@@ -5,9 +5,6 @@
    [clojure.string :as cstr])
   (:require
    [com.kubelt.lib.json :as lib.json]
-   [com.kubelt.lib.jwt :as jwt]
-   [com.kubelt.lib.multiaddr :as ma]
-   [com.kubelt.lib.octet :as lib.octet]
    [com.kubelt.proto.http :as http]))
 
 ;; TODO .cljc
@@ -55,7 +52,9 @@
         port (get-in sys [:client/p2p :p2p/write :address/port])
         body {:nonce nonce :signature signature}
         body-str (lib.json/edn->json-str body)
+
         path (cstr/join "" ["/@" core "/auth/verify"])
+
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
