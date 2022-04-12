@@ -6,7 +6,8 @@
    [dapp.components.header :as header]
    [dapp.wallet :as wallet]
    [ethers :as ethers]
-   [re-frame.core :as re-frame])
+   [re-frame.core :as re-frame]
+   [taoensso.timbre :as log])
   (:require
     ["web3modal$default" :as Web3Modal]
     ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]))
@@ -29,7 +30,7 @@
                       (resolve digest)))))))))
 
 (defn open-modal []
-  (prn "open the modal")
+  (log/trace "open the modal")
   (let [modal (Web3Modal. (clj->js provider-options))]
     ;(.clearCachedProvider modal)
     (-> (.connect modal)
@@ -47,7 +48,7 @@
                                 (re-frame/dispatch [::wallet/set-current-wallet new-wallet])))))))
         (.catch (fn [error]
                   (.clearCachedProvider modal)
-                  (js/console.log error))))))
+                  (log/error {:msg "web3 modal error" :error error}))))))
 
 (defn connect-wallet
   []
