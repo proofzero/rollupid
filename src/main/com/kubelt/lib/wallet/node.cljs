@@ -58,7 +58,7 @@
 (defn- wallet-dir
   "Return the wallet directory path as a string for an application."
   [app-name]
-  (let [config-path (lib.path/config app-name)
+  (let [config-path (lib.path/data app-name)
         wallet-path (.join path config-path "wallets")]
     wallet-path))
 
