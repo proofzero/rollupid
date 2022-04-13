@@ -3,8 +3,7 @@
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.jwt :as jwt]
-   [com.kubelt.sdk.v1 :as sdk]))
+   [com.kubelt.lib.jwt :as jwt]))
 
 (defonce command
   {:command "sign"
@@ -15,10 +14,5 @@
               yargs)
 
    :handler (fn [args]
-              (let [kbt (sdk/init)]
-                (if (lib.error/error? kbt)
-                  (prn (:error kbt))
-                  (let [payload {:foo "bar"}]
-                      (println "TODO Sign payload to get JWT")
-                      ;;(jwt/sign payload)
-                      (sdk/halt! kbt)))))})
+              (println "TODO Sign payload to get JWT")
+              #_(jwt/sign payload))})
