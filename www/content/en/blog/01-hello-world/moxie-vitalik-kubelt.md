@@ -10,33 +10,6 @@ draft: false
 contributors: ["@alfl", "@maurerbot"]
 ---
 
-```
-Notes to cover off Skynet
-- go across all ecoysytems both blockchian and classical
-> Users on Skynet only have to onboard one time. Once you’ve created an account, that account can follow you from your chatroom to your blogger to your banking. Once you’ve uploaded a profile picture, every single app in the Skynet ecosystem can reference and load your profile picture, and you can use the same username across the entire ecosystem.
-- private cores!
-
-- Users and developers alike prefer convenience to security" is a bad assumption
-
-> Developers also enjoy benefits in the decentralized world. Applications don’t have any operational overhead, as the costs are shouldered by the users and the infrastructure is managed by the network. The is no need to create AWS accounts or spin up dedicated servers, and no need to plan for a contingency of hyperbolic growth. The network automatically handles many pain points, and allows the developers to largely focus on writing features and engaging users.
-- I AGREE
-
-- [ details about the Kubelt Cores client-server model ]
-- [more secure and no blockchain fees]
-
-- No browser extension needed; verify against the cores
-
-- Possibilities of cores in hardware in a peer to peer configuration (your crypto hosted locally for 100% local first)
-
-- Future isn't web2 v web3, just a bigger, better, user-centric web.
-
-
-- The answer is right infront of you, the wallets
-
-- why it's better than solid and skynet is you don't have to be just on our ecosystem to get value
-
-```
-
 Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure but also, unknowlingly provided the arguments for why and even how to address them.
 
 In summary, Moxie argues people will never run their own servers and we tend to agree. For the majoirty of users, the convenience of centralized services far outweigh any known or otherwise unknown trade offs in data privacy.
@@ -85,6 +58,10 @@ Starting from the early days of the Message Object Model (SmallTalk, Corba) and 
 
 All that's missing is content management for data and compute!
 
+> Developers also enjoy benefits in the decentralized world. Applications don’t have any operational overhead, as the costs are shouldered by the users and the infrastructure is managed by the network. The is no need to create AWS accounts or spin up dedicated servers, and no need to plan for a contingency of hyperbolic growth. The network automatically handles many pain points, and allows the developers to largely focus on writing features and engaging users.
+
+- I AGREE
+
 ### Content is Everything
 
 To truly decentralize an application you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, with the exception of [Filecoin](ipns://filecoin.io/). That said, you can't run a blockchain on the client which is why a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
@@ -97,11 +74,23 @@ The same content addresses can pack and fully encrypt signatures, schemas, versi
 
 ### Permissioning = Better Outcomes for Everyone
 
-- no accounts / complex identity
+- no new accounts / complex identity (compare to others like skynet)
+- Users and developers alike prefer convenience to security" is a bad assumption (skynet)
+- entry point into a peer networl
 - pro-blockchain and pro-web2
 - governace
 - integrations
 - extending traditional into web3
+- messaging
+- open banking and open patient records
+
+### What's Next?
+
+vitalik peer to peer response
+
+- Possibilities of cores in hardware in a peer to peer configuration (your crypto hosted locally for 100% local first)
+
+Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
 
 ## Enter Kubelt
 
@@ -116,12 +105,6 @@ Imagine your smart contracts being token-gated into your own API ecosystem, more
 Moxie winds up with a great point, and we'll end on the same note:
 
 > We should try to reduce the burden of building software.
-
-### What's Next?
-
-vitalik peer to peer response
-
-Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
 
 ## Enter Vitalik
 
