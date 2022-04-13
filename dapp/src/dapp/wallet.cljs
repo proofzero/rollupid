@@ -106,3 +106,20 @@
 (re-frame/reg-sub ::current-account
   (fn [db]
     (:current-account db)))
+
+(re-frame/reg-sub
+ ::ctx
+ (fn [db]
+   (:sdk/ctx db)))
+
+(re-frame/reg-sub
+ ::wallet
+ (fn [db]
+   (get-in db [:sdk/ctx :crypto/wallet])))
+
+(re-frame/reg-sub
+ ::logged-in?
+ :<- [::ctx]
+ :<- [::wallet]
+ (fn [[ctx {:wallet/keys [address] :as _wallet}] _]
+   (sdk.core/logged-in? ctx address)))
