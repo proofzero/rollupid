@@ -39,11 +39,11 @@ Notes to cover off Skynet
 
 Back in January [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html) and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure but also, unknowlingly provided the arguments for why and even how to address them.
 
-In summary, Moxie argues people will never run their own servers and we tend to agree. For the majoirty of users, the convenience of centralized services far outweigh any known trade offs in data privacy or other unkown.
+In summary, Moxie argues people will never run their own servers and we tend to agree. For the majoirty of users, the convenience of centralized services far outweigh any known or otherwise unknown trade offs in data privacy.
 
 The same convenience of centralized platforms applied to developers seems obviously true when you look at the big uptake in platforms like Infura and OpenSea. Ignoring any associated risks, Moxie himself claims **centralized platforms** permit faster innovation than **decentralized protocols** but, is this a valid comparison?
 
-**Platforms** and **protocols** are two very different categories. The former is generally built on the latter introducing complex, opininated technologies, frameworks or otherwise. Ultimately, conformance to these opinions, through various incentives, is what makes centralized services so sticky and exploitive.
+**Platforms** and **protocols** are two very different categories. The former is generally built on the latter introducing opininated technologies and services. These platforms force developers to conform applications to their opinions -- the greater the conformance the stickier the technology and risk of exploitation.
 
 But what if you could push opinionation to the edge? How could that improve outcomes and experience for both developer and user?
 
@@ -51,19 +51,23 @@ As a team building a part of the decentralized future, here's our take.
 
 ### The Centralization Success Trap
 
-A major selling point of centralization is the convenience of data aggregration and co-location of compute. When data and compute is co-located developing applications becomes very straight forward (more on that later). Overtime, major platforms have rolled out hyper opinionated services that force developers to trade greater optionality for accelerated development.
+A major selling point of centralization is the convenience of data aggregration and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abastract the relationship between data and compute, the easier it is to create secure applications.
+
+Platforms acheive this value through focused, hyper opinionated services **in the middle** and, as confirmed by Moxie, this is a massive advantage for applications in early stages of development as less resources are required to get to innovate. But what's the catch?
 
 Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until its not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
 
-### The Right Tool for the Right Problem
+### The Right Protocol for the Right Problem
 
-If co-location of data and compute makes for a better developer experience and small opinionted services accelerate development, how can we think differently to solve for this in a decentralized manner?
+If co-location of data and compute makes for a better developer experience and focused opinionted services accelerate development, how can we apply this in a dencentralized platform and get similar results without the trade offs?
 
-Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable trade off in DX and UX for trust and security. For everything else like application logic, content, and other **eventually consistent** use cases this trade off for developers and users is not acceptable.
+Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable cost in DX and UX for increased trust, security and transparency. For everything else like application logic, content, and other **eventually consistent** use cases this cost for developers and users is not acceptable.
 
-Afterall, it is the eventually consistent use case that makes up the bulk of all applications and this is where the team at Kubelt did a lot of thinking about how to create the **decentralized middle tier**.
+It is, afterall, the eventually consistent use case that makes up the bulk of all applications. This is where the team at Kubelt did a lot of thinking about how to develop a **decentralized middle tier**.
 
 ### The User is the Application
+
+If blockchains are decentralized and clients are decenteralized
 
 What if the user was also co-located with the data and compute? That might give us a several qualities that we want:
 
