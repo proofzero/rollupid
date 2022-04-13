@@ -67,23 +67,29 @@ It is, afterall, the eventually consistent use case that makes up the bulk of al
 
 ### The User is the Application
 
-If blockchains are decentralized and clients are decenteralized
+Where we started thinking is, if blockchains are decentralized and clients are decenteralized, could we push all the opinions out to the user at the the edge?
 
-What if the user was also co-located with the data and compute? That might give us a several qualities that we want:
+In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is user sized, developers can user their favorite tools and libraries, simplifying their stack while maintaining:
 
--[x] User privacy
+✅ Better privacy \
+✅ Better costs \
+✅ Better control
 
-Edge, local-first, user-centric
+However, all of this is easier said then done! So, we decided to take a look around and see if any work in this area has been attempted in the past? What we found was an evolution ready to pop!
 
-could very well be moved off chain using the same cryptographic primatives (wallet metaphor)
+Starting from the early days of the Message Object Model (SmallTalk, Corba) and the more recent State Actor Model (Erlang, Akka) we finally realized, the answer we were looking for was right infront of us, Wallets! With crypto wallets, developers could have ubiqitous local-first access to:
 
-Convenience and privacy (small and bundled)
+🤯 Local-first user cryptography \
+🤯 Messaging APIs \
+🤯 Blockchains
+
+All that's missing is content management for compute and data!
+
+### Content is Everything
+
+In a decentralized network
 
 vitalik peer to peer response
-
-add images
-
-### Interopable and Composabie
 
 not ecosytems (e.g.sky net)
 
