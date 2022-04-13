@@ -69,7 +69,7 @@ It is, afterall, the eventually consistent use case that makes up the bulk of al
 
 Where we started thinking is, if blockchains are decentralized and clients are decenteralized, could we push all the opinions out to the user at the the edge?
 
-In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is user sized, developers can user their favorite tools and libraries, simplifying their stack while maintaining:
+In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is **user sized**, developers can user their favorite tools and libraries, simplifying their stack while maintaining:
 
 ✅ Better privacy \
 ✅ Better costs \
@@ -77,33 +77,33 @@ In doing so, we should be able to co-locate everything with the user and take ad
 
 However, all of this is easier said then done! So, we decided to take a look around and see if any work in this area has been attempted in the past? What we found was an evolution ready to pop!
 
-Starting from the early days of the Message Object Model (SmallTalk, Corba) and the more recent State Actor Model (Erlang, Akka) we finally realized, the answer we were looking for was right infront of us, Wallets! With crypto wallets, developers could have ubiqitous local-first access to:
+Starting from the early days of the Message Object Model (SmallTalk, Corba) and the more recent State Actor Model (Erlang, Akka) we finally realized, the answer we were looking for was right infront of us, **Wallets!** With crypto wallets, developers could have ubiqitous local-first access to:
 
 🤯 Local-first user cryptography \
 🤯 Messaging APIs \
 🤯 Blockchains
 
-All that's missing is content management for compute and data!
+All that's missing is content management for data and compute!
 
 ### Content is Everything
 
-In a decentralized network
+To truly decentralize an application you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, with the exception of [Filecoin](ipns://filecoin.io/). That said, you can't run a blockchain on the client which is why a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
+
+By backing IPFS with Filecoin you can ensure content is always available to the network and leverage the power of **content addressing** to encode any kind of content.
 
 vitalik peer to peer response
 
 not ecosytems (e.g.sky net)
 
+ink and switch
+
 pro-blockchain and pro-web2
 
-### Better Outcomes for users and business
+### Permissioning = Better Outcomes for Everyone
 
-- cost
-- privacy
 - governace
 - integrations
 - extending traditional into web3
-
-### Novelity and examples
 
 ## Enter Kubelt
 
