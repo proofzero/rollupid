@@ -1,12 +1,9 @@
 ; Wallet
 (ns dapp.wallet
   (:require
-   [re-frame.core :as re-frame])
-  (:require
-    ["web3modal$default" :as Web3Modal]
-    ["@coinbase/wallet-sdk" :as CoinbaseWalletSDK]
-    ["walletlink" :as WalletLink]
-    ["web3" :as Web3]))
+   [com.kubelt.sdk.v1.core :as sdk.core]
+   [re-frame.core :as re-frame]
+   [taoensso.timbre :as log]))
 
 ; The wallet ns manages events and effects related to wallet based auth
 ; and interacts with the SDK to fulfill a full ZK-Auth
@@ -17,15 +14,11 @@
 (defn accounts-changed
   "Helper function that dispatches an account changed event"
   [event]
-  (prn "accounts-changed")
-  (js/console.log event)
   (re-frame/dispatch ::accounts-changed))
 
 (defn chain-changed
   "Helper function that dispatches a chain changed event"
   [event]
-  (prn "chain-changed")
-  (js/console.log event)
   (re-frame/dispatch ::chain-changed))
 
 
@@ -36,47 +29,41 @@
 
 ;; Events
 
-; Bootstrap the db when a provider is detected
-(re-frame/reg-event-db ::provider-detected
-  (fn [db [_ provider]]
-    (prn "provider-detected")
-    (let [web3 (Web3. provider)
-          ; TODO: replace with check for JWT session
-          current-account (.-defaultAccount (.-eth web3))] 
-      (prn "current-account")
-      (prn current-account)
-      (assoc db :provider provider :web3 web3 :current-account current-account))))
-
-; Bootstrap the db when a provider is detected
-(re-frame/reg-event-db ::modal-ready
-  (fn [db [_ web3-modal]]
-    (prn "modal-ready")
-    (js/console.log web3-modal)
-    (assoc db :modal web3-modal)))
-
-; Pop up the modal
-(re-frame/reg-event-db ::web3-modal
-  (fn [db _ provider]
-    (prn "provider received")
-    (assoc db :provider provider)))
-
-
+;; `::connect-account` isn't used but is kept for reference
+;; when working on integrating new providers
 ;Handle a connection to different wallets and kick off the zk-auth
-(re-frame/reg-event-db ::connect-account
+#_(re-frame/reg-event-db
+ ::connect-account
   (fn [db [_ wallet]]
-    (prn wallet)
     (let [web3 ^js/Web3 (:web3 db)
+          _ (log/debug {:msg "connect-account" :wallet wallet :web3 web3})
           eth (.-eth web3)]
-      (prn "providers list") 
-      (js/console.log (.-providers eth))
-      (-> (.requestAccounts eth) 
-        (.then (fn [accounts] 
-                 ; TODO: 
+      (log/debug {:msg "eth provider" :provider (.-providers eth)})
+      (-> (.requestAccounts eth)
+        (.then (fn [accounts]
+                 ; TODO:
                  ; - check for which account is selected
                  ; - call the SDK "login"
-                 (prn "accounts")
-                 (js/console.log (first accounts))
+                 (log/debug {:msg "found account" :account (first accounts)})
                  (assoc db :current-account (first accounts))))))))
+
+(re-frame/reg-event-fx
+ ::set-current-wallet
+ (fn [{:keys [db]} [_ wallet]]
+   (let [ctx (:sdk/ctx db)
+         ;; `sdk.core/set-wallet` also validates the structure of `wallet`
+         new-ctx (sdk.core/set-wallet ctx wallet)]
+     {:dispatch [::authenticate new-ctx]})))
+
+(re-frame/reg-event-db
+ ::authenticate
+ (fn [db [_ new-ctx]]
+   (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
+     (.finally (sdk.core/authenticate! new-ctx wallet-address)
+               (fn [auth-ctx]
+                 (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
+                 (log/info {:auth-ctx auth-ctx})))
+     (assoc db :sdk/ctx new-ctx))))
 
 ; TODO
 ; Handle the account changed event

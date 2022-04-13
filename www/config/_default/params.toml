@@ -3,8 +3,8 @@
 ## Homepage
 title = "Kubelt"
 titleSeparator = "-"
-titleAddition = "Decentralized content management"
-description = "Decentralized content management"
+titleAddition = "Decentralizes applications."
+description = "Kubelt decentralizes applications."
 
 ## Documentation
 docsVersion = "next"
@@ -13,18 +13,18 @@ docsVersion = "next"
 images = ["images/sociallogo.png"]
 ogLocale = "en_US"
 domainTLD = "kubelt.com"
-titleHome = "Kubelt - Decentralized content management"
+titleHome = "Kubelt - Decentralizes applications."
 
 ## Twitter Cards
-twitterSite = "@kubeltcms"
-twitterCreator = "@kubeltcms"
+twitterSite = "@kubelt"
+twitterCreator = "@kubelt"
 
 ## JSON-LD
 # schemaType = "Person"
 schemaType = "Organization"
 schemaName = "Kubelt"
 schemaAuthor = "Kubelt"
-schemaAuthorTwitter = "https://twitter.com/kubeltcms"
+schemaAuthorTwitter = "https://twitter.com/kubelt"
 schemaAuthorLinkedIn = "https://www.linkedin.com/company/kubelt/"
 schemaAuthorGitHub = "https://github.com/kubelt"
 schemaLocale = "en-US"
@@ -53,11 +53,29 @@ portraitPhotoWidths = [800, 700, 600, 500]
 lqipWidth = "20x"
 smallLimit = "300"
 
+# Navbar
+navbarIcon = "images/Asset-4.svg"
+
+navbarHiringUrl = "https://kubelt.notion.site/Jobs-4c1b8408d2244797924e53c9eae65f43"
+navbarHiringCopy = "We’re hiring"
+
+# Access
+accessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
+accessCopy = "Get Access"
+
+# Whitepaper
+whitepaperUrl = "/docs/next/basics/kubelt-cms-whitepaper"
+
+# Docs
+howItWorks = "/docs/next/basics/how-it-works"
+
 # Footer
 footer = "Powered by Hugo and Kubelt"
+footerIcon = "images/Asset-4.svg"
+footerCopy = "Decentralized content management, content delivery and content applications."
 
 # Feed
-copyRight = "Copyright (c) 2022 Proof Zero, Inc."
+copyrightHolder = "Kubelt"
 
 # Alert
 alert = false
@@ -69,7 +87,7 @@ alertText = "Introducing the Doks child theme, several DX + UX updates, and more
 # repoHost [Github | Gitea | GitLab | Bitbucket | BitbucketServer ] is used for building the edit link based on git hoster
 repoHost = "GitHub"
 #repoHost = "Gitea"
-docsRepo = "https://github.com/kubelt"
+docsRepo = "https://github.com/kubelt/kubelt"
 docsRepoBranch = "main"
 docsRepoSubPath = ""
 editPage = false

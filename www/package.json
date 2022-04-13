@@ -52,7 +52,7 @@
     "katex": "^0.15",
     "lazysizes": "^5.3",
     "markdownlint-cli2": "^0.4.0",
-    "mermaid": "^8.13",
+    "mermaid": "^8.14",
     "node-fetch": "^3.2",
     "postcss": "^8.4.6",
     "postcss-cli": "^9.1.0",

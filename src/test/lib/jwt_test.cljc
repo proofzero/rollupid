@@ -1,15 +1,15 @@
 (ns lib.jwt-test
   "Test JWT operations."
-  (:import
-   [goog.crypt base64])
-  (:require
-   #?@(:node [["crypto" :as crypto]]))
-  (:require
-    [cljs.test :as t :refer [deftest is testing use-fixtures]]
-    [clojure.string :as str])
-  (:require
-    [goog.object]
-    [malli.core :as malli])
+  #?(:node
+     (:require
+      ["crypto" :as crypto]))
+  #?(:cljs
+     (:require
+      [cljs.test :as t :refer [deftest is testing use-fixtures]]
+      [goog.iter])
+     :clj
+     (:require
+      [clojure.test :as t :refer [deftest is testing use-fixtures]]))
   (:require
    [com.kubelt.lib.jwt :as jwt]))
 
@@ -32,30 +32,33 @@
                 :pubkey (jwt/encode key-public)}))
 
 ;;;;;;;;; low level tests ;;;;;;;
-(deftest base64-roundtrip
-  (testing "base64 encode and decode"
-    (let [challenge "Test me !@#/=34@#$"
-          encoded (jwt/encode challenge)
-          decoded (jwt/decode encoded)]
-      (is (= challenge decoded)))))
 
-(deftest low-level-crypto-sign-verify
-  (testing "low level crypto sign and verify"
-    #?(:node
+#?(:node
+   (deftest base64-roundtrip
+     (testing "base64 encode and decode"
+       (let [challenge "Test me !@#/=34@#$"
+             encoded (jwt/encode challenge)
+             decoded (jwt/decode encoded)]
+         (is (= challenge decoded))))))
+
+#?(:node
+   (deftest low-level-crypto-sign-verify
+     (testing "low level crypto sign and verify"
        (let [claims "test-payload"
              digest (-> (.createSign crypto "RSA-SHA256")
                         (.update claims)
                         (.sign key-private "base64"))]
          (let [verified (-> (.createVerify crypto "RSA-SHA256")
                             (.update claims)
-                            (.verify key-public, digest, "base64"))]
+                            (.verify key-public digest "base64"))]
            (is (= verified true)))))))
 
 ;;;;;;;;; unit test ;;;;;;;;;;;;
 ;; covers create, sign and validate
-(deftest create-test-jwt
-  (testing "create and verify jwt"
-    #?(:node
+
+#?(:node
+   (deftest create-test-jwt
+     (testing "create and verify jwt"
        (let [signing-key (jwt/prepare-key key-private)
              header (jwt/create-header "RS256" "1h")
              payload (jwt/prepare-payload claims)

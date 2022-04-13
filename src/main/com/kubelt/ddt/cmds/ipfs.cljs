@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.ipfs
   "CLI setup for 'ipfs' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.ipfs.dag :as ipfs.dag]
    [com.kubelt.ddt.cmds.ipfs.key :as ipfs.key]

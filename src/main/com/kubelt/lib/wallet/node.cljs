@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.wallet.node
   "The Node.js implementation of a crypto wallet wrapper."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [goog.object :as gobj])
   (:require
@@ -19,26 +19,31 @@
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.octet :as lib.octet]
-   [com.kubelt.lib.path :as lib.path]))
+   [com.kubelt.lib.path :as lib.path]
+   [com.kubelt.lib.promise :refer [promise]]))
 
 
 (defn- make-sign-fn
   "Given an Ethereum wallet, return a signing function that uses the
-  wallet's private key to sign the digest of some given data."
+  wallet's private key to sign the digest of some given data. To match
+  what happens in the browser, the signing function returns a promise
+  that resolves to the signature value."
   [eth-wallet]
   (fn [data]
-    (let [private-key (.-privateKey eth-wallet)
-          signing-key (SigningKey. private-key)
+    (promise
+     (fn [resolve reject]
+       (let [private-key (.-privateKey eth-wallet)
+             signing-key (SigningKey. private-key)
 
-          data-length (count data)
-          prefix (str "\u0019Ethereum Signed Message:\n" data-length)
-          prefix+data (str prefix data)
-          data-bytes (lib.octet/as-bytes prefix+data)
+             data-length (count data)
+             prefix (str "\u0019Ethereum Signed Message:\n" data-length)
+             prefix+data (str prefix data)
+             data-bytes (lib.octet/as-bytes prefix+data)
 
-          digest (keccak256 data-bytes)
-          signature-raw (.signDigest signing-key digest private-key)
-          signature (gobj/get signature-raw "compact")]
-      signature)))
+             digest (keccak256 data-bytes)
+             signature-raw (.signDigest signing-key digest private-key)
+             signature (gobj/get signature-raw "compact")]
+         (resolve signature))))))
 
 (defn- random-wallet
   []
@@ -53,7 +58,7 @@
 (defn- wallet-dir
   "Return the wallet directory path as a string for an application."
   [app-name]
-  (let [config-path (lib.path/config app-name)
+  (let [config-path (lib.path/data app-name)
         wallet-path (.join path config-path "wallets")]
     wallet-path))
 
@@ -63,7 +68,11 @@
   [app-name]
   (let [wallet-dirp (wallet-dir app-name)]
     (when-not (.existsSync fs wallet-dirp)
-      (.mkdirSync fs wallet-dirp))
+      (let [mode "0700"
+            recursive? true
+            options #js {:mode mode
+                         :recursive recursive?}]
+        (.mkdirSync fs wallet-dirp options)))
     wallet-dirp))
 
 (defn- name->path

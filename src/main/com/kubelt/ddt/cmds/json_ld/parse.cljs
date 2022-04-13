@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.json-ld.parse
   "Parse a JSON-LD file to RDF/cljs format."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["fs" :as fs]
    ["path" :as path])

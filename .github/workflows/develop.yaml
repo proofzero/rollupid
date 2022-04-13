@@ -39,7 +39,6 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
@@ -57,30 +56,11 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
       - run: npm run build:kbt:develop
-
-  build-p2p:
-    needs: changes
-    if: needs.changes.outputs.sdk == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
-      - run: npm install
-      - uses: turtlequeue/setup-babashka@v1.3.0
-        with:
-          babashka-version: 0.7.8
-      - run: npm run build:p2p:develop
 
   build-sdk:
     needs: changes
@@ -93,7 +73,6 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
@@ -111,7 +90,6 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
@@ -184,7 +162,6 @@ jobs:
   #         node-version: '16'
   #         cache: 'npm'
   #         cache-dependency-path: package-lock.json
-  #     - run: sudo apt-get install -y libsystemd-dev
   #     - run: npm install
   #     - uses: turtlequeue/setup-babashka@v1.3.0
   #       with:
@@ -202,12 +179,15 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
-      - run: npm run test:dapp:develop
+      # Compile and run dapp
+      - run: npm run build:dapp:release
+      - run: npm run test:dapp:ci:run
+      # Run tests AFTER since Cypress needs server running
+      - run: npm run test:dapp:ci
 
   test-plugin-sanity:
     needs: changes
@@ -220,7 +200,6 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: sudo apt-get install -y libsystemd-dev
       - run: npm install
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:

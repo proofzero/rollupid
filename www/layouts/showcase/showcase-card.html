@@ -1,0 +1,12 @@
+<div class="card h-100">
+  {{ $image := index .Params.images 0 -}}
+  {{ .Scratch.Set "src" $image -}}
+  {{ .Scratch.Set "alt" .Title -}}
+  {{ .Scratch.Set "class" "card-img-top" -}}
+  {{ partial "main/img.html" . }}
+  <div class="card-body">
+    <h5 class="card-title mt-2"><a class="card-link stretched-link text-dark text-decoration-none" href="{{ .RelPermalink }}">{{ .Params.title | title }}</a></h5>
+    <p class="card-text mb-2">{{ .Params.lead | safeHTML | truncate 40 }}</p>
+    {{ if .Params.types -}}<p class="card-text mt-2"><small>{{ range $index, $type := .Params.types }}{{ if gt $index 0 }}, {{ end }}<a class="stretched-link position-relative" href="{{ "/showcase/types/" | relURL }}{{ . | urlize }}/">{{ . | humanize }}</a>{{ end -}}</small></p>{{ end -}}
+  </div>
+</div>

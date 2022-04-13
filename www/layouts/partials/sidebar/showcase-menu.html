@@ -1,0 +1,49 @@
+<!--
+{{ $currentPage := . -}}
+{{ range .Site.Menus.showcase -}}
+  <h3>{{ .Name }}</h3>
+  {{ if .HasChildren -}}
+  <ul class="list-unstyled">
+    {{ range .Children.ByWeight.Reverse -}}
+      {{- $active := or ($currentPage.IsMenuCurrent "showcase" .) ($currentPage.HasMenuCurrent "showcase" .) -}}
+      {{- $active = or $active (eq .Name $currentPage.Title) -}}
+      <li><a class="docs-link{{ if $active }} active{{ end }}" href="{{ .URL | relURL }}">{{ .Name }}</a></li>
+    {{ end -}}
+  </ul>
+  {{ end -}}
+{{ end -}}
+-->
+
+{{ $currentPage := . -}}
+
+<h3>Browse</h3>
+<ul class="list-unstyled">
+  {{ $active := or (eq $currentPage.Title "Showcase") (eq .Type "showcase") -}}
+  <li><a class="docs-link d-flex{{ if $active }} active{{ end }}" href="/showcase/"><span>All showcase</span><span class="badge bg-light text-dark fw-normal ms-auto me-lg-4">{{ len (where .Site.RegularPages "Section" "==" "showcase") }}</span></a></li>
+</ul>
+
+<h3>Types</h3>
+<ul class="list-unstyled">
+  {{ range .Site.Taxonomies.types }}
+    {{ $active := eq .Page.Title $currentPage.Title -}}
+    <li><a class="docs-link d-flex{{ if $active }} active{{ end }}" href="{{ .Page.Permalink }}"><span>{{ .Page.Title | title }}</span><span class="badge bg-light text-dark fw-normal ms-auto me-lg-4">{{ .Count }}</span></a></li>
+  {{ end }}
+</ul>
+
+<h3>Capabilities</h3>
+<ul class="list-unstyled">
+  {{ range .Site.Taxonomies.capabilities }}
+    {{ $active := eq .Page.Title $currentPage.Title -}}
+    <li><a class="docs-link d-flex{{ if $active }} active{{ end }}" href="{{ .Page.Permalink }}"><span>{{ .Page.Title | title }}</span><span class="badge bg-light text-dark fw-normal ms-auto me-lg-4">{{ .Count }}</span></a></li>
+  {{ end }}
+</ul>
+
+<h3>Tools</h3>
+<ul class="list-unstyled">
+  {{ range .Site.Taxonomies.tools }}
+    {{ $active := eq .Page.Title $currentPage.Title -}}
+    <li><a class="docs-link d-flex{{ if $active }} active{{ end }}" href="{{ .Page.Permalink }}"><span>{{ .Page.Title | title }}</span><span class="badge bg-light text-dark fw-normal ms-auto me-lg-4">{{ .Count }}</span></a></li>
+  {{ end }}
+</ul>
+
+<h3 class="sidebar-link"><a href="https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf">Get Early Access →</a></h3>

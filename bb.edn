@@ -101,14 +101,6 @@
   {:doc "Build release version of kbt command line application"
    :task (shell "npx shadow-cljs release kbt")}
 
-  build:p2p:develop
-  {:doc "Build development version of the p2p service"
-   :task (shell "npx shadow-cljs compile p2p")}
-
-  build:p2p:release
-  {:doc "Build release version of the p2p service"
-   :task (shell "npx shadow-cljs release p2p")}
-
   build:sdk:develop
   {:doc "Build development version of the sdk for node"
    :task (shell "npx shadow-cljs compile sdk")}
@@ -132,7 +124,7 @@
 
   build:dapp:develop
   {:doc "Build a development version of dapp"
-   :task (shell "npx shadow-cljs compile dapp")} ;; TODO: add tests
+   :task (shell "npx shadow-cljs compile dapp")}
 
   build:dapp:css-watch
   {:doc "Watch dapp CSS and rebuild when changed"
@@ -142,16 +134,38 @@
   {:doc "Watch dapp sources and build development version when changed"
    :task (shell "npx shadow-cljs watch dapp browser-test karma-test")}
 
+  build:dapp:cypress-watch
+  {:doc "Launch Cypress and run tests when changed"
+   :task (shell {:dir "dapp/"} "npx cypress open")}
+
   -build:dapp:watch
   {:doc "Watch all dapp sources and rebuild development version when changed"
    :depends [build:dapp:css-watch build:dapp:develop-watch]}
 
+  -build:dapp:watch-test
+  {:doc "Watch all dapp sources/tests and rebuild development version when changed"
+   :depends [build:dapp:css-watch build:dapp:develop-watch build:dapp:cypress-watch]}
+
   build:dapp:watch
   {:task (run '-build:dapp:watch {:parallel true})}
 
-  build:dapp:release
+  build:dapp:watch-test
+  {:task (run '-build:dapp:watch-test {:parallel true})}
+
+  build:dapp:release-css
   {:doc "Build release version of dapp CSS"
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
+   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js")}
+
+  build:dapp:release-cljs
+  {:doc "Build release version of dapp"
+   :task (shell "npx shadow-cljs release dapp")}
+
+  -build:dapp:release
+  {:doc "Build release version of dapp with CSS"
+   :depends [build:dapp:release-css build:dapp:release-cljs]}
+
+  build:dapp:release
+  {:task (run '-build:dapp:release {:parallel true})}
 
   build:plugin:sanity
   {:doc "Build release version of the plugin for Sanity CMS"
@@ -166,7 +180,7 @@
 
   watch:plugin:sanity
   {:doc "Build plugin for Sanity CMS on file change"
-   :depends [build:sdk-web:release]
+   :depends [build:sdk-web:develop]
    :task (shell "npx lerna run watch --scope sanity-plugin-kubelt")}
 
   test:sdk:cljs:develop
@@ -220,14 +234,21 @@
   {:doc "Run web tests using headless browser"
    :depends [test:web:ci:compile test:web:ci:run]}
 
-  test:dapp:develop
-  {:doc "Run dapp tests against development version"
-   :depends-on [build:dapp:develop]
-   :task (shell "npx shadow-cljs compile dapp")} ;; TODO: add test
+  test:dapp:ci:run
+  {:doc "Serve dapp server after files are compiled"
+   :task (shell "npx shadow-cljs start dapp")}
+
+  test:dapp:ci
+  {:doc "Run dapp Cypress tests"
+   ;; needs to have the dapp server running
+   ;; can be run against `release` or `development` versions
+   :task (shell {:dir "dapp/"} "npx cypress run")}
+
+  -test:dapp:release
+  {:depends [build:dapp:release test:dapp:ci:run test:dapp:ci]}
 
   test:dapp:release
-  {:doc "Run dapp tests against release version"
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css && npx shadow-cljs release dapp")}
+  {:task (run '-test:dapp:release)}
 
   test:plugin:sanity
   {:doc ""

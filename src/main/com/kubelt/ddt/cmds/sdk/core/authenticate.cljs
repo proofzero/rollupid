@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.core.authenticate
   "Invoke the 'sdk core authenticate' method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [<!]]
    [clojure.string :as cstr])
@@ -19,7 +19,13 @@
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
-              (ddt.options/options yargs)
+              (let [;; Enforce string type, otherwise yargs parses a
+                    ;; wallet address starting with "0x" as a big
+                    ;; integer.
+                    core-config #js {:describe "a @core name"
+                                     :type "string"}]
+                (.positional yargs "core" core-config)
+                (ddt.options/options yargs))
               yargs)
 
    :handler (fn [args]
@@ -39,10 +45,12 @@
                                           :p2p/read maddr
                                           :p2p.read/scheme scheme
                                           :p2p/write maddr
-                                          :p2p.write/scheme scheme})
-                           result (<! (sdk.core/authenticate! kbt core))]
-                       (if (lib.error/error? result)
-                         (prn (:error kbt))
-                         ;; TODO encrypt(?) and store returned JWT
-                         )
-                       (sdk/halt! kbt)))))))})
+                                          :p2p.write/scheme scheme})]
+                       (-> (sdk.core/authenticate! kbt core)
+                           (.then (fn [result]
+                                    (if (lib.error/error? result)
+                                      (prn (:error kbt))
+                                      ;; TODO encrypt(?) and store returned JWT
+                                      (prn result))))
+                           (.then (fn []
+                                    (sdk/halt! kbt))))))))))})

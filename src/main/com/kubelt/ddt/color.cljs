@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.color
   "Color-related utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["@colors/colors" :as colors]))
 

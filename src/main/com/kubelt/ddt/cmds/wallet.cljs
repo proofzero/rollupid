@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.wallet
   "CLI setup for 'wallet' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.wallet.init :as wallet.init]
    [com.kubelt.ddt.cmds.wallet.ls :as wallet.ls]

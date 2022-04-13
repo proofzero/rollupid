@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.json.convert
   "Convert an input JSON file to a CAR."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["fs" :as fs]
    ["path" :as path])

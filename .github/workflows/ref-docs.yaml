@@ -33,11 +33,12 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: DeLaGuardo/setup-clojure@4.0
+      - uses: DeLaGuardo/setup-clojure@5.1
         with:
-          cli: 1.11.0.1097
+          cli: 1.11.0.1100
           #lein: latest
           #boot: latest
+          #bb: latest
       - name: build literate docs
         run: clojure -M:sidenotes
         shell: bash

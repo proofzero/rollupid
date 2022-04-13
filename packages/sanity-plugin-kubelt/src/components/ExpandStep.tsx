@@ -4,20 +4,16 @@ import {
   Button,
   Card,
   Dialog,
-  Flex,
   Inline,
   Label,
   Stack,
   Text,
-  Tooltip,
 } from "@sanity/ui";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import sanityService, {
   IDocumentStructureCounter,
-  SanityService,
 } from "../services/sanityService";
-import SemanticService from "../services/semanticService";
 
 function ExpandStep({
   doc,

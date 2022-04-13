@@ -1,3 +1,6 @@
+/**
+ * Check that the calling code is indeed running in the browser. Throws an exception if not.
+ */
 export const checkDocument = () => {
   if (!document) {
     throw new ReferenceError(

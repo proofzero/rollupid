@@ -23,7 +23,7 @@
     "url": "https://github.com/kubelt/kubelt.git"
   },
   "author": "Kubelt, Inc.",
-  "license": "UNLICENSED",
+  "license": "Apache 2.0",
   "devDependencies": {
     "shadow-cljs": "2.16.12"
   }

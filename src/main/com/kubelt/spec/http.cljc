@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.http
   "Schema for HTTP requests and responses."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; TODO test me
 
@@ -110,13 +110,13 @@
    [:http/trailers {:optional true} trailers]
    [:http/status {:optional true} status]
    [:http/body {:optional true} body]
-   [:uri/scheme scheme]
-   [:uri/port port]
-   [:uri/path path]
+   [:uri/port {:optional true} port]
    [:uri/fragment {:optional true} fragment]
    [:uri/query {:optional true} query]
+   [:uri/user {:optional true} user]
+   [:uri/scheme scheme]
    [:uri/domain domain]
-   [:uri/user {:optional true} user]])
+   [:uri/path path]])
 
 (def request-schema
   [:and

@@ -1,17 +1,17 @@
-import { BehaviorSubject, Observable, Subscription } from "rxjs";
-import detectEthereumProvider from "@metamask/detect-provider";
+import { BehaviorSubject } from "rxjs";
+
+import IKubeltSdkWallet from "./kubeltSDKWallet";
+
+import getEthProvider from "../utils/ethProvider";
 import kSdkWeb from "@kubelt/sdk-web";
+
 import { hexlify } from "@ethersproject/bytes";
+import { ethers } from "ethers";
 
-export interface IKubeltError extends String { }
-
-export interface IKubeltSdkWallet {
-  address: string;
-
-  signFn: (signable: string) => Promise<string>;
-}
-
-export interface IKubeltSdk extends IKubeltSdkWallet { }
+/**
+ * TODO: Define once API is stable
+ */
+interface IKubeltSdk {}
 
 const sdkSubj = new BehaviorSubject<IKubeltSdk>(null);
 const accountSubj = new BehaviorSubject<string>(null);
@@ -20,7 +20,9 @@ const handleAccountsChanged = async (accounts: string[]) => {
   if (accounts.length === 0) {
     accountSubj.next(null);
   } else {
-    const account = accounts[0];
+    // We need to checksum the account
+    // so that it can be properly recovered
+    const account = ethers.utils.getAddress(accounts[0]);
     accountSubj.next(account);
 
     const wallet: IKubeltSdkWallet = {
@@ -28,37 +30,19 @@ const handleAccountsChanged = async (accounts: string[]) => {
       signFn: signFn,
     };
 
-    const initSDK = await kSdkWeb?.node_v1?.init();
-    sdkSubj.next(initSDK);
-
-    console.log('SDK initialized')
-    console.log(initSDK);
-    console.log('/SDK initialized')
-
-    const walletInitSDK = await kSdkWeb?.node_v1?.core.setWallet(initSDK, wallet);
-    sdkSubj.next(walletInitSDK);
-
-    console.log('Wallet initialized')
-    console.log(walletInitSDK);
-    console.log('/Wallet initialized')
-  }
-};
-
-const getEthProvider = async () => {
-  const ethProvider = (await detectEthereumProvider({
-    mustBeMetaMask: true,
-  })) as any;
-  if (!ethProvider) {
-    throw new Error(
-      "MetaMask not found. Connection to Kubelt network impossible."
+    const walletInitSDK = await kSdkWeb?.node_v1?.core.setWallet(
+      sdkSubj.getValue(),
+      wallet
     );
+    sdkSubj.next(walletInitSDK);
   }
-
-  return ethProvider;
 };
 
 const asyncMain = async () => {
   const ethProvider = await getEthProvider();
+
+  const initSDK = await kSdkWeb?.node_v1?.init();
+  sdkSubj.next(initSDK);
 
   ethProvider.on("accountsChanged", handleAccountsChanged);
 
@@ -103,13 +87,15 @@ const signFn = async (signable: string) => {
   return signed;
 };
 
-export const requestKubeltAuth = async (core: string) => {
+export const requestKubeltAuth = async (core: string = null) => {
   const currentAccount = accountSubj.getValue();
   if (!currentAccount) {
     throw new Error("No account available for signing");
   }
 
-  core = currentAccount
+  if (!core) {
+    core = currentAccount;
+  }
 
   const authedSdk = await kSdkWeb.node_v1.core.authenticate(
     sdkSubj.getValue(),

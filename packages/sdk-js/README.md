@@ -1,5 +1,10 @@
 # kubelt SDK
 
+![Build](https://img.shields.io/github/checks-status/kubelt/kubelt/main)
+![License](https://img.shields.io/github/license/kubelt/kubelt)
+[![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/m8NbsgByA9)
+![Version badge](https://img.shields.io/badge/Version-pre%20alpha-orange.svg)
+
 ## prerequisites
 
 You should have the latest [LTS version](https://nodejs.org/en/download/) of [Node.js](https://nodejs.org) installed.
@@ -7,6 +12,7 @@ You should have the latest [LTS version](https://nodejs.org/en/download/) of [No
 You should have the latest release of [IPFS](https://ipfs.io/#install) installed.
 
 You should have a web browser installed. We test against:
+
 - Firefox
 - Chrome
 
@@ -35,12 +41,15 @@ After this step is complete you should be able to run `ddt` and see help output.
 ### linting
 
 Initialize the linter (optional):
+
 ```console
 $ npm run lint:init
 ```
+
 While optional, performing this initialization step may reduce linting times for large code bases.
 
 Lint all source code:
+
 ```console
 $ npm run lint:all
 ```
@@ -56,11 +65,13 @@ To lint just the SDK test code, run target `lint:test`.
 The SDK may be used as a native dependency in ClojureScript projects.
 
 For users of `deps.edn`:
+
 ```clojure
 {com.kubelt/sdk {:mvn/version "x.x.x"}}
 ```
 
 For users of `lein` | `shadow-cljs`:
+
 ```clojure
 [com.kubelt/sdk "x.x.x"]
 ```
@@ -68,21 +79,25 @@ For users of `lein` | `shadow-cljs`:
 #### usage
 
 Require the SDK:
+
 ```clojure
 (:require [com.kubelt.sdk.v1 :as sdk])
 ```
 
 Initialize a specific version:
+
 ```clojure
 (def kbt (sdk/init {...})
 ```
 
 Call some of the available API methods:
+
 ```clojure
 (kbt/do-something)
 ```
 
 Clean-up when you're finished:
+
 ```clojure
 (sdk/halt kbt)
 ```
@@ -92,6 +107,7 @@ Clean-up when you're finished:
 #### build
 
 To compile the development version of the SDK as a Node.js library:
+
 ```console
 $ npm run build:sdk:node:develop
 ```
@@ -99,6 +115,7 @@ $ npm run build:sdk:node:develop
 #### release
 
 To compile the release version of the SDK as a Node.js library:
+
 ```console
 $ npm run build:sdk:node:release
 ```
@@ -106,16 +123,19 @@ $ npm run build:sdk:node:release
 #### test
 
 To compile the tests for execution in Node.js:
+
 ```console
 $ npm run test:sdk:node
 ```
 
 The tests are configured to run automatically when compilation completes, but may also be run separately:
+
 ```console
 $ node target/node-test.js
 ```
 
 The SDK exposes a JavaScript API that should be tested separately:
+
 ```console
 $ npm run test:sdk:js
 ```
@@ -125,6 +145,7 @@ $ npm run test:sdk:js
 #### build
 
 To compile the development version of the SDK for use in a browser:
+
 ```console
 $ npm run build:sdk:web:develop
 ```
@@ -132,6 +153,7 @@ $ npm run build:sdk:web:develop
 #### release
 
 To compile the release version of the SDK for use in a browser:
+
 ```console
 $ npm run build:sdk:web:release
 ```
@@ -139,6 +161,7 @@ $ npm run build:sdk:web:release
 #### test
 
 To compile the tests for execution in a web browser:
+
 ```console
 $ npm run test:sdk:web
 ```

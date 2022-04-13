@@ -2,7 +2,7 @@
 ;;
 ;; kaocha test runner configuration
 ;;
-;; $ clj -M:kaocha unit
+;; $ clj -M:test <test suite id>
 
 #kaocha/v1
 {:tests [;; [unit] all unit tests
@@ -34,11 +34,6 @@
           :source-paths ["src/main"]
           :test-paths ["src/test"]
           :ns-patterns ["ipfs.*-test$"]}
-         ;; [unit.p2p] only p2p unit tests
-         {:id :unit.p2p
-          :source-paths ["src/main"]
-          :test-paths ["src/test"]
-          :ns-patterns ["p2p.*-test$"]}
          ;; [unit.rdf] only rdf unit tests
          {:id :unit.rdf
           :source-paths ["src/main"]

@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.resource.add
   "Invoke the 'sdk resource add' method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))

@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.error
   "Definition of declarative error maps."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"})
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; error
 ;; -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.http.status
   "HTTP status codes and utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.set]))
 

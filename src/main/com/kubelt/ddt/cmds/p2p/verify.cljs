@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.p2p.verify
   "Invoke the p2p > verify method."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require
@@ -23,8 +23,8 @@
                     ;; wallet address starting with "0x" as a big
                     ;; integer.
                     core-config #js {:describe "a @core name"
-                                     :string true}]
-                (.options yargs "core" core-config)
+                                     :type "string"}]
+                (.positional yargs "core" core-config)
                 (ddt.options/options yargs)))
 
    :handler (fn [args]

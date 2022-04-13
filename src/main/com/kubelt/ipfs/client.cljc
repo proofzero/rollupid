@@ -1,12 +1,13 @@
 (ns com.kubelt.ipfs.client
   "IPFS cross-platform client."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as cstr])
   (:require
    [malli.core :as malli]
    [malli.error :as me])
   (:require
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.ipfs.api :as ipfs.api]
    [com.kubelt.ipfs.v0.node :as v0.node]
    [com.kubelt.ipfs.spec :as ipfs.spec]
@@ -237,11 +238,7 @@
          options (merge default-options options)]
      ;; Validate the options.
      (if-not (malli/validate ipfs.spec/init-options options)
-       (let [explain (-> ipfs.spec/init-options
-                         (malli/explain options)
-                         me/humanize)]
-         {:com.kubelt/type :kubelt.type/error
-          :error explain})
+       (lib.error/explain ipfs.spec/init-options options)
        ;; Options are valid, return the client.
        (let [{:keys [http/client]}
              (if (contains? options :http/client)
@@ -278,7 +275,7 @@
                                           (assoc :uri/port request-port)
                                           (assoc :response/keywordize? true))
                            ;; TODO validate response
-                           info (proto.http/request-sync client id-request)
+                           info (proto.http/request! client id-request)
                            ;; Extract some information from the response and
                            ;; store directly in the client. Some of these are
                            ;; the criteria along which we expect node behaviour
@@ -345,11 +342,7 @@
     request-map
     ;; Validate request-map.
     (not (malli/validate ipfs.spec/api-resource request-map))
-    (let [explain (-> ipfs.spec/api-resource
-                      (malli/explain request-map)
-                      me/humanize)]
-      {:com.kubelt/type :kubelt.type/error
-       :error explain})
+    (lib.error/explain ipfs.spec/api-resource request-map)
     ;; Perform the request!
     :else
     (let [;; TODO allow per-request override of keywordizing?
@@ -382,7 +375,7 @@
           ;; TODO supply promise/channel if requested
           http-client (get client :http/client)
           ;; By default perform synchronous request.
-          response (proto.http/request-sync http-client request)]
+          response (proto.http/request! http-client request)]
 
       ;; TODO promise, channel
       ;; TODO callback fns:
@@ -393,7 +386,7 @@
       ;; TODO parse response body
       ;; TODO validate response body, cf. :client/validate?
       ;; TODO transform response body, cf. :client/keywordize?
-      ;;@(proto.http/request-sync http-client request on-response)
+      ;;@(proto.http/request http-client request on-response)
 
       (if-let [body-fn (get request-map :response/body-fn)]
           (body-fn request-map response)

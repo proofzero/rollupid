@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.crypto
   "Cryptographic operations."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   #?(:clj
      (:import
       [java.security MessageDigest]

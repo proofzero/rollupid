@@ -6,9 +6,12 @@
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
    [reitit.frontend.easy :as rfe]
-   [dapp.components.dashboard :as dashboard]
    [dapp.components.settings :as settings]
-   [dapp.utils :as utils])
+   [dapp.pages.cores :as cores]
+   [dapp.pages.dashboard :as dashboard]
+   [dapp.pages.reports :as reports]
+   [dapp.utils :as utils]
+   [taoensso.timbre :as log])
    (:require
    ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
    ))
@@ -60,17 +63,33 @@
      :controllers
      [{;; Do whatever initialization needed for dashboard page
        ;; I.e (re-frame/dispatch [::events/load-something-with-ajax])
-       :start (fn [& params](utils/log-fn "Entering home page"))
+       :start (fn [& params](log/trace "Entering home page"))
        ;; Teardown can be done here.
-       :stop  (fn [& params] (utils/log-fn "Leaving home page"))}]}]
+       :stop  (fn [& params] (log/trace "Leaving home page"))}]}]
+   ["cores"
+    {:name      ::cores
+     :view      cores/render
+     :controllers
+     [{;; Initialization
+       :start (fn [& _params](log/trace "Entering Cores page"))
+       ;; Teardown
+       :stop  (fn [& _params] (log/trace "Leaving Cores page"))}]}]
+   ["reports"
+    {:name      ::reports
+     :view      reports/render
+     :controllers
+     [{;; Initialization
+       :start (fn [& _params](log/trace "Entering Reports page"))
+       ;; Teardown
+       :stop  (fn [& _params] (log/trace "Leaving Reports page"))}]}]
    ["settings"
     {:name      ::settings
      :view      settings/render
      :link-text "Settings"
      :icon ChartBarIcon
      :controllers
-     [{:start (fn [& params] (utils/log-fn "Entering sub-page 1"))
-       :stop  (fn [& params] (utils/log-fn "Leaving sub-page 1"))}]}]])
+     [{:start (fn [& params] (log/trace "Entering sub-page 1"))
+       :stop  (fn [& params] (log/trace "Leaving sub-page 1"))}]}]])
 
 (defn on-navigate [new-match]
   (when new-match
@@ -86,4 +105,3 @@
     router
     on-navigate
     {:use-fragment true}))
-

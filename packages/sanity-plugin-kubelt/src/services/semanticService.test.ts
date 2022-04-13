@@ -117,10 +117,6 @@ test("Objects drop primitive keys", () => {
     _id: "foobar",
     _type: "person",
     name: "Not Zorro",
-    kItem: {
-      _type: "kubeltItem",
-      name: "sfdfdfdf",
-    },
     slug: {
       _type: "slug",
       current: "not-zorro",
@@ -135,7 +131,6 @@ test("Objects drop primitive keys", () => {
   const semanticObj = semanticService.semantify(obj);
 
   expect(semanticObj).not.toBeNull();
-  expect(semanticObj["kItem"]).not.toBeDefined();
   expect(semanticObj["slug"]).not.toBeDefined();
   expect(semanticObj["address"]).not.toBeDefined();
   expect(semanticObj["@context"]).toBeDefined();
