@@ -89,18 +89,16 @@ All that's missing is content management for data and compute!
 
 To truly decentralize an application you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, with the exception of [Filecoin](ipns://filecoin.io/). That said, you can't run a blockchain on the client which is why a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
 
-By backing IPFS with Filecoin you can ensure content is always available to the network and leverage the power of **content addressing** to encode any kind of content.
+By backing IPFS with Filecoin you can ensure content is always available to the network and leverage the power of **content addressing** to encode any kind of content from JSON documents to sqlite databases, WASM, and more -- you pick! By breaking problems down to a size that can be handled by a client, this forms the idea of **bring your own opinions**.
 
-vitalik peer to peer response
+This is where an **ecosystem** can of open-source tools, frameworks and other libraries can begin to grow and flourish independently of any service. For instance, the local-first work being done by [Ink and Switch](https://www.inkandswitch.com/) solving for distributed conflict resolution data types (CRDTs).
 
-not ecosytems (e.g.sky net)
-
-ink and switch
-
-pro-blockchain and pro-web2
+The same content addresses can pack and fully encrypt signatures, schemas, versions and more collapsing APIs into decentralized protocol that can materialize content anywhere for **novel applications**. This also has the advantage of making migrations a much simpler offline, client concern.
 
 ### Permissioning = Better Outcomes for Everyone
 
+- no accounts / complex identity
+- pro-blockchain and pro-web2
 - governace
 - integrations
 - extending traditional into web3
@@ -120,6 +118,8 @@ Moxie winds up with a great point, and we'll end on the same note:
 > We should try to reduce the burden of building software.
 
 ### What's Next?
+
+vitalik peer to peer response
 
 Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
 
