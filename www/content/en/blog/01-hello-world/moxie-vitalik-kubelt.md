@@ -53,13 +53,13 @@ As a team building a part of the decentralized future, here's our take.
 
 A major selling point of centralization is the convenience of data aggregration and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abastract the relationship between data and compute, the easier it is to create secure applications.
 
-Platforms acheive this value through focused, hyper opinionated services **in the middle** and, as confirmed by Moxie, this is a massive advantage for applications in early stages of development as less resources are required to get to innovate. But what's the catch?
+Platforms achieve this value through focused, hyper-opinionated services **in the middle** and, as confirmed by Moxie, this is a massive advantage for applications in early stages of development as less resources are required to get to innovate. But what's the catch?
 
-Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until its not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
+Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
 
 ### The Right Protocol for the Right Problem
 
-If co-location of data and compute makes for a better developer experience and focused opinionted services accelerate development, how can we apply this in a dencentralized platform and get similar results without the trade offs?
+If co-location of data and compute makes for a better developer experience and focused opinionated services accelerate development, how can we apply this in a decentralized platform and get similar results without the trade offs?
 
 Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable cost in DX and UX for increased trust, security and transparency. For everything else like application logic, content, and other **eventually consistent** use cases this cost for developers and users is not acceptable.
 
@@ -67,7 +67,7 @@ It is, afterall, the eventually consistent use case that makes up the bulk of al
 
 ### The User is the Application
 
-Where we started thinking is, if blockchains are decentralized and clients are decenteralized, could we push all the opinions out to the user at the the edge?
+Where we started thinking is, if blockchains are decentralized and clients are decentralized, could we push all the opinions out to the user at the the edge?
 
 In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is **user sized**, developers can user their favorite tools and libraries, simplifying their stack while maintaining:
 
