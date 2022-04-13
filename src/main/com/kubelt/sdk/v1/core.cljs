@@ -84,9 +84,9 @@
 ;; TODO check for valid sys map.
 (defn logged-in?
   [sys core]
-  (let [sessions (get sys :crypto/session)]
+  (let [session-tokens (get-in sys [:crypto/session :vault/tokens])]
     ;; TODO validate the JWT using the current wallet
-    (contains? sessions core)))
+    (contains? session-tokens core)))
 
 (defn logged-in-js?
   [sys core]
