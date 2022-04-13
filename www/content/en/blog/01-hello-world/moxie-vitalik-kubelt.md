@@ -61,13 +61,21 @@ If co-location of data and compute makes for a better developer experience and s
 
 Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable trade off in DX and UX for trust and security. For everything else like application logic, content, and other **eventually consistent** use cases this trade off for developers and users is not acceptable.
 
-Afterall, it is the eventually consistent use case that makes up the bulk of all applications and this is why we did a lot of thinking about how to create the **decentralized middle tier**.
+Afterall, it is the eventually consistent use case that makes up the bulk of all applications and this is where the team at Kubelt did a lot of thinking about how to create the **decentralized middle tier**.
 
-### Local-First and User-Centric
+### The User is the Application
+
+What if the user was also co-located with the data and compute? That might give us a several qualities that we want:
+
+-[x] User privacy
+
+Edge, local-first, user-centric
 
 could very well be moved off chain using the same cryptographic primatives (wallet metaphor)
 
 Convenience and privacy (small and bundled)
+
+vitalik peer to peer response
 
 add images
 
