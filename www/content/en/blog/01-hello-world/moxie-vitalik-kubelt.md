@@ -55,13 +55,21 @@ A major selling point of centralization is the convenience of data aggregration 
 
 Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until its not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
 
-### Local-First and User-Centric
+### The Right Tool for the Right Problem
 
 If co-location of data and compute makes for a better developer experience and small opinionted services accelerate development, how can we think differently to solve for this in a decentralized manner?
 
-Blockchain seems to be the obvious answer and we agree this is true for many use cases.
+Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable trade off in DX and UX for trust and security. For everything else like application logic, content, and other **eventually consistent** use cases this trade off for developers and users is not acceptable.
 
-Convenience and privacy
+Afterall, it is the eventually consistent use case that makes up the bulk of all applications and this is why we did a lot of thinking about how to create the **decentralized middle tier**.
+
+### Local-First and User-Centric
+
+could very well be moved off chain using the same cryptographic primatives (wallet metaphor)
+
+Convenience and privacy (small and bundled)
+
+add images
 
 ### Interopable and Composabie
 
@@ -70,6 +78,12 @@ not ecosytems (e.g.sky net)
 pro-blockchain and pro-web2
 
 ### Better Outcomes for users and business
+
+- cost
+- privacy
+- governace
+- integrations
+- extending traditional into web3
 
 ### Novelity and examples
 
