@@ -3,8 +3,7 @@
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   #?(:node
      (:require
-      ["crypto" :as crypto]
-      [com.kubelt.lib.json :as lib.json]))
+      ["crypto" :as crypto]))
   #?(:cljs
      (:import
       [goog.crypt base64]))
@@ -18,7 +17,8 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.base64 :as lib.base64]
-   [com.kubelt.lib.error :as lib.error]))
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.json :as lib.json]))
 
 ;; - iss (issuer): Issuer of the JWT
 ;; - sub (subject): Subject of the JWT (the user)

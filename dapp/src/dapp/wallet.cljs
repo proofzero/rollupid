@@ -53,17 +53,34 @@
    (let [ctx (:sdk/ctx db)
          ;; `sdk.core/set-wallet` also validates the structure of `wallet`
          new-ctx (sdk.core/set-wallet ctx wallet)]
-     {:dispatch [::authenticate new-ctx]})))
+     {:db db
+      :dispatch [::authenticate! new-ctx]})))
 
 (re-frame/reg-event-db
- ::authenticate
+ ::authenticate!
  (fn [db [_ new-ctx]]
    (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
-     (.finally (sdk.core/authenticate! new-ctx wallet-address)
-               (fn [auth-ctx]
-                 (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
-                 (log/info {:auth-ctx auth-ctx})))
-     (assoc db :sdk/ctx new-ctx))))
+     (-> (sdk.core/authenticate! new-ctx wallet-address)
+         (.then (fn [auth-ctx]
+                  (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
+                  ;; must dispatch the next event within the promise
+                  (re-frame/dispatch [::authenticate-success auth-ctx])))
+         (.catch (fn [err]
+                   (log/error {:message (str "Failed to authenticate with wallet address: " wallet-address)
+                               :error err})
+                   (re-frame/dispatch [::authenticate-failure wallet-address err]))))
+     ;; needs to return `db` since this is a `reg-event-db`
+     db)))
+
+(re-frame/reg-event-db
+ ::authenticate-success
+ (fn [db [_ auth-ctx]]
+   (assoc db :sdk/ctx auth-ctx)))
+
+(re-frame/reg-event-db
+ ::authenticate-failure
+ (fn [db [_ wallet-address err]]
+   (assoc-in db [:sdk/ctx :errors wallet-address] err)))
 
 ; TODO
 ; Handle the account changed event
@@ -89,3 +106,20 @@
 (re-frame/reg-sub ::current-account
   (fn [db]
     (:current-account db)))
+
+(re-frame/reg-sub
+ ::ctx
+ (fn [db]
+   (:sdk/ctx db)))
+
+(re-frame/reg-sub
+ ::wallet
+ (fn [db]
+   (get-in db [:sdk/ctx :crypto/wallet])))
+
+(re-frame/reg-sub
+ ::logged-in?
+ :<- [::ctx]
+ :<- [::wallet]
+ (fn [[ctx {:wallet/keys [address] :as _wallet}] _]
+   (sdk.core/logged-in? ctx address)))
