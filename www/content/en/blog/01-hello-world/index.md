@@ -30,6 +30,8 @@ Platforms achieve this value through focused, hyper-opinionated services **in th
 
 Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter) all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begin to show their fangs and you have little means of replatforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line and the pressure is on.
 
+What you want is a system that allows developers to enjoy the benefits in the decentralized model without any of the operational overhead and contingency planning for hyperbolic growth.
+
 ### The Right Protocol for the Right Problem
 
 If co-location of data and compute makes for a better developer experience and focused opinionated services accelerate development, how can we apply this in a decentralized platform and get similar results without the trade offs?
@@ -37,6 +39,7 @@ If co-location of data and compute makes for a better developer experience and f
 Blockchain seems like the obvious answer and we would agree this is true for many use cases involving **trusted state transitions**. DeFi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases smart contracts and associated fees provide an acceptable cost in DX and UX for increased trust, security and transparency. For everything else like application logic, content, and other **eventually consistent** use cases this cost for developers and users is not acceptable.
 
 It is, afterall, the eventually consistent use case that makes up the bulk of all applications. This is where the team at Kubelt did a lot of thinking about how to develop a **decentralized middle tier**.
+
 
 ### The User is the Application
 
@@ -58,19 +61,15 @@ Starting from the early days of the Message Object Model (SmallTalk, Corba) and 
 
 All that's missing is content management for data and compute!
 
-> Developers also enjoy benefits in the decentralized world. Applications don’t have any operational overhead, as the costs are shouldered by the users and the infrastructure is managed by the network. The is no need to create AWS accounts or spin up dedicated servers, and no need to plan for a contingency of hyperbolic growth. The network automatically handles many pain points, and allows the developers to largely focus on writing features and engaging users.
-
-- I AGREE
-
 ### Content is Everything
 
 To truly decentralize an application you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, with the exception of [Filecoin](ipns://filecoin.io/). That said, you can't run a blockchain on the client which is why a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
 
-By backing IPFS with Filecoin you can ensure content is always available to the network and leverage the power of **content addressing** to encode any kind of content from JSON documents to sqlite databases, WASM, and more -- you pick! By breaking problems down to a size that can be handled by a client, this forms the idea of **bring your own opinions**.
+When backing IPFS with Filecoin all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to sqlite databases, WASM and more -- you pick! In doing so, you are also breaking problems down to a size that can be handled by a client at the edge where you can **"bring you own opinions"**.
 
-This is where an **ecosystem** can of open-source tools, frameworks and other libraries can begin to grow and flourish independently of any service. For instance, the local-first work being done by [Ink and Switch](https://www.inkandswitch.com/) solving for distributed conflict resolution data types (CRDTs).
+There is already an **ecosystem** of open-source, client-side libraries, frameworks and tools that can continue to grow and flourish independently of any service. For instance, the local-first work being done by [Ink and Switch](https://www.inkandswitch.com/) solving for distributed conflict resolution data types (CRDTs).
 
-The same content addresses can pack and fully encrypt signatures, schemas, versions and more collapsing APIs into decentralized protocol that can materialize content anywhere for **novel applications**. This also has the advantage of making migrations a much simpler offline, client concern.
+Furthermore, the same content addresses can pack and fully encrypt signatures, schemas, versions and more collapsing APIs into decentralized protocol that can materialize content anywhere for **novel applications**. This also has the advantage of making migrations a much simpler offline, client concern.
 
 ### Permissioning = Better Outcomes for Everyone
 
