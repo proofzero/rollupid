@@ -7,6 +7,7 @@
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
    [com.kubelt.lib.detect :as detect]
+   [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
    [com.kubelt.lib.util :as util]
    [com.kubelt.lib.wallet :as lib.wallet]
@@ -36,15 +37,23 @@
 ;; Cf. https://github.com/weavejester/integrant.
 
 (def system
-  {;; Our connection to IPFS.
-   :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"
+  {;; These empty defaults should be overridden from the SDK init
+   ;; options map.
+   :log/level nil
+   :ipfs/read-addr nil
+   :ipfs/write-addr nil
+   :p2p/read-addr nil
+   :p2p/write-addr nil
+   ;; Our connection to IPFS.
+   ;; TODO support separate "write" address as with p2p.
+   :client/ipfs {:ipfs/multiaddr (ig/ref :ipfs/read-addr)
                  :client/http {}}
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
    :client/p2p {:p2p/read {:http/scheme :http
-                           :http/address "/ip4/127.0.0.1/tcp/8787"}
+                           :http/address (ig/ref :p2p/read-addr)}
                 :p2p/write {:http/scheme :http
-                            :http/address "/ip4/127.0.0.1/tcp/8787"}}
+                            :http/address (ig/ref :p2p/write-addr)}}
    ;; A map from scope identifier to session token (JWT). Upon
    ;; successfully authenticating against a core, the returned session
    ;; token is kept here.
@@ -54,6 +63,40 @@
    ;; TODO provide no-op wallet implementation, or try to detect wallet
    ;; in the environment, e.g. metamask in browser.
    :crypto/wallet {}})
+
+;; :log/level
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :log/level [_ min-level]
+  ;; Initialize the logging system.
+  (when min-level
+    (log/merge-config! {:min-level min-level}))
+  min-level)
+
+;; :ipfs/read-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/read-addr [_ address]
+  ;; Return the multiaddress string.
+  address)
+
+;; :ipfs/write-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/write-addr [_ address]
+  address)
+
+;; :p2p/read-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/read-addr [_ address]
+  address)
+
+;; :p2p/write-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/write-addr [_ address]
+  address)
 
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------
@@ -140,13 +183,15 @@
 
 ;; We expect the value to be a keyword naming the execution environment
 ;; that we are initializing for.
-(defmethod ig/init-key :client/http [_ env]
+(defmethod ig/init-key :client/http [_ platform]
   {:post [(not (nil? %))]}
-  (log/debug {:log/msg "init HTTP client [" env "]"})
+  (let [message (str "init HTTP client")
+        platform (name platform)]
+    (log/debug {:log/msg message :platform platform}))
   #?(:browser (http.browser/->HttpClient)
      :node (http.node/->HttpClient)
      :clj (http.jvm/->HttpClient))
-  #_(condp = env
+  #_(condp = platform
     :platform.type/browser (http.browser/->HttpClient)
     ;;:platform.type/jvm (http.jvm/->HttpClient)
     :platform.type/node (http.node/->HttpClient)))
@@ -158,11 +203,17 @@
 ;; :crypto/session
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :crypto/session [_ env]
+(defmethod ig/init-key :crypto/session [_ tokens]
   (log/debug {:log/msg "init session"})
-  ;; Our session storage map is a "vault".
-  {:com.kubelt/type :kubelt.type/vault
-   :vault/tokens {}})
+  ;; If any JWTs are provided, parse them and store the decoded result.
+  (let [tokens (reduce (fn [m [core token]]
+                         (let [decoded (lib.jwt/decode token)]
+                           (assoc m core decoded)))
+                       {}
+                       tokens)]
+    ;; Our session storage map is a "vault".
+    {:com.kubelt/type :kubelt.type/vault
+     :vault/tokens tokens}))
 
 (defmethod ig/halt-key! :crypto/session [_ session]
   (log/debug {:log/msg "halt session"}))
@@ -201,10 +252,7 @@
 ;; depend on it.
 (defn init
   "Initialize the SDK."
-  [{:keys [logging/min-level] :as options}]
-  ;; Initialize the logging system.
-  (when min-level
-    (log/merge-config! {:min-level min-level}))
+  [options]
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
@@ -212,6 +260,8 @@
         ;; the current platform and initialize accordingly, otherwise.
         platform (or (get options :sys/platform)
                      (util/platform))
+        ;; Use any JWTs supplied as options.
+        credentials (get options :credential/jwt {})
         ;; Use the wallet provided by the user, or default to a no-op
         ;; wallet otherwise.
         wallet (or (get options :crypto/wallet)
@@ -220,10 +270,24 @@
         ;; can detect a locally-running p2p node.
         default (:client/p2p system)
         p2p-options (detect/node-or-gateway default options)
+        ;; Get the address of the IPFS node we talk to.
+        ipfs-read (get options :ipfs/read)
+        ipfs-write (get options :ipfs/write)
+        ;; Get the r/w addresses of the Kubelt gateways we talk to.
+        p2p-read (get options :p2p/read)
+        p2p-write (get options :p2p/write)
+        ;; Get the default minimum log level.
+        log-level (get options :log/level)
         ;; Update the system configuration map before initializing the
         ;; system.
         system (-> system
                    (assoc :sys/platform platform)
+                   (assoc :log/level log-level)
+                   (assoc :ipfs/read-addr ipfs-read)
+                   (assoc :ipfs/write-addr ipfs-write)
+                   (assoc :p2p/read-addr p2p-read)
+                   (assoc :p2p/write-addr p2p-write)
+                   (assoc :crypto/session credentials)
                    (assoc :crypto/wallet wallet)
                    (assoc :client/http platform)
                    (assoc :client/p2p p2p-options))]
@@ -238,3 +302,19 @@
   "Clean-up resources used by the SDK."
   [sys-map]
   (ig/halt! sys-map))
+
+(defn options
+  "Return an options map that can be used to reinitialize the SDK."
+  [sys-map]
+  (let [ipfs-read (get sys-map :ipfs/read-addr)
+        ipfs-write (get sys-map :ipfs/write-addr)
+        p2p-read (get sys-map :p2p/read-addr)
+        p2p-write (get sys-map :p2p/write-addr)
+        log-level (get sys-map :log/level)
+        credentials {}]
+    {:log/level log-level
+     :ipfs/read ipfs-read
+     :ipfs/write ipfs-write
+     :p2p/read p2p-read
+     :p2p/write p2p-write
+     :credential/jwt credentials}))
