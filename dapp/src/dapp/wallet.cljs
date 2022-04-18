@@ -1,6 +1,7 @@
 ; Wallet
 (ns dapp.wallet
   (:require
+   [com.kubelt.sdk.v1 :as sdk.v1]
    [com.kubelt.sdk.v1.core :as sdk.core]
    [re-frame.core :as re-frame]
    [taoensso.timbre :as log]))
@@ -47,6 +48,11 @@
                  (log/debug {:msg "found account" :account (first accounts)})
                  (assoc db :current-account (first accounts))))))))
 
+(re-frame/reg-event-db
+ ::set-web3-modal
+ (fn [db [_ modal]]
+   (assoc db :web3-modal modal)))
+
 (re-frame/reg-event-fx
  ::set-current-wallet
  (fn [{:keys [db]} [_ wallet]]
@@ -81,6 +87,15 @@
  ::authenticate-failure
  (fn [db [_ wallet-address err]]
    (assoc-in db [:sdk/ctx :errors wallet-address] err)))
+
+(re-frame/reg-event-db
+ ::disconnect
+ (fn [{:keys [web3-modal] :as db} [_ wallet-address]]
+   (log/info {:message (str "Disconnecting from address: " wallet-address)})
+   ;; Clear the provider from the web3-modal object
+   (.clearCachedProvider web3-modal)
+   ;; Reset the SDK context to `init` state
+   (assoc db :sdk/ctx (sdk.v1/init))))
 
 ; TODO
 ; Handle the account changed event
