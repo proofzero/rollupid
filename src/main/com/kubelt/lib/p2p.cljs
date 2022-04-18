@@ -15,9 +15,9 @@
   [sys core]
   {:pre [(string? core)]}
   (let [client (get sys :client/http)
-        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
-        host (get-in sys [:client/p2p :p2p/write :address/host])
-        port (get-in sys [:client/p2p :p2p/write :address/port])
+        scheme (get-in sys [:client/p2p :http/scheme])
+        host (get-in sys [:client/p2p :http/host])
+        port (get-in sys [:client/p2p :http/port])
 
         wallet (get sys :crypto/wallet)
         address (get wallet :wallet/address)
@@ -47,9 +47,10 @@
   [sys core nonce signature]
   {:pre [(every? string? [core nonce])]}
   (let [client (get sys :client/http)
-        scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
-        host (get-in sys [:client/p2p :p2p/write :address/host])
-        port (get-in sys [:client/p2p :p2p/write :address/port])
+        scheme (get-in sys [:client/p2p :http/scheme])
+        host (get-in sys [:client/p2p :http/host])
+        port (get-in sys [:client/p2p :http/port])
+
         body {:nonce nonce :signature signature}
         body-str (lib.json/edn->json-str body)
 
