@@ -44,12 +44,15 @@
    :ipfs/write-addr nil
    :p2p/read-addr nil
    :p2p/write-addr nil
+   ;; Our common HTTP client.
+   :client/http {}
    ;; Our connection to IPFS.
    ;; TODO support separate "write" address as with p2p.
    :client/ipfs {:ipfs/multiaddr (ig/ref :ipfs/read-addr)
-                 :client/http {}}
+                 :client/http (ig/ref :client/http)}
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
+   ;; TODO inject common HTTP client.
    :client/p2p {:p2p/read {:http/scheme :http
                            :http/address (ig/ref :p2p/read-addr)}
                 :p2p/write {:http/scheme :http
@@ -177,24 +180,14 @@
 
 ;; :client/http
 ;; -----------------------------------------------------------------------------
-;; TODO if possible, we want that when compiling an environment-specific
-;; variant of the SDK that we are optimizing away whichever of these
-;; HttpClient protocol reifications isn't used.
+;; TODO support custom user agent string.
 
-;; We expect the value to be a keyword naming the execution environment
-;; that we are initializing for.
-(defmethod ig/init-key :client/http [_ platform]
+(defmethod ig/init-key :client/http [_ value]
   {:post [(not (nil? %))]}
-  (let [message (str "init HTTP client")
-        platform (name platform)]
-    (log/debug {:log/msg message :platform platform}))
+  (log/debug {:log/msg "init HTTP client"})
   #?(:browser (http.browser/->HttpClient)
      :node (http.node/->HttpClient)
-     :clj (http.jvm/->HttpClient))
-  #_(condp = platform
-    :platform.type/browser (http.browser/->HttpClient)
-    ;;:platform.type/jvm (http.jvm/->HttpClient)
-    :platform.type/node (http.node/->HttpClient)))
+     :clj (http.jvm/->HttpClient)))
 
 (defmethod ig/halt-key! :client/http [_ client]
   {:pre [(satisfies? proto.http/HttpClient client)]}
@@ -256,11 +249,7 @@
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
-  (let [;; Initialize for given platform if specified by user, or detect
-        ;; the current platform and initialize accordingly, otherwise.
-        platform (or (get options :sys/platform)
-                     (util/platform))
-        ;; Use any JWTs supplied as options.
+  (let [;; Use any JWTs supplied as options.
         credentials (get options :credential/jwt {})
         ;; Use the wallet provided by the user, or default to a no-op
         ;; wallet otherwise.
@@ -281,7 +270,6 @@
         ;; Update the system configuration map before initializing the
         ;; system.
         system (-> system
-                   (assoc :sys/platform platform)
                    (assoc :log/level log-level)
                    (assoc :ipfs/read-addr ipfs-read)
                    (assoc :ipfs/write-addr ipfs-write)
@@ -289,7 +277,6 @@
                    (assoc :p2p/write-addr p2p-write)
                    (assoc :crypto/session credentials)
                    (assoc :crypto/wallet wallet)
-                   (assoc :client/http platform)
                    (assoc :client/p2p p2p-options))]
     ;; NB: If we provide an additional collection of keys when calling
     ;; integrant.core/init, only those keys will be initialized.
