@@ -40,7 +40,6 @@ Blockchain seems like the obvious answer and we would agree this is true for man
 
 It is, afterall, the eventually consistent use case that makes up the bulk of all applications. This is where the team at Kubelt did a lot of thinking about how to develop a **decentralized middle tier**.
 
-
 ### The User is the Application
 
 Where we started thinking is, if blockchains are decentralized and clients are decentralized, could we push all the opinions out to the user at the the edge?
@@ -65,60 +64,26 @@ All that's missing is content management for data and compute!
 
 To truly decentralize an application you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, with the exception of [Filecoin](ipns://filecoin.io/). That said, you can't run a blockchain on the client which is why a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
 
-When backing IPFS with Filecoin all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to sqlite databases, WASM and more -- you pick! In doing so, you are also breaking problems down to a size that can be handled by a client at the edge where you can **"bring you own opinions"**.
+When backing IPFS with Filecoin all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to sqlite databases, WASM and more -- you pick! In doing so, you are also breaking problems down to a size that can be handled by a client at the edge where you can now **"bring your own opinions"**.
 
-There is already an **ecosystem** of open-source, client-side libraries, frameworks and tools that can continue to grow and flourish independently of any service. For instance, the local-first work being done by [Ink and Switch](https://www.inkandswitch.com/) solving for distributed conflict resolution data types (CRDTs).
+With that said, you can already take advantage of an existing **ecosystem** of open-source, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict resolution data types (CRDTs).
 
-Furthermore, the same content addresses can pack and fully encrypt signatures, schemas, versions and more collapsing APIs into decentralized protocol that can materialize content anywhere for **novel applications**. This also has the advantage of making migrations a much simpler offline, client concern.
+These same content addresses can also pack and fully encrypt signatures, schemas, versions and more collapsing APIs into a fully decentralized protocol simplifying the traditional three-tier application architecture. This isn't to be underestimated as it pushes the almost the entire application to the client meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
 
 ### Permissioning = Better Outcomes for Everyone
 
-- no new accounts / complex identity (compare to others like skynet)
-- Users and developers alike prefer convenience to security" is a bad assumption (skynet)
-- entry point into a peer networl
-- pro-blockchain and pro-web2
-- governace
-- integrations
-- extending traditional into web3
-- messaging
-- open banking and open patient records
+When combining capacity, availability and distribution (IPFS + Filecoin) with _wallets_ we can now talk about a fully genearlized protocol that both convenient and useful for application developement. This is because wallets are already ubiquitous across multiple platforms and we can use them to ensure access to content and capabilities are correclty governed in way that is at par or better than centralized services.
+
+For Kubelt, the wallet is the entry point into the network which, unlike other patforms, eliminates the need to install any new software or create new identities. Instead, we create a **"private core"** that keeps your cyrptography private but adds an always available API develoeprs can access for content, messaging and more. And that's only the beginnning of what cores can offer.
+
+Kubelt isn't built just for Web3. A Kubelt Core is a fully genearlized backend that can breakdown data silos and simplify integrations all in a very user permissined and private way. For instance, with Kubelt, your bank can generate content addresses containing your banking information using your favorit account softwares public key permissioned by you or host and permission your health care records, and more.
+
+It doesn't stop their either. Kubelt developers and users can provision single or multi-signing Kubelt cores that can be laid out in a configurations that gate and or commericalize access to public or protected content. These types of configurations are great for SaaS applications, DAOs, and more.
+
+The possibilities are virtually endless.
 
 ### What's Next?
 
-vitalik peer to peer response
+Kubelt is building a bigger, better, user centric web. If you like what we're doing and want to learn more follow us on [Twitter](https://twitter.com/kubelt) and join us on [Discord](https://discord.gg/UgwAsJf6C5).
 
-- Possibilities of cores in hardware in a peer to peer configuration (your crypto hosted locally for 100% local first)
-
-Agreed! [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of web3 infrastructure, together!
-
-## Enter Kubelt
-
-Web3 does have a ["web2 problem"](https://discord.com/channels/790660849471062046/956202308214095872/961623808958156831). Smart contracts do need upgradable data and business logic. Building on a peer network has significant advantages.
-
-That's why we built Kubelt. Our peers -- "Kubelt Cores" -- offer distributed compute, storage, networking, and cryptography capabilities. They compose into a fully decentralized application platform, the missing middle tier for web3.
-
-You can use Kubelt to run APIs, upgrade their logic, query chain data, run your own oracles, store customer data, authenticate users, all in a fully distributed application model.
-
-Imagine your smart contracts being token-gated into your own API ecosystem, more available than OpenSea, cheaper than AWS, and without having to run your own servers. That's Kubelt.
-
-Moxie winds up with a great point, and we'll end on the same note:
-
-> We should try to reduce the burden of building software.
-
-## Enter Vitalik
-
-[Let's slice Vitalik's list](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/) of ways to inspect chain data (this time **emphasis mine**):
-
-> 2.  Run a piece of code that asks the Infura API endpoint what the blockchain state is, trust the answer. However, keys are still kept locally; the code signs transactions locally and sends them to the Infura API endpoint to be re-broadcasted.
-> 1.  Same as (2), but the code also runs a light client to verify the signatures on the block headers and uses Merkle proofs to verify individual account and storage data.
-> 1.  Same as (3), but the code talks to N different API endpoints run by N different companies, so only 1 of them need to be providing honest answers for the connection to be reliable.
-> 1.  **Same as (4), but instead of pre-specifying N API endpoints the code connects directly to a p2p network**
-> 1.  **Same as (5), but the code also does data availability sampling and accepts fraud proofs, so it can detect and refuse to accept blocks that are invalid.**
-
-Vitalik's argument picks up where Moxie's left off, querying a centralized platform: "call the Infura API". He develops it, adding assurance and availability capabilities, and by points five and six arrives at a decentralized peer-to-peer model.
-
-This is how a decentralized platform can achieve the same functional capabilities (in this case accessing chain data) with superior non-functional capabilities (better availability, better trustability), all while being cheaper (peers run everywhere with no egress fees).
-
-So: platforms aren't protocols, and decentralized platforms are better than centralized platforms.
-
-If only someone would build a decentralized platform!
+For early access [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of the decentralized web, together!
