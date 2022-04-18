@@ -1,38 +1,16 @@
 (ns com.kubelt.lib.jwt
   "Wrapper around jose JWT library."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  #?(:node
-     (:require
-      ["crypto" :as crypto]))
-  #?(:cljs
-     (:import
-      [goog.crypt base64]))
-  #?(:cljs
-     (:require
-      [goog.json :as json]
-      [goog.crypt.base64 :refer [encodeString decodeString]]))
   (:require
    [clojure.string :as cstr])
   (:require
-   [taoensso.timbre :as log])
-  (:require
    [com.kubelt.lib.base64 :as lib.base64]
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.json :as lib.json]))
+   [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.lib.jwt.check :as lib.jwt.check]
+   [com.kubelt.lib.time :as lib.time]
+   [com.kubelt.spec.jwt :as spec.jwt]))
 
-;; - iss (issuer): Issuer of the JWT
-;; - sub (subject): Subject of the JWT (the user)
-;; - aud (audience): Recipient for which the JWT is intended
-;; - exp (expiration time): Time after which the JWT expires
-;; - nbf (not before time): Time before which the JWT must not be accepted
-;;   for processing
-;; - iat (issued at time): Time at which the JWT was issued; can be used
-;;   to determine age of the JWT
-;; - jti (JWT ID): Unique identifier; can be used to prevent the JWT from
-;;   being replayed (allows a token to be used only once)
-
-;; Public
-;; -----------------------------------------------------------------------------
 ;; TODO wallet implementation should generate keys, wrapping:
 ;; - [browser] https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey
 ;; - [node] https://nodejs.org/api/crypto.html#crypto_class_keyobject
@@ -40,79 +18,76 @@
 ;;   - [browser] Uint8Array
 ;;   - [node] Buffer
 ;;
-;; TODO local implementation
 ;; TODO change signature as (sign payload key algorithm type)
 ;; TODO spec for JWT + validation
 
-;;;;;;;;;; helpers ;;;;;;;;;;;;;;;;;;;
+(comment
+  (def ex-jwt
+    {:header {:typ "JWT"
+              ;; ECDSA using P-256 curve and SHA-256 hash algorithm
+              :alg "ES256"}
+     :claims {:iss "0xF4E9A36d4D37B1F83706c58eF8e3AF559F4c1E2E"
+              :sub "0xF4E9A36d4D37B1F83706c58eF8e3AF559F4c1E2E"
+              :aud "0xF4E9A36d4D37B1F83706c58eF8e3AF559F4c1E2E"
+              :iat 1649880757
+              :exp 1678894358383}
+     :token "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJzdWIiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJhdWQiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJpYXQiOjE2NDk4ODA3NTcsImV4cCI6MTY0OTg4NDM1NzM4M30"
+     :signature "D2elS8jdiFQp2KZn_qg8dO0ZE_JV403MX9ZfButZIkRoZ7rQkcVDNWS8Vl-bU_j7JH-2sNGw--xJtfKF0QZ-jg"})
+  )
 
-;; #?(:node
-;;    (defn encode [target]
-;;      "Encode a string with base64 URL Safe"
-;;      (.encodeString base64 target goog.crypt.base64.BASE_64_URL_SAFE)))
+;; Right now this is the only algorithm we support.
+(def ^:private algorithms
+  ["ES256"])
 
-;; #?(:node
-;;    (defn decode [target]
-;;      "Decode a string with base64 URL Safe"
-;;      (.decodeString base64 target)))
+;; Maximum allowed age for the JWT in seconds.
+;; - this is a bit over 11 days.
+(def ^:private max-age
+  1000000)
 
-;; (defn create-header [alg exp]
-;;   "Create a JWT header specifying the algorithm used and expiry time"
-;;   {:alg alg :exp exp})
+;; Amount of clock drift (in seconds) that we tolerate when checking
+;; certain timestamps, e.g. token issue time.
+(def ^:private tolerance
+  10)
 
-;; #?(:node
-;;    (defn get-public-key [token]
-;;      "Extract public key from the JWT payload"
-;;      (let [payload-part (decode (get (cstr/split token #"\.") 1))
-;;            payload-json (cstr/replace payload-part "\"" "")
-;;            payload-map (js->clj (json/parse (decode (js->clj payload-json))) :keywordize-keys true)]
-;;        (decode (get payload-map :pubkey)))))
+;; jwt-string?
+;; -----------------------------------------------------------------------------
 
-;; #?(:node
-;;    (defn prepare-key [key-material]
-;;      "import raw private key string"
-;;      ;; return key object
-;;      key-material))
+(defn jwt-string?
+  "Return true if given a JWT encoded as a string, false otherwise."
+  [x]
+  ;; TODO check against malli spec
+  (string? x))
 
-;; #?(:node
-;;    (defn prepare-payload [claims]
-;;      "import raw private key string"
-;;      (encode (json/serialize (clj->js claims)))))
+;; jwt-map?
+;; -----------------------------------------------------------------------------
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; #?(:node
-;;    (defn- sign-jwt [alg secret-key header-enc payload-enc]
-;;      "Sign encoded payload and header using secret key, return digest"
-;;      ;; sign payload+header
-;;      (let [signature-target (cstr/join "" [header-enc payload-enc])
-;;            signature-digest (-> (.createSign crypto "RSA-SHA256")
-;;                                 (.update (cstr/join "." [header-enc payload-enc]))
-;;                                 (.sign secret-key "base64"))]
-;;        signature-digest)))
+(defn jwt-map?
+  "Return true if given a JWT decoded as a map, false otherwise."
+  [x]
+  ;; TODO Check against malli spec
+  (map? x))
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; #?(:node
-;;    (defn create-jwt [secret-key header payload]
-;;      "Create a JWT token from key, header and payload"
-;;      (let [alg (get header :alg)
-;;            header-enc (encode (json/serialize (clj->js header)))
-;;            payload-enc (encode (json/serialize (clj->js payload)))
-;;            signature-enc  (encode (sign-jwt alg secret-key header-enc payload-enc))]
-;;        (cstr/join "." [header-enc payload-enc signature-enc]))))
+;; jwt?
+;; -----------------------------------------------------------------------------
 
-;; ;; TODO this can probably extract the pubkey internally
-;; #?(:node
-;;    (defn validate-jwt [token]
-;;      "Validate a token against a given public key"
-;;      (let [;; extract public key
-;;            pubkey (get-public-key token)
-;;            token-pieces (cstr/split token #"\.")
-;;            psig (get token-pieces 2)
-;;            verified (-> (.createVerify crypto "RSA-SHA256")
-;;                         (.update (cstr/join "." [(get token-pieces 0) (get token-pieces 1)]))
-;;                         ;;(.verify pubkey, psig, "base64"))]
-;;                         (.verify pubkey (decode psig) "base64"))]
-;;        verified)))
+(defn jwt?
+  "Return true if given a JWT as either a string or a decoded map, and
+  false otherwise."
+  [x]
+  (or (jwt-string? x)
+      (jwt-map? x)))
+
+;; key?
+;; -----------------------------------------------------------------------------
+
+(defn key?
+  ""
+  [x]
+  ;; TODO check against malli spec
+  (string? x))
+
+;; decode
+;; -----------------------------------------------------------------------------
 
 (defn decode
   "Decode a JWT."
@@ -132,3 +107,34 @@
          :claims claims
          :token token
          :signature signature}))))
+
+;; verify
+;; -----------------------------------------------------------------------------
+
+(defn verify
+  "Verify a JWT."
+  ([token key]
+   (let [defaults {}]
+     (verify token key defaults)))
+
+  ([token key options]
+   (lib.error/conform*
+    [spec.jwt/token token]
+    [spec.jwt/key key]
+    [spec.jwt/options options]
+    (let [;; Note that the JWT may be provided as either a string or a
+          ;; map. If a string, it should be decoded into a map.
+          token-map (if (string? token) (decode token) token)
+          ;; Current timestamp, used as reference for time-based checks
+          ;; unless a specific timestamp value to use is provided as an
+          ;; option. NB: JWT specifies NumericDate for timestamps,
+          ;; i.e. unix time (seconds since epoch).
+          now (lib.time/unix-time)
+          ;; The default set of options determine what the minimum set
+          ;; of verification checks to perform are.
+          defaults {:jwt/algorithms algorithms
+                    :jwt/max-age max-age
+                    :jwt/tolerance tolerance
+                    :jwt/timestamp now}
+          options (merge defaults options)]
+      (lib.jwt.check/token token-map key options)))))
