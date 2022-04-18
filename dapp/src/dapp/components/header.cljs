@@ -19,9 +19,9 @@
               (str (subs address 0 10) "..." (subs address 32))]
              [:a
               {:on-click (fn [e]
-                           ;; TODO: when clicked, kill session and disconnect wallet
-                           (.preventDefault e))
-               :class "text-xs hover:underline"}
+                           (.preventDefault e)
+                           (re-frame/dispatch [:dapp.wallet/disconnect address]))
+               :class "text-xs hover:underline cursor-pointer"}
               "Disconnect"]]
             [:img
              {:class "h-8"

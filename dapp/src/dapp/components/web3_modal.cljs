@@ -64,6 +64,9 @@
                  (log/debug {:provider provider})
                  (-> (.request provider (clj->js {:method "eth_requestAccounts"}))
                      (.then (fn [account]
+                              ;; Set the web3-modal object in the app-db. Needed to disconnect later.
+                              (re-frame/dispatch [::wallet/set-web3-modal modal])
+                              ;; Set the wallet to begin auth flow
                               (fetch-and-set-wallet provider account))))))
         (.catch (fn [error]
                   (.clearCachedProvider modal)
