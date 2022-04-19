@@ -68,7 +68,7 @@ To truly decentralize an application, you also need to decentralize the applicat
 
 When backing IPFS with Filecoin, all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to SQLite databases, WASM, and more -- you pick! You are also breaking problems down to a size that a client can handle at the edge where you can now **"bring your own opinions."**
 
-With that said, you can already take advantage of an existing **ecosystem** of open-source, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict resolution data types (CRDTs).
+With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict resolution data types (CRDTs).
 
 These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, collapsing APIs into a fully decentralized protocol simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
 
