@@ -10,13 +10,13 @@ draft: false
 contributors: ["@alfl", "@maurerbot"]
 ---
 
-In January, [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html), and [Vitalik responded](https://old.reddit.com/r/ethereum/comments/ryk3it/my_first_impressions_of_web3/hrrz15r/). Both raised issues fundamental to the future of web3 infrastructure and unknowingly provided arguments for why and even how to address them.
+In January, [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html), raising issues fundamental to the future of web3 infrastructure.
 
-Moxie argues that people will never run their servers, and we tend to agree. For most users, the convenience of centralized services far outweighs any known or otherwise unknown trade-offs in data privacy.
+Moxie argued that people will never run their servers, and we tend to agree. For most users, the convenience of centralized services far outweighs any known or otherwise unknown trade-offs in data privacy.
 
 The same convenience of centralized platforms applied to developers seems true when looking at the significant uptake in platforms like Infura and OpenSea. Moxie himself claims **centralized platforms** permit faster innovation than **decentralized protocols**, ignoring any associated risks, but is this a valid comparison?
 
-**Platforms** and **protocols** are two very different categories. The former is generally built on the latter, introducing opinionated technologies and services. These platforms force developers to conform applications to their opinions -- the more significant the conformance, the stickier the technology and risk of exploitation.
+**Platforms** and **protocols** are two very different categories. The former is generally built on the latter, introducing opinionated technologies and services. Platforms force developers to conform applications to their opinions -- the more applications conform to platform opinions, the stickier they become and therefore applications are exposed to greater risk of exploitation.
 
 But what if you could push opinionation to the edge? How could that improve outcomes and experience for both developer and user?
 
@@ -26,23 +26,25 @@ As a team building a part of the decentralized future, here's our take.
 
 A major selling point of centralization is the convenience of data aggregation and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abstract the relationship between data and compute, the easier it is to create secure applications.
 
-Platforms achieve this value through focused, hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
+Platforms provide abstractions through hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
 
-Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begins to show their fangs, and you have little means of re-platforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line, and the pressure is on.
+Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begin to show their fangs, leaving you with little means of re-platforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line, and the pressure is on.
 
-What you want is a system that allows developers to enjoy the benefits of the decentralized model without any of the operational overhead and contingency planning for hyperbolic growth.
+Instead, what you want is a system that allows developers to enjoy the benefits of the decentralized model without any of the operational overhead and contingency planning for hyperbolic growth.
 
 ### The Right Protocol for the Right Problem
 
-Suppose co-location of data and compute makes for a better developer experience and focuses opinionated services to accelerate development. How can we apply this in a decentralized platform and get similar results without the trade-offs?
+Supposing abstractions around co-location of data and compute makes for a better developer experience, how can we think differently and apply this idea in a **decentralized platform** and still get **similar results without the trade-offs?**
 
-Blockchain seems like the obvious answer, and we agree this is true for many use cases involving **trusted state transitions**. Defi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases, smart contracts and associated fees provide an acceptable cost in DX and UX for increased trust, security, and transparency. This cost for developers and users is not acceptable for everything else, like application logic, content, and **eventually consistent** use cases
+Blockchain seems like the obvious answer, and we agree this is true for many use cases involving **trusted state transitions**. Defi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases, smart contracts and the associated fees provide an acceptable cost in DX and UX for increased trust, security, and transparency.
 
-It is, after all, the eventually consistent use case that makes up the bulk of all applications. This is where the team at Kubelt did much thinking about how to develop a **decentralized middle tier**.
+This cost and trade-off in experience for developers and users however, is not acceptable for the majority of use cases. Application logic, content, and general configurations change much more quickly and would suit an **eventually consistent** protocol better.
+
+It is, after all, the eventually consistent use case that makes up the bulk of all applications we see today and is where the team at Kubelt did much of our thinking about how to develop a **"decentralized middle tier"**.
 
 ### The User is the Application
 
-We started thinking that if blockchains and clients are decentralized, could we push all the opinions out to the user at the edge?
+We started thinking that if blockchains and clients are already decentralized, could we push all the opinions out to the user at the edge?
 
 In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is **user sized**, developers can use their favorite tools and libraries, simplifying their stack while maintaining:
 
@@ -52,7 +54,7 @@ In doing so, we should be able to co-locate everything with the user and take ad
 
 However, all of this is easier said than done! So, we decided to look around and see if any work in this area has been attempted in the past? What we found was an evolution ready to pop!
 
-Starting from the early days of the Message Object Model (SmallTalk, Corba) and the more recent State Actor Model (Erlang, Akka), we finally realized the answer we were looking for was right in front of us, **Wallets**! With crypto wallets, developers could have ubiquitous local-first access to:
+Starting from the early days of the Message Object Model (SmallTalk, Corba) and the more recent State Actor Model (Erlang, Akka), we finally realized the answer we were looking for was right in front of us, **Wallets**! With crypto wallets, developers could have ubiquitous access to:
 
 🤯 Local-first user cryptography \
 🤯 Messaging APIs \
@@ -74,9 +76,9 @@ These same content addresses can also pack and fully encrypt signatures, schemas
 
 When combining capacity, availability, and distribution (IPFS + Filecoin) with _wallets_, we can now discuss a fully generalized protocol that is convenient and useful for application development. This is because wallets are ubiquitous across multiple platforms. We can use them to ensure access to content and capabilities are correctly governed in a way that is at par or better than centralized services.
 
-For Kubelt, the wallet is the entry point into the network, which, unlike other platforms, eliminates the need to install any new software or create new identities. Instead, we form a **"private core"** that keeps your cryptography private but adds an always available API that developers can access for content, messaging, and more. And that's only the beginning of what cores can offer.
+For Kubelt, the wallet is the entry point into the network, which, unlike other platforms, eliminates the need to install any new software or create new identities. Instead, we form a **"private core"** that keeps your cryptography local but adds an always available API that developers can access for content, messaging, and more. And that's only the beginning of what cores can offer.
 
-Kubert isn't built just for Web3. A Kubelt Core is a fully generalized backend that can break down data silos and simplify integrations, all user permissioned and private. For instance, with Kubelt, your bank can generate content addresses containing your banking information using your favorite account software public key permissioned by you or host and permission your health care records.
+Kubelt isn't built just for Web3. A Kubelt Core is a fully generalized backend that can break down data silos and simplify integrations, all user permissioned and private. For instance, with Kubelt, your bank can generate content addresses containing your banking information using your favorite accounting software's public key permissioned by you or, in a similar way, even host and permission your health care records.
 
 It doesn't stop there either. Kubelt developers and users can provide single or multi-signing Kubelt cores that can be laid out in configurations that gate and or commercialize access to public or protected content. These configurations are significant for SaaS applications, DAOs, and more.
 
