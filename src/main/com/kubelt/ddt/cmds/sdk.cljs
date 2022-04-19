@@ -4,6 +4,7 @@
   (:require
    [com.kubelt.ddt.cmds.sdk.core :as sdk.core]
    [com.kubelt.ddt.cmds.sdk.init :as sdk.init]
+   [com.kubelt.ddt.cmds.sdk.options :as sdk.options]
    [com.kubelt.ddt.cmds.sdk.resource :as sdk.resource]
    [com.kubelt.ddt.cmds.sdk.workspace :as sdk.workspace]))
 
@@ -13,6 +14,7 @@
    :builder (fn [^js yargs]
               (-> yargs
                   (.command (clj->js sdk.init/command))
+                  (.command (clj->js sdk.options/command))
                   (.command (clj->js sdk.core/command))
                   (.command (clj->js sdk.resource/command))
                   (.command (clj->js sdk.workspace/command))

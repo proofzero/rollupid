@@ -32,6 +32,13 @@
 (def multiaddr
   [:re #"^(/(\w+)/(\w+|\.)+)+$"])
 
+(def credentials
+  [:and
+   {:description "A map from core name to JWT strings."
+    :example {"0x123abc" "<header>.<payload>.<signature>"}}
+   ;; TODO flesh this out
+   [:map-of :string :string]])
+
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the the configuration map passed to the sdk/init function.
@@ -39,8 +46,12 @@
 (def config
   [:map {:closed true}
    [:sys/platform {:optional true} platform]
-   [:logging/min-level {:optional true} logging-level]
+   [:log/level {:optional true} logging-level]
+   [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
+   ;; TODO support IPFS Scheme
+   [:ipfs/read {:optional true} multiaddr]
+   [:ipfs/write {:optional true} multiaddr]
    [:p2p/read {:optional true} multiaddr]
    [:p2p.read/scheme {:optional true} spec.http/scheme]
    [:p2p/write {:optional true} multiaddr]

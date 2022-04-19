@@ -101,6 +101,21 @@
 (defmethod ig/init-key :p2p/write-addr [_ address]
   address)
 
+;; :client/http
+;; -----------------------------------------------------------------------------
+;; TODO support custom user agent string.
+
+(defmethod ig/init-key :client/http [_ value]
+  {:post [(not (nil? %))]}
+  (log/debug {:log/msg "init HTTP client"})
+  #?(:browser (http.browser/->HttpClient)
+     :node (http.node/->HttpClient)
+     :clj (http.jvm/->HttpClient)))
+
+(defmethod ig/halt-key! :client/http [_ client]
+  {:pre [(satisfies? proto.http/HttpClient client)]}
+  (log/debug {:log/msg "halt HTTP client"}))
+
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------
 ;; Send headers with each request:
@@ -177,21 +192,6 @@
 
 (defmethod ig/halt-key! :client/p2p [_ value]
   (log/debug {:log/msg "halt p2p client"}))
-
-;; :client/http
-;; -----------------------------------------------------------------------------
-;; TODO support custom user agent string.
-
-(defmethod ig/init-key :client/http [_ value]
-  {:post [(not (nil? %))]}
-  (log/debug {:log/msg "init HTTP client"})
-  #?(:browser (http.browser/->HttpClient)
-     :node (http.node/->HttpClient)
-     :clj (http.jvm/->HttpClient)))
-
-(defmethod ig/halt-key! :client/http [_ client]
-  {:pre [(satisfies? proto.http/HttpClient client)]}
-  (log/debug {:log/msg "halt HTTP client"}))
 
 ;; :crypto/session
 ;; -----------------------------------------------------------------------------
