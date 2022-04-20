@@ -2,6 +2,7 @@
   "Define ddt command hierarchy."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
+   [com.kubelt.ddt.cmds.alias :as ddt.alias]
    [com.kubelt.ddt.cmds.http :as ddt.http]
    [com.kubelt.ddt.cmds.ipfs :as ddt.ipfs]
    [com.kubelt.ddt.cmds.json :as ddt.json]
@@ -19,6 +20,8 @@
 (defn init
   [yargs]
   (-> yargs
+      ;; $CLI alias <command>
+      (.command (clj->js ddt.alias/command))
       ;; $CLI json <command>
       (.command (clj->js ddt.json/command))
       ;; $DDT http <command>
