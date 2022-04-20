@@ -18,6 +18,42 @@ In January, [Moxie wrote about his first impressions of web3](https://moxie.org/
 
 Moxie argued that people will never run their servers, and we tend to agree. For most users, the convenience of centralized services far outweighs any known or otherwise unknown trade-offs in data privacy.
 
+As a team of engineers with over two decades of experience, we tend to agree. The "three tiered", client-server-database application, has proven to be the best architecture for delivering applications quickly and securely. This application architecture however, went through it's own evolution and growing pains.
+
+The first generation of this architecture was to conveniently co-locate state and compute inside large databases or stateful application. This introduced the problem of errors introduced by application logic causing casacading incorrect state changes and scaling problems -- arguably similar to blockchains and smart contracts today.
+
+To improve on this, developers began to migrate application logic out of the large stateful applications into a small stateless APIs by building the tools and frameworks that conveniently abstracted away databases and pushed more work onto clients so, developers could iterate on their use case quickly in the middle of clients and database.
+
+However, this pattern of building applications has created three distinct and very current problems...
+
+**User Problem: Data Silos**
+
+Overtime, as more of these APIs came online, developers began to accrue _your_ valuable data in their respective data silos. This creates a power dynamic between user and developer over control and distribution of data as the only way to access this data was to integrate with or consume their services.
+
+**Customer Problem: Integration Headaches**
+
+If you are integrating one of these services (complaince, change management, cost)
+
+**Developer Problem: Platform Risk**
+
+Later on, centralized cloud platforms emerged and began to offer services that abastracted away common infrastructure patterns and other critical systems forcing developers to conform conform to their service layers which baloons in surprise costs if your application is successful.
+
+**A better way?**
+
+We'll discuss both of these problems in future blog posts but, the point is...
+
+```
+Notes for edits:
+- solve dinner not pizza (thesis is not opinions but wallet)
+- point about credibility of the authors (web2 devs, stored procedures connect)
+- relate to reader skeptisicm (right protocol summary)
+
+- right protocol, decentralized middle tier, wallets are the key, local first app model (opinions, p2p cdn, arguments)
+- new way is same as old way but better
+- setup for the next post (centralizatino success trap / scaling web2 v web3)
+
+```
+
 The same convenience of centralized platforms applied to developers seems true when looking at the significant uptake in platforms like Infura and OpenSea. Moxie himself claims **centralized platforms** permit faster innovation than **decentralized protocols**, ignoring any associated risks, but is this a valid comparison?
 
 **Platforms** and **protocols** are two very different categories. The former is generally built on the latter, introducing opinionated technologies and services. Platforms force developers to conform applications to their opinions -- the more applications conform to platform opinions, the stickier they become and therefore applications are exposed to greater risk of exploitation.
@@ -32,7 +68,7 @@ As a team building a part of the decentralized future, here's our take.
 
 A major selling point of centralization is the convenience of data aggregation and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abstract the relationship between data and compute, the easier it is to create secure applications.
 
-Platforms provide abstractions through hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
+Platforms provide **abstractions** through hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
 
 Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begin to show their fangs, leaving you with little means of re-platforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line, and the pressure is on.
 
@@ -42,19 +78,19 @@ Instead, what you want is a system that allows developers to enjoy the benefits 
 
 <!--<img src="/images/right_protocol.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
-Supposing abstractions around co-location of data and compute makes for a better developer experience, how can we think differently and apply this idea in a **decentralized platform** and still get **similar results without the trade-offs?**
+Given that abstractions around co-location of data and compute makes for a better developer experience, how can we think differently and apply this idea in a **decentralized platform** and still get **similar results without the trade-offs?**
 
-Blockchain seems like the obvious answer, and we agree this is true for many use cases involving **trusted state transitions**. Defi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases, smart contracts and the associated fees provide an acceptable cost in DX and UX for increased trust, security, and transparency.
+Blockchain seems like the obvious answer, and we agree this is true for many use cases involving **trusted state transitions**. Defi, NFT, and other transactional use cases that require a **consensus** on state make great sense for blockchains! For these cases, smart contracts and the associated fees provide an acceptable cost in DX and UX for increased trust, security, and transparency.
 
 This cost and trade-off in experience for developers and users however, is not acceptable for the majority of use cases. Application logic, content, and general configurations change much more quickly and would suit an **eventually consistent** protocol better.
 
 It is, after all, the eventually consistent use case that makes up the bulk of all applications we see today and is where the team at Kubelt did much of our thinking about how to develop a **"decentralized middle tier"**.
 
-### The User is the Application
+### The Wallet is a Node
 
 <!--<img src="/images/user_application.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
-We started thinking that if blockchains and clients are already decentralized, could we push all the opinions out to the user at the edge?
+We started thinking that if blockchains and clients are already decentralized, could we push all the opinions out to the **user at the edge**?
 
 In doing so, we should be able to co-locate everything with the user and take advantage of a local-first application model using user cryptography and ubiquitous runtimes. When the problem is **user sized**, developers can use their favorite tools and libraries, simplifying their stack while maintaining:
 
@@ -72,7 +108,7 @@ Starting from the early days of the Message Object Model (SmallTalk, Corba) and 
 
 All that's missing is content management for data and compute!
 
-### Content is Everything
+### Content is Data
 
 <!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
@@ -82,7 +118,7 @@ When backing IPFS with Filecoin, all content is available through a decentralize
 
 With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict-free replicated data types (CRDTs).
 
-These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, collapsing APIs into a fully decentralized protocol simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
+These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, **collapsing APIs into a fully decentralized protocol** simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
 
 ### Permissioning = Better Outcomes for Everyone
 

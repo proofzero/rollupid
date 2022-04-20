@@ -12,7 +12,7 @@
 
 [[main]]
  name = "SDK"
- url = "https://reference.kubelt.com"
+ url = "https://sdk.kubelt.com"
  weight = 20
 
 #[[main]]
