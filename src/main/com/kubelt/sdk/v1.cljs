@@ -30,12 +30,7 @@
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
   ([]
-   {:post [(map? %)]}
-   (let [config lib.config/default-config]
-     (if (m/validate spec.config/config config)
-       (lib.init/init config)
-       (lib.error/explain spec.config/config config))))
-
+   (init lib.config/default-config))
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
