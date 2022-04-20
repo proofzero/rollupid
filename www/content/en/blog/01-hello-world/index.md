@@ -10,6 +10,10 @@ draft: false
 contributors: ["@alfl", "@maurerbot"]
 ---
 
+<img src="/images/kubelt-banner.gif" width="{{ .Width }}" height="{{ .Height }}">
+
+\
+
 In January, [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html), raising issues fundamental to the future of web3 infrastructure.
 
 Moxie argued that people will never run their servers, and we tend to agree. For most users, the convenience of centralized services far outweighs any known or otherwise unknown trade-offs in data privacy.
@@ -24,6 +28,8 @@ As a team building a part of the decentralized future, here's our take.
 
 ### The Centralization Success Trap
 
+<img src="/images/success_trap.png" width="{{ .Width }}" height="{{ .Height }}">
+
 A major selling point of centralization is the convenience of data aggregation and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abstract the relationship between data and compute, the easier it is to create secure applications.
 
 Platforms provide abstractions through hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
@@ -34,6 +40,8 @@ Instead, what you want is a system that allows developers to enjoy the benefits 
 
 ### The Right Protocol for the Right Problem
 
+<!--<img src="/images/right_protocol.png" width="{{ .Width }}" height="{{ .Height }}">-->
+
 Supposing abstractions around co-location of data and compute makes for a better developer experience, how can we think differently and apply this idea in a **decentralized platform** and still get **similar results without the trade-offs?**
 
 Blockchain seems like the obvious answer, and we agree this is true for many use cases involving **trusted state transitions**. Defi, NFT, and other transactional use cases that require a consensus on state make great sense for blockchains! For these cases, smart contracts and the associated fees provide an acceptable cost in DX and UX for increased trust, security, and transparency.
@@ -43,6 +51,8 @@ This cost and trade-off in experience for developers and users however, is not a
 It is, after all, the eventually consistent use case that makes up the bulk of all applications we see today and is where the team at Kubelt did much of our thinking about how to develop a **"decentralized middle tier"**.
 
 ### The User is the Application
+
+<!--<img src="/images/user_application.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
 We started thinking that if blockchains and clients are already decentralized, could we push all the opinions out to the user at the edge?
 
@@ -64,11 +74,13 @@ All that's missing is content management for data and compute!
 
 ### Content is Everything
 
+<!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
+
 To truly decentralize an application, you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, except for [Filecoin](ipns://filecoin.io/). You can't run a blockchain on the client, so a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
 
 When backing IPFS with Filecoin, all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to SQLite databases, WASM, and more -- you pick! You are also breaking problems down to a size that a client can handle at the edge where you can now **"bring your own opinions."**
 
-With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict resolution data types (CRDTs).
+With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict replicated data types (CRDTs).
 
 These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, collapsing APIs into a fully decentralized protocol simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
 
@@ -85,6 +97,8 @@ It doesn't stop there either. Kubelt developers and users can provide single or 
 The possibilities are virtually endless.
 
 ### What's Next?
+
+<img src="/images/enter_kubelt.png" width="{{ .Width }}" height="{{ .Height }}">
 
 Kubelt is building a more extensive, better, user-centric web. If you like what we're doing and want to learn more, follow us on [Twitter](https://twitter.com/kubelt) and join us on [Discord](https://discord.gg/UgwAsJf6C5).
 
