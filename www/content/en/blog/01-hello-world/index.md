@@ -100,6 +100,6 @@ The possibilities are virtually endless.
 
 <img src="/images/enter_kubelt.png" width="{{ .Width }}" height="{{ .Height }}">
 
-Kubelt is building a more extensive, better, user-centric web. If you like what we're doing and want to learn more, follow us on [Twitter](https://twitter.com/kubelt) and join us on [Discord](https://discord.gg/UgwAsJf6C5).
+Kubelt is building a more extensive, better, user-centric web. If you like what we're doing and want to learn more, follow us on **[Twitter](https://twitter.com/kubelt)** and join us on **[Discord](https://discord.gg/UgwAsJf6C5)**.
 
-For early access [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of the decentralized web, together!
+Also take a look at our [docs]({{< relref "introduction" >}}) for more information. For **early access** [Get in touch for access,](https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf) tell us about your use case, and let's build the future of the decentralized web, together!
