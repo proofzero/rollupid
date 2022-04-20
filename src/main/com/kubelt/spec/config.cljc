@@ -10,10 +10,6 @@
 ;; the "Schema AST" map-based syntax instead as that should be faster to
 ;; instantiate for large schemas.
 
-(def platform
-  "Supported execution environments."
-  [:enum :platform.type/node :platform.type/browser :platform.type/jvm])
-
 (def logging-level
   "Logging levels defined by the timbre logging library."
   [:and
@@ -45,13 +41,13 @@
 
 (def config
   [:map {:closed true}
-   [:sys/platform {:optional true} platform]
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
-   ;; TODO support IPFS Scheme
    [:ipfs/read {:optional true} multiaddr]
+   [:ipfs.read/scheme {:optional true} spec.http/scheme]
    [:ipfs/write {:optional true} multiaddr]
+   [:ipfs.write/scheme {:optional true} spec.http/scheme]
    [:p2p/read {:optional true} multiaddr]
    [:p2p.read/scheme {:optional true} spec.http/scheme]
    [:p2p/write {:optional true} multiaddr]

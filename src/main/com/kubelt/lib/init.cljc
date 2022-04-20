@@ -41,14 +41,18 @@
    ;; options map.
    :log/level nil
    :ipfs/read-addr nil
+   :ipfs/read-scheme nil
    :ipfs/write-addr nil
+   :ipfs/write-scheme nil
    :p2p/read-addr nil
    :p2p/write-addr nil
    ;; Our common HTTP client.
    :client/http {}
    ;; Our connection to IPFS.
-   ;; TODO support separate "write" address as with p2p.
-   :client/ipfs {:ipfs/multiaddr (ig/ref :ipfs/read-addr)
+   :client/ipfs {:ipfs/read {:http/scheme :http
+                             :ipfs/multiaddr (ig/ref :ipfs/read-addr)}
+                 :ipfs/write {:http/scheme :http
+                              :ipfs/multiaddr (ig/ref :ipfs/write-addr)}
                  :client/http (ig/ref :client/http)}
    ;; Our connection to the Kubelt p2p system. Typically write paths
    ;; will go through a kubelt managed http gateway.
@@ -83,11 +87,23 @@
   ;; Return the multiaddress string.
   address)
 
+;; :ipfs/read-scheme
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/read-scheme [_ scheme]
+  scheme)
+
 ;; :ipfs/write-addr
 ;; -----------------------------------------------------------------------------
 
 (defmethod ig/init-key :ipfs/write-addr [_ address]
   address)
+
+;; :ipfs/write-scheme
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/write-scheme [_ scheme]
+  scheme)
 
 ;; :p2p/read-addr
 ;; -----------------------------------------------------------------------------
@@ -129,17 +145,21 @@
 ;;   agent {:agent (.. http Agent.)}
 
 (defmethod ig/init-key :client/ipfs [_ value]
-  (let [;; Set a global timeout for *all* requests:
-        timeout {:timeout "2m"}
-        ;; Supply the address of the IPFS node:
-        maddr-str (get value :ipfs/multiaddr)
-        url {:url maddr-str}
-        ;; Create the options object we pass to client creation fn.
-        options (clj->js (merge url timeout))
+  (let [;; Supply the address of the IPFS node(s). Read and write can
+        ;; use different paths if desired, e.g. when you want to read
+        ;; from a local daemon but write to a remote service for
+        ;; pinning.
+        read-addr (get-in value [:ipfs/read :ipfs/multiaddr])
+        read-scheme (get-in value [:ipfs/read :http/scheme])
+        write-addr (get-in value [:ipfs/write :ipfs/multiaddr])
+        write-scheme (get-in value [:ipfs/write :http/scheme])
         ;; Get the platform-specific HTTP client.
         http-client (get value :client/http)]
-    (log/debug {:log/msg "init IPFS client" :ipfs/addr maddr-str})
+    (let [ipfs-read (str (name read-scheme) "://" read-addr)
+          ipfs-write (str (name write-scheme) "://" write-addr)]
+      (log/debug {:log/msg "init IPFS client" :ipfs/read ipfs-read :ipfs/write ipfs-write}))
     (try
+      ;; Create the options object we pass to client creation fn.
       (let [;; TODO convert multiaddress to URL parts and pass in
             ;; options map to IPFS client.
             ;; http-scheme ""
@@ -148,8 +168,14 @@
             ;; options {:http/scheme http-scheme
             ;;          :http/host http-host
             ;;          :http/port http-port}
-            options {:http/client http-client}]
-        ;;(.create ipfs-http-client options)
+            options {:http/client http-client
+                     :read/addr read-addr
+                     :read/scheme read-scheme
+                     :write/addr write-addr
+                     :write/scheme write-scheme
+                     ;; Set a global timeout for *all* requests:
+                     ;;:client/timeout 5000
+                     }]
         (ipfs.client/init options))
       (catch js/Error e
         (log/fatal e))
@@ -261,7 +287,9 @@
         p2p-options (detect/node-or-gateway default options)
         ;; Get the address of the IPFS node we talk to.
         ipfs-read (get options :ipfs/read)
+        ipfs-read-scheme (get options :ipfs.read/scheme)
         ipfs-write (get options :ipfs/write)
+        ipfs-write-scheme (get options :ipfs.write/scheme)
         ;; Get the r/w addresses of the Kubelt gateways we talk to.
         p2p-read (get options :p2p/read)
         p2p-write (get options :p2p/write)
@@ -272,7 +300,9 @@
         system (-> system
                    (assoc :log/level log-level)
                    (assoc :ipfs/read-addr ipfs-read)
+                   (assoc :ipfs/read-scheme ipfs-read-scheme)
                    (assoc :ipfs/write-addr ipfs-write)
+                   (assoc :ipfs/write-scheme ipfs-write-scheme)
                    (assoc :p2p/read-addr p2p-read)
                    (assoc :p2p/write-addr p2p-write)
                    (assoc :crypto/session credentials)
@@ -294,14 +324,22 @@
   "Return an options map that can be used to reinitialize the SDK."
   [sys-map]
   (let [ipfs-read (get sys-map :ipfs/read-addr)
+        ipfs-read-scheme (get-in sys-map [:client/ipfs :ipfs/read :http/scheme])
         ipfs-write (get sys-map :ipfs/write-addr)
+        ipfs-write-scheme (get-in sys-map [:client/ipfs :ipfs/write :http/scheme])
         p2p-read (get sys-map :p2p/read-addr)
+        p2p-read-scheme (get-in sys-map [:client/p2p :p2p/read :http/scheme])
         p2p-write (get sys-map :p2p/write-addr)
+        p2p-write-scheme (get-in sys-map [:client/p2p :p2p/write :http/scheme])
         log-level (get sys-map :log/level)
         credentials {}]
     {:log/level log-level
      :ipfs/read ipfs-read
+     :ipfs.read/scheme ipfs-read-scheme
      :ipfs/write ipfs-write
+     :ipfs.write/scheme ipfs-write-scheme
      :p2p/read p2p-read
+     :p2p.read/scheme p2p-read-scheme
      :p2p/write p2p-write
+     :p2p.write/scheme p2p-write-scheme
      :credential/jwt credentials}))

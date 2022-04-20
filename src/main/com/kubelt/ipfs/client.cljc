@@ -64,25 +64,62 @@
 ;; call (if any), the value that was specified as the default during
 ;; client creation (if any), or the default (if all else fails).
 (defn- request->scheme
-  [client request]
+  [request client rw]
+  {:pre [(contains? #{:read :write} rw)]}
   (or
    (get request :uri/scheme)
-   (get client :http/scheme)
+   (let [rw (name rw)
+         kw (keyword rw "scheme")]
+     (get client kw))
    default-scheme))
 
 (defn- request->domain
-  [client request]
+  [request client rw]
+  {:pre [(contains? #{:read :write} rw)]}
   (or
    (get request :uri/domain)
-   (get client :http/host)
+   (let [rw (name rw)
+         kw (keyword rw "host")]
+     (get client kw))
    default-host))
 
 (defn- request->port
-  [client request]
+  [request client rw]
+  {:pre [(contains? #{:read :write} rw)]}
   (or
    (get request :uri/port)
-   (get client :http/port)
+   ;; We want to get the value of either :read/port or :write/port.
+   ;; The rw parameter is either :read or :write
+   (let [rw (name rw)
+         kw (keyword rw "port")]
+     (get client kw))
    default-port))
+
+(defn- request-for
+  "Takes a client map containing configuration options, a request map
+  defining the request to perform, and a keyword indicating whether the
+  request to be performed should be directed at the :read IPFS node or
+  the :write IPFS node. Returns an updated request map with the target
+  URL and request options filled in using values taken from the client
+  configuration."
+  [request client read-or-write]
+  {:pre [(contains? #{:read :write} read-or-write)]}
+  (let [;; Get the HTTP request scheme for the request.
+        scheme (request->scheme request client read-or-write)
+        ;; Get the HTTP host for the request.
+        domain (request->domain request client read-or-write)
+        ;; Get the HTTP port for the request.
+        port (request->port request client read-or-write)
+        ;; Should response body be keywordized?
+        keywordize? (get client :client/keywordize?)
+        ;; Should response body be validated?
+        validate? (get client :client/validate?)]
+    (-> request
+        (assoc :uri/scheme scheme)
+        (assoc :uri/domain domain)
+        (assoc :uri/port port)
+        (assoc :response/keywordize? keywordize?)
+        (assoc :response/validate? validate?))))
 
 (defn- extract-node-id
   [m]
@@ -224,17 +261,24 @@
   :client/node-info? - fetch and store node information in client
   :client/timeout - request timeout in milliseconds
   :http/client - a pre-created HTTP client (must satisfy HttpClient)
-  :http/scheme - the transport scheme to use, e.g. :http, :https
-  :http/host - the IP address of the IPFS host
-  :http/port - the listening port of the IPFS host"
+  :read/scheme - the HTTP scheme to use for reads, e.g. :http, :https
+  :read/host - the IP address of the IPFS read host
+  :read/port - the listening port of the IPFS read host
+  :write/scheme - the HTTP scheme to use for writes, e.g. :http, :https
+  :write/host - the IP address of the IPFS write host
+  :write/port - the listening port of the IPFS write host"
   ([]
    (init {}))
   ([options]
-   (let [default-options {:http/scheme default-scheme
-                          :http/host default-host
-                          :http/port default-port
+   (let [default-options {:read/scheme default-scheme
+                          :read/host default-host
+                          :read/port default-port
+                          :write/scheme default-scheme
+                          :write/host default-host
+                          :write/port default-port
                           :client/validate? true
-                          :client/keywordize? true}
+                          :client/keywordize? true
+                          :client/timeout 5000}
          options (merge default-options options)]
      ;; Validate the options.
      (if-not (malli/validate ipfs.spec/init-options options)
@@ -259,21 +303,9 @@
             ;; to paper over differences in the various implementations.
             (merge options
                    (if (get options :client/node-info? true)
-                     (let [id-request (-> (v0.node/id) :http/request)
-                           ;; Get the HTTP request scheme for the request.
-                           request-scheme (request->scheme options id-request)
-                           ;; Get the HTTP host for the request.
-                           request-domain (request->domain options id-request)
-                           ;; Get the HTTP port for the request.
-                           request-port (request->port options id-request)
-                           ;; We always keywordize and validate this
-                           ;; response so we're storing data in known
-                           ;; format.
-                           id-request (-> id-request
-                                          (assoc :uri/scheme request-scheme)
-                                          (assoc :uri/domain request-domain)
-                                          (assoc :uri/port request-port)
-                                          (assoc :response/keywordize? true))
+                     (let [id-request (-> (v0.node/id)
+                                          :http/request
+                                          (request-for options :read))
                            ;; TODO validate response
                            info (proto.http/request! client id-request)
                            ;; Extract some information from the response and
@@ -345,32 +377,23 @@
     (lib.error/explain ipfs.spec/api-resource request-map)
     ;; Perform the request!
     :else
-    (let [;; TODO allow per-request override of keywordizing?
-          keywordize? (get client :client/keywordize? true)
-          ;; TODO perform validation if asked for.
-          ;; TODO allow per-request override of validation?
-          validate? (get client :client/validate? false)
-          ;; This stored map contains the HTTP request parameters we can
-          ;; pass to our HTTP client (once we've added a few missing
-          ;; bits).
-          request (get request-map :http/request)
-          ;; Get the HTTP request scheme for the request.
-          request-scheme (request->scheme client request)
-          ;; Get the HTTP host for the request.
-          request-domain (request->domain client request)
-          ;; Get the HTTP port for the request.
-          request-port (request->port client request)
-          ;; Add the request target details to the request map, along
-          ;; with any additional parameters that control how the result
-          ;; will be performed and/or the response processed.
-          request (-> request
-                      (assoc :uri/scheme request-scheme)
-                      (assoc :uri/domain request-domain)
-                      (assoc :uri/port request-port)
-                      ;; Should response body be keywordized?
-                      (assoc :response/keywordize? keywordize?)
-                      ;; Should response body be validated?
-                      (assoc :response/validate? validate?))
+    ;; TODO allow per-request override of keywordizing?
+    ;; TODO perform validation if asked for.
+    ;; TODO allow per-request override of validation?
+    ;; TODO categorize requests as being reads or writes and
+    ;; directing to the appropriate IPFS node (allowing user
+    ;; override).
+    (let [;; This stored map contains the HTTP request parameters we can
+          ;; pass to our HTTP client once we've added a few missing
+          ;; bits. The HTTP request is defined by the map available at
+          ;; key :http/request, and we fill it in using (request-for).
+          ;;
+          ;; This adds the request target details to the request map,
+          ;; along with any additional parameters that control how the
+          ;; result will be validated and/or the response processed.
+          request (-> request-map
+                      :http/request
+                      (request-for client :read))
           ;; TODO invoke callbacks if provided
           ;; TODO supply promise/channel if requested
           http-client (get client :http/client)
