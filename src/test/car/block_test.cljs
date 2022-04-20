@@ -16,8 +16,8 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.lib.car.block :as car.block]
-   [com.kubelt.lib.car.build :as car.build]
+   [com.kubelt.car.block :as car.block]
+   [com.kubelt.car.build :as car.build]
    [com.kubelt.lib.ipld :as ipld]))
 
 ;; NB: when writing asynchronous tests, use the clojure.test/async macro
