@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.rdf.supported
   "List RDF formats that can be parsed."
-  {:copyright "ⓒ2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"})
 
 (defonce command
   {:command "supported"

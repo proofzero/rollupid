@@ -9,7 +9,7 @@
     "ipfs",
     "metadata"
   ],
-  "author": "Kubelt Inc.",
+  "author": "Proof Zero Inc.",
   "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
   "main": "lib/kbt.js",

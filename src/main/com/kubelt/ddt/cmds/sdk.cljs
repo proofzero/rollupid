@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk
   "CLI setup for 'sdk' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.sdk.core :as sdk.core]
    [com.kubelt.ddt.cmds.sdk.init :as sdk.init]

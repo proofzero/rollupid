@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.options
   "Common options various sub-commands."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 ;; Defaults
 ;; -----------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.p2p.verify
   "Invoke the p2p > verify method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require

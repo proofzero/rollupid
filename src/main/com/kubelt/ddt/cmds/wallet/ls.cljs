@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.wallet.ls
   "Invoke the wallet (ls) method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require

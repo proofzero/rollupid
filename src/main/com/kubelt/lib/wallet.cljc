@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.wallet
   "Wallet-related utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #?(:cljs
      (:require
       [goog.object]))

@@ -1,7 +1,7 @@
 (ns rdf.data-factory-test
   "Test the conversion of RDF/js data factory instances into RDF/cljs data
   values."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["rdf-data-factory" :refer
     [DataFactory

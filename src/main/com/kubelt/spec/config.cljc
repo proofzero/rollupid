@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.config
   "Schema for SDK configuration data."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.spec.http :as spec.http]
    [com.kubelt.spec.wallet :as spec.wallet]))

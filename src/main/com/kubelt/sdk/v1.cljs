@@ -1,6 +1,6 @@
 (ns com.kubelt.sdk.v1
   "Defines the interface of the Kubelt SDK, v1."
-  {:copyright "©2022 Kubelt, Inc" :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc" :license "Apache 2.0"}
   (:require
    [malli.core :as m]
    [malli.error :as me])

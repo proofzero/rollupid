@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.name
   "Methods for working with IPNS names."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [resolve])
   (:require
    [com.kubelt.ipfs.spec :as ipfs.spec]

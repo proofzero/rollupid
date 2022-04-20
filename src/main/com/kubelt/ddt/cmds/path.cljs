@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.path
   "CLI setup for 'path' sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.path.cache :as path.cache]
    [com.kubelt.ddt.cmds.path.config :as path.config]
