@@ -28,8 +28,10 @@
     "test:web:develop": "bb test:web:develop",
     "test:web:release": "bb test:web:release",
     "test:web:ci": "bb test:web:ci",
+    "test:dapp:ci:compile": "bb test:dapp:ci:compile",
     "test:dapp:ci:run": "bb test:dapp:ci:run",
-    "test:dapp:ci": "bb test:dapp:ci",
+    "test:dapp-karma:ci:compile": "bb test:dapp-karma:ci:compile",
+    "test:dapp-karma:ci:run": "bb test:dapp-karma:ci:run",
     "test:plugin:sanity": "bb test:plugin:sanity",
     "sidenotes:http:run": "http-server ./docs"
   },
