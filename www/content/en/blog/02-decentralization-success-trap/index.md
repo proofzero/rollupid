@@ -6,7 +6,7 @@ date: 2022-04-05T14:25:35-04:00
 lastmod: 2022-04-05T14:25:35-04:00
 weight: 50
 images: ["kubelt.png"]
-draft: false
+draft: true
 contributors: ["@alfl", "@maurerbot"]
 ---
 
@@ -44,7 +44,9 @@ Later on, centralized cloud platforms emerged and began to offer services that a
 
 However, similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, so do your cost and you're left with little means of re-platforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line, and the pressure is on.
 
----
+### A Decentralized Middle Tier
+
+<!--**A better way?**-->
 
 Each of these problems deserve their own blog post
 
@@ -64,6 +66,18 @@ But what if you could push opinionation to the edge? How could that improve outc
 
 As a team building a part of the decentralized future, here's our take.
 
+### The Centralization Success Trap
+
+<img src="/images/success_trap.png" width="{{ .Width }}" height="{{ .Height }}">
+
+A major selling point of centralization is the convenience of data aggregation and co-location of compute. When data and compute are co-located developing applications becomes very straight forward (more on that later). The more abstract the relationship between data and compute, the easier it is to create secure applications.
+
+Platforms provide **abstractions** through hyper-opinionated services **in the middle**. As confirmed by Moxie, this is a massive advantage for applications in the early stages of development as fewer resources are required to innovate. But what's the catch?
+
+Similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, the cost of these choices begin to show their fangs, leaving you with little means of re-platforming. Now you are stuck with the surprise compute and egress fees eating away at your bottom line, and the pressure is on.
+
+Instead, what you want is a system that allows developers to enjoy the benefits of the decentralized model without any of the operational overhead and contingency planning for hyperbolic growth.
+
 ### The Right Protocol for the Right Problem
 
 <!--<img src="/images/right_protocol.png" width="{{ .Width }}" height="{{ .Height }}">-->
@@ -76,19 +90,7 @@ This cost and trade-off in experience for developers and users however, is not a
 
 It is, after all, the eventually consistent use case that makes up the bulk of all applications we see today and is where the team at Kubelt did much of our thinking about how to develop a **"decentralized middle tier"**.
 
-### Decentralizing the Middle Tier
-
-<!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
-
-To truly decentralize an application, you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, except for [Filecoin](ipns://filecoin.io/). You can't run a blockchain on the client, so a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
-
-When backing IPFS with Filecoin, all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to SQLite databases, WASM, and more -- you pick! You are also breaking problems down to a size that a client can handle at the edge where you can now **"bring your own opinions."**
-
-With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict-free replicated data types (CRDTs).
-
-These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, **collapsing APIs into a fully decentralized protocol** simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
-
-### The User is the Application
+### The Wallet is a Node
 
 <!--<img src="/images/user_application.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
@@ -110,7 +112,19 @@ Starting from the early days of the Message Object Model (SmallTalk, Corba) and 
 
 All that's missing is content management for data and compute!
 
-### Local-First
+### Content is Data
+
+<!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
+
+To truly decentralize an application, you also need to decentralize the application content itself. As we already discussed, most blockchains aren't great for this, except for [Filecoin](ipns://filecoin.io/). You can't run a blockchain on the client, so a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is just as important.
+
+When backing IPFS with Filecoin, all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to SQLite databases, WASM, and more -- you pick! You are also breaking problems down to a size that a client can handle at the edge where you can now **"bring your own opinions."**
+
+With that said, you can already take advantage of an existing **ecosystem** of **open-source**, client-side libraries, frameworks and tools which can continue to grow and flourish independently of any service. Take the work being done by [Ink and Switch](https://www.inkandswitch.com/), for example, which is solving for distributed conflict-free replicated data types (CRDTs).
+
+These same content addresses can also pack and fully encrypt signatures, schemas, versions, and more, **collapsing APIs into a fully decentralized protocol** simplifying the traditional three-tier application architecture. This isn't to be underestimated. It pushes almost the entire application to the client, meaning developers can create **novel applications** and their own user experiences on a uniform, distributed API surface permissioned by the end-user.
+
+### Permissioning = Better Outcomes for Everyone
 
 When combining capacity, availability, and distribution (IPFS + Filecoin) with _wallets_, we can now discuss a fully generalized protocol that is convenient and useful for application development. This is because wallets are ubiquitous across multiple platforms. We can use them to ensure access to content and capabilities are correctly governed in a way that is at par or better than centralized services.
 
