@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.http.request
   "Miscellaneous HTTP request utilties."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [goog.Uri]
    [goog.object])

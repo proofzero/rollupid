@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.bag.check
   "Checks for BAG and subsidiary types."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 (defn dag?
   "Return true if the given value is a DAG."

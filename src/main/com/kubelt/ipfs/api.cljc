@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.api
   "Declarative map of available API surface."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.walk :as walk])
   (:require

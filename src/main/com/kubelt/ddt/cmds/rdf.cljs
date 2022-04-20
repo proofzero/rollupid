@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.rdf
   "CLI setup for 'rdf' sub-command."
-  {:author "Kubelt, Inc."}
+  {:author "Proof Zero Inc."}
   (:require
    [com.kubelt.ddt.cmds.rdf.data :as rdf.data]
    [com.kubelt.ddt.cmds.rdf.index :as rdf.index]

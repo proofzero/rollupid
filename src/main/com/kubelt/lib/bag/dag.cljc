@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.bag.dag
   "Defines the DAGs that are stored in a BAG."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.bag.check :as bag.check]
    [com.kubelt.lib.bag.node :as bag.node]

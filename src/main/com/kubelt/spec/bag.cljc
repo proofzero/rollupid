@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.bag
   "Defines a spec for the kubelt BAG (Bundle of Acyclic Graphs) type."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.ipld :as ipld]))
 

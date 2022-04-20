@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.core
   "CLI setup for SDK > core sub-command."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.sdk.core.authenticate :as core.authenticate]
    [com.kubelt.ddt.cmds.sdk.core.logged-in :as core.logged-in]

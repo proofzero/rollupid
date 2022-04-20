@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs.v0.swarm.address
   "Methods for investigating a libp2p swarm."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ipfs.util :as ipfs.util]
    [com.kubelt.ipfs.v0 :as ipfs.v0]))

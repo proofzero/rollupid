@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.wallet.init
   "Invoke the wallet (init) method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["path" :as path])
   (:require

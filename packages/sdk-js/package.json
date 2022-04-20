@@ -2,7 +2,7 @@
   "name": "@kubelt/sdk-js",
   "version": "0.0.1-next.49+59d5010",
   "description": "Kubelt SDK (for JavaScript)",
-  "author": "Kubelt, Inc.",
+  "author": "Proof Zero Inc.",
   "homepage": "https://github.com/kubelt/kubelt#readme",
   "license": "Apache-2.0",
   "main": "lib/sdk.js",

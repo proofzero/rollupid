@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.jwt
   "Wrapper around jose JWT library."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #?(:node
      (:require
       ["crypto" :as crypto]))

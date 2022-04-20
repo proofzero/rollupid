@@ -1,6 +1,6 @@
 (ns com.kubelt.ipfs
   "IPFS client."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ipfs.client :as ipfs.client])
   (:require
