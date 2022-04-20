@@ -58,6 +58,7 @@
     "karma": "6.3.17",
     "karma-chrome-launcher": "3.1.1",
     "karma-cljs-test": "0.1.0",
+    "karma-junit-reporter": "2.0.1",
     "lerna": "4.0.0",
     "node-polyfill-webpack-plugin": "1.1.4",
     "sanipack": "2.1.0",
