@@ -1,6 +1,6 @@
 (ns kubelt.sidebar.script
   "Sidebar business logic."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 ;; TODO should this be a shared worker to allow access from both the
 ;; sidebar and the script injected into the page?

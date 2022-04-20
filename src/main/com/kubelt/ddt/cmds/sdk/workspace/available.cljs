@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.workspace.available
   "Invoke the 'sdk workspace available' method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))

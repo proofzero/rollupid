@@ -1,6 +1,6 @@
 (ns com.kubelt.car.file
   "Support for working with CAR-format files."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #_(:require
    ["@ipld/car" :as ipld.car :refer [CarReader CarWriter]]
    ["fs" :as fs]

@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.p2p
   "Wrapper around the external p2p naming system."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as cstr])
   (:require

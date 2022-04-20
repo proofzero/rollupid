@@ -1,5 +1,5 @@
 (ns com.kubelt.lib.crypto.seed
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.crypto.digest :as lib.digest]
    [com.kubelt.lib.uuid :as lib.uuid]))

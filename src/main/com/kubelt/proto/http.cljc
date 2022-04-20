@@ -1,6 +1,6 @@
 (ns com.kubelt.proto.http
   "A protocol for making HTTP requests."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 
 (defprotocol HttpClient

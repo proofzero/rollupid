@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt
   "The entry-point for the Kubelt Development CLI tool."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require
@@ -26,7 +26,7 @@
   2022)
 
 (def copyright-author
-  "Kubelt Inc.")
+  "Proof Zero Inc.")
 
 (def epilogue
   (str "Copyright ©" copyright-year ", " copyright-author))

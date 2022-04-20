@@ -1,6 +1,6 @@
 (ns build.command
   "Miscellaneous build-related tooling."
-  {:copyright "©2021 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2021 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.tools.cli :as cli])
   (:require

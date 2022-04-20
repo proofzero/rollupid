@@ -1,6 +1,6 @@
 (ns com.kubelt.spec.crypto
   "Defines a spec for crypto-related data."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.spec.common :as spec.common]))
 

@@ -1,7 +1,7 @@
 (ns com.kubelt.lib.bag.node
   "Defines the nodes that are stored in a BAG and which map onto IPLD CAR
   blocks."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.bag.check :as bag.check]
    [com.kubelt.lib.ipld :as ipld]))

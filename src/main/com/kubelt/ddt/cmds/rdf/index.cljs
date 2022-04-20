@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.rdf.index
   "Generate a CAR index of supported RDF vocabularies."
-  {:copyright "ⓒ2022 Kubelt, Inc." :license "Apache 2.0"})
+  {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"})
 
 (defonce command
   {:command "index <car-files>"

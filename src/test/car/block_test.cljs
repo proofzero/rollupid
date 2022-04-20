@@ -1,6 +1,6 @@
 (ns car.block-test
   "Test the encoding and decoding of IPLD blocks."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["multiformats/block" :as block :refer [Block]]
    ["multiformats/cid" :as cid :refer [CID]]
