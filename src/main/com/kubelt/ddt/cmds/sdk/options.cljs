@@ -17,7 +17,9 @@
               yargs)
 
    :handler (fn [args]
-              (let [args-map (ddt.options/to-map args)
+              (let [;; Convert command line arguments to a Clojure map.
+                    args-map (ddt.options/to-map args)
+                    ;; Transform command line arguments into an SDK options map.
                     options (ddt.options/init-options args-map)
                     kbt (sdk/init options)]
                 (if (lib.error/error? kbt)

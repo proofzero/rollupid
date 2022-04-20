@@ -10,6 +10,7 @@
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
    [com.kubelt.lib.util :as util]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
   (:require
@@ -324,15 +325,17 @@
   "Return an options map that can be used to reinitialize the SDK."
   [sys-map]
   (let [ipfs-read (get sys-map :ipfs/read-addr)
-        ipfs-read-scheme (get-in sys-map [:client/ipfs :ipfs/read :http/scheme])
+        ipfs-read-scheme (get sys-map :ipfs/read-scheme)
         ipfs-write (get sys-map :ipfs/write-addr)
-        ipfs-write-scheme (get-in sys-map [:client/ipfs :ipfs/write :http/scheme])
+        ipfs-write-scheme (get sys-map :ipfs/write-scheme)
         p2p-read (get sys-map :p2p/read-addr)
         p2p-read-scheme (get-in sys-map [:client/p2p :p2p/read :http/scheme])
         p2p-write (get sys-map :p2p/write-addr)
         p2p-write-scheme (get-in sys-map [:client/p2p :p2p/write :http/scheme])
         log-level (get sys-map :log/level)
-        credentials {}]
+        ;; TODO rename :crypto/session to :crypto/vault for clarity
+        credentials (lib.vault/tokens (:crypto/session sys-map))
+        wallet (get sys-map :crypto/wallet)]
     {:log/level log-level
      :ipfs/read ipfs-read
      :ipfs.read/scheme ipfs-read-scheme
@@ -342,4 +345,5 @@
      :p2p.read/scheme p2p-read-scheme
      :p2p/write p2p-write
      :p2p.write/scheme p2p-write-scheme
+     :crypto/wallet wallet
      :credential/jwt credentials}))

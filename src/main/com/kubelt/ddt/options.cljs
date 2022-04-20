@@ -9,6 +9,12 @@
 ;; Defaults
 ;; -----------------------------------------------------------------------------
 
+(def scheme-default
+  "http")
+
+(def scheme-choices
+  #js ["http" "https"])
+
 (def host-default
   "127.0.0.1")
 
@@ -79,6 +85,17 @@
        :string true
        :nargs 1})
 
+(def ipfs-read-scheme
+  "ipfs-read-scheme")
+
+(def ipfs-read-scheme-config
+  #js {:describe "use http or https to talk to IPFS read instance"
+       :requiresArg true
+       :demandOption "scheme is required"
+       :choices scheme-choices
+       :nargs 1
+       :default scheme-default})
+
 (def ipfs-read-host
   "ipfs-read-host")
 
@@ -100,6 +117,17 @@
        :number true
        :nargs 1
        :default ipfs-port-default})
+
+(def ipfs-write-scheme
+  "ipfs-write-scheme")
+
+(def ipfs-write-scheme-config
+  #js {:describe "use http or https to talk to IPFS write instance"
+       :requiresArg true
+       :demandOption "scheme is required"
+       :choices scheme-choices
+       :nargs 1
+       :default scheme-default})
 
 (def ipfs-write-host
   "ipfs-write-host")
@@ -152,10 +180,14 @@
   (.option yargs host-name host-config)
   ;; Add --port option
   (.option yargs port-name port-config)
+  ;; Add --ipfs-read-scheme
+  (.option yargs ipfs-read-scheme ipfs-read-scheme-config)
   ;; Add --ipfs-read-host option
   (.option yargs ipfs-read-host ipfs-read-host-config)
   ;; Add --ipfs-read-port option
   (.option yargs ipfs-read-port ipfs-read-port-config)
+  ;; Add --ipfs-write-scheme
+  (.option yargs ipfs-write-scheme ipfs-write-scheme-config)
   ;; Add --ipfs-write-host option
   (.option yargs ipfs-write-host ipfs-write-host-config)
   ;; Add --ipfs-write-port option
@@ -190,10 +222,12 @@
         ipfs-read-host (get m :ipfs-read-host)
         ipfs-read-port (get m :ipfs-read-port)
         ipfs-read (cstr/join "/" ["" "ip4" ipfs-read-host "tcp" ipfs-read-port])
+        ipfs-read-scheme (keyword (get m :ipfs-read-scheme))
         ;; Store coordinates of IPFS write host as a multiaddress.
         ipfs-write-host (get m :ipfs-write-host)
         ipfs-write-port (get m :ipfs-write-port)
         ipfs-write (cstr/join "/" ["" "ip4" ipfs-write-host "tcp" ipfs-write-port])
+        ipfs-write-scheme (keyword (get m :ipfs-write-scheme))
         ;; Turn a sequence of core names and JWT strings into a map:
         ;; ["aaa" "bbb" "ccc" "ddd"]
         ;; => {"aaa" "bbb", "ccc" "ddd"}
@@ -204,18 +238,26 @@
         (assoc :p2p-maddr p2p-maddr)
         (assoc :p2p-scheme p2p-scheme)
         (assoc :ipfs-read ipfs-read)
+        (assoc :ipfs-read-scheme ipfs-read-scheme)
         (assoc :ipfs-write ipfs-write)
+        (assoc :ipfs-write-scheme ipfs-write-scheme)
         (assoc :credentials credentials)
         (update :log-level keyword))))
 
 (defn init-options
+  "Transform an argument map into a map of options that can be used to
+  initialize the SDK. The argument map should contain arguments provided
+  on the command line, and have been transformed from a JavaScript
+  object to a Clojure map using (to-map)."
   [m]
   {:pre [(map? m)]}
   (let []
     {:credential/jwt (get m :credentials)
      :log/level (get m :log-level)
      :ipfs/read (get m :ipfs-read)
+     :ipfs.read/scheme (get m :ipfs-read-scheme)
      :ipfs/write (get m :ipfs-write)
+     :ipfs.write/scheme (get m :ipfs-write-scheme)
      :p2p/read (get m :p2p-maddr)
      :p2p.read/scheme (get m :p2p-scheme)
      :p2p/write (get m :p2p-maddr)
