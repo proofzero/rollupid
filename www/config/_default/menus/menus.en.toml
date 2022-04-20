@@ -15,10 +15,10 @@
  url = "https://reference.kubelt.com"
  weight = 20
 
-[[main]]
-  name = "Showcase"
-  url = "/showcase/"
-  weight = 40
+#[[main]]
+  #name = "Showcase"
+  #url = "/showcase/"
+  #weight = 40
 
 [[main]]
   name = "Blog"

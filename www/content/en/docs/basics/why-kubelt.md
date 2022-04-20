@@ -13,6 +13,8 @@ weight: 101
 toc: true
 ---
 
+_Feel free to check out **[Kubelt's approach to decentralization]({{< relref "01-hello-world" >}})** for an **in-depth** walkthrough._
+
 ## Stop paying the cloud tax\!
 
 Existing cloud providers surprise users with **unfair fees** that scale with the success of their applications.
@@ -30,8 +32,6 @@ These applications that can be composed in a peer-to-peer configuration, unlocki
 ## Content management; not content storage
 
 The current state of decentralized storage is a high-touch experience that requires a certain level of knowledge about cryptography, networking, and more.
-
-Kubelt abstracts this complexity away with an intuitive headless content management experience for developers and non-techinical users with existing CMS [plugins]({{< relref "plugins" >}}).
 
 Content to Kubelt is **everything** from documents, databases, rich media, wasm compute, and more. All content remains encapsualted within a Kubelt Core and distributed over a decentralized network.
 

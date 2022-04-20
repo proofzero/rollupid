@@ -33,8 +33,6 @@ Read about how Kubelt works by checking out our [whitepaper]({{< relref "Guides"
 
 Learn how to build applications on Kubelt by reading our [guides]({{< relref "Guides" >}}) or starting with our [quick start]({{< relref "Quick-Start" >}}) page.
 
-Not a developer? Check out our [plugins]({{< relref "plugins" >}}) page to find a UI you like.
-
 You can also login to our configuration [portal dApp](https://app.kubelt.com) to explore the network.
 
 #### Join the community
