@@ -1,8 +1,10 @@
-(ns com.kubelt.lib.config
+(ns com.kubelt.lib.config.opts
   "Configuration-related support."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [com.kubelt.lib.detect :as detect]
+   [com.kubelt.lib.wallet :as lib.wallet]))
 
 ;; Default logging level.
 (def log-level :warn)
@@ -29,7 +31,7 @@
 (def default-credentials
   {:credential/jwt {}})
 
-(def default-config
+(def sdk-defaults
   (merge default-ipfs
          default-p2p
          default-logging
@@ -48,14 +50,15 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-(defn obj->map
-  "Convert a JavaScript configuration object to a Clojure config map."
-  [o]
-  {:pre [(object? o)]}
-  (let [config (js->clj o :keywordize-keys true)]
-    (if (empty? config)
-      default-config
-      ;; Fix up any config map values that didn't translate from
-      ;; JavaScript.
-      (-> config
-          (update-in [:logging/min-level] log-level->keyword)))))
+#?(:node
+   (defn obj->map
+     "Convert a JavaScript configuration object to a Clojure config map."
+     [o]
+     {:pre [(object? o)]}
+     (let [config  (js->clj o :keywordize-keys true)]
+       (if (empty? config)
+         sdk-defaults
+       ;; Fix up any config map values that didn't translate from
+       ;; JavaScript.
+         (-> config
+             (update-in [:logging/min-level] log-level->keyword))))))

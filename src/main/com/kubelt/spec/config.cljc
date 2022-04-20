@@ -39,7 +39,7 @@
 ;; -----------------------------------------------------------------------------
 ;; Specifies the the configuration map passed to the sdk/init function.
 
-(def config
+(def sdk-config
   [:map {:closed true}
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
@@ -61,4 +61,4 @@
    {:title "Configuration"
     :description "The SDK configuration map"
     :example {:logging/min-level :info}}
-   config])
+   sdk-config])

@@ -1,8 +1,6 @@
 (ns com.kubelt.lib.detect
   "Node and gateway detection."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
-  (:require
-   [clojure.string :as str]))
+  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"})
 
 ;; Public
 ;; -----------------------------------------------------------------------------
