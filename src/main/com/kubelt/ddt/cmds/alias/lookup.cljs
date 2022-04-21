@@ -5,12 +5,14 @@
    [com.kubelt.lib.error :as lib.error]))
 
 (defonce command
-  {:command "lookup"
+  {:command "lookup <core> <alias-name>"
    :desc "Lookup a core's alias"
-   :requiresArg true
+   :requiresArg false
 
    :builder (fn [^Yargs yargs]
               yargs)
 
    :handler (fn [args]
-              (println "TODO lookup core alias"))})
+              (let [args-map (js->clj args :keywordize-keys true)
+               {:keys [host port core]} args-map]
+              (println "TODO lookup core alias")))})

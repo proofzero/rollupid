@@ -9,7 +9,7 @@
 
 (defn add-alias!
   "Add an alias to a core"
-  [sys core]
+  [sys core alias-name target-address]
   {:pre [(string? core)]}
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
@@ -40,7 +40,7 @@
 
 (defn lookup!
   "resolve a core address by looking up the alias in a core" 
-  [sys core nonce signature]
+  [sys core alias-name]
   {:pre [(every? string? [core nonce])]}
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
@@ -51,6 +51,7 @@
 
         ralias "fixme-request-alias"
         path (cstr/join "" ["/@" core "/alias/" ralias])
+        test-request "/@0x7c5b59f22af326e045389f3a123d0b5aba5d0bb2/alias/parent"
 
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
@@ -58,5 +59,5 @@
                  :uri/scheme scheme
                  :uri/domain host
                  :uri/port port
-                 :uri/path path}]
+                 :uri/path test-request}]
     (http/request! client request)))
