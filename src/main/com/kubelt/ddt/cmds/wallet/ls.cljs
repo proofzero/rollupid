@@ -7,6 +7,7 @@
    [clojure.string :as cstr])
   (:require
    [com.kubelt.ddt.color :as ddt.color]
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
@@ -19,8 +20,8 @@
               yargs)
 
    :handler (fn [args]
-              (let [args-map (js->clj args :keywordize-keys true)
-                    app-name (get args-map :$0)]
+              (let [args-map (ddt.options/to-map args)
+                    app-name (get args-map :app-name)]
                 (doseq [wallet-name (lib.wallet/ls app-name)]
                   (let [arrow (ddt.color/hilite "->")
                         wallet-line (cstr/join " " [arrow wallet-name])]

@@ -10,10 +10,6 @@
 ;; the "Schema AST" map-based syntax instead as that should be faster to
 ;; instantiate for large schemas.
 
-(def platform
-  "Supported execution environments."
-  [:enum :platform.type/node :platform.type/browser :platform.type/jvm])
-
 (def logging-level
   "Logging levels defined by the timbre logging library."
   [:and
@@ -32,19 +28,28 @@
 (def multiaddr
   [:re #"^(/(\w+)/(\w+|\.)+)+$"])
 
+(def credentials
+  [:and
+   {:description "A map from core name to JWT strings."
+    :example {"0x123abc" "<header>.<payload>.<signature>"}}
+   ;; TODO flesh this out
+   [:map-of :string :string]])
+
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the the configuration map passed to the sdk/init function.
 
 (def config
   [:map {:closed true}
-   [:sys/platform {:optional true} platform]
-   [:logging/min-level {:optional true} logging-level]
+   [:log/level {:optional true} logging-level]
+   [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
-   [:p2p/read {:optional true} multiaddr]
-   [:p2p.read/scheme {:optional true} spec.http/scheme]
-   [:p2p/write {:optional true} multiaddr]
-   [:p2p.write/scheme {:optional true} spec.http/scheme]])
+   [:ipfs/read {:optional true} multiaddr]
+   [:ipfs.read/scheme {:optional true} spec.http/scheme]
+   [:ipfs/write {:optional true} multiaddr]
+   [:ipfs.write/scheme {:optional true} spec.http/scheme]
+   [:p2p/multiaddr {:optional true} multiaddr]
+   [:p2p/scheme {:optional true} spec.http/scheme]])
 
 (def config-schema
   "Schema for SDK configuration map."

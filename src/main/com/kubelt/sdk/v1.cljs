@@ -95,3 +95,24 @@
        (if (lib.error/error? result)
          (reject (clj->js result))
          (resolve result))))))
+
+;; options
+;; -----------------------------------------------------------------------------
+
+(defn options
+  "Return the options map representing the SDK state, allowing for the SDK
+  to be re-instantiated."
+  [system]
+  {:pre [(map? system)]}
+  (lib.init/options system))
+
+(defn options-js
+  "Return an options object for the SDK from a JavaScript context."
+  [system]
+  {:pre [(map? system)] :post [(promise? %)]}
+  (promise
+   (fn [resolve reject]
+     (let [result (options system)]
+       (if (lib.error/error? result)
+         (reject (clj->js result))
+         (resolve (clj->js result)))))))
