@@ -39,6 +39,8 @@
 (def system
   {;; These empty defaults should be overridden from the SDK init
    ;; options map.
+   :system/started nil
+
    :log/level nil
    :ipfs/read-addr nil
    :ipfs/read-scheme nil
@@ -53,7 +55,8 @@
                              :ipfs/multiaddr (ig/ref :ipfs/read-addr)}
                  :ipfs/write {:http/scheme (ig/ref :ipfs/write-scheme)
                               :ipfs/multiaddr (ig/ref :ipfs/write-addr)}
-                 :client/http (ig/ref :client/http)}
+                 :client/http (ig/ref :client/http)
+                 :started (ig/ref :system/started)}
    ;; Our connection to the Kubelt p2p system.
    :client/p2p {:http/scheme (ig/ref :p2p/scheme)
                 :p2p/multiaddr (ig/ref :p2p/multiaddr)}
@@ -70,11 +73,15 @@
 ;; :log/level
 ;; -----------------------------------------------------------------------------
 
+(defmethod ig/init-key :system/started [_ _]
+  (atom nil))
+
 (defmethod ig/init-key :log/level [_ min-level]
   ;; Initialize the logging system.
   (when min-level
     (log/merge-config! {:min-level min-level}))
   min-level)
+
 
 ;; :ipfs/read-addr
 ;; -----------------------------------------------------------------------------
@@ -169,6 +176,7 @@
                      :write/scheme write-scheme
                      :write/host write-host
                      :write/port write-port
+                     :started (:started value)
                      ;; Set a global timeout for *all* requests:
                      ;;:client/timeout 5000
                      }]

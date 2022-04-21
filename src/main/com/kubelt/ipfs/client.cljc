@@ -339,12 +339,14 @@
              ;; write nodes.
              (-> (lib.promise/all [read-p write-p])
                  (.then (fn [[read-info write-info]]
-                          ;; Returns the final shape of the client map.
-                          ;;(merge options read-info))
-                          (-> {:com.kubelt/type :kubelt.type/ipfs-client
-                               :http/client client}
-                              (assoc :node/read read-info)
-                              (assoc :node/write write-info))))))))))))
+                            ;; Returns the final shape of the client map.
+                            ;;(merge options read-info))
+                          (let [data (-> {:com.kubelt/type :kubelt.type/ipfs-client
+                                          :http/client client}
+                                         (assoc :node/read read-info)
+                                         (assoc :node/write write-info))]
+                            (reset! (:started options) data)
+                            data)))))))))))
 
 #?(:cljs
    (defn init-js
