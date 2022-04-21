@@ -60,7 +60,7 @@ Most applications, however, do not benefit from a blockchain in the same way. Al
 
 <!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
-To truly decentralize an application, you also need to decentralize the APIs. A blockchain can't run on the client so a centralized _(http gateway is required)_ but, a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) is not.
+To truly decentralize an application, you also need to decentralize the APIs. A blockchain generally can't run on the client, which means a centralized _(http gateway is required)_; but a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) can.
 
 With IPFS, backed by Filecoin, all content is available through a decentralized network encoded as immutable **content addresses**. These addresses can pack anything from JSON documents to SQLite databases, WASM, and more -- you pick! By using content addresses, you are also breaking problems down to a size that a client can handle at the edge where you can now pick and choose from an ecosystem of **open source tools, libraries and abstractions.**.
 
