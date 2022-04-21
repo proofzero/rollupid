@@ -6,9 +6,10 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
-   [com.kubelt.lib.detect :as detect]
+   [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
    [com.kubelt.lib.util :as util]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
   (:require
@@ -36,15 +37,26 @@
 ;; Cf. https://github.com/weavejester/integrant.
 
 (def system
-  {;; Our connection to IPFS.
-   :client/ipfs {:ipfs/multiaddr "/ip4/127.0.0.1/tcp/5001"
-                 :client/http {}}
-   ;; Our connection to the Kubelt p2p system. Typically write paths
-   ;; will go through a kubelt managed http gateway.
-   :client/p2p {:p2p/read {:http/scheme :http
-                           :http/address "/ip4/127.0.0.1/tcp/8787"}
-                :p2p/write {:http/scheme :http
-                            :http/address "/ip4/127.0.0.1/tcp/8787"}}
+  {;; These empty defaults should be overridden from the SDK init
+   ;; options map.
+   :log/level nil
+   :ipfs/read-addr nil
+   :ipfs/read-scheme nil
+   :ipfs/write-addr nil
+   :ipfs/write-scheme nil
+   :p2p/scheme nil
+   :p2p/multiaddr nil
+   ;; Our common HTTP client.
+   :client/http {}
+   ;; Our connection to IPFS.
+   :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs/read-scheme)
+                             :ipfs/multiaddr (ig/ref :ipfs/read-addr)}
+                 :ipfs/write {:http/scheme (ig/ref :ipfs/write-scheme)
+                              :ipfs/multiaddr (ig/ref :ipfs/write-addr)}
+                 :client/http (ig/ref :client/http)}
+   ;; Our connection to the Kubelt p2p system.
+   :client/p2p {:http/scheme (ig/ref :p2p/scheme)
+                :p2p/multiaddr (ig/ref :p2p/multiaddr)}
    ;; A map from scope identifier to session token (JWT). Upon
    ;; successfully authenticating against a core, the returned session
    ;; token is kept here.
@@ -54,6 +66,67 @@
    ;; TODO provide no-op wallet implementation, or try to detect wallet
    ;; in the environment, e.g. metamask in browser.
    :crypto/wallet {}})
+
+;; :log/level
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :log/level [_ min-level]
+  ;; Initialize the logging system.
+  (when min-level
+    (log/merge-config! {:min-level min-level}))
+  min-level)
+
+;; :ipfs/read-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/read-addr [_ address]
+  ;; Return the multiaddress string.
+  address)
+
+;; :ipfs/read-scheme
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/read-scheme [_ scheme]
+  scheme)
+
+;; :ipfs/write-addr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/write-addr [_ address]
+  address)
+
+;; :ipfs/write-scheme
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs/write-scheme [_ scheme]
+  scheme)
+
+;; :p2p/multiaddr
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/multiaddr [_ address]
+  address)
+
+;; :p2p/scheme
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/scheme [_ scheme]
+  scheme)
+
+;; :client/http
+;; -----------------------------------------------------------------------------
+;; TODO support custom user agent string.
+
+(defmethod ig/init-key :client/http [_ value]
+  {:post [(not (nil? %))]}
+  (log/debug {:log/msg "init HTTP client"})
+  #?(:browser (http.browser/->HttpClient)
+     :node (http.node/->HttpClient)
+     :clj (http.jvm/->HttpClient)))
+
+(defmethod ig/halt-key! :client/http [_ client]
+  {:pre [(satisfies? proto.http/HttpClient client)]}
+  (log/debug {:log/msg "halt HTTP client"}))
 
 ;; :client/ipfs
 ;; -----------------------------------------------------------------------------
@@ -68,27 +141,37 @@
 ;;   agent {:agent (.. http Agent.)}
 
 (defmethod ig/init-key :client/ipfs [_ value]
-  (let [;; Set a global timeout for *all* requests:
-        timeout {:timeout "2m"}
-        ;; Supply the address of the IPFS node:
-        maddr-str (get value :ipfs/multiaddr)
-        url {:url maddr-str}
-        ;; Create the options object we pass to client creation fn.
-        options (clj->js (merge url timeout))
+  (let [;; Supply the address of the IPFS node(s). Read and write can
+        ;; use different paths if desired, e.g. when you want to read
+        ;; from a local daemon but write to a remote service for
+        ;; pinning.
+        read-addr (get-in value [:ipfs/read :ipfs/multiaddr])
+        read-map (lib.multiaddr/str->map read-addr)
+        read-host (:address/host read-map)
+        read-port (:address/port read-map)
+        read-scheme (get-in value [:ipfs/read :http/scheme])
+        write-addr (get-in value [:ipfs/write :ipfs/multiaddr])
+        write-map (lib.multiaddr/str->map write-addr)
+        write-host (:address/host write-map)
+        write-port (:address/port write-map)
+        write-scheme (get-in value [:ipfs/write :http/scheme])
         ;; Get the platform-specific HTTP client.
         http-client (get value :client/http)]
-    (log/debug {:log/msg "init IPFS client" :ipfs/addr maddr-str})
+    (let [ipfs-read (str (name read-scheme) "://" read-addr)
+          ipfs-write (str (name write-scheme) "://" write-addr)]
+      (log/debug {:log/msg "init IPFS client" :ipfs/read ipfs-read :ipfs/write ipfs-write}))
     (try
-      (let [;; TODO convert multiaddress to URL parts and pass in
-            ;; options map to IPFS client.
-            ;; http-scheme ""
-            ;; http-host ""
-            ;; http-port ""
-            ;; options {:http/scheme http-scheme
-            ;;          :http/host http-host
-            ;;          :http/port http-port}
-            options {:http/client http-client}]
-        ;;(.create ipfs-http-client options)
+      ;; Create the options object we pass to client creation fn.
+      (let [options {:http/client http-client
+                     :read/scheme read-scheme
+                     :read/host read-host
+                     :read/port read-port
+                     :write/scheme write-scheme
+                     :write/host write-host
+                     :write/port write-port
+                     ;; Set a global timeout for *all* requests:
+                     ;;:client/timeout 5000
+                     }]
         (ipfs.client/init options))
       (catch js/Error e
         (log/fatal e))
@@ -101,68 +184,42 @@
 ;; :client/p2p
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :client/p2p [_ {:keys [p2p/read p2p/write] :as value}]
+(defmethod ig/init-key :client/p2p [_ {:keys [http/scheme p2p/multiaddr] :as value}]
   ;; If we wanted to initialize a stateful client for the p2p system,
   ;; this would be the place. Since that system exposes a stateless HTTP
   ;; API, we'll just convert the multiaddresses we're given for the p2p
   ;; read/write nodes into more conventional coordinates (host, port) in
   ;; the system configuration map and pull them out when we need to make
   ;; a call.
-  (let [;; read; get the multiaddr string and convert into a map
+  (let [p2p-addr (str (name scheme) "://" multiaddr)]
+    (log/debug {:log/msg "init p2p client" :p2p/address p2p-addr}))
+  (let [;; Get the multiaddr string and convert into a map
         ;; containing {:address/host :address/port}.
-        read-maddr (get read :http/address)
-        read-scheme (get read :http/scheme)
-        read-address (-> read-maddr
-                         lib.multiaddr/str->map
-                         (assoc :http/scheme read-scheme))
-        ;; write
-        write-maddr (get write :http/address)
-        write-scheme (get write :http/scheme)
-        write-address (-> write-maddr
-                          lib.multiaddr/str->map
-                          (assoc :http/scheme write-scheme))
-        ;; Format log messages.
-        log-read (str (name read-scheme) "::" read-maddr)
-        log-write (str (name write-scheme) "::" write-maddr)]
-    (log/debug {:log/msg "init p2p client" :read/addr log-read :write/addr log-write})
+        address (lib.multiaddr/str->map multiaddr)
+        host (get address :address/host)
+        port (get address :address/port)]
     (-> value
-        (assoc :p2p/read read-address)
-        (assoc :p2p/write write-address))))
+        (assoc :http/scheme scheme)
+        (assoc :http/host host)
+        (assoc :http/port port))))
 
 (defmethod ig/halt-key! :client/p2p [_ value]
   (log/debug {:log/msg "halt p2p client"}))
 
-;; :client/http
-;; -----------------------------------------------------------------------------
-;; TODO if possible, we want that when compiling an environment-specific
-;; variant of the SDK that we are optimizing away whichever of these
-;; HttpClient protocol reifications isn't used.
-
-;; We expect the value to be a keyword naming the execution environment
-;; that we are initializing for.
-(defmethod ig/init-key :client/http [_ env]
-  {:post [(not (nil? %))]}
-  (log/debug {:log/msg "init HTTP client [" env "]"})
-  #?(:browser (http.browser/->HttpClient)
-     :node (http.node/->HttpClient)
-     :clj (http.jvm/->HttpClient))
-  #_(condp = env
-    :platform.type/browser (http.browser/->HttpClient)
-    ;;:platform.type/jvm (http.jvm/->HttpClient)
-    :platform.type/node (http.node/->HttpClient)))
-
-(defmethod ig/halt-key! :client/http [_ client]
-  {:pre [(satisfies? proto.http/HttpClient client)]}
-  (log/debug {:log/msg "halt HTTP client"}))
-
 ;; :crypto/session
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :crypto/session [_ env]
+(defmethod ig/init-key :crypto/session [_ tokens]
   (log/debug {:log/msg "init session"})
-  ;; Our session storage map is a "vault".
-  {:com.kubelt/type :kubelt.type/vault
-   :vault/tokens {}})
+  ;; If any JWTs are provided, parse them and store the decoded result.
+  (let [tokens (reduce (fn [m [core token]]
+                         (let [decoded (lib.jwt/decode token)]
+                           (assoc m core decoded)))
+                       {}
+                       tokens)]
+    ;; Our session storage map is a "vault".
+    {:com.kubelt/type :kubelt.type/vault
+     :vault/tokens tokens}))
 
 (defmethod ig/halt-key! :crypto/session [_ session]
   (log/debug {:log/msg "halt session"}))
@@ -201,32 +258,38 @@
 ;; depend on it.
 (defn init
   "Initialize the SDK."
-  [{:keys [logging/min-level] :as options}]
-  ;; Initialize the logging system.
-  (when min-level
-    (log/merge-config! {:min-level min-level}))
+  [options]
   ;; NB: inject supplied configuration into the system map before
   ;; calling ig/init. The updated values will be passed to the system
   ;; init fns.
-  (let [;; Initialize for given platform if specified by user, or detect
-        ;; the current platform and initialize accordingly, otherwise.
-        platform (or (get options :sys/platform)
-                     (util/platform))
+  (let [;; Use any JWTs supplied as options.
+        credentials (get options :credential/jwt {})
         ;; Use the wallet provided by the user, or default to a no-op
         ;; wallet otherwise.
         wallet (or (get options :crypto/wallet)
                    (lib.wallet/no-op))
-        ;; Get p2p connection addresses determined by whether or not we
-        ;; can detect a locally-running p2p node.
-        default (:client/p2p system)
-        p2p-options (detect/node-or-gateway default options)
+        ;; Get the address of the IPFS node we talk to.
+        ipfs-read (get options :ipfs/read)
+        ipfs-read-scheme (get options :ipfs.read/scheme)
+        ipfs-write (get options :ipfs/write)
+        ipfs-write-scheme (get options :ipfs.write/scheme)
+        ;; Get the address of the Kubelt gateway we talk to.
+        p2p-scheme (get options :p2p/scheme)
+        p2p-multiaddr (get options :p2p/multiaddr)
+        ;; Get the default minimum log level.
+        log-level (get options :log/level)
         ;; Update the system configuration map before initializing the
         ;; system.
         system (-> system
-                   (assoc :sys/platform platform)
-                   (assoc :crypto/wallet wallet)
-                   (assoc :client/http platform)
-                   (assoc :client/p2p p2p-options))]
+                   (assoc :log/level log-level)
+                   (assoc :ipfs/read-addr ipfs-read)
+                   (assoc :ipfs/read-scheme ipfs-read-scheme)
+                   (assoc :ipfs/write-addr ipfs-write)
+                   (assoc :ipfs/write-scheme ipfs-write-scheme)
+                   (assoc :p2p/scheme p2p-scheme)
+                   (assoc :p2p/multiaddr p2p-multiaddr)
+                   (assoc :crypto/session credentials)
+                   (assoc :crypto/wallet wallet))]
     ;; NB: If we provide an additional collection of keys when calling
     ;; integrant.core/init, only those keys will be initialized.
     ;;
@@ -238,3 +301,26 @@
   "Clean-up resources used by the SDK."
   [sys-map]
   (ig/halt! sys-map))
+
+(defn options
+  "Return an options map that can be used to reinitialize the SDK."
+  [sys-map]
+  (let [ipfs-read (get sys-map :ipfs/read-addr)
+        ipfs-read-scheme (get sys-map :ipfs/read-scheme)
+        ipfs-write (get sys-map :ipfs/write-addr)
+        ipfs-write-scheme (get sys-map :ipfs/write-scheme)
+        p2p-multiaddr (get sys-map :p2p/multiaddr)
+        p2p-scheme (get sys-map :p2p/scheme)
+        log-level (get sys-map :log/level)
+        ;; TODO rename :crypto/session to :crypto/vault for clarity
+        credentials (lib.vault/tokens (:crypto/session sys-map))
+        wallet (get sys-map :crypto/wallet)]
+    {:log/level log-level
+     :ipfs/read ipfs-read
+     :ipfs.read/scheme ipfs-read-scheme
+     :ipfs/write ipfs-write
+     :ipfs.write/scheme ipfs-write-scheme
+     :p2p/scheme p2p-scheme
+     :p2p/multiaddr p2p-multiaddr
+     :crypto/wallet wallet
+     :credential/jwt credentials}))
