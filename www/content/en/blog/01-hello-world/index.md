@@ -84,7 +84,7 @@ However, all of this is easier said than done! We're still missing a big piece o
 🤯 Messaging APIs \
 🤯 Blockchain Smart Contracts & Payments
 
-All that's missing is configuration for data and compute!
+All we need to do now is put it all together!
 
 ### Enter Kubelt Cores
 
