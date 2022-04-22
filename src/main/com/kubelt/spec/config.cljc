@@ -35,6 +35,11 @@
    ;; TODO flesh this out
    [:map-of :string :string]])
 
+(def storage
+  [:and
+   {:description "FIXME"}
+   :map])
+
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the configuration map passed to the sdk/init function.
@@ -55,7 +60,8 @@
    [:ipfs.write/port {:optional true} spec.http/port]
    [:p2p/scheme {:optional true} spec.http/scheme]
    [:p2p/host {:optional true} spec.http/host]
-   [:p2p/port {:optional true} spec.http/port]])
+   [:p2p/port {:optional true} spec.http/port]
+   [:platform/storage {:optional true} storage]])
 
 ;; After default options and user-supplied options are combined, we
 ;; should have an SDK configuration options map that has every value
