@@ -4,7 +4,7 @@
    [cljs.test :as t :refer [deftest is testing use-fixtures]]
    [clojure.string :as str])
   (:require
-   [com.kubelt.lib.config :as config]
+   [com.kubelt.lib.config.opts :as config]
    [com.kubelt.lib.detect :as detect]))
 
 (deftest local-node?-test
