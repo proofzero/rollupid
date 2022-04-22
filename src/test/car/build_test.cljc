@@ -1,6 +1,6 @@
 (ns car.build-test
   "Test the creation of a car-map from a BAG."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [chan go <! >!]]
    [cljs.core.async.interop :refer-macros [<p!]]
@@ -14,7 +14,7 @@
    [com.kubelt.lib.bag :as bag]
    [com.kubelt.lib.bag.dag :as bag.dag]
    [com.kubelt.lib.bag.node :as bag.node]
-   [com.kubelt.lib.car.build :as car.build]
+   [com.kubelt.car.build :as car.build]
    [com.kubelt.lib.ipld :as ipld]
    [com.kubelt.spec.car :as spec.car]))
 

@@ -1,6 +1,6 @@
 (ns com.kubelt.kbt.cmds.workspace
   "Sets up the CLI 'workspace' command group."
-  {:copyright "ⓒ2022 Kubelt Inc." :license "Apache 2.0"}
+  {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.kbt.cmds.workspace.list :as workspace.list]))
 

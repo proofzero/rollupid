@@ -1,13 +1,14 @@
 (ns com.kubelt.ddt.cmds.wallet.rm
   "Invoke the wallet (rm) method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["process" :as process])
   (:require
    [clojure.string :as cstr])
   (:require
-   [com.kubelt.ddt.util :as ddt.util]
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
+   [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
 (defonce command
@@ -19,8 +20,8 @@
               yargs)
 
    :handler (fn [args]
-              (let [args-map (js->clj args :keywordize-keys true)
-                    app-name (get args-map :$0)
+              (let [args-map (ddt.options/to-map args)
+                    app-name (get args-map :app-name)
                     wallet-name (get args-map :name)]
                 ;; Check that the wallet to remove exists.
                 (when-not (lib.wallet/has-wallet? app-name wallet-name)

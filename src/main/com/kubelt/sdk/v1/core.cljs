@@ -1,13 +1,14 @@
 (ns com.kubelt.sdk.v1.core
   "Account management."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [<! go]])
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.http.status :as http.status]
+   [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.p2p :as lib.p2p]
-   [com.kubelt.lib.promise :refer [promise]]
+   [com.kubelt.lib.promise :as lib.promise :refer [promise]]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
 ;; authenticate!
@@ -26,8 +27,10 @@
   hex-encoded string along with the account id. These two pieces of
   information together kick off a zero-knowledge authentication request.
 
-  The decryption function stored in the wallet will be used to decrypt
-  a nonce to complete the proof"
+  The decryption function stored in the wallet will be used to decrypt a
+  nonce to complete the proof. Returns a promise that resolves to the
+  updated system map containing the JWT for the given core, or is
+  rejected with some information about the error that occurred."
   [sys core]
   ;; TODO add an extra arity that allows a wallet to be passed in?
   ;; TODO validate system map (especially: ensure wallet is present)
@@ -39,7 +42,8 @@
   (-> (lib.p2p/authenticate! sys core)
       (.then (fn [auth-result]
                (if (lib.error/error? auth-result)
-                 auth-result
+                 ;; This triggers .catch handlers on returned promise.
+                 (throw (ex-info "error" auth-result))
                  ;; We successfully retrieved a nonce, now verify it by signing
                  ;; it and sending it back.
                  (get-in auth-result [:http/body :nonce]))))
@@ -54,20 +58,18 @@
                       (fn [signature]
                         (let [result (lib.p2p/verify! sys core nonce signature)]
                           (if (lib.error/error? result)
-                            result
+                            (throw (ex-info "invalid signature" result))
                             ;; If successful we get back a JWT that needs to be stored
                             ;; in the system map. NB: the JWT has an expiry and encodes
                             ;; client IP to restrict renewing JWTs for other clients.
                             ;; TODO check/assert that this is true.
                             (.then result
-                                   (fn [{:keys [http/status http/body]}]
-                                     (if (http.status/success? status)
-                                       (let [jwt body]
-                                         (assoc-in sys [:crypto/session :vault/tokens core] jwt))
-                                       ;; We weren't able to retrieve
-                                       ;; the token, return the system
-                                       ;; map unchanged.
-                                       sys)))))))))))
+                                   (fn [{:keys [http/status http/body] :as response}]
+                                     (if-not (http.status/success? status)
+                                       (throw (ex-info "http error" response))
+                                       (let [jwt (lib.jwt/decode body)]
+                                         ;; TODO verify jwt
+                                         (assoc-in sys [:crypto/session :vault/tokens core] jwt)))))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
@@ -82,9 +84,9 @@
 ;; TODO check for valid sys map.
 (defn logged-in?
   [sys core]
-  (let [sessions (get sys :crypto/session)]
+  (let [session-tokens (get-in sys [:crypto/session :vault/tokens])]
     ;; TODO validate the JWT using the current wallet
-    (contains? sessions core)))
+    (contains? session-tokens core)))
 
 (defn logged-in-js?
   [sys core]

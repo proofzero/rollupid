@@ -1,6 +1,6 @@
 (ns com.kubelt.ddt.cmds.sdk.core.authenticate
   "Invoke the 'sdk core authenticate' method."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [<!]]
    [clojure.string :as cstr])
@@ -14,43 +14,37 @@
    [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (defonce command
-  {:command "authenticate <core>"
+  {:command "authenticate"
    :desc "Authenticate an account"
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
-              (let [;; Enforce string type, otherwise yargs parses a
-                    ;; wallet address starting with "0x" as a big
-                    ;; integer.
-                    core-config #js {:describe "a @core name"
-                                     :type "string"}]
-                (.positional yargs "core" core-config)
-                (ddt.options/options yargs))
+              ;; Include the common options.
+              (ddt.options/options yargs)
               yargs)
 
    :handler (fn [args]
-              (let [args-map (js->clj args :keywordize-keys true)
-                    {:keys [host port tls core]} args-map
-                    app-name (get args-map :$0)
-                    wallet-name (get args-map :wallet)
-                    maddr (str "/ip4/" host "/tcp/" port)
-                    scheme (if tls :https :http)]
-                (ddt.prompt/ask-password!
-                 (fn [err result]
-                   (ddt.util/exit-if err)
-                   (async/go
-                     (let [password (.-password result)
-                           wallet (<! (lib.wallet/load app-name wallet-name password))
-                           kbt (sdk/init {:crypto/wallet wallet
-                                          :p2p/read maddr
-                                          :p2p.read/scheme scheme
-                                          :p2p/write maddr
-                                          :p2p.write/scheme scheme})]
-                       (-> (sdk.core/authenticate! kbt core)
-                           (.then (fn [result]
-                                    (if (lib.error/error? result)
-                                      (prn (:error kbt))
-                                      ;; TODO encrypt(?) and store returned JWT
-                                      (prn result))))
-                           (.then (fn []
-                                    (sdk/halt! kbt))))))))))})
+              (ddt.prompt/ask-password!
+               (fn [err result]
+                 (ddt.util/exit-if err)
+                 (async/go
+                   (let [args-map (ddt.options/to-map args)
+                         ;; Load the wallet.
+                         app-name (get args-map :app-name)
+                         wallet-name (get args-map :wallet)
+                         password (.-password result)
+                         wallet (<! (lib.wallet/load app-name wallet-name password))
+                         ;; Transform command line arguments into an SDK options map.
+                         options (-> args-map
+                                     ddt.options/init-options
+                                     (assoc :crypto/wallet wallet))
+                         kbt (sdk/init options)
+                         address (:wallet/address wallet)]
+                     (-> (sdk.core/authenticate! kbt address)
+                         (.then (fn [result]
+                                  (prn result)))
+                         (.catch (fn [e]
+                                   (println (ex-message e))
+                                   (prn (ex-data e))))
+                         (.finally (fn []
+                                     (sdk/halt! kbt)))))))))})

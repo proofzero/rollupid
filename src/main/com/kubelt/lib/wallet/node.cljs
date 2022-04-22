@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.wallet.node
   "The Node.js implementation of a crypto wallet wrapper."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [goog.object :as gobj])
   (:require
@@ -58,7 +58,7 @@
 (defn- wallet-dir
   "Return the wallet directory path as a string for an application."
   [app-name]
-  (let [config-path (lib.path/config app-name)
+  (let [config-path (lib.path/data app-name)
         wallet-path (.join path config-path "wallets")]
     wallet-path))
 

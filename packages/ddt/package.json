@@ -5,7 +5,7 @@
   "keywords": [
     "kubelt"
   ],
-  "author": "Kubelt, Inc.",
+  "author": "Proof Zero Inc.",
   "homepage": "https://kubelt.com",
   "license": "Apache-2.0",
   "main": "lib/ddt.js",

@@ -1,7 +1,7 @@
 (ns com.kubelt.ipfs.util
   "Utilities for converting API resource description maps into functions
   that accept resource parameters and return resource descriptors."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [malli.core :as malli]
    [malli.error]

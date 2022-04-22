@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.rdf.json-ld
   "Generate RDF/cljs quads from JSON-LD."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   ;; This breaks web build
   #_(:require
    ["jsonld" :as jsonld])

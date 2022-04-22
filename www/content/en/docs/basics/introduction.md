@@ -17,9 +17,9 @@ toc: false
 
 ## What is Kubelt?
 
-Kubelt's integrated peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave like any crypto wallets with the addition of content enabled APIs. These cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
+Kubelt's peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave any crypto wallet with the addition of content-enabled APIs. Cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
 
-What content means to Kubelt really is anything! Kubelt Cores can host anything from web content, user databases, web assembly (compute), and more. Kubelt Cores are also compatible with popular wallet cryptography algorithms meaning you or your users don't need new ID protocols to use Kubelt -- **your wallet is your entrypoint into the network!**
+What content means to Kubelt really is anything! Kubelt Cores can host anything from web content, user databases, WebAssembly, and more. Kubelt Cores are also compatible with popular wallet cryptography meaning you or your users don't need new ID protocols to use Kubelt -- **your wallet is your entrypoint into the network!**
 
 ### Getting Started
 
@@ -33,10 +33,10 @@ Read about how Kubelt works by checking out our [whitepaper]({{< relref "Guides"
 
 Learn how to build applications on Kubelt by reading our [guides]({{< relref "Guides" >}}) or starting with our [quick start]({{< relref "Quick-Start" >}}) page.
 
-You can also login to our configuration [portal dApp](https://app.kubelt.com) to explore the network.
+You can also use our configuration [portal dApp](https://app.kubelt.com) to explore the network.
 
 #### Join the community
 
-- Join our [Discord](https://discord.gg/UgwAsJf6C5) to ask questions and engage with the community.
+- Join our [Discord](https://discord.gg/UgwAsJf6C5) community to ask questions.
 - Follow us on [Twitter](https://twitter.com/kubeltcms) for updates.
 - Check out our [Github](https://github.com/kubelt) and read our [contributors guidelines]({{< relref "contributing" >}}).

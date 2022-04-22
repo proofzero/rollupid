@@ -1,6 +1,6 @@
 (ns car.block-test
   "Test the encoding and decoding of IPLD blocks."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    ["multiformats/block" :as block :refer [Block]]
    ["multiformats/cid" :as cid :refer [CID]]
@@ -16,8 +16,8 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.lib.car.block :as car.block]
-   [com.kubelt.lib.car.build :as car.build]
+   [com.kubelt.car.block :as car.block]
+   [com.kubelt.car.build :as car.build]
    [com.kubelt.lib.ipld :as ipld]))
 
 ;; NB: when writing asynchronous tests, use the clojure.test/async macro

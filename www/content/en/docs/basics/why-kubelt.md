@@ -17,39 +17,45 @@ _Feel free to check out **[Kubelt's approach to decentralization]({{< relref "01
 
 ## Stop paying the cloud tax\!
 
-Existing cloud providers surprise users with **unfair fees** that scale with the success of their applications.
+Existing cloud providers surprise users with **unfair fees** that scale with the success of your application.
 
-With Kubelt, applications and content are optionally deployed to the edge over a decentralized, local-first content routing and delivery network called IPFS, saving users from egress and other variable cloud fees.
+With Kubelt applications and content are deployed to the edge over a decentralized, local-first content routing and delivery network called IPFS, saving you from egress and other surprise cloud fees.
 
 ## Users are the application
 
-Traditional applications incentivize data aggregration that require large and expensive databases with complex governance overhead.
+Traditional applications incentivize data aggregration and require large, expensive databases with complex governance overhead.
 
-With Kubelt, applications are namespaced within our [Kubelt Cores]({{< relref "How-it-works" >}}) permissioned to individual user cryptography and designed to run in a fully local context -- **just like a wallet**. Access to application data, configurations and more is controlled by APIs just like with your favorite web3 wallet.
+With Kubelt applications are namespaced within your [Kubelt Cores]({{< relref "How-it-works" >}}), permissioned to individual user cryptography, and designed to run locally -- **just like a wallet**. Access to application data, configuration, and more is controlled by APIs just like with your favorite web3 wallet.
 
-These applications that can be composed in a peer-to-peer configuration, unlocking endless possibilities.
+These applications can be composed in a peer-to-peer configuration, unlocking endless possibilities.
 
-## Content management; not content storage
+## Content management not content storage
 
-The current state of decentralized storage is a high-touch experience that requires a certain level of knowledge about cryptography, networking, and more.
+Implementing decentralized storage without Kubelt is hard. It requires expertise in cryptography, networking, and more.
 
 Content to Kubelt is **everything** from documents, databases, rich media, wasm compute, and more. All content remains encapsualted within a Kubelt Core and distributed over a decentralized network.
 
 ## Advantages for Web2 apps too
 
-Connect and expand your existing application stack with an integrated edge platform to take advantage and benefit from decentralization.
+Connect and expand your existing application stack with an integrated edge platform to take advantage of decentralization.
 
-Kubelt cores makes your applications wallet-aware to simplify identity protocols and enable novel, user-centric application development.
+Kubelt Cores makes your applications wallet-aware to simplify identity protocols and enable novel, user-centric application development.
 
 Our Javascript tools and libraries provide a familiar developer experience to make all of this easy and intuitive.
 
 ## Eventual Consistency + Consensus
 
-Blockchain is Web3 but, Web3 is not just blockchain. The middle-tier is still centralized to provide access to bridge decentralized clients with decentralized back-ends. Smart contracts were introduced to address part of this problem but introduce new problems in speed, cost, and cascading effects (you don't want a bug in your business logic to cause a major financial loss).
+Web3 is bigger than blockchain. Right now, the middle tier of web3 is centralized, built on web2 architectures, to bridge decentralized clients with decentralized chains. The middle tier can and should be decentralized too.
 
-Kubelt decentralizes the middle-tier, in an eventually consistent network, in the same way as your stateless web framework moved application logic outside of databases and stored procedures while also providing novel capabilities such as:
+Storage and compute can happen on-chain through, for example, smart contracts. However this introduces new problems in speed, cost, and cascading effects (you don't want a bug in your business logic to cause a major financial loss).
 
-- Interoperability with traditional and blockchain applications.
+Kubelt decentralizes the middle-tier in the same way that stateless web frameworks moved application logic outside of database stored procedures.
+
+This model also unlocks novel capabilities such as:
+
+- User-centric data storage
+- Local-first development
+- Interoperability between traditional and blockchain applications
 - Zero-knowledge content management
-- Multi-signing mutations
+- Multi-signing mutations for assurance and accountability
 - Peer-to-peer collaboration

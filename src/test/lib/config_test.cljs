@@ -17,31 +17,31 @@
 
   (testing "logging levels"
     (testing "log level"
-      (let [options {:logging/min-level :log}]
+      (let [options {:log/level :log}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :log is valid")))
     (testing "trace level"
-      (let [options {:logging/min-level :trace}]
+      (let [options {:log/level :trace}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :trace is valid")))
     (testing "debug level"
-      (let [options {:logging/min-level :debug}]
+      (let [options {:log/level :debug}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :debug is valid")))
     (testing "info level"
-      (let [options {:logging/min-level :info}]
+      (let [options {:log/level :info}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :info is valid")))
     (testing "warn level"
-      (let [options {:logging/min-level :warn}]
+      (let [options {:log/level :warn}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :warn is valid")))
     (testing "error level"
-      (let [options {:logging/min-level :error}]
+      (let [options {:log/level :error}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :error is valid")))
     (testing "fatal level"
-      (let [options {:logging/min-level :fatal}]
+      (let [options {:log/level :fatal}]
         (is (malli/validate spec.config/config options)
             "logging min-level of :fatal is valid"))))
 
@@ -56,12 +56,12 @@
 
     (testing "multiaddr"
       (testing "localhost"
-        (let [options {:p2p/read "/ip4/127.0.0.1"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/127.0.0.1"}]
           (is (malli/validate spec.config/config options)
               "loopback IP is a valid network address"))
-        (let [options {:p2p/read "/ip4/localhost"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/localhost"}]
           (is (malli/validate spec.config/config options)
               "localhost is a valid network address"))
-        (let [options {:p2p/read "/ip4/127.0.0.1/tcp/8080"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/127.0.0.1/tcp/8080"}]
           (is (malli/validate spec.config/config options)
               "localhost:8080 is a valid network address"))))))

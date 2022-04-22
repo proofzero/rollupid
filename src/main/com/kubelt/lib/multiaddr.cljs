@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.multiaddr
   "Multiaddress utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as str])
   (:require

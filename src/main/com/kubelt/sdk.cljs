@@ -1,6 +1,6 @@
 (ns com.kubelt.sdk
   "Entry point for the Kubelt SDK."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
    [com.kubelt.sdk.v1.core :as sdk.v1.core]
@@ -46,6 +46,7 @@
 (def node-v1
   #js {:init sdk.v1/init-js
        :halt sdk.v1/halt-js!
+       :options sdk.v1/options-js
 
        ;; core
        :core #js {:authenticate sdk.v1.core/authenticate-js!

@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.error
   "Error-related utilities."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [malli.core :as mc]
    [malli.error :as me]))

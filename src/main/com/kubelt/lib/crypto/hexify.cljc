@@ -1,6 +1,6 @@
 (ns com.kubelt.lib.crypto.hexify
   "Generate hex strings from byte data."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #?(:clj
      (:import
       [org.bouncycastle.util.encoders Hex]))

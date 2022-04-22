@@ -33,7 +33,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: DeLaGuardo/setup-clojure@5.0
+      - uses: DeLaGuardo/setup-clojure@5.1
         with:
           cli: 1.11.0.1100
           #lein: latest

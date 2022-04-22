@@ -53,6 +53,7 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, [], 'v1');
     check(kbt, ['v1'], 'init');
     check(kbt, ['v1'], 'halt');
+    check(kbt, ['v1'], 'options');
     check(kbt, ['v1', 'core'], 'authenticate'),
     check(kbt, ['v1'], 'workspace');
     check(kbt, ['v1', 'workspace'], 'available');
@@ -95,7 +96,7 @@ tap.test('sdk init', (t) => {
 
     tap.test('with valid config', (t) => {
         return kbt.v1.init({
-            "logging/min-level": "info",
+            "log/level": "info",
         }).then((sdk) => {
             t.type(sdk, 'object');
             return kbt.v1.halt(sdk);

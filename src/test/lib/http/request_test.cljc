@@ -1,6 +1,6 @@
 (ns lib.http.request-test
   "Test various http request-related functionality."
-  {:copyright "©2022 Kubelt, Inc." :license "UNLICENSED"}
+  {:copyright "©2022 Proof Zero Inc." :license "UNLICENSED"}
   #?(:cljs
      (:require
       [cljs.test :as t :refer [deftest is testing use-fixtures]])

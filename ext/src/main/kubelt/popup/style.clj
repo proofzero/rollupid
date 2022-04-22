@@ -1,6 +1,6 @@
 (ns kubelt.popup.style
   "Generate the popup panel CSS."
-  {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.tools.cli :refer [parse-opts]]
    [garden.core :as g]
