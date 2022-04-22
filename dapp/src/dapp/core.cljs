@@ -64,6 +64,8 @@
                   (fn [db]
                     (:current-user db)))
 
+(re-frame/reg-sub ::db (fn [db] db))
+
 (defn init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [::initialize-db])

@@ -88,14 +88,21 @@
  (fn [db [_ wallet-address err]]
    (assoc-in db [:sdk/ctx :errors wallet-address] err)))
 
-(re-frame/reg-event-db
+;; Two events for disconnect for testing async completion via re-frame-test
+(re-frame/reg-event-fx
  ::disconnect
- (fn [{:keys [web3-modal] :as db} [_ wallet-address]]
+ (fn [{:keys [db]} [_ wallet-address]]
    (log/info {:message (str "Disconnecting from address: " wallet-address)})
    ;; Clear the provider from the web3-modal object
-   (.clearCachedProvider web3-modal)
+   (.clearCachedProvider (:web3-modal db))
    ;; Reset the SDK context to `init` state
-   (assoc db :sdk/ctx (sdk.v1/init))))
+   {:db (assoc db :sdk/ctx (sdk.v1/init))
+    :dispatch [::disconnect-success]}))
+
+(re-frame/reg-event-db
+ ::disconnect-success
+ (fn [db _]
+   (dissoc db :web3-modal)))
 
 ; TODO
 ; Handle the account changed event
