@@ -5,7 +5,8 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.lib.config :as lib.config]
+   [com.kubelt.lib.config.opts :as lib.config.opts]
+   [com.kubelt.lib.config.system :as lib.config.system]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :refer [promise promise?]]
@@ -30,19 +31,15 @@
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
   ([]
-   {:post [(map? %)]}
-   (let [config lib.config/default-config]
-     (if (m/validate spec.config/config config)
-       (lib.init/init config)
-       (lib.error/explain spec.config/config config))))
-
+   (init {}))
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
-   (if (m/validate spec.config/config config)
-     (let [config (merge lib.config/default-config config)]
-       (lib.init/init config))
-     (lib.error/explain spec.config/config config))))
+   (if (m/validate spec.config/sdk-config config)
+     (let [sdk-config (merge lib.config.opts/sdk-defaults config)
+           system-config (lib.config.system/config lib.config.system/default sdk-config)]
+       (lib.init/init system-config))
+     (lib.error/explain spec.config/sdk-config config))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
@@ -64,7 +61,7 @@
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
-   (let [config (lib.config/obj->map config)]
+   (let [config (lib.config.opts/obj->map config)]
      (promise
       (fn [resolve reject]
         (let [result (init config)]
@@ -104,7 +101,7 @@
   to be re-instantiated."
   [system]
   {:pre [(map? system)]}
-  (lib.init/options system))
+  (lib.config.system/hidrate-options system))
 
 (defn options-js
   "Return an options object for the SDK from a JavaScript context."
