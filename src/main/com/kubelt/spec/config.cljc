@@ -26,7 +26,11 @@
 ;; TODO refine this regex to better match a multiaddr
 ;; TODO move into com.kubelt.spec.multiaddr
 (def multiaddr
-  [:re #"^(/(\w+)/(\w+|\.)+)+$"])
+  [:re #?(;; cljs can't generate re values  so providing a default one
+          :cljs {:gen/fmap (fn [_] "/ip4/127.0.0.1/tcp/5001")}
+          ;; TODO: add test.check dependency, required for clj env
+          :clj {})
+   #"^(/(\w+)/(\w+|\.)+)+$"])
 
 (def credentials
   [:and
