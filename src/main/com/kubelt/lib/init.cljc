@@ -149,6 +149,8 @@
                      ;; Set a global timeout for *all* requests:
                      ;;:client/timeout 5000
                      }]
+        ;; TODO this returns a promise that is being directly included
+        ;; in the system map rather than resolved and the data used.
         (ipfs.client/init options))
       (catch js/Error e
         (log/fatal e))
