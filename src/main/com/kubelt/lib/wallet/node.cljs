@@ -2,58 +2,17 @@
   "The Node.js implementation of a crypto wallet wrapper."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [goog.object :as gobj])
-  (:require
    ["fs" :as fs]
    ["path" :as path])
   (:require
-   ["@ethersproject/keccak256" :refer [keccak256]]
-   ["@ethersproject/signing-key" :refer [SigningKey]]
    ["@ethersproject/wallet" :refer [Wallet]])
   (:require
-   [cljs.core.async :as async :refer [go take! <!]]
-   [cljs.core.async.interop :refer-macros [<p!]]
-   [clojure.set :as cset])
-  (:require
-   [camel-snake-kebab.core :as csk])
+   [cljs.core.async :as async :refer [go]]
+   [cljs.core.async.interop :refer-macros [<p!]])
   (:require
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.octet :as lib.octet]
    [com.kubelt.lib.path :as lib.path]
-   [com.kubelt.lib.promise :refer [promise]]))
-
-
-(defn- make-sign-fn
-  "Given an Ethereum wallet, return a signing function that uses the
-  wallet's private key to sign the digest of some given data. To match
-  what happens in the browser, the signing function returns a promise
-  that resolves to the signature value."
-  [eth-wallet]
-  (fn [data]
-    (promise
-     (fn [resolve reject]
-       (let [private-key (.-privateKey eth-wallet)
-             signing-key (SigningKey. private-key)
-
-             data-length (count data)
-             prefix (str "\u0019Ethereum Signed Message:\n" data-length)
-             prefix+data (str prefix data)
-             data-bytes (lib.octet/as-bytes prefix+data)
-
-             digest (keccak256 data-bytes)
-             signature-raw (.signDigest signing-key digest private-key)
-             signature (gobj/get signature-raw "compact")]
-         (resolve signature))))))
-
-(defn- random-wallet
-  []
-  (go
-    (let [eth-wallet (.createRandom Wallet)
-          address (<p! (.getAddress eth-wallet))
-          sign-fn (make-sign-fn eth-wallet)]
-      {:com.kubelt/type :kubelt.type/wallet
-       :wallet/address address
-       :wallet/sign-fn sign-fn})))
+   [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
 (defn- wallet-dir
   "Return the wallet directory path as a string for an application."
@@ -83,6 +42,7 @@
         wallet-path (.join path wallet-path wallet-name)]
     wallet-path))
 
+;; Unused predicate
 (defn- valid-perms?
   "Return true if the named wallet has the correct permissions, false
   otherwise."
@@ -154,7 +114,7 @@
       (go
         (let [eth-wallet (.fromEncryptedJsonSync Wallet wallet-str password)
               address (.-address eth-wallet)
-              sign-fn (make-sign-fn eth-wallet)]
+              sign-fn (lib.wallet/make-sign-fn eth-wallet)]
           {:com.kubelt/type :kubelt.type/wallet
            :wallet/address address
            :wallet/sign-fn sign-fn})))))
@@ -176,7 +136,7 @@
   ""
   []
   :fixme
-  ;; (<! (random-wallet))
-  #_(let [sign-fn (make-sign-fn eth-wallet)]
+  ;; (<! (lib.wallet/random-wallet))
+  #_(let [sign-fn (lib.wallet/make-sign-fn eth-wallet)]
     {:wallet/address :fixme
      :wallet/sign-fn sign-fn}))
