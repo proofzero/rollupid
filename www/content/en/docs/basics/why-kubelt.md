@@ -13,6 +13,8 @@ weight: 101
 toc: true
 ---
 
+_Feel free to check out **[Kubelt's approach to decentralization]({{< relref "01-hello-world" >}})** for an **in-depth** walkthrough._
+
 ## Stop paying the cloud tax\!
 
 Existing cloud providers surprise users with **unfair fees** that scale with the success of your application.
@@ -31,9 +33,7 @@ These applications can be composed in a peer-to-peer configuration, unlocking en
 
 Implementing decentralized storage without Kubelt is hard. It requires expertise in cryptography, networking, and more.
 
-Kubelt abstracts this complexity away with an intuitive headless content management experience for developers and non-technical users with existing CMS [plugins]({{< relref "plugins" >}}).
-
-Content to Kubelt is **everything**: documents, databases, rich media, wasm compute, and more. All content remains encapsulated within a Kubelt Core distributed over a decentralized network.
+Content to Kubelt is **everything** from documents, databases, rich media, wasm compute, and more. All content remains encapsualted within a Kubelt Core and distributed over a decentralized network.
 
 ## Advantages for Web2 apps too
 
