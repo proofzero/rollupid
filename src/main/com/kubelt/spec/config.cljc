@@ -44,9 +44,9 @@
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
-   [:ipfs/read {:optional true} multiaddr]
+   [:ipfs.read/multiaddr {:optional true} multiaddr]
    [:ipfs.read/scheme {:optional true} spec.http/scheme]
-   [:ipfs/write {:optional true} multiaddr]
+   [:ipfs.write/multiaddr {:optional true} multiaddr]
    [:ipfs.write/scheme {:optional true} spec.http/scheme]
    [:p2p/multiaddr {:optional true} multiaddr]
    [:p2p/scheme {:optional true} spec.http/scheme]])
