@@ -10,7 +10,8 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :refer [promise promise?]]
-   [com.kubelt.spec.config :as spec.config]))
+   [com.kubelt.spec.config :as spec.config])
+  (:require-macros [com.kubelt.spec :as kspec]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
@@ -35,11 +36,11 @@
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
-   (if (m/validate spec.config/sdk-config config)
-     (let [sdk-config (merge lib.config.opts/sdk-defaults config)
-           system-config (lib.config.system/config lib.config.system/default sdk-config)]
-       (lib.init/init system-config))
-     (lib.error/explain spec.config/sdk-config config))))
+   (kspec/conform
+    spec.config/optional-sdk-config config
+    (let [sdk-config (merge lib.config.opts/sdk-defaults config)
+          system-config (lib.config.system/config lib.config.system/default sdk-config)]
+      (lib.init/init system-config)))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
