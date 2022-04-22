@@ -185,9 +185,12 @@ jobs:
           babashka-version: 0.7.8
       # Compile and run dapp
       - run: npm run build:dapp:release
+      - run: npm run test:dapp:ci:compile
+      # Run Cypress tests AFTER the server is running
       - run: npm run test:dapp:ci:run
-      # Run tests AFTER since Cypress needs server running
-      - run: npm run test:dapp:ci
+      # Compile and run re-frame tests with karma
+      - run: npm run test:dapp-karma:ci:compile
+      - run: npm run test:dapp-karma:ci:run
 
   test-plugin-sanity:
     needs: changes

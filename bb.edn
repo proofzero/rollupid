@@ -132,7 +132,7 @@
 
   build:dapp:develop-watch
   {:doc "Watch dapp sources and build development version when changed"
-   :task (shell "npx shadow-cljs watch dapp browser-test karma-test")}
+   :task (shell "npx shadow-cljs watch dapp dapp-test dapp-ci")}
 
   build:dapp:cypress-watch
   {:doc "Launch Cypress and run tests when changed"
@@ -234,18 +234,32 @@
   {:doc "Run web tests using headless browser"
    :depends [test:web:ci:compile test:web:ci:run]}
 
-  test:dapp:ci:run
+  test:dapp-karma:ci:compile
+  {:doc "Compile re-frame tests to be run with karma"
+   :task (shell "npx shadow-cljs compile dapp-ci")}
+
+  test:dapp-karma:ci:run
+  {:doc "Run re-frame tests with karma"
+   :task (shell {:dir "dapp/"} "npx karma start --single-run --reporters junit,dots")}
+
+  test:dapp:ci:compile
   {:doc "Serve dapp server after files are compiled"
    :task (shell "npx shadow-cljs start dapp")}
 
-  test:dapp:ci
+  test:dapp:ci:run
   {:doc "Run dapp Cypress tests"
    ;; needs to have the dapp server running
    ;; can be run against `release` or `development` versions
    :task (shell {:dir "dapp/"} "npx cypress run")}
 
   -test:dapp:release
-  {:depends [build:dapp:release test:dapp:ci:run test:dapp:ci]}
+  {:depends [build:dapp:release
+             ;; Compile and run Cypress tests
+             test:dapp:ci:compile
+             test:dapp:ci:run
+             ;; Compile and run re-frame tests w/karma
+             test:dapp-karma:ci:compile
+             test:dapp-karma:ci:run]}
 
   test:dapp:release
   {:task (run '-test:dapp:release)}
