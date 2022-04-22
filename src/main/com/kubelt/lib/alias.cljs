@@ -41,23 +41,25 @@
 (defn lookup!
   "resolve a core address by looking up the alias in a core" 
   [sys core alias-name]
-  {:pre [(every? string? [core nonce])]}
+ ;; {:pre [(every? string? [core alias-name])]}
+  (println "hereiam in lookup")
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
-        port (get-in sys [:client/p2p :p2p/write :address/port])
-        body {:nonce nonce :signature signature}
+        ;;port (get-in sys [:client/p2p :p2p/write :address/port])
+        body {}
         body-str (lib.json/edn->json-str body)
 
         ralias "fixme-request-alias"
-        path (cstr/join "" ["/@" core "/alias/" ralias])
+        ;;path (cstr/join "" ["/@" core "/alias/" ralias])
         test-request "/@0x7c5b59f22af326e045389f3a123d0b5aba5d0bb2/alias/parent"
-
+        _ (println "hereiam in lookup after args")
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
-                 :uri/scheme scheme
-                 :uri/domain host
-                 :uri/port port
+                 :uri/scheme :http
+                 :uri/domain "127.0.0.1"
+                 :uri/port 8787
                  :uri/path test-request}]
-    (http/request! client request)))
+        _ (println request)
+                 (http/request! client request)))
