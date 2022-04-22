@@ -28,7 +28,7 @@
 (def default
   {;; These empty defaults should be overridden from the SDK init
    ;; options map.
-   :log/level nil
+   :log/level {:min-level :info}
    :ipfs/read-addr nil
    :ipfs/read-scheme nil
    :ipfs/write-addr nil

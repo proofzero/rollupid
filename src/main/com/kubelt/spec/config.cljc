@@ -39,8 +39,9 @@
 ;; -----------------------------------------------------------------------------
 ;; Specifies the the configuration map passed to the sdk/init function.
 
-(def sdk-config
-  [:map {:closed true}
+(def optional-sdk-config
+  [:map {:closed true
+         :title ::optional-sdk-config}
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
@@ -50,6 +51,17 @@
    [:ipfs.write/scheme {:optional true} spec.http/scheme]
    [:p2p/multiaddr {:optional true} multiaddr]
    [:p2p/scheme {:optional true} spec.http/scheme]])
+
+(def sdk-config
+  (into [:map {:closed true
+               :title ::sdk-config}]
+        (map #(assoc-in % [1 :optional] false) (drop 2 optional-sdk-config))))
+
+(def system-config
+  [:map {;;:closed false
+         :title ::system-config}
+   [:log/level {:optional false}
+    [:map [:min/level logging-level]]]])
 
 (def config-schema
   "Schema for SDK configuration map."

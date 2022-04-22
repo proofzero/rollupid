@@ -6,4 +6,4 @@
 (defmacro conform [spec data & body]
   `(if (m/validate ~spec ~data)
      (do ~@body)
-     (lib.error/explain ~spec ~data)))
+     (lib.error/explain ~spec ~data :kubelt.type/spec-error)))

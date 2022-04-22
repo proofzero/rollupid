@@ -28,7 +28,10 @@
 (defn explain
   "Return human-friendly description of why some value doesn't conform to
   the provided schema."
-  [schema value]
+  [schema value & [type-error]]
   (let [explain (-> schema (mc/explain value) me/humanize)]
-    {:com.kubelt/type :kubelt.type/error
-     :error explain}))
+    (merge
+     {:com.kubelt/type (or type-error :kubelt.type/error)}
+     (when (:title (mc/properties schema))
+       {:title (:title (mc/properties schema))})
+     {:error explain})))

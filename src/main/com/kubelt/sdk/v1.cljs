@@ -38,9 +38,13 @@
    {:pre [(map? config)] :post [(map? %)]}
    (kspec/conform
     spec.config/optional-sdk-config config
-    (let [sdk-config (merge lib.config.opts/sdk-defaults config)
-          system-config (lib.config.system/config lib.config.system/default sdk-config)]
-      (lib.init/init system-config)))))
+    (let [sdk-config (merge lib.config.opts/sdk-defaults config)]
+      (kspec/conform
+       spec.config/sdk-config sdk-config
+       (let [system-config (lib.config.system/config lib.config.system/default sdk-config)]
+         (kspec/conform
+          spec.config/system-config system-config
+          (lib.init/init system-config))))))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
