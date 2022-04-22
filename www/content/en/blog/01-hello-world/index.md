@@ -46,7 +46,7 @@ However, similar to the story of [The Walrus and the Carpenter](https://en.wikip
 
 ### The Right Protocol for the Right Problem
 
-<!--<img src="/images/right_protocol.png" width="{{ .Width }}" height="{{ .Height }}">-->
+<img src="/images/right_protocol.png" width="{{ .Width }}" height="{{ .Height }}">
 
 The question we're answering at Kubelt is: how can we completely decentralize the middle tier? How can we make developer experience 10x better by giving people the familiarity of a centralized architecture without all of the associated complexity, problems, and costs? 
 
@@ -56,7 +56,7 @@ But blockchains are ledgers, a data structure typically more suited to backend d
 
 ### Decentralizing the Middle Tier
 
-<!--<img src="/images/content_is_everything.png" width="{{ .Width }}" height="{{ .Height }}">-->
+<img src="/images/decentralize_middle.png" width="{{ .Width }}" height="{{ .Height }}">
 
 To truly decentralize an application you need to decentralize APIs. A blockchain generally can't run on the client, which means a centralized _(HTTP gateway is required)_; but a **peer-to-peer content delivery network** like [IPFS](ipns://ipfs.io/) _can_ run on clients.
 
@@ -67,8 +67,6 @@ These same content addresses can also pack and fully encrypt signatures, schemas
 This isn't to be underestimated. When the entire application to pushed to the client, developers can begin to think about novel applications over a fully generalized, **local-first**, distributed API surface.
 
 ### Wallet(s) are the Key(s)
-
-<!--<img src="/images/user_application.png" width="{{ .Width }}" height="{{ .Height }}">-->
 
 A **local-first** application, where problems are **user sized**, and content and compute are co-located, simplifies the developer experience while adding:
 
@@ -86,6 +84,8 @@ All we need to do now is put it all together!
 
 ### Enter Kubelt Cores
 
+<img src="/images/enter_kubelt.png" width="{{ .Width }}" height="{{ .Height }}">
+
 A Kubelt Core bundles decentralized protocols and other capabilties into a **fully generalized and configurable backend** that bootstraps your local-first applications.
 
 Your wallet is the entry point into the network. When you unlock your private core it extends your wallet into a local-first application. With your private core you can send and receive encrypted messages, store content, create local-first applications, and create more cores.
@@ -93,8 +93,6 @@ Your wallet is the entry point into the network. When you unlock your private co
 You don't need to install any new software or make new identities, you just log in with your existing wallet and claim your core.
 
 ### What's Next?
-
-<img src="/images/enter_kubelt.png" width="{{ .Width }}" height="{{ .Height }}">
 
 Kubelt is building a better, more user-centric web. If you like the sound of that and want to learn more, follow us on **[Twitter](https://twitter.com/kubelt)** and join us on **[Discord](https://discord.gg/UgwAsJf6C5)**.
 
