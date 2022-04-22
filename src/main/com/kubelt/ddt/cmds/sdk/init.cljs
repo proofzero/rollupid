@@ -2,9 +2,6 @@
   "Invoke the SDK (init) method."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   ["fs" :as fs]
-   ["path" :as path])
-  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.sdk.v1 :as sdk]))
 

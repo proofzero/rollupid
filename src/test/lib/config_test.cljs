@@ -56,12 +56,12 @@
 
     (testing "multiaddr"
       (testing "localhost"
-        (let [options {:ipfs/read "/ip4/127.0.0.1"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/127.0.0.1"}]
           (is (malli/validate spec.config/config options)
               "loopback IP is a valid network address"))
-        (let [options {:ipfs/read "/ip4/localhost"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/localhost"}]
           (is (malli/validate spec.config/config options)
               "localhost is a valid network address"))
-        (let [options {:ipfs/read "/ip4/127.0.0.1/tcp/8080"}]
+        (let [options {:ipfs.read/multiaddr "/ip4/127.0.0.1/tcp/8080"}]
           (is (malli/validate spec.config/config options)
               "localhost:8080 is a valid network address"))))))

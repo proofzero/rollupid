@@ -40,19 +40,19 @@
   {;; These empty defaults should be overridden from the SDK init
    ;; options map.
    :log/level nil
-   :ipfs/read-addr nil
-   :ipfs/read-scheme nil
-   :ipfs/write-addr nil
-   :ipfs/write-scheme nil
+   :ipfs.read/multiaddr nil
+   :ipfs.read/scheme nil
+   :ipfs.write/multiaddr nil
+   :ipfs.write/scheme nil
    :p2p/scheme nil
    :p2p/multiaddr nil
    ;; Our common HTTP client.
    :client/http {}
    ;; Our connection to IPFS.
-   :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs/read-scheme)
-                             :ipfs/multiaddr (ig/ref :ipfs/read-addr)}
-                 :ipfs/write {:http/scheme (ig/ref :ipfs/write-scheme)
-                              :ipfs/multiaddr (ig/ref :ipfs/write-addr)}
+   :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
+                             :ipfs/multiaddr (ig/ref :ipfs.read/multiaddr)}
+                 :ipfs/write {:http/scheme (ig/ref :ipfs.write/scheme)
+                              :ipfs/multiaddr (ig/ref :ipfs.write/multiaddr)}
                  :client/http (ig/ref :client/http)}
    ;; Our connection to the Kubelt p2p system.
    :client/p2p {:http/scheme (ig/ref :p2p/scheme)
@@ -79,26 +79,26 @@
 ;; :ipfs/read-addr
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :ipfs/read-addr [_ address]
+(defmethod ig/init-key :ipfs.read/multiaddr [_ address]
   ;; Return the multiaddress string.
   address)
 
 ;; :ipfs/read-scheme
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :ipfs/read-scheme [_ scheme]
+(defmethod ig/init-key :ipfs.read/scheme [_ scheme]
   scheme)
 
 ;; :ipfs/write-addr
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :ipfs/write-addr [_ address]
+(defmethod ig/init-key :ipfs.write/multiaddr [_ address]
   address)
 
 ;; :ipfs/write-scheme
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :ipfs/write-scheme [_ scheme]
+(defmethod ig/init-key :ipfs.write/scheme [_ scheme]
   scheme)
 
 ;; :p2p/multiaddr
@@ -269,9 +269,9 @@
         wallet (or (get options :crypto/wallet)
                    (lib.wallet/no-op))
         ;; Get the address of the IPFS node we talk to.
-        ipfs-read (get options :ipfs/read)
+        ipfs-read-maddr (get options :ipfs.read/multiaddr)
         ipfs-read-scheme (get options :ipfs.read/scheme)
-        ipfs-write (get options :ipfs/write)
+        ipfs-write-maddr (get options :ipfs.write/multiaddr)
         ipfs-write-scheme (get options :ipfs.write/scheme)
         ;; Get the address of the Kubelt gateway we talk to.
         p2p-scheme (get options :p2p/scheme)
@@ -282,10 +282,10 @@
         ;; system.
         system (-> system
                    (assoc :log/level log-level)
-                   (assoc :ipfs/read-addr ipfs-read)
-                   (assoc :ipfs/read-scheme ipfs-read-scheme)
-                   (assoc :ipfs/write-addr ipfs-write)
-                   (assoc :ipfs/write-scheme ipfs-write-scheme)
+                   (assoc :ipfs.read/multiaddr ipfs-read-maddr)
+                   (assoc :ipfs.read/scheme ipfs-read-scheme)
+                   (assoc :ipfs.write/multiaddr ipfs-write-maddr)
+                   (assoc :ipfs.write/scheme ipfs-write-scheme)
                    (assoc :p2p/scheme p2p-scheme)
                    (assoc :p2p/multiaddr p2p-multiaddr)
                    (assoc :crypto/session credentials)
@@ -305,10 +305,10 @@
 (defn options
   "Return an options map that can be used to reinitialize the SDK."
   [sys-map]
-  (let [ipfs-read (get sys-map :ipfs/read-addr)
-        ipfs-read-scheme (get sys-map :ipfs/read-scheme)
-        ipfs-write (get sys-map :ipfs/write-addr)
-        ipfs-write-scheme (get sys-map :ipfs/write-scheme)
+  (let [ipfs-read-maddr (get sys-map :ipfs.read/multiaddr)
+        ipfs-read-scheme (get sys-map :ipfs.read/scheme)
+        ipfs-write-maddr (get sys-map :ipfs.write/multiaddr)
+        ipfs-write-scheme (get sys-map :ipfs.write/scheme)
         p2p-multiaddr (get sys-map :p2p/multiaddr)
         p2p-scheme (get sys-map :p2p/scheme)
         log-level (get sys-map :log/level)
@@ -316,9 +316,9 @@
         credentials (lib.vault/tokens (:crypto/session sys-map))
         wallet (get sys-map :crypto/wallet)]
     {:log/level log-level
-     :ipfs/read ipfs-read
+     :ipfs.read/multiaddr ipfs-read-maddr
      :ipfs.read/scheme ipfs-read-scheme
-     :ipfs/write ipfs-write
+     :ipfs.write/multiaddr ipfs-write-maddr
      :ipfs.write/scheme ipfs-write-scheme
      :p2p/scheme p2p-scheme
      :p2p/multiaddr p2p-multiaddr

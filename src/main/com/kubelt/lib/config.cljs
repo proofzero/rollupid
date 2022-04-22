@@ -12,9 +12,9 @@
 
 ;; By default we look for a local IPFS node.
 (def default-ipfs
-  {:ipfs/read "/ip4/127.0.0.1/tcp/5001"
+  {:ipfs.read/multiaddr "/ip4/127.0.0.1/tcp/5001"
    :ipfs.read/scheme :http
-   :ipfs/write "/ip4/127.0.0.1/tcp/5001"
+   :ipfs.write/multiaddr "/ip4/127.0.0.1/tcp/5001"
    :ipfs.write/scheme :http})
 
 (def default-p2p

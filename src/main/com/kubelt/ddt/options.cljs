@@ -221,12 +221,12 @@
         ;; Store coordinates of IPFS read host as a multiaddress.
         ipfs-read-host (get m :ipfs-read-host)
         ipfs-read-port (get m :ipfs-read-port)
-        ipfs-read (cstr/join "/" ["" "ip4" ipfs-read-host "tcp" ipfs-read-port])
+        ipfs-read-maddr (cstr/join "/" ["" "ip4" ipfs-read-host "tcp" ipfs-read-port])
         ipfs-read-scheme (keyword (get m :ipfs-read-scheme))
         ;; Store coordinates of IPFS write host as a multiaddress.
         ipfs-write-host (get m :ipfs-write-host)
         ipfs-write-port (get m :ipfs-write-port)
-        ipfs-write (cstr/join "/" ["" "ip4" ipfs-write-host "tcp" ipfs-write-port])
+        ipfs-write-maddr (cstr/join "/" ["" "ip4" ipfs-write-host "tcp" ipfs-write-port])
         ipfs-write-scheme (keyword (get m :ipfs-write-scheme))
         ;; Turn a sequence of core names and JWT strings into a map:
         ;; ["aaa" "bbb" "ccc" "ddd"]
@@ -237,9 +237,9 @@
         (assoc :app-name app-name)
         (assoc :p2p-scheme p2p-scheme)
         (assoc :p2p-maddr p2p-maddr)
-        (assoc :ipfs-read ipfs-read)
+        (assoc :ipfs-read-maddr ipfs-read-maddr)
         (assoc :ipfs-read-scheme ipfs-read-scheme)
-        (assoc :ipfs-write ipfs-write)
+        (assoc :ipfs-write-maddr ipfs-write-maddr)
         (assoc :ipfs-write-scheme ipfs-write-scheme)
         (assoc :credentials credentials)
         (update :log-level keyword))))
@@ -253,9 +253,9 @@
   {:pre [(map? m)]}
   {:credential/jwt (get m :credentials)
    :log/level (get m :log-level)
-   :ipfs/read (get m :ipfs-read)
+   :ipfs.read/multiaddr (get m :ipfs-read-maddr)
    :ipfs.read/scheme (get m :ipfs-read-scheme)
-   :ipfs/write (get m :ipfs-write)
+   :ipfs.write/multiaddr (get m :ipfs-write-maddr)
    :ipfs.write/scheme (get m :ipfs-write-scheme)
    :p2p/scheme (get m :p2p-scheme)
    :p2p/multiaddr (get m :p2p-maddr)})
