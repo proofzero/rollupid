@@ -172,6 +172,16 @@ jobs:
     needs: changes
     if: needs.changes.outputs.dapp == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    services:
+      cloudflare-worker:
+        image: ghcr.io/kubelt/cloudflare-worker:latest
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.github_token }}
+        ports:
+          - 8787:8787
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v3
@@ -179,7 +189,7 @@ jobs:
           node-version: '16'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      - run: npm install
+      - run: npm ci
       - uses: turtlequeue/setup-babashka@v1.3.0
         with:
           babashka-version: 0.7.8
@@ -187,6 +197,8 @@ jobs:
       - run: npm run build:dapp:release
       - run: npm run test:dapp:ci:compile
       # Run Cypress tests AFTER the server is running
+      # Install cypress if it didn't get cached properly
+      - run: npm install cypress --save-dev
       - run: npm run test:dapp:ci:run
       # Compile and run re-frame tests with karma
       - run: npm run test:dapp-karma:ci:compile
