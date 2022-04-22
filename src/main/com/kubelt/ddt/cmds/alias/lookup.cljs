@@ -2,6 +2,7 @@
   "Invoke the alias lookup method."
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.alias :as lib.alias]
    [com.kubelt.sdk.v1 :as sdk]))
@@ -12,14 +13,22 @@
    :requiresArg false
 
    :builder (fn [^Yargs yargs]
-              yargs)
+       (let [;; Enforce string type, otherwise yargs parses a
+                    ;; wallet address starting with "0x" as a big
+                    ;; integer.
+                    core-addr #js {:describe "a @core name"
+                                     :type "string"}]
+                (.positional yargs "core" core-addr)
+                yargs))
 
    :handler (fn [args]
               (let [args-map (js->clj args :keywordize-keys true)
+                _ (println "hereiam with arg map")
+                _ (println args-map)
                {:keys [host port core aliasname]} args-map
                kbt (sdk/init )]
               (println "TODO lookup core alias")
-              (-> (lib.alias/lookup! kbt "0xdeadbeefdeadbeef" "testtest") 
+              (-> (lib.alias/lookup! kbt core aliasname) 
                 (.then (fn [lookup-result]
                   (println lookup-result)))
                 (.catch (fn [e]    
