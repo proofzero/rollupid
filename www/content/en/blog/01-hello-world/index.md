@@ -16,33 +16,25 @@ contributors: ["@alfl", "@maurerbot"]
 
 In January, [Moxie wrote about his first impressions of web3](https://moxie.org/2022/01/07/web3-first-impressions.html), raising issues fundamental to the future of web3 infrastructure.
 
-Moxie made some good points; for example, that people will never run their own servers. For most developers the convenience of centralized services far outweighs any trade-offs in cost or user privacy.
+Moxie made some good points; for example, that people will never run their own servers. Most developers think the convenience of centralized services outweighs the trade-offs in cost and user privacy.
 
-As a team of senior engineers, we tend to agree with Moxie. The centralized "three tiered" (client-server-database) application has proved to be the best architecture for delivering applications quickly and securely. This application architecture, however, went through it's own evolution and growing pains.
+As a team of senior engineers, we tend to agree with Moxie. The centralized "three-tiered" (client-server-database) application has proved to be the best architecture for delivering applications quickly and securely. This application architecture, however, went through its own evolution and growing pains.
 
-The first generation of this architecture conveniently co-located state and compute inside large databases via stored procedures, or stateful backend applications. This introduced the problem of errors in application logic causing casacading faulty state changes and scaling problems. These are very similar to the problems we've seen with blockchains and smart contracts today.
+The first generation of the three-tiered architecture conveniently co-located state and compute inside large databases via stored procedures, or stateful backend applications. This introduced the problem of errors in application logic causing casacading faulty state changes and scaling problems. These are very similar to the problems we see today with blockchains and smart contracts.
 
-Developers addressed these weaknesses by migrating application logic out of these large, stateful applications into small, stateless APIs. They built tools and frameworks that abstracted away databases and pushed work to different layers of the application stack. By solving the right problem in the right application tier developers were able to organize and iterate on their work.
+Developers addressed these weaknesses by migrating application logic out of these large, stateful applications into small, stateless APIs. They built tools and frameworks that abstracted away databases and pushed work to different layers of the application stack. By solving the right problem in the right tier developers were better able to organize their work and iterate quickly.
 
-However, this pattern of building applications created three distinct, immediate problems.
+However, this pattern of building applications created a distinct, immediate problem.
 
-**User Problem: Data Silos**
+**Platform Risk**
 
-As more of these cloud-backed APIs came online, cloud providers began to accumulate _your_ valuable data in their respective data silos.
+As more three-tiered applications came online centralized cloud platforms emerged and began to offer services that abastracted away common infrastructure patterns and systems, forcing developers to conform to their service layers in exchange for _"cheap and easy"_ infrastructure.
 
-This creates a unfavorable power dynamic with cloud providers. The only way developers can access their user data is to integrate with, consume services owned by, and pay, big cloud providers. The only alternatives are... other cloud providers.
+However, similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, so do your costs. Now you're left with a choice between expensive re-platforming work or getting stuck with surprise compute and egress fees eating away at your bottom line. **Business is left with tough decisions amongst bad choices.**
 
-**Business Problem: Integration Headaches**
+As Paul Graham wrote, [99.5% of code is glue](https://paul-graham.com/weird/). Centralized services help developers iterate quickly, but the more services developers use in their applications, the bigger the **integration headache**. Iterations get slows as code piles up and is harder to test and maintain. **Development gets harder, slower, and more expensive.**
 
-As Paul Graham wrote, [99.5% of code is glue](https://paul-graham.com/weird/). As you integrate more and more API services into your application you end up with middleware and service providers that you need to maintain.
-
-This increase in complexity produces eventually slows down developement by increasing the cost of a change (and any compliance or governance related activities).
-
-**Developer Problem: Platform Risk**
-
-Centralized cloud platforms emerged and began to offer services that abastracted away common infrastructure patterns and systems, forcing developers to conform to their service layers in exchange for _"cheap and easy"_ infrastructure.
-
-However, similar to the story of [The Walrus and the Carpenter](https://en.wikipedia.org/wiki/The_Walrus_and_the_Carpenter), all of this sounds great _until it's not_. As your application scales with your success, so do your costs. Now you're left with little means of re-platforming and are stuck with surprise compute and egress fees eating away at your bottom line.
+Over time, cloud providers have accumulated _your_ valuable user data in their respective data silos to use in targeted advertising campaigns. Data silos initially make commercialization easier, but [there are rapid diminishing returns as you scale](https://a16z.com/2019/05/09/data-network-effects-moats/). This creates a unfavorable power dynamic between users, developers, and Big Tech. Developers don't want to expose competitive information, Big Tech doesn't want to wean itself off low-hanging advertizing revenue, and **Users don't want their data shared.**
 
 ### The Right Protocol for the Right Problem
 
