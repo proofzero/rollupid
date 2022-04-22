@@ -35,6 +35,13 @@
    :uri/domain domain
    :uri/user user})
 
+(defn- validate-content-type
+  "Only lower-case when content-type exists. Calling `str/lower-case`
+  on `nil` throws an error."
+  [content-type]
+  (when (and content-type
+             (not (str/blank? content-type)))
+    (str/lower-case content-type)))
 
 (defn- make-response-fn
   "Returns a response handler function for an HTTP request send using
@@ -43,23 +50,24 @@
   (fn [^js event]
     (let [res (-> event .-target .getResponseText)
           status (-> event .-target .getStatus)
-          content-type (-> event .-target (.getResponseHeader "content-type"))
-          ]
+          content-type (-> event
+                           .-target
+                           (.getResponseHeader "content-type")
+                           validate-content-type)
+          response {:http/status status :http/headers ""}]
       ;; TODO Return a structured map containing the response data. The
       ;; structure needs to be schematized as a spec, e.g.
       ;; {:body {:text ...}}
 
       ;; FIXME support non-json and pass headers properly
-      (let [response {:http/status status :http/headers "" }]
-        (case (str/lower-case content-type)
-          "application/json; charset=utf-8" 
+      (case content-type
+          "application/json; charset=utf-8"
           (resolve (assoc response :http/body (lib.json/from-json res true)))
-          
+
           "text/plain;charset=utf-8"
           (resolve (assoc response :http/body res))
-          
-          (resolve (assoc response :http/body res)))))))
-      ;;(resolve (res)
+
+          (resolve (assoc response :http/body res))))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
