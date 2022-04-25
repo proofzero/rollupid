@@ -11,7 +11,8 @@
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :refer [promise promise?]]
    [com.kubelt.spec.config :as spec.config])
-  (:require-macros [com.kubelt.spec :as kspec]))
+  (:require-macros
+    [com.kubelt.spec :as kspec]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
