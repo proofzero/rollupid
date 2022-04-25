@@ -1,5 +1,5 @@
 ---
-title: "Kubelt's Approach to a Decentralization"
+title: "Kubelt's Approach to Decentralization"
 description: "A bigger, better, user-centric web."
 lead: "A bigger, better, user-centric web."
 date: 2022-04-05T14:25:35-04:00
