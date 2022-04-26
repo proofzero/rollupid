@@ -10,6 +10,7 @@
    [com.kubelt.lib.integrant :as lib.integrant]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.promise :as lib.promise]
+   [com.kubelt.lib.storage :as lib.storage]
    [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
@@ -48,6 +49,12 @@
 
 (defmethod ig/halt-key! :log/level [_ log-level]
   (log/debug {:log/msg "halt logging"}))
+
+;; :app/name
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :app/name [_ app-name]
+  app-name)
 
 ;; :ipfs.read/scheme
 ;; -----------------------------------------------------------------------------
@@ -215,12 +222,22 @@
 
 (defmethod ig/init-key :crypto/wallet [_ wallet]
   (log/debug {:log/msg "init wallet"})
-  (if-not (lib.wallet/valid? wallet)
-    (throw (ex-info "invalid wallet" wallet))
+  (if-not (lib.wallet/wallet? wallet)
+    (lib.wallet/create)
     wallet))
 
 (defmethod ig/halt-key! :crypto/wallet [_ wallet]
   (log/debug {:log/msg "halt wallet"}))
+
+;; config/storage
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :config/storage [_ {app-name :app/name :as storage}]
+  (log/debug {:log/msg "init storage" :app/name app-name})
+  (lib.storage/create app-name))
+
+(defmethod ig/halt-key! :config/storage [_ storage]
+  (log/debug {:log/msg "halt storage"}))
 
 ;; Public
 ;; -----------------------------------------------------------------------------

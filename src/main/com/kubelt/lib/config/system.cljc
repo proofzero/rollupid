@@ -2,26 +2,30 @@
   "SDK system config."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.spec.config :as spec.config]
-   [com.kubelt.lib.config.default :as lib.config.default])
+   [com.kubelt.lib.config.default :as lib.config.default]
+   [com.kubelt.spec.config :as spec.config])
   (:require-macros
    [com.kubelt.spec :as kubelt.spec]))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-(defn config [system-config options]
+(defn config
+  [system-config options]
   "Return an integrant system configuration map that combines a default
   configuration and a user-provided configuration options map."
   (->> [[:log/level :log/level]
-        [:ipfs.read/multiaddr :ipfs.read/multiaddr]
+        [:app/name :app/name]
         [:ipfs.read/scheme :ipfs.read/scheme]
-        [:ipfs.write/multiaddr :ipfs.write/multiaddr]
+        [:ipfs.read/host :ipfs.read/host]
+        [:ipfs.read/port :ipfs.read/port]
         [:ipfs.write/scheme :ipfs.write/scheme]
+        [:ipfs.write/host :ipfs.write/host]
+        [:ipfs.write/port :ipfs.write/port]
+        [:p2p/scheme :p2p/scheme]
         [:p2p/port :p2p/port]
         [:p2p/host :p2p/host]
-        [:p2p/scheme :p2p/scheme]
-        [:p2p/multiaddr :p2p/multiaddr]
+        [:config/storage :config/storage]
         [:crypto/session :credential/jwt {}]
         [:crypto/wallet :crypto/wallet]]
        (reduce (fn [s [sys-kw opts-kw default]]

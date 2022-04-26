@@ -4,6 +4,7 @@
   (:require
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.promise :as lib.promise]
+   [com.kubelt.lib.storage :as lib.storage]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.sdk.v1 :as sdk]
    [com.kubelt.sdk.v1.core :as sdk.core]))
@@ -36,8 +37,12 @@
     (-> (lib.wallet/load& app-name wallet-name password)
         (lib.promise/then
          (fn [wallet]
-           (let [options (args->init-options args-map wallet)]
+           (let [options (args->init-options args-map wallet)
+                 address (:wallet/address wallet)]
              (-> (sdk/init options)
+                 (lib.promise/catch
+                     (fn [e]
+                       (prn (:error e))))
                  (lib.promise/then
                   (fn [kbt]
                     (-> (sdk.core/authenticate& kbt)
@@ -48,7 +53,9 @@
                            (prn (ex-data e))))
                         (lib.promise/finally
                           (fn []
-                            (sdk/halt! kbt))))))
-                 (lib.promise/catch
-                  (fn [e]
-                    (println e))))))))))
+                            (sdk/halt! kbt))))))))))
+        ;; An error was thrown during (lib.wallet/load&).
+        (lib.promise/catch
+            (fn [e]
+              (println (ex-message e))
+              (prn (ex-data e)))))))
