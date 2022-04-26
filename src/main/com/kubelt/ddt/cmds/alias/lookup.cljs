@@ -28,12 +28,12 @@
       {:keys [host port core aliasname]} args-map
       kbt (sdk/init )]
       ;;TODO set log level from env arg
-      (log/set-level! :trace)
+      ;;(log/set-level! :trace)
       (log/debug {:log/msg "Lookup Begin"})
       (-> (lib.alias/lookup! kbt core aliasname) 
        (.then (fn [lookup-result]
                (log/debug {:log/msg "Lookup received" :result lookup-result})
-               (println lookup-result)
+               (println lookup-result)))
        (.catch (fn [e]    
-                {})))))
-      (log/debug {:log/msg "Lookup End"})))})
+                {}))))
+      (log/debug {:log/msg "Lookup End"}))})

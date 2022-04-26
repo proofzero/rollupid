@@ -28,7 +28,7 @@
       {:keys [host port core aliasname targetaddress]} args-map
       kbt (sdk/init )]
       ;;TODO set log level from env arg
-      (log/set-level! :trace)
+      ;;(log/set-level! :trace)
       (log/debug {:log/msg "add-alias begin"})
       (-> (lib.alias/add-alias! kbt core aliasname targetaddress)
        (.then (fn [add-result]
