@@ -35,12 +35,12 @@
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
   ([resolve reject]
-   {:post [(map? %)]}
-   (init lib.config/default-config resolve reject))
+   {:pre [(fn? resolve) (fn? resolve)]}
+   (init {} resolve reject))
 
   ;; The 1-arity implementation expects a configuration map.
   ([config resolve reject]
-   {:pre [(map? config)] :post [(map? %)]}
+   {:pre [(map? config) (fn? resolve) (fn? resolve)]}
    ;; Check that the user-provided options map is valid. If not, an
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
