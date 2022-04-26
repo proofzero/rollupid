@@ -20,7 +20,7 @@
        (when-let [refs (seq (#'ig/missing-refs relevant-config))]
          (throw (#'ig/missing-refs-exception config refs)))
        (async/go-loop [k-v-seq (map (fn [k] [k (config k)]) relevant-keys)
-                       system (with-meta {} {::origin config})]
+                       system (with-meta {} {:integrant.core/origin config})]
          (let [[k v] (first k-v-seq)
                v' (#'ig/expand-key system resolvef v)
                _ (assertf system k v')
