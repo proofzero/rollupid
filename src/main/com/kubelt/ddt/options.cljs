@@ -81,7 +81,7 @@
   #js {:alias "w"
        :describe "a wallet name"
        :requiresArg true
-       :demandOption "wallet must be specified"
+       ;;:demandOption "wallet must be specified"
        :string true
        :nargs 1})
 
@@ -164,8 +164,8 @@
 ;; defaults won't cause an error if not supplied by user.
 (def required-options
   #js [host-name
-       port-name
-       wallet-name])
+       port-name])
+     ;;  wallet-name])
 
 ;; Public
 ;; -----------------------------------------------------------------------------
