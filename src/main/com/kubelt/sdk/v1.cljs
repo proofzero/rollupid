@@ -5,14 +5,16 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.lib.config.opts :as lib.config.opts]
+   [com.kubelt.lib.config.default :as lib.config.default]
+   [com.kubelt.lib.config.sdk :as lib.config.sdk]
    [com.kubelt.lib.config.system :as lib.config.system]
+   [com.kubelt.lib.config.util :as lib.config.util]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :refer [promise promise?]]
    [com.kubelt.spec.config :as spec.config])
   (:require-macros
-    [com.kubelt.spec :as kspec]))
+   [com.kubelt.spec :as kspec]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
@@ -37,12 +39,21 @@
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
+   ;; Check that the user-provided options map is valid. If not, an
+   ;; error map is returned. Note that these configuration options are
+   ;; not required, so we provide defaults for those values that aren't
+   ;; provided.
    (kspec/conform
     spec.config/optional-sdk-config config
-    (let [sdk-config (merge lib.config.opts/sdk-defaults config)]
+    (let [sdk-config (merge lib.config.default/sdk config)]
+      ;; Check that the final options map (defaults combined with
+      ;; user-provided options) is valid.
       (kspec/conform
        spec.config/sdk-config sdk-config
-       (let [system-config (lib.config.system/config lib.config.system/default sdk-config)]
+       (let [;; Construct a system configuration map from the default
+             ;; configuration combined with the options provided by the
+             ;; user.
+             system-config (lib.config.system/config lib.config.default/system sdk-config)]
          (kspec/conform
           spec.config/system-config system-config
           (lib.init/init system-config))))))))
@@ -62,7 +73,7 @@
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
-   (let [config (lib.config.opts/obj->map config)]
+   (let [config (lib.config.util/obj->map config)]
      (promise
       (fn [resolve reject]
         (let [result (init config)]
@@ -102,7 +113,7 @@
   to be re-instantiated."
   [system]
   {:pre [(map? system)]}
-  (lib.config.system/sdk-init-options system))
+  (lib.config.sdk/options system))
 
 (defn options-js
   "Return an options object for the SDK from a JavaScript context."

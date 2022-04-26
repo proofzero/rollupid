@@ -1,5 +1,5 @@
 (ns com.kubelt.lib.init
-  "SDK implementation."
+  "SDK system map implementation."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [integrant.core :as ig]
@@ -8,6 +8,7 @@
    [com.kubelt.ipfs.client :as ipfs.client]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
   (:require
@@ -15,15 +16,36 @@
        :node [[com.kubelt.lib.http.node :as http.node]]
        :clj [[com.kubelt.lib.http.jvm :as http.jvm]])))
 
+;; System
+;; -----------------------------------------------------------------------------
+;; For each key in the system map, if a corresponding method is
+;; implemented for the ig/init-key multimethod it will be invoked in
+;; order to initialize that part of the system. The return value is
+;; stored as part of the system configuration map. Initialization is
+;; performed recursively, making it possible to have nested subsystems.
+;;
+;; If methods are defined for the ig/halt-key! multimethod, they are
+;; invoked in order to tear down the system in the reverse order in
+;; which it was initialized.
+;;
+;; To begin the system:
+;;   (integrant.core/init)
+;; To stop the system:
+;;   (integrant.core/halt!)
+;;
+;; Cf. https://github.com/weavejester/integrant.
 
 ;; :log/level
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :log/level [_ {:keys [min/level]}]
+(defmethod ig/init-key :log/level [_ log-level]
   ;; Initialize the logging system.
-  (when level
-    (log/merge-config! {:min-level level}))
-  level)
+  (when log-level
+    (log/merge-config! {:min-level log-level}))
+  log-level)
+
+(defmethod ig/halt-key! :log/level [_ log-level]
+  (log/debug {:log/msg "halt logging"}))
 
 ;; :ipfs/read-addr
 ;; -----------------------------------------------------------------------------
@@ -61,6 +83,12 @@
 
 (defmethod ig/init-key :p2p/scheme [_ scheme]
   scheme)
+
+;; :credential/jwt
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :credential/jwt [_ tokens]
+  tokens)
 
 ;; :client/http
 ;; -----------------------------------------------------------------------------
@@ -158,7 +186,7 @@
 ;; :crypto/session
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :crypto/session [_ tokens]
+(defmethod ig/init-key :crypto/session [_ {:keys [jwt/tokens]}]
   (log/debug {:log/msg "init session"})
   ;; If any JWTs are provided, parse them and store the decoded result.
   (let [tokens (reduce (fn [m [core token]]
@@ -167,8 +195,7 @@
                        {}
                        tokens)]
     ;; Our session storage map is a "vault".
-    {:com.kubelt/type :kubelt.type/vault
-     :vault/tokens tokens}))
+    (lib.vault/vault tokens)))
 
 (defmethod ig/halt-key! :crypto/session [_ session]
   (log/debug {:log/msg "halt session"}))
@@ -178,8 +205,6 @@
 
 (defmethod ig/init-key :crypto/wallet [_ wallet]
   (log/debug {:log/msg "init wallet"})
-  ;; If user provided a wallet, use it if it is valid. Otherwise, return
-  ;; a placeholder wallet that will need to be replaced.
   (if-not (lib.wallet/valid? wallet)
     (throw (ex-info "invalid wallet" wallet))
     wallet))
@@ -187,24 +212,10 @@
 (defmethod ig/halt-key! :crypto/wallet [_ wallet]
   (log/debug {:log/msg "halt wallet"}))
 
-;; :sys/platform
-;; -----------------------------------------------------------------------------
-
-;; TODO any platform-specific setup.
-(defmethod ig/init-key :sys/platform [_ platform]
-  (log/debug {:log/msg "init platform" :sys/platform platform})
-  platform)
-
-;; TODO any platform-specific teardown.
-(defmethod ig/halt-key! :sys/platform [_ platform]
-  (log/debug {:log/msg "halt platform"}))
-
 ;; Public
 ;; -----------------------------------------------------------------------------
 ;; NB: the configuration map is validated by the exposed SDK methods.
 
-;; TODO top-level environment key should be injected into sub-keys that
-;; depend on it.
 (defn init
   "Initialize the SDK."
   [system-config]
