@@ -25,36 +25,33 @@
 ;;
 ;; Cf. https://github.com/weavejester/integrant.
 
+;; These defaults should be overridden from the SDK init
+;; options map.
+;; The current "wallet" implementation. This is provided externally
+;; by the user.
+;; TODO provide no-op wallet implementation, or try to detect wallet
+;; in the environment, e.g. metamask in browser.
 (def default
-  {;; These empty defaults should be overridden from the SDK init
-   ;; options map.
-   :log/level config.opts/log-level
-   :ipfs.read/multiaddr nil
-   :ipfs.read/scheme nil
-   :ipfs.write/multiaddr nil
-   :ipfs.write/scheme nil
-   :p2p/scheme nil
-   :p2p/multiaddr nil
-   ;; Our common HTTP client.
-   :client/http {}
-   ;; Our connection to IPFS.
-   :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
-                             :ipfs/multiaddr (ig/ref :ipfs.read/multiaddr)}
-                 :ipfs/write {:http/scheme (ig/ref :ipfs.write/scheme)
-                              :ipfs/multiaddr (ig/ref :ipfs.write/multiaddr)}
-                 :client/http (ig/ref :client/http)}
-   ;; Our connection to the Kubelt p2p system.
-   :client/p2p {:http/scheme (ig/ref :p2p/scheme)
-                :p2p/multiaddr (ig/ref :p2p/multiaddr)}
-   ;; A map from scope identifier to session token (JWT). Upon
-   ;; successfully authenticating against a core, the returned session
-   ;; token is kept here.
-   :crypto/session {}
-   ;; The current "wallet" implementation. This is provided externally
-   ;; by the user.
-   ;; TODO provide no-op wallet implementation, or try to detect wallet
-   ;; in the environment, e.g. metamask in browser.
-   :crypto/wallet {}})
+  (merge
+   config.opts/default-ipfs
+   config.opts/default-p2p
+   config.opts/default-wallet
+   config.opts/default-logging
+   {;; Our common HTTP client.
+    :client/http {}
+    ;; Our connection to IPFS.
+    :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
+                              :ipfs/multiaddr (ig/ref :ipfs.read/multiaddr)}
+                  :ipfs/write {:http/scheme (ig/ref :ipfs.write/scheme)
+                               :ipfs/multiaddr (ig/ref :ipfs.write/multiaddr)}
+                  :client/http (ig/ref :client/http)}
+    ;; Our connection to the Kubelt p2p system.
+    :client/p2p {:http/scheme (ig/ref :p2p/scheme)
+                 :p2p/multiaddr (ig/ref :p2p/multiaddr)}
+    ;; A map from scope identifier to session token (JWT). Upon
+    ;; successfully authenticating against a core, the returned session
+    ;; token is kept here.
+    :crypto/session {}}))
 
 (defn config [default-system-config options]
   ;; NB: inject supplied configuration into the system map before

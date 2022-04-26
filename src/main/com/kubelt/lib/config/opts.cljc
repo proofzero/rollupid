@@ -30,14 +30,17 @@
 ;; corresponding JWT:
 ;; {"0xF4E9A36d4D37B1F83706c58eF8e3AF559F4c1E2E" "<header>.<payload>.<signature>"}
 (def default-credentials
-  {:crypto/wallet (lib.wallet/no-op)
-   :credential/jwt {}})
+  {:credential/jwt {}})
+
+(def default-wallet
+  {:crypto/wallet (lib.wallet/no-op)})
 
 (def sdk-defaults
   (merge default-ipfs
          default-p2p
          default-logging
-         default-credentials))
+         default-credentials
+         default-wallet))
 
 ;; Internal
 ;; -----------------------------------------------------------------------------
