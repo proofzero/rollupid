@@ -36,7 +36,7 @@
   ;; The 0-arity implementation uses the default configuration.
   ([resolve reject]
    {:post [(map? %)]}
-   (init {} resolve reject))
+   (init lib.config/default-config resolve reject))
 
   ;; The 1-arity implementation expects a configuration map.
   ([config resolve reject]
