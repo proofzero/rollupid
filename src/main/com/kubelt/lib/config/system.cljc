@@ -96,7 +96,7 @@
         (assoc :crypto/wallet wallet))))
 
 
-(defn hidrate-options
+(defn sdk-init-options
   "Return an options map that can be used to reinitialize the SDK."
   [sys-map]
   (let [ipfs-read-maddr (get sys-map :ipfs.read/multiaddr)

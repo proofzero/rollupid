@@ -102,7 +102,7 @@
   to be re-instantiated."
   [system]
   {:pre [(map? system)]}
-  (lib.config.system/hidrate-options system))
+  (lib.config.system/sdk-init-options system))
 
 (defn options-js
   "Return an options object for the SDK from a JavaScript context."
