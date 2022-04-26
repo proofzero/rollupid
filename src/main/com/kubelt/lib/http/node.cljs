@@ -91,6 +91,7 @@
          (let [scheme (get request :uri/scheme :http)
                request-map (dissoc request :uri/scheme)
                options (request->node-options request-map)
+                _ (println options)
                ;; If user specified :https as the request scheme, use the
                ;; Node.js "https" module to fire off the request. Default
                ;; to using the "http" module otherwise.

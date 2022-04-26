@@ -10,7 +10,7 @@
 (defn add-alias!
   "Add an alias to a core"
   [sys core alias-name target-address]
-  {:pre [(string? core)]}
+  ;;{:pre [(string? core)]}
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
@@ -18,17 +18,17 @@
 
         wallet (get sys :crypto/wallet)
         address (get wallet :wallet/address)
-        body {:address address}
+        body {:address address :alias alias-name :target target-address}
         body-str (lib.json/edn->json-str body)
 
-        path "fixme" ;; (cstr/join "" ["/@" core "/alias/"])
+        path (cstr/join "" ["/@" core "/alias/add-alias" ])
 
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
                  :uri/scheme scheme
-                 :uri/domain host
-                 :uri/port port
+                 :uri/domain "127.0.0.1"
+                 :uri/port 8787
                  :uri/path path}]
     ;; Make an HTTP request to p2p system, passing along the user's
     ;; wallet address. Expect a nonce in return, which should be signed
@@ -36,13 +36,13 @@
     ;; registration.
     ;;
     ;; Returns a promise.
+    (println "hereiam in add alias http")
     (http/request! client request)))
 
 (defn lookup!
   "resolve a core address by looking up the alias in a core" 
   [sys core ralias]
   ;;{:pre [(every? string? [core ralias])]}
-  (println "hereiam in lookup")
   (let [client (get sys :client/http)
         scheme (get-in sys [:client/p2p :p2p/read :http/scheme])
         host (get-in sys [:client/p2p :p2p/write :address/host])
@@ -50,11 +50,8 @@
         body {}
         body-str (lib.json/edn->json-str body)
 
-        ;;path (cstr/join "" ["/@" core "/alias/" ralias])
         path (cstr/join "" ["/@" core "/alias/" ralias])
-        _ (println {:path path})
-        test-request "/@0x7c5b59f22af326e045389f3a123d0b5aba5d0bb2/alias/parent"
-        _ (println "hereiam in lookup after args")
+        ;;test-request "/@0x7c5b59f22af326e045389f3a123d0b5aba5d0bb2/alias/parent"
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
@@ -62,5 +59,4 @@
                  :uri/domain "127.0.0.1"
                  :uri/port 8787
                  :uri/path path}]
-        _ (println request)
                  (http/request! client request)))
