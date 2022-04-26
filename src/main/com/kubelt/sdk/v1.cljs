@@ -34,10 +34,12 @@
   "Initialize the SDK. Accepts an optional configuration map and returns
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
-  ([]
-   (init {}))
+  ([resolve reject]
+   {:post [(map? %)]}
+   (init {} resolve reject))
+
   ;; The 1-arity implementation expects a configuration map.
-  ([config]
+  ([config resolve reject]
    {:pre [(map? config)] :post [(map? %)]}
    ;; Check that the user-provided options map is valid. If not, an
    ;; error map is returned. Note that these configuration options are
@@ -56,7 +58,8 @@
              system-config (lib.config.system/config lib.config.default/system sdk-config)]
          (kspec/conform
           spec.config/system-config system-config
-          (lib.init/init system-config))))))))
+          (lib.init/init system-config resolve reject)
+          #_(reject (clj->js (lib.error/explain spec.config/config config))))))))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
@@ -76,10 +79,8 @@
    (let [config (lib.config.util/obj->map config)]
      (promise
       (fn [resolve reject]
-        (let [result (init config)]
-          (if (lib.error/error? result)
-            (reject (clj->js result))
-            (resolve result))))))))
+        (init config resolve reject))))))
+
 
 ;; halt
 ;; -----------------------------------------------------------------------------
