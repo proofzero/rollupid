@@ -8,6 +8,8 @@
    [com.kubelt.ipfs.client :as ipfs.client]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
+   [com.kubelt.lib.integrant :as kig]
+   [com.kubelt.lib.util :as util]
    [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
@@ -220,10 +222,10 @@
 
 (defn init
   "Initialize the SDK."
-  [system-config]
+  [system-config resolve reject]
   ;; NB: If we provide an additional collection of keys when calling
   ;; integrant.core/init, only those keys will be initialized.
-  (ig/init system-config))
+  (kig/init system-config resolve reject))
 
 (defn halt!
   "Clean-up resources used by the SDK."
