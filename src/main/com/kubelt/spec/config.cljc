@@ -3,6 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.spec.http :as spec.http]
+   [malli.core :as m]
    [com.kubelt.spec.wallet :as spec.wallet]))
 
 ;; We use the default vector-based format for ease of authoring, but if
@@ -59,7 +60,7 @@
 (def sdk-config
   (into [:map {:closed true
                :title ::sdk-config}]
-        (map #(assoc-in % [1 :optional] false) (drop 2 optional-sdk-config))))
+        (map #(assoc-in % [1 :optional] false) (m/-children (m/schema optional-sdk-config nil)))))
 
 (def system-config
   [:map {;;:closed false
