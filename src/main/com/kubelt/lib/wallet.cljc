@@ -53,19 +53,6 @@
      :wallet/address address
      :wallet/sign-fn sign-fn}))
 
-(defn no-op
-  "Return a no-op wallet that can be used as a placeholder."
-  []
-  {:post [(valid? %)]}
-  (let [null-address "0x00000000000000000000"
-        null-key {:com.kubelt.type :kubelt.type/public-key
-                  :key/data ""}]
-    {:com.kubelt/type :kubelt.type/wallet
-     :wallet/address null-address
-     :wallet/encrypt-key null-key
-     :wallet/decrypt-fn identity
-     :wallet/sign-fn identity}))
-
 #?(:node
    (defn has-wallet?&
      "Return true if named wallet exists, and false otherwise."
@@ -109,7 +96,7 @@
      {:pre [(every? string? [app-name wallet-name])]}
      (wallet.node/delete!& app-name wallet-name)))
 
-;; TODO
+;; TODO support browser, jvm
 (defn create
   "Create a platform-appropriate wallet."
   []
@@ -121,5 +108,4 @@
   newly imported wallet on success."
   [app-name wallet-name mnemonic password]
   {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)]}
-  #?(:node
-     (wallet.node/import& app-name wallet-name mnemonic password)))
+  #?(:node (wallet.node/import& app-name wallet-name mnemonic password)))

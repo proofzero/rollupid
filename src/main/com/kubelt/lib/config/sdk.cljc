@@ -12,22 +12,30 @@
   reinitialize the SDK with the same configuration by passing it
   to (com.kubelt.sdk.v1/init)."
   [sys-map]
-  (let [ipfs-read-maddr (get sys-map :ipfs.read/multiaddr)
-        ipfs-read-scheme (get sys-map :ipfs.read/scheme)
-        ipfs-write-maddr (get sys-map :ipfs.write/multiaddr)
+  (let [ipfs-read-scheme (get sys-map :ipfs.read/scheme)
+        ipfs-read-host (get sys-map :ipfs.read/host)
+        ipfs-read-port (get sys-map :ipfs.read/port)
         ipfs-write-scheme (get sys-map :ipfs.write/scheme)
-        p2p-multiaddr (get sys-map :p2p/multiaddr)
+        ipfs-write-host (get sys-map :ipfs.write/host)
+        ipfs-write-port (get sys-map :ipfs.write/port)
         p2p-scheme (get sys-map :p2p/scheme)
+        p2p-host (get sys-map :p2p/host)
+        p2p-port (get sys-map :p2p/port)
         log-level (get sys-map :log/level)
         ;; TODO rename :crypto/session to :crypto/vault for clarity
         credentials (lib.vault/tokens (:crypto/session sys-map))
-        wallet (get sys-map :crypto/wallet)]
+        wallet (get sys-map :crypto/wallet)
+        storage (get sys-map :config/storage)]
     {:log/level log-level
-     :ipfs.read/multiaddr ipfs-read-maddr
      :ipfs.read/scheme ipfs-read-scheme
-     :ipfs.write/multiaddr ipfs-write-maddr
+     :ipfs.read/host ipfs-read-host
+     :ipfs.read/port ipfs-read-port
      :ipfs.write/scheme ipfs-write-scheme
+     :ipfs.write/host ipfs-write-host
+     :ipfs.write/port ipfs-write-port
      :p2p/scheme p2p-scheme
-     :p2p/multiaddr p2p-multiaddr
+     :p2p/host p2p-host
+     :p2p/port p2p-port
      :crypto/wallet wallet
+     :config/storage storage
      :credential/jwt credentials}))
