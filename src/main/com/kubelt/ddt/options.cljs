@@ -259,6 +259,7 @@
   {:pre [(map? m)]}
   {:credential/jwt (get m :credentials)
    :log/level (get m :log-level)
+   :app/name (get m :app-name)
    :ipfs.read/scheme (get m :ipfs-read-scheme)
    :ipfs.read/host (get m :ipfs-read-host)
    :ipfs.read/port (get m :ipfs-read-port)
