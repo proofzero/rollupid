@@ -2,7 +2,8 @@
   "Configuration-related support."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as str]))
+   [clojure.string :as str]
+   [com.kubelt.lib.wallet :as lib.wallet]))
 
 ;; Default logging level.
 (def log-level :warn)
@@ -12,9 +13,9 @@
 
 ;; By default we look for a local IPFS node.
 (def default-ipfs
-  {:ipfs/read "/ip4/127.0.0.1/tcp/5001"
+  {:ipfs.read/multiaddr "/ip4/127.0.0.1/tcp/5001"
    :ipfs.read/scheme :http
-   :ipfs/write "/ip4/127.0.0.1/tcp/5001"
+   :ipfs.write/multiaddr "/ip4/127.0.0.1/tcp/5001"
    :ipfs.write/scheme :http})
 
 (def default-p2p
@@ -29,7 +30,8 @@
 ;; corresponding JWT:
 ;; {"0xF4E9A36d4D37B1F83706c58eF8e3AF559F4c1E2E" "<header>.<payload>.<signature>"}
 (def default-credentials
-  {:credential/jwt {}})
+  {:crypto/wallet (lib.wallet/no-op)
+   :credential/jwt {}})
 
 (def sdk-defaults
   (merge default-ipfs

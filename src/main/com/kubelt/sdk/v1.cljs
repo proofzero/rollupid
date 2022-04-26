@@ -57,12 +57,7 @@
   ;; The 0-arity implementation uses the default configuration.
   ([]
    {:post [(promise? %)]}
-   (promise
-    (fn [resolve reject]
-      (let [result (init)]
-        (if (lib.error/error? result)
-          (reject (clj->js result))
-          (resolve result))))))
+   (init-js #js{}))
 
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]

@@ -4,8 +4,7 @@
   (:require
    [integrant.core :as ig]
    [com.kubelt.lib.config.opts :as config.opts]
-   [com.kubelt.lib.vault :as lib.vault]
-   [com.kubelt.lib.wallet :as lib.wallet]))
+   [com.kubelt.lib.vault :as lib.vault]))
 
 ;; System
 ;; -----------------------------------------------------------------------------
@@ -29,7 +28,7 @@
 (def default
   {;; These empty defaults should be overridden from the SDK init
    ;; options map.
-   :log/level {:min-level config.opts/log-level}
+   :log/level config.opts/log-level
    :ipfs.read/multiaddr nil
    :ipfs.read/scheme nil
    :ipfs.write/multiaddr nil
@@ -65,8 +64,8 @@
         credentials (get options :credential/jwt {})
         ;; Use the wallet provided by the user, or default to a no-op
         ;; wallet otherwise.
-        wallet (or (get options :crypto/wallet)
-                   (lib.wallet/no-op))
+        wallet (get options :crypto/wallet)
+
         ;; Get the address of the IPFS node we talk to.
         ipfs-read-maddr (get options :ipfs.read/multiaddr)
         ipfs-read-scheme (get options :ipfs.read/scheme)
@@ -86,7 +85,7 @@
     ;; TODO use this mechanism to selectively initialize the system for
     ;; the current context, i.e. in browser, node cli client, etc.
     (-> default-system-config
-        (assoc :log/level log-level)
+        (assoc :log/level {:min/level log-level})
         (assoc :ipfs.read/multiaddr ipfs-read-maddr)
         (assoc :ipfs.read/scheme ipfs-read-scheme)
         (assoc :ipfs.write/multiaddr ipfs-write-maddr)

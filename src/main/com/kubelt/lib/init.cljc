@@ -19,11 +19,11 @@
 ;; :log/level
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :log/level [_ min-level]
+(defmethod ig/init-key :log/level [_ {:keys [min/level]}]
   ;; Initialize the logging system.
-  (when min-level
-    (log/merge-config! {:min-level min-level}))
-  min-level)
+  (when level
+    (log/merge-config! {:min-level level}))
+  level)
 
 ;; :ipfs/read-addr
 ;; -----------------------------------------------------------------------------
