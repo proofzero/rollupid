@@ -3,6 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [integrant.core :as ig]
+   [com.kubelt.lib.config.opts :as config.opts]
    [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
@@ -28,7 +29,7 @@
 (def default
   {;; These empty defaults should be overridden from the SDK init
    ;; options map.
-   :log/level nil
+   :log/level {:min-level config.opts/log-level}
    :ipfs.read/multiaddr nil
    :ipfs.read/scheme nil
    :ipfs.write/multiaddr nil
