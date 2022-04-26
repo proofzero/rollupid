@@ -26,7 +26,7 @@
         request {:com.kubelt/type :kubelt.type/http-request
                  :http/method :post
                  :http/body body-str
-                 :uri/scheme scheme
+                 :uri/scheme :http
                  :uri/domain "127.0.0.1"
                  :uri/port 8787
                  :uri/path path}]
@@ -36,7 +36,6 @@
     ;; registration.
     ;;
     ;; Returns a promise.
-    (println "hereiam in add alias http")
     (http/request! client request)))
 
 (defn lookup!

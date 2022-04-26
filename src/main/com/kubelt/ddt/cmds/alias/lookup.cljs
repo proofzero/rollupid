@@ -5,7 +5,8 @@
   [com.kubelt.ddt.options :as ddt.options]
   [com.kubelt.lib.error :as lib.error]
   [com.kubelt.lib.alias :as lib.alias]
-  [com.kubelt.sdk.v1 :as sdk]))
+  [com.kubelt.sdk.v1 :as sdk]
+  [taoensso.timbre :as log]))
 
 (defonce command
  {:command "lookup <core> <aliasname>"
@@ -26,11 +27,13 @@
      (let [args-map (js->clj args :keywordize-keys true)
       {:keys [host port core aliasname]} args-map
       kbt (sdk/init )]
-      (println "TODO lookup core alias")
+      ;;TODO set log level from env arg
+      (log/set-level! :trace)
+      (log/debug {:log/msg "Lookup Begin"})
       (-> (lib.alias/lookup! kbt core aliasname) 
        (.then (fn [lookup-result]
-               (println "Got lookup result:")
-               (println lookup-result)))
+               (log/debug {:log/msg "Lookup received" :result lookup-result})
+               (println lookup-result)
        (.catch (fn [e]    
-                {})))
-      (println "hereiam finished")))})
+                {})))))
+      (log/debug {:log/msg "Lookup End"})))})

@@ -5,7 +5,8 @@
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.error :as lib.error]
   [com.kubelt.lib.alias :as lib.alias]
-  [com.kubelt.sdk.v1 :as sdk]))
+  [com.kubelt.sdk.v1 :as sdk]
+  [taoensso.timbre :as log]))
 
 (defonce command
   {:command "add <core> <aliasname> <targetaddress>"
@@ -26,11 +27,14 @@
        (let [args-map (js->clj args :keywordize-keys true)
       {:keys [host port core aliasname targetaddress]} args-map
       kbt (sdk/init )]
-      (println "TODO add core alias")
+      ;;TODO set log level from env arg
+      (log/set-level! :trace)
+      (log/debug {:log/msg "add-alias begin"})
       (-> (lib.alias/add-alias! kbt core aliasname targetaddress)
-       (.then (fn [lookup-result]
-               (println "Got add-alias result:")
-               (println lookup-result)))
+       (.then (fn [add-result]
+               (log/debug {:log/msg "add alias complete" :result add-result})
+               (println add-result)))
        (.catch (fn [e]    
                 {})))
-      (println "hereiam finished")))})
+
+      (log/debug {:log/msg "add-alias end"})))})
