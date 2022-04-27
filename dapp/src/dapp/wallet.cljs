@@ -121,14 +121,6 @@
 
 ;;; Subs ;;;
 
-(re-frame/reg-sub ::provider
-  (fn [db]
-    (:provider db)))
-
-(re-frame/reg-sub ::current-account
-  (fn [db]
-    (:current-account db)))
-
 (re-frame/reg-sub
  ::ctx
  (fn [db]
