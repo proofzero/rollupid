@@ -5,16 +5,12 @@
    [reitit.coercion.spec :as rss]
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
-   [reitit.frontend.easy :as rfe]
-   [dapp.components.settings :as settings]
    [dapp.pages.cores :as cores]
    [dapp.pages.dashboard :as dashboard]
    [dapp.pages.reports :as reports]
-   [dapp.utils :as utils]
    [taoensso.timbre :as log])
    (:require
-   ["@heroicons/react/outline" :refer (ChartBarIcon, FolderIcon, HomeIcon)]
-   ))
+   ["@heroicons/react/outline" :refer (HomeIcon)]))
 
 ;;; Events ;;;
 
@@ -81,15 +77,7 @@
      [{;; Initialization
        :start (fn [& _params](log/trace "Entering Reports page"))
        ;; Teardown
-       :stop  (fn [& _params] (log/trace "Leaving Reports page"))}]}]
-   ["settings"
-    {:name      ::settings
-     :view      settings/render
-     :link-text "Settings"
-     :icon ChartBarIcon
-     :controllers
-     [{:start (fn [& params] (log/trace "Entering sub-page 1"))
-       :stop  (fn [& params] (log/trace "Leaving sub-page 1"))}]}]])
+       :stop  (fn [& _params] (log/trace "Leaving Reports page"))}]}]])
 
 (defn on-navigate [new-match]
   (when new-match

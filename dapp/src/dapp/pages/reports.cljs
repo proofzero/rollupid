@@ -1,6 +1,4 @@
-(ns dapp.pages.reports
-  (:require
-   [dapp.components.header :as header]))
+(ns dapp.pages.reports)
 
 (defn reports-content
   []
@@ -14,6 +12,5 @@
   []
   (fn []
     [:div.reports-container
-     {:class "w-4/5 flex flex-col"}
-     [header/render]
+     {:class "h-full"}
      [reports-content]]))

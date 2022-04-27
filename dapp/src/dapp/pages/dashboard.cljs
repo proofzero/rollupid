@@ -1,7 +1,6 @@
 (ns dapp.pages.dashboard
   (:require
    [dapp.components.button :as button]
-   [dapp.components.header :as header]
    [dapp.components.web3-modal :as web3-modal]
    [re-frame.core :as re-frame]))
 
@@ -39,8 +38,7 @@
 (defn render
   []
   (let [logged-in? (re-frame/subscribe [:dapp.wallet/logged-in?])]
-   (fn []
-     [:div.dashboard-container
-      {:class "w-4/5 flex flex-col"}
-      [header/render @logged-in?]
-      [dashboard-content @logged-in?]])))
+    (fn []
+      [:div.dashboard-container
+       {:class "h-full"}
+       [dashboard-content @logged-in?]])))
