@@ -346,7 +346,7 @@
                                :http/client client}
                               (assoc :node/read read-info)
                               (assoc :node/write write-info))))
-                 (.cacth (fn [e]
+                 (.catch (fn [e]
                            (log/fatal ::error e)
                            (log/fatal ::mocking-ipfs-client "TODO: FIX IN CI")
                            {:com.kubelt/type :kubelt.type/ipfs-client
