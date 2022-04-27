@@ -199,9 +199,7 @@
                        :ipfs.node/version node-version
                        :ipfs.node/protocol node-proto-version
                        :ipfs.node/addresses node-addresses
-                       :ipfs.node/protocols node-protocols})))
-           (.catch (fn [e]
-                     {}))))))
+                       :ipfs.node/protocols node-protocols})))))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -345,14 +343,7 @@
                           (-> {:com.kubelt/type :kubelt.type/ipfs-client
                                :http/client client}
                               (assoc :node/read read-info)
-                              (assoc :node/write write-info))))
-                 (.catch (fn [e]
-                           (log/fatal ::error e)
-                           (log/fatal ::mocking-ipfs-client "TODO: FIX IN CI")
-                           {:com.kubelt/type :kubelt.type/ipfs-client
-                            :http/client :mock
-                            :node/read "http:///ip4/127.0.0.1/tcp/5001"
-                            :node/write "http:///ip4/127.0.0.1/tcp/5001"}))))))))))
+                              (assoc :node/write write-info))))))))))))
 
 #?(:cljs
    (defn init-js
