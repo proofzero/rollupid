@@ -12,6 +12,16 @@
 ;; the "Schema AST" map-based syntax instead as that should be faster to
 ;; instantiate for large schemas.
 
+;; Note that we can use the (malli.core/properties) function to retrieve
+;; metadata associated with a schema, e.g.
+;;
+;; (malli.core/properties
+;;   [:and
+;;    {:docs "An example map"
+;;     :example {}}
+;;    :map])
+;; => {:docs "An example map" :example {}}
+
 (def logging-level
   "Logging levels defined by the timbre logging library."
   [:and
@@ -73,13 +83,3 @@
   [:map {;;:closed false
          :title ::system-config}
    [:log/level {:optional false} logging-level]])
-
-#_(def config-schema
-  "Schema for SDK configuration map."
-  [:and
-   ;; Assign properties to the schema that can be retrieved
-   ;; using (m/properties schema).
-   {:title "Configuration"
-    :description "The SDK configuration map"
-    :example {:log/level :info}}
-   sdk-config])
