@@ -7,7 +7,6 @@
    [malli.core :as malli]
    [malli.error :as me])
   (:require
-   [taoensso.timbre :as log]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.ipfs.api :as ipfs.api]
