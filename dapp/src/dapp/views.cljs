@@ -2,22 +2,11 @@
   (:require
    [re-frame.core :as re-frame]
    [dapp.routes :as routes]
-   [dapp.wallet :as wallet]
-   [dapp.components.layout :as layout]
-   [dapp.components.login :as login]
-   ))
+   [dapp.components.layout :as layout]))
 
-(defn main-panel [{:keys [router]}]
-  (let [current-route @(re-frame/subscribe [::routes/current-route])
-        current-account @(re-frame/subscribe [::wallet/current-account])
-        provider @(re-frame/subscribe [::wallet/provider])]
-    (cond
-      current-account
-      [layout/render {:router router :current-route current-route}]
-
-      (and provider (not current-account))
-      [layout/render {:router router :current-route current-route}]
-      #_[login/render nil]
-
-      :else
-      [layout/render {:router router :current-route current-route}])))
+(defn main-panel
+  [_]
+  (fn [{:keys [router]}]
+   (let [current-route (re-frame/subscribe [::routes/current-route])]
+     [layout/render {:router router
+                     :current-route @current-route}])))

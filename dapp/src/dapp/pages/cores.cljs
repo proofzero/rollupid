@@ -1,6 +1,4 @@
-(ns dapp.pages.cores
-  (:require
-   [dapp.components.header :as header]))
+(ns dapp.pages.cores)
 
 (defn cores-content
   []
@@ -14,6 +12,5 @@
   []
   (fn []
     [:div.cores-container
-     {:class "w-4/5 flex flex-col"}
-     [header/render]
+     {:class "h-full"}
      [cores-content]]))
