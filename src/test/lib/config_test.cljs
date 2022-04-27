@@ -6,17 +6,16 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.spec.config :as spec.config]
-   [com.kubelt.lib.config.opts :as config]))
+   [com.kubelt.lib.config.default :as lib.config.default]
+   [com.kubelt.spec.config :as spec.config]))
 
 (defn with-defaults [conf]
-  (merge config/sdk-defaults conf))
+  (merge lib.config.default/sdk conf))
 
 (deftest config-test
   (testing "default config is valid"
-    (let [default-config config/sdk-defaults]
-      (is (malli/validate spec.config/sdk-config default-config)
-          "default options must be valid")))
+    (is (malli/validate spec.config/sdk-config lib.config.default/sdk)
+        "default options must be valid"))
 
   (testing "logging levels"
     (testing "log level"
