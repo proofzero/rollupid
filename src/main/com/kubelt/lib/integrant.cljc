@@ -3,8 +3,7 @@
   components before injecting them as dependencies"
   (:require [integrant.core :as ig]
             [cljs.core.async :as async]
-            #?(:cljs [cljs.core.async.interop :refer-macros [<p!]])
-            #?(:cljs [com.kubelt.lib.promise :as promise])))
+            #?(:cljs [cljs.core.async.interop :refer-macros [<p!]])))
 
 (defn relevant-keys [config keys]
   (let [relevant-keys   (#'ig/dependent-keys config keys)
@@ -19,7 +18,7 @@
 
 (defn build
   "add extra callback arg"
-  ([config resolve reject keys f assertf resolvef]
+  ([config keys f assertf resolvef resolve reject]
    {:pre [(map? config)]}
    (try
      (async/go-loop [k-v-seq (map (fn [k] [k (config k)]) (relevant-keys config keys))
@@ -28,7 +27,7 @@
              system' (#'ig/build-key f assertf resolvef system [k v])
              v'      (get system' k)
              v''     #?(:clj v'
-                        :cljs (if (promise/promise? v') (<p! v') v'))
+                        :cljs (if (= js/Promise (type v')) (<p! v') v'))
              system''  (assoc system' k v'')]
          (if-let [k-v-seq (seq (next k-v-seq))]
            (recur k-v-seq system'')
@@ -40,4 +39,4 @@
   "add extra callback arg"
   [config resolve reject]
   {:pre [(map? config)]}
-  (build config resolve reject (keys config) ig/init-key #'ig/assert-pre-init-spec ig/resolve-key))
+  (build config (keys config) ig/init-key #'ig/assert-pre-init-spec ig/resolve-key resolve reject))
