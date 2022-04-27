@@ -2,6 +2,8 @@
   "Schema for SDK configuration data."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [malli.core :as m])
+  (:require
    [com.kubelt.spec.http :as spec.http]
    [com.kubelt.spec.wallet :as spec.wallet]))
 
@@ -9,6 +11,16 @@
 ;; performance issues arise it may be more efficient to switch to
 ;; the "Schema AST" map-based syntax instead as that should be faster to
 ;; instantiate for large schemas.
+
+;; Note that we can use the (malli.core/properties) function to retrieve
+;; metadata associated with a schema, e.g.
+;;
+;; (malli.core/properties
+;;   [:and
+;;    {:docs "An example map"
+;;     :example {}}
+;;    :map])
+;; => {:docs "An example map" :example {}}
 
 (def logging-level
   "Logging levels defined by the timbre logging library."
@@ -41,10 +53,13 @@
 
 ;; config
 ;; -----------------------------------------------------------------------------
-;; Specifies the the configuration map passed to the sdk/init function.
+;; Specifies the configuration map passed to the sdk/init function.
 
-(def config
-  [:map {:closed true}
+;; A spec for the SDK intialization map where all values are
+;; optional. We provide defaults for those options that aren't provided.
+(def optional-sdk-config
+  [:map {:closed true
+         :title ::optional-sdk-config}
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
@@ -55,12 +70,16 @@
    [:p2p/multiaddr {:optional true} multiaddr]
    [:p2p/scheme {:optional true} spec.http/scheme]])
 
-(def config-schema
-  "Schema for SDK configuration map."
-  [:and
-   ;; Assign properties to the schema that can be retrieved
-   ;; using (m/properties schema).
-   {:title "Configuration"
-    :description "The SDK configuration map"
-    :example {:logging/min-level :info}}
-   config])
+;; After default options and user-supplied options are combined, we
+;; should have an SDK configuration options map that has every value
+;; provided.
+(def sdk-config
+  (into [:map {:closed true
+               :title ::sdk-config}]
+        (map #(assoc-in % [1 :optional] false)
+             (m/-children (m/schema optional-sdk-config nil)))))
+
+(def system-config
+  [:map {;;:closed false
+         :title ::system-config}
+   [:log/level {:optional false} logging-level]])

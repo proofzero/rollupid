@@ -30,5 +30,8 @@
   the provided schema."
   [schema value]
   (let [explain (-> schema (mc/explain value) me/humanize)]
-    {:com.kubelt/type :kubelt.type/error
-     :error explain}))
+    (merge
+     {:com.kubelt/type :kubelt.type/error}
+     (when (:title (mc/properties schema))
+       {:title (:title (mc/properties schema))})
+     {:error explain})))

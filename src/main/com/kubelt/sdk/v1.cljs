@@ -5,11 +5,16 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
-   [com.kubelt.lib.config :as lib.config]
+   [com.kubelt.lib.config.default :as lib.config.default]
+   [com.kubelt.lib.config.sdk :as lib.config.sdk]
+   [com.kubelt.lib.config.system :as lib.config.system]
+   [com.kubelt.lib.config.util :as lib.config.util]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :refer [promise promise?]]
-   [com.kubelt.spec.config :as spec.config]))
+   [com.kubelt.spec.config :as spec.config])
+  (:require-macros
+   [com.kubelt.spec :as kspec]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
@@ -30,19 +35,28 @@
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
   ([]
-   {:post [(map? %)]}
-   (let [config lib.config/default-config]
-     (if (m/validate spec.config/config config)
-       (lib.init/init config)
-       (lib.error/explain spec.config/config config))))
-
+   (init {}))
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(map? %)]}
-   (if (m/validate spec.config/config config)
-     (let [config (merge lib.config/default-config config)]
-       (lib.init/init config))
-     (lib.error/explain spec.config/config config))))
+   ;; Check that the user-provided options map is valid. If not, an
+   ;; error map is returned. Note that these configuration options are
+   ;; not required, so we provide defaults for those values that aren't
+   ;; provided.
+   (kspec/conform
+    spec.config/optional-sdk-config config
+    (let [sdk-config (merge lib.config.default/sdk config)]
+      ;; Check that the final options map (defaults combined with
+      ;; user-provided options) is valid.
+      (kspec/conform
+       spec.config/sdk-config sdk-config
+       (let [;; Construct a system configuration map from the default
+             ;; configuration combined with the options provided by the
+             ;; user.
+             system-config (lib.config.system/config lib.config.default/system sdk-config)]
+         (kspec/conform
+          spec.config/system-config system-config
+          (lib.init/init system-config))))))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
@@ -54,17 +68,12 @@
   ;; The 0-arity implementation uses the default configuration.
   ([]
    {:post [(promise? %)]}
-   (promise
-    (fn [resolve reject]
-      (let [result (init)]
-        (if (lib.error/error? result)
-          (reject (clj->js result))
-          (resolve result))))))
+   (init-js #js{}))
 
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
-   (let [config (lib.config/obj->map config)]
+   (let [config (lib.config.util/obj->map config)]
      (promise
       (fn [resolve reject]
         (let [result (init config)]
@@ -104,7 +113,7 @@
   to be re-instantiated."
   [system]
   {:pre [(map? system)]}
-  (lib.init/options system))
+  (lib.config.sdk/options system))
 
 (defn options-js
   "Return an options object for the SDK from a JavaScript context."

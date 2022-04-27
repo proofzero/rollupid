@@ -11,6 +11,17 @@
    (map? x)
    (= :kubelt.type/vault (:com.kubelt/type x))))
 
+(defn vault
+  "Return a token storage vault containing a map from core name to
+  associated JWT."
+  ([]
+   (let [tokens {}]
+     (vault tokens)))
+  ([token-map]
+   {:pre [(map? token-map)]}
+   {:com.kubelt/type :kubelt.type/vault
+    :vault/tokens token-map}))
+
 (defn tokens
   "Return a map from core name to JWT token strings."
   [vault]
