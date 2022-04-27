@@ -5,7 +5,9 @@
             [cljs.core.async :as async]
             #?(:cljs [cljs.core.async.interop :refer-macros [<p!]])))
 
-(defn relevant-keys [config keys]
+(defn- relevant-keys
+  "let's try to have this function in https://github.com/weavejester/integrant or in the worst case on  https://github.com/[kubelt|tangrammer]/integrant"
+  [config keys]
   (let [relevant-keys   (#'ig/dependent-keys config keys)
         relevant-config (select-keys config relevant-keys)]
     (when-let [invalid-key (first (#'ig/invalid-composite-keys config))]
