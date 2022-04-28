@@ -33,5 +33,5 @@
                           (ddt.util/exit-if err))
                         (let [password (.-password result)]
                           (lib.wallet/import (fn [res]
-                                               (println "successfully imported wallet:" res))
+                                               (println res))
                                              app-name wallet-name mnemonic password)))))))))})

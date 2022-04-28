@@ -149,8 +149,10 @@
     (when (has-wallet? app-name wallet-name)
       (callback (str "wallet " wallet-name " already exists")))
     (go
-      (let [wallet-path (.join path wallet-dirp wallet-name)
-            w  (.fromMnemonic Wallet mnemonic)
-            wallet-js (<p! (.encrypt w password))]
-        (.writeFileSync fs wallet-path wallet-js)
-        (callback wallet-name)))))
+      (try
+        (let [wallet-path (.join path wallet-dirp wallet-name)
+              w  (.fromMnemonic Wallet mnemonic)
+              wallet-js (<p! (.encrypt w password))]
+          (.writeFileSync fs wallet-path wallet-js)
+          (callback (str "successfully imported wallet:" wallet-name)))
+        (catch js/Error e (callback (str e)))))))
