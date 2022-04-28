@@ -3,9 +3,11 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [cljs.core.async :as async :refer [<! go]])
+
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.http.status :as http.status]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.p2p :as lib.p2p]
    [com.kubelt.lib.promise :as lib.promise :refer [promise]]
@@ -67,9 +69,13 @@
                                    (fn [{:keys [http/status http/body] :as response}]
                                      (if-not (http.status/success? status)
                                        (throw (ex-info "http error" response))
-                                       (let [jwt (lib.jwt/decode body)]
+                                       (let [body-map (lib.json/from-json body true)
+                                              _ (println body-map)
+                                              ;; body
+                                              jwt (lib.jwt/decode (get body-map :jwt))
+                                              sys-temp (assoc-in sys [:crypto/wallet :wallet/rpc-endpoint] (get body-map :jsonrpc))]
                                          ;; TODO verify jwt
-                                         (assoc-in sys [:crypto/session :vault/tokens core] jwt)))))))))))))
+                                         (assoc-in sys-temp [:crypto/session :vault/tokens core] jwt)))))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
