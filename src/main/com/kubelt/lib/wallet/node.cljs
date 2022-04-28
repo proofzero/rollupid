@@ -145,7 +145,13 @@
 (defn import
   "Import a wallet and store it encrypted"
   [callback app-name wallet-name mnemonic password]
-  (go
-    (println ::processing app-name wallet-name )
-    (let [w  (.fromMnemonic Wallet mnemonic)]
-      (callback [wallet-name (.-address w)]))))
+  (let [wallet-dirp (ensure-wallet-dir app-name)]
+    (when (has-wallet? app-name wallet-name)
+      (let [message (str "wallet " wallet-name " already exists")]
+        (lib.error/error message)))
+    (go
+      (let [wallet-path (.join path wallet-dirp wallet-name)
+            w  (.fromMnemonic Wallet mnemonic)
+            wallet-js (<p! (.encrypt w password))]
+        (.writeFileSync fs wallet-path wallet-js)
+        (callback wallet-name)))))

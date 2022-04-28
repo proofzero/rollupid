@@ -21,17 +21,17 @@
 
                 ;; Check to see if named wallet already exists. Wallets
                 ;; can't be overwritten so throw an error if so.
-                (if (lib.wallet/has-wallet? app-name wallet-name)
+                (when (lib.wallet/has-wallet? app-name wallet-name)
                   (let [message (str "wallet '" wallet-name "' already exists")]
-                    (ddt.util/exit-if message))
-                  (println "good! no other wallet exists with this name"))
-                (ddt.prompt/ask-mnemonic! (fn [err result]
-                                            (let [mnemonic (.-mnemonic result)]
-                                              (ddt.prompt/confirm-password!
-                                               (fn [err result]
-                                                 (when err
-                                                   (ddt.util/exit-if err))
-                                                 (let [password (.-password result)]
-                                                   (lib.wallet/import (fn [res]
-                                                                        (println "imported wallet:" res))
-                                                                      app-name wallet-name mnemonic password)))))))))})
+                    (ddt.util/exit-if message)))
+                (ddt.prompt/ask-mnemonic!
+                 (fn [err result]
+                   (let [mnemonic (.-mnemonic result)]
+                     (ddt.prompt/confirm-password!
+                      (fn [err result]
+                        (when err
+                          (ddt.util/exit-if err))
+                        (let [password (.-password result)]
+                          (lib.wallet/import (fn [res]
+                                               (println "successfully imported wallet:" res))
+                                             app-name wallet-name mnemonic password)))))))))})
