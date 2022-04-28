@@ -2,10 +2,7 @@
   "Invoke the wallet (init) method."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   ["path" :as path])
-  (:require
-   [clojure.string :as cstr])
-  (:require
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.wallet :as lib.wallet]))
@@ -19,9 +16,8 @@
               yargs)
 
    :handler (fn [args]
-              (let [args-map (js->clj args :keywordize-keys true)
-                    base-name (.basename path (get args-map :$0))
-                    app-name (cstr/join "." ["com" "kubelt" base-name])
+              (let [args-map (ddt.options/to-map args)
+                    app-name (get args-map :app-name)
                     wallet-name (get args-map :name)]
                 ;; TODO check to see if wallet name is valid (using yargs)
 
