@@ -15,6 +15,16 @@
 (def pw-regex
   #"^\w+$")
 
+(def pnemonic-config
+  {:pnemonic
+   {:description "Enter your pnmemonic phrase"
+    :type "string"
+    :message "Password must be 12 words"
+    :hidden true
+    :replace "*"
+    :required true
+    :before pw-clean}})
+
 (def password-config
   {:password
    {:description "Enter your password"
@@ -45,9 +55,13 @@
 ;; The prompt schema determines what is asked for from the user.
 ;; NB: "before" fn is run before callbacks and can modify user's input.
 
-(def ask-schema
+(def ask-pw-schema
   (clj->js
    {:properties password-config}))
+
+(def ask-pnemonic-schema
+  (clj->js
+   {:properties pnemonic-config}))
 
 (def confirm-schema
   (clj->js
@@ -82,16 +96,30 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-(defn ask-password!
+(defn ask!
   "Prompt the user for their password. Expects a callback function that
   accepts an error and a result parameter: (fn [err result] ...)."
-  [callback]
+  [callback ask-schema]
   {:pre [(fn? callback)]}
   ;; Remove the preliminary prompt set by default in "prompt" library.
   (set! (.-message prompt) "")
   ;; Prompt the user for their wallet password.
   (.start prompt)
   (.get prompt ask-schema callback))
+
+(defn ask-pnemonic!
+  "Prompt the user for their password. Expects a callback function that
+  accepts an error and a result parameter: (fn [err result] ...)."
+  [callback]
+  {:pre [(fn? callback)]}
+  (ask! callback ask-pnemonic-schema))
+
+(defn ask-password!
+  "Prompt the user for their password. Expects a callback function that
+  accepts an error and a result parameter: (fn [err result] ...)."
+  [callback]
+  {:pre [(fn? callback)]}
+  (ask! callback ask-pw-schema))
 
 (defn confirm-password!
   "Prompt the user for their password twice and passes along an error
