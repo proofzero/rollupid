@@ -147,8 +147,7 @@
   [callback app-name wallet-name mnemonic password]
   (let [wallet-dirp (ensure-wallet-dir app-name)]
     (when (has-wallet? app-name wallet-name)
-      (let [message (str "wallet " wallet-name " already exists")]
-        (lib.error/error message)))
+      (callback (str "wallet " wallet-name " already exists")))
     (go
       (let [wallet-path (.join path wallet-dirp wallet-name)
             w  (.fromMnemonic Wallet mnemonic)
