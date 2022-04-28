@@ -45,21 +45,24 @@
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
    ;; provided.
-   (kspec/conform
-    spec.config/optional-sdk-config config
-    (let [sdk-config (merge lib.config.default/sdk config)]
-      ;; Check that the final options map (defaults combined with
-      ;; user-provided options) is valid.
-      (kspec/conform
-       spec.config/sdk-config sdk-config
-       (let [;; Construct a system configuration map from the default
-             ;; configuration combined with the options provided by the
-             ;; user.
-             system-config (lib.config.system/config lib.config.default/system sdk-config)]
+   (let [init-system-process
          (kspec/conform
-          spec.config/system-config system-config
-          (lib.init/init system-config resolve reject)
-          #_(reject (clj->js (lib.error/explain spec.config/config config))))))))))
+          spec.config/optional-sdk-config config
+          (let [sdk-config (merge lib.config.default/sdk config)]
+            ;; Check that the final options map (defaults combined with
+            ;; user-provided options) is valid.
+            (kspec/conform
+             spec.config/sdk-config sdk-config
+             (let [;; Construct a system configuration map from the default
+                   ;; configuration combined with the options provided by the
+                   ;; user.
+                   system-config (lib.config.system/config lib.config.default/system sdk-config)]
+               (kspec/conform
+                spec.config/system-config system-config
+                (lib.init/init system-config resolve reject))))))]
+     (if (lib.error/error? init-system-process)
+       (reject (clj->js init-system-process))
+       init-system-process))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
