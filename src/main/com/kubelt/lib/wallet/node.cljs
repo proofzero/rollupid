@@ -1,6 +1,7 @@
 (ns com.kubelt.lib.wallet.node
   "The Node.js implementation of a crypto wallet wrapper."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:refer-clojure :exclude [import])
   (:require
    ["fs" :as fs]
    ["path" :as path])
@@ -9,10 +10,10 @@
   (:require
    [cljs.core.async :as async :refer [go]]
    [cljs.core.async.interop :refer-macros [<p!]])
-  (:refer-clojure :exclude [import])
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.path :as lib.path]
+   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
 (defn- wallet-dir
@@ -143,16 +144,42 @@
      :wallet/sign-fn sign-fn}))
 
 (defn import
-  "Import a wallet and store it encrypted"
-  [callback app-name wallet-name mnemonic password]
-  (let [wallet-dirp (ensure-wallet-dir app-name)]
-    (when (has-wallet? app-name wallet-name)
-      (callback (str "wallet " wallet-name " already exists")))
-    (go
-      (try
-        (let [wallet-path (.join path wallet-dirp wallet-name)
-              w  (.fromMnemonic Wallet mnemonic)
-              wallet-js (<p! (.encrypt w password))]
-          (.writeFileSync fs wallet-path wallet-js)
-          (callback (str "successfully imported wallet:" wallet-name)))
-        (catch js/Error e (callback (str e)))))))
+  "Import a wallet and store it encrypted. Returns a promise that resolves
+  to the path to the imported wallet, or if an error occurs rejects with
+  a standard error map."
+  [app-name wallet-name mnemonic password]
+  (lib.promise/promise
+   (fn [resolve reject]
+     (when (has-wallet? app-name wallet-name)
+       (let [msg (str "wallet " wallet-name " already exists")
+             error (lib.error/error msg)]
+         (reject error)))
+     ;; The wallet with the given name doesn't yet exist, we can import
+     ;; from the mnemonic and create a wallet with that name.
+     (letfn [;; Returns a promise that resolves to the wallet
+             ;; JSON. Throws if the mnemonic is invalid.
+             (from-mnemonic [mnemonic]
+               (try
+                 (let [w (.fromMnemonic Wallet mnemonic)]
+                   (.encrypt w password))
+                 (catch js/Error e
+                   (let [error (lib.error/from-obj e)]
+                     (reject error)))))
+             ;; Returns the path of the wallet file to write.
+             (wallet-path []
+               (let [wallet-dir (ensure-wallet-dir app-name)
+                     wallet-file (.join path wallet-dir wallet-name)]
+                 (lib.promise/resolved wallet-file)))]
+       (let [path& (wallet-path)
+             wallet& (from-mnemonic mnemonic)]
+         (-> (lib.promise/all [path& wallet&])
+             (.then (fn [[wallet-dirp wallet-js]]
+                      (-> (.writeFile fs wallet-dirp wallet-js)
+                          (.then (fn []
+                                   (resolve wallet-dirp)))
+                          (.catch (fn [e]
+                                    (let [error (lib.error/from-obj e)]
+                                      (reject error)))))))
+             (.catch (fn [e]
+                       (let [error (lib.error/error e)]
+                         (reject error))))))))))
