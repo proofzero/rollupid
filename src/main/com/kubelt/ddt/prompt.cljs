@@ -15,9 +15,9 @@
 (def pw-regex
   #"^\w+$")
 
-(def pnemonic-config
-  {:pnemonic
-   {:description "Enter your pnmemonic phrase"
+(def mnemonic-config
+  {:mnemonic
+   {:description "Enter your mnemonic phrase"
     :type "string"
     :message "Password must be 12 words"
     :hidden true
@@ -59,9 +59,9 @@
   (clj->js
    {:properties password-config}))
 
-(def ask-pnemonic-schema
+(def ask-mnemonic-schema
   (clj->js
-   {:properties pnemonic-config}))
+   {:properties mnemonic-config}))
 
 (def confirm-schema
   (clj->js
@@ -107,12 +107,12 @@
   (.start prompt)
   (.get prompt ask-schema callback))
 
-(defn ask-pnemonic!
+(defn ask-mnemonic!
   "Prompt the user for their password. Expects a callback function that
   accepts an error and a result parameter: (fn [err result] ...)."
   [callback]
   {:pre [(fn? callback)]}
-  (ask! callback ask-pnemonic-schema))
+  (ask! callback ask-mnemonic-schema))
 
 (defn ask-password!
   "Prompt the user for their password. Expects a callback function that

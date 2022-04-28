@@ -9,6 +9,7 @@
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.spec.wallet :as spec.wallet])
+  (:refer-clojure :exclude [import])
   #?(:node
      (:require
       [com.kubelt.lib.wallet.node :as wallet.node])))
@@ -113,3 +114,11 @@
   "Create a platform-appropriate wallet."
   []
   #?(:node (wallet.node/create)))
+
+(defn import
+  "Import a wallet and store it encrypted"
+  [callback app-name wallet-name mnemonic password]
+  {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)
+         (fn? callback)]}
+  #?(:node
+       (wallet.node/import callback app-name wallet-name mnemonic password)))

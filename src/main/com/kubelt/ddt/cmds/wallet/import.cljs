@@ -25,14 +25,13 @@
                   (let [message (str "wallet '" wallet-name "' already exists")]
                     (ddt.util/exit-if message))
                   (println "good! no other wallet exists with this name"))
-                (ddt.prompt/ask-pnemonic! (fn [err result]
+                (ddt.prompt/ask-mnemonic! (fn [err result]
                                             (let [mnemonic (.-mnemonic result)]
                                               (ddt.prompt/confirm-password!
                                                (fn [err result]
                                                  (when err
                                                    (ddt.util/exit-if err))
                                                  (let [password (.-password result)]
-                                                   (println {:mnemonic mnemonic
-                                                             :password password})
-                                                   #_(let [wallet-path (lib.wallet/init app-name wallet-name password)]
-                                                       (println "initialized wallet:" wallet-name))))))))))})
+                                                   (lib.wallet/import (fn [res]
+                                                                        (println "imported wallet:" res))
+                                                                      app-name wallet-name mnemonic password)))))))))})

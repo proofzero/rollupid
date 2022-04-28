@@ -9,6 +9,7 @@
   (:require
    [cljs.core.async :as async :refer [go]]
    [cljs.core.async.interop :refer-macros [<p!]])
+  (:refer-clojure :exclude [import])
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.path :as lib.path]
@@ -140,3 +141,11 @@
   #_(let [sign-fn (lib.wallet/make-sign-fn eth-wallet)]
     {:wallet/address :fixme
      :wallet/sign-fn sign-fn}))
+
+(defn import
+  "Import a wallet and store it encrypted"
+  [callback app-name wallet-name mnemonic password]
+  (go
+    (println ::processing app-name wallet-name )
+    (let [w  (.fromMnemonic Wallet mnemonic)]
+      (callback [wallet-name (.-address w)]))))
