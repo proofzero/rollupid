@@ -25,9 +25,7 @@
      [o]
      {:pre [(object? o)]}
      (let [config  (js->clj o :keywordize-keys true)]
-       (if (empty? config)
-         lib.config.default/sdk
-         ;; Fix up any config map values that didn't translate from
-         ;; JavaScript.
-         (-> config
-             (update-in [:log/level] log-level->keyword))))))
+       ;; Fix up any config map values that didn't translate from
+       ;; JavaScript.
+       (cond-> config
+         (:log/level config) (update-in [:log/level] log-level->keyword)))))
