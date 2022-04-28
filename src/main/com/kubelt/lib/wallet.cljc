@@ -61,6 +61,7 @@
                   :key/data ""}]
     {:com.kubelt/type :kubelt.type/wallet
      :wallet/address null-address
+     :wallet/rpc-endpoint nil
      :wallet/encrypt-key null-key
      :wallet/decrypt-fn identity
      :wallet/sign-fn identity}))

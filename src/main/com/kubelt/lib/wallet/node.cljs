@@ -117,7 +117,13 @@
               sign-fn (lib.wallet/make-sign-fn eth-wallet)]
           {:com.kubelt/type :kubelt.type/wallet
            :wallet/address address
+           :wallet/rpc-endpoint nil
            :wallet/sign-fn sign-fn})))))
+(defn set-endpoint
+  "Set wallet's JSON RPC endpoint address"
+  [wallet rpc-address]
+  ;;TODO replace :wallet/rpc-endpoint with address
+  wallet)
 
 (defn ls
   "Return a list of wallet names."
@@ -139,4 +145,5 @@
   ;; (<! (lib.wallet/random-wallet))
   #_(let [sign-fn (lib.wallet/make-sign-fn eth-wallet)]
     {:wallet/address :fixme
+     :wallet/rpc-endpoint nil
      :wallet/sign-fn sign-fn}))

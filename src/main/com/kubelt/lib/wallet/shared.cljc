@@ -42,4 +42,5 @@
                (fn [address]
                  {:com.kubelt/type :kubelt.type/wallet
                   :wallet/address address
+                  :wallet/rpc-endpoint "http://localhost:8787/"
                   :wallet/sign-fn sign-fn})))))))

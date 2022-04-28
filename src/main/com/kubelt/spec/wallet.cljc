@@ -41,6 +41,7 @@ wallet."}
   [:map
    [:com.kubelt/type [:enum :kubelt.type/wallet]]
    [:wallet/address wallet-address]
+;;   [:wallet/rpc-endpoint rpc-endpoint]
    ;;[:wallet/encrypt-key spec.crypto/public-key]
    ;;[:wallet/decrypt-fn decrypt-fn]
    [:wallet/sign-fn sign-fn]])
@@ -51,6 +52,7 @@ wallet."}
     :description "A crypto wallet"
     :example {:com.kubelt/type :kubelt.type/wallet
               :wallet/address "0x13235asdasf31312sadfasd"
+              :wallet/rpc-endpoint "https://account.example.com"
               :wallet/encrypt-key {:com.kubelt/type :kubelt.type/public-key
                                    :key/data "<key data>"}
               :wallet/sign-fn '(fn [data] "<signature>")}}
@@ -60,6 +62,7 @@ wallet."}
 ;; -----------------------------------------------------------------------------
 ;; A vault is a collection of session tokens (JWTs) returned from
 ;; authentication calls.
+
 
 (def vault
   [:map
