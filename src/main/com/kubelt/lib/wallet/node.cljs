@@ -86,7 +86,11 @@
     false))
 
 (defn init
-  ""
+  "Create and store an encrypted wallet. The encrypted wallet file is
+  stored in an XDG compliant location based on the application name. It
+  is also named using the supplied wallet name and encrypted with the
+  supplied password. A map describing the created wallet is returned if
+  successful. An error map is returned otherwise."
   [app-name wallet-name password]
   (let [;; Create the wallet directory if it doesn't already exist.
         wallet-dirp (ensure-wallet-dir app-name)]
@@ -95,13 +99,18 @@
       (let [message (str "wallet " wallet-name " already exists")]
         (lib.error/error message)))
     ;; Wallet doesn't yet exist, so create it!
-    (let [wallet-path (.join path wallet-dirp wallet-name)]
+    (let [wallet-path (.join path wallet-dirp wallet-name)
+          eth-wallet (.createRandom Wallet)
+          mnemonic (.-mnemonic eth-wallet)]
       (go
-        (let [eth-wallet (.createRandom Wallet)
-              wallet-js (<p! (.encrypt eth-wallet password))]
+        (let [wallet-js (<p! (.encrypt eth-wallet password))]
           (.writeFileSync fs wallet-path wallet-js)))
-      ;; TODO return a map
-      wallet-path)))
+      (let [{:keys [phrase path locale]} (js->clj mnemonic :keywordize-keys true)]
+        {:wallet/path wallet-path
+         :wallet/name wallet-name
+         :wallet.mnemonic/phrase phrase
+         :wallet.mnemonic/path path
+         :wallet.mnemonic/locale locale}))))
 
 (defn load
   ""
@@ -161,6 +170,7 @@
              (from-mnemonic [mnemonic]
                (try
                  (let [w (.fromMnemonic Wallet mnemonic)]
+                   ;; Returns a promise.
                    (.encrypt w password))
                  (catch js/Error e
                    (let [error (lib.error/from-obj e)]
@@ -174,12 +184,14 @@
              wallet& (from-mnemonic mnemonic)]
          (-> (lib.promise/all [path& wallet&])
              (.then (fn [[wallet-dirp wallet-js]]
-                      (-> (.writeFile fs wallet-dirp wallet-js)
-                          (.then (fn []
-                                   (resolve wallet-dirp)))
-                          (.catch (fn [e]
-                                    (let [error (lib.error/from-obj e)]
-                                      (reject error)))))))
+                      (try
+                        (.writeFileSync fs wallet-dirp wallet-js)
+                        (let [result {:wallet/name wallet-name
+                                      :wallet/path wallet-path}]
+                          (resolve result))
+                        (catch js/Error e
+                          (let [error (lib.error/from-obj e)]
+                            (reject error))))))
              (.catch (fn [e]
-                       (let [error (lib.error/error e)]
+                       (let [error (lib.error/from-obj e)]
                          (reject error))))))))))
