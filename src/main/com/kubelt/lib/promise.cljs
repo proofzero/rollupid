@@ -95,7 +95,7 @@
 ;;   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
 (defn all-map
   "Resolves when all promise values in the map resolve. The resolved value
-  will e a map with the same keys as the input map, but with the
+  will be a map with the same keys as the input map, but with the
   resolved values of the promises. Rejects with first error if any
   promise rejects. Like Promise.all() but for Maps."
   [js-map]

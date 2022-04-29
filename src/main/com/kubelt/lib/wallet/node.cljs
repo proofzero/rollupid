@@ -1,6 +1,7 @@
 (ns com.kubelt.lib.wallet.node
   "The Node.js implementation of a crypto wallet wrapper."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:refer-clojure :exclude [import])
   (:require
    ["fs" :as fs]
    ["path" :as path])
@@ -12,6 +13,7 @@
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.path :as lib.path]
+   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
 (defn- wallet-dir
@@ -84,7 +86,11 @@
     false))
 
 (defn init
-  ""
+  "Create and store an encrypted wallet. The encrypted wallet file is
+  stored in an XDG compliant location based on the application name. It
+  is also named using the supplied wallet name and encrypted with the
+  supplied password. A map describing the created wallet is returned if
+  successful. An error map is returned otherwise."
   [app-name wallet-name password]
   (let [;; Create the wallet directory if it doesn't already exist.
         wallet-dirp (ensure-wallet-dir app-name)]
@@ -93,13 +99,18 @@
       (let [message (str "wallet " wallet-name " already exists")]
         (lib.error/error message)))
     ;; Wallet doesn't yet exist, so create it!
-    (let [wallet-path (.join path wallet-dirp wallet-name)]
+    (let [wallet-path (.join path wallet-dirp wallet-name)
+          eth-wallet (.createRandom Wallet)
+          mnemonic (.-mnemonic eth-wallet)]
       (go
-        (let [eth-wallet (.createRandom Wallet)
-              wallet-js (<p! (.encrypt eth-wallet password))]
+        (let [wallet-js (<p! (.encrypt eth-wallet password))]
           (.writeFileSync fs wallet-path wallet-js)))
-      ;; TODO return a map
-      wallet-path)))
+      (let [{:keys [phrase path locale]} (js->clj mnemonic :keywordize-keys true)]
+        {:wallet/path wallet-path
+         :wallet/name wallet-name
+         :wallet.mnemonic/phrase phrase
+         :wallet.mnemonic/path path
+         :wallet.mnemonic/locale locale}))))
 
 (defn load
   ""
@@ -140,3 +151,47 @@
   #_(let [sign-fn (lib.wallet/make-sign-fn eth-wallet)]
     {:wallet/address :fixme
      :wallet/sign-fn sign-fn}))
+
+(defn import
+  "Import a wallet and store it encrypted. Returns a promise that resolves
+  to the path to the imported wallet, or if an error occurs rejects with
+  a standard error map."
+  [app-name wallet-name mnemonic password]
+  (lib.promise/promise
+   (fn [resolve reject]
+     (when (has-wallet? app-name wallet-name)
+       (let [msg (str "wallet " wallet-name " already exists")
+             error (lib.error/error msg)]
+         (reject error)))
+     ;; The wallet with the given name doesn't yet exist, we can import
+     ;; from the mnemonic and create a wallet with that name.
+     (letfn [;; Returns a promise that resolves to the wallet
+             ;; JSON. Throws if the mnemonic is invalid.
+             (from-mnemonic [mnemonic]
+               (try
+                 (let [w (.fromMnemonic Wallet mnemonic)]
+                   ;; Returns a promise.
+                   (.encrypt w password))
+                 (catch js/Error e
+                   (let [error (lib.error/from-obj e)]
+                     (reject error)))))
+             ;; Returns the path of the wallet file to write.
+             (wallet-path []
+               (let [wallet-dir (ensure-wallet-dir app-name)
+                     wallet-file (.join path wallet-dir wallet-name)]
+                 (lib.promise/resolved wallet-file)))]
+       (let [path& (wallet-path)
+             wallet& (from-mnemonic mnemonic)]
+         (-> (lib.promise/all [path& wallet&])
+             (.then (fn [[wallet-dirp wallet-js]]
+                      (try
+                        (.writeFileSync fs wallet-dirp wallet-js)
+                        (let [result {:wallet/name wallet-name
+                                      :wallet/path wallet-path}]
+                          (resolve result))
+                        (catch js/Error e
+                          (let [error (lib.error/from-obj e)]
+                            (reject error))))))
+             (.catch (fn [e]
+                       (let [error (lib.error/from-obj e)]
+                         (reject error))))))))))

@@ -2,10 +2,7 @@
   "Invoke the wallet (init) method."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   ["path" :as path])
-  (:require
-   [clojure.string :as cstr])
-  (:require
+   [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.wallet :as lib.wallet]))
@@ -19,12 +16,10 @@
               yargs)
 
    :handler (fn [args]
-              (let [args-map (js->clj args :keywordize-keys true)
-                    base-name (.basename path (get args-map :$0))
-                    app-name (cstr/join "." ["com" "kubelt" base-name])
+              (let [args-map (ddt.options/to-map args)
+                    app-name (get args-map :app-name)
+                    ;; TODO check to see if wallet name is valid (using yargs)
                     wallet-name (get args-map :name)]
-                ;; TODO check to see if wallet name is valid (using yargs)
-
                 ;; Check to see if named wallet already exists. Wallets
                 ;; can't be overwritten so throw an error if so.
                 (if (lib.wallet/has-wallet? app-name wallet-name)
@@ -35,5 +30,9 @@
                    (when err
                      (ddt.util/exit-if err))
                    (let [password (.-password result)]
-                     (let [wallet-path (lib.wallet/init app-name wallet-name password)]
-                       (println "initialized wallet:" wallet-name)))))))})
+                     (let [wallet (lib.wallet/init app-name wallet-name password)
+                           wallet-name (get wallet :wallet/name)
+                           ;; NB: Also available are the mnemonic path, locale.
+                           mnemonic (get wallet :wallet.mnemonic/phrase)]
+                       (println "initialized wallet:" wallet-name)
+                       (println "-> mnemonic:" mnemonic)))))))})
