@@ -19,7 +19,7 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-#?(:node
+#?(:cljs
    (defn obj->map
      "Convert a JavaScript configuration object to a Clojure config map."
      [o]
