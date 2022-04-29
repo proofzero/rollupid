@@ -57,4 +57,9 @@
        :resource #js {:add sdk.v1.resource/add-js!}
 
        ;; workspace
-       :workspace #js {:available sdk.v1.workspace/available-js!}})
+       :workspace #js {:available sdk.v1.workspace/available-js!}
+
+       ;; development (removed from production builds)
+       ;; TODO
+       ;;:develop #js {:rpc #js {:call sdk.v1.develop.rpc/call-js!}}
+       })
