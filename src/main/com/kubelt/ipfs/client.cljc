@@ -203,6 +203,7 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
+;; TODO validate with malli.
 (defn client?
   "Return true if x is an IPFS client returned from calling (init), and
   false otherwise."
@@ -211,6 +212,8 @@
    (map? x)
    (= :kubelt.type/ipfs-client (get x :com.kubelt/type))))
 
+;; TODO validate with malli.
+;; TODO move to lib.error.
 (defn error?
   "Return true if x is a Kubelt error map, and false otherwise."
   [x]
@@ -232,7 +235,7 @@
 ;;  [:dag :get]
 ;;  [:dag :import]]
 (defn ops
-  "Return the collection of oeprations provided by the API. Each vector of
+  "Return the collection of operations provided by the API. Each vector of
   keywords in the returned collection represents a call that may be
   performed. Use the (doc) command to get a description of the API
   resource."
