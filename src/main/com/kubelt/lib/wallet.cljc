@@ -116,9 +116,10 @@
   #?(:node (wallet.node/create)))
 
 (defn import
-  "Import a wallet and store it encrypted"
-  [callback app-name wallet-name mnemonic password]
-  {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)
-         (fn? callback)]}
+  "Import a wallet and store it encrypted. Returns a promise that rejects
+  with an error map if a problem occurs, or resolves to the name of the
+  newly imported wallet on success."
+  [app-name wallet-name mnemonic password]
+  {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)]}
   #?(:node
-       (wallet.node/import callback app-name wallet-name mnemonic password)))
+     (wallet.node/import app-name wallet-name mnemonic password)))

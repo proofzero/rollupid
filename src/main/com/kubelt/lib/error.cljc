@@ -35,3 +35,10 @@
      (when (:title (mc/properties schema))
        {:title (:title (mc/properties schema))})
      {:error explain})))
+
+#?(:cljs
+  (defn from-obj
+    "Return an error map from a js/Error object."
+    [o]
+    (let [message (.-message o)]
+      (error message))))
