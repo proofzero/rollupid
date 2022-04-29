@@ -69,11 +69,11 @@
                                    (fn [{:keys [http/status http/body] :as response}]
                                      (if-not (http.status/success? status)
                                        (throw (ex-info "http error" response))
-                                       (let [body-map (lib.json/from-json body true)
-                                              _ (println body-map)
+                                       (let [ _ (println {:type "body" :msg body})
                                               ;; body
-                                              jwt (lib.jwt/decode (get body-map :jwt))
-                                              sys-temp (assoc-in sys [:crypto/wallet :wallet/rpc-endpoint] (get body-map :jsonrpc))]
+                                              jwt (lib.jwt/decode body)
+                                              _ (println {:msg "jwt" :jwt jwt})
+                                              sys-temp (assoc-in sys [:crypto/wallet :wallet/rpc-endpoint] (get jwt :jsonrpcurl))]
                                          ;; TODO verify jwt
                                          (assoc-in sys-temp [:crypto/session :vault/tokens core] jwt)))))))))))))
 
