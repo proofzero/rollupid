@@ -113,22 +113,28 @@
          :wallet.mnemonic/locale locale}))))
 
 (defn load
-  ""
+  "Return a promise that resolves to a wallet map, or that rejects with an
+  error map if a problem occurs."
   [app-name wallet-name password]
   (let [wallet-dirp (ensure-wallet-dir app-name)]
-    (when-not (has-wallet? app-name wallet-name)
-      (let [message (str "wallet " wallet-name " doesn't exist")]
-        (lib.error/error message)))
-    ;; Load the wallet JSON
-    (let [wallet-path (name->path app-name wallet-name)
-          wallet-str (.readFileSync fs wallet-path)]
-      (go
-        (let [eth-wallet (.fromEncryptedJsonSync Wallet wallet-str password)
-              address (.-address eth-wallet)
-              sign-fn (lib.wallet/make-sign-fn eth-wallet)]
-          {:com.kubelt/type :kubelt.type/wallet
-           :wallet/address address
-           :wallet/sign-fn sign-fn})))))
+    (lib.promise/promise
+     (fn [resolve reject]
+       (when-not (has-wallet? app-name wallet-name)
+         (let [message (str "wallet " wallet-name " doesn't exist")]
+           (reject (lib.error/error message))))
+       ;; Load the wallet JSON
+       (let [wallet-path (name->path app-name wallet-name)]
+         (.readFile fs wallet-path "utf8"
+          (fn [err wallet-str]
+            (if err
+              (reject (lib.error/error err))
+              (let [eth-wallet (.fromEncryptedJsonSync Wallet wallet-str password)
+                    address (.-address eth-wallet)
+                    sign-fn (lib.wallet/make-sign-fn eth-wallet)]
+                (resolve
+                 {:com.kubelt/type :kubelt.type/wallet
+                  :wallet/address address
+                  :wallet/sign-fn sign-fn}))))))))))
 
 (defn ls
   "Return a list of wallet names."

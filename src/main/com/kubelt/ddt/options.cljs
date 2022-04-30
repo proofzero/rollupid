@@ -4,6 +4,7 @@
   (:require
    ["path" :as path])
   (:require
+   [clojure.set :as cset]
    [clojure.string :as cstr]))
 
 ;; Defaults
@@ -206,7 +207,12 @@
   "Convert arguments object to a Clojure map, ensuring that common options
   are transformed appropriately."
   [args]
-  (let [m (js->clj args :keywordize-keys true)
+  (let [;; The parsed arguments are returned as a #js object. Convert to
+        ;; a CLJS map with keywords as keys.
+        m (js->clj args :keywordize-keys true)
+        ;; The string array of arguments is provided with the
+        ;; key "_". Rename it to something a bit friendlier.
+        m (cset/rename-keys m {:_ :args})
         ;; Get the name of the application that was invoked; store in
         ;; the arguments map as something that is namespace qualified,
         ;; i.e. com.kubelt.$name.
