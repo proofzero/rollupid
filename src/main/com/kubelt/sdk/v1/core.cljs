@@ -64,12 +64,12 @@
                             ;; client IP to restrict renewing JWTs for other clients.
                             ;; TODO check/assert that this is true.
                             (.then result
-                                   (fn [{:keys [http/status http/body] :as response}]
+                                   (fn [{:http/keys [body status] :as response}]
                                      (if-not (http.status/success? status)
                                        (throw (ex-info "http error" response))
-                                       (let [jwt (lib.jwt/decode body)]
+                                       (let [decoded-jwt (lib.jwt/decode (:jwt body))]
                                          ;; TODO verify jwt
-                                         (assoc-in sys [:crypto/session :vault/tokens core] jwt)))))))))))))
+                                         (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
