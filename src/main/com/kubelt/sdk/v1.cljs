@@ -43,20 +43,22 @@
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
    ;; provided.
-   (kspec/conform
-    spec.config/optional-sdk-config config
-    (let [sdk-config (merge lib.config.default/sdk config)]
+   (let [ipfs? (boolean (:ipfs config true))
+         config (dissoc config :ipfs)]
+     (kspec/conform
+      (spec.config/optional-sdk-config ipfs?) config
+      (let [sdk-config (merge (lib.config.default/sdk ipfs?) config)]
       ;; Check that the final options map (defaults combined with
       ;; user-provided options) is valid.
-      (kspec/conform
-       spec.config/sdk-config sdk-config
-       (let [;; Construct a system configuration map from the default
+        (kspec/conform
+         (spec.config/sdk-config ipfs?) sdk-config
+         (let [;; Construct a system configuration map from the default
              ;; configuration combined with the options provided by the
              ;; user.
-             system-config (lib.config.system/config lib.config.default/system sdk-config)]
-         (kspec/conform
-          spec.config/system-config system-config
-          (lib.init/init system-config))))))))
+               system-config (lib.config.system/config (lib.config.default/system ipfs?) (assoc sdk-config :ipfs ipfs?))]
+           (kspec/conform
+            spec.config/system-config system-config
+            (lib.init/init system-config)))))))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
