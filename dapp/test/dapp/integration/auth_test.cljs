@@ -15,10 +15,11 @@
   (rf-test/run-test-sync
    (re-frame/dispatch [:dapp.core/initialize-db])
    (testing "Initialize SDK context with empty wallet via dapp"
-     (let [ctx (re-frame/subscribe [:dapp.wallet/ctx])
-           wallet (re-frame/subscribe [:dapp.wallet/wallet])]
-       (is (contains? @ctx :crypto/wallet))
-       (is (lib.wallet/valid? @wallet))))))
+     (let [ctx (re-frame/subscribe [:dapp.wallet/ctx])]
+       (.then @ctx (fn [kbt]
+                     (let [wallet (re-frame/subscribe [:dapp.wallet/wallet])]
+                       (is (lib.wallet/valid? @wallet))
+                       (is (contains? kbt :crypto/wallet)))))))))
 
 ;; Requires connection to cloudflare-worker OR appropriate backend to run correctly
 (deftest gen-wallet-authenticate-and-disconnect
@@ -48,11 +49,11 @@
           (is (= (:wallet/address @generated-wallet) address))
           ;; Ensure that a session with appropriate JWT token information is stored
           (is (contains? (get-in auth-ctx [:crypto/session :vault/tokens]) address))
-          (let [jwt-path [:crypto/session :vault/tokens address]]
-            (is (and (some? (get-in auth-ctx (conj jwt-path :header)))
-                     (some? (get-in auth-ctx (conj jwt-path :claims)))
-                     (some? (get-in auth-ctx (conj jwt-path :token)))
-                     (some? (get-in auth-ctx (conj jwt-path :signature)))))))
+          (let [jwt-path (get-in auth-ctx [:crypto/session :vault/tokens address])]
+            (is (some? (get-in auth-ctx (conj jwt-path :header))))
+            (is (some? (get-in auth-ctx (conj jwt-path :signature))))
+            (is (some? (get-in auth-ctx (conj jwt-path :token))))
+            (is (some? (get-in auth-ctx (conj jwt-path :claims))))))
 
         ;; Dispatch disconnect event and wait for it to succeed
         (re-frame/dispatch [:dapp.wallet/disconnect (:wallet/address @generated-wallet)])

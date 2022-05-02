@@ -1,9 +1,10 @@
 (ns com.kubelt.lib.integrant
-  "extending ig.core/init and ig.core/build in order to support/realise js/promises
-  components before injecting them as dependencies"
-  (:require [integrant.core :as ig]
-            [cljs.core.async :as async]
-            #?(:cljs [cljs.core.async.interop :refer-macros [<p!]])))
+  "Extending ig.core/init and ig.core/build in order to support/realise
+  js/promises components before injecting them as dependencies"
+  (:require
+   [integrant.core :as ig]
+   [cljs.core.async :as async]
+   #?(:cljs [cljs.core.async.interop :refer-macros [<p!]])))
 
 (defn- relevant-keys
   "let's try to have this function in https://github.com/weavejester/integrant or in the worst case on  https://github.com/[kubelt|tangrammer]/integrant"

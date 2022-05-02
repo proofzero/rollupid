@@ -148,20 +148,19 @@
                       :write/scheme write-scheme
                       :write/host write-host
                       :write/port write-port
-                       ;; Set a global timeout for *all* requests:
-                       ;;:client/timeout 5000
+                      ;; Set a global timeout for *all* requests:
+                      ;;:client/timeout 5000
                       }]
-         (->
-          (ipfs.client/init options)
-          (lib.promise/then (fn [x] (lib.promise/resolved x)))
-          (lib.promise/catch (fn [e]
-                               (log/fatal ::error e)
-                               (log/fatal ::mocking-ipfs-client "TODO: FIX IN CI")
-                               (lib.promise/resolved
-                                {:com.kubelt/type :kubelt.type/ipfs-client
-                                 :http/client :mock
-                                 :node/read "http:///ip4/127.0.0.1/tcp/5001"
-                                 :node/write "http:///ip4/127.0.0.1/tcp/5001"}))))))))
+         (-> (ipfs.client/init options)
+             (lib.promise/then (fn [x] (lib.promise/resolved x)))
+             (lib.promise/catch (fn [e]
+                                  (log/fatal ::error e)
+                                  (log/fatal ::mocking-ipfs-client "TODO: FIX IN CI")
+                                  (lib.promise/resolved
+                                   {:com.kubelt/type :kubelt.type/ipfs-client
+                                    :http/client :mock
+                                    :node/read "http:///ip4/127.0.0.1/tcp/5001"
+                                    :node/write "http:///ip4/127.0.0.1/tcp/5001"}))))))))
 
 (defmethod ig/halt-key! :client/ipfs [_ client]
   (log/debug {:log/msg "halt IPFS client"}))
@@ -227,7 +226,10 @@
 (defn init
   "Initialize the SDK."
   [system-config resolve reject]
-  (lib.integrant/init system-config resolve reject))
+  (-> system-config
+      ;; TEMP
+      (dissoc :client/ipfs)
+      (lib.integrant/init resolve reject)))
 
 (defn halt!
   "Clean-up resources used by the SDK."
