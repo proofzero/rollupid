@@ -40,29 +40,34 @@
 ;; -----------------------------------------------------------------------------
 
 ;; These are the defaults for the option map passed to the SDK init function.
-(def sdk
-  (merge ipfs
-         log
-         p2p
-         credentials
-         logging
-         wallet))
+(defn sdk
+  ([] (sdk true))
+  ([ipfs?]
+   (merge (when ipfs? ipfs)
+          log
+          p2p
+          credentials
+          logging
+          wallet)))
 
 ;; These defaults should be overridden from the SDK init options map.
-(def system
-  (merge sdk
-         {;; Our common HTTP client.
-          :client/http {}
-          ;; Our connection to IPFS.
-          :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
-                                    :ipfs/multiaddr (ig/ref :ipfs.read/multiaddr)}
-                        :ipfs/write {:http/scheme (ig/ref :ipfs.write/scheme)
-                                     :ipfs/multiaddr (ig/ref :ipfs.write/multiaddr)}
-                        :client/http (ig/ref :client/http)}
+(defn system
+  ([] (system true))
+  ([ipfs?]
+   (merge (sdk ipfs?)
+          (when ipfs?
+            {;; Our connection to IPFS.
+             :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
+                                       :ipfs/multiaddr (ig/ref :ipfs.read/multiaddr)}
+                           :ipfs/write {:http/scheme (ig/ref :ipfs.write/scheme)
+                                        :ipfs/multiaddr (ig/ref :ipfs.write/multiaddr)}
+                           :client/http (ig/ref :client/http)}})
+          {;; Our common HTTP client.
+           :client/http {}
           ;; Our connection to the Kubelt p2p system.
-          :client/p2p {:http/scheme (ig/ref :p2p/scheme)
-                       :p2p/multiaddr (ig/ref :p2p/multiaddr)}
+           :client/p2p {:http/scheme (ig/ref :p2p/scheme)
+                        :p2p/multiaddr (ig/ref :p2p/multiaddr)}
           ;; A crypto "vault" that stores session credentials.
-          :crypto/session {:jwt/tokens (ig/ref :credential/jwt)}
+           :crypto/session {:jwt/tokens (ig/ref :credential/jwt)}
           ;; A wrapper around the platform wallet functionality.
-          :crypto/wallet {}}))
+           :crypto/wallet {}})))

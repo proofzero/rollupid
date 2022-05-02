@@ -51,33 +51,40 @@
    ;; TODO flesh this out
    [:map-of :string :string]])
 
+
+(def ipfs
+  [[:ipfs.read/multiaddr {:optional true} multiaddr]
+   [:ipfs.read/scheme {:optional true} spec.http/scheme]
+   [:ipfs.write/multiaddr {:optional true} multiaddr]
+   [:ipfs.write/scheme {:optional true} spec.http/scheme]])
+
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the configuration map passed to the sdk/init function.
 
 ;; A spec for the SDK intialization map where all values are
 ;; optional. We provide defaults for those options that aren't provided.
-(def optional-sdk-config
-  [:map {:closed true
-         :title ::optional-sdk-config}
-   [:log/level {:optional true} logging-level]
-   [:credential/jwt {:optional true} credentials]
-   [:crypto/wallet {:optional true} spec.wallet/wallet]
-   [:ipfs.read/multiaddr {:optional true} multiaddr]
-   [:ipfs.read/scheme {:optional true} spec.http/scheme]
-   [:ipfs.write/multiaddr {:optional true} multiaddr]
-   [:ipfs.write/scheme {:optional true} spec.http/scheme]
-   [:p2p/multiaddr {:optional true} multiaddr]
-   [:p2p/scheme {:optional true} spec.http/scheme]])
+(defn optional-sdk-config
+  ([] (optional-sdk-config true))
+  ([ipfs?]
+   (cond-> [:map {:title ::optional-sdk-config}
+            [:log/level {:optional true} logging-level]
+            [:credential/jwt {:optional true} credentials]
+            [:crypto/wallet {:optional true} spec.wallet/wallet]
+            [:p2p/multiaddr {:optional true} multiaddr]
+            [:p2p/scheme {:optional true} spec.http/scheme]]
+     ipfs? (into ipfs))))
 
 ;; After default options and user-supplied options are combined, we
 ;; should have an SDK configuration options map that has every value
 ;; provided.
-(def sdk-config
-  (into [:map {:closed true
-               :title ::sdk-config}]
-        (map #(assoc-in % [1 :optional] false)
-             (m/-children (m/schema optional-sdk-config nil)))))
+(defn sdk-config
+  ([] (sdk-config true))
+  ([ipfs?]
+   (into [:map {:closed true
+                :title ::sdk-config}]
+         (map #(assoc-in % [1 :optional] false)
+              (m/-children (m/schema (optional-sdk-config ipfs?) nil))))))
 
 (def system-config
   [:map {;;:closed false

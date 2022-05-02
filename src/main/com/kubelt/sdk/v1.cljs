@@ -2,19 +2,12 @@
   "Defines the interface of the Kubelt SDK, v1."
   {:copyright "©2022 Proof Zero Inc" :license "Apache 2.0"}
   (:require
-   [malli.core :as m]
-   [malli.error :as me])
-  (:require
-   [com.kubelt.lib.config.default :as lib.config.default]
    [com.kubelt.lib.config.sdk :as lib.config.sdk]
    [com.kubelt.lib.config.system :as lib.config.system]
    [com.kubelt.lib.config.util :as lib.config.util]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
-   [com.kubelt.lib.promise :as lib.promise :refer [promise?]]
-   [com.kubelt.spec.config :as spec.config])
-  (:require-macros
-   [com.kubelt.spec :as kspec]))
+   [com.kubelt.lib.promise :as lib.promise :refer [promise?]]))
 
 ;; All of the namespaces under sdk.v1 expose interface functions, and
 ;; don't implement any business logic. Instead, they call methods under
