@@ -1,6 +1,7 @@
 (ns com.kubelt.lib.config.system
   "SDK system config."
-  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:require [com.kubelt.lib.flags :as f]))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -17,7 +18,7 @@
                       [:p2p/multiaddr :p2p/multiaddr]
                       [:crypto/session :credential/jwt {}]
                       [:crypto/wallet :crypto/wallet]]
-               (:ipfs options) (into ipfs))]
+               (f/ipfs? options) (into ipfs))]
     (->> base
          (reduce (fn [s [sys-kw opts-kw default]]
                    (if-let [data (get options opts-kw default)]

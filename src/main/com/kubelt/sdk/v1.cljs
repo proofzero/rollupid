@@ -43,19 +43,18 @@
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
    ;; provided.
-   (let [ipfs? (boolean (:ipfs config true))
-         config (dissoc config :ipfs)]
+   (let [flags (:flags config {})]
      (kspec/conform
-      (spec.config/optional-sdk-config ipfs?) config
-      (let [sdk-config (merge (lib.config.default/sdk ipfs?) config)]
+      (spec.config/optional-sdk-config flags)
+      (let [sdk-config (merge (lib.config.default/sdk flags) config)]
       ;; Check that the final options map (defaults combined with
       ;; user-provided options) is valid.
         (kspec/conform
-         (spec.config/sdk-config ipfs?) sdk-config
+         (spec.config/sdk-config flags) sdk-config
          (let [;; Construct a system configuration map from the default
              ;; configuration combined with the options provided by the
              ;; user.
-               system-config (lib.config.system/config (lib.config.default/system ipfs?) (assoc sdk-config :ipfs ipfs?))]
+               system-config (lib.config.system/config (lib.config.default/system flags) (merge sdk-config flags))]
            (kspec/conform
             spec.config/system-config system-config
             (lib.init/init system-config)))))))))
