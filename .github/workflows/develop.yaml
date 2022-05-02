@@ -169,8 +169,6 @@ jobs:
   #     - run: npm run test:sdk-web:develop
 
   test-dapp:
-    needs: changes
-    if: needs.changes.outputs.dapp == 'true'
     runs-on: ubuntu-latest
     permissions:
       packages: read
