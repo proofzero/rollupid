@@ -1,6 +1,11 @@
 (ns com.kubelt.lib.config.system
   "SDK system config."
-  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:require
+   [com.kubelt.spec.config :as spec.config]
+   [com.kubelt.lib.config.default :as lib.config.default])
+  (:require-macros
+   [com.kubelt.spec :as kubelt.spec]))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -21,3 +26,24 @@
                  (if-let [data (get options opts-kw default)]
                    (assoc s sys-kw data)
                    s)) system-config)))
+
+(defn config->system
+  "Return a system configuration map including defaults where options were
+  not supplied by the user. In any of the supplied values did not
+  conform to the options schema, an error map is returned."
+  [config-map]
+  (kubelt.spec/conform
+   spec.config/optional-sdk-config config-map
+   (let [sdk-config (merge lib.config.default/sdk config-map)]
+     ;; Check that the final options map (defaults combined with
+     ;; user-provided options) is valid.
+     (kubelt.spec/conform
+      spec.config/sdk-config sdk-config
+      (let [;; Construct a system configuration map from the default
+            ;; configuration combined with the options provided by the
+            ;; user.
+            system-config (config lib.config.default/system sdk-config)]
+        (kubelt.spec/conform
+         spec.config/system-config system-config
+         ;; Returns the system configuration map, or an error map.
+         system-config))))))

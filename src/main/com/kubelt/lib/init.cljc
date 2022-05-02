@@ -6,12 +6,11 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
+   [com.kubelt.lib.integrant :as lib.integrant]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
-   [com.kubelt.lib.integrant :as kig]
-   [com.kubelt.lib.util :as util]
-   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.promise :as lib.promise]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
   (:require
@@ -228,9 +227,7 @@
 (defn init
   "Initialize the SDK."
   [system-config resolve reject]
-  ;; NB: If we provide an additional collection of keys when calling
-  ;; integrant.core/init, only those keys will be initialized.
-  (kig/init system-config resolve reject))
+  (lib.integrant/init system-config resolve reject))
 
 (defn halt!
   "Clean-up resources used by the SDK."

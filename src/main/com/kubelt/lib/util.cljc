@@ -44,28 +44,3 @@
         :tmp-dir tmp-dir
         :environment env-map
         :username username})))
-
-;; TODO test me
-(defn browser?
-  "Return true if this is a browser-based execution environment, false
-  otherwise."
-  []
-  ;; User agent string is not empty when running in browser.
-  (not (str/blank? (.getUserAgentString goog.userAgent))))
-
-;; TODO test me
-(defn node?
-  "Return true if this is a node-based execution environment, false
-  otherwise."
-  []
-  ;; User agent string is empty when not running in browser.
-  (str/blank? (.getUserAgentString goog.userAgent)))
-
-;; TODO test me
-(defn platform
-  "Return a keyword representing the current platform (which is either
-  node or browser)."
-  []
-  (cond
-    (browser?) :platform.type/browser
-    true :platform.type/node))
