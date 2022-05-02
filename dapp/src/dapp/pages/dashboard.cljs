@@ -1,6 +1,8 @@
 (ns dapp.pages.dashboard
   (:require
    [dapp.components.button :as button]
+   [dapp.components.dashboard.cta :as dashboard-cta]
+   [dapp.components.dashboard.tile :as dashboard-tile]
    [dapp.components.web3-modal :as web3-modal]
    [re-frame.core :as re-frame]))
 
@@ -25,6 +27,76 @@
                                (web3-modal/open-modal))
                    :variant :primary}]])
 
+(defn create-a-core
+  []
+  [:div.create-a-core
+   {:class "flex flex-col mt-8 content-center text-center"}
+   [:img
+    {:class "h-8"
+     :src "images/folder-create.svg"}]
+   [:p
+    {:class "text-gray-900 text-sm mt-4"}
+    "No cores"]
+   [:p
+    {:class "text-gray-500 text-sm my-1"}
+    "Get started by creating a new core."]
+   [button/render {:id "create-a-core"
+                   :class "self-center mt-6"
+                   :text "Create a core"
+                   ;; TODO: Unimplemented
+                   :on-click (fn [e]
+                               (.preventDefault e))
+                   :variant :primary}]])
+
+(defn root-core-details
+  []
+  [:div.root-core-details
+   [:div.metrics
+    {:class "flex flex-row"}
+
+    ;; Dashboard Metrics
+    [dashboard-tile/render
+     {:id "metrics-1"
+      :heading "Dummy metrics"
+      :metric-data {:base "70,946"
+                    :current "71,897"}}]
+    [dashboard-tile/render
+     {:id "metrics-2"
+      :heading "Dummy metrics"
+      :metric-data {:base "70,946"
+                    :current "71,897"}}]
+    [dashboard-tile/render
+     {:id "metrics-3"
+      :heading "Dummy metrics"
+      :metric-data {:base "70,946"
+                    :current "71,897"}}]]
+
+   ;; Dashboard calls to action
+   [:div.calls-to-action
+    {:class "mt-8 flex flex-row"}
+    [dashboard-cta/render
+     {:heading "Join our community"
+      :id "community-cta"
+      :image-file "images/community.svg"
+      :link "https://discord.gg/rQdPmUyk8p"
+      ;; TODO: Needs better copy
+      :paragraph "Link to our Discord server"}]
+    [dashboard-cta/render
+     {:heading "Learn best practices"
+      :id "best-practices-cta"
+      :image-file "images/learn.svg"
+      :link "https://kubelt.com/docs/next/basics/introduction/"
+      ;; TODO: Needs better copy
+      :paragraph "Link to our docs"}]]
+
+   ;; Create a new core OR view active cores
+   [:div.active-cores
+    {:class "mt-8 flex flex-col"}
+    [:h1
+     {:class "ml-6 text-gray-900 font-semibold"}
+     "Most Active Cores"]
+    [create-a-core]]])
+
 (defn dashboard-content
   [logged-in?]
   [:div.dashboard-content
@@ -32,7 +104,8 @@
    [:h1
     {:class "mt-6 ml-6 text-xl w-auto"}
     "Dashboard"]
-   (when-not logged-in?
+   (if logged-in?
+     [root-core-details]
      [connect-wallet])])
 
 (defn render
