@@ -50,7 +50,6 @@
     "@types/jest": "27.4.1",
     "@types/node": "17.0.23",
     "@types/react": "17.0.43",
-    "@webpack-cli/generators": "2.4.2",
     "babel-loader": "8.2.4",
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-runtime": "6.23.0",
