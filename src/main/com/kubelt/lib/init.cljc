@@ -219,6 +219,8 @@
 (defn init
   "Initialize the SDK."
   [system-config]
+  ;; NB: If we provide an additional collection of keys when calling
+  ;; integrant.core/init, only those keys will be initialized.
   (ig/init system-config))
 
 (defn halt!
