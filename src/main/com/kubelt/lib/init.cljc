@@ -6,8 +6,10 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
+   [com.kubelt.lib.integrant :as lib.integrant]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.multiaddr :as lib.multiaddr]
+   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.proto.http :as proto.http])
@@ -133,27 +135,32 @@
         write-port (:address/port write-map)
         write-scheme (get-in value [:ipfs/write :http/scheme])
         ;; Get the platform-specific HTTP client.
-        http-client (get value :client/http)]
-    (let [ipfs-read (str (name read-scheme) "://" read-addr)
-          ipfs-write (str (name write-scheme) "://" write-addr)]
-      (log/debug {:log/msg "init IPFS client" :ipfs/read ipfs-read :ipfs/write ipfs-write}))
-    (try
+        http-client (get value :client/http)
+        ipfs-read (str (name read-scheme) "://" read-addr)
+        ipfs-write (str (name write-scheme) "://" write-addr)]
+    (log/debug {:log/msg "init IPFS client" :ipfs/read ipfs-read :ipfs/write ipfs-write})
       ;; Create the options object we pass to client creation fn.
-      (let [options {:http/client http-client
-                     :read/scheme read-scheme
-                     :read/host read-host
-                     :read/port read-port
-                     :write/scheme write-scheme
-                     :write/host write-host
-                     :write/port write-port
-                     ;; Set a global timeout for *all* requests:
-                     ;;:client/timeout 5000
-                     }]
-        (ipfs.client/init options))
-      (catch js/Error e
-        (log/fatal e))
-      (catch :default e
-        (log/error {:log/msg "unexpected error" :error/value e})))))
+    #?(:cljs
+       (let [options {:http/client http-client
+                      :read/scheme read-scheme
+                      :read/host read-host
+                      :read/port read-port
+                      :write/scheme write-scheme
+                      :write/host write-host
+                      :write/port write-port
+                      ;; Set a global timeout for *all* requests:
+                      ;;:client/timeout 5000
+                      }]
+         (-> (ipfs.client/init options)
+             (lib.promise/then (fn [x] (lib.promise/resolved x)))
+             (lib.promise/catch (fn [e]
+                                  (log/fatal ::error e)
+                                  (log/fatal ::mocking-ipfs-client "TODO: FIX IN CI")
+                                  (lib.promise/resolved
+                                   {:com.kubelt/type :kubelt.type/ipfs-client
+                                    :http/client :mock
+                                    :node/read "http:///ip4/127.0.0.1/tcp/5001"
+                                    :node/write "http:///ip4/127.0.0.1/tcp/5001"}))))))))
 
 (defmethod ig/halt-key! :client/ipfs [_ client]
   (log/debug {:log/msg "halt IPFS client"}))
@@ -218,10 +225,11 @@
 
 (defn init
   "Initialize the SDK."
-  [system-config]
-  ;; NB: If we provide an additional collection of keys when calling
-  ;; integrant.core/init, only those keys will be initialized.
-  (ig/init system-config))
+  [system-config resolve reject]
+  (-> system-config
+      ;; TEMP
+      (dissoc :client/ipfs)
+      (lib.integrant/init resolve reject)))
 
 (defn halt!
   "Clean-up resources used by the SDK."

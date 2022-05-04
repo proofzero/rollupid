@@ -97,17 +97,31 @@
 ;; set-wallet
 ;; -----------------------------------------------------------------------------
 
+;; (defn set-wallet
+;;   [sys wallet]
+;;   (let [wallet-map (lib.wallet/to-edn wallet)]
+;;        (if (lib.error/error? wallet-map)
+;;          (reject wallet-map)
+;;          (resolve (set-wallet sys wallet-map)))))
+
+;; (defn set-wallet-js
+;;   [sys wallet]
+;;   (promise
+;;    (fn [resolve reject]
+;;      (if-not (lib.wallet/valid? wallet)
+;;        (lib.wallet/explain wallet)
+;;        (assoc sys :crypto/wallet wallet)))))
+
 (defn set-wallet
   [sys wallet]
-  (if-not (lib.wallet/valid? wallet)
-    (lib.wallet/explain wallet)
-    (assoc sys :crypto/wallet wallet)))
+  (lib.promise/promise
+   (fn [resolve reject]
+     (if-not (lib.wallet/valid? wallet)
+       (reject (lib.wallet/explain wallet))
+       (let [sys' (assoc sys :crypto/wallet wallet)]
+         (resolve sys'))))))
 
 (defn set-wallet-js
   [sys wallet]
-  (promise
-   (fn [resolve reject]
-     (let [wallet-map (lib.wallet/to-edn wallet)]
-       (if (lib.error/error? wallet-map)
-         (reject wallet-map)
-         (resolve (set-wallet sys wallet-map)))))))
+  (let [wallet-map (lib.wallet/to-edn wallet)]
+    (set-wallet sys wallet-map)))

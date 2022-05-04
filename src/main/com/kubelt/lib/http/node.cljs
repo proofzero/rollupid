@@ -82,7 +82,7 @@
 (defrecord HttpClient []
   proto.http/HttpClient
   (request!
-    [this request]
+    [_ request]
     (promise
      (fn [resolve reject]
        (if-not (malli/validate spec.http/request request)
@@ -99,8 +99,10 @@
                node-req (.request request-mod options on-response)]
            (when (or (http.request/post? request)
                      (http.request/put? request))
-             (if-let [data (get request-map :http/body)]
+             (when-let [data (get request-map :http/body)]
                (.write node-req data)))
            (doto node-req
-             (.on "error" on-error)
+             (.on "error" (fn [e]
+                            (reject e)
+                            on-error))
              (.end))))))))

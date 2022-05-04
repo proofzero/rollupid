@@ -198,9 +198,7 @@
                        :ipfs.node/version node-version
                        :ipfs.node/protocol node-proto-version
                        :ipfs.node/addresses node-addresses
-                       :ipfs.node/protocols node-protocols})))
-           (.catch (fn [e]
-                     {}))))))
+                       :ipfs.node/protocols node-protocols})))))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------

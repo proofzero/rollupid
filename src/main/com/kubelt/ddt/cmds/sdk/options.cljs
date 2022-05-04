@@ -4,6 +4,7 @@
   (:require
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.sdk.v1 :as sdk]))
 
 (defonce command
@@ -20,10 +21,15 @@
               (let [;; Convert command line arguments to a Clojure map.
                     args-map (ddt.options/to-map args)
                     ;; Transform command line arguments into an SDK options map.
-                    options (ddt.options/init-options args-map)
-                    kbt (sdk/init options)]
-                (if (lib.error/error? kbt)
-                  (prn (:error kbt))
-                  (let [options (sdk/options kbt)]
-                    (prn options)
-                    (sdk/halt! kbt)))))})
+                    options (ddt.options/init-options args-map)]
+                (-> (sdk/init options)
+                    (lib.promise/then
+                     (fn [kbt]
+                       (-> (sdk/options kbt)
+                           (lib.promise/then
+                            (fn [options]
+                              (prn options)
+                              (sdk/halt! kbt))))))
+                    (lib.promise/catch
+                        (fn [e]
+                          (prn (:error e)))))))})

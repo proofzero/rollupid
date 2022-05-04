@@ -11,7 +11,7 @@
    [com.kubelt.lib.config.util :as lib.config.util]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
-   [com.kubelt.lib.promise :refer [promise promise?]]
+   [com.kubelt.lib.promise :as lib.promise :refer [promise?]]
    [com.kubelt.spec.config :as spec.config])
   (:require-macros
    [com.kubelt.spec :as kspec]))
@@ -35,28 +35,20 @@
   an SDK instance."
   ;; The 0-arity implementation uses the default configuration.
   ([]
+   {:post (promise? %)}
    (init {}))
+
   ;; The 1-arity implementation expects a configuration map.
   ([config]
-   {:pre [(map? config)] :post [(map? %)]}
+   {:pre [(map? config)]}
    ;; Check that the user-provided options map is valid. If not, an
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
    ;; provided.
-   (kspec/conform
-    spec.config/optional-sdk-config config
-    (let [sdk-config (merge lib.config.default/sdk config)]
-      ;; Check that the final options map (defaults combined with
-      ;; user-provided options) is valid.
-      (kspec/conform
-       spec.config/sdk-config sdk-config
-       (let [;; Construct a system configuration map from the default
-             ;; configuration combined with the options provided by the
-             ;; user.
-             system-config (lib.config.system/config lib.config.default/system sdk-config)]
-         (kspec/conform
-          spec.config/system-config system-config
-          (lib.init/init system-config))))))))
+   (let [system-config (lib.config.system/config->system config)]
+     (lib.promise/promise
+      (fn [resolve reject]
+        (lib.init/init system-config resolve reject))))))
 
 ;; We deliberately resolve a ClojureScript data structure, without
 ;; converting to a JavaScript object. The returned system description is
@@ -74,36 +66,39 @@
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
    (let [config (lib.config.util/obj->map config)]
-     (promise
-      (fn [resolve reject]
-        (let [result (init config)]
-          (if (lib.error/error? result)
-            (reject (clj->js result))
-            (resolve result))))))))
+     (-> (init config)
+         ;; If an error occurred, convert the returned error map into an
+         ;; JavaScript object.
+         (lib.promise/catch
+          (fn [e]
+            (clj->js e)))))))
 
 ;; halt
 ;; -----------------------------------------------------------------------------
 
 (defn halt!
   "Shutdown the SDK. Takes the system description returned by
-  calling (init) as the system to halt."
+  calling (init) as the system to halt. Returns a promise/future that
+  resolves when the shutdown is complete, or rejects with an error map
+  describing the problem that occurred."
   [system]
   {:pre [(map? system)]}
-  (if-not (lib.error/error? system)
-    (lib.init/halt! system)
-    true))
+  (lib.promise/promise
+   (fn [resolve reject]
+     (let [result (lib.init/halt! system)]
+       (if-not (lib.error/error? result)
+         (resolve result)
+         (reject result))))))
 
 (defn halt-js!
   "Shutdown the SDK from a JavaScript context. Takes the system
   description returned by calling (init) as the system to halt."
   [system]
   {:pre [(map? system)] :post [(promise? %)]}
-  (promise
-   (fn [resolve reject]
-     (let [result (halt! system)]
-       (if (lib.error/error? result)
-         (reject (clj->js result))
-         (resolve result))))))
+  (-> (halt! system)
+      (lib.promise/catch
+          (fn [e]
+            (clj->js e)))))
 
 ;; options
 ;; -----------------------------------------------------------------------------
@@ -113,15 +108,21 @@
   to be re-instantiated."
   [system]
   {:pre [(map? system)]}
-  (lib.config.sdk/options system))
+  (lib.promise/promise
+   (fn [resolve reject]
+     (let [result (lib.config.sdk/options system)]
+       (if-not (lib.error/error? result)
+         (resolve result)
+         (reject result))))))
 
 (defn options-js
   "Return an options object for the SDK from a JavaScript context."
   [system]
   {:pre [(map? system)] :post [(promise? %)]}
-  (promise
-   (fn [resolve reject]
-     (let [result (options system)]
-       (if (lib.error/error? result)
-         (reject (clj->js result))
-         (resolve (clj->js result)))))))
+  (-> (options system)
+      (lib.promise/then
+       (fn [m]
+         (clj->js m)))
+      (lib.promise/catch
+          (fn [e]
+            (clj->js e)))))

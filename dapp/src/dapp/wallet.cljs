@@ -53,14 +53,15 @@
  (fn [db [_ modal]]
    (assoc db :web3-modal modal)))
 
-(re-frame/reg-event-fx
+(re-frame/reg-event-db
  ::set-current-wallet
- (fn [{:keys [db]} [_ wallet]]
-   (let [ctx (:sdk/ctx db)
-         ;; `sdk.core/set-wallet` also validates the structure of `wallet`
-         new-ctx (sdk.core/set-wallet ctx wallet)]
-     {:db db
-      :dispatch [::authenticate! new-ctx]})))
+ (fn [db [_ wallet]]
+   (let [ctx (:sdk/ctx db)]
+     ;; `sdk.core/set-wallet` also validates the structure of `wallet`
+     (.then (sdk.core/set-wallet ctx wallet)
+            (fn [new-ctx]
+              (re-frame/dispatch [::authenticate! new-ctx])))
+     db)))
 
 (re-frame/reg-event-db
  ::authenticate!

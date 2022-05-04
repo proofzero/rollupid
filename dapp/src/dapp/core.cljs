@@ -28,10 +28,17 @@
 (re-frame/reg-event-db
  ::initialize-db
  (fn [_db _]
-   (let [ctx (sdk.v1/init)]
-     (merge
-      kubelt-db
-      {:sdk/ctx ctx}))))
+   (.then (sdk.v1/init)
+          (fn [ctx]
+            (re-frame/dispatch [::init-sdk ctx])))
+   kubelt-db))
+
+(re-frame/reg-event-db
+ ::init-sdk
+ (fn [_db [_ ctx]]
+   (merge
+    kubelt-db
+    {:sdk/ctx ctx})))
 
 (re-frame/reg-sub
  ::db

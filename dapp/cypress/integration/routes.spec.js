@@ -1,7 +1,8 @@
 describe('Routes test without connecting wallet', () => {
   it('Opens the dapp locally on the Dashboard page', () => {
     cy.visit('/')
-    cy.get('h1').should('contain', 'Dashboard')
+    cy.get("#dashboard").click()
+    cy.get('h1', {timeout: 30000}).should('contain', 'Dashboard')
     cy.get('#connect-a-wallet').should('contain', 'Connect a Wallet')
   })
 
