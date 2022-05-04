@@ -1,13 +1,12 @@
 (ns com.kubelt.lib.wallet.shared
   (:require
-   [goog.object :as gobj])
+   [goog.object :as gobj]
+   [com.kubelt.lib.octet :as lib.octet]
+   [com.kubelt.lib.promise :as lib.promise])
   (:require
    ["@ethersproject/keccak256" :refer [keccak256]]
    ["@ethersproject/signing-key" :refer [SigningKey]]
-   ["@ethersproject/wallet" :refer [Wallet]])
-  (:require
-   [com.kubelt.lib.octet :as lib.octet]
-   [com.kubelt.lib.promise :refer [promise]]))
+   ["@ethersproject/wallet" :refer [Wallet]]))
 
 (defn make-sign-fn
   "Given an Ethereum wallet, return a signing function that uses the
@@ -16,7 +15,7 @@
   that resolves to the signature value."
   [eth-wallet]
   (fn [data]
-    (promise
+    (lib.promise/promise
      (fn [resolve _reject]
        (let [private-key (.-privateKey eth-wallet)
              signing-key (SigningKey. private-key)
@@ -33,7 +32,7 @@
 
 (defn random-wallet
   []
-  (promise
+  (lib.promise/promise
    (fn [resolve _reject]
      (let [eth-wallet (.createRandom Wallet)
            sign-fn (make-sign-fn eth-wallet)]
