@@ -10,7 +10,10 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-(defn config [system-config options]
+(defn config
+  "Return an integrant system configuration map that combines a default
+  configuration and a user-provided configuration options map."
+  [system-config options]
   (let [ipfs [[:ipfs.read/multiaddr :ipfs.read/multiaddr]
               [:ipfs.read/scheme :ipfs.read/scheme]
               [:ipfs.write/multiaddr :ipfs.write/multiaddr]
