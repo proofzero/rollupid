@@ -10,7 +10,7 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 
-(defn config
+(defn- config*
   "Return an integrant system configuration map that combines a default
   configuration and a user-provided configuration options map."
   [system-config options]
@@ -36,7 +36,7 @@
   conform to the options schema, an error map is returned."
   [config]
   (let [ipfs? (boolean (:ipfs config true))
-         config (dissoc config :ipfs)]
+        config (dissoc config :ipfs)]
      (kubelt.spec/conform
       (spec.config/optional-sdk-config ipfs?) config
       (let [sdk-config (merge (lib.config.default/sdk ipfs?) config)]
@@ -47,7 +47,7 @@
          (let [;; Construct a system configuration map from the default
              ;; configuration combined with the options provided by the
              ;; user.
-               system-config (config (lib.config.default/system ipfs?) (assoc sdk-config :ipfs ipfs?))]
+               system-config (config* (lib.config.default/system ipfs?) (assoc sdk-config :ipfs ipfs?))]
            (kubelt.spec/conform
             spec.config/system-config system-config
             system-config)))))))
