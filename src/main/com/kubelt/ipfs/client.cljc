@@ -327,10 +327,10 @@
            {:com.kubelt/type :kubelt.type/error
             :error "invalid HTTP client"}
            (let [node-info? (get options :client/node-info? true)
-                 read-p (if-not node-info?
+                 read& (if-not node-info?
                           (lib.promise/resolved {})
                           (info-request client options :read))]
-             (-> read-p
+             (-> read&
                  (.then (fn [read-info]
                           ;; Returns the final shape of the client map.
                           ;;(merge options read-info))
