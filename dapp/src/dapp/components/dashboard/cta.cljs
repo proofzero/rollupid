@@ -1,4 +1,5 @@
-(ns dapp.components.dashboard.cta)
+(ns dapp.components.dashboard.cta
+  "Call to action component")
 
 (defn render
   [{:keys [heading

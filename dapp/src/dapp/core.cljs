@@ -19,10 +19,6 @@
 
 ;;; Effects ;;;
 
-(def kubelt-db
-  {:sdk/ctx {}
-   :web3-modal nil})
-
 ;;; Events ;;;
 
 (re-frame/reg-event-db
@@ -31,13 +27,14 @@
    (.then (sdk.v1/init)
           (fn [ctx]
             (re-frame/dispatch [::init-sdk ctx])))
-   kubelt-db))
+   {:sdk/ctx {}
+    :web3-modal nil}))
 
 (re-frame/reg-event-db
  ::init-sdk
  (fn [_db [_ ctx]]
    (merge
-    kubelt-db
+    _db
     {:sdk/ctx ctx})))
 
 (re-frame/reg-sub
