@@ -5,15 +5,13 @@
    [re-frame.core :as re-frame])
   (:require
    [com.kubelt.lib.wallet :as lib.wallet]
-   [com.kubelt.lib.wallet.shared :as lib.wallet.shared]
    [dapp.core]
-   [dapp.wallet])
-  (:require
-   ["web3modal$default" :as Web3Modal]))
+   [dapp.integration.test-utils :as test-utils]
+   [dapp.wallet]))
 
 (deftest init-sdk-and-wallet
   (rf-test/run-test-async
-   (re-frame/dispatch [:dapp.core/initialize-db])
+   (test-utils/sync-initialize-db)
    (testing "Initialize SDK context with empty wallet via dapp"
      (rf-test/wait-for
       [:dapp.core/init-sdk]
@@ -25,53 +23,37 @@
 ;; Requires connection to cloudflare-worker OR appropriate backend to run correctly
 (deftest gen-wallet-authenticate-and-disconnect
   (rf-test/run-test-async
-   (re-frame/dispatch-sync [:dapp.core/initialize-db])
+   (test-utils/sync-initialize-db)
    (testing "Generate wallet, authenticate with SDK and disconnect"
      (rf-test/wait-for
       [:dapp.core/init-sdk]
-      (let [generated-wallet (atom {})
-            modal (Web3Modal. (clj->js {:network "testnet"
-                                        :cacheProvider true}))]
-        (.then (lib.wallet.shared/random-wallet)
-               (fn [generated-wallet*]
-                 (is (lib.wallet/valid? generated-wallet*))
-                 ;; need access to generated-wallet value outside of promise
-                 (reset! generated-wallet generated-wallet*)
-                 ;; Set the modal & current wallet in re-frame app-db
-                 (re-frame/dispatch [:dapp.wallet/set-web3-modal modal])
-                 (re-frame/dispatch [:dapp.wallet/set-current-wallet generated-wallet*])))
+      (test-utils/generate-random-wallet)
 
-        ;; Wait for authentication to succeed
-        (rf-test/wait-for
-         [:dapp.wallet/authenticate-success]
-         (let [auth-ctx @(re-frame/subscribe [:dapp.wallet/ctx])
-               {:wallet/keys [address] :as connected-wallet} @(re-frame/subscribe [:dapp.wallet/wallet])]
-           ;; Ensure connected-wallet passes validation
-           (is (lib.wallet/valid? connected-wallet))
-           ;; Ensure connected-wallet address is the same as generated-wallet address
-           (is (= (:wallet/address @generated-wallet) address))
-           ;; Ensure that a session with appropriate JWT token information is stored
-           (is (contains? (get-in auth-ctx [:crypto/session :vault/tokens]) address))
-           (let [jwt-path [:crypto/session :vault/tokens address]]
-             (is (map? (get-in auth-ctx (conj jwt-path :header))))
-             (is (contains? (get-in auth-ctx (conj jwt-path :header)) :alg))
-             (is (string? (get-in auth-ctx (conj jwt-path :signature))))
-             (is (string? (get-in auth-ctx (conj jwt-path :token))))
-             (is (map? (get-in auth-ctx (conj jwt-path :claims))))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :aud))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :exp))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :iat))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :iss))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :json-rpc-url))
-             (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :sub))))
+      ;; Wait for authentication to succeed
+      (rf-test/wait-for
+       [:dapp.wallet/authenticate-success]
+       (let [auth-ctx @(re-frame/subscribe [:dapp.wallet/ctx])
+             {:wallet/keys [address] :as connected-wallet} @(re-frame/subscribe [:dapp.wallet/wallet])]
 
-         ;; Dispatch disconnect event and wait for it to succeed
-         (re-frame/dispatch [:dapp.wallet/disconnect (:wallet/address @generated-wallet)])
-         (rf-test/wait-for
-          [:dapp.wallet/disconnect-success]
-          (let [{:keys [web3-modal] :as _db} @(re-frame/subscribe [:dapp.core/db])
-                disconnected-ctx @(re-frame/subscribe [:dapp.wallet/ctx])]
-            ;; Ensure no modal exists in the app-db
-            (is (nil? web3-modal))
-            ;; Ensure no session information remains in the app-db
-            (is (nil? (get-in disconnected-ctx [:crypto/session :vault/tokens (:wallet/address @generated-wallet)])))))))))))
+         ;; Ensure connected-wallet passes validation
+         (is (lib.wallet/valid? connected-wallet))
+
+         ;; Ensure connected-wallet address is the same as generated-wallet address
+         (is (= (:wallet/address @test-utils/*generated-wallet*) address))
+
+         ;; Ensure that a session with appropriate JWT token information is stored
+         (is (contains? (get-in auth-ctx [:crypto/session :vault/tokens]) address))
+         (let [jwt-path [:crypto/session :vault/tokens address]]
+           (is (map? (get-in auth-ctx (conj jwt-path :header))))
+           (is (contains? (get-in auth-ctx (conj jwt-path :header)) :alg))
+           (is (string? (get-in auth-ctx (conj jwt-path :signature))))
+           (is (string? (get-in auth-ctx (conj jwt-path :token))))
+           (is (map? (get-in auth-ctx (conj jwt-path :claims))))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :aud))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :exp))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :iat))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :iss))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :json-rpc-url))
+           (is (contains? (get-in auth-ctx (conj jwt-path :claims)) :sub))))
+
+       (test-utils/disconnect-wallet))))))
