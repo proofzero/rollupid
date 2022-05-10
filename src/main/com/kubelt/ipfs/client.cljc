@@ -329,16 +329,20 @@
            (let [node-info? (get options :client/node-info? true)
                  read& (if-not node-info?
                          (lib.promise/resolved {})
-                         (info-request client options :read))]
-             (-> read&
+                         (info-request client options :read))
+                 write& (if-not node-info?
+                          (lib.promise/resolved {})
+                          (info-request client options :write))]
+             ;; Make simultaneous requests for info to read and write
+             ;; nodes.
+             (-> (lib.promise/all [read& write&])
                  (lib.promise/then
-                  (fn [read-info]
+                  (fn [[read-info write-info]]
                     ;; Returns the final shape of the client map.
-                    ;;(merge options read-info))
                     (-> {:com.kubelt/type :kubelt.type/ipfs-client
                          :http/client client}
                         (assoc :node/read read-info)
-                        (assoc :node/write read-info))))))))))))
+                        (assoc :node/write write-info))))))))))))
 
 #?(:cljs
    (defn init-js
