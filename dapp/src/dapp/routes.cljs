@@ -5,7 +5,7 @@
    [reitit.coercion.spec :as rss]
    [reitit.frontend.easy :as rfe]
    [reitit.frontend.controllers :as rfc]
-   [dapp.pages.cores :as cores]
+   [dapp.pages.apps :as apps]
    [dapp.pages.dashboard :as dashboard]
    [dapp.pages.reports :as reports]
    [taoensso.timbre :as log])
@@ -62,14 +62,14 @@
        :start (fn [& params](log/trace "Entering home page"))
        ;; Teardown can be done here.
        :stop  (fn [& params] (log/trace "Leaving home page"))}]}]
-   ["cores"
-    {:name      ::cores
-     :view      cores/render
+   ["apps"
+    {:name      ::apps
+     :view      apps/render
      :controllers
      [{;; Initialization
-       :start (fn [& _params](log/trace "Entering Cores page"))
+       :start (fn [& _params](log/trace "Entering Apps page"))
        ;; Teardown
-       :stop  (fn [& _params] (log/trace "Leaving Cores page"))}]}]
+       :stop  (fn [& _params] (log/trace "Leaving Apps page"))}]}]
    ["reports"
     {:name      ::reports
      :view      reports/render

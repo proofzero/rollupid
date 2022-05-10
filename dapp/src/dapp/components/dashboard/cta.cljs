@@ -8,8 +8,9 @@
            link
            paragraph]}]
   [:a
-   {:class "bg-white w-1/2 h-40 rounded shadow
-            flex flex-col mx-4 cursor-pointer"
+   {:class "bg-white w-1/2 h-40 rounded shadow-sm
+            flex flex-col mx-4 cursor-pointer
+            hover:shadow"
     :href link
     :id id
     :target "_blank"}

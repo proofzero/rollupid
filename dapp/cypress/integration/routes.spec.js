@@ -6,10 +6,10 @@ describe('Routes test without connecting wallet', () => {
     cy.get('#connect-a-wallet').should('contain', 'Connect a Wallet')
   })
 
-  it('Routing to cores pages works', () => {
-    cy.get("#cores").click()
-    cy.url().should('include', '/cores')
-    cy.get('h1').should('contain', 'Cores')
+  it('Routing to apps pages works', () => {
+    cy.get("#apps").click()
+    cy.url().should('include', '/apps')
+    cy.get('h1').should('contain', 'Apps')
 
   })
 

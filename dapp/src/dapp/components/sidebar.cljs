@@ -62,10 +62,10 @@
        :tab-name "Dashboard"}]
 
      [sidebar-tab
-      {:route-name ::routes/cores
+      {:route-name ::routes/apps
        :current-route-name (get-in current-route [:data :name])
        :tab-icon FolderIcon
-       :tab-name "Cores"}]
+       :tab-name "Apps"}]
 
      [sidebar-tab
       {:route-name ::routes/reports
