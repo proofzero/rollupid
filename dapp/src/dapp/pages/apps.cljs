@@ -1,16 +1,16 @@
-(ns dapp.pages.cores)
+(ns dapp.pages.apps)
 
-(defn cores-content
+(defn apps-content
   []
-  [:div.cores-content
+  [:div.apps-content
    {:class "bg-gray-200 h-full flex flex-col"}
    [:h1
     {:class "mt-6 ml-6 text-xl w-auto"}
-    "Cores"]])
+    "Apps"]])
 
 (defn render
   []
   (fn []
-    [:div.cores-container
+    [:div.apps-container
      {:class "h-full"}
-     [cores-content]]))
+     [apps-content]]))
