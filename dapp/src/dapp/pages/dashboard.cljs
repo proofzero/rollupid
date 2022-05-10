@@ -27,22 +27,22 @@
                                (web3-modal/open-modal))
                    :variant :primary}]])
 
-(defn create-a-core
+(defn create-an-app
   []
-  [:div.create-a-core
-   {:class "flex flex-col mt-8 content-center text-center"}
+  [:div.create-an-app
+   {:class "flex flex-col my-8 content-center text-center"}
    [:img
     {:class "h-8"
      :src "images/folder-create.svg"}]
    [:p
     {:class "text-gray-900 text-sm mt-4"}
-    "No cores"]
+    "No apps"]
    [:p
     {:class "text-gray-500 text-sm my-1"}
-    "Get started by creating a new core."]
-   [button/render {:id "create-a-core"
+    "Get started by creating a new app."]
+   [button/render {:id "create-an-app"
                    :class "self-center mt-6"
-                   :text "Create a core"
+                   :text "Create an App"
                    ;; TODO: Unimplemented
                    :on-click (fn [e]
                                (.preventDefault e))
@@ -89,18 +89,18 @@
       ;; TODO: Needs better copy
       :paragraph "Link to our docs"}]]
 
-   ;; Create a new core OR view active cores
-   [:div.active-cores
+   ;; Create a new app OR view active apps
+   [:div.active-apps
     {:class "mt-8 flex flex-col"}
     [:h1
      {:class "ml-6 text-gray-900 font-semibold"}
-     "Most Active Cores"]
-    [create-a-core]]])
+     "Most Active Apps"]
+    [create-an-app]]])
 
 (defn dashboard-content
   [logged-in?]
   [:div.dashboard-content
-   {:class "bg-gray-200 h-full flex flex-col"}
+   {:class "bg-gray-100 h-full flex flex-col"}
    [:h1
     {:class "mt-6 ml-6 text-xl w-auto"}
     "Dashboard"]
