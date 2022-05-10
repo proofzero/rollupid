@@ -326,6 +326,8 @@
          (if-not (satisfies? proto.http/HttpClient client)
            {:com.kubelt/type :kubelt.type/error
             :error "invalid HTTP client"}
+           ;; TODO avoid making multiple requests if the read and write
+           ;; nodes are the same.
            (let [node-info? (get options :client/node-info? true)
                  read& (if-not node-info?
                          (lib.promise/resolved {})
