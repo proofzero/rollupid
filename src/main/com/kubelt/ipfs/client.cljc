@@ -328,16 +328,17 @@
             :error "invalid HTTP client"}
            (let [node-info? (get options :client/node-info? true)
                  read& (if-not node-info?
-                          (lib.promise/resolved {})
-                          (info-request client options :read))]
+                         (lib.promise/resolved {})
+                         (info-request client options :read))]
              (-> read&
-                 (.then (fn [read-info]
-                          ;; Returns the final shape of the client map.
-                          ;;(merge options read-info))
-                          (-> {:com.kubelt/type :kubelt.type/ipfs-client
-                               :http/client client}
-                              (assoc :node/read read-info)
-                              (assoc :node/write read-info))))))))))))
+                 (lib.promise/then
+                  (fn [read-info]
+                    ;; Returns the final shape of the client map.
+                    ;;(merge options read-info))
+                    (-> {:com.kubelt/type :kubelt.type/ipfs-client
+                         :http/client client}
+                        (assoc :node/read read-info)
+                        (assoc :node/write read-info))))))))))))
 
 #?(:cljs
    (defn init-js
