@@ -6,13 +6,19 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.http :as lib.http]
+   [com.kubelt.proto.http :as proto.http]
+   [com.kubelt.rpc.client :as rpc.client]
+   [com.kubelt.rpc.http :as rpc.http]
    [com.kubelt.rpc.path :as rpc.path]
+   [com.kubelt.rpc.request :as rpc.request]
    [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.spec :as spec]
    [com.kubelt.spec.openrpc :as spec.openrpc]
    [com.kubelt.spec.rpc :as spec.rpc]
    [com.kubelt.spec.rpc.call :as spec.rpc.call]
    [com.kubelt.spec.rpc.client :as spec.rpc.client]
+   [com.kubelt.spec.rpc.doc :as spec.rpc.doc]
    [com.kubelt.spec.rpc.init :as spec.rpc.init]
    [com.kubelt.spec.rpc.methods :as spec.rpc.methods]
    [com.kubelt.spec.rpc.request :as spec.rpc.request]))
@@ -31,16 +37,17 @@
 ;; TODO rather than injecting a provider URL, use the server URL
 ;; template feature defined in the OpenRPC spec.
 
-(defn client?
-  [x]
-  (malli/validate spec.rpc.client/client x))
-
 ;; TODO add option to provide set of "dividing" characters, e.g. _, .
 ;; - "eth_sync" => [:eth :sync]
 ;; - "rpc.provider" => [:rpc :provider]
+;;
 ;; TODO add option for using a prefix, e.g.
 ;; {:method/prefix :xxx}
 ;; - "eth_sync" => [:xxx :eth :sync]
+;;
+;; TODO if user wants to inject an existing HTTP client, should it go
+;; into the options map (as things are now) or via a separate
+;; parameter (var args, multi-arity).
 (defn init
   "Create a JSON-RPC client."
   ([url schema]
@@ -51,9 +58,24 @@
     [spec.rpc.init/url url]
     [spec.openrpc/schema schema]
     [spec.rpc.init/options options]
-    ;; Analyze schema and convert to client map.
-    (let [client (rpc.schema/build url schema options)]
-      (merge {:com.kubelt/type :kubelt.type/rpc.client} client)))))
+    ;; TODO url not currently used! It may make sense to use the
+    ;; OpenRPC "Server" block to configure RPC endpoints using URL
+    ;; templates.
+    (let [user-agent (rpc.http/user-agent 0 0 1)
+          ;; Create an HTTP client (use the one in the options map, if provided).
+          http-client (if-not (contains? options :http/client)
+                        (lib.http/client)
+                        (:http/client options))
+          defaults {:http/user-agent user-agent}
+          ;; Remove the HTTP client and use defaults for any option
+          ;; values not supplied.
+          options (as-> options $
+                    (dissoc $ :http/client)
+                    (merge defaults $))
+          ;; Analyze schema and convert to client map.
+          client (rpc.client/from-schema schema options)]
+      (-> client
+          (assoc :http/client http-client))))))
 
 ;; The intent of this function is to provide a pleasant REPL-driven
 ;; developer experience. A user should be able to instantiate or receive
@@ -103,17 +125,20 @@
 (defn doc
   "Given a method path (a vector of keywords) return a map that describes
   it."
-  [client path]
-  (lib.error/conform*
-   [spec.rpc.client/client client]
-   [spec.rpc/path path]
-   (let [methods (get client :rpc/methods)]
-     (if-not (contains? methods path)
-       (let [message {:message "missing method"
-                      :method path}]
-         (lib.error/error message))
-       ;; TODO optionally provide a better formatted version of documentation
-       (get methods path)))))
+  ([client path]
+   (let [defaults {}]
+     (doc client path defaults)))
+  ([client path options]
+   (lib.error/conform*
+    [spec.rpc.client/client client]
+    [spec.rpc/path path]
+    [spec.rpc.doc/options options]
+    (let [methods (get client :rpc/methods)]
+      (if-not (contains? methods path)
+        (let [message {:message "missing method" :method path}]
+          (lib.error/error message))
+        ;; TODO optionally provide a better formatted version of documentation
+        (get methods path))))))
 
 ;; WIP
 (defn request
@@ -131,30 +156,15 @@
    ;; collection of predicates and return meaningful errors when they
    ;; fail. Maybe something like: (guards [() () ... ()] (body)).
    (if-let [method (get-in client [:rpc/methods path])]
-     method
-     ;; TODO confirm that path/method exists
-     ;; TODO pull method description
-     ;; TODO validate params
+     (let [options (get client :rpc/options)]
+       ;; TODO does not yet validate params
+       (rpc.request/from-method path method params options))
      (lib.error/error {:message "no such method" :method path}))))
-
-(comment
-  (let [resource-desc]
-       {:com.kubelt/type :kubelt.type/api-resource
-        :resource/description resource-desc
-        :resource/methods resource-methods
-        :resource/path request-path
-        :resource/params request-params
-        :resource/conflicts request-conflicts
-        :resource/body request-body
-        :response/types response-types
-        :response/spec response-spec
-        :parameter/spec parameter-spec
-        :parameter/data options
-        :http/request request}))
 
 ;; options:
 ;; - explicit request ID
 ;; - override provider URL
+;; - request timeout
 (defn call
   "Call an RPC method."
   ([client request]
@@ -165,8 +175,16 @@
     [spec.rpc.client/client client]
     [spec.rpc.request/request request]
     [spec.rpc.call/options options]
-    ;; Do eeet
-   )))
+    (let [http-client (get client :http/client)
+          http-request (get request :http/request)]
+      ;; TODO including a request body breaks, fix before performing
+      ;; request.
+      http-request
+      ;; TODO validate result
+      ;; :node/browser Returns a promise.
+      ;; :jvm Returns a future.
+      ;;(proto.http/request! http-client http-request)
+      ))))
 
 ;; TODO is this useful for developers?
 (defn rpc-fn
