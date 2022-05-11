@@ -3,12 +3,6 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [methods]))
 
-;; url
-;; -----------------------------------------------------------------------------
-
-(def url
-  :string)
-
 ;; path
 ;; -----------------------------------------------------------------------------
 ;; RPC calls as defined in an OpenRPC schema are strings. We prefer to
