@@ -11,6 +11,7 @@
    [com.kubelt.spec.openrpc :as spec.openrpc]
    [com.kubelt.spec.rpc :as spec.rpc]
    [com.kubelt.spec.rpc.call :as spec.rpc.call]
+   [com.kubelt.spec.rpc.client :as spec.rpc.client]
    [com.kubelt.spec.rpc.init :as spec.rpc.init]
    [com.kubelt.spec.rpc.methods :as spec.rpc.methods]
    [com.kubelt.spec.rpc.request :as spec.rpc.request]))
@@ -18,11 +19,20 @@
 ;; Public
 ;; -----------------------------------------------------------------------------
 ;; TODO check version of supplied schema to ensure we support it
+;;
 ;; TODO support dynamic extension of client to add another schema (with prefix)
+;;
+;; TODO support taking a map of schemas, with the map keys serving as
+;; the prefixes. If the schema map has an :openrpc key it's a schema
+;; itself; otherwise we can try assuming that the map is a collection of
+;; schemas.
+;;
+;; TODO rather than injecting a provider URL, use the server URL
+;; template feature defined in the OpenRPC spec.
 
 (defn client?
   [x]
-  (malli/validate spec.rpc/client x))
+  (malli/validate spec.rpc.client/client x))
 
 (defn path?
   [x]
@@ -41,7 +51,7 @@
      (init url schema defaults)))
   ([url schema options]
    (lib.error/conform*
-    [spec.rpc/url url]
+    [spec.rpc.init/url url]
     [spec.openrpc/schema schema]
     [spec.rpc.init/options options]
     (let [;; Returns the schema, if valid, or an error map indicating
@@ -77,7 +87,7 @@
      (methods client path defaults)))
   ([client path options]
    (lib.error/conform*
-    [spec.rpc/client client]
+    [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.methods/options options]
     (let [method-map (get client :rpc/methods [])
@@ -103,7 +113,7 @@
   it."
   [client path]
   (lib.error/conform*
-   [spec.rpc/client client]
+   [spec.rpc.client/client client]
    [spec.rpc/path path]
    (let [methods (get client :rpc/methods)]
      (if-not (contains? methods path)
@@ -122,7 +132,7 @@
   ;; Use lib.error/conform* to ensure that each argument matches
   ;; its schema.
   (lib.error/conform*
-   [spec.rpc/client client]
+   [spec.rpc.client/client client]
    [spec.rpc/path path]
    [spec.rpc/params params]
    ;; TODO add macro for guards, i.e. to check the results of a
@@ -160,7 +170,7 @@
       (call client request defaults)))
   ([client request options]
    (lib.error/conform*
-    [spec.rpc/client client]
+    [spec.rpc.client/client client]
     [spec.rpc.request/request request]
     [spec.rpc.call/options options]
     ;; Do eeet
@@ -172,7 +182,7 @@
   the expected parameters and returns the expected result."
   [client path]
   (lib.error/conform*
-   [spec.rpc/client client]
+   [spec.rpc.client/client client]
    [spec.rpc/path path]
    ;; The returned function should invoke the RPC method named by the
    ;; path argument, assuming that it exists on the client.
