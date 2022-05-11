@@ -33,7 +33,7 @@
     "test:dapp-karma:ci:compile": "bb test:dapp-karma:ci:compile",
     "test:dapp-karma:ci:run": "bb test:dapp-karma:ci:run",
     "test:plugin:sanity": "bb test:plugin:sanity",
-    "rpc:ethereum:mock-server": "bb rpc:ethereum:mock-server",
+    "rpc:mock-server:ethereum": "bb rpc:mock-server:ethereum",
     "sidenotes:http:run": "http-server ./docs"
   },
   "author": "Proof Zero, Inc.",
