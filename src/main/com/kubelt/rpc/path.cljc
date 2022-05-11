@@ -2,6 +2,8 @@
   "Path-related utilities."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [clojure.string :as cstr])
+  (:require
    [malli.core :as malli])
   (:require
    [com.kubelt.spec.rpc :as spec.rpc]))
@@ -15,6 +17,18 @@
   otherwise."
   [x]
   (malli/validate spec.rpc/path x))
+
+;; path->str
+;; -----------------------------------------------------------------------------
+
+(defn path->str
+  "Convert a path, a structured data value representing the name of an RPC
+  call, into the string equivalent."
+  ([path]
+   (let [separator "_"]
+     (path->str path separator)))
+  ([path separator]
+   (cstr/join separator (map name path))))
 
 ;; filter-depth
 ;; -----------------------------------------------------------------------------

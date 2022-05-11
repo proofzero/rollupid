@@ -1,7 +1,9 @@
 (ns com.kubelt.spec.rpc.client
   "An RPC client map."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  (:refer-clojure :exclude [methods]))
+  (:refer-clojure :exclude [methods])
+  (:require
+   [com.kubelt.spec.rpc.init :as spec.rpc.init]))
 
 ;; client
 ;; -----------------------------------------------------------------------------
@@ -13,13 +15,12 @@
 (def metadata :map)
 (def servers [:vector :any])
 (def methods :map)
-(def url :string)
 
 (def client
   [:map
    [:com.kubelt/type [:enum :kubelt.type/rpc.client]]
+   [:rpc/options spec.rpc.init/options]
    [:rpc/version version]
    [:rpc/metadata metadata]
    [:rpc/servers servers]
-   [:rpc/methods methods]
-   [:rpc/url url]])
+   [:rpc/methods methods]])

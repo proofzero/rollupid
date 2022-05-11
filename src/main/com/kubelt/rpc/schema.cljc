@@ -42,17 +42,18 @@
   into [:foo :get-bar]."
   [schema]
   {:pre [(map? schema)]}
-  (letfn [(extract-method [m]
-            (dissoc m :name))
-          (s->kw [s]
+  (letfn [(s->kw [s]
             (-> s keyword csk/->kebab-case))
           (name->path [s]
+            ;; TODO allow to override the separator; should be passed as
+            ;; a configuration value in the (init) options map.
             (let [v (cstr/split s #"_")]
               (mapv s->kw v)))
           (f [m method]
             (let [method-name (get method :name)
                   path (name->path method-name)
-                  method (extract-method method)]
+                  method {:method/name method-name
+                          :method/raw m}]
               (assoc m path method)))]
     (let [methods (get schema :methods [])]
       (reduce f {} methods))))
@@ -75,7 +76,6 @@
   (defn extract-method
     [m]
     (-> m
-        (dissoc :name)
         (params->schema)
         (cset/rename-keys {:description :method/description
                            :summary :method/summary
@@ -167,27 +167,3 @@
     (if-not (empty? missing)
       (lib.error/error {:message "missing $refs" :missing missing})
       schema)))
-
-;; TODO convert result names to kebab keywords
-;; e.g. "hashesPerSecond" -> :hashes-per-second
-;; - use original string names *and* kebab keywords
-;; TODO replace $ref with the referenced values
-;; - method > params
-;; - method > result
-(defn build
-  "Given a provider URL and an OpenRPC schema (converted to edn),
-  transform the schema into a client map. The options map is the same as
-  that provided to the client init function."
-  [url schema options]
-  {:pre [(string? url) (map? schema) (map? options)]}
-  (let [version (version schema)
-        metadata (metadata schema)
-        servers (servers schema)
-        ;; Generate a map from "path" (a vector of keywords representing
-        ;; an available RPC call) to a descriptive map.
-        methods (methods schema)]
-    {:rpc/version version
-     :rpc/metadata metadata
-     :rpc/servers servers
-     :rpc/methods methods
-     :rpc/url url}))
