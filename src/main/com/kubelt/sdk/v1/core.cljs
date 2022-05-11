@@ -46,7 +46,7 @@
                  (throw (ex-info "error" auth-result))
                  ;; We successfully retrieved a nonce, now verify it by signing
                  ;; it and sending it back.
-                 (get-in auth-result [:http/body :nonce]))))
+                 auth-result)))
       (.then (fn [nonce]
                (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
                      signature (sign-fn nonce)]
@@ -56,20 +56,20 @@
                ;; not strictly necessary on some platforms.
                (.then signature-p
                       (fn [signature]
-                        (let [result (lib.p2p/verify! sys core nonce signature)]
-                          (if (lib.error/error? result)
-                            (throw (ex-info "invalid signature" result))
-                            ;; If successful we get back a JWT that needs to be stored
-                            ;; in the system map. NB: the JWT has an expiry and encodes
-                            ;; client IP to restrict renewing JWTs for other clients.
-                            ;; TODO check/assert that this is true.
-                            (.then result
-                                   (fn [{:http/keys [body status] :as response}]
-                                     (if-not (http.status/success? status)
-                                       (throw (ex-info "http error" response))
-                                       (let [decoded-jwt (lib.jwt/decode (:jwt body))]
+                        ;; If successful we get back a JWT that needs to be stored
+                        ;; in the system map. NB: the JWT has an expiry and encodes
+                        ;; client IP to restrict renewing JWTs for other clients.
+                        ;; TODO check/assert that this is true.
+                        (.then (lib.p2p/verify! sys core nonce signature)
+                               (fn [verify-result]
+                                 (if (lib.error/error? verify-result)
+                                       ;; This triggers .catch handlers on returned promise.
+                                   (throw (ex-info "error" verify-result))
+                                       ;; We successfully retrieved a nonce, now verify it by signing
+                                       ;; it and sending it back.
+                                   (let [decoded-jwt (lib.jwt/decode verify-result)]
                                          ;; TODO verify jwt
-                                         (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))))
+                                     (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
