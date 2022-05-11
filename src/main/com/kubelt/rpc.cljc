@@ -6,6 +6,7 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.rpc.path :as rpc.path]
    [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.spec :as spec]
    [com.kubelt.spec.openrpc :as spec.openrpc]
@@ -34,10 +35,6 @@
   [x]
   (malli/validate spec.rpc.client/client x))
 
-(defn path?
-  [x]
-  (malli/validate spec.rpc/path x))
-
 ;; TODO add option to provide set of "dividing" characters, e.g. _, .
 ;; - "eth_sync" => [:eth :sync]
 ;; - "rpc.provider" => [:rpc :provider]
@@ -54,14 +51,9 @@
     [spec.rpc.init/url url]
     [spec.openrpc/schema schema]
     [spec.rpc.init/options options]
-    (let [;; Returns the schema, if valid, or an error map indicating
-          ;; the detected errors.
-          schema (rpc.schema/validate schema)]
-      (if (lib.error/error? schema)
-        schema
-        ;; Analyze schema and convert to client map.
-        (let [client (rpc.schema/build url schema options)]
-          (merge {:com.kubelt/type :kubelt.type/rpc.client} client)))))))
+    ;; Analyze schema and convert to client map.
+    (let [client (rpc.schema/build url schema options)]
+      (merge {:com.kubelt/type :kubelt.type/rpc.client} client)))))
 
 ;; The intent of this function is to provide a pleasant REPL-driven
 ;; developer experience. A user should be able to instantiate or receive
@@ -97,13 +89,13 @@
           paths (cond-> (keys method-map)
                   ;; depth
                   (and (integer? depth) (>= depth 0))
-                  (rpc.schema/filter-depth depth)
+                  (rpc.path/filter-depth depth)
                   ;; search
                   (string? search)
-                  (rpc.schema/filter-search search)
-                  ;; path
+                  (rpc.path/filter-search search)
+                  ;; prefix
                   (not-empty path)
-                  (rpc.schema/filter-path path))]
+                  (rpc.path/filter-prefix path))]
       (if sort?
         (apply sorted-set paths)
         (into #{} paths))))))

@@ -57,51 +57,6 @@
     (let [methods (get schema :methods [])]
       (reduce f {} methods))))
 
-;; Take a sequence of paths and trim each path be of the given
-;; length. Returns a set.
-(defn filter-depth
-  [paths depth]
-  (letfn [(trim-depth [v path]
-            ;; If depth is greater than the length of the path, we
-            ;; include the path without any further processing.
-            (if (> depth (count path))
-              (conj v path)
-              (let [path (vec (first (partition depth path)))]
-                (conj v path))))]
-    (reduce trim-depth #{} paths)))
-
-;; Filter a sequence of paths to include only those containing a given
-;; search string.
-(defn filter-search
-  [paths search]
-  {:pre [(string? search)]}
-  (let [pattern (re-pattern (str ".*" search ".*"))]
-    (letfn [(match-kw [kw]
-              (re-matches pattern (name kw)))
-            (matches? [path]
-              (not-empty (filter match-kw path)))
-            (match-search [a-set path]
-              (if (matches? path)
-                (conj a-set path)
-                a-set))]
-      (reduce match-search #{} paths))))
-
-;; Return only those paths that have the given path prefix. For example,
-;; if path contains [:foo :bar], only paths that begin with that
-;; sequence of keywords will be returned, e.g. [:foo :bar :baz].
-(defn filter-path
-  [paths prefix]
-  (letfn [(pair= [[a b]]
-            (= a b))
-          (has-prefix? [prefix path]
-            (let [pairs (partition 2 (interleave prefix path))]
-              (every? pair= pairs)))
-          (match-path [a-set path]
-            (if (has-prefix? prefix path)
-              (conj a-set path)
-              a-set))]
-    (reduce match-path #{} paths)))
-
 ;; Development
 ;; -----------------------------------------------------------------------------
 
@@ -182,17 +137,12 @@
             p])])]
     (sp/select (schema-walker :$ref) {:$ref "xxx" :foo "bar" :biz "baz"})))
 
+;; TODO make this fn private
 (defn refs
   "Return a set of all references ($ref) found in the schema."
   [schema]
-  (let [inner (fn [x]
-                (if (and (map? x) (contains? x :$ref))
-                  (do
-                    (prn x)
-                    (get x :$ref))
-                  x))
-        outer identity]
-    (walk/walk inner outer schema)))
+  (let [f (fn [a x])]
+    (reduce f #{} schema)))
 
 ;; TODO make fn private
 (defn missing-refs
