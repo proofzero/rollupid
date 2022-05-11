@@ -287,6 +287,6 @@
              test:dapp:release
              test:plugin:sanity]}
 
-  rpc:ethereum:mock-server
+  rpc:mock-server:ethereum
   {:doc "Run ethereum rpc mock server"
    :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/ethereum.json -p 3333")}}}
