@@ -82,6 +82,13 @@
   [sys core]
   (authenticate! sys core))
 
+
+;; TODO test me
+(defn rpc-api [sys core]
+  (lib.p2p/rpc-api sys core))
+
+(defn rpc-api-js [sys core]
+  (rpc-api sys core))
 ;; logged-in?
 ;; -----------------------------------------------------------------------------
 ;; A predicate that returns true when the user has successfully authenticated.
