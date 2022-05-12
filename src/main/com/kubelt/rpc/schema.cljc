@@ -100,9 +100,9 @@
            tf (mt/transformer mt/strip-extra-keys-transformer
                               mt/string-transformer
                               mt/json-transformer)
-           clean-edn (mc/decode spec.openrpc/schema edn tf)]
-       (if-not (mc/validate spec.openrpc/schema clean-edn)
-         (lib.error/explain spec.openrpc/schema clean-edn)
+           clean-edn (mc/decode spec.openrpc/schema* edn tf)]
+       (if-not (mc/validate spec.openrpc/schema* clean-edn)
+         (lib.error/explain spec.openrpc/schema* clean-edn)
          clean-edn))))
 
 ;; TODO make fn private

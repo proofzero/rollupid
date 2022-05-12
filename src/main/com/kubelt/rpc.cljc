@@ -8,7 +8,6 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.rpc.path :as rpc.path]
    [com.kubelt.rpc.schema :as rpc.schema]
-   [com.kubelt.spec :as spec]
    [com.kubelt.spec.openrpc :as spec.openrpc]
    [com.kubelt.spec.rpc :as spec.rpc]
    [com.kubelt.spec.rpc.call :as spec.rpc.call]
@@ -49,7 +48,7 @@
   ([url schema options]
    (lib.error/conform*
     [spec.rpc.init/url url]
-    [spec.openrpc/schema schema]
+    [spec.openrpc/schema* schema]
     [spec.rpc.init/options options]
     ;; Analyze schema and convert to client map.
     (let [client (rpc.schema/build url schema options)]
