@@ -20,22 +20,22 @@
 
 ;; TODO consider malli transformers for JSON to edn transformation
 
-(defn version
+(defn schema->version
   [schema]
   {:pre [(map? schema)]}
   (get schema :openrpc))
 
-(defn metadata
+(defn schema->metadata
   [schema]
   {:pre [(map? schema)]}
   (get schema :info))
 
-(defn servers
+(defn schema->servers
   [schema]
   {:pre [(map? schema)]}
   (get schema :servers []))
 
-(defn methods
+(defn schema->methods
   "Extract the method descriptions from an Open RPC schema supplied as
   edn. Note that underscores in the method names are used to namespace
   the methods, i.e. a method named foo_getBar will be mapped
@@ -53,7 +53,7 @@
             (let [method-name (get method :name)
                   path (name->path method-name)
                   method {:method/name method-name
-                          :method/raw m}]
+                          :method/raw method}]
               (assoc m path method)))]
     (let [methods (get schema :methods [])]
       (reduce f {} methods))))
@@ -167,3 +167,30 @@
     (if-not (empty? missing)
       (lib.error/error {:message "missing $refs" :missing missing})
       schema)))
+
+;; parse
+;; -----------------------------------------------------------------------------
+;; TODO convert result names to kebab keywords
+;; e.g. "hashesPerSecond" -> :hashes-per-second
+;; - use original string names *and* kebab keywords
+;;
+;; TODO replace $ref with the referenced values
+;; - method > params
+;; - method > result
+
+(defn parse
+  "Given a provider URL and an OpenRPC schema (converted to edn),
+  transform the schema into a client map. The options map is the same as
+  that provided to the client init function."
+  [schema options]
+  {:pre [(map? schema) (map? options)]}
+  (let [rpc-version (schema->version schema)
+        rpc-metadata (schema->metadata schema)
+        rpc-servers (schema->servers schema)
+        ;; Generate a map from "path" (a vector of keywords representing
+        ;; an available RPC call) to a descriptive map.
+        rpc-methods (schema->methods schema)]
+    {:rpc/version rpc-version
+     :rpc/metadata rpc-metadata
+     :rpc/servers rpc-servers
+     :rpc/methods rpc-methods}))

@@ -16,31 +16,33 @@
   [x]
   (malli/validate spec.rpc.client/client x))
 
-;; from-schema
+;; init
 ;; -----------------------------------------------------------------------------
-;; TODO convert result names to kebab keywords
-;; e.g. "hashesPerSecond" -> :hashes-per-second
-;; - use original string names *and* kebab keywords
-;;
-;; TODO replace $ref with the referenced values
-;; - method > params
-;; - method > result
 
-(defn from-schema
-  "Given a provider URL and an OpenRPC schema (converted to edn),
-  transform the schema into a client map. The options map is the same as
-  that provided to the client init function."
-  [schema options]
-  {:pre [(map? schema) (map? options)]}
-  (let [version (rpc.schema/version schema)
-        metadata (rpc.schema/metadata schema)
-        servers (rpc.schema/servers schema)
-        ;; Generate a map from "path" (a vector of keywords representing
-        ;; an available RPC call) to a descriptive map.
-        methods (rpc.schema/methods schema)]
-    {:com.kubelt/type :kubelt.type/rpc.client
-     :rpc/options options
-     :rpc/version version
-     :rpc/metadata metadata
-     :rpc/servers servers
-     :rpc/methods methods}))
+(defn init
+  "Initialize an RPC client."
+  [http-client options]
+  {:com.kubelt/type :kubelt.type/rpc.client
+   :init/options options
+   :http/client http-client
+   :rpc/schemas {}})
+
+
+;; find-method
+;; -----------------------------------------------------------------------------
+
+(defn find-method
+  "Look up the method associated with a path in the client."
+  [client path]
+  ;; Does unaltered path exist in default schema? If
+  ;; so, return the corresponding method, and
+  ;; otherwise look for the path in the schemas that
+  ;; are prefixed.
+  (let [lookup-path
+        (fn [client prefix path]
+          (get-in client [:rpc/schemas prefix :rpc/methods path]))]
+    (if-let [method (lookup-path client ::default path)]
+      method
+      (let [prefix (first path)
+            path (vec (rest path))]
+        (lookup-path client prefix path)))))
