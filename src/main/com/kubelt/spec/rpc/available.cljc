@@ -1,4 +1,4 @@
-(ns com.kubelt.spec.rpc.methods
+(ns com.kubelt.spec.rpc.available
   "Schemas related to the rpc/methods function."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 

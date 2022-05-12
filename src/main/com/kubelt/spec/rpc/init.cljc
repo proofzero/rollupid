@@ -2,13 +2,6 @@
   "Schemas related to RPC client (init) function."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
-;; url
-;; -----------------------------------------------------------------------------
-;; The init call takes a provider URL (RPC endpoint) as a parameter.
-
-(def url
-  :string)
-
 ;; http-client
 ;; -----------------------------------------------------------------------------
 
