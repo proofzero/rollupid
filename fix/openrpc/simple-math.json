@@ -1,0 +1,143 @@
+{
+  "openrpc": "1.0.0-rc1",
+  "info": {
+    "title": "Simple Math",
+    "description": "A simple math example",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "name": "my simple math server",
+      "summary": "simple math server summary",
+      "description": "simple math server description",
+      "url": "http://${username}.simple-math.example.org:${port}/${basePath}/",
+      "variables": {
+        "username": {
+          "default": "demo",
+          "description": "this is applied to the url as the subdomain"
+        },
+        "port": {
+          "default": "443",
+          "enum": [
+            "8545",
+            "443"
+          ]
+        },
+        "basePath": {
+          "default": "jsonrpc"
+        }
+      }
+    }
+  ],
+  "methods": [
+    {
+      "name": "addition",
+      "params": [
+        { "name": "a", "schema": { "$ref": "#/components/schemas/Integer" } },
+        { "name": "b", "schema": { "$ref": "#/components/schemas/Integer" } }
+      ],
+      "result": { "$ref": "#/components/contentDescriptors/c" },
+      "examples": [
+        {
+          "name": "simpleMathAdditionTwo",
+          "params": [
+            { "$ref": "#/components/examples/integerTwo" },
+            { "$ref": "#/components/examples/integerTwo" }
+          ],
+          "result": { "$ref": "#/components/examples/integerFour" }
+        },
+        {
+          "name": "simpleMathAdditionFour",
+          "params": [
+            { "$ref": "#/components/examples/integerFour" },
+            { "$ref": "#/components/examples/integerFour" }
+          ],
+          "result": { "$ref": "#/components/examples/integerEight" }
+        }
+      ],
+      "links": [
+        {
+          "name": "subtractionLink",
+          "description": "use the parameters from addition for subtraction",
+          "method": "subtraction",
+          "params": {
+            "a": "$params.a",
+            "b": "$params.b"
+          }
+        }
+      ]
+    },
+    {
+      "name": "subtraction",
+      "params": [
+        { "name": "a", "schema": { "$ref": "#/components/schemas/Integer" } },
+        { "name": "b", "schema": { "$ref": "#/components/schemas/Integer" } }
+      ],
+      "result": { "$ref": "#/components/contentDescriptors/c" },
+      "examples": [
+        {
+          "name": "examplesSubtractFourTwo",
+          "params": [
+            { "$ref": "#/components/examples/integerFour" },
+            { "$ref": "#/components/examples/integerTwo" }
+          ],
+          "result": { "$ref": "#/components/examples/integerTwo" }
+        },
+        {
+          "name": "examplesSubtractEightFour",
+          "params": [
+            { "$ref": "#/components/examples/integerEight" },
+            { "$ref": "#/components/examples/integerFour" }
+          ],
+          "result": { "$ref": "#/components/examples/integerFour" }
+        }
+      ],
+      "links": [
+        {
+          "name": "additionLink",
+          "description": "use the parameters from subtraction for addition",
+          "method": "addition",
+          "params": {
+            "a": "$params.a",
+            "b": "$params.b"
+          }
+        }
+      ]
+    }
+  ],
+  "components": {
+    "contentDescriptors": {
+      "c": {
+        "name": "c",
+        "schema": {
+          "type": "integer"
+        }
+      }
+    },
+    "schemas": {
+      "Integer": {
+        "type": "integer"
+      }
+    },
+    "examples": {
+      "integerTwo": {
+        "name": "two",
+        "summary": "its a sample two",
+        "description": "Im not sure how else to say two",
+        "value": 2
+      },
+      "integerFour": {
+        "name": "four",
+        "summary": "its a sample four",
+        "description": "Im not sure how else to say four",
+        "value": 4
+      },
+      "integerEight": {
+        "name": "eight",
+        "summary": "its a sample eight",
+        "description": "Im not sure how else to say eight",
+        "value": 8
+      }
+    }
+  }
+}

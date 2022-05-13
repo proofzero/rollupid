@@ -1,0 +1,276 @@
+{
+  "openrpc": "1.0.0-rc1",
+  "info": {
+    "title": "Links",
+    "version": "1.0.0"
+  },
+  "methods": [
+    {
+      "name": "get_user_by_name",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "user",
+        "description": "The User",
+        "schema": {
+          "$ref": "#/components/schemas/user"
+        }
+      },
+      "links": [
+        { "$ref": "#/components/links/UserRepositories" }
+      ]
+    },
+    {
+      "name": "get_repositories_by_owner",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "repositories",
+        "description": "repositories owned by the supplied user",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/repository"
+          }
+        }
+      },
+      "links": [
+        {
+          "$ref": "#/components/links/UserRepository"
+        }
+      ]
+    },
+    {
+      "name": "get_repository",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "repository",
+        "description": "The repository",
+        "schema": {
+          "$ref": "#/components/schemas/repository"
+        }
+      },
+      "links": [
+        {
+          "$ref": "#/components/links/RepositoryPullRequests"
+        }
+      ]
+    },
+    {
+      "name": "get_pull_requests_by_repository",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "state",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "open",
+              "merged",
+              "declined"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "name": "pullrequests",
+        "description": "an array of pull request objects",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/pullrequest"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_pull_requests_by_id",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "pid",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "pullrequest",
+        "description": "a pull request object",
+        "schema": {
+          "$ref": "#/components/schemas/pullrequest"
+        }
+      },
+      "links": [
+        { "$ref": "#/components/links/PullRequestMerge" }
+      ]
+    },
+    {
+      "name": "merge_pull_request",
+      "params": [
+        {
+          "name": "username",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "slug",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "pid",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "merged",
+        "description": "the PR was successfully merged",
+        "schema": {}
+      }
+    }
+  ],
+  "components": {
+    "links": {
+      "UserRepositories": {
+        "description": "Get the repositories by owner.",
+        "summary": "Get the repos by owner",
+        "server":{
+          "name": "Other Server Name",
+          "description": "Use other server instead",
+          "url": "http://localhost:9210"
+        },
+        "method": "get_repositories_by_owner",
+        "params": {
+          "username": "${result.username}"
+        }
+      },
+      "UserRepository": {
+        "method": "getRepository",
+        "params": {
+          "username": "${result.owner.username}",
+          "slug": "${result.slug}"
+        }
+      },
+      "RepositoryPullRequests": {
+        "method": "getPullRequestsByRepository",
+        "params": {
+          "username": "${result.owner.username}",
+          "slug": "${result.slug}"
+        }
+      },
+      "PullRequestMerge": {
+        "method": "mergePullRequest",
+        "params": {
+          "username": "${result.author.username}",
+          "slug": "${result.repository.slug}",
+          "pid": "${result.id}"
+        }
+      }
+    },
+    "schemas": {
+      "user": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "repository": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/user"
+          }
+        }
+      },
+      "pullrequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "repository": {
+            "$ref": "#/components/schemas/repository"
+          },
+          "author": {
+            "$ref": "#/components/schemas/user"
+          }
+        }
+      }
+    }
+  }
+}

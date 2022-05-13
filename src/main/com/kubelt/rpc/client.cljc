@@ -27,21 +27,19 @@
    :http/client http-client
    :rpc/schemas {}})
 
-
 ;; find-method
 ;; -----------------------------------------------------------------------------
 
 (defn find-method
   "Look up the method associated with a path in the client."
   [client path]
-  ;; Does unaltered path exist in default schema? If
-  ;; so, return the corresponding method, and
-  ;; otherwise look for the path in the schemas that
-  ;; are prefixed.
+  ;; Does unaltered path exist in default schema? If so, return the
+  ;; corresponding method, and otherwise look for the path in the
+  ;; schemas that are prefixed.
   (let [lookup-path
         (fn [client prefix path]
           (get-in client [:rpc/schemas prefix :rpc/methods path]))]
-    (if-let [method (lookup-path client ::default path)]
+    (if-let [method (lookup-path client ::rpc.schema/default path)]
       method
       (let [prefix (first path)
             path (vec (rest path))]
