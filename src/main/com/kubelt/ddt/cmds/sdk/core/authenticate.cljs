@@ -16,7 +16,6 @@
 (defn authenticate [args-map password on-authenticate]
  (let [app-name (get args-map :app-name)
        wallet-name (get args-map :wallet)]
-   (println app-name wallet-name)
    (-> (lib.wallet/load app-name wallet-name password)
        (lib.promise/then
         (fn [wallet]
