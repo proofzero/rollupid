@@ -33,8 +33,6 @@
                         (lib.promise/then (fn [api]
                                             (println (->> (update-in api [:methods 1 :result] assoc :name "pong" :schema {:type "string"})
                                                           (rpc/init "url")
-                                                          :rpc/methods
-                                                          keys
-                                                          vec))))
+                                                          (rpc/methods)))))
                         (lib.promise/catch (fn [error]
                                             (println "we got an error" error)))))))))})
