@@ -89,6 +89,15 @@
 
 (defn rpc-api-js [sys core]
   (rpc-api sys core))
+
+;; TODO test me
+(defn call-rpc-method [sys core method args]
+  (lib.p2p/call-rpc-method sys core method args))
+
+(defn call-rpc-api-js [sys core method args]
+  (call-rpc-method sys core method args))
+
+
 ;; logged-in?
 ;; -----------------------------------------------------------------------------
 ;; A predicate that returns true when the user has successfully authenticated.

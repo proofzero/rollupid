@@ -61,3 +61,9 @@
 (defn rpc-api [sys core]
   {:pre [(string? core)]}
   (send (json-rpc-provider sys core) "rpc.discover"))
+
+(defn call-rpc-method [sys core method args]
+  {:pre [(string? core) (string? method) (vector? args)]}
+  (send (json-rpc-provider sys core) method args))
+
+
