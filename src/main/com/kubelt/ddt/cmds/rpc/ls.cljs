@@ -2,13 +2,13 @@
   "List available RPC methods."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [com.kubelt.ddt.cmds.sdk.core.authenticate :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.sdk.v1.core :as sdk.core]
-   [com.kubelt.ddt.cmds.sdk.core.authenticate :as ddt.auth]
-   [com.kubelt.rpc :as rpc]))
+   [com.kubelt.rpc :as rpc]
+   [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (defonce command
   {:command "list"

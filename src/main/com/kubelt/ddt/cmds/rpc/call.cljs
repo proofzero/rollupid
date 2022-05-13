@@ -3,13 +3,14 @@
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [clojure.string :as cstr]
+   [com.kubelt.ddt.cmds.sdk.core.authenticate :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.promise :as lib.promise]
+   [com.kubelt.rpc :as rpc]
    [com.kubelt.sdk.v1.core :as sdk.core]
-   [com.kubelt.ddt.cmds.sdk.core.authenticate :as ddt.auth]
-   [com.kubelt.rpc :as rpc]))
+   [taoensso.timbre :as log]))
 
 (defonce command
   {:command "call <method>"
@@ -62,8 +63,8 @@
                                                                               rpc-method
                                                                               (into [] (vals rpc-params)))
                                                     (lib.promise/then (fn [r]
-                                                                        (println :method rpc-method
-                                                                                 :params rpc-params)
+                                                                        (log/debug :rpc/call {:method rpc-method
+                                                                                              :params rpc-params})
                                                                         (println "call result: " r)))))))
                           (lib.promise/catch (fn [e]
                                                (println (ex-message e))
