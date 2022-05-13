@@ -27,6 +27,9 @@
   ([provider method params]
    (println :method method :params params)
    (-> (.send provider method (clj->js params))
+       (lib.promise/then
+        (fn [x]
+          (js->clj x :keywordize-keys true)))
        (lib.promise/catch
         (fn [e]
           (lib.error/from-obj e))))))
