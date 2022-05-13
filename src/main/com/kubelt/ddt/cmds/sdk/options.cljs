@@ -3,7 +3,6 @@
   {:copyright "©2022 Kubelt, Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.options :as ddt.options]
-   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.sdk.v1 :as sdk]))
 
