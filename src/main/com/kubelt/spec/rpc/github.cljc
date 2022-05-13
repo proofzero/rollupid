@@ -1,13 +1,15 @@
-(ns com.kubelt.spec.rpc.discover
-  "Schemas related to com.kubelt.rpc/discover function."
+(ns com.kubelt.spec.rpc.github
+  "Schemas relating to com.kubelt.rpc.schemas/github function."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
-;; url
+;; repo
 ;; -----------------------------------------------------------------------------
-;; The init call takes a provider URL (RPC endpoint) as a parameter.
+;; The coordinates of a GitHub repository.
 
-(def url
-  :string)
+(def repo
+  [:map {:closed true}
+   [:github/org :string]
+   [:github/repo :string]])
 
 ;; options
 ;; -----------------------------------------------------------------------------

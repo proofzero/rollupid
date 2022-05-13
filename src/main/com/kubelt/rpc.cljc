@@ -75,78 +75,6 @@
                     (merge defaults $))]
       (rpc.client/init http-client options)))))
 
-;; schema
-;; -----------------------------------------------------------------------------
-
-(defn schema
-  "Load a schema into the RPC client."
-  ([client schema-doc]
-   (let [prefix ::default]
-     (schema client prefix schema-doc)))
-
-  ([client prefix schema-doc]
-   (let [defaults {}]
-     (schema client prefix schema-doc defaults)))
-
-  ([client prefix schema-doc options]
-   (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.schema/schema schema-doc]
-    [spec.rpc.schema/options options]
-    ;; TODO process schema and store in client
-    ;; TODO check options for separator, e.g. ".", "_" (use regex? set of chars?)
-    ;; Analyze schema and convert to client map.
-    (let [defaults {}
-          options (merge defaults options)
-          parsed-schema (rpc.schema/parse schema-doc options)]
-      (assoc-in client [:rpc/schemas prefix] parsed-schema)))))
-
-;; inflate
-;; -----------------------------------------------------------------------------
-
-;; TODO rework to use guards
-;; TODO handle promise/future
-(defn inflate
-  "Load an OpenRPC schema document from the filesystem and use it to
-  initialize the RPC client."
-  ([client filename]
-   (let [prefix ::default]
-     (inflate client prefix filename)))
-
-  ([client prefix filename]
-   (let [defaults {}]
-     (inflate client prefix filename defaults)))
-
-  ([client prefix filename options]
-   (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.inflate/filename filename]
-    [spec.rpc.inflate/options options]
-    (let [;; This is an edn value representing the schema, if
-          ;; successful, but will be an error map if an issue occurred.
-          schema-doc (rpc.schema/load filename)]
-      (if (lib.error/error? schema-doc)
-        schema-doc
-        ;; Inject the loaded schema into the client.
-        (let [defaults {}
-              options (merge defaults options)]
-          (schema client prefix schema-doc options)))))))
-
-;; discover
-;; -----------------------------------------------------------------------------
-
-;; TODO
-(defn discover
-  "Given a provider URL, fetch the schema document using the standard
-  OpenRPC discovery process (via an rpc.discover call)."
-  [client url]
-  (lib.error/conform*
-   [spec.rpc.discover/url url]
-   :fixme
-   ))
-
 ;; available
 ;; -----------------------------------------------------------------------------
 ;; The intent of this function is to provide a pleasant REPL-driven
@@ -188,8 +116,8 @@
           ;; describes the method.
           rpc-schemas (get client :rpc/schemas {})
           ;; When no explicit prefix is set, the prefix associated with
-          ;; the corresponding schema is ::default. This is to
-          ;; accommodate the common situation where there is only one
+          ;; the corresponding schema is ::rpc.schema/default. This is
+          ;; to accommodate the common situation where there is only one
           ;; schema being used with the client. In this case we use the
           ;; paths from the schema untouched (not adding the prefix
           ;; keyword to the path vector).
@@ -197,7 +125,7 @@
                     (fn [path-set [prefix rpc-schema]]
                       (let [add-prefix (fn [v] (into [prefix] v))
                             paths (into #{} (keys (get rpc-schema :rpc/methods)))
-                            paths (if (= prefix ::default)
+                            paths (if (= prefix ::rpc.schema/default)
                                     paths
                                     (into #{} (map add-prefix paths)))]
                         (cset/union path-set paths)))
@@ -239,7 +167,6 @@
       ;; prefix, i.e. [:foo] will match all paths like [:foo ...]. We
       ;; pass a full path so the returned set should have only a single
       ;; entry if the path exists.
-      ;;
       (cond
         ;; Returned path set was empty so the path isn't there.
         (= 0 path-count)
@@ -260,10 +187,10 @@
             ;; provide alternately formatted versions of documentation.
             method-raw)))))))
 
-;; request
+;; prepare
 ;; -----------------------------------------------------------------------------
 
-(defn request
+(defn prepare
   "Return a request map describing the RPC call to perform. The supplied
   parameters are validated against the service schema and an error map
   is returned if any issues are detected."
@@ -277,13 +204,11 @@
    ;; TODO add macro for guards, i.e. to check the results of a
    ;; collection of predicates and return meaningful errors when they
    ;; fail. Maybe something like: (guards [() () ... ()] (body)).
-
    (if-let [method (rpc.client/find-method client path)]
-     (let [method-raw (get method :method/raw)
-           options (get client :init/options)]
+     (let [options (get client :init/options)]
        ;; NB does not yet validate params.
-       (rpc.request/from-method path method-raw params options))
-     (lib.error/error {:message "no such method" :method path}))))
+       (rpc.request/from-method path method params options))
+     (lib.error/error {:message "no such RPC method" :method path}))))
 
 ;; execute
 ;; -----------------------------------------------------------------------------
@@ -318,15 +243,23 @@
 ;; -----------------------------------------------------------------------------
 
 (defn call
-  "Invoke an RPC method."
-  [client path params options]
-  (lib.error/conform*
-   [spec.rpc.client/client client]
-   [spec.rpc.request/request request]
-   [spec.rpc/params params]
-   [spec.rpc.call/options options]
-   :fixme
-   ))
+  "Invoke an RPC method. Any error encountered in the supplied parameters
+  results in an error map being returned without any request being
+  performed."
+  ([client path params]
+   (let [defaults {}]
+     (call client path params defaults)))
+
+  ([client path params options]
+   (lib.error/conform*
+    [spec.rpc.client/client client]
+    [spec.rpc/path path]
+    [spec.rpc/params params]
+    [spec.rpc.call/options options]
+    (let [request (prepare client path params)]
+      (if (lib.error/error? request)
+        request
+        (execute client request))))))
 
 ;; rpc-fn
 ;; -----------------------------------------------------------------------------
@@ -335,18 +268,20 @@
 (defn rpc-fn
   "Return a function that implements the given RPC call and which accepts
   the expected parameters and returns the expected result."
-  [client path]
-  (lib.error/conform*
-   [spec.rpc.client/client client]
-   [spec.rpc/path path]
-   ;; The returned function should invoke the RPC method named by the
-   ;; path argument, assuming that it exists on the client.
-   ;; - should we require a single parameter map, or allow the user to
-   ;;   supply arguments as varargs? [params] vs. [& params]
-   (fn [params]
-     (let [;; This validates the parameters and returns an error map if
-           ;; any issue(s) were detected.
-           req-map (request client path params)]
-       (if (lib.error/error? req-map)
-         req-map
-         (call client req-map))))))
+  ([client path]
+   (let [defaults {}]
+     (rpc-fn client path defaults)))
+
+  ([client path options]
+   (lib.error/conform*
+    [spec.rpc.client/client client]
+    [spec.rpc/path path]
+    [spec.rpc.call/options options]
+    ;; The returned function should invoke the RPC method named by the
+    ;; path argument, assuming that it exists on the client.
+    ;; - should we require a single parameter map, or allow the user to
+    ;;   supply arguments as varargs? [params] vs. [& params]
+    (fn [params]
+      ;; This validates the parameters and returns an error map if
+      ;; any issue(s) were detected.
+      (call client path params options)))))

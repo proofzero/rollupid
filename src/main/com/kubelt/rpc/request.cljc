@@ -32,16 +32,22 @@
      :uri/port port
      :uri/path path}))
 
+;; TODO use an integer stored in client for incrementing counter?
+;; Or perhaps a ULID / SQUUID to show calling sequence?
+(defn- make-request-id
+  "Return a unique request identifier."
+  []
+  (lib.uuid/random))
+
 (defn- make-body
   [path method]
   {:pre [(rpc.path/path? path) (map? method)]}
-  (let [;; TODO use an integer stored in client for incrementing counter?
-        ;; Or perhaps a ULID / SQUUID to show calling sequence?
-        request-id (lib.uuid/random)
+  (let [;; Every RPC request must have a unique identifier.
+        request-id (make-request-id)
+        ;; The version of the JSON-RPC spec that we conform to.
         rpc-version "2.0"
-        ;; This is the name of the RPC method to call.
-        ;; TODO look up original string version of method name using
-        ;; path as key. These should be stored during initialization.
+        ;; The original name of the RPC method to call is stored in the
+        ;; method map.
         method-name (get method :method/name)
         params []]
     (lib.json/edn->json-str
@@ -64,6 +70,7 @@
   ([path method params]
    (let [defaults {}]
      (from-method path method params defaults)))
+
   ([path method params options]
    {:pre [(vector? path) (every? map? [method params options])]}
    ;; TODO allow specification of parameters as a sequence, in which

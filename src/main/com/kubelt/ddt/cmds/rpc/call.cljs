@@ -2,15 +2,17 @@
   "Make an RPC call."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr]
-   [com.kubelt.ddt.cmds.sdk.core.authenticate :as ddt.auth]
+   [clojure.string :as cstr])
+  (:require
+   [taoensso.timbre :as log])
+  (:require
+   [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc :as rpc]
-   [com.kubelt.sdk.v1.core :as sdk.core]
-   [taoensso.timbre :as log]))
+   [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (defonce command
   {:command "call <method>"
@@ -19,7 +21,7 @@
    :builder (fn [^Yargs yargs]
               ;; Include the common options.
               (ddt.options/options yargs)
-              ;; A generic --param option is used to collection RPC call
+              ;; A generic --param option is used to collect RPC call
               ;; parameters.
               (let [config #js {:alias "x"
                                 :describe "An RPC parameter (<name>=<value>)"
@@ -39,11 +41,14 @@
                          (fn [params]
                            (js->clj (reduce param-fn {} params))))))
 
+   ;; RPC calls are represented as keyword vectors,
+   ;; e.g. [:foo :bar]. For convenience on the command line, we ask the
+   ;; user to provide this value as a colon-separated string,
+   ;; e.g. :foo:bar.
+
    :handler (fn [args]
               (let [args-map (ddt.options/to-map args)
-                    method (->> (cstr/split (get args-map :method) #":")
-                                (filter (complement cstr/blank?))
-                                (mapv keyword))
+                    method (-> args-map :method ddt.util/rpc-name->path)
                     params (get args-map :param)]
                 (ddt.prompt/ask-password!
                  (fn [err result]
@@ -53,19 +58,22 @@
                     (.-password result)
                     (fn [sys]
                       (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
-                          (lib.promise/then (fn [api]
-                                              (let [client (->> (update-in api [:methods 1 :result] assoc :name "pong" :schema {:type "string"})
-                                                                (rpc/init "url"))
-                                                    request (rpc/request* client method params)
-                                                    rpc-method (:method/name (:rpc/method request))
-                                                    rpc-params (:rpc/params request)]
-                                                (-> (sdk.core/call-rpc-method sys (-> sys :crypto/wallet :wallet/address)
-                                                                              rpc-method
-                                                                              (into [] (vals rpc-params)))
-                                                    (lib.promise/then (fn [r]
-                                                                        (log/debug :rpc/call {:method rpc-method
-                                                                                              :params rpc-params})
-                                                                        (println "call result: " r)))))))
-                          (lib.promise/catch (fn [e]
-                                               (println (ex-message e))
-                                               (prn (ex-data e)))))))))))})
+                          (lib.promise/then
+                           (fn [api]
+                             (let [client (->> (update-in api [:methods 1 :result] assoc :name "pong" :schema {:type "string"})
+                                               (rpc/init))
+                                   request (rpc/request* client method params)
+                                   rpc-method (:method/name (:rpc/method request))
+                                   rpc-params (:rpc/params request)]
+                               (-> (sdk.core/call-rpc-method sys (-> sys :crypto/wallet :wallet/address)
+                                                             rpc-method
+                                                             (into [] (vals rpc-params)))
+                                   (lib.promise/then
+                                    (fn [r]
+                                      (log/debug :rpc/call {:method rpc-method
+                                                            :params rpc-params})
+                                      (println "call result: " r)))))))
+                          (lib.promise/catch
+                              (fn [e]
+                                (println (ex-message e))
+                                (prn (ex-data e)))))))))))})
