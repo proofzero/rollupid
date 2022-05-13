@@ -65,5 +65,6 @@
                                                                         (println :method rpc-method
                                                                                  :params rpc-params)
                                                                         (println "call result: " r)))))))
-                          (lib.promise/catch (fn [error]
-                                               (println "we got an error" error))))))))))})
+                          (lib.promise/catch (fn [e]
+                                               (println (ex-message e))
+                                               (prn (ex-data e)))))))))))})

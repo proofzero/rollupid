@@ -34,5 +34,6 @@
                                             (println (->> (update-in api [:methods 1 :result] assoc :name "pong" :schema {:type "string"})
                                                           (rpc/init "url")
                                                           (rpc/methods)))))
-                        (lib.promise/catch (fn [error]
-                                            (println "we got an error" error)))))))))})
+                        (lib.promise/catch (fn [e]
+                                               (println (ex-message e))
+                                               (prn (ex-data e))))))))))})
