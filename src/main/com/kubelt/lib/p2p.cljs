@@ -2,6 +2,7 @@
   "Wrapper around the external p2p naming system."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [taoensso.timbre :as log]
    [clojure.string :as cstr])
   (:require
    ["@ethersproject/providers" :refer [JsonRpcProvider]]
@@ -14,9 +15,10 @@
   (let [scheme (get-in sys [:client/p2p :http/scheme])
         host (get-in sys [:client/p2p :http/host])
         port (get-in sys [:client/p2p :http/port])
-        path (cstr/join "" ["/@" core "/jsonrpc"])]
-    (println :uri (str (name scheme) "://" host ":" port path))
-    (str (name scheme) "://" host ":" port path)))
+        path (cstr/join "" ["/@" core "/jsonrpc"])
+        uri (str (name scheme) "://" host ":" port path)]
+    (log/debug {::connection-uri uri})
+    uri))
 
 (defn- json-rpc-provider [sys core]
   (JsonRpcProvider. (connection-uri sys core)))
@@ -25,7 +27,7 @@
   ([provider method]
    (send provider method []))
   ([provider method params]
-   (println :method method :params params)
+   (log/debug {::send {:method method :params params}})
    (-> (.send provider method (clj->js params))
        (lib.promise/then
         (fn [x]
