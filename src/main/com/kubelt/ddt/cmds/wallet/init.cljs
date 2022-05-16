@@ -28,7 +28,7 @@
                         (fn [wallet]
                           (let [;; TODO return a promise from wallet/init
                                 wallet-name (get wallet :wallet/name)
-                     ;; NB: Also available are the mnemonic path, locale.
+                                ;; NB: Also available are the mnemonic path, locale.
                                 mnemonic (get wallet :wallet.mnemonic/phrase)]
                             (println "initialized wallet:" wallet-name)
                             (println "-> mnemonic:" mnemonic)))))))))})
