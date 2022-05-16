@@ -160,6 +160,23 @@
                       :reader-features #{:browser}}
    :output-dir "packages/sdk-web/lib"}
 
+
+    ;; id3 (npm + webpack)
+  ;; ---------------------------------------------------------------------------
+  ;; Same as :sdk-web but supporting three-id
+
+  :id3-web
+  {:target :npm-module
+   :entries [com.kubelt.id3]
+   :compiler-options {:optimizations :advanced
+                      :infer-externs :true
+                      :output-feature-set :es6
+                      :reader-features #{:browser}}
+   :output-dir "packages/id3-web/lib"}
+
+
+
+
   ;; SDK tests
   ;; ---------------------------------------------------------------------------
 
