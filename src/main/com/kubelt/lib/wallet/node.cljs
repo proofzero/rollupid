@@ -16,6 +16,12 @@
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
+(defn- fs-exists?&
+  "Return the file location if exists"
+  [file]
+  (-> (.access fs-promises file  (.. fs -constants -F_OK))
+      (lib.promise/then (fn [_] file))))
+
 (defn- wallet-dir
   "Return the wallet directory path as a string for an application."
   [app-name]
