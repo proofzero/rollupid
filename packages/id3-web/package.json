@@ -1,10 +1,11 @@
 {
-  "name": "@kubelt/sdk-web",
+  "name": "@kubelt/id3-web",
   "version": "0.0.1-next.49+59d5010",
-  "description": "Kubelt SDK for CommonJS",
+  "description": "Kubelt Id3 for CommonJS",
   "keywords": [
     "kubelt",
     "sdk",
+    "id3",
     "web3",
     "cms",
     "ipfs",

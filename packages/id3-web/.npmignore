@@ -1,4 +1,4 @@
-# packages/sdk-js/.npmignore
+# packages/id3-js/.npmignore
 
 # Babashka tasks
 bb.edn

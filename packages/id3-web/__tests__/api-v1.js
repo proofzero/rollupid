@@ -1,6 +1,6 @@
 // test/api-v1.js
 //
-// Test the JavaScript API of the Kubelt SDK.
+// Test the JavaScript API of the Kubelt Id3.
 //
 // We use node-tap for testing. See the documentation for available test
 // assertions and other information.
@@ -13,8 +13,8 @@ const kbt = require('../');
 // Called before every subsequent descendent test.
 /*
 tap.beforeEach((t) => {
-    // Instantiate the SDK.
-    t.context.sdk = kbt.v1.init();
+    // Instantiate the id3.
+    t.context.id3 = kbt.v1.init();
 });
 */
 
@@ -31,4 +31,4 @@ tap.teardown(() => {
 });
 */
 
-// TODO re-use tests for sdk-js
+// TODO re-use tests for id3-js

@@ -2,6 +2,6 @@
 
 const kubelt = require('..');
 
-describe('sdk-web', () => {
+describe('id3-web', () => {
     it('needs tests');
 });

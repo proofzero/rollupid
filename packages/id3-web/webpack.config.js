@@ -1,4 +1,4 @@
-// packages/sdk-web/webpack.config.js
+// packages/id3-web/webpack.config.js
 
 const path = require("path");
 const webpack = require("webpack");
@@ -6,11 +6,11 @@ const webpack = require("webpack");
 const isProduction = process.env.NODE_ENV == "production";
 
 const config = {
-  entry: path.resolve(__dirname, "./lib/com.kubelt.sdk.js"),
+  entry: path.resolve(__dirname, "./lib/com.kubelt.id3.js"),
   output: {
     path: path.resolve(__dirname, "./lib/"),
     filename: "index.js",
-    library: "sdk",
+    library: "id3",
     libraryTarget: "amd",
   },
   /*
