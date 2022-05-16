@@ -117,6 +117,14 @@
   {:doc "Build release version of the sdk using webpack"
    :task (shell "npx lerna run build:release --scope @kubelt/sdk-web")}
 
+  build:id3-web:develop
+  {:doc "Build development version of the id3 using webpack"
+   :task (shell "npx lerna run build:develop --scope @kubelt/id3-web")}
+
+  build:id3-web:release
+  {:doc "Build release version of the id3 using webpack"
+   :task (shell "npx lerna run build:release --scope @kubelt/id3-web")}
+
   ;; TODO: use varaibles for paths
   build:dapp:css
   {:doc "Generate CSS for the dapp"
