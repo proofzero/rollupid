@@ -29,18 +29,20 @@
         wallet-path (.join path config-path "wallets")]
     wallet-path))
 
-(defn- ensure-wallet-dir
+(defn- ensure-wallet-dir&
   "Return the wallet directory path for the application as a string,
   creating it if it doesn't already exist."
   [app-name]
   (let [wallet-dirp (wallet-dir app-name)]
-    (when-not (.existsSync fs wallet-dirp)
-      (let [mode "0700"
-            recursive? true
-            options #js {:mode mode
-                         :recursive recursive?}]
-        (.mkdirSync fs wallet-dirp options)))
-    wallet-dirp))
+    (-> (fs-exists?& wallet-dirp)
+        (lib.promise/then (fn [x]
+                            (when-not x
+                              (let [mode "0700"
+                                    recursive? true
+                                    options #js {:mode mode
+                                                 :recursive recursive?}]
+                                (.mkdir fs-promises wallet-dirp options)))))
+        (lib.promise/then (fn [_] wallet-dirp)))))
 
 (defn- name->path
   "Return the path to a wallet given the owning application name and
