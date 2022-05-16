@@ -5,6 +5,7 @@
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
+   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
 (defonce command
@@ -28,9 +29,11 @@
                         (let [password (.-password result)
                               result& (lib.wallet/import& app-name wallet-name mnemonic password)]
                           (-> result&
-                              (.then (fn [{:keys [wallet/name]}]
-                                       (let [message (str "wallet '" name "' successfully imported")]
-                                         (println message))))
-                              (.catch (fn [error]
-                                        (let [message (:error error)]
-                                          (println message)))))))))))))})
+                              (lib.promise/then
+                               (fn [{:keys [wallet/name]}]
+                                 (let [message (str "wallet '" name "' successfully imported")]
+                                   (println message))))
+                              (lib.promise/catch
+                                  (fn [error]
+                                    (let [message (:error error)]
+                                      (println message)))))))))))))})

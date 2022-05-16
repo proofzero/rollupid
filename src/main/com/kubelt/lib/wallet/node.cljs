@@ -209,14 +209,18 @@
        (let [path& (wallet-path)
              wallet& (from-mnemonic mnemonic)]
          (-> (lib.promise/all [path& wallet&])
-             (.then (fn [[wallet-dirp wallet-js]]
-                      (try
-                        (.writeFileSync fs wallet-dirp wallet-js)
-                        (let [result {:wallet/name wallet-name}]
-                          (resolve result))
-                        (catch js/Error e
-                          (let [error (lib.error/from-obj e)]
-                            (reject error))))))
-             (.catch (fn [e]
+             (lib.promise/then
+              (fn [[wallet-dirp wallet-js]]
+                (-> (.writeFile fs-promises wallet-dirp wallet-js)
+                    (lib.promise/then
+                     (fn [_]
+                       (let [result {:wallet/name wallet-name}]
+                         (resolve result))))
+                    (lib.promise/catch
+                     (fn [e]
                        (let [error (lib.error/from-obj e)]
-                         (reject error))))))))))
+                         (reject error)))))))
+             (lib.promise/catch
+              (fn [e]
+                (let [error (lib.error/from-obj e)]
+                  (reject error))))))))))
