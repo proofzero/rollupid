@@ -43,7 +43,7 @@
                         (if err
                           (reject err)
                           (let [password (.-password result)]
-                            (-> (lib.wallet/load app-name wallet password)
+                            (-> (lib.wallet/load& app-name wallet password)
                                 (lib.promise/then
                                  (fn [wallet]
                                    (let [sign-fn (get wallet :wallet/sign-fn)

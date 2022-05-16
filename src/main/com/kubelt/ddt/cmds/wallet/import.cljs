@@ -18,12 +18,6 @@
                     app-name (get args-map :app-name)
                     wallet-name (get args-map :name)]
                 ;; TODO check to see if wallet name is valid (using yargs)
-
-                ;; Check to see if named wallet already exists. Wallets
-                ;; can't be overwritten so throw an error if so.
-                (when (lib.wallet/has-wallet? app-name wallet-name)
-                  (let [message (str "wallet '" wallet-name "' already exists")]
-                    (ddt.util/exit-if message)))
                 (ddt.prompt/ask-mnemonic!
                  (fn [err result]
                    (let [mnemonic (.-mnemonic result)]
@@ -32,7 +26,7 @@
                         (when err
                           (ddt.util/exit-if err))
                         (let [password (.-password result)
-                              result& (lib.wallet/import app-name wallet-name mnemonic password)]
+                              result& (lib.wallet/import& app-name wallet-name mnemonic password)]
                           (-> result&
                               (.then (fn [{:keys [wallet/name]}]
                                        (let [message (str "wallet '" name "' successfully imported")]

@@ -37,16 +37,20 @@
                       (ddt.util/exit-if err)
                       (let [password (.-password result)]
                         ;; Check that password is correct (can decrypt wallet).
-                        (when-not (lib.wallet/can-decrypt? app-name wallet-name password)
-                          (let [message (str "password for '" wallet-name "' is incorrect")]
-                            (println (str "error: " message))
-                            (.exit process 1)))
-                        ;; Prompt the user to confirm that they want to
+                        (-> (lib.wallet/can-decrypt?& app-name wallet-name password)
+                            (lib.promise/then (fn [_]
+                                                (ddt.prompt/confirm-rm!
+                                                 (fn [err rm?]
+                                                   (ddt.util/exit-if err)
+                                                   (when rm?
+                                                     (lib.wallet/delete! app-name wallet-name)
+                                                     (println "removed wallet" wallet-name)
+                                                     (resolve))))))
+                            (lib.promise/catch (fn [e]
+                                                 (let [message (str "password for '" wallet-name "' is incorrect")]
+                                                   (println (str "error: " message))
+                                                   (.exit process 1)))))
+
+;; Prompt the user to confirm that they want to
                         ;; remove the wallet.
-                        (ddt.prompt/confirm-rm!
-                         (fn [err rm?]
-                           (ddt.util/exit-if err)
-                           (when rm?
-                             (lib.wallet/delete! app-name wallet-name)
-                             (println "removed wallet" wallet-name)
-                             (resolve)))))))))))})
+                        )))))))})

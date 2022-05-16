@@ -32,7 +32,7 @@
                        app-name (get args-map :app-name)
                        wallet-name (get args-map :wallet)
                        password (.-password result)]
-                   (-> (lib.wallet/load app-name wallet-name password)
+                   (-> (lib.wallet/load& app-name wallet-name password)
                        (lib.promise/then
                         (fn [wallet]
                           (let [;; Transform command line arguments into an SDK options map.
