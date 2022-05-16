@@ -164,11 +164,11 @@
   (-> (ensure-wallet-dir& app-name)
       (lib.promise/then #(js->clj (.readdir fs-promises %)))))
 
-(defn delete!
+(defn delete!&
   "Delete a wallet."
   [app-name wallet-name]
   (let [wallet-path (name->path app-name wallet-name)]
-    (.unlinkSync fs wallet-path)))
+    (.unlink fs-promises wallet-path)))
 
 (defn create
   ""

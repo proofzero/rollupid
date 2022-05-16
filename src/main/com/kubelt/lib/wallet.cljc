@@ -103,11 +103,11 @@
      (wallet.node/ls& app-name)))
 
 #?(:node
-   (defn delete!
+   (defn delete!&
      "Delete a wallet."
      [app-name wallet-name]
      {:pre [(every? string? [app-name wallet-name])]}
-     (wallet.node/delete! app-name wallet-name)))
+     (wallet.node/delete!& app-name wallet-name)))
 
 ;; TODO
 (defn create

@@ -43,7 +43,7 @@
                                                  (fn [err rm?]
                                                    (ddt.util/exit-if err)
                                                    (when rm?
-                                                     (lib.wallet/delete! app-name wallet-name)
+                                                     (lib.wallet/delete!& app-name wallet-name)
                                                      (println "removed wallet" wallet-name)
                                                      (resolve))))))
                             (lib.promise/catch (fn [e]
