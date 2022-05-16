@@ -3,6 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.options :as ddt.options]
+   [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet :as lib.wallet]))
@@ -22,7 +23,7 @@
                 (ddt.prompt/confirm-password!
                  (fn [err result]
                    (when err
-                     (println err))
+                     (ddt.util/exit-if err)                     )
                    (-> (lib.wallet/init& app-name wallet-name (.-password result))
                        (lib.promise/then
                         (fn [wallet]
