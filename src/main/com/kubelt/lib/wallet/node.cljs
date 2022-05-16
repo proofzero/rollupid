@@ -191,17 +191,15 @@
                      (reject error)))))
              ;; Returns the path of the wallet file to write.
              (wallet-path []
-               (let [wallet-dir (ensure-wallet-dir app-name)
-                     wallet-file (.join path wallet-dir wallet-name)]
-                 (lib.promise/resolved wallet-file)))]
+               (-> (ensure-wallet-dir& app-name)
+                   (lib.promise/then #(.join path % wallet-name))))]
        (let [path& (wallet-path)
              wallet& (from-mnemonic mnemonic)]
          (-> (lib.promise/all [path& wallet&])
              (.then (fn [[wallet-dirp wallet-js]]
                       (try
                         (.writeFileSync fs wallet-dirp wallet-js)
-                        (let [result {:wallet/name wallet-name
-                                      :wallet/path wallet-path}]
+                        (let [result {:wallet/name wallet-name}]
                           (resolve result))
                         (catch js/Error e
                           (let [error (lib.error/from-obj e)]

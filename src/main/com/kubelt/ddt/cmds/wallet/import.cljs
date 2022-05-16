@@ -34,7 +34,7 @@
                         (let [password (.-password result)
                               result& (lib.wallet/import app-name wallet-name mnemonic password)]
                           (-> result&
-                              (.then (fn [{:keys [wallet/name wallet/path]}]
+                              (.then (fn [{:keys [wallet/name]}]
                                        (let [message (str "wallet '" name "' successfully imported")]
                                          (println message))))
                               (.catch (fn [error]
