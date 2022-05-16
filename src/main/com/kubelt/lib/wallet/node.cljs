@@ -3,7 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [import])
   (:require
-   ["fs" :as fs]
+   ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
    ["path" :as path])
   (:require
    ["@ethersproject/wallet" :refer [Wallet]])
