@@ -27,7 +27,7 @@
                 (lib.promise/promise
                  (fn [resolve reject]
                    ;; Check that the wallet to remove exists.
-                   (when-not (lib.wallet/has-wallet? app-name wallet-name)
+                   (when-not (lib.wallet/has-wallet?& app-name wallet-name)
                      (let [message (str "error: wallet '" wallet-name "' doesn't exist")]
                        (reject message)))
                    ;; We only remove the wallet if the user can supply the

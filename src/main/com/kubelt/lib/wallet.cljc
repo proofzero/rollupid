@@ -67,14 +67,14 @@
      :wallet/sign-fn identity}))
 
 #?(:node
-   (defn has-wallet?
+   (defn has-wallet?&
      "Return true if named wallet exists, and false otherwise."
      [app-name wallet-name]
      {:pre [(every? string? [app-name wallet-name])]}
      (wallet.node/has-wallet?& app-name wallet-name)))
 
 #?(:node
-   (defn can-decrypt?
+   (defn can-decrypt?&
      "Return true if the wallet can be successfully decrypted with the
      supplied password, and false otherwise."
      [app-name wallet-name password]

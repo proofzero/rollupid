@@ -32,7 +32,7 @@
                 (lib.promise/promise
                  (fn [resolve reject]
                    ;; Check to see if named wallet exists.
-                   (if-not (lib.wallet/has-wallet? app-name wallet)
+                   (if-not (lib.wallet/has-wallet?& app-name wallet)
                      (let [message (str "error: wallet '" wallet "' doesn't exist")]
                        (reject message))
                      ;; The named wallet exists so load it and extract
