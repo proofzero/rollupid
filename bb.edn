@@ -219,6 +219,16 @@
    :depends-on [build:sdk-web:release]
    :task (shell "npx lerna run test --scope @kubelt/sdk-web")}
 
+  test:id3-web:develop
+  {:doc ""
+   :depends-on [build:id3-web:develop]
+   :task (shell "npx lerna run test --scope @kubelt/id3-web")}
+
+  test:id3-web:release
+  {:doc ""
+   :depends-on [build:id3-web:release]
+   :task (shell "npx lerna run test --scope @kubelt/id3-web")}
+
   test:web:develop
   {:doc ""
    :task (shell "npx shadow-cljs compile web-test")}
@@ -283,6 +293,7 @@
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
+             test:id3-web:develop
              test:dapp:develop
              test:plugin:sanity]}
 
@@ -292,6 +303,7 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
+             test:id3-web:release
              test:dapp:release
              test:plugin:sanity]}
 
