@@ -186,10 +186,7 @@
   [app-name wallet-name mnemonic password]
   (lib.promise/promise
    (fn [resolve reject]
-     (when (has-wallet?& app-name wallet-name)
-       (let [msg (str "wallet " wallet-name " already exists")
-             error (lib.error/error msg)]
-         (reject error)))
+
      ;; The wallet with the given name doesn't yet exist, we can import
      ;; from the mnemonic and create a wallet with that name.
      (letfn [;; Returns a promise that resolves to the wallet
@@ -208,19 +205,26 @@
                    (lib.promise/then #(.join path % wallet-name))))]
        (let [path& (wallet-path)
              wallet& (from-mnemonic mnemonic)]
-         (-> (lib.promise/all [path& wallet&])
+         (-> (has-wallet?& app-name wallet-name)
              (lib.promise/then
-              (fn [[wallet-dirp wallet-js]]
-                (-> (.writeFile fs-promises wallet-dirp wallet-js)
+              (fn [wallet]
+                (when wallet
+                  (let [msg (str "wallet " wallet-name " already exists")
+                        error (lib.error/error msg)]
+                    (reject error)))
+                (-> (lib.promise/all [path& wallet&])
                     (lib.promise/then
-                     (fn [_]
-                       (let [result {:wallet/name wallet-name}]
-                         (resolve result))))
+                     (fn [[wallet-dirp wallet-js]]
+                       (-> (.writeFile fs-promises wallet-dirp wallet-js)
+                           (lib.promise/then
+                            (fn [_]
+                              (let [result {:wallet/name wallet-name}]
+                                (resolve result))))
+                           (lib.promise/catch
+                            (fn [e]
+                              (let [error (lib.error/from-obj e)]
+                                (reject error)))))))
                     (lib.promise/catch
                      (fn [e]
                        (let [error (lib.error/from-obj e)]
-                         (reject error)))))))
-             (lib.promise/catch
-              (fn [e]
-                (let [error (lib.error/from-obj e)]
-                  (reject error))))))))))
+                         (reject error)))))))))))))
