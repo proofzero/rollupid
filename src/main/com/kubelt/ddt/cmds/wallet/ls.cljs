@@ -23,10 +23,10 @@
    :handler (fn [args]
               (let [args-map (ddt.options/to-map args)
                     app-name (get args-map :app-name)]
-                (lib.promise/promise
-                 (fn [resolve reject]
-                   (doseq [wallet-name (lib.wallet/ls app-name)]
-                     (let [arrow (ddt.color/hilite "->")
-                           wallet-line (cstr/join " " [arrow wallet-name])]
-                       (println wallet-line)))
-                   (resolve)))))})
+                (-> (lib.wallet/ls& app-name)
+                    (lib.promise/then
+                     (fn [wallet-names]
+                       (doseq [wallet-name wallet-names]
+                         (let [arrow (ddt.color/hilite "->")
+                               wallet-line (cstr/join " " [arrow wallet-name])]
+                           (println wallet-line))))))))})

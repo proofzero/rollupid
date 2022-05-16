@@ -96,11 +96,11 @@
      (wallet.node/load app-name wallet-name password)))
 
 #?(:node
-   (defn ls
+   (defn ls&
      "List wallets."
      [app-name]
      {:pre [(string? app-name)]}
-     (wallet.node/ls app-name)))
+     (wallet.node/ls& app-name)))
 
 #?(:node
    (defn delete!

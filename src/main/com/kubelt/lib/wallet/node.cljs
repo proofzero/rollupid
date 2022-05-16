@@ -144,12 +144,11 @@
                   :wallet/address address
                   :wallet/sign-fn sign-fn}))))))))))
 
-(defn ls
+(defn ls&
   "Return a list of wallet names."
   [app-name]
-  (let [wallet-dirp (ensure-wallet-dir app-name)
-        wallet-files (.readdirSync fs wallet-dirp)]
-    (js->clj wallet-files)))
+  (-> (ensure-wallet-dir& app-name)
+      (lib.promise/then #(js->clj (.readdir fs-promises %)))))
 
 (defn delete!
   "Delete a wallet."
