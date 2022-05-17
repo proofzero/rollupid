@@ -23,7 +23,7 @@
                 (ddt.prompt/confirm-password!
                  (fn [err result]
                    (when err
-                     (ddt.util/exit-if err)                     )
+                     (ddt.util/exit-if err))
                    (-> (lib.wallet/init& app-name wallet-name (.-password result))
                        (lib.promise/then
                         (fn [wallet]

@@ -33,16 +33,14 @@
                         ;; Check that password is correct (can decrypt wallet).
                      (-> (lib.wallet/can-decrypt?& app-name wallet-name password)
                          (lib.promise/then
-                          (fn [[decrypted? error]]
-                            (if-not decrypted?
-                              (ddt.util/exit-if error)
-                              (ddt.prompt/confirm-rm!
+                          (fn [_]
+                            (ddt.prompt/confirm-rm!
                                ;; Prompt the user to confirm that they want to
                                ;; remove the wallet.
-                               (fn [err rm?]
-                                 (ddt.util/exit-if err)
-                                 (when rm?
-                                   (-> (lib.wallet/delete!& app-name wallet-name)
-                                       (lib.promise/then (fn [] (println "removed wallet" wallet-name)))
-                                       (lib.promise/catch (fn [e] (ddt.util/exit-if e))))))))))
+                             (fn [err rm?]
+                               (ddt.util/exit-if err)
+                               (when rm?
+                                 (-> (lib.wallet/delete!& app-name wallet-name)
+                                     (lib.promise/then (fn [] (println "removed wallet" wallet-name)))
+                                     (lib.promise/catch (fn [e] (ddt.util/exit-if e)))))))))
                          (lib.promise/catch (fn [e] (ddt.util/exit-if e)))))))))})

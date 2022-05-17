@@ -93,8 +93,7 @@
 (defn has-wallet?&
   "Return true if the named wallet already exists."
   [app-name wallet-name]
-  (lib.promise/promise
-   (fs-exists?& (name->path app-name wallet-name))))
+  (fs-exists?& (name->path app-name wallet-name)))
 
 (defn can-decrypt?&
   "Return true if the wallet can be successfully decrypted with the
@@ -141,7 +140,9 @@
                                                  :wallet/name wallet-name
                                                  :wallet.mnemonic/phrase phrase
                                                  :wallet.mnemonic/path path
-                                                 :wallet.mnemonic/locale locale})))))))))))))))
+                                                 :wallet.mnemonic/locale locale}))))
+                         (lib.promise/catch (fn [e] (reject e))))))))))
+         (lib.promise/catch (fn [e] (reject e)))))))
 
 (defn load&
   "Return a promise that resolves to a wallet map, or that rejects with an
