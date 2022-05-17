@@ -168,7 +168,9 @@
                        :wallet/sign-fn sign-fn}))))
                 (lib.promise/catch
                  (fn [error]
-                   (reject (lib.error/error error)))))))))))
+                   (reject (lib.error/error error)))))))
+         (lib.promise/catch
+             (fn [e] (reject e)))))))
 
 (defn ls&
   "Return a list of wallet names."
