@@ -2,12 +2,9 @@
   "Invoke the 'sdk core authenticate' method."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr])
-  (:require
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
-   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.sdk.v1 :as sdk]
@@ -32,7 +29,7 @@
                        app-name (get args-map :app-name)
                        wallet-name (get args-map :wallet)
                        password (.-password result)]
-                   (-> (lib.wallet/load app-name wallet-name password)
+                   (-> (lib.wallet/load& app-name wallet-name password)
                        (lib.promise/then
                         (fn [wallet]
                           (let [;; Transform command line arguments into an SDK options map.
@@ -53,4 +50,5 @@
                                              (prn (ex-data e))))
                                        (lib.promise/finally
                                          (fn []
-                                           (sdk/halt! kbt)))))))))))))))})
+                                           (sdk/halt! kbt))))))))))
+                       (lib.promise/catch (fn [e] (ddt.util/exit-if e))))))))})

@@ -67,47 +67,47 @@
      :wallet/sign-fn identity}))
 
 #?(:node
-   (defn has-wallet?
+   (defn has-wallet?&
      "Return true if named wallet exists, and false otherwise."
      [app-name wallet-name]
      {:pre [(every? string? [app-name wallet-name])]}
-     (wallet.node/has-wallet? app-name wallet-name)))
+     (wallet.node/has-wallet?& app-name wallet-name)))
 
 #?(:node
-   (defn can-decrypt?
+   (defn can-decrypt?&
      "Return true if the wallet can be successfully decrypted with the
      supplied password, and false otherwise."
      [app-name wallet-name password]
      {:pre [(every? string? [app-name wallet-name password])]}
-     (wallet.node/can-decrypt? app-name wallet-name password)))
+     (wallet.node/can-decrypt?& app-name wallet-name password)))
 
 #?(:node
-   (defn init
+   (defn init&
      "Initialize a wallet."
      [app-name wallet-name password]
      {:pre [(every? string? [app-name wallet-name password])]}
-     (wallet.node/init app-name wallet-name password)))
+     (wallet.node/init& app-name wallet-name password)))
 
 #?(:node
-   (defn load
+   (defn load&
      "Load a wallet."
      [app-name wallet-name password]
      {:pre [(every? string? [app-name wallet-name password])]}
-     (wallet.node/load app-name wallet-name password)))
+     (wallet.node/load& app-name wallet-name password)))
 
 #?(:node
-   (defn ls
+   (defn ls&
      "List wallets."
      [app-name]
      {:pre [(string? app-name)]}
-     (wallet.node/ls app-name)))
+     (wallet.node/ls& app-name)))
 
 #?(:node
-   (defn delete!
+   (defn delete!&
      "Delete a wallet."
      [app-name wallet-name]
      {:pre [(every? string? [app-name wallet-name])]}
-     (wallet.node/delete! app-name wallet-name)))
+     (wallet.node/delete!& app-name wallet-name)))
 
 ;; TODO
 (defn create
@@ -115,11 +115,11 @@
   []
   #?(:node (wallet.node/create)))
 
-(defn import
+(defn import&
   "Import a wallet and store it encrypted. Returns a promise that rejects
   with an error map if a problem occurs, or resolves to the name of the
   newly imported wallet on success."
   [app-name wallet-name mnemonic password]
   {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)]}
   #?(:node
-     (wallet.node/import app-name wallet-name mnemonic password)))
+     (wallet.node/import& app-name wallet-name mnemonic password)))
