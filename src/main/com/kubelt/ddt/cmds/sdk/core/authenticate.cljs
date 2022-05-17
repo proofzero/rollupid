@@ -53,4 +53,5 @@
                                              (prn (ex-data e))))
                                        (lib.promise/finally
                                          (fn []
-                                           (sdk/halt! kbt)))))))))))))))})
+                                           (sdk/halt! kbt))))))))))
+                       (lib.promise/catch (fn [e] (ddt.util/exit-if e))))))))})

@@ -21,19 +21,15 @@
                 ;; TODO check to see if wallet name is valid (using yargs)
                 (ddt.prompt/ask-mnemonic!
                  (fn [err result]
+                   (when err (ddt.util/exit-if err))
                    (let [mnemonic (.-mnemonic result)]
                      (ddt.prompt/confirm-password!
                       (fn [err result]
-                        (when err
-                          (ddt.util/exit-if err))
-                        (let [password (.-password result)
-                              result& (lib.wallet/import& app-name wallet-name mnemonic password)]
-                          (-> result&
+                        (when err (ddt.util/exit-if err))
+                        (let [password (.-password result)]
+                          (-> (lib.wallet/import& app-name wallet-name mnemonic password)
                               (lib.promise/then
                                (fn [{:keys [wallet/name]}]
                                  (let [message (str "wallet '" name "' successfully imported")]
                                    (println message))))
-                              (lib.promise/catch
-                                  (fn [error]
-                                    (let [message (:error error)]
-                                      (println message)))))))))))))})
+                              (lib.promise/catch (fn [e] (ddt.util/exit-if e))))))))))))})

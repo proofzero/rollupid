@@ -32,4 +32,5 @@
                                 ;; NB: Also available are the mnemonic path, locale.
                                 mnemonic (get wallet :wallet.mnemonic/phrase)]
                             (println "initialized wallet:" wallet-name)
-                            (println "-> mnemonic:" mnemonic)))))))))})
+                            (println "-> mnemonic:" mnemonic))))
+                       (lib.promise/catch (fn [err] (ddt.util/exit-if err))))))))})

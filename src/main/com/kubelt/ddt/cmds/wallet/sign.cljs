@@ -2,11 +2,6 @@
   "Sign data using the wallet."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   ["process" :as process])
-  (:require
-   [cljs.core.async :as async :refer [<!]]
-   [clojure.string :as cstr])
-  (:require
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
@@ -29,26 +24,17 @@
                     app-name (get args-map :app-name)
                     wallet (get args-map :wallet)
                     data (get args-map :data)]
-                (lib.promise/promise
-                 (fn [resolve reject]
-                   ;; Check to see if named wallet exists.
-                   (if-not (lib.wallet/has-wallet?& app-name wallet)
-                     (let [message (str "error: wallet '" wallet "' doesn't exist")]
-                       (reject message))
-                     ;; The named wallet exists so load it and extract
-                     ;; the signing function to use on the supplied
-                     ;; data.
-                     (ddt.prompt/ask-password!
-                      (fn [err result]
-                        (if err
-                          (reject err)
-                          (let [password (.-password result)]
-                            (-> (lib.wallet/load& app-name wallet password)
-                                (lib.promise/then
-                                 (fn [wallet]
-                                   (let [sign-fn (get wallet :wallet/sign-fn)
-                                         decoded (lib.base64/decode-string data)]
-                                     (-> (sign-fn decoded)
-                                         (.then (fn [signature]
-                                                  (println signature)
-                                                  (resolve)))))))))))))))))})
+                (ddt.prompt/ask-password!
+                 (fn [err result]
+                   (if err
+                     (ddt.util/exit-if err)
+                     (let [password (.-password result)]
+                       (-> (lib.wallet/load& app-name wallet password)
+                           (lib.promise/then
+                            (fn [wallet]
+                              (let [sign-fn (get wallet :wallet/sign-fn)
+                                    decoded (lib.base64/decode-string data)]
+                                (-> (sign-fn decoded)
+                                    (.then (fn [signature]
+                                             (println signature)))))))
+                           (lib.promise/catch (fn [e] (ddt.util/exit-if e))))))))))})
