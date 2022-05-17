@@ -1,5 +1,5 @@
 {
-  "openrpc": "1.0.0-rc1",
+  "openrpc": "1.2.6",
   "info": {
     "title": "Simple RPC overview",
     "version": "2.0.0"

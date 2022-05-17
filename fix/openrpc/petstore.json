@@ -1,5 +1,5 @@
 {
-  "openrpc": "1.0.0-rc1",
+  "openrpc": "1.2.6",
   "info": {
     "version": "1.0.0",
     "title": "Petstore",
