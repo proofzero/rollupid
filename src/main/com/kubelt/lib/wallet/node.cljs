@@ -14,7 +14,7 @@
    [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
 (defn- fs-exists?&
-  "Return the file location if exists"
+  "Return the file location if exists. Don't throw exception if no exists"
   [file]
   (lib.promise/promise
    (fn [resolve _]
@@ -31,7 +31,8 @@
 
 (defn- ensure-wallet-dir&
   "Return the wallet directory path for the application as a string,
-  creating it if it doesn't already exist."
+  creating it if it doesn't already exist.
+  Throws exception if Wallet dir isn't available"
   [app-name]
   (let [wallet-dirp (wallet-dir app-name)]
     (lib.promise/promise
@@ -71,7 +72,8 @@
 
 
 (defn ensure-wallet&
-  "Return true if the named wallet already exists."
+  "Return true if the named wallet already exists.
+  Throws exception if wallet doesn't exist with this name"
   [app-name wallet-name]
   (lib.promise/promise
    (fn [resolve reject]
@@ -79,10 +81,12 @@
          (lib.promise/then
           (fn [_]
             (-> (fs-exists?& (name->path app-name wallet-name))
-                (lib.promise/then (fn [x]
-                                    (if x
-                                      (resolve x)
-                                      (reject (lib.error/error (str "no wallet with this name: " wallet-name)))))))))))))
+                (lib.promise/then
+                 (fn [x]
+                   (if x
+                     (resolve x)
+                     (reject (lib.error/error (str "no wallet with this name: " wallet-name)))))))))
+         (lib.promise/catch reject)))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -91,13 +95,14 @@
 ;; TODO allow wallet deletion
 
 (defn has-wallet?&
-  "Return true if the named wallet already exists."
+  "Return wallet file path if the named wallet already exists. Returns nil if no wallet exists"
   [app-name wallet-name]
   (fs-exists?& (name->path app-name wallet-name)))
 
 (defn can-decrypt?&
   "Return true if the wallet can be successfully decrypted with the
-  supplied password, and false otherwise."
+  supplied password, and false otherwise.
+  Throws exception if password is incorrect"
   [app-name wallet-name password]
   (lib.promise/promise
    (fn [resolve reject]
@@ -108,15 +113,16 @@
              (.readFile fs-promises wallet-path)
              (lib.promise/then #(.fromEncryptedJson Wallet % password))
              (lib.promise/then (fn [_] (resolve true)))
-             (lib.promise/catch (fn [_] (reject (lib.error/error (str "password for '" wallet-name "' is incorrect"))))))))))))
-
+             (lib.promise/catch (fn [_] (reject (lib.error/error (str "password for '" wallet-name "' is incorrect"))))))))
+         (lib.promise/catch reject)))))
 
 (defn init&
   "Create and store an encrypted wallet. The encrypted wallet file is
   stored in an XDG compliant location based on the application name. It
   is also named using the supplied wallet name and encrypted with the
   supplied password. A map describing the created wallet is returned if
-  successful. An error map is returned otherwise."
+  successful. An error map is returned otherwise.
+  Throws exception on wallet-encryption or fs-write problems"
   [app-name wallet-name password]
   (lib.promise/promise
    (fn [resolve reject]
@@ -136,13 +142,13 @@
                          (lib.promise/then (fn []
                                              (resolve
                                               (let [{:keys [phrase path locale]} (js->clj mnemonic :keywordize-keys true)]
-                                                {:wallet/path wallet-path
-                                                 :wallet/name wallet-name
+                                                {:wallet/path            wallet-path
+                                                 :wallet/name            wallet-name
                                                  :wallet.mnemonic/phrase phrase
-                                                 :wallet.mnemonic/path path
+                                                 :wallet.mnemonic/path   path
                                                  :wallet.mnemonic/locale locale}))))
-                         (lib.promise/catch (fn [e] (reject e))))))))))
-         (lib.promise/catch (fn [e] (reject e)))))))
+                         (lib.promise/catch (fn [e] (reject (lib.error/error e)))))))))))
+         (lib.promise/catch reject)))))
 
 (defn load&
   "Return a promise that resolves to a wallet map, or that rejects with an
@@ -166,14 +172,16 @@
                 (lib.promise/catch
                  (fn [error]
                    (reject (lib.error/error error)))))))
-         (lib.promise/catch
-             (fn [e] (reject e)))))))
+         (lib.promise/catch reject)))))
 
 (defn ls&
   "Return a list of wallet names."
   [app-name]
-  (-> (ensure-wallet-dir& app-name)
-      (lib.promise/then #(js->clj (.readdir fs-promises %)))))
+  (lib.promise/promise
+   (fn [resolve reject]
+     (-> (ensure-wallet-dir& app-name)
+         (lib.promise/then #(resolve (js->clj (.readdir fs-promises %))))
+         (lib.promise/catch reject)))))
 
 (defn delete!&
   "Delete a wallet."
@@ -193,11 +201,11 @@
 (defn import&
   "Import a wallet and store it encrypted. Returns a promise that resolves
   to the path to the imported wallet, or if an error occurs rejects with
-  a standard error map."
+  a standard error map.
+  Throws encrypt or fs-wallet exceptions"
   [app-name wallet-name mnemonic password]
   (lib.promise/promise
    (fn [resolve reject]
-
      ;; The wallet with the given name doesn't yet exist, we can import
      ;; from the mnemonic and create a wallet with that name.
      (letfn [;; Returns a promise that resolves to the wallet
@@ -219,23 +227,11 @@
          (-> (has-wallet?& app-name wallet-name)
              (lib.promise/then
               (fn [wallet]
-                (when wallet
-                  (let [msg (str "wallet " wallet-name " already exists")
-                        error (lib.error/error msg)]
-                    (reject error)))
+                (when wallet (reject (lib.error/error (str "wallet " wallet-name " already exists"))))
                 (-> (lib.promise/all [path& wallet&])
                     (lib.promise/then
                      (fn [[wallet-dirp wallet-js]]
                        (-> (.writeFile fs-promises wallet-dirp wallet-js)
-                           (lib.promise/then
-                            (fn [_]
-                              (let [result {:wallet/name wallet-name}]
-                                (resolve result))))
-                           (lib.promise/catch
-                            (fn [e]
-                              (let [error (lib.error/from-obj e)]
-                                (reject error)))))))
-                    (lib.promise/catch
-                     (fn [e]
-                       (let [error (lib.error/from-obj e)]
-                         (reject error)))))))))))))
+                           (lib.promise/then (fn [_] (resolve {:wallet/name wallet-name})))
+                           (lib.promise/catch (fn [e] (reject (lib.error/from-obj e)))))))
+                    (lib.promise/catch (fn [e] (reject (lib.error/from-obj e)))))))))))))
