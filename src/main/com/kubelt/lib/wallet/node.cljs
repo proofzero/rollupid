@@ -8,9 +8,6 @@
   (:require
    ["@ethersproject/wallet" :refer [Wallet]])
   (:require
-   [cljs.core.async :as async :refer [go]]
-   [cljs.core.async.interop :refer-macros [<p!]])
-  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.promise :as lib.promise]
@@ -48,7 +45,7 @@
                                                     :recursive recursive?}]
                                    (.mkdir fs-promises wallet-dirp options)))))
            (lib.promise/then (fn [_] (resolve wallet-dirp)))
-           (lib.promise/catch (fn [e] (reject (str "Wallet dir isn't available" e)))))))))
+           (lib.promise/catch (fn [e] (reject (lib.error/error (str "Wallet dir isn't available" e))))))))))
 
 (defn- name->path
   "Return the path to a wallet given the owning application name and
@@ -85,7 +82,7 @@
                 (lib.promise/then (fn [x]
                                     (if x
                                       (resolve x)
-                                      (reject (str "no wallet with this name: '" wallet-name))))))))))))
+                                      (reject (lib.error/error (str "no wallet with this name: " wallet-name)))))))))))))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
@@ -112,7 +109,7 @@
              (.readFile fs-promises wallet-path)
              (lib.promise/then #(.fromEncryptedJson Wallet % password))
              (lib.promise/then (fn [_] (resolve true)))
-             (lib.promise/catch (fn [_] (reject (str "password for '" wallet-name "' is incorrect")))))))))))
+             (lib.promise/catch (fn [_] (reject (lib.error/error (str "password for '" wallet-name "' is incorrect"))))))))))))
 
 
 (defn init&
@@ -131,8 +128,7 @@
                 (lib.promise/then
                  (fn [file]
                    (when file
-                     (let [message (str "wallet " wallet-name " already exists")]
-                       (reject (lib.error/error message))))
+                     (reject (lib.error/error (str "wallet " wallet-name " already exists"))))
                    (let [wallet-path (.join path wallet-dirp wallet-name)
                          eth-wallet (.createRandom Wallet)
                          mnemonic (.-mnemonic eth-wallet)]
