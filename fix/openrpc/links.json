@@ -196,6 +196,7 @@
   "components": {
     "links": {
       "UserRepositories": {
+        "name": "userRepos",
         "description": "Get the repositories by owner.",
         "summary": "Get the repos by owner",
         "server":{
@@ -209,6 +210,7 @@
         }
       },
       "UserRepository": {
+        "name": "userRepo",
         "method": "getRepository",
         "params": {
           "username": "${result.owner.username}",
@@ -216,6 +218,7 @@
         }
       },
       "RepositoryPullRequests": {
+        "name": "repoPullRequests",
         "method": "getPullRequestsByRepository",
         "params": {
           "username": "${result.owner.username}",
@@ -223,6 +226,7 @@
         }
       },
       "PullRequestMerge": {
+        "name": "pullRequestMerge",
         "method": "mergePullRequest",
         "params": {
           "username": "${result.author.username}",
