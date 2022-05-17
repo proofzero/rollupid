@@ -22,8 +22,7 @@
      (let [json-str (slurp filename)
            keywordize? true
            edn (lib.json/from-json json-str keywordize?)
-           tf (mt/transformer mt/strip-extra-keys-transformer
-                              mt/string-transformer
+           tf (mt/transformer mt/string-transformer
                               mt/json-transformer)
            clean-edn (mc/decode spec.rpc.schema/schema edn tf)]
        (if-not (mc/validate spec.rpc.schema/schema clean-edn)
