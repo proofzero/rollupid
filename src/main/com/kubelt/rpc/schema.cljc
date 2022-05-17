@@ -32,13 +32,14 @@
     [spec.rpc.client/prefix prefix]
     [spec.rpc.schema/schema schema-doc]
     [spec.rpc.schema/options options]
-    ;; TODO process schema and store in client
     ;; TODO check options for separator, e.g. ".", "_" (use regex? set of chars?)
-    ;; Analyze schema and convert to client map.
     (let [defaults {}
           options (merge defaults options)
+          ;; Analyze schema and convert to client map.
           parsed-schema (rpc.schema.parse/parse schema-doc options)]
-      (assoc-in client [:rpc/schemas prefix] parsed-schema)))))
+      (if (lib.error/error? parsed-schema)
+        parsed-schema
+        (assoc-in client [:rpc/schemas prefix] parsed-schema))))))
 
 ;; inflate
 ;; -----------------------------------------------------------------------------
