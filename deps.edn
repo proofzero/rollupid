@@ -26,18 +26,29 @@
   org.clojure/core.async {:mvn/version "1.5.648"}
   ;; Crypto library for tx signing and key/wallet management in Ethereum
   ;; cf. https://docs.web3j.io/4.8.7/advanced/web3j_core_modules/
-  org.web3j/crypto {:mvn/version "5.0.0"}
+  org.web3j/crypto {:mvn/version "4.9.2"}
   ;; Minimal set of web3 utility classes
-  org.web3j/utils {:mvn/version "5.0.0"}}
+  org.web3j/utils {:mvn/version "4.9.2"}}
+
+ ;; To start a REPL session for a specific user with CIDER/emacs:
+ ;;   C-u C-x M-j (prefix + cider-jack-in-clj)
+ ;;
+ ;; Using a prefix allows the CIDER start command to be edited; add the
+ ;; necessary alias(es) for your REPL session:
+ ;;   -A:dev:robert
+ ;;
+ ;; Switch to your user-specific namespace:
+ ;;   user> (in-ns 'robert.user)
 
  :aliases
  {:dev {:extra-paths ["src/dev"]
         :extra-deps {fipp/fipp {:mvn/version "0.6.26"}}}
+  :robert {:extra-deps {}}
 
   ;; Generate literate docs from the source code using sidenote (a fork
   ;; of marginalia).
   :sidenotes {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
-         :main-opts ["-m" "sidenotes.core"]}
+              :main-opts ["-m" "sidenotes.core"]}
 
   ;; Unit test runner.
   ;; > https://github.com/lambdaisland/kaocha
