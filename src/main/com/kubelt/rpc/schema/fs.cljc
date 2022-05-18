@@ -3,13 +3,13 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #?(:node
      (:require
-      ["fs" :refer [promises] :rename {promises fs-promises} :as fs]))
+      ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
+      [com.kubelt.lib.json :as lib.json]
+      [com.kubelt.lib.promise :as lib.promise]))
   (:require
    [malli.core :as mc]
    [malli.transform :as mt]
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.json :as lib.json]
-   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.spec.rpc.schema :as spec.rpc.schema]))
 
 ;; load
