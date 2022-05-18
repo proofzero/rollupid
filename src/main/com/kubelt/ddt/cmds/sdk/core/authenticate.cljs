@@ -5,11 +5,7 @@
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
-   [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.lib.wallet :as lib.wallet]
-   [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
-
+   [com.kubelt.ddt.auth :as ddt.auth]))
 
 (defonce command
   {:command "authenticate"
