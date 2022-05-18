@@ -33,7 +33,7 @@
   [args-map password on-authenticate]
   (let [app-name (get args-map :app-name)
         wallet-name (get args-map :wallet)]
-    (-> (lib.wallet/load app-name wallet-name password)
+    (-> (lib.wallet/load& app-name wallet-name password)
         (lib.promise/then
          (fn [wallet]
            (let [options (args->init-options args-map wallet)
