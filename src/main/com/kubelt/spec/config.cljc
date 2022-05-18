@@ -28,22 +28,6 @@
    {:default :info}
    [:enum :log :trace :debug :info :warn :error :fatal]])
 
-;; TODO move into com.kubelt.spec.network
-#_(def dotted-quad
-  #"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")
-
-(def dotted-quad
-  #"(\\.|\\d)*")
-
-;; TODO refine this regex to better match a multiaddr
-;; TODO move into com.kubelt.spec.multiaddr
-(def multiaddr
-  [:re #?(;; cljs can't generate re values  so providing a default one
-          :cljs {:gen/fmap (fn [_] "/ip4/127.0.0.1/tcp/5001")}
-          ;; TODO: add test.check dependency, required for clj env
-          :clj {})
-   #"^(/(\w+)/(\w+|\.)+)+$"])
-
 (def credentials
   [:and
    {:description "A map from core name to JWT strings."
@@ -63,12 +47,15 @@
    [:log/level {:optional true} logging-level]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
-   [:ipfs.read/multiaddr {:optional true} multiaddr]
    [:ipfs.read/scheme {:optional true} spec.http/scheme]
-   [:ipfs.write/multiaddr {:optional true} multiaddr]
+   [:ipfs.read/host {:optional true} spec.http/host]
+   [:ipfs.read/port {:optional true} spec.http/port]
    [:ipfs.write/scheme {:optional true} spec.http/scheme]
-   [:p2p/multiaddr {:optional true} multiaddr]
-   [:p2p/scheme {:optional true} spec.http/scheme]])
+   [:ipfs.write/host {:optional true} spec.http/host]
+   [:ipfs.write/port {:optional true} spec.http/port]
+   [:p2p/scheme {:optional true} spec.http/scheme]
+   [:p2p/host {:optional true} spec.http/host]
+   [:p2p/port {:optional true} spec.http/port]])
 
 ;; After default options and user-supplied options are combined, we
 ;; should have an SDK configuration options map that has every value

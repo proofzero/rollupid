@@ -15,6 +15,7 @@
    {:example "/example"}
    :string])
 
+;; TODO use spec.network/dotted-quad
 (def host
   [:and
    {:example "127.0.0.1"}
