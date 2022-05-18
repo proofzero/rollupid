@@ -32,11 +32,9 @@
   #?(:browser nil
      :node (lib.promise/promise
             (fn [resolve reject]
-              (println "filename" filename)
               (-> (.readFile fs-promises filename)
                   (lib.promise/then #(resolve (conform (lib.json/json-str->edn % lib.json/keyword-mapper))))
-                  (lib.promise/catch reject))
-              ))
+                  (lib.promise/catch reject))))
      :clj
      (let [json-str (slurp filename)
            keywordize? true]
