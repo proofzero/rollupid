@@ -232,6 +232,7 @@
 
   test:web:ci
   {:doc "Run web tests using headless browser"
+   ;; CHROME_BIN=$(which chromium) bb run test:web:ci
    :depends [test:web:ci:compile test:web:ci:run]}
 
   test:dapp-karma:ci:compile
