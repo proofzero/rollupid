@@ -24,29 +24,23 @@
               (let [args-map (ddt.options/to-map args)
                     app-name (get args-map :app-name)
                     wallet-name (get args-map :name)]
-                (lib.promise/promise
-                 (fn [resolve reject]
-                   ;; Check that the wallet to remove exists.
-                   (when-not (lib.wallet/has-wallet? app-name wallet-name)
-                     (let [message (str "error: wallet '" wallet-name "' doesn't exist")]
-                       (reject message)))
-                   ;; We only remove the wallet if the user can supply the
+                ;; We only remove the wallet if the user can supply the
                    ;; password that decrypts it.
-                   (ddt.prompt/ask-password!
-                    (fn [err result]
-                      (ddt.util/exit-if err)
-                      (let [password (.-password result)]
+                (ddt.prompt/ask-password!
+                 (fn [err result]
+                   (ddt.util/exit-if err)
+                   (let [password (.-password result)]
                         ;; Check that password is correct (can decrypt wallet).
-                        (when-not (lib.wallet/can-decrypt? app-name wallet-name password)
-                          (let [message (str "password for '" wallet-name "' is incorrect")]
-                            (println (str "error: " message))
-                            (.exit process 1)))
-                        ;; Prompt the user to confirm that they want to
-                        ;; remove the wallet.
-                        (ddt.prompt/confirm-rm!
-                         (fn [err rm?]
-                           (ddt.util/exit-if err)
-                           (when rm?
-                             (lib.wallet/delete! app-name wallet-name)
-                             (println "removed wallet" wallet-name)
-                             (resolve)))))))))))})
+                     (-> (lib.wallet/can-decrypt?& app-name wallet-name password)
+                         (lib.promise/then
+                          (fn [_]
+                            (ddt.prompt/confirm-rm!
+                               ;; Prompt the user to confirm that they want to
+                               ;; remove the wallet.
+                             (fn [err rm?]
+                               (ddt.util/exit-if err)
+                               (when rm?
+                                 (-> (lib.wallet/delete!& app-name wallet-name)
+                                     (lib.promise/then (fn [] (println "removed wallet" wallet-name)))
+                                     (lib.promise/catch (fn [e] (ddt.util/exit-if e)))))))))
+                         (lib.promise/catch (fn [e] (ddt.util/exit-if e)))))))))})

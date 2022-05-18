@@ -1,4 +1,4 @@
-(ns main.com.kubelt.lib.jwk
+(ns com.kubelt.lib.jwk
   "JSON Web Key implementation"
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
