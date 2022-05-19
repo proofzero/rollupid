@@ -9,12 +9,12 @@
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.json :as lib.json]
-   [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc.schema.util :as rpc.schema.util]
    [com.kubelt.spec.rpc.schema :as spec.rpc.schema])
-  (:require
-   #?@(:node
-       [["fs" :refer [promises] :rename {promises fs-promises} :as fs]])))
+  #?(:node
+     (:require
+      ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
+      [com.kubelt.lib.promise :as lib.promise])))
 
 ;; A decoding transformer, only mounting to :string schemas with
 ;; truthy :string/trim property, e.g.

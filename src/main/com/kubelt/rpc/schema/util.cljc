@@ -59,6 +59,8 @@
   (loop [components (get schema :components)
          ref-path (ref->path $ref)
          ref-val (get-in schema ref-path)]
+    ;;(prn ref-path)
+    ;;(prn ref-val)
     (if-not (contains? ref-val :$ref)
       ref-val
       (recur components ref-path ref-val))))
