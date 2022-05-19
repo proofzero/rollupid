@@ -15,8 +15,9 @@
    [com.kubelt.proto.http :as proto.http])
   (:require
    #?@(:browser [[com.kubelt.lib.http.browser :as http.browser]]
-       :node [[com.kubelt.lib.http.node :as http.node]]
-       :clj [[com.kubelt.lib.http.jvm :as http.jvm]])))
+       :clj [[com.kubelt.lib.http.jvm :as http.jvm]]
+       :cljs [[com.kubelt.lib.http.browser :as http.browser]]
+       :node [[com.kubelt.lib.http.node :as http.node]])))
 
 ;; System
 ;; -----------------------------------------------------------------------------
@@ -117,8 +118,9 @@
   {:post [(not (nil? %))]}
   (log/debug {:log/msg "init HTTP client"})
   #?(:browser (http.browser/->HttpClient)
-     :node (http.node/->HttpClient)
-     :clj (http.jvm/->HttpClient)))
+     :clj (http.jvm/->HttpClient)
+     :cljs (http.browser/->HttpClient)
+     :node (http.node/->HttpClient)))
 
 (defmethod ig/halt-key! :client/http [_ client]
   {:pre [(satisfies? proto.http/HttpClient client)]}
