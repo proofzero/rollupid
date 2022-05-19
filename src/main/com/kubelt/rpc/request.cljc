@@ -61,12 +61,13 @@
 
 (defn from-method
   "Given a method descriptor map 'method' and a collection of parameters to bind,
-  return an description of the RPC request to perform. The
+  return a description of the RPC request to perform. The
   stored :rpc/path is the 'path' that names the RPC method, and the
   'options' map is the same as that passed to the (init) call to
   initialize a client, values from which may be used in the process of
-  create the request, e.g. a user agent string. The :http/request value
-  is an HTTP request map that is used to invoke the RPC call."
+  creating the request, e.g. a user agent string, an HTTP host name,
+  port, or path, etc. The :http/request value is an HTTP request map
+  that is used to invoke the RPC call."
   ([path method params]
    (let [defaults {}]
      (from-method path method params defaults)))
