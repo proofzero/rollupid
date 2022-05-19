@@ -9,13 +9,10 @@
   (:require
    ["fs" :refer [promises] :rename {promises fs-promises} :as fs]))
 
-
-(def ^:dynamic json-path "./fix/openrpc/" #_"./../../../fix/openrpc/")
-
-(do
-  (js/console.log (js->clj (node-env)))
-  (println (node-env))
-  )
+(def json-path
+  (if (= "runner" (:username (node-env)))
+    "./fix/openrpc/"
+    "./../../../fix/openrpc/"))
 
 (deftest fs-async-test
   (testing "reading async existing repo files"
