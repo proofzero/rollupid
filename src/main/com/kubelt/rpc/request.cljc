@@ -18,9 +18,9 @@
                  "User-Agent" user-agent}
         trailers {}
         scheme :http
-        domain "example.com"
-        port 33337
-        path "/foo"]
+        domain (:uri/domain options "example.com")
+        port (:uri/port options 33337)
+        path (:uri/path options "/foo")]
     {:com.kubelt/type :kubelt.type/http-request
      :http/version version
      :http/method method
