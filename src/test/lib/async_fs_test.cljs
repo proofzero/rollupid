@@ -2,8 +2,9 @@
   "Test async fs "
   (:require
    [cljs.core.async :refer [go]]
+   [com.kubelt.lib.util :as lib.util :refer [environment node-env]]
    [com.kubelt.lib.json :as lib.json]
-   [cljs.test :as t :refer [deftest is testing async] ]
+   [cljs.test :as t :refer [deftest is testing async]]
    [cljs.core.async.interop :refer-macros [<p!]])
   (:require
    ["fs" :refer [promises] :rename {promises fs-promises} :as fs]))
@@ -11,6 +12,10 @@
 
 (def ^:dynamic json-path "./fix/openrpc/" #_"./../../../fix/openrpc/")
 
+(do
+  (js/console.log (js->clj (node-env)))
+  (println (node-env))
+  )
 
 (deftest fs-async-test
   (testing "reading async existing repo files"
