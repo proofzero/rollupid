@@ -191,3 +191,6 @@ project.clj
 /docs/css
 /docs/js
 /docs/*.html
+
+# dapp
+/dapp/cypress/videos/
