@@ -40,42 +40,63 @@
   ;; API "/@core/auth". This kicks off a zero-knowledge proof
   ;; authentication.
   (-> (lib.p2p/authenticate! sys core)
-      (.then (fn [auth-result]
-               (if (lib.error/error? auth-result)
-                 ;; This triggers .catch handlers on returned promise.
-                 (throw (ex-info "error" auth-result))
-                 ;; We successfully retrieved a nonce, now verify it by signing
-                 ;; it and sending it back.
-                 (get-in auth-result [:http/body :nonce]))))
-      (.then (fn [nonce]
-               (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
-                     signature (sign-fn nonce)]
-                 [nonce signature])))
-      (.then (fn [[nonce signature-p]]
+      (lib.promise/then
+       (fn [auth-result]
+         (if (lib.error/error? auth-result)
+           ;; This triggers .catch handlers on returned promise.
+           (throw (ex-info "error" auth-result))
+           ;; We successfully retrieved a nonce, now verify it by signing
+           ;; it and sending it back.
+           auth-result)))
+      (lib.promise/then
+       (fn [nonce]
+         (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
+               signature (sign-fn nonce)]
+           [nonce signature])))
+      (lib.promise/then
+       (fn [[nonce signature-p]]
                ;; NB: the signature is expected to be a promise, even if
                ;; not strictly necessary on some platforms.
-               (.then signature-p
-                      (fn [signature]
-                        (let [result (lib.p2p/verify! sys core nonce signature)]
-                          (if (lib.error/error? result)
-                            (throw (ex-info "invalid signature" result))
-                            ;; If successful we get back a JWT that needs to be stored
-                            ;; in the system map. NB: the JWT has an expiry and encodes
-                            ;; client IP to restrict renewing JWTs for other clients.
-                            ;; TODO check/assert that this is true.
-                            (.then result
-                                   (fn [{:http/keys [body status] :as response}]
-                                     (if-not (http.status/success? status)
-                                       (throw (ex-info "http error" response))
-                                       (let [decoded-jwt (lib.jwt/decode (:jwt body))]
-                                         ;; TODO verify jwt
-                                         (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))))
+         (lib.promise/then
+          signature-p
+          (fn [signature]
+            ;; If successful we get back a JWT that needs to be stored
+            ;; in the system map. NB: the JWT has an expiry and encodes
+            ;; client IP to restrict renewing JWTs for other clients.
+            ;; TODO check/assert that this is true.
+            (lib.promise/then
+             (lib.p2p/verify! sys core nonce signature)
+             (fn [verify-result]
+               (if (lib.error/error? verify-result)
+                 ;; This triggers .catch handlers on returned promise.
+                 (throw (ex-info "error" verify-result))
+                 ;; We successfully retrieved a nonce, now verify it by signing
+                 ;; it and sending it back.
+                 (let [decoded-jwt (lib.jwt/decode verify-result)]
+                   ;; TODO verify jwt
+                   (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
   "Create an account from a JavaScript context."
   [sys core]
   (authenticate! sys core))
+
+
+;; TODO test me
+(defn rpc-api [sys core]
+  (lib.p2p/rpc-api sys core))
+
+(defn rpc-api-js [sys core]
+  (rpc-api sys core))
+
+;; TODO test me
+(defn call-rpc-method [sys core method args]
+  (lib.p2p/call-rpc-method sys core method args))
+
+(defn call-rpc-api-js [sys core method args]
+  (call-rpc-method sys core method args))
+
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------

@@ -2,65 +2,68 @@
   "Wrapper around the external p2p naming system."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [taoensso.timbre :as log]
    [clojure.string :as cstr])
   (:require
-   [com.kubelt.lib.json :as lib.json]
-   [com.kubelt.proto.http :as http]))
+   ["@ethersproject/providers" :refer [JsonRpcProvider]]
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.promise :as lib.promise]))
 
 ;; TODO .cljc
+
+(defn- connection-uri [sys core]
+  (let [scheme (get-in sys [:client/p2p :http/scheme])
+        host (get-in sys [:client/p2p :http/host])
+        port (get-in sys [:client/p2p :http/port])
+        path (cstr/join "" ["/@" core "/jsonrpc"])
+        uri (str (name scheme) "://" host ":" port path)]
+    (log/debug {::connection-uri uri})
+    uri))
+
+(defn- json-rpc-provider [sys core]
+  (JsonRpcProvider. (connection-uri sys core)))
+
+(defn- send
+  ([provider method]
+   (send provider method []))
+  ([provider method params]
+   (log/debug {::send {:method method :params params}})
+   (-> (.send provider method (clj->js params))
+       (lib.promise/then
+        (fn [x]
+          (js->clj x :keywordize-keys true)))
+       (lib.promise/catch
+        (fn [e]
+          (lib.error/from-obj e))))))
 
 (defn authenticate!
   "Authenticate a user against a core. The account is a map that contains the public
   key from the keypair that represents the user's account."
   [sys core]
   {:pre [(string? core)]}
-  (let [client (get sys :client/http)
-        scheme (get-in sys [:client/p2p :http/scheme])
-        host (get-in sys [:client/p2p :http/host])
-        port (get-in sys [:client/p2p :http/port])
-
-        wallet (get sys :crypto/wallet)
-        address (get wallet :wallet/address)
-        body {:address address}
-        body-str (lib.json/edn->json-str body)
-
-        path (cstr/join "" ["/@" core "/auth"])
-
-        request {:com.kubelt/type :kubelt.type/http-request
-                 :http/method :post
-                 :http/body body-str
-                 :uri/scheme scheme
-                 :uri/domain host
-                 :uri/port port
-                 :uri/path path}]
-    ;; Make an HTTP request to p2p system, passing along the user's
+  (let [address (get-in sys [:crypto/wallet :wallet/address])]
+    ;; Make an JsonRpc call to p2p system, passing along the user's
     ;; wallet address. Expect a nonce in return, which should be signed
     ;; and returned to prove ownership of provided key and complete
     ;; registration.
     ;;
     ;; Returns a promise.
-    (http/request! client request)))
+    (send (json-rpc-provider sys core) "kb_auth" [address])))
 
 (defn verify!
   "Send a signed nonce to verify ownership of a keypair as part of the
   authentication flow."
   [sys core nonce signature]
   {:pre [(every? string? [core nonce])]}
-  (let [client (get sys :client/http)
-        scheme (get-in sys [:client/p2p :http/scheme])
-        host (get-in sys [:client/p2p :http/host])
-        port (get-in sys [:client/p2p :http/port])
+  ;; Returns a promise.
+  (send (json-rpc-provider sys core) "kb_auth_verify" [nonce signature]))
 
-        body {:nonce nonce :signature signature}
-        body-str (lib.json/edn->json-str body)
+(defn rpc-api [sys core]
+  {:pre [(string? core)]}
+  (send (json-rpc-provider sys core) "rpc.discover"))
 
-        path (cstr/join "" ["/@" core "/auth/verify"])
+(defn call-rpc-method [sys core method args]
+  {:pre [(string? core) (string? method) (vector? args)]}
+  (send (json-rpc-provider sys core) method args))
 
-        request {:com.kubelt/type :kubelt.type/http-request
-                 :http/method :post
-                 :http/body body-str
-                 :uri/scheme scheme
-                 :uri/domain host
-                 :uri/port port
-                 :uri/path path}]
-    (http/request! client request)))
+

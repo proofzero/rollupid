@@ -276,6 +276,7 @@
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
+             test:dapp:develop
              test:plugin:sanity]}
 
   test:all:release
@@ -284,10 +285,9 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
-             ;; TODO: Enable once JSON RPC is ready
-             ;; test:dapp:release
+             test:dapp:release
              test:plugin:sanity]}
 
   rpc:mock-server:ethereum
   {:doc "Run ethereum rpc mock server"
-   :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/ethereum.json -p 3333")}}}
+   :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/ethereum.json -p 33337")}}}

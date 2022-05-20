@@ -8,6 +8,8 @@
   commons-codec/commons-codec {:mvn/version "1.15"}
   ;; A data format and set of libraries for conveying values
   com.cognitect/transit-clj {:mvn/version "1.0.329"}
+  ;; Navigator-based query and transformation of Clojure data
+  com.rpl/specter {:mvn/version "1.1.4"}
   ;; Pure Clojure/Script logging library
   com.taoensso/timbre {:mvn/version "5.2.1"}
   ;; An http client for Clojure wrapping jdk 11's HttpClient
@@ -24,18 +26,29 @@
   org.clojure/core.async {:mvn/version "1.5.648"}
   ;; Crypto library for tx signing and key/wallet management in Ethereum
   ;; cf. https://docs.web3j.io/4.8.7/advanced/web3j_core_modules/
-  org.web3j/crypto {:mvn/version "5.0.0"}
+  org.web3j/crypto {:mvn/version "4.9.2"}
   ;; Minimal set of web3 utility classes
-  org.web3j/utils {:mvn/version "5.0.0"}}
+  org.web3j/utils {:mvn/version "4.9.2"}}
+
+ ;; To start a REPL session for a specific user with CIDER/emacs:
+ ;;   C-u C-x M-j (prefix + cider-jack-in-clj)
+ ;;
+ ;; Using a prefix allows the CIDER start command to be edited; add the
+ ;; necessary alias(es) for your REPL session:
+ ;;   -A:dev:robert
+ ;;
+ ;; Switch to your user-specific namespace:
+ ;;   user> (in-ns 'robert.user)
 
  :aliases
  {:dev {:extra-paths ["src/dev"]
-        :extra-deps {fipp/fipp {:mvn/version "0.6.25"}}}
+        :extra-deps {fipp/fipp {:mvn/version "0.6.26"}}}
+  :robert {:extra-deps {}}
 
   ;; Generate literate docs from the source code using sidenote (a fork
   ;; of marginalia).
   :sidenotes {:extra-deps {sidenotes/sidenotes {:mvn/version "RELEASE"}}
-         :main-opts ["-m" "sidenotes.core"]}
+              :main-opts ["-m" "sidenotes.core"]}
 
   ;; Unit test runner.
   ;; > https://github.com/lambdaisland/kaocha
@@ -43,13 +56,13 @@
   ;; Execute the tests configured in tests.edn:
   ;; $ clojure -M:kaocha
   :test {:extra-paths ["src/test"]
-         :extra-deps {lambdaisland/kaocha {:mvn/version "1.65.1029"}
+         :extra-deps {lambdaisland/kaocha {:mvn/version "1.66.1034"}
                       org.clojure/test.check {:mvn/version "1.1.1"}
                       org.clojure/test.generative {:mvn/version "1.0.0"}
-                      org.clojure/tools.namespace {:mvn/version "1.2.0"}
+                      org.clojure/tools.namespace {:mvn/version "1.3.0"}
                       org.clojure/tools.trace {:mvn/version "0.7.11"}}
          :main-opts ["-m" "kaocha.runner"]}
 
   ;; $ clojure -M:lint --lint src/
-  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.04.08"}}
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2022.04.25"}}
          :main-opts ["-m" "clj-kondo.main"]}}}
