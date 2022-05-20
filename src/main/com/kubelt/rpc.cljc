@@ -236,8 +236,7 @@
       ;; TODO validate result
       ;; :node/browser Returns a promise.
       ;; :jvm Returns a future.
-      ;;(proto.http/request! http-client http-request)
-      ))))
+      (proto.http/request! http-client http-request)))))
 
 ;; call
 ;; -----------------------------------------------------------------------------
