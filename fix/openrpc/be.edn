@@ -1,0 +1,46 @@
+{:openrpc "1.2.6",
+ :info {:title "Kubelt Core", :version "0.0.0"},
+ :methods
+ [{:name "kb_ping",
+   :params [],
+   :result {:name "pong", :schema {:type "string"}}}
+  {:name "kb_pong",
+   :params [],
+   :result {:name "pong", :schema {:type "null"}},
+   :errors [{:code -31999, :message "cannot pong"}]}
+  {:name "kb_auth",
+   :params
+   [{:name "address",
+     :summary "Account address",
+     :required true,
+     :schema {:type "string"}}],
+   :result {:name "nonce", :schema {:type "string"}}}
+  {:name "kb_auth_verify",
+   :params
+   [{:name "nonce",
+     :summary "Challenge Nonce",
+     :required true,
+     :schema {:type "string"}}
+    {:name "signature",
+     :summary "Nonce Signature",
+     :required true,
+     :schema {:type "string"}}],
+   :result {:name "jwt", :schema {:type "string"}}}
+  {:name "kb_core_create",
+   :params
+   [{:name "name",
+     :summary "Core Name",
+     :required true,
+     :schema {:type "string"}}],
+   :result {:name "Core Address", :schema {:type "string"}}}
+  {:name "kb_core_add_signer",
+   :params
+   [{:name "address",
+     :summary "Signer Account Address",
+     :required true,
+     :schema {:type "string"}}
+    {:name "permissions",
+     :summary "Signer Granted Permissions",
+     :required true,
+     :schema {:type "array"}}],
+   :result {:name "Signer", :schema {:type "string"}}}]}
