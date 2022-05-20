@@ -53,7 +53,6 @@
     "levelup": "5.1.1",
     "libp2p-crypto": "0.21.2",
     "memdown": "6.1.1",
-    "multiaddr": "10.0.1",
     "multiformats": "9.6.4",
     "os": "0.1.2",
     "os-browserify": "0.3.0",

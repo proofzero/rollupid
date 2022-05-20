@@ -218,22 +218,19 @@
         ;; i.e. com.kubelt.$name.
         base-name (.basename path (get m :$0))
         app-name (cstr/join "." ["com" "kubelt" base-name])
-        ;; Store the p2p service coordinates as a multiaddress.
-        host (get m :host)
-        port (get m :port)
+        ;; Store the p2p service coordinates.
         tls (get m :tls)
-        p2p-maddr (cstr/join "/" ["" "ip4" host "tcp" port])
         p2p-scheme (if tls :https :http)
-        ;; Store coordinates of IPFS read host as a multiaddress.
+        p2p-host (get m :host)
+        p2p-port (get m :port)
+        ;; Store coordinates of IPFS read host.
+        ipfs-read-scheme (keyword (get m :ipfs-read-scheme))
         ipfs-read-host (get m :ipfs-read-host)
         ipfs-read-port (get m :ipfs-read-port)
-        ipfs-read-maddr (cstr/join "/" ["" "ip4" ipfs-read-host "tcp" ipfs-read-port])
-        ipfs-read-scheme (keyword (get m :ipfs-read-scheme))
-        ;; Store coordinates of IPFS write host as a multiaddress.
+        ;; Store coordinates of IPFS write host.
+        ipfs-write-scheme (keyword (get m :ipfs-write-scheme))
         ipfs-write-host (get m :ipfs-write-host)
         ipfs-write-port (get m :ipfs-write-port)
-        ipfs-write-maddr (cstr/join "/" ["" "ip4" ipfs-write-host "tcp" ipfs-write-port])
-        ipfs-write-scheme (keyword (get m :ipfs-write-scheme))
         ;; Turn a sequence of core names and JWT strings into a map:
         ;; ["aaa" "bbb" "ccc" "ddd"]
         ;; => {"aaa" "bbb", "ccc" "ddd"}
@@ -242,11 +239,14 @@
     (-> m
         (assoc :app-name app-name)
         (assoc :p2p-scheme p2p-scheme)
-        (assoc :p2p-maddr p2p-maddr)
-        (assoc :ipfs-read-maddr ipfs-read-maddr)
+        (assoc :p2p-host p2p-host)
+        (assoc :p2p-port p2p-port)
         (assoc :ipfs-read-scheme ipfs-read-scheme)
-        (assoc :ipfs-write-maddr ipfs-write-maddr)
+        (assoc :ipfs-read-host ipfs-read-host)
+        (assoc :ipfs-read-port ipfs-read-port)
         (assoc :ipfs-write-scheme ipfs-write-scheme)
+        (assoc :ipfs-write-host ipfs-write-host)
+        (assoc :ipfs-write-port ipfs-write-port)
         (assoc :credentials credentials)
         (update :log-level keyword))))
 
@@ -259,9 +259,12 @@
   {:pre [(map? m)]}
   {:credential/jwt (get m :credentials)
    :log/level (get m :log-level)
-   :ipfs.read/multiaddr (get m :ipfs-read-maddr)
    :ipfs.read/scheme (get m :ipfs-read-scheme)
-   :ipfs.write/multiaddr (get m :ipfs-write-maddr)
+   :ipfs.read/host (get m :ipfs-read-host)
+   :ipfs.read/port (get m :ipfs-read-port)
    :ipfs.write/scheme (get m :ipfs-write-scheme)
+   :ipfs.write/host (get m :ipfs-write-host)
+   :ipfs.write/port (get m :ipfs-write-port)
    :p2p/scheme (get m :p2p-scheme)
-   :p2p/multiaddr (get m :p2p-maddr)})
+   :p2p/host (get m :p2p-host)
+   :p2p/port (get m :p2p-port)})

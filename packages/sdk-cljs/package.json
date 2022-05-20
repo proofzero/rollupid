@@ -45,7 +45,6 @@
     "levelup": "5.1.1",
     "libp2p-crypto": "0.21.2",
     "memdown": "6.1.1",
-    "multiaddr": "10.0.1",
     "multiformats": "9.6.2",
     "quadstore": "9.1.0",
     "web3": "1.7.1"

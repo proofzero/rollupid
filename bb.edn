@@ -232,6 +232,7 @@
 
   test:web:ci
   {:doc "Run web tests using headless browser"
+   ;; CHROME_BIN=$(which chromium) bb run test:web:ci
    :depends [test:web:ci:compile test:web:ci:run]}
 
   test:dapp-karma:ci:compile
@@ -275,7 +276,6 @@
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
-             test:dapp:develop
              test:plugin:sanity]}
 
   test:all:release
@@ -284,7 +284,8 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
-             test:dapp:release
+             ;; TODO: Enable once JSON RPC is ready
+             ;; test:dapp:release
              test:plugin:sanity]}
 
   rpc:mock-server:ethereum

@@ -12,12 +12,7 @@
    [com.kubelt.lib.http.shared :as lib.shared]
    [com.kubelt.spec.http :as spec.http]))
 
-
-#_(deftest config-test
-  (testing "default config is valid"
-    (let [default-config config/default-config]
-      (is (malli/validate spec.config/config default-config)
-          "default options must be valid"))))
+;; TODO test that the default configuration is valid.
 
 (deftest method-test
   (testing "get method from request map"

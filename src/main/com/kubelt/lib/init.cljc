@@ -6,9 +6,9 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.ipfs.client :as ipfs.client]
+   [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.integrant :as lib.integrant]
    [com.kubelt.lib.jwt :as lib.jwt]
-   [com.kubelt.lib.multiaddr :as lib.multiaddr]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]
@@ -49,42 +49,59 @@
 (defmethod ig/halt-key! :log/level [_ log-level]
   (log/debug {:log/msg "halt logging"}))
 
-;; :ipfs/read-addr
-;; -----------------------------------------------------------------------------
-
-(defmethod ig/init-key :ipfs.read/multiaddr [_ address]
-  ;; Return the multiaddress string.
-  address)
-
-;; :ipfs/read-scheme
+;; :ipfs.read/scheme
 ;; -----------------------------------------------------------------------------
 
 (defmethod ig/init-key :ipfs.read/scheme [_ scheme]
   scheme)
 
-;; :ipfs/write-addr
+;; :ipfs.read/host
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :ipfs.write/multiaddr [_ address]
-  address)
+(defmethod ig/init-key :ipfs.read/host [_ host]
+  host)
 
-;; :ipfs/write-scheme
+;; :ipfs.read/port
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs.read/port [_ port]
+  port)
+
+;; :ipfs.write/scheme
 ;; -----------------------------------------------------------------------------
 
 (defmethod ig/init-key :ipfs.write/scheme [_ scheme]
   scheme)
 
-;; :p2p/multiaddr
+;; :ipfs.write/host
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :p2p/multiaddr [_ address]
-  address)
+(defmethod ig/init-key :ipfs.write/host [_ host]
+  host)
+
+;; :ipfs.write/port
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :ipfs.write/port [_ port]
+  port)
 
 ;; :p2p/scheme
 ;; -----------------------------------------------------------------------------
 
 (defmethod ig/init-key :p2p/scheme [_ scheme]
   scheme)
+
+;; :p2p/host
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/host [_ host]
+  host)
+
+;; :p2p/port
+;; -----------------------------------------------------------------------------
+
+(defmethod ig/init-key :p2p/port [_ port]
+  port)
 
 ;; :credential/jwt
 ;; -----------------------------------------------------------------------------
@@ -124,22 +141,20 @@
         ;; use different paths if desired, e.g. when you want to read
         ;; from a local daemon but write to a remote service for
         ;; pinning.
-        read-addr (get-in value [:ipfs/read :ipfs/multiaddr])
-        read-map (lib.multiaddr/str->map read-addr)
-        read-host (:address/host read-map)
-        read-port (:address/port read-map)
         read-scheme (get-in value [:ipfs/read :http/scheme])
-        write-addr (get-in value [:ipfs/write :ipfs/multiaddr])
-        write-map (lib.multiaddr/str->map write-addr)
-        write-host (:address/host write-map)
-        write-port (:address/port write-map)
+        read-host (get-in value [:ipfs/read :http/host])
+        read-port (get-in value [:ipfs/read :http/port])
         write-scheme (get-in value [:ipfs/write :http/scheme])
+        write-host (get-in value [:ipfs/write :http/host])
+        write-port (get-in value [:ipfs/write :http/port])
         ;; Get the platform-specific HTTP client.
         http-client (get value :client/http)
-        ipfs-read (str (name read-scheme) "://" read-addr)
-        ipfs-write (str (name write-scheme) "://" write-addr)]
+        make-url (fn [scheme host port]
+                   (str (name read-scheme) "://" read-host ":" read-port))
+        ipfs-read (make-url read-scheme read-host read-port)
+        ipfs-write (make-url write-scheme write-host write-port)]
     (log/debug {:log/msg "init IPFS client" :ipfs/read ipfs-read :ipfs/write ipfs-write})
-      ;; Create the options object we pass to client creation fn.
+    ;; Create the options object we pass to client creation fn.
     #?(:cljs
        (let [options {:http/client http-client
                       :read/scheme read-scheme
@@ -168,24 +183,12 @@
 ;; :client/p2p
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :client/p2p [_ {:keys [http/scheme p2p/multiaddr] :as value}]
-  ;; If we wanted to initialize a stateful client for the p2p system,
-  ;; this would be the place. Since that system exposes a stateless HTTP
-  ;; API, we'll just convert the multiaddresses we're given for the p2p
-  ;; read/write nodes into more conventional coordinates (host, port) in
-  ;; the system configuration map and pull them out when we need to make
-  ;; a call.
-  (let [p2p-addr (str (name scheme) "://" multiaddr)]
-    (log/debug {:log/msg "init p2p client" :p2p/address p2p-addr}))
-  (let [;; Get the multiaddr string and convert into a map
-        ;; containing {:address/host :address/port}.
-        address (lib.multiaddr/str->map multiaddr)
-        host (get address :address/host)
-        port (get address :address/port)]
-    (-> value
-        (assoc :http/scheme scheme)
-        (assoc :http/host host)
-        (assoc :http/port port))))
+(defmethod ig/init-key :client/p2p [_ {:keys [http/scheme http/host http/port] :as value}]
+  ;; TODO initialize an RPC client using the given coordinates once
+  ;; local client is fleshed out.
+  (let [address (str (name scheme) "://" host ":" port)]
+    (log/debug {:log/msg "init p2p client" :p2p/address address})
+    value))
 
 (defmethod ig/halt-key! :client/p2p [_ value]
   (log/debug {:log/msg "halt p2p client"}))
@@ -226,10 +229,12 @@
 (defn init
   "Initialize the SDK."
   [system-config resolve reject]
-  (-> system-config
-      ;; TEMP
-      (dissoc :client/ipfs)
-      (lib.integrant/init resolve reject)))
+  (if (lib.error/error? system-config)
+    (reject system-config)
+    (-> system-config
+        ;; TEMP
+        (dissoc :client/ipfs)
+        (lib.integrant/init resolve reject))))
 
 (defn halt!
   "Clean-up resources used by the SDK."
