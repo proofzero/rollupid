@@ -28,10 +28,10 @@
 
   ([client prefix schema-doc options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.schema/schema schema-doc]
-    [spec.rpc.schema/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc.client/prefix prefix]
+     [spec.rpc.schema/schema schema-doc]
+     [spec.rpc.schema/options options]]
     ;; TODO check options for separator, e.g. ".", "_" (use regex? set of chars?)
     (let [defaults {}
           options (merge defaults options)
@@ -59,10 +59,10 @@
 
   ([client prefix filename options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.inflate/filename filename]
-    [spec.rpc.inflate/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc.client/prefix prefix]
+     [spec.rpc.inflate/filename filename]
+     [spec.rpc.inflate/options options]]
     (let [;; This is an edn value representing the schema, if
           ;; successful, but will be an error map if an issue occurred.
           schema-doc (rpc.schema.fs/read-schema filename)]
@@ -89,12 +89,11 @@
 
   ([client prefix url options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.discover/url url]
-    [spec.rpc.discover/options options]
-    :fixme
-    )))
+    [[spec.rpc.client/client client]
+     [spec.rpc.client/prefix prefix]
+     [spec.rpc.discover/url url]
+     [spec.rpc.discover/options options]]
+    :fixme)))
 
 ;; http
 ;; -----------------------------------------------------------------------------
@@ -112,12 +111,11 @@
 
   ([client prefix url options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.http/url url]
-    [spec.rpc.http/options options]
-    :fixme
-    )))
+    [[spec.rpc.client/client client]
+     [spec.rpc.client/prefix prefix]
+     [spec.rpc.http/url url]
+     [spec.rpc.http/options options]]
+    :fixme)))
 
 ;; github
 ;; -----------------------------------------------------------------------------
@@ -135,9 +133,8 @@
 
   ([client prefix repo options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.client/prefix prefix]
-    [spec.rpc.github/repo repo]
-    [spec.rpc.github/options options]
-    :fixme
-    )))
+    [[spec.rpc.client/client client]
+     [spec.rpc.client/prefix prefix]
+     [spec.rpc.github/repo repo]
+     [spec.rpc.github/options options]]
+    :fixme)))

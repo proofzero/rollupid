@@ -45,6 +45,10 @@
        {:title (:title (mc/properties schema))})
      {:error explain})))
 
+(defn validate [spec data]
+  (when-not (mc/validate spec data)
+     (explain spec data)))
+
 ;; conform
 ;; -----------------------------------------------------------------------------
 
@@ -53,8 +57,8 @@
   body when it does. Otherwise, return an error map that explains the
   issue(s) that were detected in the data."
   [spec data & body]
-  `(if-not (mc/validate ~spec ~data)
-     (explain ~spec ~data)
+  `(if-let [error# (validate ~spec ~data)]
+     error#
      (do ~@body)))
 
 ;; conform*
@@ -62,30 +66,18 @@
 ;; For example:
 ;; (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] :foo)
 
-(let [validate-if (fn [spec data body]
-                    `(if-not (mc/validate ~spec ~data)
-                       (explain ~spec ~data)
-                       ~body))]
   ;; TODO write some tests
   ;; TODO remove duplicate guard pairs
   ;; TODO check required number and type of arguments (malli?)
-  (defmacro conform*
-    "Check that pairs of specs and data are all valid, and if all data
-  matches the provided specs then execute the provided body. Otherwise,
-  an error is returned that describes the errors found in the first data
-  that failed validation."
-    [& args]
-    (loop [guards (butlast args)
-           body (last args)]
-      (if (empty? guards)
-        body
-        (let [[spec data] (first guards)]
-          (recur (rest guards) (validate-if spec data body)))))))
-
-(comment
-  (require '[com.kubelt.spec.rpc :as spec.rpc])
-  (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] :foo)
-  (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] (+ 1 2)))
+(defmacro conform*
+  [guards & body]
+  `(loop [guards# ~guards]
+     (if (empty? guards#)
+       (do ~@body)
+       (let [[spec# data#] (first guards#)]
+         (if-let [error# (validate spec# data#)]
+           error#
+           (recur (rest guards#)))))))
 
 ;; from-obj
 ;; -----------------------------------------------------------------------------

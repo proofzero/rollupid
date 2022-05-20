@@ -58,7 +58,7 @@
 
   ([options]
    (lib.error/conform*
-    [spec.rpc.init/options options]
+    [[spec.rpc.init/options options]]
     ;; TODO url not currently used! It may make sense to use the
     ;; OpenRPC "Server" block to configure RPC endpoints using URL
     ;; templates.
@@ -104,9 +104,9 @@
 
   ([client path options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc/path path]
-    [spec.rpc.available/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc/path path]
+     [spec.rpc.available/options options]]
     (let [sort? (get options :methods/sort?)
           depth (get options :methods/depth)
           search (get options :methods/search)
@@ -158,9 +158,9 @@
 
   ([client path options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc/path path]
-    [spec.rpc.doc/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc/path path]
+     [spec.rpc.doc/options options]]
     (let [path-set (available client path)
           path-count (count path-set)]
       ;; Calling (available) returns a set of paths that match a path
@@ -198,9 +198,9 @@
   ;; Use lib.error/conform* to ensure that each argument matches
   ;; its schema.
   (lib.error/conform*
-   [spec.rpc.client/client client]
-   [spec.rpc/path path]
-   [spec.rpc/params params]
+   [[spec.rpc.client/client client]
+    [spec.rpc/path path]
+    [spec.rpc/params params]]
    ;; TODO add macro for guards, i.e. to check the results of a
    ;; collection of predicates and return meaningful errors when they
    ;; fail. Maybe something like: (guards [() () ... ()] (body)).
@@ -220,14 +220,14 @@
 (defn execute
   "Execute a prepared RPC request."
   ([client request]
-    (let [defaults {}]
-      (execute client request defaults)))
+   (let [defaults {}]
+     (execute client request defaults)))
 
   ([client request options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc.request/request request]
-    [spec.rpc.execute/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc.request/request request]
+     [spec.rpc.execute/options options]]
     (let [http-client (get client :http/client)
           http-request (get request :http/request)]
       ;; TODO including a request body breaks, fix before performing
@@ -252,10 +252,10 @@
 
   ([client path params options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc/path path]
-    [spec.rpc/params params]
-    [spec.rpc.call/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc/path path]
+     [spec.rpc/params params]
+     [spec.rpc.call/options options]]
     (let [request (prepare client path params)]
       (if (lib.error/error? request)
         request
@@ -274,9 +274,9 @@
 
   ([client path options]
    (lib.error/conform*
-    [spec.rpc.client/client client]
-    [spec.rpc/path path]
-    [spec.rpc.call/options options]
+    [[spec.rpc.client/client client]
+     [spec.rpc/path path]
+     [spec.rpc.call/options options]]
     ;; The returned function should invoke the RPC method named by the
     ;; path argument, assuming that it exists on the client.
     ;; - should we require a single parameter map, or allow the user to
