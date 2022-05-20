@@ -3,7 +3,9 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [malli.core :as mc]
-   [malli.error :as me]))
+   [malli.error :as me])
+  (:require
+   [com.kubelt.spec.error :as spec.error]))
 
 ;; TODO define catalog of errors
 ;; TODO use cognitect.anomalies?
@@ -59,33 +61,44 @@
 
 ;; conform*
 ;; -----------------------------------------------------------------------------
-;; For example:
-;; (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] :foo)
+;; TODO write some tests
 
-(let [validate-if (fn [spec data body]
-                    `(if-not (mc/validate ~spec ~data)
-                       (explain ~spec ~data)
-                       ~body))]
-  ;; TODO write some tests
-  ;; TODO remove duplicate guard pairs
-  ;; TODO check required number and type of arguments (malli?)
-  (defmacro conform*
-    "Check that pairs of specs and data are all valid, and if all data
+(defmacro conform*
+  "Check that pairs of specs and data are all valid, and if all data
   matches the provided specs then execute the provided body. Otherwise,
   an error is returned that describes the errors found in the first data
   that failed validation."
-    [& args]
-    (loop [guards (butlast args)
-           body (last args)]
-      (if (empty? guards)
-        body
-        (let [[spec data] (first guards)]
-          (recur (rest guards) (validate-if spec data body)))))))
+  [& args]
+  (let [guards# (distinct (butlast args))
+        body# (last args)
+        check-for (fn [msg# spec# data#]
+                    `(when-not (mc/validate ~spec# ~data#)
+                      (let [err# (explain ~spec# ~data#)]
+                        (throw (ex-info msg# err#)))))]
+    ;; Validate that there's at least one guard tuple: [spec data].
+    (check-for "invalid guards" spec.error/guards guards#)
+    ;; Validate that a body to execute was provided.
+    (check-for "invalid body" spec.error/body body#)
+    ;; Generate the output form.
+    (loop [guards# guards#
+           body# body#]
+      (if (empty? guards#)
+        (do body#)
+        (let [[spec# data#] (first guards#)]
+          (recur (rest guards#)
+                 `(if-not (mc/validate ~spec# ~data#)
+                    (explain ~spec# ~data#)
+                    ~body#)))))))
 
 (comment
   (require '[com.kubelt.spec.rpc :as spec.rpc])
   (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] :foo)
-  (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] (+ 1 2)))
+  (conform* [spec.rpc/path [:eth :sync]] [spec.rpc/path [:web-3 :sha-3]] (+ 1 2))
+
+  (require '[com.kubelt.spec.rpc.client :as spec.rpc.client])
+  (conform* [spec.rpc.client/client {}] :test)
+  (macroexpand '(conform* [spec.rpc.client/client {}] :test))
+  )
 
 ;; from-obj
 ;; -----------------------------------------------------------------------------

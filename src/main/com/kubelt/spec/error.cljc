@@ -16,3 +16,15 @@
     :description "An error map"
     :example {}}
    error])
+
+;; conform*
+;; -----------------------------------------------------------------------------
+
+(def guard
+  [:tuple :vector :any])
+
+(def guards
+  [:+ guard])
+
+(def body
+  :any)
