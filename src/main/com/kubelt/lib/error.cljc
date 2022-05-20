@@ -70,6 +70,10 @@
   ;; TODO remove duplicate guard pairs
   ;; TODO check required number and type of arguments (malli?)
 (defmacro conform*
+  "Check that pairs of specs and data are all valid, and if all data
+  matches the provided specs then execute the provided body. Otherwise,
+  an error is returned that describes the errors found in the first data
+  that failed validation."
   [guards & body]
   `(loop [guards# ~guards]
      (if (empty? guards#)
