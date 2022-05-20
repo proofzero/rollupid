@@ -33,7 +33,6 @@
   [{:keys [params] :as method}]
   {:pre [(map? method)]}
   (reduce (fn [a {param-name :name}]
-            (prn method)
             (let [path (rpc.schema.util/name->path param-name)]
               (conj a path)))
           [] params))

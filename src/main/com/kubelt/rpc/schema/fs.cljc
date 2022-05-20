@@ -46,6 +46,17 @@
       (lib.error/explain spec.rpc.schema/schema clean-edn)
       clean-edn)))
 
+(defn read-file&
+  "Load an OpenRPC schema from a file. Validates the OpenRPC schema and
+  returns an error map if any issues were detected. Otherwise, returns
+  the schema as a map whose keys have been keywordized and converted to
+  kebab case."
+  [filename]
+  #?(:browser nil
+     :node (.readFile fs-promises filename)
+     :clj
+     (slurp filename)))
+
 ;; read-schema
 ;; -----------------------------------------------------------------------------
 
@@ -58,10 +69,10 @@
   #?(:browser nil
      :node (lib.promise/promise
             (fn [resolve reject]
-              (-> (.readFile fs-promises filename)
+              (-> (read-file& filename)
                   (lib.promise/then #(resolve (conform (lib.json/json-str->edn % lib.json/keyword-mapper))))
                   (lib.promise/catch reject))))
      :clj
-     (let [json-str (slurp filename)
+     (let [json-str (read-file& filename)
            keywordize? true]
        (conform (lib.json/from-json json-str keywordize?)))))
