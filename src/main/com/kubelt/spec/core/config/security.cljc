@@ -48,6 +48,8 @@
    [:policy-id :string]
    [:capabilities [:vector capability]]])
 
-(def policies [:vector policy])
+(def policies
+  [:vector policy])
 
-(def capabilities [:vector capability])
+(def capabilities
+  [:vector capability])

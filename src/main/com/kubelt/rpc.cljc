@@ -59,9 +59,8 @@
   ([options]
    (lib.error/conform*
     [spec.rpc.init/options options]
-    ;; TODO url not currently used! It may make sense to use the
-    ;; OpenRPC "Server" block to configure RPC endpoints using URL
-    ;; templates.
+    ;; TODO Use the OpenRPC "Server" block to configure RPC endpoints
+    ;; using URL templates.
     (let [user-agent (rpc.http/user-agent 0 0 1)
           ;; Create an HTTP client (use the one in the options map, if provided).
           http-client (if-not (contains? options :http/client)
@@ -205,9 +204,23 @@
    ;; collection of predicates and return meaningful errors when they
    ;; fail. Maybe something like: (guards [() () ... ()] (body)).
    (if-let [method (rpc.client/find-method client path)]
-     (let [options (get client :init/options)]
-       ;; NB does not yet validate params.
-       (rpc.request/from-method path method params options))
+     (let [options (get client :init/options)
+           ;; If a vector of values was supplied, turn it into a map by
+           ;; associating each positional value with its name in the
+           ;; schema definition. If a map was supplied, it should be
+           ;; from parameter name keyword to parameter value already. In
+           ;; either case, validate that we have the correct number of
+           ;; parameters.
+           ;;
+           ;; NB does not yet validate params using JSON Schema definition.
+           params (if (vector? params)
+                    (rpc.request/from-params-vec method params)
+                    (rpc.request/from-params-map method params))]
+       ;; TODO check if any of the parameter values are error
+       ;; maps. Coalesce into a single error map and return it, if so.
+       (if (lib.error/error? params)
+         params
+         (rpc.request/from-method path method params options)))
      (lib.error/error {:message "no such RPC method" :method path}))))
 
 ;; execute
@@ -230,9 +243,6 @@
     [spec.rpc.execute/options options]
     (let [http-client (get client :http/client)
           http-request (get request :http/request)]
-      ;; TODO including a request body breaks, fix before performing
-      ;; request.
-      http-request
       ;; TODO validate result
       ;; :node/browser Returns a promise.
       ;; :jvm Returns a future.

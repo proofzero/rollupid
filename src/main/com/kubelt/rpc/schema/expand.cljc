@@ -9,17 +9,6 @@
    [com.kubelt.rpc.schema.util :as rpc.schema.util]
    [com.kubelt.rpc.schema.zip :as rpc.schema.zip]))
 
-;; ref-loc?
-;; -----------------------------------------------------------------------------
-;; A reference is a map with a :$ref key, whose value is a string
-;; reference to another location in the schema, e.g.
-;; {:$ref "#/components/examples/fooBar"}.
-
-(defn- ref-loc?
-  [loc]
-  (let [node (zip/node loc)]
-    (and (map? node) (contains? node :$ref))))
-
 ;; replace-ref
 ;; -----------------------------------------------------------------------------
 ;; NB: must return a loc that is *just before* the next loc of
@@ -57,6 +46,6 @@
   (loop [loc (rpc.schema.zip/schema-zip schema)]
     (if (zip/end? loc)
       (zip/root loc)
-      (recur (zip/next (if (ref-loc? loc)
+      (recur (zip/next (if (rpc.schema.zip/ref-loc? loc)
                          (replace-ref loc schema)
                          loc))))))

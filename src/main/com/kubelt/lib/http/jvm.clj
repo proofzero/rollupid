@@ -2,9 +2,7 @@
   "Support for HTTP requests from a JVM execution context."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.core.async :as async :refer [>! go]]
-   [clojure.string :as str]
-   [com.kubelt.lib.json :as lib.json])
+   [clojure.string :as cstr])
   (:require
    [camel-snake-kebab.core :as csk]
    [hato.client :as hc]
@@ -50,7 +48,7 @@
           multipart (map to-client-part parts)]
       {:multipart multipart})
     ;; Return the body unchanged.
-    :else x))
+    :else {:http/body x}))
 
 (defn- to-params
   "Given a map of query parameters, convert values that would cause
@@ -75,7 +73,7 @@
         domain (get m :uri/domain)
         port (get m :uri/port)
         path (get m :uri/path)
-        host (str/join ":" [domain port])
+        host (cstr/join ":" [domain port])
         url (str scheme "://" host path)]
     (merge
      {:method method
@@ -102,37 +100,36 @@
   proto.http/HttpClient
   (request!
     [this request]
-    (if-not (malli/validate spec.http/request request)
-      (lib.error/explain spec.http/request request)
-      ;; The request map is valid, so fire off the request.
-      (let [;; Convert our incoming request map (matching our internal
-            ;; format for describing HTTP requests) into a ring-format
-            ;; map understood by the HTTP client.
-            options (request->ring request)
-            ;; Configure how the request is executed.
-            default-options {:async? true
-                             :timeout 10000}
-            options (merge default-options options)
+    (lib.error/conform*
+     [spec.http/request request]
+     (let [;; Convert our incoming request map (matching our internal
+           ;; format for describing HTTP requests) into a ring-format
+           ;; map understood by the HTTP client.
+           options (request->ring request)
+           ;; Configure how the request is executed.
+           default-options {:async? true
+                            :timeout 10000}
+           options (merge default-options options)
 
-            ;; TODO :as :byte-array, :stream (returns InputStream)
-            ;; Look at preferred response media type?
-            ;;options (assoc options :as :byte-array)
+           ;; TODO :as :byte-array, :stream (returns InputStream)
+           ;; Look at preferred response media type?
+           ;;options (assoc options :as :byte-array)
 
-            ;; Perform the request, returning a completable future. The
-            ;; callback puts the response on the channel that is returned
-            ;; from this function.
-            response @(hc/request options)
-            status (get response :status)]
-        (if-not (http.status/success? status)
-          ;; TODO pass through error returned from server.
-          {:com.kubelt/type :kubelt.type/error
-           :error {:fixme true}}
-          ;; We have a success status, process the response body.
-          (let [content-type (get response :content-type)
-                body (get response :body)
-                keywordize? (get request :response/keywordize? true)]
-            (condp = content-type
-              ;; TODO use media type constant.
-              :application/json (lib.json/from-json body keywordize?)
-              ;; If no match, return body unchanged.
-              body)))))))
+           ;; Perform the request, returning a completable future. The
+           ;; callback puts the response on the channel that is returned
+           ;; from this function.
+           response @(hc/request options)
+           status (get response :status)]
+       (if-not (http.status/success? status)
+         ;; TODO pass through error returned from server.
+         {:com.kubelt/type :kubelt.type/error
+          :error {:fixme true}}
+         ;; We have a success status, process the response body.
+         (let [content-type (get response :content-type)
+               body (get response :body)
+               keywordize? (get request :response/keywordize? true)]
+           (condp = content-type
+             ;; TODO use media type constant.
+             :application/json (lib.json/from-json body keywordize?)
+             ;; If no match, return body unchanged.
+             body)))))))
