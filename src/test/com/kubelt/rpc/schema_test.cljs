@@ -70,6 +70,7 @@
                (catch js/Error err (js/console.log err))
                (finally (done)))))))
 
+;; TODO uncomment once our parser works with $refs
 #_(deftest parse-async-schema-test
   (testing "parsing rpc api (in edn format)"
     (async done
