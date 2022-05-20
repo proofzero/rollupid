@@ -47,7 +47,7 @@
     (async done
            (go
              (try
-               (let [data (read-string (str (<p! (s.fs/read-file& (str json-path "be.edn")))))
+               (let [data (read-string (str (<p! (s.fs/read-file& (str json-path "oort.edn")))))
                      parsed (rpc.schema.parse/parse data {})]
                  (check-keys parsed)
                  (let [client (rpc.schema/schema (rpc/init) data)]
