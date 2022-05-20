@@ -8,10 +8,13 @@
    [cljs.test :as t :refer [deftest is testing async]]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.util :as lib.util :refer [node-env]]
-   [com.kubelt.rpc.schema :as s]
+   [com.kubelt.rpc :as rpc]
+   [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.rpc.schema.fs :as s.fs]
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
    [malli.core :as malli]))
+
+
 
 
 (def json-path
@@ -26,7 +29,6 @@
            [{:name "kb_ping",
              :params [],
              :result {:name "pong", :schema {:type "string"}}}]})
-
 
 
 (defn check-keys [parsed]
@@ -48,11 +50,25 @@
                (let [data (read-string (str (<p! (s.fs/read-file& (str json-path "be.edn")))))
                      parsed (rpc.schema.parse/parse data {})]
                  (check-keys parsed)
-                 )
+                 (let [client (rpc.schema/schema (rpc/init) data)]
+                   (is (= #{[:kb :auth] [:kb :ping] [:kb :pong]
+                            [:kb :auth :verify] [:kb :core :create]
+                            [:kb :core :add :signer]}
+                          (rpc/available client)))
+                   (is (= {:com.kubelt/type :kubelt.type/rpc.request,
+                           :rpc/path [:kb :ping],
+                           :rpc/method
+                           #:method{:name "kb_ping",
+                                    :summary nil,
+                                    :params [],
+                                    :raw
+                                    {:name "kb_ping",
+                                     :params [],
+                                     :result {:name "pong", :schema {:type "string"}}}}}
+                          (-> (rpc/prepare client [:kb :ping] {})
+                              (select-keys   [:com.kubelt/type :rpc/path :rpc/method]))))))
                (catch js/Error err (js/console.log err))
                (finally (done)))))))
-
-
 
 #_(deftest parse-async-schema-test
   (testing "parsing rpc api (in edn format)"
@@ -67,19 +83,3 @@
 
                (catch js/Error err (js/console.log err)))
              (done)))))
-
-
-(comment
-  (t/run-tests)
-
-  (go
-    (try
-      (def x (<p! (s.fs/read-schema (str json-path "ethereum.json")))
-        )
-       (rpc.schema.parse/parse x {})
-      ;; (rpc.schema.validate/validate x)
-      ;; (rpc.schema.expand/expand x)
-      (catch js/Error err (js/console.log err))))
-
-  ;;
-  )
