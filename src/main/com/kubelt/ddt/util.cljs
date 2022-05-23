@@ -2,6 +2,7 @@
   "Misc utilities."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [camel-snake-kebab.core :as csk]
    [clojure.string :as cstr])
   (:require
    ["process" :as process]))
@@ -28,4 +29,4 @@
   {:pre [(string? s)]}
   (->> (cstr/split s #":")
        (filter (complement cstr/blank?))
-       (mapv keyword)))
+       (mapv csk/->kebab-case-keyword)))
