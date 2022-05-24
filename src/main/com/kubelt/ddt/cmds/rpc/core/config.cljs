@@ -10,4 +10,5 @@
    :builder (fn [^js yargs]
               (-> yargs
                   (.command (clj->js core.config.get/command))
+                  (.command (clj->js core.config.set/command))
                   (.demandCommand)))})
