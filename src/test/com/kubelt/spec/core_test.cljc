@@ -1,4 +1,4 @@
-(ns spec.core-test
+(ns com.kubelt.spec.core-test
   #?(:clj
      (:require
       [clojure.test :as t :refer [deftest is testing]])
