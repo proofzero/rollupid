@@ -1,10 +1,10 @@
 (ns spec.core-test
   #?(:clj
      (:require
-      [clojure.test :as t :refer [deftest is testing use-fixtures]])
+      [clojure.test :as t :refer [deftest is testing]])
      :cljs
      (:require
-      [cljs.test :as t :refer [deftest is testing use-fixtures]]))
+      [cljs.test :as t :refer [deftest is testing]]))
   (:require
    [com.kubelt.spec.core.config :as config]
    [malli.core :as malli]))
