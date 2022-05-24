@@ -4,6 +4,17 @@
   (:require [com.kubelt.ddt.cmds.rpc.core.config.set :as core.config.set]
             [com.kubelt.ddt.cmds.rpc.core.config.get :as core.config.get]))
 
+(def json-path-config
+  #js {:alias "P"
+       :describe "json path config"
+       :requiresArg false
+       :string true
+       :nargs 1
+       :default ""})
+
+(def json-path-name "json-path")
+
+
 (defonce command
   {:command "config"
    :desc "Work with RPC core config APIs"
