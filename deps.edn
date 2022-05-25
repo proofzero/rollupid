@@ -3,7 +3,7 @@
 
  :deps
  {;; a Clojure/Script library for word case conversions
-  camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}
+  camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
   ;; Implementations of common encoders and decoders
   commons-codec/commons-codec {:mvn/version "1.15"}
   ;; A data format and set of libraries for conveying values
@@ -26,9 +26,9 @@
   org.clojure/core.async {:mvn/version "1.5.648"}
   ;; Crypto library for tx signing and key/wallet management in Ethereum
   ;; cf. https://docs.web3j.io/4.8.7/advanced/web3j_core_modules/
-  org.web3j/crypto {:mvn/version "4.9.2"}
+  org.web3j/crypto {:mvn/version "5.0.0"}
   ;; Minimal set of web3 utility classes
-  org.web3j/utils {:mvn/version "4.9.2"}}
+  org.web3j/utils {:mvn/version "5.0.0"}}
 
  ;; To start a REPL session for a specific user with CIDER/emacs:
  ;;   C-u C-x M-j (prefix + cider-jack-in-clj)
