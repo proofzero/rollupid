@@ -53,5 +53,5 @@
   ;; TODO use guards
   (let [missing-set (missing-refs schema)]
     (if-not (empty? missing-set)
-      (lib.error/error {:message "missing $refs" :missing missing-set})
+      (lib.error/error "missing $refs" {:missing missing-set})
       schema)))
