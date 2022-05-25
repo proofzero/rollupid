@@ -27,4 +27,9 @@
    ;; data-driven schemas for Clojure/Script
    [metosin/malli "0.8.4"]
    ;; tools for working with command line arguments
-   [org.clojure/tools.cli "1.0.206"]])
+   [org.clojure/tools.cli "1.0.206"]]
+
+  :deploy-repositories [["github" {:url "https://maven.pkg.github.com/kubelt/kubelt"
+                                   :username :env/github_actor
+                                   :password :env/github_token
+                                   :gpg/key  "CA8616DB61D5E946"}]])

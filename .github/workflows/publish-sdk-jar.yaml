@@ -1,0 +1,35 @@
+name: Publish SDK to GitHub Packages
+
+on:
+  push:
+    branches:
+      - 'main'
+      # Remove once the build passes
+      - 'drew-patel/chore/sdk/build-jar-on-merge'
+
+jobs:
+  publish-sdk-jar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+          check-latest: true
+      - uses: DeLaGuardo/setup-clojure@5.0
+        with:
+          lein: 'latest'
+      - uses: olafurpg/setup-gpg@v3
+      - id: install-secret-key
+        name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET_KEY }}") | gpg --batch --import
+      - name: Publish SDK
+        run: lein deploy github
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
