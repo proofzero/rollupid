@@ -6,29 +6,6 @@
 
 ;; TODO test test test
 
-(comment
-  (key (clojure.lang.MapEntry/create :schema {:xxx true}))
-  (first (clojure.lang.MapEntry/create :schema {:xxx true}))
-
-  (val (clojure.lang.MapEntry/create :schema {:xxx true}))
-  (second (clojure.lang.MapEntry/create :schema {:xxx true}))
-
-  (seq (val (clojure.lang.MapEntry/create :schema {:xxx true})))
-
-  (empty (clojure.lang.MapEntry/create :schema {:xxx true}))
-
-  (seq (clojure.lang.MapEntry/create :schema {:xxx true}))
-
-  (first (rest (seq (clojure.lang.MapEntry/create :schema {:xxx true}))))
-
-  (reverse (seq (clojure.lang.MapEntry/create :schema {:xxx true})))
-
-  (let [me (clojure.lang.MapEntry/create :schema {:xxx true})]
-    (into
-     (empty (seq me))
-     (seq me)))
-  )
-
 ;; map-entry
 ;; -----------------------------------------------------------------------------
 ;; Construct a map entry.
