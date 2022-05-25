@@ -4,7 +4,9 @@
 
 ;; options
 ;; -----------------------------------------------------------------------------
-;; The options map that can be passed to the RPC client (methods) function.
+;; The options map that can be passed to the (available) function that
+;; is used to explore the collection of API methods available via an RPC
+;; client.
 
 (def options
   [:map

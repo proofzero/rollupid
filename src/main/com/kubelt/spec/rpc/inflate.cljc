@@ -10,6 +10,8 @@
 
 ;; options
 ;; -----------------------------------------------------------------------------
+;; The options that may be passed to the schema (inflate) function to
+;; load an OpenRPC schema file into an RPC client.
 
 (def options
   :map)

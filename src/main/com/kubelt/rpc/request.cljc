@@ -84,7 +84,7 @@
                         (if (lib.error/error? result)
                           [param-kw result]
                           pair))
-                      [param-kw (lib.error/error "no such parameter" :parameter param-kw)]))
+                      [param-kw (lib.error/error "no such parameter" {:parameter param-kw})]))
                   params))))
 
 ;; from-params-vec
