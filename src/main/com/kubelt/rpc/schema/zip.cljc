@@ -35,7 +35,8 @@
 
 (defn- map-entry
   [k v]
-  #?(:clj (clojure.lang.MapEntry/create k v)))
+  #?(:clj (clojure.lang.MapEntry/create k v)
+     :cljs (cljs.core/MapEntry. k v nil)))
 
 ;; branch?
 ;; -----------------------------------------------------------------------------
