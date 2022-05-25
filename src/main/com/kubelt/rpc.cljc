@@ -243,6 +243,7 @@
     [spec.rpc.execute/options options]
     (let [http-client (get client :http/client)
           http-request (get request :http/request)]
+      (tap> [::execute http-request])
       ;; TODO validate result
       ;; :node/browser Returns a promise.
       ;; :jvm Returns a future.

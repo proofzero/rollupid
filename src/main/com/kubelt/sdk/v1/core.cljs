@@ -74,7 +74,9 @@
                  ;; it and sending it back.
                  (let [decoded-jwt (lib.jwt/decode verify-result)]
                    ;; TODO verify jwt
-                   (assoc-in sys [:crypto/session :vault/tokens core] decoded-jwt)))))))))))
+                   (-> sys
+                       (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
+                       (assoc-in [:crypto/session :vault/tokens* core] verify-result))))))))))))
 
 ;; TODO test me
 (defn authenticate-js!

@@ -40,7 +40,8 @@
            client (-> {:uri/domain (-> sys :client/p2p :http/host)
                        :uri/port (-> sys :client/p2p :http/port)
                        :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
-                       :http/client (:client/http sys)}
+                       :http/client (:client/http sys)
+                       :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}
                       rpc/init
                       (rpc.schema/schema api))
            request (rpc/prepare client (:method args) (or (:params args) {}))
