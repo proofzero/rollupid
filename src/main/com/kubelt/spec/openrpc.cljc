@@ -16,7 +16,7 @@
 ;; Root
 ;; -----------------------------------------------------------------------------
 
-(def schema
+(def schemata
   [:map
    {:closed true
     :description "The root object of an OpenRPC document."}
