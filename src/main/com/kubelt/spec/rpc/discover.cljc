@@ -11,6 +11,9 @@
 
 ;; options
 ;; -----------------------------------------------------------------------------
+;; Describes the options that may be passed to the (discover) function
+;; that performs OpenRPC schema discovery and injects the fetched schema
+;; into an RPC client.
 
 (def options
   :map)
