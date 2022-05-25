@@ -32,7 +32,7 @@
                           (lib.promise/then
                            (fn [api]
                              (-> (rpc.call/rpc-call& sys api args)
-                                 (lib.promise/then #(println "-> " % " ... ->" path))
+                                 (lib.promise/then #(println "-> " %))
                                  (lib.promise/catch #(println "ERROR-> " %)))))
                           (lib.promise/catch
                            (fn [e]
