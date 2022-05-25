@@ -51,7 +51,10 @@
 ;; including in options map?
 
 (defn init
-  "Create a JSON-RPC client."
+  "Create a JSON-RPC client. Supported options include:
+  - :http/client, the HTTP client to use; must reify the HttpClient protocol
+  - :http/user-agent, a User Agent string to include when making requests
+  - :rpc/jwt, a JWT to include with any requests that are performed"
   ([]
    (let [defaults {}]
      (init defaults)))

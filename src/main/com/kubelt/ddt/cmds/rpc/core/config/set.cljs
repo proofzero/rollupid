@@ -2,7 +2,8 @@
   "RPC core options"
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [cljs.reader :as r]
+   [cljs.reader :as r])
+  (:require
    [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call ]
    [com.kubelt.ddt.options :as ddt.options]

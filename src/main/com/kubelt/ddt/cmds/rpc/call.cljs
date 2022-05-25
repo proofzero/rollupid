@@ -2,7 +2,8 @@
   "Make an RPC call."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr]
+   [clojure.string :as cstr])
+  (:require
    [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
@@ -11,8 +12,7 @@
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.schema :as rpc.schema]
-   [com.kubelt.sdk.v1.core :as sdk.core]
-   ))
+   [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (def ethers-rpc-name
   "ethers-rpc")

@@ -1,6 +1,8 @@
 (ns com.kubelt.spec.rpc.init
   "Schemas related to RPC client (init) function."
-  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:require
+   [com.kubelt.spec.jwt :as spec.jwt]))
 
 ;; http-client
 ;; -----------------------------------------------------------------------------
@@ -25,4 +27,5 @@
 (def options
   [:map
    [:http/client {:optional true} http-client]
-   [:http/user-agent {:optional true} user-agent]])
+   [:http/user-agent {:optional true} user-agent]
+   [:rpc/jwt {:optional true} spec.jwt/jwt]])

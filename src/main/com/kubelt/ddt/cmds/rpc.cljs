@@ -2,8 +2,8 @@
   "CLI setup for 'rpc' sub-command."
   {:author "Proof Zero Inc."}
   (:require
-   [com.kubelt.ddt.cmds.rpc.core :as rpc.core]
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call]
+   [com.kubelt.ddt.cmds.rpc.core :as rpc.core]
    [com.kubelt.ddt.cmds.rpc.ls :as rpc.ls]))
 
 (defonce command

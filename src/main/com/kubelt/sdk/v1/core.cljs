@@ -2,8 +2,6 @@
   "Account management."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [cljs.core.async :as async :refer [<! go]])
-  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.jwt :as lib.jwt]
@@ -74,6 +72,10 @@
                  ;; it and sending it back.
                  (let [decoded-jwt (lib.jwt/decode verify-result)]
                    ;; TODO verify jwt
+                   ;; TODO once we are able to inject a
+                   ;; platform-specific storage capability, use that to
+                   ;; allow the SDK state (or possibly just a subset,
+                   ;; e.g. tokens) to be frozen and thawed back out
                    (-> sys
                        (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
                        (assoc-in [:crypto/session :vault/tokens* core] verify-result))))))))))))
