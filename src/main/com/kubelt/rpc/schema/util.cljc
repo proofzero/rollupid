@@ -48,19 +48,20 @@
 
 ;; lookup
 ;; -----------------------------------------------------------------------------
-;; TODO memoize
+;; NB We memoize the lookup function to avoid repeating the work
+;; of (possibly recursively) looking up the definition of a $ref.
 
-(defn lookup
+(def lookup
   "Given a schema and a reference map (containing a :$ref key), return the
   value being referred to by the reference string. References can refer
   to other references so it's necessary to recursively look them up."
-  [$ref schema]
-  {:pre [(string? $ref) (map? schema)]}
-  (loop [components (get schema :components)
-         ref-path (ref->path $ref)
-         ref-val (get-in schema ref-path)]
-    ;;(prn ref-path)
-    ;;(prn ref-val)
-    (if-not (contains? ref-val :$ref)
-      ref-val
-      (recur components ref-path ref-val))))
+  (memoize
+   (fn
+     [$ref schema]
+     {:pre [(string? $ref) (map? schema)]}
+     (loop [components (get schema :components)
+            ref-path (ref->path $ref)
+            ref-val (get-in schema ref-path)]
+       (if-not (contains? ref-val :$ref)
+         ref-val
+         (recur components ref-path ref-val))))))
