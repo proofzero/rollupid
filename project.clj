@@ -8,10 +8,10 @@
   :dependencies
   [;; always use "provided" for Clojure(Script)
    [org.clojure/clojure "1.11.1" :scope "provided"]
-   [org.clojure/clojurescript "1.11.51" :scope "provided"]
+   [org.clojure/clojurescript "1.11.54" :scope "provided"]
    [thheller/shadow-cljs "2.19.0" :scope "provided"]
    ;; a Clojure/Script library for word case conversions
-   [camel-snake-kebab/camel-snake-kebab "0.4.2"]
+   [camel-snake-kebab/camel-snake-kebab "0.4.3"]
    ;; errors as simple, actionable, generic information
    [com.cognitect/anomalies "0.1.12"]
    ;; data format for conveying values between applications
@@ -19,7 +19,7 @@
    ;; a pure Clojure/Script logging library
    [com.taoensso/timbre "5.2.1"]
    ;; fast, idiomatic pretty-printer
-   [fipp/fipp "0.6.25"]
+   [fipp/fipp "0.6.26"]
    ;; a micro-framework for building data-driven applications
    [integrant/integrant "0.8.0"]
    ;; fast JSON encoding and decoding
