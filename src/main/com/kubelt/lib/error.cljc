@@ -29,9 +29,16 @@
 
 (defn error
   "Return a Kubelt error map wrapping the given error."
-  [e]
-  {:com.kubelt/type :kubelt.type/error
-   :error e})
+  ([message]
+   (error message nil))
+  ([message data]
+   (error message data nil))
+  ([message data cause]
+   (cond->
+    {:com.kubelt/type :kubelt.type/error
+     :error message}
+     data (assoc :data data)
+     cause (assoc :cause cause))))
 
 ;; explain
 ;; -----------------------------------------------------------------------------
