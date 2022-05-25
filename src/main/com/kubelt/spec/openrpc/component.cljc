@@ -2,32 +2,32 @@
   ""
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [com.kubelt.spec.openrpc.content :as openrpc.content]
    [com.kubelt.spec.openrpc.error :as openrpc.error]
    [com.kubelt.spec.openrpc.example :as openrpc.example]
    [com.kubelt.spec.openrpc.link :as openrpc.link]
    [com.kubelt.spec.openrpc.pairing :as openrpc.pairing]
    [com.kubelt.spec.openrpc.schema :as openrpc.schema]
-   [com.kubelt.spec.openrpc.tag :as openrpc.tag]
-   [com.kubelt.spec.openrpc.content :as openrpc.content]))
+   [com.kubelt.spec.openrpc.tag :as openrpc.tag]))
 
 
 (def errors
-  [:map-of :string openrpc.error/error])
+  [:map-of :keyword openrpc.error/error])
 
 (def pairing
-  [:map-of :string openrpc.pairing/example])
+  [:map-of :keyword openrpc.pairing/example])
 
 (def tags
-  [:map-of :string openrpc.tag/tag])
+  [:map-of :keyword openrpc.tag/tag])
 
 (def links
-  [:map-of :string openrpc.link/link])
+  [:map-of :keyword openrpc.link/link])
 
 (def schemas
   [:map-of :keyword openrpc.schema/schema])
 
 (def examples
-  [:map-of :string openrpc.example/example])
+  [:map-of :keyword openrpc.example/example])
 
 ;; Components
 ;; -----------------------------------------------------------------------------

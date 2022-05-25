@@ -15,11 +15,17 @@
 
 ;; params
 ;; -----------------------------------------------------------------------------
-;; This is the definition of the parameter map for an RPC request. This
-;; is a basic check, but a more detailed parameter map schema for a
-;; specific call lives inside the client as part of the transformed
-;; schema.
+;; This is the definition of the collection of parameters supplied for
+;; an RPC request. If a vector of values is supplied, the values are
+;; assumed to be in the order defined by the schema's parameter list for
+;; the method. If a map of parameters is supplied, the keys are assumed
+;; to be the parameter names and the corresponding values are the
+;; parameter values.
+;;
+;; NB: a schema for each parameter may be specified, in which it case it
+;; will (eventually) be used to validate the supplied parameter value.
 
 (def params
-  ;; TODO
-  :map)
+  [:or
+   [:map-of :keyword :any]
+   [:vector :any]])

@@ -2,27 +2,43 @@
   "Validate an OpenRPC schema."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.lib.error :as lib.error]))
+   [clojure.zip :as zip])
+  (:require
+   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.rpc.schema.util :as rpc.schema.util]
+   [com.kubelt.rpc.schema.zip :as rpc.schema.zip]))
 
 
-;; TODO make this fn private
-(defn refs
+(defn- collect-ref
+  "Extract the ref at the given location and add it to the provided set,
+  returning the set."
+  [loc ref-set]
+  (let [node (zip/node loc)
+        $ref (:$ref node)]
+    (conj ref-set $ref)))
+
+(defn- refs
   "Return a set of all references ($ref) found in the schema."
   [schema]
-  (let [f (fn [a x])]
-    ;; TODO walk the schema and collect a set of all the refs that are
-    ;; found.
-    (reduce f #{} schema)))
+  (loop [loc (rpc.schema.zip/schema-zip schema)
+         ref-set #{}]
+    (if (zip/end? loc)
+      ref-set
+      (recur (zip/next loc) (if (rpc.schema.zip/ref-loc? loc)
+                              (collect-ref loc ref-set)
+                              ref-set)))))
 
-;; TODO make fn private
-(defn missing-refs
+(defn- missing-refs
   "Find all $ref and look them up to confirm that they're provided in the
-  schema. Return a vector of just the missing refs."
+  schema. Return a set of just the missing refs."
   [schema]
   (let [ref-set (refs schema)]
-    ;; TODO look up each ref to confirm that it exists
-    ;; TODO return only the missing items
-    #{}))
+    (reduce (fn [ref-set $ref]
+              (if-not (rpc.schema.util/lookup $ref schema)
+                (conj ref-set $ref)
+                ref-set))
+            #{}
+            ref-set)))
 
 ;; validate
 ;; -----------------------------------------------------------------------------
@@ -35,7 +51,7 @@
   error map describing any issues that were found."
   [schema]
   ;; TODO use guards
-  (let [missing (missing-refs schema)]
-    (if-not (empty? missing)
-      (lib.error/error {:message "missing $refs" :missing missing})
+  (let [missing-set (missing-refs schema)]
+    (if-not (empty? missing-set)
+      (lib.error/error {:message "missing $refs" :missing missing-set})
       schema)))

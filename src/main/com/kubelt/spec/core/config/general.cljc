@@ -1,27 +1,31 @@
 (ns com.kubelt.spec.core.config.general
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [alias])
-  (:require [com.kubelt.spec.core.config.security :as security]))
+  (:require
+   [com.kubelt.spec.core.config.security :as security]))
 
 (def alias :string)
 
-(def id [:map
-         [:alias alias]])
+(def id
+  [:map
+   [:alias alias]])
 
+(def media-type
+  [:enum "application/json"])
 
-(def media-type [:enum "application/json"])
-
-(def client [:map
-             [:ttl security/ttl]
-             [:media-type media-type]])
+(def client
+  [:map
+   [:ttl security/ttl]
+   [:media-type media-type]])
 
 ;; "libp2p://provider_address/rpc"
 (def provider :string)
 
-(def aliases [:vector
-              [:map
-               [:alias alias]
-               [:provider provider]]])
+(def aliases
+  [:vector
+   [:map
+    [:alias alias]
+    [:provider provider]]])
 
 ;; eg: "2022-05-23"
 (def version

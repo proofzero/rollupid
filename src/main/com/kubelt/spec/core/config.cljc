@@ -1,7 +1,8 @@
 (ns com.kubelt.spec.core.config
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  (:require [com.kubelt.spec.core.config.general :as general]
-            [com.kubelt.spec.core.config.security :as security]))
+  (:require
+   [com.kubelt.spec.core.config.general :as general]
+   [com.kubelt.spec.core.config.security :as security]))
 
 (def general-config
   [:map

@@ -99,6 +99,17 @@
     (or (map? node) (vector? node) (set? node))
     (into (empty node) children)))
 
+;; ref-loc?
+;; -----------------------------------------------------------------------------
+;; A reference is a map with a :$ref key, whose value is a string
+;; reference to another location in the schema, e.g.
+;; {:$ref "#/components/examples/fooBar"}.
+
+(defn ref-loc?
+  [loc]
+  (let [node (zip/node loc)]
+    (and (map? node) (contains? node :$ref))))
+
 ;; schema-zip
 ;; -----------------------------------------------------------------------------
 
