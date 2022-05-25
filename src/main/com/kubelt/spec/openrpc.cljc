@@ -3,11 +3,11 @@
   to initialize an RPC client."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.spec.openrpc.method :as openrpc.method]
-   [com.kubelt.spec.openrpc.server :as openrpc.server]
    [com.kubelt.spec.openrpc.component :as openrpc.component]
+   [com.kubelt.spec.openrpc.external :as openrpc.external]
    [com.kubelt.spec.openrpc.info :as openrpc.info]
-   [com.kubelt.spec.openrpc.external :as openrpc.external]))
+   [com.kubelt.spec.openrpc.method :as openrpc.method]
+   [com.kubelt.spec.openrpc.server :as openrpc.server]))
 
 
 (def version
@@ -16,7 +16,7 @@
 ;; Root
 ;; -----------------------------------------------------------------------------
 
-(def schemata
+(def root
   [:map
    {:closed true
     :description "The root object of an OpenRPC document."}
