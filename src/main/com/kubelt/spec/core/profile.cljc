@@ -2,10 +2,11 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 ;; These definitions could be Regexed
-(def socials [:map [[:twitter :string]
-                    [:instagram :string]
-                    [:linkedin :string]
-                    [:github :string]]])
+(def socials [:map
+              [:twitter :string]
+              [:instagram :string]
+              [:linkedin :string]
+              [:github :string]])
 
 (def nickname :string)
 (def profile-picture :string)
