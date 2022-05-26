@@ -169,7 +169,8 @@
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
-   :task (shell "npx shadow-cljs compile sdk-test")}
+   :task (do (shell "npx shadow-cljs compile sdk-test ")
+             (shell "node target/sdk-test.js"))}
 
   test:sdk:cljs:release
   {:doc "Build and run release version of sdk tests"
