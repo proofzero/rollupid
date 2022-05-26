@@ -48,7 +48,13 @@
 
 ;; lookup
 ;; -----------------------------------------------------------------------------
-;; TODO memoize
+;; NB We memoize the lookup function to avoid repeating the work
+;; of (possibly recursively) looking up the definition of a $ref. This
+;; is done via alter-var-root, which atomically alters the root binding
+;; of a var by applying a function and any arguments. The advantage is
+;; that it leaves the original fn available for development and testing,
+;; without needing to account for the complications in these areas that
+;; arise from memoization.
 
 (defn lookup
   "Given a schema and a reference map (containing a :$ref key), return the
@@ -59,8 +65,8 @@
   (loop [components (get schema :components)
          ref-path (ref->path $ref)
          ref-val (get-in schema ref-path)]
-    ;;(prn ref-path)
-    ;;(prn ref-val)
     (if-not (contains? ref-val :$ref)
       ref-val
       (recur components ref-path ref-val))))
+
+(alter-var-root #'lookup memoize)
