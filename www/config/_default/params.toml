@@ -6,6 +6,16 @@ titleSeparator = "-"
 titleAddition = "Decentralizes applications."
 description = "Kubelt decentralizes applications."
 
+## Social
+githubUrl = 'https://github.com/kubelt'
+githubIcon = 'images/Social-link4.svg'
+
+twitterUrl = 'https://twitter.com/kubelt'
+twitterIcon = 'images/Social-link3.svg'
+
+discordUrl = 'https://discord.gg/UgwAsJf6C5'
+discordIcon = 'images/discord-icon.svg'
+
 ## Documentation
 docsVersion = "next"
 
