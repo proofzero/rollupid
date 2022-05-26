@@ -45,5 +45,5 @@
          :website "https://kubelt.com",
          :bio "I am Kubelt, a decentralized cloud."}]
 
-    (testing "config data is valid"
-      (is (malli/validate profile/profile-config data) "schema doesn't validate"))))
+    (testing "profile schema is valid"
+      (is (malli/validate profile/schema data) "schema doesn't validate"))))

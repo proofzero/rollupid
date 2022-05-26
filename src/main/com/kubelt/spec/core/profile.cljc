@@ -16,7 +16,7 @@
 (def website :string)
 (def bio :string)
 
-(def profile-config
+(def schema
   [:map
    [:socials socials]
    [:nickname nickname]
