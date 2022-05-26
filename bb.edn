@@ -110,7 +110,7 @@
    :task (shell "npx shadow-cljs compile sdk-test ")}
 
   build:sdk:watch
-  {:doc "Build development version of the sdk for node"
+  {:doc "Watch and rebuild when changed development version of the sdk for node"
    :task (shell "npx shadow-cljs watch sdk")}
 
   build:sdk:release
