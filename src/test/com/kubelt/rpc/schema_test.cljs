@@ -54,19 +54,22 @@
                    (is (= #{[:kb :auth] [:kb :ping] [:kb :pong]
                             [:kb :auth :verify] [:kb :core :create]
                             [:kb :core :add :signer]}
-                          (rpc/available client)))
-                   (is (= {:com.kubelt/type :kubelt.type/rpc.request,
-                           :rpc/path [:kb :ping],
-                           :rpc/method
-                           #:method{:name "kb_ping",
-                                    :summary nil,
-                                    :params [],
-                                    :raw
-                                    {:name "kb_ping",
-                                     :params [],
-                                     :result {:name "pong", :schema {:type "string"}}}}}
-                          (-> (rpc/prepare client [:kb :ping] {})
-                              (select-keys   [:com.kubelt/type :rpc/path :rpc/method]))))))
+                          (rpc/available client))
+                       "failing methods")
+                   (is (=
+                        {:com.kubelt/type :kubelt.type/rpc.request,
+                         :rpc/path [:kb :ping],
+                         :rpc/method
+                         {:method/name "kb_ping",
+                          :method/summary nil,
+                          :method/params {},
+                          :method.params/all [],
+                          :method.params/required [],
+                          :method.params/optional [],
+                          :method.params/schemas {}}}
+                        (-> (rpc/prepare client [:kb :ping] {})
+                            (select-keys   [:com.kubelt/type :rpc/path :rpc/method])))
+                       "failing ping prepare expectations")))
                (catch js/Error err (js/console.log err))
                (finally (done)))))))
 
