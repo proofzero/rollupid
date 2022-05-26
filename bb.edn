@@ -105,6 +105,14 @@
   {:doc "Build development version of the sdk for node"
    :task (shell "npx shadow-cljs compile sdk")}
 
+  build:sdk-test:develop
+  {:doc "Build development version of the sdk-test for node"
+   :task (shell "npx shadow-cljs compile sdk-test ")}
+
+  build:sdk:watch
+  {:doc "Watch and rebuild when changed development version of the sdk for node"
+   :task (shell "npx shadow-cljs watch sdk")}
+
   build:sdk:release
   {:doc "Build release version of the sdk for node"
    :task (shell "npx shadow-cljs release sdk")}
@@ -169,7 +177,8 @@
 
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
-   :task (shell "npx shadow-cljs compile sdk-test")}
+   :depends [build:sdk-test:develop]
+   :task (shell "node target/sdk-test.js")}
 
   test:sdk:cljs:release
   {:doc "Build and run release version of sdk tests"

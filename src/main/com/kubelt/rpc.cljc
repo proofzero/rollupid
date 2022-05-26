@@ -6,7 +6,7 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.error :as lib.error :refer-macros [conform*]]
    [com.kubelt.lib.http :as lib.http]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.rpc.client :as rpc.client]
@@ -60,7 +60,7 @@
      (init defaults)))
 
   ([options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.init/options options]
     ;; TODO Use the OpenRPC "Server" block to configure RPC endpoints
     ;; using URL templates.
@@ -105,7 +105,7 @@
      (available client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.available/options options]
@@ -159,7 +159,7 @@
      (doc client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.doc/options options]
@@ -197,9 +197,9 @@
   parameters are validated against the service schema and an error map
   is returned if any issues are detected."
   [client path params]
-  ;; Use lib.error/conform* to ensure that each argument matches
+  ;; Use conform* to ensure that each argument matches
   ;; its schema.
-  (lib.error/conform*
+  (conform*
    [spec.rpc.client/client client]
    [spec.rpc/path path]
    [spec.rpc/params params]
@@ -240,7 +240,7 @@
       (execute client request defaults)))
 
   ([client request options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.request/request request]
     [spec.rpc.execute/options options]
@@ -264,7 +264,7 @@
      (call client path params defaults)))
 
   ([client path params options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc/params params]
@@ -286,7 +286,7 @@
      (rpc-fn client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.call/options options]
