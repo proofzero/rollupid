@@ -65,7 +65,7 @@ The components below are arranged to deliver the desired properties enumerated a
 
 ### CMS Dapp
 
-The CMS Dapp is a distributed application (dapp) that gives users the ability to edit and publish content with a graphical user interface. For a reference implementation, see [Sanity Studio](https://sanity.io). The CMS Dapp is (and Sanity Studio integrations are) implemented using the SDK.
+The CMS Dapp is a distributed application (dapp) that gives users the ability to edit and publish content with a graphical user interface. The CMS Dapp is  implemented using the SDK.
 
 The CMS Dapp serves as a reference implementation for dapp developers, including as a reference for third-party wallet logins, satisfying the property of an appropriate authentication, authorization, and encryption solution.
 

@@ -12,7 +12,6 @@ jobs:
       sdk: ${{ steps.changes.outputs.sdk }}
       dapp: ${{ steps.changes.outputs.dapp }}
       www: ${{ steps.changes.outputs.www }}
-      sanity: ${{ steps.changes.outputs.sanity }}
       ext: ${{ steps.changes.outputs.ext }}
     steps:
       # find out what deploy stack to use
@@ -24,7 +23,6 @@ jobs:
             sdk: 'src/**'
             dapp: 'dapp/**'
             www: 'www/**'
-            sanity: 'packages/sanity-plugin-kubelt/**'
             ext: 'ext/**'
 
 
@@ -205,20 +203,3 @@ jobs:
       # Compile and run re-frame tests with karma
       - run: npm run test:dapp-karma:ci:compile
       - run: npm run test:dapp-karma:ci:run
-
-  test-plugin-sanity:
-    needs: changes
-    if: needs.changes.outputs.sanity == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - run: npm install
-      - uses: turtlequeue/setup-babashka@v1.3.0
-        with:
-          babashka-version: 0.7.8
-      - run: npm run test:plugin:sanity

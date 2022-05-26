@@ -167,22 +167,6 @@
   build:dapp:release
   {:task (run '-build:dapp:release {:parallel true})}
 
-  build:plugin:sanity
-  {:doc "Build release version of the plugin for Sanity CMS"
-   ;; Rely on the development build of the SDK as Sanity will run the
-   ;; code through webpack and apply the optimization settings that they
-   ;; require.
-   ;;
-   ;; NB: using the release build applies "advanced" optimization that
-   ;; breaks the sanity-webpack transpiled version!
-   :depends [build:sdk-web:develop]
-   :task (shell "npx lerna run build --scope sanity-plugin-kubelt")}
-
-  watch:plugin:sanity
-  {:doc "Build plugin for Sanity CMS on file change"
-   :depends [build:sdk-web:develop]
-   :task (shell "npx lerna run watch --scope sanity-plugin-kubelt")}
-
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
    :task (shell "npx shadow-cljs compile sdk-test")}
@@ -265,19 +249,13 @@
   test:dapp:release
   {:task (run '-test:dapp:release)}
 
-  test:plugin:sanity
-  {:doc ""
-   :depends-on [build:plugin:sanity]
-   :task (shell "npx lerna run test --scope sanity-plugin-kubelt")}
-
   test:all:develop
   {:doc "Build and test all develop"
    :depends [test:sdk:cljs:develop
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
-             test:dapp:develop
-             test:plugin:sanity]}
+             test:dapp:develop]}
 
   test:all:release
   {:doc "Build and test all release"
@@ -285,8 +263,7 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
-             test:dapp:release
-             test:plugin:sanity]}
+             test:dapp:release]}
 
   rpc:mock-server:ethereum
   {:doc "Run ethereum rpc mock server"
