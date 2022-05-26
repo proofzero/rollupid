@@ -70,4 +70,4 @@
       (recur components ref-path ref-val))))
 
 #?(:clj (alter-var-root #'lookup memoize)
-   :cljs (def lookup (memoize lookup) ))
+   :cljs (set! lookup (memoize lookup)))
