@@ -6,35 +6,36 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.uuid :as lib.uuid]
-   [com.kubelt.rpc.path :as rpc.path]))
+   [com.kubelt.rpc.path :as rpc.path]
+   [com.kubelt.rpc.server :as rpc.server]))
 
 (defn- http-request
-  [body options]
-  {:pre [(map? options)]}
+  [server body options]
+  {:pre [(every? map? [server body options])]}
   (let [version "1.1"
         ;; All RPC calls use POST.
         method :post
-        user-agent (get options :http/user-agent "")
         headers (merge
-                 {"Content-Type" "application/json"
-                  "User-Agent" user-agent}
+                 {"Content-Type" "application/json"}
+                 (when-let [user-agent (:http/user-agent options)]
+                   {"User-Agent" user-agent})
+                 ;; TODO this is kubelt-specific; can we use a more
+                 ;; generic way to specify the JWT,
+                 ;; e.g. "Authorization:" header, and add an option that
+                 ;; allows for the injection of arbitrary header(s)?
                  (when-let [jwt (:rpc/jwt options)]
                    {"KBT-Access-JWT-Assertion" jwt}))
-        trailers {}
-        scheme (:uri/scheme options :http)
-        domain (:uri/domain options "example.com")
-        port (:uri/port options 33337)
-        path (:uri/path options "/foo")]
-    {:com.kubelt/type :kubelt.type/http-request
-     :http/version version
-     :http/method method
-     :http/headers headers
-     :http/trailers trailers
-     :http/body body
-     :uri/scheme scheme
-     :uri/domain domain
-     :uri/port port
-     :uri/path path}))
+        trailers {}]
+    (merge
+     {:com.kubelt/type :kubelt.type/http-request
+      :http/version version
+      :http/method method
+      :http/headers headers
+      :http/trailers trailers
+      :http/body body}
+     ;; Converts the Server map into a URI map with the parts of the URI
+     ;; are broken up into separate components.
+     (rpc.server/uri-map server))))
 
 
 ;; TODO use an integer stored in client for incrementing counter?
@@ -53,8 +54,8 @@
     params))
 
 (defn- make-body
-  [path method params]
-  {:pre [(rpc.path/path? path) (every? map? [method params])]}
+  [method params]
+  {:pre [(every? map? [method params])]}
   (let [;; Every RPC request must have a unique identifier.
         request-id (make-request-id)
         ;; The version of the JSON-RPC spec that we conform to.
@@ -125,21 +126,22 @@
   creating the request, e.g. a user agent string, an HTTP host name,
   port, or path, etc. The :http/request value is an HTTP request map
   that is used to invoke the RPC call."
-  ([path method params]
+  ([server method params]
    (let [defaults {}]
-     (from-method path method params defaults)))
+     (from-method server method params defaults)))
 
-  ([path method params options]
-   {:pre [(vector? path) (every? map? [method params options])]}
-   (let [body (make-body path method params)
-         request (http-request body options)]
+  ([server method params options]
+   {:pre [(rpc.server/server? server)
+          (every? map? [method params options])]}
+   (let [body (make-body method params)
+         request (http-request server body options)]
      ;; TODO should we merge the method map into the result, rather than
      ;; storing it as the value of the :rpc/method key?
      {:com.kubelt/type :kubelt.type/rpc.request
       ;; TODO add a :rpc.param/<name> for each param that includes metadata,
       ;; schema, etc.
       ;; TODO add a :rpc.result that describes the expected result.
-      :rpc/path path
+      :rpc/server server
       :rpc/method method
       :rpc/params params
       :http/request request})))

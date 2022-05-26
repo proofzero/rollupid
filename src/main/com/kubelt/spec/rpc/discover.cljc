@@ -1,6 +1,8 @@
 (ns com.kubelt.spec.rpc.discover
   "Schemas related to com.kubelt.rpc/discover function."
-  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:require
+   [com.kubelt.spec.jwt :as spec.jwt]))
 
 ;; url
 ;; -----------------------------------------------------------------------------
@@ -16,4 +18,5 @@
 ;; into an RPC client.
 
 (def options
-  :map)
+  [:map
+   [:rpc/jwt {:optional true} spec.jwt/jwt]])

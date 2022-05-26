@@ -1,8 +1,10 @@
 (ns com.kubelt.rpc.schema
   "Tools for working with OpenRPC schemas."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-   (:require
+  (:require
    [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
+   [com.kubelt.rpc :as rpc]
+   [com.kubelt.rpc.request :as rpc.request]
    [com.kubelt.rpc.schema.fs :as rpc.schema.fs]
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
    [com.kubelt.spec.rpc.client :as spec.rpc.client]
@@ -92,8 +94,54 @@
     [spec.rpc.client/prefix prefix]
     [spec.rpc.discover/url url]
     [spec.rpc.discover/options options]
-    :fixme
-    )))
+
+    ;; TODO option :rpc/jwt (to perform rpc.discover call)
+
+    ;; - Save the base URL into client; when referring to URL in a
+    ;;   Server block, it may be defined relative to the base URL (or it
+    ;;   might be absolute)
+
+    ;; prepare an rpc.discover request
+    ;; execute request
+    ;; extract schema from result
+    ;; inject a Server entry (if missing)
+    ;; update client by calling (schema)
+
+    (let [;; TEMP
+          schema-doc {:openrpc "1.2.6", :methods [], :info {:title "", :version "1.0.0"}}
+          ;; Construct a fake server object for now
+          server {:name "localhost"
+                  :url "http://localhost:8787/@0x4d38b2ccaed021d60a6161deac5fbd2641916064/jsonrpc"
+                  ;; Map from string (server variable name) to ServerVariable object
+                  ;; TODO use URL templates to construct final URL
+                  :variables {}}
+          ;; We concoct a description of an rpc.discover call as though
+          ;; it were described in an OpenRPC schema. This lets us use
+          ;; the same machinery for performing the RPC call as used for
+          ;; standard API calls.
+          ;; TODO add description of expected result (a schema).
+          method {:method/name "rpc.discover"
+                  :method/params {}
+                  :method.params/all []
+                  :method.params/required []
+                  :method.params/optional []
+                  :method.params/schemas {}}
+          ;; This call takes takes no parameters.
+          params {}
+          ;;
+          options (merge (get client :init/options {}) options)
+          ;; Prepare a request map for the standard rpc.discover
+          ;; call.
+          request (rpc.request/from-method server method params options)
+          ;;result (rpc/execute client request)
+          ]
+      request
+      ;;(schema client prefix schema-doc options)
+      ))))
+
+(comment
+  (def rpc-url "http://localhost:8787/@0x4d38b2ccaed021d60a6161deac5fbd2641916064/jsonrpc")
+  )
 
 ;; http
 ;; -----------------------------------------------------------------------------
