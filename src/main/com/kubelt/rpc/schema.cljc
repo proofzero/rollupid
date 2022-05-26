@@ -2,7 +2,7 @@
   "Tools for working with OpenRPC schemas."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.error :as lib.error :refer-macros [conform*]]
    [com.kubelt.rpc.schema.fs :as rpc.schema.fs]
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
    [com.kubelt.rpc.schema.util :as rpc.schema.util]
@@ -27,7 +27,7 @@
      (schema client prefix schema-doc defaults)))
 
   ([client prefix schema-doc options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.client/prefix prefix]
     [spec.rpc.schema/schema schema-doc]
@@ -58,7 +58,7 @@
      (inflate client prefix filename defaults)))
 
   ([client prefix filename options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.client/prefix prefix]
     [spec.rpc.inflate/filename filename]
@@ -88,7 +88,7 @@
      (discover client prefix url defaults)))
 
   ([client prefix url options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.client/prefix prefix]
     [spec.rpc.discover/url url]
@@ -111,7 +111,7 @@
      (http client prefix url defaults)))
 
   ([client prefix url options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.client/prefix prefix]
     [spec.rpc.http/url url]
@@ -134,7 +134,7 @@
      (github client prefix repo defaults)))
 
   ([client prefix repo options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.client/prefix prefix]
     [spec.rpc.github/repo repo]
