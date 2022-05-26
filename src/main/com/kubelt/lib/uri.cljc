@@ -119,8 +119,8 @@
 
 (defn expand
   "Given a URL template and a map of parameter values, return the expanded
-  URI."
-  [tpl params]
-  {:pre [(string? tpl) (map? params)]}
-  :fixme
-  )
+  URI. If no variables are supplied, the template is returned unchanged."
+  [tpl variables]
+  {:pre [(string? tpl) ((some-fn [nil? map?]) variables)]}
+  ;; TODO actually expand this template
+  tpl)
