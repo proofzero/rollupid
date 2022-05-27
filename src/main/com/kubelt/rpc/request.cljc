@@ -6,7 +6,6 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.uuid :as lib.uuid]
-   [com.kubelt.rpc.path :as rpc.path]
    [com.kubelt.rpc.server :as rpc.server]))
 
 (defn- http-request
@@ -54,11 +53,9 @@
     params))
 
 (defn- make-body
-  [method params]
+  [request-id method params]
   {:pre [(every? map? [method params])]}
-  (let [;; Every RPC request must have a unique identifier.
-        request-id (make-request-id)
-        ;; The version of the JSON-RPC spec that we conform to.
+  (let [;; The version of the JSON-RPC spec that we conform to.
         rpc-version "2.0"
         ;; The original name of the RPC method to call is stored in the
         ;; method map.
@@ -133,7 +130,9 @@
   ([server method params options]
    {:pre [(rpc.server/server? server)
           (every? map? [method params options])]}
-   (let [body (make-body method params)
+   (let [;; Every RPC request must have a unique identifier.
+         request-id (make-request-id)
+         body (make-body request-id method params)
          request (http-request server body options)]
      ;; TODO should we merge the method map into the result, rather than
      ;; storing it as the value of the :rpc/method key?
@@ -141,6 +140,7 @@
       ;; TODO add a :rpc.param/<name> for each param that includes metadata,
       ;; schema, etc.
       ;; TODO add a :rpc.result that describes the expected result.
+      :request/id request-id
       :rpc/server server
       :rpc/method method
       :rpc/params params

@@ -3,7 +3,6 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
-   [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.request :as rpc.request]
    [com.kubelt.rpc.schema.fs :as rpc.schema.fs]
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
@@ -107,9 +106,8 @@
     ;; inject a Server entry (if missing)
     ;; update client by calling (schema)
 
-    (let [;; TEMP
-          schema-doc {:openrpc "1.2.6", :methods [], :info {:title "", :version "1.0.0"}}
-          ;; Construct a fake server object for now
+    (let [;; TODO Construct a fake server object for now, but we need to
+          ;; look up the correct server to use.
           server {:name "localhost"
                   :url "http://localhost:8787/@0x4d38b2ccaed021d60a6161deac5fbd2641916064/jsonrpc"
                   ;; Map from string (server variable name) to ServerVariable object
@@ -128,13 +126,18 @@
                   :method.params/schemas {}}
           ;; This call takes takes no parameters.
           params {}
-          ;;
-          options (merge (get client :init/options {}) options)
+          ;; Merge the options used to initialize the client and the
+          ;; options used for this call. Some of the client options
+          ;; apply generally when executing RPC calls, e.g. the user
+          ;; agent to use, or the global request timeout value.
+          client-opts (get client :init/options {})
+          options (merge client-opts options)
           ;; Prepare a request map for the standard rpc.discover
           ;; call.
           request (rpc.request/from-method server method params options)
-          ;;result (rpc/execute client request)
-          ]
+          ;; Perform the HTTP request returning a promise (CLJS) or
+          ;; future (CLJ).
+          #_result #_(rpc.execute/execute client request)]
       request
       ;;(schema client prefix schema-doc options)
       ))))

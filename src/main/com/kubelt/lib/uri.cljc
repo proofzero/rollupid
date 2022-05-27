@@ -27,7 +27,7 @@
    :query/keywordize? true
    :query/hyphenate? true})
 
-(defn- query->map
+(defn- query-string->map
   "Convert a query string into a map."
   [query-str {:keys [query/keywordize? query/hyphenate?]}]
   {:pre [(string? query-str)]}
@@ -44,6 +44,17 @@
                  [k v]))
              (cstr/split query-str #"&"))))
 
+(defn query-map->str
+  "Convert a query map into a string. If given a string, the string is
+  returned unchanged."
+  [m]
+  {:pre [(map? m)]}
+  (let [parts (map (fn [[k v]]
+                    (let [k (name k)]
+                      (str k "=" v)))
+                   m)]
+    (cstr/join "&" parts)))
+
 (defn- parse-query
   "Given a query string, process it according to the configured
   options. With an empty options map, the same query string is
@@ -51,7 +62,7 @@
   [query-str {:keys [query/convert?] :as options}]
   {:pre [(string? query-str)]}
   (if convert?
-    (query->map query-str options)
+    (query-string->map query-str options)
     query-str))
 
 ;; parse
@@ -93,24 +104,39 @@
              (when-let [query (:query uri)]
                (let [query (parse-query query options)]
                  {:uri/query query}))
-             ;; :uri/user
+             ;; :uri/username
              (when-let [user (:user uri)]
-               {:uri/user user})
+               {:uri/username user})
              ;; :uri/password
              (when-let [password (:password uri)]
                {:uri/password password}))))))
 
 ;; unparse
 ;; -----------------------------------------------------------------------------
-;; TODO convert a URI map back into a URI string.
 
 (defn unparse
-  ""
+  "Convert a URI map into a URI string."
   [m]
-  #_(lib.error/conform*
-     [])
-  :fixme
-  )
+  (let [scheme (name (get m :uri/scheme))
+        user (get m :uri/username)
+        password (get m :uri/password)
+        host (get m :uri/domain)
+        port (get m :uri/port)
+        path (get m :uri/path)
+        fragment (get m :uri/fragment)
+        query (let [x (get m :uri/query)]
+                (if (map? x)
+                  (query-map->str x)
+                  x))
+        m {:scheme scheme
+           :user user
+           :password password
+           :host host
+           :port port
+           :path path
+           :query query
+           :fragment fragment}]
+    (str (merge (lambda/uri "") m))))
 
 ;; expand
 ;; -----------------------------------------------------------------------------

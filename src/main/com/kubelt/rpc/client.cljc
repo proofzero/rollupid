@@ -25,6 +25,7 @@
   {:com.kubelt/type :kubelt.type/rpc.client
    :init/options options
    :http/client http-client
+   :rpc/servers {}
    :rpc/schemas {}})
 
 ;; find-method

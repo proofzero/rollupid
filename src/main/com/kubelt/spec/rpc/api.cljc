@@ -1,12 +1,12 @@
-(ns com.kubelt.spec.rpc.available
-  "Schemas related to the rpc/methods function."
+(ns com.kubelt.spec.rpc.api
+  "Schemas related to the com.kubelt.rpc/api function."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
 
 ;; options
 ;; -----------------------------------------------------------------------------
-;; The options map that can be passed to the (available) function that
-;; is used to explore the collection of API methods available via an RPC
-;; client.
+;; The options map that can be passed to the (com.kubelt.rpc/api)
+;; function that is used to explore the collection of API methods
+;; available via an RPC client.
 
 (def options
   [:map

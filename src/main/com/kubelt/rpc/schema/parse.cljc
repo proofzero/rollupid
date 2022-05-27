@@ -170,4 +170,5 @@
         {:rpc/version rpc-version
          :rpc/metadata rpc-metadata
          :rpc/servers rpc-servers
-         :rpc/methods rpc-methods}))))
+         :rpc/methods rpc-methods}))
+    (lib.error/error "unable to validate schema")))
