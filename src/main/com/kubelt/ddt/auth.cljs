@@ -44,9 +44,12 @@
                     (-> (sdk.core/authenticate! kbt address)
                         (lib.promise/then on-authenticate)
                         (lib.promise/catch
-                            (fn [e]
-                              (println (ex-message e))
-                              (prn (ex-data e))))
+                         (fn [e]
+                           (println (ex-message e))
+                           (prn (ex-data e))))
                         (lib.promise/finally
                           (fn []
-                            (sdk/halt! kbt)))))))))))))
+                            (sdk/halt! kbt))))))
+                 (lib.promise/catch
+                  (fn [e]
+                    (println e))))))))))
