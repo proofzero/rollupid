@@ -28,4 +28,5 @@
   [:map
    [:http/client {:optional true} http-client]
    [:http/user-agent {:optional true} user-agent]
-   [:rpc/jwt {:optional true} spec.jwt/jwt]])
+   ;; TODO flip :rpc/jwt to spec.jwt/jwt once we use/expect decrypted jwt value (in BE too)
+   [:rpc/jwt {:optional true} :string]])
