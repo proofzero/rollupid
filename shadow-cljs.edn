@@ -169,7 +169,7 @@
   {:target :node-test
    :compiler-options {:reader-features #{:node}}
    :output-to "target/sdk-test.js"
-   :ns-regexp "(lib|sdk|com\\.kubelt\\.rpc)\\..*-test$"
+   :ns-regexp "(lib|sdk|com\\.kubelt\\.(rpc|spec))\\..*-test$"
    :autorun false}
 
   ;; Generate an HTML version of the SDK tests that can be manually checked by:
