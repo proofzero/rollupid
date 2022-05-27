@@ -8,7 +8,7 @@
 
 (def id
   [:map
-   [:alias alias]])
+   [:alias {:optional true} alias]])
 
 (def media-type
   [:enum "application/json"])
@@ -16,7 +16,7 @@
 (def client
   [:map
    [:ttl security/ttl]
-   [:media-type media-type]])
+   [:media-type {:optional true} media-type]])
 
 ;; "libp2p://provider_address/rpc"
 (def provider :string)

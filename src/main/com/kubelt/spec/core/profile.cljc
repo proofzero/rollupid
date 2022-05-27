@@ -3,10 +3,10 @@
 
 ;; These definitions could be Regexed
 (def socials [:map
-              [:twitter :string]
-              [:instagram :string]
-              [:linkedin :string]
-              [:github :string]])
+              [:twitter {:optional true} :string]
+              [:instagram {:optional true} :string]
+              [:linkedin {:optional true} :string]
+              [:github {:optional true} :string]])
 
 (def nickname :string)
 (def profile-picture :string)
@@ -18,11 +18,11 @@
 
 (def schema
   [:map
-   [:socials socials]
-   [:nickname nickname]
+   [:socials {:optional true} socials]
+   [:nickname {:optional true} nickname]
    [:profile-picture profile-picture]
-   [:email email]
-   [:location location]
-   [:job job]
-   [:website website]
-   [:bio bio]])
+   [:email {:optional true} email]
+   [:location {:optional true} location]
+   [:job {:optional true} job]
+   [:website {:optional true} website]
+   [:bio {:optional true} bio]])

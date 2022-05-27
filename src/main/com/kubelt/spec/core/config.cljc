@@ -6,7 +6,7 @@
 
 (def general-config
   [:map
-   [:id {:optional false} general/id]
+   [:id {:optional true} general/id]
    [:client {:optional false} general/client]
    [:aliases {:optional false} general/aliases]
    [:metadata {:optional false} general/metadata]])
@@ -21,5 +21,5 @@
 
 (def config
   [:map
-   [:general general-config]
-   [:security security-config]])
+   [:general {:optional true} general-config]
+   [:security {:optional true} security-config]])
