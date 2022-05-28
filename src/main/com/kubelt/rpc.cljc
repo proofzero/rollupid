@@ -5,10 +5,8 @@
    [clojure.set :as cset])
   (:require
    [malli.core :as malli])
-  #?(:browser (:require [com.kubelt.lib.error :as lib.error :refer-macros [conform*]])
-     :node (:require [com.kubelt.lib.error :as lib.error :refer-macros [conform*]])
-     :clj (:require [com.kubelt.lib.error :as lib.error]))
   (:require
+   [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
    [com.kubelt.lib.http :as lib.http]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.rpc.client :as rpc.client]
@@ -62,7 +60,7 @@
      (init defaults)))
 
   ([options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.init/options options]
     ;; TODO Use the OpenRPC "Server" block to configure RPC endpoints
     ;; using URL templates.
@@ -107,7 +105,7 @@
      (available client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.available/options options]
@@ -161,7 +159,7 @@
      (doc client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.doc/options options]
@@ -201,7 +199,7 @@
   [client path params]
   ;; Use conform* to ensure that each argument matches
   ;; its schema.
-  (lib.error/conform*
+  (conform*
    [spec.rpc.client/client client]
    [spec.rpc/path path]
    [spec.rpc/params params]
@@ -242,7 +240,7 @@
       (execute client request defaults)))
 
   ([client request options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc.request/request request]
     [spec.rpc.execute/options options]
@@ -266,7 +264,7 @@
      (call client path params defaults)))
 
   ([client path params options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc/params params]
@@ -288,7 +286,7 @@
      (rpc-fn client path defaults)))
 
   ([client path options]
-   (lib.error/conform*
+   (conform*
     [spec.rpc.client/client client]
     [spec.rpc/path path]
     [spec.rpc.call/options options]
