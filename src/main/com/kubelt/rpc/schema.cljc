@@ -1,11 +1,10 @@
 (ns com.kubelt.rpc.schema
   "Tools for working with OpenRPC schemas."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  (:require
-   [com.kubelt.lib.error :as lib.error :refer-macros [conform*]]
+   (:require
+   [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
    [com.kubelt.rpc.schema.fs :as rpc.schema.fs]
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
-   [com.kubelt.rpc.schema.util :as rpc.schema.util]
    [com.kubelt.spec.rpc.client :as spec.rpc.client]
    [com.kubelt.spec.rpc.discover :as spec.rpc.discover]
    [com.kubelt.spec.rpc.github :as spec.rpc.github]

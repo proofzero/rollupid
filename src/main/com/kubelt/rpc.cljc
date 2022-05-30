@@ -6,7 +6,7 @@
   (:require
    [malli.core :as malli])
   (:require
-   [com.kubelt.lib.error :as lib.error :refer-macros [conform*]]
+   [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
    [com.kubelt.lib.http :as lib.http]
    [com.kubelt.proto.http :as proto.http]
    [com.kubelt.rpc.client :as rpc.client]
