@@ -16,7 +16,7 @@
 ;; functionality is provided via other means.
 
 ;; TODO test me
-(defn authenticate!
+(defn authenticate&
   "Create an account or authorize an existing account. User identity is
   centered around an wallet accounts and is also the name linked to the
   user's Kubelt application data (aka the 'me dag').
@@ -84,7 +84,7 @@
 (defn authenticate-js!
   "Create an account from a JavaScript context."
   [sys core]
-  (authenticate! sys))
+  (authenticate& sys))
 
 
 ;; TODO test me

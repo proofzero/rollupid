@@ -40,7 +40,7 @@
              (-> (sdk/init options)
                  (lib.promise/then
                   (fn [kbt]
-                    (-> (sdk.core/authenticate! kbt)
+                    (-> (sdk.core/authenticate& kbt)
                         (lib.promise/then on-authenticate)
                         (lib.promise/catch
                          (fn [e]
