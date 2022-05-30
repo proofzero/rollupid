@@ -15,7 +15,6 @@
 ;; provider plugin, e.g. MetaMask. On other platforms, similar
 ;; functionality is provided via other means.
 
-;; TODO test me
 (defn authenticate&
   "Create an account or authorize an existing account. User identity is
   centered around an wallet accounts and is also the name linked to the
@@ -80,7 +79,6 @@
                          (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
                          (assoc-in [:crypto/session :vault/tokens* core] verify-result)))))))))))))
 
-;; TODO test me
 (defn authenticate-js!
   "Create an account from a JavaScript context."
   [sys core]
