@@ -2,7 +2,7 @@
   "Schemas related to RPC client (init) function."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.spec.jwt :as spec.jwt]
+   ;;[com.kubelt.spec.jwt :as spec.jwt]
    [com.kubelt.spec.rpc.init :as spec.rpc.init]))
 
 ;; http-client

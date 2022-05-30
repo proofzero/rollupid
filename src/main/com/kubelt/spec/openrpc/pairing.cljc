@@ -1,5 +1,6 @@
 (ns com.kubelt.spec.openrpc.pairing
-  ""
+  "Defines the schema for an OpenRPC Example Pairing object that provides
+  a set of example parameters and results."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [name])
   (:require

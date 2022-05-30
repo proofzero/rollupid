@@ -1,5 +1,6 @@
 (ns com.kubelt.spec.openrpc.info.license
-  ""
+  "Defines the schema for an OpenRPC License object that provides the
+  license information for an API."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [name]))
 

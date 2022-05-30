@@ -3,7 +3,6 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [methods])
   (:require
-   [com.kubelt.rpc.server :as rpc.server]
    [com.kubelt.spec.openrpc.server :as spec.openrpc.server]
    [com.kubelt.spec.rpc.init :as spec.rpc.init]
    [com.kubelt.spec.rpc.server :as spec.rpc.server]))
@@ -28,23 +27,23 @@
 
 ;; TODO flesh these specs out to describe the RPC client map that
 ;; results from the (rpc/init) call.
-(def version :string)
-(def metadata :map)
-(def servers [:vector :any])
-(def methods :map)
+(def schema-version :string)
+(def schema-metadata :map)
+(def schema-servers [:vector :any])
+(def schema-methods :map)
 
 (def schema
   [:map
-   [:rpc/version version]
-   [:rpc/metadata metadata]
-   [:rpc/servers servers]
-   [:rpc/methods methods]])
+   [:rpc/version schema-version]
+   [:rpc/metadata schema-metadata]
+   [:rpc/servers schema-servers]
+   [:rpc/methods schema-methods]])
 
 (def schemas
   [:map-of prefix schema])
 
 (def servers
-  [:map-of prefix [:map-of spec.openrpc.server/name rpc.server/server]])
+  [:map-of prefix [:map-of spec.openrpc.server/name spec.rpc.server/server]])
 
 ;; client
 ;; -----------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 (ns com.kubelt.spec.openrpc.info.contact
-  ""
+  "Defines the schema for an OpenRPC Contact object that provides contact
+  information for an API."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [name]))
 
