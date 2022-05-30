@@ -36,12 +36,11 @@
     (-> (lib.wallet/load& app-name wallet-name password)
         (lib.promise/then
          (fn [wallet]
-           (let [options (args->init-options args-map wallet)
-                 address (:wallet/address wallet)]
+           (let [options (args->init-options args-map wallet)]
              (-> (sdk/init options)
                  (lib.promise/then
                   (fn [kbt]
-                    (-> (sdk.core/authenticate! kbt address)
+                    (-> (sdk.core/authenticate& kbt)
                         (lib.promise/then on-authenticate)
                         (lib.promise/catch
                          (fn [e]

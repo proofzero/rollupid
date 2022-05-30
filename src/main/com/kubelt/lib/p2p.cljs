@@ -39,8 +39,7 @@
 (defn authenticate!
   "Authenticate a user against a core. The account is a map that contains the public
   key from the keypair that represents the user's account."
-  [sys core]
-  {:pre [(string? core)]}
+  [sys]
   (let [address (get-in sys [:crypto/wallet :wallet/address])]
     ;; Make an JsonRpc call to p2p system, passing along the user's
     ;; wallet address. Expect a nonce in return, which should be signed
@@ -48,7 +47,7 @@
     ;; registration.
     ;;
     ;; Returns a promise.
-    (send (json-rpc-provider sys core) "kb_auth" [address])))
+    (send (json-rpc-provider sys address) "kb_auth" [address])))
 
 (defn verify!
   "Send a signed nonce to verify ownership of a keypair as part of the

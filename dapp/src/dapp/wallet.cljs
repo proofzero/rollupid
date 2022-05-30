@@ -67,7 +67,7 @@
  ::authenticate!
  (fn [db [_ new-ctx]]
    (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
-     (-> (sdk.core/authenticate! new-ctx wallet-address)
+     (-> (sdk.core/authenticate& new-ctx)
          (.then (fn [auth-ctx]
                   (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
                   ;; must dispatch the next event within the promise
