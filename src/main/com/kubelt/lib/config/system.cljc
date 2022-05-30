@@ -18,6 +18,8 @@
         [:ipfs.read/scheme :ipfs.read/scheme]
         [:ipfs.write/multiaddr :ipfs.write/multiaddr]
         [:ipfs.write/scheme :ipfs.write/scheme]
+        [:p2p/port :p2p/port]
+        [:p2p/host :p2p/host]
         [:p2p/scheme :p2p/scheme]
         [:p2p/multiaddr :p2p/multiaddr]
         [:crypto/session :credential/jwt {}]
