@@ -3,9 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
-   [com.kubelt.sdk.v1.core :as sdk.v1.core]
-   [com.kubelt.sdk.v1.resource :as sdk.v1.resource]
-   [com.kubelt.sdk.v1.workspace :as sdk.v1.workspace]))
+   [com.kubelt.sdk.v1.core :as sdk.v1.core]))
 
 ;; Entrypoint
 ;; -----------------------------------------------------------------------------
@@ -52,12 +50,6 @@
        :core #js {:authenticate sdk.v1.core/authenticate-js!
                   :isLoggedIn sdk.v1.core/logged-in-js?
                   :setWallet sdk.v1.core/set-wallet-js}
-
-       ;; resource
-       :resource #js {:add sdk.v1.resource/add-js!}
-
-       ;; workspace
-       :workspace #js {:available sdk.v1.workspace/available-js!}
 
        ;; development (removed from production builds)
        ;; TODO
