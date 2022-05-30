@@ -54,9 +54,7 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, ['v1'], 'init');
     check(kbt, ['v1'], 'halt');
     check(kbt, ['v1'], 'options');
-    check(kbt, ['v1', 'core'], 'authenticate'),
-    check(kbt, ['v1'], 'workspace');
-    check(kbt, ['v1', 'workspace'], 'available');
+    check(kbt, ['v1', 'core'], 'authenticate');
 
     t.end();
 });
@@ -119,18 +117,5 @@ tap.test('account authenticate', (t) => {
             };
             kbt.v1.core.authenticate(sdk, wallet);
         });
-});
-*/
-
-// TODO do we actually want to invoke the function? Prefer to use
-// mocking....
-/*
-tap.test('sdk workspace available', (t) => {
-    const sdk = kbt.v1.init();
-    kbt.v1.workspace.available(sdk);
-
-    t.pass('ok');
-
-    t.end();
 });
 */
