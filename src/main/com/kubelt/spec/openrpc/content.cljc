@@ -1,5 +1,6 @@
 (ns com.kubelt.spec.openrpc.content
-  ""
+  "Defines the schema for an OpenRPC Content Descriptor object. These are
+  reusable ways of describing either an RPC parameter or a result."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [name])
   (:require

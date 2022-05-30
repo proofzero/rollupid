@@ -1,5 +1,6 @@
 (ns com.kubelt.spec.openrpc.info
-  ""
+  "Define the schema for an OpenRPC Info object that provides metadata
+  about an API."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.spec.openrpc.info.contact :as info.contact]

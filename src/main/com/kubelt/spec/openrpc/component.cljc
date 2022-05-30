@@ -1,5 +1,7 @@
 (ns com.kubelt.spec.openrpc.component
-  ""
+  "Defines the schema for the set of OpenRPC components, which are objects
+  that constitute different aspects of an OpenRPC API that may be
+  referred to from elsewhere in an API definition to allow reuse."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.spec.openrpc.content :as openrpc.content]

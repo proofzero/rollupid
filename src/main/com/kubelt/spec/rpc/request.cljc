@@ -4,20 +4,25 @@
   (:require
    [com.kubelt.spec.http :as spec.http]))
 
-;; options
+;; id
 ;; -----------------------------------------------------------------------------
-;; The options map that may be passed to RPC client (request) function.
+;; Every RPC request must have a unique identifier.
 
-(def options
-  ;; TODO
-  :map)
+(def id
+  :string)
 
 ;; request
 ;; -----------------------------------------------------------------------------
 ;; An RPC request map.
-
+;;
 ;; NB: we re-use the HTTP request map schema.
+
 (def request
   [:map
    [:com.kubelt/type [:enum :kubelt.type/rpc.request]]
-   [:http/request   spec.http/request]])
+   [:request/id id]
+   ;; TODO
+   ;;[:rpc/method method]
+   ;;[:rpc/params params]
+   ;;[:rpc/server server]
+   [:http/request spec.http/request]])

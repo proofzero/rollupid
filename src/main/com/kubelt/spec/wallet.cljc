@@ -3,9 +3,8 @@
   cross-platform key management and crypto facilities."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.spec.common :as spec.common]
    [com.kubelt.spec.core :as spec.core]
-   [com.kubelt.spec.crypto :as spec.crypto]
+   ;;[com.kubelt.spec.crypto :as spec.crypto]
    [com.kubelt.spec.jwt :as spec.jwt]))
 
 (def wallet-address

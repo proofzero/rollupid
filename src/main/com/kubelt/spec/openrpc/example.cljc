@@ -1,4 +1,6 @@
 (ns com.kubelt.spec.openrpc.example
+  "Describes an OpenRPC Example object that is intended to match a Content
+  Descriptor schema."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:refer-clojure :exclude [name]))
 
