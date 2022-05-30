@@ -5,7 +5,7 @@
    [malli.core :as malli])
   (:require
    [com.kubelt.lib.uri :as lib.uri]
-   [com.kubelt.rpc.client :as rpc.client]
+   ;;[com.kubelt.rpc.client :as rpc.client]
    [com.kubelt.spec.openrpc.server :as spec.openrpc.server]))
 
 ;; server?
@@ -63,11 +63,15 @@
      (select client path defaults)))
 
   ([client path options]
-   (let [method (rpc.client/find-method client path)]
+   (let [;; TODO fix me; this introduces a cyclic dependency. Move into
+         ;; shared .method namespace and use from both client and this
+         ;; namespace?
+         ;;method (rpc.client/find-method client path)
+         ]
      ;; TODO use the path to select one of the available schemas.
      ;; TODO use the :server/name value to select one of the servers from the schema
      ;; TODO use the :server/random? flag to return an available server at random
      ;; TODO otherwise return only available server
      ;; TODO otherwise return an error (no servers available)
-     method
+     ;;method
      )))
