@@ -1,19 +1,21 @@
 (ns com.kubelt.rpc.schema-test
   "Test rpc schema"
   (:require
-   ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
    [cljs.core.async :refer [go]]
    [cljs.core.async.interop :refer-macros [<p!]]
    [cljs.reader :refer [read-string]]
-   [cljs.test :as t :refer [deftest is testing async]]
+   [cljs.test :as t :refer [deftest is testing async]])
+  (:require
+   ["fs" :refer [promises] :rename {promises fs-promises} :as fs])
+  (:require
+   [malli.core :as malli])
+  (:require
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.util :as lib.util :refer [node-env]]
    [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.rpc.schema.fs :as s.fs]
-   [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
-   [malli.core :as malli]))
-
+   [com.kubelt.rpc.schema.parse :as rpc.schema.parse]))
 
 
 
@@ -43,7 +45,7 @@
 
 
 (deftest parse-be-schema-test
-  (testing "checks on be.edn "
+  (testing "checks on oort.edn"
     (async done
            (go
              (try
