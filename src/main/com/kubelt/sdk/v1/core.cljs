@@ -27,64 +27,64 @@
 
   The decryption function stored in the wallet will be used to decrypt a
   nonce to complete the proof. Returns a promise that resolves to the
-  updated system map containing the JWT for the given core, or is
+  updated system map containing the JWT for the system wallet core address, or is
   rejected with some information about the error that occurred."
-  [sys core]
+  [sys]
   ;; TODO add an extra arity that allows a wallet to be passed in?
   ;; TODO validate system map (especially: ensure wallet is present)
-  ;; TODO validate core
 
   ;; Send the public key and the account id to gateway
   ;; API "/@core/auth". This kicks off a zero-knowledge proof
   ;; authentication.
-  (-> (lib.p2p/authenticate! sys core)
-      (lib.promise/then
-       (fn [auth-result]
-         (if (lib.error/error? auth-result)
-           ;; This triggers .catch handlers on returned promise.
-           (throw (ex-info "error" auth-result))
-           ;; We successfully retrieved a nonce, now verify it by signing
-           ;; it and sending it back.
-           auth-result)))
-      (lib.promise/then
-       (fn [nonce]
-         (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
-               signature (sign-fn nonce)]
-           [nonce signature])))
-      (lib.promise/then
-       (fn [[nonce signature-p]]
-               ;; NB: the signature is expected to be a promise, even if
-               ;; not strictly necessary on some platforms.
-         (lib.promise/then
-          signature-p
-          (fn [signature]
-            ;; If successful we get back a JWT that needs to be stored
-            ;; in the system map. NB: the JWT has an expiry and encodes
-            ;; client IP to restrict renewing JWTs for other clients.
-            ;; TODO check/assert that this is true.
-            (lib.promise/then
-             (lib.p2p/verify! sys core nonce signature)
-             (fn [verify-result]
-               (if (lib.error/error? verify-result)
-                 ;; This triggers .catch handlers on returned promise.
-                 (throw (ex-info "error" verify-result))
-                 ;; We successfully retrieved a nonce, now verify it by signing
-                 ;; it and sending it back.
-                 (let [decoded-jwt (lib.jwt/decode verify-result)]
-                   ;; TODO verify jwt
-                   ;; TODO once we are able to inject a
-                   ;; platform-specific storage capability, use that to
-                   ;; allow the SDK state (or possibly just a subset,
-                   ;; e.g. tokens) to be frozen and thawed back out
-                   (-> sys
-                       (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
-                       (assoc-in [:crypto/session :vault/tokens* core] verify-result))))))))))))
+  (let [core (get-in sys [:crypto/wallet :wallet/address])]
+    (-> (lib.p2p/authenticate! sys)
+        (lib.promise/then
+         (fn [auth-result]
+           (if (lib.error/error? auth-result)
+                  ;; This triggers .catch handlers on returned promise.
+             (throw (ex-info "error" auth-result))
+                  ;; We successfully retrieved a nonce, now verify it by signing
+                  ;; it and sending it back.
+             auth-result)))
+        (lib.promise/then
+         (fn [nonce]
+           (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
+                 signature (sign-fn nonce)]
+             [nonce signature])))
+        (lib.promise/then
+         (fn [[nonce signature-p]]
+                ;; NB: the signature is expected to be a promise, even if
+                ;; not strictly necessary on some platforms.
+           (lib.promise/then
+            signature-p
+            (fn [signature]
+                   ;; If successful we get back a JWT that needs to be stored
+                   ;; in the system map. NB: the JWT has an expiry and encodes
+                   ;; client IP to restrict renewing JWTs for other clients.
+                   ;; TODO check/assert that this is true.
+              (lib.promise/then
+               (lib.p2p/verify! sys core nonce signature)
+               (fn [verify-result]
+                 (if (lib.error/error? verify-result)
+                        ;; This triggers .catch handlers on returned promise.
+                   (throw (ex-info "error" verify-result))
+                        ;; We successfully retrieved a nonce, now verify it by signing
+                        ;; it and sending it back.
+                   (let [decoded-jwt (lib.jwt/decode verify-result)]
+                          ;; TODO verify jwt
+                          ;; TODO once we are able to inject a
+                          ;; platform-specific storage capability, use that to
+                          ;; allow the SDK state (or possibly just a subset,
+                          ;; e.g. tokens) to be frozen and thawed back out
+                     (-> sys
+                         (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
+                         (assoc-in [:crypto/session :vault/tokens* core] verify-result)))))))))))))
 
 ;; TODO test me
 (defn authenticate-js!
   "Create an account from a JavaScript context."
   [sys core]
-  (authenticate! sys core))
+  (authenticate! sys))
 
 
 ;; TODO test me
