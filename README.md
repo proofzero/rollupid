@@ -65,6 +65,10 @@ Please use the following tools and versions when developing with this repository
 - Java SDK v8+
 - Babashaka 0.7.x
 
+#### NIX ENV
+
+Install NIX and run `nix-build` to install nix packages and `nix-shell` create a nix shell with a fully configured development environment.
+
 ### Build
 
 Run `bb run test:all:develop` to make sure everything is setup correctly. Then use `bb tasks` to see what other build and test tasks are available.
