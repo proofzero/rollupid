@@ -33,12 +33,11 @@
                        _ (<p! (rpc.call/rpc-call& kbt api {:method [:kb :set :profile]
                                                            :params {:profile {:profilePicture updated-profile-picture}}}))
                        updated-profile (<p! (rpc.call/rpc-call& kbt api {:method [:kb :get :profile]}))]
-                   (is (= [{:profile-picture updated-profile-picture}] updated-profile))))
+                   (is (= {:profile-picture updated-profile-picture} updated-profile))))
                (catch js/Error err (log/error err))
                (finally (done)))))))
 
 (comment
-  "TODO: incosistent get-profile result after set-profile"
   "TODO:  should be rpc params be camelcased?"
   (t/run-tests)
   )
