@@ -106,3 +106,29 @@
                            (fn [e]
                              (println (ex-message e))
                              (prn (ex-data e)))))))))))})
+
+(defn ddt-rpc-call
+  ([method]
+   (ddt-rpc-call method nil))
+  ([method params]
+   (fn [args]
+     (aset args "method" method)
+     (aset args "params" params)
+     (let [args (rpc-args args)]
+       (ddt.prompt/ask-password!
+        (fn [err result]
+          (ddt.util/exit-if err)
+          (ddt.auth/authenticate
+           args
+           (.-password result)
+           (fn [sys]
+             (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+                 (lib.promise/then
+                  (fn [api]
+                    (-> (rpc-call& sys api args)
+                        (lib.promise/then #(println "-> " %))
+                        (lib.promise/catch #(println "ERROR-> " %)))))
+                 (lib.promise/catch
+                  (fn [e]
+                    (println (ex-message e))
+                    (prn (ex-data e)))))))))))))
