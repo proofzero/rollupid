@@ -192,3 +192,6 @@ pom.xml
 # dapp
 /dapp/cypress/videos/
 /roam/
+
+# nix
+result
