@@ -19,8 +19,7 @@
               (.option yargs rpc.call/ethers-rpc-name rpc.call/ethers-rpc-config))
    :handler (fn [args]
               (aset args "method" ":kb:get:config")
-              (let [args (rpc.call/rpc-args args)
-                    path (ddt.util/rpc-name->path (get args :path ""))]
+              (let [args (rpc.call/rpc-args args)]
                 (ddt.prompt/ask-password!
                  (fn [err result]
                    (ddt.util/exit-if err)
