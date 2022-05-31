@@ -7,7 +7,7 @@
   (:require
    [com.kubelt.rpc.test-commons :as t.commons]
    [com.kubelt.lib.test-utils :as lib.test-utils]
-   [com.kubelt.ddt.cmds.rpc.call :as rpc.call]
+   [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.lib.wallet.node :as wallet]
    [com.kubelt.sdk.v1 :as sdk]
    [com.kubelt.sdk.v1.core :as sdk.core]))
@@ -27,12 +27,12 @@
                      core (:wallet/address wallet)
                      kbt (<p! (sdk.core/authenticate& (assoc sys :crypto/wallet wallet)))
                      api (<p! (sdk.core/rpc-api sys core))
-                     profile (<p! (rpc.call/rpc-call& kbt api {:method [:kb :get :profile]}))]
+                     profile (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get :profile]}))]
                  (is (= {:profile-picture "DefaultKubeltPFP"} profile))
                  (let [updated-profile-picture "UpdatedProfilePicture"
-                       _ (<p! (rpc.call/rpc-call& kbt api {:method [:kb :set :profile]
+                       _ (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :set :profile]
                                                            :params {:profile {:profilePicture updated-profile-picture}}}))
-                       updated-profile (<p! (rpc.call/rpc-call& kbt api {:method [:kb :get :profile]}))]
+                       updated-profile (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get :profile]}))]
                    (is (= {:profile-picture updated-profile-picture} updated-profile))))
                (catch js/Error err (log/error err))
                (finally (done)))))))

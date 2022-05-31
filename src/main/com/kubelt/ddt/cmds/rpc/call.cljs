@@ -8,10 +8,8 @@
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
-   [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.rpc :as rpc]
-   [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.sdk.v1.core :as sdk.core]))
 
 (def ethers-rpc-name
@@ -33,27 +31,7 @@
            :params params
            :rpc-client-type rpc-client-type)))
 
-(defn rpc-call& [sys api args]
-  (lib.promise/promise
-   (fn [resolve reject]
-     (let [wallet-address (-> sys :crypto/wallet :wallet/address)
-           client (-> {:uri/domain (-> sys :client/p2p :http/host)
-                       :uri/port (-> sys :client/p2p :http/port)
-                       :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
-                       :http/client (:client/http sys)
-                       :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}
-                      rpc/init
-                      (rpc.schema/schema api))
-           request (rpc/prepare client (:method args) (or (:params args) {}))
-           rpc-method (:method/name (:rpc/method request))
-           rpc-params (:rpc/params request)]
-       (if (:rpc-client-type args)
-         (-> (sdk.core/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
-             (lib.promise/then resolve)
-             (lib.promise/catch reject))
-         (-> (rpc/execute client request)
-             (lib.promise/then #(resolve (-> % :http/body :result)))
-             (lib.promise/catch reject)))))))
+
 
 (defonce command
   {:command "call <method>"
@@ -99,7 +77,7 @@
                       (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                           (lib.promise/then
                            (fn [api]
-                             (-> (rpc-call& sys api args)
+                             (-> (lib.rpc/rpc-call& sys api args)
                                  (lib.promise/then #(println "-> " %))
                                  (lib.promise/catch #(println "ERROR-> " %)))))
                           (lib.promise/catch
@@ -125,7 +103,7 @@
              (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                  (lib.promise/then
                   (fn [api]
-                    (-> (rpc-call& sys api args)
+                    (-> (lib.rpc/rpc-call& sys api args)
                         (lib.promise/then #(println "-> " %))
                         (lib.promise/catch #(println "ERROR-> " %)))))
                  (lib.promise/catch

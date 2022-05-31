@@ -5,6 +5,7 @@
    [cljs.reader :as r])
   (:require
    [com.kubelt.ddt.auth :as ddt.auth]
+   [com.kubelt.lib.rpc :as lib.rpc ]
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call ]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
@@ -51,7 +52,7 @@
                       (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                           (lib.promise/then
                            (fn [api]
-                             (-> (rpc.call/rpc-call& sys api args)
+                             (-> (lib.rpc/rpc-call& sys api args)
                                  (lib.promise/then
                                   (fn [response]
                                     (println "CURRENT CONFIG-> " response)
@@ -59,7 +60,7 @@
                                     (let [args (assoc args
                                                       :method  (ddt.util/rpc-name->path ":kb:set:config")
                                                       :params (assoc-in response path config-value))]
-                                      (-> (rpc.call/rpc-call& sys api args)
+                                      (-> (lib.rpc/rpc-call& sys api args)
                                           (lib.promise/then #(println "SET->" %))
                                           (lib.promise/catch #(println "SET ERROR-> " %))))))
                                  (lib.promise/catch #(println "ERROR-> " %)))))
