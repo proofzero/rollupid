@@ -67,7 +67,7 @@ Please use the following tools and versions when developing with this repository
 
 #### NIX ENV
 
-Install NIX and run `nix-build` to install nix packages and `nix-shell` create a nix shell with a fully configured development environment.
+Install NIX and run `nix-build` to install nix packages and `nix-shell` to execute a shell with a fully configured development environment.
 
 ### Build
 
