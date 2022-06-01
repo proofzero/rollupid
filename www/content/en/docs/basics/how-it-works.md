@@ -13,6 +13,10 @@ weight: 102
 toc: true
 ---
 
+Kubelt decentralizes any application by integrating with local wallet cryptography and backing every blockchain account with standardized decentralized services over a integrated peer-to-peer edge platform.
+
+In doing so, the platform provides a unified API for all dApps to interact with each other and the blockchain. This allows for a decentralized application ecosystem to be built around a single, unified, and secure platform using local cryptography and decentralized storage, content delivery and messaging.
+
 ## Kubelt Cores
 
 At the heart of Kubelt is the **"Kubelt Core"**, an application container designed to look and feel like a supercharged Web3 wallet.

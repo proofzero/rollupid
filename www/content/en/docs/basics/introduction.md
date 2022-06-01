@@ -17,9 +17,56 @@ toc: false
 
 ## What is Kubelt?
 
-Kubelt's peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric **"Kubelt Cores"** that look and behave any crypto wallet with the addition of content-enabled APIs. Cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
+Kubelt is a fully managed decentralized application platform. 
 
-What content means to Kubelt really is anything! Kubelt Cores can host anything from web content, user databases, WebAssembly, and more. Kubelt Cores are also compatible with popular wallet cryptography meaning you or your users don't need new ID protocols to use Kubelt -- **your wallet is your entrypoint into the network!**
+Easily deploy dApps with standardized identity, storage, messaging services over a unified serverless RPC API, and more using Kubelt's **no-code, serverless, and decentralized infrastructure**:
+
+<style>
+.card:hover {
+  border: 1px solid white;
+}
+</style>
+
+<div class="container" style="padding: 0px;">
+  <div class="row">
+    <div class="col col--6">
+      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+        <div class="card__body">
+          <h4>✨ Starbase Dashboard</h4>
+          <p>Decentralized application control centre and analytics.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col col--6">
+      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+        <div class="card__body">
+          <h4>🚀 Starship Apps</h4>
+          <p>No-code, serverless dApp backends.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 32px">
+    <div class="col col--6">
+      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 00px 18px 12px 18px; color: #dee2e6;">
+        <div class="card__body">
+          <h4>🪐 Orbit CDN</h4>
+          <p>IPFS powered content addressing and delivery.</p>
+        </div>
+      </a>
+    </div>
+    <div class="col col--6">
+      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+        <div class="card__body">
+          <h4>🛂 3ID</h4>
+          <p>Decentralized application user passport and database.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+
 
 ### Getting Started
 
