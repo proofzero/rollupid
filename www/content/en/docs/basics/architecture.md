@@ -1,5 +1,5 @@
 ---
-title: "How it works"
+title: "Architecture"
 description: "Kubelt decentralizes applications."
 lead: "Kubelt decentralizes applications."
 date: 2020-10-06T08:48:45+00:00
@@ -13,9 +13,17 @@ weight: 102
 toc: true
 ---
 
+## Concepts
+
 Kubelt decentralizes any application by integrating with local wallet cryptography and backing every blockchain account with standardized decentralized services over a integrated peer-to-peer edge platform.
 
 In doing so, the platform provides a unified API for all dApps to interact with each other and the blockchain. This allows for a decentralized application ecosystem to be built around a single, unified, and secure platform using local cryptography and decentralized storage, content delivery and messaging.
+
+**[insert logically local wallet diagram here plus binding into startships with a single API]**
+
+# Architecture
+
+**[insert architecture diagram here]**
 
 ## Kubelt Cores
 

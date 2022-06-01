@@ -4,7 +4,7 @@ description: "Kubelt decentralizes the middle-tier."
 lead: "Kubelt is building the decentralized cloud to provide a better, faster, and more fair cloud."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
-draft: false
+draft: true
 images: []
 menu:
   docs:
@@ -25,7 +25,7 @@ With Kubelt applications and content are deployed to the edge over a decentraliz
 
 Traditional applications incentivize data aggregration and require large, expensive databases with complex governance overhead.
 
-With Kubelt applications are namespaced within your [Kubelt Cores]({{< relref "How-it-works" >}}), permissioned to individual user cryptography, and designed to run locally -- **just like a wallet**. Access to application data, configuration, and more is controlled by APIs just like with your favorite web3 wallet.
+With Kubelt applications are namespaced within your [Kubelt Cores]({{< relref "Architecture" >}}), permissioned to individual user cryptography, and designed to run locally -- **just like a wallet**. Access to application data, configuration, and more is controlled by APIs just like with your favorite web3 wallet.
 
 These applications can be composed in a peer-to-peer configuration, unlocking endless possibilities.
 

@@ -1,7 +1,7 @@
 ---
 title: "Introduction"
 description: "An introduction to Kubelt"
-lead: "Kubelt is a peer-to-peer cloud for truly decentralized applications."
+lead: "Kubelt decentralizes applications."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -17,7 +17,7 @@ toc: false
 
 ## What is Kubelt?
 
-Kubelt is a fully managed decentralized application platform. 
+Kubelt is a fully managed decentralized application platform.
 
 Easily deploy dApps with standardized identity, storage, messaging services over a unified serverless RPC API, and more using Kubelt's **no-code, serverless, and decentralized infrastructure**:
 
