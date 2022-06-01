@@ -72,18 +72,15 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 
 ---
 
-#### Learn more
+Visit [✨ Starbase](https://starbase.kubelt.com) to get started with the Kubelt platform or explore our [guides]({{< relref "Guides" >}}) to learn more about the platform.
 
-Read about how Kubelt works by checking out our [whitepaper]({{< relref "Guides" >}}), [why kubelt?]({{< relref "why-kubelt" >}}), and our [how it works]({{< relref "How-it-works" >}}) page.
+Check out our [📦 Github Repo](https://github.com/kubelt/kubelt) to learn more about open source [SDK](https://sdk.kubelt.com/) and libraries.
 
-#### Building applications with Kubelt
+Kubelt also provides a [community forum](https://github.com/kubelt/kubelt/discussions) for  developers to discuss and learn about the platform.
 
-Learn how to build applications on Kubelt by reading our [guides]({{< relref "Guides" >}}) or starting with our [quick start]({{< relref "Quick-Start" >}}) page.
-
-You can also use our configuration [portal dApp](https://app.kubelt.com) to explore the network.
 
 #### Join the community
 
 - Join our [Discord](https://discord.gg/UgwAsJf6C5) community to ask questions.
 - Follow us on [Twitter](https://twitter.com/kubeltcms) for updates.
-- Check out our [Github](https://github.com/kubelt) and read our [contributors guidelines]({{< relref "contributing" >}}).
+- Read our [contributors guidelines]({{< relref "contributing" >}}).
