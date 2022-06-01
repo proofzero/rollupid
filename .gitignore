@@ -195,3 +195,7 @@ pom.xml
 
 # nix
 result
+
+# repl
+.calva
+.joyride
