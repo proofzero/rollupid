@@ -14,9 +14,6 @@
    [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
    [malli.core :as malli]))
 
-
-
-
 (def json-path
   (if (= "runner" (:username (node-env)))
     "./fix/openrpc/"
