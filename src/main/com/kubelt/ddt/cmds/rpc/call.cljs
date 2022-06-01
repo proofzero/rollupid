@@ -2,15 +2,26 @@
   "Make an RPC call."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr])
+   [clojure.string :as cstr]
+   [cljs.reader :as r])
   (:require
    [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.sdk.v1.core :as sdk.core]))
+
+(def edn-name
+  "edn-format")
+
+(def edn-value
+  #js {:describe "read value as edn"
+       :boolean false
+       :alias "f"
+       :default false})
 
 (def ethers-rpc-name
   "ethers-rpc")
@@ -89,10 +100,17 @@
   ([method]
    (ddt-rpc-call method nil))
   ([method params]
-   (fn [args]
-     (aset args "method" method)
-     (aset args "params" params)
-     (let [args (rpc-args args)]
+   (fn [args*]
+     (aset args* "method" method)
+     (let [args (rpc-args args*)
+           edn? (get args (keyword edn-name))
+           args (reduce (fn [c p]
+                          (assoc-in c [:params] (let [data (p c (if edn? "nil"  "null"))]
+                                                  (if edn?
+                                                    (r/read-string data)
+                                                    (lib.json/json-str->edn data)))))
+                        args
+                        params)]
        (ddt.prompt/ask-password!
         (fn [err result]
           (ddt.util/exit-if err)
