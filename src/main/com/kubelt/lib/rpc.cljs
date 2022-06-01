@@ -15,6 +15,7 @@
      (let [wallet-address (-> sys :crypto/wallet :wallet/address)
            client (-> {:uri/domain (-> sys :client/p2p :http/host)
                        :uri/port (-> sys :client/p2p :http/port)
+                       :uri/scheme (-> sys :client/p2p :http/scheme)
                        :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
                        :http/client (:client/http sys)
                        :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}

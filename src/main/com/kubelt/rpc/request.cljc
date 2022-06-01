@@ -21,7 +21,7 @@
                  (when-let [jwt (:rpc/jwt options)]
                    {"KBT-Access-JWT-Assertion" jwt}))
         trailers {}
-        scheme :http
+        scheme (:uri/scheme options :http)
         domain (:uri/domain options "example.com")
         port (:uri/port options 33337)
         path (:uri/path options "/foo")]
