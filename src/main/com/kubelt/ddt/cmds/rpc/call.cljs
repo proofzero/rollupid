@@ -2,17 +2,26 @@
   "Make an RPC call."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr])
+   [clojure.string :as cstr]
+   [cljs.reader :as r])
   (:require
    [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
-   [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.ddt.util :as ddt.util]
+   [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.rpc :as rpc]
-   [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.sdk.v1.core :as sdk.core]))
+
+(def edn-name
+  "edn-format")
+
+(def edn-value
+  #js {:describe "read value as edn"
+       :boolean false
+       :alias "f"
+       :default false})
 
 (def ethers-rpc-name
   "ethers-rpc")
@@ -33,27 +42,7 @@
            :params params
            :rpc-client-type rpc-client-type)))
 
-(defn rpc-call& [sys api args]
-  (lib.promise/promise
-   (fn [resolve reject]
-     (let [wallet-address (-> sys :crypto/wallet :wallet/address)
-           client (-> {:uri/domain (-> sys :client/p2p :http/host)
-                       :uri/port (-> sys :client/p2p :http/port)
-                       :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
-                       :http/client (:client/http sys)
-                       :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}
-                      rpc/init
-                      (rpc.schema/schema api))
-           request (rpc/prepare client (:method args) (or (:params args) {}))
-           rpc-method (:method/name (:rpc/method request))
-           rpc-params (:rpc/params request)]
-       (if (:rpc-client-type args)
-         (-> (sdk.core/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
-             (lib.promise/then resolve)
-             (lib.promise/catch reject))
-         (-> (rpc/execute client request)
-             (lib.promise/then #(resolve (-> % :http/body :result)))
-             (lib.promise/catch reject)))))))
+
 
 (defonce command
   {:command "call <method>"
@@ -99,10 +88,43 @@
                       (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                           (lib.promise/then
                            (fn [api]
-                             (-> (rpc-call& sys api args)
+                             (-> (lib.rpc/rpc-call& sys api args)
                                  (lib.promise/then #(println "-> " %))
                                  (lib.promise/catch #(println "ERROR-> " %)))))
                           (lib.promise/catch
                            (fn [e]
                              (println (ex-message e))
                              (prn (ex-data e)))))))))))})
+
+(defn ddt-rpc-call
+  ([method]
+   (ddt-rpc-call method nil))
+  ([method params]
+   (fn [args*]
+     (aset args* "method" method)
+     (let [args (rpc-args args*)
+           edn? (get args (keyword edn-name))
+           args (reduce (fn [c p]
+                          (assoc-in c [:params] (let [data (p c (if edn? "nil"  "null"))]
+                                                  (if edn?
+                                                    (r/read-string data)
+                                                    (lib.json/json-str->edn data)))))
+                        args
+                        params)]
+       (ddt.prompt/ask-password!
+        (fn [err result]
+          (ddt.util/exit-if err)
+          (ddt.auth/authenticate
+           args
+           (.-password result)
+           (fn [sys]
+             (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+                 (lib.promise/then
+                  (fn [api]
+                    (-> (lib.rpc/rpc-call& sys api args)
+                        (lib.promise/then #(println "-> " %))
+                        (lib.promise/catch #(println "ERROR-> " %)))))
+                 (lib.promise/catch
+                  (fn [e]
+                    (println (ex-message e))
+                    (prn (ex-data e)))))))))))))
