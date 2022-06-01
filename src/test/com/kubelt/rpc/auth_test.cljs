@@ -26,7 +26,7 @@
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
                      core (:wallet/address wallet)
                      kbt (<p! (sdk.core/authenticate& (assoc sys :crypto/wallet wallet)))]
-                  (is (= {} (-> sys :crypto/session :vault/tokens)))
+                 (is (= {} (-> sys :crypto/session :vault/tokens)))
                  (is (map? (get-in kbt [:crypto/session :vault/tokens core])))
                  (is (string? (get-in kbt [:crypto/session :vault/tokens* core]))))
                (catch js/Error err (log/error err))
