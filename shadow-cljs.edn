@@ -29,7 +29,7 @@
   ;; a pure Clojure/Script logging library
   [com.taoensso/timbre "5.2.1"]
   ;; tailwind components for dapp
-  [com.github.mainej/headlessui-reagent "1.6.3.67"]
+  [com.github.mainej/headlessui-reagent "1.6.4.68"]
   ;; immutable database and Datalog query engine
   [datascript/datascript "1.3.13"]
   ;; inspection tool for re-frame events & app-db
@@ -42,8 +42,10 @@
   [fipp/fipp "0.6.26"]
   ;; a micro-framework for building data-driven applications
   [integrant/integrant "0.8.0"]
+  ;; Time as a Clojure/Script value
+  [tick/tick "0.4.32"]
   ;; fast JSON encoding and decoding
-  [metosin/jsonista "0.3.5"]
+  [metosin/jsonista "0.3.6"]
   ;; data-driven schemas for Clojure/Script
   [metosin/malli "0.8.4"]
   ;; request router for dapp
