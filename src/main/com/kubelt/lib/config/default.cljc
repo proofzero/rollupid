@@ -12,6 +12,9 @@
 ;; Default configuration
 ;; -----------------------------------------------------------------------------
 
+(def app
+  {:app/name ""})
+
 (def log
   {:log/level log-level})
 
@@ -40,7 +43,8 @@
 ;; These are the defaults for the option map passed to the SDK init function.
 
 (def sdk
-  (merge ipfs
+  (merge app
+         ipfs
          log
          p2p
          credentials
