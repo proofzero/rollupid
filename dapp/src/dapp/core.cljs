@@ -24,7 +24,7 @@
 (re-frame/reg-event-db
  ::initialize-db
  (fn [_db _]
-   (.then (sdk.v1/init)
+   (.then (sdk.v1/init {:app/name "kubelt-dapp"})
           (fn [ctx]
             (re-frame/dispatch [::init-sdk ctx])))
    {:sdk/ctx {}
