@@ -63,10 +63,10 @@
               "an integer is a valid port")))
 
       (testing "write address"
-        (let [options (with-defaults {:ipfs.read/host "192.168.1.1"})]
+        (let [options (with-defaults {:ipfs.write/host "192.168.1.1"})]
           (is (malli/validate spec.config/sdk-config options)
               "a dotted-quad string is a valid host"))
-        (let [options (with-defaults {:ipfs.read/port 1234})]
+        (let [options (with-defaults {:ipfs.write/port 1234})]
           (is (malli/validate spec.config/sdk-config options)
               "an integer is a valid port"))))
 

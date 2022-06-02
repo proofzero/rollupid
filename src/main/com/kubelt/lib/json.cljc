@@ -47,7 +47,8 @@
   "Write edn data as a JSON string."
   [x]
   #?(:clj (json/write-value-as-string x)
-     :cljs (js/JSON.stringify (clj->js x))))
+     :cljs (let [w (transit/writer :json-verbose)]
+             (transit/write w x))))
 
 (defn json-str->edn
   "Parse a JSON string into edn data."

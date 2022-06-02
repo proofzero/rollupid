@@ -9,11 +9,13 @@
   []
   (some? (get-in (node-env) [:environment "GITHUB_ACTIONS"])))
 
+;; TODO use "oort-devnet.admin1337.workers.dev" as host when CORS issue abated
 (defn p2p-config
   "return p2p config based on env"
   []
   (if (ci-env)
-    {:p2p/scheme :https
-     :p2p/host "oort-devnet.admin1337.workers.dev"
-     :p2p/port  443}
+      {:p2p/scheme :https
+       :app/name "kubelt-test"
+       :p2p/host "d42a-46-6-209-110.eu.ngrok.io"
+       :p2p/port  443}
     {}))

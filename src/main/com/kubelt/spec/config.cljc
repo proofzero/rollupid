@@ -5,6 +5,7 @@
    [malli.core :as m])
   (:require
    [com.kubelt.spec.http :as spec.http]
+   [com.kubelt.spec.storage :as spec.storage]
    [com.kubelt.spec.wallet :as spec.wallet]))
 
 ;; We use the default vector-based format for ease of authoring, but if
@@ -28,11 +29,17 @@
    {:default :info}
    [:enum :log :trace :debug :info :warn :error :fatal]])
 
+(def app-name
+  "An application name, preferable reverse-TLD namespaced."
+  [:and
+   {:example "com.example.foo-app"}
+   :string])
+
 (def credentials
   [:and
    {:description "A map from core name to JWT strings."
     :example {"0x123abc" "<header>.<payload>.<signature>"}}
-   ;; TODO flesh this out
+   ;; TODO flesh this out in com.kubelt.spec.jwt
    [:map-of :string :string]])
 
 ;; config
@@ -45,6 +52,8 @@
   [:map {:closed true
          :title ::optional-sdk-config}
    [:log/level {:optional true} logging-level]
+   [:app/name {:optional true} app-name]
+   [:config/storage {:optional true} spec.storage/storage]
    [:credential/jwt {:optional true} credentials]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
    [:ipfs.read/scheme {:optional true} spec.http/scheme]
@@ -61,10 +70,16 @@
 ;; should have an SDK configuration options map that has every value
 ;; provided.
 (def sdk-config
-  (into [:map {:closed true
-               :title ::sdk-config}]
-        (map #(assoc-in % [1 :optional] false)
-             (m/-children (m/schema optional-sdk-config nil)))))
+  (let [;; These keys remain optional; if not provided by the user, we
+        ;; initialize their values to platform defaults in lib.init.
+        excluded-keys #{:config/storage :crypto/wallet}]
+    (into [:map {:closed true
+                 :title ::sdk-config}]
+          (map (fn [[k _ :as x]]
+                 (if-not (contains? excluded-keys k)
+                   (assoc-in x [1 :optional] false)
+                   x))
+               (m/-children (m/schema optional-sdk-config nil))))))
 
 (def system-config
   [:map {;;:closed false

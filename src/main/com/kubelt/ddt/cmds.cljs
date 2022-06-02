@@ -10,6 +10,7 @@
    [com.kubelt.ddt.cmds.rdf :as ddt.rdf]
    [com.kubelt.ddt.cmds.rpc :as ddt.rpc]
    [com.kubelt.ddt.cmds.sdk :as ddt.sdk]
+   [com.kubelt.ddt.cmds.storage :as ddt.storage]
    [com.kubelt.ddt.cmds.wallet :as ddt.wallet]))
 
 ;; Public
@@ -34,5 +35,7 @@
       (.command (clj->js ddt.rpc/command))
       ;; $DDT sdk <command>
       (.command (clj->js ddt.sdk/command))
+      ;; $DDT storage <command>
+      (.command (clj->js ddt.storage/command))
       ;; $DDT wallet <command>
       (.command (clj->js ddt.wallet/command))))

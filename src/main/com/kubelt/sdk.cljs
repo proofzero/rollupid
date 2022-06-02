@@ -46,6 +46,10 @@
        :halt sdk.v1/halt-js!
        :options sdk.v1/options-js
 
+       ;; storage
+       :store sdk.v1/store-js&
+       :restore sdk.v1/restore-js&
+
        ;; core
        :core #js {:authenticate sdk.v1.core/authenticate-js!
                   :isLoggedIn sdk.v1.core/logged-in-js?

@@ -40,7 +40,7 @@
 
   ;; The 1-arity implementation expects a configuration map.
   ([config]
-   {:pre [(map? config)]}
+   {:pre [(map? config)] :post [(promise? %)]}
    ;; Check that the user-provided options map is valid. If not, an
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
@@ -107,7 +107,7 @@
   "Return the options map representing the SDK state, allowing for the SDK
   to be re-instantiated."
   [system]
-  {:pre [(map? system)]}
+  {:pre [(map? system)] :post [(promise? %)]}
   (lib.promise/promise
    (fn [resolve reject]
      (let [result (lib.config.sdk/options system)]
@@ -126,3 +126,70 @@
       (lib.promise/catch
           (fn [e]
             (clj->js e)))))
+
+;; store
+;; -----------------------------------------------------------------------------
+
+(defn store&
+  "Store the state of the system using the platform storage capability
+  that was injected (or provided by default) during SDK
+  initialization. We only care about preserving state that can't be
+  recreated or are costly to recreate, e.g. JWTs. Returns a promise that
+  resolves to a map of the stored state once complete."
+  [system]
+  {:pre [(map? system)] :post [(promise? %)]}
+  (let [;; We'll store the options that were used to initialize the SDK
+        ;; so we can reinitialize a new instance.
+        init-options& (options system)
+        ;; This function provides a platform specific means of storing
+        ;; a (small) data map.
+        store-fn (get-in system [:config/storage :storage/store-fn])
+        ;; Get the JWTs currently owned by the SDK instance.
+        vault (get system :crypto/session)]
+    ;; TODO move into library utility.
+    (-> init-options&
+        (lib.promise/then
+         (fn [options]
+           ;; Construct the state map to store.
+           (let [;; options can't include fns if we are to serialize it!
+                 options (-> options
+                             (dissoc :config/storage)
+                             (dissoc :crypto/wallet))
+                 state {:options options :vault vault}]
+             ;; Returns a promise that resolves when the writing is
+             ;; finished.
+             (store-fn state)))))))
+
+(defn store-js&
+  "Store the state of the system in a platform-specific way."
+  [system]
+  {:pre [(map? system)] :post [(promise? %)]}
+  ;; We don't have any arguments to convert from JSON to edn, so we just
+  ;; invoke store& directly.
+  (store& system))
+
+;; restore
+;; -----------------------------------------------------------------------------
+
+(defn restore&
+  ""
+  [system]
+  {:pre [(map? system)] :post [(promise? %)]}
+  (let [;; This function provides a platform specific means of restoring
+        ;; a (small) data map.
+        restore-fn (get-in system [:config/storage :storage/restore-fn])
+        ;; Resolves to the data that has been restored.
+        restore& (restore-fn)]
+    (-> restore&
+        (lib.promise/then
+         (fn [{:keys [options vault]}]
+           ;; TODO fold options back into system map?
+           (assoc system :crypto/session vault))))))
+
+(defn restore-js&
+  "Return a system map that has had saved state restored."
+  [system]
+  {:pre [(map? system)] :post [(promise? %)]}
+  ;; We don't have any arguments to convert from JSON to edn, so we just
+  ;; invoke restore& directly.
+  (restore& system))

@@ -97,7 +97,7 @@
    ;; Clear the provider from the web3-modal object
    (.clearCachedProvider (:web3-modal db))
    ;; Reset the SDK context to `init` state
-   (.then (sdk.v1/init)
+   (.then (sdk.v1/init {:app/name "kubelt-dapp"})
           (fn [ctx]
             (re-frame/dispatch [:dapp.core/init-sdk ctx])))
    {:db (assoc db :sdk/ctx {})

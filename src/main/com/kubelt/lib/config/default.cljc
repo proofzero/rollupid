@@ -4,7 +4,6 @@
   (:require
    [integrant.core :as ig])
   (:require
-   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
 ;; Default logging level.
@@ -12,6 +11,9 @@
 
 ;; Default configuration
 ;; -----------------------------------------------------------------------------
+
+(def app
+  {:app/name ""})
 
 (def log
   {:log/level log-level})
@@ -36,25 +38,28 @@
 (def credentials
   {:credential/jwt {}})
 
-(def wallet
-  {:crypto/wallet (lib.wallet/no-op)})
-
-;; Public
+;; sdk
 ;; -----------------------------------------------------------------------------
-
 ;; These are the defaults for the option map passed to the SDK init function.
+
 (def sdk
-  (merge ipfs
+  (merge app
+         ipfs
          log
          p2p
          credentials
-         logging
-         wallet))
+         logging))
 
+;; system
+;; -----------------------------------------------------------------------------
 ;; These defaults should be overridden from the SDK init options map.
+
 (def system
   (merge sdk
-         {;; Our common HTTP client.
+         {;; An application name, usually reverse-TLD namespaced,
+          ;; e.g. com.example.foo-app.
+          :app/name ""
+          ;; Our common HTTP client.
           :client/http {}
           ;; Our connection to IPFS.
           :client/ipfs {:ipfs/read {:http/scheme (ig/ref :ipfs.read/scheme)
@@ -68,6 +73,8 @@
           :client/p2p {:http/scheme (ig/ref :p2p/scheme)
                        :http/host (ig/ref :p2p/host)
                        :http/port (ig/ref :p2p/port)}
+          ;; A wrapper around platform configuration storage.
+          :config/storage {:app/name (ig/ref :app/name)}
           ;; A crypto "vault" that stores session credentials.
           :crypto/session {:jwt/tokens (ig/ref :credential/jwt)}
           ;; A wrapper around the platform wallet functionality.
