@@ -13,7 +13,8 @@
   "return p2p config based on env"
   []
   (if (ci-env)
-    {:p2p/scheme :https
-     :p2p/host "d42a-46-6-209-110.eu.ngrok.io"
-     :p2p/port  443}
+      {:p2p/scheme :https
+       :app/name "kubelt-test"
+       :p2p/host "d42a-46-6-209-110.eu.ngrok.io"
+       :p2p/port  443}
     {}))
