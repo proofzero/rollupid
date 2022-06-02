@@ -5,13 +5,9 @@
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.json :as lib.json]))
 
-(def ^:dynamic session-storage? false)
-
 (defn- get-storage
   []
-  (if session-storage?
-    (.-sessionStorage js/window)
-    (.-localStorage js/window)))
+  (.-localStorage js/window))
 
 (defn- set-item!
   "Set `key' in browser's localStorage to `val`."
@@ -57,7 +53,7 @@
 (defn create
   "Create a configuration storage capability."
   [app-name]
-  (tap> [::create app-name :session-storage? session-storage?])
+  (tap> [::create app-name])
   {:com.kubelt/type :kubelt.type/storage
    :storage/store-fn store-fn
    :storage/restore-fn restore-fn})
