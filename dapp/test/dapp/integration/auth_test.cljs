@@ -9,17 +9,6 @@
    [dapp.integration.test-utils :as test-utils]
    [dapp.wallet]))
 
-(deftest init-sdk-and-wallet
-  (rf-test/run-test-async
-   (test-utils/sync-initialize-db)
-   (testing "Initialize SDK context with empty wallet via dapp"
-     (rf-test/wait-for
-      [:dapp.core/init-sdk]
-      (let [ctx @(re-frame/subscribe [:dapp.wallet/ctx])
-            wallet @(re-frame/subscribe [:dapp.wallet/wallet])]
-        (is (lib.wallet/valid? wallet))
-        (is (contains? ctx :crypto/wallet)))))))
-
 ;; Requires connection to cloudflare-worker OR appropriate backend to run correctly
 (deftest gen-wallet-authenticate-and-disconnect
   (rf-test/run-test-async
