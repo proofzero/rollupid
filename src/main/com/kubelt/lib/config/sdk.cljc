@@ -26,7 +26,8 @@
         credentials (lib.vault/tokens (:crypto/session sys-map))
         wallet (get sys-map :crypto/wallet)
         storage (get sys-map :config/storage)]
-    {:log/level log-level
+    {:app/name (get sys-map :app/name)
+     :log/level log-level
      :ipfs.read/scheme ipfs-read-scheme
      :ipfs.read/host ipfs-read-host
      :ipfs.read/port ipfs-read-port
