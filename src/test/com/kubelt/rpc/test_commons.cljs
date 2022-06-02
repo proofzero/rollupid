@@ -9,6 +9,7 @@
   []
   (some? (get-in (node-env) [:environment "GITHUB_ACTIONS"])))
 
+;; TODO use "oort-devnet.admin1337.workers.dev" as host when CORS issue abated
 (defn p2p-config
   "return p2p config based on env"
   []
