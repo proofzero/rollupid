@@ -39,7 +39,7 @@
   {:pre [(map? m)] :post [(lib.promise/promise? %)]}
   (lib.promise/promise
    (fn [resolve _]
-     (let [data (lib.json/edn->json-str m {:encode-key-fn keyword})]
+     (let [data (lib.json/edn->json-str m)]
        (set-item! DB_ID_KEY data)
        (resolve {:data data})))))
 
@@ -51,7 +51,7 @@
   (lib.promise/promise
    (fn [resolve _]
      (let [data (-> (get-item DB_ID_KEY)
-                    (lib.json/json-str->edn {:decode-key-fn keyword}))]
+                    (lib.json/json-str->edn))]
        (resolve {:data data})))))
 
 (defn create

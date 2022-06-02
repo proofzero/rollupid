@@ -45,14 +45,10 @@
 
 (defn edn->json-str
   "Write edn data as a JSON string."
-  ([x]
-   #?(:clj (json/write-value-as-string x)
-      :cljs (js/JSON.stringify (clj->js x))))
-  ([x mapper]
-   #?(:clj (json/write-value-as-string x mapper)
-      :cljs (let [encode-key-fn (get mapper :encode-key-fn)]
-              (println "YYYY" encode-key-fn)
-              (js/JSON.stringify (clj->js x :keyword-fn encode-key-fn))))))
+  [x]
+  #?(:clj (json/write-value-as-string x)
+     :cljs (let [w (transit/writer :json-verbose)]
+             (transit/write w x))))
 
 (defn json-str->edn
   "Parse a JSON string into edn data."
