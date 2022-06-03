@@ -25,10 +25,10 @@ At Kubelt, we believe that the best way to create a dApp is to co-locate applica
 We call this the **local-first** approach to building applications and it's a good way to ensure that your dApp is secure, private, and easy to use. All you need is a service layer to coordinate with the blockchain and other decentralized services. The user's cyrptography provides the necessary features to [turn any browser or client into a user peer in a peer-to-peer network]({{<relref "cms-whitepaper">}}).
 
 In other words, if you think of a [dApp as a wallet]({{<relref "01-hello-world" >}}) with storage, messaging, and other features, Kubelt provides the necessary APIs to make this coordination possible with as little as one line of code.
-
+z`
 ## The Kubelt Star Platform
 
-**[insert local first diagram here]**
+<img src="/images/logicalarch.png" width="{{ .Width }}" height="{{ .Height }}">
 
 [todo]:
 principles:
