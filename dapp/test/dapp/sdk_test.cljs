@@ -52,7 +52,7 @@
                             :ipfs.write/scheme
                             :ipfs.write/host
                             :crypto/session
-                            :ipfs.read/port})
-                       (set (keys data)))))
+                            :ipfs.read/port}
+                          (set (keys data))))))
                (catch js/Error err (log/error err))
                (finally (done)))))))
