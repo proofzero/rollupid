@@ -29,5 +29,7 @@
                  (is (= {} (-> sys :crypto/session :vault/tokens)))
                  (is (map? (get-in kbt [:crypto/session :vault/tokens core])))
                  (is (string? (get-in kbt [:crypto/session :vault/tokens* core]))))
-               (catch js/Error err (log/error err))
+               (catch js/Error err (do
+                                     (log/error err)
+                                     (is false err)))
                (finally (done)))))))
