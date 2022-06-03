@@ -58,15 +58,13 @@ Easily deploy dApps with standardized identity, storage, messaging services over
     <div class="col col--6">
       <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
-          <h4>🛂 3ID</h4>
+          <h4>🪪 3ID</h4>
           <p>Decentralized application user passport and database.</p>
         </div>
-      </a>
+      </a>  
     </div>
   </div>
 </div>
-
-
 
 ### Getting Started
 
@@ -83,4 +81,4 @@ Kubelt also provides a [community forum](https://github.com/kubelt/kubelt/discus
 
 - Join our [Discord](https://discord.gg/UgwAsJf6C5) community to ask questions.
 - Follow us on [Twitter](https://twitter.com/kubeltcms) for updates.
-- Read our [contributors guidelines]({{< relref "contributing" >}}).
+- Become a [contributor]({{< relref "contributing" >}}).

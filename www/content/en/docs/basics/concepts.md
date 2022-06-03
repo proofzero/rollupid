@@ -1,7 +1,6 @@
 ---
-title: "Architecture"
-description: "Kubelt decentralizes applications."
-lead: "Kubelt decentralizes applications."
+title: "Concepts"
+description: "Understanding the Kubelt platform."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
 draft: false
@@ -13,21 +12,37 @@ weight: 102
 toc: true
 ---
 
-## Concepts
+Kubelt is a platform for creating decentralized applications. We designed Kubelt to be a simple, easy to use, and secure platform for creating dApps.
 
-Kubelt decentralizes any application by integrating with local wallet cryptography and backing every blockchain account with standardized decentralized services over a integrated peer-to-peer edge platform.
+With Kubelt, you can create dApps that interact with the blockchain and other decentralized services without the need of running infrastructure or custom server applications.
 
-In doing so, the platform provides a unified API for all dApps to interact with each other and the blockchain. This allows for a decentralized application ecosystem to be built around a single, unified, and secure platform using local cryptography and decentralized storage, content delivery and messaging.
+Your users also get the benefit of better security, privacy and experience without needing to download any new tools or apps.
 
-**[insert logically local wallet diagram here plus binding into startships with a single API]**
+## Design Principles
 
-# Architecture
+At Kubelt, we believe that the best way to create a dApp is to co-locate applications with the user and eliminate the need for infrastructure and server applications. After all, browsers and other clients are where the user's private cryptography is located and, like blockchains, are already decentralized.
 
-**[insert architecture diagram here]**
+We call this the **local-first** approach to building applications and it's a good way to ensure that your dApp is secure, private, and easy to use. All you need is a service layer to coordinate with the blockchain and other decentralized services. The user's cyrptography provides the necessary features to [turn any browser or client into a user peer in a peer-to-peer network]({{<relref "cms-whitepaper">}}).
 
-## Kubelt Cores
+In other words, if you think of a [dApp as a wallet]({{<relref "01-hello-world" >}}) with storage, messaging, and other features, Kubelt provides the necessary APIs to make this coordination possible with as little as one line of code.
 
-At the heart of Kubelt is the **"Kubelt Core"**, an application container designed to look and feel like a supercharged Web3 wallet.
+## The Kubelt Star Platform
+
+**[insert local first diagram here]**
+
+[todo]:
+principles:
+- handle the repeated patterns
+- standardization / adoption (acknowledgement of the blockchain)
+- unification of services, chains/identity (embrace)
+- extensibility / composability (open source and proprietary - there are always exceptions)
+- open source libraries and SDK
+- unification
+
+--- 
+
+
+<!-- At the heart of Kubelt is the **"Kubelt Core"**, an application container designed to look and feel like a supercharged Web3 wallet.
 
 The Kubelt Core extends standard wallet APIs with multi-signer, content management, and networking capabilities. These capabilities can be configured and organized into decentralized applications. Kubelt provides several libraries, tools and applications to work with and manage cores.
 
@@ -71,7 +86,7 @@ Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6
 
 Kubelt is local-first by default in order to provide a full-stack local developer experience. This makes sure that that Kubelt applications are user-centric and decentralized.
 
-Kubelt will also always try to deliver and publish content over available decentralized networks like IPFS and fall back to HTTP gatways when needed.
+Kubelt will also always try to deliver and publish content over available decentralized networks like IPFS and fall back to HTTP gatways when needed. -->
 
 ## Showcase
 
