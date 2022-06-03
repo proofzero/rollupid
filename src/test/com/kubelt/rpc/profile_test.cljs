@@ -35,7 +35,9 @@
                                                           :params {:profile {:profilePicture updated-profile-picture}}}))
                        updated-profile (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get :profile]}))]
                    (is (= {:profile-picture updated-profile-picture} updated-profile))))
-               (catch js/Error err (log/error err))
+               (catch js/Error err (do
+                                     (log/error err)
+                                     (is false err)))
                (finally (done)))))))
 
 (comment
