@@ -5,9 +5,8 @@
   from jamesmacaulay/cljs-promises."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [goog.async.promises :refer [allMapValues]])
-  (:require
-   [cljs.core.async.interop :refer-macros [<p!]]))
+   [promesa.core :as p]
+   [goog.async.promises :refer [allMapValues]]))
 
 ;; TODO support goog.Promise, which is the same as a native promise but
 ;; can also be cancelled.
@@ -15,7 +14,7 @@
 ;; Internal
 ;; -----------------------------------------------------------------------------
 
-(defn- cast-as-array
+#_(defn- cast-as-array
   [coll]
   (if (or (array? coll)
           (not (reduceable? coll)))
@@ -29,7 +28,7 @@
   "Returns true if the argument is a JavaScript promise, and false
   otherwise."
   [x]
-  (= js/Promise (type x)))
+  (p/promise? x))
 
 (defn promise
   "Return a promise that uses the given resolver function. This function
@@ -38,35 +37,36 @@
   promise."
   [resolver]
   {:pre [(fn? resolver)]}
-  (js/Promise. resolver))
+  (p/create resolver))
 
 (defn then
-  ([promise on-fulfilled]
-   {:pre [(fn? on-fulfilled)]}
-   (.then promise on-fulfilled))
-  ([promise on-fulfilled on-rejected]
-   {:pre [(every? fn? [on-fulfilled on-rejected])]}
-   (.then promise on-fulfilled on-rejected)))
+  [promise on-fulfilled]
+  {:pre [(fn? on-fulfilled)]}
+  (p/then promise on-fulfilled)
+  #_([promise on-fulfilled on-rejected]
+     {:pre [(every? fn? [on-fulfilled on-rejected])]}
+     (p/then promise on-fulfilled)
+     (.then promise on-fulfilled on-rejected)))
 
 (defn catch
   [promise on-rejected]
   {:pre [(fn? on-rejected)]}
-  (.catch promise on-rejected))
+  (p/catch promise on-rejected))
 
 (defn finally
   [promise on-final]
   {:pre [(fn? on-final)]}
-  (.finally promise on-final))
+  (p/finally promise on-final))
 
 (defn resolved
   "Return a promise that resolves to the given value."
   [x]
-  (.resolve js/Promise x))
+  (p/promise x))
 
 (defn rejected
   "Return a promise that rejects to the given value."
   [x]
-  (.reject js/Promise x))
+  (p/rejected x))
 
 (defn timeout
   "Returns a promise that resolves after the given millisecond interval."
@@ -75,7 +75,7 @@
              (js/setTimeout resolve ms))))
 
 ;; https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/any
-(defn any
+#_(defn any
   "Takes an iterable of promises and returns a single promise that
   resolves as soon as any of the promises in the iterable fulfills, with
   the value of the fulfilled promise."
@@ -87,13 +87,13 @@
   "Takes an iterable of promises and returns a single promise that
   resolves to an array of the results of the input promises."
   [coll]
-  (.all js/Promise (cast-as-array coll)))
+  (p/all coll))
 
 ;; Google Clojure library promise utilities:
 ;;   https://google.github.io/closure-library/api/goog.async.promises.html
 ;; JavaScript native Maps:
 ;;   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
-(defn all-map
+#_(defn all-map
   "Resolves when all promise values in the map resolve. The resolved value
   will be a map with the same keys as the input map, but with the
   resolved values of the promises. Rejects with first error if any
@@ -103,7 +103,7 @@
   (allMapValues js-map))
 
 ;; https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled
-(defn all-settled
+#_(defn all-settled
   "Returns a promise that resolves after all of the given promises have
   either fulfilled or rejected, with an array of objects that each
   describes the outcome of each promise."

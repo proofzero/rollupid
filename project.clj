@@ -20,6 +20,8 @@
    [com.taoensso/timbre "5.2.1"]
    ;; fast, idiomatic pretty-printer
    [fipp/fipp "0.6.26"]
+   ;; Promise library for Clojure(Script)
+   [funcool/promesa "8.0.450"]
    ;; a micro-framework for building data-driven applications
    [integrant/integrant "0.8.0"]
    ;; fast JSON encoding and decoding

@@ -40,6 +40,8 @@
   ^:dev [day8.re-frame/tracing "0.6.2"]
   ;; fast, idiomatic pretty-printer
   [fipp/fipp "0.6.26"]
+  ;; Promise library for Clojure(Script)
+  [funcool/promesa "8.0.450"]
   ;; a micro-framework for building data-driven applications
   [integrant/integrant "0.8.0"]
   ;; Time as a Clojure/Script value
