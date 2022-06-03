@@ -42,6 +42,11 @@
 
 ;; Public
 ;; -----------------------------------------------------------------------------
+(defn edn->json-forjs-str
+  "json parseable from js env (without transit, so eg: no keyword support)"
+  [x]
+  #?(:clj (json/write-value-as-string x)
+     :cljs  (js/JSON.stringify (clj->js x))))
 
 (defn edn->json-str
   "Write edn data as a JSON string."

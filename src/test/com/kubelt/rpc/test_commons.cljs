@@ -16,6 +16,6 @@
   (if (ci-env)
       {:p2p/scheme :https
        :app/name "kubelt-test"
-       :p2p/host "d42a-46-6-209-110.eu.ngrok.io"
+       :p2p/host "oort-devnet.admin1337.workers.dev"
        :p2p/port  443}
     {}))
