@@ -59,7 +59,7 @@
         ;; Collect parameters from the supplied parameter map, removing
         ;; any nil entries.
         params (filter some? (map #(get params %) all-params))]
-    (lib.json/edn->json-str
+    (lib.json/edn->json-forjs-str
      {:id request-id
       :jsonrpc rpc-version
       :method method-name
