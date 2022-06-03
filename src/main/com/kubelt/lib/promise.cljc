@@ -1,7 +1,14 @@
 (ns com.kubelt.lib.promise
-  "Promise-related utilities. Wrapper around funcool/promesa lib"
+  "Promise-related utilities. Wrapper around funcool/promesa lib ... macros cloned"
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  (:require [promesa.core :as p]))
+  (:refer-clojure :exclude [delay promise
+                            map
+                            let
+                            -> ->> as-> do])
+  (:require
+   [promesa.protocols :as pt]
+   [clojure.core :as c]
+   [promesa.core :as p]))
 
 ;; TODO support goog.Promise, which is the same as a native promise but
 ;; can also be cancelled.
@@ -89,3 +96,14 @@
   rejected."
   [coll]
   (p/all coll))
+
+(defmacro let
+  "cloned of [funcool/promesa 8.0.450]"
+  [bindings & body]
+  `(pt/-bind
+    (pt/-promise nil)
+    (fn [_#]
+      ~(c/->> (reverse (partition 2 bindings))
+              (reduce (fn [acc [l r]]
+                        `(pt/-bind (pt/-promise ~r) (fn [~l] ~acc)))
+                      `(do! ~@body))))))
