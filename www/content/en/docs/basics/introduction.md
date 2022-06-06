@@ -30,7 +30,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 <div class="container" style="padding: 0px;">
   <div class="row">
     <div class="col col--6">
-      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href="{{<relref \"starbase\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>✨ Starbase Dashboard</h4>
           <p>Decentralized application control centre and analytics.</p>
@@ -38,7 +38,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
       </a>
     </div>
     <div class="col col--6">
-      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href="{{<relref \"starship\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>🚀 Starship Apps</h4>
           <p>No-code, serverless dApp backends.</p>
@@ -48,7 +48,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
   </div>
   <div class="row" style="margin-top: 32px">
     <div class="col col--6">
-      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 00px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href="{{<relref \"orbit\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 00px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>🪐 Orbit CDN</h4>
           <p>IPFS powered content addressing and delivery.</p>
@@ -56,7 +56,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
       </a>
     </div>
     <div class="col col--6">
-      <a class="card" href="/docs/guides/database" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href="{{<relref \"3id\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>🪪 3ID</h4>
           <p>Decentralized application user passport and database.</p>

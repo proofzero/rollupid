@@ -1,5 +1,5 @@
 ---
-title: "Concepts"
+title: "Platform"
 description: "Understanding the Kubelt platform."
 date: 2020-10-06T08:48:45+00:00
 lastmod: 2020-10-06T08:48:45+00:00
@@ -22,7 +22,7 @@ Your users also get the benefit of better security, privacy and experience witho
 
 At Kubelt, we believe that the best way to create a dApp is to co-locate applications with the user and eliminate the need for infrastructure and server applications. After all, browsers and other clients are where the user's private cryptography is located and, like blockchains, are already decentralized.
 
-We call this the **local-first** approach to building applications and it's a good way to ensure that your dApp is secure, private, and easy to use. All you need is a service layer to coordinate with the blockchain and other decentralized services. The user's cyrptography provides the necessary features to [turn any browser or client into a peer in a peer-to-peer network]({{<relref "cms-whitepaper">}}).
+We call this the **local-first** approach to building applications and it's a good way to ensure that your dApp is secure, private, and easy to use. All you need is a service layer to coordinate with the blockchain and other decentralized services. The user's cyrptography provides the necessary features to [turn any browser or client into a peer within a peer-to-peer network]({{<relref "whitepaper">}}).
 
 In other words, if you think of a [dApp as a wallet]({{<relref "01-hello-world" >}}) with storage, messaging, and other features, Kubelt provides the necessary APIs to make this coordination possible with as little as one line of code.
 
@@ -54,6 +54,6 @@ Find out how to contribute to Kubelt. [Contributing →]({{< relref "contributin
 ## Resources
 
 - Get started with our [quick start]({{< relref "quick-start" >}}) guide.
-- Read our [whitepaper]({{< relref "cms-whitepaper" >}}) to learn more.
+- Read our [whitepaper]({{< relref "whitepaper" >}}) to learn more.
 - Check out our [SDK Reference](#) docs.
 - FAQ and troubleshooting in our [help]({{< relref "help" >}}) section.

@@ -1,5 +1,5 @@
 ---
-title: "Kubelt Whitepaper"
+title: "Whitepaper"
 description: "Kubelt is an open source toolkit for building peer-to-peer dapps. Using a CMS dapp, SDK, and peer node, developers can build dapps quickly using open standards, allowing maximum interoperability, easy scalability, and high availability. This paper describes the full architecture of a system composed from these components and its theoretical foundations."
 lead: "A physical approach to distributed semantic graphs."
 date: 2021-12-01T00:00:00+00:00
