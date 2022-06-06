@@ -7,9 +7,11 @@
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/m8NbsgByA9)
 ![Version badge](https://img.shields.io/badge/Version-pre%20alpha-orange.svg)
 
-Kubelt’s integrated peer-to-peer edge architecture decentralizes any application. The Kubelt network is made of wallet-centric “Kubelt Cores” that look and behave any crypto wallets with the addition of content enabled APIs. These cores are configurable and composable in infinite ways with other peers on the network to create decentralized applications that fit your use case.
+Kubelt is a fully managed decentralized application platform. Easily deploy dApps with standardized identity, storage, messaging services over a unified serverless RPC API, and more.
 
-For more please see the [Kubelt Docs](https://kubelt.com/docs).
+This repository hosts Kubelt's libraries, client source code and documentation.
+
+To learn more please see the [Kubelt Docs](https://kubelt.com/docs).
 
 ## Kubelt Monorepo Tour
 
