@@ -10,11 +10,7 @@
             [malli.generator :as mg]))
 
 (defn test-length [length]
-  (let [hex [:and
-             [:re
-              #?(:cljs {:gen/fmap (common/gen-fmap-hex length)})
-              (re-pattern (common/hex-pattern length))]
-             [:string {:mix length :max length}]]
+  (let [hex (common/hex length)
         generated (mg/generate hex)]
     (is (m/validate hex generated)
         {:generated-value generated
