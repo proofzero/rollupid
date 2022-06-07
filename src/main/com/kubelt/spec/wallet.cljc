@@ -12,9 +12,6 @@
   ;; TODO should be 0x<hex string>
   :string)
 
-(def key-string
-  ;; TODO hex string
-  :string)
 
 ;; Operations
 ;; -----------------------------------------------------------------------------
