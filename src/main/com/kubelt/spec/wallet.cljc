@@ -15,14 +15,17 @@
 (defn hex-0x-pattern [length]
   (str "0[xX]" (spec.common/hex-pattern length)))
 
-(def wallet-address
-  "string length to 42 instead of 40 thus we have prefixed 0x"
+(defn hex-0x
+  "string length +2 thus it's prefixed with 0x"
+  [length]
   [:and
    [:re
     #?(:cljs {:gen/fmap (fn [_] (.-address (.createRandom Wallet)))}
        :clj {:gen/elements wallet-mock-data})
-    (re-pattern (hex-0x-pattern 40))]
-   [:string {:max 42 :min 42}]])
+    (re-pattern (hex-0x-pattern length))]
+   [:string {:max (+ 2 length) :min (+ 2 length)}]])
+
+(def wallet-address (hex-0x 40))
 
 ;; Operations
 ;; -----------------------------------------------------------------------------
