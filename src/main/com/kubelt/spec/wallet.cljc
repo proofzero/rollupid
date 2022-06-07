@@ -5,21 +5,21 @@
   (:require
    [com.kubelt.spec.common :as spec.common]
    [com.kubelt.spec.core :as spec.core]
-   [com.kubelt.spec.crypto :as spec.crypto]
    [com.kubelt.spec.jwt :as spec.jwt])
   #?(:cljs (:require ["@ethersproject/wallet" :refer [Wallet]])))
-
-(defn hex-pattern [length] (re-pattern (str "0[xX][0-9a-fA-F]{" length "}")))
 
 (def ^:private wallet-mock-data
   "generated with/from ether (cljs) logic too (set (repeatedly 5 #(.-address (.createRandom Wallet))));;"
   #{"0x3E2C108FEE24bC552Ba98e3360A97d0912Cc0D63" "0x605b42fdBE0bbdaED4F0BA4158CD94F890292D5e" "0xE7187321fdb2A8E78aca4122586280571fa21D88" "0xd8e66F535061135643A3579Cc86BF7b860cb0e8A" "0xf46632c8a15d3f19ad9DF5568dE96891eaC48934"})
 
+(defn hex-0x-pattern [length]
+  (str "0[xX]" (spec.common/hex-pattern length)))
+
 (def wallet-address
   [:re
    #?(:cljs {:gen/fmap (fn [_] (.-address (.createRandom Wallet)))}
       :clj {:gen/elements wallet-mock-data})
-   (hex-pattern 40)])
+   (re-pattern (hex-0x-pattern 40))])
 
 ;; Operations
 ;; -----------------------------------------------------------------------------

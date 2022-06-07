@@ -18,3 +18,6 @@
   #?(:clj bytes?
      ;; TODO should be a Uint8Array
      :cljs :any))
+
+(defn hex-pattern [length]
+  (str "[0-9a-fA-F]{" length "}"))
