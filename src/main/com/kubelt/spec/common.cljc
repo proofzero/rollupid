@@ -19,5 +19,22 @@
      ;; TODO should be a Uint8Array
      :cljs :any))
 
+(def hex-digit
+  (set "0123456789abcdefABCDEF"))
+
+(defn rand-hex []
+  (rand-nth (vec hex-digit)))
+
+(defn generate-hex [length]
+  (apply str (repeatedly length rand-hex)))
+
+(defn gen-fmap-hex
+  "malli helper to define :re schema using gen/fmap
+   eg: [:re
+           #?(:cljs {:gen/fmap (gen-fmap-hex 10)})
+           (re-pattern (hex-pattern 10))]"
+  [length]
+  #(generate-hex length))
+
 (defn hex-pattern [length]
   (str "[0-9a-fA-F]{" length "}"))
