@@ -49,6 +49,6 @@
 (defn hex [length]
   [:and
    [:re
-    #?(:cljs {:gen/fmap (gen-fmap-hex length)})
+    {:gen/fmap (gen-fmap-hex length)}
     (re-pattern (hex-pattern length))]
    [:string {:max length :min length}]])
