@@ -30,11 +30,18 @@
 
 (defn gen-fmap-hex
   "malli helper to define :re schema using gen/fmap
-   eg: [:re
-           #?(:cljs {:gen/fmap (gen-fmap-hex 10)})
-           (re-pattern (hex-pattern 10))]"
+   Pay attention that [:string {:min xx :max xx} goes after [:re …....] spec]
+   otherwise malli will raise following error:
+  \"Couldn't satisfy such-that predicate after 100 tries.\"
+
+  Example:
+      [:and
+        [:re
+          #?(:cljs {:gen/fmap (gen-fmap-hex 10)})
+         (re-pattern (hex-pattern 10))]
+        [:string {:min 10 :max 10}]]"
   [length]
   #(generate-hex length))
 
 (defn hex-pattern [length]
-  (str "[0-9a-fA-F]{" length "}"))
+  (str "[\\da-fA-F]{" length "}"))
