@@ -31,7 +31,8 @@ In other words, if you think of a [dApp as a wallet]({{<relref "01-hello-world" 
 The Kubelt platform is powered by a suite of services that can be configured and extended to support your dApp. You can use our Kubelt CLI or our no-code configuration experience called [✨Starbase]().
 
 
-<img src="/images/logicalarch.png" width="{{ .Width }}" height="{{ .Height }}">
+<img src="/images/logicalarch.png">
+<a href="/images/logicalarch.png">click here for larger image</a>
 <br />
 <br />
 
