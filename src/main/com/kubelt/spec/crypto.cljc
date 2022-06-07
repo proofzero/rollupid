@@ -6,10 +6,10 @@
 
 
 (def hex-64-string
-  [:re (re-pattern (spec.common/hex-pattern 64))])
+  (spec.common/hex 64))
 
 (def hex-128-string
-  [:re (re-pattern (spec.common/hex-pattern 128))])
+  (spec.common/hex 128))
 
 ;; Digest
 ;; -----------------------------------------------------------------------------
