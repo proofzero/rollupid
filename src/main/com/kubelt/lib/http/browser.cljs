@@ -2,9 +2,10 @@
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [clojure.string :as cstr])
+  (:require
    [goog.net.XhrIo :as xhrio]
-   [goog.url :as gurl]
-   [clojure.string :as str])
+   [goog.url :as gurl])
   (:require
    [malli.core :as malli])
   (:require
@@ -36,12 +37,12 @@
    :uri/user user})
 
 (defn- validate-content-type
-  "Only lower-case when content-type exists. Calling `str/lower-case`
+  "Only lower-case when content-type exists. Calling `cstr/lower-case`
   on `nil` throws an error."
   [content-type]
   (when (and content-type
-             (not (str/blank? content-type)))
-    (str/lower-case content-type)))
+             (not (cstr/blank? content-type)))
+    (cstr/lower-case content-type)))
 
 (defn- make-response-fn
   "Returns a response handler function for an HTTP request send using
@@ -69,6 +70,18 @@
 
           (resolve (assoc response :http/body res))))))
 
+(defn- strip-forbidden-headers
+  "We are generally not allowed to set certain headers from
+  browser. Returns the given map of headers with any disallowed headers
+  removed."
+  [headers]
+  {:pre [(map? headers)]}
+  (let [forbidden #{"user-agent"}]
+    (into {} (remove (fn [[header _]]
+                       (let [header (-> header cstr/trim cstr/lower-case)]
+                         (contains? forbidden header)))
+                     headers))))
+
 ;; Public
 ;; -----------------------------------------------------------------------------
 
@@ -88,7 +101,12 @@
              ;; Perform the HTTP request.
              (let [method (http.shared/request->method request)
                    body (http.shared/request->body request)
-                   headers (http.shared/request->headers request)
+                   headers (-> request
+                               http.shared/request->headers
+                               ;; Some headers may not be sent from a
+                               ;; browser context, so we'll remove them
+                               ;; here.
+                               strip-forbidden-headers)
                    headers-obj (clj->js headers)
                    ;; 0 means no timeout.
                    timeout-ms 0
