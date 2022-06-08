@@ -1,7 +1,7 @@
 ;; packages/sdk-web/bb.edn
 {:paths []
  :deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
- :min-bb "0.7.0"
+ :min-bb "0.8.0"
  :tasks
  {:requires
   [[babashka.classpath :as cp]
@@ -17,11 +17,7 @@
     ;; Add shared build code to classpath.
     (cp/add-classpath (str (fs/path sdk-root "bb")))
     (require '[com.kubelt.cli :as cli])
-    (require '[com.kubelt.environ :as environ])
     (require '[com.kubelt.package :as package])
-    (require '[com.kubelt.semver :as semver])
-    (require '[com.kubelt.shadow :as shadow])
-    (require '[com.kubelt.time :as time])
     ;; Extract version from package.json.
     (def version (cli/release-version "package.json" *command-line-args*)))
 

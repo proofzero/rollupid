@@ -1,4 +1,5 @@
-{:min-bb "0.7.0"
+;; bb.edn
+{:min-bb "0.8.0"
  :tasks
  {:requires
   [[babashka.classpath :as cp]
