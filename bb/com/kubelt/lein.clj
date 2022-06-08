@@ -14,6 +14,12 @@
 (def ^:private base-map
   {:name :com.kubelt/sdk
    :description "Kubelt SDK"
+   ;; The project's license. :distribution should be :repo or :manual;
+   ;; :repo means it is OK for public repositories to host this project's
+   ;; artifacts.
+   :license {:name "Apache 2.0"
+             :url "https://www.apache.org/licenses/LICENSE-2.0"
+             :distribution :repo}
    :url "https://kubelt.com/"
    :source-paths ["src/main"]
    :repositories
