@@ -1,4 +1,4 @@
-(defproject kubelt/sdk "0.0.1"
+(defproject com.kubelt/sdk "0.0.2"
   :description "Kubelt SDK"
   :url "https://kubelt.com/"
 
