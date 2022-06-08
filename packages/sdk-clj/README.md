@@ -1,4 +1,4 @@
-# `@kubelt/sdk-cljs`
+# `@kubelt/sdk-clj`
 
 ![Build](https://img.shields.io/github/checks-status/kubelt/kubelt/main)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
@@ -9,8 +9,10 @@
 
 ## Usage
 
-```
-const sdkCljs = require('@kubelt/sdk-cljs');
+```clojure
+(ns com.example
+  (:require
+    [com.kubelt.sdk.v1 :as sdk]))
 
 // TODO: DEMONSTRATE API
 ```

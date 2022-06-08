@@ -1,7 +1,7 @@
 ;; packages/sdk-js/bb.edn
 {:paths []
  :deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
- :min-bb "0.7.0"
+ :min-bb "0.8.0"
  :tasks
  {:requires
   [[babashka.classpath :as cp]

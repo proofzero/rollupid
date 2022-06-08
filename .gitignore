@@ -199,3 +199,6 @@ result
 # repl
 .calva
 .joyride
+
+# leiningen
+project.clj
