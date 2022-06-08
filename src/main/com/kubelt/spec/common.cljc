@@ -18,3 +18,12 @@
   #?(:clj bytes?
      ;; TODO should be a Uint8Array
      :cljs :any))
+
+(defn hex-pattern [length]
+  (str "[\\da-fA-F]{" length "}"))
+
+(defn hex [length]
+  [:and
+   [:re
+    (re-pattern (hex-pattern length))]
+   [:string {:max length :min length}]])

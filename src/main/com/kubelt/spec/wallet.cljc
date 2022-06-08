@@ -5,16 +5,23 @@
   (:require
    [com.kubelt.spec.common :as spec.common]
    [com.kubelt.spec.core :as spec.core]
-   [com.kubelt.spec.crypto :as spec.crypto]
    [com.kubelt.spec.jwt :as spec.jwt]))
 
-(def wallet-address
-  ;; TODO should be 0x<hex string>
-  :string)
 
-(def key-string
-  ;; TODO hex string
-  :string)
+(defn- hex-0x-pattern [length]
+  (str "0[xX]" (spec.common/hex-pattern length)))
+
+(defn hex-0x
+  "string length +2 thus it's prefixed with 0x"
+  [length]
+  [:and
+   [:re
+    (re-pattern (hex-0x-pattern length))]
+   [:string {:max (+ 2 length) :min (+ 2 length)}]])
+
+(def wallet-address
+  (let [length 40]
+    (hex-0x length)))
 
 ;; Operations
 ;; -----------------------------------------------------------------------------

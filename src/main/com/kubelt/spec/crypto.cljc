@@ -4,9 +4,12 @@
   (:require
    [com.kubelt.spec.common :as spec.common]))
 
-;; TODO Match against a regex
-(def hex-string
-  :string)
+
+(def hex-64-string
+  (spec.common/hex 64))
+
+(def hex-128-string
+  (spec.common/hex 128))
 
 ;; Digest
 ;; -----------------------------------------------------------------------------
@@ -23,9 +26,9 @@
    [:digest/byte-length spec.common/byte-length]
    [:digest/bit-length spec.common/bit-length]
    [:digest/bytes spec.common/byte-data]
-   [:digest/hex-string hex-string]])
+   [:digest/hex-string hex-64-string]])
 
-(def digest-spec
+#_(def digest-spec
   [:and
    {:name "Digest"
     :description "A cryptographic digest."
@@ -47,7 +50,7 @@
    [:digest/byte-length spec.common/byte-length]
    [:digest/bit-length spec.common/bit-length]
    [:digest/algorithm digest-algorithm]
-   [:seed/hex-string hex-string]
+   [:seed/hex-string hex-64-string]
    [:seed/bytes spec.common/byte-data]])
 
 (def seed-schema
@@ -121,7 +124,7 @@
   [:map
    [:com.kubelt/type [:enum :kubelt.type/crypto.signature]]
    [:signature/algorithm keypair-algorithm]
-   [:signature/hex-string hex-string]
+   [:signature/hex-string hex-128-string]
    [:signature/bytes spec.common/byte-data]
    [:signature/length spec.common/byte-length]])
 
