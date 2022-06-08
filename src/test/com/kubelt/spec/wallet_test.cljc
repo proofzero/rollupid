@@ -26,7 +26,7 @@
 
 (deftest wallet-test
   (testing "hex validation and generation"
-    (let [generated (mg/generate gen.wallet/wallet-address)]
+    (let [generated (mg/generate (gen.wallet/wallet-address spec.wallet/wallet-address))]
       (is (m/validate spec.wallet/wallet-address generated)
           {:generated-value generated
            :error (str "no valid wallet generated")}))))
