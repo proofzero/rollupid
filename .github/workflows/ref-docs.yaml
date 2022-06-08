@@ -35,7 +35,7 @@ jobs:
           java-version: '17'
       - uses: DeLaGuardo/setup-clojure@5.1
         with:
-          cli: 1.11.0.1113
+          cli: 1.11.1.1113
           #lein: latest
           #boot: latest
           #bb: latest
