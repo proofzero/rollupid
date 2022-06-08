@@ -1,16 +1,18 @@
 (ns com.kubelt.spec.common-test
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   #?(:cljs
      (:require
       [cljs.test :as t :refer [deftest is testing]])
      :clj
      (:require
       [clojure.test :as t :refer [deftest is testing]]))
-  (:require [com.kubelt.spec.common :as common]
+  (:require [com.kubelt.spec.common :as spec.common]
+            [com.kubelt.gen.common :as gen.common]
             [malli.core :as m]
             [malli.generator :as mg]))
 
-(defn test-length [length]
-  (let [hex (common/hex length)
+(defn- hex-test-length [length]
+  (let [hex (gen.common/hex (spec.common/hex length))
         generated (mg/generate hex)]
     (is (m/validate hex generated)
         {:generated-value generated
@@ -18,6 +20,6 @@
 
 (deftest hex-test
   (testing "hex validation and generation"
-    (test-length 10)
-    (test-length 128)
-    (test-length 256)))
+    (hex-test-length 10)
+    (hex-test-length 128)
+    (hex-test-length 256)))
