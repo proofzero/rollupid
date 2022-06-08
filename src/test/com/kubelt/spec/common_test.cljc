@@ -7,7 +7,7 @@
      (:require
       [clojure.test :as t :refer [deftest is testing]]))
   (:require [com.kubelt.spec.common :as spec.common]
-            [com.kubelt.gen.common :as gen.common]
+            [com.kubelt.lib.gen.common :as gen.common]
             [malli.core :as m]
             [malli.generator :as mg]))
 

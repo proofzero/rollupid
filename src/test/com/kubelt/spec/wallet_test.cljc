@@ -7,7 +7,7 @@
      (:require
       [clojure.test :as t :refer [deftest is testing]]))
   (:require [com.kubelt.spec.wallet :as spec.wallet]
-            [com.kubelt.gen.wallet :as gen.wallet]
+            [com.kubelt.lib.gen.wallet :as gen.wallet]
             [malli.core :as m]
             [malli.generator :as mg]))
 

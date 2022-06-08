@@ -1,4 +1,4 @@
-(ns com.kubelt.gen.common
+(ns com.kubelt.lib.gen.common
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require [malli.util :as mu]
             [malli.core :as m]))

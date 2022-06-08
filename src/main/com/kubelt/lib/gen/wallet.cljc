@@ -1,6 +1,6 @@
-(ns com.kubelt.gen.wallet
+(ns com.kubelt.lib.gen.wallet
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
-  (:require [com.kubelt.gen.common :as gen.common])
+  (:require [com.kubelt.lib.gen.common :as gen.common])
   #?(:cljs (:require ["@ethersproject/wallet" :refer [Wallet]])))
 
 (def ^:private wallet-mock-data
