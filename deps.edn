@@ -1,17 +1,29 @@
 ;; deps.edn
-{:paths ["src/main"]
+{:paths ["src/dev"
+         "src/main"
+         "src/test"
+         "dapp/src"
+         "dapp/test"]
 
  :deps
  {;; a Clojure/Script library for word case conversions
   camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
   ;; Implementations of common encoders and decoders
   commons-codec/commons-codec {:mvn/version "1.15"}
+  ;; errors as simple, actionable, generic information
+  com.cognitect/anomalies {:mvn/version "0.1.12"}
   ;; A data format and set of libraries for conveying values
   com.cognitect/transit-clj {:mvn/version "1.0.329"}
+  ;; A data format for conveying values between applications
+  com.cognitect/transit-cljs {:mvn/version "0.8.269"}
   ;; Navigator-based query and transformation of Clojure data
   com.rpl/specter {:mvn/version "1.1.4"}
   ;; Pure Clojure/Script logging library
   com.taoensso/timbre {:mvn/version "5.2.1"}
+  ;; fast, idiomatic pretty-printer
+  fipp/fipp {:mvn/version "0.6.26"}
+  ;; Promise library for Clojure(Script)
+  funcool/promesa {:mvn/version "8.0.450"}
   ;; An http client for Clojure wrapping jdk 11's HttpClient
   hato/hato {:mvn/version "0.8.2"}
   ;; Micro-framework for data-driven architecture
@@ -26,6 +38,8 @@
   org.bouncycastle/bcprov-jdk15on {:mvn/version "1.70"}
   ;; Facilities for async programming and communication in Clojure
   org.clojure/core.async {:mvn/version "1.5.648"}
+  ;; tools for working with command line arguments
+  org.clojure/tools.cli {:mvn/version "1.0.206"}
   ;; Crypto library for tx signing and key/wallet management in Ethereum
   ;; cf. https://docs.web3j.io/4.8.7/advanced/web3j_core_modules/
   org.web3j/crypto {:mvn/version "5.0.0"}
@@ -46,6 +60,29 @@
  {:dev {:extra-paths ["src/dev"]
         :extra-deps {fipp/fipp {:mvn/version "0.6.26"}}}
   :robert {:extra-deps {}}
+
+  :cljs {:extra-deps {;; ClojureScript compilation made easy
+                      thheller/shadow-cljs {:mvn/version "2.19.2"}}}
+
+  :dapp {:extra-deps {;; Chrome DevTools enhancements for CLJS developers
+                      binaryage/devtools {:mvn/version "1.0.6"}
+                      ;; Reagent wrappers for @headlessui/react components
+                      com.github.mainej/headlessui-reagent {:mvn/version "1.6.4.68"}
+                      ;; A fast data-driven router for Clojure/Script
+                      metosin/reitit {:mvn/version "0.5.18"}
+                      ;; Minimalistic React for ClojureScript
+                      reagent/reagent {:mvn/version "1.1.1"}
+                      ;; A CLJS framework for building UIs leveraging React
+                      re-frame/re-frame {:mvn/version "1.2.0"}
+
+                      ;; TODO use deps below for ^:dev
+
+                      ;; inspection tool for re-frame events & app-db
+                      day8.re-frame/re-frame-10x {:mvn/version "1.3.0"}
+                      ;; testing for re-frame events & subs
+                      day8.re-frame/test {:mvn/version "0.1.5"}
+                      ;; tracing for re-frame events
+                      day8.re-frame/tracing {:mvn/version "0.6.2"}}}
 
   ;; Generate literate docs from the source code using sidenote (a fork
   ;; of marginalia).

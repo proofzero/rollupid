@@ -4,8 +4,7 @@
   (:require
    ["yargs" :as yargs :refer [Yargs]])
   (:require
-   [clojure.set :as cset]
-   [clojure.string :as str])
+   [clojure.set :as cset])
   (:require
    [com.kubelt.kbt.cmds :as kbt.cmds]))
 
