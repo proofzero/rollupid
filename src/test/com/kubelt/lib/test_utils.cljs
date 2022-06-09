@@ -2,10 +2,13 @@
   (:require
    [cljs.core.async :refer [go <!]]
    [cljs.core.async.interop :refer-macros [<p!]]
+   [cljs.reader :refer [read-string]]
    [cljs.test :refer-macros [is async] :as t]
+   [com.kubelt.lib.util :as lib.util :refer [node-env]]
    [taoensso.timbre :as log])
   (:require
-   [com.kubelt.lib.wallet.node :as wallet]))
+   [com.kubelt.lib.wallet.node :as wallet]
+   [com.kubelt.rpc.schema.fs :as s.fs]))
 
 (defn create-wallet [app-name wallet-name wallet-password]
   (go
@@ -45,3 +48,12 @@
         (<! (delete-wallet app-name wallet-name wallet-password))
         (catch js/Error err (js/console.log err))
         (finally (done))))))
+
+(def json-path
+  (if (= "runner" (:username (node-env)))
+    "./fix/openrpc/"
+    "./../../../fix/openrpc/"))
+
+(defn read-local-edn&go [path]
+  (go
+    (read-string (str (<p! (s.fs/read-file& (str json-path path)))))))
