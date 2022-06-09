@@ -5,10 +5,10 @@
    [malli.core :as m]
    [malli.error :as me])
   (:require
+   [com.kubelt.lib.config :as lib.config]
    [com.kubelt.lib.config.default :as lib.config.default]
    [com.kubelt.lib.config.sdk :as lib.config.sdk]
    [com.kubelt.lib.config.system :as lib.config.system]
-   [com.kubelt.lib.config.util :as lib.config.util]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :as lib.promise :refer [promise?]]
@@ -65,13 +65,13 @@
   ;; The 1-arity implementation uses expects a configuration object.
   ([config]
    {:pre [(object? config)] :post [(promise? %)]}
-   (let [config (lib.config.util/obj->map config)]
+   (let [config (lib.config/obj->map config)]
      (-> (init config)
          ;; If an error occurred, convert the returned error map into an
          ;; JavaScript object.
          (lib.promise/catch
           (fn [e]
-            (clj->js e)))))))
+            (lib.promise/rejected (clj->js e))))))))
 
 ;; halt
 ;; -----------------------------------------------------------------------------

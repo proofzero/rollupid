@@ -54,7 +54,13 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, ['v1'], 'init');
     check(kbt, ['v1'], 'halt');
     check(kbt, ['v1'], 'options');
+
+    check(kbt, ['v1'], 'store');
+    check(kbt, ['v1'], 'restore');
+
     check(kbt, ['v1', 'core'], 'authenticate');
+    check(kbt, ['v1', 'core'], 'isLoggedIn');
+    check(kbt, ['v1', 'core'], 'setWallet');
 
     t.end();
 });
@@ -95,6 +101,57 @@ tap.test('sdk init', (t) => {
     tap.test('with valid config', (t) => {
         return kbt.v1.init({
             "log/level": "info",
+        }).then((sdk) => {
+            t.type(sdk, 'object');
+            return kbt.v1.halt(sdk);
+        }).then(() => {
+            t.pass('ok');
+        });
+    });
+
+    tap.test('with app name config', (t) => {
+        return kbt.v1.init({
+            "app/name": "foobar",
+        }).then((sdk) => {
+            t.type(sdk, 'object');
+            return kbt.v1.halt(sdk);
+        }).then(() => {
+            t.pass('ok');
+        });
+    });
+
+    tap.test('with empty credential config', (t) => {
+        return kbt.v1.init({
+            "credential/jwt": {},
+        }).then((sdk) => {
+            t.type(sdk, 'object');
+            return kbt.v1.halt(sdk);
+        }).then(() => {
+            t.pass('ok');
+        });
+    });
+
+    tap.test('with p2p config', (t) => {
+        return kbt.v1.init({
+            "p2p/scheme": "http",
+            "p2p/host": "127.0.0.1",
+            "p2p/port": 5001,
+        }).then((sdk) => {
+            t.type(sdk, 'object');
+            return kbt.v1.halt(sdk);
+        }).then(() => {
+            t.pass('ok');
+        });
+    });
+
+    tap.test('with ipfs config', (t) => {
+        return kbt.v1.init({
+            "ipfs.read/scheme": "http",
+            "ipfs.read/host": "127.0.0.1",
+            "ipfs.read/port": 5001,
+            "ipfs.write/scheme": "http",
+            "ipfs.write/host": "127.0.0.1",
+            "ipfs.write/port": 5001,
         }).then((sdk) => {
             t.type(sdk, 'object');
             return kbt.v1.halt(sdk);
