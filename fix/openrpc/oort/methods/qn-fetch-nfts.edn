@@ -1,5 +1,5 @@
 {:name "qn_fetchNFTs"
- :params [{:name "result"
+ :params [{:name "params"
            :schema
            {:type "object"
             :required ["wallet"]

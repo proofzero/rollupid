@@ -679,7 +679,7 @@
       "name": "qn_fetchNFTs",
       "params": [
         {
-          "name": "result",
+          "name": "params",
           "schema": {
             "type": "object",
             "required": [
