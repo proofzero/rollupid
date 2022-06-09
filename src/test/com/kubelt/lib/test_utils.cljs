@@ -3,6 +3,7 @@
    [cljs.core.async :refer [go <!]]
    [cljs.core.async.interop :refer-macros [<p!]]
    [cljs.test :refer-macros [is async] :as t]
+   [com.kubelt.lib.util :as lib.util :refer [node-env]]
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.wallet.node :as wallet]))
@@ -45,3 +46,8 @@
         (<! (delete-wallet app-name wallet-name wallet-password))
         (catch js/Error err (js/console.log err))
         (finally (done))))))
+
+(def json-path
+  (if (= "runner" (:username (node-env)))
+    "./fix/openrpc/"
+    "./../../../fix/openrpc/"))

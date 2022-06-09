@@ -1,23 +1,16 @@
 (ns com.kubelt.rpc.schema-test
   "Test rpc schema"
   (:require
-   ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
    [cljs.core.async :refer [go]]
    [cljs.core.async.interop :refer-macros [<p!]]
    [cljs.reader :refer [read-string]]
    [cljs.test :as t :refer [deftest is testing async]]
-   [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.lib.util :as lib.util :refer [node-env]]
+   [com.kubelt.lib.test-utils :as lib.test-utils]
    [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.schema :as rpc.schema]
    [com.kubelt.rpc.schema.fs :as s.fs]
-   [com.kubelt.rpc.schema.parse :as rpc.schema.parse]
-   [malli.core :as malli]))
+   [com.kubelt.rpc.schema.parse :as rpc.schema.parse]))
 
-(def json-path
-  (if (= "runner" (:username (node-env)))
-    "./fix/openrpc/"
-    "./../../../fix/openrpc/"))
 
 
 (def data {:openrpc "1.2.6",
@@ -44,7 +37,7 @@
     (async done
            (go
              (try
-               (let [data (read-string (str (<p! (s.fs/read-file& (str json-path "oort.edn")))))
+               (let [data (read-string (str (<p! (s.fs/read-file& (str lib.test-utils/json-path "oort.edn")))))
                      parsed (rpc.schema.parse/parse data {})]
                  (check-keys parsed)
                  (let [client (rpc.schema/schema (rpc/init) data)]
@@ -79,7 +72,7 @@
                (doseq [filename  ["empty.json" "ethereum.json" "links.json" "petstore-by-name.json"
                                   "petstore-expanded.json" "petstore.json" "simple-math.json" "api-simple.json"]]
                  (println filename)
-                 (check-keys (-> (<p! (s.fs/read-schema (str json-path filename)))
+                 (check-keys (-> (<p! (s.fs/read-schema (str lib.test-utils/json-path filename)))
                                  (rpc.schema.parse/parse  {}))))
 
                (catch js/Error err (js/console.log err)))
