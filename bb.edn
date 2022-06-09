@@ -276,4 +276,8 @@
 
   rpc:mock-server:ethereum
   {:doc "Run ethereum rpc mock server"
-   :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/ethereum.json -p 33337")}}}
+   :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/ethereum.json -p 33337")}
+
+  rpc:mock-server:oort
+  {:doc "Run oort rpc mock server"
+   :task (shell "npx open-rpc-mock-server -d ./fix/openrpc/oort.json -p 33337")}}}
