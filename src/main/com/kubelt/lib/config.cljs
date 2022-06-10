@@ -2,29 +2,26 @@
   "Configuration-related support."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as str]))
+   [com.kubelt.lib.config.default :as lib.config.default]
+   [com.kubelt.lib.config.util :as lib.config.util]))
 
-;; Internal
-;; -----------------------------------------------------------------------------
-
-(defn- log-level->keyword
-  "Convert a log level string (e.g. 'info', ':info') to a keyword."
-  [s]
-  (if (string? s)
-    (keyword (str/replace s #"^:" ""))
-    log-level))
-
-;; Public
+;; obj->map
 ;; -----------------------------------------------------------------------------
 
 (defn obj->map
-  "Convert a JavaScript configuration object to a Clojure config map."
+  "Convert a JavaScript object containing SDK initialization options to a
+  Clojure config map containing the same configuration options but
+  updated to conform to the schema that defines what is allowed as an
+  option to the SDK (init) call. Any configuration options that aren't
+  provided are set to their default values in the returned map."
   [o]
   {:pre [(object? o)]}
-  (let [config (js->clj o :keywordize-keys true)]
-    (if (empty? config)
-      default-config
-      ;; Fix up any config map values that didn't translate from
-      ;; JavaScript.
-      (-> config
-          (update-in [:log/level] log-level->keyword)))))
+  (let [config  (js->clj o :keywordize-keys true)
+        config  (merge lib.config.default/sdk config)]
+    ;; Fix up any config map values that didn't translate from
+    ;; JavaScript.
+    (-> config
+        (update-in [:log/level] lib.config.util/str->kw)
+        (update-in [:p2p/scheme] lib.config.util/str->kw)
+        (update-in [:ipfs.read/scheme] lib.config.util/str->kw)
+        (update-in [:ipfs.write/scheme] lib.config.util/str->kw))))

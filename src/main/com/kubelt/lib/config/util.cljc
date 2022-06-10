@@ -6,28 +6,12 @@
   (:require
    [com.kubelt.lib.config.default :as lib.config.default]))
 
-;; Internal
+;; str->kw
 ;; -----------------------------------------------------------------------------
 
-(defn log-level->keyword
+(defn str->kw
   "Convert a log level string (e.g. 'info', ':info') to a keyword."
   [log-level]
   (if (string? log-level)
-    (keyword (cstr/replace log-level #"^:" ""))
+    (keyword (-> log-level (cstr/trim) (cstr/replace #"^:" "")))
     log-level))
-
-;; Public
-;; -----------------------------------------------------------------------------
-
-#?(:cljs
-   (defn obj->map
-     "Convert a JavaScript configuration object to a Clojure config map."
-     [o]
-     {:pre [(object? o)]}
-     (let [config  (js->clj o :keywordize-keys true)]
-       (if (empty? config)
-         lib.config.default/sdk
-         ;; Fix up any config map values that didn't translate from
-         ;; JavaScript.
-         (-> config
-             (update-in [:log/level] log-level->keyword))))))
