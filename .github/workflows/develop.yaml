@@ -25,6 +25,34 @@ jobs:
             www: 'www/**'
             ext: 'ext/**'
 
+  # To detect lint errors across namespaces in your project, a cache is
+  # needed. A cache will be created at .clj-kondo/ when you run
+  # clj-kondo. It is recommended to lint the entire classpath to teach
+  # clj-kondo about all the libraries you are using, including Clojure
+  # and/or ClojureScript itself.
+  pre-lint:
+    needs: changes
+    #if: needs.changes.outputs.sdk == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --lint "$(clj -Spath)" --dependencies --parallel --copy-configs
+
+  # ddt
+  # ----------------------------------------------------------------------------
+
+  lint-ddt:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/ddt*
 
   build-ddt:
     needs: changes
@@ -32,10 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -44,16 +72,29 @@ jobs:
       - run: npm install
       - run: npm run build:ddt:develop
 
+  # kbt
+  # ----------------------------------------------------------------------------
+
+  lint-kbt:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/kbt*
+
   build-kbt:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -62,16 +103,61 @@ jobs:
       - run: npm install
       - run: npm run build:kbt:develop
 
+  # sdk
+  # ----------------------------------------------------------------------------
+
+  lint-lib:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/lib*
+
+  lint-proto:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/proto*
+
+  lint-spec:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/spec*
+
+  lint-sdk:
+    needs: pre-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: DeLaGuardo/setup-clojure@6.0
+        with:
+          clj-kondo: 2022.05.31
+      - run: clj-kondo --fail-level error --lint src/main/com/kubelt/sdk*
+
+  # Builds the node library version of the SDK (using the :node
+  # conditional reader variant).
   build-sdk:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -80,16 +166,18 @@ jobs:
       - run: npm install
       - run: npm run build:sdk:develop
 
+  # Builds the node module version of the SDK (using the :browser
+  # conditional reader variant).
   build-sdk-web:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -98,45 +186,45 @@ jobs:
       - run: npm install
       - run: npm run build:sdk-web:develop
 
+  # ----------------------------------------------------------------------------
+
+  # Execute the SDK tests written in ClojureScript.
   test-sdk-cljs:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      #- run: sudo apt-get update
-      #- run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - run: npm run test:sdk:cljs:develop
+      - run: bb run test:sdk:cljs:develop
 
+  # Execute the SDK tests written in JavaScript.
   test-sdk-js:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
           cache: 'npm'
           cache-dependency-path: package-lock.json
-      #- run: sudo apt-get update
-      #- run: sudo apt-get install -y libsystemd-dev
       - run: npm install
-      - run: npm run test:sdk:js:develop
+      - run: bb run test:sdk:js:develop
 
   test-web:
     needs: changes
@@ -146,10 +234,10 @@ jobs:
       CHROME_BIN: /snap/bin/chromium
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -165,10 +253,10 @@ jobs:
   #   runs-on: ubuntu-latest
   #   steps:
   #     - uses: actions/checkout@master
-  #     - uses: DeLaGuardo/setup-clojure@5.1
+  #     - uses: DeLaGuardo/setup-clojure@6.0
   #       with:
   #         bb: 0.8.156
-  #         cli: 1.11.1.1113
+  #         cli: 1.11.1.1119
   #     - uses: actions/setup-node@v3
   #       with:
   #         node-version: lts/gallium
@@ -191,10 +279,10 @@ jobs:
           - 8787:8787
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1113
+          cli: 1.11.1.1119
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium

@@ -53,6 +53,9 @@
  ;; cljs.test tests. If you want to use another testing framework
  ;; you'll need to specify a new entrypoint by setting :main.
 
+ ;; NB: extra per-target reader conditionals are a shadow-cljs *only*
+ ;; feature.
+
  :builds
  {;; DAPP (Kubelt React App)
   ;; ---------------------------------------------------------------------------

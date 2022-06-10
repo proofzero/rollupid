@@ -19,22 +19,21 @@
 ;; Internal
 ;; -----------------------------------------------------------------------------
 
-(comment
-  "request map example"
-  {:kubelt/type :kubelt.type/uri
-   :http/method method
-   :http/version version
-   :http/headers headers
-   :http/trailers trailers
-   :http/status status
-   :http/body body
-   :uri/scheme scheme
-   :uri/port port
-   :uri/path path
-   :uri/fragment fragment
-   :uri/query query
-   :uri/domain domain
-   :uri/user user})
+;; Request map example
+;; {:kubelt/type :kubelt.type/uri
+;;  :http/method method
+;;  :http/version version
+;;  :http/headers headers
+;;  :http/trailers trailers
+;;  :http/status status
+;;  :http/body body
+;;  :uri/scheme scheme
+;;  :uri/port port
+;;  :uri/path path
+;;  :uri/fragment fragment
+;;  :uri/query query
+;;  :uri/domain domain
+;;  :uri/user user}
 
 (defn- validate-content-type
   "Only lower-case when content-type exists. Calling `cstr/lower-case`
