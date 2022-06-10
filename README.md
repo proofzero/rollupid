@@ -32,6 +32,7 @@ The [packages/](packages/) directory contains package configuration for the thin
 - [IPFS JS](packages/ipfs-js): Kubelt utility library for working with IPFS.
 - [Kubelt CLI](packages/kbt): Kubelt command line tool.
 - [Kubelt Debug CLI](packages/ddt): Kubelt debug command line tool.
+- [Kubelt Oort Cloud](oort): Self-Hosted Kubelt backend.
 
 ### Website / Docs
 
