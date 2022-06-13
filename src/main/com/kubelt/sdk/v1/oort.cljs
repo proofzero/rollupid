@@ -1,11 +1,11 @@
-(ns com.kubelt.sdk.v1.core
+(ns com.kubelt.sdk.v1.oort
   "Account management."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.jwt :as lib.jwt]
-   [com.kubelt.lib.p2p :as lib.p2p]
+   [com.kubelt.lib.oort :as lib.oort]
    [com.kubelt.lib.promise :as lib.promise :refer [promise]]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
@@ -32,7 +32,7 @@
   ;; TODO add an extra arity that allows a wallet to be passed in?
   ;; TODO validate system map (especially: ensure wallet is present)
   (let [core (get-in sys [:crypto/wallet :wallet/address])]
-    (-> (lib.p2p/authenticate! sys)
+    (-> (lib.oort/authenticate! sys)
         (lib.promise/then
          (fn [auth-result]
            (if (lib.error/error? auth-result)
@@ -58,7 +58,7 @@
               ;; client IP to restrict renewing JWTs for other clients.
               ;; TODO check/assert that this is true.
               (lib.promise/then
-               (lib.p2p/verify! sys core nonce signature)
+               (lib.oort/verify! sys core nonce signature)
                (fn [verify-result]
                  (if (lib.error/error? verify-result)
                    ;; This triggers .catch handlers on returned promise.
@@ -84,14 +84,14 @@
 
 ;; TODO test me
 (defn rpc-api [sys core]
-  (lib.p2p/rpc-api sys core))
+  (lib.oort/rpc-api sys core))
 
 (defn rpc-api-js [sys core]
   (rpc-api sys core))
 
 ;; TODO test me
 (defn call-rpc-method [sys core method args]
-  (lib.p2p/call-rpc-method sys core method args))
+  (lib.oort/call-rpc-method sys core method args))
 
 (defn call-rpc-api-js [sys core method args]
   (call-rpc-method sys core method args))

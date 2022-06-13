@@ -1,5 +1,5 @@
-(ns com.kubelt.ddt.cmds.rpc.core.config.get
-  "RPC core config get"
+(ns com.kubelt.ddt.cmds.rpc.oort.config.get
+  "RPC oort config get"
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call]

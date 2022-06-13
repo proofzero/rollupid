@@ -7,7 +7,7 @@
    [com.kubelt.lib.storage :as lib.storage]
    [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 ;; args->init-options
 ;; -----------------------------------------------------------------------------
@@ -45,7 +45,7 @@
                        (prn (:error e))))
                  (lib.promise/then
                   (fn [kbt]
-                    (-> (sdk.core/authenticate& kbt)
+                    (-> (sdk.oort/authenticate& kbt)
                         (lib.promise/then on-authenticate)
                         (lib.promise/catch
                          (fn [e]

@@ -1,11 +1,13 @@
-(ns com.kubelt.lib.p2p
-  "Wrapper around the external p2p naming system."
+(ns com.kubelt.lib.oort
+  "Wrapper around the Oort backend."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr]
+   [clojure.string :as cstr])
+  (:require
+   ["@ethersproject/providers" :refer [JsonRpcProvider]])
+  (:require
    [taoensso.timbre :as log])
   (:require
-   ["@ethersproject/providers" :refer [JsonRpcProvider]]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.promise :as lib.promise]))
 

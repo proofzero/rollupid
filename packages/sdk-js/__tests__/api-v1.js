@@ -58,9 +58,9 @@ tap.test('SDK v1 has expected API', (t) => {
     check(kbt, ['v1'], 'store');
     check(kbt, ['v1'], 'restore');
 
-    check(kbt, ['v1', 'core'], 'authenticate');
-    check(kbt, ['v1', 'core'], 'isLoggedIn');
-    check(kbt, ['v1', 'core'], 'setWallet');
+    check(kbt, ['v1', 'oort'], 'authenticate');
+    check(kbt, ['v1', 'oort'], 'isLoggedIn');
+    check(kbt, ['v1', 'oort'], 'setWallet');
 
     t.end();
 });

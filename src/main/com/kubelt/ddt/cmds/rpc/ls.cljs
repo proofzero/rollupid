@@ -11,7 +11,7 @@
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.schema :as rpc.schema]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 (defonce command
   {:command "list"
@@ -32,7 +32,7 @@
                   (ddt.options/to-map args)
                   (.-password result)
                   (fn [sys]
-                    (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+                    (-> (sdk.oort/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                         (lib.promise/then (fn [api]
                                             (let [client (-> {:uri/domain (-> sys :client/p2p :http/host)
                                                               :uri/port (-> sys :client/p2p :http/port)

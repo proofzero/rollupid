@@ -2,7 +2,7 @@
 (ns dapp.wallet
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
-   [com.kubelt.sdk.v1.core :as sdk.core]
+   [com.kubelt.sdk.v1.oort :as sdk.oort]
    [re-frame.core :as re-frame]
    [taoensso.timbre :as log]))
 
@@ -57,8 +57,8 @@
  ::set-current-wallet
  (fn [db [_ wallet]]
    (let [ctx (:sdk/ctx db)]
-     ;; `sdk.core/set-wallet` also validates the structure of `wallet`
-     (.then (sdk.core/set-wallet ctx wallet)
+     ;; `sdk.oort/set-wallet` also validates the structure of `wallet`
+     (.then (sdk.oort/set-wallet ctx wallet)
             (fn [new-ctx]
               (re-frame/dispatch [::authenticate! new-ctx])))
      db)))
@@ -67,7 +67,7 @@
  ::authenticate!
  (fn [db [_ new-ctx]]
    (let [wallet-address (get-in new-ctx [:crypto/wallet :wallet/address])]
-     (-> (sdk.core/authenticate& new-ctx)
+     (-> (sdk.oort/authenticate& new-ctx)
          (.then (fn [auth-ctx]
                   (log/info {:message (str "Authenticating a new wallet with address: " wallet-address)})
                   ;; must dispatch the next event within the promise
@@ -140,4 +140,4 @@
  :<- [::ctx]
  :<- [::wallet]
  (fn [[ctx {:wallet/keys [address] :as _wallet}] _]
-   (sdk.core/logged-in? ctx address)))
+   (sdk.oort/logged-in? ctx address)))
