@@ -1,4 +1,4 @@
-;; deps.edn
+; deps.edn
 {:paths ["src/dev"
          "src/main"
          "src/test"
@@ -62,7 +62,7 @@
   :robert {:extra-deps {}}
 
   :cljs {:extra-deps {;; ClojureScript compilation made easy
-                      thheller/shadow-cljs {:mvn/version "2.19.2"}}}
+                      thheller/shadow-cljs {:mvn/version "2.19.3"}}}
 
   :dapp {:extra-deps {;; Chrome DevTools enhancements for CLJS developers
                       binaryage/devtools {:mvn/version "1.0.6"}
