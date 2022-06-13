@@ -108,7 +108,7 @@
 
   build:sdk-test:develop
   {:doc "Build development version of the sdk-test for node"
-   :task (shell "npx shadow-cljs compile sdk-test ")}
+   :task (shell "npx shadow-cljs compile sdk-test")}
 
   build:sdk:watch
   {:doc "Watch and rebuild when changed development version of the sdk for node"
@@ -176,22 +176,28 @@
   build:dapp:release
   {:task (run '-build:dapp:release {:parallel true})}
 
+  run:sdk-test:cljs:develop
+  {:doc "Run development version of ClojureScript SDK tests"
+   :task (shell "node target/sdk-test.js")}
+
   test:sdk:cljs:develop
   {:doc "Build and run development version of sdk tests"
-   :depends [build:sdk-test:develop]
-   :task (shell "node target/sdk-test.js")}
+   :depends [build:sdk-test:develop run:sdk-test:cljs:develop]}
 
   test:sdk:cljs:release
   {:doc "Build and run release version of sdk tests"
    :task (shell "npx shadow-cljs release sdk-test")}
 
-  test:sdk:js:develop
-  {:doc "Run JavaScript tests against development sdk"
-   :depends [build:sdk:develop]
+  run:sdk-test:js:develop
+  {:doc "Run JavaScript SDK tests"
    :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
 
+  test:sdk:js:develop
+  {:doc "Build and run JavaScript tests against development SDK"
+   :depends [build:sdk:develop run:sdk-test:js:develop]}
+
   test:sdk:js:release
-  {:doc "Run JavaScript tests against release sdk"
+  {:doc "Run JavaScript tests against release SDK"
    :depends [build:sdk:release]
    :task (shell {:dir "packages/sdk-js/__tests__"} "node api-v1.js")}
 

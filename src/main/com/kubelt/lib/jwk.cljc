@@ -82,21 +82,22 @@
               (cset/union ops (into #{} key-ops)))]
     (assoc jwk :jwk/operations ops)))
 
-(defn- jwk-as-obj
-  [jwk]
-  (letfn [(kw->str [kw]
-            (name (csk/->camelCase kw)))]
-    (let [key-id (get jwk :jwk/id)
-          key-type (get jwk :jwk/type)
-          key-use (kw->str (get jwk :jwk/use))
-          key-alg (kw->str (get jwk :jwk/algorithm))
-          key-ops (mapv kw->str (get jwk :jwk/operations))]
-      (clj->js
-       {:kid key-id
-        :kty key-type
-        :use key-use
-        :alg key-alg
-        :key_ops key-ops}))))
+#?(:cljs
+   (defn- jwk-as-obj
+     [jwk]
+     (letfn [(kw->str [kw]
+               (name (csk/->camelCase kw)))]
+       (let [key-id (get jwk :jwk/id)
+             key-type (get jwk :jwk/type)
+             key-use (kw->str (get jwk :jwk/use))
+             key-alg (kw->str (get jwk :jwk/algorithm))
+             key-ops (mapv kw->str (get jwk :jwk/operations))]
+         (clj->js
+          {:kid key-id
+           :kty key-type
+           :use key-use
+           :alg key-alg
+           :key_ops key-ops})))))
 
 (defn- jwk-from-eth
   [eth-wallet]

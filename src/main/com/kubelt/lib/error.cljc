@@ -81,7 +81,7 @@
         check-for (fn [msg# spec# data#]
                     `(when-not (mc/validate ~spec# ~data#)
                       (let [err# (explain ~spec# ~data#)]
-                        (throw (ex-info msg# err#)))))]
+                        (throw (ex-info ~msg# err#)))))]
     ;; Validate that there's at least one guard tuple: [spec data].
     (check-for "invalid guards" spec.error/guards guards#)
     ;; Validate that a body to execute was provided.
