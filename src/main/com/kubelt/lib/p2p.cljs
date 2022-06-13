@@ -2,8 +2,8 @@
   "Wrapper around the external p2p naming system."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [taoensso.timbre :as log]
-   [clojure.string :as cstr])
+   [clojure.string :as cstr]
+   [taoensso.timbre :as log])
   (:require
    ["@ethersproject/providers" :refer [JsonRpcProvider]]
    [com.kubelt.lib.error :as lib.error]
@@ -37,8 +37,8 @@
           (lib.error/from-obj e))))))
 
 (defn authenticate!
-  "Authenticate a user against a core. The account is a map that contains the public
-  key from the keypair that represents the user's account."
+  "Authenticate a user against a core. The account is a map that contains
+  the public key from the keypair that represents the user's account."
   [sys]
   (let [address (get-in sys [:crypto/wallet :wallet/address])]
     ;; Make an JsonRpc call to p2p system, passing along the user's
@@ -64,5 +64,3 @@
 (defn call-rpc-method [sys core method args]
   {:pre [(string? core) (string? method) (vector? args)]}
   (send (json-rpc-provider sys core) method args))
-
-
