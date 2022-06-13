@@ -33,9 +33,9 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: DeLaGuardo/setup-clojure@5.1
+      - uses: DeLaGuardo/setup-clojure@6.0
         with:
-          cli: 1.11.1.1113
+          cli: 1.11.1.1129
           #lein: latest
           #boot: latest
           #bb: latest
