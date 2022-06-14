@@ -7,15 +7,15 @@
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc :as rpc]
    [com.kubelt.rpc.schema :as rpc.schema]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 (defn rpc-call& [sys api args]
   (lib.promise/promise
    (fn [resolve reject]
      (let [wallet-address (-> sys :crypto/wallet :wallet/address)
-           client (-> {:uri/domain (-> sys :client/p2p :http/host)
-                       :uri/port (-> sys :client/p2p :http/port)
-                       :uri/scheme (-> sys :client/p2p :http/scheme)
+           client (-> {:uri/domain (-> sys :client/oort :http/host)
+                       :uri/port (-> sys :client/oort :http/port)
+                       :uri/scheme (-> sys :client/oort :http/scheme)
                        :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
                        :http/client (:client/http sys)
                        :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}
@@ -25,7 +25,7 @@
            rpc-method (:method/name (:rpc/method request))
            rpc-params (:rpc/params request)]
        (if (:rpc-client-type args)
-         (-> (sdk.core/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
+         (-> (sdk.oort/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
              (lib.promise/then resolve)
              (lib.promise/catch reject))
          (-> (rpc/execute client request)

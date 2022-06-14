@@ -1,5 +1,5 @@
-(ns com.kubelt.ddt.cmds.rpc.core.profile.get
-  "RPC core profile get"
+(ns com.kubelt.ddt.cmds.rpc.oort.profile.get
+  "RPC oort profile get"
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call]

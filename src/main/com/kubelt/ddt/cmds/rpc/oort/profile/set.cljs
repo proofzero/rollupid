@@ -1,5 +1,5 @@
-(ns com.kubelt.ddt.cmds.rpc.core.profile.set
-  "RPC core options"
+(ns com.kubelt.ddt.cmds.rpc.oort.profile.set
+  "RPC oort profile set options"
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call ]

@@ -62,9 +62,9 @@
    [:ipfs.write/scheme {:optional true} spec.http/scheme]
    [:ipfs.write/host {:optional true} spec.http/host]
    [:ipfs.write/port {:optional true} spec.http/port]
-   [:p2p/scheme {:optional true} spec.http/scheme]
-   [:p2p/host {:optional true} spec.http/host]
-   [:p2p/port {:optional true} spec.http/port]])
+   [:oort/scheme {:optional true} spec.http/scheme]
+   [:oort/host {:optional true} spec.http/host]
+   [:oort/port {:optional true} spec.http/port]])
 
 ;; After default options and user-supplied options are combined, we
 ;; should have an SDK configuration options map that has every value

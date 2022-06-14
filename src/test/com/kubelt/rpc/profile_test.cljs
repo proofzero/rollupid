@@ -11,7 +11,7 @@
    [com.kubelt.lib.wallet.node :as wallet]
    [com.kubelt.rpc.test-commons :as t.commons]
    [com.kubelt.sdk.v1 :as sdk]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 (use-fixtures :once
   {:before  (lib.test-utils/create-wallet-fixture t.commons/app-name t.commons/wallet-name t.commons/wallet-password)
@@ -22,12 +22,12 @@
     (async done
            (go
              (try
-               (let [config (t.commons/p2p-config)
+               (let [config (t.commons/oort-config)
                      sys (<p! (sdk/init config))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
                      core (:wallet/address wallet)
-                     kbt (<p! (sdk.core/authenticate& (assoc sys :crypto/wallet wallet)))
-                     api (<p! (sdk.core/rpc-api sys core))
+                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
+                     api (<p! (sdk.oort/rpc-api sys core))
                      profile (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get :profile]}))]
                  (is (= {:profile-picture "DefaultKubeltPFP"} profile))
                  (let [updated-profile-picture "UpdatedProfilePicture"

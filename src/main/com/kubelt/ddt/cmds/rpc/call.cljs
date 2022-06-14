@@ -2,17 +2,17 @@
   "Make an RPC call."
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [clojure.string :as cstr]
-   [cljs.reader :as r])
+   [cljs.reader :as r]
+   [clojure.string :as cstr])
   (:require
    [com.kubelt.ddt.auth :as ddt.auth]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
-   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.ddt.util :as ddt.util]
-   [com.kubelt.lib.rpc :as lib.rpc]
+   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.lib.rpc :as lib.rpc]
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 (def edn-name
   "edn-format")
@@ -85,7 +85,7 @@
                     args
                     (.-password result)
                     (fn [sys]
-                      (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+                      (-> (sdk.oort/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                           (lib.promise/then
                            (fn [api]
                              (-> (lib.rpc/rpc-call& sys api args)
@@ -118,7 +118,7 @@
            args
            (.-password result)
            (fn [sys]
-             (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+             (-> (sdk.oort/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                  (lib.promise/then
                   (fn [api]
                     (-> (lib.rpc/rpc-call& sys api args)

@@ -1,18 +1,18 @@
-(ns com.kubelt.ddt.cmds.rpc.core.config.set
-  "RPC core options"
+(ns com.kubelt.ddt.cmds.rpc.oort.config.set
+  "RPC oort config set options"
   {:copyright "ⓒ2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [cljs.reader :as r])
   (:require
    [com.kubelt.ddt.auth :as ddt.auth]
-   [com.kubelt.lib.rpc :as lib.rpc ]
    [com.kubelt.ddt.cmds.rpc.call :as rpc.call ]
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.ddt.prompt :as ddt.prompt]
    [com.kubelt.ddt.util :as ddt.util]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.sdk.v1.core :as sdk.core]))
+   [com.kubelt.lib.rpc :as lib.rpc ]
+   [com.kubelt.sdk.v1.oort :as sdk.oort]))
 
 (defonce command
   {:command "set <path> [config-value]"
@@ -38,7 +38,7 @@
                     args
                     (.-password result)
                     (fn [sys]
-                      (-> (sdk.core/rpc-api sys (-> sys :crypto/wallet :wallet/address))
+                      (-> (sdk.oort/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                           (lib.promise/then
                            (fn [api]
                              (-> (lib.rpc/rpc-call& sys api args)

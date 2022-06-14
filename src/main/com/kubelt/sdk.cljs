@@ -3,7 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
-   [com.kubelt.sdk.v1.core :as sdk.v1.core]))
+   [com.kubelt.sdk.v1.oort :as sdk.v1.oort]))
 
 ;; Entrypoint
 ;; -----------------------------------------------------------------------------
@@ -50,10 +50,10 @@
        :store sdk.v1/store-js&
        :restore sdk.v1/restore-js&
 
-       ;; core
-       :core #js {:authenticate sdk.v1.core/authenticate-js!
-                  :isLoggedIn sdk.v1.core/logged-in-js?
-                  :setWallet sdk.v1.core/set-wallet-js}
+       ;; oort
+       :oort #js {:authenticate sdk.v1.oort/authenticate-js!
+                  :isLoggedIn sdk.v1.oort/logged-in-js?
+                  :setWallet sdk.v1.oort/set-wallet-js}
 
        ;; development (removed from production builds)
        ;; TODO
