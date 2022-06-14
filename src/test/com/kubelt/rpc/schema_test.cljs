@@ -60,7 +60,9 @@
                         (-> (rpc/prepare client [:kb :ping] {})
                             (select-keys   [:com.kubelt/type :rpc/path :rpc/method])))
                        "failing ping prepare expectations")))
-               (catch js/Error err (js/console.log err))
+               (catch js/Error err (do
+                                     (js/console.log err)
+                                     (is false err)))
                (finally (done)))))))
 
 ;; TODO uncomment once our parser works with $refs
