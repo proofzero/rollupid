@@ -21,38 +21,38 @@
                                 (lib.json/json-str->edn))]
                    (is (= data
                           {:options
-                           {:credential/jwt    {},
-                            :ipfs.read/host    "127.0.0.1",
-                            :p2p/host          "127.0.0.1",
-                            :p2p/port          8787,
-                            :ipfs.write/port   5001,
-                            :log/level         :warn,
+                           {:app/name          "kubelt-dapp",
+                            :credential/jwt    {},
+                            :oort/scheme        :http,
+                            :oort/host          "127.0.0.1",
+                            :oort/port          8787,
                             :ipfs.read/scheme  :http,
-                            :app/name          "kubelt-dapp",
-                            :p2p/scheme        :http,
+                            :ipfs.read/host    "127.0.0.1",
+                            :ipfs.read/port    5001
                             :ipfs.write/scheme :http,
                             :ipfs.write/host   "127.0.0.1",
-                            :ipfs.read/port    5001},
+                            :ipfs.write/port   5001,
+                            :log/level         :warn,},
                            :vault {:com.kubelt/type :kubelt.type/vault, :vault/tokens {}}})))
                  (let [data (<p! (sdk.v1/restore& sdk))]
                    (is (= app-name (:app/name data)))
-                   (is (= #{:credential/jwt
-                            :ipfs.read/host
-                            :p2p/host
-                            :p2p/port
-                            :crypto/wallet
-                            :ipfs.write/port
-                            :log/level
-                            :client/p2p
-                            :ipfs.read/scheme
+                   (is (= #{:app/name
                             :client/http
-                            :app/name
-                            :p2p/scheme
+                            :client/oort
                             :config/storage
-                            :ipfs.write/scheme
-                            :ipfs.write/host
+                            :credential/jwt
                             :crypto/session
-                            :ipfs.read/port}
+                            :crypto/wallet
+                            :ipfs.read/host
+                            :ipfs.read/port
+                            :ipfs.read/scheme
+                            :ipfs.write/host
+                            :ipfs.write/port
+                            :ipfs.write/scheme
+                            :log/level
+                            :oort/host
+                            :oort/port
+                            :oort/scheme}
                           (set (keys data))))))
                (catch js/Error err (log/error err))
                (finally (done)))))))

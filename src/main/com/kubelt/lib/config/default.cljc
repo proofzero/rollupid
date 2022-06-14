@@ -27,10 +27,10 @@
    :ipfs.write/host "127.0.0.1"
    :ipfs.write/port 5001})
 
-(def p2p
-  {:p2p/scheme :http
-   :p2p/host "127.0.0.1"
-   :p2p/port 8787})
+(def oort
+  {:oort/scheme :http
+   :oort/host "127.0.0.1"
+   :oort/port 8787})
 
 (def logging
   {:log/level log-level})
@@ -46,7 +46,7 @@
   (merge app
          ipfs
          log
-         p2p
+         oort
          credentials
          logging))
 
@@ -69,10 +69,10 @@
                                      :http/host (ig/ref :ipfs.write/host)
                                      :http/port (ig/ref :ipfs.write/port)}
                         :client/http (ig/ref :client/http)}
-          ;; Our connection to the Kubelt p2p system.
-          :client/p2p {:http/scheme (ig/ref :p2p/scheme)
-                       :http/host (ig/ref :p2p/host)
-                       :http/port (ig/ref :p2p/port)}
+          ;; Our connection to the Kubelt Oort backend.
+          :client/oort {:http/scheme (ig/ref :oort/scheme)
+                        :http/host (ig/ref :oort/host)
+                        :http/port (ig/ref :oort/port)}
           ;; A wrapper around platform configuration storage.
           :config/storage {:app/name (ig/ref :app/name)}
           ;; A crypto "vault" that stores session credentials.

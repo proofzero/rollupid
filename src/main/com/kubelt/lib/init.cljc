@@ -92,22 +92,22 @@
 (defmethod ig/init-key :ipfs.write/port [_ port]
   port)
 
-;; :p2p/scheme
+;; :oort/scheme
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :p2p/scheme [_ scheme]
+(defmethod ig/init-key :oort/scheme [_ scheme]
   scheme)
 
-;; :p2p/host
+;; :oort/host
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :p2p/host [_ host]
+(defmethod ig/init-key :oort/host [_ host]
   host)
 
-;; :p2p/port
+;; :oort/port
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :p2p/port [_ port]
+(defmethod ig/init-key :oort/port [_ port]
   port)
 
 ;; :credential/jwt
@@ -187,18 +187,18 @@
 (defmethod ig/halt-key! :client/ipfs [_ client]
   (log/debug {:log/msg "halt IPFS client"}))
 
-;; :client/p2p
+;; :client/oort
 ;; -----------------------------------------------------------------------------
 
-(defmethod ig/init-key :client/p2p [_ {:keys [http/scheme http/host http/port] :as value}]
+(defmethod ig/init-key :client/oort [_ {:keys [http/scheme http/host http/port] :as value}]
   ;; TODO initialize an RPC client using the given coordinates once
   ;; local client is fleshed out.
   (let [address (str (name scheme) "://" host ":" port)]
-    (log/debug {:log/msg "init p2p client" :p2p/address address})
+    (log/debug {:log/msg "init oort client" :oort/address address})
     value))
 
-(defmethod ig/halt-key! :client/p2p [_ value]
-  (log/debug {:log/msg "halt p2p client"}))
+(defmethod ig/halt-key! :client/oort [_ value]
+  (log/debug {:log/msg "halt oort client"}))
 
 ;; :crypto/session
 ;; -----------------------------------------------------------------------------

@@ -14,9 +14,9 @@
 ;; TODO .cljc
 
 (defn- connection-uri [sys core]
-  (let [scheme (get-in sys [:client/p2p :http/scheme])
-        host (get-in sys [:client/p2p :http/host])
-        port (get-in sys [:client/p2p :http/port])
+  (let [scheme (get-in sys [:client/oort :http/scheme])
+        host (get-in sys [:client/oort :http/host])
+        port (get-in sys [:client/oort :http/port])
         path (cstr/join "" ["/@" core "/jsonrpc"])
         uri (str (name scheme) "://" host ":" port path)]
     (log/debug {::connection-uri uri})
@@ -43,7 +43,7 @@
   the public key from the keypair that represents the user's account."
   [sys]
   (let [address (get-in sys [:crypto/wallet :wallet/address])]
-    ;; Make an JsonRpc call to p2p system, passing along the user's
+    ;; Make an JsonRpc call to oort backend, passing along the user's
     ;; wallet address. Expect a nonce in return, which should be signed
     ;; and returned to prove ownership of provided key and complete
     ;; registration.

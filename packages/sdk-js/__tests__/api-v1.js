@@ -131,11 +131,11 @@ tap.test('sdk init', (t) => {
         });
     });
 
-    tap.test('with p2p config', (t) => {
+    tap.test('with oort config', (t) => {
         return kbt.v1.init({
-            "p2p/scheme": "http",
-            "p2p/host": "127.0.0.1",
-            "p2p/port": 5001,
+            "oort/scheme": "http",
+            "oort/host": "127.0.0.1",
+            "oort/port": 5001,
         }).then((sdk) => {
             t.type(sdk, 'object');
             return kbt.v1.halt(sdk);

@@ -18,9 +18,9 @@
         ipfs-write-scheme (get sys-map :ipfs.write/scheme)
         ipfs-write-host (get sys-map :ipfs.write/host)
         ipfs-write-port (get sys-map :ipfs.write/port)
-        p2p-scheme (get sys-map :p2p/scheme)
-        p2p-host (get sys-map :p2p/host)
-        p2p-port (get sys-map :p2p/port)
+        oort-scheme (get sys-map :oort/scheme)
+        oort-host (get sys-map :oort/host)
+        oort-port (get sys-map :oort/port)
         log-level (get sys-map :log/level)
         ;; TODO rename :crypto/session to :crypto/vault for clarity
         credentials (lib.vault/tokens (:crypto/session sys-map))
@@ -34,9 +34,9 @@
      :ipfs.write/scheme ipfs-write-scheme
      :ipfs.write/host ipfs-write-host
      :ipfs.write/port ipfs-write-port
-     :p2p/scheme p2p-scheme
-     :p2p/host p2p-host
-     :p2p/port p2p-port
+     :oort/scheme oort-scheme
+     :oort/host oort-host
+     :oort/port oort-port
      :crypto/wallet wallet
      :config/storage storage
      :credential/jwt credentials}))

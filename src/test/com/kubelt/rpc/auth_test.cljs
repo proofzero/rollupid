@@ -22,7 +22,7 @@
     (async done
            (go
               (try
-               (let [config (t.commons/p2p-config)
+               (let [config (t.commons/oort-config)
                      sys (<p! (sdk/init config))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
                      core (:wallet/address wallet)

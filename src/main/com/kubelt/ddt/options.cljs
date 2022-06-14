@@ -19,7 +19,7 @@
 (def host-default
   "127.0.0.1")
 
-(def p2p-port-default
+(def oort-port-default
   8787)
 
 (def ipfs-port-default
@@ -56,7 +56,7 @@
 
 (def host-config
   #js {:alias "h"
-       :describe "p2p service host"
+       :describe "oort service host"
        :requiresArg true
        :demandOption "service host is required"
        :string true
@@ -68,12 +68,12 @@
 
 (def port-config
   #js {:alias "p"
-       :describe "p2p service port"
+       :describe "oort service port"
        :requiresArg true
        :demandOption "service port is required"
        :number true
        :nargs 1
-       :default p2p-port-default})
+       :default oort-port-default})
 
 (def wallet-name
   "wallet")
@@ -218,11 +218,11 @@
         ;; i.e. com.kubelt.$name.
         base-name (.basename path (get m :$0))
         app-name (cstr/join "." ["com" "kubelt" base-name])
-        ;; Store the p2p service coordinates.
+        ;; Store the oort service coordinates.
         tls (get m :tls)
-        p2p-scheme (if tls :https :http)
-        p2p-host (get m :host)
-        p2p-port (get m :port)
+        oort-scheme (if tls :https :http)
+        oort-host (get m :host)
+        oort-port (get m :port)
         ;; Store coordinates of IPFS read host.
         ipfs-read-scheme (keyword (get m :ipfs-read-scheme))
         ipfs-read-host (get m :ipfs-read-host)
@@ -238,9 +238,9 @@
         credentials (apply hash-map jwts)]
     (-> m
         (assoc :app-name app-name)
-        (assoc :p2p-scheme p2p-scheme)
-        (assoc :p2p-host p2p-host)
-        (assoc :p2p-port p2p-port)
+        (assoc :oort-scheme oort-scheme)
+        (assoc :oort-host oort-host)
+        (assoc :oort-port oort-port)
         (assoc :ipfs-read-scheme ipfs-read-scheme)
         (assoc :ipfs-read-host ipfs-read-host)
         (assoc :ipfs-read-port ipfs-read-port)
@@ -266,6 +266,6 @@
    :ipfs.write/scheme (get m :ipfs-write-scheme)
    :ipfs.write/host (get m :ipfs-write-host)
    :ipfs.write/port (get m :ipfs-write-port)
-   :p2p/scheme (get m :p2p-scheme)
-   :p2p/host (get m :p2p-host)
-   :p2p/port (get m :p2p-port)})
+   :oort/scheme (get m :oort-scheme)
+   :oort/host (get m :oort-host)
+   :oort/port (get m :oort-port)})

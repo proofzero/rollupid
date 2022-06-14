@@ -22,6 +22,6 @@
     ;; JavaScript.
     (-> config
         (update-in [:log/level] lib.config.util/str->kw)
-        (update-in [:p2p/scheme] lib.config.util/str->kw)
+        (update-in [:oort/scheme] lib.config.util/str->kw)
         (update-in [:ipfs.read/scheme] lib.config.util/str->kw)
         (update-in [:ipfs.write/scheme] lib.config.util/str->kw))))

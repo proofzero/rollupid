@@ -34,8 +34,8 @@
                   (fn [sys]
                     (-> (sdk.oort/rpc-api sys (-> sys :crypto/wallet :wallet/address))
                         (lib.promise/then (fn [api]
-                                            (let [client (-> {:uri/domain (-> sys :client/p2p :http/host)
-                                                              :uri/port (-> sys :client/p2p :http/port)
+                                            (let [client (-> {:uri/domain (-> sys :client/oort :http/host)
+                                                              :uri/port (-> sys :client/oort :http/port)
                                                               :uri/path (cstr/join "" ["/@" (-> sys :crypto/wallet :wallet/address) "/jsonrpc"])
                                                               :http/client (:client/http sys)}
                                                              rpc/init
