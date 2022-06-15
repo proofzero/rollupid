@@ -131,19 +131,52 @@
 
 (deftest claim-expires
   (testing "jwt :exp claim"
-    ))
-(comment
-  ;; current time < expiry time
-  (claim-expires {:claims {:exp 1515691416624}} {:jwt/timestamp 0})
-  ;; current time < expiry time (close)
-  (claim-expires {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416623})
-  ;; current time = expiry time
-  (claim-expires {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416624})
-  ;; missing timestamp
-  (claim-expires {:claims {:exp 1515691416624}} {:xxx 0})
-  ;; missing claim
-  (claim-expires {:claims {:foo 1515691416624}} {:jwt/timestamp 0})
-  )
+    (let [f #'jwt.check/claim-expires
+          ts 1515691416624
+          ts+1 (inc ts)]
+      (testing "no check performed when missing :jwt/timestamp option"
+        (is (nil? (f {:claims {:exp 0}} {}))
+            "check not performed when missing :jwt/timestamp option"))
+      (testing "current time < expiry time"
+        (is (= true (f {:claims {:exp 1515691416624}} {:jwt/timestamp 0}))
+            "expiry time in the far future")
+        (is (= true (f {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416623}))
+            "expiry time in the near future"))
+      (testing "expired token"
+        (testing "expiry time = current time"
+          (let [result (f {:claims {:exp ts}} {:jwt/timestamp ts})]
+            (is (lib.error/error? result)
+                "expired token generates an error")
+            (is (= "token has expired" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= [:claims :exp] (get-in result [:error :failed]))
+                "error reports which claim has failed")
+            (is (= ts (get-in result [:error :received]))
+                "error reports the received claim value")
+            (is (= ts (get-in result [:error :expected]))
+                "error reports the timestamp")))
+        (testing "timestamp > token expiry time"
+          (let [result (f {:claims {:exp ts}} {:jwt/timestamp ts+1})]
+            (is (lib.error/error? result)
+                "expired token generates an error")
+            (is (= "token has expired" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= [:claims :exp] (get-in result [:error :failed]))
+                "error reports which claim has failed")
+            (is (= ts (get-in result [:error :received]))
+                "error reports the received claim value")
+            (is (= ts+1 (get-in result [:error :expected]))
+                "error reports the timestamp"))))
+      (testing "missing expiry claim"
+        (let [result (f {:claims {:foo "bar"}} {:jwt/timestamp ts})]
+            (is (lib.error/error? result)
+                "missing :exp claim generates an error")
+            (is (= "missing claim" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= [:claims :exp] (get-in result [:error :missing]))
+                "error reports which claim is missing")
+            (is (= ts (get-in result [:error :expected]))
+                "error reports the received claim value"))))))
 
 (deftest claim-not-before
   (testing "jwt :nbf claim"

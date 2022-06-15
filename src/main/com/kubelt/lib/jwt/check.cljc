@@ -147,14 +147,20 @@
       ;; Check whether timestamp < expires. The claim and the timestamp
       ;; must be seconds-since-epoch.
       (let [tolerance (if tolerance tolerance 0)
-            now (tick/instant timestamp)
-            expires (tick/instant expires)]
-        (if-not (tick/< now expires)
-          (lib.jwt.claim/failed :exp "token has expired" {:claim/expires (str timestamp)
-                                                          :token/expires (str expires)})
+            now-inst (tick/instant timestamp)
+            expires-inst (tick/instant expires)]
+        (if-not (tick/< now-inst expires-inst)
+          ;; TODO use more descriptive keywords in
+          ;; error, :claim/expires, token/expires.
+          ;; :time/expires (str expires-inst)
+          ;; :time/now (str now-inst)
+          (lib.jwt.claim/failed :exp "token has expired" {:expected timestamp
+                                                          :received expires})
           true))
-      (let [expires (str (tick/instant timestamp))]
-        (lib.jwt.claim/missing :exp {:claim/expires expires})))))
+      (let [now-inst (str (tick/instant timestamp))]
+        ;; TODO use more descriptive keyword in error, e.g. :claim/expires
+        ;; :time/now now-inst
+        (lib.jwt.claim/missing :exp {:expected timestamp})))))
 
 (comment
   ;; current time < expiry time
@@ -165,6 +171,8 @@
   (claim-expires {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416624})
   ;; missing timestamp
   (claim-expires {:claims {:exp 1515691416624}} {:xxx 0})
+  ;; expired token
+  (claim-expires {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416625})
   ;; missing claim
   (claim-expires {:claims {:foo 1515691416624}} {:jwt/timestamp 0})
   )
