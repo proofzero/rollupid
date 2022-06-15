@@ -7,7 +7,18 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.jwt.claim :as lib.jwt.claim]
    [com.kubelt.lib.jwt.header :as lib.jwt.header]
+   [com.kubelt.lib.jwt.option :as lib.jwt.option]
    [com.kubelt.lib.re :as lib.re]))
+
+(defn timestamp?
+  ""
+  [x]
+  (nat-int? x))
+
+(defn tolerance?
+  ""
+  [x]
+  (nat-int? x))
 
 ;;
 ;; verify-timestamp
@@ -181,33 +192,54 @@
 ;; not-before
 ;;
 
+;; TODO prefer using a schema and lib.error/conform to validate options
 (defn- claim-not-before
   "Validates the not-before ('nbf') claim that represents the time at
   which the token becomes valid. If the current time is before the
-  claimed time the token is invalid. The claim value MUST be a string
+  claimed time the token is invalid. The claim value MUST be a number
   containing a NumericDate value. This is an OPTIONAL registered claim."
-  [{claims :claims} {timestamp :claim/not-before}]
-  (when timestamp
-    (if-let [not-before (get claims :nbf)]
+  [{claims :claims} {:jwt/keys [timestamp tolerance]}]
+  (when-let [not-before (get claims :nbf)]
+    (cond
+      ;; missing timestamp
+      (nil? timestamp)
+      (lib.jwt.option/missing :nbf :jwt/timestamp)
+      ;; invalid timestamp
+      (not (timestamp? timestamp))
+      (lib.jwt.option/invalid :nbf :jwt/timestamp {:provided timestamp})
+      ;; missing tolerance
+      (nil? tolerance)
+      (lib.jwt.option/missing :nbf :jwt/tolerance)
+      ;; invalid tolerance
+      (not (tolerance? tolerance))
+      (lib.jwt.option/invalid :nbf :jwt/tolerance {:provided tolerance})
+      ;; invalid claim
+      (not (timestamp? not-before))
+      (lib.jwt.claim/invalid :nbf {:received not-before})
+      :else
       ;; Check whether timestamp > not-before. The claim and the
       ;; timestamp must be seconds-since-epoch.
-      (let [now (tick/instant timestamp)
-            not-before (tick/instant not-before)]
-        (if-not (tick/> now not-before)
-          (lib.jwt.claim/failed :nbf "token not yet valid" {:not-before (str not-before)
-                                                            :now (str now)})
-          true))
-      (lib.jwt.claim/missing :nbf {:not-before timestamp}))))
+      (if-not (> (- timestamp tolerance) not-before)
+        ;; :timestamp (str (tick/instant timestamp))
+        ;; :not-before (str (tick/instant not-before))
+        (lib.jwt.claim/failed :nbf "token not yet valid" {:received not-before
+                                                          :expected timestamp})
+        true))))
 
 (comment
-  ;; Token nbf is before the reference timestamp
-  (claim-not-before {:claims {:nbf 1515691416624}} {:claim/not-before 2015691416624})
-  ;; Token nbf is after the reference timestamp
-  (claim-not-before {:claims {:nbf 1515691416624}} {:claim/not-before 1015691416624})
   ;; With no timestamp, no way to verify time-related claims.
-  (claim-not-before {:claims {:nbf 1515691416624}} {:foo 0})
-  ;; With no not-before claim but with a timestamp, return a missing claim error.
-  (claim-not-before {:claims {:foo "xxx"}} {:claim/not-before 1015691416624})
+  (claim-not-before {:claims {:nbf 1515691416624}} {})
+  ;; With no not-before claim but with a timestamp, return invalid option error.
+  (claim-not-before {:claims {:foo "xxx"}} {:jwt/timestamp 1015691416624})
+
+  (claim-not-before {:claims {:nbf 1515691416624}} {:jwt/timestamp 2015691416624})
+  (claim-not-before {:claims {:nbf 1515691416624}} {:jwt/timestamp "foo"})
+  ;; Token nbf is before the reference timestamp
+  (claim-not-before {:claims {:nbf 1515691416624}} {:jwt/timestamp 2015691416624 :jwt/tolerance 0})
+
+  ;; Token nbf is after the reference timestamp
+  (claim-not-before {:claims {:nbf 1515691416624}} {:jwt/timestamp 1015691416624 :jwt/tolerance 0})
+
   )
 
 ;;

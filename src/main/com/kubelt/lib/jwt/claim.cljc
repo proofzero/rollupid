@@ -42,15 +42,14 @@
 ;; -----------------------------------------------------------------------------
 
 (defn invalid
-  "Returns an error indicating that an invalid option was provided. The
+  "Returns an error indicating that an invalid claim was provided. The
   claim is a keyword representing a standard claim type,
   e.g. :iat, :aud, :iss, etc. The detail map provides extra information
   that is merged into the resulting error map."
-  [claim option detail]
+  [claim detail]
   {:pre [(keyword? claim)
-         (keyword? option)
          (map? detail)
-         (every? #{:provided} (keys detail))]}
+         (every? #{:received} (keys detail))]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     (merge detail {:message "invalid option" :option option}))))
+     (merge detail {:message "invalid claim" :invalid path}))))

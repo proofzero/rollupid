@@ -133,16 +133,21 @@
   (testing "jwt :exp claim"
     (let [f #'jwt.check/claim-expires
           ts 1515691416624
-          ts+1 (inc ts)]
+          ts+1 (inc ts)
+          ts-1 (dec ts)]
+
       (testing "no check performed when missing :jwt/timestamp option"
         (is (nil? (f {:claims {:exp 0}} {}))
             "check not performed when missing :jwt/timestamp option"))
+
       (testing "current time < expiry time"
-        (is (= true (f {:claims {:exp 1515691416624}} {:jwt/timestamp 0}))
+        (is (= true (f {:claims {:exp ts}} {:jwt/timestamp 0}))
             "expiry time in the far future")
-        (is (= true (f {:claims {:exp 1515691416624}} {:jwt/timestamp 1515691416623}))
+        (is (= true (f {:claims {:exp ts}} {:jwt/timestamp ts-1}))
             "expiry time in the near future"))
+
       (testing "expired token"
+
         (testing "expiry time = current time"
           (let [result (f {:claims {:exp ts}} {:jwt/timestamp ts})]
             (is (lib.error/error? result)
@@ -155,6 +160,7 @@
                 "error reports the received claim value")
             (is (= ts (get-in result [:error :expected]))
                 "error reports the timestamp")))
+
         (testing "timestamp > token expiry time"
           (let [result (f {:claims {:exp ts}} {:jwt/timestamp ts+1})]
             (is (lib.error/error? result)
@@ -167,6 +173,8 @@
                 "error reports the received claim value")
             (is (= ts+1 (get-in result [:error :expected]))
                 "error reports the timestamp"))))
+
+      ;; TODO this claim is optional, this shouldn't be an error
       (testing "missing expiry claim"
         (let [result (f {:claims {:foo "bar"}} {:jwt/timestamp ts})]
             (is (lib.error/error? result)
@@ -180,17 +188,81 @@
 
 (deftest claim-not-before
   (testing "jwt :nbf claim"
-    ))
-(comment
-  ;; Token nbf is before the reference timestamp
-  (claim-not-before {:claims {:nbf 1515691416624}} {:claim/not-before 2015691416624})
-  ;; Token nbf is after the reference timestamp
-  (claim-not-before {:claims {:nbf 1515691416624}} {:claim/not-before 1015691416624})
-  ;; With no timestamp, no way to verify time-related claims.
-  (claim-not-before {:claims {:nbf 1515691416624}} {:foo 0})
-  ;; With no not-before claim but with a timestamp, return a missing claim error.
-  (claim-not-before {:claims {:foo "xxx"}} {:claim/not-before 1015691416624})
-  )
+    (let [f #'jwt.check/claim-not-before
+          ts 1515691416624
+          ts+1 (inc ts)
+          ts-1 (dec ts)]
+
+      (testing "missing :nbf claim when :jwt/timestamp provided"
+        (is (nil? (f {:claims {:foo "xxx"}} {:jwt/timestamp ts}))
+            "the not-before claim is optional"))
+
+      (testing "options"
+
+        (testing "missing :jwt/timestamp option"
+          (let [result (f {:claims {:nbf ts}} {})]
+            (is (lib.error/error? result)
+                "missing :jwt/timestamp option causes error")
+            (is (= "missing option" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= :jwt/timestamp (get-in result [:error :missing]))
+                "error reports which option was missing")
+            (is (= [:claims :nbf] (get-in result [:error :claim]))
+                "error reports claim that couldn't be checked")))
+
+        (testing "invalid :jwt/timestamp option"
+          (let [result (f {:claims {:nbf ts}} {:jwt/timestamp "foobar"})]
+            (is (lib.error/error? result)
+                "invalid :jwt/timestamp option causes error")
+            (is (= "invalid option" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= :jwt/timestamp (get-in result [:error :invalid]))
+                "error reports which option was invalid")
+            (is (= [:claims :nbf] (get-in result [:error :claim]))
+                "error reports claim that couldn't be checked")))
+
+        (testing "missing :jwt/tolerance option"
+          (let [result (f {:claims {:nbf ts}} {:jwt/timestamp ts})]
+            (is (lib.error/error? result)
+                "missing :jwt/tolerance option causes error")
+            (is (= "missing option" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= :jwt/tolerance (get-in result [:error :missing]))
+                "error reports which option was missing")
+            (is (= [:claims :nbf] (get-in result [:error :claim]))
+                "error reports claim that couldn't be checked")))
+
+        (testing "invalid :jwt/tolerance option"
+          (let [result (f {:claims {:nbf ts}} {:jwt/timestamp ts :jwt/tolerance "foobar"})]
+            (is (lib.error/error? result)
+                "invalid :jwt/tolerance option causes error")
+            (is (= "invalid option" (get-in result [:error :message]))
+                "error has the correct description")
+            (is (= :jwt/tolerance (get-in result [:error :invalid]))
+                "error reports which option was invalid")
+            (is (= [:claims :nbf] (get-in result [:error :claim]))
+                "error reports claim that couldn't be checked"))))
+
+      (testing "token nbf time is before the current time"
+        (is (= true (f {:claims {:nbf ts}} {:jwt/timestamp ts+1 :jwt/tolerance 0}))
+            "not-before time is after current timestamp"))
+
+      (testing "token nbf time is after the reference timestamp"
+        (let [result (f {:claims {:nbf ts+1}} {:jwt/timestamp ts :jwt/tolerance 0})]
+          (is (lib.error/error? result)
+              "invalid :jwt/tolerance option causes error")
+          (is (= "token not yet valid" (get-in result [:error :message]))
+              "error has the correct description")
+          (is (= [:claims :nbf] (get-in result [:error :failed]))
+              "error reports claim that failed")
+          (is (= ts (get-in result [:error :expected]))
+              "error reports the expected claim value")
+          (is (= ts+1 (get-in result [:error :received]))
+                "error reports the expected claim value")))
+
+      (testing "claim falls within tolerance window "
+        ;; TODO
+        ))))
 
 (deftest claim-issued-at
   (testing "jwt :iat claim"
