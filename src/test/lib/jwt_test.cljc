@@ -136,6 +136,8 @@
           ts+1 (inc ts)
           ts-1 (dec ts)]
 
+      ;; TODO missing timestamp and claim is not an error
+      ;; TODO claim present but  missing timestamp option is an error
       (testing "no check performed when missing :jwt/timestamp option"
         (is (nil? (f {:claims {:exp 0}} {}))
             "check not performed when missing :jwt/timestamp option"))
