@@ -57,7 +57,7 @@
     :example ""}
    :string])
 
-(def not-before
+#_(def not-before
   [:and
    {:description "The timestamp at which the token becomes valid"
     :example 1515691416624}
@@ -137,7 +137,7 @@
     :claim/identity {:optional true} ident
     :claim/issuer {:optional true} issuer
     :claim/nonce {:optional true} nonce
-    :claim/not-before {:optional true} not-before
+    ;;:claim/not-before {:optional true} not-before
     :claim/subject {:optional true} subject
     :jwt/algorithms {:optional true} algorithms
     :jwt/max-age {:optional true} max-age

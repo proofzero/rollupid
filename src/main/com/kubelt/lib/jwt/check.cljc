@@ -399,61 +399,58 @@
 ;; token
 ;; -----------------------------------------------------------------------------
 
-;; TODO get current timestamp; (/ (js/Date.now) 1000)
-;; TODO get decoded token (if provided as string); should we require a string argument?
+;; Verification functions to apply. As a rule, these return true by
+;; default, and only apply checking logic if a corresponding value is
+;; found in the supplied options map. E.g. if a :nonce is supplied in
+;; options, the verify-nonce check will return true if it matches (in
+;; whatever way makes sense for that claim) the value in the JWT.
+(def ^:private checks
+  [#_{:name :timestamp
+      :fn verify-timestamp}
+   #_{:name :max-age
+      :fn verify-max-age}
+   #_{:name :nonce
+      :fn verify-nonce}
+
+   ;; TODO this header is optional, recommended to be "JWT" if
+   ;; present, but not a failure if absent or has different
+   ;; value.
+   #_{:name :header/type
+      :fn header-type}
+   {:name :header/algo
+    :fn header-algo}
+
+   {:name :claim/identity
+    :fn claim-identity}
+   {:name :claim/expires
+    :fn claim-expires}
+   {:name :claim/not-before
+    :fn claim-not-before}
+   {:name :claim/issued-at
+    :fn claim-issued-at}
+   {:name :claim/issuer
+    :fn claim-issuer}
+   {:name :claim/subject
+    :fn claim-subject}
+   {:name :claim/audience
+    :fn claim-audience}])
 
 ;; TODO multimethod for verification, dispatch on alg type
 ;; TODO check expiry (timestamp, tolerance)
-;; TODO optionally return decoded?
 (defn token
-  [token key options]
+  [token options]
   {:pre [(every? map? [token options])]}
-
-  ;; TODO verify signature. If not valid, no point in doing any further checking!
-
   (reduce (fn [result-map {check-name :name check-fn :fn}]
             (let [result (check-fn token options)]
               ;; NB: this stores error objects when verification fails.
-              (if (some? result)
+              (if (lib.error/error? result)
                 (assoc result-map check-name result)
                 ;; When nil is returned that verification check wasn't
                 ;; requested (by the presence of a corresponding value in
                 ;; the options map).
                 result-map)))
             {}
-            ;; Verification functions to apply. As a rule, these return
-            ;; true by default, and only apply checking logic if a
-            ;; corresponding value is found in the supplied options
-            ;; map. E.g. if a :nonce is supplied in options, the
-            ;; verify-nonce check will return true if it matches (in
-            ;; whatever way makes sense for that claim) the value in the
-            ;; JWT.
-            [#_{:name :timestamp
-              :fn verify-timestamp}
-             #_{:name :max-age
-              :fn verify-max-age}
-             #_{:name :nonce
-              :fn verify-nonce}
-
-             {:name :header/type
-              :fn header-type}
-             {:name :header/algo
-              :fn header-algo}
-
-             {:name :claim/identity
-              :fn claim-identity}
-             {:name :claim/expires
-              :fn claim-expires}
-             {:name :claim/not-before
-              :fn claim-not-before}
-             {:name :claim/issued-at
-              :fn claim-issued-at}
-             {:name :claim/issuer
-              :fn claim-issuer}
-             {:name :claim/subject
-              :fn claim-subject}
-             {:name :claim/audience
-              :fn claim-audience}]))
+            checks))
 
 (comment
   (def ex-jwt

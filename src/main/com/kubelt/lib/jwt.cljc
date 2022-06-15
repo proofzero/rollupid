@@ -8,6 +8,7 @@
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.jwt.check :as lib.jwt.check]
+   [com.kubelt.lib.jwt.signature :as lib.signature]
    [com.kubelt.lib.time :as lib.time]
    [com.kubelt.spec.jwt :as spec.jwt]))
 
@@ -33,6 +34,8 @@
               :exp 1678894358383}
      :token "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJzdWIiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJhdWQiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJpYXQiOjE2NDk4ODA3NTcsImV4cCI6MTY0OTg4NDM1NzM4M30"
      :signature "D2elS8jdiFQp2KZn_qg8dO0ZE_JV403MX9ZfButZIkRoZ7rQkcVDNWS8Vl-bU_j7JH-2sNGw--xJtfKF0QZ-jg"})
+
+  (def jwt-str "eyJhbGciOiJFUzI1NiJ9.eyJpc3MiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJzdWIiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJhdWQiOiIweEY0RTlBMzZkNEQzN0IxRjgzNzA2YzU4ZUY4ZTNBRjU1OUY0YzFFMkUiLCJpYXQiOjE2NDk4ODA3NTcsImV4cCI6MTY0OTg4NDM1NzM4M30.D2elS8jdiFQp2KZn_qg8dO0ZE_JV403MX9ZfButZIkRoZ7rQkcVDNWS8Vl-bU_j7JH-2sNGw--xJtfKF0QZ-jg")
   )
 
 ;; Right now this is the only algorithm we support.
@@ -92,30 +95,31 @@
 (defn decode
   "Decode a JWT."
   [token]
-  (letfn [(decode-part [part]
-            (let [keywordize? true]
-              (-> part
-                  lib.base64/decode-string
-                  (lib.json/from-json keywordize?))))]
-    (if-not (string? token)
-      (lib.error/error "token is not a string")
-      (let [[header claims signature] (cstr/split token #"\.")
-            token (str header "." claims)
-            header (decode-part header)
-            claims (decode-part claims)]
-        {:header header
-         :claims claims
-         :token token
-         :signature signature}))))
+  (lib.error/conform*
+   [spec.jwt/jwt-string token]
+   (letfn [(decode-part [part]
+             (let [keywordize? true]
+               (-> part
+                   lib.base64/decode-string
+                   (lib.json/from-json keywordize?))))]
+     (let [[header claims signature] (cstr/split token #"\.")
+           header-map (decode-part header)
+           claims-map (decode-part claims)]
+       {:token/decoded {:header header-map
+                        :claims claims-map}
+        :token/encoded {:header header
+                        :claims claims
+                        :signature signature}}))))
 
-;; verify
+;; validate
 ;; -----------------------------------------------------------------------------
 
-(defn verify
-  "Verify a JWT."
+(defn validate
+  "Validate a JWT. Returns true if validation is successful, an error map
+  describing any validity checks that failed."
   ([token key]
    (let [defaults {}]
-     (verify token key defaults)))
+     (validate token key defaults)))
 
   ([token key options]
    (lib.error/conform*
@@ -124,17 +128,25 @@
     [spec.jwt/options options]
     (let [;; Note that the JWT may be provided as either a string or a
           ;; map. If a string, it should be decoded into a map.
-          token-map (if (string? token) (decode token) token)
-          ;; Current timestamp, used as reference for time-based checks
-          ;; unless a specific timestamp value to use is provided as an
-          ;; option. NB: JWT specifies NumericDate for timestamps,
-          ;; i.e. unix time (seconds since epoch).
-          now (lib.time/unix-time)
-          ;; The default set of options determine what the minimum set
-          ;; of verification checks to perform are.
-          defaults {:jwt/algorithms algorithms
-                    :jwt/max-age max-age
-                    :jwt/tolerance tolerance
-                    :jwt/timestamp now}
-          options (merge defaults options)]
-      (lib.jwt.check/token token-map key options)))))
+          decoded-jwt (if (string? token) (decode token) token)
+          ;; Extract the base64-encoded signature string.
+          signature (get-in decoded-jwt [:token/decoded :signature])]
+      (if (not (lib.signature/valid? key decoded-jwt))
+        (lib.error/error "invalid signature")
+        ;; validate whatever claims are present in the token
+        (let [token (get decoded-jwt :token/decoded)
+              ;; Current timestamp, used as reference for time-based checks
+              ;; unless a specific timestamp value to use is provided as an
+              ;; option. NB: JWT specifies NumericDate for timestamps,
+              ;; i.e. unix time (seconds since epoch).
+              now (lib.time/unix-time)
+              ;; The default set of options determine what the minimum set
+              ;; of verification checks to perform are.
+              defaults {:jwt/algorithms algorithms
+                        :jwt/max-age max-age
+                        :jwt/tolerance tolerance
+                        :jwt/timestamp now}
+              options (merge defaults options)
+              ;; TODO massage into a single error map.
+              errors (lib.jwt.check/token token options)]
+          (if (empty? errors) true errors)))))))
