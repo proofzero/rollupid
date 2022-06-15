@@ -59,7 +59,8 @@
         all-params (get method :method.params/all)
         ;; Collect parameters from the supplied parameter map, removing
         ;; any nil entries.
-        params (filter some? (map #(get params %) all-params))]
+        params (cond-> (filter some? (map #(get params %) all-params))
+                 (= "object" (-> method :method/params :params :schema :type)) first)]
     (lib.json/edn->json-forjs-str
      {:id request-id
       :jsonrpc rpc-version
