@@ -36,12 +36,13 @@
      :uri/port port
      :uri/path path}))
 
+(def uuid-at (atom 0))
 ;; TODO use an integer stored in client for incrementing counter?
 ;; Or perhaps a ULID / SQUUID to show calling sequence?
 (defn- make-request-id
   "Return a unique request identifier."
   []
-  (lib.uuid/random))
+  (swap! uuid-at inc))
 
 (defn- make-body
   [path method params]
