@@ -36,12 +36,21 @@
      :uri/port port
      :uri/path path}))
 
+
 ;; TODO use an integer stored in client for incrementing counter?
 ;; Or perhaps a ULID / SQUUID to show calling sequence?
 (defn- make-request-id
   "Return a unique request identifier."
   []
   (lib.uuid/random))
+
+(defn- adapt-params-shape
+  "some rpc methods expect an object instead of an array of args.
+  We derive the expectation based on the rpc method specification"
+  [method params]
+  (if (= "object" (-> method :method/params :params :schema :type))
+    (first params)
+    params))
 
 (defn- make-body
   [path method params]
@@ -58,7 +67,7 @@
         all-params (get method :method.params/all)
         ;; Collect parameters from the supplied parameter map, removing
         ;; any nil entries.
-        params (filter some? (map #(get params %) all-params))]
+        params (adapt-params-shape method (filter some? (map #(get params %) all-params)))]
     (lib.json/edn->json-forjs-str
      {:id request-id
       :jsonrpc rpc-version
