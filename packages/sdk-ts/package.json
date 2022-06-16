@@ -1,0 +1,35 @@
+{
+  "name": "@kubelt/sdk-ts",
+  "version": "0.0.0",
+  "description": "Kubelt SDK for TypeScript",
+  "keywords": [
+    "kubelt",
+    "sdk",
+    "web3",
+    "cms",
+    "ipfs",
+    "ipld",
+    "rdf"
+  ],
+  "author": "Proof Zero Inc.",
+  "homepage": "https://kubelt.com",
+  "license": "Apache-2.0",
+  "main": "dist/sdk.js",
+  "types": "dist/sdk.d.ts",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubelt/kubelt.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/kubelt/kubelt/issues"
+  },
+  "dependencies": {
+    "@kubelt/sdk-js": "file:../sdk-js"
+  }
+}
