@@ -268,19 +268,55 @@
 
 (deftest claim-issued-at
   (testing "jwt :iat claim"
-    ))
-(comment
-  ;; no timestamp in options
-  (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/tolerance 100})
-  ;; token issued later than reference timestamp ("now")
-  (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/timestamp 0 :jwt/tolerance 100})
-  ;; token issued before the reference timestamp
-  (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/timestamp 1915691416624 :jwt/tolerance 100})
-  ;; token issued before timestamp, within the tolerance
-  (claim-issued-at {:claims {:iat 1000}} {:jwt/timestamp 1050 :jwt/tolerance 100})
-  (claim-issued-at {:claims {:iat 1000}} {:jwt/timestamp 1000 :jwt/tolerance 0})
-  (claim-issued-at {:claims {:iat 1000}} {:jwt/timestamp 999 :jwt/tolerance 0})
-  )
+    (let [f #'jwt.check/claim-issued-at
+          ts 1515691416624
+          ts+1 (inc ts)]
+
+      (testing "no claim to check and no timestamp options"
+        (is (nil? (f {:claims {:foo "bar"}} {}))
+            "the issued-at claim is optional"))
+
+      (testing "no claim to check but timestamp options provided"
+        (is (nil? (f {:claims {:foo "bar"}} {:jwt/timestamp 100 :jwt/tolerance 0}))
+            "the issued-at claim is optional"))
+
+      (testing "no timestamp in options"
+        (let [result (f {:claims {:iat ts}} {:jwt/tolerance 100})]
+          (is (lib.error/error? result)
+              "missing :jwt/timestamp option")
+          (is (= "missing option" (get-in result [:error :message]))
+              "error has the correct description")
+          (is (= [:claims :iat] (get-in result [:error :claim/failed]))
+              "error reports claim that failed")
+          (is (= :jwt/timestamp (get-in result [:error :option/missing]))
+              "error reports which option is missing")))
+
+      (testing "token issued before the reference timestamp"
+        (is (= true (f {:claims {:iat ts}} {:jwt/timestamp ts+1 :jwt/tolerance 100}))
+            "token was issued before current time"))
+
+      (testing "token was issued at current time"
+        (is (= true (f {:claims {:iat 1000}} {:jwt/timestamp 1000 :jwt/tolerance 0}))
+            "token was issued at current time"))
+
+      (testing "token issued before timestamp within tolerance window"
+        (is (= true (f {:claims {:iat 1000}} {:jwt/timestamp 1050 :jwt/tolerance 100}))
+            "token was issued within tolerance window"))
+
+      (testing "token issued later than reference timestamp"
+        (let [result (f {:claims {:iat ts}} {:jwt/timestamp 0 :jwt/tolerance 100})]
+          (is (lib.error/error? result)
+              "token issued in the future generates an error")
+          (is (= "issue time is in the future" (get-in result [:error :message]))
+              "error has the correct description")
+          (is (= [:claims :iat] (get-in result [:error :failed]))
+              "error reports claim that failed")
+          (is (= ts (get-in result [:error :claim/issued-at]))
+              "error contains token issue time")
+          (is (= 0 (get-in result [:error :jwt/timestamp]))
+              "error contains reference timestamp")
+          (is (= 100 (get-in result [:error :jwt/tolerance]))
+              "error contains tolerance parameter"))))))
 
 (deftest claim-audience
   (testing "jwt :aud claim"

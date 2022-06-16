@@ -246,44 +246,51 @@
 ;; issued-at
 ;;
 
+;; TODO validate timestamp
+;; - this should be checked in the com.kubelt.spec.jwt/options map
+;; TODO validate tolerance
+;; - this should be checked in the com.kubelt.spec.jwt/options map
 (defn- claim-issued-at
   "The issued-at ('iat') claim records the time at which the token was
   issued. It can be used to determine the age of the token. Its value
   MUST be a number containing a NumericDate value. This is an OPTIONAL
   but recommended registered claim."
   [{claims :claims :as jwt} {:keys [:jwt/timestamp :jwt/tolerance]}]
-  (when timestamp
-    ;; TODO validate timestamp
-    ;; - this should be checked in the com.kubelt.spec.jwt/options map
-    ;; TODO validate tolerance
-    ;; - this should be checked in the com.kubelt.spec.jwt/options map
-    (if-let [issued-at (get claims :iat)]
-      (let [tolerance (if tolerance tolerance 0)]
-        (cond
-          ;;
-          (not (nat-int? timestamp))
-          (lib.jwt.claim/failed :iat "timestamp is not a number" {:timestamp timestamp})
-          ;; Check that tolerance is a number.
-          (not (nat-int? tolerance))
-          (lib.jwt.claim/failed :iat "tolerance is not a number" {:tolerance tolerance})
-          ;; The issue time must be an integer timestamp.
-          (not (nat-int? issued-at))
-          (lib.jwt.claim/failed :iat "issue time is not a number" {:issued-at issued-at})
-          ;; Check that iat is in the past. Allows for some clock drift (tolerance).
-          (> issued-at (+ timestamp tolerance))
-          (lib.jwt.claim/failed :iat "issue time is in the future" {:issued-at issued-at
-                                                                    :timestamp timestamp
-                                                                    :tolerance tolerance})
-          :else true))
-      (lib.jwt.claim/missing :iat {:issued-at timestamp}))))
+  (if-let [issued-at (get claims :iat)]
+    (cond
+      ;; Missing reference timestamp.
+      (nil? timestamp)
+      (lib.jwt.option/missing :iat :jwt/timestamp)
+      ;; Check the timestamp is a NumericDate.
+      (not (timestamp? timestamp))
+      (lib.jwt.option/invalid :iat "timestamp is not a number" {:jwt/timestamp timestamp})
+      ;; Missing tolerance option.
+      (nil? tolerance)
+      (lib.jwt.option/missing :iat :jwt/tolerance)
+      ;; Check that tolerance is a number.
+      (not (tolerance? tolerance))
+      (lib.jwt.option/invalid :iat "tolerance is not a number" {:jwt/tolerance tolerance})
+      ;; The issue time must be an integer timestamp.
+      (not (timestamp? issued-at))
+      (lib.jwt.claim/failed :iat "issue time is not a number" {:claim/issued-at issued-at})
+      ;; Check that iat is in the past. Allows for some clock drift (tolerance).
+      (> issued-at (+ timestamp tolerance))
+      (lib.jwt.claim/failed :iat "issue time is in the future" {:claim/issued-at issued-at
+                                                                :jwt/timestamp timestamp
+                                                                :jwt/tolerance tolerance})
+      :else true)))
 
 (comment
+  ;; no claim to check, no timestamp options
+  (claim-issued-at {:claims {:foo "bar"}} {})
+  ;; no claim to check, with timestamp options
+  (claim-issued-at {:claims {:foo "bar"}} {:jwt/timestamp 100 :jwt/tolerance 0})
   ;; no timestamp in options
   (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/tolerance 100})
-  ;; token issued later than reference timestamp ("now")
-  (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/timestamp 0 :jwt/tolerance 100})
   ;; token issued before the reference timestamp
   (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/timestamp 1915691416624 :jwt/tolerance 100})
+  ;; token issued later than reference timestamp ("now")
+  (claim-issued-at {:claims {:iat 1515691416624}} {:jwt/timestamp 0 :jwt/tolerance 100})
   ;; token issued before timestamp, within the tolerance
   (claim-issued-at {:claims {:iat 1000}} {:jwt/timestamp 1050 :jwt/tolerance 100})
   (claim-issued-at {:claims {:iat 1000}} {:jwt/timestamp 1000 :jwt/tolerance 0})
@@ -315,7 +322,7 @@
           true)
         ;; option value wasn't a string or regex
         :else
-        (lib.jwt.claim/invalid :aud :claim/audience {:provided expected}))
+        (lib.jwt.claim/invalid :aud {:provided expected}))
       ;; Return an error about the missing claim.
       (lib.jwt.claim/missing :aud {:expected expected}))))
 
