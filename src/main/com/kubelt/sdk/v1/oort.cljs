@@ -40,7 +40,7 @@
              (throw (ex-info "error" auth-result))
              ;; We successfully retrieved a nonce, now verify it by signing
              ;; it and sending it back.
-             auth-result)))
+             (:nonce auth-result))))
         (lib.promise/then
          (fn [nonce]
            (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
