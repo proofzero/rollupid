@@ -182,9 +182,9 @@
         restore& (restore-fn)]
     (-> restore&
         (lib.promise/then
-         (fn [{:keys [options vault]}]
+         (fn [{:keys [data]}]
            ;; TODO fold options back into system map?
-           (assoc system :crypto/session vault))))))
+           (assoc system :crypto/session (:vault data)))))))
 
 (defn restore-js&
   "Return a system map that has had saved state restored."
