@@ -44,7 +44,7 @@
         (lib.promise/then
          (fn [nonce]
            (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
-                 signature (sign-fn nonce)]
+                 signature (sign-fn (:message nonce))]
              [nonce signature])))
         (lib.promise/then
          (fn [[nonce signature-p]]
@@ -58,7 +58,7 @@
               ;; client IP to restrict renewing JWTs for other clients.
               ;; TODO check/assert that this is true.
               (lib.promise/then
-               (lib.oort/verify! sys core nonce signature)
+               (lib.oort/verify! sys core (:nonce nonce) signature)
                (fn [verify-result]
                  (if (lib.error/error? verify-result)
                    ;; This triggers .catch handlers on returned promise.
