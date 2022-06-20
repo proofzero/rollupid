@@ -46,7 +46,10 @@
                            :current-owner "0x1919DB36cA2fa2e15F9000fd9CdC2EdCF863E685",
                            :chain "ETH",
                            :collection-name "CryptoPunksMarket",
-                           :network "mainnet"}]} nfts)))
+                           :network "mainnet"}],
+                         :total-items 1985,
+                         :total-pages 1985,
+                         :page-number 1} nfts)))
                (catch js/Error err (do
                                      (log/error err)
                                      (is false err)))
