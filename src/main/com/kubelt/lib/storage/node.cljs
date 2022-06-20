@@ -55,7 +55,7 @@
             (lib.promise/then
              (fn [data-str]
                (let [data (t/read r data-str)]
-                 {:data data}))))))))
+                 data))))))))
 
 (defn- make-path
   "Return the path to the file where state is stored."

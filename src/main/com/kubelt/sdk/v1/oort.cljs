@@ -6,6 +6,7 @@
    [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.oort :as lib.oort]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.promise :as lib.promise :refer [promise]]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
@@ -73,8 +74,8 @@
                      ;; subset, e.g. tokens) to be frozen and thawed
                      ;; back out
                      (-> sys
-                         (assoc-in [:crypto/session :vault/tokens core] decoded-jwt)
-                         (assoc-in [:crypto/session :vault/tokens* core] verify-result)))))))))))))
+                         (assoc :crypto/session (lib.vault/vault {core decoded-jwt}))
+                         (assoc-in [:crypto/session :vault/tokens*]  {core verify-result})))))))))))))
 
 (defn authenticate-js!
   "Create an account from a JavaScript context."

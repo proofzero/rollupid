@@ -29,6 +29,7 @@
                      kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))]
                  (is (= {} (-> sys :crypto/session :vault/tokens)))
                  (is (map? (get-in kbt [:crypto/session :vault/tokens core])))
+                 (is (= :kubelt.type/vault (get-in kbt [:crypto/session :com.kubelt/type])))
                  (is (string? (get-in kbt [:crypto/session :vault/tokens* core]))))
                (catch js/Error err (do
                                      (log/error err)
