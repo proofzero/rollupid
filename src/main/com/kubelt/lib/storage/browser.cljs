@@ -2,8 +2,8 @@
   "Support for HTTP requests from a browser execution context."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.lib.json :as lib.json]))
+   [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.lib.promise :as lib.promise]))
 
 (defn- get-storage
   []
@@ -48,7 +48,7 @@
    (fn [resolve _]
      (let [data (-> (get-item DB_ID_KEY)
                     (lib.json/json-str->edn))]
-       (resolve {:data data})))))
+       (resolve data)))))
 
 (defn create
   "Create a configuration storage capability."
