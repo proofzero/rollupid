@@ -1,6 +1,8 @@
 (ns com.kubelt.lib.jwt.signature
   "JWT signature validation."
-  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"})
+  {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
+  (:require
+   [com.kubelt.lib.base64 :as lib.base64]))
 
 ;; Message Signature or MAC Validation
 
@@ -98,6 +100,16 @@
   valid, and false otherwise."
   [key m]
   {:pre [(map? m)]}
-  ;; TODO
-  true
-  )
+  ;; TODO check that the signature used is supported
+  ;; TODO decode the signature
+  (let [signature (get-in m [:token/encoded :signature])
+        decoded-sig (lib.base64/decode-bytes signature)]
+    (prn (type decoded-sig))
+    ;;    8.  Validate the JWS Signature against the JWS Signing Input
+    ;;        ASCII(BASE64URL(UTF8(JWS Protected Header)) || '.' ||
+    ;;        BASE64URL(JWS Payload)) in the manner defined for the algorithm
+    ;;        being used, which MUST be accurately represented by the value of
+    ;;        the "alg" (algorithm) Header Parameter, which MUST be present.
+    ;;        See Section 10.6 for security considerations on algorithm
+    ;;        validation.  Record whether the validation succeeded or not.
+    true))

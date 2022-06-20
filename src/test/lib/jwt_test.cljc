@@ -412,37 +412,41 @@
   (testing "jwt :sub claim"
     (let [;; Use var to bypass private attribute of function under test.
           f #'jwt.check/claim-subject]
-      (testing "no check option supplied"
+      (testing "no subject option supplied"
         (is (nil? (f {:claims {:sub "xxx"}} {:foo/bar "aaa"}))
             "check not performed when missing :claim/subject option"))
 
-      (testing "direct match"
+      (testing "direct string match of subject claim"
         (is (= true (f {:claims {:sub "xxx"}} {:claim/subject "xxx"}))
             "token claim matches expected audience"))
 
-      (testing "claim doesn't match expected"
+      (testing "claim doesn't match expected value"
         (let [result (f {:claims {:sub "xxx"}} {:claim/subject "yyy"})]
           (is (lib.error/error? result)
               "token claim doesn't match expected audience")
-          (is (= "yyy" (get-in result [:error :expected]))
-              "error reports the expected value for the claim")
-          (is (= "xxx" (get-in result [:error :received]))
-              "error reports the received value for the claim")
-          (is (= "invalid subject" (get-in result [:error :message]))
+          (is (= "failed claim" (get-in result [:error :message]))
               "error has the correct description")
-          (is (= [:claims :sub] (get-in result [:error :failed]))
-              "error indicates which claim has failed")))
+          (is (= [:claims :sub] (get-in result [:error :claim/failed]))
+              "error indicates which claim has failed")
+          (is (= "yyy" (get-in result [:error :claim/expected]))
+              "error reports the expected value for the claim")
+          (is (= "xxx" (get-in result [:error :claim/received]))
+              "error reports the received value for the claim")))
 
       (testing "missing subject claim in token when check requested"
         (let [result (f {:claims {:foo "bar"}} {:claim/subject "yyy"})]
           (is (lib.error/error? result)
               "token doesn't have a subject claim")
-          (is (= "yyy" (get-in result [:error :expected]))
+          (is (= "yyy" (get-in result [:error :claim/expected]))
               "error reports the expected value for the claim")
           (is (= "missing claim" (get-in result [:error :message]))
               "error has the correct description")
-          (is (= [:claims :sub] (get-in result [:error :missing]))
-              "error indicates which claim is missing"))))))
+          (is (= [:claims :sub] (get-in result [:error :claim/missing]))
+              "error indicates which claim is missing")
+          (is (= "yyy" (get-in result [:error :claim/expected]))))))))
+
+(deftest claim-nonce
+  (testing "jwt :nonce claim"))
 
 ;; #?(:node
 ;;    (def keypair

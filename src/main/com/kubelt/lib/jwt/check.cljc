@@ -42,24 +42,6 @@
   )
 
 ;;
-;; verify-nonce
-;;
-
-(defn- verify-nonce
-  "Verify the 'nonce' claim against the expected nonce. Expected a decoded
-  JWT map and the verify options map as arguments. Returns true if there
-  is no check to perform because no expected nonce was provided, or if
-  the expected nonce matches the provided claim in the JWT
-  payload. Otherwise returns false."
-  [{claims :claims :as jwt} {expected :nonce :as options}]
-  (when expected
-    (when-let [nonce (get claims :nonce)]
-      (if-not (= nonce expected)
-        (lib.error/error {:message "invalid nonce"
-                          :expected nonce})
-        true))))
-
-;;
 ;; header-algo
 ;;
 
@@ -71,8 +53,9 @@
     (if-let [algo (get header :alg)]
       (let [supported (into #{} algorithms)]
         (if-not (contains? supported algo)
-          (lib.jwt.header/failed :alg "unsupported algorithm" {:algorithm/supported algorithms
-                                                               :algorithm/token algo})
+          (lib.jwt.header/failed :alg {:error/reason "unsupported algorithm"
+                                       :jwt/algorithms algorithms
+                                       :claim/algorithm algo})
           true))
       (lib.jwt.header/missing :alg {:jwt/algorithms algorithms}))))
 
@@ -263,21 +246,25 @@
       (lib.jwt.option/missing :iat :jwt/timestamp)
       ;; Check the timestamp is a NumericDate.
       (not (timestamp? timestamp))
-      (lib.jwt.option/invalid :iat "timestamp is not a number" {:jwt/timestamp timestamp})
+      (lib.jwt.option/invalid :iat {:error/reason "timestamp is not a number"
+                                    :jwt/timestamp timestamp})
       ;; Missing tolerance option.
       (nil? tolerance)
       (lib.jwt.option/missing :iat :jwt/tolerance)
       ;; Check that tolerance is a number.
       (not (tolerance? tolerance))
-      (lib.jwt.option/invalid :iat "tolerance is not a number" {:jwt/tolerance tolerance})
+      (lib.jwt.option/invalid :iat {:error/reason "tolerance is not a number"
+                                    :jwt/tolerance tolerance})
       ;; The issue time must be an integer timestamp.
       (not (timestamp? issued-at))
-      (lib.jwt.claim/failed :iat "issue time is not a number" {:claim/issued-at issued-at})
+      (lib.jwt.claim/failed :iat {:error/reason "issue time is not a number"
+                                  :claim/received issued-at})
       ;; Check that iat is in the past. Allows for some clock drift (tolerance).
       (> issued-at (+ timestamp tolerance))
-      (lib.jwt.claim/failed :iat "issue time is in the future" {:claim/issued-at issued-at
-                                                                :jwt/timestamp timestamp
-                                                                :jwt/tolerance tolerance})
+      (lib.jwt.claim/failed :iat {:error/reason "issue time is in the future"
+                                  :claim/issued-at issued-at
+                                  :jwt/timestamp timestamp
+                                  :jwt/tolerance tolerance})
       :else true)))
 
 (comment
@@ -311,20 +298,18 @@
         ;; exact string match
         (string? expected)
         (if (not= expected audience)
-          (lib.jwt.claim/failed :aud "invalid audience" {:expected expected
-                                                         :received audience})
+          (lib.jwt.claim/failed :aud {:claim/expected expected :claim/received audience})
           true)
         ;; regular expression match
         (lib.re/regexp? expected)
         (if (not (some? (re-matches expected audience)))
-          (lib.jwt.claim/failed :aud "invalid audience" {:expected expected
-                                                         :received audience})
+          (lib.jwt.claim/failed :aud {:claim/expected expected :claim/received audience})
           true)
         ;; option value wasn't a string or regex
         :else
-        (lib.jwt.claim/invalid :aud {:provided expected}))
+        (lib.jwt.claim/invalid :aud {:claim/expected expected}))
       ;; Return an error about the missing claim.
-      (lib.jwt.claim/missing :aud {:expected expected}))))
+      (lib.jwt.claim/missing :aud {:claim/expected expected}))))
 
 (comment
   (claim-audience {:claims {:aud "public"}} {:xxx "yyy"})
@@ -360,8 +345,7 @@
         (if (lib.error/error? expected)
           expected
           (if-not (contains? expected issuer)
-            (lib.jwt.claim/failed :iss "invalid issuer" {:expected expected
-                                                         :received issuer})
+            (lib.jwt.claim/failed :iss {:claim/expected expected :claim/received issuer})
             true)))
       ;; Return an error about the missing claim.
       (lib.jwt.claim/missing :iss {:expected expected}))))
@@ -383,14 +367,13 @@
 (defn- claim-subject
   "Check subject claim ('sub'). Expects the subject to be specified as a
   string. Use of this claim is OPTIONAL."
-  [{claims :claims :as jwt} {expected :claim/subject :as options}]
+  [{claims :claims} {expected :claim/subject}]
   (when expected
     (if-let [subject (get claims :sub)]
       (if-not (= subject expected)
-        (lib.jwt.claim/failed :sub "invalid subject" {:expected expected
-                                                      :received subject})
+        (lib.jwt.claim/failed :sub {:claim/expected expected :claim/received subject})
         true)
-      (lib.jwt.claim/missing :sub {:expected expected}))))
+      (lib.jwt.claim/missing :sub {:claim/expected expected}))))
 
 (comment
   ;; Missing :claim/subject
@@ -401,6 +384,30 @@
   (claim-subject {:claims {:sub "xxx"}} {:claim/subject "yyy"})
   ;; Missing :sub claim
   (claim-subject {:claims {:foo "xxx"}} {:claim/subject "yyy"})
+  )
+
+;;
+;; claim-nonce
+;;
+
+(defn- claim-nonce
+  "Verify the 'nonce' claim against the expected nonce. Expected a decoded
+  JWT map and the verify options map as arguments. Returns true if there
+  is no check to perform because no expected nonce was provided, or if
+  the expected nonce matches the provided claim in the JWT
+  payload. Otherwise returns false."
+  [{claims :claims} {expected :claim/nonce}]
+  (when expected
+    (when-let [nonce (get claims :nonce)]
+      (if-not (= nonce expected)
+        (lib.jwt.claim/failed :nonce {:error/reason "nonce does not match"
+                                      :claim/expected expected
+                                      :claim/received nonce})
+        true))))
+
+(comment
+  ;; Direct match
+  (claim-nonce {:claims {:nonce "foobar"}} {:claim/nonce "foobar"})
   )
 
 ;; token
@@ -416,8 +423,6 @@
       :fn verify-timestamp}
    #_{:name :max-age
       :fn verify-max-age}
-   #_{:name :nonce
-      :fn verify-nonce}
 
    ;; TODO this header is optional, recommended to be "JWT" if
    ;; present, but not a failure if absent or has different
@@ -440,7 +445,9 @@
    {:name :claim/subject
     :fn claim-subject}
    {:name :claim/audience
-    :fn claim-audience}])
+    :fn claim-audience}
+   {:name :claim/nonce
+    :fn claim-nonce}])
 
 ;; TODO multimethod for verification, dispatch on alg type
 ;; TODO check expiry (timestamp, tolerance)

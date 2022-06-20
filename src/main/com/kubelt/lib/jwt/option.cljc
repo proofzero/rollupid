@@ -16,10 +16,12 @@
   {:pre [(keyword? claim)
          (keyword? option)
          (map? detail)
-         (every? #{:provided} (keys detail))]}
+         (not (some #{:error/message :option/invalid :claim/failed} (keys detail)))]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     (merge detail {:message "invalid option" :invalid option :claim path}))))
+     (merge detail {:error/message "invalid option"
+                    :option/invalid option
+                    :claim/failed path}))))
 
 ;; missing
 ;; -----------------------------------------------------------------------------
@@ -34,4 +36,6 @@
          (keyword? option)]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     {:message "missing option" :missing option :claim path})))
+     {:error/message "missing option"
+      :option/missing option
+      :claim/failed path})))

@@ -9,17 +9,23 @@
 
 (defn missing
   [field detail]
-  {:pre [(keyword? field) (map? detail)]}
+  {:pre [(keyword? field)
+         (map? detail)
+         (not (some #{:error/message :header/missing} (keys detail)))]}
   (let [path (conj [:header] field)]
     (lib.error/error
-     (merge detail {:message "missing header" :missing path}))))
+     (merge detail {:error/message "missing header"
+                    :header/missing path}))))
 
 ;; failed
 ;; -----------------------------------------------------------------------------
 
 (defn failed
-  [field message detail]
-  {:pre [(keyword? field) (string? message) (map? detail)]}
+  [field detail]
+  {:pre [(keyword? field)
+         (map? detail)
+         (not (some #{:error/message :header/failed} (keys detail)))]}
   (let [path (conj [:header] field)]
     (lib.error/error
-     (merge detail {:message message :failed path}))))
+     (merge detail {:error/message "failed header"
+                    :header/failed path}))))

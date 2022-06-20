@@ -15,10 +15,13 @@
   [claim detail]
   {:pre [(keyword? claim)
          (map? detail)
-         (every? #{:expected} (keys detail))]}
+         (every? #{:claim/expected} (keys detail))
+         (not (some #{:error/message :claim/missing} (keys detail)))]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     (merge detail {:message "missing claim" :missing path}))))
+     (merge detail {:error/message "missing claim"
+                    :claim/missing path
+                    :claim/expected expected}))))
 
 ;; failed
 ;; -----------------------------------------------------------------------------
@@ -29,14 +32,15 @@
   etc. The message is a human-readable description of the error. The
   detail map provides extra information that is merged into the
   resulting error map."
-  [claim message detail]
+  [claim detail]
   {:pre [(keyword? claim)
-         (string? message)
          (map? detail)
-         (every? #{:expected :received} (keys detail))]}
+         ;;(every? #{:claim/expected :claim/received} (keys detail))
+         (not (some #{:error/message :claim/failed} (keys detail)))]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     (merge detail {:message message :failed path}))))
+     (merge detail {:error/message "failed claim"
+                    :claim/failed path}))))
 
 ;; invalid
 ;; -----------------------------------------------------------------------------
@@ -49,7 +53,7 @@
   [claim detail]
   {:pre [(keyword? claim)
          (map? detail)
-         (every? #{:received} (keys detail))]}
+         (not (some #{:error/message :claim/invalid} (keys detail)))]}
   (let [path (conj [:claims] claim)]
     (lib.error/error
-     (merge detail {:message "invalid claim" :invalid path}))))
+     (merge detail {:error/message "invalid claim" :claim/invalid path}))))
