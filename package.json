@@ -78,6 +78,7 @@
     "@kubelt/sdk-cljs": "file:packages\\sdk-cljs",
     "@kubelt/sdk-js": "file:packages\\sdk-js",
     "@kubelt/sdk-web": "file:packages\\sdk-web",
+    "@kubelt/three-id": "file:packages\\three-id",
     "aes-js": "3.1.2",
     "ethers": "5.6.9",
     "highlight.js": "11.5.1",
