@@ -1,4 +1,4 @@
-{:name "al_fetchNFTs"
+{:name "al_fetchNFTS"
  :params [{:name "params"
            :schema
            {:type "object"
@@ -14,7 +14,6 @@
                                  :type "array"
                                  :summary "array of contract addresses to filter the responses with. Max limit 20 contracts."
                                  :items {:name "contractAddress"
-                                         :sumammry ""
                                          :type "string"}}
              :filters {:name "filters"
                        :type "array"
