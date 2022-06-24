@@ -1,6 +1,6 @@
 ;; packages/sdk-clj/bb.edn
 {:paths []
- :deps {uberdeps/uberdeps {:mvn/version "1.1.2"}}
+ :deps {uberdeps/uberdeps {:mvn/version "1.1.4"}}
  :min-bb "0.8.0"
  :tasks
  {:requires
