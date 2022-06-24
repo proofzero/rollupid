@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --lint "$(clj -Spath)" --dependencies --parallel --copy-configs
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/ddt*
@@ -60,10 +60,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/kbt*
@@ -91,10 +91,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -111,7 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/lib*
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/proto*
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/spec*
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           clj-kondo: 2022.05.31
       - run: clj-kondo --fail-level error --lint src/main/com/kubelt/sdk*
@@ -154,10 +154,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -174,10 +174,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -195,10 +195,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -214,10 +214,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -234,10 +234,10 @@ jobs:
       CHROME_BIN: /snap/bin/chromium
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -253,10 +253,10 @@ jobs:
   #   runs-on: ubuntu-latest
   #   steps:
   #     - uses: actions/checkout@master
-  #     - uses: DeLaGuardo/setup-clojure@6.0
+  #     - uses: DeLaGuardo/setup-clojure@7.0
   #       with:
   #         bb: 0.8.156
-  #         cli: 1.11.1.1129
+  #         cli: 1.11.1.1149
   #     - uses: actions/setup-node@v3
   #       with:
   #         node-version: lts/gallium
@@ -279,10 +279,10 @@ jobs:
           - 8787:8787
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@6.0
+      - uses: DeLaGuardo/setup-clojure@7.0
         with:
           bb: 0.8.156
-          cli: 1.11.1.1129
+          cli: 1.11.1.1149
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
