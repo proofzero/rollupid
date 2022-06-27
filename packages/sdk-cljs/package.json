@@ -29,9 +29,9 @@
     "url": "https://github.com/kubelt/kubelt/issues"
   },
   "dependencies": {
-    "@ethersproject/keccak256": "5.6.0",
-    "@ethersproject/signing-key": "5.6.0",
-    "@ethersproject/wallet": "5.6.0",
+    "@ethersproject/keccak256": "5.6.1",
+    "@ethersproject/signing-key": "5.6.2",
+    "@ethersproject/wallet": "5.6.2",
     "@stablelib/ed25519": "1.0.2",
     "@stablelib/hex": "1.0.1",
     "@stablelib/sha256": "1.0.1",
@@ -40,14 +40,14 @@
     "@stablelib/uuid": "1.0.1",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
-    "jose": "4.6.0",
-    "jsonld": "5.2.0",
+    "jose": "4.8.1",
+    "jsonld": "6.0.0",
     "levelup": "5.1.1",
     "libp2p-crypto": "0.21.2",
     "memdown": "6.1.1",
-    "multiformats": "9.6.2",
-    "quadstore": "9.1.0",
-    "web3": "1.7.1"
+    "multiformats": "9.7.0",
+    "quadstore": "10.0.0",
+    "web3": "1.7.4"
   },
   "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }

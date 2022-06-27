@@ -48,18 +48,18 @@
     "event-stream": "4.0.1",
     "fs": "0.0.1-security",
     "https-browserify": "1.0.0",
-    "jose": "4.6.0",
-    "jsonld": "5.2.0",
+    "jose": "4.8.1",
+    "jsonld": "6.0.0",
     "levelup": "5.1.1",
     "libp2p-crypto": "0.21.2",
     "memdown": "6.1.1",
-    "multiformats": "9.6.4",
+    "multiformats": "9.7.0",
     "os": "0.1.2",
     "os-browserify": "0.3.0",
-    "quadstore": "9.1.0",
+    "quadstore": "10.0.0",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
-    "web3": "1.7.1"
+    "web3": "1.7.4"
   },
   "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
 }
