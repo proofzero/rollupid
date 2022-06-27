@@ -6,6 +6,7 @@
 	},
 	"dependencies": {
 		"@coinbase/wallet-sdk": "3.3.0",
+		"@ethersproject/keccak256": "5.6.1",
 		"@headlessui/react": "1.6.5",
 		"@heroicons/react": "1.0.6",
 		"@metamask/detect-provider": "1.2.0",
