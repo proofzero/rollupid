@@ -1,5 +1,5 @@
 {
-  "name": "al_fetchNFTS",
+  "name": "alchemy_getNFTs",
   "params": [
     {
     "name": "params",
@@ -43,7 +43,7 @@
   }
   ],
   "result": {
-    "name": "al_fetchNFTs",
+    "name": "alchemy_getNFTs",
     "schema": {
       "type": "object",
       "required": [

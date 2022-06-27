@@ -17,7 +17,7 @@
   {:before  (lib.test-utils/create-wallet-fixture t.commons/app-name t.commons/wallet-name t.commons/wallet-password)
    :after (lib.test-utils/delete-wallet-fixture t.commons/app-name t.commons/wallet-name t.commons/wallet-password)})
 
-(deftest rpc-nfts-test
+(deftest rpc-qn-nfts-test
   (testing "rpc core fetch nfts ... so far jwt not related with wallet(nfts owner) param"
     (async done
            (go
@@ -47,9 +47,35 @@
                            :chain "ETH",
                            :collection-name "CryptoPunksMarket",
                            :network "mainnet"}],
-                         :total-items 1985,
-                         :total-pages 1985,
-                         :page-number 1} nfts)))
+                         :page-number 1}
+                        ;; not checking totals thus is a changing number over time
+                        (dissoc nfts :total-items :total-pages))))
+               (catch js/Error err (do
+                                     (log/error err)
+                                     (is false err)))
+               (finally (done)))))))
+
+(deftest rpc-alchemy-nfts-test
+  (testing "rpc core fetch alchemy-nfts ... so far jwt not related with wallet(nfts owner) param"
+    (async done
+           (go
+             (try
+               (let [config (t.commons/oort-config)
+                     sys (<p! (sdk/init config))
+                     wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
+                     core (:wallet/address wallet)
+                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
+                     api (-> (<p! (sdk.oort/rpc-api sys core))
+                             (update :methods conj (<! (lib.test-utils/read-local-edn&go "oort/methods/alchemy-get-nfts.edn"))))
+                     nfts (<p! (lib.rpc/rpc-call& kbt api
+                                                  {:method  [:alchemy :get-nf-ts]
+                                                   :params {:params {:owner "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C"}}}))]
+                 (is (= #{:owned-nfts :block-hash :total-count}
+                        (set (keys nfts))))
+
+                 (is (= (set (keys (first (:owned-nfts nfts))))
+                        #{:description :token-uri :contract :time-last-updated :title :balance :id :media :metadata})))
+
                (catch js/Error err (do
                                      (log/error err)
                                      (is false err)))

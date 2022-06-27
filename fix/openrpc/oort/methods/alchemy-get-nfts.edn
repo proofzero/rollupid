@@ -1,4 +1,4 @@
-{:name "al_fetchNFTS"
+{:name "alchemy_getNFTs"
  :params [{:name "params"
            :schema
            {:type "object"
@@ -21,7 +21,7 @@
                        :items {:name "filter"
                                :sumammry "Valid filter strings include:  \"SPAM\" : NFTs that have been classified as spam. Spam classification has a wide range of criteria that includes but is not limited to emitting fake events and copying other well-known NFTs."
                                :type "string"}}}}}]
- :result {:name "al_fetchNFTs"
+ :result {:name "alchemy_getNFTs"
           :schema {:type "object"
                    :required [:ownedNfts :totalCount :blockHash]
                    :properties
