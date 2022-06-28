@@ -69,8 +69,8 @@
                              (update :methods conj (<! (lib.test-utils/read-local-edn&go "oort/methods/alchemy-get-nfts.edn"))))
                      nfts (<p! (lib.rpc/rpc-call& kbt api
                                                   {:method  [:alchemy :get-nf-ts]
-                                                   :params {:params {:owner "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C"}}}))]
-                 (is (= #{:owned-nfts :block-hash :total-count}
+                                                   :params {:params {:owner "0xB0b9cd000A5AFA56d016C39470C3ec237df4e043"}}}))]
+                 (is (= #{:owned-nfts :block-hash :total-count :page-key}
                         (set (keys nfts))))
 
                  (is (= (set (keys (first (:owned-nfts nfts))))
