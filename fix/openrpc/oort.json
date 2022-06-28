@@ -1,934 +1,938 @@
 {
-  "openrpc": "1.2.6",
-  "info": {
-    "title": "Kubelt Core",
-    "version": "0.0.0"
-  },
-  "methods": [
-    {
-      "name": "kb_ping",
-      "params": [],
-      "result": {
-        "name": "pong",
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
-    {
-      "name": "kb_pong",
-      "params": [],
-      "result": {
-        "name": "pong",
-        "schema": {
-          "type": "null"
-        }
-      },
-      "errors": [
-        {
-          "code": -31999,
-          "message": "cannot pong"
-        }
-      ]
-    },
-    {
-      "name": "kb_auth",
-      "params": [
-        {
-          "name": "address",
-          "summary": "Account address",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "result": {
-        "name": "nonce",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "nonce": {
-              "type": "string"
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": {
+        "openrpc": "1.2.6",
+        "info": {
+            "title": "Kubelt Core",
+            "version": "0.0.0"
+        },
+        "methods": [
+            {
+                "name": "kb_ping",
+                "params": [],
+                "result": {
+                    "name": "pong",
+                    "schema": {
+                        "type": "string"
+                    }
+                }
             },
-            "message": {
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "kb_auth_verify",
-      "params": [
-        {
-          "name": "nonce",
-          "summary": "Challenge Nonce",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "name": "signature",
-          "summary": "Nonce Signature",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "result": {
-        "name": "jwt",
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
-    {
-      "name": "kb_core_create",
-      "params": [
-        {
-          "name": "name",
-          "summary": "Core Name",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "result": {
-        "name": "Core Address",
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
-    {
-      "name": "kb_core_add_signer",
-      "params": [
-        {
-          "name": "address",
-          "summary": "Signer Account Address",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "name": "permissions",
-          "summary": "Signer Granted Permissions",
-          "required": true,
-          "schema": {
-            "type": "array"
-          }
-        }
-      ],
-      "result": {
-        "name": "Signer",
-        "schema": {
-          "type": "string"
-        }
-      }
-    },
-    {
-      "name": "kb_metrics_submit",
-      "params": [
-        {
-          "name": "metric",
-          "summary": "Metric name",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "name": "value",
-          "summary": "Metric value",
-          "required": false,
-          "schema": {
-            "type": "number"
-          }
-        },
-        {
-          "name": "tags",
-          "summary": "Metric tags",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        {
-          "name": "type",
-          "summary": "Metric type",
-          "required": false,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
-      "result": {
-        "name": "metrics_result",
-        "schema": {
-          "type": "null"
-        }
-      }
-    },
-    {
-      "name": "kb_get_config",
-      "params": [],
-      "result": {
-        "name": "config",
-        "schema": {
-          "properties": {
-            "general": {
-              "properties": {
-                "id": {
-                  "properties": {
-                    "alias": {
-                      "type": "string"
+            {
+                "name": "kb_pong",
+                "params": [],
+                "result": {
+                    "name": "pong",
+                    "schema": {
+                        "type": "null"
                     }
-                  }
                 },
-                "client": {
-                  "properties": {
-                    "ttl": {
-                      "type": "integer"
-                    },
-                    "mediaType": {
-                      "type": "string"
+                "errors": [
+                    {
+                        "code": -31999,
+                        "message": "cannot pong"
                     }
-                  }
-                },
-                "aliases": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "alias": {
-                        "type": "string"
-                      },
-                      "provider": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "metadata": {
-                  "properties": {
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "version": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
+                ]
             },
-            "security": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "jwt": {
-                      "properties": {
-                        "ttl": {
-                          "type": "number"
-                        }
-                      }
-                    },
-                    "nonce": {
-                      "properties": {
-                        "ttl": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  }
-                },
-                "signers": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "userId": {
-                        "type": "string"
-                      },
-                      "key": {
-                        "type": "string"
-                      },
-                      "roles": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "roleId": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "roles": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "roleId": {
-                        "type": "string"
-                      },
-                      "policies": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                },
-                "policies": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "policyId": {
-                        "type": "string"
-                      },
-                      "capabilities": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "capabilityId": {
-                              "type": "string"
-                            },
-                            "caveats": {
-                              "type": "array",
-                              "items": {
-                                "properties": {
-                                  "type": {
-                                    "type": "string"
-                                  },
-                                  "value": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "capabilities": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "capabilityId": {
-                        "type": "string"
-                      },
-                      "caveats": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "type": {
-                              "type": "string"
-                            },
-                            "value": {
-                              "type": "array",
-                              "items": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "kb_set_config",
-      "params": [
-        {
-          "name": "config",
-          "required": true,
-          "schema": {
-            "properties": {
-              "general": {
-                "properties": {
-                  "id": {
-                    "properties": {
-                      "alias": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "client": {
-                    "properties": {
-                      "ttl": {
-                        "type": "integer"
-                      },
-                      "mediaType": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "aliases": {
-                    "type": "array",
-                    "items": {
-                      "properties": {
-                        "alias": {
-                          "type": "string"
-                        },
-                        "provider": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  },
-                  "metadata": {
-                    "properties": {
-                      "tags": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "version": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              "security": {
-                "properties": {
-                  "auth": {
-                    "properties": {
-                      "jwt": {
-                        "properties": {
-                          "ttl": {
-                            "type": "number"
-                          }
-                        }
-                      },
-                      "nonce": {
-                        "properties": {
-                          "ttl": {
-                            "type": "number"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "signers": {
-                    "type": "array",
-                    "items": {
-                      "properties": {
-                        "userId": {
-                          "type": "string"
-                        },
-                        "key": {
-                          "type": "string"
-                        },
-                        "roles": {
-                          "type": "array",
-                          "items": {
-                            "properties": {
-                              "roleId": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "roles": {
-                    "type": "array",
-                    "items": {
-                      "properties": {
-                        "roleId": {
-                          "type": "string"
-                        },
-                        "policies": {
-                          "type": "array",
-                          "items": {
+            {
+                "name": "kb_auth",
+                "params": [
+                    {
+                        "name": "address",
+                        "summary": "Account address",
+                        "required": true,
+                        "schema": {
                             "type": "string"
-                          }
                         }
-                      }
                     }
-                  },
-                  "policies": {
-                    "type": "array",
-                    "items": {
-                      "properties": {
-                        "policyId": {
-                          "type": "string"
-                        },
-                        "capabilities": {
-                          "type": "array",
-                          "items": {
-                            "properties": {
-                              "capabilityId": {
-                                "type": "string"
-                              },
-                              "caveats": {
-                                "type": "array",
-                                "items": {
-                                  "properties": {
-                                    "type": {
-                                      "type": "string"
-                                    },
-                                    "value": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "capabilities": {
-                    "type": "array",
-                    "items": {
-                      "properties": {
-                        "capabilityId": {
-                          "type": "string"
-                        },
-                        "caveats": {
-                          "type": "array",
-                          "items": {
-                            "properties": {
-                              "type": {
-                                "type": "string"
-                              },
-                              "value": {
-                                "type": "array",
-                                "items": {
-                                  "type": "string"
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      ],
-      "result": {
-        "name": "config",
-        "description": "This core's configuration object.",
-        "schema": {
-          "properties": {
-            "general": {
-              "properties": {
-                "id": {
-                  "properties": {
-                    "alias": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "client": {
-                  "properties": {
-                    "ttl": {
-                      "type": "integer"
-                    },
-                    "mediaType": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "aliases": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "alias": {
-                        "type": "string"
-                      },
-                      "provider": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "metadata": {
-                  "properties": {
-                    "tags": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "version": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            },
-            "security": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "jwt": {
-                      "properties": {
-                        "ttl": {
-                          "type": "number"
-                        }
-                      }
-                    },
-                    "nonce": {
-                      "properties": {
-                        "ttl": {
-                          "type": "number"
-                        }
-                      }
-                    }
-                  }
-                },
-                "signers": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "userId": {
-                        "type": "string"
-                      },
-                      "key": {
-                        "type": "string"
-                      },
-                      "roles": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "roleId": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "roles": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "roleId": {
-                        "type": "string"
-                      },
-                      "policies": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                },
-                "policies": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "policyId": {
-                        "type": "string"
-                      },
-                      "capabilities": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "capabilityId": {
-                              "type": "string"
-                            },
-                            "caveats": {
-                              "type": "array",
-                              "items": {
-                                "properties": {
-                                  "type": {
-                                    "type": "string"
-                                  },
-                                  "value": {
-                                    "type": "array",
-                                    "items": {
-                                      "type": "string"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "capabilities": {
-                  "type": "array",
-                  "items": {
-                    "properties": {
-                      "capabilityId": {
-                        "type": "string"
-                      },
-                      "caveats": {
-                        "type": "array",
-                        "items": {
-                          "properties": {
-                            "type": {
-                              "type": "string"
-                            },
-                            "value": {
-                              "type": "array",
-                              "items": {
-                                "type": "string"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "errors": [
-        {
-          "code": -32603,
-          "message": "failure to persist general config"
-        },
-        {
-          "code": -32603,
-          "message": "failure to persist security config"
-        }
-      ]
-    },
-    {
-      "name": "kb_set_profile",
-      "params": [
-        {
-          "name": "profile",
-          "required": true,
-          "schema": {
-            "properties": {
-              "nickname": {
-                "type": "string"
-              },
-              "profilePicture": {
-                "type": "object",
-                "required": [
-                  "collectionTokenId",
-                  "name",
-                  "imageUrl"
                 ],
-                "properties": {
-                  "collectionTokenId": {
-                    "type": "string"
-                  },
-                  "collectionId": {
-                    "type": "string"
-                  },
-                  "name": {
-                    "type": "string"
-                  },
-                  "imageUrl": {
-                    "type": "string"
-                  }
+                "result": {
+                    "name": "nonce",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "nonce": {
+                                "type": "string"
+                            },
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
-              },
-              "email": {
-                "type": "string"
-              },
-              "location": {
-                "type": "string"
-              },
-              "job": {
-                "type": "string"
-              },
-              "website": {
-                "type": "string"
-              },
-              "bio": {
-                "type": "string"
-              },
-              "socials": {
-                "properties": {
-                  "twitter": {
-                    "type": "string"
-                  },
-                  "instagram": {
-                    "type": "string"
-                  },
-                  "linkedin": {
-                    "type": "string"
-                  },
-                  "github": {
-                    "type": "string"
-                  }
+            },
+            {
+                "name": "kb_auth_verify",
+                "params": [
+                    {
+                        "name": "nonce",
+                        "summary": "Challenge Nonce",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "signature",
+                        "summary": "Nonce Signature",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "jwt",
+                    "schema": {
+                        "type": "string"
+                    }
                 }
-              }
+            },
+            {
+                "name": "kb_core_create",
+                "params": [
+                    {
+                        "name": "name",
+                        "summary": "Core Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "Core Address",
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "kb_core_add_signer",
+                "params": [
+                    {
+                        "name": "address",
+                        "summary": "Signer Account Address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "permissions",
+                        "summary": "Signer Granted Permissions",
+                        "required": true,
+                        "schema": {
+                            "type": "array"
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "Signer",
+                    "schema": {
+                        "type": "string"
+                    }
+                }
+            },
+            {
+                "name": "kb_metrics_submit",
+                "params": [
+                    {
+                        "name": "metric",
+                        "summary": "Metric name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "value",
+                        "summary": "Metric value",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "tags",
+                        "summary": "Metric tags",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "summary": "Metric type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "metrics_result",
+                    "schema": {
+                        "type": "null"
+                    }
+                }
+            },
+            {
+                "name": "kb_get_config",
+                "params": [],
+                "result": {
+                    "name": "config",
+                    "schema": {
+                        "properties": {
+                            "general": {
+                                "properties": {
+                                    "id": {
+                                        "properties": {
+                                            "alias": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "client": {
+                                        "properties": {
+                                            "ttl": {
+                                                "type": "integer"
+                                            },
+                                            "mediaType": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "aliases": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "alias": {
+                                                    "type": "string"
+                                                },
+                                                "provider": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "metadata": {
+                                        "properties": {
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "version": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "security": {
+                                "properties": {
+                                    "auth": {
+                                        "properties": {
+                                            "jwt": {
+                                                "properties": {
+                                                    "ttl": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            },
+                                            "nonce": {
+                                                "properties": {
+                                                    "ttl": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "signers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "userId": {
+                                                    "type": "string"
+                                                },
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "roleId": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "roleId": {
+                                                    "type": "string"
+                                                },
+                                                "policies": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "policies": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "policyId": {
+                                                    "type": "string"
+                                                },
+                                                "capabilities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "capabilityId": {
+                                                                "type": "string"
+                                                            },
+                                                            "caveats": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "value": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "capabilities": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "capabilityId": {
+                                                    "type": "string"
+                                                },
+                                                "caveats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "value": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "name": "kb_set_config",
+                "params": [
+                    {
+                        "name": "config",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "general": {
+                                    "properties": {
+                                        "id": {
+                                            "properties": {
+                                                "alias": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "client": {
+                                            "properties": {
+                                                "ttl": {
+                                                    "type": "integer"
+                                                },
+                                                "mediaType": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "aliases": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "alias": {
+                                                        "type": "string"
+                                                    },
+                                                    "provider": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "metadata": {
+                                            "properties": {
+                                                "tags": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "version": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "security": {
+                                    "properties": {
+                                        "auth": {
+                                            "properties": {
+                                                "jwt": {
+                                                    "properties": {
+                                                        "ttl": {
+                                                            "type": "number"
+                                                        }
+                                                    }
+                                                },
+                                                "nonce": {
+                                                    "properties": {
+                                                        "ttl": {
+                                                            "type": "number"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "signers": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "userId": {
+                                                        "type": "string"
+                                                    },
+                                                    "key": {
+                                                        "type": "string"
+                                                    },
+                                                    "roles": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "roleId": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "roleId": {
+                                                        "type": "string"
+                                                    },
+                                                    "policies": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "policies": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "policyId": {
+                                                        "type": "string"
+                                                    },
+                                                    "capabilities": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "capabilityId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "caveats": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "type": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "value": {
+                                                                                "type": "array",
+                                                                                "items": {
+                                                                                    "type": "string"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "capabilities": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "capabilityId": {
+                                                        "type": "string"
+                                                    },
+                                                    "caveats": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "value": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "string"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "config",
+                    "description": "This core's configuration object.",
+                    "schema": {
+                        "properties": {
+                            "general": {
+                                "properties": {
+                                    "id": {
+                                        "properties": {
+                                            "alias": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "client": {
+                                        "properties": {
+                                            "ttl": {
+                                                "type": "integer"
+                                            },
+                                            "mediaType": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "aliases": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "alias": {
+                                                    "type": "string"
+                                                },
+                                                "provider": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "metadata": {
+                                        "properties": {
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "version": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "security": {
+                                "properties": {
+                                    "auth": {
+                                        "properties": {
+                                            "jwt": {
+                                                "properties": {
+                                                    "ttl": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            },
+                                            "nonce": {
+                                                "properties": {
+                                                    "ttl": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "signers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "userId": {
+                                                    "type": "string"
+                                                },
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "roleId": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "roleId": {
+                                                    "type": "string"
+                                                },
+                                                "policies": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "policies": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "policyId": {
+                                                    "type": "string"
+                                                },
+                                                "capabilities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "capabilityId": {
+                                                                "type": "string"
+                                                            },
+                                                            "caveats": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "type": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "value": {
+                                                                            "type": "array",
+                                                                            "items": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "capabilities": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "capabilityId": {
+                                                    "type": "string"
+                                                },
+                                                "caveats": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "value": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "errors": [
+                    {
+                        "code": -32603,
+                        "message": "failure to persist general config"
+                    },
+                    {
+                        "code": -32603,
+                        "message": "failure to persist security config"
+                    }
+                ]
+            },
+            {
+                "name": "kb_set_profile",
+                "params": [
+                    {
+                        "name": "profile",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "nickname": {
+                                    "type": "string"
+                                },
+                                "profilePicture": {
+                                    "type": "object",
+                                    "required": true,
+                                    "properties": {
+                                        "collectionTokenId": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "collectionId": {
+                                            "type": "string",
+                                            "required": false
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "imageUrl": {
+                                            "type": "string",
+                                            "required": true
+                                        }
+                                    }
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "location": {
+                                    "type": "string"
+                                },
+                                "job": {
+                                    "type": "string"
+                                },
+                                "website": {
+                                    "type": "string"
+                                },
+                                "bio": {
+                                    "type": "string"
+                                },
+                                "socials": {
+                                    "properties": {
+                                        "twitter": {
+                                            "type": "string"
+                                        },
+                                        "instagram": {
+                                            "type": "string"
+                                        },
+                                        "linkedin": {
+                                            "type": "string"
+                                        },
+                                        "github": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "result": {
+                    "name": "profile",
+                    "description": "This core's profile configuration object.",
+                    "schema": {
+                        "properties": {
+                            "nickname": {
+                                "type": "string"
+                            },
+                            "profilePicture": {
+                                "type": "object",
+                                "required": true,
+                                "properties": {
+                                    "collectionTokenId": {
+                                        "type": "string",
+                                        "required": true
+                                    },
+                                    "collectionId": {
+                                        "type": "string",
+                                        "required": false
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "required": true
+                                    },
+                                    "imageUrl": {
+                                        "type": "string",
+                                        "required": true
+                                    }
+                                }
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "location": {
+                                "type": "string"
+                            },
+                            "job": {
+                                "type": "string"
+                            },
+                            "website": {
+                                "type": "string"
+                            },
+                            "bio": {
+                                "type": "string"
+                            },
+                            "socials": {
+                                "properties": {
+                                    "twitter": {
+                                        "type": "string"
+                                    },
+                                    "instagram": {
+                                        "type": "string"
+                                    },
+                                    "linkedin": {
+                                        "type": "string"
+                                    },
+                                    "github": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "name": "kb_get_profile",
+                "params": [],
+                "result": {
+                    "name": "profile",
+                    "description": "This core's profile configuration object.",
+                    "schema": {
+                        "properties": {
+                            "nickname": {
+                                "type": "string"
+                            },
+                            "profilePicture": {
+                                "type": "object",
+                                "required": true,
+                                "properties": {
+                                    "collectionTokenId": {
+                                        "type": "string",
+                                        "required": true
+                                    },
+                                    "collectionId": {
+                                        "type": "string",
+                                        "required": false
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "required": true
+                                    },
+                                    "imageUrl": {
+                                        "type": "string",
+                                        "required": true
+                                    }
+                                }
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "location": {
+                                "type": "string"
+                            },
+                            "job": {
+                                "type": "string"
+                            },
+                            "website": {
+                                "type": "string"
+                            },
+                            "bio": {
+                                "type": "string"
+                            },
+                            "socials": {
+                                "properties": {
+                                    "twitter": {
+                                        "type": "string"
+                                    },
+                                    "instagram": {
+                                        "type": "string"
+                                    },
+                                    "linkedin": {
+                                        "type": "string"
+                                    },
+                                    "github": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-          }
-        }
-      ],
-      "result": {
-        "name": "profile",
-        "description": "This core's profile configuration object.",
-        "schema": {
-          "properties": {
-            "nickname": {
-              "type": "string"
-            },
-            "profilePicture": {
-              "type": "object",
-              "required": [
-                "collectionTokenId",
-                "name",
-                "imageUrl"
-              ],
-              "properties": {
-                "collectionTokenId": {
-                  "type": "string"
-                },
-                "collectionId": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "imageUrl": {
-                  "type": "string"
-                }
-              }
-            },
-            "email": {
-              "type": "string"
-            },
-            "location": {
-              "type": "string"
-            },
-            "job": {
-              "type": "string"
-            },
-            "website": {
-              "type": "string"
-            },
-            "bio": {
-              "type": "string"
-            },
-            "socials": {
-              "properties": {
-                "twitter": {
-                  "type": "string"
-                },
-                "instagram": {
-                  "type": "string"
-                },
-                "linkedin": {
-                  "type": "string"
-                },
-                "github": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "name": "kb_get_profile",
-      "params": [],
-      "result": {
-        "name": "profile",
-        "description": "This core's profile configuration object.",
-        "schema": {
-          "properties": {
-            "nickname": {
-              "type": "string"
-            },
-            "profilePicture": {
-              "type": "object",
-              "required": [
-                "collectionTokenId",
-                "name",
-                "imageUrl"
-              ],
-              "properties": {
-                "collectionTokenId": {
-                  "type": "string"
-                },
-                "collectionId": {
-                  "type": "string"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "imageUrl": {
-                  "type": "string"
-                }
-              }
-            },
-            "email": {
-              "type": "string"
-            },
-            "location": {
-              "type": "string"
-            },
-            "job": {
-              "type": "string"
-            },
-            "website": {
-              "type": "string"
-            },
-            "bio": {
-              "type": "string"
-            },
-            "socials": {
-              "properties": {
-                "twitter": {
-                  "type": "string"
-                },
-                "instagram": {
-                  "type": "string"
-                },
-                "linkedin": {
-                  "type": "string"
-                },
-                "github": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        }
-      }
+        ]
     }
-  ]
 }
