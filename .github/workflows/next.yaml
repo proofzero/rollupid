@@ -32,6 +32,27 @@ jobs:
       - run: npm ci
       - run: npm install cypress --save-dev
       - run: npm run test:all:release
+
+      # - name: [three-id] generate wrangler.toml for CloudFlare
+      #   env:
+      #     ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+      #     NEXT_KV_GATE_ID: ${{ secrets.NEXT_KV_GATE_ID }}
+      #     NEXT_KV_SITE_ID: ${{ secrets.NEXT_KV_SITE_ID }}
+      #   working-directory: ./three-id
+      #   run: bb wrangler:toml
+
+      # - name: [three-id] run preflight checks
+      #   working-directory: ./three-id
+      #   run: bb check:all
+
+      # - name: [three-id] wrangler login
+      #   working-directory: ./three-id
+      #   run: xxx
+
+      # - name: [three-id] deploy the application
+      #   working-directory: ./three-id
+      #   run: bb deploy:app --deploy-env next
+
       # TODO: Do we want to replease a @kubelt/package@prerelease to github registry or npm?
       #- name: Publish Next
         #run: npx lerna publish --canary --preid next --yes

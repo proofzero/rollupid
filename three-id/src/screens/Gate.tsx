@@ -2,29 +2,12 @@ import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
-import { authenticate, isAuthenticated } from "../provider/kubelt";
-
-import { connect } from "../provider/web3";
-
 import Layout from "./Layout";
 
-export default function Auth({ navigation }: { navigation: any }) {
+import Constants from "expo-constants";
+
+export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      if (!isAuthenticated()) {
-        const provider = await connect();
-        await authenticate(provider);
-
-        if (isAuthenticated()) {
-          navigation.navigate("Gate");
-        }
-      }
-    };
-
-    asyncFn();
-  }, []);
 
   useEffect(() => {
     if (account === null) {
@@ -46,13 +29,13 @@ export default function Auth({ navigation }: { navigation: any }) {
           style={{
             paddingBottom: "1em",
             fontFamily: "Inter_700Bold",
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: "700",
-            lineHeight: 28,
+            lineHeight: 32,
             color: "#1F2937",
           }}
         >
-          Connecting with MetaMask...
+          Your wallet address is not whitelisted for Early Access.
         </Text>
 
         <Text
@@ -65,7 +48,30 @@ export default function Auth({ navigation }: { navigation: any }) {
             color: "#1F2937",
           }}
         >
-          Sign the message with your wallet.
+          To get onto the whitelist{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.twitterUrl}
+          >
+            follow us on Twitter
+          </a>
+          ,{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.discordUrl}
+          >
+            join our Discord
+          </a>
+          , and leave us a message in{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.discordChannelUrl}
+          >
+            #3iD
+          </a>
         </Text>
       </View>
     </Layout>
