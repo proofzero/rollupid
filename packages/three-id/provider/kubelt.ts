@@ -7,6 +7,7 @@ import { hexlify } from "ethers/lib/utils";
 import { BehaviorSubject } from "rxjs";
 
 let sdk: any = null;
+let sdkStored: any = null;
 
 const isAuthSubj = new BehaviorSubject(false);
 
@@ -44,6 +45,7 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
     const isAuth = await sdkWeb?.node_v1?.oort.isLoggedIn();
     if (!isAuth) {
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
+      sdkStored = await sdkWeb?.node_v1?.store(sdk);
       isAuthSubj.next(true);
     }
   } catch (e) {
