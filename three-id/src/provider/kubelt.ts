@@ -1,5 +1,5 @@
 // @ts-ignore
-import sdkWeb from "@kubelt/sdk-web";
+import sdkWeb from "../../../packages/sdk-web/lib/com.kubelt.sdk.js";
 
 import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";

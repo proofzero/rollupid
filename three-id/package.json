@@ -31,7 +31,7 @@
     "@coinbase/wallet-sdk": "3.3.0",
     "@expo-google-fonts/inter": "0.2.2",
     "@expo/webpack-config": "0.16.21",
-    "@kubelt/sdk-web": "file:../kubelt/packages/sdk-web",
+    "@kubelt/sdk-web": "file:../packages/sdk-web",
     "@react-navigation/native": "6.0.10",
     "@react-navigation/native-stack": "6.6.2",
     "ethers": "5.6.8",

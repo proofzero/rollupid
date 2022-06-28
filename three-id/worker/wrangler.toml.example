@@ -1,0 +1,83 @@
+# three-id/worker/wrangler.toml.example
+
+compatibility_date = "2022-06-20"
+
+main = "src/index.js"
+
+# Account ID for admin@kubelt.com (staging and production). Override for
+# per-user deployments, which should use individual user's account ID to
+# keep development activities separate from production infra, hopefully
+# avoiding accidents.
+account_id = "${admin-account-id}"
+
+# Development
+# ------------------------------------------------------------------------------
+# NB: each developer gets a personal dev environment.
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+
+[env.robert]
+name = "three-id-gate"
+# Personal account ID for <rob@kubelt.com>.
+account_id = "{{robert-account-id}}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{robert-kv-site-id}}" },
+  { binding = "GATE", id = "{{robert-kv-gate-id}}" },
+]
+
+[env.juan]
+name = "three-id-gate"
+# Personal account ID for <juan@kubelt.com>.
+#account_id = "{{juan-account-id}}"
+vars = { ENVIRONMENT = "development" }
+# kv_namespaces = [
+#   { binding = "SITE", id = "{{juan-kv-site-id}}" },
+#   { binding = "GATE", id = "{{juan-kv-gate-id}}" },
+# ]
+
+[env.cosmin]
+name = "three-id-gate"
+# Personal account ID for <cosmin@kubelt.com>.
+#account_id = ""
+vars = { ENVIRONMENT = "development" }
+# kv_namespaces = [
+#   { binding = "SITE", id = "{{cosmin-kv-site-id}}" },
+#   { binding = "GATE", id = "{{cosmin-kv-gate-id}}" },
+# ]
+
+[env.dhruv]
+name = "three-id-gate"
+# Personal account ID for <dhruvil@kubelt.com>.
+account_id = "7275dc74ed165e86fc91badf4359fefc"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{dhruv-kv-site-id}}" },
+  { binding = "GATE", id = "{{dhruv-kv-gate-id}}" },
+]
+
+# Staging
+# ------------------------------------------------------------------------------
+
+[env.next]
+name = "three-id-gate-next"
+vars = { ENVIRONMENT = "next" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{next-kv-site-id}}" },
+  { binding = "GATE", id = "{{next-kv-gate-id}}" },
+]
+
+# Production
+# ------------------------------------------------------------------------------
+
+[env.current]
+name = "three-id-gate-current"
+#route = "dapp.threeid.xyz/*"
+#zone_id = "b11c699637302521054b5bc8fb373956"
+vars = { ENVIRONMENT = "current" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{current-kv-site-id}}" },
+  { binding = "GATE", id = "{{current-kv-gate-id}}" },
+]

@@ -1,0 +1,597 @@
+;; three-id/bb.edn
+{:min-bb "0.8.0"
+ :tasks
+ {:requires
+  [[babashka.classpath :as cp]
+   [babashka.fs :as fs]
+   [babashka.pods :as pods]
+   [babashka.process :as proc]
+   [cheshire.core :as json]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.java.shell :refer [sh]]
+   [clojure.pprint :as pprint]
+   [clojure.set :as cs]
+   [clojure.string :as cstr]
+   [org.httpkit.client :as http]
+   [selmer.parser :as tpl]]
+  :init
+  (do
+    ;; Load pod for hickory, etc.
+    (pods/load-pod 'retrogradeorbit/bootleg "0.1.9")
+
+    ;; Add shared build code to classpath.
+    (cp/add-classpath "../bb")
+
+    (require '[pod.retrogradeorbit.hickory.select :as hick])
+
+    (require '[com.kubelt.build :as build])
+    (require '[com.kubelt.cloudflare :as cf])
+    (require '[com.kubelt.cloudflare.asset :as cf.asset])
+    (require '[com.kubelt.cloudflare.kv :as cf.kv])
+    (require '[com.kubelt.edn :as kb.edn])
+    (require '[com.kubelt.git :as git])
+
+    ;; The name of the application to build and deploy.
+    (def app-id "three-id")
+    ;; The KV namespace ("binding") where files are stored.
+    (def kv-namespace "GATE")
+
+    ;; Developers
+    ;; -------------------------------------------------------------------------
+    ;; To add a new dev environment, a development:
+    ;; * create a CloudFlare account with their @kubelt.com e-mail
+    ;; * run: npm install in the repo
+    ;;   installs wrangler
+    ;; * run: npx wrangler login
+    ;;   grants wrangler permission to make changes in their account
+    ;; * ensure logged into developer CF site
+    ;;   in CloudFlare UI make sure you're viewing <dev@kublelt.com>,
+    ;;   not <admin@kubelt.com>
+    ;; * create worker service: three-id
+    ;; * create KV store: three-id-SITE
+    ;;
+    ;; In this file:
+    ;; * add environment name
+    ;;   (def env-joe "joe")
+    ;; * set up user environment URL
+    ;;   -url:joe "https://three-id.fixme.workers.dev"
+    ;; * set up user options
+    ;;   -options:joe
+    ;;   {:doc "The options map for 'joe' development environment."
+    ;;    :depends [-options:common]
+    ;;    :task (do (merge -options:common {:env/name env-joe}))}
+    ;; * update -url:deploy mapping
+
+    ;; The name of the per-user development environments.
+    (def env-dhruv "dhruv")
+    (def env-juan "juan")
+    (def env-robert "robert")
+    ;; The name of the staging environment.
+    (def env-next "next")
+    ;; The name of the production environment.
+    (def env-current "current")
+    ;; All valid deployment environments.
+    (def environments #{env-dhruv
+                        env-juan
+                        env-robert
+                        env-next
+                        env-current})
+
+    ;; DIRECTORIES
+    ;; -------------------------------------------------------------------------
+
+    ;; Source code root.
+    (def source-dir (str (fs/path "src")))
+    ;; Root directory of the CloudFlare Worker for proxying web.
+    (def worker-dir (str (fs/path "worker")))
+    ;; Root path of the files to deploy to CloudFlare host.
+    (def build-dir (str (fs/path "web-build")))
+
+    ;; FILES
+    ;; -------------------------------------------------------------------------
+
+    ;; CloudFlare wrangler config file for the web-serving worker.
+    (def wrangler-toml (str (fs/path "worker" "wrangler.toml")))
+    ;; Compiler-generated build manifest.
+    ;;(def manifest-edn (str (fs/path output-dir "manifest.edn")))
+
+    ;; INIT
+    ;; -------------------------------------------------------------------------
+
+    ;; Set the location where template engine looks for templates.
+    ;;(tpl/set-resource-path! (str (fs/canonicalize resources-dir)))
+    ;; Disable caching of rendered templates.
+    ;;(tpl/cache-off!)
+    )
+
+  ;; TODO add a --verbose flag that, when provided, signals us to print
+  ;; extra output e.g. when entering and leaving a task.
+
+  ;;:enter (println "entering:" (:name (current-task)))
+
+  ;;:leave (println "leaving:" (:name (current-task)))
+
+  ;; Data
+  ;; ---------------------------------------------------------------------------
+  ;; NB: can also supply a namespace ID rather than environment and binding:
+  ;; - :namespace/id "1bca95d621054bffb7b943c899586552"
+
+  ;; A collection of all application files rooted at build-dir.
+  -app:files (cf/files build-dir)
+
+  ;;
+  ;; Files
+  ;;
+
+  -file:robots (fs/path build-dir "robots.txt")
+
+  ;;
+  ;; CLI options
+  ;;
+
+  ;; For an example CLI configuration cf.
+  ;; https://github.com/clojure/tools.cli#example-usage
+  -cli:config
+  (do [;; --deploy-env
+       [nil "--deploy-env ENV" "Deployment environment"
+        :validate [(fn [env] (contains? environments env))]]
+       ;; --app-version
+       [nil "--app-version VERSION" "Application version"]
+       ;; --[no]-test-strict
+       [nil "--[no-]test-strict" "Treat errors as exceptions"]])
+
+  -cli:options
+  {:doc "Parse the CLI options"
+   :requires [[clojure.tools.cli :as cli]]
+   :depends [-cli:config]
+   :task (let [opts (cli/parse-opts *command-line-args* -cli:config)]
+           (if-let [errors (:errors opts)]
+             (let [error-msg (cstr/join \newline errors)]
+               (throw (ex-info error-msg {:errors errors})))
+             opts))}
+
+  ;;
+  ;; deployment environment
+  ;;
+
+  ;; The target deployment environment. Looks for this value in order:
+  ;; - the CLI option --deploy-env
+  ;; - the environment variable DEPLOY_ENV
+  ;; Throws if the given environment isn't one that is supported.
+  -deploy:env
+  {:doc "Extract deployment environment from DEPLOY_ENV and --deploy-env"
+   :depends [-cli:options]
+   :task (let [env-deploy (build/env "DEPLOY_ENV")
+               opt-deploy (get-in -cli:options [:options :deploy-env])
+               deploy-env (or opt-deploy env-deploy)]
+           (if (contains? environments deploy-env)
+             deploy-env
+             (throw (ex-info "unknown deployment environment; try using --deploy-env or DEPLOY_ENV"
+                             {:env/provided deploy-env
+                              :env/allowed environments}))))}
+
+  ;;
+  ;; strict tests
+  ;;
+
+  -test:strict?
+  {:doc "Extract strict testing flag from TEST_STRICT and --test-strict"
+   :depends [-cli:options]
+   :task (let [;; NB: everything except false and nil is true in
+               ;; boolean context.
+               env-strict (= "true" (build/env "TEST_STRICT" "true"))
+               opt-strict (get-in -cli:options [:options :test-strict])]
+           (if (some? opt-strict)
+             opt-strict
+             env-strict))}
+
+  ;;
+  ;; application version
+  ;;
+
+  ;; NB: We can also extract version from package.json:
+  ;; (def version (cli/release-version "package.json" *command-line-args*))
+
+  -git:head
+  {:doc "Print the git HEAD commit"
+   :task (git/commit)}
+
+  ;; The application version. Looks for this value in order:
+  ;; - the CLI option --app-version
+  ;; - the environment variable APP_VERSION
+  ;; - the first part of the HEAD git commit
+  -app:version
+  {:depends [-git:head -cli:options]
+   :task (let [env-version (build/env "APP_VERSION")
+               opt-version (get-in -cli:options [:options :app-version])
+               git-version (subs -git:head 0 10)
+               app-version (or opt-version env-version git-version)]
+           ;; TODO can we validate the version string?
+           app-version)}
+
+  ;;
+  ;; urls
+  ;;
+
+  ;; Development
+  -url:dhruv "https://three-id-gate.dhruvil.workers.dev"
+  -url:robert "https://three-id-gate.rob5492.workers.dev"
+
+  ;; Pre-production
+  -url:next "https://three-id-gate-next.admin1337.workers.dev"
+
+  ;; Production
+  -url:current "https://three-id-gate-current.admin1337.workers.dev"
+
+  -url:deploy
+  {:doc "The URL of the deployed application"
+   :depends [-deploy:env
+             -url:dhruv
+             -url:robert
+             -url:next
+             -url:current]
+   :task (let [url (get {env-dhruv -url:dhruv
+                         env-robert -url:robert
+                         env-next -url:next
+                         env-current -url:current} -deploy:env)]
+           (if (some? url)
+             url
+             (throw (ex-info "missing environment to URL mapping"
+                             {:deploy/env -deploy:env}))))}
+
+  ;;
+  ;; options
+  ;;
+
+  ;; Configuration common across all environments.
+  -options:common (do {:app/name app-id
+                       :config/path wrangler-toml
+                       :namespace/name kv-namespace})
+
+  -options:dhruv
+  {:doc "The options map for 'robert' development environment."
+   :depends [-options:common]
+   :task (do (merge -options:common {:env/name env-dhruv}))}
+
+  -options:robert
+  {:doc "The options map for 'robert' development environment."
+   :depends [-options:common]
+   :task (do (merge -options:common {:env/name env-robert}))}
+
+  -options:next
+  {:doc "The options map for next environment"
+   :depends [-options:common]
+   :task (do (merge -options:common {:env/name env-next}))}
+
+  -options:current
+  {:doc "The options map for current environment"
+   :depends [-options:common]
+   :task (do (merge -options:common {:env/name env-current}))}
+
+  -options:cloudflare
+  {:doc "The options map used for CloudFlare operations"
+   :depends [-deploy:env
+             -options:dhruv
+             -options:robert
+             -options:next
+             -options:current]
+   :task (condp = -deploy:env
+           env-dhruv -options:dhruv
+           env-robert -options:robert
+           env-next -options:next
+           env-current -options:current
+           (throw (ex-info "no options map for unknown build"
+                           {:deploy/env -deploy:env})))}
+
+  ;; Tasks
+  ;; ---------------------------------------------------------------------------
+  ;; TODO refuse to build and deploy if repo is dirty
+  ;; TODO make app version always a semantic version
+  ;; TODO include tasks from package.json
+  ;; TODO create required kv stores, etc.
+  ;; TODO read binding (ns) from CLI
+  ;; TODO blue / green?
+  ;; TODO support --preview option of wrangler kv:* commands
+  ;; TODO generate asset-manifest with hashed keys
+  ;; - hash the contents of the files and use as the KV store key
+  ;; - update the asset manifest
+  ;; - also store the asset manifest in KV store to allow manual lookup
+  ;;   of specific files
+
+  ;; TODO what kind of release labels and workflow do we want?
+  ;; - tags
+  ;; - git commits
+  ;; - dates
+
+  ;; $ npx wrangler kv:namespace create SITE --env staging --preview
+  ;; $ npx wrangler kv:namespace create SITE --env production
+
+  ;; Push a value into a KV namespace:
+  ;; $ wrangler kv:key put --binding=MY_KV "key" "value"
+
+  ;; - Run `npx wrangler dev src/index.js` in your terminal to start a development server
+  ;; - Open a browser tab at http://localhost:8787/ to see your worker in action
+  ;; - Run `npx wrangler publish src/index.js --name my-worker` to publish your worker
+
+  ;; preflight
+  ;; ---------------------------------------------------------------------------
+  ;; These tasks inspect the local environment to make sure everything
+  ;; looks as it should before building and/or deploying the
+  ;; application.
+
+  check:repo-clean
+  {:doc "Ensure that the repo working tree is clean"
+   :task (when (git/dirty?)
+           (let [message "dirty repo"
+                 status (git/status)]
+             (throw (ex-info message {:status status}))))}
+
+  check:wrangler-toml
+  {:doc "Ensure that wrangler.toml configuration file exists"
+   :task (when-not (fs/regular-file? wrangler-toml)
+           (let [message (str "missing " wrangler-toml)]
+             (throw (ex-info message {:file wrangler-toml}))))}
+
+  check:all
+  {:doc "Run all available preflight checks"
+   :depends [check:repo-clean
+             check:wrangler-toml]}
+
+  ;; informational
+  ;; ---------------------------------------------------------------------------
+  ;; Tasks to describe the environment and available configuration options.
+
+  available:env
+  {:doc "List the available deployment environments"
+   :task (doseq [env environments]
+           (println "->" env))}
+
+  deploy:env
+  {:doc "Print the configured deployment environment"
+   :depends [-deploy:env]
+   :task (println -deploy:env)}
+
+  app:version
+  {:doc "Print the configured application version"
+   :depends [-app:version]
+   :task (println -app:version)}
+
+  git:commit
+  {:doc "Print the git HEAD commit"
+   :depends [-git:head]
+   :task (println -git:head)}
+
+  ;; compile
+  ;; ---------------------------------------------------------------------------
+  ;; Compile (and clean up) the various artifacts that make up the
+  ;; application.
+
+  ;; config - contains compile-time constants injected compiled into the app
+
+  ;; compile:config
+  ;; {:doc "Inject values into the application configuration file"
+  ;;  :depends [-build:config -app:version -git:head]
+  ;;  :task (let [config (-> -build:config
+  ;;                         (assoc-in [:closure-defines 'three-id.core/APP-VERSION] -app:version)
+  ;;                         (assoc-in [:clojure-defines 'three-id.core/GIT-COMMIT] -git:head))
+  ;;              prefix (str app-id "-")
+  ;;              suffix (str "-config-" -deploy:env)
+  ;;              tmp_path (str (fs/create-temp-file {:prefix prefix :suffix suffix}))]
+  ;;          ;; Place configuration into a temp file.
+  ;;          (kb.edn/write -build:config tmp_path)
+  ;;          ;; Return the path of the generated file.
+  ;;          tmp_path)}
+
+  ;; robots.txt - directives for web crawlers
+
+  compile:robots
+  {:doc "Generate a robots.txt configuration file"
+   :depends [-deploy:env -file:robots]
+   :task (let [;; Block nothing in production, block everything in other
+               ;; environments.
+               all-paths "*"
+               no-paths ""
+               ;; TODO Until launch day our robots.txt blocks everything.
+               disallow (if (= "current" -deploy:env) all-paths all-paths)
+               all-agents "*"
+               lines [["User-agent" all-agents]
+                      ["Disallow" disallow]]
+               content (cstr/join \newline (map (fn [pair] (cstr/join ": " pair)) lines))
+               out-file (str -file:robots)]
+           (with-open [writer (io/writer out-file)]
+             (spit writer content))
+           ;; Return the path of the generated file.
+           out-file)}
+
+  clean:robots
+  {:doc "Remove the generated robots.txt file"
+   :depends [-file:robots]
+   :task (fs/delete-if-exists -file:robots)}
+
+  ;; application - the compiled JavaScript application
+
+  compile:app
+  {:doc "Build release version of the application"
+   :depends [;;compile:config
+             ]
+   :task (let [command (cstr/join " " ["expo" "build:web"])]
+           (shell command))}
+
+  clean:app
+  {:doc "Remove compiled application resources"
+   :task (fs/delete-tree build-dir)}
+
+  ;; release - compile the full application for release
+
+  build:release
+  {:doc "Build all application assets for production"
+   :depends [compile:app compile:robots]}
+
+  clean:release
+  {:doc "Remove all generated application assets"
+   :depends [clean:app]}
+
+  ;; manifest - the mapping from path to KV store key used by CloudFlare
+  ;; worker when serving the site
+
+  asset:manifest
+  {:doc "Generate an asset manifest for CloudFlare worker"
+   :depends [-app:files]
+   :task (let [;; For each file under public-dir, the manifest has an entry:
+               ;; {"some/path": "/some/path"}
+               manifest-edn (cf.asset/manifest -app:files)
+               out-path (str (fs/path worker-dir "src" "asset-manifest.json"))]
+           (json/generate-stream manifest-edn (clojure.java.io/writer out-path))
+           ;; Return the asset manifest content
+           manifest-edn)}
+
+  install:worker
+  {:doc "Install node deps for worker"
+   :task (let [command (cstr/join " " ["npm" "install"])]
+           (shell {:dir worker-dir} command))}
+
+  publish:worker
+  {:doc "Publish the CloudFlare worker"
+   :depends [-deploy:env asset:manifest install:worker]
+   :task (let [command ["npx" "wrangler" "publish" "--env" -deploy:env]]
+           (shell {:dir worker-dir} (cstr/join " " command)))}
+
+  publish:assets
+  {:doc "Publish website assets to CloudFlare KV store"
+   :depends [-app:files -options:cloudflare]
+   :task (do
+           ;; Remove any values in the KV store.
+           (cf.kv/truncate -options:cloudflare)
+           ;; Push the application files en masse.
+           (cf.kv/bulk-put -app:files -options:cloudflare))}
+
+  publish:site
+  {:doc "Publish assets and worker to CloudFlare"
+   :depends [publish:assets publish:worker]}
+
+  deploy:app
+  {:doc "Build and deploy the application"
+   :depends [-deploy:env clean:release build:release publish:site test:smoke]
+   :task (let [message (str "[🌸] Deployment: successful [env:'" -deploy:env "']")]
+           (println message))}
+
+  ;; test
+
+  ;; The asset manifest is mapping from KV store key to remote
+  ;; path. This is a sequence of the paths of every file stored in the
+  ;; KV store.
+  test:smoke:http
+  {:doc "Perform HTTP request for every deployed asset"
+   :requires []
+   :depends [asset:manifest -url:deploy -test:strict?]
+   :task (let [remote-paths (vals asset:manifest)
+               ;; Turn the paths into full URLs.
+               urls (map (partial str -url:deploy) remote-paths)
+               ;; Construct a map from url to HTTP request promise. The
+               ;; request isn't actually performed until the promise is
+               ;; deref'ed.
+               request-fn (fn [url]
+                            (let [result (deref (http/head url))
+                                  status (:status result)]
+                              [url status]))
+               requests (into {} (map request-fn urls))]
+           ;; If any of the requests had a non-OK status result, throw
+           ;; an exception if --test-strict flag was set.
+           (when -test:strict?
+             (doseq [[url status] requests]
+               (when (not= 200 status)
+                 (let [message (str "error fetching " url)]
+                   (throw (ex-info message {:url url :status status}))))))
+           ;; Return the results for later inspection.
+           requests)}
+
+  test:smoke
+  {:doc "Perform all smoke tests"
+   :depends [test:smoke:http]
+   :task (println "[🚬] Smoke tests: successful")}
+
+  ;; Debugging
+  ;; ---------------------------------------------------------------------------
+
+  -prn:test-strict?
+  {:doc "Print test-strict? setting"
+   :depends [-test:strict?]
+   :task (println -test:strict?)}
+
+  -prn:deploy-env
+  {:doc "Print the configured deployment environment"
+   :depends [-deploy:env]
+   :task (println -deploy:env)}
+
+  -prn:deploy-url
+  {:doc "Print the configured deployment URL"
+   :depends [-url:deploy]
+   :task (println -url:deploy)}
+
+  -prn:app-version
+  {:doc "Print the application version"
+   :depends [-app:version]
+   :task (println -app:version)}
+
+  -prn:asset-manifest
+  {:doc "Print asset manifest JSON"
+   :depends [asset:manifest]
+   :task (pprint/pprint asset:manifest)}
+
+  -prn:config
+  {:doc "Print the merged compile-time configuration"
+   :depends [-build:config]
+   :task (pprint/pprint -build:config)}
+
+  -prn:options
+  {:doc "Print the options map for CloudFlare operations"
+   :depends [-options:cloudflare]
+   :task (pprint/pprint -options:cloudflare)}
+
+  -prn:cli-options
+  {:doc "Print the parsed command line arguments"
+   :depends [-cli:options]
+   :task (pprint/pprint -cli:options)}
+
+  -prn:cli-args
+  {:doc "Print the raw command line arguments"
+   :task (pprint/pprint *command-line-args*)}
+
+  -prn:task-name
+  {:doc "Print the name of the executing task"
+   :task (println (:name (current-task)))}
+
+  -prn:smoke-http
+  {:doc "Print the output of HTTP smoke test"
+   :depends [test:smoke:http]
+   :task (pprint/pprint test:smoke:http)}
+
+  -git:status
+  {:doc "Print the git status of working tree"
+   :task (pprint/pprint (git/status))}
+
+  -git:dirty?
+  {:doc "Print out git working tree dirty status"
+   :task (prn (git/dirty?))}
+
+  -kv:key:list
+  {:doc "List the keys in a CloudFlare KV store"
+   :depends [-options:cloudflare]
+   :task (pprint/pprint (cf.kv/key-list -options:cloudflare))}
+
+  -kv:bulk:delete
+  {:doc "Remove all entries from a CloudFlare KV store"
+   :depends [-options:cloudflare]
+   :task (let [items #{"foo"}]
+           (println (cf.kv/bulk-delete items -options:cloudflare)))}
+
+  -kv:bulk:put
+  {:doc "Write app files to a CloudFlare KV store"
+   :depends [-app:files -options:cloudflare]
+   :task (println (cf.kv/bulk-put -app:files -options:cloudflare))}
+
+  -kv:truncate
+  {:doc "Remove all keys from a CloudFlare KV store"
+   :depends [-options:cloudflare]
+   :task (println (cf.kv/truncate -options:cloudflare))}}}
