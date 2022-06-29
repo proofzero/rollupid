@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
@@ -19,7 +20,10 @@ export default function Auth({ navigation }: { navigation: any }) {
 
         if (isAuthenticated()) {
           if (await isWhitelisted(provider)) {
-            alert('Yay!')
+            // Will be replaced with
+            // expo location 
+            // in a follow up PR
+            window.location = Constants.manifest?.extra?.gateRedirectUrl
           } else {
             navigation.navigate("Gate");
           }

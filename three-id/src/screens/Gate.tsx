@@ -4,6 +4,8 @@ import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
 import Layout from "./Layout";
 
+import Constants from "expo-constants";
+
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
 
@@ -46,8 +48,30 @@ export default function Gate({ navigation }: { navigation: any }) {
             color: "#1F2937",
           }}
         >
-          To get onto the whitelist follow us on Twitter, join our Discord and
-          leave us a message in #3ID-Whitelist channel
+          To get onto the whitelist{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.twitterUrl}
+          >
+            follow us on Twitter
+          </a>
+          ,{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.discordUrl}
+          >
+            join our Discord
+          </a>
+          , and leave us a message in{" "}
+          <a
+            target={"_blank"}
+            rel={"noopener noopener noreferrer"}
+            href={Constants.manifest?.extra?.discordChannelUrl}
+          >
+            #3iD
+          </a>
         </Text>
       </View>
     </Layout>
