@@ -1,15 +1,13 @@
-;; three-id/bb.edn
+;; kubelt/three-id/bb.edn
 {:min-bb "0.8.0"
  :tasks
  {:requires
   [[babashka.classpath :as cp]
    [babashka.fs :as fs]
    [babashka.pods :as pods]
-   [babashka.process :as proc]
    [cheshire.core :as json]
    [clojure.edn :as edn]
    [clojure.java.io :as io]
-   [clojure.java.shell :refer [sh]]
    [clojure.pprint :as pprint]
    [clojure.set :as cs]
    [clojure.string :as cstr]
@@ -31,6 +29,7 @@
     (require '[com.kubelt.cloudflare.kv :as cf.kv])
     (require '[com.kubelt.edn :as kb.edn])
     (require '[com.kubelt.git :as git])
+    (require '[com.kubelt.github.secret :as github.secret])
 
     ;; The name of the application to build and deploy.
     (def app-id "three-id")
@@ -92,7 +91,9 @@
     ;; -------------------------------------------------------------------------
 
     ;; CloudFlare wrangler config file for the web-serving worker.
-    (def wrangler-toml (str (fs/path "worker" "wrangler.toml")))
+    (def wrangler-toml (str (fs/path worker-dir "wrangler.toml")))
+    ;; Example wrangler config file we use as template.
+    (def wrangler-example (str (fs/path worker-dir "wrangler.toml.example")))
     ;; Compiler-generated build manifest.
     ;;(def manifest-edn (str (fs/path output-dir "manifest.edn")))
 
@@ -100,10 +101,9 @@
     ;; -------------------------------------------------------------------------
 
     ;; Set the location where template engine looks for templates.
-    ;;(tpl/set-resource-path! (str (fs/canonicalize resources-dir)))
+    (tpl/set-resource-path! (str (fs/canonicalize ".")))
     ;; Disable caching of rendered templates.
-    ;;(tpl/cache-off!)
-    )
+    (tpl/cache-off!))
 
   ;; TODO add a --verbose flag that, when provided, signals us to print
   ;; extra output e.g. when entering and leaving a task.
@@ -284,35 +284,85 @@
            (throw (ex-info "no options map for unknown build"
                            {:deploy/env -deploy:env})))}
 
-  ;; Tasks
-  ;; ---------------------------------------------------------------------------
-  ;; TODO refuse to build and deploy if repo is dirty
-  ;; TODO make app version always a semantic version
-  ;; TODO include tasks from package.json
-  ;; TODO create required kv stores, etc.
-  ;; TODO read binding (ns) from CLI
-  ;; TODO blue / green?
-  ;; TODO support --preview option of wrangler kv:* commands
-  ;; TODO generate asset-manifest with hashed keys
-  ;; - hash the contents of the files and use as the KV store key
-  ;; - update the asset manifest
-  ;; - also store the asset manifest in KV store to allow manual lookup
-  ;;   of specific files
+  ;; secrets
+  ;; -----------------------------------------------------------------------------
 
-  ;; TODO what kind of release labels and workflow do we want?
-  ;; - tags
-  ;; - git commits
-  ;; - dates
+  -env:admin-account-id (build/env "ADMIN_ACCOUNT_ID")
+  -env:next-kv-gate-id (build/env "NEXT_KV_GATE_ID")
+  -env:next-kv-site-id (build/env "NEXT_KV_SITE_ID")
+  -env:current-kv-gate-id (build/env "CURRENT_KV_GATE_ID")
+  -env:current-kv-site-id (build/env "CURRENT_KV_SITE_ID")
 
-  ;; $ npx wrangler kv:namespace create SITE --env staging --preview
-  ;; $ npx wrangler kv:namespace create SITE --env production
+  -env:cosmin-account-id (build/env "COSMIN_ACCOUNT_ID")
+  -env:cosmin-kv-gate-id (build/env "COSMIN_KV_GATE_ID")
+  -env:cosmin-kv-site-id (build/env "COSMIN_KV_SITE_ID")
+  -env:dhruv-account-id (build/env "DHRUV_ACCOUNT_ID")
+  -env:dhruv-kv-gate-id (build/env "DHRUV_KV_GATE_ID")
+  -env:dhruv-kv-site-id (build/env "DHRUV_KV_SITE_ID")
+  -env:juan-account-id (build/env "JUAN_ACCOUNT_ID")
+  -env:juan-kv-gate-id (build/env "JUAN_KV_GATE_ID")
+  -env:juan-kv-site-id (build/env "JUAN_KV_SITE_ID")
+  -env:robert-account-id (build/env "ROBERT_ACCOUNT_ID")
+  -env:robert-kv-gate-id (build/env "ROBERT_KV_GATE_ID")
+  -env:robert-kv-site-id (build/env "ROBERT_KV_SITE_ID")
 
-  ;; Push a value into a KV namespace:
-  ;; $ wrangler kv:key put --binding=MY_KV "key" "value"
+  ;; environment
+  ;; -----------------------------------------------------------------------------
+  ;; TODO set all secrets in GHA
 
-  ;; - Run `npx wrangler dev src/index.js` in your terminal to start a development server
-  ;; - Open a browser tab at http://localhost:8787/ to see your worker in action
-  ;; - Run `npx wrangler publish src/index.js --name my-worker` to publish your worker
+  -env:variables
+  {:doc "A map of values read from environment variables"
+   :depends [-env:current-kv-site-id
+             -env:current-kv-gate-id
+             -env:admin-account-id
+             -env:robert-account-id
+             -env:robert-kv-site-id
+             -env:robert-kv-gate-id
+             -env:dhruv-account-id
+             -env:dhruv-kv-site-id
+             -env:dhruv-kv-gate-id
+             -env:juan-account-id
+             -env:juan-kv-site-id
+             -env:juan-kv-gate-id
+             -env:cosmin-account-id
+             -env:cosmin-kv-site-id
+             -env:cosmin-kv-gate-id
+             -env:next-kv-site-id
+             -env:next-kv-gate-id]
+   :task (do
+           {:robert-account-id -env:robert-account-id
+            :robert-kv-site-id -env:robert-kv-site-id
+            :robert-kv-gate-id -env:robert-kv-gate-id
+            :juan-account-id -env:juan-account-id
+            :juan-kv-site-id -env:juan-kv-site-id
+            :juan-kv-gate-id -env:juan-kv-gate-id
+            :cosmin-account-id -env:cosmin-account-id
+            :cosmin-kv-site-id -env:cosmin-kv-site-id
+            :cosmin-kv-gate-id -env:cosmin-kv-gate-id
+            :dhruv-account-id -env:dhruv-account-id
+            :dhruv-kv-site-id -env:dhruv-kv-site-id
+            :dhruv-kv-gate-id -env:dhruv-kv-gate-id
+            :admin-account-id -env:admin-account-id
+            :next-kv-site-id -env:next-kv-site-id
+            :next-kv-gate-id -env:next-kv-gate-id
+            :current-kv-site-id -env:current-kv-site-id
+            :current-kv-gate-id -env:current-kv-gate-id})}
+
+  -env:config-file
+  {:doc "A map of values read from an .env file"
+   :task (let [lines (cstr/split-lines (slurp ".env"))
+               split-on (re-pattern "=")
+               update-key (fn [[k v]]
+                            (let [under (re-pattern "_")
+                                  under->dash (fn [s] (cstr/replace s under "-"))
+                                  new-k (-> k cstr/lower-case under->dash keyword)]
+                              [new-k v]))]
+           (into {} (map (fn [s] (-> s cstr/trim (cstr/split split-on) update-key)) lines)))}
+
+  -env:merged
+  {:doc "Configuration from environment variables overlaid with .env"
+   :depends [-env:config-file -env:variables]
+   :task (merge-with -env:variables -env:config-file)}
 
   ;; preflight
   ;; ---------------------------------------------------------------------------
@@ -333,9 +383,14 @@
            (let [message (str "missing " wrangler-toml)]
              (throw (ex-info message {:file wrangler-toml}))))}
 
+  check:gh-installed
+  {:doc "Ensure GitHub CLI is available"
+   :task (shell "which gh")}
+
   check:all
   {:doc "Run all available preflight checks"
-   :depends [check:repo-clean
+   :depends [check:gh-installed
+             check:repo-clean
              check:wrangler-toml]}
 
   ;; informational
@@ -362,26 +417,54 @@
    :depends [-git:head]
    :task (println -git:head)}
 
+  ;; github
+  ;; -----------------------------------------------------------------------------
+
+  -gh:secret:admin-account-id
+  {:depends [-env:merged]
+   :task (let [secret (:admin-account-id -env:merged)]
+           (github.secret/set "ADMIN_ACCOUNT_ID" secret))}
+
+  -gh:secret:next-kv-gate-id
+  {:depends [-env:merged]
+   :task (let [secret (:next-kv-gate-id -env:merged)]
+           (github.secret/set "NEXT_KV_GATE_ID" secret))}
+
+  -gh:secret:next-kv-site-id
+  {:depends [-env:merged]
+   :task (let [secret (:next-kv-site-id -env:merged)]
+           (github.secret/set "NEXT_KV_SITE_ID" secret))}
+
+  -gh:secret:current-kv-gate-id
+  {:depends [-env:merged]
+   :task (let [secret (:current-kv-gate-id -env:merged)]
+           (github.secret/set "CURRENT_KV_GATE_ID" secret))}
+
+  -gh:secret:current-kv-site-id
+  {:depends [-env:merged]
+   :task (let [secret (:current-kv-site-id -env:merged)]
+           (github.secret/set "CURRENT_KV_SITE_ID" secret))}
+
+  gh:secret:init
+  {:doc "Set up secrets in GitHub Actions"
+   :depends [-gh:secret:admin-account-id
+             -gh:secret:next-kv-gate-id
+             -gh:secret:next-kv-site-id
+             -gh:secret:current-kv-gate-id
+             -gh:secret:current-kv-site-id]}
+
   ;; compile
   ;; ---------------------------------------------------------------------------
   ;; Compile (and clean up) the various artifacts that make up the
   ;; application.
 
-  ;; config - contains compile-time constants injected compiled into the app
+  ;; wrangler.toml - construct a wrangler.toml
 
-  ;; compile:config
-  ;; {:doc "Inject values into the application configuration file"
-  ;;  :depends [-build:config -app:version -git:head]
-  ;;  :task (let [config (-> -build:config
-  ;;                         (assoc-in [:closure-defines 'three-id.core/APP-VERSION] -app:version)
-  ;;                         (assoc-in [:clojure-defines 'three-id.core/GIT-COMMIT] -git:head))
-  ;;              prefix (str app-id "-")
-  ;;              suffix (str "-config-" -deploy:env)
-  ;;              tmp_path (str (fs/create-temp-file {:prefix prefix :suffix suffix}))]
-  ;;          ;; Place configuration into a temp file.
-  ;;          (kb.edn/write -build:config tmp_path)
-  ;;          ;; Return the path of the generated file.
-  ;;          tmp_path)}
+  wrangler:toml
+  {:doc "Generate a wrangler.toml from example file"
+   :depends [-env:merged]
+   :task (let [output (tpl/render-file wrangler-example -env:merged)]
+           (spit wrangler-toml output))}
 
   ;; robots.txt - directives for web crawlers
 
@@ -513,6 +596,21 @@
 
   ;; Debugging
   ;; ---------------------------------------------------------------------------
+
+  -prn:dot-env
+  {:doc "Print the contents of the .env file"
+   :depends [-env:config-file]
+   :task (pprint/pprint -env:config-file)}
+
+  -prn:env-vars
+  {:doc "Print the environment variables we use"
+   :depends [-env:variables]
+   :task (pprint/pprint -env:variables)}
+
+  -prn:env
+  {:doc "Print the merged environment"
+   :depends [-env:merged]
+   :task (pprint/pprint -env:merged)}
 
   -prn:test-strict?
   {:doc "Print test-strict? setting"

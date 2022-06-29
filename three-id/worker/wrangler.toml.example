@@ -8,7 +8,7 @@ main = "src/index.js"
 # per-user deployments, which should use individual user's account ID to
 # keep development activities separate from production infra, hopefully
 # avoiding accidents.
-account_id = "${admin-account-id}"
+account_id = "{{admin-account-id}}"
 
 # Development
 # ------------------------------------------------------------------------------
@@ -18,45 +18,49 @@ account_id = "${admin-account-id}"
 # either route or workers_dev, but not both.
 workers_dev = true
 
+{% if robert-account-id %}
 [env.robert]
 name = "three-id-gate"
-# Personal account ID for <rob@kubelt.com>.
 account_id = "{{robert-account-id}}"
 vars = { ENVIRONMENT = "development" }
 kv_namespaces = [
   { binding = "SITE", id = "{{robert-kv-site-id}}" },
   { binding = "GATE", id = "{{robert-kv-gate-id}}" },
 ]
+{% endif %}
 
+{% if juan-account-id %}
 [env.juan]
 name = "three-id-gate"
-# Personal account ID for <juan@kubelt.com>.
-#account_id = "{{juan-account-id}}"
+account_id = "{{juan-account-id}}"
 vars = { ENVIRONMENT = "development" }
-# kv_namespaces = [
-#   { binding = "SITE", id = "{{juan-kv-site-id}}" },
-#   { binding = "GATE", id = "{{juan-kv-gate-id}}" },
-# ]
+kv_namespaces = [
+  { binding = "SITE", id = "{{juan-kv-site-id}}" },
+  { binding = "GATE", id = "{{juan-kv-gate-id}}" },
+]
+{% endif %}
 
+{% if cosmin-account-id %}
 [env.cosmin]
 name = "three-id-gate"
-# Personal account ID for <cosmin@kubelt.com>.
-#account_id = ""
+account_id = "{{cosmin-account-id}}"
 vars = { ENVIRONMENT = "development" }
-# kv_namespaces = [
-#   { binding = "SITE", id = "{{cosmin-kv-site-id}}" },
-#   { binding = "GATE", id = "{{cosmin-kv-gate-id}}" },
-# ]
+kv_namespaces = [
+  { binding = "SITE", id = "{{cosmin-kv-site-id}}" },
+  { binding = "GATE", id = "{{cosmin-kv-gate-id}}" },
+]
+{% endif %}
 
+{% if dhruv-account-id %}
 [env.dhruv]
 name = "three-id-gate"
-# Personal account ID for <dhruvil@kubelt.com>.
-account_id = "7275dc74ed165e86fc91badf4359fefc"
+account_id = "{{ dhruv-account-id }}"
 vars = { ENVIRONMENT = "development" }
 kv_namespaces = [
   { binding = "SITE", id = "{{dhruv-kv-site-id}}" },
   { binding = "GATE", id = "{{dhruv-kv-gate-id}}" },
 ]
+{% endif %}
 
 # Staging
 # ------------------------------------------------------------------------------

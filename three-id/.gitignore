@@ -10,6 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 wrangler.toml
+.env
 
 # macOS
 .DS_Store
