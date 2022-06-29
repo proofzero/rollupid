@@ -3,6 +3,7 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.sdk.v1 :as sdk.v1]
+   [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.sdk.v1.oort :as sdk.v1.oort]))
 
 ;; Entrypoint
@@ -53,6 +54,8 @@
        ;; oort
        :oort #js {:authenticate sdk.v1.oort/authenticate-js!
                   :callRpc sdk.v1.oort/call-rpc-api-js
+                  :callRpcClient lib.rpc/rpc-call-js
+                  :rpcApi sdk.v1.oort/rpc-api-js
                   :isLoggedIn sdk.v1.oort/logged-in-js?
                   :setWallet sdk.v1.oort/set-wallet-js}
 
