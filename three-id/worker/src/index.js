@@ -8,11 +8,15 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-import { getAssetFromKV, NotFoundError, MethodNotAllowedError } from '@cloudflare/kv-asset-handler';
+import {
+  getAssetFromKV,
+  NotFoundError,
+  MethodNotAllowedError,
+} from "@cloudflare/kv-asset-handler";
 
 // This manifest is generated as part of the deployment process and
 // should not be checked in.
-import assetManifest from './asset-manifest.json';
+import assetManifest from "./asset-manifest.json";
 
 // Should it becomes necessary to perform custom key mapping it can be
 // done as follows:
@@ -57,37 +61,42 @@ import assetManifest from './asset-manifest.json';
 // }
 
 export default {
-    async fetch(request, env, ctx) {
-        if (env['ENVIRONMENT'] === "development") {
-            // Development-specific code.
-        } else if (env['ENVIRONMENT'] === "next") {
-            // Staging-specific code.
-            console.log("next");
-        } else if (env['ENVIRONMENT'] === "current") {
-            // Production-specific code.
-            console.log("current");
-        }
+  async fetch(request, env, ctx) {
+    if (env["ENVIRONMENT"] === "development") {
+      // Development-specific code.
+    } else if (env["ENVIRONMENT"] === "next") {
+      // Staging-specific code.
+      console.log("next");
+    } else if (env["ENVIRONMENT"] === "current") {
+      // Production-specific code.
+      console.log("current");
+    }
 
-        try {
-            return await getAssetFromKV({ request, waitUntil(promise) {
-                    return ctx.waitUntil(promise);
-                },
-            }, {
-                ASSET_NAMESPACE: env.GATE,
-                ASSET_MANIFEST: assetManifest,
-            });
-        } catch (e) {
-            if (e instanceof NotFoundError) {
-                // TODO serve 404 page?
-                return new Response('Not Found', { status: 404 });
-            } else if (e instanceof MethodNotAllowedError) {
-                // TODO serve error page?
-                return new Response('Method Not Allowed', { status: 405 });
-            } else {
-                // TODO serve ISE page?
-                console.log(e);
-                return new Response('An unexpected error occurred', { status: 500 });
-            }
+    try {
+      return await getAssetFromKV(
+        {
+          request,
+          waitUntil(promise) {
+            return ctx.waitUntil(promise);
+          },
+        },
+        {
+          ASSET_NAMESPACE: env.GATE,
+          ASSET_MANIFEST: assetManifest,
         }
-    },
+      );
+    } catch (e) {
+      if (e instanceof NotFoundError) {
+        // TODO serve 404 page?
+        return new Response("Not Found", { status: 404 });
+      } else if (e instanceof MethodNotAllowedError) {
+        // TODO serve error page?
+        return new Response("Method Not Allowed", { status: 405 });
+      } else {
+        // TODO serve ISE page?
+        console.log(e);
+        return new Response("An unexpected error occurred", { status: 500 });
+      }
+    }
+  },
 };

@@ -3,16 +3,11 @@ import "dotenv/config";
 export default {
   entryPoint: "./src/index",
   name: "3iD Gateway",
-  slug: "3id-gateway",
+  slug: "three-id-gateway",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./src/assets/icon.png",
+  icon: "./src/assets/android-chrome-512x512.png",
   userInterfaceStyle: "light",
-  splash: {
-    image: "./src/assets/splash.png",
-    resizeMode: "contain",
-    backgroundColor: "#ffffff",
-  },
   updates: {
     fallbackToCacheTimeout: 0,
   },
@@ -22,12 +17,24 @@ export default {
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: "./src/assets/adaptive-icon.png",
+      foregroundImage: "./src/assets/android-chrome-512x512.png",
       backgroundColor: "#FFFFFF",
     },
   },
   web: {
-    favicon: "./src/assets/favicon.png",
+    favicon: "./src/assets/favicon-32x32.png",
+    icons: [
+      {
+        src: "/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
   },
   extra: {
     twitterUrl: process.env.TWITTER_URL,
