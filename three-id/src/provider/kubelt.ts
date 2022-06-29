@@ -77,9 +77,8 @@ export const isWhitelisted = async (
    */
   let receivedPong = false;
   try {
-    debugger
-    const ping = await sdkWeb?.node_v1?.oort.callRpc(sdk, address, "kb_ping", []);
-    debugger
+    const api = await sdkWeb?.node_v1?.oort.rpcApi(sdk, address);
+    const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, {'method': ['kb', 'ping'], 'params': []});
     if (ping) receivedPong = true;
   } catch (e) {
     console.info("core is not whitelisted");
