@@ -76,15 +76,17 @@ export const isWhitelisted = async (
    * as whitelisting
    */
   let receivedPong = false;
-  try {
-    const api = await sdkWeb?.node_v1?.oort.rpcApi(sdk, address);
-    const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, {'method': ['kb', 'ping'], 'params': []});
-    if (ping) receivedPong = true;
-  } catch (e) {
-    console.info("core is not whitelisted");
-    console.log(e)
-    debugger
-  } finally {
-    return receivedPong;
+  const api = await sdkWeb?.node_v1?.oort.rpcApi(sdk, address);
+  const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, { 'method': ['kb', 'ping'], 'params': [] });
+  if (ping) {
+    receivedPong = true;
+
+    // Temporary workaround for 401 results
+    if (ping?.body?.result?.ok === false) {
+      receivedPong = false
+      console.info("core is not whitelisted");
+    }
   }
+
+  return receivedPong;
 };
