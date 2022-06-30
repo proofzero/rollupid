@@ -265,38 +265,38 @@ jobs:
   #     - run: npm install
   #     - run: npm run test:sdk-web:develop
 
-  test-dapp:
-    runs-on: ubuntu-latest
-    permissions:
-      packages: read
-    services:
-      cloudflare-worker:
-        image: ghcr.io/kubelt/cloudflare-worker:latest
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.github_token }}
-        ports:
-          - 8787:8787
-    steps:
-      - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@7.0
-        with:
-          bb: 0.8.156
-          cli: 1.11.1.1149
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/gallium
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-      - run: npm ci
-      # TODO: Enable once JSON RPC work is ready
-      # Compile and run dapp
-      - run: npm run build:dapp:release
-      - run: npm run test:dapp:ci:compile
-      # Run Cypress tests AFTER the server is running
-      # Install cypress if it didn't get cached properly
-      - run: npm install cypress --save-dev
-      - run: npm run test:dapp:ci:run
-      # Compile and run re-frame tests with karma
-      - run: npm run test:dapp-karma:ci:compile
-      - run: npm run test:dapp-karma:ci:run
+  # test-dapp:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     packages: read
+  #   services:
+  #     cloudflare-worker:
+  #       image: ghcr.io/kubelt/cloudflare-worker:latest
+  #       credentials:
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.github_token }}
+  #       ports:
+  #         - 8787:8787
+  #   steps:
+  #     - uses: actions/checkout@master
+  #     - uses: DeLaGuardo/setup-clojure@7.0
+  #       with:
+  #         bb: 0.8.156
+  #         cli: 1.11.1.1149
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: lts/gallium
+  #         cache: 'npm'
+  #         cache-dependency-path: package-lock.json
+  #     - run: npm ci
+  #     # TODO: Enable once JSON RPC work is ready
+  #     # Compile and run dapp
+  #     - run: npm run build:dapp:release
+  #     - run: npm run test:dapp:ci:compile
+  #     # Run Cypress tests AFTER the server is running
+  #     # Install cypress if it didn't get cached properly
+  #     - run: npm install cypress --save-dev
+  #     - run: npm run test:dapp:ci:run
+  #     # Compile and run re-frame tests with karma
+  #     - run: npm run test:dapp-karma:ci:compile
+  #     - run: npm run test:dapp-karma:ci:run
