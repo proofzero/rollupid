@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
-import { authenticate, isAuthenticated } from "../provider/kubelt";
+import { authenticate, isAuthenticated, isWhitelisted } from "../provider/kubelt";
 
 import { connect } from "../provider/web3";
 
@@ -18,7 +18,11 @@ export default function Auth({ navigation }: { navigation: any }) {
         await authenticate(provider);
 
         if (isAuthenticated()) {
-          navigation.navigate("Gate");
+          if (await isWhitelisted(provider)) {
+            alert('Yay!')
+          } else {
+            navigation.navigate("Gate");
+          }
         }
       }
     };
