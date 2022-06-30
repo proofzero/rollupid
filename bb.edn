@@ -259,8 +259,9 @@
              test:dapp:ci:compile
              test:dapp:ci:run
              ;; Compile and run re-frame tests w/karma
-             test:dapp-karma:ci:compile
-             test:dapp-karma:ci:run]}
+             ;;test:dapp-karma:ci:compile
+             ;;test:dapp-karma:ci:run
+             ]}
 
   test:dapp:release
   {:task (run '-test:dapp:release)}
