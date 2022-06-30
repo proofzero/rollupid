@@ -18,7 +18,6 @@
     (cp/add-classpath (str (fs/path sdk-root "bb")))
     (require '[com.kubelt.cli :as cli])
     (require '[com.kubelt.deps :as deps])
-    (require '[com.kubelt.environ :as environ])
     (require '[com.kubelt.lein :as lein])
     (require '[com.kubelt.package :as package])
     (require '[com.kubelt.semver :as semver])

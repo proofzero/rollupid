@@ -14,7 +14,6 @@
     ;; Add shared build code to classpath.
     (cp/add-classpath "./bb")
     (require '[com.kubelt.cli :as cli])
-    (require '[com.kubelt.environ :as environ])
     (require '[com.kubelt.package :as package])
     (require '[com.kubelt.semver :as semver])
     (require '[com.kubelt.shadow :as shadow])
