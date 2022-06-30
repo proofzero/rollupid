@@ -34,7 +34,11 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
 
   try {
     if (!sdk) {
-      sdk = await sdkWeb?.node_v1?.init();
+      sdk = await sdkWeb?.node_v1?.init({
+        "oort/scheme": Constants.manifest?.extra?.oortSchema,
+        "oort/host": Constants.manifest?.extra?.oortHost,
+        "oort/port": Constants.manifest?.extra?.oortPort,
+      });
     }
 
     sdk = await sdkWeb?.node_v1?.oort.setWallet(sdk, {
