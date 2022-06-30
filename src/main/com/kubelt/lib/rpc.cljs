@@ -29,5 +29,9 @@
              (lib.promise/then resolve)
              (lib.promise/catch reject))
          (-> (rpc/execute client request)
-             (lib.promise/then #(resolve (-> % :http/body :result)))
+             (lib.promise/then resolve)
              (lib.promise/catch reject)))))))
+
+(defn rpc-call-js [sys api args]
+ (-> (rpc-call& sys api (update (js->clj args :keywordize-keys true) :method #(mapv keyword %)))
+     (lib.promise/then clj->js)))

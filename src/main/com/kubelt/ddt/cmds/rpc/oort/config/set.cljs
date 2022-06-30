@@ -42,6 +42,7 @@
                           (lib.promise/then
                            (fn [api]
                              (-> (lib.rpc/rpc-call& sys api args)
+                                 (lib.promise/then #(-> % :http/body :result))
                                  (lib.promise/then
                                   (fn [response]
                                     (println "CURRENT CONFIG-> " response)
@@ -50,6 +51,7 @@
                                                       :method  (ddt.util/rpc-name->path ":kb:set:config")
                                                       :params {:config (assoc-in response path config-value)})]
                                       (-> (lib.rpc/rpc-call& sys api args)
+                                          (lib.promise/then #(-> % :http/body :result))
                                           (lib.promise/then #(println "SET->" %))
                                           (lib.promise/catch #(println "SET ERROR-> " %))))))
                                  (lib.promise/catch #(println "ERROR-> " %)))))
