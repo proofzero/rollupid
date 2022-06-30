@@ -29,12 +29,13 @@
                      kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
                      api (-> (<p! (sdk.oort/rpc-api sys core))
                              (update :methods conj (<! (lib.test-utils/read-local-edn&go "oort/methods/qn-fetch-nfts.edn"))))
-                     nfts (<p! (lib.rpc/rpc-call& kbt api
-                                                  {:method  [:qn :fetch-nf-ts]
-                                                   :params {:params {:wallet "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C"
-                                                                     :omitFields ["provenance" "traits"]
-                                                                     :perPage 1
-                                                                     :page 1}}}))]
+                     nfts (-> (<p! (lib.rpc/rpc-call& kbt api
+                                                   {:method  [:qn :fetch-nf-ts]
+                                                    :params {:params {:wallet "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C"
+                                                                      :omitFields ["provenance" "traits"]
+                                                                      :perPage 1
+                                                                      :page 1}}}))
+                              :http/body :result)]
                  (is (= {:owner "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C",
                          :assets
                          [{:description "CryptoPunksMarket",
@@ -67,9 +68,10 @@
                      kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
                      api (-> (<p! (sdk.oort/rpc-api sys core))
                              (update :methods conj (<! (lib.test-utils/read-local-edn&go "oort/methods/alchemy-get-nfts.edn"))))
-                     nfts (<p! (lib.rpc/rpc-call& kbt api
-                                                  {:method  [:alchemy :get-nf-ts]
-                                                   :params {:params {:owner "0xB0b9cd000A5AFA56d016C39470C3ec237df4e043"}}}))]
+                     nfts (-> (<p! (lib.rpc/rpc-call& kbt api
+                                                      {:method  [:alchemy :get-nf-ts]
+                                                       :params {:params {:owner "0xB0b9cd000A5AFA56d016C39470C3ec237df4e043"}}}))
+                              :http/body :result)]
                  (is (= #{:owned-nfts :block-hash :total-count :page-key}
                         (set (keys nfts))))
 
