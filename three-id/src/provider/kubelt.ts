@@ -68,7 +68,7 @@ export const isWhitelisted = async (
     return false;
   }
 
-  if (!Constants.manifest?.extra?.autoGate) {
+  if (Constants.manifest?.extra?.autoGate === true) {
     return false
   }
 
