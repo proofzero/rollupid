@@ -6,6 +6,8 @@ import { hexlify } from "ethers/lib/utils";
 
 import { BehaviorSubject } from "rxjs";
 
+import Constants from "expo-constants";
+
 let sdk: any = null;
 
 const isAuthSubj = new BehaviorSubject(false);
@@ -64,6 +66,10 @@ export const isWhitelisted = async (
 ) => {
   if (!sdk) {
     return false;
+  }
+
+  if (!Constants.manifest?.extra?.autoGate) {
+    return false
   }
 
   const signer = provider.getSigner();
