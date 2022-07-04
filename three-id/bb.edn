@@ -558,7 +558,7 @@
    :task (let [;; For each file under public-dir, the manifest has an entry:
                ;; {"some/path": "/some/path"}
                manifest-edn (cf.asset/manifest -app:files)
-               out-path (str (fs/path worker-dir "src" "asset-manifest.json"))]
+               out-path (str (fs/path worker-dir "src" "gate-manifest.json"))]
            (json/generate-stream manifest-edn (clojure.java.io/writer out-path))
            ;; Return the asset manifest content
            manifest-edn)}
