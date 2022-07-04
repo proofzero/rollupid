@@ -1,0 +1,99 @@
+# three-id/worker/wrangler.toml.example
+
+compatibility_date = "2022-06-20"
+
+main = "src/index.js"
+
+# Account ID for admin@kubelt.com (staging and production). Override for
+# per-user deployments, which should use individual user's account ID to
+# keep development activities separate from production infra, hopefully
+# avoiding accidents.
+account_id = "{{admin/account-id}}"
+
+# Development
+# ------------------------------------------------------------------------------
+# NB: each developer gets a personal dev environment.
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+
+{% if robert/account-id %}
+[env.robert]
+name = "three-id-gate"
+account_id = "{{robert/account-id}}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{robert/kv-site-id}}" },
+  { binding = "GATE", id = "{{robert/kv-gate-id}}" },
+]
+{% endif %}
+
+{% if juan/account-id %}
+[env.juan]
+name = "three-id-gate"
+account_id = "{{juan/account-id}}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{juan/kv-site-id}}" },
+  { binding = "GATE", id = "{{juan/kv-gate-id}}" },
+]
+{% endif %}
+
+{% if cosmin/account-id %}
+[env.cosmin]
+name = "three-id-gate"
+account_id = "{{cosmin/account-id}}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{cosmin/kv-site-id}}" },
+  { binding = "GATE", id = "{{cosmin/kv-gate-id}}" },
+]
+{% endif %}
+
+{% if dhruv/account-id %}
+[env.dhruv]
+name = "three-id-gate"
+account_id = "{{ dhruv/account-id }}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "SITE", id = "{{dhruv/kv-site-id}}" },
+  { binding = "GATE", id = "{{dhruv/kv-gate-id}}" },
+]
+{% endif %}
+
+{% if admin/account-id %}
+
+  {% if all next/kv-site-id next/kv-gate-id %}
+  # next (staging)
+  # ------------------------------------------------------------------------------
+
+  [env.next]
+  name = "three-id-gate-next"
+  vars = { ENVIRONMENT = "next" }
+  kv_namespaces = [
+    { binding = "SITE", id = "{{next/kv-site-id}}" },
+    { binding = "GATE", id = "{{next/kv-gate-id}}" },
+  ]
+  {% else %}
+  # Skipping setup for next
+  {% endif %}
+
+  {% if all current/kv-site-id current/kv-gate-id %}
+  # current (production)
+  # ------------------------------------------------------------------------------
+
+  [env.current]
+  name = "three-id-gate-current"
+  vars = { ENVIRONMENT = "current" }
+  kv_namespaces = [
+    { binding = "SITE", id = "{{current/kv-site-id}}" },
+    { binding = "GATE", id = "{{current/kv-gate-id}}" },
+  ]
+  {% else %}
+  # Skipping setup for current
+  {% endif %}
+
+{% else %}
+# Skipping setup for next and current
+{% endif %}

@@ -1,11 +1,38 @@
+import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
+import { authenticate, isAuthenticated, isWhitelisted } from "../provider/kubelt";
+
+import { connect } from "../provider/web3";
+
 import Layout from "./Layout";
 
-export default function Gate({ navigation }: { navigation: any }) {
+export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      if (!isAuthenticated()) {
+        const provider = await connect();
+        await authenticate(provider);
+
+        if (isAuthenticated()) {
+          if (await isWhitelisted(provider)) {
+            // Will be replaced with
+            // expo location 
+            // in a follow up PR
+            window.location = Constants.manifest?.extra?.gateRedirectUrl
+          } else {
+            navigation.navigate("Gate");
+          }
+        }
+      }
+    };
+
+    asyncFn();
+  }, []);
 
   useEffect(() => {
     if (account === null) {
@@ -27,13 +54,13 @@ export default function Gate({ navigation }: { navigation: any }) {
           style={{
             paddingBottom: "1em",
             fontFamily: "Inter_700Bold",
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: "700",
-            lineHeight: 32,
+            lineHeight: 28,
             color: "#1F2937",
           }}
         >
-          Your wallet address is not whitelisted for Early Access.
+          Connecting with MetaMask...
         </Text>
 
         <Text
@@ -46,8 +73,7 @@ export default function Gate({ navigation }: { navigation: any }) {
             color: "#1F2937",
           }}
         >
-          To get onto the whitelist follow us on Twitter, join our Discord and
-          leave us a message in #3ID-Whitelist channel
+          Sign the message with your wallet.
         </Text>
       </View>
     </Layout>
