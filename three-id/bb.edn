@@ -306,6 +306,35 @@
            (throw (ex-info "no options map for unknown build"
                            {:deploy/env -deploy:env})))}
 
+  ;; application config
+  ;; -----------------------------------------------------------------------------
+  ;; Compile-time constants built into the application.
+
+  -app:common
+  (do
+    {:oort-port 8787
+     :oort-schema "http"})
+
+  -app:development
+  (do
+    {:oort-host "oort-devnet.kubelt.com"})
+
+  -app:next
+  (do
+    {:oort-host "oort-testnet.kubelt.com"})
+
+  -app:current
+  (do
+    {:oort-host "oort-mainnet.kubelt.com"})
+
+  -app:config
+  {:doc "Compile-time configuration for application build"
+   :depends [-deploy:env -app:common -app:development -app:next -app:current]
+   :task (condp = -deploy:env
+           env-next (merge -app:common -app:next)
+           env-current (merge -app:common -app:current)
+           (merge -app:common -app:development))}
+
   ;; secrets
   ;; -----------------------------------------------------------------------------
 
@@ -495,9 +524,11 @@
 
   dot:env
   {:doc "Inject values into the .env file"
-   :depends [-env:file -app:version -git:head]
-   :task (let [new-env (merge -env:file {:git-commit -git:head
-                                         :app-version -app:version})]
+   :depends [-env:file -app:version -git:head -app:config]
+   :task (let [new-env (merge -env:file
+                              -app:config
+                              {:git-commit -git:head
+                               :app-version -app:version})]
            ;; Write updated .env file.
            (dot-env/write dot-env new-env :output/sort? true))}
 

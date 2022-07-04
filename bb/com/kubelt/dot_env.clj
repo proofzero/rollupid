@@ -31,7 +31,7 @@
 (defn write
   "Write a map of values to the path as collection of environment variable
   definitions. Supported options:
-  - :sort? [default: false], sort the output lines when true"
+  - :output/sort? [default: false], sort the output lines when true"
   [path env & {:keys [output/sort?] :or {output/sort? false}}]
   {:pre [(string? path) (map? env)]}
   (let [lines (reduce (fn [a [k v]]
