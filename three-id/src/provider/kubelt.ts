@@ -51,7 +51,7 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
     if (!isAuth) {
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
 
-      // todo: use oort.store to store the SDK
+      await sdkWeb.node_v1.store(sdk)
 
       isAuthSubj.next(true);
     }
