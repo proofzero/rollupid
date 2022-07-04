@@ -64,38 +64,3 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
 
 // Exposing this method until SDK isAuth gets sorted
 export const isAuthenticated = () => isAuthSubj.getValue();
-
-export const isWhitelisted = async (
-  provider: ethers.providers.Web3Provider
-) => {
-  if (Constants.manifest?.extra?.autoGate || !sdk) {
-    return false;
-  }
-
-  const signer = provider.getSigner();
-  const address = await signer.getAddress();
-
-  /**
-   * We expect non whitelisted cores
-   * to respond with Unauthorized
-   * thus a valid response counts
-   * as whitelisting
-   */
-  let receivedPong = false;
-  const api = await sdkWeb?.node_v1?.oort.rpcApi(sdk, address);
-  const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, {
-    method: ["kb", "ping"],
-    params: [],
-  });
-  if (ping) {
-    receivedPong = true;
-
-    // Temporary workaround for 401 results
-    if (ping?.body?.result?.ok === false) {
-      receivedPong = false;
-      console.info("core is not whitelisted");
-    }
-  }
-
-  return receivedPong;
-};

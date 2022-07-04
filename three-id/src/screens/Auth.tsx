@@ -6,7 +6,6 @@ import useAccount from "../hooks/account";
 import {
   authenticate,
   isAuthenticated,
-  isWhitelisted,
 } from "../provider/kubelt";
 
 import { connect } from "../provider/web3";
@@ -27,16 +26,9 @@ export default function Auth({ navigation }: { navigation: any }) {
         await authenticate(provider);
 
         if (isAuthenticated()) {
-          if (await isWhitelisted(provider)) {
-            // Will be replaced with
-            // expo location
-            // in a follow up PR
-            window.location = Constants.manifest?.extra?.gateRedirectUrl;
-          } else {
-            navigation.navigate("Gate");
-          }
-        } else {
           navigation.navigate("Gate");
+        } else {
+          navigation.navigate("Landing");
         }
       }
     };
