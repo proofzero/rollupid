@@ -68,12 +68,8 @@ export const isAuthenticated = () => isAuthSubj.getValue();
 export const isWhitelisted = async (
   provider: ethers.providers.Web3Provider
 ) => {
-  if (!sdk) {
+  if (Constants.manifest?.extra?.autoGate || !sdk) {
     return false;
-  }
-
-  if (Constants.manifest?.extra?.autoGate === true) {
-    return false
   }
 
   const signer = provider.getSigner();
@@ -87,13 +83,16 @@ export const isWhitelisted = async (
    */
   let receivedPong = false;
   const api = await sdkWeb?.node_v1?.oort.rpcApi(sdk, address);
-  const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, { 'method': ['kb', 'ping'], 'params': [] });
+  const ping = await sdkWeb?.node_v1?.oort.callRpcClient(sdk, api, {
+    method: ["kb", "ping"],
+    params: [],
+  });
   if (ping) {
     receivedPong = true;
 
     // Temporary workaround for 401 results
     if (ping?.body?.result?.ok === false) {
-      receivedPong = false
+      receivedPong = false;
       console.info("core is not whitelisted");
     }
   }

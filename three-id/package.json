@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "3.3.0",
+    "@datadog/browser-rum": "4.14.0",
     "@expo-google-fonts/inter": "0.2.2",
     "@expo/webpack-config": "0.16.21",
     "@kubelt/sdk-web": "file:../packages/sdk-web",
