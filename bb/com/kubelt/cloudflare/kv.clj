@@ -159,7 +159,9 @@
   - :output/verbose (optional, default: false), print more information"
   [items opts]
   {:pre [(set? items) (map? opts)]}
-  (let [args-fn (juxt arg-config arg-env arg-ns)
+  (let [;; Construct the CLI arguments we pass to wrangler from the opts
+        ;; map.
+        args-fn (juxt arg-config arg-env arg-ns)
         args (args-fn opts)
         ;; NB: using --force stops asking for confirmation.
         invoke ["kv:bulk" "delete" "--force"]
