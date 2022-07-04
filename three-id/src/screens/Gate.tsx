@@ -5,6 +5,7 @@ import useAccount from "../hooks/account";
 import Layout from "./Layout";
 
 import Constants from "expo-constants";
+import { startView } from "../analytics/datadog";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -15,6 +16,10 @@ export default function Gate({ navigation }: { navigation: any }) {
       navigation.navigate("Landing");
     }
   }, [account]);
+
+  useEffect(() => {
+    startView("gate");
+  }, []);
 
   return (
     <Layout>

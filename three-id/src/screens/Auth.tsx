@@ -3,11 +3,17 @@ import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
-import { authenticate, isAuthenticated, isWhitelisted } from "../provider/kubelt";
+import {
+  authenticate,
+  isAuthenticated,
+  isWhitelisted,
+} from "../provider/kubelt";
 
 import { connect } from "../provider/web3";
 
 import Layout from "./Layout";
+
+import { startView } from "../analytics/datadog";
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -21,9 +27,9 @@ export default function Auth({ navigation }: { navigation: any }) {
         if (isAuthenticated()) {
           if (await isWhitelisted(provider)) {
             // Will be replaced with
-            // expo location 
+            // expo location
             // in a follow up PR
-            window.location = Constants.manifest?.extra?.gateRedirectUrl
+            window.location = Constants.manifest?.extra?.gateRedirectUrl;
           } else {
             navigation.navigate("Gate");
           }
@@ -40,6 +46,10 @@ export default function Auth({ navigation }: { navigation: any }) {
       navigation.navigate("Landing");
     }
   }, [account]);
+
+  useEffect(() => {
+    startView("auth");
+  }, []);
 
   return (
     <Layout>
