@@ -20,7 +20,9 @@ export default function Auth({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (!isAuthenticated()) {
+      if (isAuthenticated()) {
+        navigation.navigate("Gate");
+      } else {
         const provider = await connect();
         await authenticate(provider);
 
@@ -33,6 +35,8 @@ export default function Auth({ navigation }: { navigation: any }) {
           } else {
             navigation.navigate("Gate");
           }
+        } else {
+          navigation.navigate("Gate");
         }
       }
     };
