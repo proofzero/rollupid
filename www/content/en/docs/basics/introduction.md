@@ -38,10 +38,10 @@ Easily deploy dApps with standardized identity, storage, messaging services over
       </a>
     </div>
     <div class="col col--6">
-      <a class="card" href="{{<relref \"starship\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href="{{<relref \"starport\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
-          <h4>🚀 Starship Apps</h4>
-          <p>No-code, serverless dApp backends.</p>
+          <h4>🚀 Starport DApps</h4>
+          <p>Instant serverless dApp backends with auth, messaging and more.</p>
         </div>
       </a>
     </div>
@@ -58,8 +58,8 @@ Easily deploy dApps with standardized identity, storage, messaging services over
     <div class="col col--6">
       <a class="card" href="{{<relref \"3id\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
-          <h4>🪪 3ID</h4>
-          <p>Decentralized application user passport and database.</p>
+          <h4>🪪 3iD</h4>
+          <p>Decentralized user passport, database and storage.</p>
         </div>
       </a>  
     </div>
