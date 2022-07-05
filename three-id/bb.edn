@@ -35,7 +35,11 @@
     ;; The name of the application to build and deploy.
     (def app-id "three-id")
     ;; The KV namespace ("binding") where files are stored.
-    (def kv-namespace "GATE")
+    (def kv-namespace "APP")
+
+    ;; The public host name that is aliased to our production deployment
+    ;; worker.
+    (def public-host "dapp.threeid.xyz")
 
     ;; Developers
     ;; -------------------------------------------------------------------------
@@ -80,8 +84,8 @@
     (def wrangler-toml (str (fs/path worker-dir "wrangler.toml")))
     ;; Example wrangler config file we use as template.
     (def wrangler-example (str (fs/path worker-dir "wrangler.toml.example")))
-    ;; Compiler-generated build manifest.
-    ;;(def manifest-edn (str (fs/path output-dir "manifest.edn")))
+    ;; Worker asset manifest used to list files in KV store.
+    (def worker-manifest (str (fs/path worker-dir "src" "asset-manifest.json")))
 
     ;; INIT
     ;; -------------------------------------------------------------------------
@@ -312,8 +316,8 @@
 
   -app:common
   (do
-    {:oort-port 8787
-     :oort-schema "http"})
+    {:oort-port 443
+     :oort-schema "https"})
 
   -app:development
   (do
@@ -339,64 +343,46 @@
   ;; -----------------------------------------------------------------------------
 
   -env:admin-account-id (system/env "ADMIN_ACCOUNT_ID")
-  -env:next-kv-gate-id (system/env "NEXT_KV_GATE_ID")
-  -env:next-kv-site-id (system/env "NEXT_KV_SITE_ID")
-  -env:current-kv-gate-id (system/env "CURRENT_KV_GATE_ID")
-  -env:current-kv-site-id (system/env "CURRENT_KV_SITE_ID")
+  -env:next-kv-app-id (system/env "NEXT_KV_APP_ID")
+  -env:current-kv-app-id (system/env "CURRENT_KV_APP_ID")
 
   -env:cosmin-account-id (system/env "COSMIN_ACCOUNT_ID")
-  -env:cosmin-kv-gate-id (system/env "COSMIN_KV_GATE_ID")
-  -env:cosmin-kv-site-id (system/env "COSMIN_KV_SITE_ID")
+  -env:cosmin-kv-app-id (system/env "COSMIN_KV_APP_ID")
   -env:dhruv-account-id (system/env "DHRUV_ACCOUNT_ID")
-  -env:dhruv-kv-gate-id (system/env "DHRUV_KV_GATE_ID")
-  -env:dhruv-kv-site-id (system/env "DHRUV_KV_SITE_ID")
+  -env:dhruv-kv-app-id (system/env "DHRUV_KV_APP_ID")
   -env:juan-account-id (system/env "JUAN_ACCOUNT_ID")
-  -env:juan-kv-gate-id (system/env "JUAN_KV_GATE_ID")
-  -env:juan-kv-site-id (system/env "JUAN_KV_SITE_ID")
+  -env:juan-kv-app-id (system/env "JUAN_KV_APP_ID")
   -env:robert-account-id (system/env "ROBERT_ACCOUNT_ID")
-  -env:robert-kv-gate-id (system/env "ROBERT_KV_GATE_ID")
-  -env:robert-kv-site-id (system/env "ROBERT_KV_SITE_ID")
+  -env:robert-kv-app-id (system/env "ROBERT_KV_APP_ID")
 
   ;; environment
   ;; -----------------------------------------------------------------------------
 
   -env:variables
   {:doc "A map of values read from environment variables"
-   :depends [-env:current-kv-site-id
-             -env:current-kv-gate-id
-             -env:admin-account-id
+   :depends [-env:admin-account-id
              -env:robert-account-id
-             -env:robert-kv-site-id
-             -env:robert-kv-gate-id
+             -env:robert-kv-app-id
              -env:dhruv-account-id
-             -env:dhruv-kv-site-id
-             -env:dhruv-kv-gate-id
+             -env:dhruv-kv-app-id
              -env:juan-account-id
-             -env:juan-kv-site-id
-             -env:juan-kv-gate-id
+             -env:juan-kv-app-id
              -env:cosmin-account-id
-             -env:cosmin-kv-site-id
-             -env:cosmin-kv-gate-id
-             -env:next-kv-site-id
-             -env:next-kv-gate-id]
+             -env:cosmin-kv-app-id
+             -env:next-kv-app-id
+             -env:current-kv-app-id]
    :task (do
            {:robert/account-id -env:robert-account-id
-            :robert/kv-site-id -env:robert-kv-site-id
-            :robert/kv-gate-id -env:robert-kv-gate-id
+            :robert/kv-app-id -env:robert-kv-app-id
             :juan/account-id -env:juan-account-id
-            :juan/kv-site-id -env:juan-kv-site-id
-            :juan/kv-gate-id -env:juan-kv-gate-id
+            :juan/kv-app-id -env:juan-kv-app-id
             :cosmin/account-id -env:cosmin-account-id
-            :cosmin/kv-site-id -env:cosmin-kv-site-id
-            :cosmin/kv-gate-id -env:cosmin-kv-gate-id
+            :cosmin/kv-app-id -env:cosmin-kv-app-id
             :dhruv/account-id -env:dhruv-account-id
-            :dhruv/kv-site-id -env:dhruv-kv-site-id
-            :dhruv/kv-gate-id -env:dhruv-kv-gate-id
+            :dhruv/kv-app-id -env:dhruv-kv-app-id
             :admin/account-id -env:admin-account-id
-            :next/kv-site-id -env:next-kv-site-id
-            :next/kv-gate-id -env:next-kv-gate-id
-            :current/kv-site-id -env:current-kv-site-id
-            :current/kv-gate-id -env:current-kv-gate-id})}
+            :next/kv-app-id -env:next-kv-app-id
+            :current/kv-app-id -env:current-kv-app-id})}
 
   -deploy:edn
   {:doc "A map of values read from deployment configuration file"
@@ -479,33 +465,21 @@
    :task (let [secret (:admin/account-id -env:merged)]
            (github.secret/set "ADMIN_ACCOUNT_ID" secret))}
 
-  -gh:secret:next-kv-gate-id
+  -gh:secret:next-kv-app-id
   {:depends [-env:merged]
-   :task (let [secret (:next/kv-gate-id -env:merged)]
-           (github.secret/set "NEXT_KV_GATE_ID" secret))}
+   :task (let [secret (:next/kv-app-id -env:merged)]
+           (github.secret/set "NEXT_KV_APP_ID" secret))}
 
-  -gh:secret:next-kv-site-id
+  -gh:secret:current-kv-app-id
   {:depends [-env:merged]
-   :task (let [secret (:next/kv-site-id -env:merged)]
-           (github.secret/set "NEXT_KV_SITE_ID" secret))}
-
-  -gh:secret:current-kv-gate-id
-  {:depends [-env:merged]
-   :task (let [secret (:current/kv-gate-id -env:merged)]
-           (github.secret/set "CURRENT_KV_GATE_ID" secret))}
-
-  -gh:secret:current-kv-site-id
-  {:depends [-env:merged]
-   :task (let [secret (:current/kv-site-id -env:merged)]
-           (github.secret/set "CURRENT_KV_SITE_ID" secret))}
+   :task (let [secret (:current/kv-app-id -env:merged)]
+           (github.secret/set "CURRENT_KV_APP_ID" secret))}
 
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
    :depends [-gh:secret:admin-account-id
-             -gh:secret:next-kv-gate-id
-             -gh:secret:next-kv-site-id
-             -gh:secret:current-kv-gate-id
-             -gh:secret:current-kv-site-id]}
+             -gh:secret:next-kv-app-id
+             -gh:secret:current-kv-app-id]}
 
   ;; compile
   ;; ---------------------------------------------------------------------------
@@ -589,7 +563,7 @@
    :task (let [;; For each file under public-dir, the manifest has an entry:
                ;; {"some/path": "/some/path"}
                manifest-edn (cf.asset/manifest -app:files)
-               out-path (str (fs/path worker-dir "src" "gate-manifest.json"))]
+               out-path worker-manifest]
            (json/generate-stream manifest-edn (clojure.java.io/writer out-path))
            ;; Return the asset manifest content
            manifest-edn)}
@@ -601,7 +575,7 @@
 
   publish:worker
   {:doc "Publish the CloudFlare worker"
-   :depends [-deploy:env asset:manifest install:worker]
+   :depends [-deploy:env wrangler:toml asset:manifest install:worker]
    :task (let [command ["npx" "wrangler" "publish" "--env" -deploy:env]]
            (shell {:dir worker-dir} (cstr/join " " command))
            ;; Sleep for a bit to give the worker time to become
@@ -610,7 +584,7 @@
 
   publish:assets
   {:doc "Publish website assets to CloudFlare KV store"
-   :depends [-app:files -options:cloudflare]
+   :depends [-app:files -options:cloudflare wrangler:toml]
    :task (do
            ;; Remove any values in the KV store.
            (cf.kv/truncate -options:cloudflare)
@@ -628,6 +602,8 @@
            (println message))}
 
   ;; test
+
+  ;; TODO on production deploy, smoke test internal *and* external URL.
 
   ;; The asset manifest is mapping from KV store key to remote
   ;; path. This is a sequence of the paths of every file stored in the

@@ -14,15 +14,9 @@ import {
   MethodNotAllowedError,
 } from "@cloudflare/kv-asset-handler";
 
-// These manifests are generated as part of the deployment process and
-// should not be checked in. The "gate" manifest is generated when the
-// "gate" application is compiled, while the "site" manifest is
-// generated when the web(site) application is compiled.
-import gateManifest from "./gate-manifest.json";
-import siteManifest from "./site-manifest.json";
-
-// The prefix used to route requests to files stored in the SITE store.
-const APP_PREFIX = new RegExp("^/dapp");
+// The manifest is generated as part of the deployment process and
+// should not be checked in.
+import ASSET_MANIFEST from "./asset-manifest.json";
 
 // Requests originating in these domains get clobbered.
 const BLOCKED_HOSTNAMES = [
@@ -77,6 +71,22 @@ const serveAssetFrom = async (namespace, manifest, request, ctx) => {
 
 // Entry-point
 // -----------------------------------------------------------------------------
+// If we needed to rewrite the URL for some reason, we would then
+// create a modified request:
+//   const modifiedRequest = new Request(url.toString(), request);
+//
+// Another possible approach would be to use the mapRequestToAsset
+// option to getAssetFromKV.
+//
+// import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
+// ...
+// const customKeyModifier = request => {
+//   let url = request.url;
+//   //custom key mapping optional
+//   url = url.replace('/docs', '').replace(/^\/+/, '');
+//   return mapRequestToAsset(new Request(url, request));
+// }
+// let asset = await getAssetFromKV(event, { mapRequestToAsset: customKeyModifier });
 
 export default {
   async fetch(request, env, ctx) {
@@ -84,10 +94,8 @@ export default {
       // Development-specific code.
     } else if (env["ENVIRONMENT"] === "next") {
       // Staging-specific code.
-      console.log("next");
     } else if (env["ENVIRONMENT"] === "current") {
       // Production-specific code.
-      console.log("current");
     }
 
     // Parse the incoming request URL so that we can inspect the
@@ -99,47 +107,15 @@ export default {
       return new Response("Blocked Host", { status: 403 });
     }
 
-    // When a request arrives that begins with the application prefix,
-    // we serve up resources from the SITE binding (where the web
-    // application lives) rather than the GATE binding (where our front
-    // door lives). For example, the request:
-    //
-    //   GET ${APP_PREFIX}/manifest.json
-    //
-    // will be rewritten to:
-    //
-    //   GET /manifest.json
-    //
-    // and return the value for the key /manifest.json in the SITE
-    // store. Any other requests will return a value from the GATE
-    // store, if present.
-
     // The namespace of the KV store that we want to serve files from.
-    let namespace;
+    const namespace = env.APP;
     // The manifest of files stored in the KV store.
-    let manifest;
+    const manifest = ASSET_MANIFEST;
 
-    if (APP_PREFIX.test(url.pathname)) {
-      // Strip off the application prefix.
-      url.pathname = url.pathname.replace(APP_PREFIX, "");
-      manifest = siteManifest;
-      namespace = env.SITE;
-    } else {
-      manifest = gateManifest;
-      namespace = env.GATE;
-    }
+    const response = await serveAssetFrom(namespace, manifest, request, ctx);
 
-    const modifiedRequest = new Request(url.toString(), request);
+    response.headers.set("Access-Control-Allow-Origin", "*");
 
-    const response = await serveAssetFrom(namespace, manifest, modifiedRequest, ctx);
-
-    // If request 404s and we were looking it up in the GATE namespace,
-    // try looking it up in the SITE namespace as fallback.
-    if (404 == response.status && env.GATE == namespace) {
-      console.log(`falling back (env.GATE => env.SITE) for ${url.pathname}`);
-      return serveAssetFrom(env.SITE, siteManifest, modifiedRequest, ctx);
-    } else {
-      return response;
-    }
+    return response;
   }
 };
