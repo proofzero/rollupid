@@ -3,10 +3,7 @@ import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
 import useAccount from "../hooks/account";
-import {
-  authenticate,
-  isAuthenticated,
-} from "../provider/kubelt";
+import { authenticate, isAuthenticated } from "../provider/kubelt";
 
 import { connect } from "../provider/web3";
 
@@ -19,13 +16,16 @@ export default function Auth({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (isAuthenticated()) {
+      if (await isAuthenticated(account)) {
         navigation.navigate("Gate");
       } else {
         const provider = await connect();
         await authenticate(provider);
 
-        if (isAuthenticated()) {
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+
+        if (await isAuthenticated(address)) {
           navigation.navigate("Gate");
         } else {
           navigation.navigate("Landing");

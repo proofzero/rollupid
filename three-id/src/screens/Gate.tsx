@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
 
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import useAccount from "../hooks/account";
 import Layout from "./Layout";
 
 import Constants from "expo-constants";
 import { startView } from "../analytics/datadog";
+import { clearAccount } from "../provider/web3";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -30,9 +31,38 @@ export default function Gate({ navigation }: { navigation: any }) {
           alignItems: "center",
         }}
       >
+        <Pressable
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 49,
+            paddingTop: 12,
+            paddingBottom: 14,
+            backgroundColor: "#192030",
+            maxWidth: "100%",
+            height: 48,
+          }}
+          onPress={() => clearAccount()}
+        >
+          <Text
+            style={{
+              fontFamily: "Manrope_700Bold",
+              fontSize: 16,
+              fontWeight: "700",
+              lineHeight: 22,
+              color: "white",
+            }}
+          >
+            Try Different Wallet
+          </Text>
+        </Pressable>
+
         <Text
           style={{
-            paddingBottom: "1em",
+            paddingTop: 56,
+            paddingBottom: 43,
             fontFamily: "Inter_700Bold",
             fontSize: 24,
             fontWeight: "700",
