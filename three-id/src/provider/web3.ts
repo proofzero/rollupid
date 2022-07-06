@@ -7,7 +7,7 @@ let web3Provider: null | ethers.providers.Web3Provider = null;
 
 const eth = (window as any).ethereum;
 
-export const isMetamask = () => eth.isMetaMask;
+export const isMetamask = () => eth?.isMetaMask === true;
 
 const handleAccountsChanged = (accounts: string[]) => {
   if (accounts.length > 0) {
