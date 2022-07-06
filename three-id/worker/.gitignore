@@ -1,5 +1,4 @@
 # worker/.gitignore
 
 # Generated asset manifests, built as part of the deployment process.
-site-manifest.json
-gate-manifest.json
+asset-manifest.json
