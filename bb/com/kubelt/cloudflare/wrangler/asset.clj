@@ -1,4 +1,4 @@
-(ns com.kubelt.cloudflare.asset
+(ns com.kubelt.cloudflare.wrangler.asset
   "Generate asset manifests."
   (:require
    [clojure.string :as cstr]))

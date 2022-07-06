@@ -1,5 +1,8 @@
 # packages/sdk-clj/.gitignore
 
+# Source tree
+src
+
 # Compiled application
 /lib
 

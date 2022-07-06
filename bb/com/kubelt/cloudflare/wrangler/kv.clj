@@ -1,4 +1,4 @@
-(ns com.kubelt.cloudflare.kv
+(ns com.kubelt.cloudflare.wrangler.kv
   "Operate on CloudFlare KV stores."
   (:require
    [clojure.string :as cstr])
