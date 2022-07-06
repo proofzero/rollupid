@@ -9,19 +9,28 @@ import {
   Inter_800ExtraBold,
 } from "@expo-google-fonts/inter";
 
+import { Manrope_700Bold } from "@expo-google-fonts/manrope";
+
 import Landing from "./screens/Landing";
 import Auth from "./screens/Auth";
 import Gate from "./screens/Gate";
 
+import AppLoading from "expo-app-loading";
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  useFonts({
+  let [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_600SemiBold,
     Inter_700Bold,
     Inter_800ExtraBold,
+    Manrope_700Bold,
   });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
 
   return (
     <NavigationContainer>

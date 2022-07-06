@@ -47,11 +47,13 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
     });
     isAuthSubj.next(false);
 
-    const isAuth = await sdkWeb?.node_v1?.oort.isLoggedIn();
+    const isAuth = await isAuthenticated(address);
     if (!isAuth) {
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
 
-      await sdkWeb.node_v1.store(sdk)
+      await sdkWeb.node_v1.store(sdk);
+
+      sessionStorage.setItem(`auth_${address}`, "true");
 
       isAuthSubj.next(true);
     }
@@ -63,4 +65,14 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
 };
 
 // Exposing this method until SDK isAuth gets sorted
-export const isAuthenticated = () => isAuthSubj.getValue();
+export const isAuthenticated = async (address: string | null | undefined) => {
+  if (address == null) {
+    return false;
+  }
+
+  const isAuth = isAuthSubj.getValue();
+  const isAuthStored = sessionStorage.getItem(`auth_${address}`) === "true";
+  const isAuthSDK = await sdkWeb?.node_v1?.oort.isLoggedIn();
+
+  return isAuth || isAuthStored || isAuthSDK;
+};

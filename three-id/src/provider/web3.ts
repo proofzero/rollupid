@@ -9,9 +9,14 @@ const eth = (window as any).ethereum;
 
 export const isMetamask = () => eth?.isMetaMask === true;
 
+export const clearAccount = () => accountSubj.next(null);
+
 const handleAccountsChanged = (accounts: string[]) => {
+  const currentAccount = accountSubj.getValue();
   if (accounts.length > 0) {
-    accountSubj.next(accounts[0]);
+    if (accounts[0] !== currentAccount) {
+      accountSubj.next(accounts[0]);
+    }
   } else {
     accountSubj.next(null);
   }
@@ -30,6 +35,7 @@ export const connect = async (): Promise<ethers.providers.Web3Provider> => {
   }
 
   await web3Provider?.send("eth_requestAccounts", []);
+  await forceAccounts();
 
   return web3Provider;
 };
