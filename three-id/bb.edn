@@ -33,6 +33,7 @@
     (require '[com.kubelt.git :as git])
     (require '[com.kubelt.github.secret :as github.secret])
     (require '[com.kubelt.system :as system])
+    (require '[com.kubelt.util :as util])
 
     ;; The name of the application to build and deploy.
     (def app-id "three-id")
@@ -408,7 +409,9 @@
 
   -deploy:edn
   {:doc "A map of values read from deployment configuration file"
-   :task (kb.edn/read deploy-edn)}
+   :task (if (fs/regular-file? deploy-edn)
+           (kb.edn/read deploy-edn)
+           {})}
 
   -env:merged
   {:doc "Merged deployment configuration"
@@ -440,7 +443,9 @@
 
   check:wrangler
   {:doc "Ensure that wrangler is available"
-   :task (shell "which wrangler")}
+   :task (let [wrangler-path (util/which "wrangler")]
+           (when-not (fs/regular-file? wrangler-path)
+             (throw (ex-info "missing wrangler" {:file wrangler-path}))))}
 
   check:deploy-edn
   {:doc "Ensure that deployment configuration exists"
@@ -565,7 +570,7 @@
   compile:app
   {:doc "Build release version of the application"
    :depends [dot:env]
-   :task (let [command (cstr/join " " ["expo" "build:web"])]
+   :task (let [command (cstr/join " " ["npx" "expo" "build:web" "."])]
            (shell command))}
 
   clean:app

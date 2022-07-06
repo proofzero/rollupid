@@ -20,7 +20,7 @@ jobs:
           - 8787:8787
     steps:
       - uses: actions/checkout@master
-      - uses: DeLaGuardo/setup-clojure@7.0
+      - uses: DeLaGuardo/setup-clojure@8.0
         with:
           bb: 0.8.156
           cli: 1.11.1.1149
