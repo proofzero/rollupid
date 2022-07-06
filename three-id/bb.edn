@@ -23,9 +23,11 @@
 
     (require '[pod.retrogradeorbit.hickory.select :as hick])
 
-    (require '[com.kubelt.cloudflare :as cf])
-    (require '[com.kubelt.cloudflare.asset :as cf.asset])
-    (require '[com.kubelt.cloudflare.kv :as cf.kv])
+    (require '[com.kubelt.cloudflare.client :as cf])
+    (require '[com.kubelt.cloudflare.client.zone :as cf.zone])
+    (require '[com.kubelt.cloudflare.wrangler :as wrangler])
+    (require '[com.kubelt.cloudflare.wrangler.asset :as wrangler.asset])
+    (require '[com.kubelt.cloudflare.wrangler.kv :as wrangler.kv])
     (require '[com.kubelt.dot-env :as dot-env])
     (require '[com.kubelt.edn :as kb.edn])
     (require '[com.kubelt.git :as git])
@@ -107,8 +109,9 @@
   ;; NB: can also supply a namespace ID rather than environment and binding:
   ;; - :namespace/id "1bca95d621054bffb7b943c899586552"
 
-  ;; A collection of all application files rooted at build-dir.
-  -app:files (cf/files build-dir)
+  ;; A collection of all application files rooted at build-dir. Data is
+  ;; in the format expected by wrangler.
+  -app:files (wrangler/files build-dir)
 
   ;;
   ;; Files
@@ -258,6 +261,25 @@
              url
              (throw (ex-info "missing environment to URL mapping"
                              {:deploy/env -deploy:env}))))}
+
+  ;;
+  ;; cloudflare
+  ;;
+
+  -cf:token
+  {:doc "Cloudflare API token"
+   :depends [-env:merged]
+   :task (:cloudflare/token -env:merged)}
+
+  -cf:zone-id
+  {:doc "Cloudflare zone identifier for site"
+   :depends [-env:merged]
+   :task (:cloudflare/zone-id -env:merged)}
+
+  -cf:zone-name
+  {:doc "Cloudflare zone name for site"
+   :depends [-env:merged]
+   :task (:cloudflare/zone-name -env:merged)}
 
   ;;
   ;; options
@@ -460,6 +482,11 @@
   ;; github
   ;; -----------------------------------------------------------------------------
 
+  -gh:secret:cloudflare-token
+  {:depends [-env:merged]
+   :task (let [secret (:cloudflare/token -env:merged)]
+           (github.secret/set "CLOUDFLARE_TOKEN" secret))}
+
   -gh:secret:admin-account-id
   {:depends [-env:merged]
    :task (let [secret (:admin/account-id -env:merged)]
@@ -477,7 +504,8 @@
 
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
-   :depends [-gh:secret:admin-account-id
+   :depends [-gh:secret:cloudflare-token
+             -gh:secret:admin-account-id
              -gh:secret:next-kv-app-id
              -gh:secret:current-kv-app-id]}
 
@@ -562,7 +590,7 @@
    :depends [-app:files]
    :task (let [;; For each file under public-dir, the manifest has an entry:
                ;; {"some/path": "/some/path"}
-               manifest-edn (cf.asset/manifest -app:files)
+               manifest-edn (wrangler.asset/manifest -app:files)
                out-path worker-manifest]
            (json/generate-stream manifest-edn (clojure.java.io/writer out-path))
            ;; Return the asset manifest content
@@ -587,13 +615,25 @@
    :depends [-app:files -options:cloudflare wrangler:toml]
    :task (do
            ;; Remove any values in the KV store.
-           (cf.kv/truncate -options:cloudflare)
+           (wrangler.kv/truncate -options:cloudflare)
            ;; Push the application files en masse.
-           (cf.kv/bulk-put -app:files -options:cloudflare))}
+           (wrangler.kv/bulk-put -app:files -options:cloudflare))}
+
+  cf:zone:purge-all
+  {:doc "Purge the Cloudflare cache for production zone"
+   :depends [-deploy:env -cf:token -cf:zone-id -cf:zone-name]
+   :task (when (= env-current -deploy:env)
+           (let [client (cf/init -cf:token)
+                 response (cf.zone/purge-cache client -cf:zone-id)
+                 details (str " [env:" -deploy:env ", zone:" -cf:zone-name "])")
+                 message (if (= 200 (get response :status))
+                           (str "[🪹] Purge zone cache: SUCCESS" details)
+                           (str "[❌] Purge zone cache: FAILED" details))]
+             (println message)))}
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
-   :depends [publish:assets publish:worker]}
+   :depends [publish:assets publish:worker cf:zone:purge-all]}
 
   deploy:app
   {:doc "Build and deploy the application"
@@ -723,22 +763,22 @@
    :task (prn (git/dirty?))}
 
   -kv:key:list
-  {:doc "List the keys in a CloudFlare KV store"
+  {:doc "List the keys in a Cloudflare KV store"
    :depends [-options:cloudflare]
-   :task (pprint/pprint (cf.kv/key-list -options:cloudflare))}
+   :task (pprint/pprint (wrangler.kv/key-list -options:cloudflare))}
 
   -kv:bulk:delete
-  {:doc "Remove all entries from a CloudFlare KV store"
+  {:doc "Remove all entries from a Cloudflare KV store"
    :depends [-options:cloudflare]
    :task (let [items #{"foo"}]
-           (println (cf.kv/bulk-delete items -options:cloudflare)))}
+           (println (wrangler.kv/bulk-delete items -options:cloudflare)))}
 
   -kv:bulk:put
-  {:doc "Write app files to a CloudFlare KV store"
+  {:doc "Write app files to a Cloudflare KV store"
    :depends [-app:files -options:cloudflare]
-   :task (println (cf.kv/bulk-put -app:files -options:cloudflare))}
+   :task (println (wrangler.kv/bulk-put -app:files -options:cloudflare))}
 
   -kv:truncate
-  {:doc "Remove all keys from a CloudFlare KV store"
+  {:doc "Remove all keys from a Cloudflare KV store"
    :depends [-options:cloudflare]
-   :task (println (cf.kv/truncate -options:cloudflare))}}}
+   :task (println (wrangler.kv/truncate -options:cloudflare))}}}
