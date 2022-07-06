@@ -6,7 +6,7 @@ export default {
   slug: "three-id-gateway",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./src/assets/android-chrome-512x512.png",
+  icon: "./src/assets/three-id-logo.png",
   userInterfaceStyle: "light",
   updates: {
     fallbackToCacheTimeout: 0,
@@ -14,27 +14,6 @@ export default {
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-  },
-  android: {
-    adaptiveIcon: {
-      foregroundImage: "./src/assets/android-chrome-512x512.png",
-      backgroundColor: "#FFFFFF",
-    },
-  },
-  web: {
-    favicon: "./src/assets/favicon-32x32.png",
-    icons: [
-      {
-        src: "/android-chrome-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        src: "/android-chrome-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-      },
-    ],
   },
   extra: {
     twitterUrl: process.env.TWITTER_URL,
