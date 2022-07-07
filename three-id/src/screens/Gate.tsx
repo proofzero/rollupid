@@ -81,6 +81,8 @@ export default function Gate({ navigation }: { navigation: any }) {
             fontWeight: "400",
             lineHeight: 32,
             color: "#1F2937",
+            maxWidth: 758,
+            textAlign: "center",
           }}
         >
           To get onto the whitelist{" "}
@@ -98,15 +100,16 @@ export default function Gate({ navigation }: { navigation: any }) {
             href={Constants.manifest?.extra?.discordUrl}
           >
             join our Discord
-          </a>
-          , and leave us a message in{" "}
+          </a>{" "}
+          and leave us a message in{" "}
           <a
             target={"_blank"}
             rel={"noopener noopener noreferrer"}
             href={Constants.manifest?.extra?.discordChannelUrl}
           >
             #3iD
-          </a>
+          </a>{" "}
+          channel
         </Text>
       </View>
     </Layout>
