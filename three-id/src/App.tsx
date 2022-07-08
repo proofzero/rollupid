@@ -15,12 +15,10 @@ import Landing from "./screens/Landing";
 import Auth from "./screens/Auth";
 import Gate from "./screens/Gate";
 
-import AppLoading from "expo-app-loading";
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  let [fontsLoaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_600SemiBold,
     Inter_700Bold,
@@ -28,9 +26,7 @@ export default function App() {
     Manrope_700Bold,
   });
 
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <NavigationContainer>
