@@ -40,12 +40,14 @@
     "ethers": "5.6.8",
     "expo": "45.0.0",
     "expo-app-loading": "2.0.0",
+    "expo-asset": "8.5.0",
     "expo-constants": "13.1.1",
     "expo-font": "10.1.0",
     "expo-status-bar": "1.3.0",
     "expo-updates": "0.13.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-helmet": "6.1.0",
     "react-native": "0.68.2",
     "react-native-safe-area-context": "4.2.4",
     "react-native-screens": "3.11.1",
@@ -57,6 +59,7 @@
   "devDependencies": {
     "@babel/core": "7.12.9",
     "@types/react": "17.0.21",
+    "@types/react-helmet": "6.1.5",
     "@types/react-native": "0.66.13",
     "typescript": "4.3.5",
     "wrangler": "2.0.16"

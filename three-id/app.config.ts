@@ -6,8 +6,24 @@ export default {
   slug: "three-id-gateway",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./src/assets/three-id-logo.png",
-  userInterfaceStyle: "light",
+
+  // https://github.com/kubelt/three-id/issues/92
+
+  // Adding the icon property
+  // makes Expo generate favicons and
+  // application (PWA, iOS, Android)
+  // icons based on a single reference image.
+
+  // In order to adapt to user browser style
+  // with the application icon
+  // we need to remove expo's auto generated
+  // icons. This means ejecting or removing
+  // this property and handling it via head
+  // manipulation.
+
+  // icon: "./src/assets/Favicon.png",
+
+  userInterfaceStyle: "automatic",
   updates: {
     fallbackToCacheTimeout: 0,
   },
