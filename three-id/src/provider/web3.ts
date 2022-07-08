@@ -9,7 +9,10 @@ const eth = (window as any).ethereum;
 
 export const isMetamask = () => eth?.isMetaMask === true;
 
-export const clearAccount = () => accountSubj.next(null);
+export const clearAccount = async () => {
+  accountSubj.next(null);
+  sessionStorage.clear();
+};
 
 const handleAccountsChanged = (accounts: string[]) => {
   const currentAccount = accountSubj.getValue();
@@ -34,7 +37,11 @@ export const connect = async (): Promise<ethers.providers.Web3Provider> => {
     web3Provider = new ethers.providers.Web3Provider(eth);
   }
 
-  await web3Provider?.send("eth_requestAccounts", []);
+  if (!accountSubj.getValue()) {
+    await web3Provider?.send("wallet_requestPermissions", [
+      { eth_accounts: {} },
+    ]);
+  }
   await forceAccounts();
 
   return web3Provider;
