@@ -64,9 +64,11 @@ export default function Auth({ navigation }: { navigation: any }) {
             fontWeight: "700",
             lineHeight: 28,
             color: "#1F2937",
+            maxWidth: 758,
           }}
         >
-          Connecting with MetaMask...
+          Connecting with MetaMask... It could take a few seconds for the
+          message to appear. If it does not appear try clicking on your wallet.
         </Text>
 
         <Text
