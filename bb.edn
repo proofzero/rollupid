@@ -14,12 +14,22 @@
     ;; Add shared build code to classpath.
     (cp/add-classpath "./bb")
     (require '[com.kubelt.cli :as cli])
+    (require '[com.kubelt.edn :as kb.edn])
+    (require '[com.kubelt.dot-env :as dot-env])
     (require '[com.kubelt.package :as package])
     (require '[com.kubelt.semver :as semver])
     (require '[com.kubelt.shadow :as shadow])
     (require '[com.kubelt.time :as time])
     ;; Extract version from package.json.
-    (def version (cli/release-version "package.json" *command-line-args*)))
+    (def version (cli/release-version "package.json" *command-line-args*))
+
+    ;; FILES
+
+    ;; The path of local-only configuration file containing various
+    ;; build configuration values.
+    (def deploy-edn (str (fs/path "three-id" "deploy.edn")))
+    ;; Secrets used by act (local GitHub Actions workflow runner).
+    (def act-secrets "act.secrets"))
 
   ;; Development
   ;; ---------------------------------------------------------------------------
@@ -43,6 +53,30 @@
   cmd:example
   {:doc "Invoke Clojure build script via shadow-cljs."
    :task (shell "npx shadow-cljs run build.command/example")},
+
+  -deploy:edn
+  {:doc "A map of values read from deployment configuration file"
+   :task (if (fs/regular-file? deploy-edn)
+           (kb.edn/read deploy-edn)
+           {})}
+
+  -act:secrets
+  {:doc "Generate a secret-containing env-file for use with act"
+   :depends [-deploy:edn]
+   :task (let [{admin-account-id :admin/account-id
+                cloudflare-token :cloudflare/token
+                next-kv-app-id :next/kv-app-id
+                current-kv-app-id :current/kv-app-id} -deploy:edn
+               secrets {:admin-account-id admin-account-id
+                        :cloudflare-token cloudflare-token
+                        :next-kv-app-id next-kv-app-id
+                        :current-kv-app-id current-kv-app-id}]
+           (dot-env/write act-secrets secrets))}
+
+  -act:next:three-id
+  {:doc "Run GitHub Actions 'next' pipeline, 'three-id' job locally"
+   :depends [-act:secrets]
+   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j three-id")}
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------
