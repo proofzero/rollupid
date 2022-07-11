@@ -252,12 +252,13 @@
              -url:robert
              -url:next
              -url:current]
-   :task (let [url (get {env-cosmin -url:cosmin
+   :task (let [env->url {env-cosmin -url:cosmin
                          env-dhruv -url:dhruv
                          env-juan -url:juan
                          env-robert -url:robert
                          env-next -url:next
-                         env-current -url:current} -deploy:env)]
+                         env-current -url:current}
+               url (get env->url -deploy:env)]
            (if (some? url)
              url
              (throw (ex-info "missing environment to URL mapping"
@@ -403,7 +404,9 @@
 
   -env:admin-account-id (system/env "ADMIN_ACCOUNT_ID")
   -env:next-kv-app-id (system/env "NEXT_KV_APP_ID")
+  -env:next-url (system/env "NEXT_URL")
   -env:current-kv-app-id (system/env "CURRENT_KV_APP_ID")
+  -env:current-url (system/env "CURRENT_URL")
 
   -env:cosmin-account-id (system/env "COSMIN_ACCOUNT_ID")
   -env:cosmin-kv-app-id (system/env "COSMIN_KV_APP_ID")
@@ -432,7 +435,9 @@
              -env:cosmin-account-id
              -env:cosmin-kv-app-id
              -env:next-kv-app-id
+             -env:next-url
              -env:current-kv-app-id
+             -env:current-url
              -env:cloudflare-token
              -env:datadog-token]
    :task (do
@@ -446,7 +451,9 @@
             :dhruv/kv-app-id -env:dhruv-kv-app-id
             :admin/account-id -env:admin-account-id
             :next/kv-app-id -env:next-kv-app-id
+            :next/url -env:next-url
             :current/kv-app-id -env:current-kv-app-id
+            :current/url -env:current-url
             :cloudflare/token -env:cloudflare-token
             :datadog/token -env:datadog-token})}
 
@@ -550,10 +557,20 @@
    :task (let [secret (:next/kv-app-id -env:merged)]
            (github.secret/set "NEXT_KV_APP_ID" secret))}
 
+  -gh:secret:next-url
+  {:depends [-env:merged]
+   :task (let [secret (:next/url -env:merged)]
+           (github.secret/set "NEXT_URL" secret))}
+
   -gh:secret:current-kv-app-id
   {:depends [-env:merged]
    :task (let [secret (:current/kv-app-id -env:merged)]
            (github.secret/set "CURRENT_KV_APP_ID" secret))}
+
+  -gh:secret:current-url
+  {:depends [-env:merged]
+   :task (let [secret (:current/url -env:merged)]
+           (github.secret/set "CURRENT_URL" secret))}
 
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
@@ -561,7 +578,9 @@
              -gh:secret:datadog-token
              -gh:secret:admin-account-id
              -gh:secret:next-kv-app-id
-             -gh:secret:current-kv-app-id]}
+             -gh:secret:next-url
+             -gh:secret:current-kv-app-id
+             -gh:secret:current-url]}
 
   ;; compile
   ;; ---------------------------------------------------------------------------
