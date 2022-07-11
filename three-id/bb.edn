@@ -362,6 +362,37 @@
            env-current (merge -app:common -app:current)
            (merge -app:common -app:development))}
 
+  ;; datadog
+  ;; -----------------------------------------------------------------------------
+
+  -datadog:env
+  {:doc "Generate the DATADOG_ENV environment variable value"
+   :depends [-deploy:env]
+   :task (condp = -deploy:env
+           env-next -deploy:env
+           env-current -deploy:env
+           (str "dev:" -deploy:env))}
+
+  -datadog:token
+  {:doc "The Datadog client-side token set as the DATADOG_CLIENT_TOKEN value"
+   :depends [-deploy:edn]
+   :task (get -deploy:edn :datadog/token)}
+
+  -datadog:config
+  {:doc "Return a map of Datadog configuration values"
+   :depends [-datadog:env -datadog:token]
+   :task {:datadog-env -datadog:env
+          :datadog-client-token -datadog:token}}
+
+  ;; version
+  ;; -----------------------------------------------------------------------------
+
+  -version:config
+  {:doc "Return a map of application version information."
+   :depends [-app:version -git:head]
+   :task {:git-commit -git:head
+          :app-version -app:version}}
+
   ;; secrets
   ;; -----------------------------------------------------------------------------
 
@@ -531,11 +562,8 @@
 
   dot:env
   {:doc "Inject values into the .env file"
-   :depends [-env:file -app:version -git:head -app:config]
-   :task (let [new-env (merge -env:file
-                              -app:config
-                              {:git-commit -git:head
-                               :app-version -app:version})]
+   :depends [-env:file -version:config -datadog:config -app:config]
+   :task (let [new-env (merge -env:file -app:config -datadog:config -version:config)]
            ;; Write updated .env file.
            (dot-env/write dot-env new-env :output/sort? true))}
 
@@ -735,6 +763,11 @@
   {:doc "Print the merged compile-time configuration"
    :depends [-build:config]
    :task (pprint/pprint -build:config)}
+
+  -prn:datadog-config
+  {:doc "Print the Datadog configuration that's injected into .env"
+   :depends [-datadog:config]
+   :task (pprint/pprint -datadog:config)}
 
   -prn:options
   {:doc "Print the options map for CloudFlare operations"
