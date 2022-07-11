@@ -72,26 +72,15 @@ jobs:
         working-directory: ./three-id
         run: npm ci
 
-      - name: generate wrangler.toml
+      - name: build and deploy three-id
         working-directory: ./three-id
         env:
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           NEXT_KV_APP_ID: ${{ secrets.NEXT_KV_APP_ID }}
           CURRENT_KV_APP_ID: ${{ secrets.CURRENT_KV_APP_ID }}
-        run: bb wrangler:toml
-
-      - name: build and deploy three-id
-        env:
+          # The Datadog client token.
+          DATADOG_TOKEN: ${{ secrets.DATADOG_TOKEN }}
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-        working-directory: ./three-id
         run: bb deploy:app --deploy-env next
-
-      ## In which we do a little printf debugging:
-      # - working-directory: ./three-id
-      #   run: bb -prn:env-vars
-      # - working-directory: ./three-id
-      #   run: bb -prn:env
-      # - working-directory: ./three-id
-      #   run: cat worker/wrangler.toml
