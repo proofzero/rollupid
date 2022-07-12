@@ -735,7 +735,7 @@
 
   deploy:app
   {:doc "Build and deploy the application"
-   :depends [-deploy:env clean:release build:release publish:site test:smoke]
+   :depends [-deploy:env clean:release build:release publish:site]
    :task (let [message (str "[🌸] Deployment: successful [env:'" -deploy:env "']")]
            (println message))}
 

@@ -86,3 +86,7 @@ jobs:
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
         run: bb deploy:app --deploy-env next
+
+      - name: run smoke tests
+        working-directory: ./three-id
+        run: bb test:smoke --deploy-env next
