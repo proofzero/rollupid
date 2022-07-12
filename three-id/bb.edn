@@ -90,6 +90,13 @@
     ;; Worker asset manifest used to list files in KV store.
     (def worker-manifest (str (fs/path worker-dir "src" "asset-manifest.json")))
 
+    ;; GITHUB
+    ;; -----------------------------------------------------------------------------
+
+    ;; The environment variable GITHUB_ACTIONS is set to "true" in the
+    ;; GitHub Actions execution context.
+    (def github-actions? (= "true" (system/env "GITHUB_ACTIONS" "false")))
+
     ;; INIT
     ;; -------------------------------------------------------------------------
 
@@ -101,9 +108,11 @@
   ;; TODO add a --verbose flag that, when provided, signals us to print
   ;; extra output e.g. when entering and leaving a task.
 
-  ;;:enter (println "entering:" (:name (current-task)))
+  :enter (when github-actions?
+           (println "entering:" (:name (current-task))))
 
-  ;;:leave (println "leaving:" (:name (current-task)))
+  :leave (when github-actions?
+           (println "leaving:" (:name (current-task))))
 
   ;; Data
   ;; ---------------------------------------------------------------------------
@@ -133,7 +142,12 @@
        ;; --app-version
        [nil "--app-version VERSION" "Application version"]
        ;; --[no]-test-strict
-       [nil "--[no-]test-strict" "Treat errors as exceptions"]])
+       [nil "--[no-]test-strict" "Treat errors as exceptions"]
+       ;; --verbose
+       ["-v" "--verbose" "Verbosity level"
+        :id :verbosity
+        :default 0
+        :update-fn inc]])
 
   -cli:options
   {:doc "Parse the CLI options"
@@ -164,6 +178,15 @@
              (throw (ex-info "unknown deployment environment; try using --deploy-env or DEPLOY_ENV"
                              {:env/provided deploy-env
                               :env/allowed environments}))))}
+
+  ;;
+  ;; verbosity
+  ;;
+
+  -verbose:level
+  {:doc "Degree of verbosity requested by the user"
+   :depends [-cli:options]
+   :task (get-in -cli:options [:options :verbosity])}
 
   ;;
   ;; strict tests
@@ -703,7 +726,13 @@
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
-   :depends [publish:assets publish:worker cf:zone:purge-all]}
+   :depends [publish:assets publish:worker cf:zone:purge-all]
+   :task (when github-actions?
+           ;; It sometimes takes a moment before the worker is able to
+           ;; forward requests; delay to give things a chance to fully
+           ;; deploy.
+           (let [delay-ms 5000]
+             (Thread/sleep delay-ms)))}
 
   deploy:app
   {:doc "Build and deploy the application"
@@ -807,11 +836,6 @@
   {:doc "Print asset manifest JSON"
    :depends [asset:manifest]
    :task (pprint/pprint asset:manifest)}
-
-  -prn:config
-  {:doc "Print the merged compile-time configuration"
-   :depends [-build:config]
-   :task (pprint/pprint -build:config)}
 
   -prn:datadog-config
   {:doc "Print the Datadog configuration that's injected into .env"
