@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: read
-    services:
-      cloudflare-worker:
-        image: ghcr.io/kubelt/cloudflare-worker:latest
-        credentials:
-          username: ${{ github.actor }}
-          password: ${{ secrets.github_token }}
-        ports:
-          - 8787:8787
+    # services:
+    #   cloudflare-worker:
+    #     image: ghcr.io/kubelt/cloudflare-worker:latest
+    #     credentials:
+    #       username: ${{ github.actor }}
+    #       password: ${{ secrets.github_token }}
+    #     ports:
+    #       - 8787:8787
     steps:
       - uses: actions/checkout@master
       - uses: DeLaGuardo/setup-clojure@8.0
