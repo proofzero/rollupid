@@ -560,10 +560,10 @@
   ;; github
   ;; -----------------------------------------------------------------------------
 
-  -gh:secret:cloudflare-token
+  -gh:secret:cloudflare-api-token
   {:depends [-env:merged]
    :task (let [secret (:cloudflare/token -env:merged)]
-           (github.secret/set "CLOUDFLARE_TOKEN" secret))}
+           (github.secret/set "CLOUDFLARE_API_TOKEN" secret))}
 
   -gh:secret:datadog-token
   {:depends [-env:merged]
@@ -597,7 +597,7 @@
 
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
-   :depends [-gh:secret:cloudflare-token
+   :depends [-gh:secret:cloudflare-api-token
              -gh:secret:datadog-token
              -gh:secret:admin-account-id
              -gh:secret:next-kv-app-id

@@ -64,13 +64,19 @@
   {:doc "Generate a secret-containing env-file for use with act"
    :depends [-deploy:edn]
    :task (let [{admin-account-id :admin/account-id
-                cloudflare-token :cloudflare/token
+                cloudflare-api-token :cloudflare/token
+                datadog-token :datadog/token
                 next-kv-app-id :next/kv-app-id
-                current-kv-app-id :current/kv-app-id} -deploy:edn
+                next-url :next/url
+                current-kv-app-id :current/kv-app-id
+                current-url :current/url} -deploy:edn
                secrets {:admin-account-id admin-account-id
-                        :cloudflare-token cloudflare-token
+                        :cloudflare-api-token cloudflare-api-token
+                        :datadog-token datadog-token
                         :next-kv-app-id next-kv-app-id
-                        :current-kv-app-id current-kv-app-id}]
+                        :next-url next-url
+                        :current-kv-app-id current-kv-app-id
+                        :current-url current-url}]
            (dot-env/write act-secrets secrets))}
 
   -act:next:three-id
