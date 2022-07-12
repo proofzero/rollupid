@@ -727,12 +727,11 @@
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
    :depends [publish:assets publish:worker cf:zone:purge-all]
-   :task (when github-actions?
+   :task (let [delay-ms 5000]
            ;; It sometimes takes a moment before the worker is able to
            ;; forward requests; delay to give things a chance to fully
            ;; deploy.
-           (let [delay-ms 5000]
-             (Thread/sleep delay-ms)))}
+           (Thread/sleep delay-ms))}
 
   deploy:app
   {:doc "Build and deploy the application"
