@@ -1,4 +1,4 @@
-;; kubelt/three-id/bb.edn
+; kubelt/three-id/bb.edn
 {:min-bb "0.8.0"
  :tasks
  {:requires
@@ -291,10 +291,10 @@
   ;; cloudflare
   ;;
 
-  -cf:token
+  -cf:api-token
   {:doc "Cloudflare API token"
    :depends [-env:merged]
-   :task (:cloudflare/token -env:merged)}
+   :task (:cloudflare/api-token -env:merged)}
 
   -cf:zone-id
   {:doc "Cloudflare zone identifier for site"
@@ -396,22 +396,22 @@
    :task (condp = -deploy:env
            env-next -deploy:env
            env-current -deploy:env
-           (str "dev:" -deploy:env))}
+           (cstr/join ":" ["dev" -deploy:env]))}
 
-  ;; Taken from deploy.edn, overridden by presence of DATADOG_TOKEN
+  ;; Taken from deploy.edn, overridden by presence of DATADOG_CLIENT_TOKEN
   ;; environment variable.
-  -datadog:token
+  -datadog:client-token
   {:doc "The Datadog client-side token"
    :depends [-env:merged]
-   :task (get -env:merged :datadog/token)}
+   :task (get -env:merged :datadog/client-token)}
 
   ;; These values will be injected into the .env file for use as
   ;; compile-time constants.
   -datadog:config
   {:doc "Return a map of Datadog configuration values"
-   :depends [-datadog:env -datadog:token]
+   :depends [-datadog:env -datadog:client-token]
    :task {:datadog-env -datadog:env
-          :datadog-client-token -datadog:token}}
+          :datadog-client-token -datadog:client-token}}
 
   ;; version
   ;; -----------------------------------------------------------------------------
@@ -440,8 +440,8 @@
   -env:robert-account-id (system/env "ROBERT_ACCOUNT_ID")
   -env:robert-kv-app-id (system/env "ROBERT_KV_APP_ID")
 
-  -env:cloudflare-token (system/env "CLOUDFLARE_TOKEN")
-  -env:datadog-token (system/env "DATADOG_TOKEN")
+  -env:cloudflare-api-token (system/env "CLOUDFLARE_API_TOKEN")
+  -env:datadog-client-token (system/env "DATADOG_CLIENT_TOKEN")
 
   ;; environment
   ;; -----------------------------------------------------------------------------
@@ -461,8 +461,8 @@
              -env:next-url
              -env:current-kv-app-id
              -env:current-url
-             -env:cloudflare-token
-             -env:datadog-token]
+             -env:cloudflare-api-token
+             -env:datadog-client-token]
    :task (do
            {:robert/account-id -env:robert-account-id
             :robert/kv-app-id -env:robert-kv-app-id
@@ -477,8 +477,8 @@
             :next/url -env:next-url
             :current/kv-app-id -env:current-kv-app-id
             :current/url -env:current-url
-            :cloudflare/token -env:cloudflare-token
-            :datadog/token -env:datadog-token})}
+            :cloudflare/api-token -env:cloudflare-api-token
+            :datadog/client-token -env:datadog-client-token})}
 
   -deploy:edn
   {:doc "A map of values read from deployment configuration file"
@@ -562,13 +562,13 @@
 
   -gh:secret:cloudflare-api-token
   {:depends [-env:merged]
-   :task (let [secret (:cloudflare/token -env:merged)]
+   :task (let [secret (:cloudflare/api-token -env:merged)]
            (github.secret/set "CLOUDFLARE_API_TOKEN" secret))}
 
-  -gh:secret:datadog-token
+  -gh:secret:datadog-client-token
   {:depends [-env:merged]
-   :task (let [secret (:datadog/token -env:merged)]
-           (github.secret/set "DATADOG_TOKEN" secret))}
+   :task (let [secret (:datadog/client-token -env:merged)]
+           (github.secret/set "DATADOG_CLIENT_TOKEN" secret))}
 
   -gh:secret:admin-account-id
   {:depends [-env:merged]
@@ -598,7 +598,7 @@
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
    :depends [-gh:secret:cloudflare-api-token
-             -gh:secret:datadog-token
+             -gh:secret:datadog-client-token
              -gh:secret:admin-account-id
              -gh:secret:next-kv-app-id
              -gh:secret:next-url
@@ -714,9 +714,9 @@
 
   cf:zone:purge-all
   {:doc "Purge the Cloudflare cache for production zone"
-   :depends [-deploy:env -cf:token -cf:zone-id -cf:zone-name]
+   :depends [-deploy:env -cf:api-token -cf:zone-id -cf:zone-name]
    :task (when (= env-current -deploy:env)
-           (let [client (cf/init -cf:token)
+           (let [client (cf/init -cf:api-token)
                  response (cf.zone/purge-cache client -cf:zone-id)
                  details (str " [env:" -deploy:env ", zone:" -cf:zone-name "])")
                  message (if (= 200 (get response :status))

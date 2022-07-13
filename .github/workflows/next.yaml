@@ -74,7 +74,7 @@ jobs:
           NEXT_KV_APP_ID: ${{ secrets.NEXT_KV_APP_ID }}
           NEXT_URL: ${{ secrets.NEXT_URL }}
           # The Datadog client token.
-          DATADOG_TOKEN: ${{ secrets.DATADOG_TOKEN }}
+          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: bb deploy:app --deploy-env next
@@ -89,7 +89,7 @@ jobs:
           NEXT_KV_APP_ID: ${{ secrets.NEXT_KV_APP_ID }}
           NEXT_URL: ${{ secrets.NEXT_URL }}
           # The Datadog client token.
-          DATADOG_TOKEN: ${{ secrets.DATADOG_TOKEN }}
+          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: bb test:smoke --deploy-env next
