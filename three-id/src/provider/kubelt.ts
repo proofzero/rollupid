@@ -5,8 +5,8 @@ import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
 
 import { BehaviorSubject } from "rxjs";
-
 import Constants from "expo-constants";
+import { Profile } from "../types/Profile";
 
 let sdk: any = null;
 
@@ -26,7 +26,10 @@ const getSignFn = (
   };
 };
 
-export const authenticate = async (provider: ethers.providers.Web3Provider) => {
+export const authenticate = async (
+  provider: ethers.providers.Web3Provider,
+  force: boolean = false
+) => {
   const signer = provider.getSigner();
   const address = await signer.getAddress();
 
@@ -48,7 +51,7 @@ export const authenticate = async (provider: ethers.providers.Web3Provider) => {
     isAuthSubj.next(false);
 
     const isAuth = await isAuthenticated(address);
-    if (!isAuth) {
+    if (force || !isAuth) {
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
 
       await sdkWeb.node_v1.store(sdk);
@@ -78,7 +81,40 @@ export const isAuthenticated = async (address: string | null | undefined) => {
 };
 
 export const kbGetClaims = async () => {
-  const claims: string [] =  await sdkWeb?.node_v1?.oort.claims(sdk);
+  const claims: string[] = await sdkWeb?.node_v1?.oort.claims(sdk);
   console.log("kbGetClaims", claims);
   return claims;
+};
+export const kbGetProfile = async (core: string) => {
+  const profile: Profile = await new Promise((resolve, reject) => {
+    sdkWeb?.node_v1?.oort.rpcApi(sdk, core).then((api: any) => {
+      // TODO: async / await? 🤔
+      sdkWeb?.node_v1?.oort
+        .callRpcClient(sdk, api, {
+          method: ["kb", "get", "profile"],
+          params: [],
+        })
+        .then((x: any) => {
+          resolve(x?.body?.result);
+        });
+      // TODO check if not 200 status response
+    });
+  });
+
+  return profile;
+};
+
+export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
+  const profile = await new Promise((resolve, reject) => {
+    sdkWeb?.node_v1?.oort.rpcApi(sdk, core).then((api: any) => {
+      sdkWeb?.node_v1?.oort
+        .callRpcClient(sdk, api, {
+          method: ["kb", "set", "profile"],
+          params: { profile: updatedProfile },
+        })
+        .then((x: any) => resolve(x?.body?.result));
+      // TODO check if not 200 status response
+    });
+  });
+  return profile;
 };

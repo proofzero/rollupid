@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAccountObs } from "../provider/web3";
+import { connect, getAccountObs } from "../provider/web3";
 
 const useAccount = () => {
   const [account, setAccount] = useState<undefined | null | string>(undefined);
@@ -10,6 +10,8 @@ const useAccount = () => {
         setAccount(changedAccount);
       }
     });
+
+    connect(false);
 
     return () => {
       sub.unsubscribe();

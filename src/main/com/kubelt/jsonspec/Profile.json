@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "properties": {
+    "nickname": {
+      "type": "string"
+    },
+    "profilePicture": {
+      "type": "object",
+      "properties": {
+        "collectionTokenId": {
+          "type": "string"
+        },
+        "collectionId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "imageUrl": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "collectionTokenId",
+        "name",
+        "imageUrl"
+      ]
+    },
+    "email": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "job": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "socials": {
+      "type": "object",
+      "properties": {
+        "twitter": {
+          "type": "string"
+        },
+        "instagram": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
