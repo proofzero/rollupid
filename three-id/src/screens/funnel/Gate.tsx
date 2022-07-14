@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import Layout from "../Layout";
-
+import Layout from "./Layout";
+import { getProfile } from "../provider/kubelt";
 import Constants from "expo-constants";
 import { startView } from "../../analytics/datadog";
 import { clearAccount } from "../../provider/web3";
@@ -12,16 +12,19 @@ export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
 
   useEffect(() => {
-    if (account === null) {
+    if (account === null ) {
       // User maybe disconnected in the process
       navigation.navigate("Landing");
+    } else if (account !== undefined){
+      console.log("getting profile", account);
+      getProfile(account);
     }
   }, [account]);
 
   useEffect(() => {
     startView("gate");
   }, []);
-
+  console.log(account);
   return (
     <Layout>
       <View

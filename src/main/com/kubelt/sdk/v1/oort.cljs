@@ -95,8 +95,9 @@
   (lib.oort/call-rpc-method sys core method args))
 
 (defn call-rpc-api-js [sys core method args]
-  (call-rpc-method sys core method (js->clj args)))
-
+  (-> (call-rpc-method sys core method (js->clj args))
+      (lib.promise/then clj->js)
+      (lib.promise/catch clj->js)))
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------

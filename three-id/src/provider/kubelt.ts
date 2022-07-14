@@ -76,3 +76,9 @@ export const isAuthenticated = async (address: string | null | undefined) => {
 
   return isAuth || isAuthStored || isAuthSDK;
 };
+
+export const getProfile = async (core: string) => {
+  const profile = await sdkWeb?.node_v1?.oort.callRpc(sdk, core, "kb_get_profile", []);
+  console.log('profile ', profile);
+  return profile;
+};
