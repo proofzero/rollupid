@@ -1,14 +1,36 @@
-import React, { useEffect } from "react";
-
+import React, { useEffect, useState, SetStateAction } from "react";
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
+import Constants from "expo-constants";
 import { Pressable, Text, View } from "react-native";
+
 import useAccount from "../../hooks/account";
 import Layout from "./Layout";
 import { getProfile } from "../provider/kubelt";
-import Constants from "expo-constants";
 import { startView } from "../../analytics/datadog";
 import { clearAccount } from "../../provider/web3";
-
+import { Profile } from "../types/Profile";
 export default function Gate({ navigation }: { navigation: any }) {
+
+  const [value, setValue] = useState<null | Profile>(null);
+  const { getItem, setItem } = useAsyncStorage('@storage_key');
+
+  const readItemFromStorage = async () => {
+    const item = await getItem();
+    const value: null | Profile = item != null ? JSON.parse(item) : null;
+    setValue(value);
+  };
+
+  const writeItemToStorage = async (newValue: string) => {
+    await setItem(newValue);
+    const x: Profile = JSON.parse(newValue);
+    setValue(x);
+  };
+
+  useEffect(() => {
+    readItemFromStorage();
+  }, []);
+
+
   const account = useAccount();
 
   useEffect(() => {
@@ -17,14 +39,14 @@ export default function Gate({ navigation }: { navigation: any }) {
       navigation.navigate("Landing");
     } else if (account !== undefined){
       console.log("getting profile", account);
-      getProfile(account);
+      getProfile(account).then(x => JSON.stringify(x)).then(writeItemToStorage) ;
     }
   }, [account]);
 
   useEffect(() => {
     startView("gate");
   }, []);
-  console.log(account);
+
   return (
     <Layout>
       <View
@@ -57,11 +79,23 @@ export default function Gate({ navigation }: { navigation: any }) {
               lineHeight: 22,
               color: "white",
             }}
-          >
-            Try Different Wallet
+      > Try Different Wallet
           </Text>
         </Pressable>
-
+        <Text
+          style={{
+            paddingTop: 56,
+            paddingBottom: 43,
+            fontFamily: "Inter_700Bold",
+            fontSize: 16,
+            fontWeight: "20",
+            lineHeight: 12,
+            color: "#1F2937",
+            backgroundColor: 'yellow',
+          }}
+        >
+      ProfilePicture Name: {value?.profilePicture?.name}
+        </Text>
         <Text
           style={{
             paddingTop: 56,
