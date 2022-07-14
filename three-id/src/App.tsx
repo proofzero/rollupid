@@ -14,6 +14,8 @@ import { Manrope_700Bold } from "@expo-google-fonts/manrope";
 import Landing from "./screens/Landing";
 import Auth from "./screens/Auth";
 import Gate from "./screens/Gate";
+import { useEffect } from "react";
+import { startSession, stopSession } from "./analytics/datadog";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +27,20 @@ export default function App() {
     Inter_800ExtraBold,
     Manrope_700Bold,
   });
+
+  useEffect(() => {
+    stopSession()
+
+    const asyncFn = async () => {
+      await startSession() 
+    }
+
+    asyncFn()
+
+    return () => {
+      stopSession()
+    }
+  }, [])
 
   if (!fontsLoaded) return null;
 

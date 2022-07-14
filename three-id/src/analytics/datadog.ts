@@ -19,17 +19,44 @@ const configuration: RumInitConfiguration = {
 };
 
 let initialized: boolean = false;
-const init = async () => {
+let sessionStarted: boolean = false
+
+const init = async (record?: boolean) => {
   if (!initialized) {
     datadogRum.init(configuration);
+
+    if (record) {
+      startSession()
+    }
+
     initialized = true;
   }
 };
 
-export const startView = async (viewKey: string): Promise<void> => {
+export const startSession = async () => {
   await init();
 
+  if (!sessionStarted) {
+    datadogRum.startSessionReplayRecording()
+    sessionStarted = true
+  }
+  else
+    console.info("Session already started")
+}
+
+export const stopSession = () => {
+  if (sessionStarted) {
+    datadogRum.stopSessionReplayRecording()
+    sessionStarted = false
+  }
+  else
+    console.info("No session started")
+}
+
+export const startView = async (viewKey: string): Promise<void> => {
+  if(!sessionStarted) {
+    await startSession()
+  }
+  
   datadogRum.startView(viewKey);
 };
-
-export default init;
