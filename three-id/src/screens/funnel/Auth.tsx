@@ -2,14 +2,14 @@ import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
 import { Text, View } from "react-native";
-import useAccount from "../hooks/account";
-import { authenticate, isAuthenticated } from "../provider/kubelt";
+import useAccount from "../../hooks/account";
+import { authenticate, isAuthenticated } from "../../provider/kubelt";
 
-import { connect } from "../provider/web3";
+import { connect } from "../../provider/web3";
 
-import Layout from "./Layout";
+import Layout from "../Layout";
 
-import { startView } from "../analytics/datadog";
+import { startView } from "../../analytics/datadog";
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();

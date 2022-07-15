@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   useFonts,
   Inter_400Regular,
+  Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
   Inter_800ExtraBold,
@@ -11,17 +12,20 @@ import {
 
 import { Manrope_700Bold } from "@expo-google-fonts/manrope";
 
-import Landing from "./screens/Landing";
-import Auth from "./screens/Auth";
-import Gate from "./screens/Gate";
 import { useEffect } from "react";
 import { startSession, stopSession } from "./analytics/datadog";
+
+import Landing from "./screens/funnel/Landing";
+import Auth from "./screens/funnel/Auth";
+import Gate from "./screens/funnel/Gate";
+import Mint from "./screens/minting/Mint";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
+    Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
     Inter_800ExtraBold,
@@ -29,44 +33,56 @@ export default function App() {
   });
 
   useEffect(() => {
-    stopSession()
+    stopSession();
 
     const asyncFn = async () => {
-      await startSession() 
-    }
+      await startSession();
+    };
 
-    asyncFn()
+    asyncFn();
 
     return () => {
-      stopSession()
-    }
-  }, [])
+      stopSession();
+    };
+  }, []);
 
   if (!fontsLoaded) return null;
 
+  /**
+   * Prefixes should contain the urls
+   * perhaps they can be added through
+   * constants module.
+   *
+   * For now empty *seems* to work
+   */
   return (
-    /**
-     * Prefixes should contain the urls
-     * perhaps they can be added through 
-     * constants module.
-     * 
-     * For now empty *seems* to work
-     */
-    <NavigationContainer linking={{ prefixes: [], config: {
-      screens: {
-        Landing: '/',
-        Auth: 'authentication',
-        Gate: 'gate',
-      }
-    } }}>
+    <NavigationContainer
+      linking={{
+        prefixes: [],
+        config: {
+          screens: {
+            Landing: "",
+            Auth: "authentication",
+            Gate: "gate",
+            Mint: "mint",
+          },
+        },
+      }}
+    >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Landing" component={Landing} />
-        <Stack.Screen name="Auth" component={Auth} />
-        <Stack.Screen name="Gate" component={Gate} />
+        <Stack.Group>
+          <Stack.Screen name="Landing" component={Landing} />
+          <Stack.Screen name="Auth" component={Auth} />
+          <Stack.Screen name="Gate" component={Gate} />
+        </Stack.Group>
+
+        <Stack.Group>
+          <Stack.Screen name="Mint" component={Mint} />
+        </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -12,6 +12,7 @@ import {
   getAssetFromKV,
   NotFoundError,
   MethodNotAllowedError,
+  serveSinglePageApp
 } from "@cloudflare/kv-asset-handler";
 
 // The manifest is generated as part of the deployment process and
@@ -52,6 +53,7 @@ const serveAssetFrom = async (namespace, manifest, request, ctx) => {
       {
         ASSET_NAMESPACE: namespace,
         ASSET_MANIFEST: manifest,
+        mapRequestToAsset: serveSinglePageApp
       }
     );
   } catch (e) {

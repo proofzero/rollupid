@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
-import { startView } from "../analytics/datadog";
-import useAccount from "../hooks/account";
-import { connect, forceAccounts, isMetamask } from "../provider/web3";
-import Layout from "./Layout";
+import { startView } from "../../analytics/datadog";
+import useAccount from "../../hooks/account";
+import { connect, forceAccounts, isMetamask } from "../../provider/web3";
+import Layout from "../Layout";
 
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
