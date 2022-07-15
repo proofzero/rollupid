@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
-import useAccount from "../hooks/account";
-import Layout from "./Layout";
+import useAccount from "../../hooks/account";
+import Layout from "../Layout";
 
 import Constants from "expo-constants";
-import { startView } from "../analytics/datadog";
-import { clearAccount } from "../provider/web3";
+import { startView } from "../../analytics/datadog";
+import { clearAccount } from "../../provider/web3";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
