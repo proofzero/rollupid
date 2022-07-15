@@ -45,7 +45,20 @@ export default function App() {
   if (!fontsLoaded) return null;
 
   return (
-    <NavigationContainer>
+    /**
+     * Prefixes should contain the urls
+     * perhaps they can be added through 
+     * constants module.
+     * 
+     * For now empty *seems* to work
+     */
+    <NavigationContainer linking={{ prefixes: [], config: {
+      screens: {
+        Landing: '/',
+        Auth: 'authentication',
+        Gate: 'gate',
+      }
+    } }}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
