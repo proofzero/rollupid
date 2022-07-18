@@ -76,3 +76,9 @@ export const isAuthenticated = async (address: string | null | undefined) => {
 
   return isAuth || isAuthStored || isAuthSDK;
 };
+
+export const kbGetClaims = async () => {
+  const claims: string [] =  await sdkWeb?.node_v1?.oort.claims(sdk);
+  console.log("kbGetClaims", claims);
+  return claims;
+};
