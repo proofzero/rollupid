@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
-import Layout from "./Layout";
+import Layout from "../Layout";
 import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
 import { startView } from "../../analytics/datadog";
 import { clearAccount } from "../../provider/web3";
