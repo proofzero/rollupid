@@ -265,6 +265,7 @@ export default function Landing({ navigation }: { navigation: any }) {
             </View>
 
             <Text
+              testID="connect-wallet"
               style={{
                 fontFamily: "Inter_600SemiBold",
                 fontSize: 18,
