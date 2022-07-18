@@ -53,6 +53,7 @@
 
        ;; oort
        :oort #js {:authenticate sdk.v1.oort/authenticate-js!
+                  :claims sdk.v1.oort/claims-js
                   :callRpc sdk.v1.oort/call-rpc-api-js
                   :callRpcClient lib.rpc/rpc-call-js
                   :rpcApi sdk.v1.oort/rpc-api-js

@@ -7,6 +7,7 @@ import Layout from "../Layout";
 import Constants from "expo-constants";
 import { startView } from "../../analytics/datadog";
 import { clearAccount } from "../../provider/web3";
+import { kbGetClaims } from "../../provider/kubelt";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -15,6 +16,9 @@ export default function Gate({ navigation }: { navigation: any }) {
     if (account === null) {
       // User maybe disconnected in the process
       navigation.navigate("Landing");
+    } else if (account !== undefined) {
+      console.log("here!!!")
+      kbGetClaims(account);
     }
   }, [account]);
 

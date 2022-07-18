@@ -3,11 +3,11 @@
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
    [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.http.status :as http.status]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.oort :as lib.oort]
-   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.promise :as lib.promise :refer [promise]]
+   [com.kubelt.lib.rpc :as lib.rpc]
+   [com.kubelt.lib.vault :as lib.vault]
    [com.kubelt.lib.wallet :as lib.wallet]))
 
 ;; authenticate!
@@ -89,6 +89,22 @@
 
 (defn rpc-api-js [sys core]
   (rpc-api sys core))
+
+(defn claims& [sys core]
+  (lib.promise/promise
+   (fn [resolve]
+     (-> (rpc-api sys core)
+         (lib.promise/then
+          (fn [api]
+            (-> (lib.rpc/rpc-call& sys api {:method [:kb :core :get :claims] :args []})
+                (lib.promise/then #(resolve (-> % :http/body :result))))))))))
+
+
+(defn claims-js [sys]
+  (-> (claims& sys (get-in sys [:crypto/wallet :wallet/address]))
+      (lib.promise/then clj->js)))
+
+
 
 ;; TODO test me
 (defn call-rpc-method [sys core method args]

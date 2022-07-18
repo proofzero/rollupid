@@ -4,10 +4,10 @@
   (:require
    [clojure.string :as cstr])
   (:require
+   [com.kubelt.lib.oort :as lib.oort]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.rpc :as rpc]
-   [com.kubelt.rpc.schema :as rpc.schema]
-   [com.kubelt.sdk.v1.oort :as sdk.oort]))
+   [com.kubelt.rpc.schema :as rpc.schema]))
 
 (defn rpc-call& [sys api args]
   (lib.promise/promise
@@ -25,7 +25,7 @@
            rpc-method (:method/name (:rpc/method request))
            rpc-params (:rpc/params request)]
        (if (:rpc-client-type args)
-         (-> (sdk.oort/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
+         (-> (lib.oort/call-rpc-method sys wallet-address rpc-method (into [] (vals rpc-params)))
              (lib.promise/then resolve)
              (lib.promise/catch reject))
          (-> (rpc/execute client request)
