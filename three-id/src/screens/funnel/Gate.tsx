@@ -8,7 +8,7 @@ import Layout from "../Layout";
 import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
 import { startView } from "../../analytics/datadog";
 import { clearAccount } from "../../provider/web3";
-import { Profile } from "../types/Profile";
+import { Profile } from "../../types/Profile";
 export default function Gate({ navigation }: { navigation: any }) {
 
   const styles = StyleSheet.create({
