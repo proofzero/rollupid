@@ -95,12 +95,14 @@ export const kbGetProfile = async (core: string) => {
           params: [],
         })
         .then((x: any) => {
-          resolve(x?.body?.result);
+          if (x?.body?.error) {
+            reject(x.body.error);
+          } else {
+            resolve(x?.body?.result);
+          }
         });
-      // TODO check if not 200 status response
     });
   });
-
   return profile;
 };
 
@@ -110,10 +112,15 @@ export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
       sdkWeb?.node_v1?.oort
         .callRpcClient(sdk, api, {
           method: ["kb", "set", "profile"],
-          params: { profile: updatedProfile },
+          params: { profilo: updatedProfile },
         })
-        .then((x: any) => resolve(x?.body?.result));
-      // TODO check if not 200 status response
+        .then((x: any) => {
+          if (x?.body?.error) {
+            reject(x.body.error);
+          } else {
+            resolve(x?.body?.result);
+          }
+        });
     });
   });
   return profile;
