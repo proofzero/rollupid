@@ -3,13 +3,7 @@ import React, { useEffect } from "react";
 import { Text, TextInput, View, Button, Image, Pressable } from "react-native";
 import Layout from "../Layout";
 
-import { startView } from "../../analytics/datadog";
-
 export default function Mint() {
-  useEffect(() => {
-    startView("mint");
-  }, []);
-
   return (
     <Layout>
       <View
