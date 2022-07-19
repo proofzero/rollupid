@@ -92,12 +92,16 @@
 
 (defn claims& [sys core]
   (lib.promise/promise
-   (fn [resolve]
+   (fn [resolve reject]
      (-> (rpc-api sys core)
          (lib.promise/then
           (fn [api]
             (-> (lib.rpc/rpc-call& sys api {:method [:kb :core :get :claims] :args []})
-                (lib.promise/then #(resolve (-> % :http/body :result))))))))))
+                (lib.promise/then
+                 (fn [x]
+                   (if-let [error (-> x :http/body :error)]
+                     (reject error)
+                     (resolve (-> x :http/body :result))))))))))))
 
 
 (defn claims-js [sys]
@@ -111,8 +115,9 @@
   (lib.oort/call-rpc-method sys core method args))
 
 (defn call-rpc-api-js [sys core method args]
-  (call-rpc-method sys core method (js->clj args)))
-
+  (-> (call-rpc-method sys core method (js->clj args))
+      (lib.promise/then clj->js)
+      (lib.promise/catch clj->js)))
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------

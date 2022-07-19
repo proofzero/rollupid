@@ -15,10 +15,12 @@ import { Manrope_700Bold } from "@expo-google-fonts/manrope";
 import { useEffect } from "react";
 import { startSession, stopSession } from "./analytics/datadog";
 
+// TODO: Handle these screen better
 import Landing from "./screens/funnel/Landing";
 import Auth from "./screens/funnel/Auth";
 import Gate from "./screens/funnel/Gate";
 import Mint from "./screens/minting/Mint";
+import Settings from "./screens/profile/Settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +66,7 @@ export default function App() {
             Landing: "",
             Auth: "authentication",
             Gate: "gate",
+            Settings: "settings",
             Mint: "mint",
           },
         },
@@ -82,6 +85,10 @@ export default function App() {
 
         <Stack.Group>
           <Stack.Screen name="Mint" component={Mint} />
+        </Stack.Group>
+
+        <Stack.Group>
+          <Stack.Screen name="Settings" component={Settings} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

@@ -36,21 +36,11 @@
                                                                       :perPage 1
                                                                       :page 1}}}))
                               :http/body :result)]
-                 (is (= {:owner "0x505D79c7379EE65B6c2D6D18a0e7aB901b00756C",
-                         :assets
-                         [{:description "CryptoPunksMarket",
-                           :image-url
-                           "https://www.larvalabs.com/cryptopunks/cryptopunk1.png",
-                           :collection-address "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB",
-                           :name "CryptoPunksMarket #1",
-                           :collection-token-id "1",
-                           :current-owner "0x1919DB36cA2fa2e15F9000fd9CdC2EdCF863E685",
-                           :chain "ETH",
-                           :collection-name "CryptoPunksMarket",
-                           :network "mainnet"}],
-                         :page-number 1}
+                 (is (= #{:owner :assets :page-number}
                         ;; not checking totals thus is a changing number over time
-                        (dissoc nfts :total-items :total-pages))))
+                        (set (keys (dissoc nfts :total-items :total-pages)))))
+                 (is (= #{:description :image-url :collection-address :name :collection-token-id :current-owner :chain :collection-name :network}
+                        (set (keys (-> nfts :assets first))))))
                (catch js/Error err (do
                                      (log/error err)
                                      (is false err)))

@@ -1,10 +1,10 @@
 import React from "react";
 
-import { Image, Text, View } from "react-native";
+import { Image, SafeAreaView, Text, View } from "react-native";
 
 export default function Layout({ children }: { children: any }) {
   return (
-    <View
+    <SafeAreaView
       style={{
         height: 100,
         flex: 1,
@@ -55,6 +55,6 @@ export default function Layout({ children }: { children: any }) {
           assets.
         </Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

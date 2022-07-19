@@ -32,12 +32,14 @@ export const forceAccounts = async () => {
   handleAccountsChanged(accounts);
 };
 
-export const connect = async (): Promise<ethers.providers.Web3Provider> => {
+export const connect = async (
+  resync: boolean = true
+): Promise<ethers.providers.Web3Provider> => {
   if (!web3Provider) {
     web3Provider = new ethers.providers.Web3Provider(eth);
   }
 
-  if (!accountSubj.getValue()) {
+  if (resync && !accountSubj.getValue()) {
     await web3Provider?.send("wallet_requestPermissions", [
       { eth_accounts: {} },
     ]);

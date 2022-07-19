@@ -12,7 +12,7 @@ import {
   getAssetFromKV,
   NotFoundError,
   MethodNotAllowedError,
-  serveSinglePageApp
+  serveSinglePageApp,
 } from "@cloudflare/kv-asset-handler";
 
 // The manifest is generated as part of the deployment process and
@@ -23,7 +23,6 @@ import ASSET_MANIFEST from "./asset-manifest.json";
 const BLOCKED_HOSTNAMES = [
   //"miscreants.example.com",
 ];
-
 
 const serveAssetFrom = async (namespace, manifest, request, ctx) => {
   try {
@@ -53,7 +52,7 @@ const serveAssetFrom = async (namespace, manifest, request, ctx) => {
       {
         ASSET_NAMESPACE: namespace,
         ASSET_MANIFEST: manifest,
-        mapRequestToAsset: serveSinglePageApp
+        mapRequestToAsset: serveSinglePageApp,
       }
     );
   } catch (e) {
@@ -119,5 +118,5 @@ export default {
     response.headers.set("Access-Control-Allow-Origin", "*");
 
     return response;
-  }
+  },
 };
