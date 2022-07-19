@@ -112,7 +112,7 @@ export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
       sdkWeb?.node_v1?.oort
         .callRpcClient(sdk, api, {
           method: ["kb", "set", "profile"],
-          params: { profilo: updatedProfile },
+          params: { profile: updatedProfile },
         })
         .then((x: any) => {
           if (x?.body?.error) {
