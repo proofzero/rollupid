@@ -595,6 +595,16 @@
    :task (let [secret (:current/url -env:merged)]
            (github.secret/set "CURRENT_URL" secret))}
 
+  -gh:secret:metamask-password
+  {:depends [-env:merged]
+   :task (let [secret (:metamask/password -env:merged)]
+           (github.secret/set "METAMASK_3ID_TESTING_PASSWORD" secret))}
+
+  -gh:secret:metamask-recovery-phrase
+  {:depends [-env:merged]
+   :task (let [secret (:metamask/recovery-phrase -env:merged)]
+           (github.secret/set "METAMASK_3ID_TESTING_RECOVERY_PHRASE" secret))}
+
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
    :depends [-gh:secret:cloudflare-api-token
@@ -603,7 +613,9 @@
              -gh:secret:next-kv-app-id
              -gh:secret:next-url
              -gh:secret:current-kv-app-id
-             -gh:secret:current-url]}
+             -gh:secret:current-url
+             -gh:secret:metamask-password
+             -gh:secret:metamask-recovery-phrase]}
 
   ;; compile
   ;; ---------------------------------------------------------------------------
