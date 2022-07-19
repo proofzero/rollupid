@@ -9,6 +9,8 @@ import { connect } from "../../provider/web3";
 
 import Layout from "../Layout";
 
+import { startView } from "../../analytics/datadog";
+
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
 
@@ -40,6 +42,10 @@ export default function Auth({ navigation }: { navigation: any }) {
       navigation.navigate("Landing");
     }
   }, [account]);
+
+  useEffect(() => {
+    startView("auth");
+  }, []);
 
   return (
     <Layout>

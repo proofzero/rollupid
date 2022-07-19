@@ -1,5 +1,6 @@
 import React, { useEffect, useState, SetStateAction } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
@@ -10,7 +11,8 @@ import {
   kbGetProfile,
   kbSetProfile,
 } from "../../provider/kubelt";
-import { connect } from "../../provider/web3";
+import { startView } from "../../analytics/datadog";
+import { clearAccount, connect } from "../../provider/web3";
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";

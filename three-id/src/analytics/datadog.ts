@@ -21,9 +21,13 @@ const configuration: RumInitConfiguration = {
 let initialized: boolean = false;
 let sessionStarted: boolean = false;
 
-const init = async () => {
+const init = async (record?: boolean) => {
   if (!initialized) {
     datadogRum.init(configuration);
+
+    if (record) {
+      startSession();
+    }
 
     initialized = true;
   }
@@ -43,4 +47,12 @@ export const stopSession = () => {
     datadogRum.stopSessionReplayRecording();
     sessionStarted = false;
   } else console.info("No session started");
+};
+
+export const startView = async (viewKey: string): Promise<void> => {
+  if (!sessionStarted) {
+    await startSession();
+  }
+
+  datadogRum.startView(viewKey);
 };

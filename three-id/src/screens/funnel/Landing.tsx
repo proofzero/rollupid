@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
+import { startView } from "../../analytics/datadog";
 import useAccount from "../../hooks/account";
 import { connect, forceAccounts, isMetamask } from "../../provider/web3";
 import Layout from "../Layout";
@@ -24,6 +25,10 @@ export default function Landing({ navigation }: { navigation: any }) {
       navigation.navigate("Auth");
     }
   }, [account]);
+
+  useEffect(() => {
+    startView("landing");
+  }, []);
 
   return (
     <Layout>
