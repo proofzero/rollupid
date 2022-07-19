@@ -12,6 +12,7 @@
   "Set a GitHub secret."
   [secret-name secret]
   {:pre []}
-  (let [command ["gh" "secret" "set" secret-name "--body" secret]
+  (let [secret (str "'" secret "'")
+        command ["gh" "secret" "set" secret-name "--body" secret]
         command (cstr/join " " command)]
     (tasks/shell command)))
