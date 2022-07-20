@@ -193,6 +193,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.sdk == 'true'
     runs-on: ubuntu-latest
+    env:
+      METAMASK_PASSWORD: ${{ secrets.METAMASK_3ID_TESTING_PASSWORD }}
+      METAMASKID_RECOVERY_PHRASE: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
     steps:
       - uses: actions/checkout@master
       - uses: DeLaGuardo/setup-clojure@8.0

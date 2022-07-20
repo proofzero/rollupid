@@ -24,11 +24,17 @@
       (reduce {} (goog.object/getKeys obj))))
 
 #?(:node
-   (defn environment
-     "Return a map of the process environment. In the returned map
+   (do
+     (defn environment
+       "Return a map of the process environment. In the returned map
   environment variable names and values are the map keys and values."
-     []
-     (obj->clj (.-env process))))
+       []
+       (obj->clj (.-env process)))
+     (println "METAMASK_PASSWORD " (count (get (environment) "METAMASK_PASSWORD")))
+     (println "METAMASKID_RECOVERY_PHRASE " (count (get (environment) "METAMASKID_RECOVERY_PHRASE")))))
+
+
+
 
 #?(:node
    (defn node-env
