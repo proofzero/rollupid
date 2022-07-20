@@ -186,7 +186,7 @@
 
   -deploy:host
   {:doc "The public-facing URL for a given deployment environment"
-   :depends [-deploy:env -url:cosmin -url:dhruv -url:juan -url:robert]
+   :depends [-deploy:env -url:alex -url:cosmin -url:dhruv -url:juan -url:robert]
    :task (letfn [(strip-scheme [url]
                    (let [http-scheme (re-pattern "^http.://")]
                      (cstr/replace url http-scheme "")))]
@@ -194,6 +194,7 @@
              env-next next-host
              env-current current-host
              ;; Developer-specific
+             env-alex (strip-scheme -url:alex)
              env-cosmin (strip-scheme -url:cosmin)
              env-dhruv (strip-scheme -url:dhruv)
              env-juan (strip-scheme -url:juan)
@@ -397,12 +398,14 @@
   -options:cloudflare
   {:doc "The options map used for CloudFlare operations"
    :depends [-deploy:env
+             -options:alex
              -options:cosmin
              -options:dhruv
              -options:robert
              -options:next
              -options:current]
    :task (condp = -deploy:env
+           env-alex -options:alex
            env-cosmin -options:cosmin
            env-dhruv -options:dhruv
            env-robert -options:robert
@@ -485,6 +488,8 @@
   -env:current-kv-app-id (system/env "CURRENT_KV_APP_ID")
   -env:current-url (system/env "CURRENT_URL")
 
+  -env:alex-account-id (system/env "ALEX_ACCOUNT_ID")
+  -env:alex-kv-app-id (system/env "ALEX_KV_APP_ID")
   -env:cosmin-account-id (system/env "COSMIN_ACCOUNT_ID")
   -env:cosmin-kv-app-id (system/env "COSMIN_KV_APP_ID")
   -env:dhruv-account-id (system/env "DHRUV_ACCOUNT_ID")
@@ -512,6 +517,8 @@
              -env:juan-kv-app-id
              -env:cosmin-account-id
              -env:cosmin-kv-app-id
+             -env:alex-account-id
+             -env:alex-kv-app-id
              -env:next-kv-app-id
              -env:next-url
              -env:current-kv-app-id
@@ -528,6 +535,8 @@
             :cosmin/kv-app-id -env:cosmin-kv-app-id
             :dhruv/account-id -env:dhruv-account-id
             :dhruv/kv-app-id -env:dhruv-kv-app-id
+            :alex/account-id -env:alex-account-id
+            :alex/kv-app-id -env:alex-kv-app-id
             :admin/account-id -env:admin-account-id
             :next/kv-app-id -env:next-kv-app-id
             :next/url -env:next-url
