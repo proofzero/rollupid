@@ -45,7 +45,6 @@
     ;; The public host name of the staging deployment worker.
     (def next-host "preview.threeid.xyz")
 
-
     ;; Developers
     ;; -------------------------------------------------------------------------
 
@@ -185,11 +184,19 @@
 
   -deploy:host
   {:doc "The public-facing URL for a given deployment environment"
-   :depends [-deploy:env]
-   :task (condp = -deploy:env
-           env-next next-host
-           env-current current-host
-           (throw (ex-info "no environment to URL mapping" {:env -deploy:env})))}
+   :depends [-deploy:env -url:cosmin -url:dhruv -url:juan -url:robert]
+   :task (letfn [(strip-scheme [url]
+                   (let [http-scheme (re-pattern "^http.://")]
+                     (cstr/replace url http-scheme "")))]
+           (condp = -deploy:env
+             env-next next-host
+             env-current current-host
+             ;; Developer-specific
+             env-cosmin (strip-scheme -url:cosmin)
+             env-dhruv (strip-scheme -url:dhruv)
+             env-juan (strip-scheme -url:juan)
+             env-robert (strip-scheme -url:robert)
+             (throw (ex-info "no environment to URL mapping" {:env -deploy:env}))))}
 
   ;; Note: Run -prn:deploy-files to view this value. These files are
   ;; used to purge cache for a specific environment.
@@ -900,6 +907,11 @@
   {:doc "Print the configured deployment URL"
    :depends [-url:deploy]
    :task (println -url:deploy)}
+
+  -prn:deploy-host
+  {:doc "Print the configured deployment host"
+   :depends [-deploy:host]
+   :task (println -deploy:host)}
 
   -prn:deploy-files
   {:doc "Print the deployed file URLs for target environment"
