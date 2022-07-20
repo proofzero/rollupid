@@ -475,6 +475,7 @@
   -env:robert-kv-app-id (system/env "ROBERT_KV_APP_ID")
 
   -env:cloudflare-api-token (system/env "CLOUDFLARE_API_TOKEN")
+  -env:cloudflare-zone-id (system/env "CLOUDFLARE_ZONE_ID")
   -env:datadog-client-token (system/env "DATADOG_CLIENT_TOKEN")
 
   ;; environment
@@ -496,6 +497,7 @@
              -env:current-kv-app-id
              -env:current-url
              -env:cloudflare-api-token
+             -env:cloudflare-zone-id
              -env:datadog-client-token]
    :task (do
            {:robert/account-id -env:robert-account-id
@@ -512,6 +514,7 @@
             :current/kv-app-id -env:current-kv-app-id
             :current/url -env:current-url
             :cloudflare/api-token -env:cloudflare-api-token
+            :cloudflare/zone-id -env:cloudflare-zone-id
             :datadog/client-token -env:datadog-client-token})}
 
   -deploy:edn
@@ -599,6 +602,11 @@
    :task (let [secret (:cloudflare/api-token -env:merged)]
            (github.secret/set "CLOUDFLARE_API_TOKEN" secret))}
 
+  -gh:secret:cloudflare-zone-id
+  {:depends [-env:merged]
+   :task (let [secret (:cloudflare/zone-id -env:merged)]
+           (github.secret/set "CLOUDFLARE_ZONE_ID" secret))}
+
   -gh:secret:datadog-client-token
   {:depends [-env:merged]
    :task (let [secret (:datadog/client-token -env:merged)]
@@ -642,6 +650,7 @@
   gh:secret:init
   {:doc "Set up secrets in GitHub Actions"
    :depends [-gh:secret:cloudflare-api-token
+             -gh:secret:cloudflare-zone-id
              -gh:secret:datadog-client-token
              -gh:secret:admin-account-id
              -gh:secret:next-kv-app-id
