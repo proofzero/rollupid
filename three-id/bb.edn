@@ -40,9 +40,11 @@
     ;; The KV namespace ("binding") where files are stored.
     (def kv-namespace "APP")
 
-    ;; The public host name that is aliased to our production deployment
-    ;; worker.
-    (def public-host "dapp.threeid.xyz")
+    ;; The public host name of the production deployment worker.
+    (def current-host "dapp.threeid.xyz")
+    ;; The public host name of the staging deployment worker.
+    (def next-host "preview.threeid.xyz")
+
 
     ;; Developers
     ;; -------------------------------------------------------------------------
@@ -179,6 +181,33 @@
                              {:env/provided deploy-env
                               :env/allowed environments}))))}
 
+  -deploy:scheme "https"
+
+  -deploy:host
+  {:doc "The public-facing URL for a given deployment environment"
+   :depends [-deploy:env]
+   :task (condp = -deploy:env
+           env-next next-host
+           env-current current-host
+           (throw (ex-info "no environment to URL mapping" {:env -deploy:env})))}
+
+  ;; Note: Run -prn:deploy-files to view this value. These files are
+  ;; used to purge cache for a specific environment.
+  -deploy:files
+  {:doc "A deployment environment-specific list of deployed URLs"
+   :depends [-deploy:scheme -deploy:host -app:files -wrangler:manifest]
+   :task (let [files (vals -wrangler:manifest)]
+           (mapv (fn [path]
+                   (str -deploy:scheme "://" -deploy:host path))
+                 files))}
+
+  ;; For each file under public-dir, the manifest has an entry:
+  ;; {"some/path": "/some/path"}
+  -wrangler:manifest
+  {:doc "A Cloudflare wrangler-format file manifest for the application"
+   :depends [-app:files]
+   :task (wrangler.asset/manifest -app:files)}
+
   ;;
   ;; verbosity
   ;;
@@ -305,6 +334,11 @@
   {:doc "Cloudflare zone name for site"
    :depends [-env:merged]
    :task (:cloudflare/zone-name -env:merged)}
+
+  -cf:client
+  {:doc "A Cloudflare API client"
+   :depends [-cf:api-token]
+   :task (cf/init -cf:api-token)}
 
   ;;
   ;; options
@@ -692,14 +726,11 @@
 
   asset:manifest
   {:doc "Generate an asset manifest for CloudFlare worker"
-   :depends [-app:files]
-   :task (let [;; For each file under public-dir, the manifest has an entry:
-               ;; {"some/path": "/some/path"}
-               manifest-edn (wrangler.asset/manifest -app:files)
-               out-path worker-manifest]
-           (json/generate-stream manifest-edn (clojure.java.io/writer out-path))
+   :depends [-app:files -wrangler:manifest]
+   :task (let [out-path worker-manifest]
+           (json/generate-stream -wrangler:manifest (clojure.java.io/writer out-path))
            ;; Return the asset manifest content
-           manifest-edn)}
+           -wrangler:manifest)}
 
   install:worker
   {:doc "Install node deps for worker"
@@ -725,20 +756,43 @@
            (wrangler.kv/bulk-put -app:files -options:cloudflare))}
 
   cf:zone:purge-all
-  {:doc "Purge the Cloudflare cache for production zone"
+  {:doc "Purge the Cloudflare cache for staging and production zones"
    :depends [-deploy:env -cf:api-token -cf:zone-id -cf:zone-name]
-   :task (when (= env-current -deploy:env)
+   :task (when (contains? #{env-next env-current} -deploy:env)
            (let [client (cf/init -cf:api-token)
                  response (cf.zone/purge-cache client -cf:zone-id)
                  details (str " [env:" -deploy:env ", zone:" -cf:zone-name "])")
                  message (if (= 200 (get response :status))
-                           (str "[🪹] Purge zone cache: SUCCESS" details)
-                           (str "[❌] Purge zone cache: FAILED" details))]
+                           (str "[🪹] Purge zone cache: SUCCESS " details)
+                           (str "[❌] Purge zone cache: FAILED " details))]
+             (println message)))}
+
+  ;; NB: this is only supported for Cloudflare enterprise zones.
+  cf:zone:purge-host
+  {:doc "Purge Cloudflare cache for specific environment"
+   :depends [-deploy:env -deploy:host -cf:client -cf:zone-id -cf:zone-name]
+   :task (let [response (cf.zone/purge-other -cf:client -cf:zone-id :hosts [-deploy:host])
+               details (str " [env:" -deploy:env ", host:" host "]")
+               message (if (= 200 (get response :status))
+                         (str "[🪹] Purge zone cache: SUCCESS " details)
+                         (str "[❌] Purge zone cache: FAILED " details))]
+           (println message))}
+
+  cf:zone:purge-urls
+  {:doc "Purge asset URLs from Cloudflare cache for specific environment"
+   :depends [-deploy:env -cf:client -cf:zone-id -deploy:files]
+   :task (doseq [;; The API allows purging only 30 URLs at once.
+                 files (partition 30 -deploy:files)]
+           (let [response (cf.zone/purge-url -cf:client -cf:zone-id files)
+                 details (str "[env:" -deploy:env "]")
+                 message (if (= 200 (get response :status))
+                           (str "[🪹] Purge zone cache: SUCCESS " details)
+                           (str "[❌] Purge zone cache: FAILED " details))]
              (println message)))}
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
-   :depends [publish:assets publish:worker cf:zone:purge-all]
+   :depends [publish:assets publish:worker cf:zone:purge-urls]
    :task (let [delay-ms 5000]
            ;; It sometimes takes a moment before the worker is able to
            ;; forward requests; delay to give things a chance to fully
@@ -837,6 +891,11 @@
   {:doc "Print the configured deployment URL"
    :depends [-url:deploy]
    :task (println -url:deploy)}
+
+  -prn:deploy-files
+  {:doc "Print the deployed file URLs for target environment"
+   :depends [-deploy:files]
+   :task (pprint/pprint -deploy:files)}
 
   -prn:app-version
   {:doc "Print the application version"
