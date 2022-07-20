@@ -840,21 +840,70 @@
   deploy:app
   {:doc "Build and deploy the application"
    :depends [-deploy:env clean:release build:release publish:site]
-   :task (let [message (str "[🌸] Deployment: successful [env:'" -deploy:env "']")]
+   :task (let [message (str "[🌸] Deployment: SUCCESS [env:'" -deploy:env "']")]
            (println message))}
 
-  git:tag
-  {:doc "Create a signed tag using release signing key"
+  ;; release
+  ;; -----------------------------------------------------------------------------
+  ;; We use a tag-based release flow. Pushing a tag triggers a build
+  ;; and, assuming that all of the tests pass, runs deploy:app for
+  ;; the "current" target environment.
+
+  ;; GPG release signing key ID.
+  -gpg:signing-key "8912BEE648BBC38CD729CB38CA8616DB61D5E946"
+
+  -git:remote "origin"
+
+  -git:branch
+  {:doc "Current git branch"
    :depends []
-   ;; -u <keyid>
-   ;; -s sign
-   ;; -m "message"
-   :task (let [tag-name "v1"
+   :task (git/branch)}
+
+  -check:release-version
+  {:doc "Validate that release versions have expected shape"
+   :depends [-app:version]
+   :task (let [version-re (re-pattern "\\d+")]
+           (if-not (re-matches version-re -app:version)
+             (let [message "app version should be a simple integer; try --app-version"
+                   data {:app/version -app:version}]
+               (throw (ex-info message data)))
+             -app:version))}
+
+  -check:release-branch
+  {:doc "Check that release is from main branch"
+   :depends [-git:branch]
+   :task (when-not (= "main" -git:branch)
+           (let [message "must release from main branch"
+                 data {:git/branch -git:branch}]
+             (throw (ex-info message data))))}
+
+  ;; -u <keyid>; -u implies -s, which signs using committer identity
+  ;; -m "message"
+  -git:tag:create
+  {:doc "Create a signed tag using release signing key"
+   :depends [-gpg:signing-key]
+   :task (let [tag-name (str "v" -app:version)
                message tag-name
-               key-id "fixme"
-               command ["git" "tag" tag-name "-u" key-id "-s" "-m" message]]
-           (pprint/pprint command)
-           )}
+               command ["git" "tag" tag-name "-u" -gpg:signing-key "-m" message]]
+           (shell (cstr/join " " command))
+           ;; Sets the tag-name as the value of -git:tag:create.
+           tag-name)}
+
+  -git:tag:push
+  {:doc "Push a git tag to the remote"
+   :depends [-git:remote -git:tag:create]
+   :task (let [command ["git" "push" -git:remote -git:tag:create]]
+           (shell (cstr/join " " command)))}
+
+  release:app
+  {:doc "Trigger a deployment to production"
+   :depends [check:repo-clean
+             -check:release-branch
+             -check:release-version
+             -git:tag:push]
+   :task (let [detail (str "[env:'" -deploy:env "', tag:" -git:tag:create "]")
+               message (str "[🪅] Release: RUNNING" detail)]
+           (println message))}
 
   ;; test
 
@@ -978,11 +1027,16 @@
    :depends [test:smoke:http]
    :task (pprint/pprint test:smoke:http)}
 
-  -git:status
+  -prn:git-branch
+  {:doc "Print the current git branch"
+   :depends [-git:branch]
+   :task (println -git:branch)}
+
+  -prn:git-status
   {:doc "Print the git status of working tree"
    :task (pprint/pprint (git/status))}
 
-  -git:dirty?
+  -prn:git-dirty?
   {:doc "Print out git working tree dirty status"
    :task (prn (git/dirty?))}
 

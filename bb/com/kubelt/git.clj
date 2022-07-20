@@ -3,6 +3,15 @@
    [clojure.java.shell :refer [sh]]
    [clojure.string :as cstr]))
 
+;; branch
+;; -----------------------------------------------------------------------------
+
+(defn branch
+  "Returns the current branch."
+  []
+  (let [{:keys [exit out err]} (sh "git" "rev-parse" "--abbrev-ref" "HEAD")]
+    (cstr/trim out)))
+
 ;; commit
 ;; -----------------------------------------------------------------------------
 ;; sh returns a map with keys:
@@ -26,7 +35,7 @@
 ;; -----------------------------------------------------------------------------
 
 (defn- changed
-  "Convert a aplit 'changed' status line into a map."
+  "Convert a split 'changed' status line into a map."
   [[xy sub mH mI mW hH hI path]]
   {:status/type :status.type/changed
    :xy xy
