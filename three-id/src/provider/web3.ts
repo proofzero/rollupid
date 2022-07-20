@@ -11,7 +11,9 @@ export const isMetamask = () => eth?.isMetaMask === true;
 
 export const clearAccount = async () => {
   accountSubj.next(null);
+
   sessionStorage.clear();
+  localStorage.clear();
 };
 
 const handleAccountsChanged = (accounts: string[]) => {

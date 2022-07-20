@@ -1,10 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Image, ScrollView, View, Text, Pressable } from "react-native";
 import useAccount from "../hooks/account";
+import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
+import { connect } from "../provider/web3";
 
-export default function Layout({ children }: { children: any }) {
+export default function Layout({
+  children,
+  navigation,
+}: {
+  children: any;
+  navigation: any;
+}) {
   const account = useAccount();
+
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
+
+    const provider = await connect(false);
+
+    const claims = await kbGetClaims(provider);
+    if (!claims.includes(claim)) {
+      return navigation.navigate("Landing");
+    }
+  };
+
+  useEffect(() => {
+    if (account === null) {
+      return navigation.navigate("Landing");
+    }
+
+    const asyncFn = async () => {
+      const claim = "3id.enter";
+
+      if (await isAuthenticated(account)) {
+        await claimsRedirect(claim);
+      } else {
+        const provider = await connect(false);
+        await authenticate(provider);
+
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+
+        if (await isAuthenticated(address)) {
+          await claimsRedirect(claim);
+        } else {
+          return navigation.navigate("Landing");
+        }
+      }
+    };
+
+    if (account) {
+      asyncFn();
+    }
+  }, [account]);
 
   return (
     <View

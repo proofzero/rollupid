@@ -1,21 +1,49 @@
 import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
-import { Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import { authenticate, isAuthenticated } from "../../provider/kubelt";
 
 import { connect } from "../../provider/web3";
+import {
+  authenticate,
+  isAuthenticated,
+  kbGetClaims,
+} from "../../provider/kubelt";
 
 import Layout from "../Layout";
+import { Text, View } from "react-native";
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
 
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
+
+    if (!account) {
+      throw new Error("Account is null");
+    }
+
+    const provider = await connect(false);
+
+    const claims = await kbGetClaims(provider);
+    if (claims.includes(claim)) {
+      return navigation.navigate("Settings");
+    } else {
+      return navigation.navigate("Gate");
+    }
+  };
+
   useEffect(() => {
+    if (account === null) {
+      // User maybe disconnected in the process
+      return navigation.navigate("Landing");
+    }
+
     const asyncFn = async () => {
+      const claim = "3id.enter";
+
       if (await isAuthenticated(account)) {
-        navigation.navigate("Gate");
+        await claimsRedirect(claim);
       } else {
         const provider = await connect();
         await authenticate(provider);
@@ -24,20 +52,15 @@ export default function Auth({ navigation }: { navigation: any }) {
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          navigation.navigate("Gate");
+          await claimsRedirect(claim);
         } else {
-          navigation.navigate("Landing");
+          return navigation.navigate("Landing");
         }
       }
     };
 
-    asyncFn();
-  }, []);
-
-  useEffect(() => {
-    if (account === null) {
-      // User maybe disconnected in the process
-      navigation.navigate("Landing");
+    if (account) {
+      asyncFn();
     }
   }, [account]);
 

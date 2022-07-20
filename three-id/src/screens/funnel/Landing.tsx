@@ -2,12 +2,44 @@ import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
+import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
 import { connect, forceAccounts, isMetamask } from "../../provider/web3";
 import Layout from "../Layout";
 
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
   const [hasMetamask, setHasMetamask] = React.useState(false);
+
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
+
+    const provider = await connect(false);
+
+    const claims = await kbGetClaims(provider);
+    if (!claims.includes(claim)) {
+      return navigation.navigate("Settings");
+    }
+  };
+
+  useEffect(() => {
+    if (account === null) {
+      return navigation.navigate("Landing");
+    }
+
+    const asyncFn = async () => {
+      const claim = "3id.enter";
+
+      if (await isAuthenticated(account)) {
+        await claimsRedirect(claim);
+      } else {
+        return navigation.navigate("Auth");
+      }
+    };
+
+    if (account) {
+      asyncFn();
+    }
+  }, [account]);
 
   useEffect(() => {
     setHasMetamask(isMetamask());
@@ -18,12 +50,6 @@ export default function Landing({ navigation }: { navigation: any }) {
 
     asyncFn();
   }, []);
-
-  useEffect(() => {
-    if (account) {
-      navigation.navigate("Auth");
-    }
-  }, [account]);
 
   return (
     <Layout>

@@ -13,7 +13,7 @@ export default function Gate({ navigation }: { navigation: any }) {
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
-      navigation.navigate("Landing");
+      return navigation.navigate("Landing");
     }
   }, [account]);
 

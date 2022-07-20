@@ -1,22 +1,26 @@
-import React, { useEffect, useState, SetStateAction } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
 import {
-  authenticate,
   isAuthenticated,
   kbGetProfile,
   kbSetProfile,
 } from "../../provider/kubelt";
-import { connect } from "../../provider/web3";
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function Settings({ navigation }: { navigation: any }) {
+export default function Settings({
+  children,
+  navigation,
+}: {
+  children: any;
+  navigation: any;
+}) {
   // TODO: Add forms library
   const bioLimit = 300;
   const setBio = (bio: string) => {
@@ -59,23 +63,27 @@ export default function Settings({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (account != null && account != undefined) {
-        let address = account;
+      if (account != null) {
+        if (await isAuthenticated(account)) {
+          try {
+            const persistedProfile =
+              (await kbGetProfile(account)) || emptyProfile;
+            const jsonProfile = JSON.stringify(persistedProfile);
 
-        if (!(await isAuthenticated(account))) {
-          const provider = await connect(false);
-          await authenticate(provider, true);
+            setProfile(persistedProfile);
 
-          const signer = provider.getSigner();
-          address = await signer.getAddress();
+            try {
+              await writeItemToStorage(jsonProfile);
+            } catch (e) {
+              console.warn("Failed to write profile to storage");
+            }
+          } catch (e) {
+            console.error(e);
+            console.warn("Failed to retrieve persisted profile");
+          }
+        } else {
+          setProfile(emptyProfile);
         }
-
-        kbGetProfile(address)
-          .then((x) => {
-            setProfile(x || emptyProfile);
-            return JSON.stringify(x || emptyProfile);
-          })
-          .then(writeItemToStorage);
       }
     };
 
@@ -83,18 +91,31 @@ export default function Settings({ navigation }: { navigation: any }) {
   }, [account]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
-    if (account !== null && account !== undefined) {
-      kbSetProfile(account, profile)
-        .then((x) => {
-          setProfile(x);
-          return JSON.stringify(x);
-        })
-        .then(writeItemToStorage);
+    if (!account) {
+      console.warn("No account found");
+    }
+
+    if (await isAuthenticated(account)) {
+      try {
+        const persistedProfile = await kbSetProfile(account as string, profile);
+        const jsonProfile = JSON.stringify(persistedProfile);
+
+        setProfile(persistedProfile);
+
+        try {
+          await writeItemToStorage(jsonProfile);
+        } catch (e) {
+          console.warn("Failed to write profile to storage");
+        }
+      } catch (e) {
+        console.error(e);
+        console.warn("Failed to persist profile");
+      }
     }
   };
 
   return (
-    <Layout>
+    <Layout navigation={navigation}>
       <View
         style={{
           flex: 1,

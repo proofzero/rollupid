@@ -42,23 +42,41 @@ export const authenticate = async (
         "oort/host": Constants.manifest?.extra?.oortHost,
         "oort/port": Constants.manifest?.extra?.oortPort,
       });
+
+      const restoredSdk = await sdkWeb?.node_v1?.restore(sdk);
+      const isLoggedIn = await sdkWeb?.node_v1?.oort.isLoggedIn(
+        restoredSdk,
+        address
+      );
+      if (isLoggedIn) {
+        sdk = restoredSdk;
+
+        if (isLoggedIn !== isAuthSubj.getValue()) {
+          isAuthSubj.next(isLoggedIn);
+        }
+      }
     }
 
-    sdk = await sdkWeb?.node_v1?.oort.setWallet(sdk, {
-      address,
-      signFn,
-    });
-    isAuthSubj.next(false);
+    if (force || !(await isAuthenticated(address))) {
+      if (isAuthSubj.getValue()) {
+        isAuthSubj.next(false);
+      }
 
-    const isAuth = await isAuthenticated(address);
-    if (force || !isAuth) {
+      sdk = await sdkWeb?.node_v1?.oort.setWallet(sdk, {
+        address,
+        signFn,
+      });
+
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
 
-      await sdkWeb.node_v1.store(sdk);
+      const isLoggedIn = await isAuthenticated(address);
+      if (isLoggedIn) {
+        await sdkWeb.node_v1.store(sdk);
+      }
 
-      sessionStorage.setItem(`auth_${address}`, "true");
-
-      isAuthSubj.next(true);
+      if (isLoggedIn !== isAuthSubj.getValue()) {
+        isAuthSubj.next(true);
+      }
     }
   } catch (e) {
     isAuthSubj.next(false);
@@ -69,20 +87,33 @@ export const authenticate = async (
 
 // Exposing this method until SDK isAuth gets sorted
 export const isAuthenticated = async (address: string | null | undefined) => {
-  if (address == null) {
+  if (!sdk || !address) {
     return false;
   }
 
   const isAuth = isAuthSubj.getValue();
-  const isAuthStored = sessionStorage.getItem(`auth_${address}`) === "true";
-  const isAuthSDK = await sdkWeb?.node_v1?.oort.isLoggedIn();
+  const isAuthSDK = await sdkWeb?.node_v1?.oort.isLoggedIn(sdk, address);
 
-  return isAuth || isAuthStored || isAuthSDK;
+  return isAuth || isAuthSDK;
 };
 
-export const kbGetClaims = async () => {
-  const claims: string[] = await sdkWeb?.node_v1?.oort.claims(sdk);
-  console.log("kbGetClaims", claims);
+export const kbGetClaims = async (
+  provider: ethers.providers.Web3Provider
+): Promise<string[]> => {
+  let claims: string[] = ["3iD.enter"];
+
+  const signer = provider.getSigner();
+  const address = await signer.getAddress();
+
+  try {
+    claims = await sdkWeb?.node_v1?.oort.claims(sdk, address);
+  } catch (e) {
+    console.error(e);
+    console.warn("Failed to get claims, falling back to empty array");
+  }
+
+  if (!claims) throw new Error("Null claims returned. This should not happen.");
+
   return claims;
 };
 export const kbGetProfile = async (core: string) => {
