@@ -106,7 +106,7 @@ export const kbGetClaims = async (
   const address = await signer.getAddress();
 
   try {
-    claims = await sdkWeb?.node_v1?.oort.claims(sdk, address);
+    claims = await sdkWeb?.node_v1?.oort.claims(sdk);
   } catch (e) {
     console.error(e);
     console.warn("Failed to get claims, falling back to empty array");
