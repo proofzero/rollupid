@@ -1,4 +1,4 @@
-(ns com.kubelt.sdk.v1.oort-test
+(ns com.kubelt.rpc.oort-test
   (:require
    [cljs.core.async :refer [go]]
    [cljs.core.async.interop :refer-macros [<p!]]
@@ -29,3 +29,9 @@
                                      (log/error err)
                                      (is false err)))
                (finally (done)))))))
+
+(comment
+;;
+  (t/run-tests)
+  ;;
+  )
