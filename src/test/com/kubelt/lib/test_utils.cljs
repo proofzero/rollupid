@@ -19,6 +19,15 @@
         w)
       (catch js/Error err (do (is false err) err)))))
 
+(defn import-wallet [app-name wallet-name mnemonic wallet-password]
+  (go
+    (log/debug "importing-wallet: " wallet-name)
+    (try
+      (let [{:keys [wallet/name]} (<p! (wallet/import& app-name wallet-name mnemonic wallet-password))]
+        (is true (println (str "wallet imported: " name)))
+        name)
+      (catch js/Error err (do (is false err) err)))))
+
 (defn delete-wallet [app-name wallet-name wallet-password]
   (go
     (log/debug "deleting-wallet: " wallet-name)
