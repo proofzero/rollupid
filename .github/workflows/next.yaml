@@ -58,7 +58,7 @@ jobs:
         run: npm ci
 
       - name: build sdk-web
-        run: npm run build:sdk-web:release
+        run: npm run build:sdk-web:develop
 
       - name: install node dependencies (for three-id)
         working-directory: ./three-id
