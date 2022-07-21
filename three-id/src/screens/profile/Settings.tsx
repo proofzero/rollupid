@@ -131,7 +131,7 @@ export default function Settings({
         >
           <Text
             style={{
-              paddingBottom: "1em",
+              paddingBottom: 41,
               fontFamily: "Inter_700Bold",
               fontSize: 24,
               fontWeight: "700",
@@ -341,6 +341,7 @@ export default function Settings({
                       lineHeight: 24,
                       shadowColor: "#D1D5DB",
                       shadowRadius: 2,
+                      color: "#6B7280",
                     }}
                     value={profile.website}
                     onChangeText={(website) =>
@@ -414,10 +415,11 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     shadowColor: "#D1D5DB",
     shadowRadius: 2,
+    color: "#6B7280",
   },
   textarea: {
     height: 66,
-    padding: 4,
+    paddingLeft: 5,
     shadowColor: "#D1D5DB",
     shadowRadius: 2,
     borderWidth: 1,
@@ -426,6 +428,8 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontSize: 16,
     lineHeight: 24,
+    color: "#6B7280",
+    resizeMode: "vertical",
   },
   view: {
     borderWidth: 0.5,
@@ -436,7 +440,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Inter_500Medium",
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "500",
     lineHeight: 20,
     color: "#374151",
     paddingBottom: 7,
