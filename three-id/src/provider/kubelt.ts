@@ -97,16 +97,12 @@ export const isAuthenticated = async (address: string | null | undefined) => {
   return isAuth || isAuthSDK;
 };
 
-export const kbGetClaims = async (
-  provider: ethers.providers.Web3Provider
-): Promise<string[]> => {
+export const kbGetClaims = async (): Promise<string[]> => {
   let claims: string[] = ["3iD.enter"];
-
-  const signer = provider.getSigner();
-  const address = await signer.getAddress();
 
   try {
     claims = await sdkWeb?.node_v1?.oort.claims(sdk);
+    console.log(claims)
   } catch (e) {
     console.error(e);
     console.warn("Failed to get claims, falling back to empty array");

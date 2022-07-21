@@ -5,7 +5,6 @@ import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
 import {
-  isAuthenticated,
   kbGetProfile,
   kbSetProfile,
 } from "../../provider/kubelt";
@@ -41,8 +40,7 @@ export default function Settings({
 
   const [profile, setProfile] = useState<Profile>(emptyProfile);
 
-  // TODO: Use correct storage key
-  const { getItem, setItem } = useAsyncStorage("@storage_key");
+  const { getItem, setItem } = useAsyncStorage("kubelt_sdk");
 
   const readItemFromStorage = async () => {
     const item = await getItem();

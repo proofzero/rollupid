@@ -13,9 +13,7 @@ export default function Landing({ navigation }: { navigation: any }) {
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
 
-    const provider = await connect(false);
-
-    const claims = await kbGetClaims(provider);
+    const claims = await kbGetClaims();
     if (!claims.includes(claim)) {
       return navigation.navigate("Settings");
     }

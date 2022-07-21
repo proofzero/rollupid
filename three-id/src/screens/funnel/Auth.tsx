@@ -1,4 +1,3 @@
-import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
 import useAccount from "../../hooks/account";
@@ -23,9 +22,7 @@ export default function Auth({ navigation }: { navigation: any }) {
       throw new Error("Account is null");
     }
 
-    const provider = await connect(false);
-
-    const claims = await kbGetClaims(provider);
+    const claims = await kbGetClaims();
     if (claims.includes(claim)) {
       return navigation.navigate("Settings");
     } else {

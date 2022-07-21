@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { Image, ScrollView, View, Text, Pressable } from "react-native";
+import { console_log } from "../../../packages/sdk-web/lib/taoensso.encore";
 import useAccount from "../hooks/account";
 import useSDKAuth from "../hooks/sdkAuth";
 import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
@@ -19,8 +20,8 @@ export default function Layout({
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
 
-    const provider = await connect(false);
-    const claims = await kbGetClaims(provider);
+    const claims = await kbGetClaims();
+    console_log(claims)
     if (!claims.includes(claim)) {
       return navigation.navigate("Landing");
     }
