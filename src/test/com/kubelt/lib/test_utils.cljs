@@ -19,7 +19,15 @@
         w)
       (catch js/Error err (do (is false err) err)))))
 
-(defn delete-wallet [app-name wallet-name wallet-password]
+(defn import-wallet [app-name wallet-name mnemonic wallet-password]
+  (go
+    (log/debug "importing-wallet: " wallet-name)
+    (try
+      (let [{:keys [wallet/name]} (<p! (wallet/import& app-name wallet-name mnemonic wallet-password))]
+        name)
+      (catch js/Error err (do (is false err) err)))))
+
+(defn delete-wallet [app-name wallet-name wallet-password & [silently]]
   (go
     (log/debug "deleting-wallet: " wallet-name)
     (try
@@ -29,7 +37,7 @@
           (let [deleted (<p! (wallet/delete!& app-name wallet-name))]
             (log/debug :deleted deleted)
             true)))
-      (catch js/Error err (do (is false err) err)))))
+      (catch js/Error err (do (is (or false silently) err) err)))))
 
 (defn create-wallet-fixture [app-name wallet-name wallet-password]
   #(async
@@ -40,12 +48,22 @@
         (catch js/Error err (js/console.log err))
         (finally (done))))))
 
+(defn import-wallet-fixture [app-name wallet-name mnemonic wallet-password]
+  #(async
+    done
+    (go
+      (try
+        (<! (delete-wallet app-name wallet-name wallet-password true))
+        (is (= wallet-name (<! (import-wallet app-name wallet-name mnemonic wallet-password))))
+        (catch js/Error err (js/console.log err))
+        (finally (done))))))
+
 (defn delete-wallet-fixture [app-name wallet-name wallet-password]
   #(async
     done
     (go
       (try
-        (<! (delete-wallet app-name wallet-name wallet-password))
+        (<! (delete-wallet app-name wallet-name wallet-password true))
         (catch js/Error err (js/console.log err))
         (finally (done))))))
 
