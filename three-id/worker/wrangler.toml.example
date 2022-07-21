@@ -18,6 +18,16 @@ account_id = "{{admin/account-id}}"
 # either route or workers_dev, but not both.
 workers_dev = true
 
+{% if alex/account-id %}
+[env.alex]
+name = "three-id"
+account_id = "{{alex/account-id}}"
+vars = { ENVIRONMENT = "development" }
+kv_namespaces = [
+  { binding = "APP", id = "{{alex/kv-app-id}}" },
+]
+{% endif %}
+
 {% if robert/account-id %}
 [env.robert]
 name = "three-id"
