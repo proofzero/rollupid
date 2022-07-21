@@ -18,12 +18,14 @@
                [:github :string]]))
 
 (def profile
-  (mu/optional-keys [:map
-                     [:nickname :string]
-                     [:profilePicture profilePicture]
-                     [:email :string]
-                     [:location :string]
-                     [:job :string]
-                     [:website :string]
-                     [:bio :string]
-                     [:socials socials]]))
+  (mu/optional-keys
+   [:map {:registry {:profile/socials socials
+                     :profile/profilePicture profilePicture}}
+    [:nickname :string]
+    [:bio :string]
+    [:job :string]
+    [:location :string]
+    [:website :string]
+    [:email :string]
+    :profile/profilePicture
+    :profile/socials]))

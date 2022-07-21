@@ -27,13 +27,17 @@
 (def decrypt-fn
   [:=> {:description "A decryption function that takes some encrypted data
 returns a decrypted version of the data using the public key assoicated
-with the wallet." }
+with the wallet."
+        :json-schema/tsType "(data: any) => string"
+        }
    [:cat :any :string]])
 
 (def sign-fn
   [:=> {:description "A signing function that takes some data and
 returns a signature generated using the private key associated with the
-wallet."}
+wallet."
+        :json-schema/tsType "(data: any) => string"
+        }
    [:cat :any] :string])
 
 ;; Wallet

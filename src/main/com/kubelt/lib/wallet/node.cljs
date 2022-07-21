@@ -8,6 +8,7 @@
   (:require
    ["@ethersproject/wallet" :refer [Wallet]])
   (:require
+   [com.kubelt.lib.io.node :as io]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.io.node :as lib.io]
    [com.kubelt.lib.path :as lib.path]
@@ -198,7 +199,7 @@
                 (-> (lib.promise/all [path& wallet&])
                     (lib.promise/then
                      (fn [[wallet-dirp wallet-js]]
-                       (-> (.writeFile fs-promises wallet-dirp wallet-js)
+                       (-> (io/write-to-file& wallet-dirp wallet-js)
                            (lib.promise/then (fn [_] (resolve {:wallet/name wallet-name})))
                            (lib.promise/catch (fn [e] (reject (lib.error/from-obj e)))))))
                     (lib.promise/catch (fn [e] (reject (lib.error/from-obj e)))))))))))))

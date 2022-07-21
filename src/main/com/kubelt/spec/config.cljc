@@ -36,13 +36,6 @@
    {:example "com.example.foo-app"}
    :string])
 
-(def credentials
-  [:and
-   {:description "A map from core name to JWT strings."
-    :example {"0x123abc" "<header>.<payload>.<signature>"}}
-   ;; TODO flesh this out in com.kubelt.spec.jwt
-   [:map-of :string :string]])
-
 ;; config
 ;; -----------------------------------------------------------------------------
 ;; Specifies the configuration map passed to the sdk/init function.
@@ -51,7 +44,7 @@
 ;; optional. We provide defaults for those options that aren't provided.
 (def optional-sdk-config
   [:map {:closed true
-         :title ::optional-sdk-config}
+         :title :optional-sdk-config}
    [:log/level {:optional true} logging-level]
    [:app/name {:optional true} app-name]
    [:config/storage {:optional true} spec.storage/storage]

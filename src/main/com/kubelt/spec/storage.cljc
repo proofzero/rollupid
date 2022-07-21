@@ -5,14 +5,19 @@
 
 (def store-fn
   [:=> {:description "A storage function that takes a map of SDK state
-and writes it to platform storage. Returns an error map on error."}
+and writes it to platform storage. Returns an error map on error."
+        :json-schema/tsType "(sdk: any) => any"
+        :json-schema/instanceOf "Function"
+        }
    ;; TODO return error map and the stored value on success?
    [:cat :any] [:or :string :map]])
 
 (def restore-fn
   [:=> {:description "A storage function that returns an SDK instance
 using state loaded from platform storage, or an error map if an error
-occurs."}
+occurs."
+        :json-schema/tsType "(sdk: any) => any"
+        }
    ;; TODO returns a system map (use more precise spec once available)
    [:cat :any] :map])
 

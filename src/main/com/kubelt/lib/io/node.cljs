@@ -44,3 +44,6 @@
                                    (.mkdir fs-promises kubelt-dirp options)))))
            (lib.promise/then (fn [_] (resolve kubelt-dirp)))
            (lib.promise/catch (fn [e] (reject (lib.error/error (str "Dir isn't available" e))))))))))
+
+(defn write-to-file& [filename data]
+  (.writeFile fs-promises filename data))

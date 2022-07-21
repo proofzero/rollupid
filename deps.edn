@@ -33,7 +33,7 @@
   ;; A Clojure library for fast json encoding and decoding
   metosin/jsonista {:mvn/version "0.3.6"}
   ;; Data-driven schemas for Clojure
-  metosin/malli {:mvn/version "0.8.8"}
+  metosin/malli {:mvn/version "0.8.9"}
   ;; Expansive Java cryptographic library
   org.bouncycastle/bcprov-jdk15on {:mvn/version "1.70"}
   ;; Facilities for async programming and communication in Clojure
