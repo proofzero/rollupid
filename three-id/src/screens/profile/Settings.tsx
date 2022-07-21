@@ -13,6 +13,7 @@ import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import useSDKAuth from "../../hooks/sdkAuth";
 
 export default function Settings({
   children,
@@ -60,42 +61,41 @@ export default function Settings({
   }, []);
 
   const account = useAccount();
+  const sdkAuth = useSDKAuth();
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (account != null) {
-        if (await isAuthenticated(account)) {
+      if (sdkAuth && account) {
+        try {
+          const persistedProfile =
+            (await kbGetProfile(account)) || emptyProfile;
+          const jsonProfile = JSON.stringify(persistedProfile);
+
+          setProfile(persistedProfile);
+
           try {
-            const persistedProfile =
-              (await kbGetProfile(account)) || emptyProfile;
-            const jsonProfile = JSON.stringify(persistedProfile);
-
-            setProfile(persistedProfile);
-
-            try {
-              await writeItemToStorage(jsonProfile);
-            } catch (e) {
-              console.warn("Failed to write profile to storage");
-            }
+            await writeItemToStorage(jsonProfile);
           } catch (e) {
-            console.error(e);
-            console.warn("Failed to retrieve persisted profile");
+            console.warn("Failed to write profile to storage");
           }
-        } else {
-          setProfile(emptyProfile);
+        } catch (e) {
+          console.error(e);
+          console.warn("Failed to retrieve persisted profile");
         }
+      } else {
+        setProfile(emptyProfile);
       }
     };
 
     asyncFn();
-  }, [account]);
+  }, [account, sdkAuth]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
     if (!account) {
       console.warn("No account found");
     }
 
-    if (await isAuthenticated(account)) {
+    if (sdkAuth) {
       try {
         const persistedProfile = await kbSetProfile(account as string, profile);
         const jsonProfile = JSON.stringify(persistedProfile);

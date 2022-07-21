@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Image, ScrollView, View, Text, Pressable } from "react-native";
 import useAccount from "../hooks/account";
+import useSDKAuth from "../hooks/sdkAuth";
 import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
 import { connect } from "../provider/web3";
 
@@ -13,12 +14,12 @@ export default function Layout({
   navigation: any;
 }) {
   const account = useAccount();
+  const sdkAuth = useSDKAuth();
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
 
     const provider = await connect(false);
-
     const claims = await kbGetClaims(provider);
     if (!claims.includes(claim)) {
       return navigation.navigate("Landing");
@@ -53,7 +54,7 @@ export default function Layout({
     if (account) {
       asyncFn();
     }
-  }, [account]);
+  }, [account, sdkAuth]);
 
   return (
     <View

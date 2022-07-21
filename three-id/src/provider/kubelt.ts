@@ -156,3 +156,5 @@ export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
   });
   return profile;
 };
+
+export const getIsAuthObs = () => isAuthSubj.asObservable();
