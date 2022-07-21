@@ -184,7 +184,10 @@
         (lib.promise/then
          (fn [{:keys [options vault]}]
            ;; TODO fold options back into system map?
-           (assoc system :crypto/session vault))))))
+           (-> system
+               (dissoc :crypto/wallet)
+               (assoc :crypto/session vault
+                      :wallet/address (-> vault :vault/tokens keys first))))))))
 
 (defn restore-js&
   "Return a system map that has had saved state restored."

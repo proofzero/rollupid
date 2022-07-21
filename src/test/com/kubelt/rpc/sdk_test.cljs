@@ -11,6 +11,7 @@
   (:require
    [com.kubelt.lib.test-utils :as lib.test-utils]
    [com.kubelt.lib.wallet.node :as wallet]
+   [com.kubelt.lib.wallet :as lib.wallet]
    [com.kubelt.rpc.test-commons :as t.commons]
    [com.kubelt.sdk.v1 :as sdk]
    [com.kubelt.spec.config :as spec.config]
@@ -38,3 +39,21 @@
                                      (log/error err)
                                      (is false err)))
                (finally (done)))))))
+
+(deftest restore-claims-and-rpc-test
+  (testing "test restore claims and rpc"
+    (async done
+           (go
+             (try
+               (let [sys (<p! (sdk/init (t.commons/oort-config)))
+                     wallet (<p! (wallet/load& t.commons/app-name t.commons/test-wallet-name t.commons/test-wallet-password))
+                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
+                     _ (<p! (sdk/store& kbt))
+                     restored-system (<p! (sdk/restore& sys))]
+                 (is (= ["3id.enter"] (<p! (sdk.oort/claims& restored-system (lib.wallet/get-address restored-system))))))
+               (catch js/Error err (do
+                                     (log/error err)
+                                     (is false err)))
+               (finally (done)))))))
+
+

@@ -95,10 +95,10 @@
 ;; temporary redef :credential/jwt &&  :crypto/wallet
 (def restored-system
   (let [excluded-keys #{:credential/jwt :crypto/wallet}]
-    (into [:map {:closed false
+    (into [:map {:closed true
                  :title ::restored-system}
            [:credential/jwt {:optional false} :map] ;; TODO? empty map
-           [:crypto/wallet  {:optional false} [:enum :fixme]]
+           [:wallet/address  {:optional false} spec.wallet/wallet-address]
            [:crypto/session {:optional false} spec.vault/vault]
            [:client/http {:optional false} any?] ;; TODO spec client type
            [:client/oort {:optional false}

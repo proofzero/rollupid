@@ -109,3 +109,13 @@
   [app-name wallet-name mnemonic password]
   {:pre [(string? app-name) (string? wallet-name) (string? mnemonic) (string? password)]}
   #?(:node (wallet.node/import& app-name wallet-name mnemonic password)))
+
+
+(defn get-address
+  "wallet address place vary depending how the system is obtained"
+  [sys]
+  (or
+   ;; authenticated systems
+   (get-in sys [:crypto/wallet :wallet/address])
+   ;; restored systems
+   (:wallet/address sys)))
