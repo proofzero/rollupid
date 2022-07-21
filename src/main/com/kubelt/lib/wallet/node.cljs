@@ -9,50 +9,17 @@
    ["@ethersproject/wallet" :refer [Wallet]])
   (:require
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.io.node :as lib.io]
    [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.lib.wallet.shared :as lib.wallet]))
-
-(defn- fs-exists?&
-  "Return the file location if exists. Don't throw exception if no exists"
-  [file]
-  (lib.promise/promise
-   (fn [resolve _]
-     (-> (.access fs-promises file  (.. fs -constants -F_OK))
-         (lib.promise/then (fn [_] (resolve file)))
-         (lib.promise/catch (fn [_] (resolve nil)))))))
-
-(defn- wallet-dir
-  "Return the wallet directory path as a string for an application."
-  [app-name]
-  (let [config-path (lib.path/data app-name)
-        wallet-path (.join path config-path "wallets")]
-    wallet-path))
-
-(defn- ensure-wallet-dir&
-  "Return the wallet directory path for the application as a string,
-  creating it if it doesn't already exist.
-  Throws exception if Wallet dir isn't available"
-  [app-name]
-  (let [wallet-dirp (wallet-dir app-name)]
-    (lib.promise/promise
-     (fn [resolve reject]
-       (-> (fs-exists?& wallet-dirp)
-           (lib.promise/then (fn [x]
-                               (when-not x
-                                 (let [mode "0700"
-                                       recursive? true
-                                       options #js {:mode mode
-                                                    :recursive recursive?}]
-                                   (.mkdir fs-promises wallet-dirp options)))))
-           (lib.promise/then (fn [_] (resolve wallet-dirp)))
-           (lib.promise/catch (fn [e] (reject (lib.error/error (str "Wallet dir isn't available" e))))))))))
+   [com.kubelt.lib.wallet.shared :as lib.wallet])
+  )
 
 (defn- name->path
   "Return the path to a wallet given the owning application name and
   wallet name."
   [app-name wallet-name]
-  (let [wallet-path (wallet-dir app-name)
+  (let [wallet-path (lib.io/kubelt-dir app-name "wallets")
         wallet-path (.join path wallet-path wallet-name)]
     wallet-path))
 
@@ -77,10 +44,10 @@
   [app-name wallet-name]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (ensure-wallet-dir& app-name)
+     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
          (lib.promise/then
           (fn [_]
-            (-> (fs-exists?& (name->path app-name wallet-name))
+            (-> (lib.io/fs-exists?& (name->path app-name wallet-name))
                 (lib.promise/then
                  (fn [x]
                    (if x
@@ -97,7 +64,7 @@
 (defn has-wallet?&
   "Return wallet file path if the named wallet already exists. Returns nil if no wallet exists"
   [app-name wallet-name]
-  (fs-exists?& (name->path app-name wallet-name)))
+  (lib.io/fs-exists?& (name->path app-name wallet-name)))
 
 (defn can-decrypt?&
   "Return true if the wallet can be successfully decrypted with the
@@ -126,7 +93,7 @@
   [app-name wallet-name password]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (ensure-wallet-dir& app-name)
+     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
          (lib.promise/then
           (fn [wallet-dirp]
             (-> (has-wallet?& app-name wallet-name)
@@ -179,7 +146,7 @@
   [app-name]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (ensure-wallet-dir& app-name)
+     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
          (lib.promise/then #(resolve (js->clj (.readdir fs-promises %))))
          (lib.promise/catch reject)))))
 
@@ -220,7 +187,7 @@
                      (reject error)))))
              ;; Returns the path of the wallet file to write.
              (wallet-path []
-               (-> (ensure-wallet-dir& app-name)
+               (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
                    (lib.promise/then #(.join path % wallet-name))))]
        (let [path& (wallet-path)
              wallet& (from-mnemonic mnemonic)]

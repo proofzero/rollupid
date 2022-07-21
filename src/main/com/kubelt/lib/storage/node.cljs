@@ -2,7 +2,8 @@
   "Support for SDK state storage in a Node.js execution context."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   ["fs" :refer [promises] :rename {promises fs-promises} :as fs])
+   ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
+   ["path" :as path])
   (:require
    [clojure.string :as cstr])
   (:require
@@ -13,6 +14,7 @@
   (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.json :as lib.json]
+   [com.kubelt.lib.io.node :as lib.io]
    [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.spec.storage :as spec.storage]))
@@ -27,41 +29,44 @@
 
   The path to the backing file used to store the state must be passed as
   the path argument."
-  [path]
+  [path*]
   (let [w (t/writer :json)]
     (fn [m]
       {:pre [(map? m)] :post [(lib.promise/promise? %)]}
       (let [data (t/write w m)
             mode 0640
-            opts #js {:mode mode}
-            write& (.writeFile fs-promises path data opts)]
-        (-> write&
-            (lib.promise/then
-             (fn []
-               {:path path
-                :mode mode
-                :data data})))))))
+            opts #js {:mode mode}]
+        (->
+         (lib.io/ensure-kubelt-dir& path* "localstorage")
+         (lib.promise/then #(.writeFile fs-promises (.join path % "storage.json") data opts))
+         (lib.promise/then
+          (fn []
+            {:path (lib.io/kubelt-dir path* "localstorage")
+             :mode mode
+             :data m})))))))
 
 (defn- make-restore-fn
   "Return a function that loads SDK state from a node-specific storage
   location and returns it as a map. The path to the backing file where
   the state is stored is passed as the path argument."
-  [path]
+  [path*]
   (let [r (t/reader :json)]
     (fn []
       {:post [(lib.promise/promise? %)]}
       (let [opts #js{:encoding "utf8"}]
-        (-> (.readFile fs-promises path opts)
-            (lib.promise/then
-             (fn [data-str]
-               (let [data (t/read r data-str)]
-                 data))))))))
+        (->
+         (lib.io/ensure-kubelt-dir& path* "localstorage")
+         (lib.promise/then #(.readFile fs-promises (.join path % "storage.json") opts))
+         (lib.promise/then
+          (fn [data-str]
+            (let [data (t/read r data-str)]
+              data))))))))
 
 (defn- make-path
   "Return the path to the file where state is stored."
   [app-name]
   (let [data-path (lib.path/data app-name)]
-    (cstr/join "/" [data-path "storage.json"])))
+    (cstr/join "/" [data-path])))
 
 ;; Public
 ;; -----------------------------------------------------------------------------
