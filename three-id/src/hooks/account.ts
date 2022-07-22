@@ -12,7 +12,7 @@ const useAccount = () => {
     });
 
     const asyncFn = async () => {
-      await connect(false);
+      await connect();
     };
 
     asyncFn();

@@ -12,6 +12,12 @@ let sdk: any = null;
 
 const isAuthSubj = new BehaviorSubject(false);
 
+export const purge = () => {
+  sdk = null;
+  localStorage.clear();
+  isAuthSubj.next(false);
+};
+
 const getSignFn = (
   address: string,
   provider: ethers.providers.Web3Provider
@@ -35,6 +41,8 @@ export const authenticate = async (
 
   const signFn = getSignFn(address, provider);
 
+  let isAuth = isAuthSubj.getValue();
+
   try {
     if (!sdk) {
       sdk = await sdkWeb?.node_v1?.init({
@@ -44,25 +52,23 @@ export const authenticate = async (
       });
 
       const restoredSdk = await sdkWeb?.node_v1?.restore(sdk);
+
+      // We use isLoggedIn as a way to check if SDK
+      // was persisted, as there is no other way;
       const isLoggedIn = await sdkWeb?.node_v1?.oort.isLoggedIn(
         restoredSdk,
         address
       );
 
+      // If TRUE => SDK was persisted and is authenticated
       if (isLoggedIn) {
         sdk = restoredSdk;
-
-        if (isLoggedIn !== isAuthSubj.getValue()) {
-          isAuthSubj.next(isLoggedIn);
-        }
-      }
+        isAuth = true;
+      } // IF FALSE => Either not authenticated or not persisted
     }
 
-    if (force || !(await isAuthenticated(address))) {
-      if (isAuthSubj.getValue()) {
-        isAuthSubj.next(false);
-      }
-
+    isAuth = await isAuthenticated(address);
+    if (force || !isAuth) {
       sdk = await sdkWeb?.node_v1?.oort.setWallet(sdk, {
         address,
         signFn,
@@ -70,19 +76,18 @@ export const authenticate = async (
 
       sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
 
-      const isLoggedIn = await isAuthenticated(address);
-      if (isLoggedIn) {
+      isAuth = await isAuthenticated(address);
+      if (isAuth) {
         await sdkWeb.node_v1.store(sdk);
-      }
-
-      if (isLoggedIn !== isAuthSubj.getValue()) {
-        isAuthSubj.next(true);
       }
     }
   } catch (e) {
-    isAuthSubj.next(false);
+    isAuth = false;
+    console.warn("There was a problem authenticating to the Kubelt SDK");
+  }
 
-    throw e;
+  if (isAuth !== isAuthSubj.getValue()) {
+    isAuthSubj.next(isAuth);
   }
 };
 
@@ -92,14 +97,11 @@ export const isAuthenticated = async (address: string | null | undefined) => {
     return false;
   }
 
-  const isAuth = isAuthSubj.getValue();
-  const isAuthSDK = await sdkWeb?.node_v1?.oort.isLoggedIn(sdk, address);
-
-  return isAuth || isAuthSDK;
+  return sdkWeb?.node_v1?.oort.isLoggedIn(sdk, address);
 };
 
 export const kbGetClaims = async (): Promise<string[]> => {
-  let claims: string[] = ["3iD.enter"];
+  let claims: string[] = [];
 
   try {
     claims = await sdkWeb?.node_v1?.oort.claims(sdk);

@@ -62,14 +62,13 @@ export default function Settings({
     const asyncFn = async () => {
       if (sdkAuth && account) {
         try {
-          const persistedProfile =
-            (await kbGetProfile(account)) || emptyProfile;
-          const jsonProfile = JSON.stringify(persistedProfile);
+          const persistedProfile = await kbGetProfile(account);
+          const patchedProfile = { ...profile, ...persistedProfile };
 
-          setProfile(persistedProfile);
+          setProfile(patchedProfile);
 
           try {
-            await writeItemToStorage(jsonProfile);
+            await writeItemToStorage(JSON.stringify(patchedProfile));
           } catch (e) {
             console.warn("Failed to write profile to storage");
           }

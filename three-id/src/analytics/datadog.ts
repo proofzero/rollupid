@@ -35,12 +35,12 @@ export const startSession = async () => {
   if (!sessionStarted) {
     datadogRum.startSessionReplayRecording();
     sessionStarted = true;
-  } else console.info("Session already started");
+  }
 };
 
 export const stopSession = () => {
   if (sessionStarted) {
     datadogRum.stopSessionReplayRecording();
     sessionStarted = false;
-  } else console.info("No session started");
+  }
 };

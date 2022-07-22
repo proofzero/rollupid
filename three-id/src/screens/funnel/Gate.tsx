@@ -5,15 +5,15 @@ import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
 import Constants from "expo-constants";
-import { clearAccount, connect, forceAccounts } from "../../provider/web3";
-import {
-  authenticate,
-  isAuthenticated,
-  kbGetClaims,
-} from "../../provider/kubelt";
+import { clearAccount, forceAccounts } from "../../provider/web3";
+import { isAuthenticated, kbGetClaims, purge } from "../../provider/kubelt";
+
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
+
+  const otherWalletRequested = useAsyncStorage("kubelt:other_wallet_request");
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
@@ -22,6 +22,13 @@ export default function Gate({ navigation }: { navigation: any }) {
     if (claims.includes(claim)) {
       return navigation.navigate("Settings");
     }
+  };
+
+  const tryDifferentWallet = async () => {
+    await otherWalletRequested.setItem("true");
+
+    purge();
+    clearAccount();
   };
 
   useEffect(() => {
@@ -36,29 +43,7 @@ export default function Gate({ navigation }: { navigation: any }) {
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
       } else {
-        const provider = await connect(false);
-
-        try {
-          await authenticate(provider);
-
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
-
-          if (await isAuthenticated(address)) {
-            return claimsRedirect(claim);
-          } else {
-            throw new Error("Unsuccesful authentication to Kubelt SDK");
-          }
-        } catch (e) {
-          console.warn(`FUNNEL:GATE: Unsuccesful authentication`);
-
-          // Probably wise to clear up
-          // account so we can re-prompt users
-          // for their credentials
-          await clearAccount(true);
-
-          return navigation.navigate("Landing");
-        }
+        return navigation.navigate("Auth");
       }
     };
 
@@ -72,8 +57,10 @@ export default function Gate({ navigation }: { navigation: any }) {
       await forceAccounts();
     };
 
-    asyncFn();
-  });
+    if (account === undefined) {
+      asyncFn();
+    }
+  }, []);
 
   return (
     <Layout>
@@ -97,7 +84,7 @@ export default function Gate({ navigation }: { navigation: any }) {
             maxWidth: "100%",
             height: 48,
           }}
-          onPress={() => clearAccount(true)}
+          onPress={() => tryDifferentWallet()}
         >
           <Text
             style={{
