@@ -5,7 +5,7 @@ const useAccount = () => {
   const [account, setAccount] = useState<undefined | null | string>(undefined);
 
   useEffect(() => {
-    const sub = getAccountObs().subscribe(async (changedAccount) => {
+    const sub = getAccountObs().subscribe((changedAccount) => {
       if (changedAccount !== undefined && changedAccount !== account) {
         setAccount(changedAccount);
       }

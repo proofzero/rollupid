@@ -5,7 +5,7 @@ const useSDKAuth = () => {
   const [auth, setAuth] = useState<any>();
 
   useEffect(() => {
-    const sub = getIsAuthObs().subscribe(async (isAuth) => {
+    const sub = getIsAuthObs().subscribe((isAuth) => {
       if (!auth && isAuth) {
         setAuth(true);
       } else if (auth && !isAuth) {

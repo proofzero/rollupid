@@ -48,6 +48,7 @@ export const authenticate = async (
         restoredSdk,
         address
       );
+
       if (isLoggedIn) {
         sdk = restoredSdk;
 

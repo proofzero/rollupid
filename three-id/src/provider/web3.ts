@@ -19,16 +19,12 @@ export const clearAccount = async (purge: boolean = false) => {
   // We force app wide refresh
   // this has to be handled in views
   // or layouts
-  console.debug(
-    `WEB3:CLEAR:Clearing account subject ${accountSubj.getValue()}`
-  );
   accountSubj.next(null);
 
   // This can remove the SDK from ls
   // so authentication is forced
   // and signing is requested again
   if (purge) {
-    console.debug(`WEB3:CLEAR:Purge detected. Clearing targets.`);
     localStorage.clear();
 
     // Not needed yet
@@ -37,17 +33,10 @@ export const clearAccount = async (purge: boolean = false) => {
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
-  console.debug(`WEB3: Handling accounts changed ${accounts}`);
-
   if (accounts.length > 0) {
-    console.debug(`WEB3: Detected accounts`);
-
     try {
-      const currentAccount = accountSubj.getValue();
-
       const provider = await connect(false);
       const account = await provider.getSigner().getAddress();
-      console.debug(`WEB3: Identified signer account ${account}`);
 
       // We want to make sure that the used account
       // is the same as the signer account;
@@ -59,16 +48,13 @@ const handleAccountsChanged = async (accounts: string[]) => {
         // unless the value changed
         if (account !== accountSubj.getValue()) {
           accountSubj.next(account);
-          console.debug(
-            `WEB3: Succesfully updated account observable from ${currentAccount} to ${account}`
-          );
         }
       }
     } catch (e) {
       console.error(`WEB3: ${e}`);
     }
   } else {
-    console.debug(`WEB3: No accounts detected`);
+    console.warn(`WEB3: No accounts detected`);
 
     await clearAccount();
   }
