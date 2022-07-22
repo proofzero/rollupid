@@ -29,7 +29,7 @@
 (defn ensure-kubelt-dir&
   "Return the directory path for the application as a string,
   creating it if it doesn't already exist.
-  Throws exception if dir isn't available"
+  Rejects promise with error message if dir isn't available"
   [app-name folder]
   (let [kubelt-dirp (kubelt-dir app-name folder)]
     (lib.promise/promise
