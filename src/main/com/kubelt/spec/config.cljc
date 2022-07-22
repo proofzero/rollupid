@@ -92,13 +92,12 @@
                :title ::stored-system-config}]
         (m/-children (m/schema sdk-config nil))))
 
-;; temporary redef :credential/jwt &&  :crypto/wallet
+;; temporary redef :credential/jwt
 (def restored-system
-  (let [excluded-keys #{:credential/jwt :crypto/wallet}]
+  (let [excluded-keys #{:credential/jwt}]
     (into [:map {:closed true
                  :title ::restored-system}
            [:credential/jwt {:optional false} :map] ;; TODO? empty map
-           [:wallet/address  {:optional false} spec.wallet/wallet-address]
            [:crypto/session {:optional false} spec.vault/vault]
            [:client/http {:optional false} any?] ;; TODO spec client type
            [:client/oort {:optional false}

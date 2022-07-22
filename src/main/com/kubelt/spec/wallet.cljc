@@ -48,7 +48,7 @@ wallet."}
    [:wallet/address wallet-address]
    ;;[:wallet/encrypt-key spec.crypto/public-key]
    ;;[:wallet/decrypt-fn decrypt-fn]
-   [:wallet/sign-fn sign-fn]])
+   [:wallet/sign-fn {:optional true} sign-fn]])
 
 (def wallet-schema
   [:and

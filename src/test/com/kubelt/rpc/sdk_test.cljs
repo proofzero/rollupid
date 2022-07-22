@@ -50,7 +50,7 @@
                      kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
                      _ (<p! (sdk/store& kbt))
                      restored-system (<p! (sdk/restore& sys))]
-                 (is (= ["3id.enter"] (<p! (sdk.oort/claims& restored-system (lib.wallet/get-address restored-system))))))
+                 (is (= ["3id.enter"] (<p! (sdk.oort/claims& restored-system (get-in restored-system [:crypto/wallet :wallet/address]))))))
                (catch js/Error err (do
                                      (log/error err)
                                      (is false err)))

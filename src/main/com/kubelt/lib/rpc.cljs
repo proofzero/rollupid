@@ -13,7 +13,7 @@
 (defn rpc-call& [sys api args]
   (lib.promise/promise
    (fn [resolve reject]
-     (let [wallet-address (lib.wallet/get-address sys)
+     (let [wallet-address (get-in sys [:crypto/wallet :wallet/address])
            client (-> {:uri/domain (-> sys :client/oort :http/host)
                        :uri/port (-> sys :client/oort :http/port)
                        :uri/scheme (-> sys :client/oort :http/scheme)
