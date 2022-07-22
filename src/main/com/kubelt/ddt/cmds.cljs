@@ -4,7 +4,6 @@
   (:require
    [com.kubelt.ddt.cmds.http :as ddt.http]
    [com.kubelt.ddt.cmds.ipfs :as ddt.ipfs]
-   [com.kubelt.ddt.cmds.json-ld :as ddt.json-ld]
    [com.kubelt.ddt.cmds.jwt :as ddt.jwt]
    [com.kubelt.ddt.cmds.path :as ddt.path]
    [com.kubelt.ddt.cmds.rdf :as ddt.rdf]
@@ -23,8 +22,6 @@
       (.command (clj->js ddt.http/command))
       ;; $DDT ipfs <command>
       (.command (clj->js ddt.ipfs/command))
-      ;; $DDT json-ld <command>
-      (.command (clj->js ddt.json-ld/command))
       ;; $DDT jwt <command>
       (.command (clj->js ddt.jwt/command))
       ;; $DDT path <command>

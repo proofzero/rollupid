@@ -34,11 +34,6 @@
           :source-paths ["src/main"]
           :test-paths ["src/test"]
           :ns-patterns ["ipfs.*-test$"]}
-         ;; [unit.rdf] only rdf unit tests
-         {:id :unit.rdf
-          :source-paths ["src/main"]
-          :test-paths ["src/test"]
-          :ns-patterns ["rdf.*-test$"]}
          ;; [unit.sdk] only sdk unit tests
          {:id :unit.sdk
           :source-paths ["src/main"]
