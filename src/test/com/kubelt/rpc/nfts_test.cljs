@@ -17,7 +17,7 @@
   {:before  (lib.test-utils/create-wallet-fixture t.commons/app-name t.commons/wallet-name t.commons/wallet-password)
    :after (lib.test-utils/delete-wallet-fixture t.commons/app-name t.commons/wallet-name t.commons/wallet-password)})
 
-(deftest rpc-qn-nfts-test
+#_(deftest rpc-qn-nfts-test
   (testing "rpc core fetch nfts ... so far jwt not related with wallet(nfts owner) param"
     (async done
            (go

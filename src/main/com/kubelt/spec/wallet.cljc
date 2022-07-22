@@ -3,9 +3,7 @@
   cross-platform key management and crypto facilities."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.spec.common :as spec.common]
-   [com.kubelt.spec.core :as spec.core]
-   [com.kubelt.spec.jwt :as spec.jwt]))
+   [com.kubelt.spec.common :as spec.common]))
 
 
 (defn- hex-0x-pattern [length]
@@ -50,7 +48,7 @@ wallet."}
    [:wallet/address wallet-address]
    ;;[:wallet/encrypt-key spec.crypto/public-key]
    ;;[:wallet/decrypt-fn decrypt-fn]
-   [:wallet/sign-fn sign-fn]])
+   [:wallet/sign-fn {:optional true} sign-fn]])
 
 (def wallet-schema
   [:and
@@ -62,23 +60,3 @@ wallet."}
                                    :key/data "<key data>"}
               :wallet/sign-fn '(fn [data] "<signature>")}}
    wallet])
-
-;; Vault
-;; -----------------------------------------------------------------------------
-;; A vault is a collection of session tokens (JWTs) returned from
-;; authentication calls.
-
-(def vault
-  [:map
-   [:com.kubelt/type [:enum :kubelt.type/vault]]
-   [:vault/tokens [:map-of spec.core/id spec.jwt/jwt]]])
-
-(def vault-schema
-  [:and
-   {:name "vault"
-    :description "A collection of session tokens"
-    :example {:com.kubelt/type :kubelt.type/vault
-              ;; TODO is this correct?
-              :vault/tokens {"@acme" {:com.kubelt/type :kubelt.type/jwt
-                                      ,,,}}}}
-   vault])

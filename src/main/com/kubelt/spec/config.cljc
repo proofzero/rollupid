@@ -6,6 +6,7 @@
   (:require
    [com.kubelt.spec.http :as spec.http]
    [com.kubelt.spec.storage :as spec.storage]
+   [com.kubelt.spec.vault :as spec.vault]
    [com.kubelt.spec.wallet :as spec.wallet]))
 
 ;; We use the default vector-based format for ease of authoring, but if
@@ -54,7 +55,7 @@
    [:log/level {:optional true} logging-level]
    [:app/name {:optional true} app-name]
    [:config/storage {:optional true} spec.storage/storage]
-   [:credential/jwt {:optional true} credentials]
+   [:credential/jwt {:optional true} spec.vault/vault-tokens*]
    [:crypto/wallet {:optional true} spec.wallet/wallet]
    [:ipfs.read/scheme {:optional true} spec.http/scheme]
    [:ipfs.read/host {:optional true} spec.http/host]
@@ -85,3 +86,25 @@
   [:map {;;:closed false
          :title ::system-config}
    [:log/level {:optional false} logging-level]])
+
+(def stored-system-config
+  (into [:map {:closed true
+               :title ::stored-system-config}]
+        (m/-children (m/schema sdk-config nil))))
+
+;; temporary redef :credential/jwt
+(def restored-system
+  (let [excluded-keys #{:credential/jwt}]
+    (into [:map {:closed true
+                 :title ::restored-system}
+           [:credential/jwt {:optional false} :map] ;; TODO? empty map
+           [:crypto/session {:optional false} spec.vault/vault]
+           [:client/http {:optional false} any?] ;; TODO spec client type
+           [:client/oort {:optional false}
+            [:map
+             [:http/scheme [:enum :https :http]]
+             [:http/host :string]
+             [:http/port int?]]]]
+          (filter (fn [[k]]
+                    (not (contains? excluded-keys k)))
+                  (m/-children (m/schema sdk-config nil))))))

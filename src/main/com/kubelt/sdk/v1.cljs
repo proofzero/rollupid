@@ -9,7 +9,7 @@
    [com.kubelt.lib.config.default :as lib.config.default]
    [com.kubelt.lib.config.sdk :as lib.config.sdk]
    [com.kubelt.lib.config.system :as lib.config.system]
-   [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.error :as lib.error :refer [conform*] :refer-macros [conform*]]
    [com.kubelt.lib.init :as lib.init]
    [com.kubelt.lib.promise :as lib.promise :refer [promise?]]
    [com.kubelt.spec.config :as spec.config])
@@ -184,7 +184,12 @@
         (lib.promise/then
          (fn [{:keys [options vault]}]
            ;; TODO fold options back into system map?
-           (assoc system :crypto/session vault))))))
+           (let [restored-system (-> system
+                                     (assoc :crypto/session vault
+                                            :crypto/wallet {:com.kubelt/type :kubelt.type/wallet
+                                                            :wallet/address (-> vault :vault/tokens keys first)}))]
+             (conform* [spec.config/restored-system restored-system]
+                       restored-system)))))))
 
 (defn restore-js&
   "Return a system map that has had saved state restored."
