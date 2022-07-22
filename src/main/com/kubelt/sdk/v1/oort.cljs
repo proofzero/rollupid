@@ -105,8 +105,10 @@
 
 
 (defn claims-js [sys]
-  (-> (claims& sys (get-in sys [:crypto/wallet :wallet/address]))
-      (lib.promise/then clj->js)))
+  (let [core (-> (get-in sys [:crypto/session :vault/tokens]) keys first)]
+    (-> (assoc sys :crypto/wallet {:wallet/address core})
+        (claims& core)
+        (lib.promise/then clj->js))))
 
 
 

@@ -1,22 +1,23 @@
-import React, { useEffect, useState, SetStateAction } from "react";
+import React, { useEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
-import {
-  authenticate,
-  isAuthenticated,
-  kbGetProfile,
-  kbSetProfile,
-} from "../../provider/kubelt";
-import { connect } from "../../provider/web3";
+import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import useSDKAuth from "../../hooks/sdkAuth";
 
-export default function Settings({ navigation }: { navigation: any }) {
+export default function Settings({
+  children,
+  navigation,
+}: {
+  children: any;
+  navigation: any;
+}) {
   // TODO: Add forms library
   const bioLimit = 300;
   const setBio = (bio: string) => {
@@ -36,8 +37,7 @@ export default function Settings({ navigation }: { navigation: any }) {
 
   const [profile, setProfile] = useState<Profile>(emptyProfile);
 
-  // TODO: Use correct storage key
-  const { getItem, setItem } = useAsyncStorage("@storage_key");
+  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
   const readItemFromStorage = async () => {
     const item = await getItem();
@@ -56,45 +56,59 @@ export default function Settings({ navigation }: { navigation: any }) {
   }, []);
 
   const account = useAccount();
+  const sdkAuth = useSDKAuth();
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (account != null && account != undefined) {
-        let address = account;
+      if (sdkAuth && account) {
+        try {
+          const persistedProfile =
+            (await kbGetProfile(account)) || emptyProfile;
+          const jsonProfile = JSON.stringify(persistedProfile);
 
-        if (!(await isAuthenticated(account))) {
-          const provider = await connect(false);
-          await authenticate(provider, true);
+          setProfile(persistedProfile);
 
-          const signer = provider.getSigner();
-          address = await signer.getAddress();
+          try {
+            await writeItemToStorage(jsonProfile);
+          } catch (e) {
+            console.warn("Failed to write profile to storage");
+          }
+        } catch (e) {
+          console.warn("Failed to retrieve persisted profile");
         }
-
-        kbGetProfile(address)
-          .then((x) => {
-            setProfile(x || emptyProfile);
-            return JSON.stringify(x || emptyProfile);
-          })
-          .then(writeItemToStorage);
+      } else {
+        setProfile(emptyProfile);
       }
     };
 
     asyncFn();
-  }, [account]);
+  }, [account, sdkAuth]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
-    if (account !== null && account !== undefined) {
-      kbSetProfile(account, profile)
-        .then((x) => {
-          setProfile(x);
-          return JSON.stringify(x);
-        })
-        .then(writeItemToStorage);
+    if (!account) {
+      console.warn("No account found");
+    }
+
+    if (sdkAuth) {
+      try {
+        const persistedProfile = await kbSetProfile(account as string, profile);
+        const jsonProfile = JSON.stringify(persistedProfile);
+
+        setProfile(persistedProfile);
+
+        try {
+          await writeItemToStorage(jsonProfile);
+        } catch (e) {
+          console.warn("Failed to write profile to storage");
+        }
+      } catch (e) {
+        console.warn("Failed to persist profile");
+      }
     }
   };
 
   return (
-    <Layout>
+    <Layout navigation={navigation}>
       <View
         style={{
           flex: 1,
@@ -110,7 +124,7 @@ export default function Settings({ navigation }: { navigation: any }) {
         >
           <Text
             style={{
-              paddingBottom: "1em",
+              paddingBottom: 41,
               fontFamily: "Inter_700Bold",
               fontSize: 24,
               fontWeight: "700",
@@ -320,6 +334,7 @@ export default function Settings({ navigation }: { navigation: any }) {
                       lineHeight: 24,
                       shadowColor: "#D1D5DB",
                       shadowRadius: 2,
+                      color: "#6B7280",
                     }}
                     value={profile.website}
                     onChangeText={(website) =>
@@ -393,10 +408,11 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     shadowColor: "#D1D5DB",
     shadowRadius: 2,
+    color: "#6B7280",
   },
   textarea: {
     height: 66,
-    padding: 4,
+    paddingLeft: 5,
     shadowColor: "#D1D5DB",
     shadowRadius: 2,
     borderWidth: 1,
@@ -405,6 +421,8 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontSize: 16,
     lineHeight: 24,
+    color: "#6B7280",
+    resizeMode: "vertical",
   },
   view: {
     borderWidth: 0.5,
@@ -415,7 +433,7 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: "Inter_500Medium",
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "500",
     lineHeight: 20,
     color: "#374151",
     paddingBottom: 7,

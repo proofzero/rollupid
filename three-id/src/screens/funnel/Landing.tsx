@@ -2,26 +2,39 @@ import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import { connect, forceAccounts, isMetamask } from "../../provider/web3";
+import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
+import { connect, isMetamask } from "../../provider/web3";
 import Layout from "../Layout";
 
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
+
   const [hasMetamask, setHasMetamask] = React.useState(false);
 
-  useEffect(() => {
-    setHasMetamask(isMetamask());
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
 
+    const claims = await kbGetClaims();
+    if (claims.includes(claim)) {
+      return navigation.navigate("Settings");
+    }
+  };
+
+  useEffect(() => {
     const asyncFn = async () => {
-      await forceAccounts();
+      setHasMetamask(isMetamask());
+
+      const claim = "3id.enter";
+
+      if (await isAuthenticated(account)) {
+        return claimsRedirect(claim);
+      } else {
+        return navigation.navigate("Auth");
+      }
     };
 
-    asyncFn();
-  }, []);
-
-  useEffect(() => {
     if (account) {
-      navigation.navigate("Auth");
+      asyncFn();
     }
   }, [account]);
 
@@ -59,8 +72,8 @@ export default function Landing({ navigation }: { navigation: any }) {
             borderColor: "#D1D5DB",
             borderWidth: 1,
           }}
-          onPress={() => connect()}
-          disabled={!hasMetamask}
+          onPress={() => connect(true)}
+          disabled={account != null && !hasMetamask}
         >
           <View
             style={{

@@ -6,12 +6,16 @@ const useAccount = () => {
 
   useEffect(() => {
     const sub = getAccountObs().subscribe((changedAccount) => {
-      if (changedAccount !== account) {
+      if (changedAccount !== undefined && changedAccount !== account) {
         setAccount(changedAccount);
       }
     });
 
-    connect(false);
+    const asyncFn = async () => {
+      await connect(false);
+    };
+
+    asyncFn();
 
     return () => {
       sub.unsubscribe();

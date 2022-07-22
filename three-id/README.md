@@ -41,3 +41,26 @@ If you are doing any non-local development and the output of this command report
 ```shell
 $ npx wrangler login
 ```
+
+## Deployment
+
+### Generate .env file for environment
+
+`bb dot:env --deploy-env <env_name>`
+
+### Deploy app
+
+`bb deploy:app --deploy-env <env_name>`
+
+### Publish site
+
+#### Linux
+
+`bb publish:site --deploy-env <env-name>`
+
+#### Windows
+
+In case the `bb publish:site` task doesn't work on your windows configuration,
+deployment can be done through `wrangler`
+
+`wrangler publish -c .\wrangler.toml --env <env_name>`

@@ -1,45 +1,83 @@
-import Constants from "expo-constants";
 import React, { useEffect } from "react";
 
-import { Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import { authenticate, isAuthenticated } from "../../provider/kubelt";
 
-import { connect } from "../../provider/web3";
+import { clearAccount, connect, forceAccounts } from "../../provider/web3";
+import {
+  authenticate,
+  isAuthenticated,
+  kbGetClaims,
+} from "../../provider/kubelt";
 
 import Layout from "../Layout";
+import { Text, View } from "react-native";
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
 
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
+
+    const claims = await kbGetClaims();
+    if (claims.includes(claim)) {
+      return navigation.navigate("Settings");
+    } else {
+      return navigation.navigate("Gate");
+    }
+  };
+
   useEffect(() => {
+    if (account === null) {
+      // User maybe disconnected in the process
+      return navigation.navigate("Landing");
+    }
+
     const asyncFn = async () => {
+      const claim = "3id.enter";
+
       if (await isAuthenticated(account)) {
-        navigation.navigate("Gate");
+        return claimsRedirect(claim);
       } else {
         const provider = await connect();
-        await authenticate(provider);
 
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
+        try {
+          await authenticate(provider);
 
-        if (await isAuthenticated(address)) {
-          navigation.navigate("Gate");
-        } else {
-          navigation.navigate("Landing");
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          if (await isAuthenticated(address)) {
+            return claimsRedirect(claim);
+          } else {
+            throw new Error("Unsuccesful authentication to Kubelt SDK");
+          }
+        } catch (e) {
+          console.warn(`FUNNEL:AUTH: Unsuccesful authentication`);
+
+          // Probably wise to clear up
+          // account so we can re-prompt users
+          // for their credentials
+          await clearAccount(true);
+
+          return navigation.navigate("Landing");
         }
+      }
+    };
+
+    if (account) {
+      asyncFn();
+    }
+  }, [account]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      if (!account) {
+        await forceAccounts();
       }
     };
 
     asyncFn();
   }, []);
-
-  useEffect(() => {
-    if (account === null) {
-      // User maybe disconnected in the process
-      navigation.navigate("Landing");
-    }
-  }, [account]);
 
   return (
     <Layout>
