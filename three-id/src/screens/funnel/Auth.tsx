@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import useAccount from "../../hooks/account";
 
-import { connect } from "../../provider/web3";
+import { clearAccount, connect, forceAccounts } from "../../provider/web3";
 import {
   authenticate,
   isAuthenticated,
@@ -17,10 +17,6 @@ export default function Auth({ navigation }: { navigation: any }) {
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
-
-    if (!account) {
-      throw new Error("Account is null");
-    }
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
@@ -40,17 +36,29 @@ export default function Auth({ navigation }: { navigation: any }) {
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
-        await claimsRedirect(claim);
+        return claimsRedirect(claim);
       } else {
         const provider = await connect();
-        await authenticate(provider);
 
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
+        try {
+          await authenticate(provider);
 
-        if (await isAuthenticated(address)) {
-          await claimsRedirect(claim);
-        } else {
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          if (await isAuthenticated(address)) {
+            return claimsRedirect(claim);
+          } else {
+            throw new Error("Unsuccesful authentication to Kubelt SDK");
+          }
+        } catch (e) {
+          console.warn(`FUNNEL:AUTH: Unsuccesful authentication`);
+
+          // Probably wise to clear up
+          // account so we can re-prompt users
+          // for their credentials
+          await clearAccount(true);
+
           return navigation.navigate("Landing");
         }
       }
@@ -60,6 +68,16 @@ export default function Auth({ navigation }: { navigation: any }) {
       asyncFn();
     }
   }, [account]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      if (!account) {
+        await forceAccounts();
+      }
+    };
+
+    asyncFn();
+  }, []);
 
   return (
     <Layout>

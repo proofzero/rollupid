@@ -4,10 +4,7 @@ import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
-import {
-  kbGetProfile,
-  kbSetProfile,
-} from "../../provider/kubelt";
+import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
@@ -40,7 +37,7 @@ export default function Settings({
 
   const [profile, setProfile] = useState<Profile>(emptyProfile);
 
-  const { getItem, setItem } = useAsyncStorage("kubelt_sdk");
+  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
   const readItemFromStorage = async () => {
     const item = await getItem();
@@ -77,7 +74,6 @@ export default function Settings({
             console.warn("Failed to write profile to storage");
           }
         } catch (e) {
-          console.error(e);
           console.warn("Failed to retrieve persisted profile");
         }
       } else {
@@ -106,7 +102,6 @@ export default function Settings({
           console.warn("Failed to write profile to storage");
         }
       } catch (e) {
-        console.error(e);
         console.warn("Failed to persist profile");
       }
     }

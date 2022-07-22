@@ -102,13 +102,9 @@ export const kbGetClaims = async (): Promise<string[]> => {
 
   try {
     claims = await sdkWeb?.node_v1?.oort.claims(sdk);
-    console.log(claims)
   } catch (e) {
-    console.error(e);
     console.warn("Failed to get claims, falling back to empty array");
   }
-
-  if (!claims) throw new Error("Null claims returned. This should not happen.");
 
   return claims;
 };

@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 
 import { Image, ScrollView, View, Text, Pressable } from "react-native";
-import { console_log } from "../../../packages/sdk-web/lib/taoensso.encore";
 import useAccount from "../hooks/account";
 import useSDKAuth from "../hooks/sdkAuth";
 import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
-import { connect } from "../provider/web3";
+import { connect, forceAccounts } from "../provider/web3";
 
 export default function Layout({
   children,
@@ -21,7 +20,6 @@ export default function Layout({
     claim = claim.trim().toLowerCase();
 
     const claims = await kbGetClaims();
-    console_log(claims)
     if (!claims.includes(claim)) {
       return navigation.navigate("Landing");
     }
@@ -36,16 +34,17 @@ export default function Layout({
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
-        await claimsRedirect(claim);
+        return claimsRedirect(claim);
       } else {
         const provider = await connect(false);
+
         await authenticate(provider);
 
         const signer = provider.getSigner();
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          await claimsRedirect(claim);
+          return claimsRedirect(claim);
         } else {
           return navigation.navigate("Landing");
         }
@@ -56,6 +55,14 @@ export default function Layout({
       asyncFn();
     }
   }, [account, sdkAuth]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      await forceAccounts();
+    };
+
+    asyncFn();
+  }, []);
 
   return (
     <View

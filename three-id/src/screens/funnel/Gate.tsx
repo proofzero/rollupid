@@ -5,17 +5,75 @@ import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
 import Constants from "expo-constants";
-import { clearAccount } from "../../provider/web3";
+import { clearAccount, connect, forceAccounts } from "../../provider/web3";
+import {
+  authenticate,
+  isAuthenticated,
+  kbGetClaims,
+} from "../../provider/kubelt";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
+
+  const claimsRedirect = async (claim: string) => {
+    claim = claim.trim().toLowerCase();
+
+    const claims = await kbGetClaims();
+    if (claims.includes(claim)) {
+      return navigation.navigate("Settings");
+    }
+  };
 
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
       return navigation.navigate("Landing");
     }
+
+    const asyncFn = async () => {
+      const claim = "3id.enter";
+
+      if (await isAuthenticated(account)) {
+        return claimsRedirect(claim);
+      } else {
+        const provider = await connect(false);
+
+        try {
+          await authenticate(provider);
+
+          const signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          if (await isAuthenticated(address)) {
+            return claimsRedirect(claim);
+          } else {
+            throw new Error("Unsuccesful authentication to Kubelt SDK");
+          }
+        } catch (e) {
+          console.warn(`FUNNEL:GATE: Unsuccesful authentication`);
+
+          // Probably wise to clear up
+          // account so we can re-prompt users
+          // for their credentials
+          await clearAccount(true);
+
+          return navigation.navigate("Landing");
+        }
+      }
+    };
+
+    if (account) {
+      asyncFn();
+    }
   }, [account]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      await forceAccounts();
+    };
+
+    asyncFn();
+  });
 
   return (
     <Layout>
@@ -39,7 +97,7 @@ export default function Gate({ navigation }: { navigation: any }) {
             maxWidth: "100%",
             height: 48,
           }}
-          onPress={() => clearAccount()}
+          onPress={() => clearAccount(true)}
         >
           <Text
             style={{

@@ -6,18 +6,16 @@ const useAccount = () => {
 
   useEffect(() => {
     const sub = getAccountObs().subscribe(async (changedAccount) => {
-      if (changedAccount !== account) {
-        const provider = await connect(false);
-        if (provider) {
-          const account = await provider.getSigner().getAddress();
-          setAccount(account);
-        } else {
-          throw new Error("Provider and address mismatch");
-        }
+      if (changedAccount !== undefined && changedAccount !== account) {
+        setAccount(changedAccount);
       }
     });
 
-    connect(false);
+    const asyncFn = async () => {
+      await connect(false);
+    };
+
+    asyncFn();
 
     return () => {
       sub.unsubscribe();
