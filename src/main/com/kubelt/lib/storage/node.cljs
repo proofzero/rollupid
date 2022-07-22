@@ -7,17 +7,14 @@
   (:require
    [clojure.string :as cstr])
   (:require
-   [cognitect.transit :as t]
-   [malli.core :as malli]
-   [malli.error :as me]
-   [taoensso.timbre :as log])
+   [cognitect.transit :as t])
   (:require
-   [com.kubelt.lib.error :as lib.error]
-   [com.kubelt.lib.json :as lib.json]
    [com.kubelt.lib.io.node :as lib.io]
    [com.kubelt.lib.path :as lib.path]
-   [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.spec.storage :as spec.storage]))
+   [com.kubelt.lib.promise :as lib.promise]))
+
+(def ^:private file-name "storage.json")
+(def ^:private folder "localstorage")
 
 (defn- make-store-fn
   "Return a function that stores SDK state (supplied as a map) into a
@@ -37,11 +34,11 @@
             mode 0640
             opts #js {:mode mode}]
         (->
-         (lib.io/ensure-kubelt-dir& path* "localstorage")
-         (lib.promise/then #(.writeFile fs-promises (.join path % "storage.json") data opts))
+         (lib.io/ensure-kubelt-dir& path* folder)
+         (lib.promise/then #(.writeFile fs-promises (.join path % file-name) data opts))
          (lib.promise/then
           (fn []
-            {:path (lib.io/kubelt-dir path* "localstorage")
+            {:path (lib.io/kubelt-dir path* folder)
              :mode mode
              :data m})))))))
 
@@ -55,8 +52,8 @@
       {:post [(lib.promise/promise? %)]}
       (let [opts #js{:encoding "utf8"}]
         (->
-         (lib.io/ensure-kubelt-dir& path* "localstorage")
-         (lib.promise/then #(.readFile fs-promises (.join path % "storage.json") opts))
+         (lib.io/ensure-kubelt-dir& path* folder)
+         (lib.promise/then #(.readFile fs-promises (.join path % file-name) opts))
          (lib.promise/then
           (fn [data-str]
             (let [data (t/read r data-str)]
