@@ -859,6 +859,14 @@
    :depends []
    :task (git/branch)}
 
+  -check:env-current
+  {:doc "Ensure production deployment target when releasing"
+   :depends [-deploy:env]
+   :task (when (not= env-current -deploy:env)
+           (let [message "production releases must target 'current' environment"
+                 data {:deploy/env -deploy:env}]
+             (throw (ex-info message data))))}
+
   -check:release-version
   {:doc "Validate that release versions have expected shape"
    :depends [-app:version]
@@ -881,7 +889,7 @@
   ;; -m "message"
   -git:tag:create
   {:doc "Create a signed tag using release signing key"
-   :depends [-gpg:signing-key]
+   :depends [-gpg:signing-key -app:version]
    :task (let [tag-name (str "v" -app:version)
                message tag-name
                command ["git" "tag" tag-name "-u" -gpg:signing-key "-m" message]]
@@ -889,21 +897,25 @@
            ;; Sets the tag-name as the value of -git:tag:create.
            tag-name)}
 
+  ;; ----- Error --------------------------------------------------------------------
+  ;; Type:     java.lang.Exception
+  ;; Message:  On filter body 'zone-id|urlescape' and filter 'urlescape' this error occurred:
+
   -git:tag:push
   {:doc "Push a git tag to the remote"
    :depends [-git:remote -git:tag:create]
-   :task (let [command ["git" "push" -git:remote -git:tag:create]]
-           (shell (cstr/join " " command)))}
+   :task (git/push -git:remote -git:tag:create)}
 
   release:app
   {:doc "Trigger a deployment to production"
    :depends [check:repo-clean
              -check:release-branch
              -check:release-version
+             -check:env-current
              -git:tag:push]
    :task (let [detail (str "[env:'" -deploy:env "', tag:" -git:tag:create "]")
-               message (str "[🪅] Release: RUNNING" detail)]
-           (println message))}
+               message "[🪅] Release: RUNNING"]
+           (println (cstr/join " " [message detail])))}
 
   ;; test
 

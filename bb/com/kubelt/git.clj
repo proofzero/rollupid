@@ -31,6 +31,15 @@
    (let [{:keys [exit out err]} (sh "git" "rev-parse" "--verify" commit)]
      (cstr/trim out))))
 
+;; push
+;; -----------------------------------------------------------------------------
+
+(defn push
+  "Pushes a commit-ish to the specified target."
+  [target commit-ish]
+  (let [{:keys [exit out err]} (sh "git" "push" target commit-ish)]
+    (cstr/trim out)))
+
 ;; status
 ;; -----------------------------------------------------------------------------
 
