@@ -138,6 +138,7 @@ fn main() {
         *pixel = image::Rgba(rgba);
     }
 
+    // TODO: output as base64 with metadata (values used to generate the image)
     imgbuf.save(output_file).unwrap();
 }
 
