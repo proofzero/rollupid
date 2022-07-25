@@ -117,7 +117,7 @@ export const kbGetProfile = async (core: string) => {
       // TODO: async / await? 🤔
       sdkWeb?.node_v1?.oort
         .callRpcClient(sdk, api, {
-          method: ["kb", "get", "profile"],
+          method: ["kb", "get-profile"],
           params: [],
         })
         .then((x: any) => {
@@ -137,7 +137,7 @@ export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
     sdkWeb?.node_v1?.oort.rpcApi(sdk, core).then((api: any) => {
       sdkWeb?.node_v1?.oort
         .callRpcClient(sdk, api, {
-          method: ["kb", "set", "profile"],
+          method: ["kb", "set-profile"],
           params: { profile: updatedProfile },
         })
         .then((x: any) => {

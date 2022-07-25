@@ -41,9 +41,7 @@
                      parsed (rpc.schema.parse/parse data {})]
                  (check-keys parsed)
                  (let [client (rpc.schema/schema (rpc/init) data)]
-                   (is (= #{[:kb :auth] [:kb :ping] [:kb :pong]
-                            [:kb :auth :verify] [:kb :core :create]
-                            [:kb :core :add :signer]}
+                   (is (= #{[:alchemy :get-nf-ts] [:kb :add-core-signer] [:kb :create-core] [:kb :get-config] [:kb :get-core-claims] [:kb :get-nonce] [:kb :get-profile] [:kb :ping] [:kb :pong] [:kb :set-config] [:kb :set-profile] [:kb :submit-metrics] [:kb :verify-nonce]}
                           (rpc/available client))
                        "failing methods")
                    (is (=
