@@ -7,6 +7,7 @@ import {
   authenticate,
   isAuthenticated,
   kbGetClaims,
+  purge,
 } from "../../provider/kubelt";
 
 import Layout from "../Layout";
@@ -40,26 +41,15 @@ export default function Auth({ navigation }: { navigation: any }) {
       } else {
         const provider = await connect();
 
-        try {
-          await authenticate(provider);
+        await authenticate(provider);
 
-          const signer = provider.getSigner();
-          const address = await signer.getAddress();
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
 
-          if (await isAuthenticated(address)) {
-            return claimsRedirect(claim);
-          } else {
-            throw new Error("Unsuccesful authentication to Kubelt SDK");
-          }
-        } catch (e) {
-          console.warn(`FUNNEL:AUTH: Unsuccesful authentication`);
-
-          // Probably wise to clear up
-          // account so we can re-prompt users
-          // for their credentials
-          await clearAccount(true);
-
-          return navigation.navigate("Landing");
+        if (await isAuthenticated(address)) {
+          return claimsRedirect(claim);
+        } else {
+          throw new Error("Unsuccesful authentication to Kubelt SDK");
         }
       }
     };
@@ -71,12 +61,12 @@ export default function Auth({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (!account) {
-        await forceAccounts();
-      }
+      await forceAccounts();
     };
 
-    asyncFn();
+    if (account === undefined) {
+      asyncFn();
+    }
   }, []);
 
   return (

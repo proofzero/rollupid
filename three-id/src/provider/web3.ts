@@ -15,27 +15,17 @@ export const isMetamask = () => eth?.isMetaMask === true;
  *
  * @param purge If true, local and session storages will be cleared
  */
-export const clearAccount = async (purge: boolean = false) => {
+export const clearAccount = () => {
   // We force app wide refresh
   // this has to be handled in views
   // or layouts
   accountSubj.next(null);
-
-  // This can remove the SDK from ls
-  // so authentication is forced
-  // and signing is requested again
-  if (purge) {
-    localStorage.clear();
-
-    // Not needed yet
-    // sessionStorage.clear();
-  }
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
   if (accounts.length > 0) {
     try {
-      const provider = await connect(false);
+      const provider = await connect();
       const account = await provider.getSigner().getAddress();
 
       // We want to make sure that the used account
@@ -56,7 +46,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
   } else {
     console.warn(`WEB3: No accounts detected`);
 
-    await clearAccount();
+    clearAccount();
   }
 };
 
@@ -83,13 +73,13 @@ export const forceAccounts = async () => {
  * @returns available web3 provider
  */
 export const connect = async (
-  resync: boolean = true
+  resync: boolean = false
 ): Promise<ethers.providers.Web3Provider> => {
   if (!web3Provider) {
     web3Provider = new ethers.providers.Web3Provider(eth);
   }
 
-  if (resync && !accountSubj.getValue()) {
+  if (resync) {
     // This just fakes account disconnection
     // if users would come back they would find their
     // account still connected

@@ -3,13 +3,15 @@ import React, { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
 import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
-import { connect, isMetamask } from "../../provider/web3";
+import { connect, forceAccounts } from "../../provider/web3";
 import Layout from "../Layout";
+
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
 
-  const [hasMetamask, setHasMetamask] = React.useState(false);
+  const otherWalletRequested = useAsyncStorage("kubelt:other_wallet_request");
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
@@ -17,26 +19,36 @@ export default function Landing({ navigation }: { navigation: any }) {
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
       return navigation.navigate("Settings");
+    } else {
+      return navigation.navigate("Gate");
     }
   };
 
   useEffect(() => {
     const asyncFn = async () => {
-      setHasMetamask(isMetamask());
-
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
-      } else {
-        return navigation.navigate("Auth");
       }
+
+      return navigation.navigate("Auth");
     };
 
     if (account) {
       asyncFn();
     }
   }, [account]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      if (!(await otherWalletRequested.getItem())) {
+        await forceAccounts();
+      }
+    };
+
+    asyncFn();
+  }, []);
 
   return (
     <Layout>
@@ -73,7 +85,6 @@ export default function Landing({ navigation }: { navigation: any }) {
             borderWidth: 1,
           }}
           onPress={() => connect(true)}
-          disabled={account != null && !hasMetamask}
         >
           <View
             style={{
