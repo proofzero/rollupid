@@ -96,7 +96,7 @@
      (-> (rpc-api sys core)
          (lib.promise/then
           (fn [api]
-            (-> (lib.rpc/rpc-call& sys api {:method [:kb :core :get :claims] :args []})
+            (-> (lib.rpc/rpc-call& sys api {:method [:kb :get-core-claims] :args []})
                 (lib.promise/then
                  (fn [x]
                    (if-let [error (-> x :http/body :error)]

@@ -49,7 +49,7 @@
     ;; registration.
     ;;
     ;; Returns a promise.
-    (send (json-rpc-provider sys address) "kb_auth" [address])))
+    (send (json-rpc-provider sys address) "kb_getNonce" [address])))
 
 (defn verify!
   "Send a signed nonce to verify ownership of a keypair as part of the
@@ -57,7 +57,7 @@
   [sys core nonce signature]
   {:pre [(every? string? [core nonce])]}
   ;; Returns a promise.
-  (send (json-rpc-provider sys core) "kb_auth_verify" [nonce signature]))
+  (send (json-rpc-provider sys core) "kb_verifyNonce" [nonce signature]))
 
 (defn rpc-api [sys core]
   {:pre [(string? core)]}

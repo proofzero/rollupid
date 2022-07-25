@@ -32,10 +32,10 @@
       ]
     },
     {
-      "name": "kb_auth",
+      "name": "kb_getNonce",
       "params": [
         {
-          "name": "address",
+          "name": "account",
           "summary": "Account address",
           "required": true,
           "schema": {
@@ -59,7 +59,7 @@
       }
     },
     {
-      "name": "kb_auth_verify",
+      "name": "kb_verifyNonce",
       "params": [
         {
           "name": "nonce",
@@ -86,7 +86,7 @@
       }
     },
     {
-      "name": "kb_core_create",
+      "name": "kb_createCore",
       "params": [
         {
           "name": "name",
@@ -105,7 +105,7 @@
       }
     },
     {
-      "name": "kb_core_add_signer",
+      "name": "kb_addCoreSigner",
       "params": [
         {
           "name": "address",
@@ -116,8 +116,8 @@
           }
         },
         {
-          "name": "permissions",
-          "summary": "Signer Granted Permissions",
+          "name": "claims",
+          "summary": "Signer Granted Claims",
           "required": true,
           "schema": {
             "type": "array"
@@ -132,53 +132,20 @@
       }
     },
     {
-      "name": "kb_metrics_submit",
-      "params": [
-        {
-          "name": "metric",
-          "summary": "Metric name",
-          "required": true,
-          "schema": {
-            "type": "string"
-          }
-        },
-        {
-          "name": "value",
-          "summary": "Metric value",
-          "required": false,
-          "schema": {
-            "type": "number"
-          }
-        },
-        {
-          "name": "tags",
-          "summary": "Metric tags",
-          "required": false,
-          "schema": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        {
-          "name": "type",
-          "summary": "Metric type",
-          "required": false,
-          "schema": {
-            "type": "string"
-          }
-        }
-      ],
+      "name": "kb_getCoreClaims",
+      "params": [],
       "result": {
-        "name": "metrics_result",
+        "name": "Claims",
         "schema": {
-          "type": "null"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
     {
-      "name": "kb_get_config",
+      "name": "kb_getConfig",
       "params": [],
       "result": {
         "name": "config",
@@ -359,7 +326,7 @@
       }
     },
     {
-      "name": "kb_set_config",
+      "name": "kb_setConfig",
       "params": [
         {
           "name": "config",
@@ -542,7 +509,7 @@
       ],
       "result": {
         "name": "config",
-        "description": "This core's configuration object.",
+        "description": "Configuration object",
         "schema": {
           "properties": {
             "general": {
@@ -730,7 +697,7 @@
       ]
     },
     {
-      "name": "kb_set_profile",
+      "name": "kb_setProfile",
       "params": [
         {
           "name": "profile",
@@ -742,23 +709,23 @@
               },
               "profilePicture": {
                 "type": "object",
-                "required": [
-                  "collectionTokenId",
-                  "name",
-                  "imageUrl"
-                ],
+                "required": true,
                 "properties": {
                   "collectionTokenId": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   },
                   "collectionId": {
-                    "type": "string"
+                    "type": "string",
+                    "required": false
                   },
                   "name": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   },
                   "imageUrl": {
-                    "type": "string"
+                    "type": "string",
+                    "required": true
                   }
                 }
               },
@@ -807,23 +774,23 @@
             },
             "profilePicture": {
               "type": "object",
-              "required": [
-                "collectionTokenId",
-                "name",
-                "imageUrl"
-              ],
+              "required": true,
               "properties": {
                 "collectionTokenId": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 },
                 "collectionId": {
-                  "type": "string"
+                  "type": "string",
+                  "required": false
                 },
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 },
                 "imageUrl": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 }
               }
             },
@@ -863,7 +830,7 @@
       }
     },
     {
-      "name": "kb_get_profile",
+      "name": "kb_getProfile",
       "params": [],
       "result": {
         "name": "profile",
@@ -875,23 +842,23 @@
             },
             "profilePicture": {
               "type": "object",
-              "required": [
-                "collectionTokenId",
-                "name",
-                "imageUrl"
-              ],
+              "required": true,
               "properties": {
                 "collectionTokenId": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 },
                 "collectionId": {
-                  "type": "string"
+                  "type": "string",
+                  "required": false
                 },
                 "name": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 },
                 "imageUrl": {
-                  "type": "string"
+                  "type": "string",
+                  "required": true
                 }
               }
             },
@@ -923,6 +890,283 @@
                 },
                 "github": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "kb_submitMetrics",
+      "params": [
+        {
+          "name": "metric",
+          "summary": "Metric name",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "value",
+          "summary": "Metric value",
+          "required": false,
+          "schema": {
+            "type": "number"
+          }
+        },
+        {
+          "name": "tags",
+          "summary": "Metric tags",
+          "required": false,
+          "schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "name": "type",
+          "summary": "Metric type",
+          "required": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "name": "metrics_result",
+        "schema": {
+          "type": "null"
+        }
+      }
+    },
+    {
+      "name": "alchemy_getNFTs",
+      "params": [
+        {
+          "name": "params",
+          "schema": {
+            "type": "object",
+            "required": [
+              "owner"
+            ],
+            "properties": {
+              "owner": {
+                "name": "owner",
+                "summary": "address for NFT owner (can be in ENS format!)",
+                "type": "string"
+              },
+              "pageKey": {
+                "name": "pageKey",
+                "summary": "UUID for pagination. If more results are available, a UUID pageKey will be returned in the response. Pass that UUID into pageKey to fetch the next 100 NFTs. NOTE: pageKeys expire after 10 minutes. ",
+                "type": "string"
+              },
+              "contractAddresses": {
+                "name": "contractAddresseses",
+                "type": "array",
+                "summary": "array of contract addresses to filter the responses with. Max limit 20 contracts.",
+                "items": {
+                  "name": "contractAddress",
+                  "type": "string"
+                }
+              },
+              "filters": {
+                "name": "filters",
+                "type": "array",
+                "summary": "array of filters (as strings) that will be applied to the query. NFTs that are match one or more of these filters will be excluded from the response.NOTE: This is a beta feature.",
+                "items": {
+                  "name": "filter",
+                  "sumammry": "Valid filter strings include:  \"SPAM\" : NFTs that have been classified as spam. Spam classification has a wide range of criteria that includes but is not limited to emitting fake events and copying other well-known NFTs.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "result": {
+        "name": "alchemy_getNFTs",
+        "schema": {
+          "type": "object",
+          "required": [
+            "ownedNfts",
+            "totalCount",
+            "blockHash"
+          ],
+          "properties": {
+            "pageKey": {
+              "type": "string",
+              "summary": "UUID for pagination - returned if there are more NFTs to fetch. Max NFTs per page = 100."
+            },
+            "totalCout": {
+              "type": "integer",
+              "summary": "total number of NFTs owned by the given address"
+            },
+            "blockHash": {
+              "type": "string",
+              "summary": "the canonical head block hash of when your request was received"
+            },
+            "error": {
+              "type": "string",
+              "summary": " A string describing a particular reason that we were unable to fetch complete metadata for the NFT. "
+            },
+            "ownedNfts": {
+              "type": "array",
+              "summary": "list of objects that represent NFTs owned by the address. Max results per response = 100. ",
+              "items": {
+                "type": "object",
+                "required": [
+                  "contract",
+                  "id",
+                  "balance",
+                  "title",
+                  "description",
+                  "tokenUri",
+                  "media",
+                  "metadata"
+                ],
+                "properties": {
+                  "contract": {
+                    "type": "object",
+                    "required": [
+                      "address"
+                    ],
+                    "properties": {
+                      "address": {
+                        "name": "address",
+                        "type": "string",
+                        "summary": "address of NFT contract"
+                      }
+                    }
+                  },
+                  "id": {
+                    "type": "object",
+                    "required": [
+                      "tokenId",
+                      "tokenMetadata"
+                    ],
+                    "properties": {
+                      "tokenId": {
+                        "name": "tokenId",
+                        "type": "string",
+                        "summary": " Id for NFT (hex) "
+                      },
+                      "tokenMetadata": {
+                        "name": "tokenMetadata",
+                        "type": "object",
+                        "required": [
+                          "tokenType"
+                        ],
+                        "properties": {
+                          "tokenType": {
+                            "name": "tokenType",
+                            "type": "string",
+                            "summary": "ERC721 or ERC1155"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "balance": {
+                    "name": "balance",
+                    "type": "string",
+                    "summary": "token balance"
+                  },
+                  "title": {
+                    "name": "title",
+                    "type": "string",
+                    "summary": "name of the NFT asset"
+                  },
+                  "description": {
+                    "name": "description",
+                    "type": "string",
+                    "summary": "brief human-readable description"
+                  },
+                  "tokenUri": {
+                    "type": "object",
+                    "required": [
+                      "raw",
+                      "gateway"
+                    ],
+                    "properties": {
+                      "raw": {
+                        "name": "raw",
+                        "type": "string",
+                        "summary": "uri representing the location of the NFTs original metadata blob. This is a backup for you to parse when the metadata field is not automatically populated"
+                      },
+                      "gateway": {
+                        "name": "gateway",
+                        "type": "string",
+                        "summary": "public gateway uri for the raw uri above."
+                      }
+                    }
+                  },
+                  "media": {
+                    "type": "object",
+                    "required": [
+                      "raw",
+                      "gateway"
+                    ],
+                    "properties": {
+                      "raw": {
+                        "name": "raw",
+                        "type": "string",
+                        "summary": "uri representing the location of the NFT media asset. This is a backup for you to parse when the metadata field is not automatically populated"
+                      },
+                      "gateway": {
+                        "name": "gateway",
+                        "type": "string",
+                        "summary": "public gateway uri for the raw asset above"
+                      }
+                    }
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "summary": "relevant metadata for NFT contract. This is useful for viewing image url, traits, etc. without having to follow the metadata url in tokenUri to parse manually",
+                    "required": [
+                      "image",
+                      "external_url",
+                      "background_color",
+                      "name",
+                      "description",
+                      "attributes"
+                    ],
+                    "properties": {
+                      "image": {
+                        "name": "image",
+                        "type": "string",
+                        "summary": " URL to the NFT asset image. Can be standard URLs pointing to images on conventional servers, IPFS, or Arweave. Most types of images (SVGs, PNGs, JPEGs, etc.) are supported by NFT marketplaces."
+                      },
+                      "external_url": {
+                        "name": "external_url",
+                        "type": "string",
+                        "summary": "The image URL that appears alongside the asset image on NFT platforms."
+                      },
+                      "background_color": {
+                        "name": "background_color",
+                        "type": "string",
+                        "summary": "Background color of the NFT item. Usually must be defined as a six-character hexadecimal"
+                      },
+                      "name": {
+                        "name": "name",
+                        "type": "string",
+                        "summary": "Name of the NFT asset"
+                      },
+                      "description": {
+                        "name": "description",
+                        "type": "string",
+                        "summary": "human-readable description of the NFT asset. (Markdown is supported/rendered on OpenSea and other NFT platforms)"
+                      },
+                      "attributes": {
+                        "name": "attributes",
+                        "type": "string",
+                        "summary": "traits/attributes/characteristics for each NFT asset"
+                      }
+                    }
+                  }
                 }
               }
             }
