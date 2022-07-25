@@ -433,6 +433,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "nftar"
+version = "0.1.0"
+dependencies = [
+ "atty",
+ "clap",
+ "colorgrad",
+ "image",
+ "noise",
+ "rand 0.8.5",
+ "random_color",
+ "svg",
+ "terminal_size",
+]
+
+[[package]]
 name = "noise"
 version = "0.7.0"
 source = "git+https://github.com/Razaekel/noise-rs/?branch=develop#ef8a859116c7f743bf00ee672a1b20ae653ec15c"
@@ -838,21 +853,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
 dependencies = [
  "num_cpus",
-]
-
-[[package]]
-name = "threeid-pfp"
-version = "0.1.0"
-dependencies = [
- "atty",
- "clap",
- "colorgrad",
- "image",
- "noise",
- "rand 0.8.5",
- "random_color",
- "svg",
- "terminal_size",
 ]
 
 [[package]]
