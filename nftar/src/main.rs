@@ -42,7 +42,7 @@ REPOSITORY: <https://github.com/kubelt/kubelt/nftar>
 #[clap(name = "nftar", author, version, about, after_help = EXTRA_HELP, after_long_help = EXTRA_LONG_HELP)]
 #[clap(arg_required_else_help(true))]
 struct Opt {
-    /// Set blockchain account address
+    /// Set blockchain account address (required)
     #[clap(short = 'a', long, value_name = "ACCOUNT", help_heading = Some("ENTROPY"))]
     account: Option<String>,
 
