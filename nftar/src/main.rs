@@ -33,7 +33,7 @@ const EXTRA_LONG_HELP: &str = "EXAMPLES:
 
     gradient -a xd3C1D6a6B70d95e5140E01Ad7614bE8175C05787
 
-    gradient -a xd3C1D6a6B70d95e5140E01Ad7614bE8175C05787n -n open-simplex
+    gradient -a xd3C1D68a6B70d95e5140E01Ad7614bE8175C05787n -n open-simplex
 
 REPOSITORY: <https://github.com/kubelt/kubelt/nftar>
 ";
@@ -99,31 +99,47 @@ fn main() {
     let account_address = opt.account.expect("--account is required");
 
 
-    let scale_denominator = opt.scale.unwrap_or(30.0) * 100000.0;
+    let scale_denominator = opt.scale.unwrap_or(10.0) * 100000.0;
 
     let acct_color = RandomColor::new().seed(account_address).to_rgb_array();
-    let output_width = opt.width.unwrap_or(3000);
-    let output_height = opt.height.unwrap_or(1000);
+    // TODO: do we generate two images (one for pfp and one for cover)
+    let output_width = opt.width.unwrap_or(1000);
+    let output_height = opt.height.unwrap_or(500);
     let output_file = opt.output.unwrap_or("examples/pfp.png".to_string());
     let noise_name = opt.noise.unwrap_or("perlin".to_string());
 
     // TODO: these trait colors ranges should be in categories
     // we can use an address' nft collection to weigh in on probabilities
     let mut rng = thread_rng();
-    let rngone = rng.gen_range(0..255);
-    let rngtwo = rng.gen_range(0..255);
-    let rngthree = rng.gen_range(0..255);
+    let trait_color_1 = Color::from_rgba8(
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+    );
+    let trait_color_2 = Color::from_rgba8(
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+    );
+    let trait_color_3 = Color::from_rgba8(
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+        rng.gen_range(0..255),
+    );
 
 
     let grad = colorgrad::CustomGradient::new()
-    // TODO: traits
+    // TODO: traits (do we also want to play with alpha?)
     .colors(&[ // we can play around with amount of colors and use them as traits
-        Color::from_rgba8(acct_color[0], acct_color[1], acct_color[2], 255),
-        Color::from_rgba8(0, 0, 0, 255), // version account
-        Color::from_rgba8(rngone, rngtwo, rngthree, 255), // trait colour
+        Color::from_rgba8(acct_color[0], acct_color[1], acct_color[2], 255), // account color
+        Color::from_rgba8(255, 105, 180, 255), // version color
         Color::new(0.274, 0.5, 0.7, 1.0), // brand color
-        // Color::from_hsva(50.0, 1.0, 1.0, 1.0),
-        // Color::from_hsva(348.0, 0.9, 0.8, 1.0),
+        trait_color_1, // trait colour
+        trait_color_2, // trait colour
+        trait_color_3, // trait colour
     ])
     .build().unwrap();
 
