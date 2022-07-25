@@ -1,6 +1,6 @@
 use rand::{thread_rng, Rng};
 
-use clap::{ArgEnum, Parser};
+use clap::{/*ArgEnum,*/ Parser};
 
 use colorgrad::{Color};
 
@@ -44,7 +44,7 @@ REPOSITORY: <https://github.com/kubelt/kubelt/nftar>
 struct Opt {
     /// Set blockchain account address
     #[clap(short = 'a', long, value_name = "ACCOUNT", help_heading = Some("ENTROPY"))]
-    account: String,
+    account: Option<String>,
 
     /// Lists all available preset noise names
     #[clap(short = 'p', long, help_heading = Some("GRADIENT"))]
@@ -82,11 +82,26 @@ struct Opt {
 fn main() {
     let opt = Opt::parse();
 
+    if opt.list_noise {
+        for name in &NOISE_NAMES {
+            println!("{}", name);
+        }
+        return;
+    }
+    if opt.list_traits {
+        for name in &TRAIT_CATEGORIES {
+            println!("{}", name);
+        }
+        return;
+    }
+
     // TODO: verify blockchain account address
+    let account_address = opt.account.expect("--account is required");
+
 
     let scale_denominator = opt.scale.unwrap_or(30.0) * 100000.0;
 
-    let acct_color = RandomColor::new().seed(opt.account).to_rgb_array();
+    let acct_color = RandomColor::new().seed(account_address).to_rgb_array();
     let output_width = opt.width.unwrap_or(3000);
     let output_height = opt.height.unwrap_or(1000);
     let output_file = opt.output.unwrap_or("examples/pfp.png".to_string());
@@ -132,7 +147,7 @@ fn main() {
             NoiseSel::Perlin(ns) => ns.get([x as f64 * scale as f64, y as f64 * scale as f64]),
             NoiseSel::OpenSimplex(ns) => ns.get([x as f64 * scale as f64, y as f64 * scale as f64]),
             NoiseSel::SuperSimplex(ns) => ns.get([x as f64 * scale as f64, y as f64 * scale as f64]),
-            _ => panic!("Unknown noise selection"),
+            // _ => panic!("Unknown noise selection"),
         };
         let rgba = grad.at(remap(t, -0.5, 0.5, 0.0, 1.0)).to_rgba8();
         *pixel = image::Rgba(rgba);
