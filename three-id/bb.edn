@@ -356,6 +356,11 @@
    :depends [-cf:api-token]
    :task (cf/init -cf:api-token)}
 
+  -cf:kv:key:list
+  {:doc "List the keys in a Cloudflare KV store"
+   :depends [-options:cloudflare]
+   :task (wrangler.kv/key-list -options:cloudflare)}
+
   ;;
   ;; options
   ;;
@@ -816,17 +821,22 @@
                          (str "[❌] Purge zone cache: FAILED " details))]
            (println message))}
 
+  ;; TODO Should we also purge URLs using internal host name?
   cf:zone:purge-urls
   {:doc "Purge asset URLs from Cloudflare cache for specific environment"
-   :depends [-deploy:env -cf:client -cf:zone-id -deploy:files]
-   :task (doseq [;; The API allows purging only 30 URLs at once.
-                 files (partition 30 -deploy:files)]
-           (let [response (cf.zone/purge-url -cf:client -cf:zone-id files)
-                 details (str "[env:" -deploy:env "]")
-                 message (if (= 200 (get response :status))
-                           (str "[🪹] Purge zone cache: SUCCESS " details)
-                           (str "[❌] Purge zone cache: FAILED " details))]
-             (println message)))}
+   :depends [-deploy:env -cf:client -cf:zone-id -deploy:host -cf:kv:key:list -verbose:level]
+   :task (let [external-urls (map (fn [path] (str "https://" -deploy:host path)) -cf:kv:key:list)]
+           (doseq [;; The API allows purging only 30 URLs at once.
+                   files (partition 30 external-urls)]
+             (when (> -verbose:level 0)
+               (doseq [file files]
+                 (println (str "[🏹️] " file))))
+             (let [response (cf.zone/purge-url -cf:client -cf:zone-id files)
+                   details (str "[env:" -deploy:env "]")
+                   message (if (= 200 (get response :status))
+                             (str "[🪹] Purge zone cache: SUCCESS " details)
+                             (str "[❌] Purge zone cache: FAILED " details))]
+               (println message))))}
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
@@ -896,10 +906,6 @@
            (shell (cstr/join " " command))
            ;; Sets the tag-name as the value of -git:tag:create.
            tag-name)}
-
-  ;; ----- Error --------------------------------------------------------------------
-  ;; Type:     java.lang.Exception
-  ;; Message:  On filter body 'zone-id|urlescape' and filter 'urlescape' this error occurred:
 
   -git:tag:push
   {:doc "Push a git tag to the remote"
@@ -1052,9 +1058,9 @@
   {:doc "Print out git working tree dirty status"
    :task (prn (git/dirty?))}
 
-  -kv:key:list
+  -prn:kv-key-list
   {:doc "List the keys in a Cloudflare KV store"
-   :depends [-options:cloudflare]
+   :depends [-cf:kv:key:list]
    :task (pprint/pprint (wrangler.kv/key-list -options:cloudflare))}
 
   -kv:bulk:delete
