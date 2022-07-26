@@ -147,7 +147,7 @@ fn main() {
     let output_width = opt.width.unwrap_or(1000);
     let output_height = opt.height.unwrap_or(500);
     let output_file = opt.output.unwrap_or("examples/pfp.png".to_string());
-    let noise_name = opt.noise.unwrap_or("perlin".to_string());
+    let noise_name = opt.noise.unwrap_or("super-simplex".to_string());
 
     // TODO: probability algo
     let mut rng = thread_rng();
