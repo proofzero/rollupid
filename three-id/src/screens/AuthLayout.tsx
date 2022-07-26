@@ -116,6 +116,7 @@ export default function Layout({
               }}
             >
               <Text
+                testID="wallet-address"
                 style={{
                   paddingHorizontal: 37.5,
                   fontFamily: "Manrope_700Bold",
