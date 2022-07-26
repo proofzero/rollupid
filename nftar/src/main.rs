@@ -149,7 +149,7 @@ fn main() {
 
     // NOTE: modify scale in the same ratio as modifying resolution.
     // E.g. if you double the scale you need to double the width and height to get the same pattern
-    let scale_denominator = opt.scale.unwrap_or(2.0) * 100000.0;
+    let scale_denominator = opt.scale.unwrap_or(1.5) * 100000.0;
     let sharp_segment = opt.segment.unwrap_or(2);
     let sharp_smoothness = opt.smoothness.unwrap_or(2.0);
 
