@@ -848,7 +848,9 @@
                    message (if (= 200 (get response :status))
                              (str "[🪹] Purge zone cache: SUCCESS " details)
                              (str "[❌] Purge zone cache: FAILED " details))]
-               (println message))))}
+               (println message)))
+           ;; Return the set of all URLs that were purged.
+           urls)}
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
@@ -937,23 +939,40 @@
 
   ;; test
 
-  ;; TODO on production deploy, smoke test internal *and* external URL.
+  -url:paths
+  {:doc "A sequence of URL paths for all compiled output files"
+   :depends [asset:manifest]
+   :task (vals asset:manifest)}
+
+  -urls:external
+  {:depends [-deploy:host -url:paths]
+   :task (map (partial str "https://" -deploy:host) -url:paths)}
+
+  -urls:internal
+  {:depends [-internal:host -url:paths]
+   :task (map (partial str "https://" -internal:host) -url:paths)}
 
   ;; The asset manifest is mapping from KV store key to remote
   ;; path. This is a sequence of the paths of every file stored in the
   ;; KV store.
+  ;;
+  ;; NB: when testing *both* internal and external URLs, it seems as
+  ;; though DDoS protection kicks in as you switch from one hostname to
+  ;; the other.
   test:smoke:http
   {:doc "Perform HTTP request for every deployed asset"
-   :depends [asset:manifest -url:deploy -test:strict?]
-   :task (let [remote-paths (vals asset:manifest)
-               ;; Turn the paths into full URLs.
-               urls (map (partial str -url:deploy) remote-paths)
+   :depends [-urls:internal -urls:external -test:strict? -verbose:level]
+   :task (let [;; Collect all the URLs to be tested.
+               urls (concat -urls:external #_-urls:internal)
                ;; Construct a map from url to HTTP request promise. The
                ;; request isn't actually performed until the promise is
                ;; deref'ed.
                request-fn (fn [url]
-                            (let [result (deref (http/head url))
+                            (Thread/sleep 1000)
+                            (let [result (deref (http/get url))
                                   status (:status result)]
+                              (when (> -verbose:level 0)
+                                (println (format  "-> [%s] %s" status url)))
                               [url status]))
                requests (into {} (map request-fn urls))]
            ;; If any of the requests had a non-OK status result, throw
@@ -1004,10 +1023,25 @@
    :depends [-deploy:env]
    :task (println -deploy:env)}
 
-  -prn:deploy-url
+  -prn:url-deploy
   {:doc "Print the configured deployment URL"
    :depends [-url:deploy]
    :task (println -url:deploy)}
+
+  -prn:url-paths
+  {:doc "Print the set of URL paths for output files"
+   :depends [-url:paths]
+   :task (pprint/pprint -url:paths)}
+
+  -prn:urls-external
+  {:doc "Print the set of public-facing application URLs"
+   :depends [-urls:external]
+   :task (pprint/pprint -urls:external)}
+
+  -prn:urls-internal
+  {:doc "Print the set of internal-facing application URLs"
+   :depends [-urls:internal]
+   :task (pprint/pprint -urls:internal)}
 
   -prn:deploy-host
   {:doc "Print the configured deployment host"
