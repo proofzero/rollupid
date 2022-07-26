@@ -30,3 +30,4 @@ noise =  {git = "https://github.com/Razaekel/noise-rs/", branch = "develop" }
 image = "0.24.3"
 random_color = "0.6.1"
 rand = "0.8.5"
+lazy_static = "1.4.0"
