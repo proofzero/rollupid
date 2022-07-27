@@ -42,6 +42,10 @@ The [www/](www/) directory contains the Kubelt.com static website documentation 
 
 The [starbase/](starbase/) directory contains a web application for interacting with Kubelt as a customer.
 
+### 3iD
+
+The [3iD/](3iD/) directory contains an Expo React Native Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging.
+
 ### Browser Extension
 
 The [ext/](ext/) directory contains an experimental browser extension.

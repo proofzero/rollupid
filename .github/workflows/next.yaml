@@ -30,10 +30,10 @@ jobs:
       # - run: npm install cypress --save-dev
       - run: npm run test:all:release
 
-  # three-id
+  # 3iD
   # ----------------------------------------------------------------------------
 
-  three-id:
+  3iD:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -60,12 +60,12 @@ jobs:
       - name: build sdk-web
         run: npm run build:sdk-web:develop
 
-      - name: install node dependencies (for three-id)
-        working-directory: ./three-id
+      - name: install node dependencies (for 3iD)
+        working-directory: ./3iD
         run: npm ci
 
-      - name: build and deploy three-id
-        working-directory: ./three-id
+      - name: build and deploy 3iD
+        working-directory: ./3iD
         env:
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
@@ -82,7 +82,7 @@ jobs:
         run: bb deploy:app --deploy-env next
 
       - name: run smoke tests
-        working-directory: ./three-id
+        working-directory: ./3iD
         env:
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}

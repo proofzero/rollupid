@@ -27,7 +27,7 @@
 
     ;; The path of local-only configuration file containing various
     ;; build configuration values.
-    (def deploy-edn (str (fs/path "three-id" "deploy.edn")))
+    (def deploy-edn (str (fs/path "3iD" "deploy.edn")))
     ;; Secrets used by act (local GitHub Actions workflow runner).
     (def act-secrets "act.secrets"))
 
@@ -79,10 +79,10 @@
                         :current-url current-url}]
            (dot-env/write act-secrets secrets))}
 
-  -act:next:three-id
-  {:doc "Run GitHub Actions 'next' pipeline, 'three-id' job locally"
+  -act:next:3iD
+  {:doc "Run GitHub Actions 'next' pipeline, '3iD' job locally"
    :depends [-act:secrets]
-   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j three-id")}
+   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j 3iD")}
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------

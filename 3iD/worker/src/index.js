@@ -1,5 +1,5 @@
 /**
- * three-id/worker/src/index.js
+ * 3iD/worker/src/index.js
  *
  * - Run `npx wrangler dev src/index.js` in your terminal to start a development server
  * - Open a browser tab at http://localhost:8787/ to see your worker in action

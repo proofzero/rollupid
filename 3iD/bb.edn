@@ -1,4 +1,4 @@
-; kubelt/three-id/bb.edn
+; kubelt/3iD/bb.edn
 {:min-bb "0.8.0"
  :tasks
  {:requires
