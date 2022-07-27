@@ -98,6 +98,14 @@ struct Opt {
     #[clap(short = 's', long, value_name = "SCALE DEMONINATOR", help_heading = Some("GRADIENT"))]
     scale: Option<f64>,
 
+    /// Sharp Segment
+    #[clap(short = 'g', long, value_name = "SHARP SEGMENT", help_heading = Some("GRADIENT"))]
+    segment: Option<usize>,
+
+    /// Sharp Smoothness
+    #[clap(short = 'm', long, value_name = "SHARP SMOOTHNESS", help_heading = Some("GRADIENT"))]
+    smoothness: Option<f64>,
+
     /// Lists all available trait categories
     #[clap(short = 'c', long, help_heading = Some("TRAITS"))]
     list_traits: bool,
@@ -142,6 +150,8 @@ fn main() {
     // NOTE: modify scale in the same ratio as modifying resolution.
     // E.g. if you double the scale you need to double the width and height to get the same pattern
     let scale_denominator = opt.scale.unwrap_or(3.0) * 100000.0;
+    let sharp_segment = opt.segment.unwrap_or(5);
+    let sharp_smoothness = opt.smoothness.unwrap_or(1.0);
 
     // TODO: do we generate two images (one for pfp and one for cover)
     // NOTE: larger res == slower (could try to make async)
@@ -185,7 +195,7 @@ fn main() {
             // uncommon_traits, // trait colour
             // rare_traits, // trait colour
         ])
-        .build().unwrap();
+        .build().unwrap().sharp(sharp_segment, sharp_smoothness);
 
     let color_sum = acct_color.iter().fold(0,|a, &b| a as u32 + b as u32); // TODO: summing the account colors may not be unique enough
     let scale = color_sum as f64 / scale_denominator;// play with scale for more meshyness
