@@ -65,7 +65,7 @@
    :output-dir "starbase/resources/public/js/compiled"
    :asset-path "/js/compiled"
    :modules
-   {:app {:init-fn starbase.core/init}}
+   {:app {:init-fn dapp.core/init}}
    :devtools
    ;; enable re-frame-10x
    {:preloads [day8.re-frame-10x.preload]}
