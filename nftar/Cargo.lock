@@ -440,6 +440,7 @@ dependencies = [
  "clap",
  "colorgrad",
  "image",
+ "lazy_static",
  "noise",
  "rand 0.8.5",
  "random_color",
