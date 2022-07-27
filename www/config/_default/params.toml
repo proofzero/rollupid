@@ -22,7 +22,7 @@ docsVersion = "next"
 ## Open Graph
 images = ["images/sociallogo.png"]
 ogLocale = "en_US"
-domainTLD = "kubelt.com"
+domainTLD = "developers.kubelt.com"
 titleHome = "Kubelt - Decentralizes applications."
 
 ## Twitter Cards
