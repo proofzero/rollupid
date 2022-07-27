@@ -33,7 +33,7 @@
              (lib.promise/then resolve)
              (lib.promise/catch reject)))))))
 
-(defn rpc-call-js [sys api args]
+(defn call-rpc-with-api-js [sys api args]
   (let [core (-> (get-in sys [:crypto/session :vault/tokens]) keys first)]
     (-> (assoc sys :crypto/wallet {:wallet/address core})
         (rpc-call& api (update (js->clj args :keywordize-keys true) :method #(mapv keyword %)))
