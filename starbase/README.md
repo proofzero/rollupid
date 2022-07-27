@@ -1,4 +1,4 @@
-# dapp
+# starbase
 
 ![Build](https://img.shields.io/github/checks-status/kubelt/kubelt/main)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
@@ -62,7 +62,7 @@ Use your preferred editor or IDE that supports Clojure/ClojureScript development
 1. Install [JDK 8 or later](https://openjdk.java.net/install/) (Java Development Kit)
 2. Install [Node.js](https://nodejs.org/) (JavaScript runtime environment) which should include
    [NPM](https://docs.npmjs.com/cli/npm) or if your Node.js installation does not include NPM also install it.
-3. Clone this repo and open a terminal in the `dapp` project root directory
+3. Clone this repo and open a terminal in the `starbase` project root directory
 
 ### Browser Setup
 

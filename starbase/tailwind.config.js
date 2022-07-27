@@ -1,7 +1,7 @@
 module.exports = {
   content: [
     "./src/**/**/*.cljs",
-    "./dapp/src/**/**/*.cljs",
+    "./starbase/src/**/**/*.cljs",
   ],
   theme: {
     extend: {},
