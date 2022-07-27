@@ -38,9 +38,9 @@ The [packages/](packages/) directory contains package configuration for the thin
 
 The [www/](www/) directory contains the Kubelt.com static website documentation portal.
 
-### dApp
+### Starbase
 
-The [dapp/](dapp/) directory contains a web application for interacting with Kubelt as a customer.
+The [starbase/](starbase/) directory contains a web application for interacting with Kubelt as a customer.
 
 ### Browser Extension
 
