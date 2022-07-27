@@ -67,6 +67,15 @@
                         env-next
                         env-current})
 
+    ;; UTILITIES
+    ;; -------------------------------------------------------------------------
+
+    (defn strip-scheme
+      "Remove the HTTP scheme from a URL."
+      [url]
+      (let [http-scheme (re-pattern "^http.://")]
+        (cstr/replace url http-scheme "")))
+
     ;; DIRECTORIES
     ;; -------------------------------------------------------------------------
 
@@ -185,21 +194,23 @@
   -deploy:scheme "https"
 
   -deploy:host
-  {:doc "The public-facing URL for a given deployment environment"
+  {:doc "The public-facing host name for a given deployment environment"
    :depends [-deploy:env -url:alex -url:cosmin -url:dhruv -url:juan -url:robert]
-   :task (letfn [(strip-scheme [url]
-                   (let [http-scheme (re-pattern "^http.://")]
-                     (cstr/replace url http-scheme "")))]
-           (condp = -deploy:env
-             env-next next-host
-             env-current current-host
-             ;; Developer-specific
-             env-alex (strip-scheme -url:alex)
-             env-cosmin (strip-scheme -url:cosmin)
-             env-dhruv (strip-scheme -url:dhruv)
-             env-juan (strip-scheme -url:juan)
-             env-robert (strip-scheme -url:robert)
-             (throw (ex-info "no environment to URL mapping" {:env -deploy:env}))))}
+   :task (condp = -deploy:env
+           env-next next-host
+           env-current current-host
+           ;; Developer-specific
+           env-alex (strip-scheme -url:alex)
+           env-cosmin (strip-scheme -url:cosmin)
+           env-dhruv (strip-scheme -url:dhruv)
+           env-juan (strip-scheme -url:juan)
+           env-robert (strip-scheme -url:robert)
+           (throw (ex-info "no environment to URL mapping" {:env -deploy:env})))}
+
+  -internal:host
+  {:doc "The internal-facing host name for a given deployment environment"
+   :depends [-url:deploy]
+   :task (strip-scheme -url:deploy)}
 
   ;; Note: Run -prn:deploy-files to view this value. These files are
   ;; used to purge cache for a specific environment.
@@ -310,7 +321,7 @@
    :task (get -env:merged :current/url)}
 
   -url:deploy
-  {:doc "The URL of the deployed application"
+  {:doc "The internal URL of the deployed application"
    :depends [-deploy:env
              -url:cosmin
              -url:dhruv
@@ -821,13 +832,14 @@
                          (str "[❌] Purge zone cache: FAILED " details))]
            (println message))}
 
-  ;; TODO Should we also purge URLs using internal host name?
   cf:zone:purge-urls
   {:doc "Purge asset URLs from Cloudflare cache for specific environment"
-   :depends [-deploy:env -cf:client -cf:zone-id -deploy:host -cf:kv:key:list -verbose:level]
-   :task (let [external-urls (map (fn [path] (str "https://" -deploy:host path)) -cf:kv:key:list)]
+   :depends [-deploy:env -cf:client -cf:zone-id -deploy:host -internal:host -cf:kv:key:list -verbose:level]
+   :task (let [external-urls (map (fn [path] (str "https://" -deploy:host path)) -cf:kv:key:list)
+               internal-urls (map (fn [path] (str "https://" -internal:host path)) -cf:kv:key:list)
+               urls (concat internal-urls external-urls)]
            (doseq [;; The API allows purging only 30 URLs at once.
-                   files (partition 30 external-urls)]
+                   files (partition 30 urls)]
              (when (> -verbose:level 0)
                (doseq [file files]
                  (println (str "[🏹️] " file))))
@@ -836,7 +848,9 @@
                    message (if (= 200 (get response :status))
                              (str "[🪹] Purge zone cache: SUCCESS " details)
                              (str "[❌] Purge zone cache: FAILED " details))]
-               (println message))))}
+               (println message)))
+           ;; Return the set of all URLs that were purged.
+           urls)}
 
   publish:site
   {:doc "Publish assets and worker to CloudFlare"
@@ -925,23 +939,40 @@
 
   ;; test
 
-  ;; TODO on production deploy, smoke test internal *and* external URL.
+  -url:paths
+  {:doc "A sequence of URL paths for all compiled output files"
+   :depends [asset:manifest]
+   :task (vals asset:manifest)}
+
+  -urls:external
+  {:depends [-deploy:host -url:paths]
+   :task (map (partial str "https://" -deploy:host) -url:paths)}
+
+  -urls:internal
+  {:depends [-internal:host -url:paths]
+   :task (map (partial str "https://" -internal:host) -url:paths)}
 
   ;; The asset manifest is mapping from KV store key to remote
   ;; path. This is a sequence of the paths of every file stored in the
   ;; KV store.
+  ;;
+  ;; NB: when testing *both* internal and external URLs, it seems as
+  ;; though DDoS protection kicks in as you switch from one hostname to
+  ;; the other.
   test:smoke:http
   {:doc "Perform HTTP request for every deployed asset"
-   :depends [asset:manifest -url:deploy -test:strict?]
-   :task (let [remote-paths (vals asset:manifest)
-               ;; Turn the paths into full URLs.
-               urls (map (partial str -url:deploy) remote-paths)
+   :depends [-urls:internal -urls:external -test:strict? -verbose:level]
+   :task (let [;; Collect all the URLs to be tested.
+               urls (concat -urls:external #_-urls:internal)
                ;; Construct a map from url to HTTP request promise. The
                ;; request isn't actually performed until the promise is
                ;; deref'ed.
                request-fn (fn [url]
-                            (let [result (deref (http/head url))
+                            (Thread/sleep 1000)
+                            (let [result (deref (http/get url))
                                   status (:status result)]
+                              (when (> -verbose:level 0)
+                                (println (format  "-> [%s] %s" status url)))
                               [url status]))
                requests (into {} (map request-fn urls))]
            ;; If any of the requests had a non-OK status result, throw
@@ -992,10 +1023,25 @@
    :depends [-deploy:env]
    :task (println -deploy:env)}
 
-  -prn:deploy-url
+  -prn:url-deploy
   {:doc "Print the configured deployment URL"
    :depends [-url:deploy]
    :task (println -url:deploy)}
+
+  -prn:url-paths
+  {:doc "Print the set of URL paths for output files"
+   :depends [-url:paths]
+   :task (pprint/pprint -url:paths)}
+
+  -prn:urls-external
+  {:doc "Print the set of public-facing application URLs"
+   :depends [-urls:external]
+   :task (pprint/pprint -urls:external)}
+
+  -prn:urls-internal
+  {:doc "Print the set of internal-facing application URLs"
+   :depends [-urls:internal]
+   :task (pprint/pprint -urls:internal)}
 
   -prn:deploy-host
   {:doc "Print the configured deployment host"
