@@ -25,7 +25,7 @@ jobs:
             dapp: 'dapp/**'
             www: 'www/**'
             ext: 'ext/**'
-            three-id: 'three-id/**'
+            3iD: '3iD/**'
 
   # To detect lint errors across namespaces in your project, a cache is
   # needed. A cache will be created at .clj-kondo/ when you run
@@ -254,9 +254,9 @@ jobs:
         # Run the CI version of the web tests using headless Chrome.
       - run: npm run test:web:ci
 
-  test-three-id:
+  test-3iD:
     needs: changes
-    # Test three-id TS app when SDK code changes OR the app itself does
+    # Test 3iD TS app when SDK code changes OR the app itself does
     if: needs.changes.outputs.sdk == 'true' || needs.changes.outputs.three-id == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -281,22 +281,22 @@ jobs:
         run: npm ci
       - name: build sdk-web
         run: npm run build:sdk-web:develop
-      - name: install node dependencies (for three-id)
-        working-directory: ./three-id
+      - name: install node dependencies (for 3iD)
+        working-directory: ./3iD
         run: npm ci
       - name: Compile app
         run: bb compile:app --deploy-env next
-        working-directory: ./three-id
+        working-directory: ./3iD
       - name: Run app
         run: pm2 start npm -- run web
-        working-directory: ./three-id
+        working-directory: ./3iD
       # Use `xvfb` to run the synpress tests headless
       - uses: GabrielBB/xvfb-action@v1
         env:
           NETWORK: mainnet
           SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
         with:
-          working-directory: ./three-id
+          working-directory: ./3iD
           run: npm run test:synpress:run
 
   # test-sdk-web:
