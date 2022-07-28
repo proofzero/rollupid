@@ -36,6 +36,7 @@
 ;;   const sdk = kubelt.v1.init({...});
 ;;   kbt.v1.workspace.available(sdk);
 ;;   kbt.v1.halt(sdk);
+;;
 
 (defn web-v1
   []
