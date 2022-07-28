@@ -87,6 +87,7 @@ export default function Gate({ navigation }: { navigation: any }) {
           onPress={() => tryDifferentWallet()}
         >
           <Text
+            testID="try-different-wallet"
             style={{
               fontFamily: "Manrope_700Bold",
               fontSize: 16,
