@@ -2,6 +2,7 @@
 
 const path = require("path");
 const webpack = require("webpack");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const isProduction = process.env.NODE_ENV == "production";
 
@@ -20,9 +21,16 @@ const config = {
     },
   },
   */
+
   plugins: [
-    //new NodePolyfillPlugin(),
-  ],
+    new CopyPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, "src"), to: path.resolve(__dirname, "lib") },
+      ],
+    }),
+  ]
+
+
 };
 
 module.exports = () => {
