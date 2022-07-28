@@ -55,8 +55,8 @@
        ;; oort
        :oort #js {:authenticate sdk.v1.oort/authenticate-js!
                   :claims sdk.v1.oort/claims-js
-                  :callRpc sdk.v1.oort/call-rpc-api-js
-                  :callRpcClient lib.rpc/rpc-call-js
+                  :callRpc sdk.v1.oort/call-rpc-js
+                  :callRpcWithApi lib.rpc/call-rpc-with-api-js
                   :rpcApi sdk.v1.oort/rpc-api-js
                   :isLoggedIn sdk.v1.oort/logged-in-js?
                   :setWallet sdk.v1.oort/set-wallet-js}

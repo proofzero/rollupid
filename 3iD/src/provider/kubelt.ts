@@ -113,41 +113,36 @@ export const kbGetClaims = async (): Promise<string[]> => {
 };
 export const kbGetProfile = async (core: string) => {
   const profile: Profile = await new Promise((resolve, reject) => {
-    sdkWeb?.node_v1?.oort.rpcApi(sdk, core).then((api: any) => {
-      // TODO: async / await? 🤔
-      sdkWeb?.node_v1?.oort
-        .callRpcClient(sdk, api, {
-          method: ["kb", "get-profile"],
-          params: [],
-        })
-        .then((x: any) => {
-          if (x?.body?.error) {
-            reject(x.body.error);
-          } else {
-            resolve(x?.body?.result);
-          }
-        });
-    });
+    sdkWeb?.node_v1?.oort
+      .callRpc(sdk, {
+        method: ["kb", "get-profile"],
+        params: [],
+      })
+      .then((x: any) => {
+        if (x?.body?.error) {
+          reject(x.body.error);
+        } else {
+          resolve(x?.body?.result);
+        }
+      });
   });
   return profile;
 };
 
 export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
   const profile = await new Promise((resolve, reject) => {
-    sdkWeb?.node_v1?.oort.rpcApi(sdk, core).then((api: any) => {
-      sdkWeb?.node_v1?.oort
-        .callRpcClient(sdk, api, {
-          method: ["kb", "set-profile"],
-          params: { profile: updatedProfile },
-        })
-        .then((x: any) => {
-          if (x?.body?.error) {
-            reject(x.body.error);
-          } else {
-            resolve(x?.body?.result);
-          }
-        });
-    });
+    sdkWeb?.node_v1?.oort
+      .callRpc(sdk, {
+        method: ["kb", "set-profile"],
+        params: { profile: updatedProfile },
+      })
+      .then((x: any) => {
+        if (x?.body?.error) {
+          reject(x.body.error);
+        } else {
+          resolve(x?.body?.result);
+        }
+      });
   });
   return profile;
 };
