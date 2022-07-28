@@ -205,3 +205,4 @@ project.clj
 
 # nektos/act
 act.secrets
+/packages/sdk-web/ts-types/

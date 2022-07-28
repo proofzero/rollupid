@@ -16,10 +16,12 @@
 (def local-path (str/replace (.cwd process) "packages/sdk-js/lib" ""))
 
 (defn json-spec-path [filename]
-  (str local-path "target/jsonspec/" filename ".json"))
+  (str local-path "target/" filename ".json"))
+
+(def ts-path (str/replace (.cwd process) "sdk-js/lib" "sdk-web/ts-types"))
 
 (defn ts-types-path [filename]
-  (str local-path "three-id/src/types/" filename ".d.ts"))
+  (str ts-path "/" filename ".d.ts"))
 
 (defn generate-ts-type& [malli-spec type-name]
   (lib.promise/promise
@@ -35,7 +37,6 @@
                            (json-schema/transform malli-spec))
                          (update  :definitions #(reduce (fn [m [x v]]
                                                           (assoc m (name x) v)) {} %)))]
-
        (-> (io/write-to-file&
             (json-spec-path type-name)
             (.stringify js/JSON
@@ -65,13 +66,19 @@
    (lib.promise/all)))
 
 (comment
-
-  (-> (generate-all& [[spec.profile/profile "Profile"]
-                      [spec.config/optional-sdk-config "OptionalConfig"]
-                      [spec.vault/vault-tokens* "VaultToken"]
-                      [spec.jwt/jwt "JWT"]])
-      (lib.promise/then #(println "OK! .... " %))
-      (lib.promise/catch #(println "ERROR!.... " %)))
+  (lib.promise/promise
+   (fn [resolve reject]
+     (->
+      (io/ensure-dir& ts-path)
+      (lib.promise/then
+       (fn [_]
+         (-> (generate-all& [[spec.profile/profile "Profile"]
+                             [spec.config/optional-sdk-config "OptionalConfig"]
+                             [spec.vault/vault-tokens* "VaultToken"]
+                             [spec.jwt/jwt "JWT"]])
+             (lib.promise/then #(resolve (println "OK! .... " %)))
+             (lib.promise/catch #(reject (println "ERROR!.... " %))))))
+      (lib.promise/catch reject))))
 
 ;;
   )
