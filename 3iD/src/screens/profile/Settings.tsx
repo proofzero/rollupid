@@ -63,29 +63,27 @@ export default function Settings({
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (account && (await isAuthenticated(account))) {
+      try {
+        const sdk = await getSDK();
+
+        const persistedProfile = await fetchProfile(sdk);
+        const patchedProfile = { ...profile, ...persistedProfile };
+
+        setProfile(patchedProfile);
+
         try {
-          const sdk = await getSDK();
-
-          const persistedProfile = await fetchProfile(sdk);
-          const patchedProfile = { ...profile, ...persistedProfile };
-
-          setProfile(patchedProfile);
-
-          try {
-            await writeItemToStorage(JSON.stringify(patchedProfile));
-          } catch (e) {
-            console.warn("Failed to write profile to storage");
-          }
+          await writeItemToStorage(JSON.stringify(patchedProfile));
         } catch (e) {
-          console.warn("Failed to retrieve persisted profile");
+          console.warn("Failed to write profile to storage");
         }
-      } else {
-        setProfile(emptyProfile);
+      } catch (e) {
+        console.warn("Failed to retrieve persisted profile");
       }
     };
 
-    asyncFn();
+    if (account) {
+      asyncFn();
+    }
   }, [account]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
@@ -177,7 +175,7 @@ export default function Settings({
                     zIndex: -1,
                   }}
                 >
-                  <Entypo style={{}} name="email" size={16} color="#9CA3AF" />
+                  <Entypo name="email" size={16} color="#9CA3AF" />
                 </View>
 
                 <TextInput
@@ -224,12 +222,7 @@ export default function Settings({
                     zIndex: -1,
                   }}
                 >
-                  <Entypo
-                    style={{}}
-                    name="suitcase"
-                    size={16}
-                    color="#9CA3AF"
-                  />
+                  <Entypo name="suitcase" size={16} color="#9CA3AF" />
                 </View>
 
                 <TextInput
@@ -261,12 +254,7 @@ export default function Settings({
                     zIndex: -1,
                   }}
                 >
-                  <Entypo
-                    style={{}}
-                    name="location-pin"
-                    size={16}
-                    color="#9CA3AF"
-                  />
+                  <Entypo name="location-pin" size={16} color="#9CA3AF" />
                 </View>
                 <TextInput
                   style={styles.textInput}

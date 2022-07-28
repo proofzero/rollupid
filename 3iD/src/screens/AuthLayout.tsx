@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
 import { connect, forceAccounts } from "../provider/web3";
-import { Image, ScrollView, View, Text } from "react-native";
+import { Image, View, Text, ScrollView } from "react-native";
 import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
 
 const SideMenuItem = ({
@@ -143,7 +143,7 @@ export default function Layout({
             setNickname(profileJson.nickname);
           }
         }
-        claimsRedirect(claim);
+        await claimsRedirect(claim);
       } else {
         const provider = await connect(false);
 
@@ -153,7 +153,7 @@ export default function Layout({
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          claimsRedirect(claim);
+          await claimsRedirect(claim);
         } else {
           navigation.navigate("Landing");
         }
@@ -179,153 +179,148 @@ export default function Layout({
         flex: 1,
       }}
     >
-      <View
-        style={{
-          position: "absolute",
-          flex: 1,
-          height: "33%",
-          backgroundColor: "#192030",
-          left: 0,
-          right: 0,
-          zIndex: -1,
-        }}
-      ></View>
+      <NavMenu />
 
       <View
         style={{
-          flex: 1,
-          marginHorizontal: "5em",
-          marginVertical: "3em",
+          position: "relative",
         }}
       >
-        <NavMenu />
-
         <View
           style={{
-            flex: 1,
-            flexDirection: "row",
-            marginBottom: "3em",
-            shadowRadius: 5,
-            shadowOpacity: 0.1,
+            position: "absolute",
+            height: 300,
+            left: 0,
+            right: 0,
+            backgroundColor: "#192030",
+          }}
+        ></View>
+      </View>
+
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          shadowRadius: 5,
+          shadowOpacity: 0.1,
+          padding: "5em",
+        }}
+      >
+        <View
+          style={{
+            width: 240,
+            backgroundColor: "#F9FAFB",
+            paddingHorizontal: 16,
+            paddingVertical: 20,
           }}
         >
           <View
             style={{
-              width: 240,
-              backgroundColor: "#F9FAFB",
-              paddingHorizontal: 16,
-              paddingVertical: 20,
+              flexDirection: "row",
+              marginBottom: 15,
             }}
           >
+            <Image
+              style={{
+                width: 48,
+                height: 48,
+                marginRight: 12,
+              }}
+              source={require("../assets/avatar.png")}
+            ></Image>
+
             <View
               style={{
-                flexDirection: "row",
-                marginBottom: 15,
+                justifyContent: "space-between",
               }}
             >
-              <Image
+              <Text
                 style={{
-                  width: 48,
-                  height: 48,
-                  marginRight: 12,
-                }}
-                source={require("../assets/avatar.png")}
-              ></Image>
-
-              <View
-                style={{
-                  justifyContent: "space-between",
+                  marginBottom: 8,
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: 16,
+                  fontWeight: "600",
+                  lineHeight: 19.36,
+                  color: "#1A1B2D",
+                  flex: 1,
                 }}
               >
-                <Text
-                  style={{
-                    marginBottom: 8,
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 16,
-                    fontWeight: "600",
-                    lineHeight: 19.36,
-                    color: "#1A1B2D",
-                    flex: 1,
-                  }}
-                >
-                  {nickname || account?.substring(0, 6)}
-                </Text>
+                {nickname || account?.substring(0, 6)}
+              </Text>
 
-                <Link
-                  style={{
-                    marginBottom: 8,
-                    fontFamily: "Inter_600SemiBold",
-                    fontSize: 12,
-                    fontWeight: "600",
-                    lineHeight: 15,
-                    textDecorationLine: "underline",
-                    color: "#3B63FF",
-                    flex: 1,
-                  }}
-                  to={{ screen: "Settings" }}
-                >
-                  Visit My Profile
-                </Link>
-              </View>
-            </View>
-
-            <View>
-              <SideMenuItem
-                isActive={true}
-                isCurrent={navRoutes[navIndex].name === "Onboard"}
-                screen={"Onboard"}
-                title={"Dashboard"}
-                icon={require("../assets/menu/side/dashboard.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"Set PFP"}
-                icon={require("../assets/menu/side/set-pfp.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"User Details"}
-                icon={require("../assets/menu/side/user-details.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"Wallet Accounts"}
-                icon={require("../assets/menu/side/wallet-accounts.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"NFT Gallery"}
-                icon={require("../assets/menu/side/nft-gallery.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"KYC"}
-                icon={require("../assets/menu/side/kyc.png")}
-              />
-              <SideMenuItem
-                isActive={false}
-                screen={""}
-                title={"Connected dApps"}
-                icon={require("../assets/menu/side/connected-d-apps.png")}
-              />
+              <Link
+                style={{
+                  marginBottom: 8,
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: 12,
+                  fontWeight: "600",
+                  lineHeight: 15,
+                  textDecorationLine: "underline",
+                  color: "#3B63FF",
+                  flex: 1,
+                }}
+                to={{ screen: "Settings" }}
+              >
+                Visit My Profile
+              </Link>
             </View>
           </View>
 
-          <View
-            style={{
-              flex: 8,
-              backgroundColor: "#FFFFFF",
-              paddingVertical: "2em",
-              paddingHorizontal: "3em",
-            }}
-          >
-            {children}
+          <View>
+            <SideMenuItem
+              isActive={true}
+              isCurrent={navRoutes[navIndex].name === "Onboard"}
+              screen={"Onboard"}
+              title={"Dashboard"}
+              icon={require("../assets/menu/side/dashboard.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"Set PFP"}
+              icon={require("../assets/menu/side/set-pfp.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"User Details"}
+              icon={require("../assets/menu/side/user-details.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"Wallet Accounts"}
+              icon={require("../assets/menu/side/wallet-accounts.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"NFT Gallery"}
+              icon={require("../assets/menu/side/nft-gallery.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"KYC"}
+              icon={require("../assets/menu/side/kyc.png")}
+            />
+            <SideMenuItem
+              isActive={false}
+              screen={"/"}
+              title={"Connected dApps"}
+              icon={require("../assets/menu/side/connected-d-apps.png")}
+            />
           </View>
+        </View>
+
+        <View
+          style={{
+            flex: 8,
+            backgroundColor: "#FFFFFF",
+            padding: "1em",
+          }}
+        >
+          {children}
         </View>
       </View>
     </ScrollView>

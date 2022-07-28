@@ -23,11 +23,13 @@ export default function NavMenu() {
   return (
     <View
       style={{
-        marginBottom: "3em",
+        paddingVertical: "1em",
+        paddingHorizontal: "5em",
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         zIndex: 1,
+        backgroundColor: "#192030",
       }}
     >
       <View
@@ -51,6 +53,30 @@ export default function NavMenu() {
             alignItems: "center",
           }}
         >
+          <Link
+            style={{
+              marginLeft: 25,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              backgroundColor:
+                navRoutes[navIndex].name === "Details"
+                  ? "#373F52"
+                  : "transparent",
+            }}
+            to={{ screen: "Details" }}
+          >
+            <Text
+              style={{
+                fontFamily: "Manrope_500Medium",
+                fontSize: 18,
+                lineHeight: 20,
+                color: "white",
+              }}
+            >
+              My Profile
+            </Text>
+          </Link>
+
           <Link
             style={{
               marginLeft: 25,
