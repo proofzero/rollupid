@@ -5,7 +5,7 @@ import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
 import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
-import { Profile } from "../../types/Profile";
+import { Profile } from "../../../../packages/sdk-web/lib/types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";

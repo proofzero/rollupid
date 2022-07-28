@@ -1,12 +1,11 @@
 // @ts-ignore
 import sdkWeb from "../../../packages/sdk-web/lib/com.kubelt.sdk.js";
-
+import { Profile } from "../../../packages/sdk-web/lib/types/Profile";
 import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
 
 import { BehaviorSubject } from "rxjs";
 import Constants from "expo-constants";
-import { Profile } from "../types/Profile";
 
 let sdk: any = null;
 

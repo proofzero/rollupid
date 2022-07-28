@@ -25,7 +25,7 @@ const config = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: path.resolve(__dirname, "src"), to: path.resolve(__dirname, "lib") },
+        { from: path.resolve(__dirname, "ts-types"), to: path.resolve(__dirname, "lib/types") },
       ],
     }),
   ]
