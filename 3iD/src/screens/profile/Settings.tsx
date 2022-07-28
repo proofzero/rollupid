@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
-import useAccount from "../../hooks/account";
-import Layout from "../AuthLayout";
-import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
+import { kbSetProfile } from "../../provider/kubelt";
+
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+
+import useProfile from "../../hooks/profile";
+import useAccount from "../../hooks/account";
 import useSDKAuth from "../../hooks/sdkAuth";
+
+import Layout from "../AuthLayout";
 
 export default function Settings({
   children,
@@ -18,6 +22,13 @@ export default function Settings({
   children: any;
   navigation: any;
 }) {
+  const account = useAccount();
+  const sdkAuth = useSDKAuth();
+
+  const persistedProfile = useProfile();
+
+  const [profile, setProfile] = useState<Profile>(persistedProfile);
+
   // TODO: Add forms library
   const bioLimit = 300;
   const setBio = (bio: string) => {
@@ -26,62 +37,9 @@ export default function Settings({
     }
   };
 
-  const emptyProfile: Profile = {
-    nickname: "",
-    bio: "",
-    job: "",
-    location: "",
-    website: "",
-    email: "",
-  };
-
-  const [profile, setProfile] = useState<Profile>(emptyProfile);
-
-  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
-
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    const value: Profile = item != null ? JSON.parse(item) : emptyProfile;
-    setProfile(value);
-  };
-
-  const writeItemToStorage = async (newValue: string) => {
-    await setItem(newValue);
-    const x: Profile = JSON.parse(newValue);
-    setProfile(x);
-  };
-
   useEffect(() => {
-    readItemFromStorage();
-  }, []);
-
-  const account = useAccount();
-  const sdkAuth = useSDKAuth();
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      if (sdkAuth && account) {
-        try {
-          const persistedProfile = await kbGetProfile(account);
-          const patchedProfile = { ...profile, ...persistedProfile };
-
-          setProfile(patchedProfile);
-
-          try {
-            await writeItemToStorage(JSON.stringify(patchedProfile));
-          } catch (e) {
-            console.warn("Failed to write profile to storage");
-          }
-        } catch (e) {
-          console.warn("Failed to retrieve persisted profile");
-        }
-      } else {
-        setProfile(emptyProfile);
-      }
-    };
-
-    asyncFn();
-  }, [account, sdkAuth]);
+    setProfile(persistedProfile);
+  }, [persistedProfile]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
     if (!account) {
@@ -96,7 +54,10 @@ export default function Settings({
         setProfile(persistedProfile);
 
         try {
-          await writeItemToStorage(jsonProfile);
+          const { setItem } = useAsyncStorage("kubelt:profile");
+          await setItem(jsonProfile);
+          const x: Profile = JSON.parse(jsonProfile);
+          setProfile(x);
         } catch (e) {
           console.warn("Failed to write profile to storage");
         }

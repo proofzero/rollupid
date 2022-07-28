@@ -21,6 +21,7 @@ import Auth from "./screens/funnel/Auth";
 import Gate from "./screens/funnel/Gate";
 import Mint from "./screens/minting/Mint";
 import Settings from "./screens/profile/Settings";
+import Details from "./screens/profile/Details";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,10 +65,11 @@ export default function App() {
         config: {
           screens: {
             Landing: "",
-            Auth: "authentication",
-            Gate: "gate",
-            Settings: "settings",
-            Mint: "mint",
+            Auth: "/authentication",
+            Gate: "/gate",
+            Settings: "/profile/settings",
+            Details: "/profile",
+            Mint: "/mint",
           },
         },
       }}
@@ -89,6 +91,7 @@ export default function App() {
 
         <Stack.Group>
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="Details" component={Details} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
