@@ -26,24 +26,23 @@
         kubelt-path (.join path config-path folder)]
     kubelt-path))
 
-(defn ensure-kubelt-dir&
+(defn ensure-dir&
   "Return the directory path for the application as a string,
   creating it if it doesn't already exist.
   Rejects promise with error message if dir isn't available"
-  [app-name folder]
-  (let [kubelt-dirp (kubelt-dir app-name folder)]
-    (lib.promise/promise
-     (fn [resolve reject]
-       (-> (fs-exists?& kubelt-dirp)
-           (lib.promise/then (fn [x]
-                               (when-not x
-                                 (let [mode "0700"
-                                       recursive? true
-                                       options #js {:mode mode
-                                                    :recursive recursive?}]
-                                   (.mkdir fs-promises kubelt-dirp options)))))
-           (lib.promise/then (fn [_] (resolve kubelt-dirp)))
-           (lib.promise/catch (fn [e] (reject (lib.error/error (str "Dir isn't available" e))))))))))
+  [dir]
+  (lib.promise/promise
+   (fn [resolve reject]
+     (-> (fs-exists?& dir)
+         (lib.promise/then (fn [x]
+                             (when-not x
+                               (let [mode "0700"
+                                     recursive? true
+                                     options #js {:mode mode
+                                                  :recursive recursive?}]
+                                 (.mkdir fs-promises dir options)))))
+         (lib.promise/then (fn [_] (resolve dir)))
+         (lib.promise/catch (fn [e] (reject (lib.error/error (str "Dir isn't available" e)))))))))
 
 (defn write-to-file& [filename data]
   (.writeFile fs-promises filename data))

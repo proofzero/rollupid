@@ -45,7 +45,7 @@
   [app-name wallet-name]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
+     (-> (lib.io/ensure-dir& (lib.io/kubelt-dir app-name "wallets"))
          (lib.promise/then
           (fn [_]
             (-> (lib.io/fs-exists?& (name->path app-name wallet-name))
@@ -94,7 +94,7 @@
   [app-name wallet-name password]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
+     (-> (lib.io/ensure-dir& (lib.io/kubelt-dir app-name "wallets"))
          (lib.promise/then
           (fn [wallet-dirp]
             (-> (has-wallet?& app-name wallet-name)
@@ -147,7 +147,7 @@
   [app-name]
   (lib.promise/promise
    (fn [resolve reject]
-     (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
+     (-> (lib.io/ensure-dir& (lib.io/kubelt-dir app-name "wallets"))
          (lib.promise/then #(resolve (js->clj (.readdir fs-promises %))))
          (lib.promise/catch reject)))))
 
@@ -188,7 +188,7 @@
                      (reject error)))))
              ;; Returns the path of the wallet file to write.
              (wallet-path []
-               (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
+               (-> (lib.io/ensure-dir& (lib.io/kubelt-dir app-name "wallets"))
                    (lib.promise/then #(.join path % wallet-name))))]
        (let [path& (wallet-path)
              wallet& (from-mnemonic mnemonic)]

@@ -34,7 +34,7 @@
             mode 0640
             opts #js {:mode mode}]
         (->
-         (lib.io/ensure-kubelt-dir& path* folder)
+         (lib.io/ensure-dir& (lib.io/kubelt-dir path* folder))
          (lib.promise/then #(.writeFile fs-promises (.join path % file-name) data opts))
          (lib.promise/then
           (fn []
@@ -52,7 +52,7 @@
       {:post [(lib.promise/promise? %)]}
       (let [opts #js{:encoding "utf8"}]
         (->
-         (lib.io/ensure-kubelt-dir& path* folder)
+         (lib.io/ensure-dir& (lib.io/kubelt-dir path* folder))
          (lib.promise/then #(.readFile fs-promises (.join path % file-name) opts))
          (lib.promise/then
           (fn [data-str]
