@@ -25,7 +25,7 @@ jobs:
             dapp: 'dapp/**'
             www: 'www/**'
             ext: 'ext/**'
-            3iD: '3iD/**'
+            three-id: '3iD/**'
 
   # To detect lint errors across namespaces in your project, a cache is
   # needed. A cache will be created at .clj-kondo/ when you run
