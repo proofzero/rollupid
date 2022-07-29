@@ -2,6 +2,8 @@
   "Account management."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [camel-snake-kebab.core :as csk]
+   [camel-snake-kebab.extras :as cske]
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.oort :as lib.oort]
@@ -126,16 +128,16 @@
   ([sys args]
    (let [{:keys [method params]} (js->clj args :keywordize-keys true)]
      (-> (call-rpc& sys
-                          (-> sys :crypto/wallet :wallet/address)
-                          (mapv keyword (js->clj method))
-                          params)
-         (lib.promise/then clj->js)
+                    (-> sys :crypto/wallet :wallet/address)
+                    (mapv keyword (js->clj method))
+                    params)
+         (lib.promise/then #(clj->js (cske/transform-keys csk/->camelCaseString %)))
          (lib.promise/catch clj->js))))
   ([sys method params]
    (let [method (mapv keyword (js->clj method))
          params (js->clj params :keywordize-keys true)]
      (-> (call-rpc& sys (-> sys :crypto/wallet :wallet/address) method params)
-         (lib.promise/then clj->js)
+         (lib.promise/then #(clj->js (cske/transform-keys csk/->camelCaseString %)))
          (lib.promise/catch clj->js)))))
 
 ;; logged-in?
