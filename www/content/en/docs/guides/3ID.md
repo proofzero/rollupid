@@ -63,7 +63,7 @@ The getter and setter methods are:
 
 ### Authorization Model
 
-While the `kb_getProfile` method is publicly available, calling the `kb_setProfile` method requires authorization. [See the Authorization Guide](content/en/docs/guides/authorization.md) for more information on Kubelt's authorization model.
+While the `kb_getProfile` method is publicly available, calling the `kb_setProfile` method requires authorization. [See the Authorization Guide]({{< relref "Authorization" >}}) for more information on Kubelt's authorization model.
 
 ### 3iD Profile Data Shape
 
