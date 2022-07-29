@@ -9,7 +9,7 @@ import { Profile } from "../../types/Profile";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import useProfile from "../../hooks/profile";
+import {useProfile} from "../../hooks/profile";
 import useAccount from "../../hooks/account";
 import useSDKAuth from "../../hooks/sdkAuth";
 

@@ -5,7 +5,7 @@ import { Profile } from "../types/Profile";
 import useAccount from "./account";
 import useSDKAuth from "./sdkAuth";
 
-const emptyProfile: Profile = {
+export const emptyProfile: Profile = {
   nickname: "",
   bio: "",
   job: "",
@@ -14,7 +14,7 @@ const emptyProfile: Profile = {
   email: "",
 };
 
-const useProfile = () => {
+export const useProfile = () => {
   const account = useAccount();
   const sdkAuth = useSDKAuth();
 
@@ -66,4 +66,4 @@ const useProfile = () => {
   return profile;
 };
 
-export default useProfile;
+export const humanAccount= (account:string) => `${account.substring(0, 4)}...${account.substring(account.length - 6)}`

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../AppLayout";
 
-import useProfile from "../../hooks/profile";
+import { Profile } from "../types/Profile";
+import {humanAccount, useProfile, emptyProfile} from "../../hooks/profile";
 import { View, Text, StyleSheet } from "react-native";
 
 import { Entypo } from "@expo/vector-icons";
@@ -19,8 +20,11 @@ export default function Details({
   const [profile, setProfile] = useState(persistedProfile);
 
   useEffect(() => {
-    setProfile(persistedProfile);
+      console.log(JSON.stringify(profile, null, 2));
+      setProfile(persistedProfile);
   }, [persistedProfile]);
+
+
 
   return (
     <Layout navigation={navigation}>
@@ -47,6 +51,7 @@ export default function Details({
             flexDirection: "row",
           }}
         >
+
           <View
             style={{
               width: 286,
@@ -59,16 +64,9 @@ export default function Details({
               alignItems: "center",
             }}
           >
-            {profile.nickname && (
-              <Text style={styles.card.nickname}>{profile.nickname}</Text>
-            )}
-            {profile.nickname && account && (
-              <Text>{`${account.substring(0, 4)}...${account.substring(
-                account.length - 6
-              )}`}</Text>
-            )}
+            <Text style={styles.card.nickname}>{profile?.nickname && profile.nickname}</Text>
+            <Text>{profile.nickname && account && humanAccount(account)}</Text>
           </View>
-
           <View
             style={{
               flex: 1,
@@ -79,12 +77,15 @@ export default function Details({
                 flex: 1,
               }}
             ></View>
+
             <View
               style={{
                 flex: 1,
                 padding: "1em",
               }}
             >
+
+
               <View
                 style={{
                   flex: 1,
@@ -92,7 +93,6 @@ export default function Details({
               >
                 <Text>{profile.bio}</Text>
               </View>
-
               <hr />
 
               <View
@@ -109,45 +109,37 @@ export default function Details({
                     flex: 1,
                   }}
                 >
-                  {profile.location && (
-                    <View style={styles.field.wrapper}>
-                      <Entypo
-                        style={styles.field.icon}
-                        name="location-pin"
-                        size={16}
-                        color="#9CA3AF"
-                      />
+                  <View style={styles.field.wrapper}>
+                    <Entypo
+                      style={styles.field.icon}
+                      name="location-pin"
+                      size={16}
+                      color="#9CA3AF"
+                    />
+                    <Text style={styles.field.text}>{profile?.location && profile.location}</Text>
+                  </View>
+                  <View style={styles.field.wrapper}>
+                    <Entypo
+                      style={styles.field.icon}
+                      name="suitcase"
+                      size={16}
+                      color="#9CA3AF"
+                    />
 
-                      <Text style={styles.field.text}>{profile.location}</Text>
-                    </View>
-                  )}
-
-                  {profile.job && (
-                    <View style={styles.field.wrapper}>
-                      <Entypo
-                        style={styles.field.icon}
-                        name="suitcase"
-                        size={16}
-                        color="#9CA3AF"
-                      />
-
-                      <Text style={styles.field.text}>{profile.job}</Text>
-                    </View>
-                  )}
+                    <Text style={styles.field.text}>{profile?.job && profile.job}</Text>
+                  </View>
                 </View>
 
-                <View>
-                  <Text>Edit profile</Text>
-                </View>
               </View>
             </View>
+
+
           </View>
         </View>
 
-        <Text>
-          <pre>{JSON.stringify(profile, null, 2)}</pre>
-        </Text>
       </View>
+
+
     </Layout>
   );
 }
