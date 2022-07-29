@@ -57,3 +57,27 @@
                (finally (done)))))))
 
 
+
+(deftest js-rpc-profile-test
+  (testing "test rpc profile from js env,
+            relates https://github.com/kubelt/kubelt/issues/630"
+    (async done
+           (go
+             (try
+               (let [sys (<p! (sdk/init (t.commons/oort-config)))
+                     wallet (<p! (wallet/load& t.commons/app-name t.commons/test-wallet-name t.commons/test-wallet-password))
+                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
+                     result (-> (<p! (sdk.oort/call-rpc-js
+                                      kbt
+                                      #js ["kb" "get-profile"]
+                                      #js []))
+                                js->clj
+                                (get-in ["body" "result"]))]
+
+                 (is (= #{"profilePicture" "nickname" "job" "location" "website" "email" "bio"}
+                        (set (keys result))))
+                 (is (= #{"name" "imageUrl" "collectionId" "collectionTokenId"} (set (keys (get result "profilePicture"))))))
+               (catch js/Error err (do
+                                     (log/error err)
+                                     (is false err)))
+               (finally (done)))))))
