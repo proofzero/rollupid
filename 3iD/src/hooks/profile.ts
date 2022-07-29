@@ -66,4 +66,4 @@ export const useProfile = () => {
   return profile;
 };
 
-export const humanAccount= (account:string) => `${account.substring(0, 4)}...${account.substring(account.length - 6)}`
+export const humanAccount= (account: string) => `${account.substring(0, 4)}...${account.substring(account.length - 6)}`

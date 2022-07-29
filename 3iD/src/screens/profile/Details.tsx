@@ -1,12 +1,77 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../AppLayout";
 
-import { Profile } from "../types/Profile";
+import { Profile } from "../../types/Profile";
 import {humanAccount, useProfile, emptyProfile} from "../../hooks/profile";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 
 import { Entypo } from "@expo/vector-icons";
 import useAccount from "../../hooks/account";
+
+
+const renderPFP = (profile: Profile, account: string) => {
+  console.log("yayayayay", {uri: profile?.profilePicture?.imageUrl});
+  const tinyLogo = {
+    width: "50%",
+    height: "50%"
+  };
+  return (<View
+    style={{
+      width: 286,
+      height: 404,
+      backgroundColor: "white",
+      shadowRadius: 5,
+      shadowColor: "rgb(0, 0, 0)",
+      shadowOpacity: 0.2,
+    }}
+  >
+    <View
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        width: 286,
+        height: 304,
+
+      }}
+    >
+      <Image style={tinyLogo}
+        source={{ uri: profile?.profilePicture?.imageUrl }} />
+      <Text style={styles.card.nickname}>YUP {profile?.nickname && profile.nickname}</Text>
+      <Text>{profile.nickname && account && humanAccount(account)}</Text>
+    </View>
+    <View
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+
+        width: 286,
+        height: 100,
+
+        display: "flex",
+        flexDirection: "row",
+        flex: 1,
+      }}
+    >
+
+      <Entypo
+        style={styles.field.icon}
+        name="globe"
+        size={16}
+        color="#9CA3AF"
+      />
+      <Entypo
+        style={styles.field.icon}
+        name="twitter"
+        size={16}
+        color="#9CA3AF"
+      />
+
+    </View>
+
+  </View>)
+
+};
+
 
 export default function Details({
   navigation,
@@ -52,22 +117,8 @@ export default function Details({
           }}
         >
 
-          <View
-            style={{
-              width: 286,
-              height: 404,
-              backgroundColor: "white",
-              shadowRadius: 5,
-              shadowColor: "rgb(0, 0, 0)",
-              shadowOpacity: 0.2,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.card.nickname}>{profile?.nickname && profile.nickname}</Text>
-            <Text>{profile.nickname && account && humanAccount(account)}</Text>
-          </View>
-          <View
+    {renderPFP(profile, account as string)}
+      <View
             style={{
               flex: 1,
             }}
