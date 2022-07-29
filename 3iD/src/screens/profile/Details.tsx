@@ -5,7 +5,8 @@ import { Profile } from "../../types/Profile";
 import {humanAccount, useProfile, emptyProfile} from "../../hooks/profile";
 import { View, Text, StyleSheet, Image } from "react-native";
 
-import { Entypo } from "@expo/vector-icons";
+import { Feather, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+
 import useAccount from "../../hooks/account";
 
 
@@ -52,8 +53,12 @@ const renderPFP = (profile: Profile, account: string) => {
         flex: 1,
       }}
     >
-
-      <Entypo
+      <MaterialCommunityIcons
+        name="discord"
+        size={16}
+        color="#9CA3AF"
+        style={styles.field.icon} />
+      <Feather
         style={styles.field.icon}
         name="globe"
         size={16}
@@ -65,6 +70,7 @@ const renderPFP = (profile: Profile, account: string) => {
         size={16}
         color="#9CA3AF"
       />
+
 
     </View>
 
