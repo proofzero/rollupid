@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 
 import useAccount from "../../hooks/account";
 
-import { clearAccount, connect, forceAccounts } from "../../provider/web3";
+import { connect, forceAccounts } from "../../provider/web3";
 import {
   authenticate,
   isAuthenticated,
   kbGetClaims,
-  purge,
+  threeIdListInvitations,
 } from "../../provider/kubelt";
 
 import Layout from "../Layout";
@@ -22,8 +22,15 @@ export default function Auth({ navigation }: { navigation: any }) {
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
       return navigation.navigate("Settings");
+    } else if (account) {
+      const invites = await threeIdListInvitations();
+      if (invites.length > 0) {
+        return navigation.navigate("Invite");
+      } else {
+        return navigation.navigate("Gate");
+      }
     } else {
-      return navigation.navigate("Gate");
+      return navigation.navigate("Landing");
     }
   };
 

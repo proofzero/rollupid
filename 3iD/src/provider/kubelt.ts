@@ -7,6 +7,7 @@ import { hexlify } from "ethers/lib/utils";
 import { BehaviorSubject } from "rxjs";
 import Constants from "expo-constants";
 import { Profile } from "../types/Profile";
+import { Invitation } from "../types/Invitation.js";
 
 let sdk: any = null;
 
@@ -104,14 +105,61 @@ export const kbGetClaims = async (): Promise<string[]> => {
   let claims: string[] = [];
 
   try {
-    claims = await sdkWeb?.node_v1?.oort.claims(sdk);
+    claims = (await sdkWeb?.node_v1?.oort.claims(sdk)) || [];
   } catch (e) {
     console.warn("Failed to get claims, falling back to empty array");
   }
 
   return claims;
 };
-export const kbGetProfile = async (core: string) => {
+
+export const threeIdListInvitations = async (): Promise<Invitation[]> => {
+  let invites: Invitation[] = [];
+
+  try {
+    const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+      method: ["3id", "list-invitations"],
+      params: [],
+    });
+
+    if (!res || res?.error || res?.body?.error) {
+      throw new Error();
+    }
+
+    // Might want to do a check here
+    invites = res.body.result;
+  } catch (e) {
+    console.warn("Failed to get invites, falling back to empty array");
+  }
+
+  return invites;
+};
+
+export const threeIdUseInvitation = async (
+  contractAddress: string,
+  tokenId: string
+): Promise<boolean> => {
+  let success = false;
+
+  try {
+    const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+      method: ["3id", "redeem-invitation"],
+      params: [contractAddress, tokenId],
+    });
+
+    if (!res || res?.error || res?.body.error) {
+      throw new Error();
+    }
+
+    success = res.body.result;
+  } catch (e) {
+    console.warn("Failed to redeem invitation");
+  }
+
+  return success;
+};
+
+export const kbGetProfile = async () => {
   const profile: Profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
       .callRpc(sdk, {
@@ -129,7 +177,7 @@ export const kbGetProfile = async (core: string) => {
   return profile;
 };
 
-export const kbSetProfile = async (core: string, updatedProfile: Profile) => {
+export const kbSetProfile = async (updatedProfile: Profile) => {
   const profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
       .callRpc(sdk, {
