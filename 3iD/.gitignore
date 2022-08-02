@@ -24,3 +24,4 @@ deploy.edn
 
 # Testing
 cypress/
+tests/e2e/synpress.dev.json
