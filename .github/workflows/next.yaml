@@ -100,13 +100,6 @@ jobs:
       # Need pm2 to run `expo web` in the background
       - name: install pm2 (run expo in background)
         run: npm install pm2 -g
-      - name: install node dependencies
-        run: npm ci
-      - name: build sdk-web
-        run: npm run build:sdk-web:develop
-      - name: install node dependencies (for 3iD)
-        working-directory: ./3iD
-        run: npm ci
       - name: Compile app
         run: bb compile:app --deploy-env next
         working-directory: ./3iD
