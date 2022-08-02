@@ -852,7 +852,10 @@
   ;; the "current" target environment.
 
   ;; GPG release signing key ID.
-  -gpg:signing-key "8912BEE648BBC38CD729CB38CA8616DB61D5E946"
+  -gpg:signing-key
+  {:doc "Key ID of the GPG release signing key"
+   :depends [-env:merged]
+   :task (:gpg/signing-key -env:merged)}
 
   -git:remote "origin"
 
@@ -990,6 +993,11 @@
   {:doc "Print the merged environment"
    :depends [-env:merged]
    :task (pprint/pprint -env:merged)}
+
+  -prn:signing-key
+  {:doc "Print the signing key ID"
+   :depends [-gpg:signing-key]
+   :task (println -gpg:signing-key)}
 
   -prn:test-strict?
   {:doc "Print test-strict? setting"
