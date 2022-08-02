@@ -50,7 +50,6 @@
 
     ;; The name of the per-user development environments.
     (def env-cosmin "cosmin")
-    (def env-dhruv "dhruv")
     (def env-juan "juan")
     (def env-alex "alex")
     (def env-robert "robert")
@@ -60,7 +59,6 @@
     (def env-current "current")
     ;; All valid deployment environments.
     (def environments #{env-cosmin
-                        env-dhruv
                         env-juan
                         env-alex
                         env-robert
@@ -195,14 +193,13 @@
 
   -deploy:host
   {:doc "The public-facing host name for a given deployment environment"
-   :depends [-deploy:env -url:alex -url:cosmin -url:dhruv -url:juan -url:robert]
+   :depends [-deploy:env -url:alex -url:cosmin -url:juan -url:robert]
    :task (condp = -deploy:env
            env-next next-host
            env-current current-host
            ;; Developer-specific
            env-alex (strip-scheme -url:alex)
            env-cosmin (strip-scheme -url:cosmin)
-           env-dhruv (strip-scheme -url:dhruv)
            env-juan (strip-scheme -url:juan)
            env-robert (strip-scheme -url:robert)
            (throw (ex-info "no environment to URL mapping" {:env -deploy:env})))}
@@ -294,10 +291,6 @@
   {:depends [-env:merged]
    :task (get -env:merged :cosmin/url)}
 
-  -url:dhruv
-  {:depends [-env:merged]
-   :task (get -env:merged :dhruv/url)}
-
   -url:juan
   {:depends [-env:merged]
    :task (get -env:merged :juan/url)}
@@ -324,14 +317,12 @@
   {:doc "The internal URL of the deployed application"
    :depends [-deploy:env
              -url:cosmin
-             -url:dhruv
              -url:juan
              -url:alex
              -url:robert
              -url:next
              -url:current]
    :task (let [env->url {env-cosmin -url:cosmin
-                         env-dhruv -url:dhruv
                          env-juan -url:juan
                          env-alex -url:alex
                          env-robert -url:robert
@@ -386,11 +377,6 @@
    :depends [-options:common]
    :task (do (merge -options:common {:env/name env-cosmin}))}
 
-  -options:dhruv
-  {:doc "The options map for 'robert' development environment."
-   :depends [-options:common]
-   :task (do (merge -options:common {:env/name env-dhruv}))}
-
   -options:alex
   {:doc "The options map for 'alex' development environment."
    :depends [-options:common]
@@ -416,14 +402,12 @@
    :depends [-deploy:env
              -options:alex
              -options:cosmin
-             -options:dhruv
              -options:robert
              -options:next
              -options:current]
    :task (condp = -deploy:env
            env-alex -options:alex
            env-cosmin -options:cosmin
-           env-dhruv -options:dhruv
            env-robert -options:robert
            env-next -options:next
            env-current -options:current
@@ -508,8 +492,6 @@
   -env:alex-kv-app-id (system/env "ALEX_KV_APP_ID")
   -env:cosmin-account-id (system/env "COSMIN_ACCOUNT_ID")
   -env:cosmin-kv-app-id (system/env "COSMIN_KV_APP_ID")
-  -env:dhruv-account-id (system/env "DHRUV_ACCOUNT_ID")
-  -env:dhruv-kv-app-id (system/env "DHRUV_KV_APP_ID")
   -env:juan-account-id (system/env "JUAN_ACCOUNT_ID")
   -env:juan-kv-app-id (system/env "JUAN_KV_APP_ID")
   -env:robert-account-id (system/env "ROBERT_ACCOUNT_ID")
@@ -527,8 +509,6 @@
    :depends [-env:admin-account-id
              -env:robert-account-id
              -env:robert-kv-app-id
-             -env:dhruv-account-id
-             -env:dhruv-kv-app-id
              -env:juan-account-id
              -env:juan-kv-app-id
              -env:cosmin-account-id
@@ -549,8 +529,6 @@
             :juan/kv-app-id -env:juan-kv-app-id
             :cosmin/account-id -env:cosmin-account-id
             :cosmin/kv-app-id -env:cosmin-kv-app-id
-            :dhruv/account-id -env:dhruv-account-id
-            :dhruv/kv-app-id -env:dhruv-kv-app-id
             :alex/account-id -env:alex-account-id
             :alex/kv-app-id -env:alex-kv-app-id
             :admin/account-id -env:admin-account-id
