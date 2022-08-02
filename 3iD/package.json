@@ -23,6 +23,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
+    "test:synpress:dev": "npx synpress run --configFile tests/e2e/synpress.dev.json --config supportFile=tests/support/index.js",
     "test:synpress:run": "npx synpress run --configFile tests/e2e/synpress.json --config supportFile=tests/support/index.js",
     "test:synpress:open": "npx synpress open --configFile tests/e2e/synpress.json"
   },
@@ -62,6 +63,7 @@
     "@synthetixio/synpress": "1.2.0",
     "@types/react": "17.0.21",
     "@types/react-native": "0.66.13",
+    "dotenv-run-script": "^0.2.0",
     "expo-optimize": "0.2.19",
     "typescript": "4.7.4",
     "wrangler": "2.0.23"
