@@ -23,7 +23,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "test:synpress:dev": "dotenv npx synpress run --configFile tests/e2e/synpress.dev.json --config supportFile=tests/support/index.js",
+    "test:synpress:dev": "dotenv npx -- synpress run --configFile tests/e2e/synpress.dev.json --config supportFile=tests/support/index.js",
     "test:synpress:run": "npx synpress run --configFile tests/e2e/synpress.json --config supportFile=tests/support/index.js",
     "test:synpress:open": "npx synpress open --configFile tests/e2e/synpress.json"
   },
