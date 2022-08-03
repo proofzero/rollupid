@@ -56,3 +56,4 @@
  ;; Metamask wallet for 3iD testing.
  :metamask/password ""
  :metamask/recovery-phrase ""}
+ 
