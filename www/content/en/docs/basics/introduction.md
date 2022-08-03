@@ -70,7 +70,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 
 ---
 
-Visit [✨ Starbase](https://starbase.kubelt.com) to get started with the Kubelt platform or explore our [guides]({{< relref "Guides" >}}) to learn more about the platform.
+Visit [✨ Starbase](https://starbase.kubelt.com) to get started with the Kubelt platform or explore our [guides]({{< relref "Quick-Start" >}}) to learn more about the platform.
 
 Check out our [📦 Github Repo](https://github.com/kubelt/kubelt) to learn more about open source [SDK](https://sdk.kubelt.com/) and libraries.
 
