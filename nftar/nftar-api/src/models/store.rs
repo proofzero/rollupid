@@ -18,37 +18,16 @@ pub struct Meta {
     pub properties: Option<Vec<String>>,
     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
     pub _type: Option<Type>,
-    #[serde(rename = "file", skip_serializing_if = "Option::is_none")]
-    pub file: Option<Vec<u8>>,
-    
 }
 
 
-// #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-// pub struct Store {pub use self::nft::Nft;
-//     /// Self-describing content-addressed identifiers for distributed systems. Check [spec](https://github.com/multiformats/cid) for more info.
-//     #[serde(rename = "cid", skip_serializing_if = "Option::is_none")]
-//     pub cid: Option<String>,
-//     /// Size in bytes of the NFT data.
-//     #[serde(rename = "size", skip_serializing_if = "Option::is_none")]
-//     pub size: Option<f32>,
-//     /// This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: YYYY-MM-DDTHH:MM:SSZ.
-//     #[serde(rename = "created", skip_serializing_if = "Option::is_none")]
-//     pub created: Option<String>,
-//     /// MIME type of the upload file or 'directory' when uploading multiple files.
-//     #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-//     pub _type: Option<Type>,
-//     /// Name of the JWT token used to create this NFT.
-//     #[serde(rename = "scope", skip_serializing_if = "Option::is_none")]
-//     pub scope: Option<String>,
-//     #[serde(rename = "pin", skip_serializing_if = "Option::is_none")]
-//     pub pin: Option<Box<crate::models::Pin>>,
-//     /// Files in the directory (only if this NFT is a directory).
-//     #[serde(rename = "files", skip_serializing_if = "Option::is_none")]
-//     pub files: Option<Vec<serde_json::Value>>,
-//     #[serde(rename = "deals", skip_serializing_if = "Option::is_none")]
-//     pub deals: Option<Vec<crate::models::Deal>>,
-// }
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Form {
+    #[serde(rename = "meta", skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Meta>,
+    #[serde(rename = "file", skip_serializing_if = "Option::is_none")]
+    pub file: Option<Vec<u8>>,
+}
 
 impl Meta {
     pub fn new() -> Meta {
@@ -57,6 +36,14 @@ impl Meta {
             description: None,
             properties: None,
             _type: None,
+        }
+    }
+}
+
+impl Form {
+    pub fn new() -> Form {
+        Form {
+            meta: None,
             file: None,
         }
     }

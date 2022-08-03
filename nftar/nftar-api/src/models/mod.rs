@@ -23,6 +23,7 @@ pub use self::nft::Nft;
 pub mod store;
 pub use self::store::Meta;
 pub use self::store::Type;
+pub use self::store::Form;
 pub mod pin;
 pub use self::pin::Pin;
 pub mod pin_status;

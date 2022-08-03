@@ -11,7 +11,7 @@
 
 use reqwest;
 
-use crate::{apis::ResponseContent, models::Meta};
+use crate::{apis::ResponseContent, models::{Meta, store::Form}};
 use super::{Error, configuration};
 
 
@@ -152,7 +152,7 @@ pub async fn status(configuration: &configuration::Configuration, cid: &str) -> 
 }
 
 /// Store a file with nft.storage.  - Submit a HTTP `POST` request passing the file data in the request body. - To store multiple files in a directory, submit a `multipart/form-data` HTTP `POST` request.  Use the `Content-Disposition` header for each part to specify a filename. 
-pub async fn store(configuration: &configuration::Configuration, body: Meta) -> Result<crate::models::UploadResponse, Error<StoreError>> {
+pub async fn store(configuration: &configuration::Configuration, body: Form) -> Result<crate::models::UploadResponse, Error<StoreError>> {
 
     let local_var_client = &configuration.client;
 

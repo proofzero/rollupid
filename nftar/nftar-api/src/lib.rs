@@ -4,7 +4,7 @@ extern crate serde_derive;
 use std::path::PathBuf;
 
 use apis::{nft_storage_api::store, configuration::Configuration};
-use models::{Meta, store::Type};
+use models::{Meta, Type, Form};
 use serde_json::json;
 use worker::*;
 use serde::Serialize;
@@ -204,10 +204,14 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                     description: None,
                     properties: None,
                     _type: Some(Type::ImageJpeg),
+                };
+
+                let form = Form {
+                    meta: Some(meta),
                     file: Some(img.into_raw()),
                 };
 
-                let resp = store(configuration, meta).await;
+                let resp = store(configuration, form).await;
                 match resp {
                     Ok(v) => return Response::from_json(&json!({
                         "address": address,
