@@ -44,7 +44,9 @@ While developing, your main concern will be running `npm run web` to get the dev
 
 ### UI Tests
 
-These tests use a wrapper called Synpress around the UI test framework Cypress. To run these tests ensure you have set your `SECRET_WORDS` in your version of the `.env` file (copied from the example). 
+These tests use a wrapper called Synpress around the UI test framework Cypress. To run these tests ensure you have set your `SECRET_WORDS` in your version of the `.env` file (copied from the example).
+
+Before running the test also make sure you've installed the `dotenv-cli` package globally with `npm install -g dotenv-cli`.
 
 With the development server running, the following command should run the test suite:
 

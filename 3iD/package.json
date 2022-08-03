@@ -18,7 +18,6 @@
     "url": "git+https://github.com/kubelt/kubelt.git"
   },
   "scripts": {
-    "preinstall": "dotenv-cli",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
