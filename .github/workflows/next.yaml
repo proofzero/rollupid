@@ -97,3 +97,21 @@ jobs:
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
         run: bb test:smoke --deploy-env next
+      # Need pm2 to run `expo web` in the background
+      - name: install pm2 (run expo in background)
+        run: npm install pm2 -g
+      - name: Compile app
+        run: bb compile:app --deploy-env next
+        working-directory: ./3iD
+      - name: Run app
+        run: pm2 start npm -- run web
+        working-directory: ./3iD
+      # Use `xvfb` to run the synpress tests headless
+      - name: "run ui tests"
+        uses: GabrielBB/xvfb-action@v1
+        env:
+          NETWORK: mainnet
+          SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
+        with:
+          working-directory: ./3iD
+          run: npm run test:synpress:run

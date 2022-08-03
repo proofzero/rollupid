@@ -42,9 +42,13 @@ While developing, your main concern will be running `npm run web` to get the dev
 
 ## Testing
 
+### UI Tests
+
+These tests use a wrapper called Synpress around the UI test framework Cypress. To run these tests ensure you have set your `SECRET_WORDS` in your version of the `.env` file (copied from the example). 
+
 With the development server running, the following command should run the test suite:
 
-`npm run test:synpress:run`
+`npm run test:synpress:dev`
 
 TODO
 
