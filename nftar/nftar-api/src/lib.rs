@@ -1,3 +1,10 @@
+#[macro_use]
+extern crate serde_derive;
+
+use std::path::PathBuf;
+
+use apis::{nft_storage_api::store, configuration::Configuration};
+use models::{Meta, store::Type};
 use serde_json::json;
 use worker::*;
 use serde::Serialize;
@@ -8,6 +15,8 @@ use noise::NoiseFn;
 use random_color::{RandomColor};
 
 mod utils;
+pub mod apis;
+pub mod models;
 
 #[macro_use]
 extern crate lazy_static;
@@ -187,18 +196,32 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                     *pixel = image::Rgba(rgba);
                 }
 
-                // TODO: save image
+                let configuration: &mut Configuration = &mut Configuration::default();
+                configuration.bearer_access_token = Some("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc3YTZCRURiMTM5NzBhMWMzQUU2NTQ4Mjk4QkVlNDc5NkUyNjM4MEUiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1OTU2NzUxMDY5OCwibmFtZSI6Im5mdGFyLWFkcmlhbiJ9.E7QLmq_H_FwkoydMK1aBvmTtZnDHYJJVucFKtf1Dkzs".to_string());
+                
+                let meta = Meta {
+                    name: None,
+                    description: None,
+                    properties: None,
+                    _type: Some(Type::ImageJpeg),
+                    file: Some(img.into_raw()),
+                };
 
-
-                return Response::from_json(&json!({
-                    "address": address,
-                    "scale_denominator": scale_denominator,
-                    "smoothness": smoothness,
-                    "output_width": output_width,
-                    "output_height": output_height,
-                    "noise_algo": noise_algo,
-                    "acct_color": acct_color,
-                }));       
+                let resp = store(configuration, meta).await;
+                match resp {
+                    Ok(v) => return Response::from_json(&json!({
+                        "address": address,
+                        "scale_denominator": scale_denominator,
+                        "smoothness": smoothness,
+                        "output_width": output_width,
+                        "output_height": output_height,
+                        "noise_algo": noise_algo,
+                        "acct_color": acct_color,
+                    })),
+                    Err(e) => return Response::from_json(&json!({
+                        "error": e.to_string(),
+                    })),  
+                }   
             }
 
             Response::error("Bad Request", 400)
