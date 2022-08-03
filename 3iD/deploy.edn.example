@@ -13,33 +13,18 @@
 ;; * create KV store: three-id-APP
 ;;
 ;; In this file:
-;; * add :joe/account-id
-;; * add :joe/kv-app-id
-;; * add :joe/url
+;; * add :dev/account-id
+;; * add :dev/kv-app-id
+;; * add :dev/url
 ;;
-;; In bb.edn:
-;; * add environment name
-;;   (def env-joe "joe")
-;; * add environment name to set of environments:
-;;   (def environments #{... env-joe ...})
-;; * set up user environment URL
-;;   -url:joe {:depends [-env:merged] :task (get -env:merged :joe/url)}
-;; * update -url:deploy
-;;   > add task dependency on -url:joe
-;;   > update mapping by adding k/v pair: {env-joe -url:joe}
-;; * set up user options
-;;   -options:joe
-;;   {:doc "The options map for 'joe' development environment."
-;;    :depends [-options:common]
-;;    :task (do (merge -options:common {:env/name env-joe}))}
 ;;
 ;; Run some tests and ensure you get expected output:
-;; * bb -prn:deploy-env --deploy-env joe
-;; * bb -prn:deploy-host --deploy-env joe
-;; * bb -prn:deploy-url --deploy-env joe
-;; * bb -prn:options --deploy-env joe
-;; * JOE_ACCOUNT_ID=foobar bb -prn:env-vars --deploy-env joe
-;; * JOE_KV_APP_ID=foobar bb -prn:env-vars --deploy-env joe
+;; * bb -prn:deploy-env --deploy-env env
+;; * bb -prn:deploy-host --deploy-env env
+;; * bb -prn:deploy-url --deploy-env env
+;; * bb -prn:options --deploy-env env
+;; * DEV_ACCOUNT_ID=foobar bb -prn:env-vars --deploy-env env
+;; * DEV_KV_APP_ID=foobar bb -prn:env-vars --deploy-env env
 
 {:dev/account-id ""
  :dev/kv-app-id ""
@@ -71,3 +56,4 @@
  ;; Metamask wallet for 3iD testing.
  :metamask/password ""
  :metamask/recovery-phrase ""}
+c5902365738951d1946e51768978eb46
