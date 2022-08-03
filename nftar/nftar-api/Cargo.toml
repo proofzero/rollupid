@@ -1,0 +1,36 @@
+[package]
+name = "todo-worker"
+version = "0.0.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+cfg-if = "0.1.2"
+worker = "0.0.9"
+serde_json = "1.0.67"
+atty = "0.2.14"
+colorgrad = "0.6.0"
+svg = "0.10.0"
+terminal_size = "0.1.17"
+noise =  {git = "https://github.com/Razaekel/noise-rs/", branch = "develop" }
+image = "0.24.3"
+random_color = "0.6.1"
+rand = "0.8.5"
+lazy_static = "1.4.0"
+serde="1.0.117"
+
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.1", optional = true }
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
