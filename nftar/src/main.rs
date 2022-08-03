@@ -236,6 +236,8 @@ fn main() {
     //     *pixel = image::Rgba(rgba);
     // }
 
+    // TODO: manipulate image with https://github.com/image-rs/image
+
     // TODO: output as base64 with metadata (values used to generate the image)
     img.save(output_file).unwrap();
 }
