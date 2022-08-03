@@ -44,7 +44,9 @@ While developing, your main concern will be running `npm run web` to get the dev
 
 ### UI Tests
 
-These tests use a wrapper called Synpress around the UI test framework Cypress. To run these tests ensure you have set your `SECRET_WORDS` in your version of the `.env` file (copied from the example). 
+These tests use a wrapper called Synpress around the UI test framework Cypress. To run these tests ensure you have set your `SECRET_WORDS` in your version of the `.env` file (copied from the example).
+
+Before running the test also make sure you've installed the `dotenv-cli` package globally with `npm install -g dotenv-cli`.
 
 With the development server running, the following command should run the test suite:
 
@@ -72,21 +74,23 @@ $ npx wrangler login
 
 ### Generate .env file for environment
 
-`bb dot:env --deploy-env <env_name>`
+`bb dot:env --deploy-env <dev|next|current>`
+
+For dev environment you should set your personal CF app and kv values.
 
 ### Deploy app
 
-`bb deploy:app --deploy-env <env_name>`
+`bb deploy:app --deploy-env <dev|next|current>`
 
 ### Publish site
 
 #### Linux
 
-`bb publish:site --deploy-env <env-name>`
+`bb publish:site --deploy-env <env-dev|next|current>`
 
 #### Windows
 
 In case the `bb publish:site` task doesn't work on your windows configuration,
 deployment can be done through `wrangler` inside the `./worker` folder.
 
-`wrangler publish -c .\wrangler.toml --env <env_name>`
+`wrangler publish -c .\wrangler.toml --env <dev|next|current>`

@@ -76,6 +76,8 @@ Please use the following tools and versions when developing with this repository
 
 Install NIX and run `nix-build` to install nix packages and `nix-shell` to execute a shell with a fully configured development environment.
 
+Note that docker doesn't fully work using nix packages.
+
 ### Build
 
 Run `bb run test:all:develop` to make sure everything is setup correctly. Then use `bb tasks` to see what other build and test tasks are available.

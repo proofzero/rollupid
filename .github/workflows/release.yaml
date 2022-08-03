@@ -34,7 +34,7 @@ jobs:
   # 3iD
   # ----------------------------------------------------------------------------
 
-  3iD:
+  ThreeiD:
     runs-on: ubuntu-latest
     permissions:
       packages: read
