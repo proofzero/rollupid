@@ -107,6 +107,12 @@ jobs:
         run: pm2 start npm -- run web
         working-directory: ./3iD
       # Use `xvfb` to run the synpress tests headless
+      - name: Cache Cypress
+        id: cache-cypress
+        uses: actions/cache@v3
+        with:
+          path: ./3iD/cypress
+          key: ${{ runner.os }}-cypress
       - name: "run ui tests"
         uses: GabrielBB/xvfb-action@v1
         env:
