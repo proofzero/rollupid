@@ -1,0 +1,73 @@
+;; three-id/deploy.edn
+;; -----------------------------------------------------------------------------
+;; To add a new dev environment, a developer must:
+;; * create a CloudFlare account with their @kubelt.com e-mail
+;; * run: npm install in the repo (in $ROOT/three-id/ directory)
+;;   [this installs wrangler]
+;; * run: npx wrangler login (in $ROOT/three-id/ directory)
+;;   [grants wrangler permission to make changes in their account]
+;; * ensure they are logged into developer CF site
+;;   NB: in CloudFlare UI make sure you're viewing <dev@kubelt.com>,
+;;   *not* <admin@kubelt.com>
+;; * create worker service: three-id
+;; * create KV store: three-id-APP
+;;
+;; In this file:
+;; * add :joe/account-id
+;; * add :joe/kv-app-id
+;; * add :joe/url
+;;
+;; In bb.edn:
+;; * add environment name
+;;   (def env-joe "joe")
+;; * add environment name to set of environments:
+;;   (def environments #{... env-joe ...})
+;; * set up user environment URL
+;;   -url:joe {:depends [-env:merged] :task (get -env:merged :joe/url)}
+;; * update -url:deploy
+;;   > add task dependency on -url:joe
+;;   > update mapping by adding k/v pair: {env-joe -url:joe}
+;; * set up user options
+;;   -options:joe
+;;   {:doc "The options map for 'joe' development environment."
+;;    :depends [-options:common]
+;;    :task (do (merge -options:common {:env/name env-joe}))}
+;;
+;; Run some tests and ensure you get expected output:
+;; * bb -prn:deploy-env --deploy-env joe
+;; * bb -prn:deploy-host --deploy-env joe
+;; * bb -prn:deploy-url --deploy-env joe
+;; * bb -prn:options --deploy-env joe
+;; * JOE_ACCOUNT_ID=foobar bb -prn:env-vars --deploy-env joe
+;; * JOE_KV_APP_ID=foobar bb -prn:env-vars --deploy-env joe
+
+{:dev/account-id "c5902365738951d1946e51768978eb46"
+ :dev/kv-app-id "7fe0ec443d7a4df881f0e5326813c33d"
+ :dev/url "https://three-id.rob5492.workers.dev"
+
+ :admin/account-id ""
+
+ ;; Pre-production
+ :next/kv-app-id ""
+ :next/url ""
+
+ ;; Production
+ :current/kv-app-id ""
+ :current/url ""
+
+ ;; The Cloudflare identifier for the threeid.xyz zone. Used to make API
+ ;; call to purge cache for the zone when deploying to production.
+ :cloudflare/zone-id ""
+ :cloudflare/zone-name "threeid.xyz"
+ ;; Token that permits purging of threeid.xyz zone cache *only*.
+ :cloudflare/api-token ""
+
+ ;; Datadog client token that is compiled into the app.
+ :datadog/client-token ""
+
+ ;; GnuPG release signing key
+ :gpg/signing-key ""
+
+ ;; Metamask wallet for 3iD testing.
+ :metamask/password ""
+ :metamask/recovery-phrase ""}

@@ -16,12 +16,12 @@
   :init
   (do
     ;; Load pod for hickory, etc.
-    (pods/load-pod 'retrogradeorbit/bootleg "0.1.9")
+;;     (pods/load-pod 'retrogradeorbit/bootleg "0.1.9")
 
     ;; Add shared build code to classpath.
     (cp/add-classpath "../bb")
 
-    (require '[pod.retrogradeorbit.hickory.select :as hick])
+;;     (require '[pod.retrogradeorbit.hickory.select :as hick])
 
     (require '[com.kubelt.cloudflare.client :as cf])
     (require '[com.kubelt.cloudflare.client.zone :as cf.zone])
@@ -49,19 +49,13 @@
     ;; -------------------------------------------------------------------------
 
     ;; The name of the per-user development environments.
-    (def env-cosmin "cosmin")
-    (def env-juan "juan")
-    (def env-alex "alex")
-    (def env-robert "robert")
+    (def env-dev "dev")
     ;; The name of the staging environment.
     (def env-next "next")
     ;; The name of the production environment.
     (def env-current "current")
     ;; All valid deployment environments.
-    (def environments #{env-cosmin
-                        env-juan
-                        env-alex
-                        env-robert
+    (def environments #{env-dev
                         env-next
                         env-current})
 
@@ -193,15 +187,12 @@
 
   -deploy:host
   {:doc "The public-facing host name for a given deployment environment"
-   :depends [-deploy:env -url:alex -url:cosmin -url:juan -url:robert]
+   :depends [-deploy:env -url:dev]
    :task (condp = -deploy:env
            env-next next-host
            env-current current-host
            ;; Developer-specific
-           env-alex (strip-scheme -url:alex)
-           env-cosmin (strip-scheme -url:cosmin)
-           env-juan (strip-scheme -url:juan)
-           env-robert (strip-scheme -url:robert)
+           env-dev (strip-scheme -url:dev)
            (throw (ex-info "no environment to URL mapping" {:env -deploy:env})))}
 
   -internal:host
@@ -287,21 +278,10 @@
   ;;
 
   ;; Development
-  -url:cosmin
-  {:depends [-env:merged]
-   :task (get -env:merged :cosmin/url)}
 
-  -url:juan
+  -url:dev
   {:depends [-env:merged]
-   :task (get -env:merged :juan/url)}
-
-  -url:alex
-  {:depends [-env:merged]
-   :task (get -env:merged :alex/url)}
-
-  -url:robert
-  {:depends [-env:merged]
-   :task (get -env:merged :robert/url)}
+   :task (get -env:merged :dev/url)}
 
   ;; Pre-production
   -url:next
@@ -316,16 +296,10 @@
   -url:deploy
   {:doc "The internal URL of the deployed application"
    :depends [-deploy:env
-             -url:cosmin
-             -url:juan
-             -url:alex
-             -url:robert
+             -url:dev
              -url:next
              -url:current]
-   :task (let [env->url {env-cosmin -url:cosmin
-                         env-juan -url:juan
-                         env-alex -url:alex
-                         env-robert -url:robert
+   :task (let [env->url {env-dev -url:dev
                          env-next -url:next
                          env-current -url:current}
                url (get env->url -deploy:env)]
@@ -372,20 +346,10 @@
                        :config/path wrangler-toml
                        :namespace/name kv-namespace})
 
-  -options:cosmin
-  {:doc "The options map for 'cosmin' development environment."
+  -options:dev
+  {:doc "The options map for 'dev' development environment."
    :depends [-options:common]
-   :task (do (merge -options:common {:env/name env-cosmin}))}
-
-  -options:alex
-  {:doc "The options map for 'alex' development environment."
-   :depends [-options:common]
-   :task (do (merge -options:common {:env/name env-alex}))}
-
-  -options:robert
-  {:doc "The options map for 'robert' development environment."
-   :depends [-options:common]
-   :task (do (merge -options:common {:env/name env-robert}))}
+   :task (do (merge -options:common {:env/name env-dev}))} 
 
   -options:next
   {:doc "The options map for next environment"
@@ -400,15 +364,11 @@
   -options:cloudflare
   {:doc "The options map used for CloudFlare operations"
    :depends [-deploy:env
-             -options:alex
-             -options:cosmin
-             -options:robert
+             -options:dev
              -options:next
              -options:current]
    :task (condp = -deploy:env
-           env-alex -options:alex
-           env-cosmin -options:cosmin
-           env-robert -options:robert
+           env-dev -options:dev
            env-next -options:next
            env-current -options:current
            (throw (ex-info "no options map for unknown build"
@@ -488,14 +448,8 @@
   -env:current-kv-app-id (system/env "CURRENT_KV_APP_ID")
   -env:current-url (system/env "CURRENT_URL")
 
-  -env:alex-account-id (system/env "ALEX_ACCOUNT_ID")
-  -env:alex-kv-app-id (system/env "ALEX_KV_APP_ID")
-  -env:cosmin-account-id (system/env "COSMIN_ACCOUNT_ID")
-  -env:cosmin-kv-app-id (system/env "COSMIN_KV_APP_ID")
-  -env:juan-account-id (system/env "JUAN_ACCOUNT_ID")
-  -env:juan-kv-app-id (system/env "JUAN_KV_APP_ID")
-  -env:robert-account-id (system/env "ROBERT_ACCOUNT_ID")
-  -env:robert-kv-app-id (system/env "ROBERT_KV_APP_ID")
+  -env:dev-account-id (system/env "DEV_ACCOUNT_ID")
+  -env:dev-kv-app-id (system/env "DEV_KV_APP_ID")
 
   -env:cloudflare-api-token (system/env "CLOUDFLARE_API_TOKEN")
   -env:cloudflare-zone-id (system/env "CLOUDFLARE_ZONE_ID")
@@ -507,14 +461,8 @@
   -env:variables
   {:doc "A map of values read from environment variables"
    :depends [-env:admin-account-id
-             -env:robert-account-id
-             -env:robert-kv-app-id
-             -env:juan-account-id
-             -env:juan-kv-app-id
-             -env:cosmin-account-id
-             -env:cosmin-kv-app-id
-             -env:alex-account-id
-             -env:alex-kv-app-id
+             -env:dev-account-id
+             -env:dev-kv-app-id
              -env:next-kv-app-id
              -env:next-url
              -env:current-kv-app-id
@@ -523,14 +471,8 @@
              -env:cloudflare-zone-id
              -env:datadog-client-token]
    :task (do
-           {:robert/account-id -env:robert-account-id
-            :robert/kv-app-id -env:robert-kv-app-id
-            :juan/account-id -env:juan-account-id
-            :juan/kv-app-id -env:juan-kv-app-id
-            :cosmin/account-id -env:cosmin-account-id
-            :cosmin/kv-app-id -env:cosmin-kv-app-id
-            :alex/account-id -env:alex-account-id
-            :alex/kv-app-id -env:alex-kv-app-id
+           {:dev/account-id -env:dev-account-id
+            :dev/kv-app-id -env:dev-kv-app-id
             :admin/account-id -env:admin-account-id
             :next/kv-app-id -env:next-kv-app-id
             :next/url -env:next-url

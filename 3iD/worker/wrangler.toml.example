@@ -18,55 +18,13 @@ account_id = "{{admin/account-id}}"
 # either route or workers_dev, but not both.
 workers_dev = true
 
-{% if alex/account-id %}
-[env.alex]
+[env.dev]
 name = "three-id"
-account_id = "{{alex/account-id}}"
+account_id = "{{dev/account-id}}"
 vars = { ENVIRONMENT = "development" }
 kv_namespaces = [
-  { binding = "APP", id = "{{alex/kv-app-id}}" },
+  { binding = "APP", id = "{{dev/kv-app-id}}" },
 ]
-{% endif %}
-
-{% if robert/account-id %}
-[env.robert]
-name = "three-id"
-account_id = "{{robert/account-id}}"
-vars = { ENVIRONMENT = "development" }
-kv_namespaces = [
-  { binding = "APP", id = "{{robert/kv-app-id}}" },
-]
-{% endif %}
-
-{% if juan/account-id %}
-[env.juan]
-name = "three-id"
-account_id = "{{juan/account-id}}"
-vars = { ENVIRONMENT = "development" }
-kv_namespaces = [
-  { binding = "APP", id = "{{juan/kv-app-id}}" },
-]
-{% endif %}
-
-{% if cosmin/account-id %}
-[env.cosmin]
-name = "three-id"
-account_id = "{{cosmin/account-id}}"
-vars = { ENVIRONMENT = "development" }
-kv_namespaces = [
-  { binding = "APP", id = "{{cosmin/kv-app-id}}" },
-]
-{% endif %}
-
-{% if dhruv/account-id %}
-[env.dhruv]
-name = "three-id"
-account_id = "{{ dhruv/account-id }}"
-vars = { ENVIRONMENT = "development" }
-kv_namespaces = [
-  { binding = "APP", id = "{{dhruv/kv-app-id}}" },
-]
-{% endif %}
 
 {% if admin/account-id %}
 

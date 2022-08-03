@@ -74,21 +74,23 @@ $ npx wrangler login
 
 ### Generate .env file for environment
 
-`bb dot:env --deploy-env <env_name>`
+`bb dot:env --deploy-env <dev|next|current>`
+
+For dev environment you should set your personal CF app and kv values.
 
 ### Deploy app
 
-`bb deploy:app --deploy-env <env_name>`
+`bb deploy:app --deploy-env <dev|next|current>`
 
 ### Publish site
 
 #### Linux
 
-`bb publish:site --deploy-env <env-name>`
+`bb publish:site --deploy-env <env-dev|next|current>`
 
 #### Windows
 
 In case the `bb publish:site` task doesn't work on your windows configuration,
 deployment can be done through `wrangler` inside the `./worker` folder.
 
-`wrangler publish -c .\wrangler.toml --env <env_name>`
+`wrangler publish -c .\wrangler.toml --env <dev|next|current>`
