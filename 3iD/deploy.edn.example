@@ -41,9 +41,9 @@
 ;; * JOE_ACCOUNT_ID=foobar bb -prn:env-vars --deploy-env joe
 ;; * JOE_KV_APP_ID=foobar bb -prn:env-vars --deploy-env joe
 
-{:dev/account-id "c5902365738951d1946e51768978eb46"
- :dev/kv-app-id "7fe0ec443d7a4df881f0e5326813c33d"
- :dev/url "https://three-id.rob5492.workers.dev"
+{:dev/account-id ""
+ :dev/kv-app-id ""
+ :dev/url ""
 
  :admin/account-id ""
 
