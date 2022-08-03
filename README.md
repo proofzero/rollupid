@@ -11,7 +11,7 @@ Kubelt is a fully managed decentralized application platform. Easily deploy dApp
 
 This repository hosts Kubelt's libraries, client source code and documentation.
 
-To learn more please see the [Kubelt Docs](https://kubelt.com/docs).
+To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
 
 ## Kubelt Monorepo Tour
 
