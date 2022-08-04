@@ -5,13 +5,16 @@ const bodyParser = require('koa-bodyparser');
 const Jsonrpc    = require('@koalex/koa-json-rpc');
 const fabric     = require('fabric');
 const views = require('koa-views');
-const path = require('path');
 const JSONStream = require('streaming-json-stringify');
-const http = require('http');
-const https = require('https');
+const mount = require('koa-mount');
+const serve = require('koa-better-serve')
+const path = require('path');
 
 const app     = new Koa();
 const router  = new Router();
+
+app.use(mount('/public', serve(path.join(__dirname,'canvas'))));
+
 
 const jsonrpc = new Jsonrpc({
     bodyParser: bodyParser({
@@ -23,7 +26,7 @@ const jsonrpc = new Jsonrpc({
 });
 
 
-jsonrpc.method('someMethod', (ctx, next) => {
+jsonrpc.method('3iD_genPFP', (ctx, next) => {
     // ctx.jsonrpc available
     /*
         ctx.jsonrpc.request
@@ -56,6 +59,7 @@ const render = views(__dirname + '/views', { map: {html: 'nunjucks' }})
 app.use(render);
 app.use(logger());
 app.use(router.routes());
+
 
 module.exports = app;
 

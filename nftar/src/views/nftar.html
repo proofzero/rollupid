@@ -1,1 +1,36 @@
-<p>hello</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome-1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+        <title>NFTar {{ account }}</title>
+        <style>
+            * {
+                outline: 0;
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                width: 100%;
+                height: 100%;
+            }
+
+            body {
+                width: 100%;
+                height: 100%;
+                background-color: rgb(162, 236, 142);
+            }
+
+            canvas, img {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <script type="module" src="public/canvas.js"></script>
+    </body>
+</html>
