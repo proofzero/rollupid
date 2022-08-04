@@ -1,6 +1,8 @@
 import { GlowParticle } from './glowparticle.js';
 
 const COLORS = [
+    // {r:162, g:236, b:142}
+
     {r: 45, g: 74, b: 277},
     {r: 255, g: 104, b: 248},
     {r: 44, g: 209, b: 252},
@@ -14,17 +16,32 @@ class App {
         document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d');
 
+      
+
+        // this.ctx.globalCompositeOperation = 'destination-over'
+        // this.ctx.canvas.style.backgroundColor = 'rbg(162, 236, 142)';
+        // this.ctx.fill()
+
+
+
         this.pixelRatio = (window.devicePixelRatio > 1) ? 2 : 1;
 
         this.totalParticles = 4;
         this.particles = [];
-        this.maxRadius = 850;
-        this.minRadius = 450;
+        this.maxRadius = 2000;
+        this.minRadius = 1500;
 
         window.addEventListener('resize', this.resize.bind(this), false);
         this.resize();
 
         window.requestAnimationFrame(this.animate.bind(this));
+
+        setTimeout(() => {
+        const freeze = this.ctx.canvas.toDataURL();
+            // console.log(freeze);
+            console.log(document.getElementById('hex').getAttributeNames());
+            document.getElementById('hex').setAttribute('src', freeze);
+        }, 1000);
     }
 
     resize() {
@@ -45,6 +62,8 @@ class App {
         let curColor = 0;
         this.particles = [];
 
+        // TODO: make it so the params always position the gradient the same way for first frame
+        // akak deterministic placements of particles
         for(let i = 0; i < this.totalParticles; i++) {
             const item = new GlowParticle(
                 Math.random() * this.stageWidth,
@@ -65,6 +84,12 @@ class App {
         window.requestAnimationFrame(this.animate.bind(this));
 
         this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+
+        // Add behind elements.
+        // this.ctx.beginPath()
+        // this.ctx.fillStyle = 'rgb(162, 236, 142)';
+        // this.ctx.fillRect(0, 0, this.stageWidth, this.stageHeight);
+
 
         for (let i = 0; i < this.totalParticles; i++) {
             const item = this.particles[i];

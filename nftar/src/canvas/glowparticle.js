@@ -23,18 +23,18 @@ export class GlowParticle {
 
         if (this.x < 0) {
             this.vx *= -1;
-            this.x += 1;
+            this.x += 10;
         } else if (this.x > stageWidth) {
             this.vx *= -1;
-            this.x -= 1;
+            this.x -= 10;
         }
 
         if (this.y < 0) {
             this.vy *= -1;
-            this.y += 1;
+            this.y += 10;
         } else if (this.y > stageHeight) {
             this.vy *= -1;
-            this.y -= 1;
+            this.y -= 10;
         }
 
         ctx.beginPath();
@@ -48,6 +48,7 @@ export class GlowParticle {
         );
         g.addColorStop(0, `rgba(${this.rgb.r}, ${this.rgb.g}, ${this.rgb.b}, 0.6)`);
         g.addColorStop(1, `rgba(${this.rgb.r}, ${this.rgb.g}, ${this.rgb.b}, 0.0)`);
+
         ctx.fillStyle = g;
         ctx.arc(this.x, this.y, this.radius, 0, P12, false);
         ctx.fill();
