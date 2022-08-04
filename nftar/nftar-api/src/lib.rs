@@ -196,19 +196,31 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                     *pixel = image::Rgba(rgba);
                 }
 
+                // TODO: can I save buffer to memory?
+                //    image::save_buffer("image.png", buffer, 800, 600, image::ColorType::Rgb8).unwrap()
+
+
                 let configuration: &mut Configuration = &mut Configuration::default();
                 configuration.bearer_access_token = Some("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc3YTZCRURiMTM5NzBhMWMzQUU2NTQ4Mjk4QkVlNDc5NkUyNjM4MEUiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY1OTU2NzUxMDY5OCwibmFtZSI6Im5mdGFyLWFkcmlhbiJ9.E7QLmq_H_FwkoydMK1aBvmTtZnDHYJJVucFKtf1Dkzs".to_string());
                 
+                let mut bytes = Vec::new();
+                img.write_to(&mut std::io::Cursor::new(&mut bytes), image::ImageOutputFormat::Png);
+
                 let meta = Meta {
                     name: None,
                     description: None,
                     properties: None,
-                    _type: Some(Type::ImageJpeg),
+                    image: None,
+                    // image: Some(img.into_raw()),
+                    // file: None,
+                    // image: Some(Type::ImageJpeg),
                 };
 
                 let form = Form {
                     meta: Some(meta),
-                    file: Some(img.into_raw()),
+                    // data: Some(img.into_vec()),
+                    // data: None,
+                    // file: None,
                 };
 
                 let resp = store(configuration, form).await;
@@ -221,6 +233,7 @@ pub async fn main(req: Request, env: Env, _ctx: worker::Context) -> Result<Respo
                         "output_height": output_height,
                         "noise_algo": noise_algo,
                         "acct_color": acct_color,
+                        "resp": v.value,
                     })),
                     Err(e) => return Response::from_json(&json!({
                         "error": e.to_string(),
