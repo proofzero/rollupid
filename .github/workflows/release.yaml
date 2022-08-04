@@ -31,10 +31,10 @@ jobs:
       # - run: npm install cypress --save-dev
       - run: npm run test:all:release
 
-  # three-id
+  # 3iD
   # ----------------------------------------------------------------------------
 
-  three-id:
+  ThreeiD:
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -66,12 +66,12 @@ jobs:
       - name: set tag as RELEASE_VERSION environment variable
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
-      - name: install node dependencies (for three-id)
-        working-directory: ./three-id
+      - name: install node dependencies (for 3iD)
+        working-directory: ./3iD
         run: npm ci
 
-      - name: build and deploy three-id
-        working-directory: ./three-id
+      - name: build and deploy 3iD
+        working-directory: ./3iD
         env:
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
@@ -88,7 +88,7 @@ jobs:
         run: bb deploy:app --deploy-env current --app-version ${{ env.RELEASE_VERSION }}
 
       - name: run smoke tests
-        working-directory: ./three-id
+        working-directory: ./3iD
         env:
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}

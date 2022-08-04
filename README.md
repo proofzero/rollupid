@@ -11,7 +11,7 @@ Kubelt is a fully managed decentralized application platform. Easily deploy dApp
 
 This repository hosts Kubelt's libraries, client source code and documentation.
 
-To learn more please see the [Kubelt Docs](https://kubelt.com/docs).
+To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
 
 ## Kubelt Monorepo Tour
 
@@ -38,9 +38,13 @@ The [packages/](packages/) directory contains package configuration for the thin
 
 The [www/](www/) directory contains the Kubelt.com static website documentation portal.
 
-### dApp
+### Starbase
 
-The [dapp/](dapp/) directory contains a web application for interacting with Kubelt as a customer.
+The [starbase/](starbase/) directory contains a web application for interacting with Kubelt as a customer.
+
+### 3iD
+
+The [3iD/](3iD/) directory contains an Expo React Native Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging.
 
 ### Browser Extension
 
@@ -71,6 +75,8 @@ Please use the following tools and versions when developing with this repository
 #### NIX ENV
 
 Install NIX and run `nix-build` to install nix packages and `nix-shell` to execute a shell with a fully configured development environment.
+
+Note that docker doesn't fully work using nix packages.
 
 ### Build
 

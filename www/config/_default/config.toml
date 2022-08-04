@@ -1,7 +1,8 @@
-baseurl = "https://kubelt.com/"
+baseurl = "https://developers.kubelt.com/"
 canonifyURLs = false
 disableAliases = true
 disableHugoGeneratorInject = true
+disableKinds = []
 enableEmoji = true
 enableGitInfo = false
 enableRobotsTXT = true

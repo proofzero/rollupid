@@ -11,5 +11,8 @@ pkgs.mkShell {
     pkgs.docker
     pkgs.google-chrome
     pkgs.chromedriver
+    pkgs.act
+    pkgs.docker
+    pkgs.rustup
   ];
 }

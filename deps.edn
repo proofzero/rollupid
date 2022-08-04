@@ -2,8 +2,8 @@
 {:paths ["src/dev"
          "src/main"
          "src/test"
-         "dapp/src"
-         "dapp/test"]
+         "starbase/src"
+         "starbase/test"]
 
  :deps
  {;; a Clojure/Script library for word case conversions
@@ -64,7 +64,7 @@
   :cljs {:extra-deps {;; ClojureScript compilation made easy
                       thheller/shadow-cljs {:mvn/version "2.19.5"}}}
 
-  :dapp {:extra-deps {;; Chrome DevTools enhancements for CLJS developers
+  :starbase {:extra-deps {;; Chrome DevTools enhancements for CLJS developers
                       binaryage/devtools {:mvn/version "1.0.6"}
                       ;; Reagent wrappers for @headlessui/react components
                       com.github.mainej/headlessui-reagent {:mvn/version "1.6.4.68"}

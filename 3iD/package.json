@@ -1,0 +1,71 @@
+{
+  "name": "@kubelt/three-id",
+  "version": "0.0.1-next.49+59d5010",
+  "description": "Kubelt 3iD Native",
+  "keywords": [
+    "kubelt",
+    "sdk",
+    "web3",
+    "expo",
+    "native"
+  ],
+  "author": "Proof Zero Inc.",
+  "homepage": "https://kubelt.com",
+  "license": "Apache-2.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubelt/kubelt.git"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "test:synpress:dev": "dotenv npx -- synpress run --configFile tests/e2e/synpress.dev.json --config supportFile=tests/support/index.js",
+    "test:synpress:run": "npx synpress run --configFile tests/e2e/synpress.json --config supportFile=tests/support/index.js",
+    "test:synpress:open": "npx synpress open --configFile tests/e2e/synpress.json"
+  },
+  "bugs": {
+    "url": "https://github.com/kubelt/kubelt/issues"
+  },
+  "dependencies": {
+    "@coinbase/wallet-sdk": "3.4.0",
+    "@datadog/browser-rum": "4.15.0",
+    "@expo-google-fonts/inter": "0.2.2",
+    "@expo-google-fonts/manrope": "0.2.2",
+    "@expo/webpack-config": "0.17.0",
+    "@kubelt/sdk-web": "file:../packages/sdk-web",
+    "@react-native-async-storage/async-storage": "1.17.7",
+    "@react-navigation/native": "6.0.11",
+    "@react-navigation/native-stack": "6.7.0",
+    "dotenv": "16.0.1",
+    "ethers": "5.6.9",
+    "expo": "45.0.6",
+    "expo-app-loading": "2.0.0",
+    "expo-constants": "13.1.1",
+    "expo-font": "10.1.0",
+    "expo-status-bar": "1.3.0",
+    "expo-updates": "0.13.3",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-native": "0.68.2",
+    "react-native-safe-area-context": "4.2.4",
+    "react-native-screens": "3.11.1",
+    "react-native-web": "0.17.7",
+    "rxjs": "7.5.6",
+    "web3modal": "1.9.8",
+    "webpack-dev-server": "4.9.3"
+  },
+  "devDependencies": {
+    "@babel/core": "7.18.9",
+    "@synthetixio/synpress": "1.2.0",
+    "@types/react": "17.0.21",
+    "@types/react-native": "0.66.13",
+    "expo-optimize": "0.2.19",
+    "typescript": "4.7.4",
+    "wrangler": "2.0.23"
+  },
+  "private": true
+}

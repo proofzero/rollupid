@@ -27,7 +27,7 @@
 
     ;; The path of local-only configuration file containing various
     ;; build configuration values.
-    (def deploy-edn (str (fs/path "three-id" "deploy.edn")))
+    (def deploy-edn (str (fs/path "3iD" "deploy.edn")))
     ;; Secrets used by act (local GitHub Actions workflow runner).
     (def act-secrets "act.secrets"))
 
@@ -79,10 +79,10 @@
                         :current-url current-url}]
            (dot-env/write act-secrets secrets))}
 
-  -act:next:three-id
-  {:doc "Run GitHub Actions 'next' pipeline, 'three-id' job locally"
+  -act:next:3iD
+  {:doc "Run GitHub Actions 'next' pipeline, '3iD' job locally"
    :depends [-act:secrets]
-   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j three-id")}
+   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j 3iD")}
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------
@@ -166,54 +166,54 @@
    :task (shell "npx lerna run build:release --scope @kubelt/sdk-web")}
 
   ;; TODO: use varaibles for paths
-  build:dapp:css
-  {:doc "Generate CSS for the dapp"
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js")}
+  build:starbase:css
+  {:doc "Generate CSS for the starbase"
+   :task (shell "npx tailwindcss -i ./starbase/src/css/app.css -o ./starbase/resources/public/app.css --config starbase/tailwind.config.js")}
 
-  build:dapp:develop
-  {:doc "Build a development version of dapp"
-   :task (shell "npx shadow-cljs compile dapp")}
+  build:starbase:develop
+  {:doc "Build a development version of starbase"
+   :task (shell "npx shadow-cljs compile starbase")}
 
-  build:dapp:css-watch
-  {:doc "Watch dapp CSS and rebuild when changed"
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js --watch")}
+  build:starbase:css-watch
+  {:doc "Watch starbase CSS and rebuild when changed"
+   :task (shell "npx tailwindcss -i ./starbase/src/css/app.css -o ./starbase/resources/public/app.css --config starbase/tailwind.config.js --watch")}
 
-  build:dapp:develop-watch
-  {:doc "Watch dapp sources and build development version when changed"
-   :task (shell "npx shadow-cljs watch dapp dapp-test dapp-ci")}
+  build:starbase:develop-watch
+  {:doc "Watch starbase sources and build development version when changed"
+   :task (shell "npx shadow-cljs watch starbase starbase-test starbase-ci")}
 
-  build:dapp:cypress-watch
+  build:starbase:cypress-watch
   {:doc "Launch Cypress and run tests when changed"
-   :task (shell {:dir "dapp/"} "npx cypress open")}
+   :task (shell {:dir "starbase/"} "npx cypress open")}
 
-  -build:dapp:watch
-  {:doc "Watch all dapp sources and rebuild development version when changed"
-   :depends [build:dapp:css-watch build:dapp:develop-watch]}
+  -build:starbase:watch
+  {:doc "Watch all starbase sources and rebuild development version when changed"
+   :depends [build:starbase:css-watch build:starbase:develop-watch]}
 
-  -build:dapp:watch-test
-  {:doc "Watch all dapp sources/tests and rebuild development version when changed"
-   :depends [build:dapp:css-watch build:dapp:develop-watch build:dapp:cypress-watch]}
+  -build:starbase:watch-test
+  {:doc "Watch all starbase sources/tests and rebuild development version when changed"
+   :depends [build:starbase:css-watch build:starbase:develop-watch build:starbase:cypress-watch]}
 
-  build:dapp:watch
-  {:task (run '-build:dapp:watch {:parallel true})}
+  build:starbase:watch
+  {:task (run '-build:starbase:watch {:parallel true})}
 
-  build:dapp:watch-test
-  {:task (run '-build:dapp:watch-test {:parallel true})}
+  build:starbase:watch-test
+  {:task (run '-build:starbase:watch-test {:parallel true})}
 
-  build:dapp:release-css
-  {:doc "Build release version of dapp CSS"
-   :task (shell "npx tailwindcss -i ./dapp/src/css/app.css -o ./dapp/resources/public/app.css --config dapp/tailwind.config.js")}
+  build:starbase:release-css
+  {:doc "Build release version of starbase CSS"
+   :task (shell "npx tailwindcss -i ./starbase/src/css/app.css -o ./starbase/resources/public/app.css --config starbase/tailwind.config.js")}
 
-  build:dapp:release-cljs
-  {:doc "Build release version of dapp"
-   :task (shell "npx shadow-cljs release dapp")}
+  build:starbase:release-cljs
+  {:doc "Build release version of starbase"
+   :task (shell "npx shadow-cljs release starbase")}
 
-  -build:dapp:release
-  {:doc "Build release version of dapp with CSS"
-   :depends [build:dapp:release-css build:dapp:release-cljs]}
+  -build:starbase:release
+  {:doc "Build release version of starbase with CSS"
+   :depends [build:starbase:release-css build:starbase:release-cljs]}
 
-  build:dapp:release
-  {:task (run '-build:dapp:release {:parallel true})}
+  build:starbase:release
+  {:task (run '-build:starbase:release {:parallel true})}
 
   run:sdk-test:cljs:develop
   {:doc "Run development version of ClojureScript SDK tests"
@@ -274,36 +274,36 @@
    ;; CHROME_BIN=$(which chromium) bb run test:web:ci
    :depends [test:web:ci:compile test:web:ci:run]}
 
-  test:dapp-karma:ci:compile
+  test:starbase-karma:ci:compile
   {:doc "Compile re-frame tests to be run with karma"
-   :task (shell "npx shadow-cljs compile dapp-ci")}
+   :task (shell "npx shadow-cljs compile starbase-ci")}
 
-  test:dapp-karma:ci:run
+  test:starbase-karma:ci:run
   {:doc "Run re-frame tests with karma"
-   :task (shell {:dir "dapp/"} "npx karma start --single-run --reporters junit,dots")}
+   :task (shell {:dir "starbase/"} "npx karma start --single-run --reporters junit,dots")}
 
-  test:dapp:ci:compile
-  {:doc "Serve dapp server after files are compiled"
-   :task (shell "npx shadow-cljs start dapp")}
+  test:starbase:ci:compile
+  {:doc "Serve starbase server after files are compiled"
+   :task (shell "npx shadow-cljs start starbase")}
 
-  test:dapp:ci:run
-  {:doc "Run dapp Cypress tests"
-   ;; needs to have the dapp server running
+  test:starbase:ci:run
+  {:doc "Run starbase Cypress tests"
+   ;; needs to have the starbase server running
    ;; can be run against `release` or `development` versions
-   :task (shell {:dir "dapp/"} "npx cypress run")}
+   :task (shell {:dir "starbase/"} "npx cypress run")}
 
-  -test:dapp:release
-  {:depends [build:dapp:release
+  -test:starbase:release
+  {:depends [build:starbase:release
              ;; Compile and run Cypress tests
-             test:dapp:ci:compile
-             test:dapp:ci:run
+             test:starbase:ci:compile
+             test:starbase:ci:run
              ;; Compile and run re-frame tests w/karma
-             ;;test:dapp-karma:ci:compile
-             ;;test:dapp-karma:ci:run
+             ;;test:starbase-karma:ci:compile
+             ;;test:starbase-karma:ci:run
              ]}
 
-  test:dapp:release
-  {:task (run '-test:dapp:release)}
+  test:starbase:release
+  {:task (run '-test:starbase:release)}
 
   test:all:develop
   {:doc "Build and test all develop"
@@ -311,7 +311,7 @@
              test:sdk:js:develop
              test:web:develop
              test:sdk-web:develop
-             test:dapp:develop]}
+             test:starbase:develop]}
 
   test:all:release
   {:doc "Build and test all release"
@@ -319,7 +319,7 @@
              test:sdk:js:release
              test:web:release
              test:sdk-web:release
-             test:dapp:release]}
+             test:starbase:release]}
 
   rpc:mock-server:ethereum
   {:doc "Run ethereum rpc mock server"

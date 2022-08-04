@@ -149,13 +149,13 @@ fn main() {
 
     // NOTE: modify scale in the same ratio as modifying resolution.
     // E.g. if you double the scale you need to double the width and height to get the same pattern
-    let scale_denominator = opt.scale.unwrap_or(1.5) * 100000.0;
-    let sharp_segment = opt.segment.unwrap_or(2);
-    let sharp_smoothness = opt.smoothness.unwrap_or(2.0);
+    let scale_denominator = opt.scale.unwrap_or(3.0) * 100000.0;
+    let sharp_segment = opt.segment.unwrap_or(5);
+    let sharp_smoothness = opt.smoothness.unwrap_or(1.0);
 
     // TODO: do we generate two images (one for pfp and one for cover)
     // NOTE: larger res == slower (could try to make async)
-    let output_width = opt.width.unwrap_or(500);
+    let output_width = opt.width.unwrap_or(1000);
     let output_height = opt.height.unwrap_or(500);
     let output_file = opt.output.unwrap_or("examples/pfp.png".to_string());
     let noise_name = opt.noise.unwrap_or("perlin".to_string());
@@ -235,6 +235,8 @@ fn main() {
     //     let rgba = grad.at(y as f64 / output_height as f64).to_rgba8();
     //     *pixel = image::Rgba(rgba);
     // }
+
+    // TODO: manipulate image with https://github.com/image-rs/image
 
     // TODO: output as base64 with metadata (values used to generate the image)
     img.save(output_file).unwrap();

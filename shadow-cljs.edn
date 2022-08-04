@@ -1,6 +1,6 @@
 ;; sdk/shadow-cljs.edn
 
-{;; dapp dev configs
+{;; starbase dev configs
  :nrepl {:port 8777}
 
  ;; Use the dependencies provided in deps.edn. The listed :aliases are
@@ -14,14 +14,14 @@
  ;; adding an explicit dependency on same causes a warning to be
  ;; generated and the pinned version support by shadow-cljs to replace
  ;; it in any case.
- :deps {:aliases [:cljs :dapp]}
+ :deps {:aliases [:cljs :starbase]}
 
  ;;:nrepl {:init-ns user.shared}
 
  ;; Configuration for development-time HTTP server.
  :dev-http {8021 "web/web-test"
-            8280 "dapp/resources/public"
-            8290 "dapp/resources/public/js/test"}
+            8280 "starbase/resources/public"
+            8290 "starbase/resources/public/js/test"}
 
  ;; Built-in targets include:
  ;; :browser
@@ -57,12 +57,12 @@
  ;; feature.
 
  :builds
- {;; DAPP (Kubelt React App)
+ {;; STARBASE (Kubelt React App)
   ;; ---------------------------------------------------------------------------
 
-  :dapp
+  :starbase
   {:target     :browser
-   :output-dir "dapp/resources/public/js/compiled"
+   :output-dir "starbase/resources/public/js/compiled"
    :asset-path "/js/compiled"
    :modules
    {:app {:init-fn dapp.core/init}}
@@ -76,18 +76,18 @@
      :closure-defines {re-frame.trace.trace-enabled?        true
                        day8.re-frame.tracing.trace-enabled? true}}}
 
-  :dapp-test
+  :starbase-test
   {:target :browser-test
-   :ns-regexp "dapp\\..*-test$"
-   :test-dir "dapp/resources/public/js/test"
+   :ns-regexp "starbase\\..*-test$"
+   :test-dir "starbase/resources/public/js/test"
    :dev
    {:compiler-options
     {:reader-features #{:browser}}}}
 
-  :dapp-ci
+  :starbase-ci
   {:target :karma
-   :ns-regexp "dapp\\..*-test$"
-   :output-to "dapp/target/karma-test.js"
+   :ns-regexp "starbase\\..*-test$"
+   :output-to "starbase/target/karma-test.js"
    :dev
    {:compiler-options
     {:reader-features #{:browser}}}}
