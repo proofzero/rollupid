@@ -57,9 +57,5 @@ app.use(render);
 app.use(logger());
 app.use(router.routes());
 
-/*
-    REQUEST -> {id: 987, jsonrpc: '2.0', method: 'someMethod'}
-    RESPONSE <- {jsonrpc: '2.0', id: 987, result: 'Hello world!'}
-*/
+module.exports = app;
 
-const server  = http.createServer(app.callback()).listen(3000);
