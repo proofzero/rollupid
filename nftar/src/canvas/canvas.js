@@ -10,7 +10,7 @@ const COLORS = [
     // {r: 255, g: 255, b: 0},
 ]
 
-const FRAMES_PER_SECOND = 24;  // Valid values are 60,30,20,15,10...
+const FRAMES_PER_SECOND = 12;  // Valid values are 60,30,20,15,10...
 
 class App {
     constructor() {
