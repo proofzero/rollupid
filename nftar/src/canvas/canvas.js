@@ -10,12 +10,16 @@ const COLORS = [
     // {r: 255, g: 255, b: 0},
 ]
 
+const FRAMES_PER_SECOND = 24;  // Valid values are 60,30,20,15,10...
+
 class App {
     constructor() {
         this.canvas = document.getElementById('canvas');
         document.body.appendChild(this.canvas);
         this.ctx = this.canvas.getContext('2d');
 
+        this.lastFrameTime = 0;
+        this.time = 0;
       
 
         // this.ctx.globalCompositeOperation = 'destination-over'
@@ -34,12 +38,15 @@ class App {
         window.addEventListener('resize', this.resize.bind(this), false);
         this.resize();
 
+        this.fpsInterval = 1000 / FRAMES_PER_SECOND;
+        this.then = Date.now();
+        this.dn =  Date.now;
+
         window.requestAnimationFrame(this.animate.bind(this));
 
         setTimeout(() => {
         const freeze = this.ctx.canvas.toDataURL();
             // console.log(freeze);
-            console.log(document.getElementById('hex').getAttributeNames());
             document.getElementById('hex').setAttribute('src', freeze);
         }, 1000);
     }
@@ -81,26 +88,30 @@ class App {
     }
 
     animate() {
+        
         window.requestAnimationFrame(this.animate.bind(this));
 
-        this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+        const now = Date.now();
+        const elapsed = now - this.then;
 
-        // Add behind elements.
-        // this.ctx.beginPath()
-        // this.ctx.fillStyle = 'rgb(162, 236, 142)';
-        // this.ctx.fillRect(0, 0, this.stageWidth, this.stageHeight);
+        if (elapsed > this.fpsInterval) {
+            // console.log('frame', this.then)
+
+            this.then = now - (elapsed % this.fpsInterval);
+
+            this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+
+            // Add behind elements.
+            // this.ctx.beginPath()
+            // this.ctx.fillStyle = 'rgb(162, 236, 142)';
+            // this.ctx.fillRect(0, 0, this.stageWidth, this.stageHeight);
 
 
-        for (let i = 0; i < this.totalParticles; i++) {
-            const item = this.particles[i];
-            item.animate(this.ctx, this.stageWidth, this.stageHeight);
+            for (let i = 0; i < this.totalParticles; i++) {
+                const item = this.particles[i];
+                item.animate(this.ctx, this.stageWidth, this.stageHeight);
+            }
         }
-
-        // var image = new Image();
-        // image.id = "pic";
-        // image.src = this.toDataURL();
-        // console.log(this.ctx.canvas.toDataURL());
-        // document.getElementById('image_for_crop').appendChild(image);
     }
 }
 
