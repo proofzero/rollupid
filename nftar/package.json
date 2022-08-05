@@ -7,8 +7,7 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 'TODO: Add a test runner and then update this command'",
-    "dev": "nodemon index.js ",
-    "start": "node index.js",
+    "start": "nodemon node index.js",
     "build": "browserify src/canvas/canvas.js --outfile dist/canvas.js -s Gradient"
   },
   "devDependencies": {
