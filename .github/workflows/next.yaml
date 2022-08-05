@@ -120,6 +120,8 @@ jobs:
           SKIP_METAMASK_SETUP: true
           CYPRESS_GENERIC_SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
           CYPRESS_GENERIC_ACCOUNT: ${{ secrets.METAMASK_3ID_TESTING_ACCOUNT }}
+          CYPRESS_INVITE_SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_INVITE_RECOVERY_PHRASE }}
+          CYPRESS_INVITE_ACCOUNT: ${{ secrets.METAMASK_3ID_TESTING_INVITE_ACCOUNT }}
         with:
           working-directory: ./3iD
           run: npm run test:synpress:run
