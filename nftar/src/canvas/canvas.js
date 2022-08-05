@@ -11,35 +11,39 @@ function requestAnimationFrame(f){
 }
 
 class App {
-    constructor(canvas_el) {
+    constructor(canvas_el, COLORS, PIXEL_RATIO = 1, FPS) {
         this.canvas = canvas_el
         this.ctx = this.canvas.getContext('2d');
 
-        this.lastFrameTime = 0;
-        this.time = 0;
+        this.COLORS = COLORS
 
-        this.pixelRatio = (typeof window !== 'undefined' && window.devicePixelRatio > 1) ? 2 : 1;
+        if (FPS) {
+            this.lastFrameTime = 0;
+            this.time = 0;
+            this.fpsInterval = 1000 / FPS;
+            this.then = Date.now();
+            this.dn =  Date.now;
+        }
+
+        this.pixelRatio = PIXEL_RATIO;
+        this.stageWidth = 1500;
+        this.stageHeight = 750;
 
         this.totalParticles = 4;
         this.particles = [];
         this.maxRadius = 2000;
         this.minRadius = 1500;
 
-        // if (typeof window !== 'undefined') {
-        //     window.addEventListener('resize', this.resize.bind(this), false);
-        // }
-        this.resize();
-
-        requestAnimationFrame(this.animate.bind(this));
-
         this.frame = null;
         this.rendered = false;
-    }
 
-    setFPS(FPS) {
-        this.fpsInterval = 1000 / FPS;
-        this.then = Date.now();
-        this.dn =  Date.now;
+        this.canvas.width = this.stageWidth * this.pixelRatio;
+        this.canvas.height = this.stageHeight * this.pixelRatio;
+        this.ctx.scale(this.pixelRatio, this.pixelRatio);
+
+        this.ctx.globalCompositeOperation = 'saturation';
+
+        this.createParticles();
     }
 
     async freeze() {
@@ -49,7 +53,6 @@ class App {
             let count = 0
             await sleep(1000);
             while(!this.isRendered() && count <= 10) {
-                console.log(count, this.isRendered())
                 count++
                 await sleep(100);
             }
@@ -60,20 +63,6 @@ class App {
             resolve(this.frame)
         }.bind(this));
         return framePromise
-    }
-
-    resize() {
-        this.stageWidth = 1500;
-        this.stageHeight = 750;
-
-        this.canvas.width = this.stageWidth * this.pixelRatio;
-        this.canvas.height = this.stageHeight * this.pixelRatio;
-        this.ctx.scale(this.pixelRatio, this.pixelRatio);
-
-        this.ctx.globalCompositeOperation = 'saturation';
-        
-        this.createParticles();
-
     }
 
     createParticles() {
@@ -87,10 +76,10 @@ class App {
                 Math.random() * this.stageWidth,
                 Math.random() * this.stageHeight,
                 Math.random() * (this.maxRadius - this.minRadius) + this.minRadius,
-                COLORS[curColor]
+                this.COLORS[curColor]
             );
 
-            if (++curColor >= COLORS.length) {
+            if (++curColor >= this.COLORS.length) {
                 curColor = 0;
             }
 

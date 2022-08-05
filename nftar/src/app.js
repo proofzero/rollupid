@@ -5,7 +5,6 @@ const bodyParser = require('koa-bodyparser');
 const Jsonrpc    = require('@koalex/koa-json-rpc');
 const fabric     = require('fabric').fabric;
 const views = require('koa-views');
-const JSONStream = require('streaming-json-stringify');
 const mount = require('koa-mount');
 const serve = require('koa-better-serve')
 const path = require('path');
@@ -13,6 +12,7 @@ const Web3 = require('web3');
 
 const Probability = require('./probability.js')
 const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
+const {generateTraits} = require('./utils.js');
 const canvas = require('./canvas/canvas.js');
 
 const app     = new Koa();
@@ -96,55 +96,17 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
         ctx.throw(401, 'account is not a valid address');
     }
 
-    // GENERATE PFP Properties
-    const probability = new Probability();
+    const genTraits = generateTraits(100, 60, 20);
+    const colors = Object.keys(genTraits).map((k) => genTraits[k].value.rgb)
     
-    // TRAIT 1
-    const wtrait1t = new Probability(TRAIT_CATEGORIES);
-    // TODO: increase weight of categories based 
-    const trait_1_type = wtrait1t.peek()[0];
-    const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
-    const trait_1_value = wtrait1v.peek()[0];
-
-    // TRAIT 2
-    var wtrait2t = new Probability(TRAIT_CATEGORIES);
-    // do some checks to increase the probability of a trait
-    const trait_2_type = wtrait2t.peek()[0];
-    const wtrait2v = new Probability(V0_COLORS[trait_2_type]);
-    const trait_2_value = wtrait2v.peek()[0];
-
-
-    // TRAIT 3
-    var wtrait3t = new Probability(TRAIT_CATEGORIES);
-    // do some checks to increase the probability of a trait
-    const trait_3_type = wtrait3t.peek()[0];
-    const wtrait3v = new Probability(V0_COLORS[trait_3_type]);
-    const trait_3_value = wtrait3v.peek()[0];
-
-    const gradient = new canvas(new fabric.Canvas('c'));
+    const gradient = new canvas(new fabric.Canvas('c'), colors);
+    gradient.animate();
     const png = await gradient.freeze()
 
     ctx.body = {
         account,
         blockchain,
-        pfpProperties: {
-            "trait0": {
-                type: "GEN",
-                value: V0_COLORS.GEN[0].data,
-            },
-            "trait1": {
-                type: trait_1_type,
-                value: trait_1_value.data,
-            },
-            "trait2": {
-                type: trait_2_type,
-                value: trait_2_value.data,
-            },
-            "trait3": {
-                type: trait_3_type,
-                value: trait_3_value.data,
-            },
-        },
+        pfpProperties: genTraits,
         image: {
             cid: "abc123",
             "content-type": "image/png",

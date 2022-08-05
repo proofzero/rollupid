@@ -51,8 +51,12 @@
 
         <script type="module">
             const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
-            const g = new Gradient(document.getElementById('canvas'));
-            window.addEventListener('resize', g.resize.bind(g), false);
+            const PIXEL_RATIO = (window.devicePixelRatio > 1) ? 2 : 1
+
+            const g = new Gradient(document.getElementById('canvas'), PIXEL_RATIO, FRAMES_PER_SECOND);
+            g.animate()
+
+            // window.addEventListener('resize', g.resize.bind(g), false);
 
             const png = await g.freeze()
             document.getElementById('hex').setAttribute('src', png);
