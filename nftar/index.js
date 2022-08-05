@@ -1,7 +1,6 @@
 // nftar/index.js
 
 const app = require('./src/app');
-const Web3 = require('web3');
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const {
     Alchemy,
@@ -42,6 +41,9 @@ const main = async (api) => {
 
     // The Ethereum minting contract address.
     api.context.contract = process.env.CONTRACT_ADDRESS;
+
+    // set the app api key
+    api.context.apiKey = process.env.NFTAR_API_KEY;
 
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;
