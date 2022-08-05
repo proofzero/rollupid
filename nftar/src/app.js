@@ -143,11 +143,9 @@ async function example(ctx) {
     }
 
     const genTraits = generateTraits(100, 60, 20);
-    // const colors = Object.keys(genTraits).map((k) => genTraits[k].value.rgb)
 
     await ctx.render('nftar', {
         account: ctx.params.account,
-        // colors: JSON.stringify(colors)
         traits: genTraits,
      });
 };
