@@ -97,8 +97,8 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     }
 
     const genTraits = generateTraits(100, 60, 20);
-    const colors = Object.keys(genTraits).map((k) => genTraits[k].value.rgb)
-    
+    const colors = Object.keys(genTraits).map((k) => genTraits[k].value)
+
     const gradient = new canvas(new fabric.Canvas('c'), colors);
     gradient.animate();
     const png = await gradient.freeze()

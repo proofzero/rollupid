@@ -45,19 +45,31 @@ const generateTraits = function(wi1, wi2, wi3) {
     return {
         "trait0": {
             "type": "GEN",
-            "value": V0_COLORS.GEN[0].data
+            "value": {
+                ...V0_COLORS.GEN[0].data,
+                rnd: [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()],
+            }
         },
         "trait1": {
             type: trait_1_type,
-            value: trait_1_value.data,
+            value: {
+                ...trait_1_value.data,
+                rnd: [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()],
+            }
         },
         "trait2": {
             type: trait_2_type,
-            value: trait_2_value.data,
+            value: {
+                ...trait_2_value.data,
+                rnd: [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()],
+            }
         },
         "trait3": {
             type: trait_3_type,
-            value: trait_3_value.data,
+            value: {
+                ...trait_3_value.data,
+                rnd: [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()],
+            }
         },
     }
 }

@@ -55,13 +55,14 @@
                 <div>{{ trait }}: Type: {{ data.type }}</div>
                 <div>Name: {{ data.value.name }}</div> 
                 <div>RGB: {{ data.value.rgb | dump | safe }}</div> 
+                <div>RND: {{ data.value.rnd | dump | safe }}</div> 
             </li>
         {% endfor %}
         </ul>
 
         <script type="module">
             const TRAITS = {{ traits | dump | safe }}
-            const COLORS = Object.keys(TRAITS).map((k) => TRAITS[k].value.rgb)
+            const COLORS = Object.keys(TRAITS).map((k) => TRAITS[k].value)
             const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
             const PIXEL_RATIO = (window.devicePixelRatio > 1) ? 2 : 1
 

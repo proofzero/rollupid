@@ -1,16 +1,16 @@
 const P12 = Math.PI * 2;
 
 class GlowParticle {
-    constructor(x, y, radius, rgb) {
+    constructor(x, y, radius, colors) {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.rgb = rgb;
+        this.rgb = colors.rgb;
 
-        this.vx = Math.random() * 4;
-        this.vy = Math.random() * 4;
+        this.vx = colors.rnd[3] * 4;
+        this.vy = colors.rnd[4] * 4;
 
-        this.sinValue = Math.random();
+        this.sinValue = colors.rnd[5];
     }
 
     animate(ctx, stageWidth, stageHeight) {

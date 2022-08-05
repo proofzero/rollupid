@@ -72,11 +72,12 @@ class App {
         // TODO: make it so the params always position the gradient the same way for first frame
         // akak deterministic placements of particles
         for(let i = 0; i < this.totalParticles; i++) {
+            const curCol = this.COLORS[curColor]
             const item = new GlowParticle(
-                Math.random() * this.stageWidth,
-                Math.random() * this.stageHeight,
-                Math.random() * (this.maxRadius - this.minRadius) + this.minRadius,
-                this.COLORS[curColor]
+                curCol.rnd[0] * this.stageWidth,
+                curCol.rnd[1] * this.stageHeight,
+                curCol.rnd[2] * (this.maxRadius - this.minRadius) + this.minRadius,
+                this.COLORS[curColor],
             );
 
             if (++curColor >= this.COLORS.length) {
