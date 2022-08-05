@@ -127,11 +127,18 @@ jsonrpc.method('describe', (ctx, next) => {
 });
 
 async function example(ctx) {
-    await ctx.render('nftar', { });
+    const genTraits = generateTraits(100, 60, 20);
+    // const colors = Object.keys(genTraits).map((k) => genTraits[k].value.rgb)
+
+    await ctx.render('nftar', {
+        account: ctx.params.account,
+        // colors: JSON.stringify(colors)
+        traits: genTraits,
+     });
 };
 
 router.post('/api', jsonrpc.middleware);
-router.get('/', example);
+router.get('/:account', example);
 
 const render = views(__dirname + '/views', { map: {html: 'nunjucks' }})
 
