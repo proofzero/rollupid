@@ -116,8 +116,10 @@ jobs:
       - name: "run ui tests"
         uses: GabrielBB/xvfb-action@v1
         env:
-          NETWORK: mainnet
-          SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
+          NETWORK_NAME: mainnet
+          SKIP_METAMASK_SETUP: true
+          CYPRESS_GENERIC_SECRET_WORDS: ${{ secrets.METAMASK_3ID_TESTING_RECOVERY_PHRASE }}
+          CYPRESS_GENERIC_ACCOUNT: ${{ secrets.METAMASK_3ID_TESTING_ACCOUNT }}
         with:
           working-directory: ./3iD
           run: npm run test:synpress:run
