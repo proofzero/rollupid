@@ -1,18 +1,35 @@
-{ pkgs ? import <nixpkgs> {} }:
+# { pkgs ? import <nixpkgs> {} }:
+with import <nixpkgs> {};
 
-pkgs.mkShell {
+stdenv.mkDerivation {
+  name = "kubelt";
+
+  nativeBuildInputs = [ pkg-config ];
+  
   buildInputs = [
-    pkgs.clojure
-    pkgs.clojure-lsp
-    pkgs.babashka
-    pkgs.leiningen
-    pkgs.nodejs-16_x
-    pkgs.jdk
-    pkgs.docker
-    pkgs.google-chrome
-    pkgs.chromedriver
-    pkgs.act
-    pkgs.docker
-    pkgs.rustup
+    clojure
+    clojure-lsp
+    babashka
+    leiningen
+    nodejs-16_x
+    jdk
+    docker
+    google-chrome
+    chromedriver
+    act
+    docker
+    rustup
+    libuuid
   ];
+
+  APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid ]}";
+
+
+  shellHook = ''
+    LD=$CC
+    export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
+
+  '';
+
 }
+

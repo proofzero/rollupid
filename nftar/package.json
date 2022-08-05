@@ -12,6 +12,7 @@
     "build": "browserify src/canvas/canvas.js --outfile dist/canvas.js -s Gradient"
   },
   "devDependencies": {
+    "browserify": "^17.0.0",
     "eslint": "^7.7.0",
     "nodemon": "^2.0.19"
   },
@@ -22,6 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@koalex/koa-json-rpc": "^1.0.3",
+    "canvas": "^2.9.3",
     "fabric": "^5.2.1",
     "koa": "^2.13.4",
     "koa-better-serve": "^2.0.7",
