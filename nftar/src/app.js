@@ -103,6 +103,8 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     gradient.animate();
     const png = await gradient.freeze()
 
+    // TODO: upload to NFT.storage
+
     ctx.body = {
         account,
         blockchain,
@@ -127,6 +129,19 @@ jsonrpc.method('describe', (ctx, next) => {
 });
 
 async function example(ctx) {
+    const params = METHOD_PARAMS['3iD_genPFP'];
+
+    const blockchain = ctx.params['blockchain'];
+    if (!params.blockchain.properties.name.enum.includes(blockchain)){
+        ctx.throw(401, `${blockchain.name} is not a valid blockchain. Valid blockchains are: ${params.blockchain.properties.name.enum.join(', ')}.`);
+    }
+
+    // eth only atm
+    const account = ctx.params['account'];
+    if (blockchain == CHAINS.ETH && !Web3.utils.isAddress(account)) {
+        ctx.throw(401, 'account is not a valid address');
+    }
+
     const genTraits = generateTraits(100, 60, 20);
     // const colors = Object.keys(genTraits).map((k) => genTraits[k].value.rgb)
 
@@ -138,7 +153,7 @@ async function example(ctx) {
 };
 
 router.post('/api', jsonrpc.middleware);
-router.get('/:account', example);
+router.get('/:blockchain/:account', example);
 
 const render = views(__dirname + '/views', { map: {html: 'nunjucks' }})
 
