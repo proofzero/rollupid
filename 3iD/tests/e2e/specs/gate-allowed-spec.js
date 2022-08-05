@@ -1,29 +1,39 @@
-describe('Metamask', () => {
-  context('Gate commands', () => {
+describe("Metamask", () => {
+  context("Gate commands", () => {
+    before(() => {
+      cy.setupMetamask(Cypress.env("GENERIC_SECRET_WORDS"));
+    });
+
     it(`Ensure correct wallet address is being used for gate test`, () => {
-      cy.getMetamaskWalletAddress().then(address => {
-        expect(address).to.be.eq('0xC5221bd8a49A855DB0E5D2dee9e53d1C3Dcaceb1');
+      cy.getMetamaskWalletAddress().then((address) => {
+        expect(address).to.be.eq(Cypress.env("GENERIC_ACCOUNT"));
       });
     });
 
     it(`acceptMetamaskAccess should accept connection request to metamask`, () => {
-      cy.visit('/');
-      cy.findByTestId('connect-wallet').click();
-      cy.acceptMetamaskAccess().then(connected => {
+      cy.visit("/");
+      cy.findByTestId("connect-wallet").click();
+      cy.acceptMetamaskAccess().then((connected) => {
         expect(connected).to.be.true;
       });
     });
 
     it(`confirmMetamaskSignatureRequest should succeed`, () => {
       cy.wait(5000);
-      cy.confirmMetamaskSignatureRequest().then(signed => {
+      cy.confirmMetamaskSignatureRequest().then((signed) => {
         expect(signed).to.be.true;
       });
     });
 
     it(`Allowed wallet should be let into gated application`, () => {
-      cy.url().should('eq', 'http://localhost:19006/settings');
-      cy.findByTestId('wallet-address').contains('0xC5...ceb1');
+      cy.url().should("eq", "http://localhost:19006/settings");
+
+      const genericAccount = Cypress.env("GENERIC_ACCOUNT");
+      cy.findByTestId("wallet-address").contains(
+        `${genericAccount.substring(0, 4)}...${genericAccount.substring(
+          genericAccount.length - 4
+        )}`
+      );
     });
   });
 });
