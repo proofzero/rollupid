@@ -8,10 +8,10 @@ const generateTraits = function(wi1, wi2, wi3) {
     // TRAIT 1
     // TODO: increase weight of categories based 
     const wtrait1t = new Probability(TRAIT_CATEGORIES);
-    wtrait1t.addWeight('COMMON', wi1 % 4);
+    wtrait1t.addWeight('COMMON', wi1 % 2);
     wtrait1t.addWeight('UNCOMMON', wi1 % 3);
-    wtrait1t.addWeight('RARE', wi1 % 2);
-    wtrait1t.addWeight('EPIC', wi1);
+    wtrait1t.addWeight('RARE', wi1 % 4);
+    wtrait1t.addWeight('EPIC', wi1 % 5);
     const trait_1_type = wtrait1t.peek()[0];
     
     const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
@@ -20,10 +20,10 @@ const generateTraits = function(wi1, wi2, wi3) {
     // TRAIT 2
     // do some checks to increase the probability of a trait
     var wtrait2t = new Probability(TRAIT_CATEGORIES);
-    wtrait2t.addWeight('COMMON', wi2 % 4);
+    wtrait2t.addWeight('COMMON', wi2 % 2);
     wtrait2t.addWeight('UNCOMMON', wi2 % 3);
-    wtrait2t.addWeight('RARE', wi2 % 2);
-    wtrait2t.addWeight('EPIC', wi2);
+    wtrait2t.addWeight('RARE', wi2 % 4);
+    wtrait2t.addWeight('EPIC', wi2 % 5);
     const trait_2_type = wtrait2t.peek()[0];
 
     const wtrait2v = new Probability(V0_COLORS[trait_2_type]);
@@ -33,10 +33,10 @@ const generateTraits = function(wi1, wi2, wi3) {
     // TRAIT 3
     // do some checks to increase the probability of a trait
     var wtrait3t = new Probability(TRAIT_CATEGORIES);
-    wtrait3t.addWeight('COMMON', wi3 % 4);
+    wtrait3t.addWeight('COMMON', wi3 % 2);
     wtrait3t.addWeight('UNCOMMON', wi3 % 3);
-    wtrait3t.addWeight('RARE', wi3 % 2);
-    wtrait3t.addWeight('EPIC', wi3);
+    wtrait3t.addWeight('RARE', wi3 % 4);
+    wtrait3t.addWeight('EPIC', wi3 % 5);
     const trait_3_type = wtrait3t.peek()[0];
 
     const wtrait3v = new Probability(V0_COLORS[trait_3_type]);

@@ -31,8 +31,8 @@ class App {
 
         this.totalParticles = 4;
         this.particles = [];
-        this.maxRadius = 2000;
-        this.minRadius = 1500;
+        this.maxRadius = 1250;
+        this.minRadius = 750;
 
         this.frame = null;
         this.rendered = false;
