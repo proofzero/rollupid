@@ -62,7 +62,7 @@ export default function Settings({
     const asyncFn = async () => {
       if (sdkAuth && account) {
         try {
-          const persistedProfile = await kbGetProfile(account);
+          const persistedProfile = await kbGetProfile();
           const patchedProfile = { ...profile, ...persistedProfile };
 
           setProfile(patchedProfile);
@@ -90,7 +90,7 @@ export default function Settings({
 
     if (sdkAuth) {
       try {
-        const persistedProfile = await kbSetProfile(account as string, profile);
+        const persistedProfile = await kbSetProfile(profile);
         const jsonProfile = JSON.stringify(persistedProfile);
 
         setProfile(persistedProfile);
