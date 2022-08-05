@@ -9,6 +9,7 @@ const JSONStream = require('streaming-json-stringify');
 const mount = require('koa-mount');
 const serve = require('koa-better-serve')
 const path = require('path');
+const Web3 = require('web3');
 
 const gradient = require('./canvas/canvas.js');
 
@@ -27,8 +28,41 @@ const jsonrpc = new Jsonrpc({
     })
 });
 
+const CHAINS = {
+    ETH: 'ethereum',
+}
 
+// TODO: is there a better way to do this? e.g., open API yaml?
+const METHOD_PARAMS = {
+    '3iD_genPFP': {
+        'account': {
+            type: 'string',
+            description: 'blockchain account used to genearate the PFP'
+        },
+        'blockchain': {
+            type: 'object',
+            description: 'which blockchain this account belongs to',
+            properties: {
+                'name': {
+                    type: 'string',
+                    description: 'name of the blockchain',
+                    enum: [CHAINS.ETH],
+                },
+                'chainId': {
+                    type: 'number',
+                    description: 'chain id of the blockchain'
+                }
+            }
+        },
+    },
+    'describe': {},
+}
+
+// acceptes a blockchain account to genearte a unique PFP
+// properties are generated per account and saved
+// will check if a properties hae already been to genearted
 jsonrpc.method('3iD_genPFP', (ctx, next) => {
+    const params = METHOD_PARAMS['3iD_genPFP'];
     // ctx.jsonrpc available
     /*
         ctx.jsonrpc.request
@@ -42,11 +76,42 @@ jsonrpc.method('3iD_genPFP', (ctx, next) => {
         ctx.jsonrpc.message
         ctx.jsonrpc.data
     */
-    ctx.body = 'Hello world!';
+
+    const account = ctx.jsonrpc.params['account'];
+    if (!account){
+        ctx.throw(401, 'account is required');
+    }
+
+    const blockchain = ctx.jsonrpc.params['blockchain'];
+    if (!blockchain){
+        ctx.throw(401, 'blockchain is required');
+    } else if (!params.blockchain.properties.name.enum.includes(blockchain.name)){
+        ctx.throw(401, `${blockchain.name} is not a valid blockchain. Valid blockchains are: ${params.blockchain.properties.name.enum.join(', ')}.`);
+    }
+
+    // console.log('blockchain', blockchain);
+    // eth only atm
+    if (blockchain.name == CHAINS.ETH && !Web3.utils.isAddress(account)) {
+        ctx.throw(401, 'account is not a valid address');
+    }
+
+    // GENERATE PFP Properties
+
+    ctx.body = {
+        account,
+        blockchain,
+    }
 });
 
+
+
 jsonrpc.method('describe', (ctx, next) => {
-    ctx.body = jsonrpc.methods;
+    ctx.body = jsonrpc.methods.map(method => {
+        return {
+            name: method,
+            params: METHOD_PARAMS[method] || {}
+        }
+    });
 });
 
 async function example(ctx) {
