@@ -148,6 +148,11 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     //console.log('metadata.json contents:\n', metadata.data);
     //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
 
+    //fire and forget to gateway
+    console.log('caching', metadata.data)
+    console.log(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`)
+    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`)
+
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
 
