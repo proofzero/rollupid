@@ -5,10 +5,11 @@
 ## Development
 
 There are two solutions involved in the building / running / deploying process:
+
 1. Kubelt SDK
 2. Expo RNW App
 
-*Without additional specification, commands and paths in this README are to be interpreted in the context of the `./3iD` folder*
+_Without additional specification, commands and paths in this README are to be interpreted in the context of the `./3iD` folder_
 
 ### Preliminaries
 
@@ -26,13 +27,13 @@ To set up your environment for building the Kubelt SDK, follow [Kubelt Monorepo 
 
 3iD requires the development version of the Kubelt SDK `sdk-web` release target. This can be achieved by running the sdk-web develop command in the root of the monorepo (`../`): `bb build:sdk-web:develop`.
 
-Successfully running this command will produce an artifact in the `../packages/sdk-web` folder of the monorepo. 
+Successfully running this command will produce an artifact in the `../packages/sdk-web` folder of the monorepo.
 
 ### Expo RN
 
 The build `sdk-web` from the previous step needs to be referenced inside the 3iD Expo application. If you're developing within the monorepo, this should be the case out of the box; however, if you have a custom setup, you should take a look at `./packages.json` and make sure that the `@kubelt/sdk-web` package is properly referenced:
 
-`"@kubelt/sdk-web": "file:../packages/sdk-web"` *<- should point to the build output of previous task*
+`"@kubelt/sdk-web": "file:../packages/sdk-web"` _<- should point to the build output of previous task_
 
 With `node` and `npm` installed, we can run `npm install` to bring in all the packages. While that's happening, you can take a look at the `./.env.example` file provided to asses what values you might need to provide and can start filling them up in your own `.env` file (this can also be generated via a `bb` task, described in the Deployment section).
 
