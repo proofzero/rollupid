@@ -13,21 +13,13 @@ const COLORS = [
 const FRAMES_PER_SECOND = 12;  // Valid values are 60,30,20,15,10...
 
 class App {
-    constructor() {
-        this.canvas = document.getElementById('canvas');
-        document.body.appendChild(this.canvas);
+    constructor(canvas_el) {
+        this.canvas = canvas_el
         this.ctx = this.canvas.getContext('2d');
 
         this.lastFrameTime = 0;
         this.time = 0;
       
-
-        // this.ctx.globalCompositeOperation = 'destination-over'
-        // this.ctx.canvas.style.backgroundColor = 'rbg(162, 236, 142)';
-        // this.ctx.fill()
-
-
-
         this.pixelRatio = (window.devicePixelRatio > 1) ? 2 : 1;
 
         this.totalParticles = 4;
@@ -35,7 +27,9 @@ class App {
         this.maxRadius = 2000;
         this.minRadius = 1500;
 
-        window.addEventListener('resize', this.resize.bind(this), false);
+        if (window != undefined) {
+            window.addEventListener('resize', this.resize.bind(this), false);
+        }
         this.resize();
 
         this.fpsInterval = 1000 / FRAMES_PER_SECOND;
@@ -46,7 +40,6 @@ class App {
 
         setTimeout(() => {
         const freeze = this.ctx.canvas.toDataURL();
-            // console.log(freeze);
             document.getElementById('hex').setAttribute('src', freeze);
         }, 1000);
     }
@@ -101,12 +94,6 @@ class App {
 
             this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
-            // Add behind elements.
-            // this.ctx.beginPath()
-            // this.ctx.fillStyle = 'rgb(162, 236, 142)';
-            // this.ctx.fillRect(0, 0, this.stageWidth, this.stageHeight);
-
-
             for (let i = 0; i < this.totalParticles; i++) {
                 const item = this.particles[i];
                 item.animate(this.ctx, this.stageWidth, this.stageHeight);
@@ -114,9 +101,5 @@ class App {
         }
     }
 }
-
-// window.onload = () => {
-//     new App();
-// }
 
 module.exports = App;

@@ -10,6 +10,8 @@ const mount = require('koa-mount');
 const serve = require('koa-better-serve')
 const path = require('path');
 
+const gradient = require('./canvas/canvas.js');
+
 const app     = new Koa();
 const router  = new Router();
 
