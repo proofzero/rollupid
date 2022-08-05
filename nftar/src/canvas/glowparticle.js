@@ -1,6 +1,6 @@
 const P12 = Math.PI * 2;
 
-export class GlowParticle {
+class GlowParticle {
     constructor(x, y, radius, rgb) {
         this.x = x;
         this.y = y;
@@ -54,3 +54,5 @@ export class GlowParticle {
         ctx.fill();
     }
 }
+
+module.exports = GlowParticle

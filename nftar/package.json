@@ -7,9 +7,9 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 'TODO: Add a test runner and then update this command'",
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.js ",
     "start": "node index.js",
-    "build": "mkdir -p build && cp src/*.js build # TODO: Replace with your build command"
+    "build": "browserify src/canvas/canvas.js --outfile dist/canvas.js -s Gradient"
   },
   "devDependencies": {
     "eslint": "^7.7.0",

@@ -13,7 +13,7 @@ const path = require('path');
 const app     = new Koa();
 const router  = new Router();
 
-app.use(mount('/public', serve(path.join(__dirname,'canvas'))));
+app.use(mount('/public', serve(path.join(__dirname,'../dist'))));
 
 
 const jsonrpc = new Jsonrpc({

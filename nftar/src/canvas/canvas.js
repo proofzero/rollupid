@@ -1,4 +1,4 @@
-import { GlowParticle } from './glowparticle.js';
+const GlowParticle = require('./glowparticle.js');
 
 const COLORS = [
     // {r:162, g:236, b:142}
@@ -115,6 +115,8 @@ class App {
     }
 }
 
-window.onload = () => {
-    new App();
-}
+// window.onload = () => {
+//     new App();
+// }
+
+module.exports = App;
