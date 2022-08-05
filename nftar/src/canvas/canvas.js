@@ -12,6 +12,14 @@ const COLORS = [
 
 const FRAMES_PER_SECOND = 12;  // Valid values are 60,30,20,15,10...
 
+function requestAnimationFrame(f){
+    if (typeof window === 'undefined') {
+        setImmediate(()=>f())
+    } else {
+        window.requestAnimationFrame(f);
+    }
+}
+
 class App {
     constructor(canvas_el) {
         this.canvas = canvas_el
@@ -19,34 +27,52 @@ class App {
 
         this.lastFrameTime = 0;
         this.time = 0;
-      
-        this.pixelRatio = (window.devicePixelRatio > 1) ? 2 : 1;
+
+        this.pixelRatio = (typeof window !== 'undefined' && window.devicePixelRatio > 1) ? 2 : 1;
 
         this.totalParticles = 4;
         this.particles = [];
         this.maxRadius = 2000;
         this.minRadius = 1500;
 
-        if (window != undefined) {
-            window.addEventListener('resize', this.resize.bind(this), false);
-        }
+        // if (typeof window !== 'undefined') {
+        //     window.addEventListener('resize', this.resize.bind(this), false);
+        // }
         this.resize();
 
         this.fpsInterval = 1000 / FRAMES_PER_SECOND;
         this.then = Date.now();
         this.dn =  Date.now;
 
-        window.requestAnimationFrame(this.animate.bind(this));
+        requestAnimationFrame(this.animate.bind(this));
 
-        setTimeout(() => {
-        const freeze = this.ctx.canvas.toDataURL();
-            document.getElementById('hex').setAttribute('src', freeze);
-        }, 1000);
+        this.frame = null;
+        this.rendered = false;
+    }
+
+    async freeze() {
+        const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+        var framePromise = new Promise(async function(resolve, reject){
+            let count = 0
+            await sleep(1000);
+            while(!this.isRendered() && count <= 10) {
+                console.log(count, this.isRendered())
+                count++
+                await sleep(100);
+            }
+            if (count >= 10) {
+                reject('timeout')
+            }
+            this.frame = this.ctx.canvas.toDataURL();
+            resolve(this.frame)
+        }.bind(this));
+        return framePromise
     }
 
     resize() {
-        this.stageWidth = document.body.clientWidth;
-        this.stageHeight = document.body.clientHeight;
+        this.stageWidth = 1500;
+        this.stageHeight = 750;
 
         this.canvas.width = this.stageWidth * this.pixelRatio;
         this.canvas.height = this.stageHeight * this.pixelRatio;
@@ -82,7 +108,7 @@ class App {
 
     animate() {
         
-        window.requestAnimationFrame(this.animate.bind(this));
+        requestAnimationFrame(this.animate.bind(this));
 
         const now = Date.now();
         const elapsed = now - this.then;
@@ -99,6 +125,12 @@ class App {
                 item.animate(this.ctx, this.stageWidth, this.stageHeight);
             }
         }
+        // console.log('here', this.rendered)
+        this.rendered = true;
+    }
+
+    isRendered() {
+        return this.rendered;
     }
 }
 

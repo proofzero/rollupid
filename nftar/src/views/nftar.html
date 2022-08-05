@@ -50,10 +50,13 @@
         <script type="module" src="/public/canvas.js"></script>
 
         <script type="module">
-            new Gradient(document.getElementById('canvas'));
-            // const app = require(['/public/canvas.js'], function(app){
-            //     const gradient = new app()
-            // });
+            const g = new Gradient(document.getElementById('canvas'));
+            window.addEventListener('resize', g.resize.bind(g), false);
+
+            const png = await g.freeze()
+            document.getElementById('hex').setAttribute('src', png);
+
+            window.g = g
         </script>
     </body>
 </html>

@@ -3,7 +3,7 @@ const logger = require('koa-logger')
 const Router     = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const Jsonrpc    = require('@koalex/koa-json-rpc');
-const fabric     = require('fabric');
+const fabric     = require('fabric').fabric;
 const views = require('koa-views');
 const JSONStream = require('streaming-json-stringify');
 const mount = require('koa-mount');
@@ -11,7 +11,8 @@ const serve = require('koa-better-serve')
 const path = require('path');
 const Web3 = require('web3');
 
-const gradient = require('./canvas/canvas.js');
+const Probability = require('./probability.js')
+const canvas = require('./canvas/canvas.js');
 
 const app     = new Koa();
 const router  = new Router();
@@ -96,10 +97,26 @@ jsonrpc.method('3iD_genPFP', (ctx, next) => {
     }
 
     // GENERATE PFP Properties
+    // STEP 1: generate a unique PFP
+    const probability = new Probability();
+    var data = [['a', 10],  
+                ['b',  1],
+                ['c',  1],
+                ['d',  5],
+                ['e',  3]];
+    var wl = new Probability(data);
 
+    const gradient = new canvas(new fabric.Canvas('c'));
+    // const png = gradient.freeze();
+    // const png = await gradient.freeze()
+
+
+    // const p = probability.combinations(spots, items)
     ctx.body = {
         account,
         blockchain,
+        pfp_properties: wl.peek(3),
+        // gradient,
     }
 });
 
