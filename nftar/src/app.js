@@ -104,6 +104,8 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     const png = await gradient.freeze()
 
     // TODO: upload to NFT.storage
+    // TODO: request contracts from alchemy
+
 
     ctx.body = {
         account,
@@ -128,6 +130,10 @@ jsonrpc.method('describe', (ctx, next) => {
     });
 });
 
+// TODO: images genearted by blockchain addresses have inputs stored in REDIS with TTL.
+// user is prompted to claim their core to claim their image. We should check if this
+// account is holding a token and if so, return the image.
+// TODO: another endpoint where the uri is the token id and the image is returned.
 async function example(ctx) {
     const params = METHOD_PARAMS['3iD_genPFP'];
 
@@ -136,7 +142,7 @@ async function example(ctx) {
         ctx.throw(401, `${blockchain.name} is not a valid blockchain. Valid blockchains are: ${params.blockchain.properties.name.enum.join(', ')}.`);
     }
 
-    // eth only atm
+    // eth only atm 
     const account = ctx.params['account'];
     if (blockchain == CHAINS.ETH && !Web3.utils.isAddress(account)) {
         ctx.throw(401, 'account is not a valid address');
