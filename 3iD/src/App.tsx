@@ -69,7 +69,7 @@ export default function App() {
             Gate: "gate",
             Settings: "settings",
             Mint: "mint",
-            Invite: "invitation"
+            Invite: "invitation",
           },
         },
       }}
