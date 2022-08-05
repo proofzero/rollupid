@@ -50,6 +50,7 @@
         <script type="module" src="/public/canvas.js"></script>
 
         <script type="module">
+            const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
             const g = new Gradient(document.getElementById('canvas'));
             window.addEventListener('resize', g.resize.bind(g), false);
 

@@ -12,6 +12,7 @@ const path = require('path');
 const Web3 = require('web3');
 
 const Probability = require('./probability.js')
+const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
 const canvas = require('./canvas/canvas.js');
 
 const app     = new Koa();
@@ -62,7 +63,7 @@ const METHOD_PARAMS = {
 // acceptes a blockchain account to genearte a unique PFP
 // properties are generated per account and saved
 // will check if a properties hae already been to genearted
-jsonrpc.method('3iD_genPFP', (ctx, next) => {
+jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     const params = METHOD_PARAMS['3iD_genPFP'];
     // ctx.jsonrpc available
     /*
@@ -90,33 +91,65 @@ jsonrpc.method('3iD_genPFP', (ctx, next) => {
         ctx.throw(401, `${blockchain.name} is not a valid blockchain. Valid blockchains are: ${params.blockchain.properties.name.enum.join(', ')}.`);
     }
 
-    // console.log('blockchain', blockchain);
     // eth only atm
     if (blockchain.name == CHAINS.ETH && !Web3.utils.isAddress(account)) {
         ctx.throw(401, 'account is not a valid address');
     }
 
     // GENERATE PFP Properties
-    // STEP 1: generate a unique PFP
     const probability = new Probability();
-    var data = [['a', 10],  
-                ['b',  1],
-                ['c',  1],
-                ['d',  5],
-                ['e',  3]];
-    var wl = new Probability(data);
+    
+    // TRAIT 1
+    const wtrait1t = new Probability(TRAIT_CATEGORIES);
+    // TODO: increase weight of categories based 
+    const trait_1_type = wtrait1t.peek()[0];
+    const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
+    const trait_1_value = wtrait1v.peek()[0];
+
+    // TRAIT 2
+    var wtrait2t = new Probability(TRAIT_CATEGORIES);
+    // do some checks to increase the probability of a trait
+    const trait_2_type = wtrait2t.peek()[0];
+    const wtrait2v = new Probability(V0_COLORS[trait_2_type]);
+    const trait_2_value = wtrait2v.peek()[0];
+
+
+    // TRAIT 3
+    var wtrait3t = new Probability(TRAIT_CATEGORIES);
+    // do some checks to increase the probability of a trait
+    const trait_3_type = wtrait3t.peek()[0];
+    const wtrait3v = new Probability(V0_COLORS[trait_3_type]);
+    const trait_3_value = wtrait3v.peek()[0];
 
     const gradient = new canvas(new fabric.Canvas('c'));
-    // const png = gradient.freeze();
-    // const png = await gradient.freeze()
+    const png = await gradient.freeze()
 
-
-    // const p = probability.combinations(spots, items)
     ctx.body = {
         account,
         blockchain,
-        pfp_properties: wl.peek(3),
-        // gradient,
+        pfpProperties: {
+            "trait0": {
+                type: "GEN",
+                value: V0_COLORS.GEN[0].data,
+            },
+            "trait1": {
+                type: trait_1_type,
+                value: trait_1_value.data,
+            },
+            "trait2": {
+                type: trait_2_type,
+                value: trait_2_value.data,
+            },
+            "trait3": {
+                type: trait_3_type,
+                value: trait_3_value.data,
+            },
+        },
+        image: {
+            cid: "abc123",
+            "content-type": "image/png",
+            // "base64": png,
+        }
     }
 });
 

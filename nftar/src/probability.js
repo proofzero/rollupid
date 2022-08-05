@@ -78,7 +78,7 @@ module.exports = (function() {
        * @param {?Object} data any optional data associated wth this key
        */
       _push_values: function(key, weight, data) {
-        //console.debug('k:', key, 'w:', weight, 'd:', data);
+        // console.debug('k:', key, 'w:', weight, 'd:', data);
   
         if (this.weights[key]) {
           throw new Error('');

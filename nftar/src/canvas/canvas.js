@@ -1,15 +1,5 @@
 const GlowParticle = require('./glowparticle.js');
 
-const COLORS = [
-    // {r:162, g:236, b:142}
-
-    {r: 45, g: 74, b: 277},
-    {r: 255, g: 104, b: 248},
-    {r: 44, g: 209, b: 252},
-    {r: 54, g: 233, b: 84},
-    // {r: 255, g: 255, b: 0},
-]
-
 const FRAMES_PER_SECOND = 12;  // Valid values are 60,30,20,15,10...
 
 function requestAnimationFrame(f){
@@ -40,14 +30,16 @@ class App {
         // }
         this.resize();
 
-        this.fpsInterval = 1000 / FRAMES_PER_SECOND;
-        this.then = Date.now();
-        this.dn =  Date.now;
-
         requestAnimationFrame(this.animate.bind(this));
 
         this.frame = null;
         this.rendered = false;
+    }
+
+    setFPS(FPS) {
+        this.fpsInterval = 1000 / FPS;
+        this.then = Date.now();
+        this.dn =  Date.now;
     }
 
     async freeze() {
