@@ -29,6 +29,8 @@ export default function Invite({ navigation }: { navigation: any }) {
     const funnelState = await getFunnelState();
     if (!funnelState.mint) {
       navigation.navigate("Mint");
+    } else if (!funnelState.naming) {
+      navigation.navigate("Naming");
     } else {
       navigation.navigate("Settings");
     }
@@ -215,7 +217,7 @@ export default function Invite({ navigation }: { navigation: any }) {
               }}
             >
               <Text
-                testID="continue-to-3id"
+                testID="invite-continue-to-3id"
                 style={{
                   fontFamily: "Manrope_700Bold",
                   fontSize: 16,

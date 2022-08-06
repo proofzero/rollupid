@@ -166,7 +166,7 @@ const PreMint = ({
       onPress={() => mintRequestHandler(preMint)}
     >
       <Text
-        testID="mint-nft"
+        testID="mint-mint-nft"
         style={{
           fontFamily: "Inter_500Medium",
           fontSize: 16,
@@ -222,7 +222,7 @@ const Confirm = ({
       onPress={tryAgainHandler}
     >
       <Text
-        testID="try-again-confim"
+        testID="mint-confirm-try-again"
         style={{
           fontFamily: "Inter_500Medium",
           fontSize: 16,
@@ -387,7 +387,7 @@ const ErrorPanel = ({
       onPress={tryAgainHandler}
     >
       <Text
-        testID="try-again-error"
+        testID="mint-try-again"
         style={{
           fontFamily: "Inter_500Medium",
           fontSize: 16,
@@ -449,10 +449,8 @@ export default function Mint({ navigation }: any) {
     setScreen("root");
   };
 
-  const continueToProfileUrl = async () => {
-    await tickFunnelStep("mint");
-
-    navigation.navigate("Settings");
+  const continueToNaming = async () => {
+    navigation.navigate("Naming");
   };
 
   useEffect(() => {
@@ -592,7 +590,7 @@ export default function Mint({ navigation }: any) {
                 onPress={() => skipMinting()}
               >
                 <Text
-                  testID="skip-minting"
+                  testID="mint-skip-minting"
                   style={{
                     fontFamily: "Inter_500Medium",
                     fontSize: 16,
@@ -617,10 +615,10 @@ export default function Mint({ navigation }: any) {
                   paddingVertical: 9,
                   backgroundColor: "#1F2937",
                 }}
-                onPress={() => continueToProfileUrl()}
+                onPress={() => continueToNaming()}
               >
                 <Text
-                  testID="continue-to-profile-url"
+                  testID="mint-continue"
                   style={{
                     fontFamily: "Inter_500Medium",
                     fontSize: 16,
