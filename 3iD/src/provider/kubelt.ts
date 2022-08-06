@@ -9,16 +9,13 @@ import Constants from "expo-constants";
 import { Profile } from "../types/Profile";
 import { Invitation } from "../types/Invitation.js";
 
+// TODO: Split this file into multiple services, core, 3iD, mint etc.
+
 let sdk: any = null;
 
 const isAuthSubj = new BehaviorSubject(false);
 
-export const purge = () => {
-  sdk = null;
-  localStorage.clear();
-  isAuthSubj.next(false);
-};
-
+/// AUTHENTICATION
 const getSignFn = (
   address: string,
   provider: ethers.providers.Web3Provider
@@ -92,7 +89,6 @@ export const authenticate = async (
   }
 };
 
-// Exposing this method until SDK isAuth gets sorted
 export const isAuthenticated = async (address: string | null | undefined) => {
   if (!sdk || !address) {
     return false;
@@ -113,6 +109,7 @@ export const kbGetClaims = async (): Promise<string[]> => {
   return claims;
 };
 
+/// INVITATIONS
 export const threeIdListInvitations = async (): Promise<Invitation[]> => {
   let invites: Invitation[] = [];
 
@@ -159,6 +156,45 @@ export const threeIdUseInvitation = async (
   return success;
 };
 
+/// MINTING
+export type PreMintRes =
+  | {
+      nftImageUrl: string;
+      account: string;
+      version: string;
+      rarity: any; // not sure what it is yet, maybe number
+    }
+  | undefined;
+
+export const threeIdGetPreMint = async (): Promise<PreMintRes> => {
+  let preMint: PreMintRes;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-pre-mint"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // preMint = res.body.result;
+
+    preMint = {
+      nftImageUrl: "https://picsum.photos/93",
+      account: "0x6c60Da9471181Aa54C648c6e201263A5501363F3",
+      rarity: 3,
+      version: "GEN 0 - Mint green",
+    };
+  } catch (e) {
+    console.warn("Failed to get pre-mint");
+  }
+
+  return preMint;
+};
+
+/// PROFILE
 export const kbGetProfile = async () => {
   const profile: Profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
@@ -193,6 +229,13 @@ export const kbSetProfile = async (updatedProfile: Profile) => {
       });
   });
   return profile;
+};
+
+/// UTILS
+export const purge = () => {
+  sdk = null;
+  localStorage.clear();
+  isAuthSubj.next(false);
 };
 
 export const getIsAuthObs = () => isAuthSubj.asObservable();

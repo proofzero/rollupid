@@ -8,7 +8,7 @@ export default function Layout({ children }: { children: any }) {
       style={{
         height: 100,
         flex: 1,
-        backgroundColor: "#F9FAFB",
+        backgroundColor: "#E5E5E5",
       }}
     >
       <View
