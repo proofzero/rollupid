@@ -118,13 +118,13 @@ const PreMint = ({
         marginBottom: 37,
       }}
     >
-      <Ionicons
+      <Image
         style={{
-          marginRight: 10,
+          width: 24,
+          height: 24,
+          marginRight: 8,
         }}
-        name="information-circle-outline"
-        size={24}
-        color="#9CA3AF"
+        source={require("../../assets/info.png")}
       />
 
       <Text
@@ -202,7 +202,7 @@ const Confirm = ({
         fontWeight: "400",
         lineHeight: 24,
         color: "#9CA3AF",
-        marginBottom: 27,
+        marginBottom: 37,
       }}
     >
       Please confirm the transaction in your wallet or
@@ -249,8 +249,69 @@ const ErrorPanel = ({
   preMint: PreMintRes;
   tryAgainHandler: () => void;
 }) => (
-  <View>
-    <Text>Error</Text>
+  <View
+    style={{
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <PanelHead preMint={preMint} />
+
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 37,
+      }}
+    >
+      <Image
+        style={{
+          width: 24,
+          height: 24,
+          marginRight: 8,
+        }}
+        source={require("../../assets/error.png")}
+      />
+
+      <Text
+        style={{
+          fontFamily: "Inter_400Regular",
+          fontSize: 16,
+          fontWeight: "400",
+          lineHeight: 24,
+          color: "#9CA3AF",
+        }}
+      >
+        Something went wrong
+      </Text>
+    </View>
+
+    <Pressable
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 38,
+        paddingVertical: 9,
+        backgroundColor: "transparent",
+      }}
+      onPress={tryAgainHandler}
+    >
+      <Text
+        testID="try-again-error"
+        style={{
+          fontFamily: "Inter_500Medium",
+          fontSize: 16,
+          fontWeight: "500",
+          lineHeight: 24,
+          color: "#1F2937",
+        }}
+      >
+        Try again
+      </Text>
+    </Pressable>
   </View>
 );
 
@@ -410,6 +471,9 @@ export default function Mint({ navigation }: any) {
             )}
             {screen === "confirm" && (
               <Confirm tryAgainHandler={handleTryAgain} preMint={preMint} />
+            )}
+            {screen === "error" && (
+              <ErrorPanel tryAgainHandler={handleTryAgain} preMint={preMint} />
             )}
           </View>
 
