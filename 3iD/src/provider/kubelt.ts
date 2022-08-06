@@ -194,6 +194,53 @@ export const threeIdGetPreMint = async (): Promise<PreMintRes> => {
   return preMint;
 };
 
+export const threeIdGetMintVoucher = async (): Promise<any> => {
+  let voucher: any;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-mint-voucher"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // voucher = res.body.result;
+    voucher = {
+      foo: "bar",
+    };
+  } catch (e) {
+    console.warn("Failed to get mint voucher");
+  }
+
+  return voucher;
+};
+
+export const threeIdMint = async (voucher: any): Promise<boolean> => {
+  let success: boolean;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-mint-voucher"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // voucher = res.body.result;
+
+    await new Promise((resolve) => setTimeout(resolve, 1216));
+  } catch (e) {
+    console.warn("Failed to get mint voucher");
+  }
+
+  return voucher;
+};
+
 /// PROFILE
 export const kbGetProfile = async () => {
   const profile: Profile = await new Promise((resolve, reject) => {

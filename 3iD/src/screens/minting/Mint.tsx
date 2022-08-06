@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Text, TextInput, View, Button, Image, Pressable } from "react-native";
 import Layout from "../Layout";
@@ -9,17 +9,15 @@ import {
   authenticate,
   isAuthenticated,
   PreMintRes,
+  purge,
+  threeIdGetMintVoucher,
   threeIdGetPreMint,
+  threeIdMint,
 } from "../../provider/kubelt";
-import { connect, forceAccounts } from "../../provider/web3";
+import { connect, forceAccounts, sign } from "../../provider/web3";
 
-const PreMint = ({ preMint }: { preMint: PreMintRes }) => (
-  <View
-    style={{
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
+const PanelHead = ({ preMint }: { preMint: PreMintRes }) => (
+  <>
     <Text
       style={{
         fontFamily: "Inter_500Medium",
@@ -96,6 +94,23 @@ const PreMint = ({ preMint }: { preMint: PreMintRes }) => (
         />
       </div>
     </View>
+  </>
+);
+
+const PreMint = ({
+  preMint,
+  mintRequestHandler,
+}: {
+  preMint: PreMintRes;
+  mintRequestHandler: (preMint: PreMintRes) => void;
+}) => (
+  <View
+    style={{
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <PanelHead preMint={preMint} />
 
     <View
       style={{
@@ -147,6 +162,7 @@ const PreMint = ({ preMint }: { preMint: PreMintRes }) => (
         paddingVertical: 9,
         backgroundColor: "#1F2937",
       }}
+      onPress={() => mintRequestHandler(preMint)}
     >
       <Text
         testID="mint-nft"
@@ -164,9 +180,59 @@ const PreMint = ({ preMint }: { preMint: PreMintRes }) => (
   </View>
 );
 
-const Confirm = () => (
-  <View>
-    <Text>Confirm</Text>
+const Confirm = ({
+  preMint,
+  tryAgainHandler,
+}: {
+  preMint: PreMintRes;
+  tryAgainHandler: () => void;
+}) => (
+  <View
+    style={{
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <PanelHead preMint={preMint} />
+
+    <Text
+      style={{
+        fontFamily: "Inter_400Regular",
+        fontSize: 16,
+        fontWeight: "400",
+        lineHeight: 24,
+        color: "#9CA3AF",
+        marginBottom: 27,
+      }}
+    >
+      Please confirm the transaction in your wallet or
+    </Text>
+
+    <Pressable
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 38,
+        paddingVertical: 9,
+        backgroundColor: "transparent",
+      }}
+      onPress={tryAgainHandler}
+    >
+      <Text
+        testID="try-again-confim"
+        style={{
+          fontFamily: "Inter_500Medium",
+          fontSize: 16,
+          fontWeight: "500",
+          lineHeight: 24,
+          color: "#1F2937",
+        }}
+      >
+        Try again
+      </Text>
+    </Pressable>
   </View>
 );
 
@@ -176,13 +242,23 @@ const Success = () => (
   </View>
 );
 
-const Error = () => (
+const ErrorPanel = ({
+  preMint,
+  tryAgainHandler,
+}: {
+  preMint: PreMintRes;
+  tryAgainHandler: () => void;
+}) => (
   <View>
     <Text>Error</Text>
   </View>
 );
 
 export default function Mint({ navigation }: any) {
+  const [screen, setScreen] = useState<
+    "root" | "confirm" | "success" | "error"
+  >("root");
+
   const account = useAccount();
 
   const [preMint, setPreMint] = React.useState<PreMintRes>();
@@ -199,6 +275,33 @@ export default function Mint({ navigation }: any) {
   const fetchPreMint = async () => {
     const preMintRes = await threeIdGetPreMint();
     setPreMint(preMintRes);
+  };
+
+  const handleMintRequest = async (preMint: PreMintRes) => {
+    setScreen("confirm");
+
+    // Request signature
+    try {
+      const voucher = await threeIdGetMintVoucher();
+      const signedVoucher = await sign(JSON.stringify(voucher, null, 2));
+
+      // Minting screen?
+
+      const mintRes = await threeIdMint(signedVoucher);
+      if (!mintRes) {
+        throw new Error();
+      }
+
+      setScreen("success");
+    } catch (e) {
+      console.error("Failed to complete minting journey");
+
+      setScreen("error");
+    }
+  };
+
+  const handleTryAgain = async () => {
+    setScreen("root");
   };
 
   useEffect(() => {
@@ -220,6 +323,10 @@ export default function Mint({ navigation }: any) {
 
         if (await isAuthenticated(address)) {
           await fetchPreMint();
+        } else {
+          purge();
+
+          return navigation.navigate("Landing");
         }
       }
     };
@@ -239,11 +346,6 @@ export default function Mint({ navigation }: any) {
     }
   }, []);
 
-  let panel = null;
-  if (preMint) {
-    panel = <PreMint preMint={preMint} />;
-  }
-
   return (
     <Layout>
       <View
@@ -257,6 +359,7 @@ export default function Mint({ navigation }: any) {
           style={{
             width: 895,
             maxWidth: "75vw",
+            minHeight: 580,
             shadowRadius: 5,
             shadowOpacity: 0.1,
             backgroundColor: "white",
@@ -299,7 +402,15 @@ export default function Mint({ navigation }: any) {
               marginBottom: 25,
             }}
           >
-            {panel}
+            {screen === "root" && (
+              <PreMint
+                mintRequestHandler={handleMintRequest}
+                preMint={preMint}
+              />
+            )}
+            {screen === "confirm" && (
+              <Confirm tryAgainHandler={handleTryAgain} preMint={preMint} />
+            )}
           </View>
 
           <View
