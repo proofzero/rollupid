@@ -22,13 +22,13 @@ export default function Layout({
 
     const claims = await kbGetClaims();
     if (!claims.includes(claim)) {
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
   };
 
   useEffect(() => {
     if (account === null) {
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
 
     const asyncFn = async () => {
@@ -47,7 +47,7 @@ export default function Layout({
         if (await isAuthenticated(address)) {
           return claimsRedirect(claim);
         } else {
-          return navigation.navigate("Landing");
+          navigation.navigate("Landing");
         }
       }
     };

@@ -26,7 +26,7 @@
                      sys (<p! (sdk/init config))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
                      core (:wallet/address wallet)
-                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet)))
+                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet) {}))
                      api (<p! (sdk.oort/rpc-api sys core))
                      profile (-> (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get-profile]}))
                                  :http/body :result)]

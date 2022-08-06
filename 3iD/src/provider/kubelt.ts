@@ -9,16 +9,13 @@ import Constants from "expo-constants";
 import { Profile } from "../types/Profile";
 import { Invitation } from "../types/Invitation.js";
 
+// TODO: Split this file into multiple services, core, 3iD, mint etc.
+
 let sdk: any = null;
 
 const isAuthSubj = new BehaviorSubject(false);
 
-export const purge = () => {
-  sdk = null;
-  localStorage.clear();
-  isAuthSubj.next(false);
-};
-
+/// AUTHENTICATION
 const getSignFn = (
   address: string,
   provider: ethers.providers.Web3Provider
@@ -75,7 +72,9 @@ export const authenticate = async (
         signFn,
       });
 
-      sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, address);
+      sdk = await sdkWeb?.node_v1?.oort.authenticate(sdk, {
+        "3id.profile": ["read", "write"],
+      });
 
       isAuth = await isAuthenticated(address);
       if (isAuth) {
@@ -92,7 +91,6 @@ export const authenticate = async (
   }
 };
 
-// Exposing this method until SDK isAuth gets sorted
 export const isAuthenticated = async (address: string | null | undefined) => {
   if (!sdk || !address) {
     return false;
@@ -113,6 +111,7 @@ export const kbGetClaims = async (): Promise<string[]> => {
   return claims;
 };
 
+/// INVITATIONS
 export const threeIdListInvitations = async (): Promise<Invitation[]> => {
   let invites: Invitation[] = [];
 
@@ -159,6 +158,92 @@ export const threeIdUseInvitation = async (
   return success;
 };
 
+/// MINTING
+export type PreMintRes =
+  | {
+      nftImageUrl: string;
+      account: string;
+      version: string;
+      rarity: any; // not sure what it is yet, maybe number
+    }
+  | undefined;
+
+export const threeIdGetPreMint = async (): Promise<PreMintRes> => {
+  let preMint: PreMintRes;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-pre-mint"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // preMint = res.body.result;
+
+    preMint = {
+      nftImageUrl: "https://picsum.photos/93",
+      account: "0x6c60Da9471181Aa54C648c6e201263A5501363F3",
+      rarity: 3,
+      version: "GEN 0 - Mint green",
+    };
+  } catch (e) {
+    console.warn("Failed to get pre-mint");
+  }
+
+  return preMint;
+};
+
+export const threeIdGetMintVoucher = async (): Promise<any> => {
+  let voucher: any;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-mint-voucher"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // voucher = res.body.result;
+    voucher = {
+      foo: "bar",
+    };
+  } catch (e) {
+    console.warn("Failed to get mint voucher");
+  }
+
+  return voucher;
+};
+
+export const threeIdMint = async (voucher: any): Promise<boolean> => {
+  let success: boolean;
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-mint-voucher"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // voucher = res.body.result;
+
+    await new Promise((resolve) => setTimeout(resolve, 1216));
+  } catch (e) {
+    console.warn("Failed to get mint voucher");
+  }
+
+  return voucher;
+};
+
+/// PROFILE
 export const kbGetProfile = async () => {
   const profile: Profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
@@ -195,4 +280,88 @@ export const kbSetProfile = async (updatedProfile: Profile) => {
   return profile;
 };
 
+// STORAGE
+
+export const store = async (ns: string, path: string, data: any) => {
+  let storedObject: any;
+
+  try {
+    const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+      method: ["kb", "set-data"],
+      params: [ns, path, JSON.stringify(data)],
+    });
+
+    if (!res || res?.error || res?.body.error) {
+      throw new Error();
+    }
+
+    storedObject = res.body.result;
+  } catch (e) {
+    console.warn("Failed to store data");
+  }
+
+  return storedObject;
+};
+
+export const retrieve = async (ns: string, path: string): Promise<any> => {
+  let storedObject: any;
+
+  try {
+    const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+      method: ["kb", "get-data"],
+      params: [ns, path],
+    });
+
+    if (!res || res?.error || res?.body.error) {
+      throw new Error();
+    }
+
+    storedObject = res.body.result;
+  } catch (e) {
+    console.warn("Failed to retrieve data");
+  }
+
+  return storedObject;
+};
+
+/// UTILS
+export const purge = () => {
+  sdk = null;
+  localStorage.clear();
+  isAuthSubj.next(false);
+};
+
 export const getIsAuthObs = () => isAuthSubj.asObservable();
+
+export type FunnelState = {
+  mint: boolean;
+  invite: boolean;
+};
+
+export const tickFunnelStep = async (step: keyof FunnelState) => {
+  let funnelState: FunnelState = {
+    mint: false,
+    invite: false,
+  };
+
+  const storedFunnelState = await retrieve("3id.profile", "funnel-state");
+  if (storedFunnelState?.value) {
+    funnelState = JSON.parse(storedFunnelState.value);
+  }
+
+  funnelState[step] = true;
+
+  await store("3id.profile", "funnel-state", funnelState);
+};
+
+export const getFunnelState = async (): Promise<FunnelState> => {
+  const funnelState = await retrieve("3id.profile", "funnel-state");
+  const funnelRes: FunnelState = JSON.parse(funnelState?.value) ?? {
+    invite: false,
+    mint: false,
+  };
+
+  console.log(funnelRes);
+
+  return funnelRes;
+};
