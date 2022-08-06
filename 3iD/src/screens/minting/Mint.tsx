@@ -236,9 +236,85 @@ const Confirm = ({
   </View>
 );
 
-const Success = () => (
-  <View>
-    <Text>Success</Text>
+const Progress = ({ preMint }: { preMint: PreMintRes }) => (
+  <View
+    style={{
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <PanelHead preMint={preMint} />
+
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 37,
+      }}
+    >
+      <Image
+        style={{
+          width: 24,
+          height: 24,
+          marginRight: 8,
+        }}
+        source={require("../../assets/loading.png")}
+      />
+
+      <Text
+        style={{
+          fontFamily: "Inter_400Regular",
+          fontSize: 16,
+          fontWeight: "400",
+          lineHeight: 24,
+          color: "#9CA3AF",
+        }}
+      >
+        Minting, please wait
+      </Text>
+    </View>
+  </View>
+);
+
+const Success = ({ preMint }: { preMint: PreMintRes }) => (
+  <View
+    style={{
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <PanelHead preMint={preMint} />
+
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 37,
+      }}
+    >
+      <Image
+        style={{
+          width: 24,
+          height: 24,
+          marginRight: 8,
+        }}
+        source={require("../../assets/success.png")}
+      />
+
+      <Text
+        style={{
+          fontFamily: "Inter_400Regular",
+          fontSize: 16,
+          fontWeight: "400",
+          lineHeight: 24,
+          color: "#9CA3AF",
+        }}
+      >
+        Minted successfully!
+      </Text>
+    </View>
   </View>
 );
 
@@ -317,7 +393,7 @@ const ErrorPanel = ({
 
 export default function Mint({ navigation }: any) {
   const [screen, setScreen] = useState<
-    "root" | "confirm" | "success" | "error"
+    "root" | "confirm" | "progress" | "success" | "error"
   >("root");
 
   const account = useAccount();
@@ -346,7 +422,7 @@ export default function Mint({ navigation }: any) {
       const voucher = await threeIdGetMintVoucher();
       const signedVoucher = await sign(JSON.stringify(voucher, null, 2));
 
-      // Minting screen?
+      setScreen("progress");
 
       const mintRes = await threeIdMint(signedVoucher);
       if (!mintRes) {
@@ -363,6 +439,10 @@ export default function Mint({ navigation }: any) {
 
   const handleTryAgain = async () => {
     setScreen("root");
+  };
+
+  const continueToProfileUrl = async () => {
+    return navigation.navigate("Settings");
   };
 
   useEffect(() => {
@@ -472,6 +552,8 @@ export default function Mint({ navigation }: any) {
             {screen === "confirm" && (
               <Confirm tryAgainHandler={handleTryAgain} preMint={preMint} />
             )}
+            {screen === "progress" && <Progress preMint={preMint} />}
+            {screen === "success" && <Success preMint={preMint} />}
             {screen === "error" && (
               <ErrorPanel tryAgainHandler={handleTryAgain} preMint={preMint} />
             )}
@@ -481,33 +563,66 @@ export default function Mint({ navigation }: any) {
             style={{
               justifyContent: "flex-end",
               alignItems: "flex-end",
+              minHeight: 42, // just to reduce flickering
             }}
           >
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 38,
-                paddingVertical: 9,
-                backgroundColor: "#E5E7EB",
-              }}
-              onPress={() => skipMinting()}
-            >
-              <Text
-                testID="try-different-wallet"
+            {(screen === "root" ||
+              screen === "confirm" ||
+              screen === "error") && (
+              <Pressable
                 style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 16,
-                  fontWeight: "500",
-                  lineHeight: 24,
-                  color: "#6B7280",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 38,
+                  paddingVertical: 9,
+                  backgroundColor: "#E5E7EB",
                 }}
+                onPress={() => skipMinting()}
               >
-                Skip
-              </Text>
-            </Pressable>
+                <Text
+                  testID="skip-minting"
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 16,
+                    fontWeight: "500",
+                    lineHeight: 24,
+                    color: "#6B7280",
+                  }}
+                >
+                  Skip
+                </Text>
+              </Pressable>
+            )}
+
+            {screen === "success" && (
+              <Pressable
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 38,
+                  paddingVertical: 9,
+                  backgroundColor: "#1F2937",
+                }}
+                onPress={() => continueToProfileUrl()}
+              >
+                <Text
+                  testID="continue-to-profile-url"
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 16,
+                    fontWeight: "500",
+                    lineHeight: 24,
+                    color: "white",
+                  }}
+                >
+                  Continue
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </View>
