@@ -1,5 +1,6 @@
 import { BehaviorSubject } from "rxjs";
 import { ethers } from "ethers";
+import { hexlify } from "ethers/lib/utils";
 
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
@@ -99,4 +100,16 @@ export const getAccount = (): undefined | null | string => {
 
 export const getAccountObs = () => {
   return accountSubj.asObservable();
+};
+
+export const sign = async (message: string) => {
+  const signableBuffer = Buffer.from(message);
+  const msgHash = hexlify(signableBuffer);
+
+  const signer = web3Provider?.getSigner();
+  const address = await signer?.getAddress();
+
+  const signed = await web3Provider?.send("personal_sign", [address, msgHash]);
+
+  return signed;
 };
