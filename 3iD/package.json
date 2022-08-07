@@ -58,7 +58,8 @@
     "react-native-web": "0.17.7",
     "rxjs": "7.5.6",
     "web3modal": "1.9.8",
-    "webpack-dev-server": "4.9.3"
+    "webpack-dev-server": "4.9.3",
+    "expo-clipboard": "3.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.18.9",

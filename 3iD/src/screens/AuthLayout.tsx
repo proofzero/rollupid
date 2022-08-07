@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 import { Image, ScrollView, View, Text, Pressable } from "react-native";
+import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
 import useSDKAuth from "../hooks/sdkAuth";
 import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
@@ -89,47 +90,7 @@ export default function Layout({
           marginVertical: "3em",
         }}
       >
-        <View
-          style={{
-            marginBottom: "3em",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            style={{
-              width: 36.56,
-              height: 41.05,
-            }}
-            source={require("../assets/three-id-logo-white.svg")}
-          />
-
-          <View>
-            <Pressable
-              style={{
-                paddingHorizontal: 13.5,
-                paddingVertical: 14,
-                backgroundColor: "#FFFFFF",
-                maxWidth: "100%",
-                height: 48,
-              }}
-            >
-              <Text
-                testID="wallet-address"
-                style={{
-                  paddingHorizontal: 37.5,
-                  fontFamily: "Manrope_700Bold",
-                  fontSize: 14,
-                  fontWeight: "700",
-                  lineHeight: 16,
-                }}
-              >{`${account?.substring(0, 4)}...${account?.substring(
-                account.length - 4
-              )}`}</Text>
-            </Pressable>
-          </View>
-        </View>
+        <NavMenu />
 
         <View
           style={{
