@@ -10,7 +10,7 @@ import {
   Inter_800ExtraBold,
 } from "@expo-google-fonts/inter";
 
-import { Manrope_700Bold } from "@expo-google-fonts/manrope";
+import { Manrope_500Medium, Manrope_700Bold } from "@expo-google-fonts/manrope";
 
 import { useEffect } from "react";
 import { startSession, stopSession } from "./analytics/datadog";
@@ -32,6 +32,7 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
     Inter_800ExtraBold,
+    Manrope_500Medium,
     Manrope_700Bold,
   });
 
