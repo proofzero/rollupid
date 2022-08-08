@@ -6,10 +6,9 @@ date: 2020-11-16T13:59:39+01:00
 lastmod: 2020-11-16T13:59:39+01:00
 draft: false
 images: []
-identifier: "3id-quick-start"
 menu:
   docs:
-    parent: "guides"
+    parent: "3id"
 weight: 700
 toc: true
 ---
