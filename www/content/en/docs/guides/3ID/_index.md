@@ -1,14 +1,15 @@
 ---
 title: "🆔 3ID"
 description: ""
-lead: "This is where the Kubelt guides live."
-date: 2022-03-01T09:44:16-08:00
-lastmod: 2022-03-01T09:44:16-08:00
+lead: ""
+date: 2020-11-16T13:59:39+01:00
+lastmod: 2020-11-16T13:59:39+01:00
 draft: false
 images: []
 menu:
   docs:
     parent: "guides"
 weight: 700
-toc: true
+toc: false
 ---
+

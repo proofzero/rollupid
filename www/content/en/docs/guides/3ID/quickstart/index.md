@@ -1,16 +1,17 @@
 ---
-title: "🆔 Quick Start"
+title: "3ID Quick Start"
 description: ""
 lead: ""
 date: 2020-11-16T13:59:39+01:00
 lastmod: 2020-11-16T13:59:39+01:00
 draft: false
 images: []
+identifier: "3id-quick-start"
 menu:
   docs:
     parent: "guides"
-weight: 250
-toc: false
+weight: 700
+toc: true
 ---
 
 ### 3iD Profile Request
@@ -63,7 +64,7 @@ The getter and setter methods are:
 
 ### Authorization Model
 
-While the `kb_getProfile` method is publicly available, calling the `kb_setProfile` method requires authorization. [See the Authorization Guide]({{< relref "Authorization" >}}) for more information on Kubelt's authorization model.
+While the `kb_getProfile` method is publicly available, calling the `kb_setProfile` method requires authorization. [See the Authorization Guide]({{< relref "starport" >}}) for more information on Kubelt's authorization model.
 
 ### 3iD Profile Data Shape
 
@@ -97,6 +98,6 @@ Using 3iD means you don't have to worry about storing user data -- your users ca
 
 In order to store your own custom application data within a user's 3iD profile you will need to use a custom application namespace as well as our new encrypted storage RPC methods. [Join our Discord](https://discord.gg/UgwAsJf6C5) to talk to us about your use case and get beta access.
 
-### Questions?
+### FAQ
 
-Join our community to stay up to date. [Discord →](https://discord.gg/UgwAsJf6C5)
+Joining our [Discord →](https://discord.gg/UgwAsJf6C5) is the fastest way to get your question answered.
