@@ -148,12 +148,24 @@ async function example(ctx) {
         ctx.throw(401, 'account is not a valid address');
     }
 
-    const genTraits = generateTraits(100, 60, 20);
+    // TODO: check if account has a token and fetch the image
+    const hasToken = false;
+    // TODO: check if account has alraedy genearted an image and fetch the image
+    const hasImage = false;
 
-    await ctx.render('nftar', {
-        account: ctx.params.account,
-        traits: genTraits,
-     });
+
+    const response = {
+        account,
+    }
+
+    if (!hasImage){
+        const genTraits = generateTraits(100, 60, 20);
+        response.traits = genTraits;
+
+        // TODO: upload to NFT.storage
+    }
+
+    await ctx.render('nftar', response);
 };
 
 router.post('/api', jsonrpc.middleware);
