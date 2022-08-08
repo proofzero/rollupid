@@ -1,7 +1,8 @@
 {
   "name": "3id-nftar-generator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Procedural NFT generator for 3iD",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "lint:check": "eslint .",
