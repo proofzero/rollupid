@@ -30,14 +30,6 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 <div class="container" style="padding: 0px;">
   <div class="row">
     <div class="col col--6">
-      <a class="card" href="{{<relref \"starbase\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
-        <div class="card__body">
-          <h4>✨ Starbase Dashboard</h4>
-          <p>Decentralized application control centre and analytics.</p>
-        </div>
-      </a>
-    </div>
-    <div class="col col--6">
       <a class="card" href="{{<relref \"starport\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>🚀 Starport DApps</h4>
@@ -70,7 +62,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 
 ---
 
-Visit [✨ Starbase](https://starbase.kubelt.com) to get started with the Kubelt platform or explore our [guides]({{< relref "Quick-Start" >}}) to learn more about the platform.
+Visit [✨ Starbase](https://starbase.kubelt.com) to get started with the Kubelt platform or explore our [guides]({{< relref "guides" >}}) to learn more about the platform.
 
 Check out our [📦 Github Repo](https://github.com/kubelt/kubelt) to learn more about open source [SDK](https://sdk.kubelt.com/) and libraries.
 

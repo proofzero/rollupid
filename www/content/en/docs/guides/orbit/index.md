@@ -1,5 +1,5 @@
 ---
-title: "Guides"
+title: "🪐 Orbit"
 description: ""
 lead: "This is where the Kubelt guides live."
 date: 2022-03-01T09:44:16-08:00
@@ -9,6 +9,6 @@ images: []
 menu:
   docs:
     parent: "guides"
-weight: 700
+weight: 900
 toc: true
 ---

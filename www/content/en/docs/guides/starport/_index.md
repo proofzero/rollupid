@@ -1,14 +1,14 @@
 ---
-title: "Guides"
+title: "🚀 Starport"
 description: ""
-lead: "This is where the Kubelt guides live."
+lead: "Starport home section."
 date: 2022-03-01T09:44:16-08:00
 lastmod: 2022-03-01T09:44:16-08:00
 draft: false
 images: []
 menu:
   docs:
-    parent: "guides"
-weight: 700
+    parent: "starport"
+weight: 500
 toc: true
 ---
