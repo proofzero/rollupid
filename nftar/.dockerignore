@@ -1,0 +1,3 @@
+# nftar/.dockerignore
+
+node_modules

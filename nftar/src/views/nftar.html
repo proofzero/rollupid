@@ -40,7 +40,6 @@
             img {
                 display: none;
             }
-
         </style>
     </head>
     <body>
@@ -53,9 +52,9 @@
         {% for trait, data in traits %}
             <li>
                 <div>{{ trait }}: Type: {{ data.type }}</div>
-                <div>Name: {{ data.value.name }}</div> 
-                <div>RGB: {{ data.value.rgb | dump | safe }}</div> 
-                <div>RND: {{ data.value.rnd | dump | safe }}</div> 
+                <div>Name: {{ data.value.name }}</div>
+                <div>RGB: {{ data.value.rgb | dump | safe }}</div>
+                <div>RND: {{ data.value.rnd | dump | safe }}</div>
             </li>
         {% endfor %}
         </ul>
@@ -76,7 +75,5 @@
 
             window.g = g
         </script>
-
-       
     </body>
 </html>

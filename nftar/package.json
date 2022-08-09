@@ -13,8 +13,7 @@
   },
   "devDependencies": {
     "browserify": "17.0.0",
-    "eslint": "7.7.0",
-    "nodemon": "2.0.19"
+    "eslint": "7.7.0"
   },
   "engines": {
     "node": ">=14"
@@ -32,6 +31,8 @@
     "koa-mount": "4.0.0",
     "koa-router": "12.0.0",
     "koa-views": "8.0.0",
+    "nft.storage": "7.0.0",
+    "nodemon": "2.0.19",
     "nunjucks": "3.2.3",
     "path": "0.12.7",
     "streaming-json-stringify": "3.1.0",

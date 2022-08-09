@@ -46,23 +46,29 @@ class App {
         this.createParticles();
     }
 
-    async freeze() {
+    async freeze(asBlob = false, imageFormat = "image/png") {
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
         var framePromise = new Promise(async function(resolve, reject){
-            let count = 0
+            let count = 0;
             await sleep(1000);
             while(!this.isRendered() && count <= 10) {
-                count++
+                count++;
                 await sleep(100);
             }
             if (count >= 10) {
-                reject('timeout')
+                reject('timeout');
             }
-            this.frame = this.ctx.canvas.toDataURL();
-            resolve(this.frame)
+            if (asBlob) {
+                this.frame = this.ctx.canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, imageFormat);
+            } else {
+                this.frame = this.ctx.canvas.toDataURL();
+                resolve(this.frame);
+            }
         }.bind(this));
-        return framePromise
+        return framePromise;
     }
 
     createParticles() {
@@ -72,7 +78,7 @@ class App {
         // TODO: make it so the params always position the gradient the same way for first frame
         // akak deterministic placements of particles
         for(let i = 0; i < this.totalParticles; i++) {
-            const curCol = this.COLORS[curColor]
+            const curCol = this.COLORS[curColor];
             const item = new GlowParticle(
                 curCol.rnd[0] * this.stageWidth,
                 curCol.rnd[1] * this.stageHeight,
@@ -89,7 +95,7 @@ class App {
     }
 
     animate() {
-        
+
         requestAnimationFrame(this.animate.bind(this));
 
         const now = Date.now();

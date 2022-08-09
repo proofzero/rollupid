@@ -1,3 +1,5 @@
+// nftar/src/canvas/glowparticle.js
+
 const P12 = Math.PI * 2;
 
 class GlowParticle {
@@ -41,9 +43,9 @@ class GlowParticle {
         const g = ctx.createRadialGradient(
             this.x,
             this.y,
-            this.radius * 0.01, 
-            this.x, 
-            this.y, 
+            this.radius * 0.01,
+            this.x,
+            this.y,
             this.radius
         );
         g.addColorStop(0, `rgba(${this.rgb.r}, ${this.rgb.g}, ${this.rgb.b}, 0.6)`);

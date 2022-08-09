@@ -1,19 +1,21 @@
+// nftar/src/utils.js
+
 const Probability = require('./probability.js')
 const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
 
 const generateTraits = function(wi1, wi2, wi3) {
     // GENERATE PFP Properties
     const probability = new Probability();
-    
+
     // TRAIT 1
-    // TODO: increase weight of categories based 
+    // TODO: increase weight of categories based
     const wtrait1t = new Probability(TRAIT_CATEGORIES);
     wtrait1t.addWeight('COMMON', wi1 % 2);
     wtrait1t.addWeight('UNCOMMON', wi1 % 3);
     wtrait1t.addWeight('RARE', wi1 % 4);
     wtrait1t.addWeight('EPIC', wi1 % 5);
     const trait_1_type = wtrait1t.peek()[0];
-    
+
     const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
     const trait_1_value = wtrait1v.peek()[0];
 
