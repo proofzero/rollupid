@@ -16,12 +16,12 @@
   :init
   (do
     ;; Load pod for hickory, etc.
-;;     (pods/load-pod 'retrogradeorbit/bootleg "0.1.9")
+    ;; (pods/load-pod 'retrogradeorbit/bootleg "0.1.9")
 
     ;; Add shared build code to classpath.
     (cp/add-classpath "../bb")
 
-;;     (require '[pod.retrogradeorbit.hickory.select :as hick])
+    ;; (require '[pod.retrogradeorbit.hickory.select :as hick])
 
     (require '[com.kubelt.cloudflare.client :as cf])
     (require '[com.kubelt.cloudflare.client.zone :as cf.zone])
@@ -349,7 +349,7 @@
   -options:dev
   {:doc "The options map for 'dev' development environment."
    :depends [-options:common]
-   :task (do (merge -options:common {:env/name env-dev}))} 
+   :task (do (merge -options:common {:env/name env-dev}))}
 
   -options:next
   {:doc "The options map for next environment"
@@ -471,7 +471,7 @@
              -env:cloudflare-api-token
              -env:cloudflare-zone-id
              -env:datadog-client-token
-             -env:datadog-env]}
+             -env:datadog-env]
    :task (do
            {:dev/account-id -env:dev-account-id
             :dev/kv-app-id -env:dev-kv-app-id
