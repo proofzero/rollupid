@@ -1,5 +1,5 @@
 ---
-title: "🔒Authorization"
+title: "Authorization"
 description: ""
 lead: ""
 date: 2022-07-28T21:48:58-04:00
@@ -7,8 +7,8 @@ lastmod: 2022-07-28T21:48:58-04:00
 images: []
 menu:
   docs:
-    parent: ""
-weight: 999
+    parent: "guides"
+weight: 700
 toc: true
 ---
 

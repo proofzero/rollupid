@@ -1,15 +1,14 @@
 ---
-title: "🚀 Starport"
+title: "Orbit Quick Start"
 description: ""
 lead: ""
-date: 2020-11-16T13:59:39+01:00
-lastmod: 2020-11-16T13:59:39+01:00
-draft: false
+date: 2022-03-01T09:44:16-08:00
+lastmod: 2022-03-01T09:44:16-08:00
 images: []
 menu:
   docs:
     parent: "guides"
-weight: 220
+weight: 250
 toc: false
 ---
 
