@@ -81,6 +81,7 @@ jobs:
           NEXT_URL: ${{ secrets.NEXT_URL }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_ENV: current
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
@@ -98,6 +99,7 @@ jobs:
           NEXT_URL: ${{ secrets.NEXT_URL }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_ENV: current
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
