@@ -454,6 +454,7 @@
   -env:cloudflare-api-token (system/env "CLOUDFLARE_API_TOKEN")
   -env:cloudflare-zone-id (system/env "CLOUDFLARE_ZONE_ID")
   -env:datadog-client-token (system/env "DATADOG_CLIENT_TOKEN")
+  -env:datadog-env (system/env "DATADOG_ENV")
 
   ;; environment
   ;; -----------------------------------------------------------------------------
@@ -469,7 +470,8 @@
              -env:current-url
              -env:cloudflare-api-token
              -env:cloudflare-zone-id
-             -env:datadog-client-token]
+             -env:datadog-client-token
+             -env:datadog-env]}
    :task (do
            {:dev/account-id -env:dev-account-id
             :dev/kv-app-id -env:dev-kv-app-id
@@ -480,7 +482,8 @@
             :current/url -env:current-url
             :cloudflare/api-token -env:cloudflare-api-token
             :cloudflare/zone-id -env:cloudflare-zone-id
-            :datadog/client-token -env:datadog-client-token})}
+            :datadog/client-token -env:datadog-client-token
+            :datadog/env -env:datadog-env})}
 
   -deploy:edn
   {:doc "A map of values read from deployment configuration file"
