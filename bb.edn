@@ -66,6 +66,7 @@
    :task (let [{admin-account-id :admin/account-id
                 cloudflare-api-token :cloudflare/token
                 datadog-token :datadog/token
+                datadog-env :datadog/env
                 next-kv-app-id :next/kv-app-id
                 next-url :next/url
                 current-kv-app-id :current/kv-app-id
@@ -73,6 +74,7 @@
                secrets {:admin-account-id admin-account-id
                         :cloudflare-api-token cloudflare-api-token
                         :datadog-token datadog-token
+                        :datadog-env datadog-env
                         :next-kv-app-id next-kv-app-id
                         :next-url next-url
                         :current-kv-app-id current-kv-app-id
