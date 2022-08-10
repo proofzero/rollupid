@@ -57,4 +57,4 @@ class GlowParticle {
     }
 }
 
-module.exports = GlowParticle
+module.exports = GlowParticle;

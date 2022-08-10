@@ -9,7 +9,7 @@ const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const Jsonrpc = require('@koalex/koa-json-rpc');
 // const canvas = require('canvas')
-const streamToBlob = require('stream-to-blob')
+const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const views = require('koa-views');
 const mount = require('koa-mount');
@@ -111,11 +111,26 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     const genTraits = generateTraits(100, 60, 20);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
 
-    const gradient = new canvas(new fabric.StaticCanvas(null, { width: 1500, height: 500}), colors);
-    gradient.animate();
-    // NB: freeze() returns a Data URL by default; pass true to get a binary blob.
+    const isNode = () => {
+        if (typeof window === 'undefined') {
+            return true;
+        }
+        return false;
+    };
+
+    const gradient = new canvas(
+        new fabric.StaticCanvas(null, { width: 1500, height: 750 }),
+        colors
+    );
+    let stream;
+    if (isNode()) {
+        // Generate a single frame; call animate() to produce an animation.
+        stream = gradient.snapshot();
+    } else {
+        // NB: freeze() returns a Data URL.
+        stream = await gradient.freeze();
+    }
     const imageFormat = "image/png";
-    const stream = await gradient.freeze(true, imageFormat);
     const blob = await streamToBlob(stream, imageFormat);
     const png = new storage.File([blob], "threeid.png", {type: imageFormat});
 
@@ -137,14 +152,14 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
         metadata.embed()
     );
 
-    // const reader = 
+    // const reader =
     ctx.body = jsonrpc.methods.map(method => {
         return {
             blob,
             png,
 
-        }
-    })
+        };
+    });
 
     // TODO: request contracts from alchemy
 

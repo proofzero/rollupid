@@ -4,7 +4,7 @@ const FRAMES_PER_SECOND = 12;  // Valid values are 60,30,20,15,10...
 
 function requestAnimationFrame(f){
     if (typeof window === 'undefined') {
-        setImmediate(()=>f())
+        setImmediate(()=>f());
     } else {
         window.requestAnimationFrame(f);
     }
@@ -12,13 +12,10 @@ function requestAnimationFrame(f){
 
 class App {
     constructor(canvas_el, COLORS, PIXEL_RATIO = 1, FPS) {
-        this.canvas = canvas_el
+        this.canvas = canvas_el;
         this.ctx = this.canvas.getContext('2d');
-        if (typeof window === 'undefined') {
-            this.isNode = true
-        }
 
-        this.COLORS = COLORS
+        this.COLORS = COLORS;
 
         if (FPS) {
             this.lastFrameTime = 0;
@@ -29,8 +26,9 @@ class App {
         }
 
         this.pixelRatio = PIXEL_RATIO;
-        this.stageWidth = 1500;
-        this.stageHeight = 750;
+        // Use the full with and height of the passed-in canvas.
+        this.stageWidth = this.canvas.getWidth();
+        this.stageHeight = this.canvas.getHeight();
 
         this.totalParticles = 4;
         this.particles = [];
@@ -49,7 +47,7 @@ class App {
         this.createParticles();
     }
 
-    async freeze(asStream = false, imageFormat = "image/png") {
+    async freeze() {
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
         var framePromise = new Promise(async function(resolve, reject){
@@ -62,20 +60,10 @@ class App {
             if (count >= 10) {
                 reject('timeout');
             }
-            if (this.isNode) {
-                this.canvas.renderAll()
-            } 
-            if (asStream) {
-                this.frame = this.canvas.createPNGStream();
-                resolve(this.frame)
-                // this.frame = this.ctx.canvas.toBlob((blob) => {
-                //     resolve(blob);
-                // }, imageFormat);
-            } else {
-                this.frame = this.ctx.canvas.toDataURL();
-                resolve(this.frame);
-            }
-            
+
+            this.frame = this.ctx.canvas.toDataURL();
+            resolve(this.frame);
+
         }.bind(this));
         return framePromise;
     }
@@ -104,19 +92,18 @@ class App {
     }
 
     animate() {
-
         requestAnimationFrame(this.animate.bind(this));
 
         const now = Date.now();
         const elapsed = now - this.then;
 
         if (elapsed > this.fpsInterval) {
-            // console.log('frame', this.then)
+            //console.log('frame', this.then);
 
             this.then = now - (elapsed % this.fpsInterval);
 
             // clear the canvas
-            this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
+            this.clear();
 
             // draw the particles
             for (let i = 0; i < this.totalParticles; i++) {
@@ -127,6 +114,30 @@ class App {
 
         // console.log('here', this.rendered)
         this.rendered = true;
+    }
+
+    /**
+     * Empty the entire drawing context.
+     */
+    clear() {
+        this.ctx.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
+    /**
+     * Generate a single frame to use as PFP.
+     *
+     * @return a stream of PNG image data
+     */
+    snapshot() {
+        requestAnimationFrame(this.animate.bind(this));
+
+        this.clear();
+
+        for (const particle of this.particles) {
+            particle.animate(this.ctx, this.canvas.getWidth(), this.canvas.getHeight());
+        }
+
+        return this.canvas.createPNGStream();
     }
 
     isRendered() {
