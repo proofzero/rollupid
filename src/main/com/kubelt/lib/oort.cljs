@@ -41,7 +41,7 @@
 (defn authenticate!
   "Authenticate a user against a core. The account is a map that contains
   the public key from the keypair that represents the user's account."
-  [sys]
+  [sys permissions]
   (let [address (get-in sys [:crypto/wallet :wallet/address])]
     ;; Make an JsonRpc call to oort backend, passing along the user's
     ;; wallet address. Expect a nonce in return, which should be signed
@@ -49,7 +49,7 @@
     ;; registration.
     ;;
     ;; Returns a promise.
-    (send (json-rpc-provider sys address) "kb_getNonce" [address])))
+    (send (json-rpc-provider sys address) "kb_getNonce" [address permissions])))
 
 (defn verify!
   "Send a signed nonce to verify ownership of a keypair as part of the

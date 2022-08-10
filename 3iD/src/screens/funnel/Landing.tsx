@@ -2,7 +2,11 @@ import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
+import {
+  getFunnelState,
+  isAuthenticated,
+  kbGetClaims,
+} from "../../provider/kubelt";
 import { connect, forceAccounts } from "../../provider/web3";
 import Layout from "../Layout";
 
@@ -18,9 +22,15 @@ export default function Landing({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      return navigation.navigate("Settings");
+      const funnelState = await getFunnelState();
+
+      if (!funnelState.mint) {
+        navigation.navigate("Mint");
+      } else {
+        navigation.navigate("Settings");
+      }
     } else {
-      return navigation.navigate("Gate");
+      navigation.navigate("Invite");
     }
   };
 
@@ -32,7 +42,7 @@ export default function Landing({ navigation }: { navigation: any }) {
         return claimsRedirect(claim);
       }
 
-      return navigation.navigate("Auth");
+      navigation.navigate("Auth");
     };
 
     if (account) {

@@ -31,11 +31,11 @@
   complete the auth flow. Returns a promise that resolves to the updated
   system map containing the JWT for the system wallet core address, or
   is rejected with some information about the error that occurred."
-  [sys]
+  [sys permissions]
   ;; TODO add an extra arity that allows a wallet to be passed in?
   ;; TODO validate system map (especially: ensure wallet is present)
   (let [core (get-in sys [:crypto/wallet :wallet/address])]
-    (-> (lib.oort/authenticate! sys)
+    (-> (lib.oort/authenticate! sys permissions)
         (lib.promise/then
          (fn [auth-result]
            (if (lib.error/error? auth-result)
@@ -81,8 +81,8 @@
 
 (defn authenticate-js!
   "Create an account from a JavaScript context."
-  [sys core]
-  (authenticate& sys))
+  [sys permissions]
+  (authenticate& sys permissions))
 
 
 ;; TODO test me

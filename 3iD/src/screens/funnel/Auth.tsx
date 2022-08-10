@@ -5,6 +5,7 @@ import useAccount from "../../hooks/account";
 import { connect, forceAccounts } from "../../provider/web3";
 import {
   authenticate,
+  getFunnelState,
   isAuthenticated,
   kbGetClaims,
   threeIdListInvitations,
@@ -19,25 +20,31 @@ export default function Auth({ navigation }: { navigation: any }) {
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
 
+    const funnelState = await getFunnelState();
+
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      return navigation.navigate("Settings");
-    } else if (account) {
+      if (!funnelState.mint) {
+        navigation.navigate("Mint");
+      } else {
+        navigation.navigate("Settings");
+      }
+    } else if (!funnelState.invite) {
       const invites = await threeIdListInvitations();
       if (invites.length > 0) {
-        return navigation.navigate("Invite");
+        navigation.navigate("Invite");
       } else {
-        return navigation.navigate("Gate");
+        navigation.navigate("Gate");
       }
     } else {
-      return navigation.navigate("Landing");
+      navigation.navigate("Gate");
     }
   };
 
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
 
     const asyncFn = async () => {
@@ -87,7 +94,7 @@ export default function Auth({ navigation }: { navigation: any }) {
       >
         <Text
           style={{
-            paddingBottom: "1em",
+            paddingBottom: 22,
             fontFamily: "Inter_700Bold",
             fontSize: 20,
             fontWeight: "700",
@@ -102,7 +109,6 @@ export default function Auth({ navigation }: { navigation: any }) {
 
         <Text
           style={{
-            paddingTop: "1em",
             fontFamily: "Inter_400Regular",
             fontSize: 24,
             fontWeight: "400",

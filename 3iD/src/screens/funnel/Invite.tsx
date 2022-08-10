@@ -8,10 +8,12 @@ import Layout from "../Layout";
 
 import { forceAccounts } from "../../provider/web3";
 import {
+  getFunnelState,
   isAuthenticated,
   kbGetClaims,
   threeIdListInvitations,
   threeIdUseInvitation,
+  tickFunnelStep,
 } from "../../provider/kubelt";
 import { Invitation } from "../../types/Invitation";
 
@@ -22,7 +24,14 @@ export default function Invite({ navigation }: { navigation: any }) {
   const account = useAccount();
 
   const continueToThreeId = async () => {
-    return navigation.navigate("Settings");
+    await tickFunnelStep("invite");
+
+    const funnelState = await getFunnelState();
+    if (!funnelState.mint) {
+      navigation.navigate("Mint");
+    } else {
+      navigation.navigate("Settings");
+    }
   };
 
   const claimsRedirect = async (claim: string) => {
@@ -51,7 +60,7 @@ export default function Invite({ navigation }: { navigation: any }) {
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
 
     const asyncFn = async () => {
@@ -65,10 +74,10 @@ export default function Invite({ navigation }: { navigation: any }) {
           setAvailableInvites(invites);
           setSelectedInvite(invites[0]);
         } else {
-          return navigation.navigate("Gate");
+          navigation.navigate("Gate");
         }
       } else {
-        return navigation.navigate("Gate");
+        navigation.navigate("Gate");
       }
     };
 
@@ -193,26 +202,40 @@ export default function Invite({ navigation }: { navigation: any }) {
               flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              paddingHorizontal: 49,
-              paddingTop: 12,
-              paddingBottom: 14,
+              paddingHorizontal: 22,
+              paddingVertical: 14,
               backgroundColor: "#192030",
               maxWidth: "100%",
               height: 48,
             }}
           >
-            <Text
-              testID="continue-to-3id"
+            <View
               style={{
-                fontFamily: "Manrope_700Bold",
-                fontSize: 16,
-                fontWeight: "700",
-                lineHeight: 22,
-                color: "white",
+                flexDirection: "row",
               }}
             >
-              Continue to 3ID
-            </Text>
+              <Text
+                testID="continue-to-3id"
+                style={{
+                  fontFamily: "Manrope_700Bold",
+                  fontSize: 16,
+                  fontWeight: "700",
+                  lineHeight: 22,
+                  color: "white",
+                  marginRight: 10,
+                }}
+              >
+                Continue to 3ID
+              </Text>
+
+              <Image
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                source={require("../../assets/arrow_right_white.png")}
+              />
+            </View>
           </Pressable>
         </View>
       </View>

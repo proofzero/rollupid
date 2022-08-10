@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, Image } from "react-native";
 import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
@@ -20,7 +20,7 @@ export default function Gate({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      return navigation.navigate("Settings");
+      navigation.navigate("Settings");
     }
   };
 
@@ -34,7 +34,7 @@ export default function Gate({ navigation }: { navigation: any }) {
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
 
     const asyncFn = async () => {
@@ -43,7 +43,7 @@ export default function Gate({ navigation }: { navigation: any }) {
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
       } else {
-        return navigation.navigate("Auth");
+        navigation.navigate("Auth");
       }
     };
 
@@ -71,52 +71,32 @@ export default function Gate({ navigation }: { navigation: any }) {
           alignItems: "center",
         }}
       >
-        <Pressable
+        <Image
           style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            paddingHorizontal: 49,
-            paddingTop: 12,
-            paddingBottom: 14,
-            backgroundColor: "#192030",
-            maxWidth: "100%",
-            height: 48,
+            width: 184.82,
+            height: 159.91,
+            marginBottom: 74.09,
           }}
-          onPress={() => tryDifferentWallet()}
-        >
-          <Text
-            testID="try-different-wallet"
-            style={{
-              fontFamily: "Manrope_700Bold",
-              fontSize: 16,
-              fontWeight: "700",
-              lineHeight: 22,
-              color: "white",
-            }}
-          >
-            Try Different Wallet
-          </Text>
-        </Pressable>
+          source={require("../../assets/sad.png")}
+        />
 
         <Text
           style={{
-            paddingTop: 56,
-            paddingBottom: 43,
+            paddingHorizontal: 20,
+            paddingVertical: 14,
             fontFamily: "Inter_700Bold",
             fontSize: 24,
             fontWeight: "700",
             lineHeight: 32,
             color: "#1F2937",
+            marginBottom: 22,
           }}
         >
-          Your wallet address is not whitelisted for Early Access.
+          Your wallet does not hold an invite token.
         </Text>
 
         <Text
           style={{
-            paddingTop: "1em",
             fontFamily: "Inter_400Regular",
             fontSize: 24,
             fontWeight: "400",
@@ -124,34 +104,78 @@ export default function Gate({ navigation }: { navigation: any }) {
             color: "#1F2937",
             maxWidth: 758,
             textAlign: "center",
+            marginBottom: 43,
           }}
         >
-          To get onto the whitelist{" "}
-          <a
-            target={"_blank"}
-            rel={"noopener noopener noreferrer"}
-            href={Constants.manifest?.extra?.twitterUrl}
-          >
-            follow us on Twitter
-          </a>
-          ,{" "}
-          <a
-            target={"_blank"}
-            rel={"noopener noopener noreferrer"}
-            href={Constants.manifest?.extra?.discordUrl}
-          >
-            join our Discord
-          </a>{" "}
-          and leave us a message in{" "}
-          <a
-            target={"_blank"}
-            rel={"noopener noopener noreferrer"}
-            href={Constants.manifest?.extra?.discordChannelUrl}
-          >
-            #3iD
-          </a>{" "}
-          channel
+          If you want to get an early access please join our Discord.
         </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Pressable
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 20,
+              paddingVertical: 14,
+              backgroundColor: "#E5E7EB",
+              marginRight: 20,
+            }}
+            onPress={() => tryDifferentWallet()}
+          >
+            <Text
+              testID="try-different-wallet"
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 24,
+                color: "#6B7280",
+              }}
+            >
+              Try Different Wallet
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 20,
+              paddingVertical: 14,
+              backgroundColor: "#192030",
+              marginRight: 20,
+            }}
+          >
+            <Text
+              testID="join-our-discord"
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 24,
+              }}
+            >
+              <a
+                target={"_blank"}
+                rel={"noopener noopener noreferrer"}
+                href={Constants.manifest?.extra?.discordUrl}
+                style={{ color: "white", textDecoration: "none" }}
+              >
+                Join Our Discord
+              </a>
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </Layout>
   );
