@@ -17,6 +17,7 @@ const serve = require('koa-better-serve');
 const storage = require('nft.storage');
 const path = require('path');
 const Web3 = require('web3');
+const ethers = require('ethers');
 
 const Probability = require('./probability.js');
 const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
@@ -145,23 +146,35 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
             traits: genTraits,
         },
     });
-    console.log('IPFS URL for the metadata:', metadata.url);
-    console.log('metadata.json contents:\n', metadata.data);
-    console.log(
-        'metadata.json contents with IPFS gateway URLs:\n',
-        metadata.embed()
-    );
+    //console.log('IPFS URL for the metadata:', metadata.url);
+    //console.log('metadata.json contents:\n', metadata.data);
+    //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
 
-    // const reader =
-    ctx.body = jsonrpc.methods.map(method => {
-        return {
-            blob,
-            png,
+    // This is the URI that will be passed to the NFT minting contract.
+    const tokenURI = metadata.url;
 
-        };
-    });
+    // Generate signed voucher using ctx.wallet.
+    const voucher = {
+        account,
+        tokenURI,
+    };
+    // NB: A signed message is prefixed with "\x19Ethereum Signed
+    // Message:\n" and the length of the message, using the hashMessage
+    // method, so that it is EIP-191 compliant. If recovering the
+    // address in Solidity, this prefix will be required to create a
+    // matching hash.
+    const signature = await ctx.wallet.signMessage(JSON.stringify(voucher));
 
     // TODO: request contracts from alchemy
+
+    // Generate the response to send to the client.
+    ctx.body = jsonrpc.methods.map(method => {
+        return {
+            metadata: metadata.data,
+            voucher,
+            signature,
+        };
+    });
 
 });
 
