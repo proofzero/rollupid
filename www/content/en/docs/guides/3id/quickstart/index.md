@@ -13,9 +13,9 @@ weight: 700
 toc: true
 ---
 
-### 3iD Profile Request
+### Profile Request
 
-To request a user's 3iD profile simply construct a [JSON RPC](https://www.jsonrpc.org/) request using the user's wallet account address with the `kb_getProfile` method. For example:
+To request a user's 3ID profile simply construct a [JSON RPC](https://www.jsonrpc.org/) request using the user's wallet account address with the `3id_getProfile` method. For example:
 
 **Request**
 ```
@@ -23,7 +23,7 @@ POST https://dapp.threeid.xyz/<wallet address>/jsonrpc
 {
   "id": 1,
   "jsonrpc": "2.0",
-  "method": "kb_getProfile",
+  "method": "3id_getProfile",
   "params": []
 }
 ```
@@ -54,20 +54,20 @@ POST https://dapp.threeid.xyz/<wallet address>/jsonrpc
 }
 ```
 
-### 3iD Profile RPC Methods
+### Profile RPC Methods
 
 The getter and setter methods are:
 
-- `kb_getProfile`
-- `kb_setProfile`
+- `3id_getProfile`
+- `3id_setProfile`
 
 ### Authorization Model
 
-While the `kb_getProfile` method is publicly available, calling the `kb_setProfile` method requires authorization. [See the Authorization Guide]({{< relref "starport" >}}) for more information on Kubelt's authorization model.
+While the `3id_getProfile` method is publicly available, calling the `3id_setProfile` method requires authorization. [See the Authorization Guide]({{< relref "starport" >}}) for more information on Kubelt's authorization model.
 
-### 3iD Profile Data Shape
+### 3ID Profile Data Shape
 
-3iD-specific profile data follows this schema (in TypeScript but without loss of generality):
+3ID-specific profile data follows this schema (in TypeScript but without loss of generality):
 
 ```typescript
 export interface Profile {
@@ -93,9 +93,9 @@ export interface Profile {
 
 ### Custom User Data
 
-Using 3iD means you don't have to worry about storing user data -- your users can store it themselves!
+Using 3ID means you don't have to worry about storing user data -- your users can store it themselves!
 
-In order to store your own custom application data within a user's 3iD profile you will need to use a custom application namespace as well as our new encrypted storage RPC methods. [Join our Discord](https://discord.gg/UgwAsJf6C5) to talk to us about your use case and get beta access.
+In order to store your own custom application data within a user's 3ID profile you will need to use a custom application namespace as well as our new encrypted storage RPC methods. [Join our Discord](https://discord.gg/UgwAsJf6C5) to talk to us about your use case and get beta access.
 
 ### FAQ
 
