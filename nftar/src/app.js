@@ -1,10 +1,15 @@
 // nftar/src/app.js
 
+const {Blob} = require('node:buffer');
+global.Blob = Blob;
+
 const Koa = require('koa');
 const logger = require('koa-logger');
 const Router = require('koa-router');
 const bodyParser = require('koa-bodyparser');
 const Jsonrpc = require('@koalex/koa-json-rpc');
+// const canvas = require('canvas')
+const streamToBlob = require('stream-to-blob')
 const fabric = require('fabric').fabric;
 const views = require('koa-views');
 const mount = require('koa-mount');
@@ -106,12 +111,12 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     const genTraits = generateTraits(100, 60, 20);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
 
-    const gradient = new canvas(new fabric.Canvas('c'), colors);
+    const gradient = new canvas(new fabric.StaticCanvas(null, { width: 1500, height: 500}), colors);
     gradient.animate();
     // NB: freeze() returns a Data URL by default; pass true to get a binary blob.
-    const asBlob = true;
     const imageFormat = "image/png";
-    const blob = await gradient.freeze(asBlob, imageFormat);
+    const stream = await gradient.freeze(true, imageFormat);
+    const blob = await streamToBlob(stream, imageFormat);
     const png = new storage.File([blob], "threeid.png", {type: imageFormat});
 
     // Upload to NFT.storage.
@@ -131,6 +136,15 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
         'metadata.json contents with IPFS gateway URLs:\n',
         metadata.embed()
     );
+
+    // const reader = 
+    ctx.body = jsonrpc.methods.map(method => {
+        return {
+            blob,
+            png,
+
+        }
+    })
 
     // TODO: request contracts from alchemy
 

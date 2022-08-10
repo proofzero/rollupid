@@ -77,5 +77,4 @@ const generateTraits = function(wi1, wi2, wi3) {
 }
 
 module.exports = {
-    generateTraits,
-}
+    generateTraits,}

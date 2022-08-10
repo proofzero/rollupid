@@ -14,6 +14,9 @@ class App {
     constructor(canvas_el, COLORS, PIXEL_RATIO = 1, FPS) {
         this.canvas = canvas_el
         this.ctx = this.canvas.getContext('2d');
+        if (typeof window === 'undefined') {
+            this.isNode = true
+        }
 
         this.COLORS = COLORS
 
@@ -46,7 +49,7 @@ class App {
         this.createParticles();
     }
 
-    async freeze(asBlob = false, imageFormat = "image/png") {
+    async freeze(asStream = false, imageFormat = "image/png") {
         const sleep = ms => new Promise(res => setTimeout(res, ms));
 
         var framePromise = new Promise(async function(resolve, reject){
@@ -59,14 +62,20 @@ class App {
             if (count >= 10) {
                 reject('timeout');
             }
-            if (asBlob) {
-                this.frame = this.ctx.canvas.toBlob((blob) => {
-                    resolve(blob);
-                }, imageFormat);
+            if (this.isNode) {
+                this.canvas.renderAll()
+            } 
+            if (asStream) {
+                this.frame = this.canvas.createPNGStream();
+                resolve(this.frame)
+                // this.frame = this.ctx.canvas.toBlob((blob) => {
+                //     resolve(blob);
+                // }, imageFormat);
             } else {
                 this.frame = this.ctx.canvas.toDataURL();
                 resolve(this.frame);
             }
+            
         }.bind(this));
         return framePromise;
     }
@@ -106,13 +115,16 @@ class App {
 
             this.then = now - (elapsed % this.fpsInterval);
 
+            // clear the canvas
             this.ctx.clearRect(0, 0, this.stageWidth, this.stageHeight);
 
+            // draw the particles
             for (let i = 0; i < this.totalParticles; i++) {
                 const item = this.particles[i];
                 item.animate(this.ctx, this.stageWidth, this.stageHeight);
             }
         }
+
         // console.log('here', this.rendered)
         this.rendered = true;
     }
