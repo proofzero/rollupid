@@ -1,0 +1,4 @@
+# nftar/.gcloudignore
+
+/node_modules/
+*~

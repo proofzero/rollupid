@@ -61,5 +61,8 @@
     "stream-http": "3.2.0",
     "web3": "1.7.4"
   },
-  "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097"
+  "gitHead": "59d501028e3668b7eb7fa9fc89b9cecf4b29b097",
+  "devDependencies": {
+    "webpack-cli": "^4.10.0"
+  }
 }

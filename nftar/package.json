@@ -1,0 +1,44 @@
+{
+  "name": "3id-nftar-generator",
+  "version": "1.0.0",
+  "description": "Procedural NFT generator for 3iD",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "lint:check": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "echo 'TODO: Add a test runner and then update this command'",
+    "start": "nodemon node index.js",
+    "build": "browserify src/canvas/canvas.js --outfile dist/canvas.js -s Gradient"
+  },
+  "devDependencies": {
+    "browserify": "17.0.0",
+    "eslint": "7.7.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@koalex/koa-json-rpc": "1.0.3",
+    "canvas": "2.9.3",
+    "ethers": "5.6.9",
+    "fabric": "5.2.1",
+    "koa": "2.13.4",
+    "koa-better-serve": "2.0.7",
+    "koa-bodyparser": "4.3.0",
+    "koa-logger": "3.2.1",
+    "koa-mount": "4.0.0",
+    "koa-router": "12.0.0",
+    "koa-views": "8.0.0",
+    "nft.storage": "7.0.0",
+    "nodemon": "2.0.19",
+    "nunjucks": "3.2.3",
+    "path": "0.12.7",
+    "stream-to-blob": "2.0.1",
+    "streaming-json-stringify": "3.1.0",
+    "supertest": "6.2.4",
+    "web3": "1.7.5"
+  }
+}
