@@ -17,10 +17,8 @@ const serve = require('koa-better-serve');
 const storage = require('nft.storage');
 const path = require('path');
 const Web3 = require('web3');
-const ethers = require('ethers');
+// const ethers = require('ethers');
 
-const Probability = require('./probability.js');
-const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
 const {generateTraits} = require('./utils.js');
 const canvas = require('./canvas/canvas.js');
 
@@ -163,7 +161,7 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     // method, so that it is EIP-191 compliant. If recovering the
     // address in Solidity, this prefix will be required to create a
     // matching hash.
-    const signature = await ctx.wallet.signMessage(JSON.stringify(voucher));
+    const signature = await ctx.wallet.sign(JSON.stringify(voucher));
 
     // TODO: request contracts from alchemy
 
@@ -193,7 +191,7 @@ jsonrpc.method('describe', (ctx, next) => {
 // user is prompted to claim their core to claim their image. We should check if this
 // account is holding a token and if so, return the image.
 // TODO: another endpoint where the uri is the token id and the image is returned.
-async function example(ctx) {
+async function genPFP(ctx) {
     const params = METHOD_PARAMS['3iD_genPFP'];
 
     const blockchain = ctx.params['blockchain'];
@@ -228,7 +226,7 @@ async function example(ctx) {
 };
 
 router.post('/api', jsonrpc.middleware);
-router.get('/:blockchain/:account', example);
+router.get('/:blockchain/:account', genPFP);
 
 const render = views(__dirname + '/views', { map: { html: 'nunjucks' }});
 

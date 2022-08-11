@@ -46,6 +46,7 @@
         <image id="hex" src="" />
         <canvas id="canvas"></canvas>
         <!-- <script src="https://requirejs.org/docs/release/2.3.6/minified/require.js"></script> -->
+        <script src="http://fabricjs.com/lib/fabric.js"></script>
         <script type="module" src="/public/canvas.js"></script>
 
         <ul class="traits">
@@ -65,7 +66,10 @@
             const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
             const PIXEL_RATIO = (window.devicePixelRatio > 1) ? 2 : 1
 
-            const g = new Gradient(document.getElementById('canvas'), COLORS, PIXEL_RATIO, FRAMES_PER_SECOND);
+            const canvas = new fabric.Canvas('canvas', { width: 1500, height: 750 });
+
+
+            const g = new Gradient(canvas, COLORS, PIXEL_RATIO, FRAMES_PER_SECOND);
             g.animate()
 
             // window.addEventListener('resize', g.resize.bind(g), false);

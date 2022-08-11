@@ -8,26 +8,19 @@ on:
 
 jobs:
 
-  # verify
-  # ---------------------------------------------------------------------------
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: verify git tag
-        run: |
-        # setup the gpg key
-        git verify-tag ${GITHUB_REF#refs/*/}
-
   # build
   # ----------------------------------------------------------------------------
 
   build:
-    needs: verify
     runs-on: ubuntu-latest
     permissions:
       packages: read
     steps:
       - uses: actions/checkout@master
+      - name: verify git tag
+        run: |
+          # setup the gpg key
+          git verify-tag ${GITHUB_REF#refs/*/}
       - uses: DeLaGuardo/setup-clojure@8.0
         with:
           bb: 0.8.156
@@ -46,13 +39,15 @@ jobs:
   # ----------------------------------------------------------------------------
 
   ThreeiD:
-    needs: verify
     runs-on: ubuntu-latest
     permissions:
       packages: read
     steps:
       - uses: actions/checkout@master
-
+      - name: verify git tag
+        run: |
+          # setup the gpg key
+          git verify-tag ${GITHUB_REF#refs/*/}
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
