@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 
-import { Image, ScrollView, View, Text, Pressable } from "react-native";
+import {
+  Image,
+  ScrollView,
+  View,
+  Text,
+  Pressable,
+  SafeAreaView,
+} from "react-native";
 import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
 import useSDKAuth from "../hooks/sdkAuth";
@@ -66,7 +73,7 @@ export default function Layout({
   }, []);
 
   return (
-    <View
+    <ScrollView
       style={{
         flex: 1,
       }}
@@ -108,7 +115,7 @@ export default function Layout({
             }}
           ></View>
 
-          <ScrollView
+          <View
             style={{
               flex: 8,
               backgroundColor: "#FFFFFF",
@@ -117,9 +124,9 @@ export default function Layout({
             }}
           >
             {children}
-          </ScrollView>
+          </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }

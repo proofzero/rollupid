@@ -449,8 +449,8 @@ export default function Mint({ navigation }: any) {
     setScreen("root");
   };
 
-  const continueToNaming = async () => {
-    navigation.navigate("Naming");
+  const continueToOnboarding = async () => {
+    navigation.navigate("Onboard");
   };
 
   useEffect(() => {
@@ -615,7 +615,7 @@ export default function Mint({ navigation }: any) {
                   paddingVertical: 9,
                   backgroundColor: "#1F2937",
                 }}
-                onPress={() => continueToNaming()}
+                onPress={continueToOnboarding}
               >
                 <Text
                   testID="mint-continue"
