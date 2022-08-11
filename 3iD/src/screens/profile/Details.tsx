@@ -138,7 +138,10 @@ export default function Details({
             style={styles.button}
             onPress={() => saveAllChanges(profile, setProfile)}
           >
-            <Text style={styles.textButton}> Save all Changes </Text>
+            <Text testID="details-save-all-changes" style={styles.textButton}>
+              {" "}
+              Save all Changes{" "}
+            </Text>
           </Pressable>
         </View>
 

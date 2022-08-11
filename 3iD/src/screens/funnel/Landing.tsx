@@ -26,6 +26,8 @@ export default function Landing({ navigation }: { navigation: any }) {
 
       if (!funnelState.mint) {
         navigation.navigate("Mint");
+      } else if (!funnelState.naming) {
+        navigation.navigate("Naming");
       } else {
         navigation.navigate("Settings");
       }
