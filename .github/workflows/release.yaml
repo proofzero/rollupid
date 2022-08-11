@@ -93,7 +93,9 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-        run: bb deploy:app --deploy-env current --app-version ${{ env.RELEASE_VERSION }}
+        run: >
+          bb deploy:app --deploy-env current --app-version
+            ${{ env.RELEASE_VERSION }}
 
       - name: run smoke tests
         working-directory: ./3iD

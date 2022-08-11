@@ -158,6 +158,29 @@ export const threeIdUseInvitation = async (
   return success;
 };
 
+export const threeIdGetEns = async (): Promise<string[]> => {
+  let ens: string[] = [];
+
+  try {
+    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    //   method: ["3id", "get-ens"],
+    //   params: [],
+    // });
+
+    // if (!res || res?.error || res?.body.error) {
+    //   throw new Error();
+    // }
+
+    // ens = res.body.result;
+
+    await new Promise((resolve) => setTimeout(resolve, 1216));
+  } catch (e) {
+    console.warn("Failed to get ens");
+  }
+
+  return ens;
+};
+
 /// MINTING
 export type PreMintRes =
   | {
@@ -336,12 +359,14 @@ export const getIsAuthObs = () => isAuthSubj.asObservable();
 export type FunnelState = {
   mint: boolean;
   invite: boolean;
+  naming: boolean;
 };
 
 export const tickFunnelStep = async (step: keyof FunnelState) => {
   let funnelState: FunnelState = {
     mint: false,
     invite: false,
+    naming: false,
   };
 
   const storedFunnelState = await retrieve("3id.profile", "funnel-state");
@@ -359,6 +384,7 @@ export const getFunnelState = async (): Promise<FunnelState> => {
   let funnelRes: FunnelState = {
     invite: false,
     mint: false,
+    naming: false,
   };
 
   if (funnelState?.value) {

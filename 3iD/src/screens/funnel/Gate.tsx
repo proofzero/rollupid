@@ -157,7 +157,7 @@ export default function Gate({ navigation }: { navigation: any }) {
             }}
           >
             <Text
-              testID="join-our-discord"
+              testID="gate-join-our-discord"
               style={{
                 fontFamily: "Inter_500Medium",
                 fontSize: 16,

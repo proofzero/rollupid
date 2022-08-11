@@ -136,7 +136,7 @@ export default function NavMenu() {
                 }}
                 source={require("../assets/copy.png")}
               />
-              <Text>Copy address</Text>
+              <Text testID="nav-copy-address">Copy address</Text>
             </Pressable>
 
             <Pressable
@@ -160,7 +160,7 @@ export default function NavMenu() {
                 }}
                 source={require("../assets/cog.png")}
               />
-              <Text>Settings</Text>
+              <Text testID="nav-go-to-settings">Settings</Text>
             </Pressable>
 
             <View
@@ -200,7 +200,7 @@ export default function NavMenu() {
                 }}
                 source={require("../assets/logout.png")}
               />
-              <Text>Sign out</Text>
+              <Text testID="nav-logout">Sign out</Text>
             </Pressable>
           </View>
         )}
