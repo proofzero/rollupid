@@ -6,10 +6,14 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const {
     Alchemy,
     Network,
-} = require('alchemy-sdk')
+} = require('alchemy-sdk');
 const http = require('http');
 const process = require('process');
 const storage = require('nft.storage');
+
+// Load environment variables from .env file.
+require('dotenv').config();
+
 
 const main = async (api) => {
     // Inject client for our storage service into the context. We read the
@@ -25,15 +29,19 @@ const main = async (api) => {
     // path and standard English wordlist.
     // const mnemonic = process.env.WALLET_MNEMONIC;
     // api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
-    const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL)
+    const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL);
     api.context.web3 = web3;
     api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
 
+    // An Alchemy API client.
     api.context.alchemy = new Alchemy({
         apiKey: process.env.ALCHEMY_KEY,
         network: Network[process.env.ALCHEMY_NETWORK],
         maxRetries: 10,
-    })
+    });
+
+    // The Ethereum minting contract address.
+    api.context.contract = process.env.CONTRACT_ADDRESS;
 
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;
