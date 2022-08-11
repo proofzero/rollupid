@@ -77,15 +77,20 @@ describe("Metamask", () => {
       });
     });
 
-    it(`Allowed wallet should be let into gated application`, () => {
-      cy.url().should("eq", "http://localhost:19006/settings");
+    it(`Allowed wallet should not be stuck on gate`, () => {
+      cy.url().should("not.eq", "http://localhost:19006/gate");
 
-      const genericAccount = Cypress.env("GENERIC_ACCOUNT");
-      cy.findByTestId("wallet-address").contains(
-        `${genericAccount.substring(0, 4)}...${genericAccount.substring(
-          genericAccount.length - 4
-        )}`
-      );
+      // Commented out because we can't expect to get to
+      // settings screen and encounter this button;
+      // there are invite -> mint -> naming until 
+      // we can get to settings
+
+      // const genericAccount = Cypress.env("GENERIC_ACCOUNT");
+      // cy.findByTestId("wallet-address").contains(
+      //   `${genericAccount.substring(0, 4)}...${genericAccount.substring(
+      //     genericAccount.length - 4
+      //   )}`
+      // );
     });
   });
 });
