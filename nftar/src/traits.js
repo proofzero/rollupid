@@ -100,12 +100,12 @@ const POPULAR_COLLECTIONS = {
 }
 
 const SPECIAL_COLLECTIONS = {
-    "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": {
+    "0x581425C638882bd8169dAe6F2995878927C9fE70": { // TODO: this is on polygon?
         name: "Courtyard",
         kind: "EPIC",
         value: 2,
     },
-    "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB": {
+    "0xcD79De06DD12b09c5BeB567f83b2e9A51A4aaFd6": {
         name: "Raremint",
         kind: "EPIC",
         value: 1,
