@@ -356,12 +356,14 @@ export const tickFunnelStep = async (step: keyof FunnelState) => {
 
 export const getFunnelState = async (): Promise<FunnelState> => {
   const funnelState = await retrieve("3id.profile", "funnel-state");
-  const funnelRes: FunnelState = JSON.parse(funnelState?.value) ?? {
+  let funnelRes: FunnelState = {
     invite: false,
     mint: false,
   };
 
-  console.log(funnelRes);
+  if (funnelState?.value) {
+    funnelRes = JSON.parse(funnelState?.value);
+  }
 
   return funnelRes;
 };
