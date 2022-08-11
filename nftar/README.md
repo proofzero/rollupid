@@ -4,7 +4,7 @@ NFTar is a simple API for generating mathematically unique mesh gradients. Every
 
 ### Version 1 (Current)
 
-![](https://nftstorage.link/ipfs/bafybeihgieitc3qf32z3mouuib4xxfkam46jgi3y3riwhwlye2xoecmb5i/threeid.png)
+![](https://nftstorage.link/ipfs/bafybeic4m7ch3yt7lyov64qgrh7ekxhloli3o5n3gdk6kp3ugd2mi3yxsi/threeid.png)
 
 This version selects 3 traits from a pool of common, uncommon, rare, and epic traits. 
 
