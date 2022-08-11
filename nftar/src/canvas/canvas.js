@@ -27,8 +27,8 @@ class App {
 
         this.pixelRatio = PIXEL_RATIO;
         // Use the full with and height of the passed-in canvas.
-        this.stageWidth = this.canvas.getWidth();
-        this.stageHeight = this.canvas.getHeight();
+        this.stageWidth = this.canvas.width;
+        this.stageHeight = this.canvas.height;
 
         this.totalParticles = 4;
         this.particles = [];
@@ -120,7 +120,7 @@ class App {
      * Empty the entire drawing context.
      */
     clear() {
-        this.ctx.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     /**
@@ -134,7 +134,7 @@ class App {
         this.clear();
 
         for (const particle of this.particles) {
-            particle.animate(this.ctx, this.canvas.getWidth(), this.canvas.getHeight());
+            particle.animate(this.ctx, this.canvas.width, this.canvas.height);
         }
 
         return this.canvas.createPNGStream();

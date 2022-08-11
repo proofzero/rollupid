@@ -1,7 +1,12 @@
 // nftar/index.js
 
 const app = require('./src/app');
-const ethers = require('ethers');
+const Web3 = require('web3');
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const {
+    Alchemy,
+    Network,
+} = require('alchemy-sdk')
 const http = require('http');
 const process = require('process');
 const storage = require('nft.storage');
@@ -18,8 +23,17 @@ const main = async (api) => {
 
     // Import the wallet as a mnemonic. Assumes the default Ethereum
     // path and standard English wordlist.
-    const mnemonic = process.env.WALLET_MNEMONIC;
-    api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
+    // const mnemonic = process.env.WALLET_MNEMONIC;
+    // api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
+    const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL)
+    api.context.web3 = web3;
+    api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
+
+    api.context.alchemy = new Alchemy({
+        apiKey: process.env.ALCHEMY_KEY,
+        network: Network[process.env.ALCHEMY_NETWORK],
+        maxRetries: 10,
+    })
 
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;

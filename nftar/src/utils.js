@@ -1,19 +1,61 @@
 // nftar/src/utils.js
 
 const Probability = require('./probability.js')
-const {TRAIT_CATEGORIES, V0_COLORS} = require('./traits.js');
+const {
+    TRAIT_CATEGORIES,
+    V0_COLORS,
+    POPULAR_COLLECTIONS,
+    SPECIAL_COLLECTIONS} = require('./traits.js');
 
-const generateTraits = function(wi1, wi2, wi3) {
+const calculateNFTWeight = function(nfts) {
+    const weights = {
+        "EPIC": 0,
+        "RARE": 0,
+        "UNCOMMON": 0,
+    };
+    nfts.forEach(async (nft) => {
+        const contract = POPULAR_COLLECTIONS[nft.contract]
+        if (contract) {
+            weights[contract.kind] += contract.value;
+        }
+    });
+    return weights;
+}
+
+const calculateSpecialWeight = function(nfts) {
+    const weights = {
+        "EPIC": 0,
+        "RARE": 0,
+        "UNCOMMON": 0,
+    };
+    nfts.forEach(async (nft) => {
+        const contract = SPECIAL_COLLECTIONS[nft.contract]
+        if (contract) {
+            weights[contract.kind] += contract.value;
+        }
+    });
+    return weights;
+}
+
+const calculateBalanceWeight = function(balance) {
+    const weights = {
+        "EPIC": balance > 100 ? 1 : 0,
+        "RARE": balance > 10 ? 1 : 0,
+        "UNCOMMON": balance > 1 ? 1 : 0,
+    };
+    return weights;
+}
+
+const generateTraits = function(weightInc) {
     // GENERATE PFP Properties
     const probability = new Probability();
 
     // TRAIT 1
     // TODO: increase weight of categories based
     const wtrait1t = new Probability(TRAIT_CATEGORIES);
-    wtrait1t.addWeight('COMMON', wi1 % 2);
-    wtrait1t.addWeight('UNCOMMON', wi1 % 3);
-    wtrait1t.addWeight('RARE', wi1 % 4);
-    wtrait1t.addWeight('EPIC', wi1 % 5);
+    wtrait1t.addWeight('UNCOMMON', weightInc.trait1.UNCOMMON);
+    wtrait1t.addWeight('RARE', weightInc.trait1.RARE);
+    wtrait1t.addWeight('EPIC', weightInc.trait1.EPIC);
     const trait_1_type = wtrait1t.peek()[0];
 
     const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
@@ -22,10 +64,9 @@ const generateTraits = function(wi1, wi2, wi3) {
     // TRAIT 2
     // do some checks to increase the probability of a trait
     var wtrait2t = new Probability(TRAIT_CATEGORIES);
-    wtrait2t.addWeight('COMMON', wi2 % 2);
-    wtrait2t.addWeight('UNCOMMON', wi2 % 3);
-    wtrait2t.addWeight('RARE', wi2 % 4);
-    wtrait2t.addWeight('EPIC', wi2 % 5);
+    wtrait2t.addWeight('UNCOMMON', weightInc.trait2.UNCOMMON);
+    wtrait2t.addWeight('RARE', weightInc.trait2.RARE);
+    wtrait2t.addWeight('EPIC', weightInc.trait2.EPIC);
     const trait_2_type = wtrait2t.peek()[0];
 
     const wtrait2v = new Probability(V0_COLORS[trait_2_type]);
@@ -35,10 +76,9 @@ const generateTraits = function(wi1, wi2, wi3) {
     // TRAIT 3
     // do some checks to increase the probability of a trait
     var wtrait3t = new Probability(TRAIT_CATEGORIES);
-    wtrait3t.addWeight('COMMON', wi3 % 2);
-    wtrait3t.addWeight('UNCOMMON', wi3 % 3);
-    wtrait3t.addWeight('RARE', wi3 % 4);
-    wtrait3t.addWeight('EPIC', wi3 % 5);
+    wtrait3t.addWeight('UNCOMMON', weightInc.trait3.UNCOMMON);
+    wtrait3t.addWeight('RARE', weightInc.trait3.RARE);
+    wtrait3t.addWeight('EPIC', weightInc.trait3.EPIC);
     const trait_3_type = wtrait3t.peek()[0];
 
     const wtrait3v = new Probability(V0_COLORS[trait_3_type]);
@@ -77,4 +117,8 @@ const generateTraits = function(wi1, wi2, wi3) {
 }
 
 module.exports = {
-    generateTraits,}
+    calculateNFTWeight,
+    calculateSpecialWeight,
+    calculateBalanceWeight,
+    generateTraits,
+}
