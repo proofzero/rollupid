@@ -26,6 +26,7 @@ const main = async (api) => {
     // const mnemonic = process.env.WALLET_MNEMONIC;
     // api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
     const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL)
+    api.context.web3 = web3;
     api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
 
     api.context.alchemy = new Alchemy({

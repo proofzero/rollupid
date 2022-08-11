@@ -46,7 +46,75 @@ const V0_COLORS = {
     ],
 }
 
+const POPULAR_COLLECTIONS = {
+    "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": {
+        name: "Bored Ape Yacht Club",
+        kind: "EPIC",
+        value: 2,
+    },
+    "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB": {
+        name: "Cyrpto Punks",
+        kind: "EPIC",
+        value: 1,
+    },
+    "0x60E4d786628Fea6478F785A6d7e704777c86a7c6": {
+        name: "Mutant Ape Yacht Club",
+        kind: "RARE",
+        value: 3,
+    },
+    "0x23581767a106ae21c074b2276D25e5C3e136a68b": {
+        name: "Moonbirds",
+        kind: "RARE",
+        value: 2,
+    },
+    "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B": {
+        name: "Clonex",
+        kind: "RARE",
+        value: 1,
+    },
+    "0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e": {
+        name: "Doodles",
+        kind: "UNCOMMON",
+        value: 4,
+    },
+    "0xED5AF388653567Af2F388E6224dC7C4b3241C544": {
+        name: "Azuki",
+        kind: "UNCOMMON",
+        value: 3,
+    },
+    "0xa3AEe8BcE55BEeA1951EF834b99f3Ac60d1ABeeB": {
+        name: "Vee Friends",
+        kind: "UNCOMMON",
+        value: 2,
+    },
+    "0xa3AEe8BcE55BEeA1951EF834b99f3Ac60d1ABeeB": {
+        name: "Vee Friends",
+        kind: "UNCOMMON",
+        value: 2,
+    },
+    "0xe785E82358879F061BC3dcAC6f0444462D4b5330": {
+        name: "World of Women",
+        kind: "Uncommon",
+        value: 1,
+    },
+}
+
+const SPECIAL_COLLECTIONS = {
+    "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": {
+        name: "Courtyard",
+        kind: "EPIC",
+        value: 2,
+    },
+    "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB": {
+        name: "Raremint",
+        kind: "EPIC",
+        value: 1,
+    },
+}
+
 module.exports = {
     TRAIT_CATEGORIES,
-    V0_COLORS
+    V0_COLORS,
+    POPULAR_COLLECTIONS,
+    SPECIAL_COLLECTIONS,
 }

@@ -19,7 +19,12 @@ const path = require('path');
 const Web3 = require('web3');
 // const ethers = require('ethers');
 
-const {generateTraits} = require('./utils.js');
+const {
+    calculateNFTWeight,
+    calculateSpecialWeight,
+    calculateBalanceWeight,
+    generateTraits
+} = require('./utils.js');
 const canvas = require('./canvas/canvas.js');
 
 const app     = new Koa();
@@ -107,11 +112,20 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
         ctx.throw(401, 'account is not a valid address');
     }
 
-    const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(ctx.wallet.address);
-    console.log(nftsForOwner)
+    // derive weight inc for each trait
+    const weightInc = {};
+    const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
+    
+    // TRAIT ONE: POPULAR COLLECTIONS
+    weightInc['trait1'] = calculateNFTWeight(nftsForOwner.ownedNfts);
+    // TRAIT TWO: SPECIAL COLLECTIONS
+    weightInc['trait2'] = calculateSpecialWeight(nftsForOwner.ownedNfts);
+    // TRAIT THREE: WALLET BALLANCE
+    const balanceWei = await ctx.web3.eth.getBalance(account);
+    const balanceEth = ctx.web3.utils.fromWei(balanceWei, 'ether');
+    weightInc['trait3'] = calculateBalanceWeight(balanceEth);
 
-
-    const genTraits = generateTraits(100, 60, 20);
+    const genTraits = generateTraits(weightInc);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
 
     const isNode = () => {
