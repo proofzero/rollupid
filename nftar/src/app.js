@@ -107,6 +107,10 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
         ctx.throw(401, 'account is not a valid address');
     }
 
+    const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(ctx.wallet.address);
+    console.log(nftsForOwner)
+
+
     const genTraits = generateTraits(100, 60, 20);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
 

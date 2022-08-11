@@ -2,6 +2,11 @@
 
 const app = require('./src/app');
 const Web3 = require('web3');
+const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+const {
+    Alchemy,
+    Network,
+} = require('alchemy-sdk')
 const http = require('http');
 const process = require('process');
 const storage = require('nft.storage');
@@ -20,8 +25,14 @@ const main = async (api) => {
     // path and standard English wordlist.
     // const mnemonic = process.env.WALLET_MNEMONIC;
     // api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
-    const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+    const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL)
     api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
+
+    api.context.alchemy = new Alchemy({
+        apiKey: process.env.ALCHEMY_KEY,
+        network: Network[process.env.ALCHEMY_NETWORK],
+        maxRetries: 10,
+    })
 
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;
