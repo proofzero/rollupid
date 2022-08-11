@@ -54,6 +54,42 @@ POST https://dapp.threeid.xyz/<wallet address>/jsonrpc
 }
 ```
 
+### Implementation Guide
+
+Here is a brief snippet that shows how to use the Kubelt SDK to request the local user's 3ID profile data:
+
+```typescript
+
+  const provider
+
+  // Include the latest Kubelt SDK build as a library in your project.
+  import sdkWeb from "../lib/com.kubelt.sdk.js";
+
+  // Get constants set up in process.env.
+  import Constants from "./constants.js";
+
+  // Initialize an SDK client.
+  const sdk = await sdkWeb?.node_v1?.init({
+    "oort/scheme": Constants.manifest?.extra?.oortSchema,
+    "oort/host":   Constants.manifest?.extra?.oortHost,
+    "oort/port":   Constants.manifest?.extra?.oortPort,
+  });
+
+  // Make an RPC call to get the local user's profile data.
+  const profile = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+    method: ["3id", "get-profile"],
+    params: [],
+  });
+
+  // Validate the result is not an obvious error.
+  if (!profile || profile?.error || profile?.body?.error) {
+    throw new Error();
+  }
+
+  // This is the user data:
+  console.log(JSON.stringify(profile.body.result))
+```
+
 ### Profile RPC Methods
 
 The getter and setter methods are:
