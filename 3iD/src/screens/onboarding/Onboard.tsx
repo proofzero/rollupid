@@ -14,6 +14,121 @@ export default function Onboard({ navigation }: { navigation: any }) {
           backgroundColor: "white",
         }}
       >
+        {/* Mint */}
+        <View
+          style={{
+            padding: 20,
+            flexDirection: "row",
+
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: "#F9FAFB",
+
+            marginBottom: 13,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Image
+              style={{
+                width: 40,
+                height: 40,
+                marginRight: 12,
+              }}
+              source={{
+                uri: "https://picsum.photos/40",
+              }}
+            />
+
+            <View>
+              <Text
+                style={{
+                  paddingBottom: 4,
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 14,
+                  fontWeight: "500",
+                  lineHeight: 20,
+                  color: "#111827",
+                }}
+              >
+                Free mint!
+              </Text>
+
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: 14,
+                  fontWeight: "400",
+                  lineHeight: 20,
+                  color: "#6B7280",
+                }}
+              >
+                You can still mint your 1/1 gradient for free
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Pressable
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 22.5,
+                paddingVertical: 9,
+                marginRight: 12,
+                backgroundColor: "#F3F4F6",
+              }}
+            >
+              <Text
+                testID="onboard-dont-show-again"
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 14,
+                  fontWeight: "500",
+                  lineHeight: 16,
+                  color: "#374151",
+                }}
+              >
+                Don't show again
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 22.5,
+                paddingVertical: 9,
+                backgroundColor: "#1F2937",
+              }}
+            >
+              <Text
+                testID="onboard-mint"
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 14,
+                  fontWeight: "500",
+                  lineHeight: 16,
+                  color: "white",
+                }}
+              >
+                Mint
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+        
         {/* Hero */}
         <View
           style={{
