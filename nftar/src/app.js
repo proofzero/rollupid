@@ -11,7 +11,6 @@ const Jsonrpc = require('@koalex/koa-json-rpc');
 const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
-const path = require('path');
 const Web3 = require('web3');
 
 const {
@@ -69,23 +68,14 @@ const METHOD_PARAMS = {
 // Properties are generated per account and saved; will check if a
 // property has already been generated.
 jsonrpc.method('3iD_genPFP', async (ctx, next) => {
-    const params = METHOD_PARAMS['3iD_genPFP'];
-    // ctx.jsonrpc available
-    /*
-        ctx.jsonrpc.request
-        ctx.jsonrpc.id
-        ctx.jsonrpc.method [[Get]]
-        ctx.jsonrpc.params [[Get]]
-        ctx.jsonrpc.response
-        ctx.jsonrpc.result
-        ctx.jsonrpc.error
-        ctx.jsonrpc.code
-        ctx.jsonrpc.message
-        ctx.jsonrpc.data
-    */
-    if (!ctx.storage) {
-        ctx.throw(500, 'missing storage API key');
+    const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
+    if (ctx.apiKey && !key) {
+        ctx.throw(400, 'Missing NFTAR API key');
     }
+    if (key !== ctx.apiKey) {
+        ctx.throw(401, 'Invalid NFTAR API key');
+    }
+    const params = METHOD_PARAMS['3iD_genPFP'];
 
     const account = ctx.jsonrpc.params['account'];
     if (!account){
