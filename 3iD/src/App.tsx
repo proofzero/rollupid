@@ -22,6 +22,8 @@ import Mint from "./screens/minting/Mint";
 import Settings from "./screens/profile/Settings";
 import Invite from "./screens/funnel/Invite";
 import Naming from "./screens/profile/Naming";
+import Onboard from "./screens/onboarding/Onboard";
+
 import { useEffect } from "react";
 
 const Stack = createNativeStackNavigator();
@@ -91,6 +93,10 @@ export default function App() {
 
         <Stack.Group>
           <Stack.Screen name="Mint" component={Mint} />
+        </Stack.Group>
+
+        <Stack.Group>
+          <Stack.Screen name="Onboard" component={Onboard} />
         </Stack.Group>
 
         <Stack.Group>
