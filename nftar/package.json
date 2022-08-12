@@ -8,7 +8,7 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "echo 'TODO: Add a test runner and then update this command'",
-    "start": "dotenv -- nodemon node index.js"
+    "start": "nodemon node index.js"
   },
   "devDependencies": {
     "eslint": "7.7.0"
@@ -19,10 +19,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@alch/alchemy-web3": "^1.4.6",
+    "@alch/alchemy-web3": "1.4.6",
     "@koalex/koa-json-rpc": "1.0.3",
-    "alchemy-sdk": "^2.0.2",
+    "alchemy-sdk": "2.0.2",
     "canvas": "2.9.3",
+    "dotenv": "16.0.1",
     "fabric": "5.2.1",
     "koa": "2.13.4",
     "koa-better-serve": "2.0.7",
