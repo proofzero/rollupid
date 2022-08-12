@@ -1,11 +1,60 @@
 import Constants from "expo-constants";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, Touchable } from "react-native";
+import { getFunnelState } from "../../provider/kubelt";
 
 import Layout from "../AuthLayout";
 
 export default function Onboard({ navigation }: { navigation: any }) {
+  const [canMint, setCanMint] = useState(false);
+
+  const [steps] = useState<
+    {
+      title: string;
+      complete: boolean;
+    }[]
+  >([
+    {
+      title: "Claim your 3iD",
+      complete: true,
+    },
+    {
+      title: "Claim your PFP",
+      complete: false,
+    },
+    {
+      title: "Add user details",
+      complete: false,
+    },
+    {
+      title: "Create NFT gallery",
+      complete: false,
+    },
+    {
+      title: "Link More Wallets",
+      complete: false,
+    },
+    {
+      title: "Secure KYC",
+      complete: false,
+    },
+  ]);
+
+  const percentage =
+    (steps.filter((s) => s.complete).length / steps.length) * 100;
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      const funnelState = await getFunnelState();
+      if (!funnelState.mint) {
+        setCanMint(true);
+      }
+    };
+
+    asyncFn();
+  }, []);
+
   return (
     <Layout navigation={navigation}>
       <View
@@ -15,125 +64,128 @@ export default function Onboard({ navigation }: { navigation: any }) {
         }}
       >
         {/* Mint */}
-        <View
-          style={{
-            padding: 20,
-            flexDirection: "row",
-
-            justifyContent: "space-between",
-            alignItems: "center",
-            backgroundColor: "#F9FAFB",
-
-            marginBottom: 13,
-          }}
-        >
+        {canMint && (
           <View
             style={{
+              padding: 20,
               flexDirection: "row",
+
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: "#F9FAFB",
+
+              marginBottom: 13,
             }}
           >
-            <Image
+            <View
               style={{
-                width: 40,
-                height: 40,
-                marginRight: 12,
+                flexDirection: "row",
               }}
-              source={{
-                uri: "https://picsum.photos/40",
-              }}
-            />
-
-            <View>
-              <Text
+            >
+              <Image
                 style={{
-                  paddingBottom: 4,
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 20,
-                  color: "#111827",
+                  width: 40,
+                  height: 40,
+                  marginRight: 12,
+                }}
+                source={{
+                  uri: "https://picsum.photos/40",
+                }}
+              />
+
+              <View>
+                <Text
+                  style={{
+                    paddingBottom: 4,
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 14,
+                    fontWeight: "500",
+                    lineHeight: 20,
+                    color: "#111827",
+                  }}
+                >
+                  Free mint!
+                </Text>
+
+                <Text
+                  style={{
+                    fontFamily: "Inter_400Regular",
+                    fontSize: 14,
+                    fontWeight: "400",
+                    lineHeight: 20,
+                    color: "#6B7280",
+                  }}
+                >
+                  You can still mint your 1/1 gradient for free
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <Pressable
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 22.5,
+                  paddingVertical: 9,
+                  marginRight: 12,
+                  backgroundColor: "#F3F4F6",
                 }}
               >
-                Free mint!
-              </Text>
+                <Text
+                  testID="onboard-dont-show-again"
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 14,
+                    fontWeight: "500",
+                    lineHeight: 16,
+                    color: "#374151",
+                  }}
+                >
+                  Don't show again
+                </Text>
+              </Pressable>
 
-              <Text
+              <Pressable
                 style={{
-                  fontFamily: "Inter_400Regular",
-                  fontSize: 14,
-                  fontWeight: "400",
-                  lineHeight: 20,
-                  color: "#6B7280",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingHorizontal: 22.5,
+                  paddingVertical: 9,
+                  backgroundColor: "#1F2937",
                 }}
               >
-                You can still mint your 1/1 gradient for free
-              </Text>
+                <Text
+                  testID="onboard-mint"
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 14,
+                    fontWeight: "500",
+                    lineHeight: 16,
+                    color: "white",
+                  }}
+                >
+                  Mint
+                </Text>
+              </Pressable>
             </View>
           </View>
+        )}
 
-          <View
-            style={{
-              flexDirection: "row",
-            }}
-          >
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 22.5,
-                paddingVertical: 9,
-                marginRight: 12,
-                backgroundColor: "#F3F4F6",
-              }}
-            >
-              <Text
-                testID="onboard-dont-show-again"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "#374151",
-                }}
-              >
-                Don't show again
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 22.5,
-                paddingVertical: 9,
-                backgroundColor: "#1F2937",
-              }}
-            >
-              <Text
-                testID="onboard-mint"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "white",
-                }}
-              >
-                Mint
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-        
         {/* Hero */}
         <View
           style={{
             padding: 30,
             backgroundColor: "#F9FAFB",
+            marginBottom: 20,
           }}
         >
           <Text
@@ -251,6 +303,162 @@ export default function Onboard({ navigation }: { navigation: any }) {
               </Text>
             </Pressable>
           </View>
+        </View>
+
+        <View style={{}}>
+          {/* Steps */}
+          <View>
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                fontSize: 20,
+                fontWeight: "600",
+                lineHeight: 32,
+                color: "#1F2937",
+              }}
+            >
+              Get Started
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 23,
+              }}
+            >
+              You will earn 1 Invite NFT for each step completed
+            </Text>
+
+            {/* Progress bar */}
+            <View
+              style={{
+                width: "100%",
+                backgroundColor: "#F3F4F6",
+                height: 4.65,
+                marginBottom: 14,
+              }}
+            >
+              <View
+                style={{
+                  width: `${percentage}%`,
+                  backgroundColor: "#4F46E5",
+                  flex: 1,
+                }}
+              ></View>
+            </View>
+
+            {/* Steps */}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F4F6",
+                padding: 17,
+              }}
+            >
+              {steps.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: index !== steps.length - 1 ? 32 : 0,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: 25.6,
+                        height: 25.6,
+                        marginRight: 19.2,
+                      }}
+                      source={require(`../../assets/step_${
+                        step.complete ? "complete" : "soon"
+                      }.png`)}
+                    />
+
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: "Inter_500Medium",
+                          fontSize: 14,
+                          fontWeight: "500",
+                          lineHeight: 20,
+                          color: "#111827",
+                        }}
+                      >
+                        {step.title}
+                      </Text>
+
+                      {step.complete && (
+                        <Text
+                          style={{
+                            fontFamily: "Inter_400Regular",
+                            fontSize: 14,
+                            fontWeight: "400",
+                            lineHeight: 20,
+                            color: "#6B7280",
+                          }}
+                        >
+                          Completed
+                        </Text>
+                      )}
+
+                      {!step.complete && (
+                        <Text
+                          style={{
+                            fontFamily: "Inter_400Regular",
+                            fontSize: 14,
+                            fontWeight: "400",
+                            lineHeight: 20,
+                            color: "#D1D5DB",
+                          }}
+                        >
+                          Coming Soon
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+
+                  <Pressable
+                    disabled={true}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 16,
+                      paddingVertical: 12,
+                      backgroundColor: "#F3F4F6",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Inter_500Medium",
+                        fontSize: 14,
+                        fontWeight: "500",
+                        lineHeight: 16,
+                        color: "#E5E7EB",
+                      }}
+                    >
+                      View
+                    </Text>
+                  </Pressable>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* FAQ */}
+          <View></View>
         </View>
       </View>
     </Layout>
