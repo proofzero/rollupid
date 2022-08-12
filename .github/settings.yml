@@ -63,9 +63,9 @@ labels:
     color: "#d73a4a"
     description: Indicates an unexpected problem or unintended behavior
 
-  - name: question
-    color: '#d876e3'
-    description: Indicates that an issue, pull request, or discussion needs more information
+#  - name: question
+#    color: '#d876e3'
+#    description: Indicates that an issue, pull request, or discussion needs more information
 
   - name: enhancement
     color: '#a2eeef'
@@ -79,21 +79,21 @@ labels:
     color: '#0075ca'
     description: Indicates a need for improvements or additions to documentation
   
-  - name: help-wanted
-    color: '#008672'
-    description: Indicates that a maintainer wants help on an issue or pull request
+#  - name: help-wanted
+#    color: '#008672'
+#    description: Indicates that a maintainer wants help on an issue or pull request
 
-  - name: invalid
-    color: '#e4e669'
-    description: Indicates that an issue, pull request, or discussion is no longer relevant
+#  - name: invalid
+#    color: '#e4e669'
+#    description: Indicates that an issue, pull request, or discussion is no longer relevant
 
-  - name: wontfix
-    color: '#FFFFFF'
-    description: Indicates that work won't continue on an issue, pull request, or discussion
+#  - name: wontfix
+#    color: '#FFFFFF'
+#    description: Indicates that work won't continue on an issue, pull request, or discussion
 
-  - name: duplicate
-    color: '#cfd3d7'
-    description: Indicates similar issues, pull requests, or discussions
+#  - name: duplicate
+#    color: '#cfd3d7'
+#    description: Indicates similar issues, pull requests, or discussions
   
   - name: security
     color: '#D93F0B'
@@ -102,7 +102,7 @@ labels:
 # Milestones: define milestones for Issues and Pull Requests
 milestones:
   - title: alpha
-    description: Q1 2022 Alpha
+    description: Alpha Release
     # The state of the milestone. Either `open` or `closed`
     state: open
 

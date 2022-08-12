@@ -1,6 +1,6 @@
 ---
-name: CHORE
-about: CHORE issue template
+name: Chore
+about: Chore issue template
 title: "CHORE([DOMAIN]): [TITLE]"
 ---
 
