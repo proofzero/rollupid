@@ -271,7 +271,7 @@ export const kbGetProfile = async () => {
   const profile: Profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
       .callRpc(sdk, {
-        method: ["kb", "get-profile"],
+        method: ["3id", "get-profile"],
         params: [],
       })
       .then((x: any) => {
@@ -289,7 +289,7 @@ export const kbSetProfile = async (updatedProfile: Profile) => {
   const profile = await new Promise((resolve, reject) => {
     sdkWeb?.node_v1?.oort
       .callRpc(sdk, {
-        method: ["kb", "set-profile"],
+        method: ["3id", "set-profile"],
         params: { profile: updatedProfile },
       })
       .then((x: any) => {
