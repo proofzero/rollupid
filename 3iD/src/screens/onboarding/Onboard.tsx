@@ -127,6 +127,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
               }}
             >
               <Pressable
+                disabled={true}
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -153,6 +154,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
               </Pressable>
 
               <Pressable
+                disabled={true}
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -388,9 +390,8 @@ export default function Onboard({ navigation }: { navigation: any }) {
                         height: 25.6,
                         marginRight: 19.2,
                       }}
-                      source={require(`../../assets/step_${
-                        step.complete ? "complete" : "soon"
-                      }.png`)}
+                      source={require(`../../assets/step_${step.complete ? "complete" : "soon"
+                        }.png`)}
                     />
 
                     <View>

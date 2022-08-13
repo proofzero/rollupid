@@ -279,7 +279,7 @@ export default function Naming({ navigation }: any) {
 
   const goToSettings = async () => {
     await tickFunnelStep("naming");
-    navigation.navigate("Settings");
+    navigation.navigate("Onboard");
   };
 
   useEffect(() => {

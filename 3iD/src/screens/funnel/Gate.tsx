@@ -20,7 +20,7 @@ export default function Gate({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      navigation.navigate("Settings");
+      navigation.navigate("Onboard");
     }
   };
 
