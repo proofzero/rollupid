@@ -4,7 +4,7 @@ import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
-import { kbGetProfile, kbSetProfile } from "../../provider/kubelt";
+import { threeIdGetProfile, threeIdSetProfile } from "../../provider/kubelt";
 import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
@@ -62,7 +62,7 @@ export default function Details({
     const asyncFn = async () => {
       if (sdkAuth && account) {
         try {
-          const persistedProfile = await kbGetProfile();
+          const persistedProfile = await threeIdGetProfile();
           const patchedProfile = { ...profile, ...persistedProfile };
 
           setProfile(patchedProfile);
@@ -90,7 +90,7 @@ export default function Details({
 
     if (sdkAuth) {
       try {
-        const persistedProfile = await kbSetProfile(profile);
+        const persistedProfile = await threeIdSetProfile(profile);
         const jsonProfile = JSON.stringify(persistedProfile);
 
         setProfile(persistedProfile);

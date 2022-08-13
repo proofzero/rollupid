@@ -267,45 +267,13 @@ export const threeIdMint = async (voucher: any): Promise<boolean> => {
 };
 
 /// PROFILE
-export const kbGetProfile = async () => {
-  const profile: Profile = await new Promise((resolve, reject) => {
-    sdkWeb?.node_v1?.oort
-      .callRpc(sdk, {
-        method: ["3id", "get-profile"],
-        params: [],
-      })
-      .then((x: any) => {
-        if (x?.body?.error) {
-          reject(x.body.error);
-        } else {
-          resolve(x?.body?.result);
-        }
-      });
-  });
-  return profile;
-};
-
-export const kbSetProfile = async (updatedProfile: Profile) => {
-  const profile = await new Promise((resolve, reject) => {
-    sdkWeb?.node_v1?.oort
-      .callRpc(sdk, {
-        method: ["3id", "set-profile"],
-        params: { profile: updatedProfile },
-      })
-      .then((x: any) => {
-        if (x?.body?.error) {
-          reject(x.body.error);
-        } else {
-          resolve(x?.body?.result);
-        }
-      });
-  });
-  return profile;
-};
+export const threeIdGetProfile = async () => retrieve("3id.profile", "profile");
+export const threeIdSetProfile = async (updatedProfile: Profile) =>
+  store("3id.profile", "profile", updatedProfile);
 
 // STORAGE
 
-export const store = async (ns: string, path: string, data: any) => {
+const store = async (ns: string, path: string, data: any) => {
   let storedObject: any;
 
   try {
@@ -318,7 +286,7 @@ export const store = async (ns: string, path: string, data: any) => {
       throw new Error();
     }
 
-    storedObject = res.body.result;
+    storedObject = JSON.parse(res.body.result.value);
   } catch (e) {
     console.warn("Failed to store data");
   }
@@ -326,7 +294,7 @@ export const store = async (ns: string, path: string, data: any) => {
   return storedObject;
 };
 
-export const retrieve = async (ns: string, path: string): Promise<any> => {
+const retrieve = async (ns: string, path: string): Promise<any> => {
   let storedObject: any;
 
   try {
@@ -339,7 +307,7 @@ export const retrieve = async (ns: string, path: string): Promise<any> => {
       throw new Error();
     }
 
-    storedObject = res.body.result;
+    storedObject = JSON.parse(res.body.result.value);
   } catch (e) {
     console.warn("Failed to retrieve data");
   }
@@ -370,8 +338,8 @@ export const tickFunnelStep = async (step: keyof FunnelState) => {
   };
 
   const storedFunnelState = await retrieve("3id.profile", "funnel-state");
-  if (storedFunnelState?.value) {
-    funnelState = JSON.parse(storedFunnelState.value);
+  if (storedFunnelState) {
+    funnelState = storedFunnelState;
   }
 
   funnelState[step] = true;
@@ -380,15 +348,15 @@ export const tickFunnelStep = async (step: keyof FunnelState) => {
 };
 
 export const getFunnelState = async (): Promise<FunnelState> => {
-  const funnelState = await retrieve("3id.profile", "funnel-state");
+  const storedFunnelState = await retrieve("3id.profile", "funnel-state");
   let funnelRes: FunnelState = {
     invite: false,
     mint: false,
     naming: false,
   };
 
-  if (funnelState?.value) {
-    funnelRes = JSON.parse(funnelState?.value);
+  if (storedFunnelState) {
+    funnelRes = storedFunnelState;
   }
 
   return funnelRes;
