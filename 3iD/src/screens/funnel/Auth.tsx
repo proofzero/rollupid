@@ -24,11 +24,7 @@ export default function Auth({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      if (!funnelState.mint) {
-        navigation.navigate("Mint");
-      } else {
-        navigation.navigate("Settings");
-      }
+      navigation.navigate("Onboard");
     } else if (!funnelState.invite) {
       const invites = await threeIdListInvitations();
       if (invites.length > 0) {

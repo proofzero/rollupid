@@ -22,13 +22,7 @@ export default function Landing({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      const funnelState = await getFunnelState();
-
-      if (!funnelState.mint) {
-        navigation.navigate("Mint");
-      } else {
-        navigation.navigate("Settings");
-      }
+      navigation.navigate("Onboard");
     } else {
       navigation.navigate("Invite");
     }

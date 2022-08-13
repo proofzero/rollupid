@@ -26,12 +26,7 @@ export default function Invite({ navigation }: { navigation: any }) {
   const continueToThreeId = async () => {
     await tickFunnelStep("invite");
 
-    const funnelState = await getFunnelState();
-    if (!funnelState.mint) {
-      navigation.navigate("Mint");
-    } else {
-      navigation.navigate("Settings");
-    }
+    navigation.navigate("Onboard");
   };
 
   const claimsRedirect = async (claim: string) => {
