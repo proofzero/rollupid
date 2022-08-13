@@ -29,8 +29,6 @@ export default function Invite({ navigation }: { navigation: any }) {
     const funnelState = await getFunnelState();
     if (!funnelState.mint) {
       navigation.navigate("Mint");
-    } else if (!funnelState.naming) {
-      navigation.navigate("Naming");
     } else {
       navigation.navigate("Settings");
     }

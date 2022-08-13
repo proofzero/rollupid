@@ -26,8 +26,6 @@ export default function Auth({ navigation }: { navigation: any }) {
     if (claims.includes(claim)) {
       if (!funnelState.mint) {
         navigation.navigate("Mint");
-      } else if (!funnelState.naming) {
-        navigation.navigate("Naming");
       } else {
         navigation.navigate("Settings");
       }
