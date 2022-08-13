@@ -1,18 +1,13 @@
 ---
-name: BUG
-about: BUG issue template
+name: Bug
+about: Bug issue template
 title: "BUG([DOMAIN]): [TITLE]"
 labels: types » bug
 ---
 
-## I'm submitting a ...
-
-- [ ] bug report
-- [ ] feature request
-
 ## What is the current behavior?
 
-## If the current behavior is a bug, please provide the steps to reproduce and if possible a minimal demo of the problem
+Please provide the steps to reproduce and if possible a minimal demo of the problem.
 
 ## What is the expected behavior?
 
@@ -21,4 +16,8 @@ labels: types » bug
 ## Please tell us about your environment:
 
 Version:
-Browser or OS:
+Os:
+Browser:
+Wallet:
+
+... and anything else that could isolate the issue.
