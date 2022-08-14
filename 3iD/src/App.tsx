@@ -73,6 +73,7 @@ export default function App() {
             Gate: "gate",
             Invite: "invitation",
             Mint: "mint",
+            Onboard: "onboard",
             Naming: "naming",
             Settings: "settings",
           },

@@ -88,9 +88,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
                   height: 40,
                   marginRight: 12,
                 }}
-                source={{
-                  uri: "https://picsum.photos/40",
-                }}
+                source={require("../../assets/mint.png")}
               />
 
               <View>
@@ -390,8 +388,9 @@ export default function Onboard({ navigation }: { navigation: any }) {
                         height: 25.6,
                         marginRight: 19.2,
                       }}
-                      source={require(`../../assets/step_${step.complete ? "complete" : "soon"
-                        }.png`)}
+                      source={require(`../../assets/step_${
+                        step.complete ? "complete" : "soon"
+                      }.png`)}
                     />
 
                     <View>
@@ -437,30 +436,32 @@ export default function Onboard({ navigation }: { navigation: any }) {
                     </View>
                   </View>
 
-                  <Pressable
-                    disabled={true}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      paddingHorizontal: 16,
-                      paddingVertical: 12,
-                      backgroundColor: "#F3F4F6",
-                    }}
-                  >
-                    <Text
+                  {!step.complete && (
+                    <Pressable
+                      disabled={true}
                       style={{
-                        fontFamily: "Inter_500Medium",
-                        fontSize: 14,
-                        fontWeight: "500",
-                        lineHeight: 16,
-                        color: "#E5E7EB",
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        paddingHorizontal: 16,
+                        paddingVertical: 12,
+                        backgroundColor: "#F3F4F6",
                       }}
                     >
-                      View
-                    </Text>
-                  </Pressable>
+                      <Text
+                        style={{
+                          fontFamily: "Inter_500Medium",
+                          fontSize: 14,
+                          fontWeight: "500",
+                          lineHeight: 16,
+                          color: "#E5E7EB",
+                        }}
+                      >
+                        View
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
               ))}
             </View>
