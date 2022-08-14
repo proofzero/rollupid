@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Proof Zero, Inc.",
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE.md",
   "devDependencies": {
     "@alch/alchemy-web3": "1.4.6",
     "@nomicfoundation/hardhat-toolbox": "1.0.2",

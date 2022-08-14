@@ -577,7 +577,6 @@ const config: HardhatUserConfig = {
         NET_GOERLI.wallet.privateKey,
       ],
     },
-    /*
     mainnet: {
       // For optional validation.
       chainId: MAINNET_CHAIN_ID,
@@ -589,7 +588,6 @@ const config: HardhatUserConfig = {
         NET_MAINNET.wallet.privateKey,
       ],
     }
-    */
   },
 };
 
