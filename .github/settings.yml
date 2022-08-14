@@ -7,7 +7,7 @@ repository:
   name: kubelt
 
   # A short description of the repository that will show up on GitHub
-  description: Kubelt -- web3 CMS
+  description: Kubelt decentralizes applications
 
   # A URL with more information about the repository
   homepage: https://kubelt.com
@@ -16,7 +16,7 @@ repository:
   topics: web3, crypto, blockchain, decentralized, kubelt, dapp, federated
 
   # Either `true` to make the repository private, or `false` to make it public.
-  private: true
+  private: false
 
   # Either `true` to enable issues for this repository, `false` to disable them.
   has_issues: true
