@@ -39,7 +39,7 @@ const CHAINS = {
 
 // TODO: is there a better way to do this? e.g., open API yaml?
 const METHOD_PARAMS = {
-    '3iD_genPFP': {
+    '3id_genPFP': {
         'account': {
             type: 'string',
             description: 'blockchain account used to genearate the PFP'
@@ -67,7 +67,7 @@ const METHOD_PARAMS = {
 //
 // Properties are generated per account and saved; will check if a
 // property has already been generated.
-jsonrpc.method('3iD_genPFP', async (ctx, next) => {
+jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
     if (ctx.apiKey && !key) {
         ctx.throw(400, 'Missing NFTAR API key');
@@ -75,7 +75,7 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     if (key !== ctx.apiKey) {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
-    const params = METHOD_PARAMS['3iD_genPFP'];
+    const params = METHOD_PARAMS['3id_genPFP'];
 
     const account = ctx.jsonrpc.params['account'];
     if (!account){
@@ -135,8 +135,8 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
 
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
-        name: `3iD`,
-        description: `3iD PFP for ${account}`,
+        name: `3id`,
+        description: `3id PFP for ${account}`,
         image: png,
         properties: {
             account,
