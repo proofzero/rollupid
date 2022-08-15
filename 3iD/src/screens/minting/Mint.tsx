@@ -7,17 +7,16 @@ import { Feather } from "@expo/vector-icons";
 import useAccount from "../../hooks/account";
 import {
   authenticate,
+  GenPfPRes,
   isAuthenticated,
-  PreMintRes,
   purge,
-  threeIdGetMintVoucher,
-  threeIdGetPreMint,
+  threeIdGenPfP,
   threeIdMint,
   tickFunnelStep,
 } from "../../provider/kubelt";
 import { connect, forceAccounts, sign } from "../../provider/web3";
 
-const PanelHead = ({ preMint }: { preMint: PreMintRes }) => (
+const PanelHead = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
   <>
     <Text
       style={{
@@ -62,7 +61,7 @@ const PanelHead = ({ preMint }: { preMint: PreMintRes }) => (
           height: 93,
         }}
         source={{
-          uri: preMint?.nftImageUrl,
+          uri: genPfPRes?.metadata?.image,
         }}
       />
 
@@ -90,7 +89,7 @@ const PanelHead = ({ preMint }: { preMint: PreMintRes }) => (
             height: 93,
           }}
           source={{
-            uri: preMint?.nftImageUrl,
+            uri: genPfPRes?.metadata?.image,
           }}
         />
       </div>
@@ -99,93 +98,106 @@ const PanelHead = ({ preMint }: { preMint: PreMintRes }) => (
 );
 
 const PreMint = ({
-  preMint,
+  genPfPRes,
   mintRequestHandler,
 }: {
-  preMint: PreMintRes;
-  mintRequestHandler: (preMint: PreMintRes) => void;
-}) => (
-  <View
-    style={{
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <PanelHead preMint={preMint} />
+  genPfPRes: GenPfPRes;
+  mintRequestHandler: (genPfPRes: GenPfPRes) => void;
+}) => {
+  const [trait, setTrait] = useState<any>();
 
+  useEffect(() => {
+    if (genPfPRes?.metadata?.properties?.traits) {
+      const traits = Object.keys(genPfPRes?.metadata?.properties?.traits);
+      if (traits.length > 0) {
+        setTrait(genPfPRes.metadata.properties.traits[traits[0]]);
+      }
+    }
+  }, [genPfPRes]);
+
+  return (
     <View
       style={{
-        flexDirection: "row",
-        marginBottom: 37,
-      }}
-    >
-      <Image
-        style={{
-          width: 24,
-          height: 24,
-          marginRight: 8,
-        }}
-        source={require("../../assets/info.png")}
-      />
-
-      <Text
-        style={{
-          fontFamily: "Inter_400Regular",
-          fontSize: 16,
-          fontWeight: "400",
-          lineHeight: 24,
-          color: "#9CA3AF",
-        }}
-      >
-        The image was generated using your{" "}
-        <b style={{ cursor: "default" }} title={preMint?.account}>
-          blockchain account
-        </b>
-        ,{" "}
-        <b style={{ cursor: "default" }} title={preMint?.version}>
-          version name
-        </b>{" "}
-        and{" "}
-        <b style={{ cursor: "default" }} title={preMint?.rarity}>
-          trait rarity
-        </b>
-        .
-      </Text>
-    </View>
-
-    <Pressable
-      style={{
-        display: "flex",
-        flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        paddingHorizontal: 38,
-        paddingVertical: 9,
-        backgroundColor: "#1F2937",
       }}
-      onPress={() => mintRequestHandler(preMint)}
     >
-      <Text
-        testID="mint-mint-nft"
+      <PanelHead genPfPRes={genPfPRes} />
+
+      <View
         style={{
-          fontFamily: "Inter_500Medium",
-          fontSize: 16,
-          fontWeight: "500",
-          lineHeight: 24,
-          color: "white",
+          flexDirection: "row",
+          marginBottom: 37,
         }}
       >
-        Mint NFT
-      </Text>
-    </Pressable>
-  </View>
-);
+        <Image
+          style={{
+            width: 24,
+            height: 24,
+            marginRight: 8,
+          }}
+          source={require("../../assets/info.png")}
+        />
+
+        <Text
+          style={{
+            fontFamily: "Inter_400Regular",
+            fontSize: 16,
+            fontWeight: "400",
+            lineHeight: 24,
+            color: "#9CA3AF",
+          }}
+        >
+          The image was generated using your{" "}
+          <b style={{ cursor: "default" }} title={genPfPRes?.voucher?.account}>
+            blockchain account
+          </b>
+          ,{" "}
+          <b style={{ cursor: "default" }} title={trait?.value?.name}>
+            version name
+          </b>{" "}
+          and{" "}
+          <b style={{ cursor: "default" }} title={trait?.type}>
+            trait rarity
+          </b>
+          .
+        </Text>
+      </View>
+
+      <Pressable
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 38,
+          paddingVertical: 9,
+          backgroundColor: "#1F2937",
+        }}
+        onPress={() => mintRequestHandler(genPfPRes)}
+      >
+        <Text
+          testID="mint-mint-nft"
+          style={{
+            fontFamily: "Inter_500Medium",
+            fontSize: 16,
+            fontWeight: "500",
+            lineHeight: 24,
+            color: "white",
+          }}
+        >
+          Mint NFT
+        </Text>
+      </Pressable>
+    </View>
+  );
+};
 
 const Confirm = ({
-  preMint,
+  genPfPRes,
   tryAgainHandler,
 }: {
-  preMint: PreMintRes;
+  genPfPRes: GenPfPRes;
   tryAgainHandler: () => void;
 }) => (
   <View
@@ -194,7 +206,7 @@ const Confirm = ({
       alignItems: "center",
     }}
   >
-    <PanelHead preMint={preMint} />
+    <PanelHead genPfPRes={genPfPRes} />
 
     <Text
       style={{
@@ -237,14 +249,14 @@ const Confirm = ({
   </View>
 );
 
-const Progress = ({ preMint }: { preMint: PreMintRes }) => (
+const Progress = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
   <View
     style={{
       justifyContent: "center",
       alignItems: "center",
     }}
   >
-    <PanelHead preMint={preMint} />
+    <PanelHead genPfPRes={genPfPRes} />
 
     <View
       style={{
@@ -278,7 +290,7 @@ const Progress = ({ preMint }: { preMint: PreMintRes }) => (
   </View>
 );
 
-const Success = ({ preMint }: { preMint: PreMintRes }) => {
+const Success = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => {
   useEffect(() => {
     const asyncFn = async () => {
       await tickFunnelStep("mint");
@@ -294,7 +306,7 @@ const Success = ({ preMint }: { preMint: PreMintRes }) => {
         alignItems: "center",
       }}
     >
-      <PanelHead preMint={preMint} />
+      <PanelHead genPfPRes={genPfPRes} />
 
       <View
         style={{
@@ -330,10 +342,10 @@ const Success = ({ preMint }: { preMint: PreMintRes }) => {
 };
 
 const ErrorPanel = ({
-  preMint,
+  genPfPRes,
   tryAgainHandler,
 }: {
-  preMint: PreMintRes;
+  genPfPRes: GenPfPRes;
   tryAgainHandler: () => void;
 }) => (
   <View
@@ -342,7 +354,7 @@ const ErrorPanel = ({
       alignItems: "center",
     }}
   >
-    <PanelHead preMint={preMint} />
+    <PanelHead genPfPRes={genPfPRes} />
 
     <View
       style={{
@@ -409,7 +421,7 @@ export default function Mint({ navigation }: any) {
 
   const account = useAccount();
 
-  const [preMint, setPreMint] = React.useState<PreMintRes>();
+  const [genPfPRes, setGenPfPRes] = React.useState<GenPfPRes>();
 
   const skipMinting = async () => {
     await tickFunnelStep("mint");
@@ -417,17 +429,20 @@ export default function Mint({ navigation }: any) {
     navigation.navigate("Settings");
   };
 
-  const fetchPreMint = async () => {
-    const preMintRes = await threeIdGetPreMint();
-    setPreMint(preMintRes);
+  const genPfP = async () => {
+    const provider = await connect();
+
+    const pfpRes = await threeIdGenPfP(provider);
+
+    setGenPfPRes(pfpRes);
   };
 
-  const handleMintRequest = async (preMint: PreMintRes) => {
+  const handleMintRequest = async (genPfPRes: GenPfPRes) => {
     setScreen("confirm");
 
     // Request signature
     try {
-      const voucher = await threeIdGetMintVoucher();
+      const voucher = genPfPRes?.voucher;
       const signedVoucher = await sign(JSON.stringify(voucher, null, 2));
 
       setScreen("progress");
@@ -461,7 +476,7 @@ export default function Mint({ navigation }: any) {
 
     const asyncFn = async () => {
       if (await isAuthenticated(account)) {
-        await fetchPreMint();
+        await genPfP();
       } else {
         const provider = await connect();
 
@@ -471,7 +486,7 @@ export default function Mint({ navigation }: any) {
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          await fetchPreMint();
+          await genPfP();
         } else {
           purge();
 
@@ -554,16 +569,19 @@ export default function Mint({ navigation }: any) {
             {screen === "root" && (
               <PreMint
                 mintRequestHandler={handleMintRequest}
-                preMint={preMint}
+                genPfPRes={genPfPRes}
               />
             )}
             {screen === "confirm" && (
-              <Confirm tryAgainHandler={handleTryAgain} preMint={preMint} />
+              <Confirm tryAgainHandler={handleTryAgain} genPfPRes={genPfPRes} />
             )}
-            {screen === "progress" && <Progress preMint={preMint} />}
-            {screen === "success" && <Success preMint={preMint} />}
+            {screen === "progress" && <Progress genPfPRes={genPfPRes} />}
+            {screen === "success" && <Success genPfPRes={genPfPRes} />}
             {screen === "error" && (
-              <ErrorPanel tryAgainHandler={handleTryAgain} preMint={preMint} />
+              <ErrorPanel
+                tryAgainHandler={handleTryAgain}
+                genPfPRes={genPfPRes}
+              />
             )}
           </View>
 

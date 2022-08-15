@@ -182,69 +182,109 @@ export const threeIdGetEns = async (): Promise<string[]> => {
 };
 
 /// MINTING
-export type PreMintRes =
+export type GenPfPReq = {
+  account: string;
+  blockchain: {
+    name: string;
+    chainId: number;
+  };
+};
+
+export type GenPfPResTraits = {
+  [key: string]: {
+    type: string;
+    value: {
+      name: string;
+      rgb: {
+        r: number;
+        g: number;
+        b: number;
+      };
+      rnd: number[];
+    };
+  };
+};
+
+export type GenPfPRes =
   | {
-      nftImageUrl: string;
-      account: string;
-      version: string;
-      rarity: any; // not sure what it is yet, maybe number
+      metadata: {
+        name: string;
+        description: string;
+        properties: {
+          account: string;
+          blockchain: {
+            name: string;
+            chainId: number;
+          };
+          traits: GenPfPResTraits;
+        };
+
+        /** ipfs:// URI */
+        image: string;
+      };
+
+      voucher: {
+        account: string;
+
+        /** ipfs:// URI */
+        tokenURI: string;
+      };
+
+      signature: {
+        /**
+         * JSON representation
+         */
+        message: string;
+        messageHash: string;
+
+        v: string;
+        r: string;
+        s: string;
+
+        signature: string;
+      };
     }
   | undefined;
 
-export const threeIdGetPreMint = async (): Promise<PreMintRes> => {
-  let preMint: PreMintRes;
+export const threeIdGenPfP = async (
+  provider: ethers.providers.Web3Provider
+): Promise<GenPfPRes> => {
+  let res: any;
 
   try {
-    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
-    //   method: ["3id", "get-pre-mint"],
-    //   params: [],
-    // });
+    const signer = provider.getSigner();
 
-    // if (!res || res?.error || res?.body.error) {
-    //   throw new Error();
-    // }
+    // Worth requerying the provider in case
+    // accounts changed
+    const address = await signer.getAddress();
+    const network = await provider.getNetwork();
 
-    // preMint = res.body.result;
-
-    preMint = {
-      nftImageUrl: "https://picsum.photos/93",
-      account: "0x6c60Da9471181Aa54C648c6e201263A5501363F3",
-      rarity: 3,
-      version: "GEN 0 - Mint green",
+    const req: GenPfPReq = {
+      account: address,
+      blockchain: {
+        name: network.name,
+        chainId: network.chainId,
+      },
     };
+
+    res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
+      method: ["3id", "gen-p-f-p"],
+      params: req,
+    });
+
+    if (!res || res?.error || res?.body.error) {
+      throw new Error();
+    }
   } catch (e) {
-    console.warn("Failed to get pre-mint");
+    console.warn("Failed to generate PFP");
+    res = null;
   }
 
-  return preMint;
+  return res;
 };
 
-export const threeIdGetMintVoucher = async (): Promise<any> => {
-  let voucher: any;
-
-  try {
-    // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
-    //   method: ["3id", "get-mint-voucher"],
-    //   params: [],
-    // });
-
-    // if (!res || res?.error || res?.body.error) {
-    //   throw new Error();
-    // }
-
-    // voucher = res.body.result;
-    voucher = {
-      foo: "bar",
-    };
-  } catch (e) {
-    console.warn("Failed to get mint voucher");
-  }
-
-  return voucher;
-};
-
-export const threeIdMint = async (voucher: any): Promise<boolean> => {
-  let success: boolean;
+export const threeIdMint = async (genPfPres: GenPfPRes): Promise<boolean> => {
+  let success: boolean = false;
 
   try {
     // const res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
@@ -263,7 +303,7 @@ export const threeIdMint = async (voucher: any): Promise<boolean> => {
     console.warn("Failed to get mint voucher");
   }
 
-  return voucher;
+  return success;
 };
 
 /// PROFILE
