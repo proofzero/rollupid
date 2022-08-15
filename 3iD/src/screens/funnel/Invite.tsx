@@ -136,19 +136,40 @@ export default function Invite({ navigation }: { navigation: any }) {
           You can now login to 3ID anytime.
         </Text>
 
-        <Image
-          style={{
-            width: 264,
-            height: 197,
-            marginTop: 43,
-            marginBottom: 23,
-          }}
-          source={
-            selectedInvite
-              ? { uri: gatewayFromIpfs(selectedInvite.image) }
-              : require("../../assets/card.png")
-          }
-        />
+        {selectedInvite && (
+          <Image
+            style={{
+              width: 264,
+              height: 197,
+              marginTop: 43,
+              marginBottom: 23,
+            }}
+            source={{
+              uri: gatewayFromIpfs(selectedInvite.image),
+            }}
+          />
+        )}
+
+        {!selectedInvite && (
+          <View
+            style={{
+              width: 264,
+              height: 197,
+              marginTop: 43,
+              marginBottom: 23,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={{
+                width: 24,
+                height: 24,
+              }}
+              source={require("../../assets/loading.png")}
+            />
+          </View>
+        )}
 
         <Text
           style={{
