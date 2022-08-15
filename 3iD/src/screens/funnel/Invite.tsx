@@ -17,6 +17,18 @@ import {
 } from "../../provider/kubelt";
 import { Invitation } from "../../types/Invitation";
 
+const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
+  const regex = /(bafy\w*)/;
+  const matches = regex.exec(ipfsUrl as string);
+
+  if (!matches || !ipfsUrl) return undefined;
+
+  const itemPath = ipfsUrl?.split(matches[0])[1];
+  const resourceUrl = `https://nftstorage.link/ipfs/${matches[0]}/${itemPath}`;
+
+  return resourceUrl;
+};
+
 export default function Invite({ navigation }: { navigation: any }) {
   const [availableInvites, setAvailableInvites] = useState<Invitation[]>([]);
   const [selectedInvite, setSelectedInvite] = useState<Invitation>();
@@ -133,7 +145,7 @@ export default function Invite({ navigation }: { navigation: any }) {
           }}
           source={
             selectedInvite
-              ? { uri: selectedInvite.image }
+              ? { uri: gatewayFromIpfs(selectedInvite.image) }
               : require("../../assets/card.png")
           }
         />

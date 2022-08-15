@@ -262,25 +262,27 @@ export const threeIdGenPfP = async (
     const req: GenPfPReq = {
       account: address,
       blockchain: {
-        name: network.name,
+        name: `ethereum`,
         chainId: network.chainId,
       },
     };
 
     res = await sdkWeb?.node_v1?.oort.callRpc(sdk, {
-      method: ["3id", "gen-p-f-p"],
-      params: req,
+      method: ["3id", "gen-pfp"],
+      params: [req],
     });
 
     if (!res || res?.error || res?.body.error) {
       throw new Error();
     }
+
+    res = res.body.result;
   } catch (e) {
     console.warn("Failed to generate PFP");
     res = null;
   }
 
-  return res;
+  return res[0];
 };
 
 export const threeIdMint = async (genPfPres: GenPfPRes): Promise<boolean> => {
