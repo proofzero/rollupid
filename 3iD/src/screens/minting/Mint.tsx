@@ -16,6 +16,15 @@ import {
 } from "../../provider/kubelt";
 import { connect, forceAccounts, sign } from "../../provider/web3";
 
+const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
+  const regex = /(bafy\w*)/;
+  const matches = regex.exec(ipfsUrl as string);
+
+  return matches
+    ? `https://nftstorage.link/ipfs/${matches[0]}/threeid.png`
+    : undefined;
+};
+
 const PanelHead = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
   <>
     <Text
@@ -61,7 +70,7 @@ const PanelHead = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
           height: 93,
         }}
         source={{
-          uri: genPfPRes?.metadata?.image,
+          uri: gatewayFromIpfs(genPfPRes?.metadata?.image),
         }}
       />
 
@@ -89,7 +98,7 @@ const PanelHead = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
             height: 93,
           }}
           source={{
-            uri: genPfPRes?.metadata?.image,
+            uri: gatewayFromIpfs(genPfPRes?.metadata?.image),
           }}
         />
       </div>
