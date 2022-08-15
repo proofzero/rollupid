@@ -167,14 +167,11 @@ jsonrpc.method('3iD_genPFP', async (ctx, next) => {
     const signature = await ctx.wallet.sign(JSON.stringify(voucher));
 
     // Generate the response to send to the client.
-    ctx.body = jsonrpc.methods.map(method => {
-        return {
-            metadata: metadata.data,
-            voucher,
-            signature,
-        };
-    });
-
+    ctx.body = {
+      metadata: metadata.data,
+      voucher,
+      signature,
+    };
 });
 
 
