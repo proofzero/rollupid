@@ -1,4 +1,4 @@
-// eth/invite/contracts/Invite.sol
+// eth/mint/contracts/3idPFP.sol
 //
 // SPDX-License-Identifier: UNLICENSED
 
@@ -10,36 +10,35 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
- * A token representing an invitation to use 3iD. A token holder is
- * granted special access to the site.
+ * A token representing a generative art PFP.
  */
-contract ThreeId_Invitations is
+contract ThreeId_ProfilePicture is
     ERC721URIStorage
 {
     using Counters for Counters.Counter;
-    Counters.Counter private _inviteIds;
+    Counters.Counter private _pfpIds;
 
-    // We only allow the creation of this many invitations.
-    uint private _maxInvites;
+    // We only allow the creation of this many PFPs.
+    uint private _maxPFPs;
 
     /**
      * Constructor.
      *
-     * @param maxInvites the maximum allowed number of invitations
-     * @param metaURI the token URI to associate with reserved zeroth invite
+     * @param maxPFPs the maximum allowed number of profile pics.
+     * @param metaURI the token URI to associate with reserved zeroth PFP
      */
-    constructor(uint maxInvites, string memory metaURI) ERC721("3iD Invitation", "3ID") {
-        _maxInvites = maxInvites;
+    constructor(uint maxPFPs, string memory metaURI) ERC721("3iD Profile Picture", "3ID PFP") {
+        _maxPFPs = maxPFPs;
 
-        // Invitation #0000 is reserved.
-        awardInvite(msg.sender, metaURI);
+        // PFP #0000 is reserved.
+        awardPFP(msg.sender, metaURI);
     }
 
     /**
-     * Award an invitation.
+     * Award a PFP.
      *
      * @param invitee invitation recipient
-     * @param inviteURI a URI to associate with the invite
+     * @param pfpURI a URI to associate with the profile pic
      * Returns:
      *   the invite (token) identifier
      */
@@ -58,16 +57,16 @@ contract ThreeId_Invitations is
     }
 
     /**
-     * Return the next invitation to be awarded.
+     * Return the next PFP to be awarded.
      */
-    function nextInvite() public view returns (uint256) {
-        return _inviteIds.current();
+    function nextPFP() public view returns (uint256) {
+        return _pfpIds.current();
     }
 
     /**
-     * Return the maximum number of invitations to be awarded.
+     * Return the maximum number of PFPs to be awarded.
      */
-    function maxInvitations() public view returns (uint) {
-        return _maxInvites;
+    function maxPFPs() public view returns (uint) {
+        return _maxPFPs;
     }
 }
