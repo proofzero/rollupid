@@ -43,7 +43,9 @@ contract ThreeId_Invitations is
      * Returns:
      *   the invite (token) identifier
      */
-    function awardInvite(address invitee, string memory inviteURI) public returns(uint256) {
+    function awardInvite(address invitee, string memory inviteURI, string memory voucher) public returns(uint256) {
+        // check if the voucher is valid
+        
         // NB: invitation #0000 is reserved, user allocated range is
         // #0001 to #_maxInvites.
         uint256 inviteId = _inviteIds.current();
