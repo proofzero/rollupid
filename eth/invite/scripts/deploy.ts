@@ -9,7 +9,7 @@ import { ethers } from "hardhat";
 const MAX_INVITES = 10000;
 
 // The metadata.json URL of invitation #0000, which is reserved.
-const META_URL = "ipfs://bafyreidlagfdld5qozkgsvtwe4ix62vp5zihtrmyrdgpzw6rsujvxtw2gu/metadata.json"
+const META_URL = "ipfs://bafyreigxvmsauo3tjznuonzyupfd2j325dyshsus73uhkj2cbh726lubqq/metadata.json"
 
 // The storage provide provides the following gateway:
 // https://$CID.ipfs.nftstorage.link/metadata.json
