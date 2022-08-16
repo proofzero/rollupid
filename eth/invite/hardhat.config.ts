@@ -161,13 +161,29 @@ subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("account", "The address of the invitee")
   .addParam("contract", "The invite smart contract address")
   .addParam("tokenURI", "The URI to set for the invitation")
+  .addParam("inviteId", "The id for the invitation")
   .setAction(async (taskArgs, hre) => {
     const account = taskArgs.account;
     const contract = taskArgs.contract;
     const tokenURI = taskArgs.tokenURI;
+    const inviteId = taskArgs.inviteId;
+
+    // Generate signed voucher using our wallet.
+    const voucher = {
+      account,
+      inviteId,
+      tokenURI,
+    };
+    // NB: A signed message is prefixed with "\x19Ethereum Signed
+    // Message:\n" and the length of the message, using the hashMessage
+    // method, so that it is EIP-191 compliant. If recovering the
+    // address in Solidity, this prefix will be required to create a
+    // matching hash.
+    const [owner] = await hre.ethers.getSigners();
+    const signature = owner.signMessage(JSON.stringify(voucher))
 
     const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
-    return invite.awardInvite(account, tokenURI);
+    return invite.awardInvite(account, tokenURI, signature);
   });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
@@ -524,6 +540,8 @@ task("invite:award", "Mint an invite for an account")
     // Path the output SVG file that we will generate from the template.
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
 
+    
+
     // Write an SVG asset file as outputFile.
     const generateResult = await hre.run("invite:generate-nft-asset", {
       inviteId,
@@ -544,6 +562,7 @@ task("invite:award", "Mint an invite for an account")
       account,
       contract,
       tokenURI: publishResult.url,
+      inviteId,
     });
 
     console.log(chalk.red("AWARDED INVITE"));
