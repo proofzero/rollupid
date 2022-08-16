@@ -160,12 +160,12 @@ subtask("call:nextInvite", "Return the ID of next invitation")
 subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("account", "The address of the invitee")
   .addParam("contract", "The invite smart contract address")
-  .addParam("tokenURI", "The URI to set for the invitation")
+  .addParam("tokenUri", "The URI to set for the invitation")
   .addParam("voucher", "The signed voucher")
   .setAction(async (taskArgs, hre) => {
     const account = taskArgs.account;
     const contract = taskArgs.contract;
-    const tokenURI = taskArgs.tokenURI;
+    const tokenURI = taskArgs.tokenUri;
     const voucher = taskArgs.voucher;
 
     const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
@@ -486,7 +486,7 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
 
 task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("account", "The account address")
-  .addParam("tokenURI", "The token URI")
+  .addParam("tokenUri", "The token URI")
   .addParam("inviteId", "The invitation # to sign")
   .setAction(async (taskArgs, hre) => {
     const account = taskArgs.account;
@@ -577,14 +577,14 @@ task("invite:award", "Mint an invite for an account")
     // Create and sign a voucher
     const signature = await hre.run("invite:sign-voucher", {
       account,
-      tokenUri: publishResult.url,,
+      tokenUri: publishResult.url,
       inviteId
     });
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
-      tokenURI: publishResult.url,
+      tokenUri: publishResult.url,
       signature,
     });
 
