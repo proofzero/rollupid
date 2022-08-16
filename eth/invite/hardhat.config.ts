@@ -508,7 +508,7 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // address in Solidity, this prefix will be required to create a
     // matching hash.
     const [owner] = await hre.ethers.getSigners();
-    const signature = owner.signMessage(JSON.stringify(voucher))
+    const signature = await owner.signMessage(JSON.stringify(voucher))
 
     console.log('signed voucher', signature);
 
