@@ -487,19 +487,23 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
 task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("account", "The account address")
   .addParam("tokenUri", "The token URI")
-  .addParam("inviteId", "The invitation # to sign")
   .setAction(async (taskArgs, hre) => {
-    const account = taskArgs.account;
-    const tokenURI = taskArgs.tokenUri;
-    const inviteId = taskArgs.inviteId;
+    const recipient = taskArgs.account;
+    const tokenId = taskArgs.tokenUri;
 
     // Generate signed voucher using our wallet.
-    const voucher = {
-      account,
-      inviteId,
-      tokenURI,
+    const types = {
+      NFTVoucher: [      
+        {name: "recipient", type: "address"},    
+        {name: "tokenId", type: "uint256"},    
+      ]
     };
-    
+
+    const voucher = {
+      recipient,
+      tokenId,
+    }
+
     console.log('voucher', voucher);
 
     // NB: A signed message is prefixed with "\x19Ethereum Signed
@@ -508,11 +512,18 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // address in Solidity, this prefix will be required to create a
     // matching hash.
     const [owner] = await hre.ethers.getSigners();
-    const signature = await owner.signMessage(JSON.stringify(voucher))
+    // const domain = await owner.domain owner._signingDomain()
+    const messageHash = await hre.ethers.utils.hashMessage(JSON.stringify(voucher));
+    const signature = await owner.signMessage(messageHash);
+    // const signature = await owner._signTypedData({}, types, voucher)
 
     console.log('signed voucher', signature);
 
-    return signature;
+    return {
+      ...voucher,
+      messageHash,
+      signature
+    };
 
 })
 task("invite:award", "Mint an invite for an account")
@@ -575,17 +586,16 @@ task("invite:award", "Mint an invite for an account")
       outputFile,
     });
     // Create and sign a voucher
-    const signature = await hre.run("invite:sign-voucher", {
+    const voucher = await hre.run("invite:sign-voucher", {
       account,
       tokenUri: publishResult.url,
-      inviteId
     });
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
       tokenUri: publishResult.url,
-      signature,
+      voucher,
     });
 
     console.log(chalk.red("AWARDED INVITE"));
