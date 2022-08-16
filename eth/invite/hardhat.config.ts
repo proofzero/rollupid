@@ -161,29 +161,15 @@ subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("account", "The address of the invitee")
   .addParam("contract", "The invite smart contract address")
   .addParam("tokenURI", "The URI to set for the invitation")
-  .addParam("inviteId", "The id for the invitation")
+  .addParam("voucher", "The signed voucher")
   .setAction(async (taskArgs, hre) => {
     const account = taskArgs.account;
     const contract = taskArgs.contract;
     const tokenURI = taskArgs.tokenURI;
-    const inviteId = taskArgs.inviteId;
-
-    // Generate signed voucher using our wallet.
-    const voucher = {
-      account,
-      inviteId,
-      tokenURI,
-    };
-    // NB: A signed message is prefixed with "\x19Ethereum Signed
-    // Message:\n" and the length of the message, using the hashMessage
-    // method, so that it is EIP-191 compliant. If recovering the
-    // address in Solidity, this prefix will be required to create a
-    // matching hash.
-    const [owner] = await hre.ethers.getSigners();
-    const signature = owner.signMessage(JSON.stringify(voucher))
+    const voucher = taskArgs.voucher;
 
     const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
-    return invite.awardInvite(account, tokenURI, signature);
+    return invite.awardInvite(account, tokenURI, voucher);
   });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
@@ -498,6 +484,37 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
     console.log(publishResult.url);
   });
 
+task("invite:sign-voucher", "Sign an invite voucher")
+  .addParam("account", "The account address")
+  .addParam("tokenURI", "The token URI")
+  .addParam("inviteId", "The invitation # to sign")
+  .setAction(async (taskArgs, hre) => {
+    const account = taskArgs.account;
+    const tokenURI = taskArgs.tokenUri;
+    const inviteId = taskArgs.inviteId;
+
+    // Generate signed voucher using our wallet.
+    const voucher = {
+      account,
+      inviteId,
+      tokenURI,
+    };
+    
+    console.log('voucher', voucher);
+
+    // NB: A signed message is prefixed with "\x19Ethereum Signed
+    // Message:\n" and the length of the message, using the hashMessage
+    // method, so that it is EIP-191 compliant. If recovering the
+    // address in Solidity, this prefix will be required to create a
+    // matching hash.
+    const [owner] = await hre.ethers.getSigners();
+    const signature = owner.signMessage(JSON.stringify(voucher))
+
+    console.log('signed voucher', signature);
+
+    return signature;
+
+})
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address")
@@ -557,12 +574,18 @@ task("invite:award", "Mint an invite for an account")
       issueDate,
       outputFile,
     });
+    // Create and sign a voucher
+    const signature = await hre.run("invite:sign-voucher", {
+      account,
+      tokenUri: publishResult.url,,
+      inviteId
+    });
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
       tokenURI: publishResult.url,
-      inviteId,
+      signature,
     });
 
     console.log(chalk.red("AWARDED INVITE"));
