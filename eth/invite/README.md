@@ -1,13 +1,65 @@
-# Sample Hardhat Project
+# 3ID Invitation Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+## Orientation
 
-Try running some of the following tasks:
+This will give you a list of available commands:
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+```bash
+npx hardhat
 ```
+
+Some selected commands:
+
+*	`account:balance`       Prints an account balance
+* `account:nfts`          Gets the NFTs for an account (via Alchemy)
+* `accounts:list`         Prints the list of accounts
+* `invite:award`          Mint an invite for an account
+* `invite:image`          Print the image URL for an invitation
+* `invite:maximum`        Return maximum number of invites
+* `invite:metadata`       Display the metadata for an invitation
+* `invite:next`           Return ID of next invite that will be awarded
+* `invite:owner`          Return owner of an invite
+* `invite:premint`        Store the reserved invitation (#0000) asset
+
+Start the local hardhat chain in another terminal: `npx hardhat node`
+
+See the accounts registered in `secret.ts`: `npx hardhat accounts:list`
+
+See the balance in an account: `npx hardhat account:balance --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
+
+## Local Workflow
+
+With the local node running (`npx hardhat node`), try to get some invitation information:
+
+* `npx hardhat invite:maximum`
+* `npx hardhat invite:next`
+
+These calls will **fail** because the contract hasn't been deployed.
+
+### Deployment
+
+1. Premint the starting invitation: `npx hardhat invite:premint`
+2. Update `META_URL` in `scripts/deploy.ts` with the generated IPFS link.
+3. Deploy to the local node with `npx hardhat run scripts/deploy.ts`
+4. Update `secrets.ts` with the contract address for `NET_LOCALHOST`.
+
+Now these calls work:
+
+* `npx hardhat invite:maximum`
+* `npx hardhat invite:next`
+
+### Award an Invite
+
+`npx hardhat invite:award --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
+
+### Inspect the Invite
+
+* `npx hardhat invite:owner --invite 1`
+* `npx hardhat invite:metadata --invite 1`
+* `npx hardhat invite:image --invite 1`
+
+### Deploying to Remote Chains
+
+`npx hardhat run scripts/deploy.js --network <network-name>`
+
+Where `<network-name>` is `goerli`, `mainnet`, etc.

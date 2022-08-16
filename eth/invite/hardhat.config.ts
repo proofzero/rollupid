@@ -112,6 +112,9 @@ subtask("config:account", "Return account address for selected network")
 subtask("config:alchemyURL", "Return alchemy invite application URL")
   .setAction(async (taskArgs, hre) => {
     const config = await hre.run("network:config");
+    // NB: This dereference will fail for localhost -- no alchemy config.
+    // Hard-failing is acceptable for CLI so leaving it. Could check the
+    // dereferences and intelligently exit, but ¯\_(ツ)_/¯
     return config.alchemy.appURL;
   });
 
