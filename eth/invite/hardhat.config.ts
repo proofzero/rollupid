@@ -489,40 +489,42 @@ task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("tokenUri", "The token URI")
   .setAction(async (taskArgs, hre) => {
     const recipient = taskArgs.account;
-    const tokenId = taskArgs.tokenUri;
-
-    // Generate signed voucher using our wallet.
-    const types = {
-      NFTVoucher: [      
-        {name: "recipient", type: "address"},    
-        {name: "tokenId", type: "uint256"},    
-      ]
-    };
+    const uri = taskArgs.tokenUri;
 
     const voucher = {
       recipient,
-      tokenId,
-    }
+      uri,
+      messageHash: "",
+      signature: ""
+    };
 
-    console.log('voucher', voucher);
+    //console.log('voucher', voucher);
 
     // NB: A signed message is prefixed with "\x19Ethereum Signed
     // Message:\n" and the length of the message, using the hashMessage
     // method, so that it is EIP-191 compliant. If recovering the
     // address in Solidity, this prefix will be required to create a
     // matching hash.
-    const [owner] = await hre.ethers.getSigners();
-    // const domain = await owner.domain owner._signingDomain()
-    const messageHash = await hre.ethers.utils.hashMessage(JSON.stringify(voucher));
-    const signature = await owner.signMessage(messageHash);
-    // const signature = await owner._signTypedData({}, types, voucher)
 
-    console.log('signed voucher', signature);
+    //console.log((await hre.ethers.getSigners())[9])
+    //const [signer] = await hre.ethers.getSigners();
+
+    // TODO: Get the signer from config somewhere (secrets?)
+    const signer = (await hre.ethers.getSigners())[0];
+
+    // TODO: const domain = await owner.domain owner._signingDomain()
+    const messageHash = await hre.ethers.utils.hashMessage(JSON.stringify(voucher)); //hre.ethers.utils.arrayify(JSON.stringify(voucher)));
+    const signature = await signer.signMessage(messageHash);
+
+    voucher.messageHash = messageHash
+    voucher.signature = signature
+    console.log('signed voucher', voucher);
+    console.log('signer:', signer.address)
 
     return {
       ...voucher,
-      messageHash,
-      signature
+      // messageHash,
+      // signature
     };
 
 })
@@ -568,8 +570,6 @@ task("invite:award", "Mint an invite for an account")
     // Path the output SVG file that we will generate from the template.
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
 
-    
-
     // Write an SVG asset file as outputFile.
     const generateResult = await hre.run("invite:generate-nft-asset", {
       inviteId,
@@ -577,6 +577,7 @@ task("invite:award", "Mint an invite for an account")
       assetFile,
       outputFile
     });
+
     // Publish the generated asset to our storage provider.
     const publishResult = await hre.run("invite:publish-nft-storage", {
       storageKey,
@@ -585,11 +586,13 @@ task("invite:award", "Mint an invite for an account")
       issueDate,
       outputFile,
     });
+
     // Create and sign a voucher
     const voucher = await hre.run("invite:sign-voucher", {
       account,
       tokenUri: publishResult.url,
     });
+
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
