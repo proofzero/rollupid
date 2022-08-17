@@ -1,12 +1,16 @@
 import Constants from "expo-constants";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { View, Text, Image, Pressable, Touchable } from "react-native";
-import { getFunnelState } from "../../provider/kubelt";
+import { View, Text, Image, Pressable } from "react-native";
+import useAccount from "../../hooks/account";
+import { getSDK } from "../../provider/kubelt";
+import { getFunnelState } from "../../services/threeid";
 
 import Layout from "../AuthLayout";
 
 export default function Onboard({ navigation }: { navigation: any }) {
+  const account = useAccount();
+
   const [canMint, setCanMint] = useState(false);
 
   const [steps] = useState<
@@ -46,13 +50,17 @@ export default function Onboard({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      const funnelState = await getFunnelState();
+      const sdk = await getSDK();
+
+      const funnelState = await getFunnelState(sdk);
       if (!funnelState.mint) {
         setCanMint(true);
       }
     };
 
-    asyncFn();
+    if (account) {
+      asyncFn();
+    }
   }, []);
 
   return (
@@ -496,31 +504,60 @@ export default function Onboard({ navigation }: { navigation: any }) {
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   marginBottom: 16,
                 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Inter_500Medium",
-                    fontSize: 14,
-                    fontWeight: "500",
-                    lineHeight: 16,
-                    color: "#4B5563",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  What's 3iD for?
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                      color: "#4B5563",
+                    }}
+                  >
+                    How can I use 3iD?
+                  </Text>
+
+                  <Image
+                    style={{
+                      width: 14,
+                      height: 7,
+                    }}
+                    source={require("../../assets/dropdown.png")}
+                  ></Image>
+                </View>
+
+                <Text
+                  style={{
+                    marginVertical: "1em",
+                  }}
+                >
+                  Now that you've claimed your 3ID, other applications can query
+                  your profile to fetch your public profile details including
+                  your avatar. You can also use{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={`https://threeid.xyz/${account}`}
+                  >
+                    https://threeid.xyz/{account}
+                  </a>{" "}
+                  to promote your profile and NFTs on social media.
                 </Text>
 
-                <Image
-                  style={{
-                    width: 14,
-                    height: 7,
-                  }}
-                  source={require("../../assets/dropdown.png")}
-                ></Image>
+                <Text>
+                  In our roadmap we have many more features coming including
+                  linking multiple accounts together, messaging, storage and
+                  more.
+                </Text>
               </View>
             </View>
 
@@ -533,31 +570,70 @@ export default function Onboard({ navigation }: { navigation: any }) {
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   marginBottom: 16,
                 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Inter_500Medium",
-                    fontSize: 14,
-                    fontWeight: "500",
-                    lineHeight: 16,
-                    color: "#4B5563",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  When will be 3ID launched?
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                      color: "#4B5563",
+                    }}
+                  >
+                    What is the 3iD Roadmap?
+                  </Text>
 
-                <Image
+                  <Image
+                    style={{
+                      width: 14,
+                      height: 7,
+                    }}
+                    source={require("../../assets/dropdown.png")}
+                  ></Image>
+                </View>
+
+                <Text
                   style={{
-                    width: 14,
-                    height: 7,
+                    marginTop: "1em",
                   }}
-                  source={require("../../assets/dropdown.png")}
-                ></Image>
+                >
+                  Next we will be focusing on storage, account linking, and
+                  messaging but we're also interested in what you think we
+                  should be working on! Join us on{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={Constants.manifest?.extra?.discordUrl}
+                  >
+                    Discord
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={Constants.manifest?.extra?.twitterUrl}
+                  >
+                    Twitter
+                  </a>{" "}
+                  to share your idea and keep up to date with the{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={`https://www.kubelt.com`}
+                  >
+                    Kubelt
+                  </a>{" "}
+                  team.
+                </Text>
               </View>
             </View>
 
@@ -570,31 +646,52 @@ export default function Onboard({ navigation }: { navigation: any }) {
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   marginBottom: 16,
                 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Inter_500Medium",
-                    fontSize: 14,
-                    fontWeight: "500",
-                    lineHeight: 16,
-                    color: "#4B5563",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  What’s on the roadmap?
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                      color: "#4B5563",
+                    }}
+                  >
+                    Can I sell my invite card?
+                  </Text>
 
-                <Image
+                  <Image
+                    style={{
+                      width: 14,
+                      height: 7,
+                    }}
+                    source={require("../../assets/dropdown.png")}
+                  ></Image>
+                </View>
+
+                <Text
                   style={{
-                    width: 14,
-                    height: 7,
+                    marginTop: "1em",
                   }}
-                  source={require("../../assets/dropdown.png")}
-                ></Image>
+                >
+                  Yes. You can list your invite card on{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={`https://opensea.io/explore-collections`}
+                  >
+                    OpenSea
+                  </a>{" "}
+                  or transfer it to a friend.
+                </Text>
               </View>
             </View>
 
@@ -607,31 +704,78 @@ export default function Onboard({ navigation }: { navigation: any }) {
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   marginBottom: 16,
                 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Inter_500Medium",
-                    fontSize: 14,
-                    fontWeight: "500",
-                    lineHeight: 16,
-                    color: "#4B5563",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Can I sell my invite card?
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                      color: "#4B5563",
+                    }}
+                  >
+                    What is my new PFP?
+                  </Text>
 
-                <Image
+                  <Image
+                    style={{
+                      width: 14,
+                      height: 7,
+                    }}
+                    source={require("../../assets/dropdown.png")}
+                  ></Image>
+                </View>
+
+                <Text
                   style={{
-                    width: 14,
-                    height: 7,
+                    marginTop: "1em",
                   }}
-                  source={require("../../assets/dropdown.png")}
-                ></Image>
+                >
+                  <Text>
+                    Your 3ID gradient PFP is a soulbound avatar made up of 4
+                    color traits -- one version color and three common,
+                    uncommon, rare and epic colors traits. Rarity is decided by
+                    several factors.
+                  </Text>
+
+                  <ol>
+                    <li>
+                      The first color trait probability is based on which
+                      popular NFTs you currently hold.
+                    </li>
+
+                    <li>
+                      The second color trait is based on which of our developer
+                      collections you hold.
+                    </li>
+
+                    <li>The last color trait is based on your ETH balance.</li>
+                  </ol>
+
+                  <Text>
+                    Click{" "}
+                    <a
+                      target={"_blank"}
+                      rel={"noopener noopener noreferrer"}
+                      href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
+                    >
+                      here
+                    </a>{" "}
+                    to read the code. Once generated, your 3ID gradient PFP is
+                    soul bound to your identity. More generations of this PFP
+                    will be released corresponding with every major version of
+                    3ID.
+                  </Text>
+                </Text>
               </View>
             </View>
 
@@ -644,31 +788,58 @@ export default function Onboard({ navigation }: { navigation: any }) {
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
                   marginBottom: 16,
                 }}
               >
-                <Text
+                <View
                   style={{
-                    fontFamily: "Inter_500Medium",
-                    fontSize: 14,
-                    fontWeight: "500",
-                    lineHeight: 16,
-                    color: "#4B5563",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Who is behind the project?
-                </Text>
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                      color: "#4B5563",
+                    }}
+                  >
+                    Who is behind this project?
+                  </Text>
 
-                <Image
+                  <Image
+                    style={{
+                      width: 14,
+                      height: 7,
+                    }}
+                    source={require("../../assets/dropdown.png")}
+                  ></Image>
+                </View>
+
+                <Text
                   style={{
-                    width: 14,
-                    height: 7,
+                    marginTop: "1em",
                   }}
-                  source={require("../../assets/dropdown.png")}
-                ></Image>
+                >
+                  3iD was created by{" "}
+                  <a
+                    target={"_blank"}
+                    rel={"noopener noopener noreferrer"}
+                    href={`https://kubelt.com`}
+                  >
+                    Kubelt
+                  </a>
+                  , a decentralized application platform, and is inspired by
+                  Web3 and the digital identity specification. Instead of
+                  applications centralizing user data, 3ID users like yourself
+                  will be able to permission/revoke applications to access
+                  personal data, messages and more. Our goal is to eliminate
+                  email as a basis of online identity and shift the norm towards
+                  being cryptographic, user-centric and decentralized platforms.
+                </Text>
               </View>
             </View>
           </View>

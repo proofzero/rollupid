@@ -2,15 +2,11 @@ import React, { useEffect } from "react";
 
 import { Pressable, Text, View } from "react-native";
 import useAccount from "../../hooks/account";
-import {
-  getFunnelState,
-  isAuthenticated,
-  kbGetClaims,
-} from "../../provider/kubelt";
 import { connect, forceAccounts } from "../../provider/web3";
 import Layout from "../Layout";
 
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
 
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -33,7 +29,7 @@ export default function Landing({ navigation }: { navigation: any }) {
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
-        return claimsRedirect(claim);
+        claimsRedirect(claim);
       }
 
       navigation.navigate("Auth");

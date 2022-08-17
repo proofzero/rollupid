@@ -3,30 +3,33 @@ import React, { useEffect } from "react";
 import useAccount from "../../hooks/account";
 
 import { connect, forceAccounts } from "../../provider/web3";
-import {
-  authenticate,
-  getFunnelState,
-  isAuthenticated,
-  kbGetClaims,
-  threeIdListInvitations,
-} from "../../provider/kubelt";
 
 import Layout from "../Layout";
 import { Text, View } from "react-native";
+import { getFunnelState, listInvitations } from "../../services/threeid";
+
+import {
+  authenticate,
+  getSDK,
+  isAuthenticated,
+  kbGetClaims,
+} from "../../provider/kubelt";
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
 
   const claimsRedirect = async (claim: string) => {
+    const sdk = await getSDK();
+
     claim = claim.trim().toLowerCase();
 
-    const funnelState = await getFunnelState();
+    const funnelState = await getFunnelState(sdk);
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
       navigation.navigate("Onboard");
     } else if (!funnelState.invite) {
-      const invites = await threeIdListInvitations();
+      const invites = await listInvitations(sdk);
       if (invites.length > 0) {
         navigation.navigate("Invite");
       } else {
