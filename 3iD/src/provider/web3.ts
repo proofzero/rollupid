@@ -10,17 +10,12 @@ const eth = (window as any).ethereum;
 
 export const isMetamask = () => eth?.isMetaMask === true;
 
-/**
- * Clear account behavior (null) allowing observers to
- * handle cleared accounts
- *
- * @param purge If true, local and session storages will be cleared
- */
-export const clearAccount = () => {
-  // We force app wide refresh
-  // this has to be handled in views
-  // or layouts
-  accountSubj.next(null);
+export const getAccount = (): undefined | null | string => {
+  return accountSubj.getValue();
+};
+
+export const getAccountObs = () => {
+  return accountSubj.asObservable();
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
@@ -54,19 +49,6 @@ const handleAccountsChanged = async (accounts: string[]) => {
 eth?.on("accountsChanged", handleAccountsChanged);
 
 /**
- * This method forces accounts to refresh
- * by calling `eth_accounts` provider RPC
- * can be used to check if user is already
- * connected to the domain
- */
-export const forceAccounts = async () => {
-  const accounts = await eth?.request({ method: "eth_accounts" });
-  if (accounts) {
-    handleAccountsChanged(accounts);
-  }
-};
-
-/**
  * General purpose method that can be used throughout to get access to the current web3 provider.
  * If it doesn't exist, the provider will be created and set up.
  *
@@ -94,12 +76,30 @@ export const connect = async (
   return web3Provider;
 };
 
-export const getAccount = (): undefined | null | string => {
-  return accountSubj.getValue();
+/**
+ * This method forces accounts to refresh
+ * by calling `eth_accounts` provider RPC
+ * can be used to check if user is already
+ * connected to the domain
+ */
+export const forceAccounts = async () => {
+  const accounts = await eth?.request({ method: "eth_accounts" });
+  if (accounts) {
+    handleAccountsChanged(accounts);
+  }
 };
 
-export const getAccountObs = () => {
-  return accountSubj.asObservable();
+/**
+ * Clear account behavior (null) allowing observers to
+ * handle cleared accounts
+ *
+ * @param purge If true, local and session storages will be cleared
+ */
+export const clearAccount = () => {
+  // We force app wide refresh
+  // this has to be handled in views
+  // or layouts
+  accountSubj.next(null);
 };
 
 export const sign = async (message: string) => {

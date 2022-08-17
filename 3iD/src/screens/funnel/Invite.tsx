@@ -7,15 +7,14 @@ import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
 import { forceAccounts } from "../../provider/web3";
+import { getSDK, isAuthenticated, kbGetClaims } from "../../provider/kubelt";
+
 import {
-  getFunnelState,
-  isAuthenticated,
-  kbGetClaims,
-  threeIdListInvitations,
-  threeIdUseInvitation,
+  claimInvitation,
+  listInvitations,
   tickFunnelStep,
-} from "../../provider/kubelt";
-import { Invitation } from "../../types/Invitation";
+} from "../../services/threeid";
+import { Invitation } from "../../services/threeid/types";
 
 const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
   const regex = /(bafy\w*)/;
@@ -36,7 +35,9 @@ export default function Invite({ navigation }: { navigation: any }) {
   const account = useAccount();
 
   const continueToThreeId = async () => {
-    await tickFunnelStep("invite");
+    const sdk = await getSDK();
+
+    await tickFunnelStep(sdk, "invite");
 
     navigation.navigate("Onboard");
   };
@@ -51,13 +52,15 @@ export default function Invite({ navigation }: { navigation: any }) {
   };
 
   const claimInvite = async () => {
+    const sdk = await getSDK();
+
     if (!selectedInvite) {
       throw new Error("This should never be the case");
     }
 
     const { contractAddress, tokenId } = selectedInvite;
 
-    const usedInvite = await threeIdUseInvitation(contractAddress, tokenId);
+    const usedInvite = await claimInvitation(sdk, contractAddress, tokenId);
 
     if (usedInvite) {
       return continueToThreeId();
@@ -71,12 +74,13 @@ export default function Invite({ navigation }: { navigation: any }) {
     }
 
     const asyncFn = async () => {
+      const sdk = await getSDK();
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
         claimsRedirect(claim);
 
-        const invites = await threeIdListInvitations();
+        const invites = await listInvitations(sdk);
         if (invites && invites.length > 0) {
           setAvailableInvites(invites);
           setSelectedInvite(invites[0]);
