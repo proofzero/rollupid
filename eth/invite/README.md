@@ -66,9 +66,9 @@ Where `<network-name>` is `goerli`, `mainnet`, etc.
 
 ### Deployments from Different Branches
 
-When you deploy from different branches, particular where you've changed an
-interface, `hardhat` will not regenerate the typechain connecting TypeScript to
-Solidity. To do it manually:
+When you deploy from different branches, particularly where you have
+changed an interface, `hardhat` will not regenerate the typechain
+connecting TypeScript to Solidity. To do it manually:
 
 ```bash
 rm -rf typechain*
