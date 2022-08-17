@@ -22,6 +22,7 @@ import {
   NET_GOERLI,
   NET_MAINNET,
 } from "./secret";
+import { groupEnd } from "console";
 
 // definitions
 // -----------------------------------------------------------------------------
@@ -498,36 +499,29 @@ task("invite:sign-voucher", "Sign an invite voucher")
       signature: ""
     };
 
-    //console.log('voucher', voucher);
-
     // NB: A signed message is prefixed with "\x19Ethereum Signed
     // Message:\n" and the length of the message, using the hashMessage
     // method, so that it is EIP-191 compliant. If recovering the
     // address in Solidity, this prefix will be required to create a
     // matching hash.
 
-    //console.log((await hre.ethers.getSigners())[9])
-    //const [signer] = await hre.ethers.getSigners();
-
     // TODO: Get the signer from config somewhere (secrets?)
-    const signer = (await hre.ethers.getSigners())[0];
+    const signer = (await hre.ethers.getSigners())[9];
 
     // TODO: const domain = await owner.domain owner._signingDomain()
-    const messageHash = await hre.ethers.utils.hashMessage(JSON.stringify(voucher)); //hre.ethers.utils.arrayify(JSON.stringify(voucher)));
-    const signature = await signer.signMessage(messageHash);
+    const message = voucher.recipient+voucher.uri;
+    console.log('message: ' + message)
+  
+    voucher.messageHash = await hre.ethers.utils.hashMessage(message)
+    voucher.signature = await signer.signMessage(message)
 
-    voucher.messageHash = messageHash
-    voucher.signature = signature
-    console.log('signed voucher', voucher);
-    console.log('signer:', signer.address)
+    const recoveryAddress = await hre.ethers.utils.recoverAddress(voucher.messageHash, voucher.signature)
+    console.log('Sanity check:\n\n\t%s\n\t%s\n', signer.address, recoveryAddress)
 
-    return {
-      ...voucher,
-      // messageHash,
-      // signature
-    };
-
+    console.log('signed voucher: ', voucher);
+    return voucher
 })
+
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address")
@@ -616,7 +610,7 @@ task("invite:award", "Mint an invite for an account")
 
 const config: HardhatUserConfig = {
   defaultNetwork: "localhost",
-  solidity: "0.8.9",
+  solidity: "0.8.12",
   etherscan: {
     apiKey: `${ETHERSCAN.apiKey}`,
   },

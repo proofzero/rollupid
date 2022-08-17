@@ -18,8 +18,8 @@ const OPERATOR_ADDRESS = "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720"
 const ZERO_VOUCHER = {
   recipient: '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
   uri: 'ipfs://bafyreibtpfdfb7jnx5kmxcrzizasgcxwssk5ljeb7vpp32wyphbqwmvrbi/metadata.json',
-  messageHash: '0x1a6530c79f19a77e0568d87d131dd8e5c5af867353f5dfe63e368281d6869db4',
-  signature: '0x1c90b9416b37e9aeebac0494cbfdd820675e5b13a7456b93041b171b3965f6ce42b4a291410a357b0844791cbb1bfa91600996cb54a14973444e3f986177a3581c'
+  messageHash: '0x3dce924c5cd6068392d58730858863fe5cdf7a5f5b47971f4f09798d506ef53e',
+  signature: '0x45a5014865d4b985ea5e55f95d5bcd19b596346e6c95dc502eddc345f07ee42643440945b3b6abfcc390687235a4bd493e7122a506bca36fe6a6473fee3603561c'
 }
 
 // The storage provide provides the following gateway:

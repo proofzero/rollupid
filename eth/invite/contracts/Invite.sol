@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.12;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
@@ -66,8 +66,21 @@ contract ThreeId_Invitations is
      * Returns:
      *   the address of the signer
      */
-    function _recoverVoucherSigner(NFTVoucher memory voucher) public pure returns(address) {
-        return ECDSA.recover(ECDSA.toEthSignedMessageHash(voucher.messageHash), voucher.signature);
+    function _recoverVoucherSigner(NFTVoucher memory voucher) public returns(address) {
+        // See https://forum.openzeppelin.com/t/casting-an-address-to-string-solidity-8-0/25817/2
+        string memory recipient = Strings.toHexString(uint256(uint160(voucher.recipient)), 20);
+
+        // See https://docs.soliditylang.org/en/v0.8.12/types.html#string-concat
+        string memory message = string.concat(recipient, voucher.uri);
+        string memory ethMessage = string.concat("\x19Ethereum Signed Message:\n", Strings.toString(bytes(message).length), message);
+        console.log('message: ', ethMessage);
+
+        // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
+        // And https://docs.openzeppelin.com/contracts/2.x/utilities#checking_signatures_on_chain
+        // But https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA-toEthSignedMessageHash-bytes-
+        // So:
+        bytes32 digest = keccak256(bytes(ethMessage)); //ECDSA.toEthSignedMessageHash(bytes(message));
+        return ECDSA.recover(digest, voucher.signature);
     }
 
     /**
