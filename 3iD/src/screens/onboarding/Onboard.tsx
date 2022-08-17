@@ -1,9 +1,10 @@
 import Constants from "expo-constants";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { View, Text, Image, Pressable, Touchable } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import useAccount from "../../hooks/account";
-import { getFunnelState } from "../../provider/kubelt";
+import { getSDK } from "../../provider/kubelt";
+import { getFunnelState } from "../../services/threeid";
 
 import Layout from "../AuthLayout";
 
@@ -11,6 +12,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
   const account = useAccount();
 
   const [canMint, setCanMint] = useState(false);
+
   const [steps] = useState<
     {
       title: string;
@@ -48,13 +50,17 @@ export default function Onboard({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      const funnelState = await getFunnelState();
+      const sdk = await getSDK();
+
+      const funnelState = await getFunnelState(sdk);
       if (!funnelState.mint) {
         setCanMint(true);
       }
     };
 
-    asyncFn();
+    if (account) {
+      asyncFn();
+    }
   }, []);
 
   return (
@@ -826,8 +832,8 @@ export default function Onboard({ navigation }: { navigation: any }) {
                   >
                     Kubelt
                   </a>
-                  , a decentralized application platform, and is inspired by Web3
-                  and the digital identity specification. Instead of
+                  , a decentralized application platform, and is inspired by
+                  Web3 and the digital identity specification. Instead of
                   applications centralizing user data, 3ID users like yourself
                   will be able to permission/revoke applications to access
                   personal data, messages and more. Our goal is to eliminate

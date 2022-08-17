@@ -1,25 +1,11 @@
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Link, useNavigationState } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-
-import {
-  Image,
-  ScrollView,
-  View,
-  Text,
-  Pressable,
-  SafeAreaView,
-} from "react-native";
 import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
-import useSDKAuth from "../hooks/sdkAuth";
-import {
-  authenticate,
-  isAuthenticated,
-  kbGetClaims,
-  threeIdGetProfile,
-} from "../provider/kubelt";
 import { connect, forceAccounts } from "../provider/web3";
+import { Image, ScrollView, View, Text } from "react-native";
+import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
 
 const SideMenuItem = ({
   title,
@@ -128,7 +114,6 @@ export default function Layout({
   const [nickname, setNickname] = useState<string | undefined>();
 
   const account = useAccount();
-  const sdkAuth = useSDKAuth();
 
   const navRoutes = useNavigationState((state) => state.routes);
   const navIndex = useNavigationState((state) => state.index);
@@ -168,7 +153,7 @@ export default function Layout({
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          return claimsRedirect(claim);
+          claimsRedirect(claim);
         } else {
           navigation.navigate("Landing");
         }
@@ -178,7 +163,7 @@ export default function Layout({
     if (account) {
       asyncFn();
     }
-  }, [account, sdkAuth]);
+  }, [account]);
 
   useEffect(() => {
     const asyncFn = async () => {

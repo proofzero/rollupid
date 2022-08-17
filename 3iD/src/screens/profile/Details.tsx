@@ -4,12 +4,15 @@ import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
 
 import useAccount from "../../hooks/account";
 import Layout from "../AuthLayout";
-import { threeIdGetProfile, threeIdSetProfile } from "../../provider/kubelt";
-import { Profile } from "../../types/Profile";
 
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import useSDKAuth from "../../hooks/sdkAuth";
+import { Profile } from "../../services/threeid/types";
+import {
+  fetchProfile,
+  setProfile as updateProfile,
+} from "../../services/threeid";
+import { getSDK, isAuthenticated } from "../../provider/kubelt";
 
 export default function Details({
   children,
@@ -56,13 +59,14 @@ export default function Details({
   }, []);
 
   const account = useAccount();
-  const sdkAuth = useSDKAuth();
 
   useEffect(() => {
     const asyncFn = async () => {
-      if (sdkAuth && account) {
+      if (account && (await isAuthenticated(account))) {
         try {
-          const persistedProfile = await threeIdGetProfile();
+          const sdk = await getSDK();
+
+          const persistedProfile = await fetchProfile(sdk);
           const patchedProfile = { ...profile, ...persistedProfile };
 
           setProfile(patchedProfile);
@@ -81,16 +85,18 @@ export default function Details({
     };
 
     asyncFn();
-  }, [account, sdkAuth]);
+  }, [account]);
 
   const saveAllChanges = async (profile: Profile, setProfile: Function) => {
     if (!account) {
       console.warn("No account found");
     }
 
-    if (sdkAuth) {
+    if (await isAuthenticated(account)) {
       try {
-        const persistedProfile = await threeIdSetProfile(profile);
+        const sdk = await getSDK();
+
+        const persistedProfile = await setProfile(sdk, profile);
         const jsonProfile = JSON.stringify(persistedProfile);
 
         setProfile(persistedProfile);
@@ -136,7 +142,7 @@ export default function Details({
 
           <Pressable
             style={styles.button}
-            onPress={() => saveAllChanges(profile, setProfile)}
+            onPress={() => saveAllChanges(profile, updateProfile)}
           >
             <Text testID="details-save-all-changes" style={styles.textButton}>
               {" "}

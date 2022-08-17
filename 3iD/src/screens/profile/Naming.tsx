@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   Text,
-  TextInput,
   View,
-  Button,
   Image,
   Pressable,
   FlatList,
@@ -13,14 +11,14 @@ import {
 import Layout from "../Layout";
 
 import useAccount from "../../hooks/account";
+import { connect, forceAccounts } from "../../provider/web3";
+import { tickFunnelStep } from "../../services/threeid";
 import {
   authenticate,
+  getSDK,
   isAuthenticated,
   purge,
-  threeIdGetEns,
-  tickFunnelStep,
 } from "../../provider/kubelt";
-import { connect, forceAccounts } from "../../provider/web3";
 
 const PanelHead = () => (
   <>
@@ -266,26 +264,21 @@ export default function Naming({ navigation }: any) {
   const account = useAccount();
 
   const fetchEns = async () => {
-    const ensRes = await threeIdGetEns();
-
-    if (ensRes) {
-      setEns(ensRes);
-    } else {
-      setEns([]);
-    }
-
     setScreen("select");
   };
 
   const goToSettings = async () => {
-    await tickFunnelStep("naming");
+    const sdk = await getSDK();
+
+    await tickFunnelStep(sdk, "naming");
+
     navigation.navigate("Onboard");
   };
 
   useEffect(() => {
     if (account === null) {
       // User maybe disconnected in the process
-      return navigation.navigate("Landing");
+      navigation.navigate("Landing");
     }
 
     const asyncFn = async () => {
@@ -304,7 +297,7 @@ export default function Naming({ navigation }: any) {
         } else {
           purge();
 
-          return navigation.navigate("Landing");
+          navigation.navigate("Landing");
         }
       }
     };

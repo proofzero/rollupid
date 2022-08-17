@@ -5,16 +5,15 @@ import Layout from "../Layout";
 
 import { Feather } from "@expo/vector-icons";
 import useAccount from "../../hooks/account";
+import { connect, forceAccounts, sign } from "../../provider/web3";
+import { GenPfPRes } from "../../services/threeid/types";
+import { genPfP, tickFunnelStep } from "../../services/threeid";
 import {
   authenticate,
-  GenPfPRes,
+  getSDK,
   isAuthenticated,
   purge,
-  threeIdGenPfP,
-  threeIdMint,
-  tickFunnelStep,
 } from "../../provider/kubelt";
-import { connect, forceAccounts, sign } from "../../provider/web3";
 
 const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
   const regex = /(bafy\w*)/;
@@ -302,7 +301,9 @@ const Progress = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => (
 const Success = ({ genPfPRes }: { genPfPRes: GenPfPRes }) => {
   useEffect(() => {
     const asyncFn = async () => {
-      await tickFunnelStep("mint");
+      const sdk = await getSDK();
+
+      await tickFunnelStep(sdk, "mint");
     };
 
     asyncFn();
@@ -433,15 +434,19 @@ export default function Mint({ navigation }: any) {
   const [genPfPRes, setGenPfPRes] = React.useState<GenPfPRes>();
 
   const skipMinting = async () => {
-    await tickFunnelStep("mint");
+    const sdk = await getSDK();
+
+    await tickFunnelStep(sdk, "mint");
 
     navigation.navigate("Settings");
   };
 
-  const genPfP = async () => {
+  const genMintPfP = async () => {
+    const sdk = await getSDK();
+
     const provider = await connect();
 
-    const pfpRes = await threeIdGenPfP(provider);
+    const pfpRes = await genPfP(provider, sdk);
 
     setGenPfPRes(pfpRes);
   };
@@ -456,10 +461,8 @@ export default function Mint({ navigation }: any) {
 
       setScreen("progress");
 
-      const mintRes = await threeIdMint(signedVoucher);
-      if (!mintRes) {
-        throw new Error();
-      }
+      // Await 1.5 seconds
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       setScreen("success");
     } catch (e) {
@@ -485,7 +488,7 @@ export default function Mint({ navigation }: any) {
 
     const asyncFn = async () => {
       if (await isAuthenticated(account)) {
-        await genPfP();
+        await genMintPfP();
       } else {
         const provider = await connect();
 
@@ -495,7 +498,7 @@ export default function Mint({ navigation }: any) {
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
-          await genPfP();
+          await genMintPfP();
         } else {
           purge();
 
