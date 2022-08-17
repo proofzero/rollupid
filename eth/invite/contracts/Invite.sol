@@ -80,6 +80,9 @@ contract ThreeId_Invitations is
         // But https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA-toEthSignedMessageHash-bytes-
         // So:
         bytes32 digest = keccak256(bytes(ethMessage)); //ECDSA.toEthSignedMessageHash(bytes(message));
+
+        // TODO: Security vulnerability -- need to reconstruct the hash here to check the sig.
+        // Otherwise a voucher with a modified hash could recover the operator address.
         //return ECDSA.recover(digest, voucher.signature);
         return ECDSA.recover(voucher.messageHash, voucher.signature);
     }
