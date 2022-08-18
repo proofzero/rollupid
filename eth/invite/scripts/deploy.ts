@@ -19,7 +19,7 @@ const ZERO_VOUCHER = {
   recipient: '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52',
   uri: 'ipfs://bafyreic6i6iex32g6zpsk4njyjfmhttjxfh436apluuzs4xw6rz2oepvzq/metadata.json',
   tokenId: '1',
-  signature: '0x34db134dc0147df7e67ecc6a70e4e886b2984a869436b2f04fef5903a6a961481f3af5ab3d1efe865d1edc52ba7b8aa46def71bc8f2d7e5a7f57c5207141587d1c'
+  signature: '0x6cebf68fea96bbf402b63c1e686798adf189cf061a8cb873b102d8a36e6d2ec4315d9e1f0ab7a66bd804d3b3be0c62e9007f843b8c41c6473aa1a3e7339233a41b'
 }
 
 // The storage provide provides the following gateway:
