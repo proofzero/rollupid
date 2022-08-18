@@ -506,17 +506,17 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // matching hash.
 
     // TODO: Get the signer from config somewhere (secrets?)
-    const signer = (await hre.ethers.getSigners())[9];
+    const [_, operator] = await hre.ethers.getSigners();
 
     // TODO: const domain = await owner.domain owner._signingDomain()
     const message = voucher.recipient+voucher.uri;
     console.log('message: ' + message)
   
     voucher.messageHash = await hre.ethers.utils.hashMessage(message)
-    voucher.signature = await signer.signMessage(message)
+    voucher.signature = await operator.signMessage(message)
 
     const recoveryAddress = await hre.ethers.utils.recoverAddress(voucher.messageHash, voucher.signature)
-    console.log('Sanity check:\n\n\t%s\n\t%s\n', signer.address, recoveryAddress)
+    console.log('Sanity check:\n\n\t%s\n\t%s\n', operator.address, recoveryAddress)
 
     console.log('signed voucher: ', voucher);
     return voucher
@@ -623,7 +623,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_GOERLI.wallet.privateKey,
+        NET_GOERLI.wallet.ownerKey,
+        NET_GOERLI.wallet.operatorKey,
       ],
     },
     mainnet: {
@@ -634,7 +635,7 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MAINNET.wallet.privateKey,
+        NET_MAINNET.wallet.ownerKey,
       ],
     }
   },
