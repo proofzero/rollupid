@@ -488,16 +488,31 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
 task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("account", "The account address")
   .addParam("tokenUri", "The token URI")
+  .addParam("invite", "The invitation number to award")
   .setAction(async (taskArgs, hre) => {
     const recipient = taskArgs.account;
     const uri = taskArgs.tokenUri;
+    const tokenId = taskArgs.invite;
 
-    const voucher = {
-      recipient,
-      uri,
-      messageHash: "",
-      signature: ""
-    };
+    const [_, operator] = await hre.ethers.getSigners();
+
+    // TODO: const domain = await owner.domain owner._signingDomain()
+
+    // See https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
+    //const message = hre.ethers.utils.defaultAbiCoder.encode([ "string", "string" ], [ voucher.recipient, voucher.uri ]);
+
+    // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
+    const message = hre.ethers.utils.solidityKeccak256([ "address", "string", "uint" ], [ recipient, uri, tokenId ]);
+    // const message = voucher.recipient+voucher.uri;
+    console.log('message: ' + message)
+    console.log('message: ' + message.length)
+
+    // 32 bytes of data in Uint8Array
+    const messageHashBinary = hre.ethers.utils.arrayify(message);
+    console.log('messageHashBinary.length: ' + messageHashBinary.length)
+
+    // voucher.messageHash = message //hre.ethers.utils.keccak256(message);
+    // console.log("PayloadHash:", voucher.messageHash);
 
     // NB: A signed message is prefixed with "\x19Ethereum Signed
     // Message:\n" and the length of the message, using the hashMessage
@@ -505,18 +520,32 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // address in Solidity, this prefix will be required to create a
     // matching hash.
 
-    // TODO: Get the signer from config somewhere (secrets?)
-    const [_, operator] = await hre.ethers.getSigners();
+    // See https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
+    // 66 byte string, which represents 32 bytes of data
+    //const messageHash = hre.ethers.utils.solidityKeccak256(['string'], [message]);
 
-    // TODO: const domain = await owner.domain owner._signingDomain()
-    const message = voucher.recipient+voucher.uri;
-    console.log('message: ' + message)
-  
-    voucher.messageHash = await hre.ethers.utils.hashMessage(message)
-    voucher.signature = await operator.signMessage(message)
+    // 32 bytes of data in Uint8Array
+    // const messageHashBinary = hre.ethers.utils.arrayify(voucher.messageHash);
 
-    const recoveryAddress = await hre.ethers.utils.recoverAddress(voucher.messageHash, voucher.signature)
-    console.log('Sanity check:\n\n\t%s\n\t%s\n', operator.address, recoveryAddress)
+    // To sign the 32 bytes of data, make sure you pass in binary
+
+    const voucher = {
+      recipient,
+      uri,
+      tokenId,
+      messageHash: messageHashBinary,
+      signature: await operator.signMessage(messageHashBinary)
+    };
+
+    // voucher.messageHash = await hre.ethers.utils.hashMessage(message)
+    // console.log('messageHash: ' + voucher.messageHash)
+    // console.log(voucher.messageHash.length)
+    // voucher.signature = await operator.signMessage(message)
+    // console.log(voucher.signature.length)
+
+    // https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475990764
+    const recoveryAddress = await hre.ethers.utils.verifyMessage(messageHashBinary, voucher.signature)//await hre.ethers.utils.hashMessage(message), voucher.signature)
+    console.log('\nSanity check. These should be equal:\n\t%s\n\t%s\n', operator.address, recoveryAddress)
 
     console.log('signed voucher: ', voucher);
     return voucher
@@ -591,7 +620,6 @@ task("invite:award", "Mint an invite for an account")
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
-      tokenUri: publishResult.url,
       voucher,
     });
 

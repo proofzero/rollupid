@@ -9,17 +9,17 @@ import { ethers } from "hardhat";
 const MAX_INVITES = 10000;
 
 // The metadata.json URL of invitation #0000, which is reserved: call invite:premint and enter here.
-const META_URL = "ipfs://bafyreibtpfdfb7jnx5kmxcrzizasgcxwssk5ljeb7vpp32wyphbqwmvrbi/metadata.json"
+//const META_URL = "ipfs://bafyreibtpfdfb7jnx5kmxcrzizasgcxwssk5ljeb7vpp32wyphbqwmvrbi/metadata.json"
 
 // The chain address of the operator account for the invitation system.
 const OPERATOR_ADDRESS = "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720"
 
 // The voucher for invitation zero: call invite:sign-voucher and enter here.
 const ZERO_VOUCHER = {
-  recipient: '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
-  uri: 'ipfs://bafyreibtpfdfb7jnx5kmxcrzizasgcxwssk5ljeb7vpp32wyphbqwmvrbi/metadata.json',
-  messageHash: '0x3dce924c5cd6068392d58730858863fe5cdf7a5f5b47971f4f09798d506ef53e',
-  signature: '0x45a5014865d4b985ea5e55f95d5bcd19b596346e6c95dc502eddc345f07ee42643440945b3b6abfcc390687235a4bd493e7122a506bca36fe6a6473fee3603561c'
+  recipient: '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52',
+  uri: 'ipfs://bafyreic6i6iex32g6zpsk4njyjfmhttjxfh436apluuzs4xw6rz2oepvzq/metadata.json',
+  tokenId: '1',
+  signature: '0x34db134dc0147df7e67ecc6a70e4e886b2984a869436b2f04fef5903a6a961481f3af5ab3d1efe865d1edc52ba7b8aa46def71bc8f2d7e5a7f57c5207141587d1c'
 }
 
 // The storage provide provides the following gateway:
@@ -27,7 +27,7 @@ const ZERO_VOUCHER = {
 
 async function main() {
   const Invite = await ethers.getContractFactory("ThreeId_Invitations");
-  const invite = await Invite.deploy(OPERATOR_ADDRESS, MAX_INVITES, META_URL, ZERO_VOUCHER);
+  const invite = await Invite.deploy(OPERATOR_ADDRESS, MAX_INVITES, ZERO_VOUCHER);
 
   await invite.deployed();
 
