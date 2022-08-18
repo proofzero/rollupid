@@ -18,23 +18,41 @@ export const getAccountObs = () => {
   return accountSubj.asObservable();
 };
 
+const handleChainChanged = async (network: string) => {
+  if (network) {
+    // We want to be only on ethereum mainnet
+    if (network !== "0x1") {
+      window.alert("Please do not switch the network");
+      clearAccount();
+    }
+    console.warn(`WEB3: Another chain detected`);
+  }
+};
+
 const handleAccountsChanged = async (accounts: string[]) => {
   if (accounts.length > 0) {
     try {
       const provider = await connect();
       const account = await provider.getSigner().getAddress();
-
-      // We want to make sure that the used account
-      // is the same as the signer account;
-      // Getting address via signer will generate
-      // a properly cased address string.
-      if (account.toLowerCase() === accounts[0].toLowerCase()) {
-        // We don't want to force unnecessary refreshes
-        // to subscribers so we don't update
-        // unless the value changed
-        if (account !== accountSubj.getValue()) {
-          accountSubj.next(account);
+      const network = (await provider.getNetwork()).name;
+      // We want to be only on ethereum mainnet
+      if (network === "homestead") {
+        // We want to make sure that the used account
+        // is the same as the signer account;
+        // Getting address via signer will generate
+        // a properly cased address string.
+        if (account.toLowerCase() === accounts[0].toLowerCase()) {
+          // We don't want to force unnecessary refreshes
+          // to subscribers so we don't update
+          // unless the value changed
+          if (account !== accountSubj.getValue()) {
+            accountSubj.next(account);
+          }
         }
+      } else {
+        window.alert(
+          `You are currently on ${network}. Please switch your network to mainnet. `
+        );
       }
     } catch (e) {
       console.error(`WEB3: ${e}`);
@@ -47,6 +65,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
 };
 
 eth?.on("accountsChanged", handleAccountsChanged);
+eth?.on("chainChanged", handleChainChanged);
 
 /**
  * General purpose method that can be used throughout to get access to the current web3 provider.
