@@ -502,7 +502,7 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
     // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
     const message = hre.ethers.utils.solidityKeccak256([ "address", "string", "uint" ], [ recipient, uri, tokenId ]);
-    console.log('message: ' + message)
+    // console.log('message: ' + message)
     // console.log('message: ' + message.length)
 
     // 32 bytes of data in Uint8Array

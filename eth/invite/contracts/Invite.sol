@@ -85,19 +85,21 @@ contract ThreeId_Invitations is
      *   the invite (token) identifier
      */
     function awardInvite(address invitee, NFTVoucher memory voucher) public returns(uint256) {
-        // make sure signature is valid and get the address of the signer
+
+        // Make sure the voucher and signature are valid and get the address of the signer.
         address signer = _recoverVoucherSigner(voucher);
         console.log('\nSanity check. At deployment these should all be equal:\noperator:\t\t%s\ninvitee\t\t%s\nsigner\t\t%s', _operator, invitee, signer);
 
         // make sure that the signer is authorized to mint NFTs
         require(hasRole(MINTER_ROLE, signer), "Signature invalid or unauthorized!");
 
-        // make sure that the redeemer is the same as the receipient
+        // Make sure that the redeemer is the same as the receipient
         require(invitee == voucher.recipient, "Invalid recipient!");
         
         // NB: invitation #0000 is reserved, user allocated range is
         // #0001 to #_maxInvites.
         uint256 inviteId = _inviteIds.current();
+        require(voucher.tokenId == inviteId, 'Please request invitations in sequence.');
         require(inviteId <= _maxInvites, "All invitations have been awarded!");
 
         _safeMint(invitee, inviteId);
