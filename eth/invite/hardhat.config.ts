@@ -35,7 +35,7 @@ const OUTPUT_DIR = path.resolve("outputs");
 
 // In case we do multiple issues of invitations, we'll assign a unique
 // name to each issue.
-const INVITE_TIER = "generation#0";
+const INVITE_TIER = "Gen Zero";
 
 // Chain IDs are added to hardhat configuration to perform an additional
 // bit of validation that you're talking to the network you think you're
@@ -287,8 +287,8 @@ subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
     };
 
     const metadata = {
-      name: `3iD invite #${inviteId}`,
-      description: `${titleCase(inviteTier)} invitation to threeid.xyz`,
+      name: `3ID Invite #${inviteId}`,
+      description: `${titleCase(inviteTier)} 3ID Invite`,
       image: new File(
         [await fs.promises.readFile(outputFile)],
         baseName,
@@ -490,7 +490,8 @@ task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("tokenUri", "The token URI")
   .addParam("invite", "The invitation number to award")
   .setAction(async (taskArgs, hre) => {
-    const recipient = taskArgs.account;
+    // This lets us use an account alias from secret.ts to sign a voucher.
+    const recipient = await hre.run("config:account", { account: taskArgs.account });
     const uri = taskArgs.tokenUri;
     const tokenId = taskArgs.invite;
 

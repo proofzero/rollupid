@@ -13,10 +13,10 @@ const MAX_INVITES = 10000;
 
 // The voucher for invitation zero: call invite:sign-voucher and enter here.
 const ZERO_VOUCHER = {
-  recipient: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
-  uri: 'ipfs://bafyreic6i6iex32g6zpsk4njyjfmhttjxfh436apluuzs4xw6rz2oepvzq/metadata.json',
+  recipient: '0x274a8B441c231902aED4e2Fc8BaCBcfA16724fcD',
+  uri: 'ipfs://bafyreicxylzvdmwbwpjk3qmk4rwbbpslzvcsyjttgetw7er2yhfpnajwq4/metadata.json',
   tokenId: '0',
-  signature: '0xeab3db9d19dc3361bde9ec7dab75ecd2c6b7041dbd1ac999e1c675051720431b40651cb004bc80f96e7ffdf51b98366d40ff13bad0ba8a8a15b7655eefdb17e01c'
+  signature: '0x19da142c79270cab7c983a45a567c833c18213bbee225f9a8204915ed5441ad77f402b69c701170d7cec3bfb04f13696ed910474289a692ed577c6c3202fa3861c'
 };
 
 // The storage provide provides the following gateway:
