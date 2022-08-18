@@ -16,7 +16,6 @@ const ZERO_VOUCHER = {
   recipient: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
   uri: 'ipfs://bafyreic6i6iex32g6zpsk4njyjfmhttjxfh436apluuzs4xw6rz2oepvzq/metadata.json',
   tokenId: '0',
-  // messageHash: '0x8fa41d327008cad3bf07a51a017d252f5428c646d94832f015415c8cbaf1d482',
   signature: '0xeab3db9d19dc3361bde9ec7dab75ecd2c6b7041dbd1ac999e1c675051720431b40651cb004bc80f96e7ffdf51b98366d40ff13bad0ba8a8a15b7655eefdb17e01c'
 };
 
