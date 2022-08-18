@@ -164,13 +164,14 @@ subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("tokenUri", "The URI to set for the invitation")
   .addParam("voucher", "The signed voucher")
   .setAction(async (taskArgs, hre) => {
-    const account = taskArgs.account;
+    const account = await hre.run("config:account", { account: taskArgs.account });
     const contract = taskArgs.contract;
     const tokenURI = taskArgs.tokenUri;
-    const voucher = taskArgs.voucher;
+    // HAXX
+    const voucher = JSON.parse(taskArgs.voucher);
 
     const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
-    return invite.awardInvite(account, tokenURI, voucher);
+    return invite.awardInvite(account, voucher);
   });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
@@ -600,13 +601,15 @@ task("invite:award", "Mint an invite for an account")
     const voucher = await hre.run("invite:sign-voucher", {
       account,
       tokenUri: publishResult.url,
+      invite: inviteId,
     });
 
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
-      voucher,
+      tokenUri: publishResult.url,
+      voucher: JSON.stringify(voucher),
     });
 
     console.log(chalk.red("AWARDED INVITE"));
