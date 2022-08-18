@@ -312,8 +312,7 @@
    :depends [test:sdk:cljs:develop
              test:sdk:js:develop
              test:web:develop
-             test:sdk-web:develop
-             test:starbase:develop]}
+             test:sdk-web:develop]}
 
   test:all:release
   {:doc "Build and test all release"
