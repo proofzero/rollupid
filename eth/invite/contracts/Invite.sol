@@ -16,7 +16,7 @@ struct NFTVoucher {
   address recipient;
   string uri;
   uint tokenId;
-  string messageHash;
+//   string messageHash;
   bytes signature;
 }
 
@@ -66,10 +66,10 @@ contract ThreeId_Invitations is
      * Returns:
      *   the address of the signer
      */
-    function _recoverVoucherSigner(NFTVoucher memory voucher) public view returns(address) {
+    function _recoverVoucherSigner(NFTVoucher memory voucher) public pure returns(address) {
         bytes32 messageHash = keccak256(abi.encodePacked(voucher.recipient, voucher.uri, voucher.tokenId));
-        console.log('got  message', Strings.toHexString(uint256(messageHash)));
-        console.log('want message', voucher.messageHash);
+        // console.log('got  message', Strings.toHexString(uint256(messageHash)));
+        // console.log('want message', voucher.messageHash);
 
         bytes32 ethMessage = ECDSA.toEthSignedMessageHash(messageHash);
         return ECDSA.recover(ethMessage, voucher.signature);
@@ -88,12 +88,12 @@ contract ThreeId_Invitations is
 
         // Make sure the voucher and signature are valid and get the address of the signer.
         address signer = _recoverVoucherSigner(voucher);
-        console.log('\nSanity check. At deployment these should all be equal:\noperator:\t\t%s\ninvitee\t\t%s\nsigner\t\t%s', _operator, invitee, signer);
+        // console.log('\nSanity check. At deployment these should all be equal:\noperator:\t\t%s\ninvitee\t\t%s\nsigner\t\t%s', _operator, invitee, signer);
 
-        // make sure that the signer is authorized to mint NFTs
+        // Make sure that the signer is authorized to mint NFTs.
         require(hasRole(MINTER_ROLE, signer), "Signature invalid or unauthorized!");
 
-        // Make sure that the redeemer is the same as the receipient
+        // Make sure that the redeemer is the same as the receipient.
         require(invitee == voucher.recipient, "Invalid recipient!");
         
         // NB: invitation #0000 is reserved, user allocated range is

@@ -524,7 +524,7 @@ task("invite:sign-voucher", "Sign an invite voucher")
       recipient,
       uri,
       tokenId,
-      messageHash: message,
+      // messageHash: message,
       signature
     };
 
