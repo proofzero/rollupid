@@ -16,7 +16,7 @@ struct NFTVoucher {
   address recipient;
   string uri;
   uint tokenId;
-//   bytes32 messageHash;
+  string messageHash;
   bytes signature;
 }
 
@@ -66,59 +66,13 @@ contract ThreeId_Invitations is
      * Returns:
      *   the address of the signer
      */
-    function _recoverVoucherSigner(NFTVoucher memory voucher) public returns(address) {
-
-//     const message = hre.ethers.utils.solidityKeccak256([ "string", "string", "uint" ], [ recipient, uri, tokenId ]);
-
-        //bytes32 payloadHash = keccak256(abi.encodePacked(recipient, voucher.uri));
+    function _recoverVoucherSigner(NFTVoucher memory voucher) public view returns(address) {
         bytes32 messageHash = keccak256(abi.encodePacked(voucher.recipient, voucher.uri, voucher.tokenId));
-        console.log('message', Strings.toHexString(uint256(messageHash)));
-        console.log('message.length', messageHash.length);
-        // bytes32 messageHash = ECDSA.toEthSignedMessageHash(message);
-        
-        // //bytes(string.concat(voucher.recipient, voucher.uri, voucher.tokenId));
+        console.log('got  message', Strings.toHexString(uint256(messageHash)));
+        console.log('want message', voucher.messageHash);
 
-        // // See https://forum.openzeppelin.com/t/casting-an-address-to-string-solidity-8-0/25817/2
-        // string memory recipient = Strings.toHexString(uint256(uint160(voucher.recipient)), 20);
-
-        // // See https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475990764
-        // bytes memory message = bytes(string.concat(recipient, voucher.uri));
-        // bytes32 payloadHash = keccak256(abi.encodePacked(recipient, voucher.uri));
-        // //bytes32 payloadHash = keccak256(string.concat(voucher.recipient, voucher.uri));
-        //bytes32 ethMessage = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", messageHash));
         bytes32 ethMessage = ECDSA.toEthSignedMessageHash(messageHash);
-        // console.log('messageHash in :\t', Strings.toHexString(uint256(voucher.messageHash)));
-        // console.log('messageHash out:\t', Strings.toHexString(uint256(messageHash)));
-
-
-        // //ecrecover(messageHash, v, r, s)
-
-
         return ECDSA.recover(ethMessage, voucher.signature);
-
-        // // See https://forum.openzeppelin.com/t/casting-an-address-to-string-solidity-8-0/25817/2
-        // string memory recipient = Strings.toHexString(uint256(uint160(voucher.recipient)), 20);
-        // console.log('recipient:\t', recipient);
-
-        // // See https://docs.soliditylang.org/en/v0.8.12/types.html#string-concat
-        // string memory message = string.concat(recipient, voucher.uri);
-        // console.log('message:\t', message);
-
-        // string memory ethMessage = string.concat("\x19Ethereum Signed Message:\n32", Strings.toHexString(uint256(keccak256(bytes(message)))));
-        // bytes32 messageHash = keccak256(bytes(ethMessage));
-        // console.log('messageHash out:\t', Strings.toHexString(uint256(messageHash)));
-        // console.log('messageHash in :\t', Strings.toHexString(uint256(voucher.messageHash)));
-
-        // // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
-        // // And https://docs.openzeppelin.com/contracts/2.x/utilities#checking_signatures_on_chain
-        // // But https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA-toEthSignedMessageHash-bytes-
-        // // So:
-        // // bytes32 digest = keccak256(bytes(ethMessage)); //ECDSA.toEthSignedMessageHash(bytes(message));
-        // // return ECDSA.recover(digest, voucher.signature);
-        // return ECDSA.recover(messageHash, voucher.signature);
-        // // TODO: Security vulnerability -- need to reconstruct the hash here to check the sig.
-        // // Otherwise a voucher with a modified hash could recover the operator address.
-        // //return ECDSA.recover(voucher.messageHash, voucher.signature);
     }
 
     /**
