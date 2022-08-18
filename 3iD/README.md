@@ -95,3 +95,17 @@ In case the `bb publish:site` task doesn't work on your windows configuration,
 deployment can be done through `wrangler` inside the `./worker` folder.
 
 `wrangler publish -c .\wrangler.toml --env <dev|next|current>`
+
+### Cache Busting
+
+Post-deployment we might need to bust cache. tl;dr: [click "Purge Everything" on this screen.](https://dash.cloudflare.com/2906425795180ede5ac707178f96406d/threeid.xyz/caching/configuration)
+
+#### Instructions
+
+1. Log in to Cloudflare with the account that owns the domain (ie, threeid.xyz).
+1. If needed, select "Websites" in the menubar on the left.
+1. Select the domain (ie, threeid.xyz).
+1. Under "Quick Actions" in the menubar on the **right** select "Purge Cache".
+1. Click "Purge Everything".
+1. Confirm "Purge Everything".
+1. Wait 30 sections.
