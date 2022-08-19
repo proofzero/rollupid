@@ -11,12 +11,13 @@ const MAX_INVITES = 10000;
 // The metadata.json URL of invitation #0000, which is reserved: call invite:premint and enter here.
 //const META_URL = "ipfs://bafyreibtpfdfb7jnx5kmxcrzizasgcxwssk5ljeb7vpp32wyphbqwmvrbi/metadata.json"
 
+// TODO: MAKE THE ZERO VOUCHER PER-NET. CURRENT: RINKEBY
 // The voucher for invitation zero: call invite:sign-voucher and enter here.
 const ZERO_VOUCHER = {
   recipient: '0x274a8B441c231902aED4e2Fc8BaCBcfA16724fcD',
-  uri: 'ipfs://bafyreicxylzvdmwbwpjk3qmk4rwbbpslzvcsyjttgetw7er2yhfpnajwq4/metadata.json',
+  uri: 'ipfs://bafyreigztfdyefyjtzg4i5fg7uokrdoj4jixvqt2r6puc7jwwatqiwfjbq/metadata.json',
   tokenId: '0',
-  signature: '0x19da142c79270cab7c983a45a567c833c18213bbee225f9a8204915ed5441ad77f402b69c701170d7cec3bfb04f13696ed910474289a692ed577c6c3202fa3861c'
+  signature: '0xffae01edf06b7448f937be16952df9fbccad3ea2db58bc739d8eaa0a8d2a4e4966a7431f791a5b9c263cf09cf894b3f94f01dded1a306d08758312b0863097c61c'
 };
 
 // The storage provide provides the following gateway:

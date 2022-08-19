@@ -21,6 +21,7 @@ import {
   NET_LOCALHOST,
   NET_GOERLI,
   NET_MAINNET,
+  NET_RINKEBY,
 } from "./secret";
 import { groupEnd } from "console";
 
@@ -41,6 +42,7 @@ const INVITE_TIER = "Gen Zero";
 // bit of validation that you're talking to the network you think you're
 // talking to.
 const MAINNET_CHAIN_ID = 1;
+const RINKEBY_CHAIN_ID = 4;
 const GOERLI_CHAIN_ID = 5;
 
 // SUBTASKS
@@ -68,6 +70,9 @@ subtask("network:config", "Return network-specific configuration map")
         break;
       case "goerli":
         return NET_GOERLI;
+        break;
+      case "rinkeby":
+        return NET_RINKEBY;
         break;
       case "mainnet":
         return NET_MAINNET;
@@ -388,6 +393,8 @@ task("invite:maximum", "Return maximum number of invites")
 task("invite:next", "Return ID of next invite that will be awarded")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
+    console.log(hre.ethers.utils.solidityKeccak256([ "string" ], [ "MINTER_ROLE" ]))
+    // console.log(hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("MINTER_ROLE")));
     const contract = await hre.run("config:contract", { contract: taskArgs.contract });
     const nextInvite = await hre.run("call:nextInvite", { contract });
 
@@ -541,6 +548,16 @@ task("invite:sign-voucher", "Sign an invite voucher")
     return voucher
 })
 
+task("contract:destroy", "Send the selfdestruct message to a given contract")
+  .addOptionalParam("contract", "The invite contract address")
+  .addParam("account", "The account address to which we transfer contract contents")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const account = await hre.run("config:account", { account: taskArgs.account });
+    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    return invite.destructor(account);
+  })
+
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address")
@@ -647,7 +664,18 @@ const config: HardhatUserConfig = {
         NET_GOERLI.wallet.operatorKey,
       ],
     },
-    mainnet: {
+    rinkeby: {
+      // For optional validation.
+      chainId: RINKEBY_CHAIN_ID,
+      url: NET_RINKEBY.alchemy.appURL,
+      // Account to use as the default sender. If not supplied, the
+      // first account of the node is used.
+      //from: "",
+      accounts: [
+        NET_RINKEBY.wallet.ownerKey,
+        NET_RINKEBY.wallet.operatorKey,
+      ],
+    },    mainnet: {
       // For optional validation.
       chainId: MAINNET_CHAIN_ID,
       url: NET_MAINNET.alchemy.appURL,
