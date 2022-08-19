@@ -21,6 +21,7 @@ import {
   NET_LOCALHOST,
   NET_GOERLI,
   NET_MAINNET,
+  NET_RINKEBY,
 } from "./secret";
 import { groupEnd } from "console";
 
@@ -41,6 +42,7 @@ const INVITE_TIER = "Gen Zero";
 // bit of validation that you're talking to the network you think you're
 // talking to.
 const MAINNET_CHAIN_ID = 1;
+const RINKEBY_CHAIN_ID = 4;
 const GOERLI_CHAIN_ID = 5;
 
 // SUBTASKS
@@ -68,6 +70,9 @@ subtask("network:config", "Return network-specific configuration map")
         break;
       case "goerli":
         return NET_GOERLI;
+        break;
+      case "rinkeby":
+        return NET_RINKEBY;
         break;
       case "mainnet":
         return NET_MAINNET;
@@ -647,7 +652,18 @@ const config: HardhatUserConfig = {
         NET_GOERLI.wallet.operatorKey,
       ],
     },
-    mainnet: {
+    rinkeby: {
+      // For optional validation.
+      chainId: RINKEBY_CHAIN_ID,
+      url: NET_RINKEBY.alchemy.appURL,
+      // Account to use as the default sender. If not supplied, the
+      // first account of the node is used.
+      //from: "",
+      accounts: [
+        NET_RINKEBY.wallet.ownerKey,
+        NET_RINKEBY.wallet.operatorKey,
+      ],
+    },    mainnet: {
       // For optional validation.
       chainId: MAINNET_CHAIN_ID,
       url: NET_MAINNET.alchemy.appURL,
