@@ -27,6 +27,13 @@ See the accounts registered in `secret.ts`: `npx hardhat accounts:list`
 
 See the balance in an account: `npx hardhat account:balance --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 
+## Wallet Accounts
+
+There are two named wallet accounts in `secret.ts` (retrieve this from secret storage):
+
+* `owner` -- the wallet that deploys and owns the smart contract.
+* `operator` -- the wallet that awards invitations (ie, "operates" the smart contract).
+
 ## Local Workflow
 
 With the local node running (`npx hardhat node`), try to get some invitation information:
@@ -39,7 +46,8 @@ These calls will **fail** because the contract hasn't been deployed.
 ### Deployment
 
 1. Premint the starting invitation: `npx hardhat invite:premint`
-2. Update `META_URL` in `scripts/deploy.ts` with the generated IPFS link.
+1. Use the preminted metadata to create a voucher for the operator: `npx hardhat invite:sign-voucher --invite 0 --token-uri <metadata link> --account operator`
+2. Update `ZERO_VOUCHER` in `scripts/deploy.ts` with the signed voucher.
 3. Deploy to the local node with `npx hardhat run scripts/deploy.ts`
 4. Update `secrets.ts` with the contract address for `NET_LOCALHOST`.
 
@@ -49,6 +57,8 @@ Now these calls work:
 * `npx hardhat invite:next`
 
 ### Award an Invite
+
+Note: requires that you've updated `secret.ts` with the new address (see "Deployment", above).
 
 `npx hardhat invite:award --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 
