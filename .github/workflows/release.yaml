@@ -97,6 +97,14 @@ jobs:
           bb deploy:app --deploy-env current --app-version
             ${{ env.RELEASE_VERSION }}
 
+      - name: Purge cache
+        uses: jakejarvis/cloudflare-purge-action@master
+        env:
+          # Zone is required by both authentication methods
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
       - name: run smoke tests
         working-directory: ./3iD
         env:
