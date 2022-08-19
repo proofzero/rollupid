@@ -185,7 +185,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 });
 
 jsonrpc.method('3iD_genInvite', async (ctx, next) => {
-    const inviteId = ctx.jsonrpc.params['inviteId'];
+
+    let inviteId = ctx.jsonrpc.params['inviteId'];
     const inviteTier = ctx.jsonrpc.params['inviteTier'];
     const issueDate = ctx.jsonrpc.params['issueDate'];
     const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
@@ -194,6 +195,9 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
     const baseName = path.basename(outputFile);
+
+    inviteId = inviteId.toString().padStart(4, "0");
+
 
 
     const newCard = await fs.promises.readFile(assetFile, 'utf8')
