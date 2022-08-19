@@ -3,6 +3,10 @@
 const {Blob} = require('node:buffer');
 global.Blob = Blob;
 
+const fs = require('fs');
+const path = require('path');
+const cheerio = require('cheerio');
+
 const Koa = require('koa');
 const logger = require('koa-logger');
 const Router = require('koa-router');
@@ -58,6 +62,12 @@ const METHOD_PARAMS = {
                     description: 'chain id of the blockchain'
                 }
             }
+        },
+    },
+    '3id_genInvite': {
+        'inviteId': {
+            type: 'string',
+            description: 'Invite serial number'
         },
     },
     'describe': {},
@@ -173,6 +183,87 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
       signature,
     };
 });
+
+jsonrpc.method('3iD_genInvite', async (ctx, next) => {
+    const inviteId = ctx.jsonrpc.params['inviteId'];
+    const inviteTier = ctx.jsonrpc.params['inviteTier'];
+    const issueDate = ctx.jsonrpc.params['issuedAt'];
+    const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
+    const OUTPUT_DIR = path.resolve("outputs");
+
+    await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
+    const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
+    const baseName = path.basename(outputFile);
+
+
+    const newCard = await fs.promises.readFile(assetFile, 'utf8')
+      .then(data => {
+        // Parse the SVG XML data and return a query context.
+        return cheerio.load(data, {
+          xml: {},
+        });
+      })
+      .then(($) => {
+        /*
+        <svg>
+          ...
+          <text id="ISSUED">04/20/2022</text>
+          <text id="NUMBER">#6969</text>
+        </svg>
+        */
+        // Set the issue date.
+        $('#ISSUED').text(issueDate);
+        // Set the invite identifier.
+        $('#NUMBER').text(`#${inviteId}`);
+
+        const svgText = $.root().html();
+        if (null === svgText) {
+          throw "empty SVG document generated";
+        }
+        return svgText.trim();
+      })
+      .then(svgText => {
+        return fs.promises.writeFile(outputFile, svgText);
+      })
+
+
+
+     // Utility to title-case a string.
+    const titleCase = (s) => {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    // Upload to NFT.storage.
+    const metadata = {
+        name: `3ID Invite #${inviteId}`,
+        description: `${titleCase(inviteTier)} 3ID Invite`,
+        image: new storage.File(
+            [await fs.promises.readFile(outputFile)],
+            baseName,
+            { type: 'image/svg+xml' },
+        ),
+        properties: {
+            inviteId,
+            inviteTier,
+            issueDate,
+        }
+    };
+
+    console.log("here", metadata)
+
+
+    const result = await ctx.storage.store(metadata);
+    console.log("here", result)
+
+    return {
+        // IPFS URL of the metadata
+        url: result.url,
+        // The metadata.json contents
+        metadata: result.data,
+        // metadata.json contents with IPFS gateway URLs
+        embed: result.embed(),
+      };
+})
 
 
 
