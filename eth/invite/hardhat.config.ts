@@ -22,6 +22,7 @@ import {
   NET_GOERLI,
   NET_MAINNET,
 } from "./secret";
+import { groupEnd } from "console";
 
 // definitions
 // -----------------------------------------------------------------------------
@@ -34,7 +35,7 @@ const OUTPUT_DIR = path.resolve("outputs");
 
 // In case we do multiple issues of invitations, we'll assign a unique
 // name to each issue.
-const INVITE_TIER = "generation#0";
+const INVITE_TIER = "Gen Zero";
 
 // Chain IDs are added to hardhat configuration to perform an additional
 // bit of validation that you're talking to the network you think you're
@@ -163,14 +164,17 @@ subtask("call:nextInvite", "Return the ID of next invitation")
 subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("account", "The address of the invitee")
   .addParam("contract", "The invite smart contract address")
-  .addParam("tokenURI", "The URI to set for the invitation")
+  .addParam("tokenUri", "The URI to set for the invitation")
+  .addParam("voucher", "The signed voucher")
   .setAction(async (taskArgs, hre) => {
-    const account = taskArgs.account;
+    const account = await hre.run("config:account", { account: taskArgs.account });
     const contract = taskArgs.contract;
-    const tokenURI = taskArgs.tokenURI;
+    const tokenURI = taskArgs.tokenUri;
+    // HAXX
+    const voucher = JSON.parse(taskArgs.voucher);
 
     const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
-    return invite.awardInvite(account, tokenURI);
+    return invite.awardInvite(account, voucher);
   });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
@@ -287,8 +291,8 @@ subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
     };
 
     const metadata = {
-      name: `3iD invite #${inviteId}`,
-      description: `${titleCase(inviteTier)} invitation to threeid.xyz`,
+      name: `3ID Invite #${inviteId}`,
+      description: `${titleCase(inviteTier)} 3ID Invite`,
       image: new File(
         [await fs.promises.readFile(outputFile)],
         baseName,
@@ -485,6 +489,58 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
     console.log(publishResult.url);
   });
 
+task("invite:sign-voucher", "Sign an invite voucher")
+  .addParam("account", "The account address")
+  .addParam("tokenUri", "The token URI")
+  .addParam("invite", "The invitation number to award")
+  .setAction(async (taskArgs, hre) => {
+    // This lets us use an account alias from secret.ts to sign a voucher.
+    const recipient = await hre.run("config:account", { account: taskArgs.account });
+    const uri = taskArgs.tokenUri;
+    const tokenId = taskArgs.invite;
+
+    const [_, operator] = await hre.ethers.getSigners();
+
+    // TODO: const domain = await owner.domain owner._signingDomain()
+
+    // 66 bytes of abi.encodePacked keccak256.
+    // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
+    // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
+    const message = hre.ethers.utils.solidityKeccak256([ "address", "string", "uint" ], [ recipient, uri, tokenId ]);
+    // console.log('message: ' + message)
+    // console.log('message: ' + message.length)
+
+    // 32 bytes of data in Uint8Array
+    const messageHashBinary = hre.ethers.utils.arrayify(message);
+    // console.log('messageHashBinary.length: ' + messageHashBinary.length)
+
+    // From Ethers docs:
+    // NB: A signed message is prefixed with "\x19Ethereum Signed
+    // Message:\n" and the length of the message, using the hashMessage
+    // method, so that it is EIP-191 compliant. If recovering the
+    // address in Solidity, this prefix will be required to create a
+    // matching hash.
+
+    // Sign 32 byte digest, with the above prefix.
+    const signature = await operator.signMessage(messageHashBinary);
+
+    // Construct the voucher.
+    const voucher = {
+      recipient,
+      uri,
+      tokenId,
+      // messageHash: message,
+      signature
+    };
+
+    // https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475990764
+    const recoveryAddress = await hre.ethers.utils.verifyMessage(messageHashBinary, voucher.signature)
+    console.log('\nSanity check. These should be equal:\n\t%s\n\t%s\n', operator.address, recoveryAddress)
+
+    console.log('signed voucher for deploy script: ', voucher);
+    return voucher
+})
+
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address")
@@ -534,6 +590,7 @@ task("invite:award", "Mint an invite for an account")
       assetFile,
       outputFile
     });
+
     // Publish the generated asset to our storage provider.
     const publishResult = await hre.run("invite:publish-nft-storage", {
       storageKey,
@@ -542,11 +599,20 @@ task("invite:award", "Mint an invite for an account")
       issueDate,
       outputFile,
     });
+
+    // Create and sign a voucher
+    const voucher = await hre.run("invite:sign-voucher", {
+      account,
+      tokenUri: publishResult.url,
+      invite: inviteId,
+    });
+
     // Call our contract to award the invite.
     const awardResult = await hre.run("call:awardInvite", {
       account,
       contract,
-      tokenURI: publishResult.url,
+      tokenUri: publishResult.url,
+      voucher: JSON.stringify(voucher),
     });
 
     console.log(chalk.red("AWARDED INVITE"));
@@ -564,7 +630,7 @@ task("invite:award", "Mint an invite for an account")
 
 const config: HardhatUserConfig = {
   defaultNetwork: "localhost",
-  solidity: "0.8.9",
+  solidity: "0.8.12",
   etherscan: {
     apiKey: `${ETHERSCAN.apiKey}`,
   },
@@ -577,7 +643,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_GOERLI.wallet.privateKey,
+        NET_GOERLI.wallet.ownerKey,
+        NET_GOERLI.wallet.operatorKey,
       ],
     },
     mainnet: {
@@ -588,7 +655,7 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MAINNET.wallet.privateKey,
+        NET_MAINNET.wallet.ownerKey,
       ],
     }
   },
