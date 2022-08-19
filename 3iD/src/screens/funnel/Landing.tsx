@@ -43,7 +43,7 @@ export default function Landing({ navigation }: { navigation: any }) {
   useEffect(() => {
     const asyncFn = async () => {
       if (!(await otherWalletRequested.getItem())) {
-        await forceAccounts();
+        navigation.navigate("Landing");
       }
     };
 
