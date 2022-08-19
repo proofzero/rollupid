@@ -187,7 +187,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 jsonrpc.method('3iD_genInvite', async (ctx, next) => {
     const inviteId = ctx.jsonrpc.params['inviteId'];
     const inviteTier = ctx.jsonrpc.params['inviteTier'];
-    const issueDate = ctx.jsonrpc.params['issuedAt'];
+    const issueDate = ctx.jsonrpc.params['issueDate'];
     const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
     const OUTPUT_DIR = path.resolve("outputs");
 
@@ -255,7 +255,7 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
     const result = await ctx.storage.store(metadata);
     console.log("here", result)
 
-    return {
+    ctx.body = {
         // IPFS URL of the metadata
         url: result.url,
         // The metadata.json contents
