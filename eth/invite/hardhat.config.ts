@@ -393,6 +393,8 @@ task("invite:maximum", "Return maximum number of invites")
 task("invite:next", "Return ID of next invite that will be awarded")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
+    console.log(hre.ethers.utils.solidityKeccak256([ "string" ], [ "MINTER_ROLE" ]))
+    // console.log(hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("MINTER_ROLE")));
     const contract = await hre.run("config:contract", { contract: taskArgs.contract });
     const nextInvite = await hre.run("call:nextInvite", { contract });
 
@@ -545,6 +547,16 @@ task("invite:sign-voucher", "Sign an invite voucher")
     console.log('signed voucher for deploy script: ', voucher);
     return voucher
 })
+
+task("contract:destroy", "Send the selfdestruct message to a given contract")
+  .addOptionalParam("contract", "The invite contract address")
+  .addParam("account", "The account address to which we transfer contract contents")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const account = await hre.run("config:account", { account: taskArgs.account });
+    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    return invite.destructor(account);
+  })
 
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")

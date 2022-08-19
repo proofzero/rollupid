@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 // Voucher is produced by the operator and is used to redeem the token.
@@ -16,7 +17,6 @@ struct NFTVoucher {
   address recipient;
   string uri;
   uint tokenId;
-//   string messageHash;
   bytes signature;
 }
 
@@ -26,16 +26,22 @@ struct NFTVoucher {
  */
 contract ThreeId_Invitations is
     ERC721URIStorage,
-    AccessControl 
+    AccessControl,
+    Ownable
 {
     using Counters for Counters.Counter;
     Counters.Counter private _inviteIds;
 
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
+    
     // We only allow the creation of this many invitations.
     uint private _maxInvites;
     address _operator;
+
+    // Handles disambiguation of the multiple defitions of supportsInterface in our parent contracts.
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 
     /**
      * Constructor.
@@ -45,17 +51,30 @@ contract ThreeId_Invitations is
      * @param voucher the voucher for the reserved zeroth invite
      */
     constructor(address minter, uint maxInvites, NFTVoucher memory voucher) ERC721("3ID Invitation", "3ID") {
-        _setupRole(MINTER_ROLE, minter);
+        _setupRole(OPERATOR_ROLE, minter);
         _operator = minter;
         _maxInvites = maxInvites;
+
+        console.log("OPERATOR_ROLE", Strings.toHexString(uint256(OPERATOR_ROLE)));
 
         awardInvite(_operator, voucher);
     }
 
-    // Handles disambiguation of the multiple defitions of supportsInterface in our parent contracts.
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
-        return super.supportsInterface(interfaceId);
-    }
+    /**
+     * Destructor.
+     *
+     * Gozer:
+     * Sub-creatures! Gozer the Gozerian, Gozer the Destructor, Volguus Zildrohar, the Traveller has come! Choose and perish!
+     *
+     * ---> This is an owner-only function that selfdestructs us.
+     *
+     * @param account the form of the destructor: the address that will receive contract contents.
+     *
+     */
+     function destructor(address account) public onlyOwner  {
+        require(hasRole(OPERATOR_ROLE, account), "The operator must be the destructor!");
+        selfdestruct(payable(account));
+     }
 
     /**
      * Verify the voucher signature and return the address of the signer
@@ -69,7 +88,6 @@ contract ThreeId_Invitations is
     function _recoverVoucherSigner(NFTVoucher memory voucher) public pure returns(address) {
         bytes32 messageHash = keccak256(abi.encodePacked(voucher.recipient, voucher.uri, voucher.tokenId));
         // console.log('got  message', Strings.toHexString(uint256(messageHash)));
-        // console.log('want message', voucher.messageHash);
 
         bytes32 ethMessage = ECDSA.toEthSignedMessageHash(messageHash);
         return ECDSA.recover(ethMessage, voucher.signature);
@@ -91,7 +109,7 @@ contract ThreeId_Invitations is
         // console.log('\nSanity check. At deployment these should all be equal:\noperator:\t\t%s\ninvitee\t\t%s\nsigner\t\t%s', _operator, invitee, signer);
 
         // Make sure that the signer is authorized to mint NFTs.
-        require(hasRole(MINTER_ROLE, signer), "Signature invalid or unauthorized!");
+        require(hasRole(OPERATOR_ROLE, signer), "Signature invalid or unauthorized!");
 
         // Make sure that the redeemer is the same as the receipient.
         require(invitee == voucher.recipient, "Invalid recipient!");
