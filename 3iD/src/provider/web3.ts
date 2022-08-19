@@ -1,6 +1,7 @@
 import { BehaviorSubject } from "rxjs";
 import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
+import { authenticate } from "./kubelt";
 
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
@@ -19,12 +20,8 @@ export const getAccountObs = () => {
 };
 
 const handleChainChanged = async (network: string) => {
-  if (network) {
-    // We want to be only on ethereum mainnet
-    if (network !== "0x1") {
-      window.alert("Please do not switch the network");
-      clearAccount();
-    }
+  if (network && web3Provider) {
+    authenticate(web3Provider);
     console.warn(`WEB3: Another chain detected`);
   }
 };
@@ -34,25 +31,17 @@ const handleAccountsChanged = async (accounts: string[]) => {
     try {
       const provider = await connect();
       const account = await provider.getSigner().getAddress();
-      const network = (await provider.getNetwork()).name;
-      // We want to be only on ethereum mainnet
-      if (network === "homestead") {
-        // We want to make sure that the used account
-        // is the same as the signer account;
-        // Getting address via signer will generate
-        // a properly cased address string.
-        if (account.toLowerCase() === accounts[0].toLowerCase()) {
-          // We don't want to force unnecessary refreshes
-          // to subscribers so we don't update
-          // unless the value changed
-          if (account !== accountSubj.getValue()) {
-            accountSubj.next(account);
-          }
+      // We want to make sure that the used account
+      // is the same as the signer account;
+      // Getting address via signer will generate
+      // a properly cased address string.
+      if (account.toLowerCase() === accounts[0].toLowerCase()) {
+        // We don't want to force unnecessary refreshes
+        // to subscribers so we don't update
+        // unless the value changed
+        if (account !== accountSubj.getValue()) {
+          accountSubj.next(account);
         }
-      } else {
-        window.alert(
-          `You are currently on ${network}. Please switch your network to mainnet. `
-        );
       }
     } catch (e) {
       console.error(`WEB3: ${e}`);
