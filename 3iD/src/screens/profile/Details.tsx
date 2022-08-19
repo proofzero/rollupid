@@ -1,474 +1,673 @@
 import React, { useEffect, useState } from "react";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { StyleSheet, Pressable, Text, View, TextInput } from "react-native";
+import Layout from "../AppLayout";
 
-import useAccount from "../../hooks/account";
-import Layout from "../AuthLayout";
+import useProfile from "../../hooks/profile";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Touchable,
+  Pressable,
+} from "react-native";
 
 import { Entypo } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Profile } from "../../services/threeid/types";
-import {
-  fetchProfile,
-  setProfile as updateProfile,
-} from "../../services/threeid";
-import { getSDK, isAuthenticated } from "../../provider/kubelt";
+import useAccount from "../../hooks/account";
 
 export default function Details({
-  children,
   navigation,
 }: {
   children: any;
   navigation: any;
 }) {
-  // TODO: Add forms library
-  const bioLimit = 300;
-  const setBio = (bio: string) => {
-    if (bio.length < bioLimit) {
-      setProfile((p) => ({ ...p, bio }));
-    }
-  };
-
-  const emptyProfile: Profile = {
-    nickname: "",
-    bio: "",
-    job: "",
-    location: "",
-    website: "",
-    email: "",
-  };
-
-  const [profile, setProfile] = useState<Profile>(emptyProfile);
-
-  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
-
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    const value: Profile = item != null ? JSON.parse(item) : emptyProfile;
-    setProfile(value);
-  };
-
-  const writeItemToStorage = async (newValue: string) => {
-    await setItem(newValue);
-    const x: Profile = JSON.parse(newValue);
-    setProfile(x);
-  };
-
-  useEffect(() => {
-    readItemFromStorage();
-  }, []);
-
+  const profile = useProfile();
   const account = useAccount();
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      if (account && (await isAuthenticated(account))) {
-        try {
-          const sdk = await getSDK();
-
-          const persistedProfile = await fetchProfile(sdk);
-          const patchedProfile = { ...profile, ...persistedProfile };
-
-          setProfile(patchedProfile);
-
-          try {
-            await writeItemToStorage(JSON.stringify(patchedProfile));
-          } catch (e) {
-            console.warn("Failed to write profile to storage");
-          }
-        } catch (e) {
-          console.warn("Failed to retrieve persisted profile");
-        }
-      } else {
-        setProfile(emptyProfile);
-      }
-    };
-
-    asyncFn();
-  }, [account]);
-
-  const saveAllChanges = async (profile: Profile, setProfile: Function) => {
-    if (!account) {
-      console.warn("No account found");
-    }
-
-    if (await isAuthenticated(account)) {
-      try {
-        const sdk = await getSDK();
-
-        const persistedProfile = await setProfile(sdk, profile);
-        const jsonProfile = JSON.stringify(persistedProfile);
-
-        setProfile(persistedProfile);
-
-        try {
-          await writeItemToStorage(jsonProfile);
-        } catch (e) {
-          console.warn("Failed to write profile to storage");
-        }
-      } catch (e) {
-        console.warn("Failed to persist profile");
-      }
-    }
-  };
 
   return (
     <Layout navigation={navigation}>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "white",
-        }}
-      >
+      {profile && (
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            position: "relative",
           }}
         >
-          <Text
+          <div
             style={{
-              paddingBottom: 41,
-              fontFamily: "Inter_700Bold",
-              fontSize: 24,
-              fontWeight: "700",
-              lineHeight: 28,
-              color: "#1F2937",
+              height: 300,
+              background: "#abc",
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
             }}
-          >
-            Profile
-          </Text>
+          ></div>
 
-          <Pressable
-            style={styles.button}
-            onPress={() => saveAllChanges(profile, updateProfile)}
-          >
-            <Text testID="details-save-all-changes" style={styles.textButton}>
-              {" "}
-              Save all Changes{" "}
-            </Text>
-          </Pressable>
-        </View>
-
-        <View>
           <View
             style={{
-              flexDirection: "row",
-              marginBottom: 36,
+              position: "absolute",
+              width: 286,
+              height: 404,
+              backgroundColor: "white",
+              shadowRadius: 5,
+              shadowColor: "rgb(0, 0, 0)",
+              shadowOpacity: 0.2,
+              justifyContent: "center",
+              alignItems: "center",
+              left: 84,
+              top: 82,
             }}
           >
-            <View
+            <div
               style={{
-                flex: 1,
-                marginRight: 38,
+                width: 174,
+                height: 174,
+                clipPath:
+                  "polygon(92.32051% 40%, 93.79385% 43.1596%, 94.69616% 46.52704%, 95% 50%, 94.69616% 53.47296%, 93.79385% 56.8404%, 92.32051% 60%, 79.82051% 81.65064%, 77.82089% 84.50639%, 75.35575% 86.97152%, 72.5% 88.97114%, 69.3404% 90.44449%, 65.97296% 91.34679%, 62.5% 91.65064%, 37.5% 91.65064%, 34.02704% 91.34679%, 30.6596% 90.44449%, 27.5% 88.97114%, 24.64425% 86.97152%, 22.17911% 84.50639%, 20.17949% 81.65064%, 7.67949% 60%, 6.20615% 56.8404%, 5.30384% 53.47296%, 5% 50%, 5.30384% 46.52704%, 6.20615% 43.1596%, 7.67949% 40%, 20.17949% 18.34936%, 22.17911% 15.49361%, 24.64425% 13.02848%, 27.5% 11.02886%, 30.6596% 9.55551%, 34.02704% 8.65321%, 37.5% 8.34936%, 62.5% 8.34936%, 65.97296% 8.65321%, 69.3404% 9.55551%, 72.5% 11.02886%, 75.35575% 13.02848%, 77.82089% 15.49361%, 79.82051% 18.34936%)",
+                boxShadow: "inset 0px 10px 100px 10px white",
+                transform: "scale(1.2)",
+                marginBottom: 18,
               }}
             >
-              <Text style={styles.label}> Nickname </Text>
+              <Image
+                style={{
+                  width: 174,
+                  height: 174,
+                }}
+                source={require("../../assets/mint_large.png")}
+              />
+            </div>
 
-              <View>
-                <View
-                  style={{
-                    position: "absolute",
-                    width: 41,
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: -1,
-                  }}
-                >
-                  <Entypo style={{}} name="email" size={16} color="#9CA3AF" />
-                </View>
-
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Your Nickname"
-                  placeholderTextColor={"#D1D5DB"}
-                  value={profile.nickname}
-                  onChangeText={(nickname) =>
-                    setProfile((p) => ({ ...p, nickname }))
-                  }
-                />
-              </View>
-            </View>
-
-            {/* Hide for mobile */}
-            <View
-              style={{
-                flex: 1,
-              }}
-            ></View>
+            <>
+              {profile.nickname && (
+                <Text style={styles.card.nickname}>{profile.nickname}</Text>
+              )}
+              {account && (
+                <Text style={styles.card.account}>{`${account.substring(
+                  0,
+                  4
+                )}...${account.substring(account.length - 6)}`}</Text>
+              )}
+            </>
           </View>
 
           <View
             style={{
-              flexDirection: "row",
-              marginBottom: 36,
+              marginLeft: 400,
+              marginRight: "5em",
+              padding: "1em",
+              marginBottom: 85,
             }}
           >
-            <View
-              style={{
-                flex: 1,
-                marginRight: 19,
-              }}
-            >
-              <Text style={styles.label}> Job </Text>
-              <View>
+            <>
+              {profile.bio && (
                 <View
                   style={{
-                    position: "absolute",
-                    width: 41,
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: -1,
+                    marginBottom: 24,
                   }}
                 >
-                  <Entypo
-                    style={{}}
-                    name="suitcase"
-                    size={16}
-                    color="#9CA3AF"
-                  />
+                  <Text>{profile.bio}</Text>
                 </View>
+              )}
 
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Your job"
-                  placeholderTextColor={"#D1D5DB"}
-                  value={profile.job}
-                  onChangeText={(job) => setProfile((p) => ({ ...p, job }))}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 19,
-              }}
-            >
-              <Text style={styles.label}> Location </Text>
-
-              <View>
-                <View
-                  style={{
-                    position: "absolute",
-                    width: 41,
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: -1,
-                  }}
-                >
-                  <Entypo
-                    style={{}}
-                    name="location-pin"
-                    size={16}
-                    color="#9CA3AF"
-                  />
-                </View>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="Your location"
-                  placeholderTextColor={"#D1D5DB"}
-                  value={profile.location}
-                  onChangeText={(location) =>
-                    setProfile((p) => ({ ...p, location }))
-                  }
-                />
-              </View>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 36,
-            }}
-          >
-            <View
-              style={{
-                flex: 1,
-                marginRight: 19,
-              }}
-            >
-              <Text style={styles.label}> Website </Text>
               <View
                 style={{
                   flexDirection: "row",
+                  borderTopColor: "#E5E7EB",
+                  borderTopWidth: 1,
+                  paddingTop: 24,
+                }}
+              >
+                <>
+                  {profile.location && (
+                    <View style={styles.field.wrapper}>
+                      <Entypo
+                        style={styles.field.icon}
+                        name="location-pin"
+                        size={16}
+                        color="#9CA3AF"
+                      />
+
+                      <Text style={styles.field.text}>{profile.location}</Text>
+                    </View>
+                  )}
+                </>
+
+                <>
+                  {profile.job && (
+                    <View style={styles.field.wrapper}>
+                      <Entypo
+                        style={styles.field.icon}
+                        name="suitcase"
+                        size={16}
+                        color="#9CA3AF"
+                      />
+
+                      <Text style={styles.field.text}>{profile.job}</Text>
+                    </View>
+                  )}
+                </>
+              </View>
+            </>
+          </View>
+
+          <View
+            style={{
+              margin: "5em",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                fontSize: 14,
+                color: "#4B5563",
+              }}
+            >
+              NFT collection
+            </Text>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "flex-start",
+                marginBottom: 44,
+              }}
+            >
+              <Image
+                style={{
+                  width: 127,
+                  height: 119,
+                }}
+                source={require("../../assets/find.svg")}
+              />
+
+              <View
+                style={{
+                  marginLeft: 37.61,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Inter_700Bold",
+                    fontSize: 30,
+                    fontWeight: "700",
+                    lineHeight: 40,
+                    color: "#9CA3AF",
+                  }}
+                >
+                  Oh no!
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 24,
+                    fontWeight: "500",
+                    lineHeight: 32,
+                    color: "#9CA3AF",
+                  }}
+                >
+                  Looks like you don't own any NFTs
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={{
+                marginBottom: 26,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 18,
+                  fontWeight: "500",
+                  lineHeight: 24,
+                  color: "#4B5563",
+                }}
+              >
+                Not sure where to start?
+              </Text>
+
+              <Text
+                style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: 16,
+                  fontWeight: "400",
+                  lineHeight: 24,
+                  color: "#9CA3AF",
+                }}
+              >
+                Here is a list of popular marketplaces.
+              </Text>
+            </View>
+
+            <View
+              style={{
+                marginBottom: 46,
+              }}
+            >
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#E5E7EB",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
                 }}
               >
                 <View
                   style={{
-                    position: "absolute",
-                    height: "100%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    style={{
+                      width: 73,
+                      height: 73,
+                      marginRight: 19,
+                    }}
+                    source={require("../../assets/opensea.png")}
+                  />
+
+                  <View>
+                    <Text>OpenSea</Text>
+                    <Text>
+                      The world’s largest digital marketplace for crypto
+                      collectibles and non-fungible tokens (NFTs), including
+                      ERC721 and ERC1155 assets.{" "}
+                    </Text>
+                  </View>
+                </View>
+
+                <Pressable
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
                     justifyContent: "center",
                     alignItems: "center",
-                    backgroundColor: "#F9FAFB",
-                    paddingHorizontal: "1em",
-                    borderWidth: 1,
-                    borderColor: "#D1D5DB",
-                    zIndex: -1,
+                    paddingHorizontal: 44.5,
+                    paddingVertical: 12,
+                    marginRight: 10,
+                    backgroundColor: "#F3F4F6",
                   }}
                 >
                   <Text
                     style={{
-                      fontFamily: "Inter_400Regular",
-                      fontSize: 16,
-                      color: "#6B7280",
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
                     }}
                   >
-                    http://
+                    <a
+                      target={"_blank"}
+                      rel={"noopener noopener noreferrer"}
+                      href="https://opensea.io/"
+                      style={{ color: "#374151", textDecoration: "none" }}
+                    >
+                      Visit Website
+                    </a>
                   </Text>
-                </View>
+                </Pressable>
+              </View>
 
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#E5E7EB",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
                 <View
                   style={{
-                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
                 >
-                  <TextInput
+                  <Image
                     style={{
-                      height: 26,
-                      borderWidth: 1,
-                      borderColor: "#D1D5DB",
-                      paddingTop: "1em",
-                      paddingBottom: "1em",
-                      paddingLeft: 90,
-                      fontFamily: "Inter400_Regular",
-                      fontStyle: "normal",
-                      fontSize: 16,
-                      lineHeight: 24,
-                      shadowColor: "#D1D5DB",
-                      shadowRadius: 2,
-                      color: "#6B7280",
+                      width: 73,
+                      height: 73,
+                      marginRight: 19,
                     }}
-                    value={profile.website}
-                    onChangeText={(website) =>
-                      setProfile((p) => ({ ...p, website }))
-                    }
+                    source={require("../../assets/rarible.png")}
                   />
+
+                  <View>
+                    <Text>Rarible</Text>
+                    <Text>
+                      Rarible is a community-owned NFT marketplace, it awards
+                      the RARI token to active users on the platform, who buy or
+                      sell on the NFT marketplace.
+                    </Text>
+                  </View>
                 </View>
+
+                <Pressable
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingHorizontal: 44.5,
+                    paddingVertical: 12,
+                    marginRight: 10,
+                    backgroundColor: "#F3F4F6",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                    }}
+                  >
+                    <a
+                      target={"_blank"}
+                      rel={"noopener noopener noreferrer"}
+                      href="https://rarible.com/"
+                      style={{ color: "#374151", textDecoration: "none" }}
+                    >
+                      Visit Website
+                    </a>
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: "#E5E7EB",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Image
+                    style={{
+                      width: 73,
+                      height: 73,
+                      marginRight: 19,
+                    }}
+                    source={require("../../assets/superrare.png")}
+                  />
+
+                  <View>
+                    <Text>SuperRare</Text>
+                    <Text>
+                      SuperRare has a strong focus on being a marketplace for
+                      people to buy and sell unique, single-edition digital
+                      artworks.
+                    </Text>
+                  </View>
+                </View>
+
+                <Pressable
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    paddingHorizontal: 44.5,
+                    paddingVertical: 12,
+                    marginRight: 10,
+                    backgroundColor: "#F3F4F6",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      fontWeight: "500",
+                      lineHeight: 16,
+                    }}
+                  >
+                    <a
+                      target={"_blank"}
+                      rel={"noopener noopener noreferrer"}
+                      href="https://superrare.com/"
+                      style={{ color: "#374151", textDecoration: "none" }}
+                    >
+                      Visit Website
+                    </a>
+                  </Text>
+                </Pressable>
               </View>
             </View>
 
             <View
               style={{
-                flex: 1,
-                marginLeft: 19,
+                flexDirection: "row",
               }}
             >
-              <Text style={styles.label}> Email </Text>
-              <View>
-                <View
+              <View
+                style={{
+                  flex: 1,
+                  marginRight: 10,
+                }}
+              >
+                <Text
                   style={{
-                    position: "absolute",
-                    width: 41,
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: -1,
+                    marginBottom: 46,
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 18,
+                    fontWeight: "500",
+                    lineHeight: 24,
                   }}
                 >
-                  <MaterialIcons name="email" size={16} color="#9CA3AF" />
-                </View>
+                  Mint your own NFT on Polygon
+                </Text>
 
-                <TextInput
-                  style={styles.textInput}
-                  value={profile.email}
-                  placeholder="Your Email"
-                  placeholderTextColor={"#D1D5DB"}
-                  onChangeText={(email) => setProfile((p) => ({ ...p, email }))}
-                />
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        padding: 20,
+                        backgroundColor: "#F9FAFB",
+                        marginRight: 19,
+                      }}
+                    >
+                      <Image
+                        style={{
+                          width: 35,
+                          height: 30.8,
+                        }}
+                        source={require("../../assets/polygon.png")}
+                      />
+                    </View>
+
+                    <View>
+                      <Text>Mintnft.Today</Text>
+                    </View>
+                  </View>
+
+                  <Pressable
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 44.5,
+                      paddingVertical: 12,
+                      marginRight: 10,
+                      backgroundColor: "#F3F4F6",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Inter_500Medium",
+                        fontSize: 14,
+                        fontWeight: "500",
+                        lineHeight: 16,
+                      }}
+                    >
+                      <a
+                        target={"_blank"}
+                        rel={"noopener noopener noreferrer"}
+                        href="https://mintnft.today/"
+                        style={{ color: "#374151", textDecoration: "none" }}
+                      >
+                        Visit Website
+                      </a>
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  marginLeft: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    marginBottom: 46,
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 18,
+                    fontWeight: "500",
+                    lineHeight: 24,
+                  }}
+                >
+                  What's an NFT?
+                </Text>
+
+                <View
+                  style={{
+                    borderWidth: 1,
+                    borderColor: "#E5E7EB",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        padding: 20,
+                        backgroundColor: "#F9FAFB",
+                        marginRight: 19,
+                      }}
+                    >
+                      <Image
+                        style={{
+                          width: 35,
+                          height: 30.8,
+                        }}
+                        source={require("../../assets/book.png")}
+                      />
+                    </View>
+
+                    <View>
+                      <Text>Learn About NFTs</Text>
+                    </View>
+                  </View>
+
+                  <Pressable
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      paddingHorizontal: 44.5,
+                      paddingVertical: 12,
+                      marginRight: 10,
+                      backgroundColor: "#F3F4F6",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontFamily: "Inter_500Medium",
+                        fontSize: 14,
+                        fontWeight: "500",
+                        lineHeight: 16,
+                      }}
+                    >
+                      <a
+                        target={"_blank"}
+                        rel={"noopener noopener noreferrer"}
+                        href="https://ethereum.org/en/nft/"
+                        style={{ color: "#374151", textDecoration: "none" }}
+                      >
+                        Visit Website
+                      </a>
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           </View>
-
-          <View>
-            <Text style={styles.label}> Bio </Text>
-
-            <TextInput
-              style={styles.textarea}
-              value={profile.bio}
-              onChangeText={setBio}
-              multiline
-              numberOfLines={4}
-            />
-          </View>
         </View>
-      </View>
+      )}
     </Layout>
   );
 }
 
-const styles = StyleSheet.create({
-  textInput: {
-    height: 26,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    paddingTop: "1em",
-    paddingBottom: "1em",
-    paddingLeft: 36,
-    fontFamily: "Inter400_Regular",
-    fontStyle: "normal",
-    fontSize: 16,
-    lineHeight: 24,
-    shadowColor: "#D1D5DB",
-    shadowRadius: 2,
-    color: "#6B7280",
+const styles = {
+  card: {
+    nickname: {
+      fontFamily: "Manrope_700Bold",
+      fontSize: 24,
+      lineHeight: 32.78,
+    },
+    account: {
+      fontFamily: "Inter_600SemiBold",
+      fontSize: 12,
+      lineHeight: 15,
+      color: "#9CA3AF",
+    },
   },
-  textarea: {
-    height: 66,
-    paddingLeft: 5,
-    shadowColor: "#D1D5DB",
-    shadowRadius: 2,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    fontFamily: "Inter400_Regular",
-    fontStyle: "normal",
-    fontSize: 16,
-    lineHeight: 24,
-    color: "#6B7280",
-    resizeMode: "vertical",
-  },
-  view: {
-    borderWidth: 0.5,
-    borderColor: "#0f0f0f",
-    padding: 50,
-    justifyContent: "center",
-  },
-  label: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 14,
-    fontWeight: "500",
-    lineHeight: 20,
-    color: "#374151",
-    paddingBottom: 7,
-  },
-  text: {
-    fontFamily: "Inter_700Bold",
-    fontSize: 12,
-    fontWeight: "700",
-    lineHeight: 12,
-    color: "#1F2937",
-  },
-  textButton: {
-    fontFamily: "Manrope_700Bold",
-    fontSize: 16,
-    fontWeight: "700",
-    lineHeight: 22,
-    color: "white",
-  },
-  button: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 13.5,
-    paddingVertical: 14,
-    backgroundColor: "#192030",
-    maxWidth: "100%",
-    height: 48,
-  },
-});
+  field: StyleSheet.create({
+    wrapper: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingRight: "2em",
+    },
+    icon: {
+      marginRight: "0.5em",
+    },
+    textarea: {
+      fontFamily: "Inter_500Medium",
+      fontSize: 16,
+      fontWeight: "500",
+      lineHeight: 24,
+      color: "#6B7280",
+    },
+    text: {
+      fontFamily: "Inter_500Medium",
+      fontSize: 18,
+      fontWeight: "500",
+      lineHeight: 22,
+      color: "#6B7280",
+    },
+  }),
+};

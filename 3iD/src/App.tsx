@@ -20,6 +20,7 @@ import Auth from "./screens/funnel/Auth";
 import Gate from "./screens/funnel/Gate";
 import Mint from "./screens/minting/Mint";
 import Settings from "./screens/profile/Settings";
+import Details from "./screens/profile/Details";
 import Invite from "./screens/funnel/Invite";
 import Naming from "./screens/profile/Naming";
 import Onboard from "./screens/onboarding/Onboard";
@@ -68,14 +69,13 @@ export default function App() {
         prefixes: [],
         config: {
           screens: {
-            Landing: "",
-            Auth: "authentication",
-            Gate: "gate",
-            Invite: "invitation",
-            Mint: "mint",
-            Onboard: "onboard",
-            Naming: "naming",
-            Settings: "settings",
+            Landing: "/",
+            Auth: "/authentication",
+            Gate: "/gate",
+            Invite: "/invitation",
+            Mint: "/mint",
+            Details: "/profile",
+            Settings: "/profile/settings",
           },
         },
       }}
@@ -90,22 +90,13 @@ export default function App() {
           <Stack.Screen name="Auth" component={Auth} />
           <Stack.Screen name="Gate" component={Gate} />
           <Stack.Screen name="Invite" component={Invite} />
-        </Stack.Group>
-
-        <Stack.Group>
           <Stack.Screen name="Mint" component={Mint} />
-        </Stack.Group>
-
-        <Stack.Group>
           <Stack.Screen name="Onboard" component={Onboard} />
         </Stack.Group>
 
         <Stack.Group>
-          <Stack.Screen name="Naming" component={Naming} />
-        </Stack.Group>
-
-        <Stack.Group>
           <Stack.Screen name="Settings" component={Settings} />
+          <Stack.Screen name="Details" component={Details} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
