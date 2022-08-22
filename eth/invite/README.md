@@ -72,7 +72,11 @@ Note: requires that you've updated `secret.ts` with the new address (see "Deploy
 
 `npx hardhat run scripts/deploy.js --network <network-name>`
 
-Where `<network-name>` is `goerli`, `mainnet`, etc.
+Where `<network-name>` is `goerli`, `rinkeby`, `mainnet`, etc.
+
+### Destroy the Contract
+
+`npx hardhat contract:destroy --account operator` will destroy the contract (remember to specify `--network` too).
 
 ### Deployments from Different Branches
 
