@@ -33,7 +33,7 @@ contract ThreeId_Invitations is
     Counters.Counter private _inviteIds;
 
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
-    
+
     // We only allow the creation of this many invitations.
     uint private _maxInvites;
     address _operator;
@@ -78,7 +78,7 @@ contract ThreeId_Invitations is
 
     /**
      * Verify the voucher signature and return the address of the signer
-     * THe address is expected to be the operator of the contract
+     * The address is expected to be the operator of the contract
      *
      * @param voucher the voucher to use to validate and award the invite
      *
@@ -113,7 +113,7 @@ contract ThreeId_Invitations is
 
         // Make sure that the redeemer is the same as the receipient.
         require(invitee == voucher.recipient, "Invalid recipient!");
-        
+
         // NB: invitation #0000 is reserved, user allocated range is
         // #0001 to #_maxInvites.
         uint256 inviteId = _inviteIds.current();
