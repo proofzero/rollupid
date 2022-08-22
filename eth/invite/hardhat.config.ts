@@ -550,7 +550,7 @@ task("invite:sign-voucher", "Sign an invite voucher")
 
 task("contract:destroy", "Send the selfdestruct message to a given contract")
   .addOptionalParam("contract", "The invite contract address")
-  .addParam("account", "The account address to which we transfer contract contents")
+  .addParam("account", "The account address to which we transfer contract contents (must be operator)")
   .setAction(async (taskArgs, hre) => {
     const contract = await hre.run("config:contract", { contract: taskArgs.contract });
     const account = await hre.run("config:account", { account: taskArgs.account });
