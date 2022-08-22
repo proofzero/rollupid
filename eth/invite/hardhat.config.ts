@@ -130,6 +130,18 @@ subtask("config:storageKey", "Return nft.storage API key")
     return config.storage.apiKey;
   });
 
+subtask("config:operator:privateKey", "Return operator wallet private key")
+  .setAction(async (taskArgs, hre) => {
+    const config = await hre.run("network:config");
+    return config.wallet.operatorKey;
+  });
+
+subtask("config:owner:privateKey", "Return owner wallet private key")
+  .setAction(async (taskArgs, hre) => {
+    const config = await hre.run("network:config");
+    return config.wallet.ownerKey;
+  });
+
 subtask("call:maxInvites", `Return result of ${CONTRACT_NAME}.maxInvites()`)
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
@@ -506,7 +518,29 @@ task("invite:sign-voucher", "Sign an invite voucher")
     const uri = taskArgs.tokenUri;
     const tokenId = taskArgs.invite;
 
-    const [_, operator] = await hre.ethers.getSigners();
+    //const [_, operator] = await hre.ethers.getSigners();
+    const operatorKey = await hre.run("config:operator:privateKey");
+    const operator = new hre.ethers.Wallet(operatorKey);
+
+    // Get the address of the operator wallet instance that we
+    // constructed. If that doesn't match the wallet address loaded from
+    // configuration for the account supplied with --account on the CLI,
+    // then something has gone awry.
+    const operatorAddress = await operator.getAddress();
+    if (recipient !== operatorAddress) {
+      throw new Error("operator wallet address doesn't match configured private key!");
+    }
+
+    // Check that the owner wallet instance has the same address that is
+    // set in the configuration file for the owner alias.
+    const ownerKey = await hre.run("config:owner:privateKey");
+    const owner = new hre.ethers.Wallet(ownerKey);
+    const ownerAddress = await owner.getAddress();
+    // Configured wallet address in config for NET_XXX.user.owner.
+    const ownerWallet = await hre.run("config:account", { account: "owner" });
+    if (ownerWallet !== ownerAddress) {
+      throw new Error("owner wallet address doesn't match configured private key!");
+    }
 
     // TODO: const domain = await owner.domain owner._signingDomain()
 
@@ -675,7 +709,8 @@ const config: HardhatUserConfig = {
         NET_RINKEBY.wallet.ownerKey,
         NET_RINKEBY.wallet.operatorKey,
       ],
-    },    mainnet: {
+    },
+    mainnet: {
       // For optional validation.
       chainId: MAINNET_CHAIN_ID,
       url: NET_MAINNET.alchemy.appURL,
@@ -684,6 +719,7 @@ const config: HardhatUserConfig = {
       //from: "",
       accounts: [
         NET_MAINNET.wallet.ownerKey,
+        NET_MAINNET.wallet.operatorKey,
       ],
     }
   },
