@@ -14,6 +14,8 @@ import {
   setProfile as updateProfile,
 } from "../../services/threeid";
 import { getSDK, isAuthenticated } from "../../provider/kubelt";
+import { useAppDispatch } from "../../hooks/state";
+import { set } from "../../state/slices/profile";
 
 export default function Settings({
   children,
@@ -22,6 +24,8 @@ export default function Settings({
   children: any;
   navigation: any;
 }) {
+  const dispatch = useAppDispatch();
+
   // TODO: Add forms library
   const bioLimit = 300;
   const setBio = (bio: string) => {
@@ -71,6 +75,8 @@ export default function Settings({
 
         setProfile(patchedProfile);
 
+        dispatch(set(patchedProfile));
+
         try {
           await writeItemToStorage(JSON.stringify(patchedProfile));
         } catch (e) {
@@ -94,10 +100,13 @@ export default function Settings({
     if (await isAuthenticated(account)) {
       try {
         const sdk = await getSDK();
-        const persistedProfile = await updateProfile(sdk, profile);
-        const jsonProfile = JSON.stringify(persistedProfile);
+        const updatedProfile = await updateProfile(sdk, profile);
 
-        setProfile(persistedProfile);
+        dispatch(set(updatedProfile));
+
+        const jsonProfile = JSON.stringify(updatedProfile);
+
+        setProfile(updatedProfile);
 
         try {
           await writeItemToStorage(jsonProfile);

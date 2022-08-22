@@ -26,6 +26,8 @@ import Naming from "./screens/profile/Naming";
 import Onboard from "./screens/onboarding/Onboard";
 
 import { useEffect } from "react";
+import { Provider } from "react-redux";
+import { store } from "./state/store";
 
 const Stack = createNativeStackNavigator();
 
@@ -64,41 +66,43 @@ export default function App() {
    * For now empty *seems* to work
    */
   return (
-    <NavigationContainer
-      linking={{
-        prefixes: [],
-        config: {
-          screens: {
-            Landing: "/",
-            Auth: "/authentication",
-            Gate: "/gate",
-            Invite: "/invitation",
-            Mint: "/mint",
-            Details: "/profile",
-            Settings: "/profile/settings",
+    <Provider store={store}>
+      <NavigationContainer
+        linking={{
+          prefixes: [],
+          config: {
+            screens: {
+              Landing: "/",
+              Auth: "/authentication",
+              Gate: "/gate",
+              Invite: "/invitation",
+              Mint: "/mint",
+              Details: "/profile",
+              Settings: "/profile/settings",
+            },
           },
-        },
-      }}
-    >
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
         }}
       >
-        <Stack.Group>
-          <Stack.Screen name="Landing" component={Landing} />
-          <Stack.Screen name="Auth" component={Auth} />
-          <Stack.Screen name="Gate" component={Gate} />
-          <Stack.Screen name="Invite" component={Invite} />
-          <Stack.Screen name="Mint" component={Mint} />
-          <Stack.Screen name="Onboard" component={Onboard} />
-        </Stack.Group>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Group>
+            <Stack.Screen name="Landing" component={Landing} />
+            <Stack.Screen name="Auth" component={Auth} />
+            <Stack.Screen name="Gate" component={Gate} />
+            <Stack.Screen name="Invite" component={Invite} />
+            <Stack.Screen name="Mint" component={Mint} />
+            <Stack.Screen name="Onboard" component={Onboard} />
+          </Stack.Group>
 
-        <Stack.Group>
-          <Stack.Screen name="Settings" component={Settings} />
-          <Stack.Screen name="Details" component={Details} />
-        </Stack.Group>
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Group>
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="Details" component={Details} />
+          </Stack.Group>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }
