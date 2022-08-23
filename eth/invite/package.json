@@ -12,12 +12,12 @@
   "devDependencies": {
     "@alch/alchemy-web3": "1.4.6",
     "@nomicfoundation/hardhat-toolbox": "1.0.2",
-    "@nomiclabs/hardhat-ethers": "2.1.0",
+    "@nomiclabs/hardhat-ethers": "2.1.1",
     "@nomiclabs/hardhat-solhint": "2.0.1",
     "@openzeppelin/contracts": "4.7.3",
-    "@openzeppelin/hardhat-upgrades": "1.19.1",
+    "@openzeppelin/hardhat-upgrades": "1.20.0",
     "cheerio": "1.0.0-rc.12",
-    "hardhat": "2.10.1",
+    "hardhat": "2.10.2",
     "nft.storage": "7.0.0"
   }
 }

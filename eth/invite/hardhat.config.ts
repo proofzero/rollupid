@@ -22,7 +22,7 @@ import {
   NET_GOERLI,
   NET_MAINNET,
   NET_RINKEBY,
-} from "./secret";
+} from "../secret";
 import { groupEnd } from "console";
 
 // definitions
@@ -459,6 +459,7 @@ task("invite:image", "Print the image URL for an invitation")
 task("invite:premint", "Store the reserved invitation (#0000) asset")
   .addParam("assetFile", "Path to SVG membership card template", "./assets/3ID_NFT_CARD_NO_BG.svg", types.inputFile)
   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
+  .addOptionalParam("inviteId", "Invitation ID for the reserved preminted invite", "0000")
   .setAction(async (taskArgs, hre) => {
     // Location of generated asset files.
     const outputDir = taskArgs.outputDir;
@@ -478,7 +479,7 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
     const issueDateParsed = Date.now();
     const issueDate = new Intl.DateTimeFormat('utc').format(issueDateParsed);
 
-    const inviteId = "0000";
+    const inviteId = taskArgs.inviteId;
 
     // When parameter type is types.inputFile the existence of file is
     // validated already.
@@ -505,7 +506,54 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
 
     // The output URL should be entered into deploy.ts script for
     // injection into the contract when it is deployed.
-    console.log(publishResult.url);
+    //console.log(publishResult.url);
+
+    return publishResult;
+  });
+
+subtask("check:operator", "Check that operator address and wallet private key match")
+  .setAction(async (taskArgs, hre) => {
+    // Get the address of the operator wallet instance that we
+    // constructed. Check that it has the expected value as contained in
+    // the configuration file.
+    const operatorKey = await hre.run("config:operator:privateKey");
+    const operator = new hre.ethers.Wallet(operatorKey);
+    const operatorAddress = await operator.getAddress();
+    // Configured wallet address in config for NET_XXX.user.operator.
+    const operatorWallet = await hre.run("config:account", { account: "operator" });
+    if (operatorWallet !== operatorAddress) {
+      throw new Error("operator wallet address doesn't match configured private key!");
+    }
+  });
+
+subtask("check:owner", "Check that operator address and wallet private key match")
+  .setAction(async (taskArgs, hre) => {
+    // Check that the owner wallet instance has the same address that is
+    // set in the configuration file for the owner alias.
+    const ownerKey = await hre.run("config:owner:privateKey");
+    const owner = new hre.ethers.Wallet(ownerKey);
+    const ownerAddress = await owner.getAddress();
+    // Configured wallet address in config for NET_XXX.user.owner.
+    const ownerWallet = await hre.run("config:account", { account: "owner" });
+    if (ownerWallet !== ownerAddress) {
+      throw new Error("owner wallet address doesn't match configured private key!");
+    }
+  });
+
+subtask("check:recovery", "Ensure recovery address matches operator wallet address")
+  .addParam("messageHashBinary", "Message hash as array", [], types.any)
+  .addParam("signature", "Signature computed for voucher")
+  .addParam("operatorAddress", "Operator wallet address")
+  .setAction(async (taskArgs, hre) => {
+    const operatorAddress = taskArgs.operatorAddress;
+    // https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475990764
+    const recoveryAddress = await hre.ethers.utils.verifyMessage(
+      taskArgs.messageHashBinary,
+      taskArgs.signature
+    )
+    if (operatorAddress !== recoveryAddress) {
+      throw new Error(`These should be equal: ${operatorAddress}, ${recoveryAddress}`);
+    };
   });
 
 task("invite:sign-voucher", "Sign an invite voucher")
@@ -518,36 +566,15 @@ task("invite:sign-voucher", "Sign an invite voucher")
     const uri = taskArgs.tokenUri;
     const tokenId = taskArgs.invite;
 
-    //const [_, operator] = await hre.ethers.getSigners();
-    const operatorKey = await hre.run("config:operator:privateKey");
-    const operator = new hre.ethers.Wallet(operatorKey);
-
-    // Get the address of the operator wallet instance that we
-    // constructed. If that doesn't match the wallet address loaded from
-    // configuration for the account supplied with --account on the CLI,
-    // then something has gone awry.
-    const operatorAddress = await operator.getAddress();
-    if (recipient !== operatorAddress) {
-      throw new Error("operator wallet address doesn't match configured private key!");
-    }
-
-    // Check that the owner wallet instance has the same address that is
-    // set in the configuration file for the owner alias.
-    const ownerKey = await hre.run("config:owner:privateKey");
-    const owner = new hre.ethers.Wallet(ownerKey);
-    const ownerAddress = await owner.getAddress();
-    // Configured wallet address in config for NET_XXX.user.owner.
-    const ownerWallet = await hre.run("config:account", { account: "owner" });
-    if (ownerWallet !== ownerAddress) {
-      throw new Error("owner wallet address doesn't match configured private key!");
-    }
-
     // TODO: const domain = await owner.domain owner._signingDomain()
 
     // 66 bytes of abi.encodePacked keccak256.
     // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
     // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
-    const message = hre.ethers.utils.solidityKeccak256([ "address", "string", "uint" ], [ recipient, uri, tokenId ]);
+    const message = hre.ethers.utils.solidityKeccak256(
+      [ "address", "string", "uint" ],
+      [ recipient, uri, tokenId ]
+    );
     // console.log('message: ' + message)
     // console.log('message: ' + message.length)
 
@@ -563,6 +590,8 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // matching hash.
 
     // Sign 32 byte digest, with the above prefix.
+    const operatorKey = await hre.run("config:operator:privateKey");
+    const operator = new hre.ethers.Wallet(operatorKey);
     const signature = await operator.signMessage(messageHashBinary);
 
     // Construct the voucher.
@@ -574,13 +603,65 @@ task("invite:sign-voucher", "Sign an invite voucher")
       signature
     };
 
-    // https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475990764
-    const recoveryAddress = await hre.ethers.utils.verifyMessage(messageHashBinary, voucher.signature)
-    console.log('\nSanity check. These should be equal:\n\t%s\n\t%s\n', operator.address, recoveryAddress)
+    // Sanity check the recovery address matches operator address.
+    await hre.run("check:recovery", {
+      messageHashBinary,
+      signature,
+      operatorAddress: operator.address
+    });
 
-    console.log('signed voucher for deploy script: ', voucher);
+    console.log('signed voucher: ', voucher);
+
     return voucher
 })
+
+task("contract:deploy", "Deploy the contract")
+  .addOptionalParam("maxInvites", "Maximum number of invitations to allow", 10000, types.int)
+  .setAction(async (taskArgs, hre) => {
+    // Pre-flight sanity checks.
+    await hre.run("check:owner");
+    await hre.run("check:operator");
+
+    // Inject into contract to limit the number of invites that can be minted.
+    const maxInvites = taskArgs.maxInvites;
+    // The ID of the reserved preminted invite.
+    const inviteId = "0000";
+    // The voucher recipient should be the "operator" account.
+    const operatorAddress = await hre.run("config:account", { account: "operator" });
+
+    // When network is localhost, use an already baked asset for the premint.
+    let publishResult;
+    if (hre.network.name == 'localhost') {
+      publishResult = {
+        url: "ipfs://bafyreigtb2quz6kcyix5dw5cknfarhosz4t43ze4egvt2ufoybjhgy6qty/metadata.json",
+      };
+    } else {
+      // The URL of the published asset.
+      publishResult = await hre.run("invite:premint", { inviteId, });
+    }
+
+    // Create and sign a voucher.
+    const zeroVoucher = await hre.run("invite:sign-voucher", {
+      account: operatorAddress,
+      tokenUri: publishResult.url,
+      invite: inviteId,
+    });
+
+    const Invite = await hre.ethers.getContractFactory("ThreeId_Invitations");
+    const invite = await Invite.deploy(operatorAddress, maxInvites, zeroVoucher);
+
+    await invite.deployed();
+
+    console.log("ThreeId_Invitations deployed to:", invite.address);
+
+    // Check stored contract address, prompt user to update secret.ts if
+    // not the same as the address of the contract that was just
+    // deployed.
+    const contractAddress = await hre.run("config:contract");
+    if (contractAddress !== invite.address) {
+      console.log(chalk.red(`Contract address has changed! Please update secret.ts`));
+    }
+  });
 
 task("contract:destroy", "Send the selfdestruct message to a given contract")
   .addOptionalParam("contract", "The invite contract address")

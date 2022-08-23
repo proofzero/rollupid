@@ -9,6 +9,3 @@ typechain-types
 cache
 artifacts
 outputs
-
-# secrets
-secret.ts

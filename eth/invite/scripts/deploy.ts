@@ -1,7 +1,7 @@
 // eth/invite/scripts/deploy.ts
 
 import { ethers } from "hardhat";
-import { NET_MAINNET, NET_GOERLI, NET_LOCALHOST } from "../secret";
+import { NET_MAINNET, NET_GOERLI, NET_LOCALHOST } from "../../secret";
 
 // We only permit this many invitations to be minted.
 //
