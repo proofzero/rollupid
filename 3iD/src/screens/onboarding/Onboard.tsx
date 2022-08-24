@@ -463,6 +463,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    borderBottom: "1px solid #E5E7EB",
                   }}
                 >
                   <Text
@@ -474,7 +475,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       color: "#4B5563",
                     }}
                   >
-                    How can I use 3iD?
+                    How do I use 3iD?
                   </Text>
 
                   <Image
