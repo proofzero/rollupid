@@ -5,7 +5,15 @@ import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
 import { connect, forceAccounts } from "../provider/web3";
 import { Image, View, Text, ScrollView } from "react-native";
-import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
+import {
+  authenticate,
+  getSDK,
+  isAuthenticated,
+  kbGetClaims,
+} from "../provider/kubelt";
+import { useAppDispatch, useAppSelector } from "../hooks/state";
+import { selectNickname, set } from "../state/slices/profile";
+import { fetchProfile } from "../services/threeid";
 
 const SideMenuItem = ({
   title,
@@ -110,13 +118,31 @@ export default function Layout({
   children: any;
   navigation: any;
 }) {
-  const { getItem } = useAsyncStorage("kubelt:profile");
-  const [nickname, setNickname] = useState<string | undefined>();
+  const dispatch = useAppDispatch();
+  const nickname = useAppSelector(selectNickname);
+
+  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
   const account = useAccount();
 
   const navRoutes = useNavigationState((state) => state.routes);
   const navIndex = useNavigationState((state) => state.index);
+
+  const loadProfile = async () => {
+    const storedProfile = await getItem();
+    if (storedProfile) {
+      const parsedProfile = JSON.parse(storedProfile);
+
+      dispatch(set(parsedProfile));
+    } else {
+      const sdk = await getSDK();
+      const fetchedProfile = await fetchProfile(sdk);
+
+      dispatch(set(fetchedProfile));
+
+      await setItem(JSON.stringify(fetchedProfile));
+    }
+  };
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
@@ -136,13 +162,7 @@ export default function Layout({
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
-        const profile = await getItem();
-        if (profile) {
-          const profileJson = JSON.parse(profile);
-          if (profileJson.nickname) {
-            setNickname(profileJson.nickname);
-          }
-        }
+        await loadProfile();
         await claimsRedirect(claim);
       } else {
         const provider = await connect(false);
@@ -153,6 +173,7 @@ export default function Layout({
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
+          await loadProfile();
           await claimsRedirect(claim);
         } else {
           navigation.navigate("Landing");
@@ -245,7 +266,7 @@ export default function Layout({
                   flex: 1,
                 }}
               >
-                {nickname || account?.substring(0, 6)}
+                {nickname}
               </Text>
 
               <Link

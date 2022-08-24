@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../AppLayout";
 
-import useProfile from "../../hooks/profile";
 import {
   View,
   Text,
@@ -13,6 +12,7 @@ import {
 
 import { Entypo } from "@expo/vector-icons";
 import useAccount from "../../hooks/account";
+import { useAppSelector } from "../../hooks/state";
 
 export default function Details({
   navigation,
@@ -20,7 +20,7 @@ export default function Details({
   children: any;
   navigation: any;
 }) {
-  const profile = useProfile();
+  const profile = useAppSelector((state) => state.profile.value);
   const account = useAccount();
 
   return (

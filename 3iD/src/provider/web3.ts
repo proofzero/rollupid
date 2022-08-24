@@ -1,6 +1,8 @@
 import { BehaviorSubject } from "rxjs";
 import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
+import { store } from "../state/store";
+import { clearSlice, setAddress } from "../state/slices/profile";
 
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
@@ -34,6 +36,15 @@ const handleAccountsChanged = async (accounts: string[]) => {
         // unless the value changed
         if (account !== accountSubj.getValue()) {
           accountSubj.next(account);
+
+          // Account could still be NULL
+          // so we want to clear profile state
+          // if that's the case
+          if (account) {
+            store.dispatch(setAddress(account));
+          } else {
+            store.dispatch(clearSlice());
+          }
         }
       }
     } catch (e) {
@@ -100,6 +111,7 @@ export const clearAccount = () => {
   // this has to be handled in views
   // or layouts
   accountSubj.next(null);
+  store.dispatch(clearSlice());
 };
 
 export const sign = async (message: string) => {

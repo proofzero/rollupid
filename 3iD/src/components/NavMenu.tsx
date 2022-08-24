@@ -5,15 +5,17 @@ import {
   useNavigation,
   useNavigationState,
 } from "@react-navigation/native";
-import useAccount from "../hooks/account";
+
 import { purge } from "../provider/kubelt";
 import * as Clipboard from "expo-clipboard";
 import { clearAccount } from "../provider/web3";
+import { useAppSelector } from "../hooks/state";
+import { selectAddress } from "../state/slices/profile";
 
 export default function NavMenu() {
   const [showPanel, setShowPanel] = useState(false);
 
-  const account = useAccount();
+  const address = useAppSelector(selectAddress);
 
   const nav = useNavigation();
 
@@ -123,8 +125,8 @@ export default function NavMenu() {
               fontWeight: "700",
               lineHeight: 16,
             }}
-          >{`${account?.substring(0, 4)}...${account?.substring(
-            account.length - 4
+          >{`${address?.substring(0, 4)}...${address?.substring(
+            address.length - 4
           )}`}</Text>
         </Pressable>
 
@@ -150,7 +152,7 @@ export default function NavMenu() {
                 alignItems: "center",
               }}
               onPress={async () => {
-                await Clipboard.setStringAsync(`${account}`);
+                await Clipboard.setStringAsync(`${address}`);
                 setShowPanel(false);
               }}
             >

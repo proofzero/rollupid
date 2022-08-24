@@ -1,10 +1,19 @@
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import React, { useEffect } from "react";
 
 import { Image, View, Text, Pressable, SafeAreaView } from "react-native";
 import NavMenu from "../components/NavMenu";
 import useAccount from "../hooks/account";
-import { authenticate, isAuthenticated, kbGetClaims } from "../provider/kubelt";
+import { useAppDispatch } from "../hooks/state";
+import {
+  authenticate,
+  getSDK,
+  isAuthenticated,
+  kbGetClaims,
+} from "../provider/kubelt";
 import { connect, forceAccounts } from "../provider/web3";
+import { fetchProfile } from "../services/threeid";
+import { set } from "../state/slices/profile";
 
 export default function AppLayout({
   children,
@@ -13,7 +22,10 @@ export default function AppLayout({
   children: any;
   navigation: any;
 }) {
+  const { getItem, setItem } = useAsyncStorage("kubelt:profile");
+
   const account = useAccount();
+  const dispatch = useAppDispatch();
 
   const claimsRedirect = async (claim: string) => {
     claim = claim.trim().toLowerCase();
@@ -21,6 +33,22 @@ export default function AppLayout({
     const claims = await kbGetClaims();
     if (!claims.includes(claim)) {
       navigation.navigate("Landing");
+    }
+  };
+
+  const loadProfile = async () => {
+    const storedProfile = await getItem();
+    if (storedProfile) {
+      const parsedProfile = JSON.parse(storedProfile);
+
+      dispatch(set(parsedProfile));
+    } else {
+      const sdk = await getSDK();
+      const fetchedProfile = await fetchProfile(sdk);
+
+      dispatch(set(fetchedProfile));
+
+      await setItem(JSON.stringify(fetchedProfile));
     }
   };
 
@@ -33,6 +61,7 @@ export default function AppLayout({
       const claim = "3id.enter";
 
       if (await isAuthenticated(account)) {
+        await loadProfile();
         await claimsRedirect(claim);
       } else {
         const provider = await connect(false);
@@ -43,6 +72,7 @@ export default function AppLayout({
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
+          await loadProfile();
           await claimsRedirect(claim);
         } else {
           navigation.navigate("Landing");
