@@ -73,10 +73,11 @@ export default function App() {
           config: {
             screens: {
               Landing: "/",
-              Auth: "/authentication",
+              Auth: "/auth",
               Gate: "/gate",
-              Invite: "/invitation",
+              Invite: "/invite",
               Mint: "/mint",
+              Onboard: "/welcome",
               Details: "/profile",
               Settings: "/profile/settings",
             },

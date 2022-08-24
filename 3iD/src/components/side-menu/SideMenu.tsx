@@ -98,8 +98,6 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
           >
             {nickname}
           </Text>
-
-          <TradLink screen={"Details"} text={"Visit My Profile"} />
         </View>
       </View>
 

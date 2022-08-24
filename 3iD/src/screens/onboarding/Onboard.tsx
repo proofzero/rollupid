@@ -240,6 +240,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           <View
             style={{
               flexDirection: window.width >= window.height ? "row" : "column",
+              alignItems: "center"
             }}
           >
             <LinkButton
