@@ -8,6 +8,8 @@ import Layout from "../Layout";
 import { Text, View } from "react-native";
 import { getFunnelState, listInvitations } from "../../services/threeid";
 
+import Spinner from "../../components/Spinner";
+
 import {
   authenticate,
   getSDK,
@@ -95,27 +97,28 @@ export default function Auth({ navigation }: { navigation: any }) {
           style={{
             paddingBottom: 22,
             fontFamily: "Inter_700Bold",
-            fontSize: 20,
+            fontSize: 24,
             fontWeight: "700",
             lineHeight: 28,
             color: "#1F2937",
             maxWidth: 758,
+            textAlign: "center",
           }}
         >
-          Connecting with MetaMask... It could take a few seconds for the
-          message to appear. If it does not appear try clicking on your wallet.
-        </Text>
-
-        <Text
-          style={{
-            fontFamily: "Inter_400Regular",
-            fontSize: 24,
-            fontWeight: "400",
-            lineHeight: 32,
-            color: "#1F2937",
-          }}
-        >
+          <>
           Sign the message with your wallet.
+          <p style={{
+            fontFamily: "Inter_500Bold",
+            fontSize: 20,
+            fontWeight: "500",
+            color: "#1F2937",
+            // backgroundColor: "white",
+            // padding: "1em",
+            // borderRadius: "0.5em",
+          }}>It could take a few seconds for the signing message to appear. 
+          If the does not appear try clicking on your wallet.</p>
+          <Spinner />
+          </>
         </Text>
       </View>
     </Layout>
