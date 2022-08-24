@@ -1,23 +1,8 @@
 import { Link, useNavigationState } from "@react-navigation/native";
 import React from "react";
 import { IconType } from "react-icons/lib";
-import { View, Image, Text, Pressable, StyleSheet } from "react-native";
+import { View, Image, Text } from "react-native";
 import styled from "styled-components"
-
-// const styles = StyleSheet.create({
-//   hovered: {
-//     backgroundColor: '#F3F4F6'
-//   },
-//   focused: {
-//     boxShadow: '0px 0px 0px 1px #9CA3AF'
-//   },
-//   pressed: {
-//     // backgroundColor: '#9CA3AF'
-//   },
-//   disabled: {
-//     opacity: 0.5
-//   },
-// });
 
 const LinkWrapper = styled.div`
   &:hover {
@@ -77,33 +62,8 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
   const isCurrent = navRoutes[navIndex].name === screen;
   const isActive = screen != null;
 
-  // const [eventLog, updateEventLog] = React.useState([]);
-  // const [disabled, setDisabled] = React.useState(false);
-
-
-  // const handleEvent = (eventName: never) => {
-  //   return () => {
-  //     const limit = 10;
-  //     updateEventLog((state) => {
-  //       const nextState = state.slice(0, limit - 1);
-  //       nextState.unshift(eventName);
-  //       return nextState;
-  //     });
-  //   };
-  // };
-
   return (
-    <LinkWrapper
-      // onHoverIn={handleEvent('onHoverIn')}
-      // onHoverOut={handleEvent('onHoverOut')}
-      // disabled={disabled}
-      // style={(state) => [
-      //   !disabled && state.focused && styles.focused,
-      //   !disabled && state.hovered && styles.hovered,
-      //   !disabled && state.pressed && styles.pressed,
-      //   disabled && styles.disabled
-      // ]}
-    >
+    <LinkWrapper>
       <div
         style={{
           fontFamily: "Inter_400Regular",
