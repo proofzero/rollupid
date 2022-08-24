@@ -2,15 +2,14 @@ import React from "react";
 import { View, Image, Text, useWindowDimensions } from "react-native";
 import TradLink from "../TradLink";
 import SideMenuItem, { SideMenuItemProps } from "./SideMenuItem";
-import {
-  FaAt,
-  FaHome,
-  FaIdBadge,
-  FaLink,
-  FaUser,
-  FaWallet,
-} from "react-icons/fa";
 import { HiOutlineViewGridAdd } from "react-icons/hi";
+import {
+  BiUser,
+  BiAt,
+  BiWalletAlt,
+  BiHome,
+  BiLink,
+  BiIdCard } from "react-icons/bi";
 
 type SideMenuProps = {
   nickname: string;
@@ -24,19 +23,19 @@ const sideMenuItems: SideMenuItemProps[] = [
   {
     title: "Dashboard",
     screen: "Onboard",
-    Icon: FaHome,
+    Icon: BiHome,
   },
   {
     title: "Set PFP",
-    Icon: FaUser,
+    Icon: BiUser,
   },
   {
     title: "User Details",
-    Icon: FaAt,
+    Icon: BiAt,
   },
   {
     title: "Wallet Accounts",
-    Icon: FaWallet,
+    Icon: BiWalletAlt,
   },
   {
     title: "NFT Gallery",
@@ -44,11 +43,11 @@ const sideMenuItems: SideMenuItemProps[] = [
   },
   {
     title: "KYC",
-    Icon: FaIdBadge,
+    Icon: BiIdCard,
   },
   {
     title: "Connected dApps",
-    Icon: FaLink,
+    Icon: BiLink,
   },
 ];
 
