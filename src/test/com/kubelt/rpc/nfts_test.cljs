@@ -65,7 +65,7 @@
                         (set (keys nfts))))
 
                  (is (= (set (keys (first (:owned-nfts nfts))))
-                        #{:description :token-uri :contract :time-last-updated :title :balance :id :media :metadata})))
+                        #{:description :token-uri :contract :time-last-updated :title :balance :id :media :contract-metadata :metadata})))
 
                (catch js/Error err (do
                                      (log/error err)

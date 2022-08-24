@@ -172,7 +172,8 @@
 ;; -----------------------------------------------------------------------------
 
 (defn restore&
-  ""
+  "Return a promise that resolves to a system map that has had saved state
+  restored."
   [system]
   {:pre [(map? system)] :post [(promise? %)]}
   (let [;; This function provides a platform specific means of restoring
@@ -184,17 +185,31 @@
         (lib.promise/then
          (fn [{:keys [options vault]}]
            ;; TODO fold options back into system map?
-           (let [restored-system (-> system
-                                     (assoc :crypto/session vault
-                                            :crypto/wallet {:com.kubelt/type :kubelt.type/wallet
-                                                            :wallet/address (-> vault :vault/tokens keys first)}))]
-             (conform* [spec.config/restored-system restored-system]
-                       restored-system)))))))
+           (let [session vault
+                 wallet {:com.kubelt/type :kubelt.type/wallet
+                         :wallet/address (-> vault :vault/tokens keys first)}
+                 restored-system (assoc system
+                                        :crypto/session session
+                                        :crypto/wallet wallet)]
+             ;; TODO restore this check of the restored SDK against a schema
+             restored-system
+             #_(conform*
+              [spec.config/restored-system restored-system]
+              restored-system)))))))
 
 (defn restore-js&
-  "Return a system map that has had saved state restored."
+  "Returns a promise that resolves to a system map that has had saved
+  state restored. This function is expected to be invoked from a
+  JavaScript context."
   [system]
   {:pre [(map? system)] :post [(promise? %)]}
   ;; We don't have any arguments to convert from JSON to edn, so we just
   ;; invoke restore& directly.
-  (restore& system))
+  (-> (restore& system)
+      (lib.promise/then
+       (fn [sys]
+         (if (lib.error/error? sys)
+           ;; Convert the error into an object for inspection in the
+           ;; calling context.
+           (clj->js sys)
+           sys)))))

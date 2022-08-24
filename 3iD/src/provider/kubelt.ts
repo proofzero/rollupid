@@ -65,6 +65,10 @@ export const authenticate = async (
     }
 
     const restoredSdk = await sdkWeb.node_v1.restore(sdk);
+    if ('error' === restoredSdk.type) {
+      console.error('There was a problem restoring Kubelt SDK state');
+      console.error(restoredSdk.error);
+    }
 
     // We use isLoggedIn as a way to check if SDK
     // was persisted, as there is no other way;
