@@ -1,7 +1,9 @@
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
+import { FaDiscord, FaTwitter } from "react-icons/fa";
 
 import { View, Text, Image, Pressable } from "react-native";
+import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
 import { getFunnelState } from "../../services/threeid";
@@ -233,87 +235,19 @@ const Onboard = ({ navigation }: OnboardProps) => {
               flexDirection: "row",
             }}
           >
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 44.5,
-                paddingVertical: 12,
-                marginRight: 10,
-                backgroundColor: "#F3F4F6",
-              }}
-            >
-              <Image
-                style={{
-                  width: 19,
-                  height: 16,
-                  marginRight: 13.5,
-                }}
-                source={require("../../assets/twitter.png")}
-              />
-
-              <Text
-                testID="onboard-twitter"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                }}
-              >
-                <a
-                  target={"_blank"}
-                  rel={"noopener noopener noreferrer"}
-                  href={Constants.manifest?.extra?.twitterUrl}
-                  style={{ color: "#374151", textDecoration: "none" }}
-                >
-                  Twitter
-                </a>
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 44.5,
-                paddingVertical: 12,
-                backgroundColor: "#F3F4F6",
-              }}
-            >
-              <Image
-                style={{
-                  width: 19.82,
-                  height: 15.11,
-                  marginRight: 13.09,
-                }}
-                source={require("../../assets/discord.png")}
-              />
-
-              <Text
-                testID="onboard-twitter"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "#374151",
-                }}
-              >
-                <a
-                  target={"_blank"}
-                  rel={"noopener noopener noreferrer"}
-                  href={Constants.manifest?.extra?.discordUrl}
-                  style={{ color: "#374151", textDecoration: "none" }}
-                >
-                  Discord
-                </a>
-              </Text>
-            </Pressable>
+            <LinkButton
+              url={Constants.manifest?.extra?.twitterUrl}
+              title="Twitter"
+              Icon={FaTwitter}
+              iconColor="#1D9BF0"
+            />
+            <View style={{ width: 10 }} />
+            <LinkButton
+              url={Constants.manifest?.extra?.discordUrl}
+              title="Discord"
+              Icon={FaDiscord}
+              iconColor="#5865F2"
+            />
           </View>
         </View>
 
