@@ -62,21 +62,21 @@ export const authenticate = async (
   try {
     if (!sdk) {
       sdk = await getSDK();
-
-      const restoredSdk = await sdkWeb.node_v1.restore(sdk);
-
-      // We use isLoggedIn as a way to check if SDK
-      // was persisted, as there is no other way;
-      const isLoggedIn = await sdkWeb.node_v1.oort.isLoggedIn(
-        restoredSdk,
-        address
-      );
-
-      // If TRUE => SDK was persisted and is authenticated
-      if (isLoggedIn) {
-        sdk = restoredSdk;
-      } // IF FALSE => Either not authenticated or not persisted
     }
+
+    const restoredSdk = await sdkWeb.node_v1.restore(sdk);
+
+    // We use isLoggedIn as a way to check if SDK
+    // was persisted, as there is no other way;
+    const isLoggedIn = await sdkWeb.node_v1.oort.isLoggedIn(
+      restoredSdk,
+      address
+    );
+
+    // If TRUE => SDK was persisted and is authenticated
+    if (isLoggedIn) {
+      sdk = restoredSdk;
+    } // IF FALSE => Either not authenticated or not persisted
 
     let isAuth = await isAuthenticated(address);
     if (force || !isAuth) {
