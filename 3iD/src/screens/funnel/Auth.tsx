@@ -106,18 +106,22 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-          Sign the message with your wallet.
-          <p style={{
-            fontFamily: "Inter_500Bold",
-            fontSize: 20,
-            fontWeight: "500",
-            color: "#1F2937",
-            // backgroundColor: "white",
-            // padding: "1em",
-            // borderRadius: "0.5em",
-          }}>It could take a few seconds for the signing message to appear. 
-          If the does not appear try clicking on your wallet.</p>
-          <Spinner />
+            Sign the message with your wallet.
+            <p
+              style={{
+                fontFamily: "Inter_500Bold",
+                fontSize: 20,
+                fontWeight: "500",
+                color: "#1F2937",
+                // backgroundColor: "white",
+                // padding: "1em",
+                // borderRadius: "0.5em",
+              }}
+            >
+              It could take a few seconds for the signing message to appear. If
+              the does not appear try clicking on your wallet.
+            </p>
+            <Spinner />
           </>
         </Text>
       </View>

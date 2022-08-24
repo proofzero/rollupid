@@ -94,7 +94,7 @@ export default function AppLayout({
   }, []);
 
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
       }}
@@ -108,6 +108,6 @@ export default function AppLayout({
       >
         {children}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, Image, Pressable, Text } from "react-native";
+import {
+  View,
+  Image,
+  Pressable,
+  Text,
+  useWindowDimensions,
+} from "react-native";
 import {
   Link,
   useNavigation,
@@ -19,13 +25,14 @@ export default function NavMenu() {
   const address = useAppSelector(selectAddress);
 
   const nav = useNavigation();
+  const window = useWindowDimensions();
 
   return (
     <View
       style={{
         paddingVertical: "1em",
-        paddingHorizontal: "5em",
-        flexDirection: "row",
+        paddingHorizontal: window.width >= window.height ? "5em" : "0.5em",
+        flexDirection: window.width >= window.height ? "row" : "column",
         justifyContent: "space-between",
         alignItems: "center",
         zIndex: 1,
@@ -34,7 +41,7 @@ export default function NavMenu() {
     >
       <View
         style={{
-          flexDirection: "row",
+          flexDirection: window.width >= window.height ? "row" : "column",
           alignItems: "center",
         }}
       >
@@ -48,9 +55,11 @@ export default function NavMenu() {
 
         <View
           style={{
-            marginLeft: 65,
-            flexDirection: "row",
+            marginLeft: window.width >= window.height ? 65 : 0,
+            marginVertical: "1em",
+            flexDirection: window.width >= window.height ? "row" : "column",
             alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <NavMenuItem screen="Details" title="My Profile" />
