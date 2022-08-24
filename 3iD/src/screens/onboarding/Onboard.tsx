@@ -8,7 +8,11 @@ import { getFunnelState } from "../../services/threeid";
 
 import Layout from "../AuthLayout";
 
-export default function Onboard({ navigation }: { navigation: any }) {
+type OnboardProps = {
+  navigation: any;
+};
+
+const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
 
   const [canMint, setCanMint] = useState(false);
@@ -847,4 +851,6 @@ export default function Onboard({ navigation }: { navigation: any }) {
       </View>
     </Layout>
   );
-}
+};
+
+export default Onboard;

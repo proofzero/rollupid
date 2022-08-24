@@ -1,7 +1,7 @@
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Link, useNavigationState } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import NavMenu from "../components/NavMenu";
+import NavMenu from "../components/nav-menu/NavMenu";
 import useAccount from "../hooks/account";
 import { connect, forceAccounts } from "../provider/web3";
 import { Image, View, Text, ScrollView } from "react-native";
@@ -14,6 +14,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../hooks/state";
 import { selectNickname, set } from "../state/slices/profile";
 import { fetchProfile } from "../services/threeid";
+import SideMenu from "../components/side-menu/SideMenu";
 
 const SideMenuItem = ({
   title,
@@ -227,112 +228,7 @@ export default function Layout({
           padding: "5em",
         }}
       >
-        <View
-          style={{
-            width: 240,
-            backgroundColor: "#F9FAFB",
-            paddingHorizontal: 16,
-            paddingVertical: 20,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 15,
-            }}
-          >
-            <Image
-              style={{
-                width: 48,
-                height: 48,
-                marginRight: 12,
-              }}
-              source={require("../assets/avatar.png")}
-            ></Image>
-
-            <View
-              style={{
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                style={{
-                  marginBottom: 8,
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: 16,
-                  fontWeight: "600",
-                  lineHeight: 19.36,
-                  color: "#1A1B2D",
-                  flex: 1,
-                }}
-              >
-                {nickname}
-              </Text>
-
-              <Link
-                style={{
-                  marginBottom: 8,
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: 12,
-                  fontWeight: "600",
-                  lineHeight: 15,
-                  textDecorationLine: "underline",
-                  color: "#3B63FF",
-                  flex: 1,
-                }}
-                to={{ screen: "Settings" }}
-              >
-                Visit My Profile
-              </Link>
-            </View>
-          </View>
-
-          <View>
-            <SideMenuItem
-              isActive={true}
-              isCurrent={navRoutes[navIndex].name === "Onboard"}
-              screen={"Onboard"}
-              title={"Dashboard"}
-              icon={require("../assets/menu/side/dashboard.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Set PFP"}
-              icon={require("../assets/menu/side/set-pfp.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"User Details"}
-              icon={require("../assets/menu/side/user-details.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Wallet Accounts"}
-              icon={require("../assets/menu/side/wallet-accounts.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"NFT Gallery"}
-              icon={require("../assets/menu/side/nft-gallery.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"KYC"}
-              icon={require("../assets/menu/side/kyc.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Connected dApps"}
-              icon={require("../assets/menu/side/connected-d-apps.png")}
-            />
-          </View>
-        </View>
+        {nickname && <SideMenu nickname={nickname} />}
 
         <View
           style={{
