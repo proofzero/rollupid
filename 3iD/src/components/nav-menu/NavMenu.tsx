@@ -6,11 +6,12 @@ import {
   useNavigationState,
 } from "@react-navigation/native";
 
-import { purge } from "../provider/kubelt";
+import { purge } from "../../provider/kubelt";
 import * as Clipboard from "expo-clipboard";
-import { clearAccount } from "../provider/web3";
-import { useAppSelector } from "../hooks/state";
-import { selectAddress } from "../state/slices/profile";
+import { clearAccount } from "../../provider/web3";
+import { useAppSelector } from "../../hooks/state";
+import { selectAddress } from "../../state/slices/profile";
+import NavMenuItem from "./NavMenuItem";
 
 export default function NavMenu() {
   const [showPanel, setShowPanel] = useState(false);
@@ -18,9 +19,6 @@ export default function NavMenu() {
   const address = useAppSelector(selectAddress);
 
   const nav = useNavigation();
-
-  const navRoutes = useNavigationState((state) => state.routes);
-  const navIndex = useNavigationState((state) => state.index);
 
   return (
     <View
@@ -45,7 +43,7 @@ export default function NavMenu() {
             width: 36.56,
             height: 41.05,
           }}
-          source={require("../assets/three-id-logo-white.svg")}
+          source={require("../../assets/three-id-logo-white.svg")}
         />
 
         <View
@@ -55,53 +53,8 @@ export default function NavMenu() {
             alignItems: "center",
           }}
         >
-          <Link
-            style={{
-              marginLeft: 25,
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              backgroundColor:
-                navRoutes[navIndex].name === "Details"
-                  ? "#373F52"
-                  : "transparent",
-            }}
-            to={{ screen: "Details" }}
-          >
-            <Text
-              style={{
-                fontFamily: "Manrope_500Medium",
-                fontSize: 18,
-                lineHeight: 20,
-                color: "white",
-              }}
-            >
-              My Profile
-            </Text>
-          </Link>
-
-          <Link
-            style={{
-              marginLeft: 25,
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              backgroundColor:
-                navRoutes[navIndex].name === "Settings"
-                  ? "#373F52"
-                  : "transparent",
-            }}
-            to={{ screen: "Settings" }}
-          >
-            <Text
-              style={{
-                fontFamily: "Manrope_500Medium",
-                fontSize: 18,
-                lineHeight: 20,
-                color: "white",
-              }}
-            >
-              Settings
-            </Text>
-          </Link>
+          <NavMenuItem screen="Details" title="My Profile" />
+          <NavMenuItem screen="Settings" title="Settings" />
         </View>
       </View>
 
@@ -162,7 +115,7 @@ export default function NavMenu() {
                   height: 16,
                   marginRight: 12,
                 }}
-                source={require("../assets/copy.png")}
+                source={require("../../assets/copy.png")}
               />
               <Text testID="nav-copy-address">Copy address</Text>
             </Pressable>
@@ -186,7 +139,7 @@ export default function NavMenu() {
                   height: 16,
                   marginRight: 12,
                 }}
-                source={require("../assets/cog.png")}
+                source={require("../../assets/cog.png")}
               />
               <Text testID="nav-go-to-settings">Settings</Text>
             </Pressable>
@@ -204,7 +157,7 @@ export default function NavMenu() {
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                source={require("../assets/spacer_195.png")}
+                source={require("../../assets/spacer_195.png")}
               />
             </View>
 
@@ -226,7 +179,7 @@ export default function NavMenu() {
                   height: 16,
                   marginRight: 12,
                 }}
-                source={require("../assets/logout.png")}
+                source={require("../../assets/logout.png")}
               />
               <Text testID="nav-logout">Sign out</Text>
             </Pressable>

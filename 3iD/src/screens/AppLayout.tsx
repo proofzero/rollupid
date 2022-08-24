@@ -2,7 +2,7 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import React, { useEffect } from "react";
 
 import { Image, View, Text, Pressable, SafeAreaView } from "react-native";
-import NavMenu from "../components/NavMenu";
+import NavMenu from "../components/nav-menu/NavMenu";
 import useAccount from "../hooks/account";
 import { useAppDispatch } from "../hooks/state";
 import {
