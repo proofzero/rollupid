@@ -62,21 +62,6 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
   const isCurrent = navRoutes[navIndex].name === screen;
   const isActive = screen != null;
 
-  // const [eventLog, updateEventLog] = React.useState([]);
-  // const [disabled, setDisabled] = React.useState(false);
-
-
-  // const handleEvent = (eventName: never) => {
-  //   return () => {
-  //     const limit = 10;
-  //     updateEventLog((state) => {
-  //       const nextState = state.slice(0, limit - 1);
-  //       nextState.unshift(eventName);
-  //       return nextState;
-  //     });
-  //   };
-  // };
-
   return (
     <LinkWrapper>
       <div
