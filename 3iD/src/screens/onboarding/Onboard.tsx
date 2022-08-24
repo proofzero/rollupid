@@ -2,7 +2,13 @@ import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter } from "react-icons/fa";
 
-import { View, Text, Image, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  useWindowDimensions,
+} from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
@@ -16,6 +22,7 @@ type OnboardProps = {
 
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
+  const window = useWindowDimensions();
 
   const [canMint, setCanMint] = useState(false);
 
@@ -232,7 +239,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
           <View
             style={{
-              flexDirection: "row",
+              flexDirection: window.width >= window.height ? "row" : "column",
             }}
           >
             <LinkButton
@@ -241,7 +248,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
               Icon={FaTwitter}
               iconColor="#1D9BF0"
             />
-            <View style={{ width: 10 }} />
+            <View style={{ width: 10, height: 10 }} />
             <LinkButton
               url={Constants.manifest?.extra?.discordUrl}
               title="Discord"
@@ -253,14 +260,20 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: window.width >= window.height ? "row" : "column",
           }}
         >
           {/* Steps */}
           <View
-            style={{
-              flex: 1,
-            }}
+            style={
+              window.width >= window.height
+                ? {
+                    flex: 1,
+                  }
+                : {
+                    marginBottom: "1em",
+                  }
+            }
           >
             <Text
               style={{
@@ -417,7 +430,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           <View
             style={{
               flex: 1,
-              marginLeft: 41,
+              marginLeft: window.width >= window.height ? 41 : "1em",
             }}
           >
             <Text

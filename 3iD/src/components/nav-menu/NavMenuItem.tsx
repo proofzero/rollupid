@@ -1,6 +1,6 @@
 import { Link, useNavigationState } from "@react-navigation/native";
 import React from "react";
-import { Text } from "react-native";
+import { Text, useWindowDimensions } from "react-native";
 
 type NavMenuItemProps = {
   screen: string;
@@ -12,12 +12,13 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
   const navIndex = useNavigationState((state) => state.index);
 
   const isCurrent = navRoutes[navIndex].name === screen;
-  const isActive = screen != null;
+
+  const window = useWindowDimensions();
 
   return (
     <Link
       style={{
-        marginLeft: 25,
+        marginLeft: window.width >= window.height ? 25 : 0,
         paddingHorizontal: 12,
         paddingVertical: 8,
         backgroundColor: isCurrent ? "#373F52" : "transparent",

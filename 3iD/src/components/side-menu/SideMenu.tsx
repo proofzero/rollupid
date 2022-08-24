@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, Text } from "react-native";
+import { View, Image, Text, useWindowDimensions } from "react-native";
 import TradLink from "../TradLink";
 import SideMenuItem, { SideMenuItemProps } from "./SideMenuItem";
 import {
@@ -53,10 +53,12 @@ const sideMenuItems: SideMenuItemProps[] = [
 ];
 
 const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
+  const window = useWindowDimensions();
+
   return (
     <View
       style={{
-        width: 240,
+        width: window.width >= window.height ? 240 : "100%",
         backgroundColor: "#F9FAFB",
         paddingHorizontal: 16,
         paddingVertical: 20,

@@ -4,7 +4,13 @@ import React, { useEffect, useState } from "react";
 import NavMenu from "../components/nav-menu/NavMenu";
 import useAccount from "../hooks/account";
 import { connect, forceAccounts } from "../provider/web3";
-import { Image, View, Text, ScrollView } from "react-native";
+import {
+  Image,
+  View,
+  Text,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import {
   authenticate,
   getSDK,
@@ -125,9 +131,7 @@ export default function Layout({
   const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
   const account = useAccount();
-
-  const navRoutes = useNavigationState((state) => state.routes);
-  const navIndex = useNavigationState((state) => state.index);
+  const window = useWindowDimensions();
 
   const loadProfile = async () => {
     const storedProfile = await getItem();
@@ -222,10 +226,10 @@ export default function Layout({
       <View
         style={{
           flex: 1,
-          flexDirection: "row",
+          flexDirection: window.width >= window.height ? "row" : "column",
           shadowRadius: 5,
           shadowOpacity: 0.1,
-          padding: "5em",
+          padding: window.width >= window.height ? "5em" : "0.5em",
         }}
       >
         {nickname && <SideMenu nickname={nickname} />}
