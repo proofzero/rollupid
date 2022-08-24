@@ -449,8 +449,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
             <View
               style={{
                 paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
+                // borderBottomWidth: 1,
+                // borderBottomColor: "#E5E7EB",
               }}
             >
               <View
@@ -464,6 +464,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     borderBottom: "1px solid #E5E7EB",
+                    paddingBottom: 12,
                   }}
                 >
                   <Text
@@ -516,8 +517,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
             <View
               style={{
                 paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
+                // borderBottomWidth: 1,
+                // borderBottomColor: "#E5E7EB",
               }}
             >
               <View
@@ -530,6 +531,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    borderBottom: "1px solid #E5E7EB",
+                    paddingBottom: 12,
                   }}
                 >
                   <Text
@@ -592,8 +595,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
             <View
               style={{
                 paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
+                // borderBottomWidth: 1,
+                // borderBottomColor: "#E5E7EB",
               }}
             >
               <View
@@ -606,6 +609,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    borderBottom: "1px solid #E5E7EB",
+                    paddingBottom: 12,
                   }}
                 >
                   <Text
@@ -650,8 +655,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
             <View
               style={{
                 paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
+                // borderBottomWidth: 1,
+                // borderBottomColor: "#E5E7EB",
               }}
             >
               <View
@@ -664,6 +669,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    borderBottom: "1px solid #E5E7EB",
+                    paddingBottom: 12,
                   }}
                 >
                   <Text
@@ -748,6 +755,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    borderBottom: "1px solid #E5E7EB",
+                    paddingBottom: 12,
                   }}
                 >
                   <Text
