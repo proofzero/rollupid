@@ -33,7 +33,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
     }[]
   >([
     {
-      title: "Claim your 3iD",
+      title: "Claim your 3ID",
       complete: true,
     },
     {
@@ -470,13 +470,13 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <Text
                     style={{
                       fontFamily: "Inter_500Medium",
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 16,
                       color: "#4B5563",
                     }}
                   >
-                    How do I use 3iD?
+                    How do I use 3ID?
                   </Text>
 
                   <Image
@@ -491,6 +491,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     marginVertical: "1em",
+                    fontSize: 14,
+                    color: "#111827",
+                    fontFamily: "Inter_400Regular",
                   }}
                 >
                   Now that you've claimed your 3ID, other applications can query
@@ -506,7 +509,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   to promote your profile and NFTs on social media.
                 </Text>
 
-                <Text>
+                <Text style={{
+                  fontSize: 14,
+                  color: "#111827",
+                  fontFamily: "Inter_400Regular",
+                }}>
                   In our roadmap we have many more features coming including
                   linking multiple accounts together, messaging, storage and
                   more.
@@ -538,13 +545,13 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <Text
                     style={{
                       fontFamily: "Inter_500Medium",
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 16,
                       color: "#4B5563",
                     }}
                   >
-                    What is the 3iD Roadmap?
+                    What is the 3ID Roadmap?
                   </Text>
 
                   <Image
@@ -559,6 +566,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     marginTop: "1em",
+                    fontSize: 14,
+                    color: "#111827",
+                    fontFamily: "Inter_400Regular",
                   }}
                 >
                   Next we will be focusing on storage, account linking, and
@@ -616,7 +626,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <Text
                     style={{
                       fontFamily: "Inter_500Medium",
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 16,
                       color: "#4B5563",
@@ -637,13 +647,16 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     marginTop: "1em",
+                    fontSize: 14,
+                    color: "#111827",
+                    fontFamily: "Inter_400Regular",
                   }}
                 >
                   Yes. You can list your invite card on{" "}
                   <a
                     target={"_blank"}
                     rel={"noopener noopener noreferrer"}
-                    href={`https://opensea.io/explore-collections`}
+                    href={`https://opensea.io/collection/3id-invite`}
                   >
                     OpenSea
                   </a>{" "}
@@ -676,7 +689,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <Text
                     style={{
                       fontFamily: "Inter_500Medium",
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 16,
                       color: "#4B5563",
@@ -697,6 +710,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     marginTop: "1em",
+                    fontSize: 14,
+                    color: "#111827",
+                    fontFamily: "Inter_400Regular",
+
                   }}
                 >
                   <Text>
@@ -743,6 +760,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 paddingVertical: 16,
                 borderBottomWidth: 1,
                 borderBottomColor: "#E5E7EB",
+                fontFamily: "Inter_400Regular",
               }}
             >
               <View
@@ -762,7 +780,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <Text
                     style={{
                       fontFamily: "Inter_500Medium",
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: "500",
                       lineHeight: 16,
                       color: "#4B5563",
@@ -783,9 +801,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     marginTop: "1em",
+                    fontSize: 14,
+                    color: "#111827",
                   }}
                 >
-                  3iD was created by{" "}
+                  3ID was created by{" "}
                   <a
                     target={"_blank"}
                     rel={"noopener noopener noreferrer"}
