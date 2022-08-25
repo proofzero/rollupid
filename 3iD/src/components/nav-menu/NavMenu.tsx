@@ -65,7 +65,7 @@ export default function NavMenu() {
           }}
         >
           <NavMenuItem screen="Details" title="My Profile" />
-          <NavMenuItem screen="Settings" title="Settings" />
+          <NavMenuItem screen="Settings" title="Account" />
         </View>
       </View>
 
