@@ -64,7 +64,8 @@ export default function NavMenu() {
             justifyContent: "center",
           }}
         >
-          <NavMenuItem screen="Details" title="My Profile" />
+          <NavMenuItem title="My Profile" />
+          <NavMenuItem title="0xChat" />
           <NavMenuItem screen="Settings" title="Account" />
         </View>
       </View>
