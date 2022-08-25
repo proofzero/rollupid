@@ -95,7 +95,7 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
                   width: 20,
                   height: 20,
                   marginRight: 15,
-                  color: isCurrent ? "#111827" : "gray",
+                  color: isCurrent ? "#4B5563" : "#D1D5DB",
                 }}
               ></Icon>
 
@@ -104,7 +104,7 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
                   fontFamily: "Inter_500Medium",
                   fontSize: 16,
                   lineHeight: 20,
-                  color: isCurrent ? "#111827" : "gray",
+                  color: isCurrent ? "#4B5563" : "#D1D5DB",
                 }}
               >
                 {title}
@@ -125,7 +125,7 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
                 width: 20,
                 height: 20,
                 marginRight: 15,
-                color: isCurrent ? "#111827" : "gray",
+                color: isCurrent ? "#4B5563" : "#D1D5DB",
               }}
             ></Icon>
 
@@ -134,7 +134,7 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
                 fontFamily: "Inter_500Medium",
                 fontSize: 16,
                 lineHeight: 20,
-                color: isCurrent ? "#111827" : "gray",
+                color: isCurrent ? "#4B5563" : "#D1D5DB",
               }}
             >
               {title}
