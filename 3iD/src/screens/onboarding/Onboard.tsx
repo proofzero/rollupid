@@ -17,6 +17,7 @@ import { getFunnelState, getInviteCode } from "../../services/threeid";
 import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
+import { NONE } from "../../../../packages/sdk-web/lib/cljs.core";
 
 type OnboardProps = {
   navigation: any;
@@ -30,7 +31,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
   const [canMint, setCanMint] = useState(false);
 
-  const [steps] = useState<
+  const [completeSteps] = useState<
     {
       title: string;
       complete: boolean;
@@ -40,10 +41,26 @@ const Onboard = ({ navigation }: OnboardProps) => {
       title: "Claim your 3ID",
       complete: true,
     },
+  ]);
+
+  const [comingNext] = useState<
+    {
+      title: string;
+      complete: boolean;
+    }[]
+  >([
     {
       title: "Claim your PFP",
       complete: false,
     },
+  ]);
+
+  const [roadmapSteps] = useState<
+    {
+      title: string;
+      complete: boolean;
+    }[]
+  >([
     {
       title: "Add user details",
       complete: false,
@@ -63,7 +80,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
   ]);
 
   const percentage =
-    (steps.filter((s) => s.complete).length / steps.length) * 100;
+    completeSteps.length / (completeSteps.length + comingNext.length + roadmapSteps.length) * 100;
 
   useEffect(() => {
     const asyncFn = async () => {
@@ -304,13 +321,15 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 fontWeight: "400",
                 lineHeight: 20,
                 color: "#9CA3AF",
-                marginBottom: 23,
+                marginBottom: 20,
+                marginTop: 10,
               }}
             >
-              You will earn 1 Invite NFT for each step completed
+              Discover and try new features as we roll them out.
             </Text>
 
             {/* Progress bar */}
+
             <View
               style={{
                 width: "100%",
@@ -329,6 +348,18 @@ const Onboard = ({ navigation }: OnboardProps) => {
             </View>
 
             {/* Steps */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+              }}
+            >
+              READY
+            </Text>
             <View
               style={{
                 borderWidth: 1,
@@ -336,13 +367,13 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 padding: 17,
               }}
             >
-              {steps.map((step, index) => (
+              {completeSteps.map((step, index) => (
                 <View
                   key={step.title}
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    marginBottom: index !== steps.length - 1 ? 32 : 0,
+                    marginBottom: index !== completeSteps.length - 1 ? 32 : 0,
                   }}
                 >
                   <View
@@ -357,9 +388,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         height: 25.6,
                         marginRight: 19.2,
                       }}
-                      source={require(`../../assets/step_${
-                        step.complete ? "complete" : "soon"
-                      }.png`)}
+                      source={require(`../../assets/step_complete.png`)}
                     />
 
                     <View>
@@ -378,59 +407,170 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       {step.complete && (
                         <Text
                           style={{
-                            fontFamily: "Inter_400Regular",
+                            fontFamily: "Inter_500Medium",
                             fontSize: 14,
-                            fontWeight: "400",
-                            lineHeight: 20,
+                            fontWeight: "500",
+                            lineHeight: 24,
                             color: "#6B7280",
                           }}
                         >
                           Completed
                         </Text>
                       )}
-
-                      {!step.complete && (
-                        <Text
-                          style={{
-                            fontFamily: "Inter_400Regular",
-                            fontSize: 14,
-                            fontWeight: "400",
-                            lineHeight: 20,
-                            color: "#D1D5DB",
-                          }}
-                        >
-                          Coming Soon
-                        </Text>
-                      )}
                     </View>
                   </View>
+                </View>
+              ))}
+            </View>
 
-                  {!step.complete && (
-                    <Pressable
-                      disabled={true}
+            {/* COMING NEXT */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+                marginTop: 20,
+              }}
+            >
+              COMING NEXT
+            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F4F6",
+                padding: 17,
+              }}
+            >
+              {comingNext.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: index !== comingNext.length - 1 ? 32 : 0,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
                       style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 16,
-                        paddingVertical: 12,
-                        backgroundColor: "#F3F4F6",
+                        width: 25.6,
+                        height: 25.6,
+                        marginRight: 19.2,
                       }}
-                    >
+                      source={require(`../../assets/step_soon.png`)}
+                    />
+
+                    <View>
                       <Text
                         style={{
                           fontFamily: "Inter_500Medium",
                           fontSize: 14,
                           fontWeight: "500",
-                          lineHeight: 16,
-                          color: "#E5E7EB",
+                          lineHeight: 20,
+                          color: "#111827",
                         }}
                       >
-                        View
+                        {step.title}
                       </Text>
-                    </Pressable>
-                  )}
+
+                      <Text
+                        style={{
+                          fontFamily: "Inter_400Regular",
+                          fontSize: 14,
+                          fontWeight: "400",
+                          lineHeight: 20,
+                          color: "#D1D5DB",
+                        }}
+                      >
+                        Mint your very own 3ID 1/1 PFP. <br></br>
+                        
+                        For more information see "What is the 3ID?"" PFP in the FAQ section.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* ROADMAP */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+                marginTop: 20,
+              }}
+            >
+              ROADMAP
+            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F4F6",
+                padding: 17,
+              }}
+            >
+              {roadmapSteps.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: index !== roadmapSteps.length - 1 ? 32 : 0,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: 25.6,
+                        height: 25.6,
+                        marginRight: 19.2,
+                      }}
+                      source={require(`../../assets/step_soon.png`)}
+                    />
+
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: "Inter_500Medium",
+                          fontSize: 14,
+                          fontWeight: "500",
+                          lineHeight: 20,
+                          color: "#111827",
+                        }}
+                      >
+                        {step.title}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontFamily: "Inter_400Regular",
+                          fontSize: 14,
+                          fontWeight: "400",
+                          lineHeight: 24,
+                          color: "#D1D5DB",
+                        }}
+                      >
+                        Coming Soon
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               ))}
             </View>

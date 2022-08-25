@@ -63,7 +63,7 @@ const AccordionWhatIsPFP = () => {
                   color: "#4B5563",
                 }}
               >
-                What is my new PFP?
+                What is my the 3ID PFP?
               </Text>
 
               <Image
