@@ -30,8 +30,8 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
     >
       <Text
         style={{
-          fontFamily: "Manrope_500Medium",
-          fontSize: 18,
+          fontFamily: "Inter_500Medium",
+          fontSize: 16,
           lineHeight: 20,
           color: "white",
         }}
@@ -53,8 +53,8 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
     >
       <Text
         style={{
-          fontFamily: "Manrope_500Medium",
-          fontSize: 18,
+          fontFamily: "Inter_500Medium",
+          fontSize: 16,
           lineHeight: 20,
           color: "#374151",
         }}
