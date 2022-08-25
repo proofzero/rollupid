@@ -258,9 +258,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
               marginBottom: 22,
             }}
           >
-            The app is currently in beta. We will be unlocking new features on
-            weekly basis. <br />
-            Please follow us on Twitter and join our Discord to stay updated!{" "}
+            Thanks for being an early supporter! We will be unlocking new features regularly. <br />
+            Check out what's coming next. Be sure to follow us on Twitter and Discord to stay updated!{" "}
           </Text>
 
           <View
