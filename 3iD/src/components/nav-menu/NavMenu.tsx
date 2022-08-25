@@ -33,7 +33,8 @@ export default function NavMenu() {
     <View
       style={{
         paddingVertical: "1em",
-        paddingHorizontal: window.width >= window.height ? "5em" : "0.5em",
+        width: Math.min(1600, window.width),
+        marginHorizontal: "auto",
         flexDirection: window.width >= window.height ? "row" : "column",
         justifyContent: "space-between",
         alignItems: "center",
@@ -66,7 +67,7 @@ export default function NavMenu() {
         >
           <NavMenuItem title="My Profile" />
           <NavMenuItem title="0xChat" />
-          <NavMenuItem screen="Settings" title="Account" />
+          <NavMenuItem screen="Onboard" title="Account" />
         </View>
       </View>
 
