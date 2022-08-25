@@ -12,11 +12,15 @@ import {
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
-import { getFunnelState } from "../../services/threeid";
+import { getFunnelState, getInviteCode } from "../../services/threeid";
 
 import FAQ from "./FAQ/FAQ";
 
 import Layout from "../AuthLayout";
+
+import { HiLink } from "react-icons/hi";
+
+import * as Clipboard from "expo-clipboard";
 
 type OnboardProps = {
   navigation: any;
@@ -25,6 +29,8 @@ type OnboardProps = {
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
   const window = useWindowDimensions();
+
+  const [inviteCode, setInviteCode] = useState<string | undefined>();
 
   const [canMint, setCanMint] = useState(false);
 
@@ -71,12 +77,17 @@ const Onboard = ({ navigation }: OnboardProps) => {
       if (!funnelState.mint) {
         setCanMint(true);
       }
+
+      const inviteCodeRes = await getInviteCode(sdk);
+      if (inviteCodeRes) {
+        setInviteCode(inviteCodeRes);
+      }
     };
 
     if (account) {
       asyncFn();
     }
-  }, []);
+  }, [account]);
 
   return (
     <Layout navigation={navigation}>
@@ -287,7 +298,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 color: "#1F2937",
               }}
             >
-              Get Started
+              Roadmap
             </Text>
 
             <Text

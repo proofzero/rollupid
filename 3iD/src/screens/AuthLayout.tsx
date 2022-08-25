@@ -208,6 +208,7 @@ export default function Layout({
       <View
         style={{
           backgroundColor: "#192030",
+          zIndex: 1,
         }}
       >
         <NavMenu />
