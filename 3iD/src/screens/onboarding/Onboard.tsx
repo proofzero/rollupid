@@ -14,7 +14,7 @@ import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
 import { getFunnelState, getInviteCode } from "../../services/threeid";
 
-import FAQ from "./FAQ/FAQ";
+import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
 
