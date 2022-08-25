@@ -62,7 +62,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
     }[]
   >([
     {
-      title: "Add user details",
+      title: "Verify ENS",
+      complete: false,
+    },
+    {
+      title: "Configure Profile",
       complete: false,
     },
     {
@@ -70,11 +74,23 @@ const Onboard = ({ navigation }: OnboardProps) => {
       complete: false,
     },
     {
-      title: "Link More Wallets",
+      title: "Link More Accounts",
       complete: false,
     },
     {
-      title: "Secure KYC",
+      title: "Setup Secure KYC",
+      complete: false,
+    },
+    {
+      title: "Send First Message",
+      complete: false,
+    },
+    {
+      title: "Save First File",
+      complete: false,
+    },
+    {
+      title: "Permission First App",
       complete: false,
     },
   ]);

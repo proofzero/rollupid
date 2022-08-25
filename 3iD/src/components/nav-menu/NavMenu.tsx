@@ -78,7 +78,8 @@ export default function NavMenu() {
           }}
         >
           <NavMenuItem title="My Profile" />
-          <NavMenuItem title="0xChat" />
+          <NavMenuItem title="inb0x" />
+          <NavMenuItem title="b0x" />
           <NavMenuItem screen="Onboard" title="Account" />
         </View>
       </View>
