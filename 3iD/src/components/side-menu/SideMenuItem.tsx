@@ -2,15 +2,15 @@ import { Link, useNavigationState } from "@react-navigation/native";
 import React from "react";
 import { IconType } from "react-icons/lib";
 import { View, Image, Text } from "react-native";
-import styled from "styled-components"
+import styled from "styled-components";
 
 const LinkWrapper = styled.div`
   &:hover {
-    background-color: #F3F4F6;
+    background-color: #f3f4f6;
   }
 
   &:focus {
-    box-shadow: 0px 0px 0px 1px #9CA3AF;
+    box-shadow: 0px 0px 0px 1px #9ca3af;
   }
 
   &:hover span {

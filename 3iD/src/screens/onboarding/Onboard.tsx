@@ -240,7 +240,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           <View
             style={{
               flexDirection: window.width >= window.height ? "row" : "column",
-              alignItems: "center"
+              alignItems: "center",
             }}
           >
             <LinkButton
@@ -510,11 +510,13 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   to promote your profile and NFTs on social media.
                 </Text>
 
-                <Text style={{
-                  fontSize: 14,
-                  color: "#111827",
-                  fontFamily: "Inter_400Regular",
-                }}>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: "#111827",
+                    fontFamily: "Inter_400Regular",
+                  }}
+                >
                   In our roadmap we have many more features coming including
                   linking multiple accounts together, messaging, storage and
                   more.
@@ -714,7 +716,6 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     fontSize: 14,
                     color: "#111827",
                     fontFamily: "Inter_400Regular",
-
                   }}
                 >
                   <Text>

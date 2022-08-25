@@ -15,8 +15,8 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
 
   const window = useWindowDimensions();
 
-  return (
-    screen ? <Link
+  return screen ? (
+    <Link
       style={{
         marginLeft: window.width >= window.height ? 25 : 0,
         paddingHorizontal: 12,
@@ -38,7 +38,9 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
       >
         {title}
       </Text>
-    </Link> : <div
+    </Link>
+  ) : (
+    <div
       style={{
         marginLeft: window.width >= window.height ? 25 : 0,
         paddingLeft: 12,
@@ -46,7 +48,7 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
         paddingTop: 8,
         paddingBottom: 8,
         backgroundColor: "transparent",
-        cursor: "default"
+        cursor: "default",
       }}
     >
       <Text
