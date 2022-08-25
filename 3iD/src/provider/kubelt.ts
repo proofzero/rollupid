@@ -84,6 +84,22 @@ export const authenticate = async (
 
     let isAuth = await isAuthenticated(address);
     if (force || !isAuth) {
+      let network = null;
+      try {
+        network = await provider.getNetwork();
+
+        // If network changes under us
+        // we get an exception
+        // which we can use
+        // to force refresh
+      } catch (e) {
+        window.location.reload();
+      }
+
+      console.log({
+        chainId: network?.chainId,
+      });
+
       sdk = await sdkWeb.node_v1.oort.setWallet(sdk, {
         address,
         signFn,
@@ -99,6 +115,7 @@ export const authenticate = async (
       }
     }
   } catch (e) {
+    console.error(e);
     console.warn("There was a problem authenticating to the Kubelt SDK");
   }
 };
