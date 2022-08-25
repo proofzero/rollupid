@@ -78,6 +78,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
       complete: false,
     },
     {
+      title: "Receive First Verified Credential",
+      complete: false,
+    },
+    {
       title: "Setup Secure KYC",
       complete: false,
     },
