@@ -88,15 +88,7 @@ const AccordionHowToUse = ({ account }: Account) => {
               >
                 Now that you've claimed your 3ID, other applications can query
                 your profile to fetch your public profile details including your
-                avatar. You will also soon be able to use{" "}
-                <Text
-                  style={{
-                    color: "#D1D5DB",
-                  }}
-                >
-                  https://threeid.xyz/{account}
-                </Text>{" "}
-                to promote your profile and NFTs on social media.
+                avatar. You will also soon be able to promote your profile and NFTs on social media.
               </Text>
 
               <Text

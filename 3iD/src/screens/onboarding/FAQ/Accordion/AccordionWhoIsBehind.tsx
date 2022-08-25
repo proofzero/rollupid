@@ -82,7 +82,7 @@ const AccordionWhoIsBehind = () => {
                 fontFamily: "Inter_400Regular",
               }}
             >
-              3ID was created by{" "}
+              3ID is created by{" "}
               <a
                 target={"_blank"}
                 rel={"noopener noopener noreferrer"}
