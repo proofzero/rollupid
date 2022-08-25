@@ -3,7 +3,7 @@ import React from "react";
 import { Text, useWindowDimensions } from "react-native";
 
 type NavMenuItemProps = {
-  screen: string;
+  screen?: string;
   title: string;
 };
 
@@ -16,7 +16,7 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
   const window = useWindowDimensions();
 
   return (
-    <Link
+    screen ? <Link
       style={{
         marginLeft: window.width >= window.height ? 25 : 0,
         paddingHorizontal: 12,
@@ -38,7 +38,28 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
       >
         {title}
       </Text>
-    </Link>
+    </Link> : <div
+      style={{
+        marginLeft: window.width >= window.height ? 25 : 0,
+        paddingLeft: 12,
+        paddingRight: 12,
+        paddingTop: 8,
+        paddingBottom: 8,
+        backgroundColor: "transparent",
+        cursor: "default"
+      }}
+    >
+      <Text
+        style={{
+          fontFamily: "Manrope_500Medium",
+          fontSize: 18,
+          lineHeight: 20,
+          color: "#374151",
+        }}
+      >
+        {title}
+      </Text>
+    </div>
   );
 };
 
