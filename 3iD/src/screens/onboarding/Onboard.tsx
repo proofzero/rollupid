@@ -71,7 +71,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
       const funnelState = await getFunnelState(sdk);
       if (!funnelState.mint) {
-        setCanMint(true);
+        // setCanMint(true);
       }
 
       const inviteCodeRes = await getInviteCode(sdk);
