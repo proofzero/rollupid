@@ -64,7 +64,7 @@ export default function Auth({ navigation }: { navigation: any }) {
         if (await isAuthenticated(address)) {
           return claimsRedirect(claim);
         } else {
-          throw new Error("Unsuccesful authentication to Kubelt SDK");
+          console.error("Unsuccesful authentication to Kubelt SDK");
         }
       }
     };

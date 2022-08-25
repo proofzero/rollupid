@@ -6,8 +6,7 @@ export default function Layout({ children }: { children: any }) {
   return (
     <SafeAreaView
       style={{
-        height: 100,
-        flex: 1,
+        minHeight: "100%",
         backgroundColor: "#F9FAFB",
       }}
     >
@@ -30,6 +29,7 @@ export default function Layout({ children }: { children: any }) {
         style={{
           flex: 1,
           paddingHorizontal: "1em",
+          paddingVertical: "3em",
         }}
       >
         {children}

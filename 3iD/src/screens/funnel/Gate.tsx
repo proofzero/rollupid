@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 
-import { Pressable, Text, View, Image } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  Image,
+  useWindowDimensions,
+} from "react-native";
 import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
@@ -12,6 +18,7 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
+  const window = useWindowDimensions();
 
   const otherWalletRequested = useAsyncStorage("kubelt:other_wallet_request");
 
@@ -75,7 +82,7 @@ export default function Gate({ navigation }: { navigation: any }) {
           style={{
             width: 184.82,
             height: 159.91,
-            marginBottom: 74.09,
+            marginBottom: window.width >= window.height ? 74.09 : "1em",
           }}
           source={require("../../assets/sad.png")}
         />
@@ -112,7 +119,8 @@ export default function Gate({ navigation }: { navigation: any }) {
 
         <View
           style={{
-            flexDirection: "row",
+            flexDirection:
+              window.width >= window.height ? "row" : "column-reverse",
             justifyContent: "center",
             alignItems: "center",
           }}
@@ -126,7 +134,7 @@ export default function Gate({ navigation }: { navigation: any }) {
               paddingHorizontal: 20,
               paddingVertical: 14,
               backgroundColor: "#E5E7EB",
-              marginRight: 20,
+              marginRight: window.width >= window.height ? 20 : 0,
             }}
             onPress={() => tryDifferentWallet()}
           >
@@ -153,7 +161,8 @@ export default function Gate({ navigation }: { navigation: any }) {
               paddingHorizontal: 20,
               paddingVertical: 14,
               backgroundColor: "#192030",
-              marginRight: 20,
+              marginRight: window.width >= window.height ? 20 : 0,
+              marginBottom: window.width >= window.height ? 0 : "1em",
             }}
           >
             <Text
