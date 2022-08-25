@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
 import { store } from "../state/store";
 import { clearSlice, setAddress } from "../state/slices/profile";
+import { authenticate, purge } from "./kubelt";
 
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
@@ -57,7 +58,19 @@ const handleAccountsChanged = async (accounts: string[]) => {
   }
 };
 
+// Don't really care for the chainId here as
+// it's going to be placed in the
+// SDK wallet in authentication
+// this could be used
+// but it's further away
+// from the actual signing
+const handleChainChanged = async () => {
+  purge();
+  clearAccount();
+};
+
 eth?.on("accountsChanged", handleAccountsChanged);
+eth?.on("chainChanged", handleChainChanged);
 
 /**
  * General purpose method that can be used throughout to get access to the current web3 provider.
