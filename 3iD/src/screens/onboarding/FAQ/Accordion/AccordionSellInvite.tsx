@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const AccordianSellInvite = () => {
+const AccordionSellInvite = () => {
   const [expanded, setExpanded] = useState(false);
   const [styles, setStyles] = useState({
     width: 14,
@@ -98,4 +98,4 @@ const AccordianSellInvite = () => {
   );
 };
 
-export default AccordianSellInvite;
+export default AccordionSellInvite;
