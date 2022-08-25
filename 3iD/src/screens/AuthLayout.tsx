@@ -205,7 +205,13 @@ export default function Layout({
         flex: 1,
       }}
     >
-      <NavMenu />
+      <View
+        style={{
+          backgroundColor: "#192030",
+        }}
+      >
+        <NavMenu />
+      </View>
 
       <View
         style={{
@@ -229,7 +235,9 @@ export default function Layout({
           flexDirection: window.width >= window.height ? "row" : "column",
           shadowRadius: 5,
           shadowOpacity: 0.1,
-          padding: window.width >= window.height ? "5em" : "0.5em",
+          width: Math.min(1600, window.width),
+          marginHorizontal: "auto",
+          marginVertical: "3em",
         }}
       >
         {nickname && <SideMenu nickname={nickname} />}
