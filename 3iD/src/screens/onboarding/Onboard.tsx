@@ -14,13 +14,9 @@ import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
 import { getFunnelState, getInviteCode } from "../../services/threeid";
 
-import FAQ from "./FAQ/FAQ";
+import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
-
-import { HiLink } from "react-icons/hi";
-
-import * as Clipboard from "expo-clipboard";
 
 type OnboardProps = {
   navigation: any;
@@ -441,7 +437,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           </View>
 
           {/* FAQ */}
-          <FAQ account={account} />
+          <FAQ account={account} inviteCode={inviteCode} />
         </View>
       </View>
     </Layout>

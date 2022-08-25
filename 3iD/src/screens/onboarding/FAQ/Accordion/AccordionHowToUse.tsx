@@ -36,17 +36,6 @@ const AccordionHowToUse = ({ account }: Account) => {
 
   return (
     <>
-      <Text
-        style={{
-          fontFamily: "Inter_600SemiBold",
-          fontSize: 20,
-          fontWeight: "600",
-          lineHeight: 32,
-          color: "#1F2937",
-          marginBottom: 16,
-        }}
-      ></Text>
-
       <View
         style={{
           paddingVertical: 16,
