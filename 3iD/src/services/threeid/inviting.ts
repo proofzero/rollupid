@@ -49,3 +49,24 @@ export const claimInvitation = async (
 
   return success;
 };
+
+export const getInviteCode = async (sdk: any): Promise<string | undefined> => {
+  let code: string | undefined;
+
+  try {
+    const res = await sdkWeb.node_v1.oort.callRpc(sdk, {
+      method: ["3id", "get-invite-code"],
+      params: [],
+    });
+
+    if (!res || res?.error || res?.body.error) {
+      throw new Error();
+    }
+
+    code = res.body.result;
+  } catch (e) {
+    console.warn("Failed to retrieve invite code");
+  }
+
+  return code;
+};

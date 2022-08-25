@@ -12,9 +12,13 @@ import {
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
-import { getFunnelState } from "../../services/threeid";
+import { getFunnelState, getInviteCode } from "../../services/threeid";
 
 import Layout from "../AuthLayout";
+
+import { HiLink } from "react-icons/hi";
+
+import * as Clipboard from "expo-clipboard";
 
 type OnboardProps = {
   navigation: any;
@@ -23,6 +27,8 @@ type OnboardProps = {
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
   const window = useWindowDimensions();
+
+  const [inviteCode, setInviteCode] = useState<string | undefined>();
 
   const [canMint, setCanMint] = useState(false);
 
@@ -69,12 +75,17 @@ const Onboard = ({ navigation }: OnboardProps) => {
       if (!funnelState.mint) {
         setCanMint(true);
       }
+
+      const inviteCodeRes = await getInviteCode(sdk);
+      if (inviteCodeRes) {
+        setInviteCode(inviteCodeRes);
+      }
     };
 
     if (account) {
       asyncFn();
     }
-  }, []);
+  }, [account]);
 
   return (
     <Layout navigation={navigation}>
@@ -285,7 +296,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 color: "#1F2937",
               }}
             >
-              Get Started
+              Roadmap
             </Text>
 
             <Text
@@ -441,7 +452,96 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 fontWeight: "600",
                 lineHeight: 32,
                 color: "#1F2937",
+              }}
+            >
+              Invite Friends
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 20,
+              }}
+            >
+              Share an invite link with your friends
+            </Text>
+
+            {inviteCode && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#F9FAFB",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    flex: 1,
+                    fontFamily: "Inter_400Regular",
+                    fontWeight: "400",
+                    fontSize: 14,
+                    lineHeight: 20,
+                    paddingVertical: 11,
+                    paddingLeft: 13,
+                    color: "#9CA3AF",
+                  }}
+                >
+                  https://get.threeid.xyz/{inviteCode}
+                </Text>
+
+                <Pressable
+                  disabled={!inviteCode}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#1F2937",
+                    paddingVertical: 11,
+                    paddingHorizontal: 17,
+                  }}
+                  onPress={async () => {
+                    await Clipboard.setStringAsync(
+                      `https://get.threeid.xyz/${inviteCode}`
+                    );
+                  }}
+                >
+                  <HiLink
+                    style={{
+                      width: 15,
+                      height: 15,
+                      marginRight: 10.5,
+                      color: "#D1D5DB",
+                    }}
+                  />
+
+                  <Text
+                    style={{
+                      fontFamily: "Inter_500Medium",
+                      fontSize: 14,
+                      lineHeight: 20,
+                      color: "#D1D5DB",
+                    }}
+                  >
+                    Copy Link
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                fontSize: 20,
+                fontWeight: "600",
+                lineHeight: 32,
+                color: "#1F2937",
                 marginBottom: 16,
+                marginTop: 23,
               }}
             >
               FAQ
