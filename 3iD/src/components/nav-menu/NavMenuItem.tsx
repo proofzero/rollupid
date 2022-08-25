@@ -33,7 +33,7 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
           fontFamily: "Inter_500Medium",
           fontSize: 16,
           lineHeight: 20,
-          color: "white",
+          color: "#374151",
         }}
       >
         {title}
