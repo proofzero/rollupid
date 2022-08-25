@@ -38,7 +38,7 @@ export default function NavMenu() {
         flexDirection: window.width >= window.height ? "row" : "column",
         justifyContent: "space-between",
         alignItems: "center",
-        zIndex: 1,
+        zIndex: 2,
         backgroundColor: "#192030",
       }}
     >
@@ -112,7 +112,7 @@ export default function NavMenu() {
               width: 224,
               backgroundColor: "white",
               top: 60,
-              zIndex: 2,
+              zIndex: 3,
               right: 0,
               shadowRadius: 5,
               shadowColor: "black",
