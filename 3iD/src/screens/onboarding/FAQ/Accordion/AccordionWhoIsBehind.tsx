@@ -35,8 +35,8 @@ const AccordionWhoIsBehind = () => {
       <View
         style={{
           paddingVertical: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: "#E5E7EB",
+          borderBottomWidth: 0,
+          // borderBottomColor: "#E5E7EB",
           fontFamily: "Inter_400Regular",
         }}
       >

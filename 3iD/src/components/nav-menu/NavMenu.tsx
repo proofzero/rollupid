@@ -132,38 +132,38 @@ export default function NavMenu() {
             }}
           >
             <LinkWrapper>
-            <Pressable
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-              onPress={async () => {
-                await Clipboard.setStringAsync(`${address}`);
-                setShowPanel(false);
-              }}
-            >
-              <Image
+              <Pressable
                 style={{
-                  width: 16,
-                  height: 16,
-                  marginRight: 12,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
-                source={require("../../assets/copy.png")}
-              />
-              <Text
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 16,
-                  fontWeight: "500",
-                  lineHeight: 16,
+                onPress={async () => {
+                  await Clipboard.setStringAsync(`${address}`);
+                  setShowPanel(false);
                 }}
-                testID="nav-copy-address"
               >
-                Copy address
-              </Text>
-            </Pressable>
+                <Image
+                  style={{
+                    width: 16,
+                    height: 16,
+                    marginRight: 12,
+                  }}
+                  source={require("../../assets/copy.png")}
+                />
+                <Text
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 16,
+                    fontWeight: "500",
+                    lineHeight: 16,
+                  }}
+                  testID="nav-copy-address"
+                >
+                  Copy address
+                </Text>
+              </Pressable>
             </LinkWrapper>
 
             {/* <LinkWrapper> */}
@@ -223,38 +223,38 @@ export default function NavMenu() {
             </View>
 
             <LinkWrapper>
-            <Pressable
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-              onPress={() => {
-                purge();
-                clearAccount();
-              }}
-            >
-              <Image
+              <Pressable
                 style={{
-                  width: 16,
-                  height: 16,
-                  marginRight: 12,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  flexDirection: "row",
+                  alignItems: "center",
                 }}
-                source={require("../../assets/logout.png")}
-              />
-              <Text
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 16,
-                  fontWeight: "500",
-                  lineHeight: 16,
+                onPress={() => {
+                  purge();
+                  clearAccount();
                 }}
-                testID="nav-logout"
               >
-                Sign out
-              </Text>
-            </Pressable>
+                <Image
+                  style={{
+                    width: 16,
+                    height: 16,
+                    marginRight: 12,
+                  }}
+                  source={require("../../assets/logout.png")}
+                />
+                <Text
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 16,
+                    fontWeight: "500",
+                    lineHeight: 16,
+                  }}
+                  testID="nav-logout"
+                >
+                  Sign out
+                </Text>
+              </Pressable>
             </LinkWrapper>
           </View>
         )}

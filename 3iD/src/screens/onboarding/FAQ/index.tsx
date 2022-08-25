@@ -9,6 +9,19 @@ import { HiLink } from "react-icons/hi";
 
 import * as Clipboard from "expo-clipboard";
 
+import styled from "styled-components";
+
+
+const CopyLinkWrapper = styled.div`
+  &:hover > div {
+    background-color: #F3F4F6 !important;
+  }
+
+  &:focus > div {
+    box-shadow: 0px 0px 0px 1px #9ca3af !important;
+  }
+`;
+
 type Account = {
   account: undefined | null | string;
   inviteCode: string | undefined;
@@ -72,42 +85,44 @@ const FAQ = ({ account, inviteCode }: Account) => {
             >
               https://get.threeid.xyz/{inviteCode}
             </Text>
-            <Pressable
-              disabled={!inviteCode}
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: "#1F2937",
-                paddingVertical: 11,
-                paddingHorizontal: 17,
-              }}
-              onPress={async () => {
-                await Clipboard.setStringAsync(
-                  `https://get.threeid.xyz/${inviteCode}`
-                );
-              }}
-            >
-              <HiLink
+            <CopyLinkWrapper>
+              <Pressable
+                disabled={!inviteCode}
                 style={{
-                  width: 15,
-                  height: 15,
-                  marginRight: 10.5,
-                  color: "#D1D5DB",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "#1F2937",
+                  paddingVertical: 11,
+                  paddingHorizontal: 17,
                 }}
-              />
-
-              <Text
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  lineHeight: 20,
-                  color: "#D1D5DB",
+                onPress={async () => {
+                  await Clipboard.setStringAsync(
+                    `https://get.threeid.xyz/${inviteCode}`
+                  );
                 }}
               >
-                Copy Link
-              </Text>
-            </Pressable>
+                <HiLink
+                  style={{
+                    width: 15,
+                    height: 15,
+                    marginRight: 10.5,
+                    color: "#D1D5DB",
+                  }}
+                />
+
+                <Text
+                  style={{
+                    fontFamily: "Inter_500Medium",
+                    fontSize: 14,
+                    lineHeight: 20,
+                    color: "#D1D5DB",
+                  }}
+                >
+                  Copy Link
+                </Text>
+              </Pressable>
+            </CopyLinkWrapper>
           </View>
         </>
       )}
