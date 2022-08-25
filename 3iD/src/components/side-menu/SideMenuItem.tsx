@@ -101,8 +101,8 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
 
               <Text
                 style={{
-                  fontFamily: "Manrope_500Medium",
-                  fontSize: 14,
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 16,
                   lineHeight: 20,
                   color: isCurrent ? "#111827" : "gray",
                 }}
@@ -131,8 +131,8 @@ const SideMenuItem = ({ title, screen, Icon }: SideMenuItemProps) => {
 
             <Text
               style={{
-                fontFamily: "Manrope_500Medium",
-                fontSize: 14,
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
                 lineHeight: 20,
                 color: isCurrent ? "#111827" : "gray",
               }}
