@@ -10,6 +10,7 @@ import {
   BiHome,
   BiLink,
   BiIdCard,
+  BiCog,
 } from "react-icons/bi";
 
 type SideMenuProps = {
@@ -27,18 +28,6 @@ const sideMenuItems: SideMenuItemProps[] = [
     Icon: BiHome,
   },
   {
-    title: "Set PFP",
-    Icon: BiUser,
-  },
-  {
-    title: "User Details",
-    Icon: BiAt,
-  },
-  {
-    title: "Wallet Accounts",
-    Icon: BiWalletAlt,
-  },
-  {
     title: "NFT Gallery",
     Icon: HiOutlineViewGridAdd,
   },
@@ -49,6 +38,10 @@ const sideMenuItems: SideMenuItemProps[] = [
   {
     title: "Connected dApps",
     Icon: BiLink,
+  },
+  {
+    title: "Settings",
+    Icon: BiCog,
   },
 ];
 

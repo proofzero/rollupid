@@ -493,7 +493,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   style={{
                     marginVertical: "1em",
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
                     fontFamily: "Inter_400Regular",
                   }}
                 >
@@ -513,7 +513,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
                     fontFamily: "Inter_400Regular",
                   }}
                 >
@@ -570,7 +570,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   style={{
                     marginTop: "1em",
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
                     fontFamily: "Inter_400Regular",
                   }}
                 >
@@ -651,7 +651,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   style={{
                     marginTop: "1em",
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
                     fontFamily: "Inter_400Regular",
                   }}
                 >
@@ -714,7 +714,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   style={{
                     marginTop: "1em",
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
                     fontFamily: "Inter_400Regular",
                   }}
                 >
@@ -804,7 +804,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   style={{
                     marginTop: "1em",
                     fontSize: 14,
-                    color: "#111827",
+                    color: "#9CA3AF",
+                    fontFamily: "Inter_400Regular",
                   }}
                 >
                   3ID was created by{" "}
