@@ -12,6 +12,8 @@ import {
   useNavigationState,
 } from "@react-navigation/native";
 
+import { HiChevronDown } from "react-icons/hi";
+
 import { purge } from "../../provider/kubelt";
 import * as Clipboard from "expo-clipboard";
 import { clearAccount } from "../../provider/web3";
@@ -81,15 +83,24 @@ export default function NavMenu() {
           <Text
             testID="wallet-address"
             style={{
-              paddingHorizontal: 37.5,
-              fontFamily: "Manrope_700Bold",
-              fontSize: 14,
-              fontWeight: "700",
+              paddingHorizontal: 20,
+              fontFamily: "Inter_500Medium",
+              fontSize: 16,
+              fontWeight: "500",
               lineHeight: 16,
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          >{`${address?.substring(0, 4)}...${address?.substring(
-            address.length - 4
-          )}`}</Text>
+          >
+            {`${address?.substring(0, 4)}...${address?.substring(
+              address.length - 4
+            )}`}{" "}
+            <HiChevronDown
+              style={{
+                marginLeft: "0.5em",
+              }}
+            />
+          </Text>
         </Pressable>
 
         {showPanel && (
@@ -126,7 +137,17 @@ export default function NavMenu() {
                 }}
                 source={require("../../assets/copy.png")}
               />
-              <Text testID="nav-copy-address">Copy address</Text>
+              <Text
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 16,
+                  fontWeight: "500",
+                  lineHeight: 16,
+                }}
+                testID="nav-copy-address"
+              >
+                Copy address
+              </Text>
             </Pressable>
 
             <Pressable
@@ -150,7 +171,17 @@ export default function NavMenu() {
                 }}
                 source={require("../../assets/cog.png")}
               />
-              <Text testID="nav-go-to-settings">Settings</Text>
+              <Text
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 16,
+                  fontWeight: "500",
+                  lineHeight: 16,
+                }}
+                testID="nav-go-to-settings"
+              >
+                Settings
+              </Text>
             </Pressable>
 
             <View
@@ -190,7 +221,17 @@ export default function NavMenu() {
                 }}
                 source={require("../../assets/logout.png")}
               />
-              <Text testID="nav-logout">Sign out</Text>
+              <Text
+                style={{
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 16,
+                  fontWeight: "500",
+                  lineHeight: 16,
+                }}
+                testID="nav-logout"
+              >
+                Sign out
+              </Text>
             </Pressable>
           </View>
         )}
