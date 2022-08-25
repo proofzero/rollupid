@@ -20,8 +20,10 @@ import {
   // Network-specific configuration
   NET_LOCALHOST,
   NET_GOERLI,
-  NET_MAINNET,
   NET_RINKEBY,
+  NET_MUMBAI,
+  NET_POLYGON,
+  NET_MAINNET,
 } from "../secret";
 import { groupEnd } from "console";
 
@@ -44,6 +46,8 @@ const INVITE_TIER = "Gen Zero";
 const MAINNET_CHAIN_ID = 1;
 const RINKEBY_CHAIN_ID = 4;
 const GOERLI_CHAIN_ID = 5;
+const MUMBAI_CHAIN_ID = 80001;
+const POLYGON_CHAIN_ID = 137;
 
 // SUBTASKS
 // -----------------------------------------------------------------------------
@@ -73,6 +77,12 @@ subtask("network:config", "Return network-specific configuration map")
         break;
       case "rinkeby":
         return NET_RINKEBY;
+        break;
+      case "mumbai":
+        return NET_MUMBAI;
+        break;
+      case "polygon":
+        return NET_POLYGON;
         break;
       case "mainnet":
         return NET_MAINNET;
@@ -789,6 +799,30 @@ const config: HardhatUserConfig = {
       accounts: [
         NET_RINKEBY.wallet.ownerKey,
         NET_RINKEBY.wallet.operatorKey,
+      ],
+    },
+    mumbai: {
+      // For optional validation.
+      chainId: MUMBAI_CHAIN_ID,
+      url: NET_MUMBAI.alchemy.appURL,
+      // Account to use as the default sender. If not supplied, the
+      // first account of the node is used.
+      //from: "",
+      accounts: [
+        NET_MUMBAI.wallet.ownerKey,
+        NET_MUMBAI.wallet.operatorKey,
+      ],
+    },
+    polygon: {
+      // For optional validation.
+      chainId: POLYGON_CHAIN_ID,
+      url: NET_POLYGON.alchemy.appURL,
+      // Account to use as the default sender. If not supplied, the
+      // first account of the node is used.
+      //from: "",
+      accounts: [
+        NET_POLYGON.wallet.ownerKey,
+        NET_POLYGON.wallet.operatorKey,
       ],
     },
     mainnet: {
