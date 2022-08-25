@@ -21,6 +21,18 @@ import { useAppSelector } from "../../hooks/state";
 import { selectAddress } from "../../state/slices/profile";
 import NavMenuItem from "./NavMenuItem";
 
+import styled from "styled-components";
+
+const LinkWrapper = styled.div`
+  &:hover {
+    background-color: #f3f4f6;
+  }
+
+  &:focus {
+    box-shadow: 0px 0px 0px 1px #9ca3af;
+  }
+`;
+
 export default function NavMenu() {
   const [showPanel, setShowPanel] = useState(false);
 
@@ -119,6 +131,7 @@ export default function NavMenu() {
               shadowOpacity: 0.8,
             }}
           >
+            <LinkWrapper>
             <Pressable
               style={{
                 paddingHorizontal: 16,
@@ -151,16 +164,21 @@ export default function NavMenu() {
                 Copy address
               </Text>
             </Pressable>
+            </LinkWrapper>
 
+            {/* <LinkWrapper> */}
             <Pressable
               style={{
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 flexDirection: "row",
                 alignItems: "center",
+                backgroundColor: "#f3f4f6",
+                opacity: 0.5,
+
               }}
               onPress={() => {
-                (nav as any).navigate("Settings");
+                // (nav as any).navigate("Settings"); // TODO: renable when settings are ready
 
                 setShowPanel(false);
               }}
@@ -185,6 +203,7 @@ export default function NavMenu() {
                 Settings
               </Text>
             </Pressable>
+            {/* </LinkWrapper> */}
 
             <View
               style={{
@@ -203,6 +222,7 @@ export default function NavMenu() {
               />
             </View>
 
+            <LinkWrapper>
             <Pressable
               style={{
                 paddingHorizontal: 16,
@@ -235,6 +255,7 @@ export default function NavMenu() {
                 Sign out
               </Text>
             </Pressable>
+            </LinkWrapper>
           </View>
         )}
       </View>
