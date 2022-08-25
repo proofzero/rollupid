@@ -9,7 +9,8 @@ import {
   BiWalletAlt,
   BiHome,
   BiLink,
-  BiIdCard } from "react-icons/bi";
+  BiIdCard,
+} from "react-icons/bi";
 
 type SideMenuProps = {
   nickname: string;
