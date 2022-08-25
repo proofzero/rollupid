@@ -657,13 +657,11 @@
    :depends [-deploy:env -file:robots]
    :task (let [;; Block nothing in production, block everything in other
                ;; environments.
-               all-paths "*"
-               no-paths ""
-               ;; TODO Until launch day our robots.txt blocks everything.
-               disallow (if (= "current" -deploy:env) all-paths all-paths)
+               robots-command (if (= env-current -deploy:env) "Allow" "Disallow")
                all-agents "*"
+               all-paths "*"
                lines [["User-agent" all-agents]
-                      ["Disallow" disallow]]
+                      [robots-command all-paths]]
                content (cstr/join \newline (map (fn [pair] (cstr/join ": " pair)) lines))
                out-file (str -file:robots)]
            (with-open [writer (io/writer out-file)]
