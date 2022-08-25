@@ -18,10 +18,6 @@ import FAQ from "./FAQ/FAQ";
 
 import Layout from "../AuthLayout";
 
-import { HiLink } from "react-icons/hi";
-
-import * as Clipboard from "expo-clipboard";
-
 type OnboardProps = {
   navigation: any;
 };
@@ -441,7 +437,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           </View>
 
           {/* FAQ */}
-          <FAQ account={account} />
+          <FAQ account={account} inviteCode={inviteCode} />
         </View>
       </View>
     </Layout>

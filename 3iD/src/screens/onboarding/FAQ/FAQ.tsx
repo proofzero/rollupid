@@ -5,6 +5,10 @@ import AccordionWhoIsBehind from "./Accordion/AccordionWhoIsBehind";
 
 import { View, useWindowDimensions, Text, Pressable } from "react-native";
 
+import { HiLink } from "react-icons/hi";
+
+import * as Clipboard from "expo-clipboard";
+
 type Account = {
   account: undefined | null | string;
   inviteCode: string | undefined;
