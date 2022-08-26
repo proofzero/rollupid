@@ -315,7 +315,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
             flexDirection: landscape ? "row" : "column",
           }}
         >
-          {!landscape && <InviteCode code={inviteCode} />}
+          {!landscape && inviteCode && <InviteCode code={inviteCode} />}
 
           {/* Steps */}
           <View
