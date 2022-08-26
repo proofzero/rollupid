@@ -99,7 +99,7 @@ export default function Auth({ navigation }: { navigation: any }) {
         <Text
           style={{
             paddingBottom: 22,
-            fontFamily: "Inter_700Bold",
+            fontFamily: "Inter_500Medium",
             fontSize: 24,
             fontWeight: "700",
             lineHeight: 28,
@@ -109,10 +109,10 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-            {checking ? "Checking session." : "Sign the message with your wallet."}
+            {checking ? "Wiring things up..." : "Sign the message with your wallet."}
             <p
               style={{
-                fontFamily: "Inter_500Bold",
+                fontFamily: "Inter_500Medium",
                 fontSize: 20,
                 fontWeight: "500",
                 color: "#1F2937",
