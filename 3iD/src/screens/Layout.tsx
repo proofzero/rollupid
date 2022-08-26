@@ -49,6 +49,7 @@ export default function Layout({ children }: { children: any }) {
             fontWeight: "400",
             lineHeight: 24,
             color: "#9CA3AF",
+            textAlign: "center",
           }}
         >
           3ID is non-custodial and secure. We will never request access to your

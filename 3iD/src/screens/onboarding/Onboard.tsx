@@ -282,6 +282,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
               lineHeight: 40,
               color: "#1F2937",
               marginBottom: 15,
+              textAlign: useBreakpoint(false, true) ? "center" : "left",
             }}
           >
             Welcome to 3ID! 🎉
@@ -494,6 +495,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   key={step.title}
                   style={{
                     flexDirection: "row",
+                    flexShrink: 1,
                     justifyContent: "space-between",
                     marginBottom: index !== comingNext.length - 1 ? 32 : 0,
                   }}
@@ -501,6 +503,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                   <View
                     style={{
                       flexDirection: "row",
+                      flexShrink: 1,
                       alignItems: "center",
                     }}
                   >
@@ -513,7 +516,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       source={require(`../../assets/step_soon.png`)}
                     />
 
-                    <View>
+                    <View style={{
+                      flexShrink: 1,
+
+                    }}>
                       <Text
                         style={{
                           fontFamily: "Inter_500Medium",
