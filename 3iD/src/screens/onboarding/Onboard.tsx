@@ -4,11 +4,10 @@ import { FaDiscord, FaTwitter } from "react-icons/fa";
 import ReactTooltip from 'react-tooltip';
 import styled from "styled-components";
 
-
-
 import { View, Text, Image, Pressable } from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
+import datadogRum from "../../analytics/datadog";
 import { authenticate, getSDK, isAuthenticated } from "../../provider/kubelt";
 import { 
   getFunnelState,
@@ -650,6 +649,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           if (featureVotes.size < 3) {
                             featureVotes.add(step.title)
                             setFeatureVotes(new Set(featureVotes))
+                            datadogRum.addAction('featureVote', {
+                              'value': step.title,
+                          })
                           }
                           ReactTooltip.hide(upvoteButtons[index])
                         }, 3000)

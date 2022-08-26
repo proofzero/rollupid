@@ -44,3 +44,5 @@ export const stopSession = () => {
     sessionStarted = false;
   }
 };
+
+export default datadogRum;
