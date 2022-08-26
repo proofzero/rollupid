@@ -1,8 +1,16 @@
-import React from "react";
-import { View, Image, Text, useWindowDimensions } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Image,
+  Text,
+  useWindowDimensions,
+  TouchableOpacity,
+  UIManager,
+  Platform,
+} from "react-native";
 import TradLink from "../TradLink";
 import SideMenuItem, { SideMenuItemProps } from "./SideMenuItem";
-import { HiOutlineViewGridAdd } from "react-icons/hi";
+import { HiOutlineViewGridAdd, HiMenu } from "react-icons/hi";
 import {
   BiUser,
   BiAt,
@@ -48,6 +56,19 @@ const sideMenuItems: SideMenuItemProps[] = [
 
 const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
   const window = useWindowDimensions();
+  const [expanded, setExpanded] = useState(false);
+
+  if (Platform.OS === "android") {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+
+  const isMobile = Platform.OS === "android" || Platform.OS === "ios";
+
+  useEffect(() => {
+    if (!isMobile) {
+      setExpanded(true);
+    }
+  }, []);
 
   return (
     <View
@@ -60,48 +81,87 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
     >
       <View
         style={{
+          justifyContent: "space-between",
           flexDirection: "row",
-          marginBottom: 15,
-          paddingHorizontal: "0.5em",
         }}
       >
-        <Image
-          style={{
-            width: avatarSize,
-            height: avatarSize,
-            marginRight: 12,
-          }}
-          source={
-            avatarUri ? { uri: avatarUri } : require("../../assets/avatar.png")
-          }
-        ></Image>
-
         <View
           style={{
-            justifyContent: "space-between",
+            flexDirection: "row",
+            marginBottom: 15,
+            paddingHorizontal: "0.5em",
           }}
         >
-          <Text
+          <Image
             style={{
-              marginBottom: 8,
-              fontFamily: "Inter_600SemiBold",
-              fontSize: 16,
-              fontWeight: "600",
-              lineHeight: 19.36,
-              color: "#1A1B2D",
-              flex: 1,
+              width: avatarSize,
+              height: avatarSize,
+              marginRight: 12,
+            }}
+            source={
+              avatarUri
+                ? { uri: avatarUri }
+                : require("../../assets/avatar.png")
+            }
+          ></Image>
+
+          <View
+            style={{
+              justifyContent: "space-between",
             }}
           >
-            {nickname}
-          </Text>
+            <Text
+              style={{
+                marginBottom: 8,
+                fontFamily: "Inter_600SemiBold",
+                fontSize: 16,
+                fontWeight: "600",
+                lineHeight: 19.36,
+                color: "#1A1B2D",
+                flex: 1,
+              }}
+            >
+              {nickname}
+            </Text>
+          </View>
         </View>
+        {isMobile && (
+          <TouchableOpacity
+            onPress={() => {
+              setExpanded(!expanded);
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "space-between",
+                marginBottom: 15,
+              }}
+            >
+              <Text
+                style={{
+                  marginBottom: 8,
+                  fontFamily: "Inter_600SemiBold",
+                  fontSize: 20,
+                  fontWeight: "600",
+                  lineHeight: 19.36,
+                  color: "#1A1B2D",
+                  flex: 1,
+                }}
+              >
+                <HiMenu />
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
 
-      <View>
-        {sideMenuItems.map((smi) => (
-          <SideMenuItem key={smi.title} {...smi} />
-        ))}
-      </View>
+      {expanded && (
+        <View>
+          {sideMenuItems.map((smi) => (
+            <SideMenuItem key={smi.title} {...smi} />
+          ))}
+        </View>
+      )}
     </View>
   );
 };
