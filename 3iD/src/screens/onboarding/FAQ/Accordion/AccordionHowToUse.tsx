@@ -8,11 +8,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-type Account = {
+type HowToProps = {
   account: undefined | null | string;
+  defaultExpanded: boolean;
 };
 
-const AccordionHowToUse = ({ account }: Account, { defaultExpanded} : { defaultExpanded: boolean }) => {
+const AccordionHowToUse = ({ account, defaultExpanded }: HowToProps) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [styles, setStyles] = useState({
     width: 14,
@@ -88,7 +89,7 @@ const AccordionHowToUse = ({ account }: Account, { defaultExpanded} : { defaultE
               >
                 Now that you've claimed your 3ID, other applications can query
                 your profile to fetch your public profile details including your
-                avatar. You will also soon be able to promote your profile and
+                avatar. Soon you will also be able to promote your profile and
                 NFTs on social media.
               </Text>
 

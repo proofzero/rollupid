@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const AccordionWhoIsBehind = ({ defaultExpanded} : { defaultExpanded: boolean }) => {
+const AccordionWhoIsBehind = ({ defaultExpanded } : { defaultExpanded: boolean }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [styles, setStyles] = useState({
     width: 14,
@@ -94,7 +94,7 @@ const AccordionWhoIsBehind = ({ defaultExpanded} : { defaultExpanded: boolean })
               and the digital identity specification. Instead of applications
               centralizing user data, 3ID users like yourself will be able to
               permission/revoke applications to access personal data, messages
-              and more. Our goal is to eliminate email as a basis of online
+              and more.<br/><br/>Our goal is to eliminate email as a basis of online
               identity and shift the norm towards being cryptographic,
               user-centric and decentralized platforms.
             </Text>
