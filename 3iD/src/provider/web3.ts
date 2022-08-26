@@ -1,15 +1,19 @@
 import { BehaviorSubject } from "rxjs";
 import { ethers } from "ethers";
 import { hexlify } from "ethers/lib/utils";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { store } from "../state/store";
 import { clearSlice, setAddress } from "../state/slices/profile";
 import { authenticate, purge } from "./kubelt";
+
 
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
 let web3Provider: null | ethers.providers.Web3Provider = null;
 
 const eth = (window as any).ethereum;
+
+const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
 export const isMetamask = () => eth?.isMetaMask === true;
 
@@ -22,6 +26,8 @@ export const getAccountObs = () => {
 };
 
 const handleAccountsChanged = async (accounts: string[]) => {
+  const storedProfile = await getItem();
+
   if (accounts.length > 0) {
     try {
       const provider = await connect();
@@ -52,6 +58,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
       console.error(`WEB3: ${e}`);
     }
   } else {
+    console.log("WEB3: Stored Profile", storedProfile);
     console.warn(`WEB3: No accounts detected`);
 
     clearAccount();
