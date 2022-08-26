@@ -53,14 +53,15 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
       style={{
         width: window.width >= window.height ? 240 : "100%",
         backgroundColor: "#F9FAFB",
-        paddingHorizontal: 16,
-        paddingVertical: 20,
+        paddingHorizontal: "0.5em",
+        paddingVertical: "1.5em",
       }}
     >
       <View
         style={{
           flexDirection: "row",
           marginBottom: 15,
+          paddingHorizontal: "0.5em",
         }}
       >
         <Image

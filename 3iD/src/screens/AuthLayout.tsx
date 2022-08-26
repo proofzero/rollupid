@@ -247,7 +247,7 @@ export default function Layout({
           style={{
             flex: 8,
             backgroundColor: "#FFFFFF",
-            padding: "1em",
+            padding: "1.5em",
           }}
         >
           {children}
