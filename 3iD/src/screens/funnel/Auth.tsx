@@ -32,7 +32,6 @@ export default function Auth({ navigation }: { navigation: any }) {
     if (claims.includes(claim)) {
       navigation.navigate("Onboard");
     } else if (!funnelState.invite) {
-      setChecking(false);
       const invites = await listInvitations(sdk);
       if (invites.length > 0) {
         navigation.navigate("Invite");
@@ -40,7 +39,6 @@ export default function Auth({ navigation }: { navigation: any }) {
         navigation.navigate("Gate");
       }
     } else {
-      setChecking(false);
       navigation.navigate("Gate");
     }
   };
@@ -57,7 +55,14 @@ export default function Auth({ navigation }: { navigation: any }) {
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
       } else {
+
         const provider = await connect();
+        
+        // TODO: this is a hack for showing the sign message 
+        // until we have a better state solution
+        // should have a state that let's us know if we are signed in or not
+        // not just connected.
+        setChecking(false);
 
         await authenticate(provider);
 
@@ -65,6 +70,8 @@ export default function Auth({ navigation }: { navigation: any }) {
         const address = await signer.getAddress();
 
         if (await isAuthenticated(address)) {
+          // debugger;
+
           return claimsRedirect(claim);
         } else {
           console.error("Unsuccesful authentication to Kubelt SDK");
@@ -111,7 +118,7 @@ export default function Auth({ navigation }: { navigation: any }) {
           <>
             {checking
               ? "Wiring things up..."
-              : "Sign the message with your wallet."}
+              : "Checking if authenticated..."}
             <p
               style={{
                 fontFamily: "Inter_500Medium",
@@ -125,7 +132,7 @@ export default function Auth({ navigation }: { navigation: any }) {
             >
               {checking
                 ? "Checking if you are already signed in to 3ID."
-                : "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."}
+                : "You may have to sign a message. It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."}
             </p>
             <Spinner />
           </>

@@ -59,8 +59,10 @@ const handleAccountsChanged = async (accounts: string[]) => {
   } else {
     console.log("WEB3: Stored Profile", storedProfile);
     console.warn(`WEB3: No accounts detected`);
+    console.info(`WEB3: Wallet may be locked`);
+    // TEMPORARY disable since we don't care wallet is locked.
 
-    clearAccount();
+    // clearAccount();
   }
 };
 
@@ -71,8 +73,10 @@ const handleAccountsChanged = async (accounts: string[]) => {
 // but it's further away
 // from the actual signing
 const handleChainChanged = async () => {
-  purge();
-  clearAccount();
+  console.info("WEB3: Chain changed");
+  // TEMPORARY disable since we don't care if network is switched.
+  // purge();
+  // clearAccount();
 };
 
 eth?.on("accountsChanged", handleAccountsChanged);

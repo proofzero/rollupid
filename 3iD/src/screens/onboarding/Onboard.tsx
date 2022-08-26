@@ -139,6 +139,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           }
   
           const featureVotesRes = await getFeatureVoteCount(sdk);
+          console.log(featureVotesRes);
           if (featureVotesRes?.votes) {
             setFeatureVotes(new Set(featureVotesRes.votes));
           }
@@ -655,8 +656,6 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           }
                           ReactTooltip.hide(upvoteButtons[index])
                         }, 3000)
-                        
-                        
                       }}
                     >
                       +
