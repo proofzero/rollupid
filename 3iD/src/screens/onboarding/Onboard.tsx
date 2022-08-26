@@ -18,6 +18,7 @@ import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
 import { NONE } from "../../../../packages/sdk-web/lib/cljs.core";
+import InviteCode from "../../components/invites/InviteCode";
 
 type OnboardProps = {
   navigation: any;
@@ -26,6 +27,7 @@ type OnboardProps = {
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
   const window = useWindowDimensions();
+  const landscape = window.width >= window.height;
 
   const [inviteCode, setInviteCode] = useState<string | undefined>();
 
@@ -288,7 +290,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
           <View
             style={{
-              flexDirection: window.width >= window.height ? "row" : "column",
+              flexDirection: landscape ? "row" : "column",
               alignItems: "center",
             }}
           >
@@ -310,18 +312,21 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
         <View
           style={{
-            flexDirection: window.width >= window.height ? "row" : "column",
+            flexDirection: landscape ? "row" : "column",
           }}
         >
+          {!landscape && <InviteCode code={inviteCode} />}
+
           {/* Steps */}
           <View
             style={
-              window.width >= window.height
+              landscape
                 ? {
                     flex: 1,
                   }
                 : {
                     marginBottom: "1em",
+                    marginTop: "1em",
                   }
             }
           >

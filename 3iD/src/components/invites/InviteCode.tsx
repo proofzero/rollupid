@@ -5,7 +5,7 @@ import styled from "styled-components";
 import * as Clipboard from "expo-clipboard";
 
 type InviteCodeProps = {
-  code?: string;
+  code: string;
 };
 
 const CopyLinkWrapper = styled.div`
@@ -68,7 +68,6 @@ const InviteCode = ({ code }: InviteCodeProps) => {
         >
           https://get.threeid.xyz/{code}
         </Text>
-
         <CopyLinkWrapper>
           <Pressable
             disabled={!code}

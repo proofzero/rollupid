@@ -29,14 +29,16 @@ type Account = {
 
 const FAQ = ({ account, inviteCode }: Account) => {
   const window = useWindowDimensions();
+  const landscape = window.width >= window.height;
+
   return (
     <View
       style={{
         flex: 1,
-        marginLeft: window.width >= window.height ? 41 : "1em",
+        marginLeft: landscape ? 41 : "1em",
       }}
     >
-      <InviteCode code={inviteCode} />
+      {landscape && inviteCode && <InviteCode code={inviteCode} />}
 
       <Text
         style={{
