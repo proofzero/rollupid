@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -62,8 +62,12 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
   }
 
   const isMobile = Platform.OS === "android" || Platform.OS === "ios";
+  const isNotMobile = Platform.OS === "macos" || Platform.OS === "windows";
 
-  useState(() => {
+  console.log(isMobile, isNotMobile);
+  console.log(Platform.OS);
+
+  useEffect(() => {
     if (!isMobile) {
       setExpanded(true);
     }
