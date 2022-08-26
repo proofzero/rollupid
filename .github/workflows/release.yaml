@@ -17,10 +17,10 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@master
-      - name: verify git tag
-        run: |
-          # setup the gpg key
-          git verify-tag ${GITHUB_REF#refs/*/}
+      # - name: verify git tag
+      #   run: |
+      #     # setup the gpg key
+      #     git verify-tag ${GITHUB_REF#refs/*/}
       - uses: DeLaGuardo/setup-clojure@8.0
         with:
           bb: 0.8.156
@@ -44,10 +44,10 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@master
-      - name: verify git tag
-        run: |
-          # setup the gpg key
-          git verify-tag ${GITHUB_REF#refs/*/}
+      # - name: verify git tag
+      #   run: |
+      #     # setup the gpg key
+      #     git verify-tag ${GITHUB_REF#refs/*/}
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
