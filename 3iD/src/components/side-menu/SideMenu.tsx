@@ -55,14 +55,16 @@ const sideMenuItems: SideMenuItemProps[] = [
 ];
 
 const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
-  const window = useWindowDimensions();
   const [expanded, setExpanded] = useState(false);
 
   if (Platform.OS === "android") {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 
-  const isMobile = Platform.OS === "android" || Platform.OS === "ios";
+  const isMobile =
+    Platform.OS === "android" ||
+    Platform.OS === "ios" ||
+    useBreakpoint(false, true);
 
   useEffect(() => {
     if (!isMobile) {
