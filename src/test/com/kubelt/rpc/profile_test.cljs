@@ -25,8 +25,13 @@
                (let [config (t.commons/oort-config)
                      sys (<p! (sdk/init config))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
+                     sys (assoc sys :crypto/wallet wallet)
                      core (:wallet/address wallet)
-                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet) {}))
+                     permissions {}
+                     network {:network/blockchain "ethereum"
+                              :network/chain "goerli"
+                              :network/chain-id 5}
+                     kbt (<p! (sdk.oort/authenticate& sys permissions network))
                      api (<p! (sdk.oort/rpc-api sys core))
                      profile (-> (<p! (lib.rpc/rpc-call& kbt api {:method [:kb :get-profile]}))
                                  :http/body :result)]

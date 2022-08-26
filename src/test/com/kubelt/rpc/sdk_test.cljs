@@ -10,13 +10,13 @@
    [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.test-utils :as lib.test-utils]
-   [com.kubelt.lib.wallet.node :as wallet]
    [com.kubelt.lib.wallet :as lib.wallet]
+   [com.kubelt.lib.wallet.node :as wallet]
    [com.kubelt.rpc.test-commons :as t.commons]
    [com.kubelt.sdk.v1 :as sdk]
+   [com.kubelt.sdk.v1.oort :as sdk.oort]
    [com.kubelt.spec.config :as spec.config]
-   [com.kubelt.spec.vault :as spec.vault]
-   [com.kubelt.sdk.v1.oort :as sdk.oort]))
+   [com.kubelt.spec.vault :as spec.vault]))
 
 (use-fixtures :once
   {:before (lib.test-utils/import-wallet-fixture t.commons/app-name t.commons/test-wallet-name t.commons/test-wallet-mnemonic t.commons/test-wallet-password)
@@ -65,7 +65,12 @@
              (try
                (let [sys (<p! (sdk/init (t.commons/oort-config)))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/test-wallet-name t.commons/test-wallet-password))
-                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet) {}))
+                     sys (assoc sys :crypto/wallet wallet)
+                     permissions {}
+                     network {:network/blockchain "ethereum"
+                              :network/chain "goerli"
+                              :network/chain-id 5}
+                     kbt (<p! (sdk.oort/authenticate& sys permissions network))
                      result (-> (<p! (sdk.oort/call-rpc-js
                                       kbt
                                       #js ["kb" "get-profile"]

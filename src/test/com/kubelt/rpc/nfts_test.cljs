@@ -54,8 +54,13 @@
                (let [config (t.commons/oort-config)
                      sys (<p! (sdk/init config))
                      wallet (<p! (wallet/load& t.commons/app-name t.commons/wallet-name t.commons/wallet-password))
+                     sys (assoc sys :crypto/wallet wallet)
                      core (:wallet/address wallet)
-                     kbt (<p! (sdk.oort/authenticate& (assoc sys :crypto/wallet wallet) {}))
+                     permissions {}
+                     network {:network/blockchain "ethereum"
+                              :network/chain "goerli"
+                              :network/chain-id 5}
+                     kbt (<p! (sdk.oort/authenticate& sys permissions network))
                      api (<p! (sdk.oort/rpc-api sys core))
                      nfts (-> (<p! (lib.rpc/rpc-call& kbt api
                                                       {:method  [:alchemy :get-nf-ts]
@@ -67,9 +72,8 @@
                  (is (= (set (keys (first (:owned-nfts nfts))))
                         #{:description :token-uri :contract :time-last-updated :title :balance :id :media :contract-metadata :metadata})))
 
-               (catch js/Error err (do
-                                     (log/error err)
-                                     (is false err)))
+               (catch js/Error err
+                 (do (is false err)))
                (finally (done)))))))
 
 (comment

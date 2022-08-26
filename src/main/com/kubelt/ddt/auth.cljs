@@ -2,6 +2,8 @@
   "Utilities relating to authentication."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
+   [clojure.string :as cstr])
+  (:require
    [com.kubelt.ddt.options :as ddt.options]
    [com.kubelt.lib.promise :as lib.promise]
    [com.kubelt.lib.storage :as lib.storage]
@@ -33,7 +35,14 @@
   representing the successful authentication. "
   [args-map password on-authenticate]
   (let [app-name (get args-map :app-name)
-        wallet-name (get args-map :wallet)]
+        wallet-name (get args-map :wallet)
+        blockchain (get args-map :blockchain)
+        chain (get args-map :chain)
+        chain-id (get args-map :chain-id)
+        permission (get args-map :permission [])
+        permission (reduce (fn [m s]
+                             (let [[category perm] (cstr/split s #"[:/]")]
+                               (update m category conj perm))) {} permission)]
     (-> (lib.wallet/load& app-name wallet-name password)
         (lib.promise/then
          (fn [wallet]
@@ -45,15 +54,18 @@
                        (prn (:error e))))
                  (lib.promise/then
                   (fn [kbt]
-                    (-> (sdk.oort/authenticate& kbt)
-                        (lib.promise/then on-authenticate)
-                        (lib.promise/catch
-                         (fn [e]
-                           (println (ex-message e))
-                           (prn (ex-data e))))
-                        (lib.promise/finally
-                          (fn []
-                            (sdk/halt! kbt))))))))))
+                    (let [network {:network/blockchain blockchain
+                                   :network/chain chain
+                                   :network/chain-id chain-id}]
+                      (-> (sdk.oort/authenticate& kbt permission network)
+                          (lib.promise/then on-authenticate)
+                          (lib.promise/catch
+                              (fn [e]
+                                (println (ex-message e))
+                                (prn (ex-data e))))
+                          (lib.promise/finally
+                            (fn []
+                              (sdk/halt! kbt)))))))))))
         ;; An error was thrown during (lib.wallet/load&).
         (lib.promise/catch
             (fn [e]

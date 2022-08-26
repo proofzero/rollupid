@@ -15,6 +15,36 @@
    :builder (fn [^Yargs yargs]
               ;; Include the common options.
               (ddt.options/options yargs)
+              ;; permission
+              (let [permission {;; NB: "p" is already used for "port" in common options.
+                                :alias "x"
+                                :describe "Permission to request"
+                                :requiresArg true
+                                :array true}]
+                (.option yargs "permission" (clj->js permission)))
+              ;; blockchain
+              (let [blockchain {:describe "Blockchain name"
+                                :requiresArg true
+                                :demandOption "blockchain name is required"
+                                :nargs 1
+                                :choices ["ethereum"]
+                                :default "ethereum"
+                                :string true}]
+                (.option yargs "blockchain" (clj->js blockchain)))
+              ;; chain
+              (let [chain {:describe "human-readable chain name"
+                           :requiresArg true
+                           :demandOption "chain name is required"
+                           :nargs 1
+                           :string true}]
+                (.option yargs "chain" (clj->js chain)))
+              ;; chain-id
+              (let [chain-id {:describe "numerical chain identifier"
+                              :requiresArg true
+                              :demandOption "chain identifier is required"
+                              :nargs 1
+                              :number true}]
+                (.option yargs "chain-id" (clj->js chain-id)))
               yargs)
 
    :handler (fn [args]

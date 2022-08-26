@@ -6,8 +6,8 @@
    ["fs" :refer [promises] :rename {promises fs-promises} :as fs]
    ["path" :as path])
   (:require
-   [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.error :as lib.error]
+   [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.promise :as lib.promise]))
 
 (defn fs-exists?&
@@ -27,9 +27,9 @@
     kubelt-path))
 
 (defn ensure-kubelt-dir&
-  "Return the directory path for the application as a string,
-  creating it if it doesn't already exist.
-  Rejects promise with error message if dir isn't available"
+  "Return the directory path for the application as a string, creating it
+  if it doesn't already exist. Rejects promise with error message if dir
+  isn't available"
   [app-name folder]
   (let [kubelt-dirp (kubelt-dir app-name folder)]
     (lib.promise/promise
@@ -42,5 +42,9 @@
                                        options #js {:mode mode
                                                     :recursive recursive?}]
                                    (.mkdir fs-promises kubelt-dirp options)))))
-           (lib.promise/then (fn [_] (resolve kubelt-dirp)))
-           (lib.promise/catch (fn [e] (reject (lib.error/error (str "Dir isn't available" e))))))))))
+           (lib.promise/then
+            (fn [_]
+              (resolve kubelt-dirp)))
+           (lib.promise/catch
+               (fn [e]
+                 (reject (lib.error/error (str "Dir isn't available" e))))))))))

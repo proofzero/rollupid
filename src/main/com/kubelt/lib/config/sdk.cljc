@@ -12,7 +12,8 @@
   reinitialize the SDK with the same configuration by passing it
   to (com.kubelt.sdk.v1/init)."
   [sys-map]
-  (let [ipfs-read-scheme (get sys-map :ipfs.read/scheme)
+  (let [app-name (get sys-map :app/name)
+        ipfs-read-scheme (get sys-map :ipfs.read/scheme)
         ipfs-read-host (get sys-map :ipfs.read/host)
         ipfs-read-port (get sys-map :ipfs.read/port)
         ipfs-write-scheme (get sys-map :ipfs.write/scheme)
@@ -26,7 +27,7 @@
         credentials (lib.vault/tokens (:crypto/session sys-map))
         wallet (get sys-map :crypto/wallet)
         storage (get sys-map :config/storage)]
-    {:app/name (get sys-map :app/name)
+    {:app/name app-name
      :log/level log-level
      :ipfs.read/scheme ipfs-read-scheme
      :ipfs.read/host ipfs-read-host

@@ -3,7 +3,8 @@
   {:copyright "©2022 Proof Zero Inc" :license "Apache 2.0"}
   (:require
    [malli.core :as m]
-   [malli.error :as me])
+   [malli.error :as me]
+   [taoensso.timbre :as log])
   (:require
    [com.kubelt.lib.config :as lib.config]
    [com.kubelt.lib.config.default :as lib.config.default]
@@ -29,6 +30,7 @@
 
 ;; init
 ;; -----------------------------------------------------------------------------
+;; TODO append & suffix to indicate promise return
 
 (defn init
   "Initialize the SDK. Accepts an optional configuration map and returns
@@ -41,6 +43,7 @@
   ;; The 1-arity implementation expects a configuration map.
   ([config]
    {:pre [(map? config)] :post [(promise? %)]}
+   (log/debug {:v1.init/config config})
    ;; Check that the user-provided options map is valid. If not, an
    ;; error map is returned. Note that these configuration options are
    ;; not required, so we provide defaults for those values that aren't
@@ -111,6 +114,7 @@
   (lib.promise/promise
    (fn [resolve reject]
      (let [result (lib.config.sdk/options system)]
+       (log/debug {:v1.options/options result})
        (if-not (lib.error/error? result)
          (resolve result)
          (reject result))))))
@@ -156,6 +160,7 @@
                              (dissoc :config/storage)
                              (dissoc :crypto/wallet))
                  state {:options options :vault vault}]
+             (log/debug {:v1.store/state state})
              ;; Returns a promise that resolves when the writing is
              ;; finished.
              (store-fn state)))))))
@@ -178,24 +183,38 @@
   {:pre [(map? system)] :post [(promise? %)]}
   (let [;; This function provides a platform specific means of restoring
         ;; a (small) data map.
-        restore-fn (get-in system [:config/storage :storage/restore-fn])
-        ;; Resolves to the data that has been restored.
-        restore& (restore-fn)]
-    (-> restore&
+        restore-fn (get-in system [:config/storage :storage/restore-fn])]
+    ;; Resolves to the data that has been restored.
+    (-> (restore-fn)
         (lib.promise/then
-         (fn [{:keys [options vault]}]
-           ;; TODO fold options back into system map?
-           (let [session vault
-                 wallet {:com.kubelt/type :kubelt.type/wallet
-                         :wallet/address (-> vault :vault/tokens keys first)}
-                 restored-system (assoc system
-                                        :crypto/session session
-                                        :crypto/wallet wallet)]
-             ;; TODO restore this check of the restored SDK against a schema
-             restored-system
-             #_(conform*
-              [spec.config/restored-system restored-system]
-              restored-system)))))))
+         (fn [{:keys [options vault] :as restored-data&}]
+           ;; Handle the case that an attempt to restore the SDK is made
+           ;; without having first stored it. The restored data will be
+           ;; null in that situation.
+           (if (nil? restored-data&)
+             system
+             ;; TODO fold options back into system map?
+             (let [session vault
+                   ;; TODO add a utility fn in lib.wallet to inflate the wallet.
+                   ;; TODO define wallet selection criteria.
+                   address (-> vault :vault/tokens keys first)
+                   wallet {:com.kubelt/type :kubelt.type/wallet
+                           :wallet/address address}]
+               (log/debug {:v1.restore/options options :v1.restore/vault vault})
+               (-> (init options)
+                   ;; Reinitialize the SDK using the stored configuration options.
+                   (lib.promise/then
+                    (fn [restored]
+                      ;; TODO this seems to be invoked twice
+                      ;; TODO restore this check of the restored SDK against a schema
+                      #_(conform*
+                         [spec.config/restored-system restored-system]
+                         (assoc restored
+                                :crypto/session session
+                                :crypto/wallet wallet))
+                      (assoc restored
+                             :crypto/session session
+                             :crypto/wallet wallet)))))))))))
 
 (defn restore-js&
   "Returns a promise that resolves to a system map that has had saved

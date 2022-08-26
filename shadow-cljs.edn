@@ -97,7 +97,6 @@
   ;; This is the core Node.js library that provides the Kubelt SDK,
   ;; compiled for use with Node.js.
 
-  ;; TODO rename to :sdk-node?
   :sdk
   {:target :node-library
    ;; Each keyword in the :exports map is available in the generated

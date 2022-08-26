@@ -8,12 +8,13 @@
   (:require
    ["@ethersproject/wallet" :refer [Wallet]])
   (:require
+   [taoensso.timbre :as log])
+  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.io.node :as lib.io]
    [com.kubelt.lib.path :as lib.path]
    [com.kubelt.lib.promise :as lib.promise]
-   [com.kubelt.lib.wallet.shared :as lib.wallet])
-  )
+   [com.kubelt.lib.wallet.shared :as lib.wallet]))
 
 (defn- name->path
   "Return the path to a wallet given the owning application name and
@@ -36,7 +37,6 @@
       (.accessSync fs wallet-path read-ok)
       (catch js/Error e
         false))))
-
 
 (defn ensure-wallet&
   "Return true if the named wallet already exists.
@@ -88,14 +88,15 @@
   stored in an XDG compliant location based on the application name. It
   is also named using the supplied wallet name and encrypted with the
   supplied password. A map describing the created wallet is returned if
-  successful. An error map is returned otherwise.
-  Throws exception on wallet-encryption or fs-write problems"
+  successful. An error map is returned otherwise. Throws exception on
+  wallet-encryption or fs-write problems."
   [app-name wallet-name password]
   (lib.promise/promise
    (fn [resolve reject]
      (-> (lib.io/ensure-kubelt-dir& app-name "wallets")
          (lib.promise/then
           (fn [wallet-dirp]
+            (log/debug {:log/msg "found wallet directory" :wallet/dir wallet-dirp})
             (-> (has-wallet?& app-name wallet-name)
                 (lib.promise/then
                  (fn [file]
@@ -103,18 +104,23 @@
                      (reject (lib.error/error (str "wallet " wallet-name " already exists"))))
                    (let [wallet-path (.join path wallet-dirp wallet-name)
                          eth-wallet (.createRandom Wallet)
+                         address (.-address eth-wallet)
                          mnemonic (.-mnemonic eth-wallet)]
                      (-> (.encrypt eth-wallet password)
                          (lib.promise/then #(.writeFile fs-promises wallet-path %))
-                         (lib.promise/then (fn []
-                                             (resolve
-                                              (let [{:keys [phrase path locale]} (js->clj mnemonic :keywordize-keys true)]
-                                                {:wallet/path            wallet-path
-                                                 :wallet/name            wallet-name
-                                                 :wallet.mnemonic/phrase phrase
-                                                 :wallet.mnemonic/path   path
-                                                 :wallet.mnemonic/locale locale}))))
-                         (lib.promise/catch (fn [e] (reject (lib.error/error e)))))))))))
+                         (lib.promise/then
+                          (fn []
+                            (resolve
+                             (let [{:keys [phrase path locale]} (js->clj mnemonic :keywordize-keys true)]
+                               {:wallet/path wallet-path
+                                :wallet/name wallet-name
+                                :wallet/address address
+                                :wallet.mnemonic/phrase phrase
+                                :wallet.mnemonic/path path
+                                :wallet.mnemonic/locale locale}))))
+                         (lib.promise/catch
+                             (fn [e]
+                               (reject (lib.error/error e)))))))))))
          (lib.promise/catch reject)))))
 
 (defn load&

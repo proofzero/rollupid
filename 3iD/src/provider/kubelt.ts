@@ -11,6 +11,7 @@ let sdk: any = null;
 export const getSDK = async (): Promise<any> => {
   if (!sdk) {
     sdk = await sdkWeb.node_v1.init({
+      "app/name": "3iD",
       "oort/scheme": Constants.manifest?.extra?.oortSchema,
       "oort/host": Constants.manifest?.extra?.oortHost,
       "oort/port": Constants.manifest?.extra?.oortPort,
@@ -96,22 +97,27 @@ export const authenticate = async (
         window.location.reload();
       }
 
-      console.log({
-        chainId: network?.chainId,
-      });
-
       sdk = await sdkWeb.node_v1.oort.setWallet(sdk, {
         address,
         signFn,
       });
 
-      sdk = await sdkWeb.node_v1.oort.authenticate(sdk, {
-        "3id.profile": ["read", "write"],
-        "3id.app": ["read", "write"],
-      });
+      try {
+        sdk = await sdkWeb.node_v1.oort.authenticate(sdk, {
+          "3id.profile": ["read", "write"],
+          "3id.app": ["read", "write"],
+        }, {
+          blockchain: "ethereum",
+          chain: network?.name,
+          chainId: network?.chainId,
+        });
+      } catch (e) {
+        console.error(e);
+      }
 
       isAuth = await isAuthenticated(address);
       if (isAuth) {
+        console.log(`storing SDK instance`);
         await sdkWeb.node_v1.store(sdk);
       }
     }

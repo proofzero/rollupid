@@ -12,7 +12,8 @@
    [com.kubelt.lib.promise :as lib.promise :refer [promise]]
    [com.kubelt.lib.rpc :as lib.rpc]
    [com.kubelt.lib.vault :as lib.vault]
-   [com.kubelt.lib.wallet :as lib.wallet]))
+   [com.kubelt.lib.wallet :as lib.wallet]
+   [com.kubelt.spec.provider :as spec.provider]))
 
 ;; authenticate!
 ;; -----------------------------------------------------------------------------
@@ -33,114 +34,155 @@
   complete the auth flow. Returns a promise that resolves to the updated
   system map containing the JWT for the system wallet core address, or
   is rejected with some information about the error that occurred."
-  [sys permissions]
-  ;; TODO add an extra arity that allows a wallet to be passed in?
+  [sys permissions network]
   ;; TODO validate system map (especially: ensure wallet is present)
-  (let [core (get-in sys [:crypto/wallet :wallet/address])]
-    (-> (lib.oort/authenticate! sys permissions)
-        (lib.promise/then
-         (fn [auth-result]
-           (if (lib.error/error? auth-result)
-             ;; This triggers .catch handlers on returned promise.
-             (throw (ex-info "error" auth-result))
-             ;; We successfully retrieved a nonce, now verify it by signing
-             ;; it and sending it back.
-             auth-result)))
-        (lib.promise/then
-         (fn [nonce]
-           (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
-                 signature (sign-fn (:message nonce))]
-             [nonce signature])))
-        (lib.promise/then
-         (fn [[nonce signature-p]]
-           ;; NB: the signature is expected to be a promise, even if
-           ;; not strictly necessary on some platforms.
-           (lib.promise/then
-            signature-p
-            (fn [signature]
-              ;; If successful we get back a JWT that needs to be stored
-              ;; in the system map. NB: the JWT has an expiry and encodes
-              ;; client IP to restrict renewing JWTs for other clients.
-              ;; TODO check/assert that this is true.
-              (lib.promise/then
-               (lib.oort/verify! sys core (:nonce nonce) signature)
-               (fn [verify-result]
-                 (if (lib.error/error? verify-result)
-                   ;; This triggers .catch handlers on returned promise.
-                   (throw (ex-info "error" verify-result))
-                   ;; We successfully retrieved a nonce, now verify it by signing
-                   ;; it and sending it back.
-                   (let [decoded-jwt (lib.jwt/decode verify-result)]
-                     ;; TODO verify jwt
-                     ;; TODO once we are able to inject a
-                     ;; platform-specific storage capability, use that
-                     ;; to allow the SDK state (or possibly just a
-                     ;; subset, e.g. tokens) to be frozen and thawed
-                     ;; back out
-                     (-> sys
-                         (assoc :crypto/session (lib.vault/vault {core decoded-jwt}))
-                         (assoc-in [:crypto/session :vault/tokens*]  {core verify-result})))))))))))))
+  ;; TODO create conform& variant that returns a promise; current
+  ;; conform* returns an error map if a guard check fails
+  (lib.error/conform*
+   [spec.provider/network network]
+   (let [address (get-in sys [:crypto/wallet :wallet/address])]
+     (log/debug {:log/msg "authenticating for address" :wallet/address address})
+     (-> (lib.oort/authenticate& sys permissions network)
+         ;; Check that we were able to successfully get a nonce to sign.
+         (lib.promise/then
+          (fn [auth-result]
+            (if (lib.error/error? auth-result)
+              ;; This triggers .catch handlers on returned promise.
+              (throw (ex-info "error" auth-result))
+              auth-result)))
+         ;; We successfully retrieved a nonce, now verify it by signing
+         ;; it and sending it back. The auth result has the form:
+         ;; {:nonce "0x..." :message "Some human-readable stuff"}.
+         (lib.promise/then
+          (fn [{:keys [nonce message]}]
+            (log/debug {:log/message "received nonce" :auth/nonce nonce :auth/message message})
+            (let [sign-fn (get-in sys [:crypto/wallet :wallet/sign-fn])
+                  signature& (sign-fn message)]
+              [nonce signature&])))
+         (lib.promise/then
+          (fn [[nonce signature&]]
+            ;; NB: the signature is expected to be a promise, even if
+            ;; not strictly necessary on some platforms.
+            (lib.promise/then
+             signature&
+             (fn [signature]
+               (log/debug {:log/msg "signed nonce"
+                           :wallet/address address
+                           :auth/nonce nonce
+                           :auth/signature signature})
+               ;; If successful we get back a JWT that needs to be stored
+               ;; in the system map. NB: the JWT has an expiry and encodes
+               ;; client IP to restrict renewing JWTs for other clients.
+               ;; TODO check/assert that this is true.
+               (lib.promise/then
+                (lib.oort/verify& sys address nonce signature)
+                (fn [verify-result]
+                  (if (lib.error/error? verify-result)
+                    ;; This triggers .catch handlers on returned promise.
+                    (throw (ex-info "error" verify-result))
+                    ;; We successfully retrieved a nonce, now verify it by signing
+                    ;; it and sending it back.
+                    (let [decoded-jwt (lib.jwt/decode verify-result)]
+                      ;; TODO verify jwt
+                      (-> sys
+                          ;; Store the chain specification (e.g. "eth", "5" for goerli)
+                          ;; and send with successive calls.
+                          (assoc :crypto/session (lib.vault/vault {address decoded-jwt}))
+                          (assoc-in [:crypto/session :vault/tokens*] {address verify-result}))))))))))))))
 
-(defn authenticate-js!
+(defn authenticate-js&
   "Create an account from a JavaScript context."
-  [sys permissions]
-  (authenticate& sys permissions))
+  [sys permissions network]
+  (let [;; Requested permissons in the form {:scope ["permission"]}
+        permissions (js->clj permissions)
+        ;; Blockchain provider network.
+        blockchain (goog.object/get network "blockchain" "")
+        chain (goog.object/get network "chain" "")
+        chain-id (goog.object/get network "chainId" 0)
+        network {:network/blockchain blockchain
+                 :network/chain chain
+                 :network/chain-id chain-id}
+        result (authenticate& sys permissions network)]
+    (if (lib.error/error? result)
+      (lib.promise/rejected result)
+      result)))
 
+;; RPC
+;; -----------------------------------------------------------------------------
+;; TODO replace this with our internal RPC client
 
 ;; TODO test me
-(defn rpc-api [sys core]
+(defn rpc-api
+  [sys core]
   (lib.oort/rpc-api sys core))
 
-(defn rpc-api-js [sys core]
+(defn rpc-api-js
+  [sys core]
   (rpc-api sys core))
 
-(defn claims& [sys core]
-  (lib.promise/promise
-   (fn [resolve reject]
-     (-> (rpc-api sys core)
-         (lib.promise/then
-          (fn [api]
-            (-> (lib.rpc/rpc-call& sys api {:method [:kb :get-core-claims] :args []})
-                (lib.promise/then
-                 (fn [x]
-                   (if-let [error (-> x :http/body :error)]
-                     (reject error)
-                     (resolve (-> x :http/body :result))))))))))))
-
-(defn claims-js [sys]
-  (-> (claims& sys (get-in sys [:crypto/wallet :wallet/address]))
-      (lib.promise/then clj->js)))
-
 ;; TODO test me
-(defn call-rpc& [sys core method params]
+(defn call-rpc&
+  [sys core method params]
   (lib.promise/promise
    (fn [resolve reject]
      (-> (rpc-api sys core)
          (lib.promise/then
-          (fn [api]
-            (-> (lib.rpc/rpc-call& sys api {:method method :params params})
-                (lib.promise/then resolve)
-                (lib.promise/catch
-                 (fn [e]
-                   (reject
-                    (lib.error/from-obj e)))))))))))
+          (let [args {:method method :params params}]
+            (fn [api]
+              (-> (lib.rpc/rpc-call& sys api args)
+                  (lib.promise/then resolve)
+                  (lib.promise/catch
+                      (fn [e]
+                        (reject
+                         (lib.error/from-obj e))))))))))))
 
 (defn call-rpc-js
   "entrypoint that uses sdk-rpc-client and sdk-rpc-api"
   ([sys args]
-   (let [{:keys [method params]} (js->clj args :keywordize-keys true)]
-     (-> (call-rpc& sys
-                    (-> sys :crypto/wallet :wallet/address)
-                    (mapv keyword (js->clj method))
-                    params)
+   (let [{:keys [method params]} (js->clj args :keywordize-keys true)
+         core (-> sys :crypto/wallet :wallet/address)
+         method (mapv keyword (js->clj method))]
+     (-> (call-rpc& sys core method params)
          (lib.promise/then #(clj->js (cske/transform-keys csk/->camelCaseString %)))
          (lib.promise/catch clj->js))))
+
   ([sys method params]
    (let [method (mapv keyword (js->clj method))
-         params (js->clj params :keywordize-keys true)]
-     (-> (call-rpc& sys (-> sys :crypto/wallet :wallet/address) method params)
+         params (js->clj params :keywordize-keys true)
+         core (-> sys :crypto/wallet :wallet/address)]
+     (-> (call-rpc& sys core method params)
          (lib.promise/then #(clj->js (cske/transform-keys csk/->camelCaseString %)))
          (lib.promise/catch clj->js)))))
+
+;; claims&
+;; -----------------------------------------------------------------------------
+
+(defn claims&
+  "Get the claims associated with a core. The core is identified by a
+  wallet address. Returns a promise the resolves to the collection of
+  claims."
+  [sys core]
+  (let [;; Define the RPC call to perform.
+        args {:method [:kb :get-core-claims] :args []}]
+    (lib.promise/promise
+     (fn [resolve reject]
+       (-> (rpc-api sys core)
+           (lib.promise/then
+            (fn [api]
+              (-> (lib.rpc/rpc-call& sys api args)
+                  (lib.promise/then
+                   (fn [x]
+                     (if-let [error (-> x :http/body :error)]
+                       (reject error)
+                       (resolve (-> x :http/body :result)))))))))))))
+
+(defn claims-js
+  "Get the claims associated with a core from a JS context. Returns a
+  promise that resolves to the collection of claims as JSON data."
+  [sys]
+  (let [core (get-in sys [:crypto/wallet :wallet/address])]
+    (-> (claims& sys core)
+        (lib.promise/then clj->js))))
 
 ;; logged-in?
 ;; -----------------------------------------------------------------------------
@@ -167,6 +209,7 @@
 
 ;; set-wallet
 ;; -----------------------------------------------------------------------------
+;; TODO add & suffix
 
 (defn set-wallet
   [sys wallet]

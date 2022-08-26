@@ -2,8 +2,8 @@
   "Entry point for the Kubelt SDK."
   {:copyright "©2022 Proof Zero Inc." :license "Apache 2.0"}
   (:require
-   [com.kubelt.sdk.v1 :as sdk.v1]
    [com.kubelt.lib.rpc :as lib.rpc]
+   [com.kubelt.sdk.v1 :as sdk.v1]
    [com.kubelt.sdk.v1.oort :as sdk.v1.oort]))
 
 ;; Entrypoint
@@ -38,30 +38,37 @@
 ;;   kbt.v1.halt(sdk);
 ;;
 
-(defn web-v1
-  []
-  ;; TODO
-  (println "web-v1"))
+(def ^:private public-api
+  {:init sdk.v1/init-js
+   :halt sdk.v1/halt-js!
+   :options sdk.v1/options-js
+
+   ;; storage
+   :store sdk.v1/store-js&
+   :restore sdk.v1/restore-js&
+
+   ;; oort
+   :oort {:authenticate sdk.v1.oort/authenticate-js&
+          :claims sdk.v1.oort/claims-js
+          :isLoggedIn sdk.v1.oort/logged-in-js?
+          :setWallet sdk.v1.oort/set-wallet-js
+
+          ;; TODO this should only exist as dev-time escape hatch
+          :callRpc sdk.v1.oort/call-rpc-js}})
+
+(def ^:private develop-api
+  {:develop {:rpc {:call sdk.v1.oort/call-rpc-js}}})
+
+;; NB: The compiler sets this to false for release builds.
+;; (when goog.DEBUG
+;;   (def node-v1 (clj->js public-api)))
+;; Use a macro? (lib.sdk/api ...)
 
 (def node-v1
-  #js {:init sdk.v1/init-js
-       :halt sdk.v1/halt-js!
-       :options sdk.v1/options-js
+  (clj->js public-api))
 
-       ;; storage
-       :store sdk.v1/store-js&
-       :restore sdk.v1/restore-js&
+;;:callRpc sdk.v1.oort/call-rpc-js
 
-       ;; oort
-       :oort #js {:authenticate sdk.v1.oort/authenticate-js!
-                  :claims sdk.v1.oort/claims-js
-                  :callRpc sdk.v1.oort/call-rpc-js
-                  :callRpcWithApi lib.rpc/call-rpc-with-api-js
-                  :rpcApi sdk.v1.oort/rpc-api-js
-                  :isLoggedIn sdk.v1.oort/logged-in-js?
-                  :setWallet sdk.v1.oort/set-wallet-js}
-
-       ;; development (removed from production builds)
-       ;; TODO
-       ;;:develop #js {:rpc #js {:call sdk.v1.develop.rpc/call-js!}}
-       })
+;; TODO remove; they appear to be unused
+;;:callRpcWithApi lib.rpc/call-rpc-with-api-js
+;;:rpcApi sdk.v1.oort/rpc-api-js
