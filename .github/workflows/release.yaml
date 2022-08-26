@@ -94,8 +94,7 @@ jobs:
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
         run: >
-          bb deploy:app --deploy-env current --app-version
-            ${{ env.RELEASE_VERSION }}
+          bb deploy:app --deploy-env current --app-version ${{ env.RELEASE_VERSION }}
 
       - name: Clear Cloudflare cache
         uses: Cyb3r-Jak3/action-cloudflare-cache@v1.1.0
