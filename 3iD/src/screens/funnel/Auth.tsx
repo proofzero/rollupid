@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import useAccount from "../../hooks/account";
 
@@ -19,6 +19,7 @@ import {
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
+  const [checking, setChecking] = useState(true)
 
   const claimsRedirect = async (claim: string) => {
     const sdk = await getSDK();
@@ -31,6 +32,7 @@ export default function Auth({ navigation }: { navigation: any }) {
     if (claims.includes(claim)) {
       navigation.navigate("Onboard");
     } else if (!funnelState.invite) {
+      setChecking(false);
       const invites = await listInvitations(sdk);
       if (invites.length > 0) {
         navigation.navigate("Invite");
@@ -38,6 +40,7 @@ export default function Auth({ navigation }: { navigation: any }) {
         navigation.navigate("Gate");
       }
     } else {
+      setChecking(false);
       navigation.navigate("Gate");
     }
   };
@@ -106,7 +109,7 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-            Sign the message with your wallet.
+            {checking ? "Checking session." : "Sign the message with your wallet."}
             <p
               style={{
                 fontFamily: "Inter_500Bold",
@@ -118,8 +121,11 @@ export default function Auth({ navigation }: { navigation: any }) {
                 // borderRadius: "0.5em",
               }}
             >
-              It could take a few seconds for the signing message to appear. If
-              the does not appear try clicking on your wallet.
+              {checking 
+                ? "Checking if you are already signed in to 3ID." 
+                : "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
+              }
+              
             </p>
             <Spinner />
           </>

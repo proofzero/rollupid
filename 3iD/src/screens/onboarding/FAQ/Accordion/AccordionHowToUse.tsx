@@ -12,8 +12,8 @@ type Account = {
   account: undefined | null | string;
 };
 
-const AccordionHowToUse = ({ account }: Account) => {
-  const [expanded, setExpanded] = useState(false);
+const AccordionHowToUse = ({ account }: Account, { defaultExpanded} : { defaultExpanded: boolean }) => {
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [styles, setStyles] = useState({
     width: 14,
     height: 7,
