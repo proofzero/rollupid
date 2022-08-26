@@ -36,68 +36,62 @@ const Onboard = ({ navigation }: OnboardProps) => {
   const [completeSteps] = useState<
     {
       title: string;
-      complete: boolean;
     }[]
   >([
     {
       title: "Claim your 3ID",
-      complete: true,
     },
   ]);
 
   const [comingNext] = useState<
     {
       title: string;
-      complete: boolean;
+      description: Any;
     }[]
   >([
     {
       title: "Claim your PFP",
-      complete: false,
+      description: (<>Mint your very own 3ID 1/1 PFP. <br></br>
+      For more information see "What is the 3ID?"" PFP in the
+      FAQ section.</>),
+    },
+    {
+      title: "Verify ENS",
+      description: (<>Connect your ENS name to your 3ID. <br></br>
+      Use your ENS name as your username for easier profile discovery.</>),
+    },
+    {
+      title: "Configure Profile",
+      description: (<>Configure your NFT avatar and profile. <br></br>
+      Tell the world about yourself...or don't! It's up to you.</>),
     },
   ]);
 
   const [roadmapSteps] = useState<
     {
       title: string;
-      complete: boolean;
     }[]
   >([
     {
-      title: "Verify ENS",
-      complete: false,
-    },
-    {
-      title: "Configure Profile",
-      complete: false,
-    },
-    {
       title: "Create NFT gallery",
-      complete: false,
     },
     {
       title: "Link More Accounts",
-      complete: false,
     },
     {
       title: "Receive First Verified Credential",
-      complete: false,
     },
     {
       title: "Setup Secure KYC",
-      complete: false,
     },
     {
       title: "Send First Message",
-      complete: false,
     },
     {
       title: "Save First File",
-      complete: false,
     },
     {
       title: "Permission First App",
-      complete: false,
     },
   ]);
 
@@ -518,9 +512,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           color: "#D1D5DB",
                         }}
                       >
-                        Mint your very own 3ID 1/1 PFP. <br></br>
-                        For more information see "What is the 3ID?"" PFP in the
-                        FAQ section.
+                        {step.description}
                       </Text>
                     </View>
                   </View>
