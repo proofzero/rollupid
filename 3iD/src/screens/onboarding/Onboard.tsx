@@ -1,6 +1,10 @@
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter } from "react-icons/fa";
+import ReactTooltip from 'react-tooltip';
+import styled from "styled-components";
+
+
 
 import { View, Text, Image, Pressable } from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
@@ -20,6 +24,8 @@ type OnboardProps = {
 
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
+
+  const [upvoteButtons, setUpvoteButtons] = useState([]);
 
   const [inviteCode, setInviteCode] = useState<string | undefined>();
 
@@ -104,6 +110,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
     100;
 
   useEffect(() => {
+
     const asyncFn = async () => {
       const sdk = await getSDK();
 
@@ -122,6 +129,17 @@ const Onboard = ({ navigation }: OnboardProps) => {
       asyncFn();
     }
   }, [account]);
+
+  const TooltipWrapper = styled.span`
+
+    .tooltip {
+      position: absolute !important;
+      width: fit-content !important;
+      left: inherit !important;
+      top: inherit !important;
+      margin-top: -60px !important;
+      margin-left: -78px !important;
+  `;
 
   return (
     <Layout navigation={navigation}>
@@ -514,7 +532,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           fontSize: 14,
                           fontWeight: "400",
                           lineHeight: 20,
-                          color: "#D1D5DB",
+                          color: "#4B5563",
                         }}
                       >
                         {step.description}
@@ -561,14 +579,48 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       alignItems: "center",
                     }}
                   >
-                    <Image
+                    <button
                       style={{
                         width: 25.6,
                         height: 25.6,
                         marginRight: 19.2,
+                        backgroundColor: "#fff",
+                        paddingTop: 2,
                       }}
-                      source={require(`../../assets/step_soon.png`)}
-                    />
+                      onClick={() => { 
+                        upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
+                        console.log(upvoteButtons[index])
+                        ReactTooltip.show(upvoteButtons[index]) 
+                        setTimeout(() => {
+                          ReactTooltip.hide(upvoteButtons[index])
+                        }, 3000)
+                        // TODO: add upvote functionality
+                      }}
+                    >
+                      +
+                      <p
+                        ref={ref => {
+                          upvoteButtons[index] = ref
+                          setUpvoteButtons(upvoteButtons)
+                          return ref
+                        }}
+                        data-tip={`Upvoted!`} 
+                        data-delay-show='100' 
+                        data-delay-hide='1000'
+                        data-effect='solid'
+                        data-for={`tooltip_${index}`}
+                        data-place='top'
+                        data-scroll-hide='true'
+                      ></p>
+                      
+                    </button>
+                    <TooltipWrapper>
+                    <ReactTooltip 
+                          className="tooltip"
+                          id={`tooltip_${index}`}
+                          scrollHide={true} 
+                        />
+                      </TooltipWrapper>
 
                     <View>
                       <Text

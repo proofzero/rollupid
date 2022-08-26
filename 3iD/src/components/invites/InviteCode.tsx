@@ -20,9 +20,13 @@ const CopyLinkWrapper = styled.div`
 `;
 
 const TooltipWrapper = styled.span`
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0.3s linear, opacity 0.3s linear;
+  .tooltip {
+    position: absolute !important;
+    width: fit-content !important;
+    left: inherit !important;
+    top: inherit !important;
+    margin-top: -60px !important;
+    margin-left: -100px !important;
 `;
 
 const InviteCode = ({ code }: InviteCodeProps) => {
@@ -115,15 +119,16 @@ const InviteCode = ({ code }: InviteCodeProps) => {
             >
               Copy Link
               {/* <Tooltip>Copied!</Tooltip> */}
-              <span
-                ref={(ref) => setCopiedRef(ref)}
-                data-tip="Copied!"
-                data-delay-show="100"
-                data-delay-hide="1000"
-                data-effect="solid"
-                data-offset='{"top": 10, "left": 40}'
+              <span 
+                ref={ref => setCopiedRef(ref)}
+                data-tip="Copied!" 
+                data-delay-show='100' 
+                data-delay-hide='1000'
+                data-effect='solid'
               ></span>
-              <ReactTooltip />
+              <TooltipWrapper>
+                <ReactTooltip className="tooltip" />
+              </TooltipWrapper>
             </Text>
           </Pressable>
         </CopyLinkWrapper>
