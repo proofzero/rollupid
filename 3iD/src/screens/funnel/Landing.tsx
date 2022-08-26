@@ -8,6 +8,8 @@ import Layout from "../Layout";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { isAuthenticated, kbGetClaims } from "../../provider/kubelt";
 
+import { isMobileOperatingSystem } from "../../utils";
+
 export default function Landing({ navigation }: { navigation: any }) {
   const account = useAccount();
 
@@ -71,6 +73,24 @@ export default function Landing({ navigation }: { navigation: any }) {
         >
           Connect Your Wallet
         </Text>
+
+        { isMobileOperatingSystem() &&
+          (<View 
+            style={{
+              paddingTop: "2em",
+              marginBottom: "-2em",
+              fontFamily: "Inter_700Bold",
+              fontSize: 14,
+              fontWeight: "700",
+              lineHeight: 28,
+              color: "#1F2937",
+            }}
+          >
+            <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
+              Open in Metamask Mobile App
+            </a>
+          </View>)
+        }
 
         <Pressable
           style={{
