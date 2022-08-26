@@ -1,67 +1,181 @@
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
+import { FaDiscord, FaTwitter } from "react-icons/fa";
+import ReactTooltip from 'react-tooltip';
+import styled from "styled-components";
 
 import { View, Text, Image, Pressable } from "react-native";
+import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
-import { getSDK } from "../../provider/kubelt";
-import { getFunnelState } from "../../services/threeid";
+import datadogRum from "../../analytics/datadog";
+import { authenticate, getSDK, isAuthenticated } from "../../provider/kubelt";
+import { 
+  getFunnelState,
+  getInviteCode,
+  getFeatureVoteCount,
+  setFeatureVoteCount,
+} from "../../services/threeid";
+
+import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
+import InviteCode from "../../components/invites/InviteCode";
+import useBreakpoint from "../../hooks/breakpoint";
+import { connect } from "../../provider/web3";
 
-export default function Onboard({ navigation }: { navigation: any }) {
+type OnboardProps = {
+  navigation: any;
+};
+
+const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
+
+  const [upvoteButtons, setUpvoteButtons] = useState([]);
+
+  const [inviteCode, setInviteCode] = useState<string | undefined>();
+
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>());
 
   const [canMint, setCanMint] = useState(false);
 
-  const [steps] = useState<
+  const [completeSteps] = useState<
     {
       title: string;
-      complete: boolean;
     }[]
   >([
     {
-      title: "Claim your 3iD",
-      complete: true,
+      title: "Claim your 3ID",
     },
+  ]);
+
+  const [comingNext] = useState<
+    {
+      title: string;
+      description: Any;
+    }[]
+  >([
     {
       title: "Claim your PFP",
-      complete: false,
+      description: (
+        <>
+          Mint your very own 3ID 1/1 PFP. <br></br>
+          For more information see "What is the 3ID?"" PFP in the FAQ section.
+        </>
+      ),
     },
     {
-      title: "Add user details",
-      complete: false,
+      title: "Verify ENS",
+      description: (
+        <>
+          Connect your ENS name to your 3ID. <br></br>
+          Use your ENS name as your username for easier profile discovery.
+        </>
+      ),
     },
+    {
+      title: "Configure Profile",
+      description: (
+        <>
+          Configure your NFT avatar and profile. <br></br>
+          Tell the world about yourself...or don't! It's up to you.
+        </>
+      ),
+    },
+  ]);
+
+  const [roadmapSteps] = useState<
+    {
+      title: string;
+    }[]
+  >([
     {
       title: "Create NFT gallery",
-      complete: false,
     },
     {
-      title: "Link More Wallets",
-      complete: false,
+      title: "Link More Accounts",
     },
     {
-      title: "Secure KYC",
-      complete: false,
+      title: "Receive First Credential",
+    },
+    {
+      title: "Setup Secure KYC",
+    },
+    {
+      title: "Send First Message",
+    },
+    {
+      title: "Publish First File",
+    },
+    {
+      title: "Permission First App",
     },
   ]);
 
   const percentage =
-    (steps.filter((s) => s.complete).length / steps.length) * 100;
+    (completeSteps.length /
+      (completeSteps.length + comingNext.length + roadmapSteps.length)) *
+    100;
+
+    useEffect(() => {
+      const asyncFn = async () => {
+        let isAuth = await isAuthenticated(account);
+        if (!isAuth) {
+          const provider = await connect();
+          await authenticate(provider);
+        }
+  
+        isAuth = await isAuthenticated(account);
+        if (isAuth) {
+          const sdk = await getSDK();
+  
+          const funnelState = await getFunnelState(sdk);
+          if (!funnelState.mint) {
+            // setCanMint(true);
+          }
+  
+          const inviteCodeRes = await getInviteCode(sdk);
+          if (inviteCodeRes) {
+            setInviteCode(inviteCodeRes);
+          }
+  
+          const featureVotesRes = await getFeatureVoteCount(sdk);
+          console.log(featureVotesRes);
+          if (featureVotesRes?.votes) {
+            setFeatureVotes(new Set(featureVotesRes.votes));
+          }
+        }
+      };
+  
+      if (account) {
+        asyncFn();
+      }
+    }, [account]);
 
   useEffect(() => {
     const asyncFn = async () => {
       const sdk = await getSDK();
+      setFeatureVoteCount(sdk, {votes: Array.from(featureVotes)})
+    }
 
-      const funnelState = await getFunnelState(sdk);
-      if (!funnelState.mint) {
-        setCanMint(true);
-      }
-    };
-
-    if (account) {
+    if (featureVotes) {
       asyncFn();
     }
-  }, []);
+
+
+  }, [featureVotes]);
+
+  const TooltipWrapper = styled.span`
+
+    .tooltip {
+      position: absolute !important;
+      width: fit-content !important;
+      left: inherit !important;
+      top: inherit !important;
+      margin-top: -60px !important;
+      margin-left: -78px !important;
+      fontFamily: "Inter_400Regular";
+
+  `;
 
   return (
     <Layout navigation={navigation}>
@@ -204,6 +318,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
               lineHeight: 40,
               color: "#1F2937",
               marginBottom: 15,
+              textAlign: useBreakpoint(false, true) ? "center" : "left",
             }}
           >
             Welcome to 3ID! 🎉
@@ -219,110 +334,55 @@ export default function Onboard({ navigation }: { navigation: any }) {
               marginBottom: 22,
             }}
           >
-            The app is currently in beta. We will be unlocking new features on
-            weekly basis. <br />
-            Please follow us on Twitter and join our Discord to stay updated!{" "}
+            Thanks for being an early supporter! We will be unlocking new
+            features regularly. <br />
+            Check out what's coming next. Be sure to follow us on Twitter and
+            Discord to stay updated!{" "}
           </Text>
 
           <View
             style={{
-              flexDirection: "row",
+              flexDirection: useBreakpoint("row", "column"),
+              alignItems: "center",
             }}
           >
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 44.5,
-                paddingVertical: 12,
-                marginRight: 10,
-                backgroundColor: "#F3F4F6",
-              }}
-            >
-              <Image
-                style={{
-                  width: 19,
-                  height: 16,
-                  marginRight: 13.5,
-                }}
-                source={require("../../assets/twitter.png")}
-              />
-
-              <Text
-                testID="onboard-twitter"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                }}
-              >
-                <a
-                  target={"_blank"}
-                  rel={"noopener noopener noreferrer"}
-                  href={Constants.manifest?.extra?.twitterUrl}
-                  style={{ color: "#374151", textDecoration: "none" }}
-                >
-                  Twitter
-                </a>
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 44.5,
-                paddingVertical: 12,
-                backgroundColor: "#F3F4F6",
-              }}
-            >
-              <Image
-                style={{
-                  width: 19.82,
-                  height: 15.11,
-                  marginRight: 13.09,
-                }}
-                source={require("../../assets/discord.png")}
-              />
-
-              <Text
-                testID="onboard-twitter"
-                style={{
-                  fontFamily: "Inter_500Medium",
-                  fontSize: 14,
-                  fontWeight: "500",
-                  lineHeight: 16,
-                  color: "#374151",
-                }}
-              >
-                <a
-                  target={"_blank"}
-                  rel={"noopener noopener noreferrer"}
-                  href={Constants.manifest?.extra?.discordUrl}
-                  style={{ color: "#374151", textDecoration: "none" }}
-                >
-                  Discord
-                </a>
-              </Text>
-            </Pressable>
+            <LinkButton
+              url={Constants.manifest?.extra?.twitterUrl}
+              title="Twitter"
+              Icon={FaTwitter}
+              iconColor="#1D9BF0"
+            />
+            <View style={{ width: 10, height: 10 }} />
+            <LinkButton
+              url={Constants.manifest?.extra?.discordUrl}
+              title="Discord"
+              Icon={FaDiscord}
+              iconColor="#5865F2"
+            />
           </View>
         </View>
 
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: useBreakpoint("row", "column"),
           }}
         >
+          {!useBreakpoint(true, false) && inviteCode && (
+            <InviteCode code={inviteCode} />
+          )}
+
           {/* Steps */}
           <View
-            style={{
-              flex: 1,
-            }}
+            style={
+              useBreakpoint(true, false)
+                ? {
+                    flex: 1,
+                  }
+                : {
+                    marginBottom: "1em",
+                    marginTop: "1em",
+                  }
+            }
           >
             <Text
               style={{
@@ -333,7 +393,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
                 color: "#1F2937",
               }}
             >
-              Get Started
+              Roadmap
             </Text>
 
             <Text
@@ -343,13 +403,15 @@ export default function Onboard({ navigation }: { navigation: any }) {
                 fontWeight: "400",
                 lineHeight: 20,
                 color: "#9CA3AF",
-                marginBottom: 23,
+                marginBottom: 20,
+                marginTop: 10,
               }}
             >
-              You will earn 1 Invite NFT for each step completed
+              Discover and try new features as we roll them out.
             </Text>
 
             {/* Progress bar */}
+
             <View
               style={{
                 width: "100%",
@@ -368,6 +430,18 @@ export default function Onboard({ navigation }: { navigation: any }) {
             </View>
 
             {/* Steps */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+              }}
+            >
+              READY
+            </Text>
             <View
               style={{
                 borderWidth: 1,
@@ -375,13 +449,13 @@ export default function Onboard({ navigation }: { navigation: any }) {
                 padding: 17,
               }}
             >
-              {steps.map((step, index) => (
+              {completeSteps.map((step, index) => (
                 <View
                   key={step.title}
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    marginBottom: index !== steps.length - 1 ? 32 : 0,
+                    marginBottom: index !== completeSteps.length - 1 ? 32 : 0,
                   }}
                 >
                   <View
@@ -396,9 +470,7 @@ export default function Onboard({ navigation }: { navigation: any }) {
                         height: 25.6,
                         marginRight: 19.2,
                       }}
-                      source={require(`../../assets/step_${
-                        step.complete ? "complete" : "soon"
-                      }.png`)}
+                      source={require(`../../assets/step_complete.png`)}
                     />
 
                     <View>
@@ -417,434 +489,243 @@ export default function Onboard({ navigation }: { navigation: any }) {
                       {step.complete && (
                         <Text
                           style={{
-                            fontFamily: "Inter_400Regular",
+                            fontFamily: "Inter_500Medium",
                             fontSize: 14,
-                            fontWeight: "400",
-                            lineHeight: 20,
+                            fontWeight: "500",
+                            lineHeight: 24,
                             color: "#6B7280",
                           }}
                         >
                           Completed
                         </Text>
                       )}
-
-                      {!step.complete && (
-                        <Text
-                          style={{
-                            fontFamily: "Inter_400Regular",
-                            fontSize: 14,
-                            fontWeight: "400",
-                            lineHeight: 20,
-                            color: "#D1D5DB",
-                          }}
-                        >
-                          Coming Soon
-                        </Text>
-                      )}
                     </View>
                   </View>
+                </View>
+              ))}
+            </View>
 
-                  {!step.complete && (
-                    <Pressable
-                      disabled={true}
+            {/* COMING NEXT */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+                marginTop: 20,
+              }}
+            >
+              COMING NEXT
+            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F4F6",
+                padding: 17,
+              }}
+            >
+              {comingNext.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={{
+                    flexDirection: "row",
+                    flexShrink: 1,
+                    justifyContent: "space-between",
+                    marginBottom: index !== comingNext.length - 1 ? 32 : 0,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexShrink: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Image
                       style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        paddingHorizontal: 16,
-                        paddingVertical: 12,
-                        backgroundColor: "#F3F4F6",
+                        width: 25.6,
+                        height: 25.6,
+                        marginRight: 19.2,
                       }}
-                    >
+                      source={require(`../../assets/step_soon.png`)}
+                    />
+
+                    <View style={{
+                      flexShrink: 1,
+
+                    }}>
                       <Text
                         style={{
                           fontFamily: "Inter_500Medium",
                           fontSize: 14,
                           fontWeight: "500",
-                          lineHeight: 16,
-                          color: "#E5E7EB",
+                          lineHeight: 20,
+                          color: "#111827",
                         }}
                       >
-                        View
+                        {step.title}
                       </Text>
-                    </Pressable>
-                  )}
+
+                      <Text
+                        style={{
+                          fontFamily: "Inter_400Regular",
+                          fontSize: 14,
+                          fontWeight: "400",
+                          lineHeight: 20,
+                          color: "#4B5563",
+                        }}
+                      >
+                        {step.description}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* ROADMAP */}
+            <Text
+              style={{
+                fontFamily: "Inter_500Medium",
+                fontSize: 16,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 7,
+                marginTop: 20,
+              }}
+            >
+              ROADMAP
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 20,
+                marginTop: 10,
+              }}
+            >
+              Vote for your favorite features ({3 - featureVotes.size} votes left).
+            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: "#F3F4F6",
+                padding: 17,
+              }}
+            >
+              {roadmapSteps.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    marginBottom: index !== roadmapSteps.length - 1 ? 32 : 0,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <button
+                      disabled={(featureVotes.size >= 3) ? true : false}
+                      style={{
+                        width: 25.6,
+                        height: 25.6,
+                        marginRight: 19.2,
+                        backgroundColor: "#fff",
+                        paddingTop: 2,
+                      }}
+                      onClick={() => { 
+                        // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
+                        ReactTooltip.show(upvoteButtons[index]) 
+                        
+                        
+                      }}
+                    >
+                      +
+                      <p
+                        ref={ref => {
+                          upvoteButtons[index] = ref
+                          setUpvoteButtons(upvoteButtons)
+                          return ref
+                        }}
+                        data-tip={`Upvoted!`} 
+                        // data-delay-show='100' 
+                        data-delay-hide='3000'
+                        data-effect='solid'
+                        data-for={`tooltip_${index}`}
+                        data-place='top'
+                        data-scroll-hide='true'
+                      ></p>
+                      
+                    </button>
+                    <TooltipWrapper>
+                      { React.useMemo(() => (<ReactTooltip 
+                            className="tooltip"
+                            id={`tooltip_${index}`}
+                            scrollHide={true} 
+                            afterShow={() => {
+                              
+                              ReactTooltip.hide(upvoteButtons[index])
+                            }}
+                            afterHide={() => {
+                              // Set upvotes
+                              if (featureVotes.size < 3) {
+                                featureVotes.add(step.title)
+                                setFeatureVotes(new Set(featureVotes))
+                                datadogRum.addAction('featureVote', {
+                                  'value': step.title,
+                                })
+                              }
+                            }}
+                          />), [])}
+                      </TooltipWrapper>
+                         
+                    <View>
+                      <Text
+                        style={{
+                          fontFamily: "Inter_500Medium",
+                          fontSize: 14,
+                          fontWeight: "500",
+                          lineHeight: 20,
+                          color: "#111827",
+                        }}
+                      >
+                        {step.title}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontFamily: "Inter_400Regular",
+                          fontSize: 14,
+                          fontWeight: "400",
+                          lineHeight: 24,
+                          color: "#D1D5DB",
+                        }}
+                      >
+                        Coming Soon
+                      </Text>
+                    </View>
+                  </View> 
                 </View>
               ))}
             </View>
           </View>
 
           {/* FAQ */}
-          <View
-            style={{
-              flex: 1,
-              marginLeft: 41,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                fontSize: 20,
-                fontWeight: "600",
-                lineHeight: 32,
-                color: "#1F2937",
-                marginBottom: 16,
-              }}
-            >
-              FAQ
-            </Text>
-
-            <View
-              style={{
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
-              }}
-            >
-              <View
-                style={{
-                  marginBottom: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_500Medium",
-                      fontSize: 14,
-                      fontWeight: "500",
-                      lineHeight: 16,
-                      color: "#4B5563",
-                    }}
-                  >
-                    How can I use 3iD?
-                  </Text>
-
-                  <Image
-                    style={{
-                      width: 14,
-                      height: 7,
-                    }}
-                    source={require("../../assets/dropdown.png")}
-                  ></Image>
-                </View>
-
-                <Text
-                  style={{
-                    marginVertical: "1em",
-                  }}
-                >
-                  Now that you've claimed your 3ID, other applications can query
-                  your profile to fetch your public profile details including
-                  your avatar. You can also use{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={`https://threeid.xyz/${account}`}
-                  >
-                    https://threeid.xyz/{account}
-                  </a>{" "}
-                  to promote your profile and NFTs on social media.
-                </Text>
-
-                <Text>
-                  In our roadmap we have many more features coming including
-                  linking multiple accounts together, messaging, storage and
-                  more.
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
-              }}
-            >
-              <View
-                style={{
-                  marginBottom: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_500Medium",
-                      fontSize: 14,
-                      fontWeight: "500",
-                      lineHeight: 16,
-                      color: "#4B5563",
-                    }}
-                  >
-                    What is the 3iD Roadmap?
-                  </Text>
-
-                  <Image
-                    style={{
-                      width: 14,
-                      height: 7,
-                    }}
-                    source={require("../../assets/dropdown.png")}
-                  ></Image>
-                </View>
-
-                <Text
-                  style={{
-                    marginTop: "1em",
-                  }}
-                >
-                  Next we will be focusing on storage, account linking, and
-                  messaging but we're also interested in what you think we
-                  should be working on! Join us on{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={Constants.manifest?.extra?.discordUrl}
-                  >
-                    Discord
-                  </a>{" "}
-                  and{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={Constants.manifest?.extra?.twitterUrl}
-                  >
-                    Twitter
-                  </a>{" "}
-                  to share your idea and keep up to date with the{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={`https://www.kubelt.com`}
-                  >
-                    Kubelt
-                  </a>{" "}
-                  team.
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
-              }}
-            >
-              <View
-                style={{
-                  marginBottom: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_500Medium",
-                      fontSize: 14,
-                      fontWeight: "500",
-                      lineHeight: 16,
-                      color: "#4B5563",
-                    }}
-                  >
-                    Can I sell my invite card?
-                  </Text>
-
-                  <Image
-                    style={{
-                      width: 14,
-                      height: 7,
-                    }}
-                    source={require("../../assets/dropdown.png")}
-                  ></Image>
-                </View>
-
-                <Text
-                  style={{
-                    marginTop: "1em",
-                  }}
-                >
-                  Yes. You can list your invite card on{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={`https://opensea.io/explore-collections`}
-                  >
-                    OpenSea
-                  </a>{" "}
-                  or transfer it to a friend.
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
-              }}
-            >
-              <View
-                style={{
-                  marginBottom: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_500Medium",
-                      fontSize: 14,
-                      fontWeight: "500",
-                      lineHeight: 16,
-                      color: "#4B5563",
-                    }}
-                  >
-                    What is my new PFP?
-                  </Text>
-
-                  <Image
-                    style={{
-                      width: 14,
-                      height: 7,
-                    }}
-                    source={require("../../assets/dropdown.png")}
-                  ></Image>
-                </View>
-
-                <Text
-                  style={{
-                    marginTop: "1em",
-                  }}
-                >
-                  <Text>
-                    Your 3ID gradient PFP is a soulbound avatar made up of 4
-                    color traits -- one version color and three common,
-                    uncommon, rare and epic colors traits. Rarity is decided by
-                    several factors.
-                  </Text>
-
-                  <ol>
-                    <li>
-                      The first color trait probability is based on which
-                      popular NFTs you currently hold.
-                    </li>
-
-                    <li>
-                      The second color trait is based on which of our developer
-                      collections you hold.
-                    </li>
-
-                    <li>The last color trait is based on your ETH balance.</li>
-                  </ol>
-
-                  <Text>
-                    Click{" "}
-                    <a
-                      target={"_blank"}
-                      rel={"noopener noopener noreferrer"}
-                      href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
-                    >
-                      here
-                    </a>{" "}
-                    to read the code. Once generated, your 3ID gradient PFP is
-                    soul bound to your identity. More generations of this PFP
-                    will be released corresponding with every major version of
-                    3ID.
-                  </Text>
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingVertical: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: "#E5E7EB",
-              }}
-            >
-              <View
-                style={{
-                  marginBottom: 16,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontFamily: "Inter_500Medium",
-                      fontSize: 14,
-                      fontWeight: "500",
-                      lineHeight: 16,
-                      color: "#4B5563",
-                    }}
-                  >
-                    Who is behind this project?
-                  </Text>
-
-                  <Image
-                    style={{
-                      width: 14,
-                      height: 7,
-                    }}
-                    source={require("../../assets/dropdown.png")}
-                  ></Image>
-                </View>
-
-                <Text
-                  style={{
-                    marginTop: "1em",
-                  }}
-                >
-                  3iD was created by{" "}
-                  <a
-                    target={"_blank"}
-                    rel={"noopener noopener noreferrer"}
-                    href={`https://kubelt.com`}
-                  >
-                    Kubelt
-                  </a>
-                  , a decentralized application platform, and is inspired by
-                  Web3 and the digital identity specification. Instead of
-                  applications centralizing user data, 3ID users like yourself
-                  will be able to permission/revoke applications to access
-                  personal data, messages and more. Our goal is to eliminate
-                  email as a basis of online identity and shift the norm towards
-                  being cryptographic, user-centric and decentralized platforms.
-                </Text>
-              </View>
-            </View>
-          </View>
+          <FAQ account={account} inviteCode={inviteCode} />
         </View>
       </View>
     </Layout>
   );
-}
+};
+
+export default Onboard;

@@ -65,8 +65,8 @@ export const authenticate = async (
     }
 
     const restoredSdk = await sdkWeb.node_v1.restore(sdk);
-    if ('error' === restoredSdk.type) {
-      console.error('There was a problem restoring Kubelt SDK state');
+    if ("error" === restoredSdk.type) {
+      console.error("There was a problem restoring Kubelt SDK state");
       console.error(restoredSdk.error);
     }
 
@@ -107,6 +107,7 @@ export const authenticate = async (
 
       sdk = await sdkWeb.node_v1.oort.authenticate(sdk, {
         "3id.profile": ["read", "write"],
+        "3id.app": ["read", "write"],
       });
 
       isAuth = await isAuthenticated(address);

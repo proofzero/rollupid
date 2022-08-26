@@ -6,8 +6,7 @@ export default function Layout({ children }: { children: any }) {
   return (
     <SafeAreaView
       style={{
-        height: 100,
-        flex: 1,
+        minHeight: "100%",
         backgroundColor: "#F9FAFB",
       }}
     >
@@ -30,6 +29,7 @@ export default function Layout({ children }: { children: any }) {
         style={{
           flex: 1,
           paddingHorizontal: "1em",
+          paddingVertical: "3em",
         }}
       >
         {children}
@@ -49,6 +49,7 @@ export default function Layout({ children }: { children: any }) {
             fontWeight: "400",
             lineHeight: 24,
             color: "#9CA3AF",
+            textAlign: "center",
           }}
         >
           3ID is non-custodial and secure. We will never request access to your

@@ -73,10 +73,11 @@ export default function App() {
           config: {
             screens: {
               Landing: "/",
-              Auth: "/authentication",
+              Auth: "/auth",
               Gate: "/gate",
-              Invite: "/invitation",
+              Invite: "/invite",
               Mint: "/mint",
+              Onboard: "/welcome",
               Details: "/profile",
               Settings: "/profile/settings",
             },
@@ -94,7 +95,11 @@ export default function App() {
             <Stack.Screen name="Gate" component={Gate} />
             <Stack.Screen name="Invite" component={Invite} />
             <Stack.Screen name="Mint" component={Mint} />
-            <Stack.Screen name="Onboard" component={Onboard} />
+            <Stack.Screen
+              name="Onboard"
+              options={{ title: "Welcome" }}
+              component={Onboard}
+            />
           </Stack.Group>
 
           <Stack.Group>

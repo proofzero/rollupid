@@ -1,10 +1,16 @@
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Link, useNavigationState } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import NavMenu from "../components/NavMenu";
+import NavMenu from "../components/nav-menu/NavMenu";
 import useAccount from "../hooks/account";
 import { connect, forceAccounts } from "../provider/web3";
-import { Image, View, Text, ScrollView } from "react-native";
+import {
+  Image,
+  View,
+  Text,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import {
   authenticate,
   getSDK,
@@ -14,102 +20,8 @@ import {
 import { useAppDispatch, useAppSelector } from "../hooks/state";
 import { selectNickname, set } from "../state/slices/profile";
 import { fetchProfile } from "../services/threeid";
-
-const SideMenuItem = ({
-  title,
-  isActive,
-  screen,
-  icon,
-  isCurrent,
-}: {
-  title: string;
-  isActive: boolean;
-  screen: string;
-  icon: any;
-  isCurrent?: boolean;
-}) => {
-  return (
-    <div
-      style={{
-        paddingTop: 12,
-        paddingBottom: 12,
-        paddingLeft: 8,
-        paddingRight: 9,
-        backgroundColor: isCurrent ? "#F3F4F6" : "transparent",
-        cursor: isActive ? "pointer" : "default",
-      }}
-      title={isActive ? title : "Coming soon"}
-    >
-      {isActive && (
-        <Link
-          to={{
-            screen: `${screen}`,
-            params: [],
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Image
-              resizeMode="center"
-              style={{
-                width: 20,
-                height: 20,
-                marginRight: 15,
-              }}
-              source={icon}
-            ></Image>
-
-            <Text
-              style={{
-                fontFamily: "Manrope_500Medium",
-                fontSize: 18,
-                lineHeight: 20,
-                color: isCurrent ? "#111827" : "gray",
-              }}
-            >
-              {title}
-            </Text>
-          </View>
-        </Link>
-      )}
-
-      {!isActive && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            resizeMode="center"
-            style={{
-              width: 20,
-              height: 20,
-              marginRight: 15,
-            }}
-            source={icon}
-          ></Image>
-
-          <Text
-            style={{
-              fontFamily: "Manrope_500Medium",
-              fontSize: 18,
-              lineHeight: 20,
-              color: isCurrent ? "#111827" : "gray",
-            }}
-          >
-            {title}
-          </Text>
-        </View>
-      )}
-    </div>
-  );
-};
+import SideMenu from "../components/side-menu/SideMenu";
+import useBreakpoint from "../hooks/breakpoint";
 
 export default function Layout({
   children,
@@ -124,9 +36,7 @@ export default function Layout({
   const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
   const account = useAccount();
-
-  const navRoutes = useNavigationState((state) => state.routes);
-  const navIndex = useNavigationState((state) => state.index);
+  const window = useWindowDimensions();
 
   const loadProfile = async () => {
     const storedProfile = await getItem();
@@ -200,7 +110,14 @@ export default function Layout({
         flex: 1,
       }}
     >
-      <NavMenu />
+      <View
+        style={{
+          backgroundColor: "#192030",
+          zIndex: 1,
+        }}
+      >
+        <NavMenu />
+      </View>
 
       <View
         style={{
@@ -221,124 +138,21 @@ export default function Layout({
       <View
         style={{
           flex: 1,
-          flexDirection: "row",
+          flexDirection: useBreakpoint("row", "column"),
           shadowRadius: 5,
           shadowOpacity: 0.1,
-          padding: "5em",
+          width: Math.min(1400, window.width),
+          marginHorizontal: "auto",
+          marginVertical: "3em",
         }}
       >
-        <View
-          style={{
-            width: 240,
-            backgroundColor: "#F9FAFB",
-            paddingHorizontal: 16,
-            paddingVertical: 20,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 15,
-            }}
-          >
-            <Image
-              style={{
-                width: 48,
-                height: 48,
-                marginRight: 12,
-              }}
-              source={require("../assets/avatar.png")}
-            ></Image>
-
-            <View
-              style={{
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                style={{
-                  marginBottom: 8,
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: 16,
-                  fontWeight: "600",
-                  lineHeight: 19.36,
-                  color: "#1A1B2D",
-                  flex: 1,
-                }}
-              >
-                {nickname}
-              </Text>
-
-              <Link
-                style={{
-                  marginBottom: 8,
-                  fontFamily: "Inter_600SemiBold",
-                  fontSize: 12,
-                  fontWeight: "600",
-                  lineHeight: 15,
-                  textDecorationLine: "underline",
-                  color: "#3B63FF",
-                  flex: 1,
-                }}
-                to={{ screen: "Settings" }}
-              >
-                Visit My Profile
-              </Link>
-            </View>
-          </View>
-
-          <View>
-            <SideMenuItem
-              isActive={true}
-              isCurrent={navRoutes[navIndex].name === "Onboard"}
-              screen={"Onboard"}
-              title={"Dashboard"}
-              icon={require("../assets/menu/side/dashboard.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Set PFP"}
-              icon={require("../assets/menu/side/set-pfp.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"User Details"}
-              icon={require("../assets/menu/side/user-details.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Wallet Accounts"}
-              icon={require("../assets/menu/side/wallet-accounts.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"NFT Gallery"}
-              icon={require("../assets/menu/side/nft-gallery.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"KYC"}
-              icon={require("../assets/menu/side/kyc.png")}
-            />
-            <SideMenuItem
-              isActive={false}
-              screen={"/"}
-              title={"Connected dApps"}
-              icon={require("../assets/menu/side/connected-d-apps.png")}
-            />
-          </View>
-        </View>
+        {nickname && <SideMenu nickname={nickname} />}
 
         <View
           style={{
             flex: 8,
             backgroundColor: "#FFFFFF",
-            padding: "1em",
+            padding: "1.5em",
           }}
         >
           {children}
