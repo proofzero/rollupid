@@ -15,6 +15,7 @@ import { clearAccount, forceAccounts } from "../../provider/web3";
 import { isAuthenticated, kbGetClaims, purge } from "../../provider/kubelt";
 
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import useBreakpoint from "../../hooks/breakpoint";
 
 export default function Gate({ navigation }: { navigation: any }) {
   const account = useAccount();
@@ -82,7 +83,7 @@ export default function Gate({ navigation }: { navigation: any }) {
           style={{
             width: 184.82,
             height: 159.91,
-            marginBottom: window.width >= window.height ? 74.09 : "1em",
+            marginBottom: useBreakpoint<number | string>(74.09, "1em"),
           }}
           source={require("../../assets/sad.png")}
         />
@@ -119,8 +120,7 @@ export default function Gate({ navigation }: { navigation: any }) {
 
         <View
           style={{
-            flexDirection:
-              window.width >= window.height ? "row" : "column-reverse",
+            flexDirection: useBreakpoint("row", "column-reverse"),
             justifyContent: "center",
             alignItems: "center",
           }}
@@ -134,7 +134,7 @@ export default function Gate({ navigation }: { navigation: any }) {
               paddingHorizontal: 20,
               paddingVertical: 14,
               backgroundColor: "#E5E7EB",
-              marginRight: window.width >= window.height ? 20 : 0,
+              marginRight: useBreakpoint(20, 0),
             }}
             onPress={() => tryDifferentWallet()}
           >
@@ -161,8 +161,8 @@ export default function Gate({ navigation }: { navigation: any }) {
               paddingHorizontal: 20,
               paddingVertical: 14,
               backgroundColor: "#192030",
-              marginRight: window.width >= window.height ? 20 : 0,
-              marginBottom: window.width >= window.height ? 0 : "1em",
+              marginRight: useBreakpoint(20, 0),
+              marginBottom: useBreakpoint<number | string>(0, "1em"),
             }}
           >
             <Text

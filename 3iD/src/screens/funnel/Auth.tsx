@@ -19,7 +19,7 @@ import {
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
-  const [checking, setChecking] = useState(true)
+  const [checking, setChecking] = useState(true);
 
   const claimsRedirect = async (claim: string) => {
     const sdk = await getSDK();
@@ -109,7 +109,9 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-            {checking ? "Wiring things up..." : "Sign the message with your wallet."}
+            {checking
+              ? "Wiring things up..."
+              : "Sign the message with your wallet."}
             <p
               style={{
                 fontFamily: "Inter_500Medium",
@@ -121,11 +123,9 @@ export default function Auth({ navigation }: { navigation: any }) {
                 // borderRadius: "0.5em",
               }}
             >
-              {checking 
-                ? "Checking if you are already signed in to 3ID." 
-                : "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
-              }
-              
+              {checking
+                ? "Checking if you are already signed in to 3ID."
+                : "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."}
             </p>
             <Spinner />
           </>

@@ -6,7 +6,6 @@ import { store } from "../state/store";
 import { clearSlice, setAddress } from "../state/slices/profile";
 import { authenticate, purge } from "./kubelt";
 
-
 const accountSubj = new BehaviorSubject<undefined | null | string>(undefined);
 
 let web3Provider: null | ethers.providers.Web3Provider = null;

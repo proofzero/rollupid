@@ -21,102 +21,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/state";
 import { selectNickname, set } from "../state/slices/profile";
 import { fetchProfile } from "../services/threeid";
 import SideMenu from "../components/side-menu/SideMenu";
-
-const SideMenuItem = ({
-  title,
-  isActive,
-  screen,
-  icon,
-  isCurrent,
-}: {
-  title: string;
-  isActive: boolean;
-  screen: string;
-  icon: any;
-  isCurrent?: boolean;
-}) => {
-  return (
-    <div
-      style={{
-        paddingTop: 12,
-        paddingBottom: 12,
-        paddingLeft: 8,
-        paddingRight: 9,
-        backgroundColor: isCurrent ? "#F3F4F6" : "transparent",
-        cursor: isActive ? "pointer" : "default",
-      }}
-      title={isActive ? title : "Coming soon"}
-    >
-      {isActive && (
-        <Link
-          to={{
-            screen: `${screen}`,
-            params: [],
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Image
-              resizeMode="center"
-              style={{
-                width: 20,
-                height: 20,
-                marginRight: 15,
-              }}
-              source={icon}
-            ></Image>
-
-            <Text
-              style={{
-                fontFamily: "Manrope_500Medium",
-                fontSize: 18,
-                lineHeight: 20,
-                color: isCurrent ? "#111827" : "gray",
-              }}
-            >
-              {title}
-            </Text>
-          </View>
-        </Link>
-      )}
-
-      {!isActive && (
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            resizeMode="center"
-            style={{
-              width: 20,
-              height: 20,
-              marginRight: 15,
-            }}
-            source={icon}
-          ></Image>
-
-          <Text
-            style={{
-              fontFamily: "Manrope_500Medium",
-              fontSize: 18,
-              lineHeight: 20,
-              color: isCurrent ? "#111827" : "gray",
-            }}
-          >
-            {title}
-          </Text>
-        </View>
-      )}
-    </div>
-  );
-};
+import useBreakpoint from "../hooks/breakpoint";
 
 export default function Layout({
   children,
@@ -233,7 +138,7 @@ export default function Layout({
       <View
         style={{
           flex: 1,
-          flexDirection: window.width >= window.height ? "row" : "column",
+          flexDirection: useBreakpoint("row", "column"),
           shadowRadius: 5,
           shadowOpacity: 0.1,
           width: Math.min(1400, window.width),

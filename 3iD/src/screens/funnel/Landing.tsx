@@ -74,8 +74,8 @@ export default function Landing({ navigation }: { navigation: any }) {
           Connect Your Wallet
         </Text>
 
-        { isMobileOperatingSystem() &&
-          (<View 
+        {isMobileOperatingSystem() && (
+          <View
             style={{
               paddingTop: "2em",
               marginBottom: "-2em",
@@ -89,8 +89,8 @@ export default function Landing({ navigation }: { navigation: any }) {
             <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
               Open in Metamask Mobile App
             </a>
-          </View>)
-        }
+          </View>
+        )}
 
         <Pressable
           style={{

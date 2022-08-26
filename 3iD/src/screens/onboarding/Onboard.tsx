@@ -2,13 +2,7 @@ import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter } from "react-icons/fa";
 
-import {
-  View,
-  Text,
-  Image,
-  Pressable,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
@@ -17,8 +11,8 @@ import { getFunnelState, getInviteCode } from "../../services/threeid";
 import FAQ from "./FAQ";
 
 import Layout from "../AuthLayout";
-import { NONE } from "../../../../packages/sdk-web/lib/cljs.core";
 import InviteCode from "../../components/invites/InviteCode";
+import useBreakpoint from "../../hooks/breakpoint";
 
 type OnboardProps = {
   navigation: any;
@@ -26,8 +20,6 @@ type OnboardProps = {
 
 const Onboard = ({ navigation }: OnboardProps) => {
   const account = useAccount();
-  const window = useWindowDimensions();
-  const landscape = window.width >= window.height;
 
   const [inviteCode, setInviteCode] = useState<string | undefined>();
 
@@ -51,19 +43,30 @@ const Onboard = ({ navigation }: OnboardProps) => {
   >([
     {
       title: "Claim your PFP",
-      description: (<>Mint your very own 3ID 1/1 PFP. <br></br>
-      For more information see "What is the 3ID?"" PFP in the
-      FAQ section.</>),
+      description: (
+        <>
+          Mint your very own 3ID 1/1 PFP. <br></br>
+          For more information see "What is the 3ID?"" PFP in the FAQ section.
+        </>
+      ),
     },
     {
       title: "Verify ENS",
-      description: (<>Connect your ENS name to your 3ID. <br></br>
-      Use your ENS name as your username for easier profile discovery.</>),
+      description: (
+        <>
+          Connect your ENS name to your 3ID. <br></br>
+          Use your ENS name as your username for easier profile discovery.
+        </>
+      ),
     },
     {
       title: "Configure Profile",
-      description: (<>Configure your NFT avatar and profile. <br></br>
-      Tell the world about yourself...or don't! It's up to you.</>),
+      description: (
+        <>
+          Configure your NFT avatar and profile. <br></br>
+          Tell the world about yourself...or don't! It's up to you.
+        </>
+      ),
     },
   ]);
 
@@ -284,7 +287,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
           <View
             style={{
-              flexDirection: landscape ? "row" : "column",
+              flexDirection: useBreakpoint("row", "column"),
               alignItems: "center",
             }}
           >
@@ -306,15 +309,17 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
         <View
           style={{
-            flexDirection: landscape ? "row" : "column",
+            flexDirection: useBreakpoint("row", "column"),
           }}
         >
-          {!landscape && inviteCode && <InviteCode code={inviteCode} />}
+          {!useBreakpoint(true, false) && inviteCode && (
+            <InviteCode code={inviteCode} />
+          )}
 
           {/* Steps */}
           <View
             style={
-              landscape
+              useBreakpoint(true, false)
                 ? {
                     flex: 1,
                   }

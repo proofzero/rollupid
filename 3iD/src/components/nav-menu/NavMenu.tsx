@@ -25,6 +25,7 @@ import { selectAddress } from "../../state/slices/profile";
 import NavMenuItem from "./NavMenuItem";
 
 import styled from "styled-components";
+import useBreakpoint from "../../hooks/breakpoint";
 
 const LinkWrapper = styled.div`
   &:hover {
@@ -40,8 +41,6 @@ export default function NavMenu() {
   const [showPanel, setShowPanel] = useState(false);
 
   const address = useAppSelector(selectAddress);
-
-  const nav = useNavigation();
   const window = useWindowDimensions();
 
   return (
@@ -50,7 +49,7 @@ export default function NavMenu() {
         paddingVertical: "1em",
         width: Math.min(1400, window.width),
         marginHorizontal: "auto",
-        flexDirection: window.width >= window.height ? "row" : "column",
+        flexDirection: useBreakpoint("row", "column"),
         justifyContent: "space-between",
         alignItems: "center",
         zIndex: 2,
@@ -59,7 +58,7 @@ export default function NavMenu() {
     >
       <View
         style={{
-          flexDirection: window.width >= window.height ? "row" : "column",
+          flexDirection: useBreakpoint("row", "column"),
           alignItems: "center",
         }}
       >
@@ -73,9 +72,9 @@ export default function NavMenu() {
 
         <View
           style={{
-            marginLeft: window.width >= window.height ? 65 : 0,
+            marginLeft: useBreakpoint(65, 0),
             marginVertical: "1em",
-            flexDirection: window.width >= window.height ? "row" : "column",
+            flexDirection: useBreakpoint("row", "column"),
             alignItems: "center",
             justifyContent: "center",
           }}

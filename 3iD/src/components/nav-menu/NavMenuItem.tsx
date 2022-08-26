@@ -3,6 +3,7 @@ import React from "react";
 import { Text, useWindowDimensions } from "react-native";
 
 import styled from "styled-components";
+import useBreakpoint from "../../hooks/breakpoint";
 
 const LinkWrapper = styled.div`
   &:hover span {
@@ -53,7 +54,7 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
   return screen ? (
     <Link
       style={{
-        marginLeft: window.width >= window.height ? 25 : 0,
+        marginLeft: useBreakpoint(25, 0),
         paddingHorizontal: 12,
         paddingVertical: 8,
         backgroundColor: isCurrent ? "#373F52" : "transparent",
@@ -78,7 +79,7 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
     <LinkWrapper>
       <div
         style={{
-          marginLeft: window.width >= window.height ? 25 : 0,
+          marginLeft: useBreakpoint(25, 0),
           paddingLeft: 12,
           paddingRight: 12,
           paddingTop: 8,

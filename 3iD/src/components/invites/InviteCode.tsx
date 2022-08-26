@@ -3,8 +3,7 @@ import { HiLink } from "react-icons/hi";
 import { Pressable, Text, View } from "react-native";
 import styled from "styled-components";
 import * as Clipboard from "expo-clipboard";
-import ReactTooltip from 'react-tooltip';
-
+import ReactTooltip from "react-tooltip";
 
 type InviteCodeProps = {
   code: string;
@@ -22,9 +21,9 @@ const CopyLinkWrapper = styled.div`
 
 const TooltipWrapper = styled.span`
   visibility: hidden;
-  opacity:0;
-  transition:visibility 0.3s linear,opacity 0.3s linear;
-  `;
+  opacity: 0;
+  transition: visibility 0.3s linear, opacity 0.3s linear;
+`;
 
 const InviteCode = ({ code }: InviteCodeProps) => {
   const [copiedRef, setCopiedRef] = useState<Element | null>(null);
@@ -116,17 +115,15 @@ const InviteCode = ({ code }: InviteCodeProps) => {
             >
               Copy Link
               {/* <Tooltip>Copied!</Tooltip> */}
-              <span 
-                ref={ref => setCopiedRef(ref)}
-                data-tip="Copied!" 
-                data-delay-show='100' 
-                data-delay-hide='1000'
-                data-effect='solid'
+              <span
+                ref={(ref) => setCopiedRef(ref)}
+                data-tip="Copied!"
+                data-delay-show="100"
+                data-delay-hide="1000"
+                data-effect="solid"
                 data-offset='{"top": 10, "left": 40}'
               ></span>
               <ReactTooltip />
-
-
             </Text>
           </Pressable>
         </CopyLinkWrapper>

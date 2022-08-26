@@ -3,13 +3,10 @@ import AccordionSellInvite from "./Accordion/AccordionSellInvite";
 import AccordionWhatIsPFP from "./Accordion/AccordionWhatIsPFP";
 import AccordionWhoIsBehind from "./Accordion/AccordionWhoIsBehind";
 
-import { View, useWindowDimensions, Text, Pressable } from "react-native";
-
-import { HiLink } from "react-icons/hi";
-
-import * as Clipboard from "expo-clipboard";
+import { View, Text } from "react-native";
 
 import InviteCode from "../../../components/invites/InviteCode";
+import useBreakpoint from "../../../hooks/breakpoint";
 
 type Account = {
   account: undefined | null | string;
@@ -17,17 +14,16 @@ type Account = {
 };
 
 const FAQ = ({ account, inviteCode }: Account) => {
-  const window = useWindowDimensions();
-  const landscape = window.width >= window.height;
-
   return (
     <View
       style={{
         flex: 1,
-        marginLeft: landscape ? 41 : "1em",
+        marginLeft: useBreakpoint<number | string>(41, "1em"),
       }}
     >
-      {landscape && inviteCode && <InviteCode code={inviteCode} />}
+      {useBreakpoint(true, false) && inviteCode && (
+        <InviteCode code={inviteCode} />
+      )}
 
       <Text
         style={{
@@ -44,9 +40,9 @@ const FAQ = ({ account, inviteCode }: Account) => {
       </Text>
 
       <AccordionHowToUse account={account} defaultExpanded={true} />
-      <AccordionSellInvite defaultExpanded={true}/>
-      <AccordionWhatIsPFP defaultExpanded={true}/>
-      <AccordionWhoIsBehind defaultExpanded={true}/>
+      <AccordionSellInvite defaultExpanded={true} />
+      <AccordionWhatIsPFP defaultExpanded={true} />
+      <AccordionWhoIsBehind defaultExpanded={true} />
     </View>
   );
 };

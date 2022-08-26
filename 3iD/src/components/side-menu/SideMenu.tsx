@@ -12,6 +12,7 @@ import {
   BiIdCard,
   BiCog,
 } from "react-icons/bi";
+import useBreakpoint from "../../hooks/breakpoint";
 
 type SideMenuProps = {
   nickname: string;
@@ -51,7 +52,7 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
   return (
     <View
       style={{
-        width: window.width >= window.height ? 240 : "100%",
+        width: useBreakpoint<number | string>(240, "100%"),
         backgroundColor: "#F9FAFB",
         paddingHorizontal: "0.5em",
         paddingVertical: "1.5em",

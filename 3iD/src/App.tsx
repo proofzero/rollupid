@@ -95,7 +95,11 @@ export default function App() {
             <Stack.Screen name="Gate" component={Gate} />
             <Stack.Screen name="Invite" component={Invite} />
             <Stack.Screen name="Mint" component={Mint} />
-            <Stack.Screen name="Onboard" options={{title: "Welcome"}} component={Onboard} />
+            <Stack.Screen
+              name="Onboard"
+              options={{ title: "Welcome" }}
+              component={Onboard}
+            />
           </Stack.Group>
 
           <Stack.Group>
