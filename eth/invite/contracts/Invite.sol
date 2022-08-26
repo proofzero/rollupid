@@ -68,7 +68,7 @@ contract ThreeId_Invitations is
      *
      * ---> This is an owner-only function that selfdestructs us.
      *
-     * @param account the form of the destructor: the address that will receive contract contents.
+     * @param account the form of the destructor: the address that will receive contract contents. MUST be the operator account.
      *
      */
      function destructor(address account) public onlyOwner  {
