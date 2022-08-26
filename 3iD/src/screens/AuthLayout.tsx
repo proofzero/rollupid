@@ -241,7 +241,7 @@ export default function Layout({
           marginVertical: "3em",
         }}
       >
-        {nickname && <SideMenu nickname={nickname} />}
+        {nickname?.length && <SideMenu nickname={nickname} />}
 
         <View
           style={{
