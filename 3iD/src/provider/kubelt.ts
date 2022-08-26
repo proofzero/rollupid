@@ -107,6 +107,7 @@ export const authenticate = async (
 
       sdk = await sdkWeb.node_v1.oort.authenticate(sdk, {
         "3id.profile": ["read", "write"],
+        "3id.app": ["read", "write"],
       });
 
       isAuth = await isAuthenticated(address);

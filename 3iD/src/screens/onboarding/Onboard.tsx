@@ -152,7 +152,6 @@ const Onboard = ({ navigation }: OnboardProps) => {
     }, [account]);
 
   useEffect(() => {
-    console.log("here")
     const asyncFn = async () => {
       const sdk = await getSDK();
       setFeatureVoteCount(sdk, {votes: Array.from(featureVotes)})
@@ -647,14 +646,15 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
                         ReactTooltip.show(upvoteButtons[index]) 
                         setTimeout(() => {
+                          // Set upvotes
+                          if (featureVotes.size < 3) {
+                            featureVotes.add(step.title)
+                            setFeatureVotes(new Set(featureVotes))
+                          }
                           ReactTooltip.hide(upvoteButtons[index])
                         }, 3000)
                         
-                        // Set upvotes
-                        console.log("before", featureVotes)
-                        featureVotes.add(step.title)
-                        console.log("after", featureVotes)
-                        setFeatureVotes(new Set(featureVotes))
+                        
                       }}
                     >
                       +
