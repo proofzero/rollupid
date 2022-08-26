@@ -45,7 +45,7 @@ export default function NavMenu() {
     <View
       style={{
         paddingVertical: "1em",
-        width: Math.min(1200, window.width),
+        width: Math.min(1400, window.width),
         marginHorizontal: "auto",
         flexDirection: window.width >= window.height ? "row" : "column",
         justifyContent: "space-between",

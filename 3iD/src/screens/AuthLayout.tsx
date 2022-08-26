@@ -236,7 +236,7 @@ export default function Layout({
           flexDirection: window.width >= window.height ? "row" : "column",
           shadowRadius: 5,
           shadowOpacity: 0.1,
-          width: Math.min(1200, window.width),
+          width: Math.min(1400, window.width),
           marginHorizontal: "auto",
           marginVertical: "3em",
         }}
