@@ -70,6 +70,7 @@
     "@synthetixio/synpress": "1.2.0",
     "@types/react": "17.0.21",
     "@types/react-native": "0.66.13",
+    "@types/styled-components": "5.1.26",
     "dotenv-cli": "6.0.0",
     "expo-optimize": "0.2.19",
     "typescript": "4.7.4",
