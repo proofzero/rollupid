@@ -13,6 +13,9 @@ import {
 } from "@react-navigation/native";
 
 import { HiChevronDown } from "react-icons/hi";
+import { FiSettings } from "react-icons/fi";
+import { VscSignOut } from "react-icons/vsc";
+import { BiCopy } from "react-icons/bi";
 
 import { purge } from "../../provider/kubelt";
 import * as Clipboard from "expo-clipboard";
@@ -145,13 +148,12 @@ export default function NavMenu() {
                   setShowPanel(false);
                 }}
               >
-                <Image
+                <BiCopy
                   style={{
                     width: 16,
                     height: 16,
                     marginRight: 12,
                   }}
-                  source={require("../../assets/copy.png")}
                 />
                 <Text
                   style={{
@@ -183,13 +185,12 @@ export default function NavMenu() {
                 setShowPanel(false);
               }}
             >
-              <Image
+              <FiSettings
                 style={{
                   width: 16,
                   height: 16,
                   marginRight: 12,
                 }}
-                source={require("../../assets/cog.png")}
               />
               <Text
                 style={{
@@ -211,14 +212,13 @@ export default function NavMenu() {
                 alignItems: "center",
               }}
             >
-              <Image
+              <VscSignOut
                 style={{
                   width: 195,
                   height: 1,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                source={require("../../assets/spacer_195.png")}
               />
             </View>
 
