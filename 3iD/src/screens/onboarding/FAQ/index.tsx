@@ -12,16 +12,6 @@ import * as Clipboard from "expo-clipboard";
 import styled from "styled-components";
 import InviteCode from "../../../components/invites/InviteCode";
 
-const CopyLinkWrapper = styled.div`
-  &:hover > div {
-    background-color: #f3f4f6 !important;
-  }
-
-  &:focus > div {
-    box-shadow: 0px 0px 0px 1px #9ca3af !important;
-  }
-`;
-
 type Account = {
   account: undefined | null | string;
   inviteCode: string | undefined;
