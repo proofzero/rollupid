@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { View, Text, Image, Pressable } from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
-import { getSDK } from "../../provider/kubelt";
+import { authenticate, getSDK, isAuthenticated } from "../../provider/kubelt";
 import { 
   getFunnelState,
   getInviteCode,
@@ -22,6 +22,7 @@ import FAQ from "./FAQ";
 import Layout from "../AuthLayout";
 import InviteCode from "../../components/invites/InviteCode";
 import useBreakpoint from "../../hooks/breakpoint";
+import { connect } from "../../provider/web3";
 
 type OnboardProps = {
   navigation: any;
@@ -116,31 +117,39 @@ const Onboard = ({ navigation }: OnboardProps) => {
       (completeSteps.length + comingNext.length + roadmapSteps.length)) *
     100;
 
-  useEffect(() => {
-
-    const asyncFn = async () => {
-      const sdk = await getSDK();
-
-      const funnelState = await getFunnelState(sdk);
-      if (!funnelState.mint) {
-        // setCanMint(true);
+    useEffect(() => {
+      const asyncFn = async () => {
+        let isAuth = await isAuthenticated(account);
+        if (!isAuth) {
+          const provider = await connect();
+          await authenticate(provider);
+        }
+  
+        isAuth = await isAuthenticated(account);
+        if (isAuth) {
+          const sdk = await getSDK();
+  
+          const funnelState = await getFunnelState(sdk);
+          if (!funnelState.mint) {
+            // setCanMint(true);
+          }
+  
+          const inviteCodeRes = await getInviteCode(sdk);
+          if (inviteCodeRes) {
+            setInviteCode(inviteCodeRes);
+          }
+  
+          const featureVotesRes = await getFeatureVoteCount(sdk);
+          if (featureVotesRes?.votes) {
+            setFeatureVotes(new Set(featureVotesRes.votes));
+          }
+        }
+      };
+  
+      if (account) {
+        asyncFn();
       }
-
-      const inviteCodeRes = await getInviteCode(sdk);
-      if (inviteCodeRes) {
-        setInviteCode(inviteCodeRes);
-      }
-
-      const featureVotesRes = await getFeatureVoteCount(sdk);
-      if (featureVotesRes?.votes) {
-        setFeatureVotes(new Set(featureVotesRes.votes));
-      }
-    };
-
-    if (account) {
-      asyncFn();
-    }
-  }, [account]);
+    }, [account]);
 
   useEffect(() => {
     console.log("here")
