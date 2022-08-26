@@ -83,7 +83,7 @@ const AccordionHowToUse = ({ account, defaultExpanded }: HowToProps) => {
                 style={{
                   marginVertical: "1em",
                   fontSize: 14,
-                  color: "#9CA3AF",
+                  color: "#4B5563",
                   fontFamily: "Inter_400Regular",
                 }}
               >
@@ -96,7 +96,7 @@ const AccordionHowToUse = ({ account, defaultExpanded }: HowToProps) => {
               <Text
                 style={{
                   fontSize: 14,
-                  color: "#9CA3AF",
+                  color: "#4B5563",
                   fontFamily: "Inter_400Regular",
                 }}
               >

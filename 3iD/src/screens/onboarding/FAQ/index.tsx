@@ -9,7 +9,6 @@ import { HiLink } from "react-icons/hi";
 
 import * as Clipboard from "expo-clipboard";
 
-import styled from "styled-components";
 import InviteCode from "../../../components/invites/InviteCode";
 
 type Account = {
