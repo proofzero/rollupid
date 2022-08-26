@@ -19,6 +19,10 @@ export type Profile = {
   };
 };
 
+export type FeatureVoteCount = {
+  votes: string[]
+}
+
 export type FunnelState = {
   mint: boolean;
   invite: boolean;

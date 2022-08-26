@@ -10,7 +10,12 @@ import { View, Text, Image, Pressable } from "react-native";
 import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import { getSDK } from "../../provider/kubelt";
-import { getFunnelState, getInviteCode } from "../../services/threeid";
+import { 
+  getFunnelState,
+  getInviteCode,
+  getFeatureVoteCount,
+  setFeatureVoteCount,
+} from "../../services/threeid";
 
 import FAQ from "./FAQ";
 
@@ -28,6 +33,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
   const [upvoteButtons, setUpvoteButtons] = useState([]);
 
   const [inviteCode, setInviteCode] = useState<string | undefined>();
+
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>());
 
   const [canMint, setCanMint] = useState(false);
 
@@ -123,12 +130,30 @@ const Onboard = ({ navigation }: OnboardProps) => {
       if (inviteCodeRes) {
         setInviteCode(inviteCodeRes);
       }
+
+      const featureVotesRes = await getFeatureVoteCount(sdk);
+      if (featureVotesRes?.votes) {
+        setFeatureVotes(new Set(featureVotesRes.votes));
+      }
     };
 
     if (account) {
       asyncFn();
     }
   }, [account]);
+
+  useEffect(() => {
+    console.log("here")
+    const asyncFn = async () => {
+      const sdk = await getSDK();
+      setFeatureVoteCount(sdk, {votes: Array.from(featureVotes)})
+    }
+
+    if (featureVotes) {
+      asyncFn();
+    }
+
+  }, [featureVotes]);
 
   const TooltipWrapper = styled.span`
 
@@ -139,6 +164,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
       top: inherit !important;
       margin-top: -60px !important;
       margin-left: -78px !important;
+      fontFamily: "Inter_400Regular";
+
   `;
 
   return (
@@ -563,6 +590,19 @@ const Onboard = ({ navigation }: OnboardProps) => {
             >
               ROADMAP
             </Text>
+            <Text
+              style={{
+                fontFamily: "Inter_400Regular",
+                fontSize: 14,
+                fontWeight: "400",
+                lineHeight: 20,
+                color: "#9CA3AF",
+                marginBottom: 20,
+                marginTop: 10,
+              }}
+            >
+              Vote for your favorite features ({3 - featureVotes.size} votes left).
+            </Text>
             <View
               style={{
                 borderWidth: 1,
@@ -586,6 +626,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     }}
                   >
                     <button
+                      disabled={(featureVotes.size >= 3) ? true : false}
                       style={{
                         width: 25.6,
                         height: 25.6,
@@ -595,12 +636,16 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       }}
                       onClick={() => { 
                         upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
-                        console.log(upvoteButtons[index])
                         ReactTooltip.show(upvoteButtons[index]) 
                         setTimeout(() => {
                           ReactTooltip.hide(upvoteButtons[index])
                         }, 3000)
-                        // TODO: add upvote functionality
+                        
+                        // Set upvotes
+                        console.log("before", featureVotes)
+                        featureVotes.add(step.title)
+                        console.log("after", featureVotes)
+                        setFeatureVotes(new Set(featureVotes))
                       }}
                     >
                       +
