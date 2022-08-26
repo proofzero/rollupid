@@ -79,7 +79,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
       title: "Link More Accounts",
     },
     {
-      title: "Receive First Verified Credential",
+      title: "Receive First Credential",
     },
     {
       title: "Setup Secure KYC",
@@ -88,7 +88,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
       title: "Send First Message",
     },
     {
-      title: "Save First File",
+      title: "Publish First File",
     },
     {
       title: "Permission First App",
