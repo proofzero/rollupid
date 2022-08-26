@@ -62,7 +62,7 @@ const handleAccountsChanged = async (accounts: string[]) => {
     console.info(`WEB3: Wallet may be locked`);
     // TEMPORARY disable since we don't care wallet is locked.
 
-    // clearAccount();
+    clearAccount();
   }
 };
 

@@ -19,7 +19,6 @@ import {
 
 export default function Auth({ navigation }: { navigation: any }) {
   const account = useAccount();
-  const [checking, setChecking] = useState(true);
 
   const claimsRedirect = async (claim: string) => {
     const sdk = await getSDK();
@@ -58,12 +57,6 @@ export default function Auth({ navigation }: { navigation: any }) {
 
         const provider = await connect();
         
-        // TODO: this is a hack for showing the sign message 
-        // until we have a better state solution
-        // should have a state that let's us know if we are signed in or not
-        // not just connected.
-        setChecking(false);
-
         await authenticate(provider);
 
         const signer = provider.getSigner();
@@ -116,9 +109,7 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-            {checking
-              ? "Wiring things up..."
-              : "Checking if authenticated..."}
+              Checking if authenticated...
             <p
               style={{
                 fontFamily: "Inter_500Medium",
@@ -130,9 +121,7 @@ export default function Auth({ navigation }: { navigation: any }) {
                 // borderRadius: "0.5em",
               }}
             >
-              {checking
-                ? "Checking if you are already signed in to 3ID."
-                : "You may have to sign a message. It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."}
+                You may have to sign a message. It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet.
             </p>
             <Spinner />
           </>

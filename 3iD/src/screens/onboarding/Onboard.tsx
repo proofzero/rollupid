@@ -161,6 +161,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
       asyncFn();
     }
 
+
   }, [featureVotes]);
 
   const TooltipWrapper = styled.span`
@@ -643,19 +644,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         paddingTop: 2,
                       }}
                       onClick={() => { 
-                        upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
+                        // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
                         ReactTooltip.show(upvoteButtons[index]) 
-                        setTimeout(() => {
-                          // Set upvotes
-                          if (featureVotes.size < 3) {
-                            featureVotes.add(step.title)
-                            setFeatureVotes(new Set(featureVotes))
-                            datadogRum.addAction('featureVote', {
-                              'value': step.title,
-                          })
-                          }
-                          ReactTooltip.hide(upvoteButtons[index])
-                        }, 3000)
+                        
+                        
                       }}
                     >
                       +
@@ -666,8 +658,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           return ref
                         }}
                         data-tip={`Upvoted!`} 
-                        data-delay-show='100' 
-                        data-delay-hide='1000'
+                        // data-delay-show='100' 
+                        data-delay-hide='3000'
                         data-effect='solid'
                         data-for={`tooltip_${index}`}
                         data-place='top'
@@ -676,13 +668,27 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       
                     </button>
                     <TooltipWrapper>
-                    <ReactTooltip 
-                          className="tooltip"
-                          id={`tooltip_${index}`}
-                          scrollHide={true} 
-                        />
+                      { React.useMemo(() => (<ReactTooltip 
+                            className="tooltip"
+                            id={`tooltip_${index}`}
+                            scrollHide={true} 
+                            afterShow={() => {
+                              
+                              ReactTooltip.hide(upvoteButtons[index])
+                            }}
+                            afterHide={() => {
+                              // Set upvotes
+                              if (featureVotes.size < 3) {
+                                featureVotes.add(step.title)
+                                setFeatureVotes(new Set(featureVotes))
+                                datadogRum.addAction('featureVote', {
+                                  'value': step.title,
+                                })
+                              }
+                            }}
+                          />), [])}
                       </TooltipWrapper>
-
+                         
                     <View>
                       <Text
                         style={{
@@ -708,7 +714,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         Coming Soon
                       </Text>
                     </View>
-                  </View>
+                  </View> 
                 </View>
               ))}
             </View>
