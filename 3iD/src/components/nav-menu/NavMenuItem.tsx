@@ -76,29 +76,29 @@ const NavMenuItem = ({ screen, title }: NavMenuItemProps) => {
     </Link>
   ) : (
     <LinkWrapper>
-    <div
-      style={{
-        marginLeft: window.width >= window.height ? 25 : 0,
-        paddingLeft: 12,
-        paddingRight: 12,
-        paddingTop: 8,
-        paddingBottom: 8,
-        backgroundColor: "transparent",
-        cursor: "default",
-      }}
-    >
-      <Text
+      <div
         style={{
-          fontFamily: "Inter_500Medium",
-          fontSize: 16,
-          lineHeight: 20,
-          color: "#374151",
+          marginLeft: window.width >= window.height ? 25 : 0,
+          paddingLeft: 12,
+          paddingRight: 12,
+          paddingTop: 8,
+          paddingBottom: 8,
+          backgroundColor: "transparent",
+          cursor: "default",
         }}
       >
-        {title}
-        <Tooltip>Coming Soon</Tooltip>
-      </Text>
-    </div>
+        <Text
+          style={{
+            fontFamily: "Inter_500Medium",
+            fontSize: 16,
+            lineHeight: 20,
+            color: "#374151",
+          }}
+        >
+          {title}
+          <Tooltip>Coming Soon</Tooltip>
+        </Text>
+      </div>
     </LinkWrapper>
   );
 };

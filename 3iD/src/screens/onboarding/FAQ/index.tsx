@@ -11,10 +11,9 @@ import * as Clipboard from "expo-clipboard";
 
 import styled from "styled-components";
 
-
 const CopyLinkWrapper = styled.div`
   &:hover > div {
-    background-color: #F3F4F6 !important;
+    background-color: #f3f4f6 !important;
   }
 
   &:focus > div {

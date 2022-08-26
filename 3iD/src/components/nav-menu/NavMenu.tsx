@@ -176,7 +176,6 @@ export default function NavMenu() {
                 alignItems: "center",
                 backgroundColor: "#f3f4f6",
                 opacity: 0.5,
-
               }}
               onPress={() => {
                 // (nav as any).navigate("Settings"); // TODO: renable when settings are ready

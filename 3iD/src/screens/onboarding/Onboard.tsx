@@ -100,7 +100,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
   ]);
 
   const percentage =
-    completeSteps.length / (completeSteps.length + comingNext.length + roadmapSteps.length) * 100;
+    (completeSteps.length /
+      (completeSteps.length + comingNext.length + roadmapSteps.length)) *
+    100;
 
   useEffect(() => {
     const asyncFn = async () => {
@@ -278,8 +280,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
               marginBottom: 22,
             }}
           >
-            Thanks for being an early supporter! We will be unlocking new features regularly. <br />
-            Check out what's coming next. Be sure to follow us on Twitter and Discord to stay updated!{" "}
+            Thanks for being an early supporter! We will be unlocking new
+            features regularly. <br />
+            Check out what's coming next. Be sure to follow us on Twitter and
+            Discord to stay updated!{" "}
           </Text>
 
           <View
@@ -510,8 +514,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         }}
                       >
                         Mint your very own 3ID 1/1 PFP. <br></br>
-                        
-                        For more information see "What is the 3ID?"" PFP in the FAQ section.
+                        For more information see "What is the 3ID?"" PFP in the
+                        FAQ section.
                       </Text>
                     </View>
                   </View>
