@@ -62,10 +62,6 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
   }
 
   const isMobile = Platform.OS === "android" || Platform.OS === "ios";
-  const isNotMobile = Platform.OS === "macos" || Platform.OS === "windows";
-
-  console.log(isMobile, isNotMobile);
-  console.log(Platform.OS);
 
   useEffect(() => {
     if (!isMobile) {
