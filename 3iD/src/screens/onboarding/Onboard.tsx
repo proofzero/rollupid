@@ -597,7 +597,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 marginTop: 20,
               }}
             >
-              ROADMAP
+              TELL US WHAT'S NEXT
             </Text>
             <Text
               style={{
@@ -640,8 +640,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         width: 25.6,
                         height: 25.6,
                         marginRight: 19.2,
+                        fontWeight: "700",
                         backgroundColor: "#fff",
-                        paddingTop: 2,
+                        border: "1px solid #111827",
+                        color: "#111827",
+                        paddingTop: 5,
                       }}
                       onClick={() => { 
                         // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
