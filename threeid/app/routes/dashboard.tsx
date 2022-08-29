@@ -12,10 +12,12 @@ import { getUserSession } from "~/utils/session.server";
 
 import styles from "~/styles/dashboard.css";
 import logo from "~/assets/three-id-logo.svg";
+import BaseButton, { links as buttonStyles } from "~/components/BaseButton";
 
 export function links() {
     return [
-      { rel: "stylesheet", href: styles }
+        ...buttonStyles(),
+        { rel: "stylesheet", href: styles }
     ];
 }
 
@@ -43,10 +45,20 @@ export default function Welcome() {
 
     // TODO: port over welcome screen
     return (
-        <div className="wrapper grid grid-cols-3 gap-4">
-            <nav className="col-span-3">
-            <img src={logo} alt="threeid" />
-            </nav>
+        <div className="wrapper flex flex-col justify-center align-center">
+            <div className="header flex-none flex-grow order-none">
+                <nav className="flex flex-row justify-between align-center gap-80">
+                    <div className="nav-items flex flex-row align-center justify-start gap-12">
+                        <ul className="flex flex-row flex-start gap-4">
+                            <li className="flex flex-row align-center"><img src={logo} alt="threeid" /></li>
+                            <li className="flex flex-row align-center">My Profile</li>
+                        </ul>
+                    </div>
+                    <div className="nav-button flex flex-row justify-center align-center gap-2.5">
+                        <BaseButton text={"fff"} color={"light"} onClick={()=>null} />
+                    </div>
+                </nav>
+            </div>
             <article className="content col-span-3">
                 <Outlet />
             </article>
