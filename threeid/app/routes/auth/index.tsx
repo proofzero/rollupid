@@ -16,10 +16,9 @@ export default function AuthIndex() {
     }
 
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
-    const { address, connector, isConnected } = useAccount()
+    const { address, isConnected } = useAccount()
 
     let navigate = useNavigate();
-
 
     useEffect(() => {
         if (isConnected) {
