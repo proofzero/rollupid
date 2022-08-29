@@ -1,7 +1,8 @@
 
 
 // TODO: REMOVE ADDRESS PARAM
-export async function oortSend(method: string, body: object, address: string) {
+// TODO: ERROR HANDLING
+export async function oortSend(method: string, params: any[], address: string) {
     const id = method.replace(/^.+_/,'').replace(/[A-Z]/g, m => "-" + m.toLowerCase())
     console.info("json rpc request with id: ", id)
 
@@ -16,7 +17,7 @@ export async function oortSend(method: string, body: object, address: string) {
             id,
             jsonrpc: "2.0",
             method,
-            ...body
+            params,
         }),
     });
     return response.json();

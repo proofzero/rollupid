@@ -1,6 +1,5 @@
 import { 
     json,
-    redirect 
 } from "@remix-run/cloudflare";
 
 import { useEffect } from "react";
@@ -13,6 +12,7 @@ import {
  } from 'wagmi'
 
  import { oortSend } from "~/utils/rpc.server";
+ import { createUserSession } from "~/utils/session.server";
 
  import BaseButton, { links as buttonLinks } from "~/components/BaseButton";
 
@@ -24,31 +24,30 @@ import {
 // @ts-ignore
 export const loader = async ({ params }) => {
     // @ts-ignore
-    const nonceRes = await oortSend("kb_getNonce", {
-        id: 'get-nonce',
-        jsonrpc: "2.0",
-        method: "kb_getNonce",
-        params: [
+    const nonceRes = await oortSend("kb_getNonce", [
             params.address,
             {"3id.profile": ["read", "write"], "3id.app": ["read", "write"]},
-        ],
-    }, params.address)
-    
+        ], params.address)
+
     return json(nonceRes.result);
-  };
+};
 
 // verify signature for address
 // @ts-ignore
 export async function action({ request, params }) {
     let formData = await request.formData();
-    console.log("formData", formData);
-    console.log("params", params);
-    return redirect("/welcome");
+
+    const signRes = await oortSend("kb_verifyNonce", [
+        formData.get("nonce"),
+        formData.get("signature"),
+    ], params.address)
+
+    // on success create a cookie/session for the user
+    return createUserSession(signRes.result, "/welcome")
   }
 
 export default function AuthSign() {
     const sign = useLoaderData();
-    console.log("sign", sign);
 
     // // NOTE: state is all messed if we render this component with SSR
     if (typeof document === "undefined") {
@@ -59,7 +58,7 @@ export default function AuthSign() {
     const { disconnect } = useDisconnect()
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
-            submit({signature: data}, {method: 'post', action: `/auth/sign/${address}`});
+            submit({signature: data, nonce: sign.nonce}, {method: 'post', action: `/auth/sign/${address}`});
 
         }
     })
@@ -71,7 +70,6 @@ export default function AuthSign() {
         if (!isConnected) {
             navigate("/auth");
         } else if (!isLoading && connector && sign) {
-            console.log("here")
             signMessage(sign)
         }
     }, [connector])

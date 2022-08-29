@@ -1,4 +1,6 @@
-// import { createCookieSessionStorage, redirect } from "@remix-run/cloudflare";
+import { 
+  redirect 
+} from "@remix-run/cloudflare";
 
 import {
     Outlet,
@@ -19,10 +21,20 @@ import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import styles from "../styles/auth.css";
 import logo from "../assets/three-id-logo.svg";
 
+import { getUserSession } from "~/utils/session.server";
+
 
 export function links() {
     return [{ rel: "stylesheet", href: styles }];
 }
+
+// @ts-ignore
+export const loader = async ({ request }) => {
+    const session = await getUserSession(request)
+    if (session) {
+        return redirect("/welcome");
+    }
+};
 
 export default function Auth() {
 
