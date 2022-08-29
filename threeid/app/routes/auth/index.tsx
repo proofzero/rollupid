@@ -6,6 +6,7 @@ import {
 import { useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
 
+import Spinner from "~/components/Spinner";
 import MetamaskSVG from '~/components/MetamaskSVG';
 
 export default function AuthIndex() {
@@ -31,6 +32,7 @@ export default function AuthIndex() {
             <p className="auth-message">
                 Connect Your Wallet
             </p>
+            {isLoading || pendingConnector ? <Spinner /> :
             <div>
                 {connectors.map((connector) => (
                     <div key={connector.id}>
@@ -51,7 +53,7 @@ export default function AuthIndex() {
                 
                 {error && <div className="text-center">{error.message}</div>}
                 
-            </div>
+            </div>}
             <div className="open-metamask-app">
                 <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
                     Open in Metamask Mobile App

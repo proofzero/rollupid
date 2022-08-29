@@ -15,6 +15,8 @@ import {
  import { createUserSession } from "~/utils/session.server";
 
  import BaseButton, { links as buttonLinks } from "~/components/BaseButton";
+ import Spinner from "~/components/Spinner";
+
 
  export const links = () => [
     ...buttonLinks(),
@@ -86,6 +88,8 @@ export default function AuthSign() {
                     :  "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
                 }
             </p>
+            {!error && <Spinner />}
+           
             {error && (
                 <div className="error-buttons">
                     <BaseButton text={"Try Again"} color={"dark"} onClick={() => signMessage({message: "hello"})} />

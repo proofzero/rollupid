@@ -24,9 +24,14 @@ import logo from "../assets/three-id-logo.svg";
 
 import { getUserSession } from "~/utils/session.server";
 
+import { links as spinnerLinks } from "~/components/Spinner";
+
 
 export function links() {
-    return [{ rel: "stylesheet", href: styles }];
+    return [
+      ...spinnerLinks(),
+      { rel: "stylesheet", href: styles }
+    ];
 }
 
 // @ts-ignore
