@@ -4,6 +4,8 @@
   (:require
    [camel-snake-kebab.core :as csk]
    [camel-snake-kebab.extras :as cske]
+   [taoensso.timbre :as log])
+  (:require
    [com.kubelt.lib.error :as lib.error]
    [com.kubelt.lib.jwt :as lib.jwt]
    [com.kubelt.lib.oort :as lib.oort]
@@ -147,9 +149,15 @@
 ;; TODO check for valid sys map.
 (defn logged-in?
   [sys core]
-  (let [session-tokens (get-in sys [:crypto/session :vault/tokens])]
-    ;; TODO validate the JWT using the current wallet
-    (contains? session-tokens core)))
+  (if-let [token (get-in sys [:crypto/session :vault/tokens core])]
+    ;; TODO general validation of the JWT using the current wallet, including expiry check.
+    ;; Check that token hasn't expired.
+    (let [expired? (lib.jwt/expired? token)
+          logged-in (not expired?)]
+      (log/debug #:v1.oort{:logged-in? logged-in})
+      logged-in)
+    ;; No stored JWT so not logged in.
+    false))
 
 (defn logged-in-js?
   [sys core]

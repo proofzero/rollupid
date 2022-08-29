@@ -29,7 +29,7 @@
   ;; Micro-framework for data-driven architecture
   integrant/integrant {:mvn/version "0.8.0"}
   ;; Time as a Clojure/Script value
-  tick/tick {:mvn/version "0.4.32"}
+  tick/tick {:mvn/version "0.5.0"}
   ;; A Clojure library for fast json encoding and decoding
   metosin/jsonista {:mvn/version "0.3.6"}
   ;; Data-driven schemas for Clojure

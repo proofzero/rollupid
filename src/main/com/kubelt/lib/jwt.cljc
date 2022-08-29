@@ -14,7 +14,8 @@
   (:require
    [clojure.string :as cstr])
   (:require
-   [taoensso.timbre :as log])
+   [taoensso.timbre :as log]
+   [tick.core :as tick])
   (:require
    [com.kubelt.lib.base64 :as lib.base64]
    [com.kubelt.lib.error :as lib.error]
@@ -132,3 +133,17 @@
          :claims claims
          :token token
          :signature signature}))))
+
+(defn expired?
+  "Check if a token is expired. Returns true if expired, and false
+  otherwise."
+  [token]
+  (if-let [expires (get-in token [:claims :exp])]
+    (let [now-inst (tick/instant)
+          ;; The JWT exp claim is defined as *seconds* since the epoch.
+          expires-seconds (* 1000 expires)
+          expires-inst (tick/instant expires-seconds)]
+      ;; JWT is expired when current time is after the expiry time!
+      (tick/>= now-inst expires-inst))
+    ;; No exp claim was found.
+    true))
