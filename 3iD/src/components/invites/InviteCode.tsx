@@ -45,7 +45,6 @@ const TooltipWrapper = styled.span`
 
 const InviteCode = ({ invite }: InviteCodeProps) => {
   const [copiedRef, setCopiedRef] = useState<Element | null>(null);
-  console.log("invite", invite);
   return (
     <>
       <Text
