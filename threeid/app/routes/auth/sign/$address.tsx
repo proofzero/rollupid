@@ -10,7 +10,8 @@ import { useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
 import { 
     useAccount,
     useConnect,
-    useSignMessage
+    useSignMessage,
+    useDisconnect
  } from 'wagmi'
 
  import BaseButton, { links as buttonLinks } from "~/components/BaseButton";
@@ -50,6 +51,7 @@ export default function AuthSign() {
 
     const { address, connector, isConnected } = useAccount()
     const { connectors, pendingConnector } = useConnect()
+    const { disconnect } = useDisconnect()
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
             console.log("signed", data);      
@@ -86,8 +88,8 @@ export default function AuthSign() {
             </p>
             {error && (
                 <div className="error-buttons">
-                    <BaseButton text={"Try Again"} color={"dark"} />
-                    <BaseButton text={"Disconnect"} color={"light"} />
+                    <BaseButton text={"Try Again"} color={"dark"} onClick={() => signMessage({message: "hello"})} />
+                    <BaseButton text={"Disconnect"} color={"light"} onClick={disconnect} />
                 </div>
             )}
         </div>

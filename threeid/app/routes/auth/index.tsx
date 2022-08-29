@@ -49,7 +49,7 @@ export default function AuthIndex() {
                     </div>
                 ))}
                 
-                {error && <div>{error.message}</div>}
+                {error && <div className="text-center">{error.message}</div>}
                 
             </div>
             <div className="open-metamask-app">

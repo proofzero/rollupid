@@ -7,12 +7,13 @@ export const links = () => [
 type BaseButtonProps = {
     text: string;
     color: string;
+    onClick: () => void;
 }
 
-export default function BaseButton({ text, color }: BaseButtonProps) {
+export default function BaseButton({ text, color, onClick }: BaseButtonProps) {
 
     return (
-        <button className={`base-button-${color}`}>
+        <button className={`base-button-${color}`} onClick={onClick}>
             {text}
         </button>
     )
