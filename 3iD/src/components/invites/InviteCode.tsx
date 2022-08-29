@@ -173,7 +173,7 @@ const InviteCode = ({ invite }: InviteCodeProps) => {
               color: "#9CA3AF",
             }}
           >
-            You have: {3 - invite.holders.length || 0} invite(s) left
+            Your invite has {3 - invite.holders.length || 0} uses left
           </Text>
           {invite.holders.length ? invite.holders.map(holder => (
             <View style={{
