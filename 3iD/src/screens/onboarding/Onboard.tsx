@@ -178,6 +178,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
   const UpvoteButtonWrapper = styled.span`
       button:active {
         transform: scale(0.9);
+      }
+      button:hover {
+        cursor: pointer;
+      }
   `;
 
   return (
