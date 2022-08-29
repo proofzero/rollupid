@@ -5,16 +5,15 @@ import { Outlet } from "@remix-run/react";
 
 import { Fragment, useState  } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Dialog, Transition } from '@headlessui/react'
+
 import {
   Bars3Icon,
-  CalendarIcon,
-  HomeIcon,
-  MagnifyingGlassCircleIcon,
-  MapIcon,
-  MegaphoneIcon,
-  UserGroupIcon,
+  BellIcon,
+  CogIcon,
+  CreditCardIcon,
+  KeyIcon,
+  SquaresPlusIcon,
+  UserCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 
@@ -25,14 +24,10 @@ import { oortSend } from "~/utils/rpc.server";
 import styles from "~/styles/dashboard.css";
 import logo from "~/assets/three-id-logo.svg";
 import BaseButton, { links as buttonStyles } from "~/components/BaseButton";
-import SideMenu, {
-  links as sideMenuStyles,
-} from "~/components/side-menu/SideMenu";
 
 export function links() {
   return [
     ...buttonStyles(),
-    ...sideMenuStyles(),
     { rel: "stylesheet", href: styles },
   ];
 }
@@ -62,6 +57,14 @@ const userNavigation = [
   { name: 'Your Profile', href: '#' },
   { name: 'Settings', href: '#' },
   { name: 'Sign out', href: '#' },
+]
+const subNavigation = [
+  { name: 'Profile', href: '#', icon: UserCircleIcon, current: true },
+  { name: 'Account', href: '#', icon: CogIcon, current: false },
+  { name: 'Password', href: '#', icon: KeyIcon, current: false },
+  { name: 'Notifications', href: '#', icon: BellIcon, current: false },
+  { name: 'Billing', href: '#', icon: CreditCardIcon, current: false },
+  { name: 'Integrations', href: '#', icon: SquaresPlusIcon, current: false },
 ]
 
 function classNames(...classes) {
@@ -232,13 +235,42 @@ export default function Welcome() {
         </div>
 
         <main className="-mt-72">
-          <div className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-            
-            {/* Replace with your content */}
-            <div className="bg-white px-5 py-6 shadow sm:px-6">
-              <div className="h-96" />
+          <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+            <div className="overflow-hidden rounded-lg bg-white shadow">
+              <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+                <aside className="py-6 lg:col-span-3">
+                  <nav className="space-y-1">
+                    {subNavigation.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        className={classNames(
+                          item.current
+                            ? 'bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700'
+                            : 'border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900',
+                          'group border-l-4 px-3 py-2 flex items-center text-sm font-medium'
+                        )}
+                        aria-current={item.current ? 'page' : undefined}
+                      >
+                        <item.icon
+                          className={classNames(
+                            item.current
+                              ? 'text-teal-500 group-hover:text-teal-500'
+                              : 'text-gray-400 group-hover:text-gray-500',
+                            'flex-shrink-0 -ml-1 mr-3 h-6 w-6'
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">{item.name}</span>
+                      </a>
+                    ))}
+                  </nav>
+                </aside>
+                <div className="divide-y divide-gray-200 lg:col-span-9">
+                  <Outlet />
+                </div>
+              </div>
             </div>
-            {/* /End replace */}
           </div>
         </main>
       </div>
