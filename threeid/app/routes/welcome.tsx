@@ -14,6 +14,12 @@ import {
   import styles from "../styles/welcome.css";
   import logo from "../assets/three-id-logo.svg";
 
+  export function links() {
+    return [
+      { rel: "stylesheet", href: styles }
+    ];
+}
+
 // @ts-ignore
 export const loader = async ({ request }) => {
     const session = await getUserSession(request)
@@ -30,16 +36,20 @@ export const loader = async ({ request }) => {
         inviteCode: "123456",
         votes: [],
     });
-
 };
 
 export default function Welcome() {
     const {inviteCode, votes } = useLoaderData();
+    let submit = useSubmit();
+
 
     // TODO: sort out layout component
 
     // TODO: port over welcome screen
     return (
-        <div>welcome</div>
+        <>
+            <div>welcome</div>
+            <button onClick={() => submit(null, {method: 'post', action: `/auth/signout/`})}>Sign Out</button>
+        </>
     )
 }

@@ -37,8 +37,6 @@ export function links() {
 // @ts-ignore
 export const loader = async ({ request }) => {
     const session = await getUserSession(request)
-    console.log("request", request)
-    console.log("session", session)
     if (session.has("jwt")) {
         return redirect("/welcome");
     }

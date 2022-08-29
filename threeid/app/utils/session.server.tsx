@@ -1,7 +1,8 @@
 import { 
   createCookieSessionStorage,
   // createCloudflareKVSessionStorage,
-  redirect } from "@remix-run/cloudflare";
+  redirect 
+} from "@remix-run/cloudflare";
 
 // @ts-ignore
 const sessionSecret = SESSION_SECRET;
@@ -40,3 +41,11 @@ export async function createUserSession(
 export function getUserSession(request: Request) {
   return storage.getSession(request.headers.get("Cookie"));
 }
+
+export async function destroyUserSession(session: Session) {
+  return redirect("/auth", {
+    headers: {
+      "Set-Cookie": await storage.destroySession(session),
+    },
+  });}
+
