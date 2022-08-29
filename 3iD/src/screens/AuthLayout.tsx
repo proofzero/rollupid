@@ -64,7 +64,7 @@ export default function Layout({
   };
 
   useEffect(() => {
-    if (account === null) {
+    if (!account) {
       navigation.navigate("Landing");
     }
 
