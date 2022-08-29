@@ -45,7 +45,7 @@ export async function action({ request, params }) {
     ], params.address)
 
     // on success create a cookie/session for the user
-    return createUserSession(signRes.result, "/dashboard")
+    return createUserSession(signRes.result, "/account")
   }
 
 export default function AuthSign() {

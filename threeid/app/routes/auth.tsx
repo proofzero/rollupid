@@ -38,7 +38,7 @@ export function links() {
 export const loader = async ({ request }) => {
     const session = await getUserSession(request)
     if (session.has("jwt")) {
-        return redirect("/dashboard");
+        return redirect("/account");
     }
     return null
 };

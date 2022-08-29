@@ -38,7 +38,8 @@ export async function createUserSession(
     });
   }
 
-export function getUserSession(request: Request) {
+// TODO: reset cookie maxAge if valid
+export function getUserSession(request: Request, renew: boolean = true) {
   return storage.getSession(request.headers.get("Cookie"));
 }
 

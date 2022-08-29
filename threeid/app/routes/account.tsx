@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useLoaderData, useSubmit, Link } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
 
@@ -7,13 +7,22 @@ import { Fragment, useState  } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 
 import {
+  HiOutlineBell,
+  HiOutlineCog,
+  HiOutlineKey,
+  HiOutlineHome,
+} from "react-icons/hi";
+
+// TODO: migrate the above to hi2
+//https://github.com/react-icons/react-icons/issues/597
+// import {
+//   HiBars3,
+//   HiOutlineSquaresPlus,
+//   HiXMark,
+// } from "react-icons/hi2";
+import {
   Bars3Icon,
-  BellIcon,
-  CogIcon,
-  CreditCardIcon,
-  KeyIcon,
   SquaresPlusIcon,
-  UserCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 
@@ -21,7 +30,7 @@ import { getUserSession } from "~/utils/session.server";
 
 import { oortSend } from "~/utils/rpc.server";
 
-import styles from "~/styles/dashboard.css";
+import styles from "~/styles/account.css";
 import logo from "~/assets/three-id-logo.svg";
 import BaseButton, { links as buttonStyles } from "~/components/BaseButton";
 
@@ -41,30 +50,31 @@ export const loader = async ({ request }) => {
   return null;
 };
 
+
 const user = {
   name: 'Tom Cook',
   email: 'tom@example.com',
   imageUrl:
     'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
+
 const navigation = [
-  { name: 'My Profile', href: '#', current: true },
-  { name: 'inb0x', href: '#', current: false },
-  { name: 'b0x', href: '#', current: false },
-  { name: 'Account', href:'#', current: false },
+  { name: 'My Profile', to: "", disabled: true, current: false },
+  { name: 'inb0x', to: "", disabled: true, current: false },
+  { name: 'b0x', to: "", disabled: true, current: false },
+  { name: 'Account', to:'/account', current: true },
 ]
 const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Settings', href: '#' },
-  { name: 'Sign out', href: '#' },
+  { name: 'Copy Address', href: '#' },
+  // { name: 'Account', href: '#' },
+  { name: 'Sign out', to: 'auth/signout' },
 ]
 const subNavigation = [
-  { name: 'Profile', href: '#', icon: UserCircleIcon, current: true },
-  { name: 'Account', href: '#', icon: CogIcon, current: false },
-  { name: 'Password', href: '#', icon: KeyIcon, current: false },
-  { name: 'Notifications', href: '#', icon: BellIcon, current: false },
-  { name: 'Billing', href: '#', icon: CreditCardIcon, current: false },
-  { name: 'Integrations', href: '#', icon: SquaresPlusIcon, current: false },
+  { name: 'Dashboard', href: '#', icon: HiOutlineHome, current: true },
+  { name: 'NFT Gallery', href: '#', icon: SquaresPlusIcon, current: false },
+  { name: 'KYC', href: '#', icon: HiOutlineKey, current: false },
+  { name: '0xAuth', href: '#', icon: HiOutlineKey, current: false },
+  { name: 'Settings', href: '#', icon: HiOutlineCog, current: false },
 ]
 
 function classNames(...classes) {
@@ -72,7 +82,7 @@ function classNames(...classes) {
 }
 
 
-export default function Welcome() {
+export default function AccountLayout() {
   useLoaderData();
   let submit = useSubmit();
 
@@ -101,20 +111,21 @@ export default function Welcome() {
                         </div>
                         <div className="hidden md:block">
                           <div className="ml-10 flex items-baseline space-x-4">
-                            {navigation.map((item) => (
-                              <a
+                            {navigation.map((item) => ( 
+                              // TODO: convert to NavLink to remove "disabled" and "current" https://remix.run/docs/en/v1/api/remix#navlink
+                              <Link
                                 key={item.name}
-                                href={item.href}
+                                to={item.to}
                                 className={classNames(
                                   item.current
                                     ? 'bg-gray-900 text-white'
                                     : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                  'px-3 py-2 rounded-md text-sm font-medium'
+                                  'px-3 py-2 text-sm font-medium'
                                 )}
                                 aria-current={item.current ? 'page' : undefined}
                               >
                                 {item.name}
-                              </a>
+                              </Link>
                             ))}
                           </div>
                         </div>
@@ -126,7 +137,7 @@ export default function Welcome() {
                             className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                           >
                             <span className="sr-only">View notifications</span>
-                            <BellIcon className="h-6 w-6" aria-hidden="true" />
+                            <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                           </button>
 
                           {/* Profile dropdown */}
@@ -146,7 +157,7 @@ export default function Welcome() {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0 scale-95"
                             >
-                              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                 {userNavigation.map((item) => (
                                   <Menu.Item key={item.name}>
                                     {({ active }) => (
@@ -169,7 +180,7 @@ export default function Welcome() {
                       </div>
                       <div className="-mr-2 flex md:hidden">
                         {/* Mobile menu button */}
-                        <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <Disclosure.Button className="inline-flex items-center justify-center bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                           <span className="sr-only">Open main menu</span>
                           {open ? (
                             <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -190,7 +201,7 @@ export default function Welcome() {
                         href={item.href}
                         className={classNames(
                           item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'block px-3 py-2 rounded-md text-base font-medium'
+                          'block px-3 py-2 text-base font-medium'
                         )}
                         aria-current={item.current ? 'page' : undefined}
                       >
@@ -212,7 +223,7 @@ export default function Welcome() {
                         className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="sr-only">View notifications</span>
-                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                        <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                       </button>
                     </div>
                     <div className="mt-3 space-y-1 px-2">
@@ -221,7 +232,7 @@ export default function Welcome() {
                           key={item.name}
                           as="a"
                           href={item.href}
-                          className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                          className="block px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                         >
                           {item.name}
                         </Disclosure.Button>
@@ -236,7 +247,7 @@ export default function Welcome() {
 
         <main className="-mt-72">
           <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
-            <div className="overflow-hidden rounded-lg bg-white shadow">
+            <div className="overflow-hidden bg-white shadow">
               <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
                 <aside className="py-6 lg:col-span-3">
                   <nav className="space-y-1">

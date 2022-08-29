@@ -8,5 +8,5 @@ export const loader = async ({ request }) => {
   if (!session.has("jwt")) {
     return redirect("/auth");
   }
-  return redirect("/dashboard");
+  return redirect("/account");
 };
