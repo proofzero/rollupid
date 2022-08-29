@@ -64,6 +64,7 @@ const navigation = [
   { name: 'b0x', to: "", disabled: true, current: false },
   { name: 'Account', to:'/account', current: true },
 ]
+// TODO: this should be it's own component. These are also function calls not links
 const userNavigation = [
   { name: 'Copy Address', href: '#' },
   // { name: 'Account', href: '#' },
