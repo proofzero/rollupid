@@ -141,7 +141,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           const featureVotesRes = await getFeatureVoteCount(sdk);
           console.log(featureVotesRes);
           if (featureVotesRes?.votes) {
-            setFeatureVotes(new Set(featureVotesRes.votes));
+            // setFeatureVotes(new Set(featureVotesRes.votes));
           }
         }
       };
@@ -378,9 +378,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
             flexDirection: useBreakpoint("row", "column"),
           }}
         >
-          {!useBreakpoint(true, false) && inviteCode && (
+          {/* {!useBreakpoint(true, false) && inviteCode && (
             <InviteCode code={inviteCode} />
-          )}
+          )} */}
 
           {/* Steps */}
           <View
@@ -618,7 +618,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 lineHeight: 20,
                 color: "#9CA3AF",
                 marginBottom: 20,
-                marginTop: 10,
+                // marginTop: 5,
               }}
             >
               Vote for your favorite features ({3 - featureVotes.size} votes left).

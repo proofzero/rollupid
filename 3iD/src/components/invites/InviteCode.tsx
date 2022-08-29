@@ -5,8 +5,19 @@ import styled from "styled-components";
 import * as Clipboard from "expo-clipboard";
 import ReactTooltip from "react-tooltip";
 
+type InviteHolder = {
+  address: string;
+  timestamp: number;
+}
+
 type InviteCodeProps = {
   code: string;
+  holders: InviteHolder[];
+  reservation: {
+    address: string;
+    data: object;
+    expiration: number;
+  }
 };
 
 const CopyLinkWrapper = styled.div`
@@ -31,7 +42,7 @@ const TooltipWrapper = styled.span`
 
 const InviteCode = ({ code }: InviteCodeProps) => {
   const [copiedRef, setCopiedRef] = useState<Element | null>(null);
-
+  console.log("invite", code);
   return (
     <>
       <Text
@@ -160,37 +171,39 @@ const InviteCode = ({ code }: InviteCodeProps) => {
               color: "#9CA3AF",
             }}
           >
-            You have: 0 invite(s) left
+            You have: {3 - holders?.length || 0} invite(s) left
           </Text>
-          <View style={{
-            paddingVertical: 12,
-            }}
-          >
-            <Text
-              style={{
-                // marginTop: 20,
-                fontFamily: "Inter_500Medium",
-                fontSize: 14,
-                fontWeight: "500",
-                lineHeight: 20,
-                color: "#9CA3AF",
+          {holders?.map(holder => (
+            <View style={{
+              paddingVertical: 12,
               }}
             >
-             0x1bc123
-            </Text>
-            <Text
-              style={{
-                // marginTop: 20,
-                fontFamily: "Inter_400Regular",
-                fontSize: 12,
-                fontWeight: "400",
-                lineHeight: 14,
-                color: "#9CA3AF",
-              }}
-            >
-              data time
-            </Text>
-          </View>
+              <Text
+                style={{
+                  // marginTop: 20,
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 14,
+                  fontWeight: "500",
+                  lineHeight: 20,
+                  color: "#9CA3AF",
+                }}
+              >
+              {holder.address}
+              </Text>
+              <Text
+                style={{
+                  // marginTop: 20,
+                  fontFamily: "Inter_400Regular",
+                  fontSize: 12,
+                  fontWeight: "400",
+                  lineHeight: 14,
+                  color: "#9CA3AF",
+                }}
+              >
+                {holder.timestamp}
+              </Text>
+            </View>
+          ))}
         </View>
     </>
   );
