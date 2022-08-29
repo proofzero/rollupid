@@ -40,10 +40,10 @@ const FAQ = ({ account, inviteCode }: Account) => {
         FAQ
       </Text>
 
-      <AccordionHowToUse account={account} defaultExpanded={true} collapsable={!isDesktop}/>
-      <AccordionSellInvite defaultExpanded={isDesktop} collapsable={!isDesktop}/>
-      <AccordionWhatIsPFP defaultExpanded={isDesktop} collapsable={!isDesktop}/>
-      <AccordionWhoIsBehind defaultExpanded={isDesktop} collapsable={!isDesktop}/>
+      <AccordionHowToUse account={account} defaultExpanded={true} collapsable={true}/>
+      <AccordionSellInvite defaultExpanded={false} collapsable={true}/>
+      <AccordionWhatIsPFP defaultExpanded={false} collapsable={true}/>
+      <AccordionWhoIsBehind defaultExpanded={false} collapsable={true}/>
 
     </View>
   );

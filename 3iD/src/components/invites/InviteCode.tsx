@@ -133,6 +133,65 @@ const InviteCode = ({ code }: InviteCodeProps) => {
           </Pressable>
         </CopyLinkWrapper>
       </View>
+      <View style={{
+          border: "1px solid #F3F4F6",
+          padding: 12,
+        }}
+      >
+        <Text
+            style={{
+              // marginTop: 20,
+              fontFamily: "Inter_500Medium",
+              fontSize: 14,
+              fontWeight: "600",
+              lineHeight: 20,
+              color: "#6B7280",
+            }}
+          >
+            Your Invites:
+          </Text>
+          <Text
+            style={{
+              // marginTop: 20,
+              fontFamily: "Inter_400Regular",
+              fontSize: 12,
+              fontWeight: "400",
+              lineHeight: 14,
+              color: "#9CA3AF",
+            }}
+          >
+            You have: 0 invite(s) left
+          </Text>
+          <View style={{
+            paddingVertical: 12,
+            }}
+          >
+            <Text
+              style={{
+                // marginTop: 20,
+                fontFamily: "Inter_500Medium",
+                fontSize: 14,
+                fontWeight: "500",
+                lineHeight: 20,
+                color: "#9CA3AF",
+              }}
+            >
+             0x1bc123
+            </Text>
+            <Text
+              style={{
+                // marginTop: 20,
+                fontFamily: "Inter_400Regular",
+                fontSize: 12,
+                fontWeight: "400",
+                lineHeight: 14,
+                color: "#9CA3AF",
+              }}
+            >
+              data time
+            </Text>
+          </View>
+        </View>
     </>
   );
 };

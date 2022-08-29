@@ -113,11 +113,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
 
   const percentage =
     (completeSteps.length /
-      (completeSteps.length + comingNext.length + roadmapSteps.length)) *
-    100;
+      (completeSteps.length + comingNext.length + roadmapSteps.length)) * 100;
 
     useEffect(() => {
       const asyncFn = async () => {
+        
         let isAuth = await isAuthenticated(account);
         if (!isAuth) {
           const provider = await connect();
@@ -181,6 +181,10 @@ const Onboard = ({ navigation }: OnboardProps) => {
       }
       button:hover {
         cursor: pointer;
+      }
+      button[disabled] {
+        opacity: 0.2;
+        color: #fff;
       }
   `;
 
@@ -644,7 +648,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     <UpvoteButtonWrapper>
 
                       <button
-                        disabled={(featureVotes.size >= 3) ? true : false}
+                        disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
                         style={{
                           width: 42,
                           height: 42,
