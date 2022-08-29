@@ -8,6 +8,5 @@ export const loader = async ({ request }) => {
   if (!session.has("jwt")) {
     return redirect("/auth");
   }
-  // TODO: redirect to dashboard if session.has("jwt")
-  return null;
+  return redirect("/dashboard");
 };

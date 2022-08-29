@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
+    "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "build": "remix build",
     "sass": "sass --watch app/:app/",
     "deploy": "wrangler publish",
@@ -12,6 +12,8 @@
     "start": "cross-env NODE_ENV=production miniflare ./build/index.js"
   },
   "dependencies": {
+    "@headlessui/react": "^1.6.6",
+    "@heroicons/react": "^2.0.10",
     "@remix-run/cloudflare": "^1.7.0",
     "@remix-run/cloudflare-workers": "^1.7.0",
     "@remix-run/react": "^1.7.0",
