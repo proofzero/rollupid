@@ -20,10 +20,11 @@ export const loader = async ({ request }) => {
     if (!session.has("jwt")) {
         return redirect("/auth");
     }
+    const jwt = session.get("jwt");
 
-    // TODO: call oort for invite code
+    // TODO: call oort for invite code (pass in jwt)
 
-    // TODO: call oort for votes
+    // TODO: call oort for votes (pass in jwt)
     
     return json({
         inviteCode: "123456",
