@@ -44,6 +44,7 @@ const FAQ = ({ account, inviteCode }: Account) => {
       <AccordionSellInvite defaultExpanded={isDesktop} collapsable={!isDesktop}/>
       <AccordionWhatIsPFP defaultExpanded={isDesktop} collapsable={!isDesktop}/>
       <AccordionWhoIsBehind defaultExpanded={isDesktop} collapsable={!isDesktop}/>
+
     </View>
   );
 };
