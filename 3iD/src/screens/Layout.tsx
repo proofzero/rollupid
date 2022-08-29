@@ -30,6 +30,7 @@ export default function Layout({ children }: { children: any }) {
           flex: 1,
           paddingHorizontal: "1em",
           paddingVertical: "3em",
+          marginTop: -40,
         }}
       >
         {children}

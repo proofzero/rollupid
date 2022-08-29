@@ -621,7 +621,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 // marginTop: 5,
               }}
             >
-              Vote for your favorite features ({3 - featureVotes.size} votes left).
+              Vote for your favorite features ({3 - featureVotes.size} votes left)
             </Text>
             <View
               style={{
