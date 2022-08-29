@@ -10,10 +10,8 @@ import {
 
 const AccordionWhatIsPFP = ({
   defaultExpanded,
-  collapsable,
 }: {
   defaultExpanded: boolean;
-  collapsable: boolean;
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [styles, setStyles] = useState({
@@ -27,15 +25,13 @@ const AccordionWhatIsPFP = ({
   }
 
   const handleToggle = () => {
-    if (collapsable) {
-      const state = expanded;
-      setExpanded(!expanded);
-      setStyles(
-        state
-          ? { width: 14, height: 7, transform: [{ rotate: "0deg" }] }
-          : { width: 14, height: 7, transform: [{ rotate: "180deg" }] }
-      );
-    }
+    const state = expanded;
+    setExpanded(!expanded);
+    setStyles(
+      state
+        ? { width: 14, height: 7, transform: [{ rotate: "0deg" }] }
+        : { width: 14, height: 7, transform: [{ rotate: "180deg" }] }
+    );
   };
 
   return (
