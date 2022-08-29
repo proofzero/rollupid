@@ -1,6 +1,14 @@
-import { LoaderFunction, redirect } from "@remix-run/cloudflare";
+import { 
+  redirect,
+} from "@remix-run/cloudflare";
 
-export const loader: LoaderFunction = async () => {
-  // TODO: check for session. If no session, redirect to login
-  return redirect("/auth");
-};
+import { getUserSession } from "~/utils/session.server";
+
+// @ts-ignore
+export const loader = async ({ request }) => {
+  const session = await getUserSession(request)
+  if (!session.has("jwt")) {
+      return redirect("/auth");
+  }
+  return null;
+}

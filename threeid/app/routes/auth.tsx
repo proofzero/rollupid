@@ -38,7 +38,7 @@ export function links() {
 export const loader = async ({ request }) => {
     const session = await getUserSession(request)
     if (session.has("jwt")) {
-        return redirect("/welcome");
+        return redirect("/dashboard");
     }
     return null
 };
@@ -66,20 +66,20 @@ export default function Auth() {
     })
 
     return (
-        <div className="wrapper grid grid-cols-3 gap-4">
-          <nav className="col-span-3">
-            <img src={logo} alt="threeid" />
-          </nav>
-          <article className="content col-span-3">
-            <WagmiConfig client={client}>
-                <Outlet />
-            </WagmiConfig>
-          </article>
-          <footer className="col-span-3">
-            <p>
-              3ID is non-custodial and secure.<br/>We will never request access to your assets.
-            </p>
-          </footer>
+      <div className="wrapper grid grid-cols-3 gap-4">
+        <nav className="col-span-3">
+          <img src={logo} alt="threeid" />
+        </nav>
+        <article className="content col-span-3">
+          <WagmiConfig client={client}>
+              <Outlet />
+          </WagmiConfig>
+        </article>
+        <footer className="col-span-3">
+          <p>
+            3ID is non-custodial and secure.<br/>We will never request access to your assets.
+          </p>
+        </footer>
       </div>
     )
 }
