@@ -17,7 +17,7 @@
            client (-> {:uri/domain (-> sys :client/oort :http/host)
                        :uri/port (-> sys :client/oort :http/port)
                        :uri/scheme (-> sys :client/oort :http/scheme)
-                       :uri/path (cstr/join "" ["/@" wallet-address "/jsonrpc"])
+                       :uri/path (cstr/join "" ["/" wallet-address "/jsonrpc"])
                        :http/client (:client/http sys)
                        :rpc/jwt (get-in sys [:crypto/session :vault/tokens* wallet-address])}
                       rpc/init
