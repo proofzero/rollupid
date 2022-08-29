@@ -5,8 +5,22 @@ import styled from "styled-components";
 import * as Clipboard from "expo-clipboard";
 import ReactTooltip from "react-tooltip";
 
+type InviteHolder = {
+  address: string;
+  timestamp: number;
+}
+
 type InviteCodeProps = {
-  code: string;
+  invite: {
+    code: string;
+    holders: InviteHolder[];
+    reservation: {
+      address: string;
+      data: object;
+      expiration: number;
+    }
+  };
+
 };
 
 const CopyLinkWrapper = styled.div`
@@ -29,9 +43,8 @@ const TooltipWrapper = styled.span`
     margin-left: -100px !important;
 `;
 
-const InviteCode = ({ code }: InviteCodeProps) => {
+const InviteCode = ({ invite }: InviteCodeProps) => {
   const [copiedRef, setCopiedRef] = useState<Element | null>(null);
-
   return (
     <>
       <Text
@@ -79,11 +92,11 @@ const InviteCode = ({ code }: InviteCodeProps) => {
             color: "#9CA3AF",
           }}
         >
-          https://get.threeid.xyz/{code}
+          https://get.threeid.xyz/{invite.code}
         </Text>
         <CopyLinkWrapper>
           <Pressable
-            disabled={!code}
+            disabled={!invite.code}
             style={{
               flexDirection: "row",
               justifyContent: "center",
@@ -94,7 +107,7 @@ const InviteCode = ({ code }: InviteCodeProps) => {
             }}
             onPress={async () => {
               ReactTooltip.show(copiedRef);
-              await Clipboard.setStringAsync(`https://get.threeid.xyz/${code}`);
+              await Clipboard.setStringAsync(`https://get.threeid.xyz/${invite.code}`);
               setTimeout(() => {
                 ReactTooltip.hide(copiedRef);
               }, 2000);
@@ -133,6 +146,76 @@ const InviteCode = ({ code }: InviteCodeProps) => {
           </Pressable>
         </CopyLinkWrapper>
       </View>
+      <View style={{
+          border: "1px solid #F3F4F6",
+          padding: 12,
+        }}
+      >
+        <Text
+            style={{
+              // marginTop: 20,
+              fontFamily: "Inter_500Medium",
+              fontSize: 14,
+              fontWeight: "600",
+              lineHeight: 20,
+              color: "#6B7280",
+            }}
+          >
+            Your Invitees:
+          </Text>
+          <Text
+            style={{
+              marginTop: 5,
+              fontFamily: "Inter_400Regular",
+              fontSize: 12,
+              fontWeight: "400",
+              lineHeight: 14,
+              color: "#9CA3AF",
+            }}
+          >
+            You have: {3 - invite.holders.length || 0} invite(s) left
+          </Text>
+          {invite.holders.length ? invite.holders.map(holder => (
+            <View style={{
+              paddingVertical: 12,
+              }}
+            >
+              <Text
+                style={{
+                  // marginTop: 20,
+                  fontFamily: "Inter_500Medium",
+                  fontSize: 14,
+                  fontWeight: "500",
+                  lineHeight: 20,
+                  color: "#9CA3AF",
+                }}
+              >
+              {holder.address}
+              </Text>
+              <Text
+                style={{
+                  // marginTop: 20,
+                  fontFamily: "Inter_400Regular",
+                  fontSize: 12,
+                  fontWeight: "400",
+                  lineHeight: 14,
+                  color: "#9CA3AF",
+                }}
+              >
+                {holder.timestamp}
+              </Text>
+            </View>
+          )) : <Text style={{
+                  fontFamily: "Inter_400Regular",
+                  fontSize: 12,
+                  fontWeight: "400",
+                  lineHeight: 14,
+                  color: "#9CA3AF",
+                  textAlign: "center",
+                  padding: 20
+                }}>Holders that use your invite link will show here.
+          </Text>}
+        </View>
     </>
   );
 };
