@@ -7,7 +7,6 @@ import {
   Image,
   useWindowDimensions,
 } from "react-native";
-import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
 import Constants from "expo-constants";
@@ -17,8 +16,14 @@ import { isAuthenticated, kbGetClaims, purge } from "../../provider/kubelt";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import useBreakpoint from "../../hooks/breakpoint";
 
-export default function Gate({ navigation }: { navigation: any }) {
-  const account = useAccount();
+export default function Gate({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
+  const { account } = route.params;
   const window = useWindowDimensions();
 
   const otherWalletRequested = useAsyncStorage("kubelt:other_wallet_request");
@@ -28,7 +33,7 @@ export default function Gate({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      navigation.navigate("Onboard");
+      navigation.navigate("Onboard", { account });
     }
   };
 
@@ -51,7 +56,7 @@ export default function Gate({ navigation }: { navigation: any }) {
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
       } else {
-        navigation.navigate("Auth");
+        navigation.navigate("Auth", { account });
       }
     };
 

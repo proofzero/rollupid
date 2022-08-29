@@ -16,15 +16,19 @@ import { useAppSelector } from "../../hooks/state";
 
 export default function Details({
   navigation,
+  children,
+  route,
 }: {
   children: any;
   navigation: any;
+  route: any;
 }) {
   const profile = useAppSelector((state) => state.profile.value);
-  const account = useAccount();
+  const account =
+    route.params && route.params.account ? route.params.account : useAccount();
 
   return (
-    <Layout navigation={navigation}>
+    <Layout navigation={navigation} account={account}>
       {profile && (
         <View
           style={{

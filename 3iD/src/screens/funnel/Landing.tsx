@@ -20,9 +20,9 @@ export default function Landing({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      navigation.navigate("Onboard");
+      navigation.navigate("Onboard", { account });
     } else {
-      navigation.navigate("Invite");
+      navigation.navigate("Invite", { account });
     }
   };
 
@@ -34,7 +34,7 @@ export default function Landing({ navigation }: { navigation: any }) {
         claimsRedirect(claim);
       }
 
-      navigation.navigate("Auth");
+      navigation.navigate("Auth", { account: account });
     };
 
     if (account) {

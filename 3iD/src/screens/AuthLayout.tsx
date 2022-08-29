@@ -26,16 +26,17 @@ import useBreakpoint from "../hooks/breakpoint";
 export default function Layout({
   children,
   navigation,
+  account,
 }: {
   children: any;
   navigation: any;
+  account: string;
 }) {
   const dispatch = useAppDispatch();
   const nickname = useAppSelector(selectNickname);
 
   const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
-  const account = useAccount();
   const window = useWindowDimensions();
 
   const loadProfile = async () => {

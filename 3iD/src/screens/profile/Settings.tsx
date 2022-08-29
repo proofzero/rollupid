@@ -20,9 +20,11 @@ import { set } from "../../state/slices/profile";
 export default function Settings({
   children,
   navigation,
+  route,
 }: {
   children: any;
   navigation: any;
+  route: any;
 }) {
   const dispatch = useAppDispatch();
 
@@ -63,7 +65,8 @@ export default function Settings({
     readItemFromStorage();
   }, []);
 
-  const account = useAccount();
+  const account =
+    route.params && route.params.account ? route.params.account : useAccount();
 
   useEffect(() => {
     const asyncFn = async () => {
@@ -120,7 +123,7 @@ export default function Settings({
   };
 
   return (
-    <Layout navigation={navigation}>
+    <Layout navigation={navigation} account={account}>
       <View
         style={{
           flex: 1,

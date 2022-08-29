@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-import useAccount from "../../hooks/account";
 import Layout from "../Layout";
 
 import { forceAccounts } from "../../provider/web3";
@@ -28,18 +27,24 @@ const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
   return resourceUrl;
 };
 
-export default function Invite({ navigation }: { navigation: any }) {
+export default function Invite({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
   const [availableInvites, setAvailableInvites] = useState<Invitation[]>([]);
   const [selectedInvite, setSelectedInvite] = useState<Invitation>();
 
-  const account = useAccount();
+  const { account } = route.params;
 
   const continueToThreeId = async () => {
     const sdk = await getSDK();
 
     await tickFunnelStep(sdk, "invite");
 
-    navigation.navigate("Onboard");
+    navigation.navigate("Onboard", { account });
   };
 
   const claimsRedirect = async (claim: string) => {
@@ -85,10 +90,10 @@ export default function Invite({ navigation }: { navigation: any }) {
           setAvailableInvites(invites);
           setSelectedInvite(invites[0]);
         } else {
-          navigation.navigate("Gate");
+          navigation.navigate("Gate", { account });
         }
       } else {
-        navigation.navigate("Gate");
+        navigation.navigate("Gate", { account });
       }
     };
 

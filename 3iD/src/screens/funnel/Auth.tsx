@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import useAccount from "../../hooks/account";
-
 import { connect, forceAccounts } from "../../provider/web3";
 
 import Layout from "../Layout";
@@ -17,9 +15,14 @@ import {
   kbGetClaims,
 } from "../../provider/kubelt";
 
-export default function Auth({ navigation }: { navigation: any }) {
-  const account = useAccount();
-
+export default function Auth({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
+  const { account } = route.params;
   const claimsRedirect = async (claim: string) => {
     const sdk = await getSDK();
 
@@ -29,16 +32,16 @@ export default function Auth({ navigation }: { navigation: any }) {
 
     const claims = await kbGetClaims();
     if (claims.includes(claim)) {
-      navigation.navigate("Onboard");
+      navigation.navigate("Onboard", { account });
     } else if (!funnelState.invite) {
       const invites = await listInvitations(sdk);
       if (invites.length > 0) {
-        navigation.navigate("Invite");
+        navigation.navigate("Invite", { account });
       } else {
-        navigation.navigate("Gate");
+        navigation.navigate("Gate", { account });
       }
     } else {
-      navigation.navigate("Gate");
+      navigation.navigate("Gate", { account });
     }
   };
 
@@ -54,9 +57,8 @@ export default function Auth({ navigation }: { navigation: any }) {
       if (await isAuthenticated(account)) {
         return claimsRedirect(claim);
       } else {
-
         const provider = await connect();
-        
+
         await authenticate(provider);
 
         const signer = provider.getSigner();
@@ -109,7 +111,7 @@ export default function Auth({ navigation }: { navigation: any }) {
           }}
         >
           <>
-              Checking if authenticated...
+            Checking if authenticated...
             <p
               style={{
                 fontFamily: "Inter_500Medium",
@@ -121,7 +123,9 @@ export default function Auth({ navigation }: { navigation: any }) {
                 // borderRadius: "0.5em",
               }}
             >
-                You may have to sign a message. It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet.
+              You may have to sign a message. It could take a few seconds for
+              the signing message to appear. If the does not appear try clicking
+              on your wallet.
             </p>
             <Spinner />
           </>

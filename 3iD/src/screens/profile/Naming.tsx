@@ -256,12 +256,19 @@ const Detecting = ({}: {}) => (
   </View>
 );
 
-export default function Naming({ navigation }: any) {
+export default function Naming({
+  navigation,
+  route,
+}: {
+  navigation: any;
+  route: any;
+}) {
   const [screen, setScreen] = useState<"root" | "select">("root");
 
   const [ens, setEns] = useState<string[]>([]);
 
-  const account = useAccount();
+  const account =
+    route.params && route.params.account ? route.params.account : useAccount();
 
   const fetchEns = async () => {
     setScreen("select");

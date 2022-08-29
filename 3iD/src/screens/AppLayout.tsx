@@ -18,13 +18,14 @@ import { set } from "../state/slices/profile";
 export default function AppLayout({
   children,
   navigation,
+  account,
 }: {
   children: any;
   navigation: any;
+  account: string;
 }) {
   const { getItem, setItem } = useAsyncStorage("kubelt:profile");
 
-  const account = useAccount();
   const dispatch = useAppDispatch();
 
   const claimsRedirect = async (claim: string) => {

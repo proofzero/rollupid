@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
-import ReactTooltip from 'react-tooltip';
+import ReactTooltip from "react-tooltip";
 import styled from "styled-components";
 
 import { View, Text, Image, Pressable } from "react-native";
@@ -9,7 +9,7 @@ import LinkButton from "../../components/buttons/LinkButton";
 import useAccount from "../../hooks/account";
 import datadogRum from "../../analytics/datadog";
 import { authenticate, getSDK, isAuthenticated } from "../../provider/kubelt";
-import { 
+import {
   getFunnelState,
   getInviteCode,
   getFeatureVoteCount,
@@ -25,16 +25,20 @@ import { connect } from "../../provider/web3";
 
 type OnboardProps = {
   navigation: any;
+  route: any;
 };
 
-const Onboard = ({ navigation }: OnboardProps) => {
-  const account = useAccount();
+const Onboard = ({ route, navigation }: OnboardProps) => {
+  const account =
+    route.params && route.params.account ? route.params.account : useAccount();
 
   const [upvoteButtons, setUpvoteButtons] = useState([]);
 
   const [inviteCode, setInviteCode] = useState<string | undefined>();
 
-  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>());
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(
+    new Set<string>()
+  );
 
   const [canMint, setCanMint] = useState(false);
 
@@ -51,7 +55,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
   const [comingNext] = useState<
     {
       title: string;
-      description: Any;
+      description: any;
     }[]
   >([
     {
@@ -116,52 +120,50 @@ const Onboard = ({ navigation }: OnboardProps) => {
       (completeSteps.length + comingNext.length + roadmapSteps.length)) *
     100;
 
-    useEffect(() => {
-      const asyncFn = async () => {
-        let isAuth = await isAuthenticated(account);
-        if (!isAuth) {
-          const provider = await connect();
-          await authenticate(provider);
-        }
-  
-        isAuth = await isAuthenticated(account);
-        if (isAuth) {
-          const sdk = await getSDK();
-  
-          const funnelState = await getFunnelState(sdk);
-          if (!funnelState.mint) {
-            // setCanMint(true);
-          }
-  
-          const inviteCodeRes = await getInviteCode(sdk);
-          if (inviteCodeRes) {
-            setInviteCode(inviteCodeRes);
-          }
-  
-          const featureVotesRes = await getFeatureVoteCount(sdk);
-          console.log(featureVotesRes);
-          if (featureVotesRes?.votes) {
-            setFeatureVotes(new Set(featureVotesRes.votes));
-          }
-        }
-      };
-  
-      if (account) {
-        asyncFn();
+  useEffect(() => {
+    const asyncFn = async () => {
+      let isAuth = await isAuthenticated(account);
+      if (!isAuth) {
+        const provider = await connect();
+        await authenticate(provider);
       }
-    }, [account]);
+
+      isAuth = await isAuthenticated(account);
+      if (isAuth) {
+        const sdk = await getSDK();
+
+        const funnelState = await getFunnelState(sdk);
+        if (!funnelState.mint) {
+          // setCanMint(true);
+        }
+
+        const inviteCodeRes = await getInviteCode(sdk);
+        if (inviteCodeRes) {
+          setInviteCode(inviteCodeRes);
+        }
+
+        const featureVotesRes = await getFeatureVoteCount(sdk);
+        console.log(featureVotesRes);
+        if (featureVotesRes?.votes) {
+          setFeatureVotes(new Set(featureVotesRes.votes));
+        }
+      }
+    };
+
+    if (account) {
+      asyncFn();
+    }
+  }, [account]);
 
   useEffect(() => {
     const asyncFn = async () => {
       const sdk = await getSDK();
-      setFeatureVoteCount(sdk, {votes: Array.from(featureVotes)})
-    }
+      setFeatureVoteCount(sdk, { votes: Array.from(featureVotes) });
+    };
 
     if (featureVotes) {
       asyncFn();
     }
-
-
   }, [featureVotes]);
 
   const TooltipWrapper = styled.span`
@@ -181,7 +183,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
   `;
 
   return (
-    <Layout navigation={navigation}>
+    <Layout navigation={navigation} account={account}>
       <View
         style={{
           flex: 1,
@@ -555,10 +557,11 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       source={require(`../../assets/step_soon.png`)}
                     />
 
-                    <View style={{
-                      flexShrink: 1,
-
-                    }}>
+                    <View
+                      style={{
+                        flexShrink: 1,
+                      }}
+                    >
                       <Text
                         style={{
                           fontFamily: "Inter_500Medium",
@@ -613,7 +616,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 marginTop: 10,
               }}
             >
-              Vote for your favorite features ({3 - featureVotes.size} votes left).
+              Vote for your favorite features ({3 - featureVotes.size} votes
+              left).
             </Text>
             <View
               style={{
@@ -638,9 +642,8 @@ const Onboard = ({ navigation }: OnboardProps) => {
                     }}
                   >
                     <UpvoteButtonWrapper>
-
                       <button
-                        disabled={(featureVotes.size >= 3) ? true : false}
+                        disabled={featureVotes.size >= 3 ? true : false}
                         style={{
                           width: 42,
                           height: 42,
@@ -652,51 +655,55 @@ const Onboard = ({ navigation }: OnboardProps) => {
                           color: "#111827",
                           paddingTop: 12,
                         }}
-                        onClick={() => { 
+                        onClick={() => {
                           // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
-                          ReactTooltip.show(upvoteButtons[index]) 
+                          ReactTooltip.show(upvoteButtons[index]);
                         }}
                       >
-                          <FaCaretUp />
+                        <FaCaretUp />
                         <p
-                          ref={ref => {
-                            upvoteButtons[index] = ref
-                            setUpvoteButtons(upvoteButtons)
-                            return ref
+                          ref={(ref) => {
+                            upvoteButtons[index] = ref;
+                            setUpvoteButtons(upvoteButtons);
+                            return ref;
                           }}
-                          data-tip={`Upvoted!`} 
-                          // data-delay-show='100' 
-                          data-delay-hide='1500'
-                          data-effect='solid'
+                          data-tip={`Upvoted!`}
+                          // data-delay-show='100'
+                          data-delay-hide="1500"
+                          data-effect="solid"
                           data-for={`tooltip_${index}`}
-                          data-place='top'
-                          data-scroll-hide='true'
+                          data-place="top"
+                          data-scroll-hide="true"
                         ></p>
                       </button>
                     </UpvoteButtonWrapper>
 
                     <TooltipWrapper>
-                      { React.useMemo(() => (<ReactTooltip 
+                      {React.useMemo(
+                        () => (
+                          <ReactTooltip
                             className="tooltip"
                             id={`tooltip_${index}`}
-                            scrollHide={true} 
+                            scrollHide={true}
                             afterShow={() => {
-                              
-                              ReactTooltip.hide(upvoteButtons[index])
+                              ReactTooltip.hide(upvoteButtons[index]);
                             }}
                             afterHide={() => {
                               // Set upvotes
                               if (featureVotes.size < 3) {
-                                featureVotes.add(step.title)
-                                setFeatureVotes(new Set(featureVotes))
-                                datadogRum.addAction('featureVote', {
-                                  'value': step.title,
-                                })
+                                featureVotes.add(step.title);
+                                setFeatureVotes(new Set(featureVotes));
+                                datadogRum.addAction("featureVote", {
+                                  value: step.title,
+                                });
                               }
                             }}
-                          />), [])}
-                      </TooltipWrapper>
-                         
+                          />
+                        ),
+                        []
+                      )}
+                    </TooltipWrapper>
+
                     <View>
                       <Text
                         style={{
@@ -722,7 +729,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                         Coming Soon
                       </Text>
                     </View>
-                  </View> 
+                  </View>
                 </View>
               ))}
             </View>

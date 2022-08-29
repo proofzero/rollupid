@@ -424,12 +424,19 @@ const ErrorPanel = ({
   </View>
 );
 
-export default function Mint({ navigation }: any) {
+export default function Mint({
+  route,
+  navigation,
+}: {
+  route: any;
+  navigation: any;
+}) {
   const [screen, setScreen] = useState<
     "root" | "confirm" | "progress" | "success" | "error"
   >("root");
 
-  const account = useAccount();
+  const account =
+    route.params && route.params.account ? route.params.account : useAccount();
 
   const [genPfPRes, setGenPfPRes] = React.useState<GenPfPRes>();
 
@@ -438,7 +445,7 @@ export default function Mint({ navigation }: any) {
 
     await tickFunnelStep(sdk, "mint");
 
-    navigation.navigate("Settings");
+    navigation.navigate("Settings", { account });
   };
 
   const genMintPfP = async () => {
@@ -477,7 +484,7 @@ export default function Mint({ navigation }: any) {
   };
 
   const continueToOnboarding = async () => {
-    navigation.navigate("Onboard");
+    navigation.navigate("Onboard", { account });
   };
 
   useEffect(() => {
