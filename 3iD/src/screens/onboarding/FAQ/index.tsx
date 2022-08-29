@@ -22,9 +22,9 @@ const FAQ = ({ account, inviteCode }: Account) => {
         marginLeft: useBreakpoint<number | string>(41, "1em"),
       }}
     >
-      {/* {useBreakpoint(true, false) && inviteCode && (
-        <InviteCode code={inviteCode} />
-      )} */}
+      {useBreakpoint(true, false) && inviteCode && (
+        <InviteCode invite={inviteCode} />
+      )}
 
       <Text
         style={{

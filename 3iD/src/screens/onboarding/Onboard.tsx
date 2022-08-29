@@ -141,7 +141,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
           const featureVotesRes = await getFeatureVoteCount(sdk);
           console.log(featureVotesRes);
           if (featureVotesRes?.votes) {
-            // setFeatureVotes(new Set(featureVotesRes.votes));
+            setFeatureVotes(new Set(featureVotesRes.votes));
           }
         }
       };
@@ -378,9 +378,9 @@ const Onboard = ({ navigation }: OnboardProps) => {
             flexDirection: useBreakpoint("row", "column"),
           }}
         >
-          {/* {!useBreakpoint(true, false) && inviteCode && (
-            <InviteCode code={inviteCode} />
-          )} */}
+          {!useBreakpoint(true, false) && inviteCode && (
+            <InviteCode invite={inviteCode} />
+          )}
 
           {/* Steps */}
           <View
