@@ -143,11 +143,12 @@ const SideMenu = ({ nickname, avatarUri, avatarSize = 48 }: SideMenuProps) => {
                 style={{
                   marginBottom: 8,
                   fontFamily: "Inter_600SemiBold",
-                  fontSize: 20,
+                  fontSize: 28,
                   fontWeight: "600",
                   lineHeight: 19.36,
                   color: "#1A1B2D",
                   flex: 1,
+                  paddingHorizontal: 12,
                 }}
               >
                 <HiMenu />

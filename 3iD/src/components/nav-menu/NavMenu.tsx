@@ -58,7 +58,7 @@ export default function NavMenu() {
     >
       <View
         style={{
-          flexDirection: useBreakpoint("row", "column"),
+          flexDirection: "row",//useBreakpoint("row", "column"),
           alignItems: "center",
         }}
       >
@@ -72,9 +72,10 @@ export default function NavMenu() {
 
         <View
           style={{
-            marginLeft: useBreakpoint(65, 0),
+            display: useBreakpoint(false, true) ? "none" : "flex",
+            marginLeft: 65,//useBreakpoint(65, 0),
             marginVertical: "1em",
-            flexDirection: useBreakpoint("row", "column"),
+            flexDirection: "row", //useBreakpoint("row", "column"),
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -89,6 +90,7 @@ export default function NavMenu() {
       <View>
         <Pressable
           style={{
+            display: useBreakpoint(false, true) ? "none" : "flex",
             paddingHorizontal: 13.5,
             paddingVertical: 14,
             backgroundColor: "#FFFFFF",

@@ -40,9 +40,9 @@ const FAQ = ({ account, inviteCode }: Account) => {
       </Text>
 
       <AccordionHowToUse account={account} defaultExpanded={true} />
-      <AccordionSellInvite defaultExpanded={true} />
-      <AccordionWhatIsPFP defaultExpanded={true} />
-      <AccordionWhoIsBehind defaultExpanded={true} />
+      <AccordionSellInvite defaultExpanded={useBreakpoint(true, false)} />
+      <AccordionWhatIsPFP defaultExpanded={useBreakpoint(true, false)} />
+      <AccordionWhoIsBehind defaultExpanded={useBreakpoint(true, false)} />
     </View>
   );
 };

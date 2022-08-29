@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 import React, { useEffect, useState } from "react";
-import { FaDiscord, FaTwitter } from "react-icons/fa";
+import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
 import ReactTooltip from 'react-tooltip';
 import styled from "styled-components";
 
@@ -165,16 +165,19 @@ const Onboard = ({ navigation }: OnboardProps) => {
   }, [featureVotes]);
 
   const TooltipWrapper = styled.span`
-
     .tooltip {
       position: absolute !important;
       width: fit-content !important;
       left: inherit !important;
       top: inherit !important;
       margin-top: -60px !important;
-      margin-left: -78px !important;
+      margin-left: -86px !important;
       fontFamily: "Inter_400Regular";
+  `;
 
+  const UpvoteButtonWrapper = styled.span`
+      button:active {
+        transform: scale(0.9);
   `;
 
   return (
@@ -597,7 +600,7 @@ const Onboard = ({ navigation }: OnboardProps) => {
                 marginTop: 20,
               }}
             >
-              ROADMAP
+              TELL US WHAT'S NEXT
             </Text>
             <Text
               style={{
@@ -634,39 +637,44 @@ const Onboard = ({ navigation }: OnboardProps) => {
                       alignItems: "center",
                     }}
                   >
-                    <button
-                      disabled={(featureVotes.size >= 3) ? true : false}
-                      style={{
-                        width: 25.6,
-                        height: 25.6,
-                        marginRight: 19.2,
-                        backgroundColor: "#fff",
-                        paddingTop: 2,
-                      }}
-                      onClick={() => { 
-                        // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
-                        ReactTooltip.show(upvoteButtons[index]) 
-                        
-                        
-                      }}
-                    >
-                      +
-                      <p
-                        ref={ref => {
-                          upvoteButtons[index] = ref
-                          setUpvoteButtons(upvoteButtons)
-                          return ref
+                    <UpvoteButtonWrapper>
+
+                      <button
+                        disabled={(featureVotes.size >= 3) ? true : false}
+                        style={{
+                          width: 42,
+                          height: 42,
+                          marginRight: 19.2,
+                          fontWeight: "700",
+                          fontSize: 18,
+                          backgroundColor: "#F3F4F6",
+                          border: "none",
+                          color: "#111827",
+                          paddingTop: 12,
                         }}
-                        data-tip={`Upvoted!`} 
-                        // data-delay-show='100' 
-                        data-delay-hide='3000'
-                        data-effect='solid'
-                        data-for={`tooltip_${index}`}
-                        data-place='top'
-                        data-scroll-hide='true'
-                      ></p>
-                      
-                    </button>
+                        onClick={() => { 
+                          // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
+                          ReactTooltip.show(upvoteButtons[index]) 
+                        }}
+                      >
+                          <FaCaretUp />
+                        <p
+                          ref={ref => {
+                            upvoteButtons[index] = ref
+                            setUpvoteButtons(upvoteButtons)
+                            return ref
+                          }}
+                          data-tip={`Upvoted!`} 
+                          // data-delay-show='100' 
+                          data-delay-hide='1500'
+                          data-effect='solid'
+                          data-for={`tooltip_${index}`}
+                          data-place='top'
+                          data-scroll-hide='true'
+                        ></p>
+                      </button>
+                    </UpvoteButtonWrapper>
+
                     <TooltipWrapper>
                       { React.useMemo(() => (<ReactTooltip 
                             className="tooltip"
