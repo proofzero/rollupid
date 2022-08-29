@@ -1,0 +1,15 @@
+@import "../styles/variables";
+
+button[class^=base-button] {
+    padding: 12px 45px;
+}
+
+.base-button-light {
+    background-color: $threeid-header-light;
+    color: $threeid-header-dark;
+}
+
+.base-button-dark {
+    background-color: $threeid-header-dark;
+    color: $threeid-header-light;
+}

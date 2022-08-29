@@ -3,6 +3,7 @@ import {
     json,
     redirect 
 } from "@remix-run/cloudflare";
+
 import { useEffect } from "react";
 import { useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
 
@@ -11,6 +12,14 @@ import {
     useConnect,
     useSignMessage
  } from 'wagmi'
+
+ import BaseButton, { links as buttonLinks } from "~/components/BaseButton";
+
+ export const links = () => [
+    ...buttonLinks(),
+    // { rel: "stylesheet", href: styles },
+];
+
 
 // Fetch the nonce for address
 export const loader: LoaderFunction = async ({
@@ -66,13 +75,21 @@ export default function AuthSign() {
 
     return (
         <div className="justify-center items-center">
-             {error && <div>{error.message}</div>}
             <p className="auth-message">
                 Please sign the auth message.
             </p>
             <p className="auth-secondary-message">
-                It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet.
+                {error 
+                    ? error.message
+                    :  "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
+                }
             </p>
+            {error && (
+                <div className="error-buttons">
+                    <BaseButton text={"Try Again"} color={"dark"} />
+                    <BaseButton text={"Disconnect"} color={"light"} />
+                </div>
+            )}
         </div>
     )
 }

@@ -27,7 +27,7 @@ export default function AuthIndex() {
     }, [isConnected])
 
     return (
-        <div className="justify-center items-center">
+        <div className="connectors justify-center items-center">
             <p className="auth-message">
                 Connect Your Wallet
             </p>
@@ -50,13 +50,13 @@ export default function AuthIndex() {
                 ))}
                 
                 {error && <div>{error.message}</div>}
-                <div className="open-metamask-app">
-                    <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
-                        Open in Metamask Mobile App
-                    </a>
-                </div>
+                
             </div>
-            
+            <div className="open-metamask-app">
+                <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
+                    Open in Metamask Mobile App
+                </a>
+            </div>
         </div>
     )
 }

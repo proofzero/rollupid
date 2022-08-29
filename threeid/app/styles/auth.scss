@@ -15,8 +15,8 @@ nav {
 }
 
 .content {
-    // justify-content: center;
-    // align-items: center;
+    justify-content: center;
+    align-items: center;
     margin: auto;
 }
 
@@ -39,6 +39,7 @@ footer {
 }
 
 .auth-secondary-message {
+    padding: 1em;
     font-family: Inter_400regular;
     font-size: 18px;
     font-weight: 400;
@@ -50,6 +51,12 @@ footer {
     align-items: center;
 }
 
+.connectors {
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+}
+
 .connector {
     background-color: white;
     justify-content: center;
@@ -58,7 +65,7 @@ footer {
     // margin: 0 1em;
     // width: 460px;
     width: 100%;
-    height: 57px;
+    // height: 57px;
     border: 1px solid #D1D5DB;
 
     svg {
@@ -75,16 +82,17 @@ footer {
 
 .open-metamask-app {
     padding: 2em 0 0 0;
-    margin-bottom: -2em;
+    // margin-bottom: -2em;
     font-family: Inter_700Bold;
     font-size: 14px;
     font-weight: 700;
-    line-height: 28;
+    line-height: 28px;
     color: $threeid-header-dark;
     text-decoration: underline;
-    height: 0;
+    // height: 100px;
     text-align: center;
     justify-content: center;
     width: 100%;
-
+    // flex: 0 1 0%;
+    // display: flex;
 }
