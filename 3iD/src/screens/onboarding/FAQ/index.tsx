@@ -14,6 +14,7 @@ type Account = {
 };
 
 const FAQ = ({ account, inviteCode }: Account) => {
+  const isDesktop = useBreakpoint(true, false)
   return (
     <View
       style={{
@@ -39,10 +40,10 @@ const FAQ = ({ account, inviteCode }: Account) => {
         FAQ
       </Text>
 
-      <AccordionHowToUse account={account} defaultExpanded={true} />
-      <AccordionSellInvite defaultExpanded={useBreakpoint(true, false)} />
-      <AccordionWhatIsPFP defaultExpanded={useBreakpoint(true, false)} />
-      <AccordionWhoIsBehind defaultExpanded={useBreakpoint(true, false)} />
+      <AccordionHowToUse account={account} defaultExpanded={true} collapsable={!isDesktop}/>
+      <AccordionSellInvite defaultExpanded={isDesktop} collapsable={!isDesktop}/>
+      <AccordionWhatIsPFP defaultExpanded={isDesktop} collapsable={!isDesktop}/>
+      <AccordionWhoIsBehind defaultExpanded={isDesktop} collapsable={!isDesktop}/>
     </View>
   );
 };
