@@ -18,7 +18,6 @@ import {
 
  export const links = () => [
     ...buttonLinks(),
-    // { rel: "stylesheet", href: styles },
 ];
 
 
