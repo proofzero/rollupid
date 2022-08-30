@@ -32,7 +32,7 @@ import { oortSend } from "~/utils/rpc.server";
 
 import styles from "~/styles/account.css";
 import HeadNav from "~/components/head-nav";
-import BaseButton, { links as buttonStyles } from "~/components/base-button";
+import { links as buttonStyles } from "~/components/base-button";
 
 export function links() {
   return [
@@ -44,8 +44,19 @@ export function links() {
 // @ts-ignore
 export const loader = async ({ request }) => {
   const session = await getUserSession(request);
-  if (!session.has("jwt")) {
+  if (!session || !session.has("jwt")) {
     return redirect("/auth");
+  }
+  // gate with invites only
+  const claimsRes = await oortSend("kb_getCoreClaims", 
+      [], 
+      session.get("address"), // TODO: remove when RPC url is changed
+      session.get("jwt"),
+      request.headers.get("Cookie")
+  )
+
+  if (!claimsRes.result.includes("3id.enter")) {
+      return redirect(`/auth/gate/${session.get("address")}`)
   }
   return null;
 };

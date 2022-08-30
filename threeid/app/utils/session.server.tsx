@@ -27,10 +27,12 @@ const storage = createCookieSessionStorage({
 
 export async function createUserSession(
     jwt: string,
-    redirectTo: string
+    redirectTo: string,
+    address?: string // NOTE: storing this temporarily in the session util RPC url remove address
   ) {
     const session = await storage.getSession();
     session.set("jwt", jwt);
+    session.set("address", address);
     return redirect(redirectTo, {
       headers: {
         "Set-Cookie": await storage.commitSession(session),
@@ -48,5 +50,5 @@ export async function destroyUserSession(session: Session) {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },
-  });}
-
+  });
+}

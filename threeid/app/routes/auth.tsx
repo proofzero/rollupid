@@ -23,6 +23,7 @@ import styles from "../styles/auth.css";
 import logo from "../assets/three-id-logo.svg";
 
 import { getUserSession } from "~/utils/session.server";
+import { oortSend } from "~/utils/rpc.server";
 
 import { links as spinnerLinks } from "~/components/spinner";
 
@@ -38,7 +39,16 @@ export function links() {
 export const loader = async ({ request }) => {
     const session = await getUserSession(request)
     if (session.has("jwt")) {
-        return redirect("/account");
+      const claimsRes = await oortSend("kb_getCoreClaims", 
+            [], 
+            session.get("address"), // TODO: remove when RPC url is changed
+            session.get("jwt"),
+            request.headers.get("Cookie")
+        )
+        
+        if (claimsRes.result.includes("3id.enter")) {
+          return redirect("/account")
+        }
     }
     return null
 };

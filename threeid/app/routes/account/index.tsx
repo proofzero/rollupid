@@ -1,4 +1,4 @@
-import { json } from "@remix-run/cloudflare";
+import { json, redirect } from "@remix-run/cloudflare";
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
 
@@ -8,19 +8,20 @@ import { oortSend } from "~/utils/rpc.server";
 import logo from "~/assets/three-id-logo.svg";
 
 // @ts-ignore
-export const loader = async ({ request }) => {
+export const loader = async ({ request, params }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
+  const address = session.get("address");
 
-  const base64Url = jwt.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const address = JSON.parse(decodeURIComponent(atob(base64))).sub;
-
+  // TODO remove session address param when RPC url is changed
   const [inviteCodeRes, votesRes] = await Promise.all([
-    oortSend("3id_getInviteCode", [], address),
-    oortSend("kb_getData", ["3id.app", "feature_vote_count"], address),
+    oortSend("3id_getInviteCode", [], address, jwt, request.headers.get("Cookie")),
+    oortSend("kb_getData", ["3id.app", "feature_vote_count"], address, jwt, request.headers.get("Cookie")),
   ]);
 
+  if (inviteCodeRes.error || votesRes.error) {
+    return redirect(`/error`);
+  }
   const [inviteCode, votes] = [inviteCodeRes.result.code, votesRes.result];
 
   return json({

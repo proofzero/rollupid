@@ -1,18 +1,32 @@
 
+type HeadersObject = {
+    // "Access-Control-Allow-Origin": string,
+    "Content-Type": string,
+    "KBT-Access-JWT-Assertion"?: string,
+    "Cookie"?: string,
+}
 
 // TODO: REMOVE ADDRESS PARAM
 // TODO: ERROR HANDLING
-export async function oortSend(method: string, params: any[], address: string) {
+// TODO: PICK WINNER FOR AUTH (JWT OR COOKIE)
+export async function oortSend(method: string, params: any[], address: string, jwt?: string, cookie?: string) {
     const id = method.replace(/^.+_/,'').replace(/[A-Z]/g, m => "-" + m.toLowerCase())
-    console.info("json rpc request with id: ", id)
+
+    const headers: HeadersObject = {
+        // "Access-Control-Allow-Origin": "*",
+        'Content-Type': 'application/json;charset=UTF-8',
+    }
+    if (jwt) {
+        headers['KBT-Access-JWT-Assertion'] = jwt;
+    }
+    if (cookie) {
+        headers['Cookie'] = cookie;
+    }
 
     //@ts-ignore
     const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}/${address}/jsonrpc`, {
         method: "POST",
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            'content-type': 'application/json;charset=UTF-8',
-        },
+        headers,
         body: JSON.stringify({
             id,
             jsonrpc: "2.0",
@@ -20,5 +34,7 @@ export async function oortSend(method: string, params: any[], address: string) {
             params,
         }),
     });
-    return response.json();
+
+    const json = await response.json();
+    return json;
 }

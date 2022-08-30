@@ -1,5 +1,5 @@
 import { 
-    json,
+    json, redirect,
 } from "@remix-run/cloudflare";
 
 import { useEffect } from "react";
@@ -12,7 +12,7 @@ import {
  } from 'wagmi'
 
  import { oortSend } from "~/utils/rpc.server";
- import { createUserSession } from "~/utils/session.server";
+ import { createUserSession, getUserSession } from "~/utils/session.server";
 
  import BaseButton, { links as buttonLinks } from "~/components/base-button";
  import Spinner from "~/components/spinner";
@@ -24,7 +24,11 @@ import {
 
 // Fetch the nonce for address
 // @ts-ignore
-export const loader = async ({ params }) => {
+export const loader = async ({ request, params }) => {
+    const session = await getUserSession(request)
+    if (session.has("jwt")) {
+        return redirect("/auth/gate/" + params.address)
+    }
     // @ts-ignore
     const nonceRes = await oortSend("kb_getNonce", [
             params.address,
@@ -42,11 +46,11 @@ export async function action({ request, params }) {
     const signRes = await oortSend("kb_verifyNonce", [
         formData.get("nonce"),
         formData.get("signature"),
-    ], params.address)
+    ], params.address) // TODO remove address param when RPC url is changed
 
     // on success create a cookie/session for the user
-    return createUserSession(signRes.result, "/account")
-  }
+    return createUserSession(signRes.result, "/account", params.address);
+}
 
 export default function AuthSign() {
     const sign = useLoaderData();
