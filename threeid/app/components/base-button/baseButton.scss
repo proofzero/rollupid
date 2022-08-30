@@ -1,6 +1,6 @@
 @import "../../styles/variables";
 
-button[class^=base-button] {
+button[class^=base-button], a[class^=base-button] {
     padding: 12px 45px;
     font-family: Inter_500Medium;
     font-weight: 500;

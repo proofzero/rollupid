@@ -1,5 +1,12 @@
 import { redirect, json } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
+
+import { 
+    useDisconnect,
+    useAccount,
+ } from 'wagmi'
+
 
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
@@ -8,7 +15,9 @@ import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
-import BaseButton, { links as buttonLinks } from "~/components/base-button";
+import Spinner from "~/components/spinner";
+import BaseButton, { links as buttonLinks, BaseButtonAnchor } from "~/components/base-button";
+import sad from "../../../assets/sad.png";
 
 
 function classNames(...classes) {
@@ -40,7 +49,6 @@ export const loader = async ({ request, params }) => {
 export async function action({ request, params }) {
     const session = await getUserSession(request);
     let formData = await request.formData();
-    console.log("form data", formData);
 
     const redeemRes = await oortSend("3id_redeemInvitation", [
         formData.get("contractAddress"),
@@ -50,7 +58,6 @@ export async function action({ request, params }) {
     session.get("jwt"),
     request.headers.get("Cookie")) // TODO remove address param when RPC url is changed
 
-    console.log("redeemRes", redeemRes);
     // on success redirect to account
     if (redeemRes.result === true) {
         return redirect("/account")
@@ -73,7 +80,6 @@ const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
 
 export default function AuthGate() {
     const cards = useLoaderData();
-    console.log("cards", cards)
 
     if (cards.length) {
         // ListBox needs object with id
@@ -86,8 +92,8 @@ export default function AuthGate() {
 
         return (
             <div className="gate justify-center items-center">
-                <h1 className="auth-message">We've detected a 3ID invite!</h1>
-                <h2 className="auth-secondary-message">Select an invite to activate your 3ID.</h2>
+                <p className="auth-message">We've detected a 3ID invite!</p>
+                <p className="auth-secondary-message">Select an invite to activate your 3ID.</p>
                 <div className="invites mx-3">
                     <span className="h-96">
                         <img className="card-image" src={gatewayFromIpfs(selected.image)} />
@@ -158,12 +164,48 @@ export default function AuthGate() {
         )
     }
 
-    return (
-        <div className="gate">
-            <p className="auth-message">
-                YOU HAVE NO INVITES
-            </p>
-            
-        </div>
-    )
+    // NO INVITES
+
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    const { disconnect } = useDisconnect()
+    const { connector, isConnected } = useAccount()
+    let navigate = useNavigate();
+
+    // useEffect(() => {
+    //     if (!isConnected) {
+    //         navigate("/auth");
+    //     }
+    // }, [connector])
+
+    if (!isConnected) {
+        return (
+            <div className="gate justify-center items-center">
+                <Spinner />
+            </div>
+        )
+    } else {
+
+        return (
+            <div className="gate justify-center items-center">
+                <img className="m-auto py-12" src={sad}/>
+                <p className="auth-message">
+                    Your wallet does not hold an invite token.
+                </p>
+                <p className="auth-secondary-message">
+                    If you want to get an early access please join our Discord.
+                </p>
+                <div className="error-buttons grid grid-cols-2">
+                    <BaseButton text={"Try Different Wallet"} color={"dark"} onClick={disconnect} />
+                    <BaseButtonAnchor text={"Join Discord"} color={"light"} href={"https://discord.gg/threeid"} />
+                </div>
+                <div className="grid grid-rows-1">
+
+                </div>
+            </div>
+        )
+    }
+    return null
 }

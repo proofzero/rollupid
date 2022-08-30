@@ -87,8 +87,9 @@ footer {
     width: 100%;
 }
 
-.error-buttons button {
+.error-buttons button, .error-buttons a {
     margin: 1em 0.5em;
+    text-align: center;
 }
 
 .card-image {
