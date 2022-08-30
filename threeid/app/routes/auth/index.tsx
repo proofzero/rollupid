@@ -32,7 +32,7 @@ export default function AuthIndex() {
                 Connect Your Wallet
             </p>
             {isLoading || pendingConnector ? <Spinner /> :
-            <div>
+            <div className='grid grid-rows-1 mt-2'>
                 {connectors.map((connector) => (
                     <div key={connector.id}>
                         <button className="connector"

@@ -76,7 +76,7 @@ export default function Auth() {
     })
 
     return (
-      <div className="wrapper grid grid-cols-3 gap-4">
+      <div className="wrapper grid grid-row-3 gap-4">
         <nav className="col-span-3">
           <img src={logo} alt="threeid" />
         </nav>

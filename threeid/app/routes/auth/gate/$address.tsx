@@ -190,7 +190,7 @@ export default function AuthGate() {
 
         return (
             <div className="gate justify-center items-center">
-                <img className="m-auto py-12" src={sad}/>
+                <img className="m-auto pb-12" src={sad}/>
                 <p className="auth-message">
                     Your wallet does not hold an invite token.
                 </p>
