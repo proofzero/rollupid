@@ -274,7 +274,7 @@ export default function AccountLayout() {
                     ))}
                   </nav>
                 </aside>
-                <div className="divide-y divide-gray-200 lg:col-span-9">
+                <div className="divide-y divide-gray-200 lg:col-span-9 p-8">
                   <Outlet />
                 </div>
               </div>
