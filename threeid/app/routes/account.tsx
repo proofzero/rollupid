@@ -32,7 +32,8 @@ import { oortSend } from "~/utils/rpc.server";
 
 import styles from "~/styles/account.css";
 import logo from "~/assets/three-id-logo.svg";
-import BaseButton, { links as buttonStyles } from "~/components/base-button/BaseButton";
+import BaseButton, { links as buttonStyles } from "~/components/base-button";
+import SignOutLink from "~/components/sign-out-link";
 
 export function links() {
   return [
@@ -66,9 +67,9 @@ const navigation = [
 ]
 // TODO: this should be it's own component. These are also function calls not links
 const userNavigation = [
-  { name: 'Copy Address', href: '#' },
+  // { name: 'Copy Address', href: '#' },
   // { name: 'Account', href: '#' },
-  { name: 'Sign out', to: 'auth/signout' },
+  { name: 'Sign out', component: SignOutLink },
 ]
 const subNavigation = [
   { name: 'Dashboard', href: '#', icon: HiOutlineHome, current: true },
@@ -162,15 +163,13 @@ export default function AccountLayout() {
                                 {userNavigation.map((item) => (
                                   <Menu.Item key={item.name}>
                                     {({ active }) => (
-                                      <a
+                                      <item.component
                                         href={item.href}
                                         className={classNames(
                                           active ? 'bg-gray-100' : '',
                                           'block px-4 py-2 text-sm text-gray-700'
                                         )}
-                                      >
-                                        {item.name}
-                                      </a>
+                                      />
                                     )}
                                   </Menu.Item>
                                 ))}
@@ -231,12 +230,9 @@ export default function AccountLayout() {
                       {userNavigation.map((item) => (
                         <Disclosure.Button
                           key={item.name}
-                          as="a"
-                          href={item.href}
+                          as={item.component}
                           className="block px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                        >
-                          {item.name}
-                        </Disclosure.Button>
+                        />
                       ))}
                     </div>
                   </div>
