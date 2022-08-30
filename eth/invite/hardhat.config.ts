@@ -2,7 +2,7 @@
 
 import * as cheerio from "cheerio";
 import * as path from "path";
-import chalk from 'chalk';
+import chalk from "chalk";
 import fs from "fs";
 import https from "node:https";
 import url from "node:url";
