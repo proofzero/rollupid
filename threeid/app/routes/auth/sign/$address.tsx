@@ -18,7 +18,7 @@ import {
  import Spinner from "~/components/spinner";
 
 
- export const links = () => [
+export const links = () => [
     ...buttonLinks(),
 ];
 

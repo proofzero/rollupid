@@ -2,7 +2,6 @@
 @import "./base.scss";
 
 .wrapper {
-    min-height: 100vh;
 }
 
 nav {
@@ -10,7 +9,6 @@ nav {
 
     img {
         width: 36.56px;
-        height: 41.05px;
     }
 }
 
@@ -26,7 +24,6 @@ footer {
 
 
 .auth-message {
-    padding-bottom: 22px;
     font-family: Inter_500Medium;
     font-size: 24px;
     font-weight: 700;
@@ -66,7 +63,6 @@ footer {
     font-weight: 500;
     width: 100%;
     border: 1px solid $threeid-lightgrey;
-    line-height: 28px;
 
     svg {
         float: left;
@@ -84,7 +80,6 @@ footer {
     font-family: Inter_700Bold;
     font-size: 14px;
     font-weight: 700;
-    line-height: 28px;
     color: $threeid-dark;
     text-decoration: underline;
     text-align: center;
@@ -94,4 +89,14 @@ footer {
 
 .error-buttons button {
     margin: 1em 0.5em;
+}
+
+.card-image {
+    max-width: 400px;
+    // margin-top: -43px;
+}
+
+.activate-button {
+    margin-top: 1em;
+    text-align: center;
 }
