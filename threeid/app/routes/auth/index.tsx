@@ -6,8 +6,8 @@ import {
 import { useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
 
-import Spinner from "~/components/Spinner";
-import MetamaskSVG from '~/components/MetamaskSVG';
+import Spinner from "~/components/spinner";
+import MetamaskSVG from '~/components/metamask-svg';
 
 export default function AuthIndex() {
     // NOTE: state is all messed if we render this component with SSR

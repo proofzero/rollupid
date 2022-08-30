@@ -14,8 +14,8 @@ import {
  import { oortSend } from "~/utils/rpc.server";
  import { createUserSession } from "~/utils/session.server";
 
- import BaseButton, { links as buttonLinks } from "~/components/BaseButton";
- import Spinner from "~/components/Spinner";
+ import BaseButton, { links as buttonLinks } from "~/components/base-button";
+ import Spinner from "~/components/spinner";
 
 
  export const links = () => [

@@ -32,7 +32,7 @@ import { oortSend } from "~/utils/rpc.server";
 
 import styles from "~/styles/account.css";
 import logo from "~/assets/three-id-logo.svg";
-import BaseButton, { links as buttonStyles } from "~/components/BaseButton";
+import BaseButton, { links as buttonStyles } from "~/components/base-button/BaseButton";
 
 export function links() {
   return [
