@@ -96,7 +96,7 @@ export default function AuthSign() {
            
             {error && (
                 <div className="error-buttons">
-                    <BaseButton text={"Try Again"} color={"dark"} onClick={() => signMessage({message: "hello"})} />
+                    <BaseButton text={"Try Again"} color={"dark"} onClick={() => signMessage(sign)} />
                     <BaseButton text={"Disconnect"} color={"light"} onClick={disconnect} />
                 </div>
             )}

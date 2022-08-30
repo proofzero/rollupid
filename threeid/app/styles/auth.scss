@@ -21,6 +21,7 @@ nav {
     margin: auto;
     display: flex;
     flex-grow: 1;
+    min-width: 300px;
 }
 
 footer {
@@ -57,6 +58,10 @@ footer {
     justify-content: center;
     align-items: center;
     margin-top: 1em;
+
+    .grid {
+        min-width: 308px;
+    }
 }
 
 .connector {

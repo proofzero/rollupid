@@ -88,7 +88,7 @@ export default function AuthGate() {
             return newCard
         });
         const [selected, setSelected] = useState(cardsWithId[0])
-        let activateInvite = useSubmit();
+        let submit = useSubmit();
 
         return (
             <div className="gate justify-center items-center">
@@ -153,7 +153,7 @@ export default function AuthGate() {
                                     </Listbox.Options>
                                     </Transition>
                                 </div>
-                                <BaseButton text={"Continue to 3ID ->"} color={"dark"} onClick={() => activateInvite(selected, {method: 'post'})} />
+                                <BaseButton text={"Continue to 3ID ->"} color={"dark"} onClick={() => submit(selected, {method: 'post'})} />
 
                             </div>
                             </>
@@ -173,10 +173,13 @@ export default function AuthGate() {
     const { disconnect } = useDisconnect()
     const { connector, isConnected } = useAccount()
     let navigate = useNavigate();
+    let submit = useSubmit();
+
 
     useEffect(() => {
         if (!isConnected) {
-            navigate("/auth");
+            submit(null, {action: "/auth/signout", method: 'post'})
+            // navigate("/auth");
         }
     }, [connector])
 
@@ -198,7 +201,9 @@ export default function AuthGate() {
                     If you want to get an early access please join our Discord.
                 </p>
                 <div className="error-buttons grid grid-cols-2">
-                    <BaseButton text={"Try Different Wallet"} color={"dark"} onClick={disconnect} />
+                    <BaseButton text={"Try Different Wallet"} color={"dark"} onClick={() => {
+                        disconnect()
+                    }} />
                     <BaseButtonAnchor text={"Join Discord"} color={"light"} href={"https://discord.gg/threeid"} />
                 </div>
             </div>
