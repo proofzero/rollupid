@@ -174,13 +174,13 @@ export default function AuthGate() {
     const { connector, isConnected } = useAccount()
     let navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (!isConnected) {
-    //         navigate("/auth");
-    //     }
-    // }, [connector])
+    useEffect(() => {
+        if (!isConnected) {
+            navigate("/auth");
+        }
+    }, [connector])
 
-    if (!isConnected) {
+    if (!isConnected || typeof window === 'undefined') {
         return (
             <div className="gate justify-center items-center">
                 <Spinner />
@@ -201,11 +201,7 @@ export default function AuthGate() {
                     <BaseButton text={"Try Different Wallet"} color={"dark"} onClick={disconnect} />
                     <BaseButtonAnchor text={"Join Discord"} color={"light"} href={"https://discord.gg/threeid"} />
                 </div>
-                <div className="grid grid-rows-1">
-
-                </div>
             </div>
         )
     }
-    return null
 }

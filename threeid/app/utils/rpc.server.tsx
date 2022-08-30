@@ -1,3 +1,6 @@
+import { 
+    redirect 
+  } from "@remix-run/cloudflare";
 
 type HeadersObject = {
     // "Access-Control-Allow-Origin": string,
@@ -24,7 +27,7 @@ export async function oortSend(method: string, params: any[], address: string, j
     }
 
     //@ts-ignore
-    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}/${address}/jsonrpc`, {
+    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}${address ? `/${address}` : ''}/jsonrpc`, {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -36,5 +39,6 @@ export async function oortSend(method: string, params: any[], address: string, j
     });
 
     const json = await response.json();
+    console.log(json)
     return json;
 }
