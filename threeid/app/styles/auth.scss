@@ -1,0 +1,41 @@
+@import "./variables.scss";
+@import "./base.scss";
+
+
+.wrapper {
+    min-height: 100vh;
+}
+
+nav {
+    padding: 1em;
+
+    img {
+        width: 36.56px;
+        height: 41.05px;
+    }
+}
+
+.content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+}
+
+footer {
+    margin-top: auto;
+}
+
+
+.auth-message {
+    padding-bottom: 22px;
+    font-family: Inter_500Medium;
+    font-size: 24px;
+    font-weight: 700;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-header-dark;
+    justify-content: center;
+    align-items: center;
+    vertical-align: bottom;
+}

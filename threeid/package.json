@@ -2,7 +2,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "generate:css": "npx tailwindcss -i ./app/base.css -o ./app/tailwind.css",
+    "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
     "build": "remix build",
     "sass": "sass --watch app/:app/",
     "deploy": "wrangler publish",
