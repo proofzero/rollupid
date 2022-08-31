@@ -3,11 +3,10 @@ import {
     useConnect
  } from 'wagmi'
 
-import React, { useEffect } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useEffect } from "react";
+import { useNavigate, useSubmit } from "@remix-run/react";
 
 import MetamaskSVG from '~/components/MetamaskSVG';
-import { userInfo } from 'os';
 
 export default function AuthIndex() {
     // NOTE: state is all messed if we render this component with SSR
@@ -18,11 +17,17 @@ export default function AuthIndex() {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
     const { address, connector, isConnected } = useAccount()
 
+    // let navigate = useNavigate();
+    let submit = useSubmit();
     let navigate = useNavigate();
 
+
     useEffect(() => {
-        console.log("isConnected", isConnected)
-        navigate("/auth/sign");
+        if (isConnected) {
+            navigate(`/auth/sign/${address}`);
+            // submit(null, {action: `/auth/sign/${address}`});
+            
+        }
     }, [isConnected])
 
     return (

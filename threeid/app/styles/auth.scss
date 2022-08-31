@@ -38,6 +38,18 @@ footer {
     align-items: center;
 }
 
+.auth-secondary-message {
+    font-family: Inter_400regular;
+    font-size: 18px;
+    font-weight: 400;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-header-dark;
+    justify-content: center;
+    align-items: center;
+}
+
 .connector {
     background-color: white;
     justify-content: center;
