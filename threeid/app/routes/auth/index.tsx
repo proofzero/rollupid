@@ -1,11 +1,4 @@
-// import styles from "./auth.css";
-
-// export const links = () => [
-//   { rel: "stylesheet", href: styles },
-// ];
-
 import { useConnect } from 'wagmi'
-import { useEffect, useState } from "react";
 
 import MetamaskSVG from '~/components/MetamaskSVG';
 
@@ -16,11 +9,6 @@ export default function AuthIndex() {
     }
 
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
-
-    // useEffect(() => {
-    //     console.log("isLoading", isLoading)
-    // }, [isLoading])
-
     
     return (
         <div className="justify-center items-center">
