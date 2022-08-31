@@ -4,7 +4,7 @@ import {
  } from 'wagmi'
 
 import { useEffect } from "react";
-import { useNavigate, useSubmit } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 
 import MetamaskSVG from '~/components/MetamaskSVG';
 
@@ -17,16 +17,12 @@ export default function AuthIndex() {
     const { connect, connectors, error, isLoading, pendingConnector } = useConnect()
     const { address, connector, isConnected } = useAccount()
 
-    // let navigate = useNavigate();
-    let submit = useSubmit();
     let navigate = useNavigate();
 
 
     useEffect(() => {
         if (isConnected) {
             navigate(`/auth/sign/${address}`);
-            // submit(null, {action: `/auth/sign/${address}`});
-            
         }
     }, [isConnected])
 

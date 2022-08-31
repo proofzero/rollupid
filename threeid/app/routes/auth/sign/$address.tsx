@@ -1,14 +1,18 @@
-import { LoaderFunction, json, redirect } from "@remix-run/cloudflare";
+import { 
+    LoaderFunction,
+    json,
+    redirect 
+} from "@remix-run/cloudflare";
 import { useEffect } from "react";
-import { useNavigate, useLoaderData } from "@remix-run/react";
+import { useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
 
 import { 
     useAccount,
     useConnect,
     useSignMessage
  } from 'wagmi'
-import { connect } from "http2";
 
+// Fetch the nonce for address
 export const loader: LoaderFunction = async ({
     params,
   }) => {
@@ -18,10 +22,13 @@ export const loader: LoaderFunction = async ({
     //return json(await getUserPreferences());
   };
 
-// export async function action({ request }) {
-//     await updatePreferences(await request.formData());
-//     return redirect("/prefs");
-//   }
+// verify signature for address
+export async function action({ request, params }) {
+    let formData = await request.formData();
+    console.log("formData", formData);
+    console.log("params", params);
+    return redirect("/welcome");
+  }
 
 export default function AuthSign() {
     const sign = useLoaderData();
@@ -37,7 +44,8 @@ export default function AuthSign() {
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
             console.log("signed", data);      
-            navigate("/welcome");
+            submit({signature: data}, {method: 'post', action: `/auth/sign/${sign.address}`});
+
         },
         onError(error) {
             console.log("error", error);
@@ -45,7 +53,7 @@ export default function AuthSign() {
     })
 
     let navigate = useNavigate();
-
+    let submit = useSubmit();
 
     useEffect(() => {
         if (!isConnected) {
