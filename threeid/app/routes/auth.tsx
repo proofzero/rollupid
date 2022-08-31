@@ -1,6 +1,18 @@
 import {
     Outlet,
-  } from "@remix-run/react";
+} from "@remix-run/react";
+
+import {
+    WagmiConfig,
+    createClient,
+    defaultChains,
+    configureChains,
+} from 'wagmi'
+
+import { publicProvider } from 'wagmi/providers/public'
+
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 
 import styles from "../styles/auth.css";
 import logo from "../assets/three-id-logo.svg";
@@ -11,13 +23,36 @@ export function links() {
 }
 
 export default function Auth() {
+
+    const { chains, provider, webSocketProvider } = configureChains(defaultChains, [
+        publicProvider(),
+    ])
+    
+    const client = createClient({
+        autoConnect: true,
+        connectors: [
+          new MetaMaskConnector({ chains }),
+          new InjectedConnector({
+            chains,
+            options: {
+              name: 'Injected',
+              shimDisconnect: true,
+            },
+          }),
+        ],
+        provider,
+        webSocketProvider,
+    })
+
     return (
         <div className="wrapper grid grid-cols-3 gap-4">
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
           </nav>
           <article className="content col-span-3">
-            <Outlet />
+            <WagmiConfig client={client}>
+                <Outlet />
+            </WagmiConfig>
           </article>
           <footer className="col-span-3">
             <p>
