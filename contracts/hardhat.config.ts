@@ -1,4 +1,4 @@
-// eth/invite/hardhat.config.ts
+// contracts/hardhat.config.ts
 
 import * as cheerio from "cheerio";
 import * as path from "path";
@@ -24,7 +24,7 @@ import {
   NET_MUMBAI,
   NET_POLYGON,
   NET_MAINNET,
-} from "../secret";
+} from "./secret";
 import { groupEnd } from "console";
 
 // definitions
