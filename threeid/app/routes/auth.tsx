@@ -1,3 +1,5 @@
+// import { createCookieSessionStorage, redirect } from "@remix-run/cloudflare";
+
 import {
     Outlet,
 } from "@remix-run/react";
@@ -56,7 +58,7 @@ export default function Auth() {
           </article>
           <footer className="col-span-3">
             <p>
-              3ID is non-custodial and secure. We will never request access to your assets.
+              3ID is non-custodial and secure.<br/>We will never request access to your assets.
             </p>
           </footer>
       </div>
