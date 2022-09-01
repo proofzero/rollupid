@@ -5,6 +5,9 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("Invitations", function () {
+
+  const maxInvites = 10;
+
   // Make signed voucher fixtures.
   async function signVoucher(_recipient: SignerWithAddress, _uri: string, _tokenId: number, operator: SignerWithAddress) {
     const voucher = {
@@ -33,8 +36,6 @@ describe("Invitations", function () {
 
     const voucher = await signVoucher(operator, 'https://example.com', 0, operator);
 
-    const maxInvites = 10;
-
     const Invite = await ethers.getContractFactory("ThreeId_Invitations");
     const invite = await Invite.deploy(operator.address, maxInvites, voucher);
 
@@ -44,7 +45,7 @@ describe("Invitations", function () {
   describe("Deployment", function () {
     it("Should set the right maximum", async function () {
       const { invite } = await loadFixture(deployInviteFixture);
-      expect(await invite.maxInvitations()).to.equal(10);
+      expect(await invite.maxInvitations()).to.equal(maxInvites);
     });
 
     it("Should set the right next token id", async function () {
@@ -88,11 +89,11 @@ describe("Invitations", function () {
 
     it("Shouldn't assign more than max invites", async function () {
       const { invite, voucher, owner, operator } = await loadFixture(deployInviteFixture);
-      for (let i = 1; i <= 10; i++) {
+      for (let i = 1; i <= maxInvites; i++) {
         const nextVoucher = await signVoucher(owner, 'https://example.com', i, operator);
         await expect(invite.awardInvite(owner.address, nextVoucher)).not.to.be.rejected;
       }
-      const nextVoucher = await signVoucher(owner, 'https://example.com', 11, operator);
+      const nextVoucher = await signVoucher(owner, 'https://example.com', maxInvites + 1, operator);
       await expect(invite.awardInvite(owner.address, nextVoucher)).to.be.rejected;
     });
   });
