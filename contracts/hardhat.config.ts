@@ -415,8 +415,6 @@ task("invite:maximum", "Return maximum number of invites")
 task("invite:next", "Return ID of next invite that will be awarded")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
-    console.log(hre.ethers.utils.solidityKeccak256([ "string" ], [ "MINTER_ROLE" ]))
-    // console.log(hre.ethers.utils.keccak256(hre.ethers.utils.toUtf8Bytes("MINTER_ROLE")));
     const contract = await hre.run("config:contract", { contract: taskArgs.contract });
     const nextInvite = await hre.run("call:nextInvite", { contract });
 

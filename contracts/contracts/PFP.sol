@@ -1,4 +1,4 @@
-// eth/contracts/Invite.sol
+// eth/contracts/PFP.sol
 //
 // SPDX-License-Identifier: UNLICENSED
 
@@ -12,30 +12,28 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-// Voucher is produced by the operator and is used to redeem the token.
+// Voucher is produced by NFTar and is used to redeem the token.
 struct NFTVoucher {
   address recipient;
   string uri;
-  uint tokenId;
   bytes signature;
 }
 
 /**
- * A token representing an invitation to use 3ID. A token holder is
- * granted special access to the site.
+ * A token representing a generated 3ID PFP.
  */
-contract ThreeId_Invitations is
+contract ThreeId_ProfilePicture is
     ERC721URIStorage,
     AccessControl,
     Ownable
 {
     using Counters for Counters.Counter;
-    Counters.Counter private _inviteIds;
+    Counters.Counter private _profileIds;
 
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
-    // We only allow the creation of this many invitations.
-    uint private _maxInvites;
+    // We only allow the creation of this many profiles.
+    uint private _maxPFPs;
     address _operator;
 
     // Handles disambiguation of the multiple defitions of supportsInterface in our parent contracts.
@@ -46,18 +44,17 @@ contract ThreeId_Invitations is
     /**
      * Constructor.
      *
-     * @param minter the operator address that can mint new invitations
-     * @param maxInvites the maximum allowed number of invitations
-     * @param voucher the voucher for the reserved zeroth invite
+     * @param minter the operator address that can mint new profiles
+     * @param maxPFPs the maximum allowed number of profiles
+     * @param voucher the voucher for the reserved zeroth profile
      */
-    constructor(address minter, uint maxInvites, NFTVoucher memory voucher) ERC721("3ID Invitation", "3ID") {
+    constructor(address minter, uint maxPFPs, NFTVoucher memory voucher) ERC721("3ID Profile Picture", "PFP") {
         _setupRole(OPERATOR_ROLE, minter);
         _operator = minter;
-        _maxInvites = maxInvites;
+        _maxPFPs = maxPFPs;
 
-        console.log("OPERATOR_ROLE", Strings.toHexString(uint256(OPERATOR_ROLE)));
-
-        awardInvite(_operator, voucher);
+        // Variance from Invite: we probably don't want to award to operator.
+        //awardPFP(_operator, voucher);
     }
 
     /**
@@ -80,65 +77,62 @@ contract ThreeId_Invitations is
      * Verify the voucher signature and return the address of the signer
      * The address is expected to be the operator of the contract
      *
-     * @param voucher the voucher to use to validate and award the invite
+     * @param voucher the voucher to use to validate and award the profile pic.
      *
      * Returns:
      *   the address of the signer
      */
     function _recoverVoucherSigner(NFTVoucher memory voucher) public pure returns(address) {
-        bytes32 messageHash = keccak256(abi.encodePacked(voucher.recipient, voucher.uri, voucher.tokenId));
-        // console.log('got  message', Strings.toHexString(uint256(messageHash)));
-
+        bytes32 messageHash = keccak256(abi.encodePacked(voucher.recipient, voucher.uri));
         bytes32 ethMessage = ECDSA.toEthSignedMessageHash(messageHash);
         return ECDSA.recover(ethMessage, voucher.signature);
     }
 
     /**
-     * Award an invitation.
+     * Award a PFP.
      *
-     * @param invitee invitation recipient
-     * @param voucher the voucher to use to validate and award the invite
+     * @param recipient the address of the 3ID user awarded the PFP.
+     * @param voucher the voucher to use to validate and award the PFP.
      *
      * Returns:
-     *   the invite (token) identifier
+     *   the profile (token) identifier
      */
-    function awardInvite(address invitee, NFTVoucher memory voucher) public returns(uint256) {
+    function awardPFP(address recipient, NFTVoucher memory voucher) public returns(uint256) {
 
         // Make sure the voucher and signature are valid and get the address of the signer.
         address signer = _recoverVoucherSigner(voucher);
-        // console.log('\nSanity check. At deployment these should all be equal:\noperator:\t\t%s\ninvitee\t\t%s\nsigner\t\t%s', _operator, invitee, signer);
 
         // Make sure that the signer is authorized to mint NFTs.
         require(hasRole(OPERATOR_ROLE, signer), "Signature invalid or unauthorized!");
 
         // Make sure that the redeemer is the same as the receipient.
-        require(invitee == voucher.recipient, "Invalid recipient!");
+        require(recipient == voucher.recipient, "Invalid recipient!");
 
-        // NB: invitation #0000 is reserved, user allocated range is
-        // #0001 to #_maxInvites.
-        uint256 inviteId = _inviteIds.current();
-        require(voucher.tokenId == inviteId, 'Please request invitations in sequence.');
-        require(inviteId <= _maxInvites, "All invitations have been awarded!");
+        // NB: PFP #0000 is reserved, user allocated range is [#0001 to #_maxPFPs].
+        uint256 profileId = _profileIds.current();
+        // require(voucher.tokenId == profileId, 'Please request profiles in sequence.');
+        require(profileId <= _maxPFPs, "All profiles have been awarded!");
 
-        _safeMint(invitee, inviteId);
-        _setTokenURI(inviteId, voucher.uri);
+        _safeMint(recipient, profileId);
+        _setTokenURI(profileId, voucher.uri);
 
-        _inviteIds.increment();
+        // Note: should this move to above minting because of re-entrancy?
+        _profileIds.increment();
 
-        return inviteId;
+        return profileId;
     }
 
     /**
-     * Return the next invitation to be awarded.
+     * Return the next profile to be awarded.
      */
-    function nextInvite() public view returns (uint256) {
-        return _inviteIds.current();
+    function nextPFP() public view returns (uint256) {
+        return _profileIds.current();
     }
 
     /**
-     * Return the maximum number of invitations to be awarded.
+     * Return the maximum number of profiles to be awarded.
      */
-    function maxInvitations() public view returns (uint) {
-        return _maxInvites;
+    function maxProfiles() public view returns (uint) {
+        return _maxPFPs;
     }
 }
