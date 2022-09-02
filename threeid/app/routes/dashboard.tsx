@@ -11,9 +11,16 @@ import { oortSend } from "~/utils/rpc.server";
 import styles from "~/styles/dashboard.css";
 import logo from "~/assets/three-id-logo.svg";
 import BaseButton, { links as buttonStyles } from "~/components/BaseButton";
+import SideMenu, {
+  links as sideMenuStyles,
+} from "~/components/side-menu/SideMenu";
 
 export function links() {
-  return [...buttonStyles(), { rel: "stylesheet", href: styles }];
+  return [
+    ...buttonStyles(),
+    ...sideMenuStyles(),
+    { rel: "stylesheet", href: styles },
+  ];
 }
 
 // @ts-ignore
@@ -37,6 +44,7 @@ export default function Welcome() {
       <div className="header flex-none flex-grow order-none">
         <nav className="flex flex-row justify-between align-center gap-80">
           <div className="nav-items flex flex-row align-center justify-start gap-12">
+            <SideMenu username={"anon"} avatarUri={null} avatarSize={11} />
             <ul className="flex flex-row flex-start gap-4">
               <li className="flex flex-row align-center">
                 <img src={logo} alt="threeid" />
