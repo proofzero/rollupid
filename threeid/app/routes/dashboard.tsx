@@ -1,4 +1,4 @@
-import { json } from "@remix-run/cloudflare";
+import { redirect } from "@remix-run/cloudflare";
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
 
@@ -19,26 +19,14 @@ export function links() {
 // @ts-ignore
 export const loader = async ({ request }) => {
   const session = await getUserSession(request);
-  const jwt = session.get("jwt");
-
-  const base64Url = jwt.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const address = JSON.parse(decodeURIComponent(atob(base64))).sub;
-
-  const { code } = (await oortSend("3id_getInviteCode", [], address)).result;
-
-  const votes = (
-    await oortSend("kb_getData", ["3id.app", "feature_vote_count"], address)
-  ).result;
-
-  return json({
-    inviteCode: code,
-    votes,
-  });
+  if (!session.has("jwt")) {
+    return redirect("/auth");
+  }
+  return null;
 };
 
 export default function Welcome() {
-  const { inviteCode, votes } = useLoaderData();
+  useLoaderData();
   let submit = useSubmit();
 
   // TODO: sort out layout component
