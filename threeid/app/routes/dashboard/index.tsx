@@ -31,7 +31,6 @@ export const loader = async ({ request }) => {
 
 export default function Welcome() {
   const { inviteCode, votes } = useLoaderData();
-  console.log(inviteCode, votes);
   let submit = useSubmit();
 
   // TODO: sort out layout component
