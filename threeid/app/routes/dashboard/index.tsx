@@ -18,9 +18,13 @@ export const loader = async ({ request }) => {
 
   const { code } = (await oortSend("3id_getInviteCode", [], address)).result;
 
+  const votes = (
+    await oortSend("kb_getData", ["3id.app", "feature_vote_count"], address)
+  ).result;
+
   return json({
     inviteCode: code,
-    votes: [],
+    votes,
   });
 };
 
