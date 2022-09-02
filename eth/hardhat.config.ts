@@ -1,4 +1,4 @@
-// contracts/hardhat.config.ts
+// eth/hardhat.config.ts
 
 import * as cheerio from "cheerio";
 import * as path from "path";
@@ -24,14 +24,15 @@ import {
   NET_MUMBAI,
   NET_POLYGON,
   NET_MAINNET,
+  // Types
+  ChainnetConfiguration,
 } from "./secret";
-import { groupEnd } from "console";
 
 // definitions
 // -----------------------------------------------------------------------------
 
-// The name of the invitation contract.
-const CONTRACT_NAME = "ThreeId_Invitations";
+// The names of the various contracts.
+const CONTRACT_NAMES = ["ThreeId_Invitations", "ThreeId_ProfilePicture"];
 
 // The location for generated assets.
 const OUTPUT_DIR = path.resolve("outputs");
@@ -92,15 +93,27 @@ subtask("network:config", "Return network-specific configuration map")
     }
   });
 
-subtask("config:contract", "Return contract address for selected network")
+subtask("invite:contract", "Return contract address for selected network")
   .addOptionalParam("contract", "A contract address")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
     if (contract && (contract.startsWith("0x") || contract.endsWith(".eth"))) {
       return contract;
     } else {
-      const config = await hre.run("network:config");
-      return config.contract;
+      const config: ChainnetConfiguration = await hre.run("network:config");
+      return config.invite_contract;
+    }
+  });
+
+subtask("profile:contract", "Return contract address for selected network")
+  .addOptionalParam("contract", "A contract address")
+  .setAction(async (taskArgs, hre) => {
+    const contract = taskArgs.contract;
+    if (contract && (contract.startsWith("0x") || contract.endsWith(".eth"))) {
+      return contract;
+    } else {
+      const config: ChainnetConfiguration = await hre.run("network:config");
+      return config.profile_contract;
     }
   });
 
@@ -152,39 +165,59 @@ subtask("config:owner:privateKey", "Return owner wallet private key")
     return config.wallet.ownerKey;
   });
 
-subtask("call:maxInvites", `Return result of ${CONTRACT_NAME}.maxInvites()`)
+subtask("call:maxPFPs", `Return result of ThreeId_ProfilePicture.maxProfiles()`)
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const profile = await hre.ethers.getContractAt('ThreeId_ProfilePicture', contract);
+    return profile.maxProfiles();
+  });
+
+subtask("call:maxInvites", `Return result of ThreeId_Invitations.maxInvites()`)
+  .addParam("contract", "The address of the invite contract")
+  .setAction(async (taskArgs, hre) => {
+    const contract = taskArgs.contract;
+    const invite = await hre.ethers.getContractAt('ThreeId_Invitations', contract);
     return invite.maxInvitations();
   });
 
-subtask("call:ownerOf", `Return result of ${CONTRACT_NAME}.ownerOf(tokenId)`)
-  .addParam("contract", "The address of the invite contract")
+subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract')
+  .addParam("contract", "The address of the contract")
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
+    const contractName = CONTRACT_NAMES[0];
     const inviteId = taskArgs.inviteId;
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.ownerOf(inviteId);
   });
 
-subtask("call:tokenURI", `Return result of ${CONTRACT_NAME}.tokenURI(tokenId)`)
+subtask("call:tokenURI", 'Return result of tokenURI(tokenId) on the given contract')
   .addParam("contract", "The address of the invite contract")
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
+    const contractName = CONTRACT_NAMES[0];
     const inviteId = taskArgs.inviteId;
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.tokenURI(inviteId);
+  });
+
+subtask("call:nextProfile", "Return the ID of next profile")
+  .addParam("contract", "The address of the invite contract")
+  .setAction(async (taskArgs, hre) => {
+    const contract = taskArgs.contract;
+    const contractName = CONTRACT_NAMES[1];
+    const profile = await hre.ethers.getContractAt(contractName, contract);
+    return profile.nextPFP();
   });
 
 subtask("call:nextInvite", "Return the ID of next invitation")
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const contractName = CONTRACT_NAMES[0];
+    const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.nextInvite();
   });
 
@@ -200,7 +233,9 @@ subtask("call:awardInvite", "Mint invitation NFT")
     // HAXX
     const voucher = JSON.parse(taskArgs.voucher);
 
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const contractName = CONTRACT_NAMES[0];
+
+    const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.awardInvite(account, voucher);
   });
 
@@ -403,10 +438,28 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
     }
   });
 
+task("profile:maximum", "Return maximum number of profiles")
+  .addOptionalParam("contract", "The invite contract address")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const maxPFPs = await hre.run("call:maxPFPs", { contract });
+
+    console.log(`> maximum ${maxPFPs} profiles`);
+  });
+
+task("profile:next", "Return ID of next profile that will be awarded")
+  .addOptionalParam("contract", "The invite contract address")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const nextProfile = await hre.run("call:nextProfile", { contract });
+
+    console.log(`> next profile is #${nextProfile.toString().padStart(4, "0")}`);
+  });
+
 task("invite:maximum", "Return maximum number of invites")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const maxInvites = await hre.run("call:maxInvites", { contract });
 
     console.log(`> maximum ${maxInvites} invites`);
@@ -415,7 +468,7 @@ task("invite:maximum", "Return maximum number of invites")
 task("invite:next", "Return ID of next invite that will be awarded")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const nextInvite = await hre.run("call:nextInvite", { contract });
 
     console.log(`> next invite is #${nextInvite.toString().padStart(4, "0")}`);
@@ -425,7 +478,7 @@ task("invite:owner", "Return owner of an invite")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const inviteId = taskArgs.invite;
 
     const owner = await hre.run("call:ownerOf", { contract, inviteId });
@@ -440,7 +493,7 @@ task("invite:metadata", "Display the metadata for an invitation")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const invite = taskArgs.invite;
 
     const metadata = await hre.run("fetch:metadata", { contract, invite });
@@ -451,7 +504,7 @@ task("invite:image", "Print the image URL for an invitation")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const invite = taskArgs.invite;
 
     const metadata = await hre.run("fetch:metadata", { contract, invite });
@@ -564,6 +617,62 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
     };
   });
 
+task("profile:sign-voucher", "Sign an profile voucher")
+  .addParam("account", "The account address")
+  // .addParam("profile", "The profile number to award")
+  .setAction(async (taskArgs, hre) => {
+    // This lets us use an account alias from secret.ts to sign a voucher.
+    const recipient = await hre.run("config:account", { account: taskArgs.account });
+    const uri = taskArgs.tokenUri;
+
+    // TODO: const domain = await owner.domain owner._signingDomain()
+
+    // 66 bytes of abi.encodePacked keccak256.
+    // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
+    // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
+    const message = hre.ethers.utils.solidityKeccak256(
+      [ "address", "string" ],
+      [ recipient, uri ]
+    );
+    // console.log('message: ' + message)
+    // console.log('message: ' + message.length)
+
+    // 32 bytes of data in Uint8Array
+    const messageHashBinary = hre.ethers.utils.arrayify(message);
+    // console.log('messageHashBinary.length: ' + messageHashBinary.length)
+
+    // From Ethers docs:
+    // NB: A signed message is prefixed with "\x19Ethereum Signed
+    // Message:\n" and the length of the message, using the hashMessage
+    // method, so that it is EIP-191 compliant. If recovering the
+    // address in Solidity, this prefix will be required to create a
+    // matching hash.
+
+    // Sign 32 byte digest, with the above prefix.
+    const operatorKey = await hre.run("config:operator:privateKey");
+    const operator = new hre.ethers.Wallet(operatorKey);
+    const signature = await operator.signMessage(messageHashBinary);
+
+    // Construct the voucher.
+    const voucher = {
+      recipient,
+      uri,
+      // messageHash: message,
+      signature
+    };
+
+    // Sanity check the recovery address matches operator address.
+    await hre.run("check:recovery", {
+      messageHashBinary,
+      signature,
+      operatorAddress: operator.address
+    });
+
+    console.log('signed voucher: ', voucher);
+
+    return voucher
+});
+
 task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("account", "The account address")
   .addParam("tokenUri", "The token URI")
@@ -623,7 +732,52 @@ task("invite:sign-voucher", "Sign an invite voucher")
     return voucher
 })
 
-task("contract:deploy", "Deploy the contract")
+task("profile:deploy", "Deploy the PFP contract")
+  .addOptionalParam("maxProfiles", "Maximum number of profiles to allow", 1000, types.int)
+  .setAction(async (taskArgs, hre) => {
+    // Pre-flight sanity checks.
+    await hre.run("check:owner");
+    await hre.run("check:operator");
+
+    // Inject into contract to limit the number of profiles that can be minted.
+    const maxPFPs = taskArgs.maxProfiles;
+
+    // The voucher recipient should be the "operator" account.
+    const operatorAddress = await hre.run("config:account", { account: "operator" });
+
+    // When network is localhost, use an already baked asset for the premint.
+    let publishResult;
+    if (hre.network.name == 'localhost') {
+      publishResult = {
+        url: "ipfs://bafyreigtb2quz6kcyix5dw5cknfarhosz4t43ze4egvt2ufoybjhgy6qty/metadata.json",
+      };
+    } else {
+      // The URL of the published asset.
+      publishResult = await hre.run("profile:premint", {});
+    }
+
+    // Create and sign a voucher.
+    const zeroVoucher = await hre.run("profile:sign-voucher", {
+      account: operatorAddress,
+      tokenUri: publishResult.url,
+    });
+
+    const Profile = await hre.ethers.getContractFactory("ThreeId_ProfilePicture");
+    const profile = await Profile.deploy(operatorAddress, maxPFPs, zeroVoucher);
+
+    await profile.deployed();
+
+    console.log("ThreeId_Invitations deployed to:", profile.address);
+
+    // Check stored contract address, prompt user to update secret.ts if
+    // not the same as the address of the contract that was just deployed.
+    const contractAddress = await hre.run("profile:contract");
+    if (contractAddress !== profile.address) {
+      console.log(chalk.red(`Profile contract address has changed! Please update secret.ts`));
+    }
+  });
+
+task("invite:deploy", "Deploy the invitation contract")
   .addOptionalParam("maxInvites", "Maximum number of invitations to allow", 10000, types.int)
   .setAction(async (taskArgs, hre) => {
     // Pre-flight sanity checks.
@@ -665,19 +819,20 @@ task("contract:deploy", "Deploy the contract")
     // Check stored contract address, prompt user to update secret.ts if
     // not the same as the address of the contract that was just
     // deployed.
-    const contractAddress = await hre.run("config:contract");
+    const contractAddress = await hre.run("invite:contract");
     if (contractAddress !== invite.address) {
-      console.log(chalk.red(`Contract address has changed! Please update secret.ts`));
+      console.log(chalk.red(`Invite contract address has changed! Please update secret.ts`));
     }
   });
 
-task("contract:destroy", "Send the selfdestruct message to a given contract")
+task("invite:destroy", "Send the selfdestruct message to a given contract")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address to which we transfer contract contents (must be operator)")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const account = await hre.run("config:account", { account: taskArgs.account });
-    const invite = await hre.ethers.getContractAt(CONTRACT_NAME, contract);
+    const contractName = CONTRACT_NAMES[0]
+    const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.destructor(account);
   })
 
@@ -688,7 +843,7 @@ task("invite:award", "Mint an invite for an account")
   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
   .setAction(async (taskArgs, hre) => {
     // The invitation smart contract address.
-    const contract = await hre.run("config:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     // The recipient address for the invitation.
     const account = await hre.run("config:account", { account: taskArgs.account });
     // Location of generated asset files.
