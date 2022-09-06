@@ -26,7 +26,7 @@ import {
   NET_MAINNET,
   // Types
   ChainnetConfiguration,
-} from "./secret";
+} from "./invite.secret";
 
 // definitions
 // -----------------------------------------------------------------------------
@@ -102,18 +102,6 @@ subtask("invite:contract", "Return contract address for selected network")
     } else {
       const config: ChainnetConfiguration = await hre.run("network:config");
       return config.invite_contract;
-    }
-  });
-
-subtask("profile:contract", "Return contract address for selected network")
-  .addOptionalParam("contract", "A contract address")
-  .setAction(async (taskArgs, hre) => {
-    const contract = taskArgs.contract;
-    if (contract && (contract.startsWith("0x") || contract.endsWith(".eth"))) {
-      return contract;
-    } else {
-      const config: ChainnetConfiguration = await hre.run("network:config");
-      return config.profile_contract;
     }
   });
 
@@ -293,41 +281,6 @@ subtask("fetch:metadata", "Display the metadata for the invite")
     });
   });
 
-task("profile:generate-payload", "Call NFTar to get the custom NFT asset and voucher")
-  .setAction(async (taskArgs, hre) => {
-    return hre.run("config:nftar").then(async (config) => {
-      return new Promise((resolve, reject) => {
-        https.request(['https:/', config.host, 'api'].join('/'), {
-          method: "POST",
-          headers: {
-            'authorization': 'bearer ' + config.token
-          }
-        }, (res) => {
-          const { statusCode } = res;
-  
-          res.setEncoding('utf8');
-  
-          let rawData = '';
-          res.on('data', (chunk) => { rawData += chunk; });
-          res.on('end', () => {
-            const parsedData = JSON.parse(rawData);
-            console.log(JSON.stringify(parsedData));
-            resolve(parsedData);
-          });
-        }).on('error', (e) => {
-          let message;
-          if (e instanceof Error) {
-            message = e.message;
-          } else {
-            message = String(e);
-          }
-          console.error(message);
-          reject(message);
-        });
-      });
-    });
-  });
-
 subtask("invite:generate-nft-asset", "Generate custom NFT image asset")
   .addParam("inviteId", "The invite identifier (0-padded, 4 digits)")
   .addParam("issueDate", "Date of issue for the token")
@@ -477,24 +430,6 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
       console.log(chalk.green("->    image:"), response.metadata?.image);
       console.log(chalk.green("->  updated:"), response.timeLastUpdated);
     }
-  });
-
-task("profile:maximum", "Return maximum number of profiles")
-  .addOptionalParam("contract", "The invite contract address")
-  .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
-    const maxPFPs = await hre.run("call:maxPFPs", { contract });
-
-    console.log(`> maximum ${maxPFPs} profiles`);
-  });
-
-task("profile:next", "Return ID of next profile that will be awarded")
-  .addOptionalParam("contract", "The invite contract address")
-  .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
-    const nextProfile = await hre.run("call:nextProfile", { contract });
-
-    console.log(`> next profile is #${nextProfile.toString().padStart(4, "0")}`);
   });
 
 task("invite:maximum", "Return maximum number of invites")
@@ -658,62 +593,6 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
     };
   });
 
-task("profile:sign-voucher", "Sign an profile voucher")
-  .addParam("account", "The account address")
-  // .addParam("profile", "The profile number to award")
-  .setAction(async (taskArgs, hre) => {
-    // This lets us use an account alias from secret.ts to sign a voucher.
-    const recipient = await hre.run("config:account", { account: taskArgs.account });
-    const uri = taskArgs.tokenUri;
-
-    // TODO: const domain = await owner.domain owner._signingDomain()
-
-    // 66 bytes of abi.encodePacked keccak256.
-    // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
-    // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
-    const message = hre.ethers.utils.solidityKeccak256(
-      [ "address", "string" ],
-      [ recipient, uri ]
-    );
-    // console.log('message: ' + message)
-    // console.log('message: ' + message.length)
-
-    // 32 bytes of data in Uint8Array
-    const messageHashBinary = hre.ethers.utils.arrayify(message);
-    // console.log('messageHashBinary.length: ' + messageHashBinary.length)
-
-    // From Ethers docs:
-    // NB: A signed message is prefixed with "\x19Ethereum Signed
-    // Message:\n" and the length of the message, using the hashMessage
-    // method, so that it is EIP-191 compliant. If recovering the
-    // address in Solidity, this prefix will be required to create a
-    // matching hash.
-
-    // Sign 32 byte digest, with the above prefix.
-    const operatorKey = await hre.run("config:operator:privateKey");
-    const operator = new hre.ethers.Wallet(operatorKey);
-    const signature = await operator.signMessage(messageHashBinary);
-
-    // Construct the voucher.
-    const voucher = {
-      recipient,
-      uri,
-      // messageHash: message,
-      signature
-    };
-
-    // Sanity check the recovery address matches operator address.
-    await hre.run("check:recovery", {
-      messageHashBinary,
-      signature,
-      operatorAddress: operator.address
-    });
-
-    console.log('signed voucher: ', voucher);
-
-    return voucher
-});
-
 task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("account", "The account address")
   .addParam("tokenUri", "The token URI")
@@ -772,51 +651,6 @@ task("invite:sign-voucher", "Sign an invite voucher")
 
     return voucher
 })
-
-task("profile:deploy", "Deploy the PFP contract")
-  .addOptionalParam("maxProfiles", "Maximum number of profiles to allow", 1000, types.int)
-  .setAction(async (taskArgs, hre) => {
-    // Pre-flight sanity checks.
-    await hre.run("check:owner");
-    await hre.run("check:operator");
-
-    // Inject into contract to limit the number of profiles that can be minted.
-    const maxPFPs = taskArgs.maxProfiles;
-
-    // The voucher recipient should be the "operator" account.
-    const operatorAddress = await hre.run("config:account", { account: "operator" });
-
-    // When network is localhost, use an already baked asset for the premint.
-    let publishResult;
-    if (hre.network.name == 'localhost') {
-      publishResult = {
-        url: "ipfs://bafyreigtb2quz6kcyix5dw5cknfarhosz4t43ze4egvt2ufoybjhgy6qty/metadata.json",
-      };
-    } else {
-      // The URL of the published asset.
-      publishResult = await hre.run("profile:premint", {});
-    }
-
-    // Create and sign a voucher.
-    const zeroVoucher = await hre.run("profile:sign-voucher", {
-      account: operatorAddress,
-      tokenUri: publishResult.url,
-    });
-
-    const Profile = await hre.ethers.getContractFactory("ThreeId_ProfilePicture");
-    const profile = await Profile.deploy(operatorAddress, maxPFPs, zeroVoucher);
-
-    await profile.deployed();
-
-    console.log("ThreeId_Invitations deployed to:", profile.address);
-
-    // Check stored contract address, prompt user to update secret.ts if
-    // not the same as the address of the contract that was just deployed.
-    const contractAddress = await hre.run("profile:contract");
-    if (contractAddress !== profile.address) {
-      console.log(chalk.red(`Profile contract address has changed! Please update secret.ts`));
-    }
-  });
 
 task("invite:deploy", "Deploy the invitation contract")
   .addOptionalParam("maxInvites", "Maximum number of invitations to allow", 10000, types.int)
@@ -979,8 +813,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_GOERLI.wallets[0].ownerKey,
-        NET_GOERLI.wallets[0].operatorKey,
+        NET_GOERLI.wallet.ownerKey,
+        NET_GOERLI.wallet.operatorKey,
       ],
     },
     rinkeby: {
@@ -991,8 +825,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_RINKEBY.wallets[0].ownerKey,
-        NET_RINKEBY.wallets[0].operatorKey,
+        NET_RINKEBY.wallet.ownerKey,
+        NET_RINKEBY.wallet.operatorKey,
       ],
     },
     mumbai: {
@@ -1003,8 +837,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MUMBAI.wallets[0].ownerKey,
-        NET_MUMBAI.wallets[0].operatorKey,
+        NET_MUMBAI.wallet.ownerKey,
+        NET_MUMBAI.wallet.operatorKey,
       ],
     },
     polygon: {
@@ -1015,8 +849,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_POLYGON.wallets[0].ownerKey,
-        NET_POLYGON.wallets[0].operatorKey,
+        NET_POLYGON.wallet.ownerKey,
+        NET_POLYGON.wallet.operatorKey,
       ],
     },
     mainnet: {
@@ -1027,8 +861,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MAINNET.wallets[0].ownerKey,
-        NET_MAINNET.wallets[0].operatorKey,
+        NET_MAINNET.wallet.ownerKey,
+        NET_MAINNET.wallet.operatorKey,
       ],
     }
   },

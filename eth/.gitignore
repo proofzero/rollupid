@@ -13,3 +13,4 @@ outputs
 
 # secrets
 secret.ts
+*.secret.ts
