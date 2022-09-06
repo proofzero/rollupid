@@ -117,6 +117,12 @@ subtask("profile:contract", "Return contract address for selected network")
     }
   });
 
+subtask("config:nftar", "Get the NFTar config")
+  .setAction(async (taskArgs, hre) => {
+    const config: ChainnetConfiguration = await hre.run("network:config");
+    return config.nftar;
+});
+
 subtask("config:account", "Return account address for selected network")
   .addParam("account", "An account name or address")
   .setAction(async (taskArgs, hre) => {
@@ -283,6 +289,41 @@ subtask("fetch:metadata", "Display the metadata for the invite")
         }
         console.error(message);
         reject(message);
+      });
+    });
+  });
+
+task("profile:generate-payload", "Call NFTar to get the custom NFT asset and voucher")
+  .setAction(async (taskArgs, hre) => {
+    return hre.run("config:nftar").then(async (config) => {
+      return new Promise((resolve, reject) => {
+        https.request(['https:/', config.host, 'api'].join('/'), {
+          method: "POST",
+          headers: {
+            'authorization': 'bearer ' + config.token
+          }
+        }, (res) => {
+          const { statusCode } = res;
+  
+          res.setEncoding('utf8');
+  
+          let rawData = '';
+          res.on('data', (chunk) => { rawData += chunk; });
+          res.on('end', () => {
+            const parsedData = JSON.parse(rawData);
+            console.log(JSON.stringify(parsedData));
+            resolve(parsedData);
+          });
+        }).on('error', (e) => {
+          let message;
+          if (e instanceof Error) {
+            message = e.message;
+          } else {
+            message = String(e);
+          }
+          console.error(message);
+          reject(message);
+        });
       });
     });
   });
@@ -938,8 +979,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_GOERLI.wallet.ownerKey,
-        NET_GOERLI.wallet.operatorKey,
+        NET_GOERLI.wallets[0].ownerKey,
+        NET_GOERLI.wallets[0].operatorKey,
       ],
     },
     rinkeby: {
@@ -950,8 +991,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_RINKEBY.wallet.ownerKey,
-        NET_RINKEBY.wallet.operatorKey,
+        NET_RINKEBY.wallets[0].ownerKey,
+        NET_RINKEBY.wallets[0].operatorKey,
       ],
     },
     mumbai: {
@@ -962,8 +1003,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MUMBAI.wallet.ownerKey,
-        NET_MUMBAI.wallet.operatorKey,
+        NET_MUMBAI.wallets[0].ownerKey,
+        NET_MUMBAI.wallets[0].operatorKey,
       ],
     },
     polygon: {
@@ -974,8 +1015,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_POLYGON.wallet.ownerKey,
-        NET_POLYGON.wallet.operatorKey,
+        NET_POLYGON.wallets[0].ownerKey,
+        NET_POLYGON.wallets[0].operatorKey,
       ],
     },
     mainnet: {
@@ -986,8 +1027,8 @@ const config: HardhatUserConfig = {
       // first account of the node is used.
       //from: "",
       accounts: [
-        NET_MAINNET.wallet.ownerKey,
-        NET_MAINNET.wallet.operatorKey,
+        NET_MAINNET.wallets[0].ownerKey,
+        NET_MAINNET.wallets[0].operatorKey,
       ],
     }
   },
