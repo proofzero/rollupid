@@ -27,6 +27,7 @@ import {
   // Types
   ChainnetConfiguration,
 } from "./profile.secret";
+import { request } from "http";
 
 // definitions
 // -----------------------------------------------------------------------------
@@ -222,12 +223,12 @@ subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
   });
 
 subtask("fetch:metadata", "Display the metadata for the profile")
-  .addParam("contract", "The invite contract address")
-  .addParam("invite", "The invitation # to check")
+  .addParam("contract", "The contract address")
+  .addParam("profileId", "The profile # to check")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const inviteId = taskArgs.invite;
-    const uri = await hre.run("call:tokenURI", { contract, inviteId });
+    const profileId = taskArgs.profileId;
+    const uri = await hre.run("call:tokenURI", { contract, profileId });
 
     // The uri looks something like ipfs://<cid>/metadata.json.
     const cid = (new URL(uri)).host;
@@ -258,14 +259,16 @@ subtask("fetch:metadata", "Display the metadata for the profile")
     });
   });
 
-task("profile:generate-payload", "Call NFTar to get the custom NFT asset and voucher")
+task("profile:generate-payload", "Call NFTar to get the custom NFT asset and signed voucher")
   .setAction(async (taskArgs, hre) => {
     return hre.run("config:nftar").then(async (config) => {
       return new Promise((resolve, reject) => {
-        https.request(['https:/', config.host, 'api'].join('/'), {
+        const url = ['https:/', config.host, 'api'].join('/');
+        const request = https.request(url, {
           method: "POST",
           headers: {
-            'authorization': 'bearer ' + config.token
+            'authorization': 'Bearer ' + config.token,
+            'content-type': 'application/json'
           }
         }, (res) => {
           const { statusCode } = res;
@@ -289,59 +292,22 @@ task("profile:generate-payload", "Call NFTar to get the custom NFT asset and vou
           console.error(message);
           reject(message);
         });
+
+        request.end(JSON.stringify({
+          jsonrpc: "2.0",
+          id: "1",
+          method: "3id_genPFP",
+          params: {
+            account: "0xd3C1D6adB70d95e51ECE01Ad5614bE8175C05786",
+            blockchain: {
+              name: "ethereum", 
+              chainId: 5
+            }
+          }
+        }));
       });
     });
   });
-
-// subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
-//   .addParam("inviteId", "The invite identifier (0-padded, 4 digits)")
-//   .addParam("inviteTier", "The name of the invitation issue")
-//   .addParam("issueDate", "The token issue data (UTC)")
-//   .addParam("outputFile", "Path to generated image asset", "", types.inputFile)
-//   .addParam("storageKey", "The API key for nft.storage")
-//   .setAction(async (taskArgs, hre) => {
-//     const inviteId = taskArgs.inviteId;
-//     const inviteTier = taskArgs.inviteTier;
-//     const issueDate = taskArgs.issueDate;
-//     const outputFile = taskArgs.outputFile;
-//     const storageKey = taskArgs.storageKey;
-//     const baseName = path.basename(outputFile);
-
-//     const client = new NFTStorage({
-//       token: storageKey,
-//     });
-
-//     // Utility to title-case a string.
-//     const titleCase = (s: String) => {
-//       return s.charAt(0).toUpperCase() + s.slice(1);
-//     };
-
-//     const metadata = {
-//       name: `3ID Invite #${inviteId}`,
-//       description: `${titleCase(inviteTier)} 3ID Invite`,
-//       image: new File(
-//         [await fs.promises.readFile(outputFile)],
-//         baseName,
-//         { type: 'image/svg+xml' },
-//       ),
-//       properties: {
-//         inviteId,
-//         inviteTier,
-//         issueDate,
-//       }
-//     }
-
-//     const result = await client.store(metadata);
-
-//     return {
-//       // IPFS URL of the metadata
-//       url: result.url,
-//       // The metadata.json contents
-//       metadata: result.data,
-//       // metadata.json contents with IPFS gateway URLs
-//       embed: result.embed(),
-//     };
-//   });
 
 // TASKS
 // -----------------------------------------------------------------------------
@@ -508,61 +474,61 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
     };
   });
 
-task("profile:sign-voucher", "Sign an profile voucher")
-  .addParam("account", "The account address")
-  // .addParam("profile", "The profile number to award")
-  .setAction(async (taskArgs, hre) => {
-    // This lets us use an account alias from secret.ts to sign a voucher.
-    const recipient = await hre.run("config:account", { account: taskArgs.account });
-    const uri = taskArgs.tokenUri;
+// task("profile:sign-voucher", "Sign a profile voucher")
+//   .addParam("account", "The account address")
+//   // .addParam("profile", "The profile number to award")
+//   .setAction(async (taskArgs, hre) => {
+//     // This lets us use an account alias from secret.ts to sign a voucher.
+//     const recipient = await hre.run("config:account", { account: taskArgs.account });
+//     const uri = taskArgs.tokenUri;
 
-    // TODO: const domain = await owner.domain owner._signingDomain()
+//     // TODO: const domain = await owner.domain owner._signingDomain()
 
-    // 66 bytes of abi.encodePacked keccak256.
-    // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
-    // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
-    const message = hre.ethers.utils.solidityKeccak256(
-      [ "address", "string" ],
-      [ recipient, uri ]
-    );
-    // console.log('message: ' + message)
-    // console.log('message: ' + message.length)
+//     // 66 bytes of abi.encodePacked keccak256.
+//     // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
+//     // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
+//     const message = hre.ethers.utils.solidityKeccak256(
+//       [ "address", "string" ],
+//       [ recipient, uri ]
+//     );
+//     // console.log('message: ' + message)
+//     // console.log('message: ' + message.length)
 
-    // 32 bytes of data in Uint8Array
-    const messageHashBinary = hre.ethers.utils.arrayify(message);
-    // console.log('messageHashBinary.length: ' + messageHashBinary.length)
+//     // 32 bytes of data in Uint8Array
+//     const messageHashBinary = hre.ethers.utils.arrayify(message);
+//     // console.log('messageHashBinary.length: ' + messageHashBinary.length)
 
-    // From Ethers docs:
-    // NB: A signed message is prefixed with "\x19Ethereum Signed
-    // Message:\n" and the length of the message, using the hashMessage
-    // method, so that it is EIP-191 compliant. If recovering the
-    // address in Solidity, this prefix will be required to create a
-    // matching hash.
+//     // From Ethers docs:
+//     // NB: A signed message is prefixed with "\x19Ethereum Signed
+//     // Message:\n" and the length of the message, using the hashMessage
+//     // method, so that it is EIP-191 compliant. If recovering the
+//     // address in Solidity, this prefix will be required to create a
+//     // matching hash.
 
-    // Sign 32 byte digest, with the above prefix.
-    const operatorKey = await hre.run("config:operator:privateKey");
-    const operator = new hre.ethers.Wallet(operatorKey);
-    const signature = await operator.signMessage(messageHashBinary);
+//     // Sign 32 byte digest, with the above prefix.
+//     const operatorKey = await hre.run("config:operator:privateKey");
+//     const operator = new hre.ethers.Wallet(operatorKey);
+//     const signature = await operator.signMessage(messageHashBinary);
 
-    // Construct the voucher.
-    const voucher = {
-      recipient,
-      uri,
-      // messageHash: message,
-      signature
-    };
+//     // Construct the voucher.
+//     const voucher = {
+//       recipient,
+//       uri,
+//       // messageHash: message,
+//       signature
+//     };
 
-    // Sanity check the recovery address matches operator address.
-    await hre.run("check:recovery", {
-      messageHashBinary,
-      signature,
-      operatorAddress: operator.address
-    });
+//     // Sanity check the recovery address matches operator address.
+//     await hre.run("check:recovery", {
+//       messageHashBinary,
+//       signature,
+//       operatorAddress: operator.address
+//     });
 
-    console.log('signed voucher: ', voucher);
+//     console.log('signed voucher: ', voucher);
 
-    return voucher
-});
+//     return voucher
+// });
 
 task("profile:deploy", "Deploy the PFP contract")
   .addOptionalParam("maxProfiles", "Maximum number of profiles to allow", 1000, types.int)
