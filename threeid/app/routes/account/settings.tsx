@@ -8,10 +8,12 @@ export const links = () => {
 
 export const loader: LoaderFunction = () => {
   //* TODO: fetch user's profile here and pass to component
+  return null;
 };
 
 export const action: ActionFunction = ({ request }) => {
   //* TODO: update user's profile information
+  return null;
 };
 
 export type Profile = {
