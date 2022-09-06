@@ -1,7 +1,17 @@
+import type { LoaderFunction, ActionFunction } from "@remix-run/cloudflare";
+
 import styles from "~/styles/settings.css";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
+};
+
+export const loader: LoaderFunction = () => {
+  //* TODO: fetch user's profile here and pass to component
+};
+
+export const action: ActionFunction = ({ request }) => {
+  //* TODO: update user's profile information
 };
 
 export type Profile = {
@@ -35,73 +45,85 @@ export default function Settings() {
     email: "",
   };
   return (
-    <div>
-      <div>
-        <div>Profile</div>
-        <button className="button textButton"> Save all Changes </button>
+    <div className="view flex-1 bg-white">
+      <div className="view flex-row justify-between items-start">
+        <div className="settings-header">Profile</div>
+        <div className="button">
+          <button className="textButton"> Save all Changes </button>
+        </div>
       </div>
       <div className="view">
-        <div>
-          <div>
-            <div> Nickname </div>
-            <div>
-              <div>
-                <input type="text" defaultValue={"Nickname"} />
-              </div>
+        <div className="view flex-row">
+          <div className="view flex-1">
+            <label> Nickname </label>
+            <div className="view">
+              <input
+                className="textInput"
+                type="text"
+                defaultValue={"Your Nickname"}
+              />
             </div>
           </div>
         </div>
 
-        <div className="view">
-          <div>
-            <div> Job </div>
-            <div>
-              <div>
-                <input type="text" defaultValue={"Job"} />
-              </div>
+        <div className="view flex-row">
+          <div className="view flex-1">
+            <label> Job </label>
+            <div className="view">
+              <input
+                className="textInput"
+                type="text"
+                defaultValue={"Your job"}
+              />
             </div>
           </div>
         </div>
 
-        <div className="view">
-          <div>
+        <div className="view flex-row">
+          <div className="view flex-1">
             <div> Location </div>
-            <div>
-              <div>
-                <input type="text" defaultValue={"Location"} />
-              </div>
+            <div className="view">
+              <input
+                className="textInput"
+                type="text"
+                defaultValue={"Your location"}
+              />
             </div>
           </div>
         </div>
 
-        <div className="view">
-          <div>
+        <div className="view flex-row">
+          <div className="view flex-1">
             <div> Website </div>
-            <div>
-              <div>
-                <input type="text" defaultValue={"Website"} />
-              </div>
+            <div className="view">
+              <input
+                className="textInput"
+                type="text"
+                defaultValue={"Website"}
+              />
             </div>
           </div>
         </div>
 
-        <div className="view">
-          <div>
+        <div className="view flex-row">
+          <div className="view flex-1">
             <div> Email </div>
-            <div>
-              <div>
-                <input type="text" defaultValue={"hello"} />
-              </div>
+            <div className="view">
+              <input
+                className="textInput"
+                type="text"
+                defaultValue={"Your email"}
+              />
             </div>
           </div>
         </div>
 
-        <div className="view">
-          <div>
+        <div className="view flex-row">
+          <div className="view flex-1">
             <div> Bio </div>
-            <div>
+            <div className="view">
               <div>
-                <textarea className="textInput" defaultValue={"hello"} />
+                <textarea defaultValue={"hello"} />
               </div>
             </div>
           </div>
