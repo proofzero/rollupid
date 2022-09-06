@@ -6,7 +6,7 @@ import {
 import { useEffect } from "react";
 import { useNavigate } from "@remix-run/react";
 
-import Spinner from "~/components/spinner";
+import Spinner from "~/components/spinner/index";
 import MetamaskSVG from '~/components/metamask-svg';
 
 export default function AuthIndex() {
