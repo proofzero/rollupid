@@ -125,7 +125,7 @@ subtask("config:account", "Return account address for selected network")
     }
   });
 
-subtask("config:alchemyURL", "Return alchemy invite application URL")
+subtask("config:alchemyURL", "Return alchemy application URL")
   .setAction(async (taskArgs, hre) => {
     const config: ChainnetConfiguration = await hre.run("network:config");
     // NB: This dereference will fail for localhost -- no alchemy config.
@@ -153,7 +153,7 @@ subtask("config:owner:privateKey", "Return owner wallet private key")
   });
 
 subtask("call:maxPFPs", `Return result of ThreeId_ProfilePicture.maxProfiles()`)
-  .addParam("contract", "The address of the invite contract")
+  .addParam("contract", "The address of the contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
     const profile = await hre.ethers.getContractAt('ThreeId_ProfilePicture', contract);
@@ -162,28 +162,28 @@ subtask("call:maxPFPs", `Return result of ThreeId_ProfilePicture.maxProfiles()`)
 
 subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract')
   .addParam("contract", "The address of the contract")
-  .addParam("inviteId", "The invitation number")
+  .addParam("profileId", "The profile number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
     const contractName = "ThreeId_ProfilePicture";
-    const inviteId = taskArgs.inviteId;
-    const invite = await hre.ethers.getContractAt(contractName, contract);
-    return invite.ownerOf(inviteId);
+    const profileId = taskArgs.profileId;
+    const profile = await hre.ethers.getContractAt(contractName, contract);
+    return profile.ownerOf(profileId);
   });
 
 subtask("call:tokenURI", 'Return result of tokenURI(tokenId) on the given contract')
   .addParam("contract", "The address of the contract")
-  .addParam("inviteId", "The invitation number")
+  .addParam("profileId", "The profile number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
     const contractName = "ThreeId_ProfilePicture";
-    const inviteId = taskArgs.inviteId;
-    const invite = await hre.ethers.getContractAt(contractName, contract);
-    return invite.tokenURI(inviteId);
+    const profileId = taskArgs.profileId;
+    const profile = await hre.ethers.getContractAt(contractName, contract);
+    return profile.tokenURI(profileId);
   });
 
 subtask("call:nextProfile", "Return the ID of next profile")
-  .addParam("contract", "The address of the invite contract")
+  .addParam("contract", "The address of the contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
     const contractName = "ThreeId_ProfilePicture";
@@ -221,7 +221,7 @@ subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
     return url;
   });
 
-subtask("fetch:metadata", "Display the metadata for the invite")
+subtask("fetch:metadata", "Display the metadata for the profile")
   .addParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
@@ -456,7 +456,7 @@ task("profile:image", "Print the image URL for a PFP")
     const metadata = await hre.run("fetch:metadata", { contract, profileId });
     const ipfsURL = new URL(metadata.image);
     const cid = ipfsURL.host;
-    const path = `/invite-${metadata.properties.inviteId}.svg`;
+    const path = '/threeid.png';
 
     const imageURL = await hre.run("storage:url", { cid, path });
 
