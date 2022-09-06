@@ -15,7 +15,7 @@ import {
  import { createUserSession } from "~/utils/session.server";
 
  import BaseButton, { links as buttonLinks } from "~/components/base-button";
- import Spinner from "~/components/spinner";
+ import Spinner from "~/components/spinner/index";
 
 
  export const links = () => [
