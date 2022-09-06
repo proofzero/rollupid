@@ -1,4 +1,4 @@
-// eth/hardhat.config.ts
+// eth/invite.config.ts
 
 import * as cheerio from "cheerio";
 import * as path from "path";
@@ -30,9 +30,6 @@ import {
 
 // definitions
 // -----------------------------------------------------------------------------
-
-// The names of the various contracts.
-const CONTRACT_NAMES = ["ThreeId_Invitations", "ThreeId_ProfilePicture"];
 
 // The location for generated assets.
 const OUTPUT_DIR = path.resolve("outputs");
@@ -159,14 +156,6 @@ subtask("config:owner:privateKey", "Return owner wallet private key")
     return config.wallet.ownerKey;
   });
 
-subtask("call:maxPFPs", `Return result of ThreeId_ProfilePicture.maxProfiles()`)
-  .addParam("contract", "The address of the invite contract")
-  .setAction(async (taskArgs, hre) => {
-    const contract = taskArgs.contract;
-    const profile = await hre.ethers.getContractAt('ThreeId_ProfilePicture', contract);
-    return profile.maxProfiles();
-  });
-
 subtask("call:maxInvites", `Return result of ThreeId_Invitations.maxInvites()`)
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
@@ -180,7 +169,7 @@ subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const contractName = CONTRACT_NAMES[0];
+    const contractName = "ThreeId_Invitations";
     const inviteId = taskArgs.inviteId;
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.ownerOf(inviteId);
@@ -191,26 +180,17 @@ subtask("call:tokenURI", 'Return result of tokenURI(tokenId) on the given contra
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const contractName = CONTRACT_NAMES[0];
+    const contractName = "ThreeId_Invitations";
     const inviteId = taskArgs.inviteId;
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.tokenURI(inviteId);
-  });
-
-subtask("call:nextProfile", "Return the ID of next profile")
-  .addParam("contract", "The address of the invite contract")
-  .setAction(async (taskArgs, hre) => {
-    const contract = taskArgs.contract;
-    const contractName = CONTRACT_NAMES[1];
-    const profile = await hre.ethers.getContractAt(contractName, contract);
-    return profile.nextPFP();
   });
 
 subtask("call:nextInvite", "Return the ID of next invitation")
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const contractName = CONTRACT_NAMES[0];
+    const contractName = "ThreeId_Invitations";
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.nextInvite();
   });
@@ -227,7 +207,7 @@ subtask("call:awardInvite", "Mint invitation NFT")
     // HAXX
     const voucher = JSON.parse(taskArgs.voucher);
 
-    const contractName = CONTRACT_NAMES[0];
+    const contractName = "ThreeId_Invitations";
 
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.awardInvite(account, voucher);
@@ -706,7 +686,7 @@ task("invite:destroy", "Send the selfdestruct message to a given contract")
   .setAction(async (taskArgs, hre) => {
     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
     const account = await hre.run("config:account", { account: taskArgs.account });
-    const contractName = CONTRACT_NAMES[0]
+    const contractName = "ThreeId_Invitations";
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.destructor(account);
   })
