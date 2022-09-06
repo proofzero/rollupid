@@ -55,7 +55,7 @@ const subNavigation = [
   { name: 'NFT Gallery', href: '#', icon: SquaresPlusIcon, current: false },
   { name: 'KYC', href: '#', icon: HiOutlineKey, current: false },
   { name: '0xAuth', href: '#', icon: HiOutlineKey, current: false },
-  { name: 'Settings', href: '#', icon: HiOutlineCog, current: false },
+  { name: 'Settings', href: 'account/settings', icon: HiOutlineCog, current: false },
 ]
 
 function classNames(...classes) {

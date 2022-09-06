@@ -1,0 +1,74 @@
+.textInput {
+  height: 26;
+  border-width: 1;
+  border-color: "#D1D5DB";
+  padding-top: "1em";
+  padding-bottom: "1em";
+  padding-left: 36;
+  font-family: "Inter400_Regular";
+  font-style: "normal";
+  font-size: 16;
+  line-height: 24;
+  box-shadow: 2 2 "#D1D5DB";
+  color: "#6B7280";
+}
+
+textarea {
+  height: 66;
+  padding-left: 5;
+  box-shadow: 2 2 "#D1D5DB";
+  border-width: 1;
+  border-color: "#D1D5DB";
+  font-family: "Inter400_Regular";
+  font-style: "normal";
+  font-size: 16;
+  line-height: 24;
+  color: "#6B7280";
+  resizemode: "vertical";
+}
+
+.view {
+  border-width: 0.5;
+  border-color: "#0f0f0f";
+  padding: 50;
+  justify-content: "center";
+}
+
+label {
+  font-family: "Inter_500Medium";
+  font-size: 14;
+  font-weight: "500";
+  line-height: 20;
+  color: "#374151";
+  padding-bottom: 7;
+}
+
+.text {
+  font-family: "Inter_700Bold";
+  font-size: 12;
+  font-weight: "700";
+  line-height: 12;
+  color: "#1F2937";
+}
+
+.textButton {
+  font-family: "Manrope_700Bold";
+  font-size: 16;
+  font-weight: "700";
+  line-height: 22;
+  color: "white";
+}
+
+button {
+  display: "flex";
+  flex-direction: "row";
+  justify-content: "center";
+  align-items: "center";
+  padding-left: 13.5;
+  padding-right: 13.5;
+  padding-top: 14;
+  padding-bottom: 14;
+  background-color: "#192030";
+  max-width: "100%";
+  height: 48;
+}
