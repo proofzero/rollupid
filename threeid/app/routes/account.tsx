@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { Link, useLoaderData, useSubmit } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
 
@@ -87,9 +87,9 @@ export default function AccountLayout() {
                 <aside className="py-6 lg:col-span-3">
                   <nav className="space-y-1">
                     {subNavigation.map((item) => (
-                      <a
+                      <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.href}
                         className={classNames(
                           item.current
                             ? 'bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700'
@@ -108,7 +108,7 @@ export default function AccountLayout() {
                           aria-hidden="true"
                         />
                         <span className="truncate">{item.name}</span>
-                      </a>
+                      </Link>
                     ))}
                   </nav>
                 </aside>
