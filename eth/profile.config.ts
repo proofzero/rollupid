@@ -191,23 +191,23 @@ subtask("call:nextProfile", "Return the ID of next profile")
     return profile.nextPFP();
   });
 
-subtask("call:awardInvite", "Mint invitation NFT")
-  .addParam("account", "The address of the invitee")
-  .addParam("contract", "The invite smart contract address")
-  .addParam("tokenUri", "The URI to set for the invitation")
-  .addParam("voucher", "The signed voucher")
-  .setAction(async (taskArgs, hre) => {
-    const account = await hre.run("config:account", { account: taskArgs.account });
-    const contract = taskArgs.contract;
-    const tokenURI = taskArgs.tokenUri;
-    // HAXX
-    const voucher = JSON.parse(taskArgs.voucher);
+// subtask("call:awardInvite", "Mint invitation NFT")
+//   .addParam("account", "The address of the invitee")
+//   .addParam("contract", "The invite smart contract address")
+//   .addParam("tokenUri", "The URI to set for the invitation")
+//   .addParam("voucher", "The signed voucher")
+//   .setAction(async (taskArgs, hre) => {
+//     const account = await hre.run("config:account", { account: taskArgs.account });
+//     const contract = taskArgs.contract;
+//     const tokenURI = taskArgs.tokenUri;
+//     // HAXX
+//     const voucher = JSON.parse(taskArgs.voucher);
 
-    const contractName = "ThreeId_Invitations";
+//     const contractName = "ThreeId_Invitations";
 
-    const invite = await hre.ethers.getContractAt(contractName, contract);
-    return invite.awardInvite(account, voucher);
-  });
+//     const invite = await hre.ethers.getContractAt(contractName, contract);
+//     return invite.awardInvite(account, voucher);
+//   });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
   .addParam("cid", "The CID for content stored in IPFS")
@@ -444,7 +444,7 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
   });
 
 task("profile:maximum", "Return maximum number of profiles")
-  .addOptionalParam("contract", "The invite contract address")
+  .addOptionalParam("contract", "The profile contract address")
   .setAction(async (taskArgs, hre) => {
     const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
     const maxPFPs = await hre.run("call:maxPFPs", { contract });
@@ -453,7 +453,7 @@ task("profile:maximum", "Return maximum number of profiles")
   });
 
 task("profile:next", "Return ID of next profile that will be awarded")
-  .addOptionalParam("contract", "The invite contract address")
+  .addOptionalParam("contract", "The profile contract address")
   .setAction(async (taskArgs, hre) => {
     const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
     const nextProfile = await hre.run("call:nextProfile", { contract });
