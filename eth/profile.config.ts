@@ -191,23 +191,24 @@ subtask("call:nextProfile", "Return the ID of next profile")
     return profile.nextPFP();
   });
 
-// subtask("call:awardInvite", "Mint invitation NFT")
-//   .addParam("account", "The address of the invitee")
-//   .addParam("contract", "The invite smart contract address")
-//   .addParam("tokenUri", "The URI to set for the invitation")
-//   .addParam("voucher", "The signed voucher")
-//   .setAction(async (taskArgs, hre) => {
-//     const account = await hre.run("config:account", { account: taskArgs.account });
-//     const contract = taskArgs.contract;
-//     const tokenURI = taskArgs.tokenUri;
-//     // HAXX
-//     const voucher = JSON.parse(taskArgs.voucher);
+subtask("call:awardProfile", "Mint PFP NFT")
+  .addParam("account", "The address for which to generate a profile picture")
+  .addParam("contract", "The profile smart contract address")
+  .addParam("tokenUri", "The URI to set for the PFP")
+  .addParam("voucher", "The signed voucher")
+  .setAction(async (taskArgs, hre) => {
+    const account = await hre.run("config:account", { account: taskArgs.account });
+    const contract = taskArgs.contract;
+    const tokenURI = taskArgs.tokenUri;
+    
+    // HAXX
+    const voucher = JSON.parse(taskArgs.voucher);
 
-//     const contractName = "ThreeId_Invitations";
+    const contractName = "ThreeId_ProfilePicture";
 
-//     const invite = await hre.ethers.getContractAt(contractName, contract);
-//     return invite.awardInvite(account, voucher);
-//   });
+    const profile = await hre.ethers.getContractAt(contractName, contract);
+    return profile.awardPFP(account, voucher);
+  });
 
 subtask("storage:url", "Returns IPFS gateway URL instance for CID and path")
   .addParam("cid", "The CID for content stored in IPFS")
@@ -291,48 +292,6 @@ task("profile:generate-payload", "Call NFTar to get the custom NFT asset and vou
       });
     });
   });
-
-// subtask("invite:generate-nft-asset", "Generate custom NFT image asset")
-//   .addParam("inviteId", "The invite identifier (0-padded, 4 digits)")
-//   .addParam("issueDate", "Date of issue for the token")
-//   .addParam("assetFile", "Path to SVG asset template")
-//   .addParam("outputFile", "Path to the output SVG asset file")
-//   .setAction(async (taskArgs, hre) => {
-//     const inviteId = taskArgs.inviteId;
-//     const issueDate = taskArgs.issueDate;
-//     const assetFile = taskArgs.assetFile;
-//     const outputFile = taskArgs.outputFile;
-
-//     return fs.promises.readFile(assetFile, 'utf8')
-//       .then(data => {
-//         // Parse the SVG XML data and return a query context.
-//         return cheerio.load(data, {
-//           xml: {},
-//         });
-//       })
-//       .then(($) => {
-//         /*
-//         <svg>
-//           ...
-//           <text id="ISSUED">04/20/2022</text>
-//           <text id="NUMBER">#6969</text>
-//         </svg>
-//         */
-//         // Set the issue date.
-//         $('#ISSUED').text(issueDate);
-//         // Set the invite identifier.
-//         $('#NUMBER').text(`#${inviteId}`);
-
-//         const svgText = $.root().html();
-//         if (null === svgText) {
-//           throw "empty SVG document generated";
-//         }
-//         return svgText.trim();
-//       })
-//       .then(svgText => {
-//         return fs.promises.writeFile(outputFile, svgText);
-//       })
-//   });
 
 // subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
 //   .addParam("inviteId", "The invite identifier (0-padded, 4 digits)")
@@ -461,103 +420,48 @@ task("profile:next", "Return ID of next profile that will be awarded")
     console.log(`> next profile is #${nextProfile.toString().padStart(4, "0")}`);
   });
 
-// task("invite:owner", "Return owner of an invite")
-//   .addOptionalParam("contract", "The invite contract address")
-//   .addParam("invite", "The invitation # to check")
-//   .setAction(async (taskArgs, hre) => {
-//     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-//     const inviteId = taskArgs.invite;
+task("profile:owner", "Return owner of a profile")
+  .addOptionalParam("contract", "The contract address")
+  .addParam("profileId", "The profile # to check")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const profileId = taskArgs.profileId;
 
-//     const owner = await hre.run("call:ownerOf", { contract, inviteId });
+    const owner = await hre.run("call:ownerOf", { contract, profileId });
 
-//     console.log(chalk.red("OWNER"));
-//     console.log(chalk.green("-> contract:"), contract);
-//     console.log(chalk.green("->   invite:"), `#${inviteId.toString().padStart(4, "0")}`);
-//     console.log(chalk.green("->    owner:"), owner);
-//   });
+    console.log(chalk.red("OWNER"));
+    console.log(chalk.green("-> contract:"), contract);
+    console.log(chalk.green("->  profile:"), `#${profileId.toString().padStart(4, "0")}`);
+    console.log(chalk.green("->    owner:"), owner);
+  });
 
-// task("invite:metadata", "Display the metadata for an invitation")
-//   .addOptionalParam("contract", "The invite contract address")
-//   .addParam("invite", "The invitation # to check")
-//   .setAction(async (taskArgs, hre) => {
-//     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-//     const invite = taskArgs.invite;
+task("profile:metadata", "Display the metadata for a profile picture")
+  .addOptionalParam("contract", "The contract address")
+  .addParam("profileId", "The profile # to check")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const profileId = taskArgs.profileId;
 
-//     const metadata = await hre.run("fetch:metadata", { contract, invite });
-//     console.log(metadata);
-//   });
+    const metadata = await hre.run("fetch:metadata", { contract, profileId });
+    console.log(metadata);
+  });
 
-// task("invite:image", "Print the image URL for an invitation")
-//   .addOptionalParam("contract", "The invite contract address")
-//   .addParam("invite", "The invitation # to check")
-//   .setAction(async (taskArgs, hre) => {
-//     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-//     const invite = taskArgs.invite;
+task("profile:image", "Print the image URL for a PFP")
+  .addOptionalParam("contract", "The contract address")
+  .addParam("profileId", "The profile # to check")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const profileId = taskArgs.profileId;
 
-//     const metadata = await hre.run("fetch:metadata", { contract, invite });
-//     const ipfsURL = new URL(metadata.image);
-//     const cid = ipfsURL.host;
-//     const path = `/invite-${metadata.properties.inviteId}.svg`;
+    const metadata = await hre.run("fetch:metadata", { contract, profileId });
+    const ipfsURL = new URL(metadata.image);
+    const cid = ipfsURL.host;
+    const path = `/invite-${metadata.properties.inviteId}.svg`;
 
-//     const imageURL = await hre.run("storage:url", { cid, path });
+    const imageURL = await hre.run("storage:url", { cid, path });
 
-//     console.log(imageURL.href);
-//   });
-
-// task("invite:premint", "Store the reserved invitation (#0000) asset")
-//   .addParam("assetFile", "Path to SVG membership card template", "./assets/3ID_NFT_CARD_NO_BG.svg", types.inputFile)
-//   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
-//   .addOptionalParam("inviteId", "Invitation ID for the reserved preminted invite", "0000")
-//   .setAction(async (taskArgs, hre) => {
-//     // Location of generated asset files.
-//     const outputDir = taskArgs.outputDir;
-
-//     // Get the API key for nft.storage.
-//     const storageKey = await hre.run("config:storageKey");
-
-//     // Ensure output directory exists.
-//     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
-
-//     // This is written into the NFT metadata and indicates which batch
-//     // of invitations we're minting.
-//     const inviteTier = INVITE_TIER;
-
-//     // Returns ms since epoch if valid date string, or NaN if invalid
-//     // date string. We format it as an ISO 8601 date string in UTC.
-//     const issueDateParsed = Date.now();
-//     const issueDate = new Intl.DateTimeFormat('utc').format(issueDateParsed);
-
-//     const inviteId = taskArgs.inviteId;
-
-//     // When parameter type is types.inputFile the existence of file is
-//     // validated already.
-//     const assetFile = taskArgs.assetFile;
-
-//     // Path the output SVG file that we will generate from the template.
-//     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
-
-//     // Write an SVG asset file as outputFile.
-//     const generateResult = await hre.run("invite:generate-nft-asset", {
-//       inviteId,
-//       issueDate,
-//       assetFile,
-//       outputFile
-//     });
-//     // Publish the generated asset to our storage provider.
-//     const publishResult = await hre.run("invite:publish-nft-storage", {
-//       storageKey,
-//       inviteId,
-//       inviteTier,
-//       issueDate,
-//       outputFile,
-//     });
-
-//     // The output URL should be entered into deploy.ts script for
-//     // injection into the contract when it is deployed.
-//     //console.log(publishResult.url);
-
-//     return publishResult;
-//   });
+    console.log(imageURL.href);
+  });
 
 subtask("check:operator", "Check that operator address and wallet private key match")
   .setAction(async (taskArgs, hre) => {
@@ -695,7 +599,7 @@ task("profile:deploy", "Deploy the PFP contract")
 
     await profile.deployed();
 
-    console.log("ThreeId_Invitations deployed to:", profile.address);
+    console.log("ThreeId_ProfilePicture deployed to:", profile.address);
 
     // Check stored contract address, prompt user to update secret.ts if
     // not the same as the address of the contract that was just deployed.
@@ -705,100 +609,16 @@ task("profile:deploy", "Deploy the PFP contract")
     }
   });
 
-// task("invite:destroy", "Send the selfdestruct message to a given contract")
-//   .addOptionalParam("contract", "The invite contract address")
-//   .addParam("account", "The account address to which we transfer contract contents (must be operator)")
-//   .setAction(async (taskArgs, hre) => {
-//     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-//     const account = await hre.run("config:account", { account: taskArgs.account });
-//     const contractName = "ThreeId_Invitations";
-//     const invite = await hre.ethers.getContractAt(contractName, contract);
-//     return invite.destructor(account);
-//   })
-
-// task("invite:award", "Mint an invite for an account")
-//   .addOptionalParam("contract", "The invite contract address")
-//   .addParam("account", "The account address")
-//   .addParam("assetFile", "Path to SVG membership card template", "./assets/3ID_NFT_CARD_NO_BG.svg", types.inputFile)
-//   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
-//   .setAction(async (taskArgs, hre) => {
-//     // The invitation smart contract address.
-//     const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-//     // The recipient address for the invitation.
-//     const account = await hre.run("config:account", { account: taskArgs.account });
-//     // Location of generated asset files.
-//     const outputDir = taskArgs.outputDir;
-
-//     // Get the API key for nft.storage.
-//     const storageKey = await hre.run("config:storageKey");
-
-//     // Ensure output directory exists.
-//     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
-
-//     // This is written into the NFT metadata and indicates which batch
-//     // of invitations we're minting.
-//     const inviteTier = INVITE_TIER;
-
-//     // Returns ms since epoch if valid date string, or NaN if invalid
-//     // date string. We format it as an ISO 8601 date string in UTC.
-//     const issueDateParsed = Date.now();
-//     const issueDate = new Intl.DateTimeFormat('utc').format(issueDateParsed);
-
-//     // Get the tokenId of the next invitation.
-//     // **WARNING** potential race condition here!
-//     const nextInvite = await hre.run("call:nextInvite", { contract });
-//     // Token identifiers are integers in the range [0,1000). Convert to
-//     // a zero-padded 4-digit string.
-//     const inviteId = nextInvite.toString().padStart(4, "0");
-
-//     // When parameter type is types.inputFile the existence of file is
-//     // validated already.
-//     const assetFile = taskArgs.assetFile;
-
-//     // Path the output SVG file that we will generate from the template.
-//     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
-
-//     // Write an SVG asset file as outputFile.
-//     const generateResult = await hre.run("invite:generate-nft-asset", {
-//       inviteId,
-//       issueDate,
-//       assetFile,
-//       outputFile
-//     });
-
-//     // Publish the generated asset to our storage provider.
-//     const publishResult = await hre.run("invite:publish-nft-storage", {
-//       storageKey,
-//       inviteId,
-//       inviteTier,
-//       issueDate,
-//       outputFile,
-//     });
-
-//     // Create and sign a voucher
-//     const voucher = await hre.run("invite:sign-voucher", {
-//       account,
-//       tokenUri: publishResult.url,
-//       invite: inviteId,
-//     });
-
-//     // Call our contract to award the invite.
-//     const awardResult = await hre.run("call:awardInvite", {
-//       account,
-//       contract,
-//       tokenUri: publishResult.url,
-//       voucher: JSON.stringify(voucher),
-//     });
-
-//     console.log(chalk.red("AWARDED INVITE"));
-//     console.log(chalk.green("-> contract:"), contract);
-//     console.log(chalk.green("->  invitee:"), account);
-//     console.log(chalk.green("-> metadata:"), publishResult.url);
-//     console.log(chalk.green("->   invite:"), `#${inviteId}`);
-//     console.log(chalk.green("->   issued:"), `${issueDate}Z`);
-//     console.log(chalk.green("->     tier:"), inviteTier);
-//     console.log(chalk.green("->    asset:"), outputFile);
-//   });
+task("profile:destroy", "Send the selfdestruct message to a given contract")
+  .addOptionalParam("contract", "The contract address")
+  .addParam("account", "The account address to which we transfer contract contents (must be operator)")
+  .setAction(async (taskArgs, hre) => {
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
+    const account = await hre.run("config:account", { account: taskArgs.account });
+    const contractName = "ThreeId_ProfilePicture";
+    const profile = await hre.ethers.getContractAt(contractName, contract);
+    return profile.destructor(account);
+  });
 
 // config
 // -----------------------------------------------------------------------------
