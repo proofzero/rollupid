@@ -17,7 +17,7 @@ const AccordionComponent = ({ content }: options) => {
   const [imageCss, setImageCss] = useState({
     width: "14",
     height: "7",
-    transform: content.defaultExpanded ? "rotate(0deg)" : "rotate(180deg)",
+    transform: expanded ? "rotate(0deg)" : "rotate(180deg)",
   });
 
   useEffect(() => {
