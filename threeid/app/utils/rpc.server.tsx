@@ -27,7 +27,7 @@ export async function oortSend(method: string, params: any[], address: string, j
     }
 
     //@ts-ignore
-    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}${address ? `/${address}` : ''}/jsonrpc`, {
+    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}${address ? `/@${address}` : ''}/jsonrpc`, {
         method: "POST",
         headers,
         body: JSON.stringify({

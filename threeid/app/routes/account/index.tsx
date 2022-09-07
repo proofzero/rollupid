@@ -38,15 +38,40 @@ export default function Welcome() {
 
   // TODO: port over welcome screen
   return (
-    <>
-      <div>welcome!</div>
-      <button
+    <div className="dashboard flex flex-col">
+      <div className="welcome-banner basis-full">
+        <h1>Welcome to 3ID!</h1>
+        <p>The app is currently in beta. We will be unlocking new features on weekly basis. 
+            Please follow us on Twitter and join our Discord to stay updated! </p>
+        <div className="flex flex-row">
+          <a href="https://twitter.com/threeid.xyz">Twitter</a>
+          <a href="https://discord.gg/threeid">Discord</a>
+        </div>
+      </div>
+      <div className="flex flex-col lg:flex-row">
+        
+        <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
+          <h2 className="order">Invite Friends</h2>
+          <div className="faq hidden lg:block">
+            <h2>FAQ</h2>
+          </div>
+        </div>
+        <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
+          <h2>Roadmap</h2>
+
+        </div>
+        <div className="faq basis-full lg:basis-6/12 lg:hidden order-3">
+          <h2>faq</h2>
+
+        </div>
+      </div>
+      {/* <button
         onClick={() =>
           submit(null, { method: "post", action: `/auth/signout/` })
         }
       >
         Sign Out
-      </button>
-    </>
+      </button> */}
+    </div>
   );
 }
