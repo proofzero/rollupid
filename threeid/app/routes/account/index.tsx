@@ -55,8 +55,9 @@ export default function Welcome() {
         
         <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
           <h2 className="order">Invite Friends</h2>
+          {inviteCode && <div>Invite code: {inviteCode}</div>}
           <div className="faq hidden lg:block">
-            <FAQ account={address} inviteCode={inviteCode}/>
+            <FAQ account={address}/>
           </div>
         </div>
         <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
@@ -64,7 +65,7 @@ export default function Welcome() {
 
         </div>
         <div className="faq basis-full lg:basis-6/12 lg:hidden order-3">
-          <h2>faq</h2>
+        <FAQ account={address}/>
 
         </div>
       </div>

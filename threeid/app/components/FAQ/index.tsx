@@ -3,17 +3,18 @@ import AccordionHowToUse from "./AccordionHowToUse";
 import AccordionSellInvite from "./AccordionSellInvite";
 import AccordionWhatIsPFP from "./AccordionWhatIsPFP";
 
+import styles from "./FAQ.css";
+
+export const links = () => [{ rel: "stylesheet", href: styles }];
+
 type Account = {
   account: undefined | null | string;
-  inviteCode: string | undefined;
 };
 
-const FAQ = ({ account, inviteCode }: Account) => {
+const FAQ = ({ account }: Account) => {
   return (
     <div>
-      {inviteCode && <div>Invite code: {inviteCode}</div>}
-
-      <div>FAQ</div>
+      <h2 className="faq-header">FAQ</h2>
 
       <AccordionHowToUse account={account} defaultExpanded={true} />
       <AccordionSellInvite defaultExpanded={false} />
