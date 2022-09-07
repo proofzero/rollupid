@@ -13,7 +13,7 @@ jobs:
       dapp: ${{ steps.changes.outputs.dapp }}
       www: ${{ steps.changes.outputs.www }}
       ext: ${{ steps.changes.outputs.ext }}
-      threeid: ${{ steps.changes.outputs.three-id }}
+      threeid: ${{ steps.changes.outputs.threeid }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -25,7 +25,7 @@ jobs:
             dapp: 'dapp/**'
             www: 'www/**'
             ext: 'ext/**'
-            three-id: 'threeid/**'
+            threeid: 'threeid/**'
 
   # To detect lint errors across namespaces in your project, a cache is
   # needed. A cache will be created at .clj-kondo/ when you run

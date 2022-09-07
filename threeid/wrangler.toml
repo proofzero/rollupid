@@ -33,7 +33,6 @@ name = "three-id-next"
 # vars = { ENVIRONMENT = "next" }
 route = { pattern = "next.dapp.threeid.xyz"}
 
-
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
