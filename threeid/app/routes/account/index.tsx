@@ -3,10 +3,11 @@ import { json, redirect } from "@remix-run/cloudflare";
 import { useLoaderData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
-
+import { Tooltip } from "flowbite-react";
 
 import { getUserSession } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
+import datadogRum from "~/utils/datadog.client";
 
 import FAQ from "~/components/FAQ";
 
@@ -141,7 +142,7 @@ export default function Welcome() {
             <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
                 <div className="roadmap-ready__step step grid grid-cols-6" key={index}>
-                  <img src={stepComplete} alt="3ID logo" className="row-span-2 mt-2" />
+                  <img src={stepComplete} alt="3ID logo" className="row-span-2 mt-1" />
                   <p className="col-span-5">{step.title}</p>
                   <p className="col-span-5">Completed</p>
                 </div>
@@ -153,7 +154,7 @@ export default function Welcome() {
             <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
                 <div className="roadmap-next__step step grid grid-cols-6" key={index}>
-                  <img src={stepSoon} alt="3ID logo" className="row-span-2 mt-2" />
+                  <img src={stepSoon} alt="3ID logo" className="row-span-2 mt-1" />
                   <p className="col-span-5">{step.title}</p>
                   <p className="col-span-5">{step.description}</p>
                 </div>
@@ -166,15 +167,28 @@ export default function Welcome() {
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div className="roadmap-vote__step step grid grid-cols-6" key={index}>
-                  <button className="roadmap-vote__button row-span-2 mt-2"
-                      disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
-                      onClick={() => { 
-                        // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
-                        // ReactTooltip.show(upvoteButtons[index]) 
-                      }}
-                    >
-                      <FaCaretUp />
-                  </button>
+                  <Tooltip content="Vote submitted!" trigger="click" animation="duration-1000">
+                    <button className="roadmap-vote__button row-span-2 mt-1"
+                        disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
+                        onClick={(e) => { 
+                          console.log("click", e);
+                          setTimeout(() => {
+                            e.target.dispatchEvent(new MouseEvent("click", {
+                              "view": window,
+                              "bubbles": true,
+                              "cancelable": false
+                          }));
+                          }, 1500);
+                          featureVotes.add(step.title)
+                          setFeatureVotes(new Set(featureVotes))
+                          datadogRum.addAction('featureVote', {
+                            'value': step.title,
+                          })
+                        }}
+                      >
+                        <FaCaretUp />
+                    </button>
+                  </Tooltip>
                   <p className="col-span-5">{step.title}</p>
                 </div>
               ))}
