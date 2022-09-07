@@ -9,35 +9,35 @@ main = "./build/index.js"
 # per-user deployments, which should use individual user's account ID to
 # keep development activities separate from production infra, hopefully
 # avoiding accidents.
-account_id = "{{admin/account-id}}"
+# It can also be specified through the CLOUDFLARE_ACCOUNT_ID environment variable.
+# account_id = "{{admin/account-id}}"
 
 [site]
   bucket = "./public"
 
 [build]
-  command = "npm run sass && npm run build"
+  command = "npm run generate:css && npm run sass && npm run build"
 
-# Whether or not the worker should be deployed to *.workers.dev. Can use
-# either route or workers_dev, but not both.
-workers_dev = true
 [env.development]
-name = "three-id"
-account_id = "{{dev/account-id}}"
-vars = { ENVIRONMENT = "development" }
 # Whether or not the worker should be deployed to *.workers.dev. Can use
 # either route or workers_dev, but not both.
 workers_dev = true
+name = "three-id-dev"
+# account_id = "{{dev/account-id}}"
+# vars = { ENVIRONMENT = "development" }
 
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]
 name = "three-id-next"
-vars = { ENVIRONMENT = "next" }
+# vars = { ENVIRONMENT = "next" }
+route = { pattern = "next.dapp.threeid.xyz"}
 
 
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
 name = "three-id-current"
-vars = { ENVIRONMENT = "current" }
+# vars = { ENVIRONMENT = "current" }
+route = { pattern = "dapp.threeid.xyz" }
 

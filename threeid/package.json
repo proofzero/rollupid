@@ -3,14 +3,15 @@
   "sideEffects": false,
   "scripts": {
     "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
+    "dev:generate:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "build": "remix build",
     "dev:build": "NODE_ENV=development remix build",
     "dev:sass": "sass --watch app/:app/",
     "sass": "sass app/:app/",
-    "deploy": "npm run build && wrangler publish",
+    "deploy": "wrangler publish",
     "dev:remix": "remix watch",
     "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
-    "dev": "concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
+    "dev": "NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
     "start": "cross-env NODE_ENV=currents miniflare ./build/index.js"
   },
   "dependencies": {
