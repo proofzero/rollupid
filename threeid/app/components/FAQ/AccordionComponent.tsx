@@ -10,8 +10,6 @@ type options = {
   };
 };
 
-const imageCss = { height: "100%" };
-
 const AccordionComponent = ({ content }: options) => {
   const [expanded, setExpanded] = useState(content.defaultExpanded);
   const [imageCss, setImageCss] = useState({
