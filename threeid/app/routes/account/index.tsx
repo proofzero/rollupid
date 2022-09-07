@@ -10,6 +10,7 @@ import { oortSend } from "~/utils/rpc.server";
 import datadogRum from "~/utils/datadog.client";
 
 import FAQ from "~/components/FAQ";
+import InviteCode from "~/components/invite-code";
 
 import logo from "~/assets/three-id-logo.svg";
 import stepComplete from "~/assets/step_complete.png";
@@ -31,7 +32,7 @@ export const loader = async ({ request, params }) => {
   if (inviteCodeRes.error || votesRes.error) {
     return redirect(`/error`);
   }
-  const [inviteCode, votes] = [inviteCodeRes.result.code, votesRes.result];
+  const [inviteCode, votes] = [inviteCodeRes.result, votesRes.result];
 
   return json({
     inviteCode,
@@ -126,8 +127,7 @@ export default function Welcome() {
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
-          <h2 className="order">Invite Friends</h2>
-          {inviteCode && <div>Invite code: {inviteCode}</div>}
+         <InviteCode invite={inviteCode}/>
           <div className="faq hidden lg:block">
             <FAQ account={address}/>
           </div>
