@@ -297,7 +297,7 @@ task("profile:generate-payload", "Call NFTar to get the custom NFT asset and sig
           res.on('data', (chunk) => { rawData += chunk; });
           res.on('end', () => {
             const parsedData = JSON.parse(rawData);
-            console.log(JSON.stringify(parsedData));
+            // console.log(JSON.stringify(parsedData));
             resolve(parsedData);
           });
         }).on('error', (e) => {
@@ -549,13 +549,13 @@ task("profile:destroy", "Send the selfdestruct message to a given contract")
   });
 
 task("profile:mint", "Mint a profile for an account")
-  // .addOptionalParam("contract", "The contract address")
+  .addOptionalParam("contract", "The contract address")
   .addParam("account", "The recipient account address")
   .setAction(async (taskArgs, hre) => {
-    // The invitation smart contract address.
-    // const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    // The smart contract address.
+    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
 
-    // The recipient address for the invitation.
+    // The recipient address for the PFP.
     const account = await hre.run("config:account", { account: taskArgs.account });
 
     // Create the profile asset
@@ -563,24 +563,30 @@ task("profile:mint", "Mint a profile for an account")
       account,
     });
 
-    console.log(JSON.stringify(profilePicturePayload));
+    let voucher = profilePicturePayload.result.voucher;
+    voucher.signature = profilePicturePayload.result.signature.signature;
 
-    // Call our contract to award the invite.
-    // const awardResult = await hre.run("call:awardProfile", {
-    //   account,
-    //   contract,
-    //   tokenUri: publishResult.url,
-    //   voucher: JSON.stringify(voucher),
-    // });
+    // console.log(profilePicturePayload.result.metadata.image);
+    // console.log(profilePicturePayload.result.voucher.account);
+    // console.log(profilePicturePayload.result.voucher.tokenURI);
+    // console.log(profilePicturePayload.result.signature.signature);
 
-    // console.log(chalk.red("AWARDED INVITE"));
-    // console.log(chalk.green("-> contract:"), contract);
-    // console.log(chalk.green("->  invitee:"), account);
-    // console.log(chalk.green("-> metadata:"), publishResult.url);
-    // console.log(chalk.green("->   invite:"), `#${inviteId}`);
-    // console.log(chalk.green("->   issued:"), `${issueDate}Z`);
-    // console.log(chalk.green("->     tier:"), inviteTier);
-    // console.log(chalk.green("->    asset:"), outputFile);
+    // console.log(JSON.stringify(voucher));
+
+    // Call our contract to award the profile.
+    const awardResult = await hre.run("call:awardProfile", {
+      account,
+      contract,
+      tokenUri: profilePicturePayload.result.voucher.tokenURI,
+      voucher: JSON.stringify(voucher),
+    });
+
+    console.log(JSON.stringify(awardResult));
+
+    // console.log(chalk.red("AWARDED PROFILE PICTURE"));
+    console.log(chalk.green("->  contract:"), contract);
+    console.log(chalk.green("-> recipient:"), account);
+    console.log(chalk.green("->  metadata:"), profilePicturePayload.result.voucher.tokenURI);
   });
 
   // config
