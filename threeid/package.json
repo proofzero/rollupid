@@ -11,7 +11,7 @@
     "deploy": "wrangler publish",
     "dev:remix": "remix watch",
     "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
-    "dev": "NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
+    "dev": "cross-env NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
     "start": "cross-env NODE_ENV=currents miniflare ./build/index.js"
   },
   "dependencies": {
