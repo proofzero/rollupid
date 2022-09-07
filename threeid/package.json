@@ -2,14 +2,16 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
+    "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
     "build": "remix build",
-    "sass": "sass --watch app/:app/",
-    "deploy": "wrangler publish",
+    "dev:build": "NODE_ENV=development remix build",
+    "dev:sass": "sass --watch app/:app/",
+    "sass": "sass app/:app/",
+    "deploy": "npm run build && wrangler publish",
     "dev:remix": "remix watch",
     "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
-    "dev": "concurrently \"npm run generate:css\" \"npm run sass\" \"remix build && run-p \"dev:*\"\"",
-    "start": "cross-env NODE_ENV=production miniflare ./build/index.js"
+    "dev": "concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
+    "start": "cross-env NODE_ENV=currents miniflare ./build/index.js"
   },
   "dependencies": {
     "@datadog/browser-rum": "^4.19.0",
@@ -34,6 +36,7 @@
     "@cloudflare/workers-types": "3.14.1",
     "@remix-run/dev": "1.7.0",
     "@remix-run/eslint-config": "1.7.0",
+    "@remix-run/serve": "^1.7.0",
     "@types/react": "17.0.47",
     "@types/react-dom": "17.0.17",
     "autoprefixer": "^10.4.8",

@@ -181,7 +181,7 @@ export default function Welcome() {
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div className="roadmap-vote__step step grid grid-cols-6" key={index}>
-                  <Tooltip content={3 - featureVotes.size ? "Vote submitted!": "Already submitted" } trigger="click" animation="duration-1000">
+                  <Tooltip content={3 - featureVotes.size ? "Vote submitted!": "Already submitted"} trigger="click" animation="duration-1000">
                     <button className="roadmap-vote__button row-span-2 mt-1"
                         disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
                         onClick={(e) => { 

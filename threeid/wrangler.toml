@@ -1,12 +1,43 @@
-name = "remix-cloudflare-workers"
-
-workers_dev = true
-main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
+
+# name = "remix-cloudflare-workers"
+
+main = "./build/index.js"
+
+# Account ID for admin@kubelt.com (staging and production). Override for
+# per-user deployments, which should use individual user's account ID to
+# keep development activities separate from production infra, hopefully
+# avoiding accidents.
+account_id = "{{admin/account-id}}"
 
 [site]
   bucket = "./public"
 
 [build]
-  command = "npm run build"
+  command = "npm run sass && npm run build"
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+[env.development]
+name = "three-id"
+account_id = "{{dev/account-id}}"
+vars = { ENVIRONMENT = "development" }
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+
+# next (staging)
+# ------------------------------------------------------------------------------
+[env.next]
+name = "three-id-next"
+vars = { ENVIRONMENT = "next" }
+
+
+# current (production)
+# ------------------------------------------------------------------------------
+[env.current]
+name = "three-id-current"
+vars = { ENVIRONMENT = "current" }
+
