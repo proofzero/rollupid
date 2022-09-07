@@ -39,6 +39,5 @@ export async function oortSend(method: string, params: any[], address: string, j
     });
 
     const json = await response.json();
-    console.log(json)
     return json;
 }

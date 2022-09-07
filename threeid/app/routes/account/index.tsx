@@ -1,7 +1,7 @@
 import { json, redirect } from "@remix-run/cloudflare";
 
-import { useLoaderData, useSubmit } from "@remix-run/react";
-import { useState } from "react";
+import { useFetcher, useLoaderData, useSubmit, useFetchers } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
 import { Tooltip } from "flowbite-react";
 
@@ -40,6 +40,16 @@ export const loader = async ({ request, params }) => {
     address
   });
 };
+
+export const action = async ({ request }) => {
+  const votes = (await request.formData()).get("votes");
+  const session = await getUserSession(request);
+  const jwt = session.get("jwt");
+  const address = session.get("address");
+
+  oortSend("kb_setData", ["3id.app", "feature_vote_count", votes], address, jwt, request.headers.get("Cookie"));
+  return json({ votes });
+}
 
 const completeSteps = [
   {
@@ -110,9 +120,13 @@ export default function Welcome() {
   const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
-  console.log("votes", votes);
+  const currentVotes = JSON.parse(votes.value)
 
-  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>(votes.value || []));
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>(currentVotes || []));
+
+  useEffect(() => {
+    submit({"votes": JSON.stringify(Array.from(featureVotes))}, {method: "POST"})
+  }, [featureVotes])
 
   return (
     <div className="dashboard flex flex-col gap-4">
@@ -167,11 +181,10 @@ export default function Welcome() {
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div className="roadmap-vote__step step grid grid-cols-6" key={index}>
-                  <Tooltip content="Vote submitted!" trigger="click" animation="duration-1000">
+                  <Tooltip content={3 - featureVotes.size ? "Vote submitted!": "Already submitted" } trigger="click" animation="duration-1000">
                     <button className="roadmap-vote__button row-span-2 mt-1"
                         disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
                         onClick={(e) => { 
-                          console.log("click", e);
                           setTimeout(() => {
                             e.target.dispatchEvent(new MouseEvent("click", {
                               "view": window,
