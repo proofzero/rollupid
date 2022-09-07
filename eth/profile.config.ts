@@ -260,7 +260,25 @@ subtask("fetch:metadata", "Display the metadata for the profile")
   });
 
 task("profile:generate-payload", "Call NFTar to get the custom NFT asset and signed voucher")
+  .addParam("account", "The recipient wallet address")
   .setAction(async (taskArgs, hre) => {
+    const account = await hre.run("config:account", { account: taskArgs.account });
+
+    // Currently 'ethereum' is required by NFTar.
+    let chainName = 'ethereum';
+    let chainId = hre.network.config.chainId;
+
+    // If we're testing locally, force an arbitrary ethereum testnet.
+    if (hre.network.name == 'localhost') {
+      chainId = GOERLI_CHAIN_ID;
+    }
+
+    // These will cause NFTar to error, but this is more correct.
+    // Most correct would be NFTar accepting chain and network names.
+    if (hre.network.name == 'mumbai' || hre.network.name == 'polygon') {
+      chainName = 'polygon';
+    }
+
     return hre.run("config:nftar").then(async (config) => {
       return new Promise((resolve, reject) => {
         const url = ['https:/', config.host, 'api'].join('/');
@@ -298,10 +316,10 @@ task("profile:generate-payload", "Call NFTar to get the custom NFT asset and sig
           id: "1",
           method: "3id_genPFP",
           params: {
-            account: "0xd3C1D6adB70d95e51ECE01Ad5614bE8175C05786",
+            account: account,
             blockchain: {
-              name: "ethereum", 
-              chainId: 5
+              name: chainName, // Currently only 'ethereum' is accepted by NFTar.
+              chainId: chainId,
             }
           }
         }));
@@ -474,62 +492,6 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
     };
   });
 
-// task("profile:sign-voucher", "Sign a profile voucher")
-//   .addParam("account", "The account address")
-//   // .addParam("profile", "The profile number to award")
-//   .setAction(async (taskArgs, hre) => {
-//     // This lets us use an account alias from secret.ts to sign a voucher.
-//     const recipient = await hre.run("config:account", { account: taskArgs.account });
-//     const uri = taskArgs.tokenUri;
-
-//     // TODO: const domain = await owner.domain owner._signingDomain()
-
-//     // 66 bytes of abi.encodePacked keccak256.
-//     // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
-//     // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
-//     const message = hre.ethers.utils.solidityKeccak256(
-//       [ "address", "string" ],
-//       [ recipient, uri ]
-//     );
-//     // console.log('message: ' + message)
-//     // console.log('message: ' + message.length)
-
-//     // 32 bytes of data in Uint8Array
-//     const messageHashBinary = hre.ethers.utils.arrayify(message);
-//     // console.log('messageHashBinary.length: ' + messageHashBinary.length)
-
-//     // From Ethers docs:
-//     // NB: A signed message is prefixed with "\x19Ethereum Signed
-//     // Message:\n" and the length of the message, using the hashMessage
-//     // method, so that it is EIP-191 compliant. If recovering the
-//     // address in Solidity, this prefix will be required to create a
-//     // matching hash.
-
-//     // Sign 32 byte digest, with the above prefix.
-//     const operatorKey = await hre.run("config:operator:privateKey");
-//     const operator = new hre.ethers.Wallet(operatorKey);
-//     const signature = await operator.signMessage(messageHashBinary);
-
-//     // Construct the voucher.
-//     const voucher = {
-//       recipient,
-//       uri,
-//       // messageHash: message,
-//       signature
-//     };
-
-//     // Sanity check the recovery address matches operator address.
-//     await hre.run("check:recovery", {
-//       messageHashBinary,
-//       signature,
-//       operatorAddress: operator.address
-//     });
-
-//     console.log('signed voucher: ', voucher);
-
-//     return voucher
-// });
-
 task("profile:deploy", "Deploy the PFP contract")
   .addOptionalParam("maxProfiles", "Maximum number of profiles to allow", 1000, types.int)
   .setAction(async (taskArgs, hre) => {
@@ -586,7 +548,42 @@ task("profile:destroy", "Send the selfdestruct message to a given contract")
     return profile.destructor(account);
   });
 
-// config
+task("profile:mint", "Mint a profile for an account")
+  // .addOptionalParam("contract", "The contract address")
+  .addParam("account", "The recipient account address")
+  .setAction(async (taskArgs, hre) => {
+    // The invitation smart contract address.
+    // const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+
+    // The recipient address for the invitation.
+    const account = await hre.run("config:account", { account: taskArgs.account });
+
+    // Create the profile asset
+    const profilePicturePayload = await hre.run("profile:generate-payload", {
+      account,
+    });
+
+    console.log(JSON.stringify(profilePicturePayload));
+
+    // Call our contract to award the invite.
+    // const awardResult = await hre.run("call:awardProfile", {
+    //   account,
+    //   contract,
+    //   tokenUri: publishResult.url,
+    //   voucher: JSON.stringify(voucher),
+    // });
+
+    // console.log(chalk.red("AWARDED INVITE"));
+    // console.log(chalk.green("-> contract:"), contract);
+    // console.log(chalk.green("->  invitee:"), account);
+    // console.log(chalk.green("-> metadata:"), publishResult.url);
+    // console.log(chalk.green("->   invite:"), `#${inviteId}`);
+    // console.log(chalk.green("->   issued:"), `${issueDate}Z`);
+    // console.log(chalk.green("->     tier:"), inviteTier);
+    // console.log(chalk.green("->    asset:"), outputFile);
+  });
+
+  // config
 // -----------------------------------------------------------------------------
 
 const config: HardhatUserConfig = {
