@@ -273,6 +273,9 @@ jobs:
       CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
     steps:
       - uses: actions/checkout@v2
+      - run: npm install
+        with:
+          workingDirectory: 'threeid'
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
