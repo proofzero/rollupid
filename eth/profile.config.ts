@@ -204,10 +204,12 @@ subtask("call:awardProfile", "Mint PFP NFT")
     
     // HAXX
     const voucher = JSON.parse(taskArgs.voucher);
+    console.log(voucher);
 
     const contractName = "ThreeId_ProfilePicture";
 
     const profile = await hre.ethers.getContractAt(contractName, contract);
+    console.log('got here')
     return profile.awardPFP(account, voucher);
   });
 
@@ -502,28 +504,11 @@ task("profile:deploy", "Deploy the PFP contract")
     // Inject into contract to limit the number of profiles that can be minted.
     const maxPFPs = taskArgs.maxProfiles;
 
-    // The voucher recipient should be the "operator" account.
+    // The "operator" account so we can register it for the contract's OPERATOR_ROLE.
     const operatorAddress = await hre.run("config:account", { account: "operator" });
 
-    // When network is localhost, use an already baked asset for the premint.
-    let publishResult;
-    if (hre.network.name == 'localhost') {
-      publishResult = {
-        url: "ipfs://bafyreigtb2quz6kcyix5dw5cknfarhosz4t43ze4egvt2ufoybjhgy6qty/metadata.json",
-      };
-    } else {
-      // The URL of the published asset.
-      publishResult = await hre.run("profile:premint", {});
-    }
-
-    // Create and sign a voucher.
-    const zeroVoucher = await hre.run("profile:sign-voucher", {
-      account: operatorAddress,
-      tokenUri: publishResult.url,
-    });
-
     const Profile = await hre.ethers.getContractFactory("ThreeId_ProfilePicture");
-    const profile = await Profile.deploy(operatorAddress, maxPFPs, zeroVoucher);
+    const profile = await Profile.deploy(operatorAddress, maxPFPs);
 
     await profile.deployed();
 
@@ -533,7 +518,7 @@ task("profile:deploy", "Deploy the PFP contract")
     // not the same as the address of the contract that was just deployed.
     const contractAddress = await hre.run("profile:contract");
     if (contractAddress !== profile.address) {
-      console.log(chalk.red(`Profile contract address has changed! Please update secret.ts`));
+      console.log(chalk.red(`Profile contract address has changed! Please update profile.secret.ts`));
     }
   });
 
@@ -563,9 +548,14 @@ task("profile:mint", "Mint a profile for an account")
       account,
     });
 
-    let voucher = profilePicturePayload.result.voucher;
-    voucher.signature = profilePicturePayload.result.signature.signature;
+    const voucher = {
+      recipient: profilePicturePayload.result.voucher.account,
+      uri: profilePicturePayload.result.voucher.tokenURI,
+      signature: profilePicturePayload.result.signature.signature
+    };
 
+    // let voucher = profilePicturePayload.result.voucher;
+    // voucher.signature = profilePicturePayload.result.signature.signature;
     // console.log(profilePicturePayload.result.metadata.image);
     // console.log(profilePicturePayload.result.voucher.account);
     // console.log(profilePicturePayload.result.voucher.tokenURI);
@@ -581,9 +571,9 @@ task("profile:mint", "Mint a profile for an account")
       voucher: JSON.stringify(voucher),
     });
 
-    console.log(JSON.stringify(awardResult));
+    // console.log(JSON.stringify(awardResult));
 
-    // console.log(chalk.red("AWARDED PROFILE PICTURE"));
+    console.log(chalk.red("AWARDED PROFILE PICTURE"));
     console.log(chalk.green("->  contract:"), contract);
     console.log(chalk.green("-> recipient:"), account);
     console.log(chalk.green("->  metadata:"), profilePicturePayload.result.voucher.tokenURI);

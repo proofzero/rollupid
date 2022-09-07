@@ -676,7 +676,7 @@ task("invite:deploy", "Deploy the invitation contract")
     // deployed.
     const contractAddress = await hre.run("invite:contract");
     if (contractAddress !== invite.address) {
-      console.log(chalk.red(`Invite contract address has changed! Please update secret.ts`));
+      console.log(chalk.red(`Invite contract address has changed! Please update invite.secret.ts`));
     }
   });
 

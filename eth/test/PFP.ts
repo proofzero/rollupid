@@ -37,7 +37,7 @@ describe("Profile Pictures", function () {
     const voucher = await signVoucher(operator, 'https://example.com', operator);
 
     const Profile = await ethers.getContractFactory("ThreeId_ProfilePicture");
-    const pfp = await Profile.deploy(operator.address, maxPFPs, voucher);
+    const pfp = await Profile.deploy(operator.address, maxPFPs);
 
     return { pfp, voucher, owner, operator };
   }

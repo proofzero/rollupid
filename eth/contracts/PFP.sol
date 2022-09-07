@@ -46,9 +46,8 @@ contract ThreeId_ProfilePicture is
      *
      * @param minter the operator address that can mint new profiles
      * @param maxPFPs the maximum allowed number of profiles
-     * @param voucher the voucher for the reserved zeroth profile
      */
-    constructor(address minter, uint maxPFPs, NFTVoucher memory voucher) ERC721("3ID Profile Picture", "PFP") {
+    constructor(address minter, uint maxPFPs) ERC721("3ID Profile Picture", "PFP") {
         _setupRole(OPERATOR_ROLE, minter);
         _operator = minter;
         _maxPFPs = maxPFPs;
