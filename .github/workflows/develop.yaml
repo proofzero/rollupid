@@ -260,7 +260,7 @@ jobs:
     if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
     env:
-      ENVIROMENT: "development"
+      ENVIRONMENT: "development"
       SESSION_SECRET: "secret"
       # These values are injected into the generated wrangler.toml.
       ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
