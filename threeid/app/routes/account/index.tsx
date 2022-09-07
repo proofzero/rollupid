@@ -5,6 +5,8 @@ import { useLoaderData, useSubmit } from "@remix-run/react";
 import { getUserSession } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
+import FAQ from "~/components/FAQ";
+
 import logo from "~/assets/three-id-logo.svg";
 import stepComplete from "~/assets/step_complete.png";
 import stepSoon from "~/assets/step_soon.png";
@@ -30,6 +32,7 @@ export const loader = async ({ request, params }) => {
   return json({
     inviteCode,
     votes,
+    address
   });
 };
 
@@ -99,7 +102,7 @@ const percentage =
 
 
 export default function Welcome() {
-  const { inviteCode, votes } = useLoaderData();
+  const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
 
@@ -120,8 +123,9 @@ export default function Welcome() {
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
           <h2 className="order">Invite Friends</h2>
+          {inviteCode && <div>Invite code: {inviteCode}</div>}
           <div className="faq hidden lg:block">
-            <h2>FAQ</h2>
+            <FAQ account={address}/>
           </div>
         </div>
         <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
@@ -168,7 +172,7 @@ export default function Welcome() {
 
         </div>
         <div className="faq basis-full lg:basis-6/12 lg:hidden order-3">
-          <h2>faq</h2>
+        <FAQ account={address}/>
 
         </div>
       </div>

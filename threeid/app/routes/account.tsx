@@ -33,10 +33,12 @@ import { oortSend } from "~/utils/rpc.server";
 import styles from "~/styles/account.css";
 import HeadNav from "~/components/head-nav";
 import { links as buttonStyles } from "~/components/base-button";
+import { links as faqStyles } from "~/components/FAQ"
 
 export function links() {
   return [
     ...buttonStyles(),
+    ...faqStyles(),
     { rel: "stylesheet", href: styles },
   ];
 }

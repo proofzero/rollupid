@@ -1,0 +1,19 @@
+.dropdown {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.faq-header {
+  font-weight: bold;
+  font-size: large;
+}
+
+.faq-header-question {
+    font-weight: bold;
+  }
+
+.faq-header-image {
+  height: 100%;
+}
