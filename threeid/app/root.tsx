@@ -51,7 +51,7 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        <LiveReload port={8002}/>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(
