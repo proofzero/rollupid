@@ -95,7 +95,7 @@ subtask("profile:contract", "Return contract address for selected network")
       return contract;
     } else {
       const config: ChainnetConfiguration = await hre.run("network:config");
-      return config.profile_contract;
+      return config.contract;
     }
   });
 
