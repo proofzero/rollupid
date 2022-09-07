@@ -1,6 +1,9 @@
 import { json, redirect } from "@remix-run/cloudflare";
 
 import { useLoaderData, useSubmit } from "@remix-run/react";
+import { useState } from "react";
+import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
+
 
 import { getUserSession } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
@@ -106,10 +109,10 @@ export default function Welcome() {
   const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
+  console.log("votes", votes);
 
-  // TODO: sort out layout component
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>(votes.value || []));
 
-  // TODO: port over welcome screen
   return (
     <div className="dashboard flex flex-col gap-4">
       <div className="welcome-banner basis-full">
@@ -135,7 +138,7 @@ export default function Welcome() {
           </div>
           <div className="roadmap-ready">
             <h3>Ready</h3>
-            <div className="roadmap-ready__steps steps">
+            <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
                 <div className="roadmap-ready__step step grid grid-cols-6" key={index}>
                   <img src={stepComplete} alt="3ID logo" className="row-span-2 mt-2" />
@@ -147,7 +150,7 @@ export default function Welcome() {
           </div>
           <div className="roadmap-next">
             <h3>COMING NEXT</h3>
-            <div className="roadmap-next__steps steps">
+            <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
                 <div className="roadmap-next__step step grid grid-cols-6" key={index}>
                   <img src={stepSoon} alt="3ID logo" className="row-span-2 mt-2" />
@@ -159,11 +162,19 @@ export default function Welcome() {
           </div>
           <div className="roadmap-vote">
             <h3>TELL US WHAT'S NEXT</h3>
-            <p>Vote for your favorite features ({3 - votes.size} votes left)</p>
-            <div className="roadmap-vote__steps steps">
+            <p>Vote for your favorite features ({3 - featureVotes.size} votes left)</p>
+            <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div className="roadmap-vote__step step grid grid-cols-6" key={index}>
-                  <img src={logo} alt="3ID logo" className="row-span-2 mt-2" />
+                  <button className="roadmap-vote__button row-span-2 mt-2"
+                      disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
+                      onClick={() => { 
+                        // upvoteButtons.map((ref, i) => ReactTooltip.hide(ref))
+                        // ReactTooltip.show(upvoteButtons[index]) 
+                      }}
+                    >
+                      <FaCaretUp />
+                  </button>
                   <p className="col-span-5">{step.title}</p>
                 </div>
               ))}
