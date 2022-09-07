@@ -33,5 +33,5 @@ export const loader: LoaderFunction = async ({
   };
 
 export default function OAuth3 ()  {
-    
+    return <div>OAuth3</div>
 }
