@@ -34,9 +34,11 @@ import styles from "~/styles/account.css";
 import HeadNav from "~/components/head-nav";
 import { links as buttonStyles } from "~/components/base-button";
 import { links as faqStyles } from "~/components/FAQ"
+import { links as invCodeStyles } from "~/components/invite-code"
 
 export function links() {
   return [
+    ...invCodeStyles(),
     ...buttonStyles(),
     ...faqStyles(),
     { rel: "stylesheet", href: styles },
