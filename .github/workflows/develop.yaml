@@ -282,6 +282,7 @@ jobs:
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
             DATADOG_ENV
+            DATADOG_SERVICE_NAME
         env:
           ENVIRONMENT: "development"
           SESSION_SECRET: "secret"
@@ -292,6 +293,7 @@ jobs:
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENV: development
+          DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
