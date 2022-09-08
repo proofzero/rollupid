@@ -263,11 +263,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
-        working-directory: threeid
         with:
           node-version: lts/gallium
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: threeid/package-lock.json
       - run: npm install
         working-directory: threeid
       - name: Publish
