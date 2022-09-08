@@ -69,6 +69,7 @@ jobs:
             OORT_SCHEMA
             OORT_PORT
         env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
