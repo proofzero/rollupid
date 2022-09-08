@@ -53,7 +53,6 @@ jobs:
           command: publish --env next
           environment: "next"
           secrets: |
-            ENVIRONMENT
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -63,7 +62,6 @@ jobs:
             OORT_SCHEMA
             OORT_PORT
         env:
-          ENVIRONMENT: "next"
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
