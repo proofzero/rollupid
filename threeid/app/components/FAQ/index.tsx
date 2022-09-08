@@ -51,7 +51,7 @@ const contents = [
     question: "What is my the 3ID PFP?",
     answer: (
       <div>
-        <p className="answer-text my-4">
+        <div className="answer-text my-4">
           {" "}
           <p>
             Your 3ID gradient PFP is a soulbound avatar made up of 4 color
@@ -84,7 +84,7 @@ const contents = [
             bound to your identity. More generations of this PFP will be
             released corresponding with every major version of 3ID.
           </p>
-        </p>
+        </div>
       </div>
     ),
   },
