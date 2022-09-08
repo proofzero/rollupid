@@ -3,8 +3,8 @@ import { useLoaderData, useSubmit } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
 
-import { Fragment, useState  } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { Fragment, useState } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 
 import {
   HiOutlineBell,
@@ -24,7 +24,7 @@ import {
   Bars3Icon,
   SquaresPlusIcon,
   XMarkIcon,
-} from '@heroicons/react/24/outline'
+} from "@heroicons/react/24/outline";
 
 import { getUserSession } from "~/utils/session.server";
 
@@ -33,8 +33,9 @@ import { oortSend } from "~/utils/rpc.server";
 import styles from "~/styles/account.css";
 import HeadNav from "~/components/head-nav";
 import { links as buttonStyles } from "~/components/base-button";
-import { links as faqStyles } from "~/components/FAQ"
-import { links as invCodeStyles } from "~/components/invite-code"
+import { links as faqStyles } from "~/components/FAQ";
+import { links as invCodeStyles } from "~/components/invite-code";
+import ConditionalTooltip from "~/components/conditional-tooltip";
 
 export function links() {
   return [
@@ -52,45 +53,51 @@ export const loader = async ({ request }) => {
     return redirect("/auth");
   }
   // gate with invites only
-  const claimsRes = await oortSend("kb_getCoreClaims", 
-      [], 
-      session.get("address"), // TODO: remove when RPC url is changed
-      session.get("jwt"),
-      request.headers.get("Cookie")
-  )
+  const claimsRes = await oortSend(
+    "kb_getCoreClaims",
+    [],
+    session.get("address"), // TODO: remove when RPC url is changed
+    session.get("jwt"),
+    request.headers.get("Cookie")
+  );
 
   if (!claimsRes.result.includes("3id.enter")) {
-      return redirect(`/auth/gate/${session.get("address")}`)
+    return redirect(`/auth/gate/${session.get("address")}`);
   }
   return null;
 };
 
 const subNavigation = [
-  { name: 'Dashboard', href: '#', icon: HiOutlineHome, current: true },
-  { name: 'NFT Gallery', href: '#', icon: SquaresPlusIcon, current: false },
-  { name: 'KYC', href: '#', icon: HiOutlineKey, current: false },
-  { name: '0xAuth', href: '#', icon: HiOutlineKey, current: false },
-  { name: 'Settings', href: '#', icon: HiOutlineCog, current: false },
-]
+  {
+    name: "Dashboard",
+    href: "#",
+    icon: HiOutlineHome,
+    current: true,
+    exists: true,
+  },
+  { name: "NFT Gallery", href: "#", icon: SquaresPlusIcon, current: false },
+  { name: "KYC", href: "#", icon: HiOutlineKey, current: false },
+  { name: "0xAuth", href: "#", icon: HiOutlineKey, current: false },
+  { name: "Settings", href: "#", icon: HiOutlineCog, current: false },
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
-
 
 export default function AccountLayout() {
   useLoaderData();
   let submit = useSubmit();
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // TODO: sort out layout component
 
   // TODO: port over welcome screen
 
-  return (<>
-    <div className="min-h-full">
+  return (
+    <>
+      <div className="min-h-full">
         <div className="header">
           <HeadNav />
         </div>
@@ -102,28 +109,36 @@ export default function AccountLayout() {
                 <aside className="py-6 lg:col-span-3">
                   <nav className="space-y-1">
                     {subNavigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
+                      <div
+                        className={
                           item.current
-                            ? 'bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700'
-                            : 'border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900',
-                          'group border-l-4 px-3 py-2 flex items-center text-sm font-medium'
-                        )}
-                        aria-current={item.current ? 'page' : undefined}
+                            ? "bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
+                            : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900"
+                        }
                       >
-                        <item.icon
-                          className={classNames(
-                            item.current
-                              ? 'text-teal-500 group-hover:text-teal-500'
-                              : 'text-gray-400 group-hover:text-gray-500',
-                            'flex-shrink-0 -ml-1 mr-3 h-6 w-6'
-                          )}
-                          aria-hidden="true"
-                        />
-                        <span className="truncate">{item.name}</span>
-                      </a>
+                        <a
+                          href={item.href}
+                          aria-current={item.current ? "page" : undefined}
+                          className="group border-l-4 px-3 py-2 flex items-center text-sm font-medium"
+                        >
+                          <item.icon
+                            className={classNames(
+                              item.current
+                                ? "text-teal-500 group-hover:text-teal-500"
+                                : "text-gray-400 group-hover:text-gray-500",
+                              "flex-shrink-0 -ml-1 mr-3 h-6 w-6"
+                            )}
+                            aria-hidden="true"
+                          />
+                          <ConditionalTooltip
+                            key={item.name}
+                            content="Coming Soon"
+                            condition={!item.exists}
+                          >
+                            <span className="truncate">{item.name}</span>
+                          </ConditionalTooltip>
+                        </a>
+                      </div>
                     ))}
                   </nav>
                 </aside>
@@ -136,8 +151,5 @@ export default function AccountLayout() {
         </main>
       </div>
     </>
-  )
-
+  );
 }
-
-

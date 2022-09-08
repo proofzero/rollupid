@@ -5,7 +5,7 @@
     "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
     "dev:generate:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "build": "remix build",
-    "dev:build": "NODE_ENV=development remix build",
+    "dev:build": "cross-env NODE_ENV=development remix build",
     "dev:sass": "sass --watch app/:app/",
     "sass": "sass app/:app/",
     "deploy": "wrangler publish",
