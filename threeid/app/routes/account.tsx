@@ -32,6 +32,9 @@ import HeadNav from "~/components/head-nav";
 import { links as buttonStyles } from "~/components/base-button";
 import { links as faqStyles } from "~/components/FAQ";
 import { links as invCodeStyles } from "~/components/invite-code";
+
+import sideNavStyles from "../components/side-nav/side-nav.css";
+
 import ConditionalTooltip from "~/components/conditional-tooltip";
 
 export function links() {
@@ -39,6 +42,7 @@ export function links() {
     ...invCodeStyles(),
     ...buttonStyles(),
     ...faqStyles(),
+    { rel: "stylesheet", href: sideNavStyles },
     { rel: "stylesheet", href: styles },
   ];
 }
@@ -125,14 +129,16 @@ export default function AccountLayout() {
                           className="group border-l-4 px-3 py-2 flex items-center text-sm font-medium"
                         >
                           <item.icon
-                            className="flex-shrink-0 -ml-1 mr-3 h-6 w-6"
+                            className="flex-shrink-0 -ml-1 mr-3 h-6 w-6 side-nav-item-font"
                             aria-hidden="true"
                           />
                           <ConditionalTooltip
                             content="Coming Soon"
                             condition={!item.exists}
                           >
-                            <span className="truncate">{item.name}</span>
+                            <span className="truncate side-nav-item-font">
+                              {item.name}
+                            </span>
                           </ConditionalTooltip>
                         </a>
                       </div>
