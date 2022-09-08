@@ -3,12 +3,11 @@ compatibility_date = "2022-04-05"
 
 main = "./build/index.js"
 
-# Account ID for admin@kubelt.com (staging and production). Override for
-# per-user deployments, which should use individual user's account ID to
-# keep development activities separate from production infra, hopefully
-# avoiding accidents.
-# It can also be specified through the CLOUDFLARE_ACCOUNT_ID environment variable.
-# account_id = "{{admin/account-id}}"
+name = "three-id-dev"
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
 
 [site]
   bucket = "./public"
@@ -16,25 +15,15 @@ main = "./build/index.js"
 [build]
   command = "npm run generate:css && npm run sass && npm run build"
 
-[env.development]
-# Whether or not the worker should be deployed to *.workers.dev. Can use
-# either route or workers_dev, but not both.
-name = "three-id-dev"
-route = { pattern = "https://dev.dapp.threeid.xyz/*"}
-# account_id = "{{dev/account-id}}"
-# vars = { ENVIRONMENT = "development" }
-
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]
 name = "three-id-next"
-# vars = { ENVIRONMENT = "next" }
-route = { pattern = "https://next.dapp.threeid.xyz/*"}
+route = "https://next.dapp.threeid.xyz/*"
 
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
 name = "three-id-current"
-# vars = { ENVIRONMENT = "current" }
-route = { pattern = "https://dapp.threeid.xyz/*" }
+route = "https://dapp.threeid.xyz/*"
 

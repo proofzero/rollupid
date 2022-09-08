@@ -256,7 +256,7 @@ jobs:
 
   # threeid
   # ----------------------------------------------------------------------------
-  publish-threeid-dev:
+  build-publish-threeid:
     needs: changes
     if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
@@ -275,7 +275,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
-          command: publish --env development --name three-id-dev
+          command: publish
           secrets: |
             ENVIRONMENT
             SESSION_SECRET
@@ -284,7 +284,7 @@ jobs:
         env:
           ENVIRONMENT: "development"
           SESSION_SECRET: "secret"
-          CF_ROUTE: https://dev.dapp.threeid.xyz/*
+          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.
