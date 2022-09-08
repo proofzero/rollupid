@@ -260,20 +260,14 @@ jobs:
     needs: changes
     if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
-    env:
-      ENVIRONMENT: "development"
-      SESSION_SECRET: "secret"
-      # These values are injected into the generated wrangler.toml.
-      ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-      # The Datadog client token.
-      DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-      DATADOG_ENV: current
-      # The Cloudflare API token used by wrangler.
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      # Cloudflare zone identifier for threeid.xyz.
-      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        working-directory: threeid
+        with:
+          node-version: lts/gallium
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm install
         working-directory: threeid
       - name: Publish
@@ -283,6 +277,18 @@ jobs:
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
           command: publish --env development
+        env:
+          ENVIRONMENT: "development"
+          SESSION_SECRET: "secret"
+          # These values are injected into the generated wrangler.toml.
+          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          # The Datadog client token.
+          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_ENV: current
+          # The Cloudflare API token used by wrangler.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # Cloudflare zone identifier for threeid.xyz.
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
 
 
   # test-sdk-web:
