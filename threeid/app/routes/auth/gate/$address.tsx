@@ -102,7 +102,7 @@ export default function AuthGate() {
                         {({ open }) => (
                             <>
                             <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Select invite</Listbox.Label>
-                            <div className="grid grid-cols-2 md:grid-cols-1">
+                            <div className="grid grid-rows-2 lg:grid-cols-2">
                                 <div className="relative">
                                     <Listbox.Button className="relative w-full cursor-default border border-gray-300 bg-white py-4 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                                     <span className="block truncate">{selected.title}</span>

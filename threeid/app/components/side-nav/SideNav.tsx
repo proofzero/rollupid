@@ -5,14 +5,14 @@ import SideNavItem from "./SideNavItem";
 const subNavigation = [
   {
     name: "Dashboard",
-    href: "#",
+    href: "/account",
     icon: HiOutlineHome,
     current: true,
     exists: true,
   },
   {
     name: "NFT Gallery",
-    href: "#",
+    href: "/notaccount",
     icon: HiOutlineViewGridAdd,
     current: false,
   },
@@ -23,8 +23,8 @@ const subNavigation = [
 
 const SideNav = () => {
   return (
-    <aside className="lg:col-start-1 lg:col-end-3 bg-gray-50">
-      <nav className="space-y-1">
+    <aside className="fixed bottom-0 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
+      <nav className="flex flex-row justify-center items-center lg:flex-none lg:block space-y-1">
         {subNavigation.map((item) => (
           <SideNavItem key={item.name} item={item} />
         ))}

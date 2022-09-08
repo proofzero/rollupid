@@ -83,12 +83,11 @@ export default function AccountLayout() {
         </div>
 
         <main className="-mt-72">
-          <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+          <div className="mx-auto max-w-screen-xl lg:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
             <div className="overflow-hidden bg-white shadow">
               <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
                 <SideNav />
-
-                <div className="divide-y divide-gray-200 lg:col-start-3 lg:col-end-13 p-8">
+                <div className="divide-y divide-gray-200 sm:mb-16 lg:col-start-3 lg:col-end-13 p-4 lg:p-8">
                   <Outlet />
                 </div>
               </div>
