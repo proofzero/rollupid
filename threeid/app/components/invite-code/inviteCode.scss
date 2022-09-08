@@ -1,18 +1,38 @@
 .invite-header {
   font-family: Inter_600SemiBold;
-  font-size: 20;
+  font-size: 20px;
   font-weight: 600;
-  line-height: 4;
+  line-height: 32px;
   color: #1f2937;
 }
 
 .invite-description {
-  font-family: "Inter_400Regular";
-  font-size: 14;
+  font-family: Inter_400Regular;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 2;
+  line-height: 20px;
   color: #9ca3af;
-  margin-bottom: 20;
+  margin-bottom: 20px;
+}
+
+.invite-link-wrapper {
+  display: flex;
+  flex-direction: row;
+  background-color: #f9fafb;
+  justify-content: center;
+  align-items: center;
+}
+
+.invite-link {
+  flex: 1;
+  font-family: Inter_400Regular;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  padding-left: 13px;
+  color: #9ca3af;
 }
 
 .invite-link-btn {
@@ -21,86 +41,74 @@
   justify-content: center;
   align-items: center;
   background-color: #1f2937;
-  padding-top: 11;
-  padding-bottom: 11;
-  padding-left: 17;
-  padding-right: 17;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  padding-left: 17px;
+  padding-right: 17px;
+}
+
+.invite-link-img {
+  width: 15px;
+  height: 15px;
+  margin-right: 10.5px;
+  color: #d1d5db;
 }
 
 .invite-link-text {
   font-family: Inter_500Medium;
-  font-size: 14;
-  line-height: 2;
-  color: #d1d5db;
-}
-
-.invite-link {
-  flex: 1;
-  font-family: Inter_400Regular;
-  font-weight: 400;
-  font-size: 14;
-  line-height: 4;
-  padding-top: 11;
-  padding-bottom: 11;
-  padding-left: 13;
-  color: #9ca3af;
-}
-
-.invite-link-img {
-  width: 15;
-  height: 15;
-  margin-right: 10.5;
+  font-size: 14px;
+  line-height: 20px;
   color: #d1d5db;
 }
 
 .invitees {
   border: 1px solid #f3f4f6;
-  padding: 12;
+  padding: 12px;
 }
 
 .invitees-prefix {
   font-family: Inter_500Medium;
-  font-size: 14;
+  font-size: 14px;
   font-weight: 600;
-  line-height: 3;
+  line-height: 20px;
   color: #6b7280;
 }
 
 .invites-left-amount {
-  margin-top: 5;
+  margin-top: 5px;
   font-family: Inter_400Regular;
-  font-size: 12;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 2;
+  line-height: 14px;
   color: #9ca3af;
 }
 
 .holder-wide {
-  padding-top: 12;
-  padding-bottom: 12;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .holder-address {
   font-family: Inter_500Medium;
-  font-size: 14;
+  font-size: 14px;
   font-weight: 500;
-  line-height: 2;
+  line-height: 20px;
   color: #9ca3af;
 }
 .holder-timestamp {
   font-family: Inter_400Regular;
-  font-size: 12;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 2;
+  line-height: 14px;
   color: #9ca3af;
 }
 
 .placeholder-for-holders {
   font-family: Inter_400Regular;
-  font-size: 12;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 4;
+  line-height: 14px;
   color: #9ca3af;
   text-align: center;
-  padding: 20;
+  padding: 20px;
 }

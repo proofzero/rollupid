@@ -14,13 +14,13 @@ const contents = [
     question: "How do I use 3ID?",
     answer: (
       <div>
-        <p>
+        <p className="answer-text  my-4">
           Now that you've claimed your 3ID, other applications can query your
           profile to fetch your public profile details including your avatar.
           Soon you will also be able to promote your profile and NFTs on social
           media.
         </p>
-        <p>
+        <p className="answer-text">
           In our roadmap we have many more features coming including linking
           multiple accounts together, messaging, storage and more.
         </p>
@@ -32,7 +32,7 @@ const contents = [
     question: "Can I sell my invite card?",
     answer: (
       <div>
-        <p>
+        <p className="answer-text  my-4">
           Yes. You can list your invite card on{" "}
           <a
             target={"_blank"}
@@ -51,38 +51,40 @@ const contents = [
     question: "What is my the 3ID PFP?",
     answer: (
       <div>
-        <p>
+        <div className="answer-text my-4">
           {" "}
-          Your 3ID gradient PFP is a soulbound avatar made up of 4 color traits
-          -- one version color and three common, uncommon, rare and epic colors
-          traits. Rarity is decided by several factors.
-        </p>
-        <ol>
-          <li>
-            The first color trait probability is based on which popular NFTs you
-            currently hold.
-          </li>
+          <p>
+            Your 3ID gradient PFP is a soulbound avatar made up of 4 color
+            traits -- one version color and three common, uncommon, rare and
+            epic colors traits. Rarity is decided by several factors.
+          </p>
+          <ol>
+            <li>
+              The first color trait probability is based on which popular NFTs
+              you currently hold.
+            </li>
 
-          <li>
-            The second color trait is based on which of our developer
-            collections you hold.
-          </li>
+            <li>
+              The second color trait is based on which of our developer
+              collections you hold.
+            </li>
 
-          <li>The last color trait is based on your ETH balance.</li>
-        </ol>
-        <p>
-          Click{" "}
-          <a
-            target={"_blank"}
-            rel={"noopener noopener noreferrer"}
-            href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
-          >
-            here
-          </a>{" "}
-          to read the code. Once generated, your 3ID gradient PFP is soul bound
-          to your identity. More generations of this PFP will be released
-          corresponding with every major version of 3ID.
-        </p>
+            <li>The last color trait is based on your ETH balance.</li>
+          </ol>
+          <p className="answer-text">
+            Click{" "}
+            <a
+              target={"_blank"}
+              rel={"noopener noopener noreferrer"}
+              href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
+            >
+              here
+            </a>{" "}
+            to read the code. Once generated, your 3ID gradient PFP is soul
+            bound to your identity. More generations of this PFP will be
+            released corresponding with every major version of 3ID.
+          </p>
+        </div>
       </div>
     ),
   },
@@ -91,7 +93,7 @@ const contents = [
     question: "Who is behind this project?",
     answer: (
       <div>
-        <p>
+        <p className="answer-text my-4">
           3ID is created by{" "}
           <a
             target={"_blank"}
