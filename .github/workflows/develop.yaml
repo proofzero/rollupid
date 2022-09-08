@@ -8,12 +8,12 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    outputs:
-      sdk: ${{ steps.changes.outputs.sdk }}
-      dapp: ${{ steps.changes.outputs.dapp }}
-      www: ${{ steps.changes.outputs.www }}
-      ext: ${{ steps.changes.outputs.ext }}
-      threeid: ${{ steps.changes.outputs.threeid }}
+    # outputs:
+    #   sdk: ${{ steps.changes.outputs.sdk }}
+    #   dapp: ${{ steps.changes.outputs.dapp }}
+    #   www: ${{ steps.changes.outputs.www }}
+    #   ext: ${{ steps.changes.outputs.ext }}
+    #   threeid: ${{ steps.changes.outputs.threeid }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -254,6 +254,7 @@ jobs:
         # Run the CI version of the web tests using headless Chrome.
       - run: npm run test:web:ci
 
+  # threeid
   # ----------------------------------------------------------------------------
   publish-threeid:
     needs: changes
