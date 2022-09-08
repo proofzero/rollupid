@@ -63,7 +63,6 @@ jobs:
             OORT_PORT
         env:
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.

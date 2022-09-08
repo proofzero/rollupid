@@ -27,11 +27,14 @@ workers_dev = true
 # ------------------------------------------------------------------------------
 [env.next]
 name = "three-id-next"
-route = "https://next.dapp.threeid.xyz/*"
+routes = [
+  "next.dapp.threeid.xyz/*",
+  "preview.dapp.threeid.xyz/*",
+]
 
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
 name = "three-id-current"
-route = "https://dapp.threeid.xyz/*"
+route = "dapp.threeid.xyz/*"
 
