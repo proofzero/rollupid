@@ -33,11 +33,7 @@ const InviteCode = ({ invite }: InviteCodeProps) => {
           <div className="invite-link">
             https://get.threeid.xyz/{invite.code}
           </div>
-          <Tooltip
-            content="Link copied!"
-            trigger="click"
-            animation="duration-1000"
-          >
+          <Tooltip content="Copied!" trigger="click" animation="duration-1000">
             <button
               onClick={() => {
                 navigator.clipboard.writeText(
