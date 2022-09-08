@@ -15,6 +15,14 @@ workers_dev = true
 [build]
   command = "npm run generate:css && npm run sass && npm run build"
 
+# development (development) is the default environment
+# ------------------------------------------------------------------------------
+# [env.development]
+# name = "three-id-dev"
+# # Whether or not the worker should be deployed to *.workers.dev. Can use
+# # either route or workers_dev, but not both.
+# workers_dev = true
+
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]

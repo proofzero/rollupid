@@ -275,7 +275,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
-          command: publish
+          command: publish --name threeid-dev
           secrets: |
             ENVIRONMENT
             SESSION_SECRET

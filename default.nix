@@ -20,6 +20,7 @@ stdenv.mkDerivation {
     docker
     rustup
     libuuid
+    act
   ];
 
   APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid ]}";

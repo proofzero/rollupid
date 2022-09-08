@@ -27,7 +27,7 @@
 
     ;; The path of local-only configuration file containing various
     ;; build configuration values.
-    (def deploy-edn (str (fs/path "3iD" "deploy.edn")))
+    (def deploy-edn (str (fs/path "threeid" "deploy.edn")))
     ;; Secrets used by act (local GitHub Actions workflow runner).
     (def act-secrets "act.secrets"))
 
@@ -67,24 +67,38 @@
                 cloudflare-api-token :cloudflare/token
                 datadog-token :datadog/token
                 datadog-env :datadog/env
-                next-kv-app-id :next/kv-app-id
+                datadog/application-id :datadog/application-id
+                datadog/service-name :datadog/service-name
+                datadog/env :datadog/env
+                oort/schema :oort/schema
+                oort/host :oort/host
+                oort/port :oort/port
+                session/secret :session/secret
                 next-url :next/url
-                current-kv-app-id :current/kv-app-id
+                twitter/url :twitter/url
+                discord/url :discord/url
                 current-url :current/url} -deploy:edn
                secrets {:admin-account-id admin-account-id
                         :cloudflare-api-token cloudflare-api-token
                         :datadog-token datadog-token
                         :datadog-env datadog-env
-                        :next-kv-app-id next-kv-app-id
+                        :datadog/application-id datadog/application-id
+                        :datadog/service-name datadog/service-name
+                        :datadog/env datadog/env
+                        :oort/schema oort/schema
+                        :oort/host oort/host
+                        :oort/port oort/port
+                        :session/secret session/secret
+                        :twitter/url twitter/url
+                        :discord/url discord/url
                         :next-url next-url
-                        :current-kv-app-id current-kv-app-id
                         :current-url current-url}]
            (dot-env/write act-secrets secrets))}
 
   -act:next:3iD
   {:doc "Run GitHub Actions 'next' pipeline, '3iD' job locally"
    :depends [-act:secrets]
-   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j 3iD")}
+   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j ThreeID")}
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------
