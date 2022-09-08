@@ -13,15 +13,39 @@ import { useLoaderData } from "@remix-run/react";
 
 
 import styles from "./styles/tailwind.css";
+import logo from "./assets/three-id-logo.svg";
+import appleIcon from "./assets/apple-touch-icon.png";
+import icon32 from "./assets/favicon-32x32.png";
+import icon16 from "./assets/favicon-16x16.png";
+import faviconSvg from "./assets/favicon.svg";
+import favicon from "./assets/favicon.ico";
+import manifest from "./assets/site.webmanifest";
+import maskIcon from "./assets/safari-pinned-tab.svg";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "3ID",
   viewport: "width=device-width,initial-scale=1",
+  "og:title": "3ID",
+  "og:site_name": "3ID",
+  "og:url": "https://dapp.threeid.xyz",
+  "og:description": "Your decentralized web passport",
+  "og:image": logo,
+  "theme-color": "#673ab8",
+  "mobile-web-app-capable": "yes",
+  "apple-mobile-web-app-capable": "yes",
+  
 });
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
+  { rel: "apple-touch-icon", href: appleIcon, sizes: "180x180" },
+  { rel: "icon", type: "image/png", href: icon32, sizes: "32x32" },
+  { rel: "icon", type: "image/png", href: icon16, sizes: "16x16" },
+  { rel: "manifest", href: manifest },
+  { rel: "mask-icon", href: maskIcon, color: "#5bbad5" },
+  { rel: "shortcut icon", href: favicon },
+  { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
 ];
 
 export const loader: LoaderFunction = () => {
