@@ -30,6 +30,7 @@ export const loader: LoaderFunction = async ({
     // TODO: accept from client accept or deny request
     // TODO: genearte jwt
     // TODO: redirect to app
+    
   };
 
 export default function OAuth3 ()  {
