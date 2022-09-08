@@ -266,7 +266,7 @@ jobs:
         with:
           node-version: lts/gallium
           cache: 'npm'
-          cache-dependency-path: threeid/package-lock.json
+          cache-dependency-path: ./threeid/package-lock.json
       - run: npm install
         working-directory: threeid
       - name: Publish
@@ -275,7 +275,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
-          command: publish --env development --name three-id-dev
+          command: publish --env development
           secrets: |
             ENVIRONMENT
             SESSION_SECRET
@@ -284,6 +284,8 @@ jobs:
         env:
           ENVIRONMENT: "development"
           SESSION_SECRET: "secret"
+          CF_NAME: three-id-dev
+          CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.

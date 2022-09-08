@@ -19,8 +19,8 @@ main = "./build/index.js"
 [env.development]
 # Whether or not the worker should be deployed to *.workers.dev. Can use
 # either route or workers_dev, but not both.
-workers_dev = true
 name = "three-id-dev"
+route = { pattern = "https://dev.dapp.threeid.xyz/*"}
 # account_id = "{{dev/account-id}}"
 # vars = { ENVIRONMENT = "development" }
 
@@ -29,12 +29,12 @@ name = "three-id-dev"
 [env.next]
 name = "three-id-next"
 # vars = { ENVIRONMENT = "next" }
-route = { pattern = "next.dapp.threeid.xyz"}
+route = { pattern = "https://next.dapp.threeid.xyz/*"}
 
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
 name = "three-id-current"
 # vars = { ENVIRONMENT = "current" }
-route = { pattern = "dapp.threeid.xyz" }
+route = { pattern = "https://dapp.threeid.xyz/*" }
 
