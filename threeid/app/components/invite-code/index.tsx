@@ -1,5 +1,6 @@
 import { HiLink } from "react-icons/hi";
 import styles from "./inviteCode.css";
+import { Tooltip } from "flowbite-react";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
@@ -32,17 +33,19 @@ const InviteCode = ({ invite }: InviteCodeProps) => {
           <div className="invite-link">
             https://get.threeid.xyz/{invite.code}
           </div>
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(
-                `https://get.threeid.xyz/${invite.code}`
-              );
-            }}
-            className="invite-link-btn"
-          >
-            <HiLink className="invite-link-img" />
-            <div className="invite-link-text">Copy link</div>
-          </button>
+          <Tooltip content="Copied!" trigger="click" animation="duration-1000">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `https://get.threeid.xyz/${invite.code}`
+                );
+              }}
+              className="invite-link-btn"
+            >
+              <HiLink className="invite-link-img" />
+              <div className="invite-link-text">Copy link</div>
+            </button>
+          </Tooltip>
           {/* TODO: add tooltip to show that link is copied */}
           <div className="invitees">
             <div className="invitees-prefix">Your Invitees:</div>
