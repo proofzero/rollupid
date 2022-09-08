@@ -6,12 +6,9 @@ import { Outlet } from "@remix-run/react";
 import { Fragment, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 
-import {
-  HiOutlineBell,
-  HiOutlineCog,
-  HiOutlineKey,
-  HiOutlineHome,
-} from "react-icons/hi";
+import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
+
+import { BiLink, BiIdCard, BiCog } from "react-icons/bi";
 
 // TODO: migrate the above to hi2
 //https://github.com/react-icons/react-icons/issues/597
@@ -75,10 +72,15 @@ const subNavigation = [
     current: true,
     exists: true,
   },
-  { name: "NFT Gallery", href: "#", icon: SquaresPlusIcon, current: false },
-  { name: "KYC", href: "#", icon: HiOutlineKey, current: false },
-  { name: "0xAuth", href: "#", icon: HiOutlineKey, current: false },
-  { name: "Settings", href: "#", icon: HiOutlineCog, current: false },
+  {
+    name: "NFT Gallery",
+    href: "#",
+    icon: HiOutlineViewGridAdd,
+    current: false,
+  },
+  { name: "KYC", href: "#", icon: BiIdCard, current: false },
+  { name: "0xAuth", href: "#", icon: BiLink, current: false },
+  { name: "Settings", href: "#", icon: BiCog, current: false },
 ];
 
 function classNames(...classes) {
@@ -106,14 +108,15 @@ export default function AccountLayout() {
           <div className="mx-auto max-w-screen-xl px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
             <div className="overflow-hidden bg-white shadow">
               <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
-                <aside className="py-6 lg:col-span-3">
+                <aside className="lg:col-start-1 lg:col-end-3 bg-gray-50">
                   <nav className="space-y-1">
                     {subNavigation.map((item) => (
                       <div
+                        key={item.name}
                         className={
                           item.current
-                            ? "bg-teal-50 border-teal-500 text-teal-700 hover:bg-teal-50 hover:text-teal-700"
-                            : "border-transparent text-gray-900 hover:bg-gray-50 hover:text-gray-900"
+                            ? "bg-gray-100 text-gray-600"
+                            : "bg-transparent text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                         }
                       >
                         <a
@@ -122,16 +125,10 @@ export default function AccountLayout() {
                           className="group border-l-4 px-3 py-2 flex items-center text-sm font-medium"
                         >
                           <item.icon
-                            className={classNames(
-                              item.current
-                                ? "text-teal-500 group-hover:text-teal-500"
-                                : "text-gray-400 group-hover:text-gray-500",
-                              "flex-shrink-0 -ml-1 mr-3 h-6 w-6"
-                            )}
+                            className="flex-shrink-0 -ml-1 mr-3 h-6 w-6"
                             aria-hidden="true"
                           />
                           <ConditionalTooltip
-                            key={item.name}
                             content="Coming Soon"
                             condition={!item.exists}
                           >
@@ -142,7 +139,7 @@ export default function AccountLayout() {
                     ))}
                   </nav>
                 </aside>
-                <div className="divide-y divide-gray-200 lg:col-span-9 p-8">
+                <div className="divide-y divide-gray-200 lg:col-start-3 lg:col-end-13 p-8">
                   <Outlet />
                 </div>
               </div>
