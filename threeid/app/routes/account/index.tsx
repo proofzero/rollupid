@@ -29,6 +29,7 @@ import Heading from "~/components/typography/Heading";
 import SectionTitle from "~/components/typography/SectionTitle";
 import SectionHeading from "~/components/typography/SectionHeading";
 import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
+import { ButtonAnchor, ButtonSize } from "~/components/buttons";
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
@@ -205,13 +206,20 @@ export default function Welcome() {
 
   return (
     <div className="dashboard flex flex-col gap-4">
-      <div className="welcome-banner basis-full">
+      <div
+        className="welcome-banner basis-full"
+        style={{
+          backgroundColor: "#F9FAFB",
+          padding: "30px 30px 23px 16px",
+        }}
+      >
         <Heading className="mb-3">Welcome to 3ID! 🎉</Heading>
 
         <Text
           weight={TextWeight.Regular400}
           size={TextSize.Base}
           color={TextColor.Gray500}
+          className="mb-6"
         >
           The app is currently in beta. We will be unlocking new features on
           weekly basis. Please follow us on Twitter and join our Discord to stay
@@ -219,8 +227,21 @@ export default function Welcome() {
         </Text>
 
         <div className="flex flex-row gap-4">
-          <a href="https://twitter.com/threeid.xyz">Twitter</a>
-          <a href="https://discord.gg/threeid">Discord</a>
+          <ButtonAnchor
+            href="https://twitter.com/threeid.xyz"
+            Icon={FaTwitter}
+            iconColor="#1D9BF0"
+          >
+            Twitter
+          </ButtonAnchor>
+
+          <ButtonAnchor
+            href="https://discord.gg/threeid"
+            Icon={FaDiscord}
+            iconColor="#5865F2"
+          >
+            Discord
+          </ButtonAnchor>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-8">

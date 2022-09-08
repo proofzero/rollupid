@@ -1,0 +1,44 @@
+.button-base {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-type-primary {
+  background-color: #1f2937;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: #374151;
+  }
+}
+
+.button-type-secondary {
+  background-color: #f3f4f6;
+
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: #e5e7eb;
+  }
+}
+
+.button-size-xs {
+  padding: 7px 11px;
+}
+
+.button-size-sm {
+  padding: 9px 13px;
+}
+
+.button-size-base {
+  padding: 9px 17px;
+}
+
+.button-size-l {
+  padding: 9px 17px;
+}
+
+.button-size-xl {
+  padding: 13px 25px;
+}
