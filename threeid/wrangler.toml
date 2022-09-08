@@ -28,8 +28,8 @@ workers_dev = true
 [env.next]
 name = "three-id-next"
 routes = [
-  "next-dapp.threeid.xyz/*",
-  "preview-dapp.threeid.xyz/*",
+  "dapp-next.threeid.xyz/*",
+  "dapp-preview.threeid.xyz/*",
 ]
 
 # current (production)
