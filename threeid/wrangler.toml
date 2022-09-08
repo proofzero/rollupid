@@ -1,7 +1,7 @@
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
 
-# name = "remix-cloudflare-workers"
+name = "three-id"
 
 main = "./build/index.js"
 
@@ -22,21 +22,21 @@ main = "./build/index.js"
 # Whether or not the worker should be deployed to *.workers.dev. Can use
 # either route or workers_dev, but not both.
 workers_dev = true
-name = "three-id-dev"
+# name = "three-id-dev"
 # account_id = "{{dev/account-id}}"
 # vars = { ENVIRONMENT = "development" }
 
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]
-name = "three-id-next"
+# name = "three-id-next"
 # vars = { ENVIRONMENT = "next" }
 route = { pattern = "next.dapp.threeid.xyz"}
 
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
-name = "three-id-current"
+# name = "three-id-current"
 # vars = { ENVIRONMENT = "current" }
 route = { pattern = "dapp.threeid.xyz" }
 
