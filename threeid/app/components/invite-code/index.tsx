@@ -30,23 +30,28 @@ const InviteCode = ({ invite }: InviteCodeProps) => {
           <div className="invite-description">
             Share an invite link with your friends
           </div>
-          <div className="invite-link">
-            https://get.threeid.xyz/{invite.code}
-          </div>
-          <Tooltip content="Copied!" trigger="click" animation="duration-1000">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `https://get.threeid.xyz/${invite.code}`
-                );
-              }}
-              className="invite-link-btn"
+          <div className="invite-link-wrapper">
+            <div className="invite-link">
+              https://get.threeid.xyz/{invite.code}
+            </div>
+            <Tooltip
+              content="Copied!"
+              trigger="click"
+              animation="duration-1000"
             >
-              <HiLink className="invite-link-img" />
-              <div className="invite-link-text">Copy link</div>
-            </button>
-          </Tooltip>
-          {/* TODO: add tooltip to show that link is copied */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `https://get.threeid.xyz/${invite.code}`
+                  );
+                }}
+                className="invite-link-btn"
+              >
+                <HiLink className="invite-link-img" />
+                <div className="invite-link-text">Copy link</div>
+              </button>
+            </Tooltip>
+          </div>
           <div className="invitees">
             <div className="invitees-prefix">Your Invitees:</div>
             <div className="invites-left-amount">
