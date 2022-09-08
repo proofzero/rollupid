@@ -13,7 +13,7 @@ import { useLoaderData } from "@remix-run/react";
 
 
 import styles from "./styles/tailwind.css";
-import social from "./assets/social.png";
+import social from "./assets/social2.png";
 import appleIcon from "./assets/apple-touch-icon.png";
 import icon32 from "./assets/favicon-32x32.png";
 import icon16 from "./assets/favicon-16x16.png";
@@ -26,10 +26,10 @@ export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "3ID",
   viewport: "width=device-width,initial-scale=1",
-  "og:title": "3ID",
+  "og:title": "3ID - Decentralized Web Passport",
   "og:site_name": "3ID",
   "og:url": "https://dapp.threeid.xyz",
-  "og:description": "Your decentralized web passport",
+  "og:description": "3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.",
   "og:image": social,
   "theme-color": "#673ab8",
   "mobile-web-app-capable": "yes",
