@@ -283,6 +283,9 @@ jobs:
             DATADOG_APPLICATION_ID
             DATADOG_ENV
             DATADOG_SERVICE_NAME
+            OORT_HOST
+            OORT_SCHEMA
+            OORT_PORT
         env:
           ENVIRONMENT: "development"
           SESSION_SECRET: "secret"
@@ -298,6 +301,9 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          OORT_HOST: oort-devnet.kubelt.com
+          OORT_SCHEMA: http
+          OORT_PORT: 80
 
 
   # test-sdk-web:
