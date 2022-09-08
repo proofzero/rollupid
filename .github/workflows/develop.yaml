@@ -256,7 +256,7 @@ jobs:
 
   # threeid
   # ----------------------------------------------------------------------------
-  build-publish-threeid:
+  build-publish-threeid-dev:
     needs: changes
     if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
