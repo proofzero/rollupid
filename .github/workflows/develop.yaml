@@ -8,12 +8,12 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
-    # outputs:
-    #   sdk: ${{ steps.changes.outputs.sdk }}
-    #   dapp: ${{ steps.changes.outputs.dapp }}
-    #   www: ${{ steps.changes.outputs.www }}
-    #   ext: ${{ steps.changes.outputs.ext }}
-    #   threeid: ${{ steps.changes.outputs.threeid }}
+    outputs:
+      sdk: ${{ steps.changes.outputs.sdk }}
+      dapp: ${{ steps.changes.outputs.dapp }}
+      www: ${{ steps.changes.outputs.www }}
+      ext: ${{ steps.changes.outputs.ext }}
+      threeid: ${{ steps.changes.outputs.threeid }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -275,8 +275,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: npm install
-        with:
-          workingDirectory: 'threeid'
+        working-directory: threeid
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
