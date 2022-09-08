@@ -275,8 +275,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
-          environment: 'development'
           command: publish
+          environment: "development"
           secrets: |
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
@@ -287,7 +287,6 @@ jobs:
             OORT_SCHEMA
             OORT_PORT
         env:
-          ENVIRONMENT: "development"
           SESSION_SECRET: "secret"
           # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
