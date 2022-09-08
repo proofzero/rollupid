@@ -302,8 +302,8 @@ jobs:
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           OORT_HOST: oort-devnet.kubelt.com
-          OORT_SCHEMA: http
-          OORT_PORT: 80
+          OORT_SCHEMA: https
+          OORT_PORT: 443
 
 
   # test-sdk-web:

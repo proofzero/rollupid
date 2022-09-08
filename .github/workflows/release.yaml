@@ -38,86 +38,51 @@ jobs:
   # 3iD
   # ----------------------------------------------------------------------------
 
-  ThreeiD:
+  ThreeID:
     runs-on: ubuntu-latest
     permissions:
       packages: read
     steps:
-      - uses: actions/checkout@master
-      # - name: verify git tag
-      #   run: |
-      #     # setup the gpg key
-      #     git verify-tag ${GITHUB_REF#refs/*/}
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '18'
-
-      - uses: DeLaGuardo/setup-clojure@8.0
-        with:
-          bb: 0.8.156
-          cli: 1.11.1.1149
-
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
           cache: 'npm'
-          cache-dependency-path: package-lock.json
-
-      - name: install node dependencies
-        run: npm ci
-
-      - name: build sdk-web
-        run: npm run build:sdk-web:develop
-
-      - name: set tag as RELEASE_VERSION environment variable
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: install node dependencies (for 3iD)
-        working-directory: ./3iD
-        run: npm ci
-
-      - name: build and deploy 3iD
-        working-directory: ./3iD
-        env:
-          # These values are injected into the generated wrangler.toml.
-          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          CURRENT_KV_APP_ID: ${{ secrets.CURRENT_KV_APP_ID }}
-          CURRENT_URL: ${{ secrets.CURRENT_URL }}
-          NEXT_KV_APP_ID: ${{ secrets.NEXT_KV_APP_ID }}
-          NEXT_URL: ${{ secrets.NEXT_URL }}
-          # The Datadog client token.
-          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_ENV: current
-          # The Cloudflare API token used by wrangler.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # Cloudflare zone identifier for threeid.xyz.
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-        run: >
-          bb deploy:app --deploy-env current --app-version ${{ env.RELEASE_VERSION }}
-
-      - name: Clear Cloudflare cache
-        uses: Cyb3r-Jak3/action-cloudflare-cache@v1.1.0
+          cache-dependency-path: ./threeid/package-lock.json
+      - run: npm install
+        working-directory: threeid
+      - name: Publish
+        uses: cloudflare/wrangler-action@2.0.0
         with:
-          # Zone is required by both methods
-          zone: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          # Using API Token
-          api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-      - name: run smoke tests
-        working-directory: ./3iD
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          workingDirectory: 'threeid'
+          command: publish --env next --name three-id-next
+          secrets: |
+            ENVIRONMENT
+            SESSION_SECRET
+            DATADOG_CLIENT_TOKEN
+            DATADOG_APPLICATION_ID
+            DATADOG_ENV
+            DATADOG_SERVICE_NAME
+            OORT_HOST
+            OORT_SCHEMA
+            OORT_PORT
         env:
+          ENVIRONMENT: "next"
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          CURRENT_KV_APP_ID: ${{ secrets.CURRENT_KV_APP_ID }}
-          CURRENT_URL: ${{ secrets.CURRENT_URL }}
-          NEXT_KV_APP_ID: ${{ secrets.NEXT_KV_APP_ID }}
-          NEXT_URL: ${{ secrets.NEXT_URL }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_ENV: current
+          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+          DATADOG_ENV: next
+          DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-        run: bb test:smoke --deploy-env current
+          OORT_HOST: oort-mainnet.kubelt.com
+          OORT_SCHEMA: https
+          OORT_PORT: 443
