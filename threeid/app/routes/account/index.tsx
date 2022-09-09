@@ -334,44 +334,33 @@ export default function Welcome() {
                   className="roadmap-vote__step step flex flex-row gap-4 items-center"
                   key={index}
                 >
-                  <Tooltip
-                      content={
-                        featureVotes.has(step.title)
-                          ? "Already submitted"
-                          : "Vote submitted!"
-                      }
-                      trigger="click"
-                      animation="duration-1000"
-                    >
-                    <button
-                      className="roadmap-vote__button mt-1 flex items-center justify-center"
-                      disabled={
-                        featureVotes.size >= 3 || featureVotes.has(step.title)
-                          ? true
-                          : false
-                      }
-                      onClick={(e) => {
-                        // setTimeout(() => {
-                        //   //dismiss tooltip
-                        //   e.target.dispatchEvent(
-                        //     new MouseEvent("click", {
-                        //       view: window,
-                        //       bubbles: true,
-                        //       cancelable: false,
-                        //     })
-                        //   );
-                        // }, 1500);
-                        featureVotes.add(step.title);
-                        setFeatureVotes(new Set(featureVotes));
-                        datadogRum.addAction("featureVote", {
-                          value: step.title,
-                        });
-                      }}
-                    >
-                      <FaCaretUp />
-                    </button>
-                  </Tooltip>
-
+                  <button
+                    className="roadmap-vote__button mt-1 flex items-center justify-center"
+                    disabled={
+                      featureVotes.size >= 3 || featureVotes.has(step.title)
+                        ? true
+                        : false
+                    }
+                    onClick={(e) => {
+                      // setTimeout(() => {
+                      //   //dismiss tooltip
+                      //   e.target.dispatchEvent(
+                      //     new MouseEvent("click", {
+                      //       view: window,
+                      //       bubbles: true,
+                      //       cancelable: false,
+                      //     })
+                      //   );
+                      // }, 1500);
+                      featureVotes.add(step.title);
+                      setFeatureVotes(new Set(featureVotes));
+                      datadogRum.addAction("featureVote", {
+                        value: step.title,
+                      });
+                    }}
+                  >
+                    <FaCaretUp />
+                  </button>
                   <div className="col-span-5">
                     <SectionHeading className="mb-1">
                       {step.title}
