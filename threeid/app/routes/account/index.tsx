@@ -194,8 +194,8 @@ export default function Welcome() {
   const currentVotes = JSON.parse(votes.value);
 
   const [featureVotes, setFeatureVotes] = useState<Set<string>>(
-    new Set<string>(currentVotes ? currentVotes || [])
-  );
+    new Set<string>(currentVotes ? currentVotes : [])
+);
 
   useEffect(() => {
     submit(
@@ -272,7 +272,7 @@ export default function Welcome() {
                   className="roadmap-ready__step step grid grid-cols-6"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-center">
+                  <div className="row-span-2 mt-1 flex justify-center items-top">
                     <img src={stepComplete} alt="3ID logo" />
                   </div>
 
@@ -303,7 +303,7 @@ export default function Welcome() {
                   className="roadmap-next__step step grid grid-cols-6"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-center">
+                  <div className="row-span-2 mt-1 flex justify-center items-top">
                     <img src={stepSoon} alt="3ID logo" />
                   </div>
 
@@ -329,20 +329,20 @@ export default function Welcome() {
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div
-                  className="roadmap-vote__step step grid grid-cols-6"
+                  className="roadmap-vote__step step flex flex-row gap-4 items-center"
                   key={index}
                 >
                   <Tooltip
-                    content={
-                      3 - featureVotes.size
-                        ? "Vote submitted!"
-                        : "Already submitted"
-                    }
-                    trigger="click"
-                    animation="duration-1000"
-                  >
+                      content={
+                        featureVotes.has(step.title)
+                          ? "Already submitted"
+                          : "Vote submitted!"
+                      }
+                      trigger="click"
+                      animation="duration-1000"
+                    >
                     <button
-                      className="roadmap-vote__button row-span-2 mt-1"
+                      className="roadmap-vote__button mt-1 flex items-center justify-center"
                       disabled={
                         featureVotes.size >= 3 || featureVotes.has(step.title)
                           ? true
@@ -350,6 +350,7 @@ export default function Welcome() {
                       }
                       onClick={(e) => {
                         setTimeout(() => {
+                          //dismiss tooltip
                           e.target.dispatchEvent(
                             new MouseEvent("click", {
                               view: window,
@@ -368,7 +369,19 @@ export default function Welcome() {
                       <FaCaretUp />
                     </button>
                   </Tooltip>
-                  <p className="col-span-5">{step.title}</p>
+
+                  <div className="col-span-5">
+                    <SectionHeading className="mb-1">
+                      {step.title}
+                    </SectionHeading>
+                    <Text
+                      size={TextSize.SM}
+                      weight={TextWeight.Regular400}
+                      color={TextColor.Gray500}
+                    >
+                      Completed
+                    </Text>
+                  </div>
                 </div>
               ))}
             </div>

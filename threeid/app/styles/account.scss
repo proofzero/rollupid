@@ -68,7 +68,7 @@
 
     .step {
         // flex-direction: row;
-        justify-content: space-between;
+        // justify-content: space-between;
 
         img {
             width: 24px;
@@ -77,22 +77,24 @@
         }
 
         .roadmap-vote__button {
-            width: 32px;
-            height: 32px;
+            width: 44px;
+            height: 44px;
             background-color: $threeid-light;
             border: none;
             color: $threeid-dark;
-            padding: 8px;
+            // padding: 8px;
             margin: 0;
 
             &:active {
                 transform: scale(0.9);
+                background-color: #EEF2FF;
+                color: #4F46E5;
             }
             &:hover {
                 cursor: pointer;
             }
             &[disabled] {
-                opacity: 0.35;
+                opacity: 0.3;
                 // color: #fff;
             }
         }

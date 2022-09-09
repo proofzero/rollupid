@@ -49,3 +49,7 @@
 .trad-url:active {
   color: blue;
 }
+
+.accordion-button:not(.collapsed) {
+  box-shadow: none;
+}

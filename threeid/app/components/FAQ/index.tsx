@@ -1,7 +1,6 @@
-import SectionTitle from "../typography/SectionTitle";
-import SectionHeading from "../typography/SectionHeading";
-import SmallRegularBlock from "../typography/SmallRegularBlock";
-import Text from "../typography/Text";
+import SectionTitle from "~/components/typography/SectionTitle";
+import SectionHeading from "~/components/typography/SectionHeading";
+import SmallRegularBlock from "~/components/typography/SmallRegularBlock";
 
 import styles from "./FAQ.css";
 
@@ -12,7 +11,7 @@ const contents = [
     question: "How do I use 3ID?",
     answer: (
       <>
-        <SmallRegularBlock className="my-4">
+        <SmallRegularBlock className="mb-4">
           Now that you've claimed your 3ID, other applications can query your
           profile to fetch your public profile details including your avatar.
           Soon you will also be able to promote your profile and NFTs on social
@@ -29,7 +28,7 @@ const contents = [
   {
     question: "Can I sell my invite card?",
     answer: (
-      <div className="my-4">
+      <div className="mb-4">
         <SmallRegularBlock type="span">
           Yes. You can list your invite card on
         </SmallRegularBlock>
@@ -52,7 +51,7 @@ const contents = [
   {
     question: "What is my the 3ID PFP?",
     answer: (
-      <div className="my-4">
+      <div className="mb-4">
         <SmallRegularBlock>
           Your 3ID gradient PFP is a soulbound avatar made up of 4 color traits
           -- one version color and three common, uncommon, rare and epic colors
@@ -64,7 +63,7 @@ const contents = [
             listStyle: "auto",
             marginTop: "1rem",
             marginBottom: "1rem",
-            marginLeft: "0.5rem",
+            marginLeft: "1.25rem",
           }}
         >
           <li>
@@ -112,7 +111,7 @@ const contents = [
   {
     question: "Who is behind this project?",
     answer: (
-      <div className="my-4">
+      <div className="mb-4">
         <SmallRegularBlock type="span">3ID is created by</SmallRegularBlock>
         <a
           target={"_blank"}
@@ -122,6 +121,7 @@ const contents = [
         >
           Kubelt
         </a>
+        
         <SmallRegularBlock type="span">
           , a decentralized application platform, and is inspired by Web3 and
           the digital identity specification. Instead of applications
