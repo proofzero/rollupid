@@ -4,15 +4,17 @@ type ConditionalTooltipProps = {
   children: any;
   condition: boolean;
   content: string;
+  trigger?: "hover" | "click";
 };
 
 const ConditionalTooltip = ({
   condition,
   content,
   children,
+  trigger = "hover",
 }: ConditionalTooltipProps) => {
   return condition ? (
-    <Tooltip content={content} trigger="hover">
+    <Tooltip content={content} trigger={trigger}>
       {children}
     </Tooltip>
   ) : (

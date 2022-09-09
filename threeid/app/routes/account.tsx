@@ -69,6 +69,10 @@ const subNavigation = [
   { name: "Settings", href: "#", icon: BiCog, current: false },
 ];
 
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
 export default function AccountLayout() {
   useLoaderData();
   let submit = useSubmit();
@@ -91,7 +95,7 @@ export default function AccountLayout() {
             <div className="overflow-hidden bg-white shadow">
               <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
               <aside className="fixed bottom-0 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
-                <nav className="flex flex-row justify-center items-center lg:flex-none lg:block space-y-1">
+                <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
                   {subNavigation.map((item) => (
                     <SideNavItem key={item.name} item={item} />
                   ))}
@@ -139,7 +143,10 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         >      
 
           <item.icon
-            className="flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6"
+            className={classNames(
+              !item.current && "opacity-25",
+              "flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6"
+            )}
             style={{
               color: item.current ? "#4B5563" : "#9CA3AF",
             }}
@@ -148,7 +155,10 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
           
           <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
 
-            <span className="hidden lg:block">
+            <span className={classNames(
+                !item.current && "opacity-25",
+                "hidden lg:block"
+              )}>
               {item.current && (
                 <Text
                   className="truncate"

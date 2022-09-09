@@ -13,13 +13,6 @@ import Text, {
 import {
   HiOutlineBell,
 } from "react-icons/hi";
-// TODO: migrate the above to hi2
-//https://github.com/react-icons/react-icons/issues/597
-// import {
-//   HiBars3,
-//   HiOutlineSquaresPlus,
-//   HiXMark,
-// } from "react-icons/hi2";
 import {
   Bars3Icon,
   XMarkIcon,
