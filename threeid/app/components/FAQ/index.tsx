@@ -122,7 +122,7 @@ const contents = [
 const FAQ = ({ account }: Account) => {
   return (
     <div>
-      <SectionTitle className="mb-1 mt-6">FAQ</SectionTitle>
+      <SectionTitle className="mb-1 mt-6" title="FAQ" />
 
       {contents.map((content) => (
         <AccordionComponent key={content.question} content={content} />

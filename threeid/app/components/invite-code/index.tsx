@@ -31,7 +31,7 @@ type InviteCodeProps = {
 const InviteCode = ({ invite }: InviteCodeProps) => {
   return (
     <div>
-      <SectionTitle>Invite Friends</SectionTitle>
+      <SectionTitle title="Invite Friends" />
 
       {invite.code && (
         <div>

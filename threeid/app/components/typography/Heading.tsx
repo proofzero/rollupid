@@ -7,7 +7,7 @@ import Text, {
 
 export type HeadingProps = {
   className?: string;
-  children: any;
+  children: string;
 };
 
 const Heading = ({ children, className }: HeadingProps) => {

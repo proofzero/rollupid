@@ -165,16 +165,13 @@ export default function Welcome() {
   return (
     <div className="dashboard flex flex-col gap-4">
       <div className="welcome-banner basis-full">
-        <Heading
-          className="mb-3"
-        >
-          Welcome to 3ID! 🎉
-        </Heading>
+        <Heading className="mb-3">Welcome to 3ID! 🎉</Heading>
 
         <Text
           weight={TextWeight.Regular400}
           size={TextSize.Base}
-          color={TextColor.Gray500}>
+          color={TextColor.Gray500}
+        >
           The app is currently in beta. We will be unlocking new features on
           weekly basis. Please follow us on Twitter and join our Discord to stay
           updated!
@@ -193,9 +190,11 @@ export default function Welcome() {
           </div>
         </div>
         <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
-          <SectionTitle>
-            Roadmap
-          </SectionTitle>
+          <SectionTitle
+            className="mb-3"
+            title="Roadmap"
+            subtitle="Discover and try new features as we roll them out"
+          />
 
           <div className="progress-bar">
             <div

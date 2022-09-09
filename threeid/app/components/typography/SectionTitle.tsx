@@ -1,25 +1,37 @@
 import Text, {
   TextColor,
-  TextProps,
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
 
 export type SectionTitleProps = {
   className?: string;
-  children: any;
+  subtitle?: string;
+  title: string;
 };
 
-const SectionTitle = ({ children, className }: SectionTitleProps) => {
+const SectionTitle = ({ className, title, subtitle }: SectionTitleProps) => {
   return (
-    <Text
-      className={className}
-      weight={TextWeight.SemiBold600}
-      size={TextSize.XL}
-      color={TextColor.Gray800}
-    >
-      {children}
-    </Text>
+    <div className={className}>
+      <Text
+        className="mb-1"
+        weight={TextWeight.SemiBold600}
+        size={TextSize.XL}
+        color={TextColor.Gray800}
+      >
+        {title}
+      </Text>
+
+      {subtitle && (
+        <Text
+          weight={TextWeight.Regular400}
+          size={TextSize.SM}
+          color={TextColor.Gray400}
+        >
+          {subtitle}
+        </Text>
+      )}
+    </div>
   );
 };
 
