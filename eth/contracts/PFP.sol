@@ -32,8 +32,6 @@ contract ThreeId_ProfilePicture is
 
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
-    // We only allow the creation of this many profiles.
-    uint private _maxPFPs;
     address _operator;
 
     // Handles disambiguation of the multiple defitions of supportsInterface in our parent contracts.
@@ -45,15 +43,10 @@ contract ThreeId_ProfilePicture is
      * Constructor.
      *
      * @param minter the operator address that can mint new profiles
-     * @param maxPFPs the maximum allowed number of profiles
      */
-    constructor(address minter, uint maxPFPs) ERC721("3ID Profile Picture", "PFP") {
+    constructor(address minter) ERC721("3ID Profile Picture", "PFP") {
         _setupRole(OPERATOR_ROLE, minter);
         _operator = minter;
-        _maxPFPs = maxPFPs;
-
-        // Variance from Invite: we probably don't want to award to operator.
-        //awardPFP(_operator, voucher);
     }
 
     /**
@@ -109,13 +102,9 @@ contract ThreeId_ProfilePicture is
 
         // NB: PFP #0000 is reserved, user allocated range is [#0001 to #_maxPFPs].
         uint256 profileId = _profileIds.current();
-        // require(voucher.tokenId == profileId, 'Please request profiles in sequence.');
-        require(profileId <= _maxPFPs, "All profiles have been awarded!");
 
         _safeMint(recipient, profileId);
         _setTokenURI(profileId, voucher.uri);
-
-        // Note: should this move to above minting because of re-entrancy?
         _profileIds.increment();
 
         return profileId;
@@ -126,12 +115,5 @@ contract ThreeId_ProfilePicture is
      */
     function nextPFP() public view returns (uint256) {
         return _profileIds.current();
-    }
-
-    /**
-     * Return the maximum number of profiles to be awarded.
-     */
-    function maxProfiles() public view returns (uint) {
-        return _maxPFPs;
     }
 }

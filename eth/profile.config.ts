@@ -154,14 +154,6 @@ subtask("config:owner:privateKey", "Return owner wallet private key")
     return config.wallet.ownerKey;
   });
 
-subtask("call:maxPFPs", `Return result of ThreeId_ProfilePicture.maxProfiles()`)
-  .addParam("contract", "The address of the contract")
-  .setAction(async (taskArgs, hre) => {
-    const contract = taskArgs.contract;
-    const profile = await hre.ethers.getContractAt('ThreeId_ProfilePicture', contract);
-    return profile.maxProfiles();
-  });
-
 subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract')
   .addParam("contract", "The address of the contract")
   .addParam("profileId", "The profile number")
@@ -386,15 +378,6 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
     }
   });
 
-task("profile:maximum", "Return maximum number of profiles")
-  .addOptionalParam("contract", "The profile contract address")
-  .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("profile:contract", { contract: taskArgs.contract });
-    const maxPFPs = await hre.run("call:maxPFPs", { contract });
-
-    console.log(`> maximum ${maxPFPs} profiles`);
-  });
-
 task("profile:next", "Return ID of next profile that will be awarded")
   .addOptionalParam("contract", "The profile contract address")
   .setAction(async (taskArgs, hre) => {
@@ -493,20 +476,16 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
   });
 
 task("profile:deploy", "Deploy the PFP contract")
-  .addOptionalParam("maxProfiles", "Maximum number of profiles to allow", 1000, types.int)
   .setAction(async (taskArgs, hre) => {
     // Pre-flight sanity checks.
     await hre.run("check:owner");
     await hre.run("check:operator");
 
-    // Inject into contract to limit the number of profiles that can be minted.
-    const maxPFPs = taskArgs.maxProfiles;
-
     // The "operator" account so we can register it for the contract's OPERATOR_ROLE.
     const operatorAddress = await hre.run("config:account", { account: "operator" });
 
     const Profile = await hre.ethers.getContractFactory("ThreeId_ProfilePicture");
-    const profile = await Profile.deploy(operatorAddress, maxPFPs);
+    const profile = await Profile.deploy(operatorAddress);
 
     await profile.deployed();
 
