@@ -426,7 +426,7 @@ task("profile:metadata", "Display the metadata for a profile picture")
     const profileId = taskArgs.profileId;
 
     const metadata = await hre.run("fetch:metadata", { contract, profileId });
-    console.log(metadata);
+    console.log(JSON.stringify(metadata));
   });
 
 task("profile:image", "Print the image URL for a PFP")
