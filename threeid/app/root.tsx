@@ -13,7 +13,7 @@ import { useLoaderData } from "@remix-run/react";
 
 
 import styles from "./styles/tailwind.css";
-import social from "./assets/social2.png";
+import social from "./assets/social.png";
 import appleIcon from "./assets/apple-touch-icon.png";
 import icon32 from "./assets/favicon-32x32.png";
 import icon16 from "./assets/favicon-16x16.png";
