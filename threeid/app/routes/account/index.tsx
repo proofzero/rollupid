@@ -230,7 +230,7 @@ export default function Welcome() {
 
         <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
           <ButtonAnchor
-            href="https://twitter.com/threeid.xyz"
+            href="https://twitter.com/threeid_xyz"
             Icon={FaTwitter}
             iconColor="#1D9BF0"
           >
