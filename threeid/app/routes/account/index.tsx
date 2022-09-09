@@ -194,7 +194,7 @@ export default function Welcome() {
   const currentVotes = JSON.parse(votes.value);
 
   const [featureVotes, setFeatureVotes] = useState<Set<string>>(
-    new Set<string>(currentVotes || [])
+    new Set<string>(currentVotes ? currentVotes || [])
   );
 
   useEffect(() => {
