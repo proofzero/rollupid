@@ -27,6 +27,8 @@ import Text, {
 } from "~/components/typography/Text";
 import Heading from "~/components/typography/Heading";
 import SectionTitle from "~/components/typography/SectionTitle";
+import SectionHeading from "~/components/typography/SectionHeading";
+import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
@@ -91,8 +93,21 @@ const comingNext = [
     title: "Claim your PFP",
     description: (
       <>
-        Mint your very own 3ID 1/1 PFP. <br></br>
-        For more information see "What is the 3ID?"" PFP in the FAQ section.
+        <Text
+          className="mb-1"
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          Mint your very own 3ID 1/1 PFP.
+        </Text>
+        <Text
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          For more information see "What is the 3ID?"" PFP in the FAQ section.
+        </Text>
       </>
     ),
   },
@@ -100,8 +115,21 @@ const comingNext = [
     title: "Verify ENS",
     description: (
       <>
-        Connect your ENS name to your 3ID. <br></br>
-        Use your ENS name as your username for easier profile discovery.
+        <Text
+          className="mb-1"
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          Connect your ENS name to your 3ID.
+        </Text>
+        <Text
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          Use your ENS name as your username for easier profile discovery.
+        </Text>
       </>
     ),
   },
@@ -109,8 +137,21 @@ const comingNext = [
     title: "Configure Profile",
     description: (
       <>
-        Configure your NFT avatar and profile. <br></br>
-        Tell the world about yourself...or don't! It's up to you.
+        <Text
+          className="mb-1"
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          Configure your NFT avatar and profile.
+        </Text>
+        <Text
+          size={TextSize.SM}
+          weight={TextWeight.Regular400}
+          color={TextColor.Gray400}
+        >
+          Tell the world about yourself...or don't! It's up to you.
+        </Text>
       </>
     ),
   },
@@ -202,49 +243,68 @@ export default function Welcome() {
             ></div>
           </div>
           <div className="roadmap-ready">
-            <h3>Ready</h3>
+            <SectionHeadingSubtle title="Ready" />
+
             <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
                 <div
                   className="roadmap-ready__step step grid grid-cols-6"
                   key={index}
                 >
-                  <img
-                    src={stepComplete}
-                    alt="3ID logo"
-                    className="row-span-2 mt-1"
-                  />
-                  <p className="col-span-5">{step.title}</p>
-                  <p className="col-span-5">Completed</p>
+                  <div className="row-span-2 mt-1 flex justify-center items-center">
+                    <img src={stepComplete} alt="3ID logo" />
+                  </div>
+
+                  <div className="col-span-5">
+                    <SectionHeading>{step.title}</SectionHeading>
+                  </div>
+
+                  <div className="col-span-5">
+                    <Text
+                      size={TextSize.SM}
+                      weight={TextWeight.Regular400}
+                      color={TextColor.Gray500}
+                    >
+                      Completed
+                    </Text>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
+
           <div className="roadmap-next">
-            <h3>COMING NEXT</h3>
+            <SectionHeadingSubtle title="Coming next" />
+
             <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
                 <div
                   className="roadmap-next__step step grid grid-cols-6"
                   key={index}
                 >
-                  <img
-                    src={stepSoon}
-                    alt="3ID logo"
-                    className="row-span-2 mt-1"
-                  />
-                  <p className="col-span-5">{step.title}</p>
-                  <p className="col-span-5">{step.description}</p>
+                  <div className="row-span-2 mt-1 flex justify-center items-center">
+                    <img src={stepSoon} alt="3ID logo" />
+                  </div>
+
+                  <div className="col-span-5">
+                    <SectionHeading className="mb-1">
+                      {step.title}
+                    </SectionHeading>
+                  </div>
+
+                  <div className="col-span-5">{step.description}</div>
                 </div>
               ))}
             </div>
           </div>
           <div className="roadmap-vote">
-            <h3>TELL US WHAT'S NEXT</h3>
-            <p>
-              Vote for your favorite features ({3 - featureVotes.size} votes
-              left)
-            </p>
+            <SectionHeadingSubtle
+              title="Tell us what's next"
+              subtitle={`Vote for your favorite features (${
+                3 - featureVotes.size
+              } votes left)`}
+            />
+
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
                 <div
