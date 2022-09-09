@@ -17,7 +17,6 @@ import datadogRum from "~/utils/datadog.client";
 import FAQ from "~/components/FAQ";
 import InviteCode from "~/components/invite-code";
 
-import logo from "~/assets/three-id-logo.svg";
 import stepComplete from "~/assets/step_complete.png";
 import stepSoon from "~/assets/step_soon.png";
 import Text, {
@@ -200,7 +199,7 @@ export default function Welcome() {
   useEffect(() => {
     submit(
       { votes: JSON.stringify(Array.from(featureVotes)) },
-      { method: "post" }
+      { action: "", method: "post" }
     );
   }, [featureVotes]);
 
@@ -349,16 +348,16 @@ export default function Welcome() {
                           : false
                       }
                       onClick={(e) => {
-                        setTimeout(() => {
-                          //dismiss tooltip
-                          e.target.dispatchEvent(
-                            new MouseEvent("click", {
-                              view: window,
-                              bubbles: true,
-                              cancelable: false,
-                            })
-                          );
-                        }, 1500);
+                        // setTimeout(() => {
+                        //   //dismiss tooltip
+                        //   e.target.dispatchEvent(
+                        //     new MouseEvent("click", {
+                        //       view: window,
+                        //       bubbles: true,
+                        //       cancelable: false,
+                        //     })
+                        //   );
+                        // }, 1500);
                         featureVotes.add(step.title);
                         setFeatureVotes(new Set(featureVotes));
                         datadogRum.addAction("featureVote", {

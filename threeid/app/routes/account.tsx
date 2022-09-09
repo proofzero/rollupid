@@ -13,10 +13,10 @@ import { getUserSession } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
 import styles from "~/styles/account.css";
-import HeadNav from "~/components/head-nav";
 import { links as buttonStyles } from "~/components/base-button";
 import { links as faqStyles } from "~/components/FAQ";
 import { links as invCodeStyles } from "~/components/invite-code";
+import HeadNav from "~/components/head-nav";
 import ConditionalTooltip from "~/components/conditional-tooltip";
 import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
 
@@ -60,7 +60,7 @@ const subNavigation = [
   },
   {
     name: "NFT Gallery",
-    href: "/notaccount",
+    href: "#",
     icon: HiOutlineViewGridAdd,
     current: false,
   },

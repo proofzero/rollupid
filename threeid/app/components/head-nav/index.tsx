@@ -3,6 +3,13 @@ import { Fragment, useState  } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Link } from "@remix-run/react";
 
+import ConditionalTooltip from "~/components/conditional-tooltip";
+import Text, {
+  TextColor,
+  TextSize,
+  TextWeight,
+} from "~/components/typography/Text";
+
 import {
   HiOutlineBell,
 } from "react-icons/hi";
@@ -18,8 +25,13 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline'
 
-import logo from "~/assets/three-id-logo.svg";
+import logo from "~/assets/three-id-logo-white.svg";
+import defaultAvatar from "~/assets/circle_gradient.png";
 import SignOutLink from "~/components/sign-out-link";
+
+import styles from "./headNav.css";
+
+export const links = () => [{ rel: "stylesheet", href: styles }];
 
 const navigation = [
     { name: 'My Profile', to: "", disabled: true, current: false },
@@ -39,10 +51,7 @@ function classNames(...classes) {
 }
 
 const user = {
-    name: 'Tom Cook',
-    email: 'tom@example.com',
-    imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+    imageUrl: defaultAvatar
 }
 
 export default function HeadNav() {
@@ -51,7 +60,7 @@ export default function HeadNav() {
         <Disclosure as="nav">
             {({ open }) => (
               <>
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl">
                     <div className="flex h-16 items-center justify-between px-4 sm:px-0">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
@@ -65,19 +74,29 @@ export default function HeadNav() {
                           <div className="ml-10 flex items-baseline space-x-4">
                             {navigation.map((item) => ( 
                               // TODO: convert to NavLink to remove "disabled" and "current" https://remix.run/docs/en/v1/api/remix#navlink
-                              <Link
-                                key={item.name}
-                                to={item.to}
-                                className={classNames(
-                                  item.current
-                                    ? 'bg-gray-900 text-white'
-                                    : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                  'px-3 py-2 text-sm font-medium'
-                                )}
-                                aria-current={item.current ? 'page' : undefined}
-                              >
-                                {item.name}
-                              </Link>
+                                <Link
+                                  key={item.name}
+                                  to={item.to}
+                                  className={classNames(
+                                    item.current
+                                      ? 'bg-gray-800 text-white'
+                                      : 'text-gray-700 hover:bg-gray-700 hover:text-white',
+                                    'px-3 py-2 text-sm font-medium nav-link-text'
+                                  )}
+                                  aria-current={item.current ? 'page' : undefined}
+                                >
+                                  <ConditionalTooltip  content="Coming Soon" condition={!item.current}>
+
+                                    <Text
+                                      size={TextSize.SM}
+                                      weight={TextWeight.Medium500}
+                                      color={item.current ? TextColor.White: TextColor.Gray700}
+                                    >
+                                      {item.name}
+                                    </Text>
+                                  </ConditionalTooltip>
+
+                                </Link>
                             ))}
                           </div>
                         </div>

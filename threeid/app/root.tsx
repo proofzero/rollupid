@@ -26,6 +26,9 @@ import manifest from "./assets/site.webmanifest";
 import maskIcon from "./assets/safari-pinned-tab.svg";
 
 import { links as buttonLinks } from "~/components/buttons";
+import { links as headNavLink } from "~/components/head-nav";
+
+
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -52,6 +55,7 @@ export const links: LinksFunction = () => [
   { rel: "shortcut icon", href: favicon },
   { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
   ...buttonLinks(),
+  ...headNavLink(),
 ];
 
 export const loader: LoaderFunction = () => {

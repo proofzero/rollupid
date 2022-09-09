@@ -21,34 +21,6 @@
     }
 }
 
-.nav-items {
-
-    img {
-        width: 36.56px;
-        height: 41.05px;
-    }
-    ul {
-
-        li {
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-family: 'Inter_500Medium';
-            font-style: normal;
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 38px;
-            color: $threeid-darkgrey;
-        }
-    }
-
-    .nav-button {
-        button {
-            background-color: white;
-            color: $threeid-darkgrey;
-        }
-    }
-}
-
 .progress-bar {
     width: 100%;
     background-color: $threeid-light;
