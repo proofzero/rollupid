@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
+import SectionHeading from "../typography/SectionHeading";
 
 const dropdown = require("../../assets/dropdown.png");
 
@@ -41,7 +42,7 @@ const AccordionComponent = ({ content }: options) => {
           className="faq-button"
         >
           <div className="dropdown">
-            <h3 className="faq-header-question">{content.question}</h3>
+            <SectionHeading>{content.question}</SectionHeading>
 
             {expanded ? (
               <RiArrowDropDownLine className="faq-header-arrow" />
