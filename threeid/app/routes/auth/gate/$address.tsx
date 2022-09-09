@@ -200,7 +200,7 @@ export default function AuthGate() {
                 <p className="auth-secondary-message">
                     If you want to get an early access please join our Discord.
                 </p>
-                <div className="error-buttons grid grid-cols-2">
+                <div className="error-buttons grid grid-rows-2 lg:grid-cols-2">
                     <BaseButton text={"Try Different Wallet"} color={"dark"} onClick={() => {
                         disconnect()
                     }} />

@@ -95,7 +95,7 @@ export default function AuthSign() {
             {!error && <Spinner />}
            
             {error && (
-                <div className="error-buttons">
+                <div className="error-buttons grid grid-rows-2 lg:grid-cols-2">
                     <BaseButton text={"Try Again"} color={"dark"} onClick={() => signMessage(sign)} />
                     <BaseButton text={"Disconnect"} color={"light"} onClick={disconnect} />
                 </div>
