@@ -1,19 +1,14 @@
 import SectionTitle from "../typography/SectionTitle";
+import SectionHeading from "../typography/SectionHeading";
 import SmallRegularBlock from "../typography/SmallRegularBlock";
 import Text from "../typography/Text";
-import AccordionComponent from "./AccordionComponent";
 
 import styles from "./FAQ.css";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
-type Account = {
-  account: undefined | null | string;
-};
-
 const contents = [
   {
-    defaultExpanded: true,
     question: "How do I use 3ID?",
     answer: (
       <>
@@ -24,7 +19,7 @@ const contents = [
           media.
         </SmallRegularBlock>
 
-        <SmallRegularBlock>
+        <SmallRegularBlock className="mb-4">
           In our roadmap we have many more features coming including linking
           multiple accounts together, messaging, storage and more.
         </SmallRegularBlock>
@@ -32,7 +27,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "Can I sell my invite card?",
     answer: (
       <div className="my-4">
@@ -56,7 +50,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "What is my the 3ID PFP?",
     answer: (
       <div className="my-4">
@@ -117,7 +110,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "Who is behind this project?",
     answer: (
       <div className="my-4">
@@ -148,14 +140,61 @@ const contents = [
   },
 ];
 
-const FAQ = ({ account }: Account) => {
+const FAQ = () => {
   return (
-    <div>
+    <div className="mb-3">
       <SectionTitle className="mb-1 mt-6" title="FAQ" />
+      <div className="accordion" id="accordionFaq">
+        {contents.map((content, index) => {
+          const borderStyle =
+            index === contents.length - 1 ? "" : "border-down";
 
-      {contents.map((content) => (
-        <AccordionComponent key={content.question} content={content} />
-      ))}
+          return (
+            <div
+              key={content.question}
+              className={`accordion-item bg-white ${borderStyle}`}
+            >
+              <div
+                className="accordion-header border-none mb-0"
+                id={`heading-${index}`}
+              >
+                <button
+                  className={
+                    index === 0
+                      ? "accordion-button relative flex\
+                       items-center w-full py-4\
+                      text-left bg-white border-0 rounded-none\
+                       transition focus:outline-none"
+                      : "accordion-button collapsed relative flex\
+                       items-center w-full py-4\
+                        text-left bg-white border-none rounded-none\
+                         transition focus:outline-none"
+                  }
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target={`#collapse-${index}`}
+                  aria-expanded="true"
+                  aria-controls={`collapse-${index}`}
+                >
+                  <SectionHeading>{content.question}</SectionHeading>
+                </button>
+              </div>
+              <div
+                id={`collapse-${index}`}
+                className={
+                  index === 0
+                    ? "accordion-collapse collapse show"
+                    : "accordion-collapse collapse"
+                }
+                aria-labelledby={`heading-${index}`}
+                data-bs-parent="#accordionFaq"
+              >
+                <div className="accordion-body">{content.answer}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
