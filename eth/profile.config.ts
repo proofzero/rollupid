@@ -545,24 +545,18 @@ task("profile:mint", "Mint a profile for an account")
       account,
     });
 
-    const voucher = {
-      recipient: profilePicturePayload.result.voucher.account,
-      uri: profilePicturePayload.result.voucher.tokenURI,
-      signature: profilePicturePayload.result.signature.signature
-    };
-
     // Call our contract to award the profile.
     const awardResult = await hre.run("call:awardProfile", {
       account,
       contract,
-      tokenUri: profilePicturePayload.result.voucher.tokenURI,
-      voucher: JSON.stringify(voucher),
+      tokenUri: profilePicturePayload.result.voucher.uri,
+      voucher: JSON.stringify(profilePicturePayload.result.voucher),
     });
 
     console.log(chalk.red("AWARDED PROFILE PICTURE"));
     console.log(chalk.green("->  contract:"), contract);
     console.log(chalk.green("-> recipient:"), account);
-    console.log(chalk.green("->  metadata:"), profilePicturePayload.result.voucher.tokenURI);
+    console.log(chalk.green("->  metadata:"), profilePicturePayload.result.voucher.uri);
   });
 
 // config
