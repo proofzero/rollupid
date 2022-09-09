@@ -1,19 +1,15 @@
 import SectionTitle from "../typography/SectionTitle";
 import SmallRegularBlock from "../typography/SmallRegularBlock";
 import Text from "../typography/Text";
-import AccordionComponent from "./AccordionComponent";
+import { useState } from "react";
+import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 
 import styles from "./FAQ.css";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
-type Account = {
-  account: undefined | null | string;
-};
-
 const contents = [
   {
-    defaultExpanded: true,
     question: "How do I use 3ID?",
     answer: (
       <>
@@ -32,7 +28,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "Can I sell my invite card?",
     answer: (
       <div className="my-4">
@@ -56,7 +51,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "What is my the 3ID PFP?",
     answer: (
       <div className="my-4">
@@ -117,7 +111,6 @@ const contents = [
     ),
   },
   {
-    defaultExpanded: false,
     question: "Who is behind this project?",
     answer: (
       <div className="my-4">
@@ -148,14 +141,49 @@ const contents = [
   },
 ];
 
-const FAQ = ({ account }: Account) => {
+const FAQ = () => {
+  const [expanded, setExpanded] = useState(0);
   return (
     <div>
       <SectionTitle className="mb-1 mt-6" title="FAQ" />
 
-      {contents.map((content) => (
-        <AccordionComponent key={content.question} content={content} />
-      ))}
+      {contents.map((content, index) => {
+        const borderStyle =
+          content.question === "Who is behind this project?"
+            ? ""
+            : "border-down";
+
+        const answerStyle = {
+          transform: expanded === index ? "scaleY(1)" : "scaleY(0)",
+          height: expanded === index ? "100%" : "0px",
+          transformOrigin: "top",
+          transition: "all 300ms",
+        };
+
+        return (
+          <div key={content.question} className={`py-3 ${borderStyle}`}>
+            <div className="mb-3 transitioned">
+              <button
+                onClick={() => {
+                  index !== expanded ? setExpanded(index) : setExpanded(-1);
+                }}
+                className="faq-button"
+              >
+                <div className="dropdown">
+                  <h3 className="faq-header-question">{content.question}</h3>
+                  {expanded === index ? (
+                    <RiArrowDropUpLine className="faq-header-arrow" />
+                  ) : (
+                    <RiArrowDropDownLine className="faq-header-arrow" />
+                  )}
+                </div>
+              </button>
+              {/* <div className={expanded === index ? "" : "faq-hidden-answer"}> */}
+              <div style={answerStyle}>{content.answer}</div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
