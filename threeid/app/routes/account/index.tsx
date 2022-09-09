@@ -1,6 +1,11 @@
 import { json, redirect } from "@remix-run/cloudflare";
 
-import { useFetcher, useLoaderData, useSubmit, useFetchers } from "@remix-run/react";
+import {
+  useFetcher,
+  useLoaderData,
+  useSubmit,
+  useFetchers,
+} from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
 import { Tooltip } from "flowbite-react";
@@ -15,7 +20,13 @@ import InviteCode from "~/components/invite-code";
 import logo from "~/assets/three-id-logo.svg";
 import stepComplete from "~/assets/step_complete.png";
 import stepSoon from "~/assets/step_soon.png";
-
+import Text, {
+  TextColor,
+  TextSize,
+  TextWeight,
+} from "~/components/typography/Text";
+import Heading from "~/components/typography/Heading";
+import SectionTitle from "~/components/typography/SectionTitle";
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
@@ -25,8 +36,20 @@ export const loader = async ({ request, params }) => {
 
   // TODO remove session address param when RPC url is changed
   const [inviteCodeRes, votesRes] = await Promise.all([
-    oortSend("3id_getInviteCode", [], address, jwt, request.headers.get("Cookie")),
-    oortSend("kb_getData", ["3id.app", "feature_vote_count"], address, jwt, request.headers.get("Cookie")),
+    oortSend(
+      "3id_getInviteCode",
+      [],
+      address,
+      jwt,
+      request.headers.get("Cookie")
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.app", "feature_vote_count"],
+      address,
+      jwt,
+      request.headers.get("Cookie")
+    ),
   ]);
 
   if (inviteCodeRes.error || votesRes.error) {
@@ -37,19 +60,25 @@ export const loader = async ({ request, params }) => {
   return json({
     inviteCode,
     votes,
-    address
+    address,
   });
 };
 
-export const action = async ({ request }) => {
+export const action = async ({ request }: any) => {
   const votes = (await request.formData()).get("votes");
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
   const address = session.get("address");
 
-  oortSend("kb_setData", ["3id.app", "feature_vote_count", votes], address, jwt, request.headers.get("Cookie"));
+  oortSend(
+    "kb_setData",
+    ["3id.app", "feature_vote_count", votes],
+    address,
+    jwt,
+    request.headers.get("Cookie")
+  );
   return json({ votes });
-}
+};
 
 const completeSteps = [
   {
@@ -113,27 +142,44 @@ const roadmapSteps = [
 
 const percentage =
   (completeSteps.length /
-    (completeSteps.length + comingNext.length + roadmapSteps.length)) * 100;
-
+    (completeSteps.length + comingNext.length + roadmapSteps.length)) *
+  100;
 
 export default function Welcome() {
   const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
-  const currentVotes = JSON.parse(votes.value)
+  const currentVotes = JSON.parse(votes.value);
 
-  const [featureVotes, setFeatureVotes] = useState<Set<string>>(new Set<string>(currentVotes || []));
+  const [featureVotes, setFeatureVotes] = useState<Set<string>>(
+    new Set<string>(currentVotes || [])
+  );
 
   useEffect(() => {
-    submit({"votes": JSON.stringify(Array.from(featureVotes))}, {method: "POST"})
-  }, [featureVotes])
+    submit(
+      { votes: JSON.stringify(Array.from(featureVotes)) },
+      { method: "post" }
+    );
+  }, [featureVotes]);
 
   return (
     <div className="dashboard flex flex-col gap-4">
       <div className="welcome-banner basis-full">
-        <h1>Welcome to 3ID!</h1>
-        <p>The app is currently in beta. We will be unlocking new features on weekly basis. 
-            Please follow us on Twitter and join our Discord to stay updated!{" "}</p>
+        <Heading
+          className="mb-3"
+        >
+          Welcome to 3ID! 🎉
+        </Heading>
+
+        <Text
+          weight={TextWeight.Regular400}
+          size={TextSize.Base}
+          color={TextColor.Gray500}>
+          The app is currently in beta. We will be unlocking new features on
+          weekly basis. Please follow us on Twitter and join our Discord to stay
+          updated!
+        </Text>
+
         <div className="flex flex-row gap-4">
           <a href="https://twitter.com/threeid.xyz">Twitter</a>
           <a href="https://discord.gg/threeid">Discord</a>
@@ -141,22 +187,35 @@ export default function Welcome() {
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
-         <InviteCode invite={inviteCode}/>
+          <InviteCode invite={inviteCode} />
           <div className="faq hidden lg:block">
-            <FAQ account={address}/>
+            <FAQ account={address} />
           </div>
         </div>
         <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
-          <h2>Roadmap</h2>
+          <SectionTitle>
+            Roadmap
+          </SectionTitle>
+
           <div className="progress-bar">
-            <div className="progress-bar__fill" style={{ width: `${percentage}%` }}></div>
+            <div
+              className="progress-bar__fill"
+              style={{ width: `${percentage}%` }}
+            ></div>
           </div>
           <div className="roadmap-ready">
             <h3>Ready</h3>
             <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
-                <div className="roadmap-ready__step step grid grid-cols-6" key={index}>
-                  <img src={stepComplete} alt="3ID logo" className="row-span-2 mt-1" />
+                <div
+                  className="roadmap-ready__step step grid grid-cols-6"
+                  key={index}
+                >
+                  <img
+                    src={stepComplete}
+                    alt="3ID logo"
+                    className="row-span-2 mt-1"
+                  />
                   <p className="col-span-5">{step.title}</p>
                   <p className="col-span-5">Completed</p>
                 </div>
@@ -167,8 +226,15 @@ export default function Welcome() {
             <h3>COMING NEXT</h3>
             <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
-                <div className="roadmap-next__step step grid grid-cols-6" key={index}>
-                  <img src={stepSoon} alt="3ID logo" className="row-span-2 mt-1" />
+                <div
+                  className="roadmap-next__step step grid grid-cols-6"
+                  key={index}
+                >
+                  <img
+                    src={stepSoon}
+                    alt="3ID logo"
+                    className="row-span-2 mt-1"
+                  />
                   <p className="col-span-5">{step.title}</p>
                   <p className="col-span-5">{step.description}</p>
                 </div>
@@ -177,29 +243,50 @@ export default function Welcome() {
           </div>
           <div className="roadmap-vote">
             <h3>TELL US WHAT'S NEXT</h3>
-            <p>Vote for your favorite features ({3 - featureVotes.size} votes left)</p>
+            <p>
+              Vote for your favorite features ({3 - featureVotes.size} votes
+              left)
+            </p>
             <div className="roadmap-vote__steps steps grid grid-rows gap-4">
               {roadmapSteps.map((step, index) => (
-                <div className="roadmap-vote__step step grid grid-cols-6" key={index}>
-                  <Tooltip content={3 - featureVotes.size ? "Vote submitted!": "Already submitted"} trigger="click" animation="duration-1000">
-                    <button className="roadmap-vote__button row-span-2 mt-1"
-                        disabled={(featureVotes.size >= 3 || featureVotes.has(step.title)) ? true : false}
-                        onClick={(e) => { 
-                          setTimeout(() => {
-                            e.target.dispatchEvent(new MouseEvent("click", {
-                              "view": window,
-                              "bubbles": true,
-                              "cancelable": false
-                          }));
-                          }, 1500);
-                          featureVotes.add(step.title)
-                          setFeatureVotes(new Set(featureVotes))
-                          datadogRum.addAction('featureVote', {
-                            'value': step.title,
-                          })
-                        }}
-                      >
-                        <FaCaretUp />
+                <div
+                  className="roadmap-vote__step step grid grid-cols-6"
+                  key={index}
+                >
+                  <Tooltip
+                    content={
+                      3 - featureVotes.size
+                        ? "Vote submitted!"
+                        : "Already submitted"
+                    }
+                    trigger="click"
+                    animation="duration-1000"
+                  >
+                    <button
+                      className="roadmap-vote__button row-span-2 mt-1"
+                      disabled={
+                        featureVotes.size >= 3 || featureVotes.has(step.title)
+                          ? true
+                          : false
+                      }
+                      onClick={(e) => {
+                        setTimeout(() => {
+                          e.target.dispatchEvent(
+                            new MouseEvent("click", {
+                              view: window,
+                              bubbles: true,
+                              cancelable: false,
+                            })
+                          );
+                        }, 1500);
+                        featureVotes.add(step.title);
+                        setFeatureVotes(new Set(featureVotes));
+                        datadogRum.addAction("featureVote", {
+                          value: step.title,
+                        });
+                      }}
+                    >
+                      <FaCaretUp />
                     </button>
                   </Tooltip>
                   <p className="col-span-5">{step.title}</p>
@@ -207,11 +294,9 @@ export default function Welcome() {
               ))}
             </div>
           </div>
-
         </div>
         <div className="faq basis-full lg:basis-6/12 lg:hidden order-3">
-        <FAQ account={address}/>
-
+          <FAQ account={address} />
         </div>
       </div>
       {/* <button

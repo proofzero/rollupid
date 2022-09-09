@@ -1,3 +1,4 @@
+import SectionTitle from "../typography/SectionTitle";
 import AccordionComponent from "./AccordionComponent";
 
 import styles from "./FAQ.css";
@@ -121,7 +122,7 @@ const contents = [
 const FAQ = ({ account }: Account) => {
   return (
     <div>
-      <h2 className="faq-header">FAQ</h2>
+      <SectionTitle className="mb-1 mt-6">FAQ</SectionTitle>
 
       {contents.map((content) => (
         <AccordionComponent key={content.question} content={content} />

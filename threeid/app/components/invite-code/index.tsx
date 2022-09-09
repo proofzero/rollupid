@@ -2,6 +2,13 @@ import { HiLink } from "react-icons/hi";
 import styles from "./inviteCode.css";
 import { Tooltip } from "flowbite-react";
 
+import Text, {
+  TextColor,
+  TextSize,
+  TextWeight,
+} from "~/components/typography/Text";
+import SectionTitle from "../typography/SectionTitle";
+
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
 type InviteHolder = {
@@ -24,7 +31,8 @@ type InviteCodeProps = {
 const InviteCode = ({ invite }: InviteCodeProps) => {
   return (
     <div>
-      <h2 className="invite-header">Invite Friends</h2>
+      <SectionTitle>Invite Friends</SectionTitle>
+
       {invite.code && (
         <div>
           <div className="invite-description">
