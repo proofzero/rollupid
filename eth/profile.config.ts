@@ -204,12 +204,9 @@ subtask("call:awardProfile", "Mint PFP NFT")
     
     // HAXX
     const voucher = JSON.parse(taskArgs.voucher);
-    console.log(voucher);
 
     const contractName = "ThreeId_ProfilePicture";
-
     const profile = await hre.ethers.getContractAt(contractName, contract);
-    console.log('got here')
     return profile.awardPFP(account, voucher);
   });
 
@@ -261,7 +258,7 @@ subtask("fetch:metadata", "Display the metadata for the profile")
     });
   });
 
-task("profile:generate-payload", "Call NFTar to get the custom NFT asset and signed voucher")
+subtask("profile:generate-payload", "Call NFTar to get the custom NFT asset and signed voucher")
   .addParam("account", "The recipient wallet address")
   .setAction(async (taskArgs, hre) => {
     const account = await hre.run("config:account", { account: taskArgs.account });
@@ -554,15 +551,6 @@ task("profile:mint", "Mint a profile for an account")
       signature: profilePicturePayload.result.signature.signature
     };
 
-    // let voucher = profilePicturePayload.result.voucher;
-    // voucher.signature = profilePicturePayload.result.signature.signature;
-    // console.log(profilePicturePayload.result.metadata.image);
-    // console.log(profilePicturePayload.result.voucher.account);
-    // console.log(profilePicturePayload.result.voucher.tokenURI);
-    // console.log(profilePicturePayload.result.signature.signature);
-
-    // console.log(JSON.stringify(voucher));
-
     // Call our contract to award the profile.
     const awardResult = await hre.run("call:awardProfile", {
       account,
@@ -571,15 +559,13 @@ task("profile:mint", "Mint a profile for an account")
       voucher: JSON.stringify(voucher),
     });
 
-    // console.log(JSON.stringify(awardResult));
-
     console.log(chalk.red("AWARDED PROFILE PICTURE"));
     console.log(chalk.green("->  contract:"), contract);
     console.log(chalk.green("-> recipient:"), account);
     console.log(chalk.green("->  metadata:"), profilePicturePayload.result.voucher.tokenURI);
   });
 
-  // config
+// config
 // -----------------------------------------------------------------------------
 
 const config: HardhatUserConfig = {
