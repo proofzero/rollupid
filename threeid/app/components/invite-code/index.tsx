@@ -31,13 +31,13 @@ type InviteCodeProps = {
 const InviteCode = ({ invite }: InviteCodeProps) => {
   return (
     <div>
-      <SectionTitle title="Invite Friends" />
+      <SectionTitle
+        title="Invite Friends"
+        subtitle="Share an invite link with your friends"
+      />
 
       {invite.code && (
         <div>
-          <div className="invite-description">
-            Share an invite link with your friends
-          </div>
           <div className="invite-link-wrapper">
             <div className="invite-link">
               https://get.threeid.xyz/{invite.code}

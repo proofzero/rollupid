@@ -191,7 +191,6 @@ export default function Welcome() {
         </div>
         <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
           <SectionTitle
-            className="mb-3"
             title="Roadmap"
             subtitle="Discover and try new features as we roll them out"
           />

@@ -11,8 +11,11 @@ export type SectionTitleProps = {
 };
 
 const SectionTitle = ({ className, title, subtitle }: SectionTitleProps) => {
+  let cleanedClassName = className?.replace("mb-3", "") || "";
+  cleanedClassName += " mb-3";
+
   return (
-    <div className={className}>
+    <div className={cleanedClassName}>
       <Text
         className="mb-1"
         weight={TextWeight.SemiBold600}
