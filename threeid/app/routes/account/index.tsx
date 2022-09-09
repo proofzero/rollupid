@@ -29,6 +29,7 @@ import Heading from "~/components/typography/Heading";
 import SectionTitle from "~/components/typography/SectionTitle";
 import SectionHeading from "~/components/typography/SectionHeading";
 import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
+import { ButtonAnchor, ButtonSize } from "~/components/buttons";
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
@@ -219,8 +220,13 @@ export default function Welcome() {
         </Text>
 
         <div className="flex flex-row gap-4">
-          <a href="https://twitter.com/threeid.xyz">Twitter</a>
-          <a href="https://discord.gg/threeid">Discord</a>
+          <ButtonAnchor
+            href="https://twitter.com/threeid.xyz"
+            size={ButtonSize.XL}
+          >
+            Twitter
+          </ButtonAnchor>
+          <ButtonAnchor href="https://discord.gg/threeid">Discord</ButtonAnchor>
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-8">

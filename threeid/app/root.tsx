@@ -1,4 +1,8 @@
-import type { MetaFunction, LinksFunction, LoaderFunction } from "@remix-run/cloudflare";
+import type {
+  MetaFunction,
+  LinksFunction,
+  LoaderFunction,
+} from "@remix-run/cloudflare";
 import {
   Links,
   LiveReload,
@@ -11,7 +15,6 @@ import { json } from "@remix-run/cloudflare";
 
 import { useLoaderData } from "@remix-run/react";
 
-
 import styles from "./styles/tailwind.css";
 import social from "./assets/social.png";
 import appleIcon from "./assets/apple-touch-icon.png";
@@ -22,6 +25,8 @@ import favicon from "./assets/favicon.ico";
 import manifest from "./assets/site.webmanifest";
 import maskIcon from "./assets/safari-pinned-tab.svg";
 
+import { links as buttonLinks } from "~/components/buttons";
+
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "3ID",
@@ -29,12 +34,12 @@ export const meta: MetaFunction = () => ({
   "og:title": "3ID - Decentralized Web Passport",
   "og:site_name": "3ID",
   "og:url": "https://dapp.threeid.xyz",
-  "og:description": "3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.",
+  "og:description":
+    "3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.",
   "og:image": social,
   "theme-color": "#673ab8",
   "mobile-web-app-capable": "yes",
   "apple-mobile-web-app-capable": "yes",
-  
 });
 
 export const links: LinksFunction = () => [
@@ -46,6 +51,7 @@ export const links: LinksFunction = () => [
   { rel: "mask-icon", href: maskIcon, color: "#5bbad5" },
   { rel: "shortcut icon", href: favicon },
   { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
+  ...buttonLinks(),
 ];
 
 export const loader: LoaderFunction = () => {
@@ -54,7 +60,7 @@ export const loader: LoaderFunction = () => {
       // @ts-ignore
       DATADOG_APPLICATION_ID: DATADOG_APPLICATION_ID,
       // @ts-ignore
-      DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN, 
+      DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN,
       // @ts-ignore
       DATADOG_SERVICE_NAME: DATADOG_SERVICE_NAME,
       // @ts-ignore
@@ -75,12 +81,10 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload port={8002}/>
+        <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(
-              browserEnv.ENV
-            )}`,
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
       </body>
