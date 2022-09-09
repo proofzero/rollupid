@@ -212,20 +212,23 @@ export default function Welcome() {
           padding: "30px 30px 23px 16px",
         }}
       >
-        <Heading className="mb-3">Welcome to 3ID! 🎉</Heading>
+        <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID!</span>
+          <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
+          </Heading>
 
         <Text
           weight={TextWeight.Regular400}
           size={TextSize.Base}
           color={TextColor.Gray500}
-          className="mb-6"
+          className="mb-6 text-center lg:text-left"
         >
           The app is currently in beta. We will be unlocking new features on
           weekly basis. Please follow us on Twitter and join our Discord to stay
           updated!
         </Text>
 
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
           <ButtonAnchor
             href="https://twitter.com/threeid.xyz"
             Icon={FaTwitter}
