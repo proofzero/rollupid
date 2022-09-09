@@ -1,8 +1,7 @@
 import SectionTitle from "../typography/SectionTitle";
+import SectionHeading from "../typography/SectionHeading";
 import SmallRegularBlock from "../typography/SmallRegularBlock";
 import Text from "../typography/Text";
-import { useState } from "react";
-import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri";
 
 import styles from "./FAQ.css";
 
@@ -20,7 +19,7 @@ const contents = [
           media.
         </SmallRegularBlock>
 
-        <SmallRegularBlock>
+        <SmallRegularBlock className="mb-4">
           In our roadmap we have many more features coming including linking
           multiple accounts together, messaging, storage and more.
         </SmallRegularBlock>
@@ -142,48 +141,60 @@ const contents = [
 ];
 
 const FAQ = () => {
-  const [expanded, setExpanded] = useState(0);
   return (
-    <div>
+    <div className="mb-3">
       <SectionTitle className="mb-1 mt-6" title="FAQ" />
+      <div className="accordion" id="accordionFaq">
+        {contents.map((content, index) => {
+          const borderStyle =
+            index === contents.length - 1 ? "" : "border-down";
 
-      {contents.map((content, index) => {
-        const borderStyle =
-          content.question === "Who is behind this project?"
-            ? ""
-            : "border-down";
-
-        const answerStyle = {
-          transform: expanded === index ? "scaleY(1)" : "scaleY(0)",
-          height: expanded === index ? "100%" : "0px",
-          transformOrigin: "top",
-          transition: "all 300ms",
-        };
-
-        return (
-          <div key={content.question} className={`py-3 ${borderStyle}`}>
-            <div className="mb-3 transitioned">
-              <button
-                onClick={() => {
-                  index !== expanded ? setExpanded(index) : setExpanded(-1);
-                }}
-                className="faq-button"
+          return (
+            <div
+              key={content.question}
+              className={`accordion-item bg-white ${borderStyle}`}
+            >
+              <div
+                className="accordion-header border-none mb-0"
+                id={`heading-${index}`}
               >
-                <div className="dropdown">
-                  <h3 className="faq-header-question">{content.question}</h3>
-                  {expanded === index ? (
-                    <RiArrowDropUpLine className="faq-header-arrow" />
-                  ) : (
-                    <RiArrowDropDownLine className="faq-header-arrow" />
-                  )}
-                </div>
-              </button>
-              {/* <div className={expanded === index ? "" : "faq-hidden-answer"}> */}
-              <div style={answerStyle}>{content.answer}</div>
+                <button
+                  className={
+                    index === 0
+                      ? "accordion-button relative flex\
+                       items-center w-full py-4\
+                      text-left bg-white border-0 rounded-none\
+                       transition focus:outline-none"
+                      : "accordion-button collapsed relative flex\
+                       items-center w-full py-4\
+                        text-left bg-white border-none rounded-none\
+                         transition focus:outline-none"
+                  }
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target={`#collapse-${index}`}
+                  aria-expanded="true"
+                  aria-controls={`collapse-${index}`}
+                >
+                  <SectionHeading>{content.question}</SectionHeading>
+                </button>
+              </div>
+              <div
+                id={`collapse-${index}`}
+                className={
+                  index === 0
+                    ? "accordion-collapse collapse show"
+                    : "accordion-collapse collapse"
+                }
+                aria-labelledby={`heading-${index}`}
+                data-bs-parent="#accordionFaq"
+              >
+                <div className="accordion-body">{content.answer}</div>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
