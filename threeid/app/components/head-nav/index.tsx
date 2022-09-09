@@ -160,12 +160,20 @@ export default function HeadNav() {
                         key={item.name}
                         as="a"
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'block px-3 py-2 text-base font-medium'
+                          item.current
+                            ? 'bg-gray-800 text-white'
+                            : 'text-gray-700 hover:bg-gray-700 hover:text-white',
+                          'px-3 py-2 text-sm font-medium nav-link-text block'
                         )}
                         aria-current={item.current ? 'page' : undefined}
                       >
-                        {item.name}
+                        <Text
+                          size={TextSize.SM}
+                          weight={TextWeight.Medium500}
+                          color={item.current ? TextColor.White: TextColor.Gray700}
+                        >
+                          {item.name}
+                        </Text>
                       </Disclosure.Button>
                     ))}
                   </div>
@@ -173,10 +181,6 @@ export default function HeadNav() {
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
                         <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
-                      </div>
-                      <div className="ml-3">
-                        <div className="text-base font-medium leading-none text-white">{user.name}</div>
-                        <div className="text-sm font-medium leading-none text-gray-400">{user.email}</div>
                       </div>
                       <button
                         type="button"
