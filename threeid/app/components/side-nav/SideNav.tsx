@@ -1,11 +1,6 @@
 import { BiCog, BiIdCard, BiLink } from "react-icons/bi";
 import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
 import SideNavItem from "./SideNavItem";
-import sideNavStyles from "./side-nav.css";
-
-export function links() {
-  return [{ rel: "stylesheet", href: sideNavStyles }];
-}
 
 const subNavigation = [
   {
