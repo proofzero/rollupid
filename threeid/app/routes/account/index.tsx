@@ -190,7 +190,7 @@ export default function Welcome() {
   const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
-  const currentVotes = JSON.parse(votes.value || []);
+  const currentVotes = JSON.parse(votes.value);
 
   const [featureVotes, setFeatureVotes] = useState<Set<string>>(
     new Set<string>(currentVotes ? currentVotes : [])
