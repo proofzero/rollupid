@@ -121,7 +121,7 @@ const contents = [
         >
           Kubelt
         </a>
-        
+
         <SmallRegularBlock type="span">
           , a decentralized application platform, and is inspired by Web3 and
           the digital identity specification. Instead of applications

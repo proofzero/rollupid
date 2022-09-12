@@ -28,8 +28,6 @@ import maskIcon from "./assets/safari-pinned-tab.svg";
 import { links as buttonLinks } from "~/components/buttons";
 import { links as headNavLink } from "~/components/head-nav";
 
-
-
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "3ID",

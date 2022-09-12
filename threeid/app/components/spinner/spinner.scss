@@ -1,20 +1,19 @@
 @-webkit-keyframes spCircRot {
-    from {
-      -webkit-transform: rotate(0deg);
-    }
-  
-    to {
-      -webkit-transform: rotate(359deg);
-    }
+  from {
+    -webkit-transform: rotate(0deg);
   }
-  
-  @keyframes spCircRot {
-    from {
-      transform: rotate(0deg);
-    }
-  
-    to {
-      transform: rotate(359deg);
-    }
+
+  to {
+    -webkit-transform: rotate(359deg);
   }
-  
+}
+
+@keyframes spCircRot {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}

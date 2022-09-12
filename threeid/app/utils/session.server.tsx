@@ -1,7 +1,7 @@
-import { 
+import {
   createCookieSessionStorage,
   // createCloudflareKVSessionStorage,
-  redirect 
+  redirect,
 } from "@remix-run/cloudflare";
 
 // @ts-ignore
@@ -26,19 +26,19 @@ const storage = createCookieSessionStorage({
 });
 
 export async function createUserSession(
-    jwt: string,
-    redirectTo: string,
-    address?: string // NOTE: storing this temporarily in the session util RPC url remove address
-  ) {
-    const session = await storage.getSession();
-    session.set("jwt", jwt);
-    session.set("address", address);
-    return redirect(redirectTo, {
-      headers: {
-        "Set-Cookie": await storage.commitSession(session),
-      },
-    });
-  }
+  jwt: string,
+  redirectTo: string,
+  address?: string // NOTE: storing this temporarily in the session util RPC url remove address
+) {
+  const session = await storage.getSession();
+  session.set("jwt", jwt);
+  session.set("address", address);
+  return redirect(redirectTo, {
+    headers: {
+      "Set-Cookie": await storage.commitSession(session),
+    },
+  });
+}
 
 // TODO: reset cookie maxAge if valid
 export function getUserSession(request: Request, renew: boolean = true) {

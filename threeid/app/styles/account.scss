@@ -6,69 +6,69 @@
 // }
 
 .header {
-    background-color: $threeid-header ;
-    padding-bottom: 300px;
-    padding-left: 1em;
-    padding-right: 1em;
+  background-color: $threeid-header;
+  padding-bottom: 300px;
+  padding-left: 1em;
+  padding-right: 1em;
 
-    nav {
-        margin-right: auto;
-        margin-left: auto;
-        padding-top: 1em;
-        padding-bottom: 1em;
-        max-width: 1214px;
-        z-index: 2;
-    }
+  nav {
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    max-width: 1214px;
+    z-index: 2;
+  }
 }
 
 .progress-bar {
-    width: 100%;
-    background-color: $threeid-light;
-    height: 5px;
-    margin-bottom: 14px;
+  width: 100%;
+  background-color: $threeid-light;
+  height: 5px;
+  margin-bottom: 14px;
 
-    .progress-bar__fill {
-        background-color: $threeid-bar;
-        flex: 1;
-        height: 5px;
-    }
+  .progress-bar__fill {
+    background-color: $threeid-bar;
+    flex: 1;
+    height: 5px;
+  }
 }
 
 .steps {
-    border: $threeid-light 1px solid;
-    padding: 12px;
+  border: $threeid-light 1px solid;
+  padding: 12px;
 
-    .step {
-        // flex-direction: row;
-        // justify-content: space-between;
+  .step {
+    // flex-direction: row;
+    // justify-content: space-between;
 
-        img {
-            width: 24px;
-            height: 24px;
-            // margin-right: 18px;
-        }
-
-        .roadmap-vote__button {
-            width: 44px;
-            height: 44px;
-            background-color: $threeid-light;
-            border: none;
-            color: $threeid-dark;
-            // padding: 8px;
-            margin: 0;
-
-            &:active {
-                transform: scale(0.9);
-                background-color: #EEF2FF;
-                color: #4F46E5;
-            }
-            &:hover {
-                cursor: pointer;
-            }
-            &[disabled] {
-                opacity: 0.3;
-                // color: #fff;
-            }
-        }
+    img {
+      width: 24px;
+      height: 24px;
+      // margin-right: 18px;
     }
+
+    .roadmap-vote__button {
+      width: 44px;
+      height: 44px;
+      background-color: $threeid-light;
+      border: none;
+      color: $threeid-dark;
+      // padding: 8px;
+      margin: 0;
+
+      &:active {
+        transform: scale(0.9);
+        background-color: #eef2ff;
+        color: #4f46e5;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+      &[disabled] {
+        opacity: 0.3;
+        // color: #fff;
+      }
+    }
+  }
 }

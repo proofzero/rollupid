@@ -6,50 +6,54 @@ import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from ".";
 import Text from "../typography/Text";
 
 type ButtonAnchorProps = {
-    children: string;
+  children: string;
 
-    type?: ButtonType;
-    size?: ButtonSize;
+  type?: ButtonType;
+  size?: ButtonSize;
 
-    Icon?: IconType;
-    iconColor?: string;
+  Icon?: IconType;
+  iconColor?: string;
 
-    href: string;
+  href: string;
 
-    disabled?: boolean;
+  disabled?: boolean;
 };
 
 const ButtonAnchor = ({
-    href,
-    children,
-    type = ButtonType.Secondary,
-    size = ButtonSize.Base,
-    Icon,
-    iconColor
+  href,
+  children,
+  type = ButtonType.Secondary,
+  size = ButtonSize.Base,
+  Icon,
+  iconColor,
 }: ButtonAnchorProps) => {
-    return (
-        <a
-            className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className}`}
-            href={href}
-            target="_blank"
-        >
-            {Icon && <Icon style={{
-                width: 19.82,
-                height: 15.11,
-                marginRight: 13.09,
-                color: iconColor ? iconColor : "default"
-            }} />}
+  return (
+    <a
+      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className}`}
+      href={href}
+      target="_blank"
+    >
+      {Icon && (
+        <Icon
+          style={{
+            width: 19.82,
+            height: 15.11,
+            marginRight: 13.09,
+            color: iconColor ? iconColor : "default",
+          }}
+        />
+      )}
 
-            <Text
-                type="span"
-                size={buttonSizeDict[size].textSize}
-                color={buttonTypeDict[type].textColor}
-                weight={buttonSizeDict[size].textWeight}
-            >
-                {children}
-            </Text>
-        </a>
-    );
+      <Text
+        type="span"
+        size={buttonSizeDict[size].textSize}
+        color={buttonTypeDict[type].textColor}
+        weight={buttonSizeDict[size].textWeight}
+      >
+        {children}
+      </Text>
+    </a>
+  );
 };
 
 export default ButtonAnchor;

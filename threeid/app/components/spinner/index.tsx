@@ -1,8 +1,6 @@
 import styles from "./spinner.css";
 
-export const links = () => [
-    { rel: "stylesheet", href: styles },
-];
+export const links = () => [{ rel: "stylesheet", href: styles }];
 
 export default function Spinner() {
   return (

@@ -6,12 +6,11 @@ import {
 
 import Constants from "expo-constants";
 
-
 const configuration: RumInitConfiguration = {
   // @ts-ignore
   applicationId: window.ENV.DATADOG_APPLICATION_ID,
   // @ts-ignore
-  clientToken: window.ENV.DATADOG_CLIENT_TOKEN, 
+  clientToken: window.ENV.DATADOG_CLIENT_TOKEN,
   site: "datadoghq.com",
   // @ts-ignore
   service: window.ENV.DATADOG_SERVICE_NAME,
