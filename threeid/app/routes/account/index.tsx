@@ -47,7 +47,7 @@ export const loader = async ({ request, params }) => {
     ),
     oortSend(
       "kb_getData",
-      ["3id.app", "feature_vote_counts"],
+      ["3id.app", "feature_vote_count"],
       address,
       jwt,
       request.headers.get("Cookie")
