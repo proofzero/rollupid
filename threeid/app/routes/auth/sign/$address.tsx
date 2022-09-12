@@ -79,8 +79,6 @@ export default function AuthSign() {
             signMessage(sign)
         }
     }, [connector])
-    
-    console.log("render error", error)
 
     return (
         <div className="justify-center items-center">

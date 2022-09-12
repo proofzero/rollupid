@@ -61,7 +61,7 @@ export const loader = async ({ request, params }) => {
 
   return json({
     inviteCode,
-    votes,
+    votes: {value: votes.value ? votes.value : `[]`},
     address,
   });
 };
