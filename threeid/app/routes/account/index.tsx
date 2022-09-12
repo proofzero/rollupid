@@ -61,7 +61,7 @@ export const loader = async ({ request, params }) => {
 
   return json({
     inviteCode,
-    votes: {value: votes.value ? votes.value : `[]`},
+    votes,
     address,
   });
 };
@@ -190,11 +190,11 @@ export default function Welcome() {
   const { inviteCode, votes, address } = useLoaderData();
   let submit = useSubmit();
 
-  const currentVotes = JSON.parse(votes.value);
+  const currentVotes = votes.value ? JSON.parse(votes.value) : [];
 
   const [featureVotes, setFeatureVotes] = useState<Set<string>>(
-    new Set<string>(currentVotes ? currentVotes : [])
-);
+    currentVotes.length ? new Set<string>(currentVotes): new Set<string>()
+  );
 
   useEffect(() => {
     submit(
