@@ -47,7 +47,7 @@ export const loader = async ({ request, params }) => {
     ),
     oortSend(
       "kb_getData",
-      ["3id.app", "feature_vote_count"],
+      ["3id.app", "feature_vote_counts"],
       address,
       jwt,
       request.headers.get("Cookie")
@@ -61,7 +61,7 @@ export const loader = async ({ request, params }) => {
 
   return json({
     inviteCode,
-    votes,
+    votes: {value: votes.value ? votes.value : `[]`},
     address,
   });
 };
