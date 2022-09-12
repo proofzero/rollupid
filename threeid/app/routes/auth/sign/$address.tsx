@@ -66,7 +66,7 @@ export default function AuthSign() {
         onSuccess(data, variables) {
             submit({signature: data, nonce: sign.nonce}, {method: 'post', action: `/auth/sign/${address}`});
 
-        }
+        },
     })
 
     let navigate = useNavigate();
@@ -80,6 +80,7 @@ export default function AuthSign() {
         }
     }, [connector])
     
+    console.log("render error", error)
 
     return (
         <div className="justify-center items-center">
@@ -88,8 +89,8 @@ export default function AuthSign() {
             </p>
             <p className="auth-secondary-message">
                 {error 
-                    ? error.message
-                    :  "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
+                    ? "Could not get signature from wallet."
+                    : "It could take a few seconds for the signing message to appear. If the does not appear try clicking on your wallet."
                 }
             </p>
             {!error && <Spinner />}
