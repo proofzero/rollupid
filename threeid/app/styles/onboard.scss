@@ -1,0 +1,19 @@
+#onboard-ens-form {
+  flex: 1;
+
+  .selected {
+    background-color: #eef2ff;
+
+    p.truncate {
+      color: #4338ca !important;
+    }
+  }
+
+  label {
+    cursor: pointer;
+  }
+}
+
+#onboard-ens-actions {
+  min-height: 44px;
+}

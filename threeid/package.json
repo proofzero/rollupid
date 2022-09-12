@@ -10,7 +10,7 @@
     "sass": "sass app/:app/",
     "deploy": "wrangler publish",
     "dev:remix": "remix watch",
-    "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
+    "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch --kv VOUCHER_CACHE",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
     "start": "cross-env NODE_ENV=current miniflare ./build/index.js",
     "test": "cross-env NODE_ENV=test npx playwright test"

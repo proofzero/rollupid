@@ -110,7 +110,7 @@ export type TextProps = {
   weight?: TextWeight;
   type?: "div" | "paragraph" | "span";
   className?: string;
-  children: string;
+  children: any;
 };
 
 const Text = ({
