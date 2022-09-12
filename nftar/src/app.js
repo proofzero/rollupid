@@ -166,15 +166,27 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     // Generate signed voucher using ctx.wallet.
     const voucher = {
-        account,
-        tokenURI,
+        recipient: account,
+        uri: tokenURI,
     };
+
+    // In Solidity this is equivalent to...
+    // `keccak256(abi.encodePacked(voucher.account, voucher.tokenURI))`
+    // ... which is the hash we want to replicate for signer recovery.
+    const packedHash = ctx.web3.utils.soliditySha3({
+        type: 'address',
+        value: voucher.recipient
+    }, {
+        type: 'string',
+        value: voucher.uri
+    });
+
     // NB: A signed message is prefixed with "\x19Ethereum Signed
     // Message:\n" and the length of the message, using the hashMessage
     // method, so that it is EIP-191 compliant. If recovering the
     // address in Solidity, this prefix will be required to create a
     // matching hash.
-    const signature = await ctx.wallet.sign(JSON.stringify(voucher));
+    const signature = await ctx.wallet.sign(packedHash);
 
     // Generate the response to send to the client.
     ctx.body = {

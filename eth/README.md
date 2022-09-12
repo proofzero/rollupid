@@ -1,5 +1,13 @@
 # 3ID Invitation Project
 
+## Project Configuration
+
+**Before doing anything** edit `hardhat.config.ts` and import the tasks related to your project (invite or profile).
+
+**Also** get `profile.secret.ts` and/or `invite.secret.ts` from secret storage.
+
+The rest of this document is about invitations for now. It largely applies _mutatis mutandis_ for profiles.
+
 ## Orientation
 
 This will give you a list of available commands:
