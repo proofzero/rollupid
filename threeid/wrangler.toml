@@ -1,0 +1,40 @@
+# https://developers.cloudflare.com/workers/platform/compatibility-dates
+compatibility_date = "2022-04-05"
+
+main = "./build/index.js"
+
+name = "three-id-dev"
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+
+[site]
+  bucket = "./public"
+
+[build]
+  command = "npm run generate:css && npm run sass && npm run build"
+
+# development (development) is the default environment
+# ------------------------------------------------------------------------------
+# [env.development]
+# name = "three-id-dev"
+# # Whether or not the worker should be deployed to *.workers.dev. Can use
+# # either route or workers_dev, but not both.
+# workers_dev = true
+
+# next (staging)
+# ------------------------------------------------------------------------------
+[env.next]
+name = "three-id-next"
+routes = [
+  "dapp-next.threeid.xyz/*",
+  "dapp-preview.threeid.xyz/*",
+]
+
+# current (production)
+# ------------------------------------------------------------------------------
+[env.current]
+name = "three-id-current"
+route = "dapp.threeid.xyz/*"
+
