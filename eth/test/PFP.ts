@@ -6,9 +6,6 @@ import { ethers } from "hardhat";
 
 describe("Profile Pictures", function () {
 
-  // Maximum number of PFPs with this contract.
-  const maxPFPs = 10;
-
   // Make signed voucher fixtures.
   async function signVoucher(_recipient: SignerWithAddress, _uri: string, operator: SignerWithAddress) {
     const voucher = {
@@ -37,22 +34,16 @@ describe("Profile Pictures", function () {
     const voucher = await signVoucher(operator, 'https://example.com', operator);
 
     const Profile = await ethers.getContractFactory("ThreeId_ProfilePicture");
-    const pfp = await Profile.deploy(operator.address, maxPFPs);
+    const pfp = await Profile.deploy(operator.address);
 
     return { pfp, voucher, owner, operator };
   }
 
   describe("Deployment", function () {
-    it("Should set the right maximum", async function () {
-      const { pfp } = await loadFixture(deployPFPFixture);
-      expect(await pfp.maxProfiles()).to.equal(maxPFPs);
-    });
-
     it("Should set the right next token id", async function () {
       const { pfp } = await loadFixture(deployPFPFixture);
       expect(await pfp.nextPFP()).to.equal(0);
     });
-
   });
 
   describe("Signatures", function () {
@@ -79,16 +70,6 @@ describe("Profile Pictures", function () {
       const { pfp, voucher, owner, operator } = await loadFixture(deployPFPFixture);
       const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
       await expect(pfp.awardPFP(owner.address, nextVoucher)).not.to.be.rejected;
-    });
-
-    it("Shouldn't assign more than max profiles", async function () {
-      const { pfp, voucher, owner, operator } = await loadFixture(deployPFPFixture);
-      for (let i = 0; i <= maxPFPs; i++) {
-        const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
-        await expect(pfp.awardPFP(owner.address, nextVoucher)).not.to.be.rejected;
-      }
-      const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
-      await expect(pfp.awardPFP(owner.address, nextVoucher)).to.be.rejected;
     });
   });
 
