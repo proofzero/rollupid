@@ -21,6 +21,7 @@ test.describe('ETH Auth Flow', () => {
   test.beforeAll(async () => {
     // Setup goerli eth account
     const pk: string = process.env.ETH_GOERLI_PK || "";
+    console.log("ETH_GOERLI_PK", pk);
     goerliInviteWallet = new ethers.Wallet(pk);
   });
 
