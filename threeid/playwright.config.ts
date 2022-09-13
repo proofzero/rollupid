@@ -14,7 +14,7 @@ dotenv.config();
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-const config: PlaywrightTestConfig = {
+let config: PlaywrightTestConfig = {
   testDir: './tests',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
@@ -102,10 +102,17 @@ const config: PlaywrightTestConfig = {
   // outputDir: 'test-results/',
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: !process.env.NODE_ENV || process.env.NODE_ENV == 'development' ? 'npm run dev' : null,
-    port: 8787,
-  },
+  // webServer: {
+  //   command:'npm run dev',
+  //   port: 8787,
+  // },
 };
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV == 'development') {
+  config['webServer'] = {
+    command: 'npm run dev',
+    port: 8787,
+  }
+}
 
 export default config;

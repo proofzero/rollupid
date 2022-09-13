@@ -313,6 +313,7 @@ jobs:
             OORT_SCHEMA
             OORT_PORT
     env:
+      NODE_ENV: development
       SESSION_SECRET: "secret"
       # CF_ROUTE: https://dev.dapp.threeid.xyz/*
       # These values are injected into the generated wrangler.toml.
