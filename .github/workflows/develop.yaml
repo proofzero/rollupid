@@ -283,18 +283,6 @@ jobs:
           cache-dependency-path: ./threeid/package-lock.json
       - run: npm install
         working-directory: threeid
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-        working-directory: threeid
-      - name: Run Playwright tests
-        run: npx playwright test
-        working-directory: threeid
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 5
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
@@ -312,6 +300,18 @@ jobs:
             OORT_HOST
             OORT_SCHEMA
             OORT_PORT
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: threeid
+      - name: Run Playwright tests
+        run: npx playwright test
+        working-directory: threeid
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 5
     env:
       NODE_ENV: development
       SESSION_SECRET: "secret"
@@ -332,7 +332,7 @@ jobs:
       OORT_PORT: 443
       ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
       DAPP_HOST: three-id-dev.admin1337.workers.dev
-      DAPP_PORT: 80
+      DAPP_PORT: 443
       DAPP_SCHEMA: https
 
 
