@@ -260,6 +260,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
@@ -269,7 +270,17 @@ jobs:
           cache-dependency-path: ./threeid/package-lock.json
       - run: npm install
         working-directory: threeid
-      - name: Publish
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 5
+      - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -286,23 +297,23 @@ jobs:
             OORT_HOST
             OORT_SCHEMA
             OORT_PORT
-        env:
-          SESSION_SECRET: "secret"
-          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
-          # These values are injected into the generated wrangler.toml.
-          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          # The Datadog client token.
-          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: development
-          DATADOG_SERVICE_NAME: 3id-application
-          # The Cloudflare API token used by wrangler.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # Cloudflare zone identifier for threeid.xyz.
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          OORT_HOST: oort-devnet.kubelt.com
-          OORT_SCHEMA: https
-          OORT_PORT: 443
+    env:
+      SESSION_SECRET: "secret"
+      # CF_ROUTE: https://dev.dapp.threeid.xyz/*
+      # These values are injected into the generated wrangler.toml.
+      ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+      # The Datadog client token.
+      DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+      DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+      DATADOG_ENV: development
+      DATADOG_SERVICE_NAME: 3id-application
+      # The Cloudflare API token used by wrangler.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # Cloudflare zone identifier for threeid.xyz.
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      OORT_HOST: oort-devnet.kubelt.com
+      OORT_SCHEMA: https
+      OORT_PORT: 443
 
 
   # test-sdk-web:

@@ -11,3 +11,6 @@ node_modules
 **/*.css.map
 
 deploy.edn
+/test-results/
+/playwright-report/
+/playwright/.cache/
