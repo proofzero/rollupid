@@ -5,6 +5,29 @@ on:
     branches:
       - main
 
+env:
+  NODE_ENV: development
+  SESSION_SECRET: "secret"
+  # CF_ROUTE: https://dev.dapp.threeid.xyz/*
+  # These values are injected into the generated wrangler.toml.
+  ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+  # The Datadog client token.
+  DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+  DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+  DATADOG_ENV: development
+  DATADOG_SERVICE_NAME: 3id-application
+  # The Cloudflare API token used by wrangler.
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  # Cloudflare zone identifier for threeid.xyz.
+  CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+  OORT_HOST: oort-devnet.kubelt.com
+  OORT_SCHEMA: https
+  OORT_PORT: 443
+  ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
+  DAPP_HOST: three-id-dev.admin1337.workers.dev
+  DAPP_PORT: 443
+  DAPP_SCHEMA: https
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -312,28 +335,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 5
-    env:
-      NODE_ENV: development
-      SESSION_SECRET: "secret"
-      # CF_ROUTE: https://dev.dapp.threeid.xyz/*
-      # These values are injected into the generated wrangler.toml.
-      ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-      # The Datadog client token.
-      DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-      DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-      DATADOG_ENV: development
-      DATADOG_SERVICE_NAME: 3id-application
-      # The Cloudflare API token used by wrangler.
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      # Cloudflare zone identifier for threeid.xyz.
-      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-      OORT_HOST: oort-devnet.kubelt.com
-      OORT_SCHEMA: https
-      OORT_PORT: 443
-      ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-      DAPP_HOST: three-id-dev.admin1337.workers.dev
-      DAPP_PORT: 443
-      DAPP_SCHEMA: https
+    
 
 
   # test-sdk-web:
