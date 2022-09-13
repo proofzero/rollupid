@@ -44,7 +44,7 @@ The [starbase/](starbase/) directory contains a web application for interacting 
 
 ### 3iD
 
-The [3iD/](3iD/) directory contains an Expo React Native Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging.
+The [threeid/](threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging. For more information visit [3ID](https://threeid.xyz).
 
 ### Browser Extension
 
