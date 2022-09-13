@@ -108,7 +108,7 @@ let config: PlaywrightTestConfig = {
   // },
 };
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV == 'development') {
+if (!process.env.NODE_ENV) {
   config['webServer'] = {
     command: 'npm run dev',
     port: 8787,
