@@ -330,7 +330,7 @@ jobs:
       OORT_SCHEMA: https
       OORT_PORT: 443
       ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-      DAPP_HOST: dapp-dev.threeid.xyz
+      DAPP_HOST: three-id-dev.admin1337.workers.dev
       DAPP_PORT: 80
       DAPP_SCHEMA: https
 

@@ -22,6 +22,9 @@ workers_dev = true
 # # Whether or not the worker should be deployed to *.workers.dev. Can use
 # # either route or workers_dev, but not both.
 # workers_dev = true
+# routes = [
+#   "dapp-dev.threeid.xyz/*",
+# ]
 
 # next (staging)
 # ------------------------------------------------------------------------------
