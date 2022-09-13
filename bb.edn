@@ -25,8 +25,7 @@
 
     ;; FILES
 
-    ;; The path of local-only configuration file containing various
-    ;; build configuration values.
+    ;; NOTE: this sub project no longer exists
     (def deploy-edn (str (fs/path "threeid" "deploy.edn")))
     ;; Secrets used by act (local GitHub Actions workflow runner).
     (def act-secrets "act.secrets"))
@@ -94,11 +93,6 @@
                         :next-url next-url
                         :current-url current-url}]
            (dot-env/write act-secrets secrets))}
-
-  -act:next:3iD
-  {:doc "Run GitHub Actions 'next' pipeline, '3iD' job locally"
-   :depends [-act:secrets]
-   :task (shell "act --insecure-secrets -W .github/workflows/next.yaml -j ThreeID")}
 
   ;; Tasks
   ;; ---------------------------------------------------------------------------
