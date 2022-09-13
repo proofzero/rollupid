@@ -365,13 +365,6 @@ export default function Welcome() {
                     <SectionHeading className="mb-1">
                       {step.title}
                     </SectionHeading>
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.Regular400}
-                      color={TextColor.Gray500}
-                    >
-                      Completed
-                    </Text>
                   </div>
                 </div>
               ))}
