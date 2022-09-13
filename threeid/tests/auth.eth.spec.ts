@@ -2,11 +2,12 @@ import { test, expect } from '@playwright/test';
 import { ethers } from "ethers";
 
 let goerliInviteWallet: ethers.Wallet;
+const dappUrl = `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`
 
 test.describe('Auth Gateway', () => {
 
   test("Landing page redirects to /auth", async ({ page }) => {
-    const response = await page.goto('http://localhost:8787');
+    const response = await page.goto(dappUrl);
     const request = response.request()
 
     expect(request.redirectedFrom().redirectedTo() === request)
