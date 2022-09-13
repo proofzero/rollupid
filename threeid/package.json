@@ -36,6 +36,7 @@
     "wagmi": "0.6.4"
   },
   "devDependencies": {
+    "@chainsafe/dappeteer": "^3.0.0-rc.0",
     "@cloudflare/workers-types": "3.14.1",
     "@remix-run/dev": "1.7.0",
     "@remix-run/eslint-config": "1.7.0",
