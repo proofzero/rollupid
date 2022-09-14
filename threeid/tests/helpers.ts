@@ -24,7 +24,7 @@ You will remain connected until you sign out.
 {{nonce}}
 `;
 
-const users = {
+export const users = {
     invited: new ethers.Wallet(process.env.ETH_GOERLI_PK || ""),
     uninvited: ethers.Wallet.createRandom(),
 }
