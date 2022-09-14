@@ -39,7 +39,7 @@ export const loader = async ({ request, params }) => {
             session.get("jwt"),
             request.headers.get("Cookie")
         )
-        
+
         return json(inviteRes.result);
     }
     return redirect("/auth");

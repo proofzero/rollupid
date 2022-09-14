@@ -12,8 +12,8 @@
     "dev:remix": "remix watch",
     "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
-    "start": "cross-env NODE_ENV=currents miniflare ./build/index.js",
-    "test": "jest"
+    "start": "cross-env NODE_ENV=current miniflare ./build/index.js",
+    "test": "cross-env NODE_ENV=test npx playwright test"
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
