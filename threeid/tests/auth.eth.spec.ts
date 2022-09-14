@@ -20,11 +20,6 @@ test.describe('Auth Gateway', () => {
     goerliInviteWallet = new ethers.Wallet(pk);
   });
 
-  // test.beforeEach(async ({ page }) => {
-  //   //logout
-  //   await page.context().storageState({ path: undefined });
-  // });
-
   test("Landing page apiRequestContextredirects to /auth", async ({ page }) => {
     const response = await page.goto("/");
     const request = response.request()
@@ -67,7 +62,10 @@ test.describe('Auth Gateway', () => {
   });
 
 });
-
+  // test.beforeEach(async ({ page }) => {
+  //   //logout
+  //   page.context().storageState({ path: undefined });
+  // });
 test.describe('ETH Auth Flow', () => {
 
   test.beforeAll(async () => {
@@ -76,38 +74,8 @@ test.describe('ETH Auth Flow', () => {
     goerliInviteWallet = new ethers.Wallet(pk);
   });
 
-  // test.beforeEach(async ({ page }) => {
-  //   //logout
-  //   page.context().storageState({ path: undefined });
-  // });
-
   invitedUsertest("Login to dapp with eth account", async ({ page }) => {
     await page.goto("/");
-
-    // const address = goerliInviteWallet.address
-    // const nonceUrl = `/auth/nonce/${address}?isTest=true`
-    // await page.goto(nonceUrl);
-
-    // // get nonce
-    // const signUrl = page.url()
-    // const url = new URL(signUrl);
-    // const nonce = url.searchParams.get("nonce") || ''
-
-    // expect(nonce).toBeTruthy()
-
-    // // sign a login message
-    // const nonceMessage = signMessageTemp.replace("{{nonce}}", nonce);
-    // const signature = await goerliInviteWallet.signMessage(nonceMessage)
-    
-    // // get jwt
-    // await page.request.post(signUrl, {
-    //   form: {
-    //     nonce,
-    //     signature,
-    //   },
-    // })
-    // page.reload()
-
     await expect(page).toHaveURL(/.*account/);
   });
 
