@@ -35,15 +35,20 @@ let config: PlaywrightTestConfig = {
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
+  // globalSetup: require.resolve('./tests/global-setup'),
+  
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
     actionTimeout: 0,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
+    baseURL: `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    
+    // Tell all tests to load signed-in state from 'storageState.json'.
+    // storageState: 'storageState.json'
   },
 
   /* Configure projects for major browsers */
@@ -52,6 +57,7 @@ let config: PlaywrightTestConfig = {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        baseURL: `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`,
       },
     },
 
@@ -108,18 +114,19 @@ let config: PlaywrightTestConfig = {
   // },
 };
 
-// if (!process.env.NODE_ENV || process.env.NODE_ENV === 'test') {
-//   config['webServer'] = {
-//     command: 'npm run dev',
-//     port: 8787,
-//   }
-// }
+if (process.env.TEST_ENV) {
+  config['webServer'] = {
+    command: 'npm run dev',
+    port: 8787,
+  }
+}
 
-if (process.env.NODE_ENV) {
+if (process.env.TEST_ENV) {
   config.projects.push({
     name: 'firefox',
     use: {
       ...devices['Desktop Firefox'],
+      baseURL: `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`,
     },
   })
 
@@ -127,6 +134,7 @@ if (process.env.NODE_ENV) {
     name: 'webkit',
     use: {
       ...devices['Desktop Safari'],
+      baseURL: `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`,
     },
   })
 }

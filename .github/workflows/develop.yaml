@@ -324,6 +324,7 @@ jobs:
         run: npx playwright test
         env:
           NODE_ENV: development
+          TEST_ENV: true
           ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
           DAPP_HOST: three-id-dev.admin1337.workers.dev
           DAPP_PORT: 443

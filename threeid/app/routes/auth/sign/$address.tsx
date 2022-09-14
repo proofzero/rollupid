@@ -32,9 +32,6 @@ export const links = () => [
 // @ts-ignore
 export const loader = async ({ request, params }) => {
     const session = await getUserSession(request)
-    console.log("session", session)
-    console.log("has", session.has("jwt"))
-
 
     if (session.has("jwt")) {
         return redirect("/auth/gate/" + params.address)
@@ -67,7 +64,6 @@ export async function action({ request, params }) {
     //     return json({error: signRes.error})
     // }
 
-    console.log("signRes", signRes)
     // on success create a cookie/session for the user
     return createUserSession(signRes.result, "/account", params.address);
 }
@@ -102,11 +98,6 @@ export default function AuthSign() {
             signMessage({message: nonceMessage})
         }
     }, [connector])
-
-    console.log("err", err)
-    console.log("error", error)
-    console.log("sign", sign)
-
 
     return (
         <div className="justify-center items-center">
