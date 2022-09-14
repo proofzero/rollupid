@@ -6,11 +6,6 @@ import { ethers } from "ethers";
 
 import { test as baseTest } from '@playwright/test';
 
-// import { 
-//     dappUrl,
-//     signMessageTemp,
-// } from './helpers'
-
 export const dappUrl = `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`
 
 export const signMessageTemp = `Welcome to 3ID!
