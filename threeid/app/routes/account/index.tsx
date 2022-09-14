@@ -342,16 +342,6 @@ export default function Welcome() {
                         : false
                     }
                     onClick={(e) => {
-                      // setTimeout(() => {
-                      //   //dismiss tooltip
-                      //   e.target.dispatchEvent(
-                      //     new MouseEvent("click", {
-                      //       view: window,
-                      //       bubbles: true,
-                      //       cancelable: false,
-                      //     })
-                      //   );
-                      // }, 1500);
                       featureVotes.add(step.title);
                       setFeatureVotes(new Set(featureVotes));
                       datadogRum.addAction("featureVote", {
@@ -375,13 +365,6 @@ export default function Welcome() {
           <FAQ />
         </div>
       </div>
-      {/* <button
-        onClick={() =>
-          submit(null, { method: "post", action: `/auth/signout/` })
-        }
-      >
-        Sign Out
-      </button> */}
     </div>
   );
 }
