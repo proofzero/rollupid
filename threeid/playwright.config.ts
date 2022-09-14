@@ -55,19 +55,19 @@ let config: PlaywrightTestConfig = {
       },
     },
 
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-      },
-    },
+    // {
+    //   name: 'firefox',
+    //   use: {
+    //     ...devices['Desktop Firefox'],
+    //   },
+    // },
 
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-      },
-    },
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari'],
+    //   },
+    // },
 
     /* Test against mobile viewports. */
     // {
@@ -113,6 +113,22 @@ if (!process.env.NODE_ENV) {
     command: 'npm run dev',
     port: 8787,
   }
+}
+
+if (process.env.NODE_ENV) {
+  config.projects.push({
+    name: 'firefox',
+    use: {
+      ...devices['Desktop Firefox'],
+    },
+  })
+
+  config.projects.push({
+    name: 'webkit',
+    use: {
+      ...devices['Desktop Safari'],
+    },
+  })
 }
 
 export default config;
