@@ -317,15 +317,15 @@ jobs:
           OORT_HOST: oort-devnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
-      - name: Cache playwright binaries
-        id: playwright-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: cache-playwright-linux-1.25.2
+      # - name: Cache playwright binaries
+      #   id: playwright-cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.cache/ms-playwright
+      #     key: cache-playwright-linux-1.25.2
       - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        # if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
         working-directory: threeid
       - name: Run Playwright tests
