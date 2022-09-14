@@ -15,6 +15,8 @@ import { json } from "@remix-run/cloudflare";
 
 import { useLoaderData } from "@remix-run/react";
 
+import { startSession } from "~/utils/datadog.client";
+
 import styles from "./styles/tailwind.css";
 import social from "./assets/social.png";
 import appleIcon from "./assets/apple-touch-icon.png";
@@ -75,6 +77,7 @@ export const loader: LoaderFunction = () => {
 
 export default function App() {
   const browserEnv = useLoaderData();
+  typeof window !== 'undefined' && startSession();
   return (
     <html lang="en">
       <head>

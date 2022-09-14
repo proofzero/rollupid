@@ -39,7 +39,7 @@ export const loader = async ({ request, params }) => {
             session.get("jwt"),
             request.headers.get("Cookie")
         )
-        
+
         return json(inviteRes.result);
     }
     return redirect("/auth");
@@ -98,7 +98,7 @@ export default function AuthGate() {
                     <span className="h-96">
                         <img className="card-image" src={gatewayFromIpfs(selected.image)} />
                     </span>
-                    <Listbox value={selected} onChange={(v) => console.log('v', v) }>
+                    <Listbox value={selected} onChange={(v) => null }>
                         {({ open }) => (
                             <>
                             <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Select invite</Listbox.Label>

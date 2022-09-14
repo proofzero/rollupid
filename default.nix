@@ -21,15 +21,17 @@ stdenv.mkDerivation {
     rustup
     libuuid
     act
+    wayland
+    google-chrome-dev
+    firefox-bin
   ];
 
-  APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid ]}";
+  APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid wayland google-chrome-dev firefox-bin]}";
 
 
   shellHook = ''
     LD=$CC
     export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
-
   '';
 
 }

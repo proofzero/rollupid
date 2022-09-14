@@ -12,7 +12,7 @@ type HeadersObject = {
 // TODO: REMOVE ADDRESS PARAM
 // TODO: ERROR HANDLING
 // TODO: PICK WINNER FOR AUTH (JWT OR COOKIE)
-export async function oortSend(method: string, params: any[], address: string, jwt?: string, cookie?: string) {
+export async function oortSend(method: string, params: any[], address?: string, jwt?: string, cookie?: string) {
     const id = method.replace(/^.+_/,'').replace(/[A-Z]/g, m => "-" + m.toLowerCase())
 
     const headers: HeadersObject = {

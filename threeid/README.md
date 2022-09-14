@@ -35,3 +35,13 @@ Once that's done, you should be able to deploy your app:
 ```sh
 npm run deploy
 ```
+
+## Testing
+
+We use https://playwright.dev/ for end-to-end testing. To run the tests, run the following command:
+
+```sh
+npx playwright test
+```
+
+Tests are located in `/tests` and are written in TypeScript. If using VSCode you can also install the playwright extension.

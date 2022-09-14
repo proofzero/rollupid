@@ -12,8 +12,8 @@
     "dev:remix": "remix watch",
     "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
     "dev": "cross-env NODE_ENV=development concurrently \"npm run generate:css\" \"run-p \"dev:*\"\"",
-    "start": "cross-env NODE_ENV=currents miniflare ./build/index.js",
-    "test": "jest"
+    "start": "cross-env NODE_ENV=current miniflare ./build/index.js",
+    "test": "cross-env NODE_ENV=test npx playwright test"
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
@@ -25,7 +25,7 @@
     "@tanstack/react-query": "4.2.3",
     "cross-env": "7.0.3",
     "ethers": "5.7.0",
-    "flowbite": "^1.5.3",
+    "flowbite": "1.5.3",
     "flowbite-react": "^0.1.10",
     "history": "5.3.0",
     "react": "17.0.2",
@@ -36,13 +36,13 @@
     "wagmi": "0.6.4"
   },
   "devDependencies": {
-    "@chainsafe/dappeteer": "^3.0.0-rc.0",
     "@cloudflare/workers-types": "3.14.1",
     "@playwright/test": "1.25.2",
     "@remix-run/dev": "1.7.0",
     "@remix-run/eslint-config": "1.7.0",
     "@remix-run/serve": "1.7.0",
-    "@types/puppeteer": "^5.4.6",
+    "@types/node": "18.7.18",
+    "@types/puppeteer": "5.4.6",
     "@types/react": "17.0.47",
     "@types/react-dom": "17.0.17",
     "autoprefixer": "10.4.8",
