@@ -6,18 +6,9 @@ import { ethers } from "ethers";
 
 import { test as baseTest } from '@playwright/test';
 
+import { signMessageTemplate } from '../app/utils/constants';
+
 export const dappUrl = `${process.env.DAPP_SCHEMA}://${process.env.DAPP_HOST}:${process.env.DAPP_PORT}`
-
-export const signMessageTemp = `Welcome to 3ID!
-
-Click "Sign" to sign in and accept the 3ID Terms of Service (https://threeid.xyz/tos), no password needed!
-
-This will not trigger a blockchain transaction or cost any gas fees.
-
-You will remain connected until you sign out.
-
-{{nonce}}
-`;
 
 export const users = {
     invited: new ethers.Wallet(process.env.ETH_GOERLI_PK || ""),
@@ -42,7 +33,7 @@ export const invitedUsertest = baseTest.extend({
         const nonce = url.searchParams.get("nonce") || ''
 
         // sign a login message
-        const nonceMessage = signMessageTemp.replace("{{nonce}}", nonce);
+        const nonceMessage = signMessageTemplate.replace("{{nonce}}", nonce);
         const signature = await users.invited.signMessage(nonceMessage)
         
         // get jwt
