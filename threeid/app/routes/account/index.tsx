@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
 import { Tooltip } from "flowbite-react";
 
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 import datadogRum from "~/utils/datadog.client";
 
@@ -32,23 +32,19 @@ import { ButtonAnchor, ButtonSize } from "~/components/buttons";
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
-  const session = await getUserSession(request);
-  const jwt = session.get("jwt");
-  const address = session.get("address");
+  const jwt = await requireJWT(request, "/auth");
 
   // TODO remove session address param when RPC url is changed
   const [inviteCodeRes, votesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
-      address,
       jwt,
       request.headers.get("Cookie")
     ),
     oortSend(
       "kb_getData",
       ["3id.app", "feature_vote_count"],
-      address,
       jwt,
       request.headers.get("Cookie")
     ),
@@ -62,7 +58,6 @@ export const loader = async ({ request, params }) => {
   return json({
     inviteCode,
     votes,
-    address,
   });
 };
 
@@ -70,12 +65,10 @@ export const action = async ({ request }: any) => {
   const votes = (await request.formData()).get("votes");
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
-  const address = session.get("address");
 
   oortSend(
     "kb_setData",
     ["3id.app", "feature_vote_count", votes],
-    address,
     jwt,
     request.headers.get("Cookie")
   );

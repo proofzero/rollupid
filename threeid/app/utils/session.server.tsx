@@ -52,3 +52,18 @@ export async function destroyUserSession(session: Session) {
     },
   });
 }
+
+export async function requireJWT(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname
+) {
+  const session = await getUserSession(request);
+  const jwt = session.get("jwt");
+  if (!jwt || typeof jwt !== "string") {
+    const searchParams = new URLSearchParams([
+      ["redirectTo", redirectTo],
+    ]);
+    throw redirect(`/auth?${searchParams}`);
+  }
+  return jwt;
+}
