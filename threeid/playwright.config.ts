@@ -114,12 +114,13 @@ let config: PlaywrightTestConfig = {
   // },
 };
 
-if (process.env.TEST_ENV) {
-  config['webServer'] = {
-    command: 'npm run dev',
-    port: 8787,
-  }
-}
+// Note: faster to run your own dev server for tests
+// if (process.env.TEST_ENV) {
+//   config['webServer'] = {
+//     command: 'npm run dev',
+//     port: 8787,
+//   }
+// }
 
 if (process.env.TEST_ENV) {
   config.projects.push({
