@@ -56,7 +56,7 @@ export async function action({ request, params }) {
     const signRes = await oortSend("kb_verifyNonce", [
         formData.get("nonce"),
         formData.get("signature"),
-    ], params.address) // TODO remove address param when RPC url is changed
+    ], {address: params.address}) // TODO remove address param when RPC url is changed
 
     //TODO: handle error
     // if (signRes.error) {

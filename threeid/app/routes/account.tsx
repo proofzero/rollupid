@@ -37,8 +37,7 @@ export const loader = async ({ request }) => {
   const claimsRes = await oortSend(
     "kb_getCoreClaims",
     [],
-    jwt,
-    request.headers.get("Cookie")
+    { jwt: jwt, cookie: request.headers.get("Cookie") },
   );
 
   if (!claimsRes.result.includes("3id.enter")) {

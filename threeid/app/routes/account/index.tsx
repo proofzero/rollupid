@@ -34,19 +34,22 @@ import { ButtonAnchor, ButtonSize } from "~/components/buttons";
 export const loader = async ({ request, params }) => {
   const jwt = await requireJWT(request, "/auth");
 
+  const oortOptions = {
+    jwt: jwt,
+    cookie: request.headers.get("Cookie"),
+  }
+
   // TODO remove session address param when RPC url is changed
   const [inviteCodeRes, votesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
-      jwt,
-      request.headers.get("Cookie")
+      oortOptions,
     ),
     oortSend(
       "kb_getData",
       ["3id.app", "feature_vote_count"],
-      jwt,
-      request.headers.get("Cookie")
+      oortOptions,
     ),
   ]);
 
@@ -69,8 +72,9 @@ export const action = async ({ request }: any) => {
   oortSend(
     "kb_setData",
     ["3id.app", "feature_vote_count", votes],
-    jwt,
-    request.headers.get("Cookie")
+    {
+      jwt, cookie: request.headers.get("Cookie")
+    }
   );
   return json({ votes });
 };

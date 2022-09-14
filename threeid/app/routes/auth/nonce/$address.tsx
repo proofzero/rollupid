@@ -24,7 +24,7 @@ export const loader = async ({ request, params }) => {
             signMessageTemplate,
             {"3id.profile": ["read", "write"], "3id.app": ["read", "write"]},
             // TODO: add support for { "blockchain": "ethereum", "chain": "goerli", "chainId": 5 } in JWT
-        ], params.address)
+        ], {address: params.address})
     
     return redirect(`/auth/sign/${params.address}?nonce=${nonceRes.result.nonce}${isTest ? "&isTest=true": ''}`);
 };
