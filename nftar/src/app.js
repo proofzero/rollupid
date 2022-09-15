@@ -127,8 +127,12 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         return false;
     };
 
+    const PFP_SQUARE_DIMENSION = 1000;
+    const PFP_WIDTH = PFP_SQUARE_DIMENSION;
+    const PFP_HEIGHT = PFP_SQUARE_DIMENSION;
+
     const gradient = new canvas(
-        new fabric.StaticCanvas(null, { width: 1500, height: 750 }),
+        new fabric.StaticCanvas(null, { width: PFP_WIDTH, height: PFP_HEIGHT }),
         colors
     );
     let stream;
@@ -143,15 +147,21 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const blob = await streamToBlob(stream, imageFormat);
     const png = new storage.File([blob], "threeid.png", {type: imageFormat});
 
+    // Put the account in the blockchain object so it's not a trait.
+    blockchain.account = account;
+
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
         name: `3ID PFP: GEN 0`,
         description: `3ID PFP for ${account}`,
         image: png,
         properties: {
-            account,
             blockchain,
             traits: genTraits,
+            "GEN": genTraits.trait0.value.name,
+            "Point": genTraits.trait1.value.name,
+            "Field": genTraits.trait2.value.name,
+            "Pin": genTraits.trait3.value.name,
         },
     });
     //console.log('IPFS URL for the metadata:', metadata.url);
