@@ -8,7 +8,7 @@ import { useState } from "react";
 import { BiCog, BiIdCard, BiLink } from "react-icons/bi";
 import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
 
-import { getUserSession } from "~/utils/session.server";
+import { requireJWT } from "~/utils/session.server";
 
 import { oortSend } from "~/utils/rpc.server";
 
@@ -31,21 +31,17 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const session = await getUserSession(request);
-  if (!session || !session.has("jwt")) {
-    return redirect("/auth");
-  }
+  const jwt = await requireJWT(request, "/auth")
+
   // gate with invites only
   const claimsRes = await oortSend(
     "kb_getCoreClaims",
     [],
-    session.get("address"), // TODO: remove when RPC url is changed
-    session.get("jwt"),
-    request.headers.get("Cookie")
+    { jwt: jwt, cookie: request.headers.get("Cookie") },
   );
 
   if (!claimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth/gate/${session.get("address")}`);
+    return redirect(`/auth`);
   }
   return null;
 };

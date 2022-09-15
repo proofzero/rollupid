@@ -35,9 +35,10 @@ export const loader = async ({ request, params }) => {
     if (session.has("jwt")) {
         const inviteRes = await oortSend("3id_listInvitations", 
             [], 
-            session.get("address"), // TODO: remove when RPC url is changed
-            session.get("jwt"),
-            request.headers.get("Cookie")
+            {
+                jwt: session.get("jwt"),
+                cookie: request.headers.get("Cookie")
+            },
         )
 
         return json(inviteRes.result);
@@ -54,9 +55,10 @@ export async function action({ request, params }) {
         formData.get("contractAddress"),
         formData.get("tokenId"),
     ],
-    params.address,
-    session.get("jwt"),
-    request.headers.get("Cookie")) // TODO remove address param when RPC url is changed
+    {
+        jwt: session.get("jwt"),
+        cookie: request.headers.get("Cookie")
+    })
 
     // on success redirect to account
     if (redeemRes.result === true) {

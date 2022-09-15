@@ -41,9 +41,10 @@ export const loader = async ({ request }) => {
     if (session.has("jwt")) {
       const claimsRes = await oortSend("kb_getCoreClaims", 
             [], 
-            session.get("address"), // TODO: remove when RPC url is changed
-            session.get("jwt"),
-            request.headers.get("Cookie")
+            {
+                jwt: session.get("jwt"),
+                cookie: request.headers.get("Cookie")
+            }
         )
         
         if (claimsRes.result.includes("3id.enter")) {

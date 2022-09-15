@@ -1,20 +1,10 @@
 import { 
-    json, redirect,
+    redirect,
 } from "@remix-run/cloudflare";
 
  import { oortSend } from "~/utils/rpc.server";
  import { getUserSession } from "~/utils/session.server";
-
-export const signMessageTemp = `Welcome to 3ID!
-
-Click "Sign" to sign in and accept the 3ID Terms of Service (https://threeid.xyz/tos), no password needed!
-
-This will not trigger a blockchain transaction or cost any gas fees.
-
-You will remain connected until you sign out.
-
-{{nonce}}
-`;
+ import { signMessageTemplate } from "~/utils/constants";
 
 // Fetch the nonce for address
 // TODO: support application/json response
@@ -31,9 +21,10 @@ export const loader = async ({ request, params }) => {
     // @ts-ignore
     const nonceRes = await oortSend("kb_getNonce", [
             params.address,
+            signMessageTemplate,
             {"3id.profile": ["read", "write"], "3id.app": ["read", "write"]},
-            signMessageTemp,
-        ], params.address)
+            // TODO: add support for { "blockchain": "ethereum", "chain": "goerli", "chainId": 5 } in JWT
+        ], {address: params.address})
     
     return redirect(`/auth/sign/${params.address}?nonce=${nonceRes.result.nonce}${isTest ? "&isTest=true": ''}`);
 };

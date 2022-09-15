@@ -21,7 +21,7 @@ import {
  import BaseButton, { links as buttonLinks } from "~/components/base-button";
  import Spinner from "~/components/spinner";
 
- import { signMessageTemp } from "~/routes/auth/nonce/$address";
+ import { signMessageTemplate } from "~/utils/constants";
 
 
 export const links = () => [
@@ -32,7 +32,6 @@ export const links = () => [
 // @ts-ignore
 export const loader = async ({ request, params }) => {
     const session = await getUserSession(request)
-
     if (session.has("jwt")) {
         return redirect("/auth/gate/" + params.address)
     }
@@ -57,7 +56,7 @@ export async function action({ request, params }) {
     const signRes = await oortSend("kb_verifyNonce", [
         formData.get("nonce"),
         formData.get("signature"),
-    ], params.address) // TODO remove address param when RPC url is changed
+    ], {address: params.address}) // TODO remove address param when RPC url is changed
 
     //TODO: handle error
     // if (signRes.error) {
@@ -72,7 +71,7 @@ export default function AuthSign() {
     const sign = useLoaderData();
     const err = useActionData()
 
-    const nonceMessage = signMessageTemp.replace("{{nonce}}", sign.nonce);
+    const nonceMessage = signMessageTemplate.replace("{{nonce}}", sign.nonce);
 
     let navigate = useNavigate();
     let submit = useSubmit();
