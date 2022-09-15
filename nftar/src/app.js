@@ -145,8 +145,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
-        name: `3id`,
-        description: `3id PFP for ${account}`,
+        name: `3ID PFP: GEN 0`,
+        description: `3ID PFP for ${account}`,
         image: png,
         properties: {
             account,
@@ -187,6 +187,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // address in Solidity, this prefix will be required to create a
     // matching hash.
     const signature = await ctx.wallet.sign(packedHash);
+
+    // The smart contract expects the signature as part of the voucher
+    // so we add it here to make integrations as easy as possible.
+    voucher.signature = signature.signature;
 
     // Generate the response to send to the client.
     ctx.body = {
