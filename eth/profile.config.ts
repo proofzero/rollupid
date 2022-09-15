@@ -525,10 +525,6 @@ task("profile:mint", "Mint a profile for an account")
       account,
     });
 
-    // Add the signature to the voucher.
-    // TODO: Move to NFTar.
-    profilePicturePayload.result.voucher.signature = profilePicturePayload.result.signature.signature;
-
     // Call our contract to award the profile.
     const awardResult = await hre.run("call:awardProfile", {
       account,
