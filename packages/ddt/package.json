@@ -48,7 +48,7 @@
     "@stablelib/utf8": "1.0.1",
     "blake3": "2.1.7",
     "event-stream": "4.0.1",
-    "jose": "4.8.1",
+    "jose": "4.9.2",
     "jsonld": "6.0.0",
     "levelup": "5.1.1",
     "libp2p-crypto": "0.21.2",
