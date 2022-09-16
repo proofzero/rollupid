@@ -111,6 +111,20 @@ contract ThreeId_ProfilePicture is
     }
 
     /**
+     * Soulbinding.
+     */
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        // When the from address is the zero address it means we are minting,
+        // per OpenZeppelin docs: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol#L461
+        // Therefore if from is not the zero address we revert the transaction.
+        require(from == address(0), "3ID PFPs are not transferable.");
+    }
+
+    /**
      * Return the next profile to be awarded.
      */
     function nextPFP() public view returns (uint256) {
