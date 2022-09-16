@@ -77,7 +77,6 @@ describe("Profile Pictures", function () {
       const { pfp, voucher, owner, operator } = await loadFixture(deployPFPFixture);
       const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
       const result = await pfp.awardPFP(owner.address, nextVoucher);
-      console.log(result);
       await expect(pfp.transferFrom(owner.address, alfl, 0)).to.be.rejected;
     });
   });
