@@ -110,8 +110,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     
     // TRAIT ONE: POPULAR COLLECTIONS
     weightInc['trait1'] = calculateNFTWeight(nftsForOwner.ownedNfts);
+
     // TRAIT TWO: SPECIAL COLLECTIONS
     weightInc['trait2'] = calculateSpecialWeight(nftsForOwner.ownedNfts);
+
     // TRAIT THREE: WALLET BALLANCE
     const balanceWei = await ctx.web3.eth.getBalance(account);
     const balanceEth = ctx.web3.utils.fromWei(balanceWei, 'ether');
@@ -120,43 +122,60 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const genTraits = generateTraits(weightInc);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
 
-    const isNode = () => {
-        if (typeof window === 'undefined') {
-            return true;
-        }
-        return false;
-    };
+    const isNode = () => typeof window === 'undefined';
 
     const PFP_SQUARE_DIMENSION = 1000;
     const PFP_WIDTH = PFP_SQUARE_DIMENSION;
     const PFP_HEIGHT = PFP_SQUARE_DIMENSION;
 
-    const gradient = new canvas(
+    const pfp_gradient = new canvas(
         new fabric.StaticCanvas(null, { width: PFP_WIDTH, height: PFP_HEIGHT }),
         colors
     );
-    let stream;
+
+    // We make a double-width version with the same color seeds for the cover
+    // image.
+    const cvr_gradient = new canvas(
+        new fabric.StaticCanvas(null, { width: PFP_WIDTH * 2, height: PFP_HEIGHT }),
+        colors
+    );
+
+    let pfp_stream;
+    let cvr_stream;
+    
     if (isNode()) {
         // Generate a single frame; call animate() to produce an animation.
-        stream = gradient.snapshot();
+        pfp_stream = pfp_gradient.snapshot();
+        cvr_stream = cvr_gradient.snapshot();
     } else {
         // NB: freeze() returns a Data URL.
-        stream = await gradient.freeze();
+        pfp_stream = await pfp_gradient.freeze();
+        cvr_stream = await cvr_gradient.freeze();
     }
+    
     const imageFormat = "image/png";
-    const blob = await streamToBlob(stream, imageFormat);
-    const png = new storage.File([blob], "threeid.png", {type: imageFormat});
 
-    // Put the account in the blockchain object so it's not a trait.
+    const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
+    const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
+
+    // nft.storage File objects are automatically uploaded.
+    const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
+    const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
+
+    // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
+
+    // Put the cover in the metadata object so it's not a trait.
+    // blockchain.cover = cvr;
 
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
         name: `3ID PFP: GEN 0`,
         description: `3ID PFP for ${account}`,
         image: png,
+        cover: cvr,
         properties: {
-            blockchain,
+            metadata: blockchain,
             traits: genTraits,
             "GEN": genTraits.trait0.value.name,
             "Point": genTraits.trait1.value.name,
