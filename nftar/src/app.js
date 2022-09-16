@@ -178,9 +178,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             metadata: blockchain,
             traits: genTraits,
             "GEN": genTraits.trait0.value.name,
-            "Point": genTraits.trait1.value.name,
-            "Field": genTraits.trait2.value.name,
-            "Pin": genTraits.trait3.value.name,
+            "Priority": genTraits.trait1.value.name,
+            "Friend": genTraits.trait2.value.name,
+            "Points": genTraits.trait3.value.name,
         },
     });
     //console.log('IPFS URL for the metadata:', metadata.url);
