@@ -71,6 +71,15 @@ describe("Profile Pictures", function () {
       const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
       await expect(pfp.awardPFP(owner.address, nextVoucher)).not.to.be.rejected;
     });
+
+    it("Should not be transferable", async function () {
+      const alfl = "0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52";
+      const { pfp, voucher, owner, operator } = await loadFixture(deployPFPFixture);
+      const nextVoucher = await signVoucher(owner, 'https://example.com', operator);
+      const result = await pfp.awardPFP(owner.address, nextVoucher);
+      console.log(result);
+      await expect(pfp.transferFrom(owner.address, alfl, 0)).to.be.rejected;
+    });
   });
 
   describe("Destruction", function () {
