@@ -17,7 +17,7 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import styles from "../styles/auth.css";
 import logo from "../assets/three-id-logo.svg";
 
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
 import { links as spinnerLinks } from "~/components/spinner";
@@ -35,9 +35,11 @@ export const loader = async ({ request }) => {
       cookie: request.headers.get("Cookie"),
     });
 
-    if (claimsRes.result.includes("3id.enter")) {
+    if (claimsRes.result && claimsRes.result.includes("3id.enter")) {
       return redirect("/onboard/nickname");
     }
+
+    requireJWT(request)
   }
   return null;
 };

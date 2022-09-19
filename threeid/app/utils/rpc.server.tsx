@@ -33,7 +33,7 @@ export async function oortSend(method: string, params: any[], options: OortOptio
     }
 
     //@ts-ignore
-    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}${options.address ? `/@${options.address}` : ''}/jsonrpc`, {
+    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}${options.address ? `/@${options.address}` : ''}/jsonrpc`, {
         method: "POST",
         headers,
         body: JSON.stringify({
@@ -45,5 +45,13 @@ export async function oortSend(method: string, params: any[], options: OortOptio
     });
 
     const json = await response.json();
+
+    if (response.status !== 200) {
+        return {
+            staus: response.status,
+            error: json,
+        }
+    }
+
     return json;
 }

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
+    "@datadog/datadog-api-client": "^1.3.0",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "2.0.10",
     "@remix-run/cloudflare": "1.7.0",

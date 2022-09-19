@@ -4,6 +4,17 @@ import {
   redirect 
 } from "@remix-run/cloudflare";
 
+import eventSubmit from "~/utils/datadog.server";
+
+type OortJwt = {
+  aud: string[];
+  iss: string;
+  sub: string;
+  exp: number;
+  iat: number;
+  capabilities: object;
+}
+
 // @ts-ignore
 const sessionSecret = SESSION_SECRET;
 if (!sessionSecret) {
@@ -30,7 +41,9 @@ export async function createUserSession(
     redirectTo: string,
     address?: string // NOTE: storing this temporarily in the session util RPC url remove address
   ) {
+    const parsedJWT = parseJwt(jwt);
     const session = await storage.getSession();
+    session.set("core", parsedJWT.iss)
     session.set("jwt", jwt);
     session.set("address", address);
     return redirect(redirectTo, {
@@ -59,11 +72,32 @@ export async function requireJWT(
 ) {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
+  const searchParams = new URLSearchParams([
+    ["redirectTo", redirectTo],
+  ]);
+
   if (!jwt || typeof jwt !== "string") {
-    const searchParams = new URLSearchParams([
-      ["redirectTo", redirectTo],
-    ]);
     throw redirect(`/auth?${searchParams}`);
   }
+  if (jwt) {
+    const parsedJWT = parseJwt(jwt);
+    if (parsedJWT.exp < Date.now() / 1000) {
+      console.log("JWT expired");
+      throw await destroyUserSession(session)
+    }
+  }
+  
+  eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
+
   return jwt;
 }
+
+export function parseJwt (token: string): OortJwt {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+
+  return JSON.parse(jsonPayload);
+};
