@@ -122,6 +122,7 @@ contract ThreeId_ProfilePicture is
         // per OpenZeppelin docs: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol#L461
         // Therefore if from is not the zero address we revert the transaction.
         require(from == address(0), "3ID PFPs are not transferable.");
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
     /**
