@@ -525,6 +525,8 @@ task("profile:mint", "Mint a profile for an account")
       account,
     });
 
+    console.log(JSON.stringify(profilePicturePayload));
+
     // Call our contract to award the profile.
     const awardResult = await hre.run("call:awardProfile", {
       account,
