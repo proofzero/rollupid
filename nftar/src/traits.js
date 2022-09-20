@@ -110,6 +110,11 @@ const SPECIAL_COLLECTIONS = {
         kind: "EPIC",
         value: 1,
     },
+    "0x92cE069c08e39bcA867d45d2Bdc4eBE94e28321a": {
+        name: "3ID Invite",
+        kind: "EPIC",
+        value: 2,
+    }
 }
 
 module.exports = {

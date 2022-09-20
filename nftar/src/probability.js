@@ -8,6 +8,8 @@
  * https://github.com/timgilbert/js-weighted-list is its home.
  */
 
+const { defaultCipherList } = require("constants");
+
 module.exports = (function() {
 
     function _WeightedList(initial) {
@@ -114,14 +116,19 @@ module.exports = (function() {
        * Select n random elements (without replacement), default 1.
        * If andRemove is true (default false), remove the elements
        * from the list.  (This is what the pop() method does.)
+       * _default, if passed, is returned instead of throwing.
        */
-      peek: function(n, andRemove) {
+      peek: function(n, andRemove, _default) {
         if (typeof n === 'undefined') {
           n = 1;
         }
         andRemove = !!andRemove;
 
         if (this.length - n < 0) {
+          if (_default) {
+            return [_default];
+          }
+
           throw new Error('Stack underflow! Tried to retrieve ' + n +
                           ' element' + (n === 1 ? '' : 's') +
                           ' from a list of ' + this.length);
