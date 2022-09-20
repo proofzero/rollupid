@@ -47,8 +47,8 @@ describe('Utilities', () => {
     });
     expect(utils.calculateBalanceWeight(0)).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 0, "UNCOMMON": 0});
     expect(utils.calculateBalanceWeight(2)).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 0, "UNCOMMON": 1});
-    expect(utils.calculateBalanceWeight(11)).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 1, "UNCOMMON": 1});
-    expect(utils.calculateBalanceWeight(101)).toStrictEqual({"COMMON": 0, "EPIC": 1, "RARE": 1, "UNCOMMON": 1});
+    expect(utils.calculateBalanceWeight(11)).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 1, "UNCOMMON": 0});
+    expect(utils.calculateBalanceWeight(101)).toStrictEqual({"COMMON": 0, "EPIC": 1, "RARE": 0, "UNCOMMON": 0});
   });
 
   test('EPIC traits do not underflow', () => {

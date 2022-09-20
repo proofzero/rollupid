@@ -42,13 +42,12 @@ const calculateSpecialWeight = function(nfts) {
 }
 
 const calculateBalanceWeight = function(balance) {
-    const weights = {
+    return {
         "EPIC": balance > 100 ? 1 : 0,
-        "RARE": balance > 10 ? 1 : 0,
-        "UNCOMMON": balance > 1 ? 1 : 0,
+        "RARE": balance <= 100 && balance > 10 ? 1 : 0,
+        "UNCOMMON": balance <= 10 && balance ? 1 : 0,
         "COMMON": 0,
     };
-    return weights;
 }
 
 // Subtract the returned color from the colors trait array
