@@ -53,7 +53,7 @@ export default function HeadNav() {
         <Disclosure as="nav">
             {({ open }) => (
               <>
-                <div className="mx-auto max-w-7xl">
+                <div className="mx-auto max-w-7xl mx-4">
                     <div className="flex h-16 items-center justify-between px-4 sm:px-0">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">

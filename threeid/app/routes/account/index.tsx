@@ -289,25 +289,24 @@ export default function Welcome() {
             <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
                 <div
-                  className="roadmap-ready__step step grid grid-cols-6"
+                  className="roadmap-next__step step flex flex-row gap-4 items-start"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-top">
-                    <img src={step.isCompleted ? stepComplete: stepSoon} alt="3ID logo" />
+                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
+                    <img src={step.isCompleted ? stepComplete: stepSoon} alt="3ID Step" />
                   </div>
 
                   <div className="col-span-5">
                     <SectionHeading>{step.title}</SectionHeading>
-                  </div>
-
-                  <div className="col-span-5">
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.Regular400}
-                      color={TextColor.Gray500}
-                    >
-                      {step.isCompleted ? "Completed" : step.description}
-                    </Text>
+                    <div className="col-span-5">
+                      <Text
+                        size={TextSize.SM}
+                        weight={TextWeight.Regular400}
+                        color={TextColor.Gray500}
+                      >
+                        {step.isCompleted ? "Completed" : step.description}
+                      </Text>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -320,20 +319,19 @@ export default function Welcome() {
             <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
                 <div
-                  className="roadmap-next__step step grid grid-cols-6"
+                  className="roadmap-next__step step flex flex-row gap-4 items-start"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-top">
-                    <img src={stepSoon} alt="3ID logo" />
+                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
+                    <img src={stepSoon} alt="3ID Step" />
                   </div>
 
                   <div className="col-span-5">
                     <SectionHeading className="mb-1">
                       {step.title}
                     </SectionHeading>
+                    <div className="col-span-5">{step.description}</div>
                   </div>
-
-                  <div className="col-span-5">{step.description}</div>
                 </div>
               ))}
             </div>
