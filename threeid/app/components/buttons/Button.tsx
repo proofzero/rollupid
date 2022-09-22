@@ -18,11 +18,13 @@ const Button = ({
   children,
   type = ButtonType.Primary,
   size = ButtonSize.Base,
+  disabled = false,
 }: ButtonProps) => {
   return (
     <button
-      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit`}
-      onClick={onClick}
+      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit opacity-${disabled ? "50" : "100"}`}
+      onClick={() => !disabled && onClick}
+      disabled={disabled}
     >
       <Text
         type="span"

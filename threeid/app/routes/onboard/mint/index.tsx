@@ -10,7 +10,7 @@ import styles from "~/styles/onboard.css";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite } from "wagmi";
+import { useContractWrite, useConnect, useAccount } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -74,6 +74,16 @@ const OnboardMintLand = ({
   minted,
   onClick,
 }: OnboardMintLandingProps) => {
+  const { connector, isConnected } = useAccount()
+  const { connect, connectors, error, isLoading, pendingConnector } =
+    useConnect()
+
+    console.log("connectors", connectors)
+    console.log("conector", connector)
+  useEffect(() => {
+    console.log("isConnected", isConnected)
+  }, [isConnected])
+
   return (
     <>
       <Text
@@ -289,7 +299,9 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          <img src={imgUrl} className="w-24 h-24" />
+          <img src={imgUrl} className="w-24 h-24"  style={{
+            animation: "spCircRot 0.6s infinite linear",
+        }}/>
 
           <Text className="mx-6">{"->"}</Text>
 
