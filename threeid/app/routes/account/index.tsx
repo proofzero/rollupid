@@ -82,12 +82,11 @@ export const action = async ({ request }: any) => {
 const completeSteps = [
   {
     title: "Claim your 3ID",
+    isCompleted: true,
   },
-];
-
-const comingNext = [
   {
     title: "Claim your PFP",
+    isCompleted: false,
     description: (
       <>
         <Text
@@ -98,18 +97,15 @@ const comingNext = [
         >
           Mint your very own 3ID 1/1 PFP.
         </Text>
-        <Text
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
-        >
-          For more information see "What is the 3ID?"" PFP in the FAQ section.
-        </Text>
+        <a>
+          Click here to complete.
+        </a>
       </>
     ),
   },
   {
     title: "Verify ENS",
+    isCompleted: false,
     description: (
       <>
         <Text
@@ -120,16 +116,15 @@ const comingNext = [
         >
           Connect your ENS name to your 3ID.
         </Text>
-        <Text
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
-        >
-          Use your ENS name as your username for easier profile discovery.
-        </Text>
+        <a>
+          Click here to complete.
+        </a>
       </>
     ),
   },
+];
+
+const comingNext = [
   {
     title: "Configure Profile",
     description: (
@@ -179,7 +174,7 @@ const roadmapSteps = [
 ];
 
 const percentage =
-  (completeSteps.length /
+  ((completeSteps.filter(step => step.isCompleted)).length /
     (completeSteps.length + comingNext.length + roadmapSteps.length)) *
   100;
 
@@ -272,7 +267,7 @@ export default function Welcome() {
                   key={index}
                 >
                   <div className="row-span-2 mt-1 flex justify-center items-top">
-                    <img src={stepComplete} alt="3ID logo" />
+                    <img src={step.isCompleted ? stepComplete: stepSoon} alt="3ID logo" />
                   </div>
 
                   <div className="col-span-5">
@@ -285,7 +280,7 @@ export default function Welcome() {
                       weight={TextWeight.Regular400}
                       color={TextColor.Gray500}
                     >
-                      Completed
+                      {step.isCompleted ? "Completed" : step.description}
                     </Text>
                   </div>
                 </div>
