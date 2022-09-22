@@ -9,7 +9,7 @@ import {
 
 
 import { oortSend } from "~/utils/rpc.server";
-import { getUserSession } from "~/utils/session.server";
+import { requireJWT } from "~/utils/session.server";
 
 import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
@@ -31,12 +31,12 @@ export const links = () => [
 // Fetch the nonce for address
 // @ts-ignore
 export const loader = async ({ request, params }) => {
-    const session = await getUserSession(request);
-    if (session.has("jwt")) {
+    const jwt = await requireJWT(request);
+    if (jwt) {
         const inviteRes = await oortSend("3id_listInvitations", 
             [], 
             {
-                jwt: session.get("jwt"),
+                jwt: jwt,
                 cookie: request.headers.get("Cookie")
             },
         )
