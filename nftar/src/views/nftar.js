@@ -1,24 +1,25 @@
-const generateTraitItems = (traits) => {
+function generateTraitItems (traits) {
     let markup = ''
     for (const item in traits) {
         if (!Object.hasOwn(traits, item)) continue;
         markup += `<li>
             <div>${item}: Type: ${ traits[item].type }</div>
             <div>Name: ${traits[item].value.name }</div>
-            <div>RGB: ${traits[item].value.rgb }</div>
-            <div>RND: ${traits[item].value.rnd }</div>
+            <div>RGB: ${JSON.stringify(traits[item].value.rgb) }</div>
+            <div>RND: ${JSON.stringify(traits[item].value.rnd) }</div>
         </li>`;
     }
     return markup
 }
 
-const animationViewer = (account, traits) => {
+function animationViewer (account, traits) {
     return `<!DOCTYPE html>
             <html lang="en">
                 <head>
                     <meta charset="utf-8">
                     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome-1">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+                    <link rel="icon" type="image/png" href="https://dapp.threeid.xyz/favicon.ico"/>
                     <title>NFTar ${account}</title>
                     <style>
                         * {
@@ -60,31 +61,29 @@ const animationViewer = (account, traits) => {
                 <body>
                     <image id="hex" src="" />
                     <canvas id="canvas"></canvas>
-                    <!-- <script src="https://requirejs.org/docs/release/2.3.6/minified/require.js"></script> -->
-                    <script type="module" src="/public/canvas.js"></script>
 
                     <ul class="traits">
                         ${generateTraitItems(traits)}
                     </ul>
 
                     <script type="module">
-                        const TRAITS = ${traits}
+                        const TRAITS = ${JSON.stringify(traits)}
                         const COLORS = Object.keys(TRAITS).map((k) => TRAITS[k].value)
                         const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
                         const PIXEL_RATIO = (window.devicePixelRatio > 1) ? 2 : 1
 
-                        const g = new Gradient(document.getElementById('canvas'), COLORS, PIXEL_RATIO, FRAMES_PER_SECOND);
-                        g.animate()
+                        var c = document.getElementById('canvas');
+                        var ctx = c.getContext("2d");
+                        var grd = ctx.createRadialGradient(75, 50, 5, 90, 60, 100);
+                        grd.addColorStop(0, "red");
+                        grd.addColorStop(1, "white");
+                        ctx.fillStyle = grd;
+                        ctx.fillRect(10, 10, 150, 80);
 
-                        // window.addEventListener('resize', g.resize.bind(g), false);
-
-                        const png = await g.freeze()
-                        document.getElementById('hex').setAttribute('src', png);
-
-                        window.g = g
+                        document.getElementById('hex').setAttribute('src', ctx.canvas.toDataURL());
                     </script>
                 </body>
             </html>`;
         };
 
-module.exports = animationViewer;
+module.exports = { animationViewer };

@@ -170,7 +170,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
     const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
-    const ani_blob = await streamToBlob(ani_stream, htmlFormat);
+    const ani_blob = ani_stream; //await streamToBlob(ani_stream, htmlFormat);
 
     // nft.storage File objects are automatically uploaded.
     const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
@@ -197,7 +197,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
             "external_url": `https://dapp.threeid.xyz/${account}`,
-            "animation_url": animationURL,
+            "animation_url": ani,
         },
     });
 
