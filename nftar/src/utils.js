@@ -10,10 +10,18 @@ const {
 } = require('./traits.js');
 
 // Does the user own any NFTs of the passed contract address?
-const isPFPOwner = function(nfts, contractAddress) {
-    nfts.forEach(async (nft) => {
-        if (nft.contract == contractAddress) return true;
-    });
+const isPFPOwner = function(nfts, _contractAddress) {
+    if (typeof _contractAddress !== 'string') return false;
+    if (nfts.constructor !== Array) return false;
+    
+    const contractAddress = _contractAddress.toLowerCase();
+    for (const i in nfts) {
+        const nft = nfts[i];
+        // console.log(nft.contract.address, contractAddress, contractAddress == nft.contract.address);
+        if (nft.contract.address == contractAddress) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -25,7 +33,7 @@ const calculateNFTWeight = function(nfts) {
         "COMMON": 0,
     };
     nfts.forEach(async (nft) => {
-        const contract = POPULAR_COLLECTIONS[nft.contract]
+        const contract = POPULAR_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }
@@ -41,7 +49,7 @@ const calculateSpecialWeight = function(nfts) {
         "COMMON": 0,
     };
     nfts.forEach(async (nft) => {
-        const contract = SPECIAL_COLLECTIONS[nft.contract]
+        const contract = SPECIAL_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }

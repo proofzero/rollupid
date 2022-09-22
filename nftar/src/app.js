@@ -115,6 +115,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
 
     // If the user owns an NFT from the PFP contract, 409 error.
+    console.log('Checking if duplicate!');
     if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
         ctx.throw(409, `${account} already owns a PFP NFT!`);
     }
