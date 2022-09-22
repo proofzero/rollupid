@@ -21,7 +21,7 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className}`}
+      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit`}
       onClick={onClick}
     >
       <Text
