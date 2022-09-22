@@ -65,7 +65,7 @@ export async function action({ request, params }) {
 
     // on success create a cookie/session for the user
 
-    return createUserSession(signRes.result, `/onboard/nickname`, params.address);
+    return createUserSession(signRes.result, `/account`, params.address);
 }
 
 export default function AuthSign() {

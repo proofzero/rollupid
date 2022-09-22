@@ -36,11 +36,12 @@ export const loader = async ({ request }) => {
     });
 
     if (claimsRes.result && claimsRes.result.includes("3id.enter")) {
-      return redirect("/onboard/nickname");
+      return redirect("/account");
     }
 
     requireJWT(request)
   }
+  
   return null;
 };
 

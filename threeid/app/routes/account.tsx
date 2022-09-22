@@ -8,7 +8,7 @@ import { useState } from "react";
 import { BiCog, BiIdCard, BiLink } from "react-icons/bi";
 import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
 
-import { requireJWT } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 import { oortSend } from "~/utils/rpc.server";
 
@@ -47,6 +47,24 @@ export const loader = async ({ request }) => {
   if (!claimsRes.result.includes("3id.enter")) {
     return redirect(`/auth`);
   }
+
+  const onboardData = await oortSend(
+    "kb_getData",
+    ["3id.profile", "onboarded"],
+    {
+      jwt,
+      cookie: request.headers.get("Cookie") as string | undefined,
+  }
+  );
+
+  if (onboardData.error) {
+    throw new Error("Error retrieving onboard data");
+  }
+
+  if (!onboardData.result?.value) {
+    return redirect(`/onboard/nickname`);
+  }
+
   return null;
 };
 
@@ -127,18 +145,17 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
   const activeStyle = {};
   return (
     <div
-      className={`${
-        item.current ? "bg-gray-100" : "lg:bg-transparent hover:bg-gray-100"
-      } basis-1/4 lg:w-100`}
+      className={`${item.current ? "bg-gray-100" : "lg:bg-transparent hover:bg-gray-100"
+        } basis-1/4 lg:w-100`}
     >
       <NavLink
         to={item.href}
         aria-current={item.current ? "page" : undefined}
         className="group lg:border-l-4 px-3 py-2 flex justify-center items-center flex-row lg:justify-start lg:items-start"
-        // if href is "" or "#" isActive is true so we can't use this yet
-        // style={({ isActive }) =>
-        //     isActive ? activeStyle : undefined
-        // }
+      // if href is "" or "#" isActive is true so we can't use this yet
+      // style={({ isActive }) =>
+      //     isActive ? activeStyle : undefined
+      // }
       >
         <item.icon
           className={classNames(

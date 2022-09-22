@@ -43,6 +43,23 @@ export const loader = async ({ request }) => {
     return redirect(`/auth/gate/${session.get("address")}`);
   }
 
+  const onboardData = await oortSend(
+    "kb_getData",
+    ["3id.profile", "onboarded"],
+    {
+      jwt,
+      cookie: request.headers.get("Cookie") as string | undefined,
+    }
+  );
+
+  if (onboardData.error) {
+    throw new Error("Error retrieving onboard data");
+  }
+
+  if (onboardData.result?.value) {
+    return redirect(`/account`);
+  }
+
   return null;
 };
 
