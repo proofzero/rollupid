@@ -4,7 +4,7 @@ import {
   redirect 
 } from "@remix-run/cloudflare";
 
-import eventSubmit from "~/utils/datadog.server";
+// import eventSubmit from "~/utils/datadog.server";
 
 type OortJwt = {
   aud: string[];
@@ -87,7 +87,7 @@ export async function requireJWT(
     }
   }
   
-  eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
+  // eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
 
   return jwt;
 }
