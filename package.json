@@ -55,7 +55,7 @@
     "karma-chrome-launcher": "3.1.1",
     "karma-cljs-test": "0.1.0",
     "karma-junit-reporter": "2.0.1",
-    "lerna": "5.2.0",
+    "lerna": "5.5.2",
     "shadow-cljs": "2.19.8",
     "tailwindcss": "3.1.6",
     "tap": "16.3.0",
