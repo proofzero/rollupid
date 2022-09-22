@@ -33,37 +33,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
 
-  const onboardData = await oortSend(
-    "kb_getData",
-    ["3id.profile", "onboarded"],
-    {
-      jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
-    }
-  );
-
-  if (onboardData.error) {
-    throw new Error("Error retrieving onboard data");
-  }
-
-  if (onboardData.result?.value) {
-    // Uncomment this to make onboarding skip
-    return redirect(`/account`); 
-  } else {
-    const data = await oortSend(
-      "kb_setData",
-      ["3id.profile", "onboarded", true],
-      {
-        jwt,
-        cookie: request.headers.get("Cookie") as string | undefined,
-      }
-    );
-
-    if (data.error) {
-      throw new Error("Error setting onboard data");
-    }
-  }
-
   const data = await oortSend("kb_getData", ["3id.profile", "nickname"], {
     jwt,
     cookie: request.headers.get("Cookie") as string | undefined,

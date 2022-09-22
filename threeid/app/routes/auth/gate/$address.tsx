@@ -62,7 +62,7 @@ export async function action({ request, params }) {
 
     // on success redirect to account
     if (redeemRes.result === true) {
-        return redirect(`/onboard/nickname`)
+        return redirect(`/account`)
     }
 
     return json({activateFailed: redeemRes});
