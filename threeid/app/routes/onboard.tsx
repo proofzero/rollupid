@@ -2,10 +2,10 @@ import { redirect } from "@remix-run/cloudflare";
 
 import { Outlet, useLoaderData } from "@remix-run/react";
 
-import styles from "../styles/auth.css";
-import logo from "../assets/three-id-logo.svg";
+import styles from "~/styles/auth.css";
+import logo from "~/assets/three-id-logo.svg";
 
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
 import {
@@ -25,12 +25,7 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const session = await getUserSession(request);
-  if (!session || !session.has("jwt")) {
-    return redirect("/auth");
-  }
-
-  const jwt = session.get("jwt");
+  const jwt = await requireJWT(request);
 
   const claimsRes = await oortSend("kb_getCoreClaims", [], {
     jwt: jwt,
@@ -38,7 +33,7 @@ export const loader = async ({ request }) => {
   });
 
   if (!claimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth/gate/${session.get("address")}`);
+    return redirect(`/auth`);
   }
 
   return null;
