@@ -1,11 +1,6 @@
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-  redirect,
-} from "@remix-run/cloudflare";
+import { ActionFunction, LoaderFunction } from "@remix-run/cloudflare";
 
-import { useLoaderData, useNavigate, useTransition } from "@remix-run/react";
+import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
 import Text, { TextColor } from "~/components/typography/Text";
@@ -15,13 +10,7 @@ import styles from "~/styles/onboard.css";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import {
-  useAccount,
-  useContractWrite,
-  usePrepareContractWrite,
-  useSignMessage,
-  useWaitForTransaction,
-} from "wagmi";
+import { useContractWrite } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -35,6 +24,8 @@ import { abi } from "~/assets/abi/mintpfp.json";
 import prevStep from "~/assets/onboard/pre.png";
 import currentStep from "~/assets/onboard/current.png";
 import nextStep from "~/assets/onboard/next.png";
+import { oortSend } from "~/utils/rpc.server";
+import { getUserSession } from "~/utils/session.server";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -43,7 +34,32 @@ export const links = () => {
 export const loader: LoaderFunction = loadVoucherLoader;
 
 export const action: ActionFunction = async ({ request }) => {
-  return redirect("/onboard/ens");
+  const session = await getUserSession(request);
+  const jwt = session.get("jwt");
+
+  const formData = await request.formData();
+
+  const imgUrl = formData.get("imgUrl");
+  const contractAddress = formData.get("contractAddress");
+
+  await oortSend(
+    "kb_setData",
+    [
+      "3id.profile",
+      "pfp",
+      {
+        url: imgUrl,
+        contractAddress: contractAddress,
+        isToken: true,
+      },
+    ],
+    {
+      jwt,
+      cookie: request.headers.get("Cookie") as string | undefined,
+    }
+  );
+
+  return null;
 };
 
 type OnboardMintLandingProps = {
@@ -174,10 +190,22 @@ const OnboardMint = () => {
     args: [recipient, voucher],
   });
 
+  const submit = useSubmit();
+
   useEffect(() => {
     if (screen === "sign" && isError) {
       setScreen("error");
     } else if (screen === "sign" && isSuccess) {
+      submit(
+        {
+          imgUrl,
+          contractAddress,
+        },
+        {
+          method: "post",
+        }
+      );
+
       setScreen("success");
     }
   }, [screen, isError, isSuccess]);
