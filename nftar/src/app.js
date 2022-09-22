@@ -18,12 +18,18 @@ const storage = require('nft.storage');
 const Web3 = require('web3');
 
 const {
+    isPFPOwner,
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits
 } = require('./utils.js');
+
 const canvas = require('./canvas/canvas.js');
+
+const {
+    animationViewer
+} = require('./views/nftar.js')
 
 const app     = new Koa();
 const router  = new Router();
@@ -107,6 +113,11 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // derive weight inc for each trait
     const weightInc = {};
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
+
+    // If the user owns an NFT from the PFP contract, 409 error.
+    if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
+        ctx.throw(409, `${account} already owns a PFP NFT!`);
+    }
     
     // TRAIT ONE: POPULAR COLLECTIONS
     weightInc['trait1'] = calculateNFTWeight(nftsForOwner.ownedNfts);
@@ -142,6 +153,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     let pfp_stream;
     let cvr_stream;
+    let ani_stream = animationViewer(account, genTraits);
     
     if (isNode()) {
         // Generate a single frame; call animate() to produce an animation.
@@ -154,13 +166,16 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     }
     
     const imageFormat = "image/png";
+    const htmlFormat = "text/html";
 
     const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
     const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
+    const ani_blob = await streamToBlob(ani_stream, htmlFormat);
 
     // nft.storage File objects are automatically uploaded.
     const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
     const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
+    const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
 
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
@@ -170,19 +185,22 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
-        name: `3ID PFP: GEN 0`,
+        name: `3ID PFP: GEN 0`, // TODO: Ethereum?
         description: `3ID PFP for ${account}`,
         image: png,
         cover: cvr,
         properties: {
             metadata: blockchain,
             traits: genTraits,
-            "GEN": genTraits.trait0.value.name,
+            "GEN": genTraits.trait0.value.name, // TODO: Ethereum?
             "Priority": genTraits.trait1.value.name,
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
+            "external_url": `https://dapp.threeid.xyz/${account}`,
+            "animation_url": animationURL,
         },
     });
+
     //console.log('IPFS URL for the metadata:', metadata.url);
     //console.log('metadata.json contents:\n', metadata.data);
     //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
@@ -242,8 +260,6 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
     const baseName = path.basename(outputFile);
 
     inviteId = inviteId.toString().padStart(4, "0");
-
-
 
     const newCard = await fs.promises.readFile(assetFile, 'utf8')
       .then(data => {
