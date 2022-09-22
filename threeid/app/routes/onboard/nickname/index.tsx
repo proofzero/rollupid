@@ -178,7 +178,6 @@ const OnboardNickname = () => {
         className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
         <Button
-          id="onboard-nickname-continue"
           disabled={!nickname || nickname === ""}
           size={ButtonSize.L}
           onClick={() => {

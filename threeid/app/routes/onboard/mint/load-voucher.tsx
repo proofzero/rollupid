@@ -125,7 +125,15 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const data = await oortSend(
     "kb_setData",
-    ["3id.profile", "pfp", voucher.imgUrl],
+    [
+      "3id.profile",
+      "pfp",
+      {
+        url: voucher.imgUrl,
+        contractAddress: null,
+        isToken: false,
+      },
+    ],
     {
       jwt,
       cookie: request.headers.get("Cookie") as string | undefined,
