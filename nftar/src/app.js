@@ -190,6 +190,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         description: `3ID PFP for ${account}`,
         image: png,
         cover: cvr,
+        external_url: `https://dapp.threeid.xyz/${account}`,
+        animation_url: ani,
         properties: {
             metadata: blockchain,
             traits: genTraits,
@@ -197,8 +199,6 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             "Priority": genTraits.trait1.value.name,
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
-            "external_url": `https://dapp.threeid.xyz/${account}`,
-            "animation_url": ani,
         },
     });
 
