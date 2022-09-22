@@ -49,7 +49,7 @@ test.describe('Auth Gateway', () => {
     const address = users.invited.address
     const signUrl = `/auth/gate/${address}`
     await page.goto(signUrl);
-    await expect(page).toHaveURL(`/auth`);
+    await expect(page).toHaveURL(/.*auth\?redirectTo=?/);
   });
 
 });
