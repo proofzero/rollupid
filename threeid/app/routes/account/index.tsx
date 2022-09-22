@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes] = await Promise.all([
+  const [inviteCodeRes, votesRes, pfpRes, namesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
@@ -51,16 +51,38 @@ export const loader = async ({ request, params }) => {
       ["3id.app", "feature_vote_count"],
       oortOptions,
     ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "pfp"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getNames",
+      [["ens"]],
+      oortOptions,
+    )
   ]);
 
   if (inviteCodeRes.error || votesRes.error) {
     return redirect(`/error`);
   }
-  const [inviteCode, votes] = [inviteCodeRes.result, votesRes.result];
+  const [
+    inviteCode,
+    votes,
+    pfp,
+    names
+  ] = [
+    inviteCodeRes.result,
+    votesRes.result,
+    pfpRes.result,
+    namesRes.result
+  ];
 
   return json({
     inviteCode,
     votes,
+    pfp,
+    names,
   });
 };
 
@@ -179,8 +201,12 @@ const percentage =
   100;
 
 export default function Welcome() {
-  const { inviteCode, votes, address } = useLoaderData();
+  const { inviteCode, votes, pfp, names } = useLoaderData();
   let submit = useSubmit();
+
+  console.log("pfp", pfp);
+  completeSteps[1].isCompleted = !!pfp.pfp;
+  // completeSteps[2].isCompleted = !!names.ens;
 
   const currentVotes = votes.value ? JSON.parse(votes.value) : [];
 

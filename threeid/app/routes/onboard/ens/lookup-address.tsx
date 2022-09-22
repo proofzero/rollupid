@@ -5,10 +5,6 @@ import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
-  if (!session || !session.has("jwt")) {
-    return redirect("/auth");
-  }
-
   const address = session.get("address");
   const jwt = session.get("jwt");
 
@@ -20,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
 
   if (!claimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth/gate/${address}`);
+    return redirect(`/auth`);
   }
 
   const ensRes = await oortSend("ens_lookupAddress", [address], {
