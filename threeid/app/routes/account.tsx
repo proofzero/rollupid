@@ -37,6 +37,9 @@ export function links() {
 export const loader = async ({ request }) => {
   const jwt = await requireJWT(request, "/auth")
 
+  const session = await getUserSession(request);
+  const address = session.get("address");
+
   // gate with invites only
   const claimsRes = await oortSend(
     "kb_getCoreClaims",
@@ -48,20 +51,12 @@ export const loader = async ({ request }) => {
     return redirect(`/auth`);
   }
 
-  const onboardData = await oortSend(
-    "kb_getData",
-    ["3id.profile", "onboarded"],
-    {
-      jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
-  }
-  );
+  // @ts-ignore
+  const onboardData = await ONBOARD_STATE.get(address);
+  if (!onboardData) {
+    // @ts-ignore
+    await ONBOARD_STATE.put(address, "true");
 
-  if (onboardData.error) {
-    throw new Error("Error retrieving onboard data");
-  }
-
-  if (!onboardData.result?.value) {
     return redirect(`/onboard/nickname`);
   }
 
