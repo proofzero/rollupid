@@ -27,7 +27,7 @@ import Text, {
 
 import { getUserSession } from "~/utils/session.server";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import styles from "~/styles/onboard.css";
 
@@ -55,39 +55,48 @@ export const action: ActionFunction = async ({ request }) => {
   });
 
   if (ensRes.error) {
-    console.error(ensRes.error);
-
-    return json(null, { status: 500 });
+    return json({ error: true }, { status: 500 });
   }
 
-  return redirect("/account");
+  return json({ error: false }, { status: 200 });
 };
 
 const OnboardEns = () => {
   const { chain } = useNetwork();
 
   const [ensChecked, setEnsChecked] = useState<boolean>(false);
-  const [validating, setValidating] = useState<boolean>(false);
+  const [validating, setValidating] = useState<boolean>(true);
 
   const { address } = useAccount();
   const { isSuccess } = useEnsName({
     address: address,
   });
 
+  const data = useActionData();
+
+  useEffect(() => {
+    if (data?.error) {
+      setEnsChecked(false);
+    }
+  }, [data]);
+
   const submit = useSubmit();
 
+  useEffect(() => {
+    setValidating(false);
+  }, [isSuccess]);
+
   const handleEnsToggle = async (checked: boolean) => {
-    if (!ensChecked && checked) {
-      // Validate and check ENS if OK
-      setValidating(true);
+    setValidating(true);
 
-      await new Promise<void>((ok) => setTimeout(() => ok(), 1500));
-
-      setValidating(false);
+    if (checked) {
+      postEnsRequest();
       setEnsChecked(true);
     } else {
-      setEnsChecked(checked);
+      setEnsChecked(false);
     }
+
+    setValidating(false);
   };
 
   const postEnsRequest = useCallback(() => {
@@ -156,7 +165,7 @@ const OnboardEns = () => {
                   htmlFor="use-ens"
                   className="inline-flex relative items-center mb-5 cursor-pointer"
                 >
-                  {!validating && (
+                  {!validating && isSuccess && (
                     <>
                       <input
                         type="checkbox"
@@ -168,9 +177,10 @@ const OnboardEns = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </>
                   )}
+
                   {validating && <Spinner />}
 
-                  {(!ensChecked || isSuccess) && (
+                  {(validating || isSuccess) && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
@@ -180,7 +190,7 @@ const OnboardEns = () => {
                     </Text>
                   )}
 
-                  {ensChecked && !isSuccess && (
+                  {!validating && !isSuccess && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
@@ -210,26 +220,12 @@ const OnboardEns = () => {
         >
           Back
         </Button>
-        
-        <Button
-          type={ButtonType.Secondary}
-          size={ButtonSize.L}
-          onClick={() => {
-            navigate("/account");
-          }}
-        >
-          Skip
-        </Button>
 
         <Button
+          disabled={validating}
           size={ButtonSize.L}
           onClick={() => {
-            // Submit & navigate
-            if (ensChecked && isSuccess) {
-              postEnsRequest();
-            } else {
-              navigate(`/account`);
-            }
+            navigate(`/account`);
           }}
         >
           Finish
