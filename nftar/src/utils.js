@@ -32,12 +32,15 @@ const calculateNFTWeight = function(nfts) {
         "UNCOMMON": 0,
         "COMMON": 0,
     };
-    nfts.forEach(async (nft) => {
+    if (nfts.constructor !== Array) return weights;
+
+    for (const i in nfts) {
+        const nft = nfts[i];
         const contract = POPULAR_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }
-    });
+    }
     return weights;
 }
 
@@ -48,12 +51,15 @@ const calculateSpecialWeight = function(nfts) {
         "UNCOMMON": 0,
         "COMMON": 0,
     };
-    nfts.forEach(async (nft) => {
+    if (nfts.constructor !== Array) return weights;
+
+    for (const i in nfts) {
+        const nft = nfts[i];
         const contract = SPECIAL_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }
-    });
+    }
     return weights;
 }
 

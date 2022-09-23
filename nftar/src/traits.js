@@ -47,52 +47,47 @@ const V0_COLORS = {
 }
 
 const POPULAR_COLLECTIONS = {
-    "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D": {
+    "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d": {
         name: "Bored Ape Yacht Club",
         kind: "EPIC",
         value: 2,
     },
-    "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB": {
+    "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb": {
         name: "Cyrpto Punks",
         kind: "EPIC",
         value: 1,
     },
-    "0x60E4d786628Fea6478F785A6d7e704777c86a7c6": {
+    "0x60e4d786628fea6478f785a6d7e704777c86a7c6": {
         name: "Mutant Ape Yacht Club",
         kind: "RARE",
         value: 3,
     },
-    "0x23581767a106ae21c074b2276D25e5C3e136a68b": {
+    "0x23581767a106ae21c074b2276d25e5c3e136a68b": {
         name: "Moonbirds",
         kind: "RARE",
         value: 2,
     },
-    "0x49cF6f5d44E70224e2E23fDcdd2C053F30aDA28B": {
+    "0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b": {
         name: "Clonex",
         kind: "RARE",
         value: 1,
     },
-    "0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e": {
+    "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e": {
         name: "Doodles",
         kind: "UNCOMMON",
         value: 4,
     },
-    "0xED5AF388653567Af2F388E6224dC7C4b3241C544": {
+    "0xed5af388653567af2f388e6224dc7c4b3241c544": {
         name: "Azuki",
         kind: "UNCOMMON",
         value: 3,
     },
-    "0xa3AEe8BcE55BEeA1951EF834b99f3Ac60d1ABeeB": {
+    "0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb": {
         name: "Vee Friends",
         kind: "UNCOMMON",
         value: 2,
     },
-    "0xa3AEe8BcE55BEeA1951EF834b99f3Ac60d1ABeeB": {
-        name: "Vee Friends",
-        kind: "UNCOMMON",
-        value: 2,
-    },
-    "0xe785E82358879F061BC3dcAC6f0444462D4b5330": {
+    "0xe785e82358879f061bc3dcac6f0444462d4b5330": {
         name: "World of Women",
         kind: "UNCOMMON",
         value: 1,
@@ -100,17 +95,17 @@ const POPULAR_COLLECTIONS = {
 }
 
 const SPECIAL_COLLECTIONS = {
-    "0x581425C638882bd8169dAe6F2995878927C9fE70": { // TODO: this is on polygon?
+    "0x581425c638882bd8169dae6f2995878927c9fe70": { // TODO: this is on polygon?
         name: "Courtyard",
         kind: "EPIC",
         value: 2,
     },
-    "0xcD79De06DD12b09c5BeB567f83b2e9A51A4aaFd6": {
+    "0xcd79de06dd12b09c5beb567f83b2e9a51a4aafd6": {
         name: "Raremint",
         kind: "EPIC",
         value: 1,
     },
-    "0x92cE069c08e39bcA867d45d2Bdc4eBE94e28321a": {
+    "0x92ce069c08e39bca867d45d2bdc4ebe94e28321a": {
         name: "3ID Invite",
         kind: "EPIC",
         value: 2,

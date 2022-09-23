@@ -661,18 +661,15 @@ describe('Utilities', () => {
   });
 
   test('calculateNFTWeight null test', () => {
-    const nfts = new Map();
+    const nfts = [];
     const result = utils.calculateNFTWeight(nfts);
     expect(result).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 0, "UNCOMMON": 0});
   });
 
   test('calculateNFTWeight BAYC test', () => {
-    const nfts = new Map();
-    for (const index in ALCHEMY_NFTS_FIXTURE.ownedNfts) {
-      nfts.set(index, ALCHEMY_NFTS_FIXTURE.ownedNfts[index]);
-    }
-    nfts.set(nfts.size, {
-      contract: { address: "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D" },
+    const nfts = ALCHEMY_NFTS_FIXTURE.ownedNfts;
+    nfts.push({
+      contract: { address: "0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d" },
       name: "Bored Ape Yacht Club",
       kind: "EPIC",
       value: 2,
@@ -682,18 +679,17 @@ describe('Utilities', () => {
   });
 
   test('calculateSpecialWeight null test', () => {
-    const nfts = new Map();
-    const result = utils.calculateSpecialWeight(nfts);
+    const nfts = [];
+    let result = utils.calculateSpecialWeight(nfts);
+    expect(result).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 0, "UNCOMMON": 0});
+    result = utils.calculateSpecialWeight('hello');
     expect(result).toStrictEqual({"COMMON": 0, "EPIC": 0, "RARE": 0, "UNCOMMON": 0});
   });
 
   test('calculateSpecialWeight invite test', () => {
-    const nfts = new Map();
-    for (const index in ALCHEMY_NFTS_FIXTURE.ownedNfts) {
-      nfts.set(index, ALCHEMY_NFTS_FIXTURE.ownedNfts[index]);
-    }
-    nfts.set(nfts.size, {
-      contract: { address: "0x92cE069c08e39bcA867d45d2Bdc4eBE94e28321a" },
+    const nfts = ALCHEMY_NFTS_FIXTURE.ownedNfts;
+    nfts.push({
+      contract: { address: "0x92ce069c08e39bca867d45d2bdc4ebe94e28321a" },
       name: "3ID Invite",
       kind: "EPIC",
       value: 2,
@@ -703,12 +699,9 @@ describe('Utilities', () => {
   });
 
   test('calculateBalanceWeight full test', () => {
-    const nfts = new Map();
-    for (const index in ALCHEMY_NFTS_FIXTURE.ownedNfts) {
-      nfts.set(index, ALCHEMY_NFTS_FIXTURE.ownedNfts[index]);
-    }
-    nfts.set(nfts.size, {
-      contract: { address: "0x92cE069c08e39bcA867d45d2Bdc4eBE94e28321a" },
+    const nfts = ALCHEMY_NFTS_FIXTURE.ownedNfts;
+    nfts.push({
+      contract: { address: "0x92ce069c08e39bca867d45d2bdc4ebe94e28321a" },
       name: "3ID Invite",
       kind: "EPIC",
       value: 2,

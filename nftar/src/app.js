@@ -113,7 +113,6 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // derive weight inc for each trait
     const weightInc = {};
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
-    console.log(JSON.stringify(nftsForOwner));
 
     // If the user owns an NFT from the PFP contract, 409 error.
     if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
