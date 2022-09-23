@@ -9,7 +9,7 @@ import {
 
 
 import { oortSend } from "~/utils/rpc.server";
-import { requireJWT } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'

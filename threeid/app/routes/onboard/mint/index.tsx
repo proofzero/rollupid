@@ -14,10 +14,7 @@ import { useContractWrite } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
-import {
-  loader as loadVoucherLoader,
-  LoadVoucherRes,
-} from "~/routes/onboard/mint/load-voucher";
+import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher";
 
 import { abi } from "~/assets/abi/mintpfp.json";
 
@@ -66,6 +63,7 @@ type OnboardMintLandingProps = {
   account: string;
   version: string;
   rarity: string;
+  minted: boolean;
   onClick: () => void;
 };
 
@@ -73,6 +71,7 @@ const OnboardMintLand = ({
   account,
   version,
   rarity,
+  minted,
   onClick,
 }: OnboardMintLandingProps) => {
   return (
@@ -99,9 +98,13 @@ const OnboardMintLand = ({
         </span>
       </Text>
 
-      <Button size={ButtonSize.L} onClick={onClick}>
-        Mint NFT
-      </Button>
+      {!minted && (
+        <Button size={ButtonSize.L} onClick={onClick}>
+          Mint NFT
+        </Button>
+      )}
+
+      {minted && <Text>Already minted</Text>}
     </>
   );
 };
@@ -173,12 +176,18 @@ const OnboardMint = () => {
     "land" | "sign" | "proc" | "success" | "error"
   >("land");
 
-  const { account, version, rarity, imgUrl, voucher, contractAddress } =
-    useLoaderData<LoadVoucherRes>();
+  const { metadata, voucher, contractAddress, minted } = useLoaderData();
+
+  const account = metadata?.properties?.metadata.account;
+  const recipient = metadata?.properties?.metadata.account;
+
+  const rarity = metadata?.properties?.traits.trait0.value.name;
+
+  const version = metadata?.name;
+  const imgUrl = metadata?.image;
 
   const navigate = useNavigate();
 
-  const recipient = account;
   const { write, isError, isSuccess } = useContractWrite({
     // https://github.com/wagmi-dev/wagmi/issues/899
     // https://github.com/wagmi-dev/wagmi/issues/891
@@ -247,6 +256,7 @@ const OnboardMint = () => {
           account={account}
           version={version}
           rarity={rarity}
+          minted={minted}
           onClick={() => {
             setScreen("sign");
             signMessage();

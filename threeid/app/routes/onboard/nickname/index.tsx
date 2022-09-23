@@ -88,7 +88,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 const OnboardNickname = () => {
   const { nickname: storedNickname } = useLoaderData();
-  const [nickname, setNickname] = useState(storedNickname);
+  const [nickname, setNickname] = useState(storedNickname || "");
 
   const { chain } = useNetwork();
 

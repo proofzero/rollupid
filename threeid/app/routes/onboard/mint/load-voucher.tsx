@@ -8,19 +8,13 @@ type LoadVoucherParams = {
   chainId: string;
 };
 
-type NFTVoucher = {
-  recipient: string;
-  uri: string;
-  signature: string;
-};
+const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
+  const regex = /(bafy\w*)/;
+  const matches = regex.exec(ipfsUrl as string);
 
-export type LoadVoucherRes = {
-  account: string;
-  version: string;
-  rarity: string;
-  imgUrl: string;
-  voucher: NFTVoucher;
-  contractAddress: string;
+  return matches
+    ? `https://nftstorage.link/ipfs/${matches[0]}/threeid.png`
+    : undefined;
 };
 
 const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
@@ -51,51 +45,17 @@ const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
     }),
   });
 
-  const jsonRes: {
-    result: {
-      metadata: {
-        name: string;
-        image: string;
+  const jsonRes = await response.json();
+  if (jsonRes.error) {
+    throw new Error(jsonRes.error.data.message);
+  }
 
-        properties: {
-          metadata: {
-            account: string;
-          };
-
-          traits: {
-            trait0: {
-              value: {
-                name: string;
-              };
-            };
-          };
-        };
-      };
-      voucher: {
-        recipient: string;
-        signature: string;
-        uri: string;
-      };
-    };
-  } = await response.json();
-
-  const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
-    const regex = /(bafy\w*)/;
-    const matches = regex.exec(ipfsUrl as string);
-
-    return matches
-      ? `https://nftstorage.link/ipfs/${matches[0]}/threeid.png`
-      : undefined;
+  let res = {
+    ...jsonRes.result,
+    contractAddress
   };
 
-  const res: LoadVoucherRes = {
-    account: jsonRes.result.metadata.properties.metadata.account,
-    version: jsonRes.result.metadata.name,
-    rarity: jsonRes.result.metadata.properties.traits.trait0.value.name,
-    imgUrl: gatewayFromIpfs(jsonRes.result.metadata.image) as string,
-    voucher: jsonRes.result.voucher,
-    contractAddress: contractAddress,
-  };
+  res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string
 
   return res;
 };
@@ -116,9 +76,20 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
-
   if (cachedVoucher) {
-    return json(cachedVoucher);
+    try {
+      await loadVoucher({ address, chainId })
+
+      return json({
+        minted: false,
+        ...cachedVoucher
+      });
+    } catch (ex) {
+      return json({
+        minted: true,
+        ...cachedVoucher
+      });
+    }
   }
 
   const voucher = await loadVoucher({ address, chainId });
@@ -147,5 +118,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   // @ts-ignore
   await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
 
-  return json(voucher);
+  return json({
+    minted: false,
+    ...cachedVoucher
+  });
 };
