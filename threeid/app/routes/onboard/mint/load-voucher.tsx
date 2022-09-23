@@ -57,6 +57,8 @@ const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
 
   res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string
 
+  fetch(res.metadata.image)
+
   return res;
 };
 
