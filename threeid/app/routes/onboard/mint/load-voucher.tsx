@@ -117,10 +117,16 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
   } catch (ex) {
+
+    let ret = cachedVoucher
+    if (!ret) {
+      ret = JSON.parse(STATIC_VOUCHER)
+      ret.metadata.image = gatewayFromIpfs(ret.metadata.image) as string
+    } 
     return json({
       minted: true,
       //@ts-ignore
-       ...(cachedVoucher || JSON.parse(STATIC_VOUCHER))
+       ...ret
     });
   }
 };
