@@ -3,7 +3,7 @@ import { ActionFunction, LoaderFunction } from "@remix-run/cloudflare";
 import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
-import Text, { TextColor } from "~/components/typography/Text";
+import Text, { TextColor, TextSize } from "~/components/typography/Text";
 
 import styles from "~/styles/onboard.css";
 
@@ -113,6 +113,13 @@ const OnboardMintLand = ({
           Mint NFT
         </Button>
       )}
+
+      {!isConnected && <Text
+        className="mt-10 flex flex-row space-x-4 items-center"
+        color={TextColor.Gray400}
+        size={TextSize.SM}>
+          "Please connect your wallet to mint your NFT"}
+      </Text> }
 
       {minted && <Text>Already minted</Text>}
     </>
