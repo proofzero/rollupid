@@ -82,6 +82,13 @@ const OnboardMintLand = ({
     console.log("isConnected", isConnected)
   }, [isConnected])
 
+  const traitNames = {
+    "trait0": "Generation",
+    "trait1": "Priority",
+    "trait2": "Friend",
+    "trait3": "Points",
+  }
+
   return (
     <>
       <Text
@@ -98,27 +105,35 @@ const OnboardMintLand = ({
       </Text>
 
       <Text
-        className="mb-10 grid grid-cols-4 gap-4 items-center"
+        className="mb-10 grid grid-cols-4 gap-2 items-center"
         color={TextColor.Gray400} size={TextSize.SM}
       >
-          <div className="">
-            <span style={{
-              width: 10,
-              height: 10,
-              display: "inline-block",
-              backgroundColor: `rbga(${metadata.properties.traits.trait0.value.rgb.r},${metadata.properties.traits.trait0.value.rgb.g},${metadata.properties.traits.trait0.value.rgb.b},1)`,
-            }}></span>{metadata.properties.traits.trait0.type}: {metadata.properties.traits.trait0.value.name}
-          </div>
-          <div className="">
-            {metadata.properties.traits.trait1.type}: {metadata.properties.traits.trait1.value.name}
-          </div>
-          <div className="">
-            {metadata.properties.traits.trait2.type}: {metadata.properties.traits.trait2.value.name}
-          </div>
-          <div className="">
-            {metadata.properties.traits.trait3.type}: {metadata.properties.traits.trait3.value.name}
-          </div>
-          
+        {[...Array(4).keys()].map((i) => {
+          const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
+          const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
+          const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
+          const bg = `rgb(${r}, ${g}, ${b})`;
+
+          return (
+          <div key={i}>
+              <div className="grid grid-cols-2 gap-1">
+                <span className="justify-items-end">Trait</span>
+                <span className="justify-items-start">{traitNames[`trait${i}`]}</span>
+                <span className="justify-items-end">Rarity</span>
+                <span className="justify-items-start">{metadata.properties.traits[`trait${i}`].type}</span>
+                <span className="justify-items-end">Value</span>
+                <span className="justify-items-start">
+                  <span style={{
+                    width: 10,
+                    height: 10,
+                    display: "inline-block",
+                    backgroundColor: bg,
+                    }}></span>{" "}
+                    {metadata.properties.traits[`trait${i}`].value.name}
+                </span>
+              </div>
+          </div>);
+        })}
       </Text>
 
       {!minted && (
