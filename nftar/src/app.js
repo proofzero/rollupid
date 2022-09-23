@@ -186,7 +186,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         image: png,
         cover: cvr,
         external_url: `https://dapp.threeid.xyz/${account}`,
-        animation_url: ani,
+        //animation_url: ani,
         properties: {
             metadata: blockchain,
             traits: genTraits,

@@ -9,7 +9,7 @@ const TRAIT_CATEGORIES = [
 
 const V0_COLORS = {
     "GEN": [
-        {key: "GEN", data: {name: "Mint Green (V0)", rgb: {r: 45, g: 74, b: 277}}, weight: 1}
+        {key: "GEN", data: {name: "Mint Green (V0)", rgb: {r: 162, g: 236, b: 142}}, weight: 1}
     ],
     "COMMON": [
         {key: "A", data: {name: "Northern Blue", rgb: {r: 99, g: 138, b: 141}}, weight: 1},
