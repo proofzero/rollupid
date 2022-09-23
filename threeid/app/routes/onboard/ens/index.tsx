@@ -1,4 +1,9 @@
-import { ActionFunction, json, redirect } from "@remix-run/cloudflare";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
@@ -44,6 +49,33 @@ export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
 
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getUserSession(request);
+  const jwt = session.get("jwt");
+  const address = session.get("address");
+
+  const addressLookup = await oortSend("ens_lookupAddress", [address], {
+    jwt,
+    cookie: request.headers.get("Cookie") as string | undefined,
+  });
+
+  const coreEnsLookup = await oortSend("kb_getCoreAddresses", [["ens"]], {
+    jwt,
+    cookie: request.headers.get("Cookie") as string | undefined,
+  });
+
+  let isSetOnCore = false;
+  if (coreEnsLookup.result?.ens?.length > 0) {
+    isSetOnCore = true;
+  }
+
+  const ensName = addressLookup.result;
+  return json({
+    ensName,
+    isSetOnCore,
+  });
+};
+
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
@@ -62,29 +94,29 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const OnboardEns = () => {
+  const navigate = useNavigate();
+
+  const submit = useSubmit();
+
   const { chain } = useNetwork();
 
-  const [ensChecked, setEnsChecked] = useState<boolean>(false);
+  const { ensName, isSetOnCore } = useLoaderData();
+
+  const [ensChecked, setEnsChecked] = useState<boolean>(isSetOnCore);
   const [validating, setValidating] = useState<boolean>(true);
 
-  const { address } = useAccount();
-  const { isSuccess } = useEnsName({
-    address: address,
-  });
-
   const data = useActionData();
-
   useEffect(() => {
     if (data?.error) {
       setEnsChecked(false);
     }
-  }, [data]);
 
-  const submit = useSubmit();
+    setValidating(false);
+  }, [data]);
 
   useEffect(() => {
     setValidating(false);
-  }, [isSuccess]);
+  }, [ensName]);
 
   const handleEnsToggle = async (checked: boolean) => {
     setValidating(true);
@@ -94,9 +126,8 @@ const OnboardEns = () => {
       setEnsChecked(true);
     } else {
       setEnsChecked(false);
+      setValidating(false);
     }
-
-    setValidating(false);
   };
 
   const postEnsRequest = useCallback(() => {
@@ -107,8 +138,6 @@ const OnboardEns = () => {
       }
     );
   }, []);
-
-  const navigate = useNavigate();
 
   return (
     <>
@@ -165,7 +194,7 @@ const OnboardEns = () => {
                   htmlFor="use-ens"
                   className="inline-flex relative items-center mb-5 cursor-pointer"
                 >
-                  {!validating && isSuccess && (
+                  {!validating && ensName && (
                     <>
                       <input
                         type="checkbox"
@@ -180,7 +209,7 @@ const OnboardEns = () => {
 
                   {validating && <Spinner />}
 
-                  {(validating || isSuccess) && (
+                  {(validating || ensName) && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
@@ -190,7 +219,7 @@ const OnboardEns = () => {
                     </Text>
                   )}
 
-                  {!validating && !isSuccess && (
+                  {!validating && !ensName && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
