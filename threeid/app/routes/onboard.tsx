@@ -25,8 +25,6 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  console.log("Calling loader");
-
   const session = await getUserSession(request);
   if (!session || !session.has("jwt")) {
     return redirect("/auth");
