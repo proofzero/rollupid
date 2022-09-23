@@ -49,6 +49,16 @@ export const action: ActionFunction = async ({ request }) => {
   const jwt = session.get("jwt");
   const address = session.get("address");
 
+  const ensValidate = await oortSend("kb_getCoreAddresses", ["eth", "ens"], {
+    jwt: jwt,
+    cookie: request.headers.get("Cookie") as string,
+  });
+
+  // ???
+  if (ensValidate.error || ensValidate.result.eth[0] !== address) {
+    return json({ error: true }, { status: 500 })
+  }
+
   const ensRes = await oortSend("3id_registerName", [address], {
     jwt: jwt,
     cookie: request.headers.get("Cookie") as string,
