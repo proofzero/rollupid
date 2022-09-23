@@ -60,3 +60,19 @@ footer {
 div[data-testid="flowbite-tooltip"] div {
     font-family: Inter_500Medium;
 }
+
+.grid-shrink {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr); // see note below
+    grid-template-areas: "shrink expand";
+
+    .expand {
+        grid-area: expand;
+    }
+
+    .shrink {
+        padding-right: 1em;
+        grid-area: shrink;
+        font-weight: 700;
+    }
+}

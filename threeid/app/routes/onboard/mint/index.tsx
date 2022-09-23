@@ -116,21 +116,27 @@ const OnboardMintLand = ({
 
           return (
           <div key={i}>
-              <div className="grid grid-cols-2 gap-1">
-                <span className="justify-items-end">Trait</span>
-                <span className="justify-items-start">{traitNames[`trait${i}`]}</span>
-                <span className="justify-items-end">Rarity</span>
-                <span className="justify-items-start">{metadata.properties.traits[`trait${i}`].type}</span>
-                <span className="justify-items-end">Value</span>
-                <span className="justify-items-start">
-                  <span style={{
-                    width: 10,
-                    height: 10,
-                    display: "inline-block",
-                    backgroundColor: bg,
-                    }}></span>{" "}
-                    {metadata.properties.traits[`trait${i}`].value.name}
-                </span>
+              <div className="grid-shrink">
+                {/* <div className="row"> */}
+                  <div className="shrink">Trait:</div>
+                  <div className="expand">{traitNames[`trait${i}`]}</div>
+                {/* </div> */}
+                {/* <div className="row"> */}
+                  <div className="shrink">Rarity:</div>
+                  <div className="expand">{metadata.properties.traits[`trait${i}`].type}</div>
+                </div>
+                {/* <div className="row"> */}
+                  <div className="shrink">Value:</div>
+                  <div className="expand">
+                    <span style={{
+                      width: 10,
+                      height: 10,
+                      display: "inline-block",
+                      backgroundColor: bg,
+                      }}></span>{" "}
+                      {metadata.properties.traits[`trait${i}`].value.name}
+                  </div>
+                {/* </div> */}
               </div>
           </div>);
         })}

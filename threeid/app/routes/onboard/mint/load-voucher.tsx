@@ -67,19 +67,26 @@ export const loader: LoaderFunction = async ({ request }) => {
   const chainId = url.searchParams.get("chainId");
   const session = await getUserSession(request);
 
+
+  // TODO: remove chain id and redirect to /auth
   if (!session || !session.has("jwt") || !chainId) {
     return json(null, {
       status: 500,
     });
   }
 
+
+
   const jwt = session.get("jwt");
   const address = session.get("address");
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
+  console.log("cachedVoucher", cachedVoucher)
+
   try {
     const voucher = await loadVoucher({ address, chainId })
+    
 
     if (cachedVoucher) {
       return json({
@@ -123,6 +130,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     let ret = cachedVoucher
     if (!ret) {
       ret = JSON.parse(STATIC_VOUCHER)
+      console.log("returning static voucher", ret)
       ret.metadata.image = gatewayFromIpfs(ret.metadata.image) as string
       return json({
         minted: false,
