@@ -118,10 +118,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   } catch (ex) {
 
+    // TODO: check if this is a dev env. Return proper error message
+    // possibly move this to the loadVoucher function
     let ret = cachedVoucher
     if (!ret) {
       ret = JSON.parse(STATIC_VOUCHER)
       ret.metadata.image = gatewayFromIpfs(ret.metadata.image) as string
+      return json({
+        minted: false,
+        //@ts-ignore
+         ...ret
+      });
     } 
     return json({
       minted: true,

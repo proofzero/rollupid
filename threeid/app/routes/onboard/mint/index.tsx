@@ -61,16 +61,14 @@ export const action: ActionFunction = async ({ request }) => {
 
 type OnboardMintLandingProps = {
   account: string;
-  version: string;
-  rarity: string;
+  metadata: object;
   minted: boolean;
   onClick: () => void;
 };
 
 const OnboardMintLand = ({
   account,
-  version,
-  rarity,
+  metadata,
   minted,
   onClick,
 }: OnboardMintLandingProps) => {
@@ -87,25 +85,40 @@ const OnboardMintLand = ({
   return (
     <>
       <Text
-        className="mb-10 flex flex-row space-x-4 items-center"
+        className="mb-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
       >
         <BiInfoCircle />
         <span>
-          The image was generated using your{" "}
+          The image was generated using using the assets your{" "}
           <b className="cursor-default" title={account}>
-            blockchain account
+            blockchain account.
           </b>
-          ,{" "}
-          <b className="cursor-default" title={version}>
-            version name
-          </b>{" "}
-          and{" "}
-          <b className="cursor-default" title={rarity}>
-            trait rarity
-          </b>
-          .
         </span>
+      </Text>
+
+      <Text
+        className="mb-10 grid grid-cols-4 gap-4 items-center"
+        color={TextColor.Gray400} size={TextSize.SM}
+      >
+          <div className="">
+            <span style={{
+              width: 10,
+              height: 10,
+              display: "inline-block",
+              backgroundColor: `rbga(${metadata.properties.traits.trait0.value.rgb.r},${metadata.properties.traits.trait0.value.rgb.g},${metadata.properties.traits.trait0.value.rgb.b},1)`,
+            }}></span>{metadata.properties.traits.trait0.type}: {metadata.properties.traits.trait0.value.name}
+          </div>
+          <div className="">
+            {metadata.properties.traits.trait1.type}: {metadata.properties.traits.trait1.value.name}
+          </div>
+          <div className="">
+            {metadata.properties.traits.trait2.type}: {metadata.properties.traits.trait2.value.name}
+          </div>
+          <div className="">
+            {metadata.properties.traits.trait3.type}: {metadata.properties.traits.trait3.value.name}
+          </div>
+          
       </Text>
 
       {!minted && (
@@ -197,10 +210,6 @@ const OnboardMint = () => {
 
   const account = metadata?.properties?.metadata.account;
   const recipient = metadata?.properties?.metadata.account;
-
-  const rarity = metadata?.properties?.traits.trait0.value.name;
-
-  const version = metadata?.name;
   const imgUrl = metadata?.image;
 
   const navigate = useNavigate();
@@ -271,8 +280,7 @@ const OnboardMint = () => {
       screenComponent = (
         <OnboardMintLand
           account={account}
-          version={version}
-          rarity={rarity}
+          metadata={metadata}
           minted={minted}
           onClick={() => {
             setScreen("sign");
