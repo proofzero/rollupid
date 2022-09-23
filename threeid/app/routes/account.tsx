@@ -47,7 +47,7 @@ export const loader = async ({ request }) => {
     { jwt: jwt, cookie: request.headers.get("Cookie") },
   );
 
-  if (!claimsRes.result.includes("3id.enter")) {
+  if (!claimsRes.result || !claimsRes.result.includes("3id.enter")) {
     return redirect(`/auth`);
   }
 

@@ -78,50 +78,49 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
-  if (cachedVoucher) {
-    try {
-      await loadVoucher({ address, chainId })
+  try {
+    const voucher = await loadVoucher({ address, chainId })
 
+    if (cachedVoucher) {
       return json({
         minted: false,
         ...cachedVoucher
       });
-    } catch (ex) {
+    } else {
+      // @ts-ignore
+      await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
+
+      const data = await oortSend(
+        "kb_setData",
+        [
+          "3id.profile",
+          "pfp",
+          {
+            url: voucher.imgUrl,
+            contractAddress: null,
+            isToken: false,
+          },
+        ],
+        {
+          jwt,
+          cookie: request.headers.get("Cookie") as string | undefined,
+        }
+      );
+    
+      if (data.error) {
+        throw new Error("Unable to persist pfp data");
+      }
+
       return json({
-        minted: true,
-        ...cachedVoucher
+        minted: false,
+        ...voucher
       });
     }
+  } catch (ex) {
+    return json({
+      minted: true,
+      //@ts-ignore
+       ...(cachedVoucher || JSON.parse(STATIC_VOUCHER))
+    });
   }
-
-  const voucher = await loadVoucher({ address, chainId });
-
-  const data = await oortSend(
-    "kb_setData",
-    [
-      "3id.profile",
-      "pfp",
-      {
-        url: voucher.imgUrl,
-        contractAddress: null,
-        isToken: false,
-      },
-    ],
-    {
-      jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
-    }
-  );
-
-  if (data.error) {
-    throw new Error("Unable to persist pfp data");
-  }
-
-  // @ts-ignore
-  await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
-
-  return json({
-    minted: false,
-    ...cachedVoucher
-  });
 };

@@ -40,6 +40,8 @@ export const loader = async ({ request, params }) => {
                 cookie: request.headers.get("Cookie")
             },
         )
+        console.log("HERE", inviteRes)
+
 
         return json(inviteRes.result);
     }

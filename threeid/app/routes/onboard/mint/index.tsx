@@ -118,7 +118,7 @@ const OnboardMintLand = ({
         className="mt-10 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
         size={TextSize.SM}>
-          "Please connect your wallet to mint your NFT"}
+          "Please connect your wallet to mint your NFT"
       </Text> }
 
       {minted && <Text>Already minted</Text>}

@@ -15,7 +15,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     cookie: request.headers.get("Cookie") as string,
   });
 
-  if (!claimsRes.result.includes("3id.enter")) {
+  if (!claimsRes || !claimsRes.result.includes("3id.enter")) {
     return redirect(`/auth`);
   }
 
