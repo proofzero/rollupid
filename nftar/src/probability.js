@@ -8,8 +8,6 @@
  * https://github.com/timgilbert/js-weighted-list is its home.
  */
 
-const { defaultCipherList } = require("constants");
-
 module.exports = (function() {
 
     function _WeightedList(initial) {

@@ -113,9 +113,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // derive weight inc for each trait
     const weightInc = {};
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
+    console.log(JSON.stringify(nftsForOwner));
 
     // If the user owns an NFT from the PFP contract, 409 error.
-    console.log('Checking if duplicate!');
     if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
         ctx.throw(409, `${account} already owns a PFP NFT!`);
     }
@@ -154,7 +154,6 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     let pfp_stream;
     let cvr_stream;
-    let ani_stream = animationViewer(account, genTraits);
     
     if (isNode()) {
         // Generate a single frame; call animate() to produce an animation.
@@ -171,7 +170,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
     const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
-    const ani_blob = ani_stream; //await streamToBlob(ani_stream, htmlFormat);
+    const ani_blob = animationViewer(account, genTraits);
 
     // nft.storage File objects are automatically uploaded.
     const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
@@ -181,12 +180,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
 
-    // Put the cover in the metadata object so it's not a trait.
-    // blockchain.cover = cvr;
-
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
-        name: `3ID PFP: GEN 0`, // TODO: Ethereum?
+        name: `3ID PFP: GEN 0`,
         description: `3ID PFP for ${account}`,
         image: png,
         cover: cvr,
@@ -195,7 +191,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         properties: {
             metadata: blockchain,
             traits: genTraits,
-            "GEN": genTraits.trait0.value.name, // TODO: Ethereum?
+            "GEN": genTraits.trait0.value.name,
             "Priority": genTraits.trait1.value.name,
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
