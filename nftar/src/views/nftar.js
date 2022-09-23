@@ -41,8 +41,8 @@ function animationViewer (account, traits) {
                         canvas, img {
                             /* background-color: rgb(162, 236, 142); */
                             /* background-color: white; */
-                            width: 100%; /* 1500px */
-                            height: 100%; /* 750px */
+                            width: 1000px;  // PFP is 1000x1000 (see app.js)
+                            height: 1000px; // PFP is 1000x1000 (see app.js)
                             margin: auto;
                             display: block;
                             position: absolute;
@@ -270,7 +270,8 @@ function animationViewer (account, traits) {
 
                         const COLORS = Object.keys(TRAITS).map((k) => TRAITS[k].value)
                         const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
-                        const PIXEL_RATIO = (window.devicePixelRatio > 1) ? 2 : 1
+                        // OpenSea display should be 1:1.
+                        const PIXEL_RATIO = 1; // (window.devicePixelRatio > 1) ? 2 : 1
 
                         const app = new App(document.getElementById('canvas'), COLORS, PIXEL_RATIO, FRAMES_PER_SECOND);
                         app.animate();
