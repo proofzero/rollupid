@@ -50,19 +50,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const form = await request.formData();
   const nickname = form.get("nickname");
-  const chainId = form.get("chainId");
 
   const errors: {
     nickname?: string;
-    chainId?: string;
   } = {};
 
   if (typeof nickname !== "string" || nickname === "") {
     errors.nickname = "Nickname needs to be provided";
-  }
-
-  if (typeof chainId !== "string" || chainId === "") {
-    errors.chainId = "ChainId needs to be provided";
   }
 
   const data = await oortSend(
@@ -83,7 +77,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // @ts-ignore
-  return redirect(`/onboard/mint?chainId=${chainId}`);
+  return redirect(`/onboard/mint`);
 };
 
 const OnboardNickname = () => {
@@ -95,40 +89,31 @@ const OnboardNickname = () => {
   const fetcher = useFetcher();
   useEffect(() => {
     if (fetcher.type === "init") {
-      fetcher.load(`/onboard/mint/load-voucher?chainId=${chain?.id || 5}`);
+      fetcher.load(`/onboard/mint/load-voucher`);
     }
   }, [fetcher]);
-
-  const submit = useSubmit();
-  const postNickname = useCallback(() => {
-    submit(
-      {
-        nickname,
-        chainId: `${chain?.id || 5}`,
-      },
-      {
-        method: "post",
-      }
-    );
-  }, [nickname]);
 
   const actionErrors = useActionData();
 
   return (
     <>
+
       <div className="flex justify-center items-center space-x-4 mb-10">
         <img src={currentStep} />
         <img src={nextStep} />
         <img src={nextStep} />
       </div>
 
-      <Heading className="text-center">How should we call you?</Heading>
-
-      <section
-        id="onboard-nickname-form"
-        className="flex-1 flex justify-center items-center"
+      <Heading className="flex flex-1 text-center justify-center items-center">What should we call you?</Heading>
+      
+      <Form method="post"
+          className="flex flex-1 flex-col justify-center items-center"
       >
-        <div>
+
+        <section
+          id="onboard-nickname-form"
+          className="flex-1 justify-center items-center items-stretch self-center"
+        >
           <Label htmlFor="display-name">
             <Text
               className="mb-1.5"
@@ -153,6 +138,7 @@ const OnboardNickname = () => {
 
           <TextInput
             id="nickname"
+            name="nickname"
             type="text"
             placeholder="Ash"
             required={true}
@@ -170,23 +156,23 @@ const OnboardNickname = () => {
               </Text>
             }
           />
-        </div>
-      </section>
+        </section>
 
-      <section
-        id="onboard-nickname-actions"
-        className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
-      >
-        <Button
-          disabled={!nickname || nickname === ""}
-          size={ButtonSize.L}
-          onClick={() => {
-            postNickname();
-          }}
+        <section
+          id="onboard-nickname-actions"
+          className="flex flex-1 justify-end w-full items-end space-x-4 pt-10 lg:pt-0"
         >
-          Continue
-        </Button>
-      </section>
+          <Button
+            isSubmit={true}
+            disabled={!nickname || nickname === ""}
+            size={ButtonSize.L}
+          >
+            Continue
+          </Button>
+        </section>
+  
+      </Form>
+
     </>
   );
 };

@@ -5,7 +5,6 @@ import { getUserSession } from "~/utils/session.server";
 
 type LoadVoucherParams = {
   address: string;
-  chainId: string;
 };
 
 const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
@@ -17,13 +16,15 @@ const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
     : undefined;
 };
 
-const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
+const loadVoucher = async ({ address }: LoadVoucherParams) => {
   // @ts-ignore
   const nftarUrl = NFTAR_URL;
   // @ts-ignore
   const nftarToken = NFTAR_AUTHORIZATION;
   // @ts-ignore
   const contractAddress = MINTPFP_CONTRACT_ADDRESS;
+  // @ts-ignore
+  const chainId = NFTAR_CHAIN_ID;
 
   const response = await fetch(`${nftarUrl}`, {
     method: "POST",
@@ -45,6 +46,8 @@ const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
     }),
   });
 
+  console.log("response", response);
+
   const jsonRes = await response.json();
   if (jsonRes.error) {
     throw new Error(jsonRes.error.data.message);
@@ -64,32 +67,33 @@ const loadVoucher = async ({ address, chainId }: LoadVoucherParams) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
-  const chainId = url.searchParams.get("chainId");
   const session = await getUserSession(request);
 
 
   // TODO: remove chain id and redirect to /auth
-  if (!session || !session.has("jwt") || !chainId) {
+  if (!session || !session.has("jwt")) {
     return json(null, {
       status: 500,
     });
   }
-
-
 
   const jwt = session.get("jwt");
   const address = session.get("address");
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
+  console.log("cachedVoucher", cachedVoucher)
 
   try {
-    const voucher = await loadVoucher({ address, chainId })
+    const voucher = await loadVoucher({ address })
     
+    console.log("voucher", voucher)
 
     if (cachedVoucher) {
       return json({
         minted: false,
+        //@ts-ignore
+        chainId: NFTAR_CHAIN_ID,
         ...cachedVoucher
       });
     } else {
@@ -119,27 +123,18 @@ export const loader: LoaderFunction = async ({ request }) => {
 
       return json({
         minted: false,
+        //@ts-ignore
+        chainId: NFTAR_CHAIN_ID,
         ...voucher
       });
     }
   } catch (ex) {
 
-    // TODO: check if this is a dev env. Return proper error message
-    // possibly move this to the loadVoucher function
-    let ret = cachedVoucher
-    if (!ret) {
-      ret = JSON.parse(STATIC_VOUCHER)
-      ret.metadata.image = gatewayFromIpfs(ret.metadata.image) as string
-      return json({
-        minted: false,
-        //@ts-ignore
-         ...ret
-      });
-    } 
     return json({
       minted: true,
       //@ts-ignore
-       ...ret
+      chainId: NFTAR_CHAIN_ID,
+       ...cachedVoucher
     });
   }
 };
