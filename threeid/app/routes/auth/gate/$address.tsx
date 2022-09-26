@@ -1,5 +1,5 @@
 import { redirect, json } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit, useNavigate } from "@remix-run/react";
+import { useLoaderData, useSubmit, useNavigate, useActionData } from "@remix-run/react";
 import { useEffect } from "react";
 
 import { 
@@ -40,8 +40,6 @@ export const loader = async ({ request, params }) => {
                 cookie: request.headers.get("Cookie")
             },
         )
-        console.log("HERE", inviteRes)
-
 
         return json(inviteRes.result);
     }
@@ -84,6 +82,7 @@ const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
 
 export default function AuthGate() {
     const cards = useLoaderData();
+    const redeemed = useActionData()
 
     if (cards.length) {
         // ListBox needs object with id
@@ -160,6 +159,9 @@ export default function AuthGate() {
                                 <BaseButton text={"Continue to 3ID ->"} color={"dark"} onClick={() => submit(selected, {method: 'post'})} />
 
                             </div>
+                            {redeemed?.activateFailed &&
+                                <p className="auth-secondary-message">Activation failed. Please try again.</p>
+                            }
                             </>
                         )}
                         </Listbox>

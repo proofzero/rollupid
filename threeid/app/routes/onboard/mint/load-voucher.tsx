@@ -82,7 +82,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
-  console.log("cachedVoucher", cachedVoucher)
 
   try {
     const voucher = await loadVoucher({ address, chainId })
@@ -130,7 +129,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     let ret = cachedVoucher
     if (!ret) {
       ret = JSON.parse(STATIC_VOUCHER)
-      console.log("returning static voucher", ret)
       ret.metadata.image = gatewayFromIpfs(ret.metadata.image) as string
       return json({
         minted: false,

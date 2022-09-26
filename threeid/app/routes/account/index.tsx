@@ -204,7 +204,6 @@ export default function Welcome() {
   const { inviteCode, votes, pfp, names } = useLoaderData();
   let submit = useSubmit();
 
-  console.log("pfp", pfp);
   completeSteps[1].isCompleted = !!pfp.pfp;
   // completeSteps[2].isCompleted = !!names.ens;
 

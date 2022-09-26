@@ -3,14 +3,14 @@ import { ActionFunction, LoaderFunction } from "@remix-run/cloudflare";
 import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
-import Text, { TextColor, TextSize } from "~/components/typography/Text";
+import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
 
 import styles from "~/styles/onboard.css";
 
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite, useConnect, useAccount } from "wagmi";
+import { useContractWrite, useAccount } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -72,15 +72,7 @@ const OnboardMintLand = ({
   minted,
   onClick,
 }: OnboardMintLandingProps) => {
-  const { connector, isConnected } = useAccount()
-  const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect()
-
-    console.log("connectors", connectors)
-    console.log("conector", connector)
-  useEffect(() => {
-    console.log("isConnected", isConnected)
-  }, [isConnected])
+  const { isConnected } = useAccount()
 
   const traitNames = {
     "trait0": "Generation",
@@ -97,50 +89,53 @@ const OnboardMintLand = ({
       >
         <BiInfoCircle />
         <span>
-          The image was generated using using the assets your{" "}
+          This image was generated using the assets your{" "}
           <b className="cursor-default" title={account}>
             blockchain account.
           </b>
+          <br/>
         </span>
       </Text>
 
-      <Text
-        className="mb-10 grid grid-cols-4 gap-2 items-center"
-        color={TextColor.Gray400} size={TextSize.SM}
-      >
+      <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {[...Array(4).keys()].map((i) => {
           const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
           const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
           const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
           const bg = `rgb(${r}, ${g}, ${b})`;
-
-          return (
-          <div key={i}>
-              <div className="grid-shrink">
-                {/* <div className="row"> */}
-                  <div className="shrink">Trait:</div>
-                  <div className="expand">{traitNames[`trait${i}`]}</div>
-                {/* </div> */}
-                {/* <div className="row"> */}
-                  <div className="shrink">Rarity:</div>
-                  <div className="expand">{metadata.properties.traits[`trait${i}`].type}</div>
-                </div>
-                {/* <div className="row"> */}
-                  <div className="shrink">Value:</div>
-                  <div className="expand">
-                    <span style={{
-                      width: 10,
-                      height: 10,
-                      display: "inline-block",
-                      backgroundColor: bg,
-                      }}></span>{" "}
-                      {metadata.properties.traits[`trait${i}`].value.name}
-                  </div>
-                {/* </div> */}
+          return (<li key={i} className="col-span-1 flex flex-col rounded-md shadow-sm">
+            <div style={{fontSize: 12}} className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate">
+              {traitNames[`trait${i}`].toUpperCase()}
+            </div>
+            <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">        
+              <div className={
+                  'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
+                }
+              >
+                <span style={{
+                  backgroundColor: bg,
+                }} className="my-4 ml-1 rounded-md w-10 h-10"></span>
               </div>
-          </div>);
-        })}
-      </Text>
+              <div className="flex flex-1 items-center justify-between truncate bg-white">
+                <div className="flex-1 truncate px-4 py-4 text-sm">
+                  <Text 
+                    color={TextColor.Gray700}
+                    size={TextSize.SM}
+                    className="font-bold">
+                    {metadata.properties.traits[`trait${i}`].value.name}
+                  </Text>
+                  <Text className=""
+                    color={TextColor.Gray400}
+                    weight={TextWeight.Medium500}
+                    size={TextSize.XS}>
+                    {metadata.properties.traits[`trait${i}`].type[0] + metadata.properties.traits[`trait${i}`].type.toLowerCase().slice(1)}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          </li>
+        )})}
+      </ul>
 
       {!minted && (
         <Button size={ButtonSize.L} onClick={onClick}>
@@ -149,10 +144,10 @@ const OnboardMintLand = ({
       )}
 
       {!isConnected && <Text
-        className="mt-10 flex flex-row space-x-4 items-center"
+        className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
         size={TextSize.SM}>
-          "Please connect your wallet to mint your NFT"
+          **Please connect your wallet to mint your NFT**
       </Text> }
 
       {minted && <Text>Already minted</Text>}

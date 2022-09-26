@@ -71,7 +71,7 @@ const Onboard = () => {
         </nav>
       </div>
 
-      <div className="max-w-4xl mx-auto mt-14 lg:mt-28 p-4">
+      <div className="max-w-4xl mx-auto mt-2 lg:mt-28 p-4">
         <div className="flex flex-col p-6 lg:bg-white lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-md min-h-[580px] space-y-4">
           <WagmiConfig client={client}>
             <Outlet />
