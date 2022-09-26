@@ -13,7 +13,6 @@ const storage = require('nft.storage');
 // Load environment variables from .env file.
 require('dotenv').config();
 
-
 const main = async (api) => {
     // Inject client for our storage service into the context. We read the
     // API key for the service from the environment variable STORAGE_KEY.

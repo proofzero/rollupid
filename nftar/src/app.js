@@ -27,9 +27,9 @@ const {
 
 const canvas = require('./canvas/canvas.js');
 
-const {
-    animationViewer
-} = require('./views/nftar.js');
+// const {
+//     animationViewer
+// } = require('./views/nftar.js');
 
 const app     = new Koa();
 const router  = new Router();
@@ -101,7 +101,9 @@ const handleDuplicateGenerationRequest = function(nftsForOwner, key, account, ct
 // Properties are generated per account and saved; will check if a
 // property has already been generated.
 jsonrpc.method('3id_genPFP', async (ctx, next) => {
+    const s0 = performance.now();
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
+    
     if (ctx.apiKey && !key) {
         ctx.throw(403, 'Missing NFTAR API key');
     }
@@ -109,24 +111,24 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
     const params = METHOD_PARAMS['3id_genPFP'];
-
+    
     const account = ctx.jsonrpc.params['account'];
     if (!account){
         ctx.throw(401, 'account is required');
     }
-
+    
     const blockchain = ctx.jsonrpc.params['blockchain'];
     if (!blockchain){
         ctx.throw(401, 'blockchain is required');
     } else if (!params.blockchain.properties.name.enum.includes(blockchain.name)){
         ctx.throw(401, `${blockchain.name} is not a valid blockchain. Valid blockchains are: ${params.blockchain.properties.name.enum.join(', ')}.`);
     }
-
+    
     // eth only atm
     if (blockchain.name == CHAINS.ETH && !Web3.utils.isAddress(account)) {
         ctx.throw(401, 'account is not a valid address');
     }
-
+    
     // derive weight inc for each trait
     let t0, t1;
     const weightInc = {};
@@ -138,6 +140,19 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // If the user owns an NFT from the PFP contract this will throw a 409
     // error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar).
     handleDuplicateGenerationRequest(nftsForOwner, key, account, ctx);
+
+    // If the client wants us to check Alchemy to see if the NFT has been
+    // minted, but has the image and wants to skip expensive operations, it
+    // sends a queryparam called 'skipImage' set to true.
+    const skipImage = (new URL(ctx.request.href)).searchParams.get('skipImage') === 'true';
+    if (skipImage) {
+        ctx.body = {
+            skipImage
+        };
+        const s1 = performance.now();
+        console.log(`Total took ${s1 - s0} milliseconds.`);
+        return;
+    }
 
     // TRAIT ONE: POPULAR COLLECTIONS
     weightInc['trait1'] = calculateNFTWeight(nftsForOwner.ownedNfts);
@@ -282,6 +297,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
       voucher,
       signature,
     };
+    const s1 = performance.now();
+    console.log(`Total took ${s1 - s0} milliseconds.`);
 });
 
 jsonrpc.method('3iD_genInvite', async (ctx, next) => {
