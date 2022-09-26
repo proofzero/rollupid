@@ -10,7 +10,7 @@ import styles from "~/styles/onboard.css";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite, useAccount } from "wagmi";
+import { useContractWrite, useAccount, useNetwork } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -60,17 +60,23 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 type OnboardMintLandingProps = {
-  account: string;
-  metadata: object;
+  account: string,
   minted: boolean;
+  isInvalidAddress: boolean;
+  isInvalidChain: boolean;
   onClick: () => void;
 };
 
 const OnboardMintLand = ({
+  account,
   minted,
+  isInvalidAddress,
+  isInvalidChain,
   onClick,
 }: OnboardMintLandingProps) => {
-  const { isConnected } = useAccount()
+
+  console.log("invalid address", isInvalidAddress);
+  console.log("invalid chain", isInvalidChain);
 
   const traitNames = {
     "trait0": "Generation",
@@ -80,11 +86,25 @@ const OnboardMintLand = ({
   }
 
   return (
-    !minted && (
+    <>
+    {!minted && !isInvalidChain && !isInvalidAddress && (
       <Button size={ButtonSize.L} onClick={onClick}>
         Mint NFT
       </Button>
-    )
+    )}
+    {isInvalidChain && <Text
+        className="mt-4 flex flex-row space-x-4 items-center"
+        color={TextColor.Gray400}
+        size={TextSize.SM}>
+        **Please select switch your network to {window.ENV.VALID_CHAIN_NAME}**
+      </Text>}
+      {isInvalidAddress && <Text
+        className="mt-4 flex flex-row space-x-4 items-center"
+        color={TextColor.Gray400}
+        size={TextSize.SM}>
+        **Please connect your wallet to {account}**
+      </Text>}
+    </>
   );
 };
 
@@ -96,7 +116,7 @@ const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
   return (
     <>
       <Button size={ButtonSize.L} onClick={onClick} disabled>
-        Connect
+        Reload Page
       </Button>
 
       <Text
@@ -187,7 +207,7 @@ const OnboardMint = () => {
 
   const account = metadata?.properties?.metadata.account;
   const recipient = metadata?.properties?.metadata.account;
-  const imgUrl = metadata?.image;
+  const [imgUrl, setImgUrl] = useState<string>(metadata?.image);
 
   const navigate = useNavigate();
 
@@ -201,7 +221,26 @@ const OnboardMint = () => {
     functionName: "awardPFP",
     args: [recipient, voucher],
   });
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
+  const { chain } = useNetwork();
+
+  const [invalidChain, setInvalidChain] = useState(false);
+  useEffect(() => {
+    if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
+      setInvalidChain(true);
+    } else {
+      setInvalidChain(false);
+    }
+  }, [chain]);
+
+  const [invalidAddress, setInvalidAddress] = useState(false);
+  useEffect(() => {
+    if (address && address !== account) {
+      setInvalidAddress(true);
+    } else {
+      setInvalidAddress(false);
+    }
+  }, [address]);
 
   const submit = useSubmit();
 
@@ -273,8 +312,9 @@ const OnboardMint = () => {
       screenActionComponent = (
         <OnboardMintLand
           account={account}
-          metadata={metadata}
           minted={minted}
+          isInvalidAddress={invalidAddress}
+          isInvalidChain={invalidChain}
           onClick={() => {
             setScreen("sign");
             signMessage();
@@ -307,9 +347,7 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          <img src={imgUrl} className="w-24 h-24"  style={{
-            animation: "spCircRot 0.6s infinite linear",
-        }}/>
+          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24"/>}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -322,10 +360,11 @@ const OnboardMint = () => {
               transform: "scale(1.2)",
             }}
           >
-            <img src={imgUrl} className="w-24 h-24" />
+           <img src={imgUrl} className="w-24 h-24" />
           </div>
-        </div>
 
+        </div>
+        
         <Text
           className="mb-4 flex flex-row space-x-2 items-center"
           color={TextColor.Gray400}>
@@ -337,6 +376,18 @@ const OnboardMint = () => {
             </b>
             <br/>
           </span>
+        </Text>
+        <Text
+          className="mb-4 flex flex-row space-x-2 items-center"
+          color={TextColor.Gray400}
+          size={TextSize.XS}>
+            <u><i><a onClick={()=> {
+              let img = imgUrl;
+              setImgUrl("")
+              setTimeout(() => {
+                setImgUrl(img)
+              }, 1000)
+            }}>If image is not loading press here to refresh.</a></i></u>
         </Text>
 
         <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">

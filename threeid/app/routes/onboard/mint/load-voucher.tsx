@@ -46,8 +46,6 @@ const loadVoucher = async ({ address }: LoadVoucherParams) => {
     }),
   });
 
-  console.log("response", response);
-
   const jsonRes = await response.json();
   if (jsonRes.error) {
     throw new Error(jsonRes.error.data.message);
@@ -82,12 +80,10 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
-  console.log("cachedVoucher", cachedVoucher)
 
   try {
     const voucher = await loadVoucher({ address })
-    
-    console.log("voucher", voucher)
+    console.log("voucher error", cachedVoucher);
 
     if (cachedVoucher) {
       return json({
@@ -129,7 +125,8 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
   } catch (ex) {
-
+    // remove the voucher info to remove chances of reminting
+    delete cachedVoucher["voucher"];
     return json({
       minted: true,
       //@ts-ignore

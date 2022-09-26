@@ -12,10 +12,12 @@ import {
   useNavigate,
   useSubmit,
 } from "@remix-run/react";
-import { Label, TextInput } from "flowbite-react";
+import { Label, TextInput, Spinner } from "flowbite-react";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNetwork } from "wagmi";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+
 
 import Heading from "~/components/typography/Heading";
 import Text, {
@@ -83,8 +85,7 @@ export const action: ActionFunction = async ({ request }) => {
 const OnboardNickname = () => {
   const { nickname: storedNickname } = useLoaderData();
   const [nickname, setNickname] = useState(storedNickname || "");
-
-  const { chain } = useNetwork();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetcher = useFetcher();
   useEffect(() => {
@@ -94,6 +95,11 @@ const OnboardNickname = () => {
   }, [fetcher]);
 
   const actionErrors = useActionData();
+  useEffect(() => {
+    if (actionErrors) {
+      setIsSubmitting(false);
+    }
+  }, [actionErrors]);
 
   return (
     <>
@@ -162,13 +168,18 @@ const OnboardNickname = () => {
           id="onboard-nickname-actions"
           className="flex flex-1 justify-end w-full items-end space-x-4 pt-10 lg:pt-0"
         >
-          <Button
-            isSubmit={true}
-            disabled={!nickname || nickname === ""}
-            size={ButtonSize.L}
-          >
-            Continue
-          </Button>
+          {isSubmitting ? <Spinner /> :
+            <Button
+              isSubmit={true}
+              disabled={!nickname || nickname === ""}
+              size={ButtonSize.L}
+              // onClick={() => {
+              //   setIsSubmitting(true);
+              // }}
+            >
+              Continue
+            </Button>
+          }
         </section>
   
       </Form>
