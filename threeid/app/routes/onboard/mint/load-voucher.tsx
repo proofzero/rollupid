@@ -27,7 +27,7 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
   // @ts-ignore
   const chainId = NFTAR_CHAIN_ID;
 
-  const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": null}`, {
+  const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
