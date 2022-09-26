@@ -81,16 +81,27 @@ export const action: ActionFunction = async ({ request }) => {
   const jwt = session.get("jwt");
   const address = session.get("address");
 
-  const ensRes = await oortSend("3id_registerName", [address], {
-    jwt: jwt,
-    cookie: request.headers.get("Cookie") as string,
-  });
+  const formData = await request.formData();
+  const operation = formData.get("operation");
 
-  if (ensRes.error) {
-    return json({ error: true }, { status: 500 });
+  let ensRes = null;
+  if (operation === "register") {
+    ensRes = await oortSend("3id_registerName", [address], {
+      jwt: jwt,
+      cookie: request.headers.get("Cookie") as string,
+    });
+  } else {
+    ensRes = await oortSend("3id_unregisterName", [address], {
+      jwt: jwt,
+      cookie: request.headers.get("Cookie") as string,
+    });
   }
 
-  return json({ error: false }, { status: 200 });
+  if (ensRes.error) {
+    return json({ error: true, operation }, { status: 500 });
+  }
+
+  return json({ error: false, operation }, { status: 200 });
 };
 
 const OnboardEns = () => {
@@ -106,9 +117,18 @@ const OnboardEns = () => {
   const [validating, setValidating] = useState<boolean>(true);
 
   const data = useActionData();
+
   useEffect(() => {
-    if (data?.error) {
+    if (data?.error && data.operation === "register") {
       setEnsChecked(false);
+    } else if (data?.error && data.operation === "unregister") {
+      setEnsChecked(true);
+    } else if (data) {
+      if (data.operation === "register") {
+        setEnsChecked(true);
+      } else if (data.operation === "unregister") {
+        setEnsChecked(false);
+      }
     }
 
     setValidating(false);
@@ -122,22 +142,22 @@ const OnboardEns = () => {
     setValidating(true);
 
     if (checked) {
-      postEnsRequest();
-      setEnsChecked(true);
+      postEnsRequest("register");
     } else {
-      setEnsChecked(false);
-      setValidating(false);
+      postEnsRequest("unregister");
     }
   };
 
-  const postEnsRequest = useCallback(() => {
+  const postEnsRequest = (operation: "register" | "unregister") => {
     submit(
-      {},
+      {
+        operation,
+      },
       {
         method: "post",
       }
     );
-  }, []);
+  };
 
   return (
     <>
