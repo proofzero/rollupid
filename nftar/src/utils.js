@@ -93,6 +93,10 @@ const generateTraits = function(weightInc) {
     // GENERATE PFP Properties
     const NUMBER_OF_ELEMENTS = 1;
     const REMOVE_FROM_DISTRIBUTION = true;
+
+    // Instance the V0_COLORS object so it can be called repeatedly. Otherwise
+    // it will be shared across calls if the process doesn't restart.
+    const COLORS = JSON.parse(JSON.stringify(V0_COLORS));
     
     // TRAIT ONE: POPULAR COLLECTIONS
     const trait1Probability = new Probability(TRAIT_CATEGORIES);
@@ -100,6 +104,7 @@ const generateTraits = function(weightInc) {
     trait1Probability.addWeight('UNCOMMON', weightInc.trait1.UNCOMMON);
     trait1Probability.addWeight('RARE', weightInc.trait1.RARE);
     trait1Probability.addWeight('EPIC', weightInc.trait1.EPIC);
+    // console.log('trait1Probability.peek()[0]')
     const trait_1_type = trait1Probability.peek()[0];
     
     // TRAIT TWO: SPECIAL COLLECTIONS AND INVITATION
@@ -108,6 +113,7 @@ const generateTraits = function(weightInc) {
     trait2Probability.addWeight('UNCOMMON', weightInc.trait2.UNCOMMON);
     trait2Probability.addWeight('RARE', weightInc.trait2.RARE);
     trait2Probability.addWeight('EPIC', weightInc.trait2.EPIC);
+    // console.log('trait2Probability.peek()[0]')
     const trait_2_type = trait2Probability.peek()[0];
     
     // TRAIT THREE: WALLET BALLANCE
@@ -116,23 +122,27 @@ const generateTraits = function(weightInc) {
     trait3Probability.addWeight('UNCOMMON', weightInc.trait3.UNCOMMON);
     trait3Probability.addWeight('RARE', weightInc.trait3.RARE);
     trait3Probability.addWeight('EPIC', weightInc.trait3.EPIC);
+    // console.log('trait3Probability.peek()[0]')
     const trait_3_type = trait3Probability.peek()[0];
     
     // Get traits from the joint probability distribution of colors.
-    let colorProbability = new Probability(V0_COLORS[trait_1_type]);
+    let colorProbability = new Probability(COLORS[trait_1_type]);
+    // console.log('trait1: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_1_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
     const trait_1_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-    V0_COLORS[trait_1_type] = preserveColorWeights(trait_1_value, V0_COLORS[trait_1_type]);
+    COLORS[trait_1_type] = preserveColorWeights(trait_1_value, COLORS[trait_1_type]);
 
-    colorProbability = new Probability(V0_COLORS[trait_2_type]);
+    colorProbability = new Probability(COLORS[trait_2_type]);
+    // console.log('trait2: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_2_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
     const trait_2_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-    V0_COLORS[trait_2_type] = preserveColorWeights(trait_2_value, V0_COLORS[trait_2_type]);
+    COLORS[trait_2_type] = preserveColorWeights(trait_2_value, COLORS[trait_2_type]);
 
     // Because there are only two epic traits we could, in theory, underflow.
     // We give the peek function a default to return in this (rare) case.
     const trait_3_default = { key: 'default', data: { name: 'Magenta', rgb: { r: 255, g: 0, b: 255 } } };
-    colorProbability = new Probability(V0_COLORS[trait_3_type]);
+    colorProbability = new Probability(COLORS[trait_3_type]);
+    // console.log('trait3: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_3_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
     const trait_3_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION, trait_3_default)[0];
-    V0_COLORS[trait_3_type] = preserveColorWeights(trait_3_value, V0_COLORS[trait_3_type]);
+    COLORS[trait_3_type] = preserveColorWeights(trait_3_value, COLORS[trait_3_type]);
 
     return {
         "trait0": {

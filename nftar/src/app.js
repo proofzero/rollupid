@@ -29,7 +29,7 @@ const canvas = require('./canvas/canvas.js');
 
 const {
     animationViewer
-} = require('./views/nftar.js')
+} = require('./views/nftar.js');
 
 const app     = new Koa();
 const router  = new Router();
@@ -79,6 +79,23 @@ const METHOD_PARAMS = {
     'describe': {},
 };
 
+// If the user owns an NFT from the PFP contract this will throw a 409
+// error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar) and used.
+const handleDuplicateGenerationRequest = function(nftsForOwner, key, account, ctx) {
+    // If the key from the header is not undefined AND the devKey from the 
+    // environment is not undefined AND the two are equal THEN we're in
+    // development mode and will skip the duplicate PFP check.
+    const isDevMode = (key !== undefined && ctx.devKey !== undefined && key === ctx.devKey);
+    if (isDevMode) {
+        return true;
+    }
+
+    // If the user owns an NFT from the PFP contract, 409 error.
+    if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
+        ctx.throw(409, `${account} already owns a PFP NFT!`);
+    }    
+};
+
 // Accepts a blockchain account to generate a unique PFP.
 //
 // Properties are generated per account and saved; will check if a
@@ -86,9 +103,9 @@ const METHOD_PARAMS = {
 jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
     if (ctx.apiKey && !key) {
-        ctx.throw(400, 'Missing NFTAR API key');
+        ctx.throw(403, 'Missing NFTAR API key');
     }
-    if (key !== ctx.apiKey) {
+    if (key !== ctx.apiKey && key !== ctx.devKey) {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
     const params = METHOD_PARAMS['3id_genPFP'];
@@ -114,11 +131,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const weightInc = {};
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
 
-    // If the user owns an NFT from the PFP contract, 409 error.
-    if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
-        ctx.throw(409, `${account} already owns a PFP NFT!`);
-    }
-    
+    // If the user owns an NFT from the PFP contract this will throw a 409
+    // error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar).
+    handleDuplicateGenerationRequest(nftsForOwner, key, account, ctx);
+
     // TRAIT ONE: POPULAR COLLECTIONS
     weightInc['trait1'] = calculateNFTWeight(nftsForOwner.ownedNfts);
 

@@ -45,6 +45,10 @@ const main = async (api) => {
     // set the app api key
     api.context.apiKey = process.env.NFTAR_API_KEY;
 
+    // This key, if set, will allow the caller to bypass the 409 error thrown
+    // when requesting generation of a PFP that already exists. For testing.
+    api.context.devKey = process.env.NFTAR_DEV_KEY;
+
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;
 
