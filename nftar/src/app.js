@@ -192,11 +192,11 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     }
     
     const imageFormat = "image/png";
-    const htmlFormat = "text/html";
+    //const htmlFormat = "text/html";
 
     const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
     const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
-    const ani_blob = animationViewer(account, genTraits);
+    //const ani_blob = animationViewer(account, genTraits);
     t1 = performance.now();
     console.log(`Generating image took ${t1 - t0} milliseconds.`);
 
@@ -204,11 +204,14 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     t0 = performance.now();
     const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
     const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
-    const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
+    //const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
+    t1 = performance.now();
+    console.log(`File blobbing took ${t1 - t0} milliseconds.`);
 
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
 
+    t0 = performance.now();
     // Upload to NFT.storage.
     const metadata = await ctx.storage.store({
         name: `3ID PFP: GEN 0`,
@@ -234,7 +237,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
     
     //fire and forget to gateway
+    t0 = performance.now();
     fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`)
+    t1 = performance.now();
+    console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
     
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
