@@ -39,6 +39,7 @@ export const loader = async ({ request }) => {
 
   const session = await getUserSession(request);
   const address = session.get("address");
+  const core = session.get("core")
 
   // gate with invites only
   const claimsRes = await oortSend(
@@ -52,7 +53,7 @@ export const loader = async ({ request }) => {
   }
 
   // @ts-ignore
-  const onboardData = await ONBOARD_STATE.get(address);
+  const onboardData = await ONBOARD_STATE.get(core);
   if (!onboardData) {
     // @ts-ignore
     await ONBOARD_STATE.put(address, "true");

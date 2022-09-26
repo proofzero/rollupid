@@ -10,6 +10,7 @@ import {
   useSubmit,
   useActionData,
   useTransition,
+  Form,
 } from "@remix-run/react";
 
 import {
@@ -34,7 +35,7 @@ import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { oortSend } from "~/utils/rpc.server";
 
 import ensLogo from "~/assets/ens.png";
-import { useNetwork } from "wagmi";
+import { useNetwork, useAccount } from "wagmi";
 
 import prevStep from "~/assets/onboard/pre.png";
 import currentStep from "~/assets/onboard/current.png";
@@ -65,6 +66,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const ensName = addressLookup.result;
   return json({
+    account: address,
     ensName,
     isSetOnCore,
   });
@@ -103,14 +105,34 @@ const OnboardEns = () => {
 
   const submit = useSubmit();
 
+  const { isConnected, address } = useAccount()
   const { chain } = useNetwork();
 
-  const { ensName, isSetOnCore } = useLoaderData();
+  const { ensName, isSetOnCore, account } = useLoaderData();
 
   const [ensChecked, setEnsChecked] = useState<boolean>(isSetOnCore);
   const [validating, setValidating] = useState<boolean>(true);
 
   const data = useActionData();
+
+  const [invalidChain, setInvalidChain] = useState(false);
+  useEffect(() => {
+    if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
+      setInvalidChain(true);
+    } else {
+      setInvalidChain(false);
+    }
+  }, [chain]);
+
+  const [invalidAddress, setInvalidAddress] = useState(false);
+  useEffect(() => {
+    if (address && address !== account) {
+      setInvalidAddress(true);
+    } else {
+      setInvalidAddress(false);
+    }
+  }, [address]);
+
 
   useEffect(() => {
     if (data?.error && data.operation === "register") {
@@ -204,49 +226,69 @@ const OnboardEns = () => {
               </Text>
             </div>
 
-            <Label htmlFor="use-ens">
-              <div className="flex flex-row space-x-3.5 items-center">
-                <label
-                  htmlFor="use-ens"
-                  className="inline-flex relative items-center mb-5 cursor-pointer"
-                >
-                  {!validating && ensName && (
-                    <>
-                      <input
-                        type="checkbox"
-                        onChange={(evt) => handleEnsToggle(evt.target.checked)}
-                        checked={ensChecked}
-                        id="use-ens"
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </>
-                  )}
+            {invalidChain && <Text
+              className=""
+              color={TextColor.Gray400}
+              size={TextSize.SM}>
+              **Please select switch your network to {window.ENV.VALID_CHAIN_NAME}**
+            </Text>}
+            {invalidAddress && <Text
+              className=""
+              color={TextColor.Gray400}
+              size={TextSize.SM}>
+              **Please connect your wallet to {account}**
+            </Text>}
+            {!isConnected && <Text
+              className=""
+              color={TextColor.Gray400}
+              size={TextSize.SM}>
+              **Please unlock your wallet and reload the page**
+            </Text>}
+            {!invalidChain && !invalidAddress && isConnected &&
+              <Label htmlFor="use-ens">
+                <div className="flex flex-row space-x-3.5 items-center">
+                  <label
+                    htmlFor="use-ens"
+                    className="inline-flex relative items-center mb-5 cursor-pointer"
+                  >
+                    {!validating && ensName && (
+                      <>
+                        <input
+                          type="checkbox"
+                          onChange={(evt) => handleEnsToggle(evt.target.checked)}
+                          checked={ensChecked}
+                          id="use-ens"
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      </>
+                    )}
 
-                  {validating && <Spinner />}
+                    {validating && <Spinner />}
 
-                  {(validating || ensName) && (
-                    <Text
-                      className="ml-3"
-                      size={TextSize.SM}
-                      weight={TextWeight.Medium500}
-                    >
-                      Use ENS domain as profile URL
-                    </Text>
-                  )}
+                    {(validating || ensName) && (
+                      <Text
+                        className="ml-3"
+                        size={TextSize.SM}
+                        weight={TextWeight.Medium500}
+                      >
+                        Use ENS domain as profile URL
+                      </Text>
+                    )}
 
-                  {!validating && !ensName && (
-                    <Text
-                      className="ml-3"
-                      size={TextSize.SM}
-                      weight={TextWeight.Medium500}
-                    >
-                      Sorry, no primary ens linked
-                    </Text>
-                  )}
-                </label>
-              </div>
-            </Label>
+                    {!validating && !ensName && (
+                      <Text
+                        className="ml-3"
+                        size={TextSize.SM}
+                        weight={TextWeight.Medium500}
+                      >
+                        Sorry, no primary ens linked
+                      </Text>
+                    )}
+                  </label>
+                </div>
+              </Label>
+            }
           </div>
         </div>
       </section>
@@ -268,15 +310,17 @@ const OnboardEns = () => {
             Back
           </Button>
 
-          <Button
-            disabled={validating}
-            size={ButtonSize.L}
-            onClick={() => {
-              navigate(`/account`);
-            }}
-          >
-            Finish
-          </Button>
+          <Form method="post" action="/onboard/complete">
+            <Button
+              disabled={validating}
+              size={ButtonSize.L}
+              onClick={() => {
+                navigate(`/account`);
+              }}
+            >
+              Finish
+            </Button>
+          </Form>
         </>)}
       </section>
     </>
