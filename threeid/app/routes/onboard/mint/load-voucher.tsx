@@ -5,6 +5,7 @@ import { getUserSession } from "~/utils/session.server";
 
 type LoadVoucherParams = {
   address: string;
+  skipImage?: boolean;
 };
 
 const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
@@ -16,7 +17,7 @@ const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
     : undefined;
 };
 
-const loadVoucher = async ({ address }: LoadVoucherParams) => {
+const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
   // @ts-ignore
   const nftarUrl = NFTAR_URL;
   // @ts-ignore
@@ -26,7 +27,7 @@ const loadVoucher = async ({ address }: LoadVoucherParams) => {
   // @ts-ignore
   const chainId = NFTAR_CHAIN_ID;
 
-  const response = await fetch(`${nftarUrl}`, {
+  const response = await fetch(`${nftarUrl}${skipImage && "?skipImage=true"}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -82,8 +83,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
 
   try {
-    const voucher = await loadVoucher({ address })
-    console.log("voucher error", cachedVoucher);
+    const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
 
     if (cachedVoucher) {
       return json({

@@ -264,7 +264,7 @@ const OnboardEns = () => {
           size={ButtonSize.L}
           onClick={() => {
             // @ts-ignore
-            navigate(`/onboard/mint?chainId=${chain?.id || 5}`);
+            navigate(`/onboard/mint`);
           }}
         >
           Back

@@ -1,4 +1,4 @@
-import { ActionFunction, LoaderFunction } from "@remix-run/cloudflare";
+import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
 
 import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 
@@ -10,7 +10,7 @@ import styles from "~/styles/onboard.css";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite, useAccount, useNetwork } from "wagmi";
+import { useContractWrite, useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -56,7 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
     }
   );
 
-  return null;
+  return redirect("/onboard/ens");
 };
 
 type OnboardMintLandingProps = {
@@ -74,9 +74,6 @@ const OnboardMintLand = ({
   isInvalidChain,
   onClick,
 }: OnboardMintLandingProps) => {
-
-  console.log("invalid address", isInvalidAddress);
-  console.log("invalid chain", isInvalidChain);
 
   const traitNames = {
     "trait0": "Generation",
@@ -116,24 +113,25 @@ const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
   return (
     <>
       <Button size={ButtonSize.L} onClick={onClick} disabled>
-        Reload Page
+        Try Again
       </Button>
 
       <Text
         className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
         size={TextSize.SM}>
-        **Please connect your wallet to mint your NFT**
+        **Please unlock your wallet to mint your NFT**
       </Text>
     </>
   );
 };
 
 type OnboardMintSignProps = {
+  isLoading: boolean;
   onClick: () => void;
 };
 
-const OnboardMintSign = ({ onClick }: OnboardMintSignProps) => {
+const OnboardMintSign = ({ onClick, isLoading }: OnboardMintSignProps) => {
   return (
     <>
       <Text color={TextColor.Gray400} className="mb-10">
@@ -179,7 +177,11 @@ const OnboardMintError = ({ onClick }: OnboardMintErrorProps) => {
   );
 };
 
-const OnboardMintSuccess = () => {
+type OnboardMintSuccessProps = {
+  data?: object;
+};
+
+const OnboardMintSuccess = ({data}: OnboardMintSuccessProps) => {
   return (
     <>
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
@@ -187,6 +189,10 @@ const OnboardMintSuccess = () => {
 
         <Text color={TextColor.Gray400}>Minted successfully!</Text>
       </section>
+
+      <Text color={TextColor.Gray400} size={TextSize.XS}>
+        <a href={`https://etherscan.io/tx/${data?.hash}`}>View on Etherscan</a>
+      </Text>
     </>
   );
 };
@@ -211,7 +217,7 @@ const OnboardMint = () => {
 
   const navigate = useNavigate();
 
-  const { write, isError, isSuccess } = useContractWrite({
+  const { data, write, isError } = useContractWrite({
     // https://github.com/wagmi-dev/wagmi/issues/899
     // https://github.com/wagmi-dev/wagmi/issues/891
     // https://github.com/wagmi-dev/wagmi/discussions/880#discussioncomment-3516226
@@ -221,6 +227,10 @@ const OnboardMint = () => {
     functionName: "awardPFP",
     args: [recipient, voucher],
   });
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
+
   const { isConnected, address } = useAccount()
   const { chain } = useNetwork();
 
@@ -245,19 +255,9 @@ const OnboardMint = () => {
   const submit = useSubmit();
 
   useEffect(() => {
-    if (screen === "sign" && isError) {
+    if (screen === "proc" && isError) {
       setScreen("error");
-    } else if (screen === "sign" && isSuccess) {
-      submit(
-        {
-          imgUrl,
-          contractAddress,
-        },
-        {
-          method: "post",
-        }
-      );
-
+    } else if (screen === "proc" && isSuccess) {
       setScreen("success");
     }
   }, [screen, isError, isSuccess]);
@@ -286,6 +286,7 @@ const OnboardMint = () => {
     case "sign":
       screenActionComponent = (
         <OnboardMintSign
+          isLoading={isLoading}
           onClick={() => {
             setScreen("land");
           }}
@@ -305,7 +306,7 @@ const OnboardMint = () => {
       );
       break;
     case "success":
-      screenActionComponent = <OnboardMintSuccess />;
+      screenActionComponent = <OnboardMintSuccess data={data} />;
       break;
     case "land":
     default:
@@ -316,7 +317,7 @@ const OnboardMint = () => {
           isInvalidAddress={invalidAddress}
           isInvalidChain={invalidChain}
           onClick={() => {
-            setScreen("sign");
+            setScreen("proc");
             signMessage();
           }}
         />
@@ -471,7 +472,15 @@ const OnboardMint = () => {
             size={ButtonSize.L}
             onClick={() => {
               // Go back
-              navigate("/onboard/ens");
+              submit(
+                {
+                  imgUrl,
+                  contractAddress,
+                },
+                {
+                  method: "post",
+                }
+              );
             }}
           >
             Continue
