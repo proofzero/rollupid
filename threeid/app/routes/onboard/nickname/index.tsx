@@ -9,13 +9,11 @@ import {
   useActionData,
   useFetcher,
   useLoaderData,
-  useNavigate,
-  useSubmit,
+  useTransition,
 } from "@remix-run/react";
 import { Label, TextInput, Spinner } from "flowbite-react";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNetwork } from "wagmi";
+import { useEffect, useState } from "react";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 
 
@@ -85,25 +83,19 @@ export const action: ActionFunction = async ({ request }) => {
 const OnboardNickname = () => {
   const { nickname: storedNickname } = useLoaderData();
   const [nickname, setNickname] = useState(storedNickname || "");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const fetcher = useFetcher();
   useEffect(() => {
     if (fetcher.type === "init") {
       fetcher.load(`/onboard/mint/load-voucher`);
     }
   }, [fetcher]);
-
+  
   const actionErrors = useActionData();
-  useEffect(() => {
-    if (actionErrors) {
-      setIsSubmitting(false);
-    }
-  }, [actionErrors]);
+  const transition = useTransition();
 
   return (
     <>
-
       <div className="flex justify-center items-center space-x-4 mb-10">
         <img src={currentStep} />
         <img src={nextStep} />
@@ -168,14 +160,11 @@ const OnboardNickname = () => {
           id="onboard-nickname-actions"
           className="flex flex-1 justify-end w-full items-end space-x-4 pt-10 lg:pt-0"
         >
-          {isSubmitting ? <Spinner /> :
+          {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> :
             <Button
               isSubmit={true}
               disabled={!nickname || nickname === ""}
               size={ButtonSize.L}
-              // onClick={() => {
-              //   setIsSubmitting(true);
-              // }}
             >
               Continue
             </Button>

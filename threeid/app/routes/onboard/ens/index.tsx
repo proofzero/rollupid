@@ -2,25 +2,19 @@ import {
   ActionFunction,
   json,
   LoaderFunction,
-  redirect,
 } from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
   useNavigate,
-  useFetcher,
   useSubmit,
   useActionData,
+  useTransition,
 } from "@remix-run/react";
 
 import {
-  Card,
-  Checkbox,
   Label,
-  Radio,
-  RadioProps,
   Spinner,
-  ToggleSwitch,
 } from "flowbite-react";
 
 import Heading from "~/components/typography/Heading";
@@ -32,7 +26,7 @@ import Text, {
 
 import { getUserSession } from "~/utils/session.server";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "~/styles/onboard.css";
 
@@ -40,7 +34,7 @@ import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { oortSend } from "~/utils/rpc.server";
 
 import ensLogo from "~/assets/ens.png";
-import { useAccount, useEnsName, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 
 import prevStep from "~/assets/onboard/pre.png";
 import currentStep from "~/assets/onboard/current.png";
@@ -159,6 +153,8 @@ const OnboardEns = () => {
     );
   };
 
+  const transition = useTransition();
+
   return (
     <>
       <div className="flex justify-center items-center space-x-4 mb-10">
@@ -259,26 +255,29 @@ const OnboardEns = () => {
         id="onboard-ens-actions"
         className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        <Button
-          type={ButtonType.Secondary}
-          size={ButtonSize.L}
-          onClick={() => {
-            // @ts-ignore
-            navigate(`/onboard/mint`);
-          }}
-        >
-          Back
-        </Button>
+        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
 
-        <Button
-          disabled={validating}
-          size={ButtonSize.L}
-          onClick={() => {
-            navigate(`/account`);
-          }}
-        >
-          Finish
-        </Button>
+          <Button
+            type={ButtonType.Secondary}
+            size={ButtonSize.L}
+            onClick={() => {
+              // @ts-ignore
+              navigate(`/onboard/mint`);
+            }}
+          >
+            Back
+          </Button>
+
+          <Button
+            disabled={validating}
+            size={ButtonSize.L}
+            onClick={() => {
+              navigate(`/account`);
+            }}
+          >
+            Finish
+          </Button>
+        </>)}
       </section>
     </>
   );

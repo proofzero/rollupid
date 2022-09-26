@@ -1,6 +1,6 @@
 import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
 
-import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import { useLoaderData, useNavigate, useSubmit, useTransition } from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
 import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
@@ -324,6 +324,8 @@ const OnboardMint = () => {
       );
   }
 
+  const transition = useTransition();
+
   return (
     <>
       <div className="flex justify-center items-center space-x-4 mb-10">
@@ -441,51 +443,53 @@ const OnboardMint = () => {
         id="onboard-ens-actions"
         className="flex justify-between lg:justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        {screen !== "sign" && screen !== "success" && (
-          <>
+        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
+          {screen !== "sign" && screen !== "success" && (
+            <>
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.L}
+                onClick={() => {
+                  // @ts-ignore
+                  navigate(`/onboard/nickname`);
+                }}
+              >
+                Back
+              </Button>
+
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.L}
+                onClick={() => {
+                  navigate("/onboard/ens");
+                }}
+              >
+                Skip
+              </Button>
+            </>
+          )}
+
+          {screen === "success" && (
             <Button
-              type={ButtonType.Secondary}
+              type={ButtonType.Primary}
               size={ButtonSize.L}
               onClick={() => {
-                // @ts-ignore
-                navigate(`/onboard/nickname`);
+                // Go back
+                submit(
+                  {
+                    imgUrl,
+                    contractAddress,
+                  },
+                  {
+                    method: "post",
+                  }
+                );
               }}
             >
-              Back
+              Continue
             </Button>
-
-            <Button
-              type={ButtonType.Secondary}
-              size={ButtonSize.L}
-              onClick={() => {
-                navigate("/onboard/ens");
-              }}
-            >
-              Skip
-            </Button>
-          </>
-        )}
-
-        {screen === "success" && (
-          <Button
-            type={ButtonType.Primary}
-            size={ButtonSize.L}
-            onClick={() => {
-              // Go back
-              submit(
-                {
-                  imgUrl,
-                  contractAddress,
-                },
-                {
-                  method: "post",
-                }
-              );
-            }}
-          >
-            Continue
-          </Button>
-        )}
+          )}
+        </>)}
       </section>
     </>
   );
