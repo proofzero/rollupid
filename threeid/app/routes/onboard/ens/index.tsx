@@ -1,4 +1,9 @@
-import { ActionFunction, json, redirect } from "@remix-run/cloudflare";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
@@ -27,7 +32,7 @@ import Text, {
 
 import { getUserSession } from "~/utils/session.server";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import styles from "~/styles/onboard.css";
 
@@ -44,62 +49,115 @@ export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
 
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getUserSession(request);
+  const jwt = session.get("jwt");
+  const address = session.get("address");
+
+  const addressLookup = await oortSend("ens_lookupAddress", [address], {
+    jwt,
+    cookie: request.headers.get("Cookie") as string | undefined,
+  });
+
+  const coreEnsLookup = await oortSend("kb_getCoreAddresses", [["ens"]], {
+    jwt,
+    cookie: request.headers.get("Cookie") as string | undefined,
+  });
+
+  let isSetOnCore = false;
+  if (coreEnsLookup.result?.ens?.length > 0) {
+    isSetOnCore = true;
+  }
+
+  const ensName = addressLookup.result;
+  return json({
+    ensName,
+    isSetOnCore,
+  });
+};
+
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
   const address = session.get("address");
 
-  const ensRes = await oortSend("3id_registerName", [address], {
-    jwt: jwt,
-    cookie: request.headers.get("Cookie") as string,
-  });
+  const formData = await request.formData();
+  const operation = formData.get("operation");
 
-  if (ensRes.error) {
-    console.error(ensRes.error);
-
-    return json(null, { status: 500 });
+  let ensRes = null;
+  if (operation === "register") {
+    ensRes = await oortSend("3id_registerName", [address], {
+      jwt: jwt,
+      cookie: request.headers.get("Cookie") as string,
+    });
+  } else {
+    ensRes = await oortSend("3id_unregisterName", [address], {
+      jwt: jwt,
+      cookie: request.headers.get("Cookie") as string,
+    });
   }
 
-  return redirect("/account");
+  if (ensRes.error) {
+    return json({ error: true, operation }, { status: 500 });
+  }
+
+  return json({ error: false, operation }, { status: 200 });
 };
 
 const OnboardEns = () => {
-  const { chain } = useNetwork();
-
-  const [ensChecked, setEnsChecked] = useState<boolean>(false);
-  const [validating, setValidating] = useState<boolean>(false);
-
-  const { address } = useAccount();
-  const { isSuccess } = useEnsName({
-    address: address,
-  });
+  const navigate = useNavigate();
 
   const submit = useSubmit();
 
-  const handleEnsToggle = async (checked: boolean) => {
-    if (!ensChecked && checked) {
-      // Validate and check ENS if OK
-      setValidating(true);
+  const { chain } = useNetwork();
 
-      await new Promise<void>((ok) => setTimeout(() => ok(), 1500));
+  const { ensName, isSetOnCore } = useLoaderData();
 
-      setValidating(false);
+  const [ensChecked, setEnsChecked] = useState<boolean>(isSetOnCore);
+  const [validating, setValidating] = useState<boolean>(true);
+
+  const data = useActionData();
+
+  useEffect(() => {
+    if (data?.error && data.operation === "register") {
+      setEnsChecked(false);
+    } else if (data?.error && data.operation === "unregister") {
       setEnsChecked(true);
+    } else if (data) {
+      if (data.operation === "register") {
+        setEnsChecked(true);
+      } else if (data.operation === "unregister") {
+        setEnsChecked(false);
+      }
+    }
+
+    setValidating(false);
+  }, [data]);
+
+  useEffect(() => {
+    setValidating(false);
+  }, [ensName]);
+
+  const handleEnsToggle = async (checked: boolean) => {
+    setValidating(true);
+
+    if (checked) {
+      postEnsRequest("register");
     } else {
-      setEnsChecked(checked);
+      postEnsRequest("unregister");
     }
   };
 
-  const postEnsRequest = useCallback(() => {
+  const postEnsRequest = (operation: "register" | "unregister") => {
     submit(
-      {},
+      {
+        operation,
+      },
       {
         method: "post",
       }
     );
-  }, []);
-
-  const navigate = useNavigate();
+  };
 
   return (
     <>
@@ -156,7 +214,7 @@ const OnboardEns = () => {
                   htmlFor="use-ens"
                   className="inline-flex relative items-center mb-5 cursor-pointer"
                 >
-                  {!validating && (
+                  {!validating && ensName && (
                     <>
                       <input
                         type="checkbox"
@@ -168,9 +226,10 @@ const OnboardEns = () => {
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </>
                   )}
+
                   {validating && <Spinner />}
 
-                  {(!ensChecked || isSuccess) && (
+                  {(validating || ensName) && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
@@ -180,7 +239,7 @@ const OnboardEns = () => {
                     </Text>
                   )}
 
-                  {ensChecked && !isSuccess && (
+                  {!validating && !ensName && (
                     <Text
                       className="ml-3"
                       size={TextSize.SM}
@@ -210,26 +269,12 @@ const OnboardEns = () => {
         >
           Back
         </Button>
-        
-        <Button
-          type={ButtonType.Secondary}
-          size={ButtonSize.L}
-          onClick={() => {
-            navigate("/account");
-          }}
-        >
-          Skip
-        </Button>
 
         <Button
+          disabled={validating}
           size={ButtonSize.L}
           onClick={() => {
-            // Submit & navigate
-            if (ensChecked && isSuccess) {
-              postEnsRequest();
-            } else {
-              navigate(`/account`);
-            }
+            navigate(`/account`);
           }}
         >
           Finish
