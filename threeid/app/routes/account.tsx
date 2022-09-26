@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/cloudflare";
+import { redirect, json} from "@remix-run/cloudflare";
 import { useLoaderData, useSubmit, NavLink } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
@@ -41,14 +41,32 @@ export const loader = async ({ request }) => {
   const address = session.get("address");
   const core = session.get("core")
 
-  // gate with invites only
-  const claimsRes = await oortSend(
-    "kb_getCoreClaims",
-    [],
-    { jwt: jwt, cookie: request.headers.get("Cookie") },
-  );
+  const oortOptions = {
+    jwt: jwt,
+    cookie: request.headers.get("Cookie"),
+  }
 
-  if (!claimsRes.result || !claimsRes.result.includes("3id.enter")) {
+  // TODO remove session address param when RPC url is changed
+  const [coreClaimsRes, pfpRes, nicknameRes] = await Promise.all([
+    oortSend(
+      "kb_getCoreClaims",
+      [],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "pfp"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "nickname"],
+      oortOptions,
+    )
+  ]);
+
+
+  if (!coreClaimsRes.result || !coreClaimsRes.result.includes("3id.enter")) {
     return redirect(`/auth`);
   }
 
@@ -61,7 +79,18 @@ export const loader = async ({ request }) => {
     return redirect(`/onboard/nickname`);
   }
 
-  return null;
+  const [
+    pfp,
+    nickname,
+  ] = [
+    pfpRes.result,
+    nicknameRes.result,
+  ];
+
+  return json({
+    pfp,
+    nickname,
+  });
 };
 
 const subNavigation = [
@@ -79,7 +108,7 @@ const subNavigation = [
     current: false,
   },
   { name: "KYC", href: "#", icon: BiIdCard, current: false },
-  { name: "0xAuth", href: "#", icon: BiLink, current: false },
+  { name: "0xAuth3", href: "#", icon: BiLink, current: false },
   { name: "Settings", href: "#", icon: BiCog, current: false },
 ];
 
@@ -88,13 +117,14 @@ function classNames(...classes: any) {
 }
 
 export default function AccountLayout() {
-  useLoaderData();
+  const {pfp, nickname} = useLoaderData();
+  console.log("pfp", pfp)
 
   return (
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav />
+          <HeadNav pfp={pfp.value} />
         </div>
 
         <main className="-mt-72">

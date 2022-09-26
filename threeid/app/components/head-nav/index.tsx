@@ -22,6 +22,8 @@ import logo from "~/assets/three-id-logo-white.svg";
 import defaultAvatar from "~/assets/circle_gradient.png";
 import SignOutLink from "~/components/sign-out-link";
 
+import hexStyle from "~/helpers/hex-style";
+
 import styles from "./headNav.css";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
@@ -47,7 +49,11 @@ const user = {
     imageUrl: defaultAvatar
 }
 
-export default function HeadNav() {
+type HeadNavProps = {
+  pfp?: string;
+}
+
+export default function HeadNav({pfp}: HeadNavProps) {
 
     return (
         <Disclosure as="nav">
@@ -109,7 +115,10 @@ export default function HeadNav() {
                             <div>
                               <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                                 <span className="sr-only">Open user menu</span>
-                                <img className="h-8 w-8 rounded-full" src={user.imageUrl} alt="" />
+                                <img 
+                                  className="h-8 w-8 rounded-full"
+                                  src={pfp.url || user.imageUrl} alt="" 
+                                  style={pfp.isToken && hexStyle} />
                               </Menu.Button>
                             </div>
                             <Transition
@@ -180,7 +189,10 @@ export default function HeadNav() {
                   <div className="border-t border-gray-700 pt-4 pb-3">
                     <div className="flex items-center px-5">
                       <div className="flex-shrink-0">
-                        <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                        <img
+                          className="h-10 w-10 rounded-full"
+                          style={pfp.isToken && hexStyle} // TODO this reloads when toggled. how do we cache?
+                          src={pfp.url || user.imageUrl} alt="" />
                       </div>
                       <button
                         type="button"

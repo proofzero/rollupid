@@ -312,11 +312,9 @@ const OnboardEns = () => {
 
           <Form method="post" action="/onboard/complete">
             <Button
+              isSubmit={true}
               disabled={validating}
               size={ButtonSize.L}
-              onClick={() => {
-                navigate(`/account`);
-              }}
             >
               Finish
             </Button>

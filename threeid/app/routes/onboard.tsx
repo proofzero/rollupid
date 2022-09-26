@@ -36,7 +36,11 @@ export const loader = async ({ request }) => {
     return redirect(`/auth`);
   }
 
+  if (!request.url.includes("nickname")) {
+    return redirect(`/onboard/nickname`);
+  }  
   return null;
+
 };
 
 const Onboard = () => {

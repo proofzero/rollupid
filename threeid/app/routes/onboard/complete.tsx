@@ -7,7 +7,7 @@ export const action: ActionFunction = async ({ request }) => {
   const core = session.get("core");
 
   // @ts-ignore
-  await ONBOARD_STATE.put(core, true);
+  await ONBOARD_STATE.put(core, "complete");
  
   return redirect(`/account`);
 };

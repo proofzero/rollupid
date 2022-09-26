@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, pfpRes, namesRes] = await Promise.all([
+  const [inviteCodeRes, votesRes, pfpRes, nicknameRes, namesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
@@ -57,7 +57,12 @@ export const loader = async ({ request, params }) => {
       oortOptions,
     ),
     oortSend(
-      "kb_getNames",
+      "kb_getData",
+      ["3id.profile", "nickname"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getCoreAddresses",
       [["ens"]],
       oortOptions,
     )
@@ -70,18 +75,23 @@ export const loader = async ({ request, params }) => {
     inviteCode,
     votes,
     pfp,
+    nickname,
     names
   ] = [
     inviteCodeRes.result,
     votesRes.result,
     pfpRes.result,
+    nicknameRes.result,
     namesRes.result
   ];
+
+  console.log("namesres", namesRes)
 
   return json({
     inviteCode,
     votes,
     pfp,
+    nickname,
     names,
   });
 };
@@ -195,17 +205,18 @@ const roadmapSteps = [
   },
 ];
 
-const percentage =
-  ((completeSteps.filter(step => step.isCompleted)).length /
-    (completeSteps.length + comingNext.length + roadmapSteps.length)) *
-  100;
-
 export default function Welcome() {
-  const { inviteCode, votes, pfp, names } = useLoaderData();
+  const { inviteCode, votes, pfp, nickname, names } = useLoaderData();
   let submit = useSubmit();
 
-  completeSteps[1].isCompleted = !!pfp.pfp;
-  // completeSteps[2].isCompleted = !!names.ens;
+  console.log("name", names);
+  completeSteps[1].isCompleted = pfp.value.isToken;
+  completeSteps[2].isCompleted = names?.ens.length;
+
+  const percentage =
+    ((completeSteps.filter(step => step.isCompleted)).length /
+      (completeSteps.length + comingNext.length + roadmapSteps.length)) *
+    100;
 
   const currentVotes = votes.value ? JSON.parse(votes.value) : [];
 
@@ -230,7 +241,7 @@ export default function Welcome() {
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID!</span>
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome {nickname.value} to 3ID!</span>
           <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
           </Heading>
 
