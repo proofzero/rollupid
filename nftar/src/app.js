@@ -128,8 +128,12 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     }
 
     // derive weight inc for each trait
+    let t0, t1;
     const weightInc = {};
+    t0 = performance.now();
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
+    t1 = performance.now();
+    console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
 
     // If the user owns an NFT from the PFP contract this will throw a 409
     // error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar).
@@ -142,12 +146,18 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     weightInc['trait2'] = calculateSpecialWeight(nftsForOwner.ownedNfts);
 
     // TRAIT THREE: WALLET BALLANCE
+    t0 = performance.now();
     const balanceWei = await ctx.web3.eth.getBalance(account);
     const balanceEth = ctx.web3.utils.fromWei(balanceWei, 'ether');
     weightInc['trait3'] = calculateBalanceWeight(balanceEth);
+    t1 = performance.now();
+    console.log(`Call to getBalance took ${t1 - t0} milliseconds.`);
 
+    t0 = performance.now();
     const genTraits = generateTraits(weightInc);
     const colors = Object.keys(genTraits).map((k) => genTraits[k].value);
+    t1 = performance.now();
+    console.log(`Call to generateTraits took ${t1 - t0} milliseconds.`);
 
     const isNode = () => typeof window === 'undefined';
 
@@ -162,6 +172,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     // We make a double-width version with the same color seeds for the cover
     // image.
+    t0 = performance.now();
     const cvr_gradient = new canvas(
         new fabric.StaticCanvas(null, { width: PFP_WIDTH * 2, height: PFP_HEIGHT }),
         colors
@@ -186,8 +197,11 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const pfp_blob = await streamToBlob(pfp_stream, imageFormat);
     const cvr_blob = await streamToBlob(cvr_stream, imageFormat);
     const ani_blob = animationViewer(account, genTraits);
+    t1 = performance.now();
+    console.log(`Generating image took ${t1 - t0} milliseconds.`);
 
     // nft.storage File objects are automatically uploaded.
+    t0 = performance.now();
     const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
     const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
     const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
@@ -212,26 +226,29 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             "Points": genTraits.trait3.value.name,
         },
     });
+    t1 = performance.now();
+    console.log(`NFT.storage took ${t1 - t0} milliseconds.`);
 
     //console.log('IPFS URL for the metadata:', metadata.url);
     //console.log('metadata.json contents:\n', metadata.data);
     //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
-
+    
     //fire and forget to gateway
     fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`)
-
+    
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
-
+    
     // Generate signed voucher using ctx.wallet.
     const voucher = {
         recipient: account,
         uri: tokenURI,
     };
-
+    
     // In Solidity this is equivalent to...
     // `keccak256(abi.encodePacked(voucher.account, voucher.tokenURI))`
     // ... which is the hash we want to replicate for signer recovery.
+    t0 = performance.now();
     const packedHash = ctx.web3.utils.soliditySha3({
         type: 'address',
         value: voucher.recipient
@@ -250,6 +267,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // The smart contract expects the signature as part of the voucher
     // so we add it here to make integrations as easy as possible.
     voucher.signature = signature.signature;
+    t1 = performance.now();
+    console.log(`Crypto took ${t1 - t0} milliseconds.`);
 
     // Generate the response to send to the client.
     ctx.body = {
