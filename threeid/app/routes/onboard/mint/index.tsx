@@ -67,8 +67,6 @@ type OnboardMintLandingProps = {
 };
 
 const OnboardMintLand = ({
-  account,
-  metadata,
   minted,
   onClick,
 }: OnboardMintLandingProps) => {
@@ -82,75 +80,31 @@ const OnboardMintLand = ({
   }
 
   return (
+    !minted && (
+      <Button size={ButtonSize.L} onClick={onClick}>
+        Mint NFT
+      </Button>
+    )
+  );
+};
+
+type OnboardMintConnectProps = {
+  onClick: () => void;
+};
+
+const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
+  return (
     <>
+      <Button size={ButtonSize.L} onClick={onClick} disabled>
+        Connect
+      </Button>
+
       <Text
-        className="mb-4 flex flex-row space-x-2 items-center"
-        color={TextColor.Gray400}
-      >
-        <BiInfoCircle />
-        <span>
-          This image was generated using the assets your{" "}
-          <b className="cursor-default" title={account}>
-            blockchain account.
-          </b>
-          <br/>
-        </span>
-      </Text>
-
-      <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-        {[...Array(4).keys()].map((i) => {
-          const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
-          const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
-          const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
-          const bg = `rgb(${r}, ${g}, ${b})`;
-          return (<li key={i} className="col-span-1 flex flex-col rounded-md shadow-sm">
-            <div style={{fontSize: 12}} className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate">
-              {traitNames[`trait${i}`].toUpperCase()}
-            </div>
-            <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">        
-              <div className={
-                  'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
-                }
-              >
-                <span style={{
-                  backgroundColor: bg,
-                }} className="my-4 ml-1 rounded-md w-10 h-10"></span>
-              </div>
-              <div className="flex flex-1 items-center justify-between truncate bg-white">
-                <div className="flex-1 truncate px-4 py-4 text-sm">
-                  <Text 
-                    color={TextColor.Gray700}
-                    size={TextSize.SM}
-                    className="font-bold">
-                    {metadata.properties.traits[`trait${i}`].value.name}
-                  </Text>
-                  <Text className=""
-                    color={TextColor.Gray400}
-                    weight={TextWeight.Medium500}
-                    size={TextSize.XS}>
-                    {metadata.properties.traits[`trait${i}`].type[0] + metadata.properties.traits[`trait${i}`].type.toLowerCase().slice(1)}
-                  </Text>
-                </div>
-              </div>
-            </div>
-          </li>
-        )})}
-      </ul>
-
-      {!minted && (
-        <Button size={ButtonSize.L} onClick={onClick}>
-          Mint NFT
-        </Button>
-      )}
-
-      {!isConnected && <Text
         className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
         size={TextSize.SM}>
-          **Please connect your wallet to mint your NFT**
-      </Text> }
-
-      {minted && <Text>Already minted</Text>}
+        **Please connect your wallet to mint your NFT**
+      </Text>
     </>
   );
 };
@@ -218,6 +172,13 @@ const OnboardMintSuccess = () => {
 };
 
 const OnboardMint = () => {
+  const traitNames = {
+    "trait0": "Generation",
+    "trait1": "Priority",
+    "trait2": "Friend",
+    "trait3": "Points",
+  }
+
   const [screen, setScreen] = useState<
     "land" | "sign" | "proc" | "success" | "error"
   >("land");
@@ -240,6 +201,7 @@ const OnboardMint = () => {
     functionName: "awardPFP",
     args: [recipient, voucher],
   });
+  const { isConnected } = useAccount()
 
   const submit = useSubmit();
 
@@ -261,14 +223,29 @@ const OnboardMint = () => {
     }
   }, [screen, isError, isSuccess]);
 
+  useEffect(() => {
+    if (!isConnected && !minted) {
+      setScreen("connect");
+    }
+  }, [isConnected, minted]);
+
   const signMessage = () => {
     if (write) write();
   };
 
-  let screenComponent = null;
+  let screenActionComponent = null;
   switch (screen) {
+    case "connect":
+      screenActionComponent = (
+        <OnboardMintConnect
+         onClick={() => {
+          window.location.reload()
+         }}
+        />
+      );
+      break;
     case "sign":
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintSign
           onClick={() => {
             setScreen("land");
@@ -277,10 +254,10 @@ const OnboardMint = () => {
       );
       break;
     case "proc":
-      screenComponent = <OnboardMintProc />;
+      screenActionComponent = <OnboardMintProc />;
       break;
     case "error":
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintError
           onClick={() => {
             setScreen("land");
@@ -289,11 +266,11 @@ const OnboardMint = () => {
       );
       break;
     case "success":
-      screenComponent = <OnboardMintSuccess />;
+      screenActionComponent = <OnboardMintSuccess />;
       break;
     case "land":
     default:
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintLand
           account={account}
           metadata={metadata}
@@ -349,7 +326,63 @@ const OnboardMint = () => {
           </div>
         </div>
 
-        {screenComponent}
+        <Text
+          className="mb-4 flex flex-row space-x-2 items-center"
+          color={TextColor.Gray400}>
+          <BiInfoCircle />
+          <span>
+            This image was generated using the assets your{" "}
+            <b className="cursor-default" title={account}>
+              blockchain account.
+            </b>
+            <br/>
+          </span>
+        </Text>
+
+        <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          {[...Array(4).keys()].map((i) => {
+            const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
+            const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
+            const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
+            const bg = `rgb(${r}, ${g}, ${b})`;
+            return (<li key={i} className="col-span-1 flex flex-col rounded-md shadow-sm">
+              <div style={{fontSize: 12}} className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate">
+                {traitNames[`trait${i}`].toUpperCase()}
+              </div>
+              <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">        
+                <div className={
+                    'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
+                  }
+                >
+                  <span style={{
+                    backgroundColor: bg,
+                  }} className="my-4 ml-1 rounded-md w-10 h-10"></span>
+                </div>
+                <div className="flex flex-1 items-center justify-between truncate bg-white">
+                  <div className="flex-1 truncate px-4 py-4 text-sm">
+                    <Text 
+                      color={TextColor.Gray700}
+                      size={TextSize.SM}
+                      className="font-bold">
+                      {metadata.properties.traits[`trait${i}`].value.name}
+                    </Text>
+                    <Text className=""
+                      color={TextColor.Gray400}
+                      weight={TextWeight.Medium500}
+                      size={TextSize.XS}>
+                      {metadata.properties.traits[`trait${i}`].type[0] + metadata.properties.traits[`trait${i}`].type.toLowerCase().slice(1)}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+            </li>
+          )})}
+        </ul>
+
+        {screenActionComponent}
+
+        {minted && <Text>Already minted</Text>}
+
       </section>
 
       <section
