@@ -84,7 +84,7 @@ const OnboardMintLand = ({
   return (
     <>
       <Text
-        className="mb-4 flex flex-row space-x-4 items-center"
+        className="mb-4 flex flex-row space-x-2 items-center"
         color={TextColor.Gray400}
       >
         <BiInfoCircle />
