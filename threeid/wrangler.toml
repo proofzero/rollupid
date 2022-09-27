@@ -36,8 +36,8 @@ kv_namespaces = [
 [env.next]
 name = "three-id-next"
 routes = [
-  "dapp-next.threeid.xyz/*",
-  "dapp-preview.threeid.xyz/*",
+  { pattern = "dapp-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "dapp-preview.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b99f064f42a945feace9a6f36b5d9c62" },
@@ -49,7 +49,7 @@ kv_namespaces = [
 # ------------------------------------------------------------------------------
 [env.current]
 name = "three-id-current"
-route = "dapp.threeid.xyz/*"
+route = { pattern = "dapp.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
   { binding = "ONBOARD_STATE", id = "b1959de0b0974c26b3bc83576a259db7" },

@@ -27,7 +27,7 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
   // @ts-ignore
   const chainId = NFTAR_CHAIN_ID;
 
-  const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, {
+  const nftarFetch = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,13 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
         },
       },
     }),
-  });
+  }
+  
+  console.log("nftar-fetch", `${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, nftarFetch);
+
+  const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, nftarFetch);
+
+  console.log("nftar-response-status", response.status, response.statusText);
   const jsonRes = await response.json();
 
   if (jsonRes.error) {
@@ -69,9 +75,7 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const url = new URL(request.url);
   const session = await getUserSession(request);
-
 
   // TODO: remove chain id and redirect to /auth
   if (!session || !session.has("jwt")) {
@@ -85,7 +89,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
-  
 
   try {
     const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
