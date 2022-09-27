@@ -1,24 +1,46 @@
 // nftar/src/utils.js
 
 const Probability = require('./probability.js')
+
 const {
     TRAIT_CATEGORIES,
     V0_COLORS,
     POPULAR_COLLECTIONS,
-    SPECIAL_COLLECTIONS} = require('./traits.js');
+    SPECIAL_COLLECTIONS
+} = require('./traits.js');
+
+// Does the user own any NFTs of the passed contract address?
+const isPFPOwner = function(nfts, _contractAddress) {
+    if (typeof _contractAddress !== 'string') return false;
+    if (nfts.constructor !== Array) return false;
+    
+    const contractAddress = _contractAddress.toLowerCase();
+    for (const i in nfts) {
+        const nft = nfts[i];
+        // console.log(nft.contract.address, contractAddress, contractAddress == nft.contract.address);
+        if (nft.contract.address == contractAddress) {
+            return true;
+        }
+    }
+    return false;
+}
 
 const calculateNFTWeight = function(nfts) {
     const weights = {
         "EPIC": 0,
         "RARE": 0,
         "UNCOMMON": 0,
+        "COMMON": 0,
     };
-    nfts.forEach(async (nft) => {
-        const contract = POPULAR_COLLECTIONS[nft.contract]
+    if (nfts.constructor !== Array) return weights;
+
+    for (const i in nfts) {
+        const nft = nfts[i];
+        const contract = POPULAR_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }
-    });
+    }
     return weights;
 }
 
@@ -27,69 +49,100 @@ const calculateSpecialWeight = function(nfts) {
         "EPIC": 0,
         "RARE": 0,
         "UNCOMMON": 0,
+        "COMMON": 0,
     };
-    nfts.forEach(async (nft) => {
-        const contract = SPECIAL_COLLECTIONS[nft.contract]
+    if (nfts.constructor !== Array) return weights;
+
+    for (const i in nfts) {
+        const nft = nfts[i];
+        const contract = SPECIAL_COLLECTIONS[nft.contract.address]
         if (contract) {
             weights[contract.kind] += contract.value;
         }
-    });
+    }
     return weights;
 }
 
 const calculateBalanceWeight = function(balance) {
-    const weights = {
+    return {
         "EPIC": balance > 100 ? 1 : 0,
-        "RARE": balance > 10 ? 1 : 0,
-        "UNCOMMON": balance > 1 ? 1 : 0,
+        "RARE": balance <= 100 && balance > 10 ? 1 : 0,
+        "UNCOMMON": balance <= 10 && balance ? 1 : 0,
+        "COMMON": 0,
     };
-    return weights;
+}
+
+// Subtract the returned color from the colors trait array
+// so that we can stop duplication.
+const preserveColorWeights = function(color, colors) {
+    for (let i in colors) {
+        if (color.key == colors[i].key) {
+            colors[i].weight = colors[i].weight - 1;
+            if (colors[i].weight <= 0) {
+                delete colors[i];
+            }
+            break;
+        }
+    }
+    // The deleted item remains in the array as an undefined
+    // element. This filter drops falsy (ie undefined) elements.
+    return colors.filter(Boolean);
 }
 
 const generateTraits = function(weightInc) {
     // GENERATE PFP Properties
     const NUMBER_OF_ELEMENTS = 1;
-    const REMOVE_FROM_DISTRIBUTION = false;
-    // const probability = new Probability(TRAIT_CATEGORIES);
+    const REMOVE_FROM_DISTRIBUTION = true;
 
+    // Instance the V0_COLORS object so it can be called repeatedly. Otherwise
+    // it will be shared across calls if the process doesn't restart.
+    const COLORS = JSON.parse(JSON.stringify(V0_COLORS));
+    
     // TRAIT ONE: POPULAR COLLECTIONS
-    // TODO: increase weight of categories based
-    const wtrait1t = new Probability(TRAIT_CATEGORIES);
-    wtrait1t.addWeight('UNCOMMON', weightInc.trait1.UNCOMMON);
-    wtrait1t.addWeight('RARE', weightInc.trait1.RARE);
-    wtrait1t.addWeight('EPIC', weightInc.trait1.EPIC);
-    const trait_1_type = wtrait1t.peek()[0];
-    // const trait_1_type = wtrait1t.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-
-    const wtrait1v = new Probability(V0_COLORS[trait_1_type]);
-    const trait_1_value = wtrait1v.peek()[0];
-    // const trait_1_value = wtrait1v.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-
+    const trait1Probability = new Probability(TRAIT_CATEGORIES);
+    trait1Probability.addWeight('COMMON', weightInc.trait1.COMMON);
+    trait1Probability.addWeight('UNCOMMON', weightInc.trait1.UNCOMMON);
+    trait1Probability.addWeight('RARE', weightInc.trait1.RARE);
+    trait1Probability.addWeight('EPIC', weightInc.trait1.EPIC);
+    // console.log('trait1Probability.peek()[0]')
+    const trait_1_type = trait1Probability.peek()[0];
+    
     // TRAIT TWO: SPECIAL COLLECTIONS AND INVITATION
-    // do some checks to increase the probability of a trait
-    var wtrait2t = new Probability(TRAIT_CATEGORIES);
-    wtrait2t.addWeight('UNCOMMON', weightInc.trait2.UNCOMMON);
-    wtrait2t.addWeight('RARE', weightInc.trait2.RARE);
-    wtrait2t.addWeight('EPIC', weightInc.trait2.EPIC);
-    const trait_2_type = wtrait2t.peek()[0];
-    // const trait_2_type = wtrait2t.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-
-    const wtrait2v = new Probability(V0_COLORS[trait_2_type]);
-    const trait_2_value = wtrait2v.peek()[0];
-    // const trait_2_value = wtrait2v.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
-
+    const trait2Probability = new Probability(TRAIT_CATEGORIES);
+    trait2Probability.addWeight('COMMON', weightInc.trait2.COMMON);
+    trait2Probability.addWeight('UNCOMMON', weightInc.trait2.UNCOMMON);
+    trait2Probability.addWeight('RARE', weightInc.trait2.RARE);
+    trait2Probability.addWeight('EPIC', weightInc.trait2.EPIC);
+    // console.log('trait2Probability.peek()[0]')
+    const trait_2_type = trait2Probability.peek()[0];
+    
     // TRAIT THREE: WALLET BALLANCE
-    // do some checks to increase the probability of a trait
-    var wtrait3t = new Probability(TRAIT_CATEGORIES);
-    wtrait3t.addWeight('UNCOMMON', weightInc.trait3.UNCOMMON);
-    wtrait3t.addWeight('RARE', weightInc.trait3.RARE);
-    wtrait3t.addWeight('EPIC', weightInc.trait3.EPIC);
-    const trait_3_type = wtrait3t.peek()[0];
-    // const trait_3_type = wtrait3t.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
+    const trait3Probability = new Probability(TRAIT_CATEGORIES);
+    trait3Probability.addWeight('COMMON', weightInc.trait3.COMMON);
+    trait3Probability.addWeight('UNCOMMON', weightInc.trait3.UNCOMMON);
+    trait3Probability.addWeight('RARE', weightInc.trait3.RARE);
+    trait3Probability.addWeight('EPIC', weightInc.trait3.EPIC);
+    // console.log('trait3Probability.peek()[0]')
+    const trait_3_type = trait3Probability.peek()[0];
+    
+    // Get traits from the joint probability distribution of colors.
+    let colorProbability = new Probability(COLORS[trait_1_type]);
+    // console.log('trait1: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_1_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
+    const trait_1_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
+    COLORS[trait_1_type] = preserveColorWeights(trait_1_value, COLORS[trait_1_type]);
 
-    const wtrait3v = new Probability(V0_COLORS[trait_3_type]);
-    const trait_3_value = wtrait3v.peek()[0];
-    // const trait_3_value = wtrait3v.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
+    colorProbability = new Probability(COLORS[trait_2_type]);
+    // console.log('trait2: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_2_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
+    const trait_2_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0];
+    COLORS[trait_2_type] = preserveColorWeights(trait_2_value, COLORS[trait_2_type]);
+
+    // Because there are only two epic traits we could, in theory, underflow.
+    // We give the peek function a default to return in this (rare) case.
+    const trait_3_default = { key: 'default', data: { name: 'Magenta', rgb: { r: 255, g: 0, b: 255 } } };
+    colorProbability = new Probability(COLORS[trait_3_type]);
+    // console.log('trait3: colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION)[0]:', trait_3_type, COLORS['GEN'].length, COLORS['COMMON'].length, COLORS['UNCOMMON'].length, COLORS['RARE'].length, COLORS['EPIC'].length)
+    const trait_3_value = colorProbability.peek(NUMBER_OF_ELEMENTS, REMOVE_FROM_DISTRIBUTION, trait_3_default)[0];
+    COLORS[trait_3_type] = preserveColorWeights(trait_3_value, COLORS[trait_3_type]);
 
     return {
         "trait0": {
@@ -124,6 +177,7 @@ const generateTraits = function(weightInc) {
 }
 
 module.exports = {
+    isPFPOwner,
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,

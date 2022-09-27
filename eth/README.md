@@ -2,15 +2,43 @@
 
 ## Project Configuration
 
-**Before doing anything** edit `hardhat.config.ts` and import the tasks related to your project (invite or profile).
+**Before doing anything** edit `hardhat.config.ts` and set the config for your default project (invite or profile).
+
+You can optionally switch between the two using `npx hardhat --config [profile|invite].config.ts` as your base hardhat command.
 
 **Also** get `profile.secret.ts` and/or `invite.secret.ts` from secret storage.
 
-The rest of this document is about invitations for now. It largely applies _mutatis mutandis_ for profiles.
+The rest of this document is about invitations. It largely applies _mutatis mutandis_ for profiles, but profile pictures are not human controlled (e.g., no airdropping, etc.).
+
+## Testing
+
+First, run your node:
+
+```bash
+npx hardhat node
+```
+
+Test your default project:
+
+```bash
+npx hardhat test
+```
+
+You can specify the config file to test a specific project:
+
+```bash
+npx hardhat --config profile.config.ts test
+```
+
+A relatively full-on test suite can be run (after starting your local node with `npx hardhat node`) with:
+
+```
+./bin/local_profile_smoke.sh
+```
 
 ## Orientation
 
-This will give you a list of available commands:
+This will give you a list of available commands in your default project (recall you can also specify `--config [profile|invite].config.ts` to select a particular project):
 
 ```bash
 npx hardhat
@@ -18,7 +46,7 @@ npx hardhat
 
 Some selected commands:
 
-*	`account:balance`       Prints an account balance
+* `account:balance`       Prints an account balance
 * `account:nfts`          Gets the NFTs for an account (via Alchemy)
 * `accounts:list`         Prints the list of accounts
 * `invite:award`          Mint an invite for an account
@@ -31,13 +59,13 @@ Some selected commands:
 
 Start the local hardhat chain in another terminal: `npx hardhat node`
 
-See the accounts registered in `secret.ts`: `npx hardhat accounts:list`
+See the accounts registered in `invite.secret.ts`: `npx hardhat accounts:list`
 
 See the balance in an account: `npx hardhat account:balance --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 
 ## Wallet Accounts
 
-There are two named wallet accounts in `secret.ts` (retrieve this from secret storage):
+There are two named wallet accounts in `invite.secret.ts` (retrieve this or `profile.secret.ts` from secret storage):
 
 * `owner` -- the wallet that deploys and owns the smart contract.
 * `operator` -- the wallet that awards invitations (ie, "operates" the smart contract).
@@ -53,11 +81,9 @@ These calls will **fail** because the contract hasn't been deployed.
 
 ### Deployment
 
-1. Premint the starting invitation: `npx hardhat invite:premint`
-1. Use the preminted metadata to create a voucher for the operator: `npx hardhat invite:sign-voucher --invite 0 --token-uri <metadata link> --account operator`
-2. Update `ZERO_VOUCHER` in `scripts/deploy.ts` with the signed voucher.
-3. Deploy to the local node with `npx hardhat run scripts/deploy.ts`
-4. Update `secrets.ts` with the contract address for `NET_LOCALHOST`.
+```bash
+npx hardhat invite:deploy
+```
 
 Now these calls work:
 
@@ -66,7 +92,7 @@ Now these calls work:
 
 ### Award an Invite
 
-Note: requires that you've updated `secret.ts` with the new address (see "Deployment", above).
+Note: requires that you've updated `invite.secret.ts` with the new address (see "Deployment", above).
 
 `npx hardhat invite:award --account 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 
