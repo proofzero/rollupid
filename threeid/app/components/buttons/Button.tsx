@@ -8,7 +8,7 @@ export type ButtonProps = {
   type?: ButtonType;
   size?: ButtonSize;
   
-  isSubmit: boolean;
+  isSubmit?: boolean;
 
   onClick?: () => void;
 

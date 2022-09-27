@@ -13,7 +13,7 @@ import {
 } from "@remix-run/react";
 import { json } from "@remix-run/cloudflare";
 
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useCatch, useNavigate  } from "@remix-run/react";
 
 import { startSession } from "~/utils/datadog.client";
 
@@ -32,7 +32,7 @@ import logo from "./assets/three-id-logo.svg";
 
 import { links as buttonLinks } from "~/components/buttons";
 import { links as headNavLink } from "~/components/head-nav";
-import { links as baseButtonLinks, BaseButtonAnchor } from "~/components/base-button";
+import BaseButton, { links as baseButtonLinks, BaseButtonAnchor } from "~/components/base-button";
 
 
 export const meta: MetaFunction = () => ({
@@ -134,7 +134,7 @@ export function ErrorBoundary({ error }) {
               </p>
               
               <div className="error-buttons grid grid-rows-1">
-                  <BaseButtonAnchor text={"Go to Discord"} color={"light"} href={"https://discord.gg/threeid"} />
+                  <BaseButtonAnchor text={"Go to Discord"} color={"dark"} href={"https://discord.gg/threeid"} />
               </div>
             </div>
           </article>
@@ -143,6 +143,48 @@ export function ErrorBoundary({ error }) {
             <pre>{error.stack}</pre>
           </article>
         </div>
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload port={8002} />
+      </body>
+    </html>
+  );
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+  const navigate = useNavigate()
+  const goBack = () => { 
+    navigate(-1) 
+  }
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div className="wrapper grid grid-row-3 gap-4">
+          <nav className="col-span-3">
+            <img src={logo} alt="threeid" />
+          </nav>
+          <article className="content col-span-3">
+            <div className="error justify-center items-center">
+              <img className="m-auto pb-12" src={sad}/>
+              <p className="error-message">
+                Oops!
+              </p>
+              <p className="error-secondary-message">{caught.status} {caught.statusText}</p>
+              <div className="error-buttons grid grid-rows-1">
+                  <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} />
+              </div>
+            </div>
+          </article>
+          <div>{" "}</div>
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload port={8002} />
       </body>
     </html>
   );
