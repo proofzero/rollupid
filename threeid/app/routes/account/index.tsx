@@ -85,8 +85,6 @@ export const loader = async ({ request, params }) => {
     namesRes.result
   ];
 
-  console.log("namesres", namesRes)
-
   return json({
     inviteCode,
     votes,
@@ -209,7 +207,6 @@ export default function Welcome() {
   const { inviteCode, votes, pfp, nickname, names } = useLoaderData();
   let submit = useSubmit();
 
-  console.log("name", names);
   completeSteps[1].isCompleted = pfp?.value?.isToken;
   completeSteps[2].isCompleted = names?.ens?.length;
 
