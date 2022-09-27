@@ -46,10 +46,14 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
       },
     }),
   });
-
   const jsonRes = await response.json();
+
   if (jsonRes.error) {
     throw new Error(jsonRes.error.data.message);
+  }
+
+  if (skipImage) {
+    return null;
   }
 
   let res = {
@@ -79,8 +83,16 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jwt = session.get("jwt");
   const address = session.get("address");
 
+  // const staticVoucher = JSON.parse(STATIC_VOUCHER)
+  // console.log("staticVoucher", staticVoucher)
+  // staticVoucher.metadata.image = gatewayFromIpfs(staticVoucher.metadata.image) as string
+
+  // await VOUCHER_CACHE.put(address, JSON.stringify(staticVoucher));
+
+
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
+  
 
   try {
     const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });

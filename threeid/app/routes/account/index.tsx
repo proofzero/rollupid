@@ -210,8 +210,8 @@ export default function Welcome() {
   let submit = useSubmit();
 
   console.log("name", names);
-  completeSteps[1].isCompleted = pfp.value.isToken;
-  completeSteps[2].isCompleted = names?.ens.length;
+  completeSteps[1].isCompleted = pfp?.value?.isToken;
+  completeSteps[2].isCompleted = names?.ens?.length;
 
   const percentage =
     ((completeSteps.filter(step => step.isCompleted)).length /

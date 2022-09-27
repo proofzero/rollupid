@@ -10,6 +10,7 @@ import {
   useFetcher,
   useLoaderData,
   useTransition,
+  PrefetchPageLinks,
 } from "@remix-run/react";
 import { Label, TextInput, Spinner } from "flowbite-react";
 
@@ -172,7 +173,7 @@ const OnboardNickname = () => {
         </section>
   
       </Form>
-
+      <PrefetchPageLinks page="/onboard/mint" />
     </>
   );
 };

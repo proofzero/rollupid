@@ -1,6 +1,11 @@
 import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
 
-import { useLoaderData, useNavigate, useSubmit, useTransition } from "@remix-run/react";
+import {
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+  useTransition,
+} from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
 import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
@@ -435,7 +440,7 @@ const OnboardMint = () => {
 
         {screenActionComponent}
 
-        {minted && <Text>Already minted</Text>}
+        {minted && <Text>Your PPF has already been minted</Text>}
 
       </section>
 

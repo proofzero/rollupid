@@ -11,6 +11,7 @@ import {
   useActionData,
   useTransition,
   Form,
+  PrefetchPageLinks,
 } from "@remix-run/react";
 
 import {
@@ -227,21 +228,21 @@ const OnboardEns = () => {
             </div>
 
             {invalidChain && <Text
-              className=""
-              color={TextColor.Gray400}
-              size={TextSize.SM}>
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
               **Please select switch your network to {window.ENV.VALID_CHAIN_NAME}**
             </Text>}
             {invalidAddress && <Text
-              className=""
-              color={TextColor.Gray400}
-              size={TextSize.SM}>
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
               **Please connect your wallet to {account}**
             </Text>}
             {!isConnected && <Text
-              className=""
-              color={TextColor.Gray400}
-              size={TextSize.SM}>
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
               **Please unlock your wallet and reload the page**
             </Text>}
             {!invalidChain && !invalidAddress && isConnected &&
@@ -282,7 +283,7 @@ const OnboardEns = () => {
                         size={TextSize.SM}
                         weight={TextWeight.Medium500}
                       >
-                        Sorry, no primary ens linked
+                        Sorry, no primary ens linked to your ETH account.
                       </Text>
                     )}
                   </label>
@@ -321,6 +322,7 @@ const OnboardEns = () => {
           </Form>
         </>)}
       </section>
+      <PrefetchPageLinks page="/onboard/mint" />
     </>
   );
 };
