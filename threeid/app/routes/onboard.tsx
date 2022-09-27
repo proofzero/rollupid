@@ -87,27 +87,3 @@ const Onboard = () => {
 };
 
 export default Onboard;
-
-// https://remix.run/docs/en/v1/guides/errors
-
-export function ErrorBoundary({ error }) {
-  return (
-    <>
-      <div className="grid grid-row-3 gap-4">
-        <nav className="col-span-3">
-          <img src={logo} alt="threeid" />
-        </nav>
-      </div>
-
-      <div className="max-w-4xl mx-auto mt-2 lg:mt-28 p-4">
-        <div className="flex flex-col p-6 lg:bg-white lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-md min-h-[580px] space-y-4">
-          <h1>Something went terribly wrong!</h1>
-          <p>If this problem persists please join <u><a href="https://discord.gg/threeid">Discord</a></u> for help.</p>
-          {/* <p>{error.message}</p>
-          <p>The stack trace is:</p>
-          <pre>{error.stack}</pre> */}
-        </div>
-      </div>
-    </>
-  );
-}

@@ -18,6 +18,7 @@ import { useLoaderData } from "@remix-run/react";
 import { startSession } from "~/utils/datadog.client";
 
 import styles from "./styles/tailwind.css";
+import baseStyles from "./styles/base.css";
 import social from "./assets/social.png";
 import appleIcon from "./assets/apple-touch-icon.png";
 import icon32 from "./assets/favicon-32x32.png";
@@ -26,10 +27,12 @@ import faviconSvg from "./assets/favicon.svg";
 import favicon from "./assets/favicon.ico";
 import manifest from "./assets/site.webmanifest";
 import maskIcon from "./assets/safari-pinned-tab.svg";
+import sad from "./assets/sad.png";
+import logo from "./assets/three-id-logo.svg";
 
 import { links as buttonLinks } from "~/components/buttons";
 import { links as headNavLink } from "~/components/head-nav";
-
+import { links as baseButtonLinks, BaseButtonAnchor } from "~/components/base-button";
 
 
 export const meta: MetaFunction = () => ({
@@ -49,6 +52,7 @@ export const meta: MetaFunction = () => ({
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: baseStyles },
   { rel: "apple-touch-icon", href: appleIcon, sizes: "180x180" },
   { rel: "icon", type: "image/png", href: icon32, sizes: "32x32" },
   { rel: "icon", type: "image/png", href: icon16, sizes: "16x16" },
@@ -56,6 +60,7 @@ export const links: LinksFunction = () => [
   { rel: "mask-icon", href: maskIcon, color: "#5bbad5" },
   { rel: "shortcut icon", href: favicon },
   { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
+  ...baseButtonLinks(),
   ...buttonLinks(),
   ...headNavLink(),
 ];
@@ -98,6 +103,46 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+      </body>
+    </html>
+  );
+}
+
+// https://remix.run/docs/en/v1/guides/errors
+
+export function ErrorBoundary({ error }) {
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div className="wrapper grid grid-row-3 gap-4">
+          <nav className="col-span-3">
+            <img src={logo} alt="threeid" />
+          </nav>
+          <article className="content col-span-3">
+            <div className="error justify-center items-center">
+              <img className="m-auto pb-12" src={sad}/>
+              <p className="error-message">
+                Something went terribly wrong!
+              </p>
+              <p className="error-secondary-message">{error.message}</p>
+              <p className="error-secondary-message">
+                If this problem persists please join Discord for help
+              </p>
+              
+              <div className="error-buttons grid grid-rows-1">
+                  <BaseButtonAnchor text={"Go to Discord"} color={"light"} href={"https://discord.gg/threeid"} />
+              </div>
+            </div>
+          </article>
+          <article className="content flex-col">
+            <p>The stack trace is:</p>
+            <pre>{error.stack}</pre>
+          </article>
+        </div>
       </body>
     </html>
   );

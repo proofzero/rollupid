@@ -76,3 +76,52 @@ div[data-testid="flowbite-tooltip"] div {
         font-weight: 700;
     }
 }
+
+.wrapper {
+    // margin: auto;
+    // display: flex;
+    height: 100vh;
+}
+
+nav {
+    padding: 1em;
+
+    img {
+        width: 36.56px;
+    }
+}
+
+.content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    display: flex;
+    flex-grow: 1;
+    min-width: 300px;
+}
+
+
+.error-message {
+    font-family: Inter_500Medium;
+    font-size: 24px;
+    font-weight: 700;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-dark;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-secondary-message {
+    padding: 1em;
+    font-family: Inter_400regular;
+    font-size: 18px;
+    font-weight: 400;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-dark;
+    justify-content: center;
+    align-items: center;
+}
