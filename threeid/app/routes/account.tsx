@@ -123,7 +123,7 @@ export default function AccountLayout() {
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav pfp={pfp.value} />
+          <HeadNav pfp={pfp?.value} />
         </div>
 
         <main className="-mt-72">

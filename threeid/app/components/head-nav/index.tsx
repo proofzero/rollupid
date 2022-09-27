@@ -117,8 +117,8 @@ export default function HeadNav({pfp}: HeadNavProps) {
                                 <span className="sr-only">Open user menu</span>
                                 <img 
                                   className="h-8 w-8 rounded-full"
-                                  src={pfp.url || user.imageUrl} alt="" 
-                                  style={pfp.isToken && hexStyle} />
+                                  src={pfp?.url || user.imageUrl} alt="" 
+                                  style={pfp?.isToken && hexStyle} />
                               </Menu.Button>
                             </div>
                             <Transition
@@ -191,8 +191,8 @@ export default function HeadNav({pfp}: HeadNavProps) {
                       <div className="flex-shrink-0">
                         <img
                           className="h-10 w-10 rounded-full"
-                          style={pfp.isToken && hexStyle} // TODO this reloads when toggled. how do we cache?
-                          src={pfp.url || user.imageUrl} alt="" />
+                          style={pfp?.isToken && hexStyle} // TODO this reloads when toggled. how do we cache?
+                          src={pfp?.url || user.imageUrl} alt="" />
                       </div>
                       <button
                         type="button"
