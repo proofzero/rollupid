@@ -82,7 +82,6 @@ export async function requireJWT(
   if (jwt) {
     const parsedJWT = parseJwt(jwt);
     if (parsedJWT.exp < Date.now() / 1000) {
-      console.log("JWT expired");
       throw await destroyUserSession(session)
     }
   }

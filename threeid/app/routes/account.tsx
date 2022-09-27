@@ -1,4 +1,4 @@
-import { redirect } from "@remix-run/cloudflare";
+import { redirect, json} from "@remix-run/cloudflare";
 import { useLoaderData, useSubmit, NavLink } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
@@ -39,20 +39,39 @@ export const loader = async ({ request }) => {
 
   const session = await getUserSession(request);
   const address = session.get("address");
+  const core = session.get("core")
 
-  // gate with invites only
-  const claimsRes = await oortSend(
-    "kb_getCoreClaims",
-    [],
-    { jwt: jwt, cookie: request.headers.get("Cookie") },
-  );
+  const oortOptions = {
+    jwt: jwt,
+    cookie: request.headers.get("Cookie"),
+  }
 
-  if (!claimsRes.result.includes("3id.enter")) {
+  // TODO remove session address param when RPC url is changed
+  const [coreClaimsRes, pfpRes, nicknameRes] = await Promise.all([
+    oortSend(
+      "kb_getCoreClaims",
+      [],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "pfp"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "nickname"],
+      oortOptions,
+    )
+  ]);
+
+
+  if (!coreClaimsRes.result || !coreClaimsRes.result.includes("3id.enter")) {
     return redirect(`/auth`);
   }
 
   // @ts-ignore
-  const onboardData = await ONBOARD_STATE.get(address);
+  const onboardData = await ONBOARD_STATE.get(core);
   if (!onboardData) {
     // @ts-ignore
     await ONBOARD_STATE.put(address, "true");
@@ -60,7 +79,18 @@ export const loader = async ({ request }) => {
     return redirect(`/onboard/nickname`);
   }
 
-  return null;
+  const [
+    pfp,
+    nickname,
+  ] = [
+    pfpRes.result,
+    nicknameRes.result,
+  ];
+
+  return json({
+    pfp,
+    nickname,
+  });
 };
 
 const subNavigation = [
@@ -78,7 +108,7 @@ const subNavigation = [
     current: false,
   },
   { name: "KYC", href: "#", icon: BiIdCard, current: false },
-  { name: "0xAuth", href: "#", icon: BiLink, current: false },
+  { name: "0xAuth3", href: "#", icon: BiLink, current: false },
   { name: "Settings", href: "#", icon: BiCog, current: false },
 ];
 
@@ -87,26 +117,19 @@ function classNames(...classes: any) {
 }
 
 export default function AccountLayout() {
-  useLoaderData();
-  let submit = useSubmit();
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // TODO: sort out layout component
-
-  // TODO: port over welcome screen
+  const {pfp, nickname} = useLoaderData();
 
   return (
     <>
       <div className="min-h-full">
-        <div className="header">
-          <HeadNav />
+        <div className="header lg:px-4">
+          <HeadNav pfp={pfp.value} />
         </div>
 
         <main className="-mt-72">
-          <div className="mx-auto max-w-screen-xl lg:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+          <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
             <div className="overflow-hidden bg-white shadow">
-              <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+              <div className="divide-y divide-gray-200 pb-4 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
                 <aside className="fixed bottom-0 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
                   <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
                     {subNavigation.map((item) => (
@@ -114,7 +137,7 @@ export default function AccountLayout() {
                     ))}
                   </nav>
                 </aside>
-                <div className="divide-y divide-gray-200 sm:mb-16 lg:col-start-3 lg:col-end-13 p-4 lg:p-8">
+                <div className="divide-y divide-gray-200 px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
                   <Outlet />
                 </div>
               </div>

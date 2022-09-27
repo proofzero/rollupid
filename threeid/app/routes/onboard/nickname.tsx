@@ -9,13 +9,14 @@ import {
   useActionData,
   useFetcher,
   useLoaderData,
-  useNavigate,
-  useSubmit,
+  useTransition,
+  PrefetchPageLinks,
 } from "@remix-run/react";
-import { Label, TextInput } from "flowbite-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNetwork } from "wagmi";
+import { Label, TextInput, Spinner } from "flowbite-react";
+
+import { useEffect, useState } from "react";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+
 
 import Heading from "~/components/typography/Heading";
 import Text, {
@@ -50,19 +51,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const form = await request.formData();
   const nickname = form.get("nickname");
-  const chainId = form.get("chainId");
 
   const errors: {
     nickname?: string;
-    chainId?: string;
   } = {};
 
   if (typeof nickname !== "string" || nickname === "") {
     errors.nickname = "Nickname needs to be provided";
-  }
-
-  if (typeof chainId !== "string" || chainId === "") {
-    errors.chainId = "ChainId needs to be provided";
   }
 
   const data = await oortSend(
@@ -83,36 +78,22 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // @ts-ignore
-  return redirect(`/onboard/mint?chainId=${chainId}`);
+  return redirect(`/onboard/mint`);
 };
 
 const OnboardNickname = () => {
   const { nickname: storedNickname } = useLoaderData();
   const [nickname, setNickname] = useState(storedNickname || "");
-
-  const { chain } = useNetwork();
-
+  
   const fetcher = useFetcher();
   useEffect(() => {
     if (fetcher.type === "init") {
-      fetcher.load(`/onboard/mint/load-voucher?chainId=${chain?.id || 5}`);
+      fetcher.load(`/onboard/mint/load-voucher`);
     }
   }, [fetcher]);
-
-  const submit = useSubmit();
-  const postNickname = useCallback(() => {
-    submit(
-      {
-        nickname,
-        chainId: `${chain?.id || 5}`,
-      },
-      {
-        method: "post",
-      }
-    );
-  }, [nickname]);
-
+  
   const actionErrors = useActionData();
+  const transition = useTransition();
 
   return (
     <>
@@ -122,13 +103,16 @@ const OnboardNickname = () => {
         <img src={nextStep} />
       </div>
 
-      <Heading className="text-center">How should we call you?</Heading>
-
-      <section
-        id="onboard-nickname-form"
-        className="flex-1 flex justify-center items-center"
+      <Heading className="flex flex-1 text-center justify-center items-center">What should we call you?</Heading>
+      
+      <Form method="post"
+          className="flex flex-1 flex-col justify-center items-center"
       >
-        <div>
+
+        <section
+          id="onboard-nickname-form"
+          className="flex-1 justify-center items-center items-stretch self-center"
+        >
           <Label htmlFor="display-name">
             <Text
               className="mb-1.5"
@@ -153,6 +137,7 @@ const OnboardNickname = () => {
 
           <TextInput
             id="nickname"
+            name="nickname"
             type="text"
             placeholder="Ash"
             required={true}
@@ -170,23 +155,25 @@ const OnboardNickname = () => {
               </Text>
             }
           />
-        </div>
-      </section>
+        </section>
 
-      <section
-        id="onboard-nickname-actions"
-        className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
-      >
-        <Button
-          disabled={!nickname || nickname === ""}
-          size={ButtonSize.L}
-          onClick={() => {
-            postNickname();
-          }}
+        <section
+          id="onboard-nickname-actions"
+          className="flex flex-1 justify-end w-full items-end space-x-4 pt-10 lg:pt-0"
         >
-          Continue
-        </Button>
-      </section>
+          {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> :
+            <Button
+              isSubmit={true}
+              disabled={!nickname || nickname === ""}
+              size={ButtonSize.L}
+            >
+              Continue
+            </Button>
+          }
+        </section>
+  
+      </Form>
+      <PrefetchPageLinks page="/onboard/mint" />
     </>
   );
 };

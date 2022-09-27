@@ -8,8 +8,8 @@
 .header {
     background-color: $threeid-header ;
     padding-bottom: 300px;
-    padding-left: 1em;
-    padding-right: 1em;
+    // padding-left: 1em;
+    // padding-right: 1em;
 
     nav {
         margin-right: auto;
@@ -70,5 +70,14 @@
                 // color: #fff;
             }
         }
+
+        .roadmap-next__check {
+            width: 44px;
+            height: 44px;
+            border: none;
+            margin: 0;
+            margin-top: 0.25em;
+        }
     }
 }
+

@@ -12,7 +12,6 @@ type BaseButtonProps = {
 }
 
 export default function BaseButton({ text, color, onClick }: BaseButtonProps) {
-
     return (
         <button className={`base-button-${color}`} onClick={onClick}>
             {text}

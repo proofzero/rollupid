@@ -2,25 +2,21 @@ import {
   ActionFunction,
   json,
   LoaderFunction,
-  redirect,
 } from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
   useNavigate,
-  useFetcher,
   useSubmit,
   useActionData,
+  useTransition,
+  Form,
+  PrefetchPageLinks,
 } from "@remix-run/react";
 
 import {
-  Card,
-  Checkbox,
   Label,
-  Radio,
-  RadioProps,
   Spinner,
-  ToggleSwitch,
 } from "flowbite-react";
 
 import Heading from "~/components/typography/Heading";
@@ -32,7 +28,7 @@ import Text, {
 
 import { getUserSession } from "~/utils/session.server";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "~/styles/onboard.css";
 
@@ -40,7 +36,7 @@ import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { oortSend } from "~/utils/rpc.server";
 
 import ensLogo from "~/assets/ens.png";
-import { useAccount, useEnsName, useNetwork } from "wagmi";
+import { useNetwork, useAccount } from "wagmi";
 
 import prevStep from "~/assets/onboard/pre.png";
 import currentStep from "~/assets/onboard/current.png";
@@ -71,6 +67,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const ensName = addressLookup.result;
   return json({
+    account: address,
     ensName,
     isSetOnCore,
   });
@@ -109,14 +106,34 @@ const OnboardEns = () => {
 
   const submit = useSubmit();
 
+  const { isConnected, address } = useAccount()
   const { chain } = useNetwork();
 
-  const { ensName, isSetOnCore } = useLoaderData();
+  const { ensName, isSetOnCore, account } = useLoaderData();
 
   const [ensChecked, setEnsChecked] = useState<boolean>(isSetOnCore);
   const [validating, setValidating] = useState<boolean>(true);
 
   const data = useActionData();
+
+  const [invalidChain, setInvalidChain] = useState(false);
+  useEffect(() => {
+    if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
+      setInvalidChain(true);
+    } else {
+      setInvalidChain(false);
+    }
+  }, [chain]);
+
+  const [invalidAddress, setInvalidAddress] = useState(false);
+  useEffect(() => {
+    if (address && address !== account) {
+      setInvalidAddress(true);
+    } else {
+      setInvalidAddress(false);
+    }
+  }, [address]);
+
 
   useEffect(() => {
     if (data?.error && data.operation === "register") {
@@ -158,6 +175,8 @@ const OnboardEns = () => {
       }
     );
   };
+
+  const transition = useTransition();
 
   return (
     <>
@@ -208,49 +227,69 @@ const OnboardEns = () => {
               </Text>
             </div>
 
-            <Label htmlFor="use-ens">
-              <div className="flex flex-row space-x-3.5 items-center">
-                <label
-                  htmlFor="use-ens"
-                  className="inline-flex relative items-center mb-5 cursor-pointer"
-                >
-                  {!validating && ensName && (
-                    <>
-                      <input
-                        type="checkbox"
-                        onChange={(evt) => handleEnsToggle(evt.target.checked)}
-                        checked={ensChecked}
-                        id="use-ens"
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </>
-                  )}
+            {invalidChain && <Text
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
+              **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
+            </Text>}
+            {invalidAddress && <Text
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
+              **Please connect your wallet to {account}**
+            </Text>}
+            {!isConnected && <Text
+              className="ml-3"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}>
+              **Please unlock your wallet and reload the page**
+            </Text>}
+            {!invalidChain && !invalidAddress && isConnected &&
+              <Label htmlFor="use-ens">
+                <div className="flex flex-row space-x-3.5 items-center">
+                  <label
+                    htmlFor="use-ens"
+                    className="inline-flex relative items-center mb-5 cursor-pointer"
+                  >
+                    {!validating && ensName && (
+                      <>
+                        <input
+                          type="checkbox"
+                          onChange={(evt) => handleEnsToggle(evt.target.checked)}
+                          checked={ensChecked}
+                          id="use-ens"
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      </>
+                    )}
 
-                  {validating && <Spinner />}
+                    {validating && <Spinner />}
 
-                  {(validating || ensName) && (
-                    <Text
-                      className="ml-3"
-                      size={TextSize.SM}
-                      weight={TextWeight.Medium500}
-                    >
-                      Use ENS domain as profile URL
-                    </Text>
-                  )}
+                    {(validating || ensName) && (
+                      <Text
+                        className="ml-3"
+                        size={TextSize.SM}
+                        weight={TextWeight.Medium500}
+                      >
+                        Use ENS domain as profile URL
+                      </Text>
+                    )}
 
-                  {!validating && !ensName && (
-                    <Text
-                      className="ml-3"
-                      size={TextSize.SM}
-                      weight={TextWeight.Medium500}
-                    >
-                      Sorry, no primary ens linked
-                    </Text>
-                  )}
-                </label>
-              </div>
-            </Label>
+                    {!validating && !ensName && (
+                      <Text
+                        className="ml-3"
+                        size={TextSize.SM}
+                        weight={TextWeight.Medium500}
+                      >
+                        Sorry, no primary ens linked to your ETH account.
+                      </Text>
+                    )}
+                  </label>
+                </div>
+              </Label>
+            }
           </div>
         </div>
       </section>
@@ -259,27 +298,31 @@ const OnboardEns = () => {
         id="onboard-ens-actions"
         className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        <Button
-          type={ButtonType.Secondary}
-          size={ButtonSize.L}
-          onClick={() => {
-            // @ts-ignore
-            navigate(`/onboard/mint?chainId=${chain?.id || 5}`);
-          }}
-        >
-          Back
-        </Button>
+        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
 
-        <Button
-          disabled={validating}
-          size={ButtonSize.L}
-          onClick={() => {
-            navigate(`/account`);
-          }}
-        >
-          Finish
-        </Button>
+          <Button
+            type={ButtonType.Secondary}
+            size={ButtonSize.L}
+            onClick={() => {
+              // @ts-ignore
+              navigate(`/onboard/mint`);
+            }}
+          >
+            Back
+          </Button>
+
+          <Form method="post" action="/onboard/complete">
+            <Button
+              isSubmit={true}
+              disabled={validating}
+              size={ButtonSize.L}
+            >
+              Finish
+            </Button>
+          </Form>
+        </>)}
       </section>
+      <PrefetchPageLinks page="/onboard/mint" />
     </>
   );
 };

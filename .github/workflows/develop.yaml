@@ -300,6 +300,11 @@ jobs:
             OORT_HOST
             OORT_SCHEMA
             OORT_PORT
+            NFTAR_URL
+            NFTAR_AUTHORIZATION
+            MINTPFP_CONTRACT_ADDRESS
+            NFTAR_CHAIN_ID
+            VALID_CHAIN_ID_NAME
         env:
           SESSION_SECRET: "secret"
           # CF_ROUTE: https://dev.dapp.threeid.xyz/*
@@ -317,6 +322,11 @@ jobs:
           OORT_HOST: oort-devnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
+          NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
+          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          NFTAR_CHAIN_ID: 5
+          VALID_CHAIN_ID_NAME: goerli
       # - name: Cache playwright binaries
       #   id: playwright-cache
       #   uses: actions/cache@v3

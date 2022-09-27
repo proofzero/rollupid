@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes] = await Promise.all([
+  const [inviteCodeRes, votesRes, pfpRes, nicknameRes, namesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
@@ -51,16 +51,46 @@ export const loader = async ({ request, params }) => {
       ["3id.app", "feature_vote_count"],
       oortOptions,
     ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "pfp"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getData",
+      ["3id.profile", "nickname"],
+      oortOptions,
+    ),
+    oortSend(
+      "kb_getCoreAddresses",
+      [["ens"]],
+      oortOptions,
+    )
   ]);
 
   if (inviteCodeRes.error || votesRes.error) {
     return redirect(`/error`);
   }
-  const [inviteCode, votes] = [inviteCodeRes.result, votesRes.result];
+  const [
+    inviteCode,
+    votes,
+    pfp,
+    nickname,
+    names
+  ] = [
+    inviteCodeRes.result,
+    votesRes.result,
+    pfpRes.result,
+    nicknameRes.result,
+    namesRes.result
+  ];
 
   return json({
     inviteCode,
     votes,
+    pfp,
+    nickname,
+    names,
   });
 };
 
@@ -82,12 +112,11 @@ export const action = async ({ request }: any) => {
 const completeSteps = [
   {
     title: "Claim your 3ID",
+    isCompleted: true,
   },
-];
-
-const comingNext = [
   {
     title: "Claim your PFP",
+    isCompleted: false,
     description: (
       <>
         <Text
@@ -98,18 +127,15 @@ const comingNext = [
         >
           Mint your very own 3ID 1/1 PFP.
         </Text>
-        <Text
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
-        >
-          For more information see "What is the 3ID?"" PFP in the FAQ section.
-        </Text>
+        <a>
+          Click here to complete.
+        </a>
       </>
     ),
   },
   {
     title: "Verify ENS",
+    isCompleted: false,
     description: (
       <>
         <Text
@@ -120,16 +146,15 @@ const comingNext = [
         >
           Connect your ENS name to your 3ID.
         </Text>
-        <Text
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
-        >
-          Use your ENS name as your username for easier profile discovery.
-        </Text>
+        <a>
+          Click here to complete.
+        </a>
       </>
     ),
   },
+];
+
+const comingNext = [
   {
     title: "Configure Profile",
     description: (
@@ -178,14 +203,17 @@ const roadmapSteps = [
   },
 ];
 
-const percentage =
-  (completeSteps.length /
-    (completeSteps.length + comingNext.length + roadmapSteps.length)) *
-  100;
-
 export default function Welcome() {
-  const { inviteCode, votes, address } = useLoaderData();
+  const { inviteCode, votes, pfp, nickname, names } = useLoaderData();
   let submit = useSubmit();
+
+  completeSteps[1].isCompleted = pfp?.value?.isToken;
+  completeSteps[2].isCompleted = names?.ens?.length;
+
+  const percentage =
+    ((completeSteps.filter(step => step.isCompleted)).length /
+      (completeSteps.length + comingNext.length + roadmapSteps.length)) *
+    100;
 
   const currentVotes = votes.value ? JSON.parse(votes.value) : [];
 
@@ -210,7 +238,7 @@ export default function Welcome() {
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID!</span>
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome {nickname.value} to 3ID!</span>
           <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
           </Heading>
 
@@ -268,25 +296,24 @@ export default function Welcome() {
             <div className="roadmap-ready__steps steps grid grid-rows gap-4">
               {completeSteps.map((step, index) => (
                 <div
-                  className="roadmap-ready__step step grid grid-cols-6"
+                  className="roadmap-next__step step flex flex-row gap-4 items-start"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-top">
-                    <img src={stepComplete} alt="3ID logo" />
+                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
+                    <img src={step.isCompleted ? stepComplete: stepSoon} alt="3ID Step" />
                   </div>
 
                   <div className="col-span-5">
                     <SectionHeading>{step.title}</SectionHeading>
-                  </div>
-
-                  <div className="col-span-5">
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.Regular400}
-                      color={TextColor.Gray500}
-                    >
-                      Completed
-                    </Text>
+                    <div className="col-span-5">
+                      <Text
+                        size={TextSize.SM}
+                        weight={TextWeight.Regular400}
+                        color={TextColor.Gray500}
+                      >
+                        {step.isCompleted ? "Completed" : step.description}
+                      </Text>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -299,20 +326,19 @@ export default function Welcome() {
             <div className="roadmap-next__steps steps grid grid-rows gap-4">
               {comingNext.map((step, index) => (
                 <div
-                  className="roadmap-next__step step grid grid-cols-6"
+                  className="roadmap-next__step step flex flex-row gap-4 items-start"
                   key={index}
                 >
-                  <div className="row-span-2 mt-1 flex justify-center items-top">
-                    <img src={stepSoon} alt="3ID logo" />
+                  <div className="roadmap-next__check mt-1 flex justify-center items-top">
+                    <img src={stepSoon} alt="3ID Step" />
                   </div>
 
                   <div className="col-span-5">
                     <SectionHeading className="mb-1">
                       {step.title}
                     </SectionHeading>
+                    <div className="col-span-5">{step.description}</div>
                   </div>
-
-                  <div className="col-span-5">{step.description}</div>
                 </div>
               ))}
             </div>

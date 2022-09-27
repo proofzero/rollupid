@@ -1,16 +1,21 @@
-import { ActionFunction, LoaderFunction } from "@remix-run/cloudflare";
+import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
 
-import { useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
+import {
+  useLoaderData,
+  useNavigate,
+  useSubmit,
+  useTransition,
+} from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
-import Text, { TextColor } from "~/components/typography/Text";
+import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
 
 import styles from "~/styles/onboard.css";
 
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite } from "wagmi";
+import { useContractWrite, useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -56,64 +61,82 @@ export const action: ActionFunction = async ({ request }) => {
     }
   );
 
-  return null;
+  return redirect("/onboard/ens");
 };
 
 type OnboardMintLandingProps = {
-  account: string;
-  version: string;
-  rarity: string;
+  account: string,
   minted: boolean;
+  isInvalidAddress: boolean;
+  isInvalidChain: boolean;
   onClick: () => void;
 };
 
 const OnboardMintLand = ({
   account,
-  version,
-  rarity,
   minted,
+  isInvalidAddress,
+  isInvalidChain,
   onClick,
 }: OnboardMintLandingProps) => {
+
+  const traitNames = {
+    "trait0": "Generation",
+    "trait1": "Priority",
+    "trait2": "Friend",
+    "trait3": "Points",
+  }
+
   return (
     <>
-      <Text
-        className="mb-10 flex flex-row space-x-4 items-center"
+    {!minted && !isInvalidChain && !isInvalidAddress && (
+      <Button size={ButtonSize.L} onClick={onClick}>
+        Mint NFT
+      </Button>
+    )}
+    {isInvalidChain && <Text
+        className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
-      >
-        <BiInfoCircle />
-        <span>
-          The image was generated using your{" "}
-          <b className="cursor-default" title={account}>
-            blockchain account
-          </b>
-          ,{" "}
-          <b className="cursor-default" title={version}>
-            version name
-          </b>{" "}
-          and{" "}
-          <b className="cursor-default" title={rarity}>
-            trait rarity
-          </b>
-          .
-        </span>
+        size={TextSize.SM}>
+        **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
+      </Text>}
+      {isInvalidAddress && <Text
+        className="mt-4 flex flex-row space-x-4 items-center"
+        color={TextColor.Gray400}
+        size={TextSize.SM}>
+        **Please connect your wallet to {account}**
+      </Text>}
+    </>
+  );
+};
+
+type OnboardMintConnectProps = {
+  onClick: () => void;
+};
+
+const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
+  return (
+    <>
+      <Button size={ButtonSize.L} onClick={onClick} disabled>
+        Try Again
+      </Button>
+
+      <Text
+        className="mt-4 flex flex-row space-x-4 items-center"
+        color={TextColor.Gray400}
+        size={TextSize.SM}>
+        **Please unlock your wallet to mint your NFT**
       </Text>
-
-      {!minted && (
-        <Button size={ButtonSize.L} onClick={onClick}>
-          Mint NFT
-        </Button>
-      )}
-
-      {minted && <Text>Already minted</Text>}
     </>
   );
 };
 
 type OnboardMintSignProps = {
+  isLoading: boolean;
   onClick: () => void;
 };
 
-const OnboardMintSign = ({ onClick }: OnboardMintSignProps) => {
+const OnboardMintSign = ({ onClick, isLoading }: OnboardMintSignProps) => {
   return (
     <>
       <Text color={TextColor.Gray400} className="mb-10">
@@ -159,7 +182,11 @@ const OnboardMintError = ({ onClick }: OnboardMintErrorProps) => {
   );
 };
 
-const OnboardMintSuccess = () => {
+type OnboardMintSuccessProps = {
+  data?: object;
+};
+
+const OnboardMintSuccess = ({data}: OnboardMintSuccessProps) => {
   return (
     <>
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
@@ -167,11 +194,22 @@ const OnboardMintSuccess = () => {
 
         <Text color={TextColor.Gray400}>Minted successfully!</Text>
       </section>
+
+      <Text color={TextColor.Gray400} size={TextSize.XS}>
+        <a href={`https://etherscan.io/tx/${data?.hash}`}>View on Etherscan</a>
+      </Text>
     </>
   );
 };
 
 const OnboardMint = () => {
+  const traitNames = {
+    "trait0": "Generation",
+    "trait1": "Priority",
+    "trait2": "Friend",
+    "trait3": "Points",
+  }
+
   const [screen, setScreen] = useState<
     "land" | "sign" | "proc" | "success" | "error"
   >("land");
@@ -180,15 +218,11 @@ const OnboardMint = () => {
 
   const account = metadata?.properties?.metadata.account;
   const recipient = metadata?.properties?.metadata.account;
-
-  const rarity = metadata?.properties?.traits.trait0.value.name;
-
-  const version = metadata?.name;
-  const imgUrl = metadata?.image;
+  const [imgUrl, setImgUrl] = useState<string>(metadata?.image);
 
   const navigate = useNavigate();
 
-  const { write, isError, isSuccess } = useContractWrite({
+  const { data, write, isError } = useContractWrite({
     // https://github.com/wagmi-dev/wagmi/issues/899
     // https://github.com/wagmi-dev/wagmi/issues/891
     // https://github.com/wagmi-dev/wagmi/discussions/880#discussioncomment-3516226
@@ -198,36 +232,66 @@ const OnboardMint = () => {
     functionName: "awardPFP",
     args: [recipient, voucher],
   });
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
+
+  const { isConnected, address } = useAccount()
+  const { chain } = useNetwork();
+
+  const [invalidChain, setInvalidChain] = useState(false);
+  useEffect(() => {
+    if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
+      setInvalidChain(true);
+    } else {
+      setInvalidChain(false);
+    }
+  }, [chain]);
+
+  const [invalidAddress, setInvalidAddress] = useState(false);
+  useEffect(() => {
+    if (address && address !== account) {
+      setInvalidAddress(true);
+    } else {
+      setInvalidAddress(false);
+    }
+  }, [address]);
 
   const submit = useSubmit();
 
   useEffect(() => {
-    if (screen === "sign" && isError) {
+    if (screen === "proc" && isError) {
       setScreen("error");
-    } else if (screen === "sign" && isSuccess) {
-      submit(
-        {
-          imgUrl,
-          contractAddress,
-        },
-        {
-          method: "post",
-        }
-      );
-
+    } else if (screen === "proc" && isSuccess) {
       setScreen("success");
     }
   }, [screen, isError, isSuccess]);
+
+  useEffect(() => {
+    if (!isConnected && !minted) {
+      setScreen("connect");
+    }
+  }, [isConnected, minted]);
 
   const signMessage = () => {
     if (write) write();
   };
 
-  let screenComponent = null;
+  let screenActionComponent = null;
   switch (screen) {
+    case "connect":
+      screenActionComponent = (
+        <OnboardMintConnect
+         onClick={() => {
+          window.location.reload()
+         }}
+        />
+      );
+      break;
     case "sign":
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintSign
+          isLoading={isLoading}
           onClick={() => {
             setScreen("land");
           }}
@@ -235,10 +299,10 @@ const OnboardMint = () => {
       );
       break;
     case "proc":
-      screenComponent = <OnboardMintProc />;
+      screenActionComponent = <OnboardMintProc />;
       break;
     case "error":
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintError
           onClick={() => {
             setScreen("land");
@@ -247,23 +311,25 @@ const OnboardMint = () => {
       );
       break;
     case "success":
-      screenComponent = <OnboardMintSuccess />;
+      screenActionComponent = <OnboardMintSuccess data={data} />;
       break;
     case "land":
     default:
-      screenComponent = (
+      screenActionComponent = (
         <OnboardMintLand
           account={account}
-          version={version}
-          rarity={rarity}
           minted={minted}
+          isInvalidAddress={invalidAddress}
+          isInvalidChain={invalidChain}
           onClick={() => {
-            setScreen("sign");
+            setScreen("proc");
             signMessage();
           }}
         />
       );
   }
+
+  const transition = useTransition();
 
   return (
     <>
@@ -289,7 +355,7 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          <img src={imgUrl} className="w-24 h-24" />
+          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24"/>}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -302,54 +368,133 @@ const OnboardMint = () => {
               transform: "scale(1.2)",
             }}
           >
-            <img src={imgUrl} className="w-24 h-24" />
+           <img src={imgUrl} className="w-24 h-24" />
           </div>
-        </div>
 
-        {screenComponent}
+        </div>
+        
+        <Text
+          className="mb-4 flex flex-row space-x-2 items-center"
+          color={TextColor.Gray400}>
+          <BiInfoCircle />
+          <span>
+            This image was generated using the assets your{" "}
+            <b className="cursor-default" title={account}>
+              blockchain account.
+            </b>
+            <br/>
+          </span>
+        </Text>
+        <Text
+          className="mb-4 flex flex-row space-x-2 items-center"
+          color={TextColor.Gray400}
+          size={TextSize.XS}>
+            <u><i><a onClick={()=> {
+              let img = imgUrl;
+              setImgUrl("")
+              setTimeout(() => {
+                setImgUrl(img)
+              }, 1000)
+            }}>If image is not loading press here to refresh.</a></i></u>
+        </Text>
+
+        <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          {[...Array(4).keys()].map((i) => {
+            const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
+            const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
+            const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
+            const bg = `rgb(${r}, ${g}, ${b})`;
+            return (<li key={i} className="col-span-1 flex flex-col rounded-md shadow-sm">
+              <div style={{fontSize: 12}} className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate">
+                {traitNames[`trait${i}`].toUpperCase()}
+              </div>
+              <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">        
+                <div className={
+                    'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
+                  }
+                >
+                  <span style={{
+                    backgroundColor: bg,
+                  }} className="my-4 ml-1 rounded-md w-10 h-10"></span>
+                </div>
+                <div className="flex flex-1 items-center justify-between truncate bg-white">
+                  <div className="flex-1 truncate px-4 py-4 text-sm">
+                    <Text 
+                      color={TextColor.Gray700}
+                      size={TextSize.SM}
+                      className="font-bold">
+                      {metadata.properties.traits[`trait${i}`].value.name}
+                    </Text>
+                    <Text className=""
+                      color={TextColor.Gray400}
+                      weight={TextWeight.Medium500}
+                      size={TextSize.XS}>
+                      {metadata.properties.traits[`trait${i}`].type[0] + metadata.properties.traits[`trait${i}`].type.toLowerCase().slice(1)}
+                    </Text>
+                  </div>
+                </div>
+              </div>
+            </li>
+          )})}
+        </ul>
+
+        {screenActionComponent}
+
+        {minted && <Text>Your PPF has already been minted</Text>}
+
       </section>
 
       <section
         id="onboard-ens-actions"
         className="flex justify-between lg:justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        {screen !== "sign" && screen !== "success" && (
-          <>
+        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
+          {screen !== "sign" && screen !== "success" && (
+            <>
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.L}
+                onClick={() => {
+                  // @ts-ignore
+                  navigate(`/onboard/nickname`);
+                }}
+              >
+                Back
+              </Button>
+
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.L}
+                onClick={() => {
+                  navigate("/onboard/ens");
+                }}
+              >
+                Skip
+              </Button>
+            </>
+          )}
+
+          {screen === "success" && (
             <Button
-              type={ButtonType.Secondary}
+              type={ButtonType.Primary}
               size={ButtonSize.L}
               onClick={() => {
-                // @ts-ignore
-                navigate(`/onboard/nickname`);
+                // Go back
+                submit(
+                  {
+                    imgUrl,
+                    contractAddress,
+                  },
+                  {
+                    method: "post",
+                  }
+                );
               }}
             >
-              Back
+              Continue
             </Button>
-
-            <Button
-              type={ButtonType.Secondary}
-              size={ButtonSize.L}
-              onClick={() => {
-                navigate("/onboard/ens");
-              }}
-            >
-              Skip
-            </Button>
-          </>
-        )}
-
-        {screen === "success" && (
-          <Button
-            type={ButtonType.Primary}
-            size={ButtonSize.L}
-            onClick={() => {
-              // Go back
-              navigate("/onboard/ens");
-            }}
-          >
-            Continue
-          </Button>
-        )}
+          )}
+        </>)}
       </section>
     </>
   );

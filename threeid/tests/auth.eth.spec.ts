@@ -19,22 +19,19 @@ test.describe('Auth Gateway', () => {
     await expect(page).toHaveURL(/.*auth/);
   });
 
-  test("Nonce page apiRequestContextredirects to /auth/sign/:address", async ({ page }) => {
+  test("Nonce page apiRequestContext redirects to /auth", async ({ page }) => {
     const address = users.invited.address
-    const nonceUrl = `/auth/nonce/${address}?isTest=true`
-    // const signUrl = `${dappUrl}/auth/sign/${address}`
+    const nonceUrl = `/auth/nonce/${address}`
     await page.goto(nonceUrl);
-    // await expect(page).toHaveURL(/.*auth/);
-
-    await expect(page).toHaveURL(/.*auth\/.*sign\/.*\?nonce=?/);
+    await expect(page).toHaveURL(/.*auth/);
   });
 
-  test("Sign page redirects back to /auth/nonce/:address if no nonce present", async ({ page }) => {
+  test("Sign page redirects back to /auth if no nonce present", async ({ page }) => {
     const address = users.invited.address
-    const signUrl = `/auth/sign/${address}?isTest=true`
+    const signUrl = `/auth/sign/${address}`
     await page.goto(signUrl);
     // goes back to get nonce
-    await expect(page).toHaveURL(/.*auth\/.*sign\/.*\?nonce=?/);
+    await expect(page).toHaveURL(/.*auth/);
   });
 
   test("Sign page loads with nonce present", async ({ page }) => {
@@ -49,7 +46,7 @@ test.describe('Auth Gateway', () => {
     const address = users.invited.address
     const signUrl = `/auth/gate/${address}`
     await page.goto(signUrl);
-    await expect(page).toHaveURL(`/auth`);
+    await expect(page).toHaveURL(/.*auth\?redirectTo=?/);
   });
 
 });

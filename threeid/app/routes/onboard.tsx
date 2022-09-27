@@ -2,10 +2,10 @@ import { redirect } from "@remix-run/cloudflare";
 
 import { Outlet, useLoaderData } from "@remix-run/react";
 
-import styles from "../styles/auth.css";
-import logo from "../assets/three-id-logo.svg";
+import styles from "~/styles/auth.css";
+import logo from "~/assets/three-id-logo.svg";
 
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
 import {
@@ -25,23 +25,22 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const session = await getUserSession(request);
-  if (!session || !session.has("jwt")) {
-    return redirect("/auth");
-  }
-
-  const jwt = session.get("jwt");
+  const jwt = await requireJWT(request);
 
   const claimsRes = await oortSend("kb_getCoreClaims", [], {
     jwt: jwt,
     cookie: request.headers.get("Cookie"),
   });
 
-  if (!claimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth/gate/${session.get("address")}`);
+  if (!claimsRes.result || !claimsRes.result.includes("3id.enter")) {
+    return redirect(`/auth`);
   }
 
+  if (!request.url.includes("nickname") && !request.url.includes("mint") && !request.url.includes("ens")) {
+    return redirect(`/onboard/nickname`);
+  }  
   return null;
+
 };
 
 const Onboard = () => {
@@ -76,7 +75,7 @@ const Onboard = () => {
         </nav>
       </div>
 
-      <div className="max-w-4xl mx-auto mt-14 lg:mt-28 p-4">
+      <div className="max-w-4xl mx-auto mt-2 lg:mt-28 p-4">
         <div className="flex flex-col p-6 lg:bg-white lg:rounded-lg lg:border lg:border-gray-200 lg:shadow-md min-h-[580px] space-y-4">
           <WagmiConfig client={client}>
             <Outlet />
