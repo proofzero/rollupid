@@ -300,18 +300,19 @@ const OnboardEns = () => {
       >
         {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
 
-          <Button
-            type={ButtonType.Secondary}
-            size={ButtonSize.L}
-            onClick={() => {
-              // @ts-ignore
-              navigate(`/onboard/mint`);
-            }}
-          >
-            Back
-          </Button>
-
-          <Form method="post" action="/onboard/complete">
+          <div className="w-full lg:w-auto">
+            <Button
+              type={ButtonType.Secondary}
+              size={ButtonSize.L}
+              onClick={() => {
+                // @ts-ignore
+                navigate(`/onboard/mint`);
+              }}
+            >
+              Back
+            </Button>
+            </div>
+          <Form className="w-full lg:w-auto" method="post" action="/onboard/complete">
             <Button
               isSubmit={true}
               disabled={validating}

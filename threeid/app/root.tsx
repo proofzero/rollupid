@@ -117,7 +117,7 @@ export function ErrorBoundary({ error }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="error-screen">
         <div className="wrapper grid grid-row-3 gap-4">
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
@@ -133,14 +133,16 @@ export function ErrorBoundary({ error }) {
                 If this problem persists please join Discord for help
               </p>
               
-              <div className="error-buttons grid grid-rows-1">
+              <div className="error-buttons grid grid-rows-1 text-center">
                   <BaseButtonAnchor text={"Go to Discord"} color={"dark"} href={"https://discord.gg/threeid"} />
               </div>
             </div>
           </article>
-          <article className="content flex-col">
-            <p>The stack trace is:</p>
-            <pre>{error.stack}</pre>
+          <article className="content col-span-3 m-12">
+          <div className="error justify-center items-center">
+              <p>The stack trace is:</p>
+              <pre>{error.stack}</pre>
+            </div>
           </article>
         </div>
         <ScrollRestoration />
@@ -163,7 +165,7 @@ export function CatchBoundary() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="error-screen">
         <div className="wrapper grid grid-row-3 gap-4">
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
@@ -175,7 +177,7 @@ export function CatchBoundary() {
                 Oops!
               </p>
               <p className="error-secondary-message">{caught.status} {caught.statusText}</p>
-              <div className="error-buttons grid grid-rows-1">
+              <div className="error-buttons grid grid-rows-1 text-center">
                   <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} />
               </div>
             </div>

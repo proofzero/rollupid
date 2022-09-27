@@ -1,3 +1,4 @@
+import { MIN } from "@datadog/datadog-api-client/dist/packages/datadog-api-client-v1/models/FormulaAndFunctionEventAggregation";
 import { LoaderFunction, redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { oortSend } from "~/utils/rpc.server";
@@ -59,7 +60,9 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
   }
 
   if (skipImage) {
-    return null;
+    return {
+      contractAddress
+    };
   }
 
   let res = {
@@ -92,13 +95,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   try {
     const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
-
     if (cachedVoucher) {
       return json({
         minted: false,
         //@ts-ignore
         chainId: NFTAR_CHAIN_ID,
-        ...cachedVoucher
+        ...cachedVoucher,
+        //@ts-ignore
+        contractAddress: MINTPFP_CONTRACT_ADDRESS,
       });
     } else {
       // @ts-ignore
@@ -111,7 +115,8 @@ export const loader: LoaderFunction = async ({ request }) => {
           "pfp",
           {
             url: voucher.imgUrl,
-            contractAddress: null,
+            //@ts-ignore
+            contractAddress: MINTPFP_CONTRACT_ADDRESS,
             isToken: false,
           },
         ],
