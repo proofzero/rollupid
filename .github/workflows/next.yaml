@@ -74,6 +74,11 @@ jobs:
             OORT_HOST
             OORT_SCHEMA
             OORT_PORT
+            NFTAR_URL
+            NFTAR_AUTHORIZATION
+            MINTPFP_CONTRACT_ADDRESS
+            NFTAR_CHAIN_ID
+            VALID_CHAIN_ID_NAME
         env:
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
@@ -91,6 +96,11 @@ jobs:
           OORT_HOST: oort-testnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
+          NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
+          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          NFTAR_CHAIN_ID: 5
+          VALID_CHAIN_ID_NAME: goerli
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
         working-directory: threeid
