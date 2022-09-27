@@ -118,7 +118,6 @@ function classNames(...classes: any) {
 
 export default function AccountLayout() {
   const {pfp, nickname} = useLoaderData();
-
   return (
     <>
       <div className="min-h-full">
