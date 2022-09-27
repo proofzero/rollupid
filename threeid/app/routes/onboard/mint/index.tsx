@@ -98,7 +98,7 @@ const OnboardMintLand = ({
         className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
         size={TextSize.SM}>
-        **Please select switch your network to {window.ENV.VALID_CHAIN_NAME}**
+        **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
       </Text>}
       {isInvalidAddress && <Text
         className="mt-4 flex flex-row space-x-4 items-center"

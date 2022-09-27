@@ -231,7 +231,7 @@ const OnboardEns = () => {
               className="ml-3"
               size={TextSize.SM}
               weight={TextWeight.Medium500}>
-              **Please select switch your network to {window.ENV.VALID_CHAIN_NAME}**
+              **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
             </Text>}
             {invalidAddress && <Text
               className="ml-3"

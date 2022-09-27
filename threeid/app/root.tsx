@@ -79,7 +79,7 @@ export const loader: LoaderFunction = () => {
       // @ts-ignore
       NFTAR_CHAIN_ID: NFTAR_CHAIN_ID,
       // @ts-ignore
-      VALID_CHAIN_NAME: VALID_CHAIN_NAME,
+      VALID_CHAIN_ID_NAME: VALID_CHAIN_ID_NAME,
     },
   });
 };
