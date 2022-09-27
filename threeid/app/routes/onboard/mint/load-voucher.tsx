@@ -83,13 +83,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jwt = session.get("jwt");
   const address = session.get("address");
 
-  // const staticVoucher = JSON.parse(STATIC_VOUCHER)
-  // console.log("staticVoucher", staticVoucher)
-  // staticVoucher.metadata.image = gatewayFromIpfs(staticVoucher.metadata.image) as string
-
-  // await VOUCHER_CACHE.put(address, JSON.stringify(staticVoucher));
-
-
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
   
