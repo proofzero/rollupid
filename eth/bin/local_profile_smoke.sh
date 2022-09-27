@@ -8,3 +8,4 @@ npx hardhat profile:image --profile-id 0
 npx hardhat profile:metadata --profile-id 0
 npx hardhat profile:destroy --account operator
 npx hardhat profile:next || echo "Expected: Error in plugin hardhat-ethers: 0x5FbDB2315678afecb367f032d93F642f64180aa3 is not a contract account."
+npx hardhat test

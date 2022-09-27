@@ -138,7 +138,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
 
     // If the user owns an NFT from the PFP contract this will throw a 409
-    // error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar).
+    // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
     handleDuplicateGenerationRequest(nftsForOwner, key, account, ctx);
 
     // If the client wants us to check Alchemy to see if the NFT has been
