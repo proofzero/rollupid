@@ -105,12 +105,6 @@ const OnboardNickname = () => {
           </a>
         </li>
 
-        {/* <li>
-          <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
-            <span className="sr-only">{"Mint"}</span>
-          </a>
-        </li> */}
-
         <li>
           <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
             <span className="sr-only">{"Mint"}</span>
