@@ -92,7 +92,7 @@ jobs:
           OORT_PORT: 443
           NFTAR_URL: ${{ secrets.NFTAR_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
-          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_CONTRACT_ADDRESS }}
+          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINTPFP_CONTRACT_ADDRESS }}
           NFTAR_CHAIN_ID: 1
           VALID_CHAIN_ID_NAME: mainnet
       # - name: Install Playwright Browsers
