@@ -140,6 +140,7 @@ const OnboardNickname = () => {
             name="nickname"
             type="text"
             placeholder="Ash"
+            autoFocus={true}
             required={true}
             onChange={(event) => setNickname(event.target.value)}
             value={nickname}
