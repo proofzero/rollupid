@@ -24,7 +24,7 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit`}
+      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit rounded-md`}
       onClick={onClick}
       type={isSubmit ? "submit" : "button"}
     >

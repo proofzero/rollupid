@@ -25,20 +25,25 @@
 
 .button-size-xs {
   padding: 7px 11px;
+  min-width: 4rem;
 }
 
 .button-size-sm {
   padding: 9px 13px;
+  min-width: 5rem;
 }
 
 .button-size-base {
   padding: 9px 17px;
+  min-width: 6rem;
 }
 
 .button-size-l {
   padding: 9px 17px;
+  min-width: 7rem;
 }
 
 .button-size-xl {
   padding: 13px 25px;
+  min-width: 8rem;
 }

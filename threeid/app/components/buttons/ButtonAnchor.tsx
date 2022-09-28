@@ -29,7 +29,7 @@ const ButtonAnchor = ({
 }: ButtonAnchorProps) => {
     return (
         <a
-            className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className}`}
+            className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} rounded-md`}
             href={href}
             target="_blank"
         >
