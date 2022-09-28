@@ -265,7 +265,7 @@ const OnboardEns = () => {
                 <div className="flex flex-row space-x-3.5 items-center">
                   <label
                     htmlFor="use-ens"
-                    className="inline-flex relative items-center mb-5 cursor-pointer"
+                    className={`inline-flex relative items-center mb-5 cursor-${!validating && !ensName ? "default" : "pointer"}`}
                   >
                     {!validating && ensName && (
                       <>
@@ -298,7 +298,7 @@ const OnboardEns = () => {
                         size={TextSize.SM}
                         weight={TextWeight.Medium500}
                       >
-                        Sorry, no primary ens linked to your ETH account.
+                        ☹️ Sorry, no primary ENS linked to your ETH account
                       </Text>
                     )}
                   </label>
@@ -326,7 +326,7 @@ const OnboardEns = () => {
             >
               Back
             </Button>
-            </div>
+          </div>
           <Form className="w-full lg:w-auto" method="post" action="/onboard/complete">
             <Button
               isSubmit={true}
