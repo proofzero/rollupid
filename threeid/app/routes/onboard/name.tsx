@@ -31,14 +31,14 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
 
-  const data = await oortSend("kb_getData", ["3id.profile", "nickname"], {
+  const data = await oortSend("kb_getData", ["3id.profile", "displayname"], {
     jwt,
     cookie: request.headers.get("Cookie") as string | undefined,
   });
 
-  const nickname = data.result?.value;
+  const displayname = data.result?.value;
   return json({
-    nickname,
+    displayname,
   });
 };
 
@@ -47,19 +47,19 @@ export const action: ActionFunction = async ({ request }) => {
   const jwt = session.get("jwt");
 
   const form = await request.formData();
-  const nickname = form.get("nickname");
+  const displayname = form.get("displayname");
 
   const errors: {
-    nickname?: string;
+    displayname?: string;
   } = {};
 
-  if (typeof nickname !== "string" || nickname === "") {
-    errors.nickname = "Nickname needs to be provided";
+  if (typeof displayname !== "string" || displayname === "") {
+    errors.displayname = "Display Name needs to be provided";
   }
 
   const data = await oortSend(
     "kb_setData",
-    ["3id.profile", "nickname", nickname],
+    ["3id.profile", "displayname", displayname],
     {
       jwt,
       cookie: request.headers.get("Cookie") as string | undefined,
@@ -67,7 +67,7 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   if (data.error) {
-    errors.nickname = "Failed persisting nickname";
+    errors.displayname = "Failed persisting displayname";
   }
 
   if (Object.keys(errors).length) {
@@ -78,9 +78,9 @@ export const action: ActionFunction = async ({ request }) => {
   return redirect(`/onboard/mint`);
 };
 
-const OnboardNickname = () => {
-  const { nickname: storedNickname } = useLoaderData();
-  const [nickname, setNickname] = useState(storedNickname || "");
+const OnboardDisplayname = () => {
+  const { displayname: storedDisplayname } = useLoaderData();
+  const [displayname, setDisplayname] = useState(storedDisplayname || "");
 
   const fetcher = useFetcher();
   useEffect(() => {
@@ -101,7 +101,7 @@ const OnboardNickname = () => {
               <span className="h-full w-full rounded-full bg-indigo-200" />
             </span>
             <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
-            <span className="sr-only">{"Nickname"}</span>
+            <span className="sr-only">{"Display Name"}</span>
           </a>
         </li>
 
@@ -125,7 +125,7 @@ const OnboardNickname = () => {
       >
 
         <section
-          id="onboard-nickname-form"
+          id="onboard-displayname-form"
           className="flex-1 justify-center items-center items-stretch self-center"
         >
           <Label htmlFor="display-name">
@@ -138,27 +138,27 @@ const OnboardNickname = () => {
               *Display Name
             </Text>
 
-            {actionErrors?.nickname && (
+            {actionErrors?.displayname && (
               <Text
                 className="mb-1.5"
                 size={TextSize.XS}
                 weight={TextWeight.Regular400}
                 color={TextColor.Gray400}
               >
-                {actionErrors.nickname}
+                {actionErrors.displayname}
               </Text>
             )}
           </Label>
 
           <TextInput
-            id="nickname"
-            name="nickname"
+            id="displayname"
+            name="displayname"
             type="text"
             placeholder="Ash"
             autoFocus={true}
             required={true}
-            onChange={(event) => setNickname(event.target.value)}
-            value={nickname}
+            onChange={(event) => setDisplayname(event.target.value)}
+            value={displayname}
             helperText={
               <Text
                 type="span"
@@ -174,13 +174,13 @@ const OnboardNickname = () => {
         </section>
 
         <section
-          id="onboard-nickname-actions"
+          id="onboard-displayname-actions"
           className="flex flex-1 justify-end w-full items-end space-x-4 pt-10 lg:pt-0"
         >
           {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> :
             <Button
               isSubmit={true}
-              disabled={!nickname || nickname === ""}
+              disabled={!displayname || displayname === ""}
               size={ButtonSize.L}
             >
               Continue
@@ -194,4 +194,4 @@ const OnboardNickname = () => {
   );
 };
 
-export default OnboardNickname;
+export default OnboardDisplayname;

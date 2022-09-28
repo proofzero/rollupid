@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, pfpRes, nicknameRes, namesRes] = await Promise.all([
+  const [inviteCodeRes, votesRes, pfpRes, displaynameRes, namesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
@@ -58,7 +58,7 @@ export const loader = async ({ request, params }) => {
     ),
     oortSend(
       "kb_getData",
-      ["3id.profile", "nickname"],
+      ["3id.profile", "displayname"],
       oortOptions,
     ),
     oortSend(
@@ -75,13 +75,13 @@ export const loader = async ({ request, params }) => {
     inviteCode,
     votes,
     pfp,
-    nickname,
+    displayname,
     names
   ] = [
     inviteCodeRes.result,
     votesRes.result,
     pfpRes.result,
-    nicknameRes.result,
+    displaynameRes.result,
     namesRes.result
   ];
 
@@ -89,7 +89,7 @@ export const loader = async ({ request, params }) => {
     inviteCode,
     votes,
     pfp,
-    nickname,
+    displayname,
     names,
   });
 };
@@ -204,7 +204,7 @@ const roadmapSteps = [
 ];
 
 export default function Welcome() {
-  const { inviteCode, votes, pfp, nickname, names } = useLoaderData();
+  const { inviteCode, votes, pfp, displayname, names } = useLoaderData();
   let submit = useSubmit();
 
   completeSteps[1].isCompleted = pfp?.value?.isToken;
@@ -238,7 +238,7 @@ export default function Welcome() {
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID, {nickname.value}!</span>
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID, {displayname.value}!</span>
           <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
           </Heading>
 
