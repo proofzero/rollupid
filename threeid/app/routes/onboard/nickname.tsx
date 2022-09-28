@@ -27,9 +27,6 @@ import Text, {
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
 
-import currentStep from "~/assets/onboard/current.png";
-import nextStep from "~/assets/onboard/next.png";
-
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
@@ -84,29 +81,53 @@ export const action: ActionFunction = async ({ request }) => {
 const OnboardNickname = () => {
   const { nickname: storedNickname } = useLoaderData();
   const [nickname, setNickname] = useState(storedNickname || "");
-  
+
   const fetcher = useFetcher();
   useEffect(() => {
     if (fetcher.type === "init") {
       fetcher.load(`/onboard/mint/load-voucher`);
     }
   }, [fetcher]);
-  
+
   const actionErrors = useActionData();
   const transition = useTransition();
 
   return (
     <>
-      <div className="flex justify-center items-center space-x-4 mb-10">
-        <img src={currentStep} />
-        <img src={nextStep} />
-        <img src={nextStep} />
-      </div>
+      <ol role="list" className="mx-auto flex items-center space-x-5">
+        <li>
+          <a href={"/onboard/nickname"} className="relative flex items-center justify-center" aria-current="step">
+            <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
+              <span className="h-full w-full rounded-full bg-indigo-200" />
+            </span>
+            <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span className="sr-only">{"Nickname"}</span>
+          </a>
+        </li>
+
+        {/* <li>
+          <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+            <span className="sr-only">{"Mint"}</span>
+          </a>
+        </li> */}
+
+        <li>
+          <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+            <span className="sr-only">{"Mint"}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/onboard/ens" className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+            <span className="sr-only">{"ENS"}</span>
+          </a>
+        </li>
+      </ol>
 
       <Heading className="flex flex-1 text-center justify-center items-center">What should we call you?</Heading>
-      
+
       <Form method="post"
-          className="flex flex-1 flex-col justify-center items-center"
+        className="flex flex-1 flex-col justify-center items-center"
       >
 
         <section
@@ -172,7 +193,7 @@ const OnboardNickname = () => {
             </Button>
           }
         </section>
-  
+
       </Form>
       <PrefetchPageLinks page="/onboard/mint" />
     </>
