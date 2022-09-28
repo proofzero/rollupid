@@ -23,9 +23,6 @@ import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher"
 
 import { abi } from "~/assets/abi/mintpfp.json";
 
-import prevStep from "~/assets/onboard/pre.png";
-import currentStep from "~/assets/onboard/current.png";
-import nextStep from "~/assets/onboard/next.png";
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
 
@@ -333,11 +330,29 @@ const OnboardMint = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center space-x-4 mb-10">
-        <img src={prevStep} />
-        <img src={currentStep} />
-        <img src={nextStep} />
-      </div>
+      <ol role="list" className="mx-auto flex items-center space-x-5">
+        <li>
+          <a href="/onboard/nickname" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+            <span className="sr-only">{"Nickname"}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href={"/onboard/mint"} className="relative flex items-center justify-center" aria-current="step">
+            <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
+              <span className="h-full w-full rounded-full bg-indigo-200" />
+            </span>
+            <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span className="sr-only">{"Mint"}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/onboard/ens" className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+            <span className="sr-only">{"ENS"}</span>
+          </a>
+        </li>
+      </ol>
 
       <Heading className="text-center">Congratulations!</Heading>
 

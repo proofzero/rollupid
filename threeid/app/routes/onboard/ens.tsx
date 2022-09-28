@@ -38,9 +38,6 @@ import { oortSend } from "~/utils/rpc.server";
 import ensLogo from "~/assets/ens.png";
 import { useNetwork, useAccount } from "wagmi";
 
-import prevStep from "~/assets/onboard/pre.png";
-import currentStep from "~/assets/onboard/current.png";
-
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
@@ -180,11 +177,29 @@ const OnboardEns = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center space-x-4 mb-10">
-        <img src={prevStep} />
-        <img src={prevStep} />
-        <img src={currentStep} />
-      </div>
+      <ol role="list" className="mx-auto flex items-center space-x-5">
+        <li>
+          <a href="/onboard/nickname" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+            <span className="sr-only">{"Nickname"}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+            <span className="sr-only">{"Mint"}</span>
+          </a>
+        </li>
+
+        <li>
+          <a href={"/onboard/ens"} className="relative flex items-center justify-center" aria-current="step">
+            <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
+              <span className="h-full w-full rounded-full bg-indigo-200" />
+            </span>
+            <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span className="sr-only">{"ENS"}</span>
+          </a>
+        </li>
+      </ol>
 
       <Heading className="text-center">Almost there!</Heading>
 
@@ -250,7 +265,7 @@ const OnboardEns = () => {
                 <div className="flex flex-row space-x-3.5 items-center">
                   <label
                     htmlFor="use-ens"
-                    className="inline-flex relative items-center mb-5 cursor-pointer"
+                    className={`inline-flex relative items-center mb-5 cursor-${!validating && !ensName ? "default" : "pointer"}`}
                   >
                     {!validating && ensName && (
                       <>
@@ -283,7 +298,7 @@ const OnboardEns = () => {
                         size={TextSize.SM}
                         weight={TextWeight.Medium500}
                       >
-                        Sorry, no primary ens linked to your ETH account.
+                        ☹️ Sorry, no primary ENS linked to your ETH account
                       </Text>
                     )}
                   </label>
@@ -311,7 +326,7 @@ const OnboardEns = () => {
             >
               Back
             </Button>
-            </div>
+          </div>
           <Form className="w-full lg:w-auto" method="post" action="/onboard/complete">
             <Button
               isSubmit={true}
