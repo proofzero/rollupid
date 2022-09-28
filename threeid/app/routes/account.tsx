@@ -76,7 +76,7 @@ export const loader = async ({ request }) => {
     // @ts-ignore
     await ONBOARD_STATE.put(address, "true");
 
-    return redirect(`/onboard/nickname`);
+    return redirect(`/onboard/displayname`);
   }
 
   const [

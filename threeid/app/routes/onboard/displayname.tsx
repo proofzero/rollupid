@@ -96,7 +96,7 @@ const OnboardNickname = () => {
     <>
       <ol role="list" className="mx-auto flex items-center space-x-5">
         <li>
-          <a href={"/onboard/nickname"} className="relative flex items-center justify-center" aria-current="step">
+          <a href={"/onboard/displayname"} className="relative flex items-center justify-center" aria-current="step">
             <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
               <span className="h-full w-full rounded-full bg-indigo-200" />
             </span>
