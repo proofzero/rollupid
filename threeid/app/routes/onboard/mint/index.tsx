@@ -215,7 +215,7 @@ const OnboardMint = () => {
   >("land");
 
   const { metadata, voucher, contractAddress, minted } = useLoaderData();
-
+  console.log("contractAddress", contractAddress);
   const account = metadata?.properties?.metadata.account;
   const recipient = metadata?.properties?.metadata.account;
   const [imgUrl, setImgUrl] = useState<string>(metadata?.image);
@@ -347,7 +347,7 @@ const OnboardMint = () => {
       </Text>
 
       <Text className="text-center" color={TextColor.Gray600}>
-        You can mint this as NFT for FREE - you only pay the gas fee.
+        You can mint this NFT for FREE - you only pay the gas fee.
       </Text>
 
       <section
@@ -378,7 +378,7 @@ const OnboardMint = () => {
           color={TextColor.Gray400}>
           <BiInfoCircle />
           <span>
-            This image was generated using the assets your{" "}
+            This image was generated using the assets in your{" "}
             <b className="cursor-default" title={account}>
               blockchain account.
             </b>

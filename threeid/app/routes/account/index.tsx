@@ -238,7 +238,7 @@ export default function Welcome() {
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome {nickname.value} to 3ID!</span>
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID, {nickname.value}!</span>
           <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
           </Heading>
 
