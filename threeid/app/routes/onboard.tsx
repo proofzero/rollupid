@@ -37,7 +37,7 @@ export const loader = async ({ request }) => {
   }
 
   if (!request.url.includes("displayname") && !request.url.includes("mint") && !request.url.includes("ens")) {
-    return redirect(`/onboard/displayname`);
+    return redirect(`/onboard/name`);
   }  
   return null;
 

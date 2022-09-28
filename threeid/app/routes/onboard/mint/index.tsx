@@ -332,7 +332,7 @@ const OnboardMint = () => {
     <>
       <ol role="list" className="mx-auto flex items-center space-x-5">
         <li>
-          <a href="/onboard/displayname" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+          <a href="/onboard/name" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
             <span className="sr-only">{"Nickname"}</span>
           </a>
         </li>
@@ -471,7 +471,7 @@ const OnboardMint = () => {
                 size={ButtonSize.L}
                 onClick={() => {
                   // @ts-ignore
-                  navigate(`/onboard/displayname`);
+                  navigate(`/onboard/name`);
                 }}
               >
                 Back
