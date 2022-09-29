@@ -1,21 +1,13 @@
 import { MIN } from "@datadog/datadog-api-client/dist/packages/datadog-api-client-v1/models/FormulaAndFunctionEventAggregation";
 import { LoaderFunction, redirect } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
 
 type LoadVoucherParams = {
   address: string;
   skipImage?: boolean;
-};
-
-const gatewayFromIpfs = (ipfsUrl: string | undefined): string | undefined => {
-  const regex = /(bafy\w*)/;
-  const matches = regex.exec(ipfsUrl as string);
-
-  return matches
-    ? `https://nftstorage.link/ipfs/${matches[0]}/threeid.png`
-    : undefined;
 };
 
 const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
@@ -46,9 +38,12 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
         },
       },
     }),
-  }
-  
-  const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, nftarFetch);
+  };
+
+  const response = await fetch(
+    `${nftarUrl}${skipImage ? "/?skipImage=true" : ""}`,
+    nftarFetch
+  );
 
   const jsonRes = await response.json();
 
@@ -58,23 +53,25 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
 
   if (skipImage) {
     return {
-      contractAddress
+      contractAddress,
     };
   }
 
   let res = {
     ...jsonRes.result,
-    contractAddress
+    contractAddress,
   };
 
-  res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string
+  res.metadata.cover = gatewayFromIpfs(jsonRes.result.metadata.cover) as string;
+  res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string;
 
-  fetch(res.metadata.image)
+  fetch(res.metadata.image);
+  fetch(res.metadata.cover);
 
   return res;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request);
 
   // TODO: remove chain id and redirect to /auth
@@ -85,14 +82,17 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const jwt = session.get("jwt");
-  const address = session.get("address");
+
+  const url = new URL(request.url);
+  const queryAddress = url.searchParams.get("address");
+  const address = queryAddress ?? session.get("address");
 
   // @ts-ignore
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
 
   try {
     const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
-    
+
     if (cachedVoucher) {
       return json({
         minted: false,
@@ -127,7 +127,7 @@ export const loader: LoaderFunction = async ({ request }) => {
           cookie: request.headers.get("Cookie") as string | undefined,
         }
       );
-    
+
       if (data.error) {
         throw new Error("Unable to persist pfp data");
       }
@@ -136,17 +136,18 @@ export const loader: LoaderFunction = async ({ request }) => {
         minted: false,
         //@ts-ignore
         chainId: NFTAR_CHAIN_ID,
-        ...voucher
+        ...voucher,
       });
     }
   } catch (ex) {
     // remove the voucher info to remove chances of reminting
     delete cachedVoucher["voucher"];
+
     return json({
       minted: true,
       //@ts-ignore
       chainId: NFTAR_CHAIN_ID,
-       ...cachedVoucher
+      ...cachedVoucher,
     });
   }
 };

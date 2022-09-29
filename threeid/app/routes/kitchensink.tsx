@@ -1,6 +1,7 @@
 import { FaTwitter } from "react-icons/fa";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import InputText from "~/components/inputs/InputText";
+import ProfileCard from "~/components/profile/ProfileCard";
 import Text, {
   TextColor,
   TextSize,
@@ -79,6 +80,35 @@ const Kitchensink = () => {
 
   return (
     <div className="overflow-hidden flex flex-col space-y-4 p-4">
+      <section className={sectionClasses}>
+        <ProfileCard
+          account="0x6c60Da9471181Aa54C648c6e201263A5501363F3"
+          displayName="Foobar"
+          avatarUrl="https://picsum.photos/200"
+        />
+        <ProfileCard
+          account="0x6c60Da9471181Aa54C648c6e201263A5501363F3"
+          displayName="Foobar"
+          avatarUrl="https://picsum.photos/200"
+          isNft={true}
+        />
+        <ProfileCard
+          account="0x6c60Da9471181Aa54C648c6e201263A5501363F3"
+          displayName="Foobar"
+          avatarUrl="https://picsum.photos/200"
+          isNft={true}
+          claimed={new Date(2022, 8, 1)}
+        />
+        <ProfileCard
+          account="0x6c60Da9471181Aa54C648c6e201263A5501363F3"
+          displayName="Foobar"
+          avatarUrl="https://picsum.photos/200"
+          isNft={true}
+          claimed={new Date(2022, 8, 1)}
+          webUrl={"https://www.kubelt.com"}
+        />
+      </section>
+
       <section className={sectionClasses}>
         <InputText heading={"Empty"} />
 
