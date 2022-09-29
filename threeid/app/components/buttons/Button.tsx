@@ -7,7 +7,7 @@ export type ButtonProps = {
 
   type?: ButtonType;
   size?: ButtonSize;
-  
+
   isSubmit?: boolean;
 
   onClick?: () => void;
@@ -21,17 +21,21 @@ const Button = ({
   type = ButtonType.Primary,
   isSubmit = false,
   size = ButtonSize.Base,
+  disabled,
 }: ButtonProps) => {
+  const computedType = disabled ? ButtonType.Disabled : type;
+
   return (
     <button
-      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} w-full lg:w-fit rounded-md`}
+      disabled={disabled}
+      className={`button-base ${buttonTypeDict[computedType].className} ${buttonSizeDict[size].className} w-full lg:w-fit rounded-md`}
       onClick={onClick}
       type={isSubmit ? "submit" : "button"}
     >
       <Text
         type="span"
         size={buttonSizeDict[size].textSize}
-        color={buttonTypeDict[type].textColor}
+        color={buttonTypeDict[computedType].textColor}
         weight={buttonSizeDict[size].textWeight}
       >
         {children}
