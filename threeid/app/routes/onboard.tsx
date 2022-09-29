@@ -36,8 +36,8 @@ export const loader = async ({ request }) => {
     return redirect(`/auth`);
   }
 
-  if (!request.url.includes("nickname") && !request.url.includes("mint") && !request.url.includes("ens")) {
-    return redirect(`/onboard/nickname`);
+  if (!request.url.includes("name") && !request.url.includes("mint") && !request.url.includes("ens")) {
+    return redirect(`/onboard/name`);
   }  
   return null;
 

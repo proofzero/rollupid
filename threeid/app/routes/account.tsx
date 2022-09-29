@@ -47,7 +47,7 @@ export const loader = async ({ request }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [coreClaimsRes, pfpRes, nicknameRes] = await Promise.all([
+  const [coreClaimsRes, pfpRes, displaynameRes] = await Promise.all([
     oortSend(
       "kb_getCoreClaims",
       [],
@@ -60,7 +60,7 @@ export const loader = async ({ request }) => {
     ),
     oortSend(
       "kb_getData",
-      ["3id.profile", "nickname"],
+      ["3id.profile", "displayname"],
       oortOptions,
     )
   ]);
@@ -76,20 +76,20 @@ export const loader = async ({ request }) => {
     // @ts-ignore
     await ONBOARD_STATE.put(address, "true");
 
-    return redirect(`/onboard/nickname`);
+    return redirect(`/onboard/name`);
   }
 
   const [
     pfp,
-    nickname,
+    displayname,
   ] = [
     pfpRes.result,
-    nicknameRes.result,
+    displaynameRes.result,
   ];
 
   return json({
     pfp,
-    nickname,
+    displayname,
   });
 };
 
@@ -117,7 +117,7 @@ function classNames(...classes: any) {
 }
 
 export default function AccountLayout() {
-  const {pfp, nickname} = useLoaderData();
+  const {pfp, displayname} = useLoaderData();
   return (
     <>
       <div className="min-h-full">
