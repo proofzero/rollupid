@@ -81,7 +81,7 @@ jobs:
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: next
+          DATADOG_ENV: current
           DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
