@@ -52,6 +52,7 @@ export const buttonSizeDict: { [key in ButtonSize]: ButtonSizeProps } = {
 export enum ButtonType {
   Primary,
   Secondary,
+  Disabled,
 }
 
 export type ButtonTypeProps = {
@@ -68,6 +69,10 @@ export const buttonTypeDict: { [key in ButtonType]: ButtonTypeProps } = {
   [ButtonType.Secondary]: {
     className: "button-type-secondary",
     textColor: TextColor.Gray700,
+  },
+  [ButtonType.Disabled]: {
+    className: "button-type-disabled",
+    textColor: TextColor.Gray300,
   },
 };
 
