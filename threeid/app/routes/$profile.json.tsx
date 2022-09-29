@@ -3,19 +3,11 @@ import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  let isOwner = false;
-
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
 
   if (!jwt) {
     throw new Error("JWT required for Oort operations");
-  }
-
-  const address = session.get("address");
-
-  if (address === params.profile) {
-    isOwner = true;
   }
 
   const oortOptions = {
@@ -31,16 +23,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let profile: {
     displayname?: string;
     pfp?: string;
-    isOwner?: boolean;
   } = {
     displayname: displayname.result?.value ?? undefined,
     pfp: pfp.result?.value ?? undefined,
-    isOwner,
   };
-
-  if (request.url.toLowerCase().endsWith("/json")) {
-    delete profile.isOwner;
-  }
 
   return json(profile);
 };
