@@ -321,6 +321,7 @@ const genInvite = async (ctx, next) => {
     if (ctx.apiKey && !key) {
         ctx.throw(403, 'Missing NFTAR API key');
     }
+
     if (key !== ctx.apiKey && key !== ctx.devKey) {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
@@ -330,18 +331,29 @@ const genInvite = async (ctx, next) => {
     const issueDate = ctx.jsonrpc.params['issueDate'];
     const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
     const OUTPUT_DIR = path.resolve("outputs");
-
+    
     const recipient = ctx.jsonrpc.params['recipient'];
+    
+    console.log('genInvite:', JSON.stringify({
+        recipient,
+        inviteId,
+        inviteTier,
+        issueDate,
+    }), 'with API key:', key === ctx.apiKey, 'with DEV key:', key === ctx.devKey);
+
+    let t0 = performance.now();
     if (recipient) {
         const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(recipient, {
             contractAddresses: [ctx.invite_contract]
         });
-    
+        
         // If the user owns an NFT from the invite contract this will throw a 409
         // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
         handleDuplicateGenerationRequest(ctx.invite_contract, nftsForOwner, recipient, key, ctx);
     }
-
+    let t1 = performance.now();
+    console.log(`genInvite: recipient ownership check took ${t1 - t0} milliseconds.`);
+    
     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
     const baseName = path.basename(outputFile);
@@ -399,8 +411,11 @@ const genInvite = async (ctx, next) => {
         }
     };
 
+    t0 = performance.now();
     const result = await ctx.storage.store(metadata);
-
+    t1 = performance.now();
+    console.log(`genInvite: ctx.storage.store took ${t1 - t0} milliseconds.`);
+    
     ctx.body = {
         // IPFS URL of the metadata
         url: result.url,
