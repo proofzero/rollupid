@@ -39,7 +39,6 @@ const main = async (api) => {
     });
 
     // The Ethereum minting contract address.
-    api.context.contract = process.env.CONTRACT_ADDRESS;
     api.context.pfp_contract = process.env.PFP_CONTRACT_ADDRESS;
     api.context.invite_contract = process.env.INVITE_CONTRACT_ADDRESS;
 
