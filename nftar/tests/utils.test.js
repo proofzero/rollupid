@@ -638,27 +638,27 @@ const ALCHEMY_NFTS_FIXTURE = {
 
 describe('Utilities', () => {
 
-  test('isPFPOwner null tests', () => {
-    const NOT_A_CONTRACT_ADDRESS = '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52';
-    let result = utils.isPFPOwner();
-    expect(result).toStrictEqual(false);
-    result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts);
-    expect(result).toStrictEqual(false);
-    result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, NOT_A_CONTRACT_ADDRESS);
-    expect(result).toStrictEqual(false);
-  });
+//   test('isPFPOwner null tests', () => {
+//     const NOT_A_CONTRACT_ADDRESS = '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52';
+//     let result = utils.isPFPOwner();
+//     expect(result).toStrictEqual(false);
+//     result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts);
+//     expect(result).toStrictEqual(false);
+//     result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, NOT_A_CONTRACT_ADDRESS);
+//     expect(result).toStrictEqual(false);
+//   });
 
-  test('isPFPOwner falsy test', () => {
-    const NOT_A_CONTRACT_ADDRESS = '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52';
-    let result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, NOT_A_CONTRACT_ADDRESS);
-    expect(result).toStrictEqual(false);
-  });
+//   test('isPFPOwner falsy test', () => {
+//     const NOT_A_CONTRACT_ADDRESS = '0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52';
+//     let result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, NOT_A_CONTRACT_ADDRESS);
+//     expect(result).toStrictEqual(false);
+//   });
 
-  test('isPFPOwner truthy test', () => {
-    const IS_A_CONTRACT_ADDRESS = '0xf8496fe24cdeb4b769e5a617b3a6159a031446d2';
-    let result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, IS_A_CONTRACT_ADDRESS);
-    expect(result).toStrictEqual(true);
-  });
+//   test('isPFPOwner truthy test', () => {
+//     const IS_A_CONTRACT_ADDRESS = '0xf8496fe24cdeb4b769e5a617b3a6159a031446d2';
+//     let result = utils.isPFPOwner(ALCHEMY_NFTS_FIXTURE.ownedNfts, IS_A_CONTRACT_ADDRESS);
+//     expect(result).toStrictEqual(true);
+//   });
 
   test('calculateNFTWeight null test', () => {
     const nfts = [];

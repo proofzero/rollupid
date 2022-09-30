@@ -71,9 +71,21 @@ const METHOD_PARAMS = {
         },
     },
     '3id_genInvite': {
+        'recipient': {
+            type: 'string',
+            description: 'blockchain account to award the invite'
+        },
         'inviteId': {
             type: 'string',
             description: 'Invite serial number'
+        },
+        'inviteTier': {
+            type: 'string',
+            description: 'Invite tier'
+        },
+        'issueDate': {
+            type: 'string',
+            description: 'Date the invite was issued'
         },
     },
     'describe': {},
@@ -81,7 +93,7 @@ const METHOD_PARAMS = {
 
 // If the user owns an NFT from the PFP contract this will throw a 409
 // error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar) and used.
-const handleDuplicateGenerationRequest = function(nftsForOwner, key, account, ctx) {
+const handleDuplicateGenerationRequest = function(contract, nfts, account, key, ctx) {
     // If the key from the header is not undefined AND the devKey from the 
     // environment is not undefined AND the two are equal THEN we're in
     // development mode and will skip the duplicate PFP check.
@@ -90,9 +102,9 @@ const handleDuplicateGenerationRequest = function(nftsForOwner, key, account, ct
         return true;
     }
 
-    // If the user owns an NFT from the PFP contract, 409 error.
-    if (isPFPOwner(nftsForOwner.ownedNfts, ctx.contract)) {
-        ctx.throw(409, `${account} already owns a PFP NFT!`);
+    // If the user owns an NFT from the given contract, 409 error.
+    if (nfts.ownedNfts.length) {
+        ctx.throw(409, `${account} already owns an NFT from ${contract}!`);
     }    
 };
 
@@ -133,13 +145,15 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     let t0, t1;
     const weightInc = {};
     t0 = performance.now();
-    const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account);
+    const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account, {
+        contractAddresses: [ctx.pfp_contract]
+    });
     t1 = performance.now();
     console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
 
     // If the user owns an NFT from the PFP contract this will throw a 409
     // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
-    handleDuplicateGenerationRequest(nftsForOwner, key, account, ctx);
+    handleDuplicateGenerationRequest(ctx.pfp_contract, nftsForOwner, account, key, ctx);
 
     // If the client wants us to check Alchemy to see if the NFT has been
     // minted, but has the image and wants to skip expensive operations, it
@@ -301,13 +315,32 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     console.log(`Total took ${s1 - s0} milliseconds.`);
 });
 
-jsonrpc.method('3iD_genInvite', async (ctx, next) => {
-
+const genInvite = async (ctx, next) => {
+    const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
+    
+    if (ctx.apiKey && !key) {
+        ctx.throw(403, 'Missing NFTAR API key');
+    }
+    if (key !== ctx.apiKey && key !== ctx.devKey) {
+        ctx.throw(401, 'Invalid NFTAR API key');
+    }
+    
     let inviteId = ctx.jsonrpc.params['inviteId'];
     const inviteTier = ctx.jsonrpc.params['inviteTier'];
     const issueDate = ctx.jsonrpc.params['issueDate'];
     const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
     const OUTPUT_DIR = path.resolve("outputs");
+
+    const recipient = ctx.jsonrpc.params['recipient'];
+    if (recipient) {
+        const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(recipient, {
+            contractAddresses: [ctx.invite_contract]
+        });
+    
+        // If the user owns an NFT from the invite contract this will throw a 409
+        // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
+        handleDuplicateGenerationRequest(ctx.invite_contract, nftsForOwner, recipient, key, ctx);
+    }
 
     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
@@ -345,8 +378,6 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
         return fs.promises.writeFile(outputFile, svgText);
       })
 
-
-
      // Utility to title-case a string.
     const titleCase = (s) => {
         return s.charAt(0).toUpperCase() + s.slice(1);
@@ -368,11 +399,7 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
         }
     };
 
-    console.log("here", metadata)
-
-
     const result = await ctx.storage.store(metadata);
-    console.log("here", result)
 
     ctx.body = {
         // IPFS URL of the metadata
@@ -382,9 +409,10 @@ jsonrpc.method('3iD_genInvite', async (ctx, next) => {
         // metadata.json contents with IPFS gateway URLs
         embed: result.embed(),
       };
-})
+};
 
-
+jsonrpc.method('3id_genInvite', genInvite);
+jsonrpc.method('3iD_genInvite', genInvite);
 
 jsonrpc.method('describe', (ctx, next) => {
     ctx.body = jsonrpc.methods.map(method => {
