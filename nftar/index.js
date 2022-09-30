@@ -33,7 +33,7 @@ const main = async (api) => {
 
     // An Alchemy API client.
     api.context.alchemy = new Alchemy({
-        apiKey: process.env.ALCHEMY_KEY,
+        apiKey: process.env.ALCHEMY_API_KEY,
         network: Network[process.env.ALCHEMY_NETWORK],
         maxRetries: 10,
     });
