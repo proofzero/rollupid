@@ -49,7 +49,7 @@ const contents = [
     ),
   },
   {
-    question: "What is my the 3ID PFP?",
+    question: "What is my 3ID PFP?",
     answer: (
       <div className="mb-4">
         <SmallRegularBlock>
