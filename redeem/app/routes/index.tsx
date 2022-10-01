@@ -9,6 +9,8 @@ import {
 import Spinner from "~/components/spinner";
 import MetamaskSVG from '~/components/metamask-svg';
 
+import blankCard from "~/assets/blankcard.png";
+
 type IndexProps = {
     inviteCode: string;
 }
@@ -32,11 +34,39 @@ export default function Index({ inviteCode }: IndexProps) {
 
   return (
     <div className="connectors justify-center items-center">
-        <p className="auth-message">
+        <div className="row flex-1 align-self-center">
+            <div className="col-12 mx-auto text-center">
+              <h1
+                className="heading auth-message"
+                style={{
+                  marginBottom: "0.5em",
+                }}
+              >
+                You've been invited to 3ID! 🎉
+              </h1>
+            </div>
+        </div>
+
+        <div className="row flex-1 align-self-center">
+        <div className="col-12 mx-auto text-center">
+            <h2 className="subheading auth-secondary-message">You can now mint your access card.</h2>
+        </div>
+        </div>
+
+        <div className="row flex-1 align-self-center"
+            style={{
+                marginBottom: "2em",
+            }}
+            >
+            <div className="flex col-12 mx-auto text-center mx-4">
+                <img style={{width: "auto", maxWidth: "28em"}} src={blankCard} />
+            </div>
+        </div>
+        <p className="auth-secondary-message">
             Connect Your Wallet
         </p>
         {isLoading || pendingConnector ? <Spinner /> :
-        <div className='grid grid-rows-1 mt-2'>
+        <div className='grid grid-rows-1 mt-2 mx-4'>
             {connectors.map((connector) => (
                 <div key={connector.id}>
                     <button className="connector"

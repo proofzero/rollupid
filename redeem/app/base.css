@@ -113,7 +113,7 @@ div[data-testid=flowbite-tooltip] div {
 }
 
 .auth-secondary-message,.error-screen .error-secondary-message {
-  padding: 1em;
+  /* padding: 1em; */
   font-family: Inter_400regular;
   font-size: 18px;
   font-weight: 400
