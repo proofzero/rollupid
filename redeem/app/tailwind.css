@@ -563,6 +563,10 @@ video {
   margin: 3rem;
 }
 
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
 .grid {
   display: grid;
 }
@@ -581,6 +585,10 @@ video {
 
 .gap-4 {
   gap: 1rem;
+}
+
+.border {
+  border-width: 1px;
 }
 
 .pb-12 {

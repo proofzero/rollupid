@@ -10,6 +10,17 @@ import {
 import { json } from "@remix-run/cloudflare";
 import { useLoaderData, useCatch, useNavigate  } from "@remix-run/react";
 
+import {
+  WagmiConfig,
+  createClient,
+  defaultChains,
+  configureChains,
+} from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+
+
 // import styles from "~/assets/styles.css";
 import styles from "./tailwind.css";
 import baseStyles from "./base.css";
@@ -17,6 +28,7 @@ import baseStyles from "./base.css";
 import blankCard from "~/assets/blankcard.png";
 import logo from "~/assets/logo.png";
 import sad from "~/assets/sad.png";
+import faviconSvg from "~/assets/favicon.svg";
 
 import { startSession } from "~/datadog.client";
 
@@ -55,11 +67,35 @@ export const meta: MetaFunction = () => ({
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
   { rel: "stylesheet", href: baseStyles },
+  { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
 ];
 
 export default function App() {
   const browserEnv = useLoaderData();
   typeof window !== 'undefined' && startSession();
+
+
+  const { chains, provider, webSocketProvider } = configureChains(
+    defaultChains,
+    [publicProvider()]
+  );
+
+  const client = createClient({
+    autoConnect: true,
+    connectors: [
+      new MetaMaskConnector({ chains }),
+      new InjectedConnector({
+        chains,
+        options: {
+          name: "Injected",
+          shimDisconnect: true,
+        },
+      }),
+    ],
+    provider,
+    webSocketProvider,
+  });
+
   return (
     <html lang="en">
       <head>
@@ -72,7 +108,9 @@ export default function App() {
             <img src={logo} alt="threeid" />
           </nav>
           <article className="content col-span-3">
-            <Outlet />
+            <WagmiConfig client={client}>
+              <Outlet />
+            </WagmiConfig>
           </article>
           <footer className="col-span-3">
             <p>
@@ -85,6 +123,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
