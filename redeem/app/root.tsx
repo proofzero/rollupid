@@ -45,6 +45,8 @@ export const loader: LoaderFunction = () => {
       DATADOG_ENV: DATADOG_ENV,
       // @ts-ignore
       INVITE_CONTRACT_ADDRESS: INVITE_CONTRACT_ADDRESS,
+      // @ts-ignore
+      TWITTER_BEARER_TOKEN: TWITTER_BEARER_TOKEN,
     },
   });
 };

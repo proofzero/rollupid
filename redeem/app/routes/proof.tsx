@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
 
 import { 
     json, redirect,
@@ -12,7 +12,14 @@ import {
 
 import { verifyMessage } from 'ethers/lib/utils'
 
+import { Label, TextInput } from "flowbite-react";
 
+import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+import Text, {
+    TextColor,
+    TextSize,
+    TextWeight,
+} from "~/components/typography/Text";
 import Spinner from "~/components/spinner";
 
 // @ts-ignore
@@ -25,15 +32,49 @@ export const loader = async ({ request }) => {
 
 }
 
+// @ts-ignore
 export const action = async ({ request }) => {
+    // get tweet url from link
+    const form = await request.formData();
+    const address = form.get("address");
+    const message = form.get("message");
+    const tweetstatus = form.get("tweetstatus");
+    const statusId = tweetstatus.substring(tweetstatus.lastIndexOf('/') + 1)
+
+    console.log("statusId", statusId)
+
+    const tweetsRes = await fetch(`https://api.twitter.com/2/tweets?ids=${statusId}`, {
+        method: "GET",
+        headers: {
+            // @ts-ignore
+            "Authorization": `Bearer ${TWITTER_BEARER_TOKEN}`,
+        }
+    })
+
+    console.log("tweets", tweetsRes)
+    const tweets = tweetsRes.json()
+    const tweet = tweets.data[0].text
+
+    console.log("tweet", tweet)
+    const signature = tweet.substring(tweet.lastIndexOf(':') + 1)
+
+    console.log("signature", signature)
+
     // Verify signature when sign message succeeds
-    // const address = verifyMessage(variables.message, data)
-    // recoveredAddress.current = address
+    const recoveredAddress = verifyMessage(message, signature)
+
+    if (recoveredAddress == address) {
+        const url = new URL(request.url);
+        const invite = url.searchParams.get("invite")
+        return redirect(`/redeem${invite ? `?invite=${invite}` : ''}`)
+    }
+    return json({ error: "Invalid signature" }, { status: 400 });
 }
 
 export default function Proof() {
     const [showVerify, setShowVerify] = useState(false);
     const [tweetStatus, setTweetStatus] = useState('');
+    const [tweetId, setTweetId] = useState('');
 
     const { invite } = useLoaderData();
 
@@ -77,10 +118,36 @@ export default function Proof() {
                     </button> 
                 :   <button onClick={handleProof}>Tweet Proof</button>}
                 {showVerify &&
-                    <form>
-                        <input type="text" />
-                        <button>Validate</button>
-                    </form>
+                    <Form method="post"
+                        className="flex flex-1 flex-col justify-center items-center"
+                    >
+                        <Label htmlFor="tweetstatus">
+                            <Text
+                            className="mb-1.5"
+                            size={TextSize.SM}
+                            weight={TextWeight.Medium500}
+                            color={TextColor.Gray700}
+                            >
+                            Enter the tweet status URL
+                            </Text>
+                        </Label>
+                        <TextInput
+                            id="tweetstatus"
+                            name="tweetstatus"
+                            type="text"
+                            placeholder="https://twitter.com/username/status/1234567890"
+                            autoFocus={true}
+                            required={true}
+                            onChange={(event) => setTweetId(event.target.value)}
+                            value={tweetId}
+                        />
+                        <Button
+                        isSubmit={true}
+                        size={ButtonSize.L}
+                        >
+                            Validate
+                        </Button>
+                    </Form>
                 }
             </div>
         </div>
