@@ -41,8 +41,6 @@ export const action = async ({ request }) => {
     const tweetstatus = form.get("tweetstatus");
     const statusId = tweetstatus.substring(tweetstatus.lastIndexOf('/') + 1)
 
-    console.log("statusId", statusId)
-
     const tweetsRes = await fetch(`https://api.twitter.com/2/tweets?ids=${statusId}`, {
         method: "GET",
         headers: {
@@ -51,16 +49,9 @@ export const action = async ({ request }) => {
         }
     })
 
-    console.log("tweetsRes", tweetsRes)
     const tweets = await tweetsRes.json()
-    console.log("tweets", tweets)
-
     const tweet = tweets.data[0].text
-
-    console.log("tweet", tweet)
-    const signature = tweet.substring(tweet.lastIndexOf(':') + 1)
-
-    console.log("signature", signature)
+    const signature = tweet.split(":")[1]
 
     // Verify signature when sign message succeeds
     const recoveredAddress = verifyMessage(message, signature)
@@ -77,8 +68,9 @@ export default function Proof() {
     const [showVerify, setShowVerify] = useState(false);
     const [tweetStatus, setTweetStatus] = useState('');
     const [tweetId, setTweetId] = useState('');
+    const [message, setMessage] = useState('');
 
-    const { invite } = useLoaderData();
+    const { invite, error: proofError } = useLoaderData();
 
     // NOTE: state is all messed if we render this component with SSR
     if (typeof document === "undefined") {
@@ -88,6 +80,7 @@ export default function Proof() {
     const { address, isConnected } = useAccount()
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
+            setMessage(variables.message.toString())
             // Show tweet status verification 
             setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz %23decentralizedidentity sig:${data.toString()}`);
         },
@@ -109,17 +102,32 @@ export default function Proof() {
 
     return (
         <div className="connectors justify-center items-center">
-            <p className="auth-message">
-                Proof
+            <p className="auth-message mb-4">
+                {!showVerify 
+                    ? 
+                    "Verify your account by signing a message with your wallet."
+                    :
+                    "Tweet your signed message to verify your identity."
+                }
             </p>
             
             <div className='grid grid-rows-1 mt-2'>
                 {!tweetStatus && !showVerify ? 
-                    <button onClick={() => signMessage({ message: "I own this tweet @threeid_xyz #decentralizedidentity" })}>
+                <>
+                    <Button
+                        onClick={() => signMessage({ message: "I own this tweet @threeid_xyz #decentralizedidentity" })}
+                        size={ButtonSize.L}
+                        >
                         Sign Proof 
-                    </button> 
-                :   <button onClick={handleProof}>Tweet Proof</button>}
-                {showVerify &&
+                    </Button> 
+                    {error && <p className="flex flex-1 flex-col justify-center items-center error">{error.message}</p>}
+                </>
+                : <>  
+                    <Button 
+                        onClick={handleProof}
+                        size={ButtonSize.L}
+                        >Tweet Proof
+                    </Button>
                     <Form method="post"
                         className="flex flex-1 flex-col justify-center items-center"
                     >
@@ -143,14 +151,29 @@ export default function Proof() {
                             onChange={(event) => setTweetId(event.target.value)}
                             value={tweetId}
                         />
+                        <TextInput
+                            id="message"
+                            name="message"
+                            type="hidden"
+                            required={true}
+                            value={message}
+                        />
+                        <TextInput
+                            id="address"
+                            name="address"
+                            type="hidden"
+                            required={true}
+                            value={address}
+                        />
                         <Button
-                        isSubmit={true}
-                        size={ButtonSize.L}
-                        >
+                            isSubmit={true}
+                            size={ButtonSize.L}
+                            >
                             Validate
                         </Button>
                     </Form>
-                }
+                </>}
+                {proofError && <p className="error">{proofError}</p>}
             </div>
         </div>
     );
