@@ -35,7 +35,7 @@ export const loader = async ({ request }) => {
     //@ts-ignore
     const proof = await PROOFS.get(address, { type: "json" });
     if (proof) {
-        return redirect(`/redeem${invite ? `?invite=${invite}` : ''}`)
+        return redirect(`/redeem?address=${address}${invite ? `&invite=${invite}` : ''}`)
     }
 
     return json({invite});
@@ -76,7 +76,7 @@ export const action = async ({ request }) => {
         
         const url = new URL(request.url);
         const invite = url.searchParams.get("invite")
-        return redirect(`/redeem${invite ? `?invite=${invite}` : ''}`)
+        return redirect(`/redeem?address=${address}${invite ? `&invite=${invite}` : ''}`)
     }
     return json({ error: "Invalid signature" }, { status: 400 });
 }
