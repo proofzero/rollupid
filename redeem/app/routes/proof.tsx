@@ -51,8 +51,10 @@ export const action = async ({ request }) => {
         }
     })
 
-    console.log("tweets", tweetsRes)
-    const tweets = tweetsRes.json()
+    console.log("tweetsRes", tweetsRes)
+    const tweets = await tweetsRes.json()
+    console.log("tweets", tweets)
+
     const tweet = tweets.data[0].text
 
     console.log("tweet", tweet)

@@ -10,7 +10,6 @@ import {
 } from "wagmi";
 
 import { publicProvider } from "wagmi/providers/public";
-
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
