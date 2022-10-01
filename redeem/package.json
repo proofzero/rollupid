@@ -7,7 +7,7 @@
     "build:remix": "remix build",
     "deploy": "wrangler publish",
     "dev:remix": "remix watch",
-    "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch",
+    "dev:miniflare": "cross-env NODE_ENV=development miniflare ./build/index.js --watch --do-persist --kv-persist --wrangler-env development",
     "dev:css": "npm run generate:css -- --watch",
     "dev": "remix build && run-p \"dev:*\"",
     "generate:css": "npx tailwindcss -o ./app/tailwind.css",

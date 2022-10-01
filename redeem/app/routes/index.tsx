@@ -26,7 +26,7 @@ export default function Index({ inviteCode }: IndexProps) {
 
   useEffect(() => {
       if (isConnected) {
-          navigate(`/proof${inviteCode ? `?invite=${inviteCode}` : ''}`);
+          navigate(`/proof?address=${address}${inviteCode ? `&invite=${inviteCode}` : ''}`);
       }
   }, [isConnected])
 

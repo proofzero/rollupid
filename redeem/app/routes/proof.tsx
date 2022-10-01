@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useNavigate, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useNavigate, useLoaderData, useActionData } from "@remix-run/react";
 
 import { 
     json, redirect,
@@ -20,13 +20,23 @@ import Text, {
     TextSize,
     TextWeight,
 } from "~/components/typography/Text";
-import Spinner from "~/components/spinner";
 
 // @ts-ignore
 export const loader = async ({ request }) => {
 
     const url = new URL(request.url);
     const invite = url.searchParams.get("invite")
+    const address = url.searchParams.get("address")
+
+    if (!address) {
+        throw new Error("No address provided");
+    }
+
+    //@ts-ignore
+    const proof = await PROOFS.get(address, { type: "json" });
+    if (proof) {
+        return redirect(`/redeem${invite ? `?invite=${invite}` : ''}`)
+    }
 
     return json({invite});
 
@@ -49,6 +59,9 @@ export const action = async ({ request }) => {
         }
     })
 
+    if (tweetsRes.status != 200) {
+        return json({ error: `Invalid tweet status: ${tweetsRes.statusText}` }, { status: tweetsRes.status })
+    }
     const tweets = await tweetsRes.json()
     const tweet = tweets.data[0].text
     const signature = tweet.split(":")[1]
@@ -57,6 +70,10 @@ export const action = async ({ request }) => {
     const recoveredAddress = verifyMessage(message, signature)
 
     if (recoveredAddress == address) {
+        // store that the proof has been sucessfully posted to twitter
+        // @ts-ignore
+        await PROOFS.put(address, JSON.stringify({ statusId, tweet, signature, message }))
+        
         const url = new URL(request.url);
         const invite = url.searchParams.get("invite")
         return redirect(`/redeem${invite ? `?invite=${invite}` : ''}`)
@@ -70,7 +87,8 @@ export default function Proof() {
     const [tweetId, setTweetId] = useState('');
     const [message, setMessage] = useState('');
 
-    const { invite, error: proofError } = useLoaderData();
+    const { invite } = useLoaderData();
+    const proofError = useActionData()
 
     // NOTE: state is all messed if we render this component with SSR
     if (typeof document === "undefined") {
@@ -81,6 +99,8 @@ export default function Proof() {
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
             setMessage(variables.message.toString())
+            setShowVerify(true);
+
             // Show tweet status verification 
             setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz %23decentralizedidentity sig:${data.toString()}`);
         },
@@ -123,22 +143,24 @@ export default function Proof() {
                     {error && <p className="flex flex-1 flex-col justify-center items-center error">{error.message}</p>}
                 </>
                 : <>  
-                    <Button 
-                        onClick={handleProof}
-                        size={ButtonSize.L}
-                        >Tweet Proof
-                    </Button>
+                    <div className="my-4">
+                        <Button 
+                            onClick={handleProof}
+                            size={ButtonSize.L}
+                            >Publish Tweet
+                        </Button>
+                    </div>
                     <Form method="post"
-                        className="flex flex-1 flex-col justify-center items-center"
+                        className="flex flex-1 flex-col justify-center items-center gap-2"
                     >
                         <Label htmlFor="tweetstatus">
                             <Text
                             className="mb-1.5"
-                            size={TextSize.SM}
+                            size={TextSize.Base}
                             weight={TextWeight.Medium500}
                             color={TextColor.Gray700}
                             >
-                            Enter the tweet status URL
+                            Paste the tweet URL here:
                             </Text>
                         </Label>
                         <TextInput
@@ -168,12 +190,14 @@ export default function Proof() {
                         <Button
                             isSubmit={true}
                             size={ButtonSize.L}
+                            disabled={!tweetId}
                             >
                             Validate
                         </Button>
+                        {proofError && <p className="error">{proofError.error}</p>}
+
                     </Form>
                 </>}
-                {proofError && <p className="error">{proofError}</p>}
             </div>
         </div>
     );
