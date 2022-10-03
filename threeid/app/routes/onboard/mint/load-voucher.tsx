@@ -91,7 +91,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
 
   try {
-    const voucher = await loadVoucher({ address });
+    const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
     
     if (cachedVoucher) {
       return json({
