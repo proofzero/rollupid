@@ -114,6 +114,7 @@ export const loader: LoaderFunction = async ({ request }) => {
           "pfp",
           {
             url: voucher.metadata.image,
+            cover: voucher.metadata.cover,
             //@ts-ignore
             contractAddress: MINTPFP_CONTRACT_ADDRESS,
             isToken: false,
