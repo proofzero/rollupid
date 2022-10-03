@@ -563,15 +563,6 @@ video {
   margin: 3rem;
 }
 
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.flex {
-  display: flex;
-}
-
 .grid {
   display: grid;
 }

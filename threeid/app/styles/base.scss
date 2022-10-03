@@ -128,3 +128,203 @@ div[data-testid="flowbite-tooltip"] div {
         align-items: center;
     }
 }
+
+html {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    height: calc(100% + env(safe-area-inset-top));
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -ms-overflow-style: scrollbar;
+    overscroll-behavior-y: none;
+    min-height: 100%;
+    background-color: #F9FAFB;
+    margin: 0px;
+    padding: 0px;
+    min-height: 100vh;
+    background-color: #F9FAFB;
+  }
+  
+  footer {
+    padding: 1em;
+    justify-content: center;
+    align-items: center;
+  }
+  footer p {
+    font-family: Inter_400Regular;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+    color: #374151;
+  }
+  
+  div[data-testid=flowbite-tooltip] div {
+    font-family: Inter_500Medium;
+  }
+  
+  .grid-shrink {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "shrink expand";
+  }
+  .grid-shrink .expand {
+    grid-area: expand;
+  }
+  .grid-shrink .shrink {
+    padding-right: 1em;
+    grid-area: shrink;
+    font-weight: 700;
+  }
+  
+  .error-screen .wrapper {
+    height: 100vh;
+  }
+  .error-screen nav {
+    padding: 1em;
+  }
+  .error-screen nav img {
+    width: 36.56px;
+  }
+  .error-screen .content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    display: flex;
+    flex-grow: 1;
+    min-width: 300px;
+  }
+  .error-screen .error-message {
+    font-family: Inter_500Medium;
+    font-size: 24px;
+    font-weight: 700;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: #1F2937;
+    justify-content: center;
+    align-items: center;
+  }
+  .error-screen .error-secondary-message {
+    padding: 1em;
+    font-family: Inter_400regular;
+    font-size: 18px;
+    font-weight: 400;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: #1F2937;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .wrapper {
+    height: 100vh;
+  }
+  
+  nav {
+    padding: 1em;
+  }
+  nav img {
+    width: 36.56px;
+  }
+  
+  .content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    display: flex;
+    flex-grow: 1;
+    min-width: 300px;
+  }
+  
+  footer {
+    margin-top: auto;
+  }
+  
+  .auth-message {
+    font-family: Inter_500Medium;
+    font-size: 24px;
+    font-weight: 700;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: #1F2937;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .auth-secondary-message {
+    padding: 1em;
+    font-family: Inter_400regular;
+    font-size: 18px;
+    font-weight: 400;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: #1F2937;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .connectors {
+    justify-content: center;
+    align-items: center;
+    margin-top: 1em;
+  }
+  .connectors .grid {
+    min-width: 308px;
+  }
+  
+  .connector {
+    background-color: white;
+    justify-content: center;
+    margin-top: 0.5em;
+    padding: 1em 2em;
+    font-family: Inter_500Medium;
+    font-weight: 500;
+    width: 100%;
+    border: 1px solid #D1D5DB;
+  }
+  .connector svg {
+    float: left;
+    margin: 0 1em 0 0;
+  }
+  .connector[disabled] {
+    background: #F3F4F6;
+    opacity: 0.5;
+  }
+  
+  .open-metamask-app {
+    padding: 2em 0 0 0;
+    font-family: Inter_700Bold;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1F2937;
+    text-decoration: underline;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .error-buttons button, .error-buttons a {
+    margin: 1em 0.5em;
+    text-align: center;
+  }
+  
+  .card-image {
+    max-width: 364px;
+  }
+  
+  .activate-button {
+    margin-top: 1em;
+    text-align: center;
+  }
+  
+  /*# sourceMappingURL=auth.css.map */
+  

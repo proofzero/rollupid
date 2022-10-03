@@ -12,6 +12,7 @@ import { useLoaderData, useCatch, useNavigate  } from "@remix-run/react";
 
 // import styles from "~/assets/styles.css";
 import styles from "./tailwind.css";
+import baseStyles from "./base.css";
 
 import blankCard from "~/assets/blankcard.png";
 import logo from "~/assets/logo.png";
@@ -53,6 +54,7 @@ export const meta: MetaFunction = () => ({
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: baseStyles },
 ];
 
 export default function App() {
@@ -65,52 +67,20 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div
-          style={{
-            display: "flex",
-            // flexDirection: "column",
-            minHeight: "100vh",
-            alignItems: "center",
-          }}
-        >
-          
-
-          <main
-            className="container-fluid"
-            style={{
-              // display: "flex",
-              // flex: 1,
-              // maxWidth: "740px"
-              marginTop: "70px"
-            }}
-          >
-            <div className="row d-flex align-self-center" style={{
-              // display: "flex",
-              // flex: 1,
-              // maxWidth: "740px"
-              marginTop:-40,
-            }}
-          >
-              <div className="col-12 mx-auto">
-                <Outlet />
-
-              </div>
-            </div>
-            <div
-              className="row d-flex align-self-center "
-              style={{
-                // display: "flex",
-                // flexDirection: "row",
-                // justifyContent: "center",
-                marginTop: "2em",
-              }}>
-              <div className="col-12 mx-auto" >
-                <p className="gray-text text-center">
-                  3ID is non-custodial and secure. We will never request access to your assets.
-                </p>
-              </div>
-            </div>
-          </main>
+        <div className="wrapper grid grid-row-3 gap-4">
+          <nav className="col-span-3">
+            <img src={logo} alt="threeid" />
+          </nav>
+          <article className="content col-span-3">
+            <Outlet />
+          </article>
+          <footer className="col-span-3">
+            <p>
+              3ID is non-custodial and secure.
+              <br />
+              We will never request access to your assets.
+            </p>
+          </footer>
         </div>
         <ScrollRestoration />
         <Scripts />
@@ -151,7 +121,7 @@ export function ErrorBoundary({ error }) {
               </p>
               
               <div className="error-buttons grid grid-rows-1 text-center">
-                  <BaseButtonAnchor text={"Go to Discord"} color={"dark"} href={"https://discord.gg/threeid"} />
+                  {/* <BaseButtonAnchor text={"Go to Discord"} color={"dark"} href={"https://discord.gg/threeid"} /> */}
               </div>
             </div>
           </article>
@@ -195,7 +165,7 @@ export function CatchBoundary() {
               </p>
               <p className="error-secondary-message">{caught.status} {caught.statusText}</p>
               <div className="error-buttons grid grid-rows-1 text-center">
-                  <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} />
+                  {/* <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} /> */}
               </div>
             </div>
           </article>
