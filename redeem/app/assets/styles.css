@@ -1,0 +1,124 @@
+html,
+body {
+  font: 14px/1.21 "Helvetica Neue", arial, sans-serif;
+  font-weight: 400;
+  height: 100%;
+  background-color: #f9fafb;
+}
+
+h1 {
+  text-align: center;
+}
+
+.heading {
+  font-size: 36px;
+  color: #1f2937;
+}
+
+.subheading {
+  font-size: 24px;
+  color: #4b5563;
+}
+
+.sectionheading {
+  font-size: 20px;
+  color: #4b5563;
+}
+
+.gray-text {
+  font-size: 16px;
+  color: #9ca3af;
+}
+
+.connect-button {
+  box-sizing: border-box;
+
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+}
+
+a.action-button:hover {
+  color: white;
+}
+
+.action-button {
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 9px 17px 9px 15px;
+  gap: 12px;
+
+  background: #1f2937;
+
+  border: 0px solid #1f2937;
+
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 1px;
+
+  color: white;
+  font-size: 16px;
+}
+
+.nav-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 14px 49px;
+  gap: 10px;
+
+  position: absolute;
+  width: 198px;
+  height: 52px;
+  left: 621px;
+  top: 634px;
+
+  background: #192030;
+}
+
+.sp {
+  width: 32px;
+  height: 32px;
+  clear: both;
+  margin: 20px auto;
+}
+
+/* Spinner Circle Rotation */
+.sp-circle {
+  border: 4px rgba(0, 0, 0, 0.25) solid;
+  border-top: 4px black solid;
+  border-radius: 50%;
+  -webkit-animation: spCircRot 0.6s infinite linear;
+  animation: spCircRot 0.6s infinite linear;
+}
+
+@-webkit-keyframes spCircRot {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(359deg);
+  }
+}
+
+@keyframes spCircRot {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.card {
+  max-width: 475px;
+}
