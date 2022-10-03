@@ -1,4 +1,6 @@
+import { FaTwitter } from "react-icons/fa";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+import InputText from "~/components/inputs/InputText";
 import Text, {
   TextColor,
   TextSize,
@@ -72,15 +74,32 @@ const Kitchensink = () => {
     }
   }
 
+  const sectionClasses =
+    "flex flex-row flex-wrap space-y-4 lg:space-x-4 justify-evenly items-end";
+
   return (
     <div className="overflow-hidden flex flex-col space-y-4 p-4">
-      <section className="flex flex-row flex-wrap space-y-4 lg:space-x-4 justify-evenly items-baseline">
-        {btnElements}
+      <section className={sectionClasses}>
+        <InputText heading={"Empty"} />
+
+        <InputText heading={"Placeholder"} placeholder="Placeholder Text" />
+
+        <InputText heading={"Filled"} defaultValue="John Doe" />
+
+        <InputText heading={"Error"} defaultValue="John Doe" error={true} />
+
+        <InputText heading={"Leading Icon"} Icon={FaTwitter} />
+
+        <InputText
+          heading={"Trailing Icon"}
+          Icon={FaTwitter}
+          iconPosition="trailing"
+        />
       </section>
 
-      <section className="flex flex-row flex-wrap space-y-4 lg:space-x-4 justify-evenly items-baseline">
-        {textElements}
-      </section>
+      <section className={sectionClasses}>{btnElements}</section>
+
+      <section className={sectionClasses}>{textElements}</section>
     </div>
   );
 };
