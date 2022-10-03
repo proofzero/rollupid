@@ -48,11 +48,8 @@ const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
     }),
   }
   
-  console.log("nftar-fetch", `${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, nftarFetch);
-
   const response = await fetch(`${nftarUrl}${skipImage ? "/?skipImage=true": ''}`, nftarFetch);
 
-  console.log("nftar-response-status", response.status, response.statusText);
   const jsonRes = await response.json();
 
   if (jsonRes.error) {
@@ -95,6 +92,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   try {
     const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
+    
     if (cachedVoucher) {
       return json({
         minted: false,
@@ -114,7 +112,8 @@ export const loader: LoaderFunction = async ({ request }) => {
           "3id.profile",
           "pfp",
           {
-            url: voucher.imgUrl,
+            url: voucher.metadata.image,
+            cover: voucher.metadata.cover,
             //@ts-ignore
             contractAddress: MINTPFP_CONTRACT_ADDRESS,
             isToken: false,
