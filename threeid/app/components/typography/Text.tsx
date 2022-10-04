@@ -27,6 +27,15 @@ export enum TextColor {
   Gray100,
   Gray50,
   White,
+  Indigo50,
+  Indigo500,
+  Orange50,
+  Orange400,
+  Red50,
+  Red500,
+  Red900,
+  Green50,
+  Green500,
 }
 
 type TextColorProps = {
@@ -95,6 +104,15 @@ const textColorDict: { [key in TextColor]: TextColorProps } = {
   [TextColor.Gray100]: { color: "#F3F4F6" },
   [TextColor.Gray50]: { color: "#F9FAFB" },
   [TextColor.White]: { color: "#FFFFFF" },
+  [TextColor.Indigo50]: { color: "#EEF2FF" },
+  [TextColor.Indigo500]: { color: "#6366F1" },
+  [TextColor.Orange50]: { color: "#FFF7ED" },
+  [TextColor.Orange400]: { color: "#FB923C" },
+  [TextColor.Red50]: { color: "#FEF2F2" },
+  [TextColor.Red500]: { color: "#EF4444" },
+  [TextColor.Red900]: { color: "#7F1D1D" },
+  [TextColor.Green50]: { color: "#ECFDF5" },
+  [TextColor.Green500]: { color: "#10B981" },
 };
 
 const textWeightDict: { [key in TextWeight]: TextWeightProps } = {
