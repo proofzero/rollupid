@@ -86,14 +86,43 @@ const Kitchensink = () => {
 
         <InputText heading={"Filled"} defaultValue="John Doe" />
 
-        <InputText heading={"Error"} defaultValue="John Doe" error={true} />
-
         <InputText heading={"Leading Icon"} Icon={FaTwitter} />
 
         <InputText
           heading={"Trailing Icon"}
           Icon={FaTwitter}
           iconPosition="trailing"
+        />
+
+        <InputText heading={"Addon"} addon={"http://"} />
+
+        <InputText
+          heading={"Addon and icon"}
+          addon={"http://"}
+          Icon={FaTwitter}
+        />
+
+        <InputText heading={"Error"} defaultValue="John Doe" error={true} />
+        <InputText
+          heading={"Error"}
+          Icon={FaTwitter}
+          defaultValue="John Doe"
+          error={true}
+        />
+        <InputText
+          heading={"Error"}
+          Icon={FaTwitter}
+          iconPosition="trailing"
+          defaultValue="John Doe"
+          error={true}
+        />
+        <InputText
+          heading={"Error"}
+          addon={"http://"}
+          Icon={FaTwitter}
+          iconPosition="trailing"
+          defaultValue="John Doe"
+          error={true}
         />
       </section>
 
