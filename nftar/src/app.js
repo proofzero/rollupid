@@ -328,7 +328,7 @@ const genInvite = async (ctx, next) => {
     
     let inviteId = ctx.jsonrpc.params['inviteId'];
     const inviteTier = ctx.jsonrpc.params['inviteTier'];
-    const issueDate = ctx.jsonrpc.params['issueDate'];
+    const issueDate = Intl.DateTimeFormat('en-GB-u-ca-iso8601').format(Date.now());
     const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
     const OUTPUT_DIR = path.resolve("outputs");
     
