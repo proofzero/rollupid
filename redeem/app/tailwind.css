@@ -618,6 +618,14 @@ video {
   margin-top: -2rem;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
