@@ -6,6 +6,11 @@ import {
   useActionData,
 } from '@remix-run/react'
 
+import { keccak256 } from '@ethersproject/solidity'
+import { BigNumber } from '@ethersproject/bignumber'
+import { Wallet } from '@ethersproject/wallet'
+import { arrayify, hexlify } from '@ethersproject/bytes'
+
 import { json, redirect } from '@remix-run/cloudflare'
 
 import {
@@ -46,29 +51,124 @@ export const loader = async ({ request }) => {
 
   //@ts-ignore
   const proof = await PROOFS.get(address, { type: 'json' })
-
   if (!proof || signature != proof.signature) {
     return redirect(
       `/proof?address=${address}${invite ? `&invite=${invite}` : ''}`,
     )
   }
 
+  // @ts-ignore
   const reservation = await RESERVE.get('reservation', { type: 'json' })
-  console.log('reservation', reservation)
-  console.log('address', address)
-  console.log(reservation && reservation.address != address)
+
+  // The reservation exists and it belongs to this address
+  if (reservation && reservation.address == address) {
+    const { data } = reservation
+    return json({ invite, isReserved: false, ...data })
+  }
+
+  // The reservation exists and it belongs to someone else make them wait
   if (reservation && reservation.address != address) {
-    console.log('here')
     return json({ invite, isReserved: true })
   }
 
-  if (!reservation) {
-    await RESERVE.put('reservation', JSON.stringify({ address }), {
-      expirationTtl: 60 * 5,
-    })
-  }
+  // No reservation so let's lock one in
+  // next steps are slow so let's set an optimistic reservation
+  // @ts-ignore
+  await RESERVE.put('reservation', JSON.stringify({ address }), {
+    expirationTtl: 60 * 5,
+  })
 
-  return json({ invite, isReserved: false })
+  try {
+    // ask the contract for the next invite id
+    // @ts-ignore
+    const tokenIdRes = await fetch(`${ALCHEMY_API_URL}`, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'eth_call',
+        params: [
+          {
+            // @ts-ignore
+            to: INVITE_CONTRACT_ADDRESS,
+            data: '0xff37c2bc',
+          },
+        ],
+      }),
+    })
+    if (tokenIdRes.status != 200) {
+      throw new Error('Error reaching blockchain node')
+    }
+    const tokenId = BigNumber.from((await tokenIdRes.json()).result).toNumber()
+
+    // ask nftar to generate the metadata and assets
+    // @ts-ignore
+    const nftarRes = await fetch(NFTAR_URL, {
+      method: 'POST',
+      headers: {
+        // @ts-ignore
+        authorization: `${NFTAR_AUTHORIZATION}`,
+        accept: 'application/json',
+        'content-type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: '3id_genInvite',
+        params: {
+          recipient: address,
+          inviteId: tokenId.toString(),
+          inviteTier: 'Gen Zero',
+          issueDate: Intl.DateTimeFormat('en-GB-u-ca-iso8601').format(
+            Date.now(),
+          ),
+        },
+      }),
+    })
+
+    if (nftarRes.status != 200) {
+      throw new Error('Error reaching invite generator')
+    }
+    const nftar = await nftarRes.json()
+    if (nftar.error) {
+      throw new Error(`Failed to generate invite: ${nftar.error.message}`)
+    }
+
+    // generate the voucher
+    const { embed, metadata, url: uri } = nftar.result
+    const hash = keccak256(
+      ['address', 'string', 'uint'],
+      [address, uri, tokenId],
+    )
+    // @ts-ignore
+    const operator = new Wallet(INVITE_OPERATOR_PRIVATE_KEY)
+    const signature = await operator.signMessage(arrayify(hash))
+    const voucher = { address, uri, tokenId, signature }
+    const expiration = Date.now() + 60 * 5 * 1000
+
+    const data = { embed, metadata, voucher }
+
+    //update the reservation
+    // @ts-ignore
+    await RESERVE.put(
+      'reservation',
+      JSON.stringify({ address, expiration, data }),
+      {
+        expirationTtl: 60 * 5,
+      },
+    )
+
+    return json({ invite, isReserved: false, voucher })
+  } catch (e) {
+    // delete the optimistic reservation
+    // @ts-ignore
+    await RESERVE.delete('reservation')
+    throw Error("Couldn't reserve invite")
+  }
 }
 
 // @ts-ignore

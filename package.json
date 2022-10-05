@@ -66,7 +66,11 @@
   },
   "dependencies": {
     "@coinbase/wallet-sdk": "3.4.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/providers": "5.6.8",
+    "@ethersproject/solidity": "^5.7.0",
+    "@ethersproject/wallet": "^5.7.0",
     "@fortawesome/free-brands-svg-icons": "^6.2.0",
     "@fortawesome/free-regular-svg-icons": "^6.2.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
