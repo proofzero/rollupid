@@ -1,5 +1,8 @@
 // nftar/index.js
 
+// Load environment variables from .env file.
+require('dotenv').config();
+
 const app = require('./src/app');
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const {
@@ -9,9 +12,6 @@ const {
 const http = require('http');
 const process = require('process');
 const storage = require('nft.storage');
-
-// Load environment variables from .env file.
-require('dotenv').config();
 
 const main = async (api) => {
     // Inject client for our storage service into the context. We read the
@@ -39,7 +39,8 @@ const main = async (api) => {
     });
 
     // The Ethereum minting contract address.
-    api.context.contract = process.env.CONTRACT_ADDRESS;
+    api.context.pfp_contract = process.env.PFP_CONTRACT_ADDRESS;
+    api.context.invite_contract = process.env.INVITE_CONTRACT_ADDRESS;
 
     // set the app api key
     api.context.apiKey = process.env.NFTAR_API_KEY;

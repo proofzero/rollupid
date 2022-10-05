@@ -9,22 +9,6 @@ const {
     SPECIAL_COLLECTIONS
 } = require('./traits.js');
 
-// Does the user own any NFTs of the passed contract address?
-const isPFPOwner = function(nfts, _contractAddress) {
-    if (typeof _contractAddress !== 'string') return false;
-    if (nfts.constructor !== Array) return false;
-    
-    const contractAddress = _contractAddress.toLowerCase();
-    for (const i in nfts) {
-        const nft = nfts[i];
-        // console.log(nft.contract.address, contractAddress, contractAddress == nft.contract.address);
-        if (nft.contract.address == contractAddress) {
-            return true;
-        }
-    }
-    return false;
-}
-
 const calculateNFTWeight = function(nfts) {
     const weights = {
         "EPIC": 0,
@@ -177,7 +161,6 @@ const generateTraits = function(weightInc) {
 }
 
 module.exports = {
-    isPFPOwner,
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
