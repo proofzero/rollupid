@@ -162,7 +162,7 @@ export const loader = async ({ request }) => {
       },
     )
 
-    return json({ invite, isReserved: false, voucher })
+    return json({ invite, isReserved: false, voucher, embed })
   } catch (e) {
     // delete the optimistic reservation
     // @ts-ignore
@@ -184,14 +184,14 @@ export const action = async ({ request }) => {
 
 export default function Redeem() {
   const [err, setError] = useState(null)
-  const [voucher, setVoucher] = useState(null)
   const [expired, setExpired] = useState(false)
   const [isReserving, setIsReserving] = useState(false)
   const [noReserve, setNoReserve] = useState(false)
   const [minting, setMinting] = useState(false)
   const [timer, setTimer] = useState(0)
 
-  const { invite, isReserved } = useLoaderData()
+  const { invite, isReserved, voucher, embed } = useLoaderData()
+  console.log('voucher', voucher, embed)
 
   const showMintTimer = async (expiration) => {
     setTimer(new Date(expiration))
@@ -358,7 +358,12 @@ export default function Redeem() {
             marginBottom: '0em',
           }}
         >
-          {/* <Card cardUrl={cardUrl} /> */}
+          <div className="mx-auto text-center mx-4">
+            <img
+              style={{ width: 'auto', maxWidth: '28em' }}
+              src={embed.image}
+            />
+          </div>
         </div>
 
         {/* <div>Connected to {address}</div>
@@ -458,10 +463,14 @@ export default function Redeem() {
     return (
       <div className="row d-flex align-self-center">
         <div className="col-12 mx-auto text-center">
-          <Text size={TextSize.XL2} weight={TextWeight.Regular400}>
-            Reserving invite...
-          </Text>
-          <Spinner />
+          {!embed && (
+            <>
+              <Text size={TextSize.XL2} weight={TextWeight.Regular400}>
+                Reserving invite...
+              </Text>
+              <Spinner />
+            </>
+          )}
         </div>
       </div>
     )
