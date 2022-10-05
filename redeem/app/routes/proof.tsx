@@ -12,9 +12,8 @@ import {
 
 import { verifyMessage } from 'ethers/lib/utils'
 
-import { Label, TextInput } from "flowbite-react";
-
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+import Spinner from "~/components/spinner";
 import Text, {
     TextColor,
     TextSize,
@@ -86,6 +85,7 @@ export default function Proof() {
     const [tweetStatus, setTweetStatus] = useState('');
     const [tweetId, setTweetId] = useState('');
     const [message, setMessage] = useState('');
+    const [signature, setSignature] = useState('invalid');
 
     const { invite } = useLoaderData();
     const proofError = useActionData()
@@ -99,10 +99,12 @@ export default function Proof() {
     const { data, error, isLoading, signMessage } = useSignMessage({
         onSuccess(data, variables) {
             setMessage(variables.message.toString())
+            setSignature(data)
             setShowVerify(true);
 
             // Show tweet status verification 
-            setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz %23decentralizedidentity sig:${data.toString()}`);
+            // setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/${address} %23Web3 sig:${data.toString()}`);
+            setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz %23Web3 sig:${data.toString()}`);
         },
     })
 
@@ -121,49 +123,71 @@ export default function Proof() {
     }
 
     return (
-        <div className="connectors justify-center items-center">
-            <p className="auth-message mb-4">
+        <div className="mx-auto justify-center items-center text-center">
+            <Text 
+                size={TextSize.XL4}
+                weight={TextWeight.SemiBold600}
+            >
                 {!showVerify 
                     ? 
-                    "Verify your account by signing a message with your wallet."
+                    "Verify your account"
                     :
-                    "Tweet your signed message to verify your identity."
+                    "Verify your identity"
                 }
-            </p>
-            
-            <div className='grid grid-rows-1 mt-2'>
-                {!tweetStatus && !showVerify ? 
-                <>
-                    <Button
-                        onClick={() => signMessage({ message: "I own this tweet @threeid_xyz #decentralizedidentity" })}
-                        size={ButtonSize.L}
-                        >
-                        Sign Proof 
-                    </Button> 
-                    {error && <p className="flex flex-1 flex-col justify-center items-center error">{error.message}</p>}
-                </>
-                : <>  
-                    <div className="my-4">
-                        <Button 
-                            onClick={handleProof}
-                            size={ButtonSize.L}
-                            >Publish Tweet
+            </Text>
+            <Text
+                className="mt-4"
+                size={TextSize.XL}
+                weight={TextWeight.Regular400}
+            >
+                {!showVerify 
+                    ? 
+                    "Sign this message with your wallet to verify account ownership"
+                    :
+                    "Verify your identity by tweeting the signed message"
+                }
+                
+            </Text>
+
+            <div className="grid mt-2 gap-4 bg-white p-8 text-left break-words">
+                {tweetStatus && showVerify && <Text>1. Tweet out the signed message.</Text>}
+                <div className="h-36 p-4 leading-6 text-lg break-words whitespace-pre-wrap max-w-2xl" 
+                    style={{
+                        backgroundColor: "#F9FAFB",
+                        color: !showVerify ? "#D1D5DB": "inherit"
+                    }}
+                >   
+                    {/* I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/{address} #Web3 sig:{signature} */}
+                    I'm claiming my decentralized identity @threeid_xyz #Web3 sig:{signature}
+                </div>
+                {!tweetStatus && !showVerify && 
+                <div className="absolute left-1/2 top-1/2 translate-y-1/2 -translate-x-1/2">
+                    {!isLoading ?
+                        <Button
+                            onClick={() => signMessage({ message: "I'm claiming my decentralized identity!" })}
+                            size={ButtonSize.XL}
+                            >
+                            Sign Proof
                         </Button>
-                    </div>
+                        : 
+                        <Spinner/>
+                    }
+                    {error && <p className="justify-center items-center error">{error.message}</p>}
+                </div>}
+                {tweetStatus && showVerify && <button 
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded"
+                    onClick={handleProof}
+                    >
+                        Click to Tweet
+                </button>}
+            </div>
+            {tweetStatus && showVerify &&
+                <div className="grid mt-2 gap-4 bg-white p-8 text-left break-words">
+                    <Text>2. Enter the tweet URL and click the validate button.</Text>
                     <Form method="post"
                         className="flex flex-1 flex-col justify-center items-center gap-2"
                     >
-                        <Label htmlFor="tweetstatus">
-                            <Text
-                            className="mb-1.5"
-                            size={TextSize.Base}
-                            weight={TextWeight.Medium500}
-                            color={TextColor.Gray700}
-                            >
-                            Paste the tweet URL here:
-                            </Text>
-                        </Label>
-                        <TextInput
+                        <input
                             id="tweetstatus"
                             name="tweetstatus"
                             type="text"
@@ -172,33 +196,39 @@ export default function Proof() {
                             required={true}
                             onChange={(event) => setTweetId(event.target.value)}
                             value={tweetId}
+                            className="w-full py-4 px-2 flex flex-1"
                         />
-                        <TextInput
+                        <input
                             id="message"
                             name="message"
                             type="hidden"
                             required={true}
                             value={message}
                         />
-                        <TextInput
+                        <input
                             id="address"
                             name="address"
                             type="hidden"
                             required={true}
                             value={address}
                         />
-                        <Button
-                            isSubmit={true}
-                            size={ButtonSize.L}
+                        <button
+                            className="py-4 px-6 rounded w-full text-white"
+                            style={{
+                                backgroundColor: "#1F2937",
+                            }}
+                            type="submit"
                             disabled={!tweetId}
                             >
                             Validate
-                        </Button>
+                        </button>
                         {proofError && <p className="error">{proofError.error}</p>}
 
                     </Form>
-                </>}
-            </div>
+
+                </div>
+            }
+          
         </div>
     );
 }

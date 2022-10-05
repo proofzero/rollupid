@@ -97,7 +97,7 @@ div[data-testid=flowbite-tooltip] div {
   margin: auto;
   display: flex;
   flex-grow: 1;
-  min-width: 300px
+  min-width: 300px;
 }
 
 .auth-message,.auth-secondary-message,.error-screen .error-message,.error-screen .error-secondary-message {

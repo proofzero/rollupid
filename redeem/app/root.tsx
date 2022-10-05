@@ -105,7 +105,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="wrapper grid grid-row-3 gap-4">
+        <div className="wrapper grid grid-row-3 grid-col-3 gap-4">
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
           </nav>
@@ -117,7 +117,6 @@ export default function App() {
           <footer className="col-span-3">
             <p>
               3ID is non-custodial and secure.
-              <br />
               We will never request access to your assets.
             </p>
           </footer>
