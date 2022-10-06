@@ -35,7 +35,7 @@
     "@cloudflare/workers-types": "^3.14.1",
     "@remix-run/dev": "^1.7.2",
     "@remix-run/eslint-config": "^1.7.2",
-    "@types/react": "^17.0.47",
+    "@types/react": "^18.0.21",
     "@types/react-dom": "^17.0.17",
     "eslint": "^8.23.1",
     "miniflare": "^2.6.0",

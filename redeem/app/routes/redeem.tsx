@@ -62,8 +62,8 @@ export const loader = async ({ request }) => {
 
   // The reservation exists and it belongs to this address
   if (reservation && reservation.address == address) {
-    const { data } = reservation
-    return json({ invite, isReserved: false, ...data })
+    const { data, expiration } = reservation
+    return json({ invite, isReserved: false, expiration, ...data })
   }
 
   // The reservation exists and it belongs to someone else make them wait
@@ -79,8 +79,6 @@ export const loader = async ({ request }) => {
   })
 
   try {
-    console.log("here1")
-
     // ask the contract for the next invite id
     // @ts-ignore
     const tokenIdRes = await fetch(`${ALCHEMY_API_URL}`, {
@@ -102,7 +100,6 @@ export const loader = async ({ request }) => {
         ],
       }),
     })
-    console.log("here", tokenIdRes)
     if (tokenIdRes.status != 200) {
       throw new Error('Error reaching blockchain node')
     }
@@ -153,7 +150,7 @@ export const loader = async ({ request }) => {
     const voucher = { address, uri, tokenId, signature }
     const expiration = Date.now() + 60 * 5 * 1000
 
-    const data = { embed, metadata, voucher }
+    const data = { embed, metadata, voucher, expiration }
 
     //update the reservation
     // @ts-ignore
@@ -165,7 +162,7 @@ export const loader = async ({ request }) => {
       },
     )
 
-    return json({ invite, isReserved: false, voucher, embed })
+    return json({ invite, isReserved: false, voucher, embed, expiration })
   } catch (e) {
     // delete the optimistic reservation
     // @ts-ignore
@@ -186,22 +183,18 @@ export const action = async ({ request }) => {
 }
 
 export default function Redeem() {
+  const { invite, isReserved, voucher, embed, expiration } = useLoaderData()
+
   const [err, setError] = useState(null)
   const [expired, setExpired] = useState(false)
-  const [isReserving, setIsReserving] = useState(false)
   const [noReserve, setNoReserve] = useState(false)
-  const [minting, setMinting] = useState(false)
-  const [timer, setTimer] = useState(0)
+  const [minting, setMinting] = useState(!!voucher)
+  const [timer, setTimer] = useState(expiration)
 
-  const { invite, isReserved, voucher, embed } = useLoaderData()
-  console.log('voucher', voucher, embed)
-
-  const showMintTimer = async (expiration) => {
-    setTimer(new Date(expiration))
-    setMinting(true)
-  }
+  console.log('voucher', voucher, embed, minting, expiration)
 
   const countdownRender = ({ hours, minutes, seconds, completed }) => {
+    console.log("countdownRender", hours, minutes, seconds, completed)
     if (completed) {
       setExpired(true)
       setNoReserve(false)
@@ -219,6 +212,7 @@ export default function Redeem() {
       )
     } else {
       // Render a countdown
+      console.log("countdown", hours, minutes, seconds)
       return (
         <span
           className="subheading"
@@ -369,8 +363,7 @@ export default function Redeem() {
           </div>
         </div>
 
-        {/* <div>Connected to {address}</div>
-        <button disabled={!write || isTxnLoading} onClick={() => write()}> */}
+        {console.log("timer", minting, !isSuccess)}
         {minting && !isSuccess && (
           <Countdown date={timer} renderer={countdownRender} />
         )}
