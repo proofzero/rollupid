@@ -55,4 +55,3 @@ kv_namespaces = [
   { binding = "ONBOARD_STATE", id = "b1959de0b0974c26b3bc83576a259db7" },
   { binding = "REDEEM", id = "a5ad55acb9624ac28bf7f13d84a358f2" },
 ]
-
