@@ -79,6 +79,8 @@ export const loader = async ({ request }) => {
   })
 
   try {
+    console.log("here1")
+
     // ask the contract for the next invite id
     // @ts-ignore
     const tokenIdRes = await fetch(`${ALCHEMY_API_URL}`, {
@@ -100,6 +102,7 @@ export const loader = async ({ request }) => {
         ],
       }),
     })
+    console.log("here", tokenIdRes)
     if (tokenIdRes.status != 200) {
       throw new Error('Error reaching blockchain node')
     }
