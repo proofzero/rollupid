@@ -151,24 +151,39 @@ export function ErrorBoundary({ error }) {
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
           </nav>
-          <article className="content col-span-3">
-            <div className="error justify-center items-center">
+          <article className="content col-span-3 flex flex-col gap-4">
+            <div className="error justify-center items-center gap-4">
               <img className="m-auto pb-12" src={sad} />
-              <p className="error-message">Something went terribly wrong!</p>
-              <p className="error-secondary-message">{error.message}</p>
-              <p className="error-secondary-message">
+              <p className="error-message mx-auto">Something went terribly wrong!</p>
+              <p className="error-secondary-message mx-auto">{error.message}</p>
+              <p className="error-secondary-message mx-auto">
                 If this problem persists please join Discord for help
               </p>
 
-              <div className="error-buttons grid grid-rows-1 text-center">
-                {/* <BaseButtonAnchor text={"Go to Discord"} color={"dark"} href={"https://discord.gg/threeid"} /> */}
+              <div className="error-buttons text-center mx-auto w-full flex justify-center align-center">
+                <a
+                  style={{
+                    // width: '100%',
+                    maxWidth: '480px',
+                    padding: '0.75em 2.5em',
+                    textDecoration: 'none',
+                    fontSize: '1.25em',
+                    marginBottom: "0.5em",
+                    marginTop: "0.5em",
+                  }}
+                  target="_blank"
+                  className="action-button"
+                  href="https://discord.gg/threeid"
+                >
+                  Go to Discord
+                </a>
               </div>
             </div>
           </article>
           <article className="content col-span-3 m-12">
             <div className="error justify-center items-center">
               <p>The stack trace is:</p>
-              <pre>{error.stack}</pre>
+              <pre className="break-words">{error.stack}</pre>
             </div>
           </article>
         </div>

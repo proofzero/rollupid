@@ -100,7 +100,7 @@ export default function Proof() {
   const [tweetStatus, setTweetStatus] = useState('')
   const [tweetId, setTweetId] = useState('')
   const [message, setMessage] = useState('')
-  const [signature, setSignature] = useState('invalid')
+  const [signature, setSignature] = useState('')
 
   const { invite } = useLoaderData()
   const proofError = useActionData()
@@ -149,12 +149,12 @@ export default function Proof() {
           : 'Verify your identity by tweeting the signed message'}
       </Text>
 
-      <div className="grid mt-2 gap-4 bg-white p-8 text-left break-words">
+      <div className="flex flex-1 flex-col mt-2 gap-4 bg-white p-8 text-left break-words">
         {tweetStatus && showVerify && (
           <Text>1. Tweet out the signed message.</Text>
         )}
         <div
-          className="h-36 p-4 leading-6 text-lg break-words whitespace-pre-wrap max-w-2xl"
+          className="min-h-36 p-4 leading-6 text-lg break-words whitespace-pre-wrap max-w-2xl"
           style={{
             backgroundColor: '#F9FAFB',
             color: !showVerify ? '#D1D5DB' : 'inherit',

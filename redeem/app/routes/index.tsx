@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useTransition } from "@remix-run/react";
 
 import { 
   useAccount,
@@ -22,6 +22,7 @@ type IndexProps = {
 }
 
 export default function Index({ inviteCode }: IndexProps) {
+  const transition = useTransition();
   // NOTE: state is all messed if we render this component with SSR
   if (typeof document === "undefined") {
       return null
@@ -74,7 +75,7 @@ export default function Index({ inviteCode }: IndexProps) {
         <p className="auth-secondary-message">
             Connect Your Wallet
         </p>
-        {isLoading || pendingConnector ? <Spinner /> :
+        {isLoading || pendingConnector || transition.state === 'loading' ? <Spinner /> :
         <div className='grid grid-rows-1 mt-2 mx-4'>
             {connectors.map((connector) => (
                 <div key={connector.id}>

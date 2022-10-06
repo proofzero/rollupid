@@ -107,6 +107,7 @@ div[data-testid='flowbite-tooltip'] div {
   display: flex;
   flex-grow: 1;
   min-width: 300px;
+  width: 100%;
 }
 
 .auth-message,
@@ -122,6 +123,7 @@ div[data-testid='flowbite-tooltip'] div {
   color: #1f2937;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .auth-secondary-message,
@@ -214,7 +216,6 @@ a.action-button:hover {
 
 .error-buttons a,
 .error-buttons button {
-  margin: 1em 0.5em;
   text-align: center;
 }
 

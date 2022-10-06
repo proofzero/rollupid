@@ -14,10 +14,9 @@ import IndexLayout from '~/routes/index';
 //@ts-ignore
 export const loader = async ({ params }) => {
 
-    return json({
-        inviteCode: params.invite,
-    });
-
+    // @ts-ignore
+    const inviteRec = await THREEID_INVITE_CODES.get(params.invite, { type: 'json' })
+    return json({ invite: params?.invite })
 }
 
 
