@@ -42,9 +42,13 @@ The [www/](www/) directory contains the Kubelt.com static website documentation 
 
 The [starbase/](starbase/) directory contains a web application for interacting with Kubelt as a customer.
 
-### 3iD
+### 3ID
 
 The [threeid/](threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging. For more information visit [3ID](https://threeid.xyz).
+
+### Redeem
+
+THe [redeem/](redeem/) directory contains a web application for minting 3ID invites.
 
 ### Browser Extension
 
