@@ -17,7 +17,6 @@ import {
 } from "~/components/buttons";
 import HeadNav from "~/components/head-nav";
 import { useEffect, useState } from "react";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 import { links as spinnerLinks } from "~/components/spinner";
 import { FaBriefcase, FaCamera, FaEdit, FaMapMarkerAlt } from "react-icons/fa";
@@ -188,7 +187,7 @@ const ProfileRoute = () => {
         )}
 
         <div className="mt-20">
-          <ProfileNftCollection account={targetAddress} isOwner={isOwner} />
+          <ProfileNftCollection account={displayname ?? targetAddress} isOwner={isOwner} />
         </div>
       </div>
     </div>
