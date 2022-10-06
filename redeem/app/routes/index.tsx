@@ -54,7 +54,7 @@ export default function Index({ inviteCode }: IndexProps) {
         <div className="align-self-center">
         <div className="col-12 mx-auto mt-2 text-center">
           <Text
-            size={TextSize.XL2}
+            size={TextSize.XL}
             weight={TextWeight.Regular400}
           >
             You can now mint your access card.
@@ -67,8 +67,8 @@ export default function Index({ inviteCode }: IndexProps) {
                 marginBottom: "2em",
             }}
             >
-            <div className="mx-auto text-center mx-4">
-                <img style={{width: "auto", maxWidth: "28em"}} src={blankCard} />
+            <div className="mx-auto text-center">
+                <img className="w-full px-4" style={{maxWidth: "28em"}} src={blankCard} />
             </div>
         </div>
         <p className="auth-secondary-message">

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import {
-  Form,
-  useNavigate,
   useLoaderData,
-  useActionData,
+  useSubmit,
+  useTransition,
 } from '@remix-run/react'
 
 import { keccak256 } from '@ethersproject/solidity'
@@ -15,19 +14,18 @@ import { json, redirect } from '@remix-run/cloudflare'
 
 import {
   useAccount,
-  useConnect,
+  useSwitchNetwork,
+  useNetwork,
   usePrepareContractWrite,
   useContractWrite,
   useWaitForTransaction,
 } from 'wagmi'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
-import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons'
-
 import Countdown from 'react-countdown'
 import Confetti from 'react-confetti'
 import { useWindowWidth, useWindowHeight } from '@react-hook/window-size'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons'
 
 import Spinner from '~/components/spinner'
 import Text, {
@@ -37,6 +35,7 @@ import Text, {
 } from '~/components/typography/Text'
 
 import { abi } from '~/assets/abi.json'
+import openSeaLogo from "~/assets/opensea.svg"
 
 // @ts-ignore
 export const loader = async ({ request }) => {
@@ -63,12 +62,12 @@ export const loader = async ({ request }) => {
   // The reservation exists and it belongs to this address
   if (reservation && reservation.address == address) {
     const { data, expiration } = reservation
-    return json({ invite, isReserved: false, expiration, ...data })
+    return json({ address, invite, expiration, ...data })
   }
 
   // The reservation exists and it belongs to someone else make them wait
   if (reservation && reservation.address != address) {
-    return json({ invite, isReserved: true })
+    return redirect(`/queue?address=${address}&signature=${signature}${invite ? `&invite=${invite}` : ''}`)
   }
 
   // No reservation so let's lock one in
@@ -147,7 +146,7 @@ export const loader = async ({ request }) => {
     // @ts-ignore
     const operator = new Wallet(INVITE_OPERATOR_PRIVATE_KEY)
     const signature = await operator.signMessage(arrayify(hash))
-    const voucher = { address, uri, tokenId, signature }
+    const voucher = { recipient: address, uri, tokenId, signature }
     const expiration = Date.now() + 60 * 5 * 1000
 
     const data = { embed, metadata, voucher, expiration }
@@ -162,7 +161,7 @@ export const loader = async ({ request }) => {
       },
     )
 
-    return json({ invite, isReserved: false, voucher, embed, expiration })
+    return json({ address, invite, voucher, embed, expiration })
   } catch (e) {
     // delete the optimistic reservation
     // @ts-ignore
@@ -173,302 +172,239 @@ export const loader = async ({ request }) => {
 
 // @ts-ignore
 export const action = async ({ request }) => {
-  const url = new URL(request.url)
-  const invite = url.searchParams.get('invite')
-
   // get tweet url from link
   const form = await request.formData()
   const address = form.get('address')
   const hash = form.get('hash')
+  const invite = form.get('invite')
+
+  console.log('form', form, {address, hash, invite})
+  
+  //@ts-ignore
+  await RESERVE.delete('reservation')
+
+
+  // @ts-ignore
+  const inviteRecord = await INVITES.get(invite, { type: 'json' })
+  if (!inviteRecord) {
+    // fake invite so skip
+    return null
+  }
+
+
+  return null
 }
 
 export default function Redeem() {
-  const { invite, isReserved, voucher, embed, expiration } = useLoaderData()
+  const { address: invitee, invite, voucher, embed, expiration } = useLoaderData()
+  const submit = useSubmit();
 
-  const [err, setError] = useState(null)
   const [expired, setExpired] = useState(false)
-  const [noReserve, setNoReserve] = useState(false)
-  const [minting, setMinting] = useState(!!voucher)
-  const [timer, setTimer] = useState(expiration)
-
-  console.log('voucher', voucher, embed, minting, expiration)
-
-  const countdownRender = ({ hours, minutes, seconds, completed }) => {
-    console.log("countdownRender", hours, minutes, seconds, completed)
-    if (completed) {
-      setExpired(true)
-      setNoReserve(false)
-      return (
-        <span
-          className="subheading"
-          style={{
-            margin: '-1em 0 1em 0',
-            fontSize: '18px',
-            // color: "#6B7280",
-          }}
-        >
-          Invite has expired. Refresh the page to try again.
-        </span>
-      )
-    } else {
-      // Render a countdown
-      console.log("countdown", hours, minutes, seconds)
-      return (
-        <span
-          className="subheading"
-          style={{
-            margin: '-1em 0 1em 0',
-            fontSize: '18px',
-            // color: "#6B7280",
-          }}
-        >
-          Invite is reserved for: {minutes < 10 ? `0${minutes}` : minutes}:
-          {seconds < 10 ? `0${seconds}` : seconds}
-        </span>
-      )
-    }
-  }
-
-  const reserveTimerRender = ({ hours, minutes, seconds, completed }) => {
-    if (completed) {
-      setNoReserve(false)
-    } else {
-      // Render a countdown
-      return (
-        <span
-          className="subheading"
-          style={{
-            margin: '-1em 0 1em 0',
-            fontSize: '18px',
-            // color: "#6B7280",
-          }}
-        >
-          Minting queue full. Trying again in:{' '}
-          {minutes < 10 ? `0${minutes}` : minutes}:
-          {seconds < 10 ? `0${seconds}` : seconds}
-        </span>
-      )
-    }
-  }
-
-  const writeTxn = function (write) {
-    write()
-  }
+  const [useWindowWidthState, setUseWindowWidthState] = useState(useWindowWidth())
+  const [useWindowHeightState, setUseWindowHeightState] = useState(useWindowHeight())
 
   const { address, isConnected } = useAccount()
-
+  const { chain } = useNetwork()
+  const { pendingChainId, switchNetwork } =  useSwitchNetwork()
   const {
-    connect,
-    connectors,
-    error,
-    isLoading,
-    pendingConnector,
-  } = useConnect()
+    config,
+    error: prepareError,
+    isError: isPrepareError,
+  } = usePrepareContractWrite({
+    //@ts-ignore
+    addressOrName: typeof window !== 'undefined' && window.ENV.INVITE_CONTRACT_ADDRESS,
+    contractInterface: abi,
+    functionName: 'awardInvite',
+    args: [invitee, voucher],
+    overrides: {
+      gasLimit: 1000000,
+    }
+  })
+  const { data, error, isError, write } = useContractWrite({
+    ...config,
+    onSuccess(data) {
+      console.log("isSuccess 2", isSuccess)
+      submit({
+        address: invitee,
+        hash: data.hash,
+        invite,
+      }, {method: "post"})
+    }
+  })
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  })
 
-  if (err) {
+  useEffect(() => {
+    //@ts-ignore
+    if (switchNetwork && chain?.id != window.ENV.CHAIN_ID) {
+      //@ts-ignore
+      switchNetwork(`0x${window.ENV.CHAIN_ID}`)
+    }
+  }, [pendingChainId])
+
+  // useEffect(() => {
+  //   console.log("isSuccess 2", isSuccess)
+  //   if (data?.hash) {
+  //     submit({
+  //       address: invitee,
+  //       hash: data.hash,
+  //       invite,
+  //     }, {method: "post"})
+  //   }
+  // }, [isSuccess])
+
+  const countdownRender = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+      setExpired(true)
+    }
     return (
-      <div className="row d-flex align-self-center">
-        <div className="col-12 mx-auto text-center subheading">
-          <FontAwesomeIcon
-            style={{
-              marginRight: '0.25em',
-              color: 'red',
-              display: 'inline-block',
-            }}
-            icon={faCircleXmark}
-          />
-          <p
-            style={{
-              display: 'inline-block',
-            }}
-          >
-            Error: {err}
-          </p>
-          <p style={{ fontSize: '18px' }}>
-            Join our{' '}
-            <a target="_blank" href={'https://discord.gg/threeid'}>
-              Discord
-            </a>{' '}
-            for support.
-          </p>
-        </div>
-      </div>
+      <Text
+        className="mb-4 text-center"
+        size={TextSize.LG}
+        weight={TextWeight.Regular400}
+      >
+        {completed
+        ?
+          "Invite has expired. Refresh the page to try again."
+        :
+          `Invite is reserved for: ${minutes < 10 ? `0${minutes}` : minutes}:
+          ${seconds < 10 ? `0${seconds}` : seconds}`
+        }
+      </Text>
     )
-  } else if (!isReserved && typeof window !== 'undefined') {
-    const invitee = address
-    const {
-      config,
-      error: prepareError,
-      isError: isPrepareError,
-    } = usePrepareContractWrite({
-      addressOrName: window.ENV.INVITE_CONTRACT_ADDRESS,
-      contractInterface: abi,
-      functionName: 'awardInvite',
-      args: [invitee, voucher],
-      overrides: {
-        gasLimit: 1000000,
-      },
-    })
+  }
 
-    const { data, error, isError, write } = useContractWrite(config)
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Text className="text-center" size={TextSize.XL3} weight={TextWeight.SemiBold600}>
+        {isSuccess
+          ? 'Congratulations! 🥳'
+          : 'You can now mint your invite. 👀'}
+      </Text>
 
-    const { isLoading, isSuccess } = useWaitForTransaction({
-      hash: data?.hash,
-    })
-
-    // if (isSuccess) {
-    //   fetch(`${process.env.PREACT_APP_API_HOST_LOCAL}/invite/submit/${props.invite}`, {
-    //     method: "POST",
-    //     headers: {
-    //       Accept: "application/json",
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({ address: address + "foo", hash: data?.hash }),
-    //   })
-    //     .then((resp) => {
-    //       if (!resp.ok) {
-    //         // get error message from body or default to response status
-    //         const error = (data && data.message) || resp.status;
-    //         return Promise.reject(error);
-    //       }
-    //     });
-    // }
-
-    return (
       <div
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          marginTop: '-2em',
+          marginBottom: '0em',
+          minHeight: 358,
         }}
       >
-        <h2 className="subheading">
-          {isSuccess
-            ? 'Congratulations! 🥳'
-            : 'You can now mint your invite. 👀'}
-        </h2>
-
-        <div
-          style={{
-            marginTop: '0em',
-            marginBottom: '0em',
-          }}
-        >
-          <div className="mx-auto text-center mx-4">
-            <img
-              style={{ width: 'auto', maxWidth: '28em' }}
-              src={embed.image}
-            />
-          </div>
+        <div className="mx-auto text-center">
+          <img
+            className="w-full"
+            style={{ maxWidth: '28em' }}
+            src={embed.image}
+          />
         </div>
+      </div>
 
-        {console.log("timer", minting, !isSuccess)}
-        {minting && !isSuccess && (
-          <Countdown date={timer} renderer={countdownRender} />
-        )}
-        {!isSuccess && (
+      {!isSuccess && (
+        <>
+          <Countdown date={expiration} renderer={countdownRender} />
+
+          {!isConnected &&
+            <Text size={TextSize.SM} className="text-center mb-2">
+              Wallet not connected.<br/>Please unlock wallet and refresh page.
+            </Text>
+          }
           <button
+            className="py-4 px-6 text-white"
             style={{
               width: 233,
-              backgroundColor:
-                !write || isLoading || expired ? '#ccc' : '#1f2937',
+              backgroundColor: !isConnected || !write || isPrepareError || isLoading || expired ? '#ccc' : '#1f2937',
             }}
-            className="action-button"
-            disabled={!write || isLoading || expired}
-            onClick={() => writeTxn(write)}
+            disabled={!isConnected || !write || isPrepareError || isLoading || expired}
+            onClick={write}
           >
             {isLoading ? 'Minting...' : 'Mint NFT'}
           </button>
-        )}
-
-        {isSuccess && (
-          <div
-            className="text-center"
-            style={{
-              padding: '2em',
-              marginTop: '-2em',
-            }}
-          >
-            <h2 className="subheading">We've successfully minted your NFT!</h2>
-            <a
-              style={{
-                width: '100%',
-                maxWidth: '480px',
-                padding: '20px',
-                textDecoration: 'none',
-                margin: '1em 0',
-              }}
-              className="action-button"
-              href="https://dapp.threeid.xyz"
-            >
-              Claim your 3ID!
-            </a>
-            <div>
-              <a
-                className="btn col-12 mx-auto"
-                style={{
-                  fontSize: '1.25em',
-                  color: '#4b5563',
-                  padding: '0.75em 2.5em',
-                  marginBottom: '0.5em',
-                  backgroundColor: '#F3F4F6',
-                }}
-                target="_blank"
-                href={`https://twitter.com/intent/tweet?text=Just minted my @threeid_xyz invite! 🚀 https://opensea.io/assets/ethereum/0x92ce069c08e39bca867d45d2bdc4ebe94e28321a/${parseInt(
-                  voucher.tokenId,
-                )}%C2%A0 %23web3%C2%A0 %23NFT %23DID`}
-              >
-                <FontAwesomeIcon
-                  style={{ color: '#1DA1F2' }}
-                  icon={faTwitter}
-                />{' '}
-                Share on Twitter
-              </a>
-            </div>
-            <div>
-              <a
-                target="_blank"
-                className="col-12 mx-auto btn"
-                href="https://opensea.io/collection/3id-invite"
-                style={{
-                  fontSize: '1.25em',
-                  color: '#4b5563',
-                  padding: '0.5em 2.5em',
-                  backgroundColor: '#F3F4F6',
-                }}
-              >
-                <img style={{ height: '1.25em' }} src="/assets/opensea.svg" />{' '}
-                View on OpenSea
-              </a>
-            </div>
-            <div style={{ marginTop: '1em' }}>
-              <a href={`https://etherscan.io/tx/${data?.hash}`}>
-                View on: Etherscan
-              </a>
-            </div>
-            <Confetti width={useWindowWidth()} height={useWindowHeight()} />
-          </div>
-        )}
-        {(isPrepareError || isError) && (
-          <div>Error: {(prepareError || error)?.message}</div>
-        )}
-      </div>
-    )
-  } else {
-    return (
-      <div className="row d-flex align-self-center">
-        <div className="col-12 mx-auto text-center">
-          {!embed && (
-            <>
-              <Text size={TextSize.XL2} weight={TextWeight.Regular400}>
-                Reserving invite...
-              </Text>
-              <Spinner />
-            </>
+          {(isPrepareError || isError) && (
+            <div>Error: {(prepareError || error)?.message}</div>
           )}
+        </>
+      )}
+
+      {isSuccess && (
+        <div
+          className="text-center"
+          style={{
+            padding: '2em',
+            marginTop: '-2em',
+          }}
+        >
+          <Text className="text-center" size={TextSize.XL} weight={TextWeight.Regular400}>
+            We've successfully minted your invite.
+          </Text>            
+          <a
+            style={{
+              width: '100%',
+              maxWidth: '480px',
+              padding: '0.75em 2.5em',
+              textDecoration: 'none',
+              fontSize: '1.25em',
+              marginBottom: "0.5em"
+            }}
+            className="action-button"
+            href="https://dapp.threeid.xyz"
+          >
+            Claim your 3ID!
+          </a>
+          <div>
+            <a
+              className="action-button col-12 mx-auto"
+              style={{
+                fontSize: '1.25em',
+                color: '#4b5563',
+                padding: '0.75em 2.5em',
+                marginBottom: '0.5em',
+                backgroundColor: '#F3F4F6',
+              }}
+              target="_blank"
+              href={`https://twitter.com/intent/tweet?text=Just minted my @threeid_xyz invite! 🚀 https://opensea.io/assets/ethereum/0x92ce069c08e39bca867d45d2bdc4ebe94e28321a/${parseInt(
+                voucher?.tokenId,
+              )}%C2%A0 %23web3%C2%A0 %23NFT %23DID`}
+            >
+              <FontAwesomeIcon
+                style={{ color: '#1DA1F2' }}
+                icon={faTwitter}
+              />{' '}
+              Share on Twitter
+            </a>
+          </div>
+          <div>
+          <a
+              target="_blank"
+              className="col-12 mx-auto action-button"
+              href="https://opensea.io/collection/3id-invite"
+              style={{
+                fontSize: '1.25em',
+                color: '#4b5563',
+                padding: '0.75em 2.5em',
+                backgroundColor: '#F3F4F6',
+              }}
+            >
+              <img style={{ height: '1.25em' }} src={openSeaLogo} />{' '}
+              View on OpenSea
+            </a>
+          </div>
+          <div style={{ marginTop: '1em' }}>
+            <a href={`https://etherscan.io/tx/${data?.hash}`} style={{textDecoration: "underline"}}>
+              View on: Etherscan
+            </a>
+          </div>
+          <Confetti width={useWindowWidthState} height={useWindowHeightState} />
         </div>
-      </div>
-    )
-  }
+      )}
+    </div>
+  )
+
 }
+

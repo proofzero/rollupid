@@ -187,6 +187,31 @@ nav img {
   text-align: center;
 }
 
+a.action-button:hover {
+  color: white;
+}
+
+.action-button {
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 9px 17px 9px 15px;
+  gap: 12px;
+
+  background: #1f2937;
+
+  border: 0px solid #1f2937;
+
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 1px;
+
+  color: white;
+  font-size: 16px;
+}
+
 .error-buttons a,
 .error-buttons button {
   margin: 1em 0.5em;

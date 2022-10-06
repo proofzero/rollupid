@@ -14,7 +14,8 @@ compatibility_date = "2022-04-05"
 [env.development]
 kv_namespaces = [
   { binding = "RESERVE", id = "f3392c3f50f24fcb981c3df5aa266224" },
-  { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271" }
+  { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271" },
+  { binding = "INVITES", id = "830516c2fa8841c7b374716fe00193a8" }
 ]
 
 [env.current]
@@ -22,5 +23,6 @@ name = "three-id-current"
 route = { pattern = "get.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 kv_namespaces = [
   { binding = "RESERVE", id = "1d694284252c4653a444dde3ab4bb28a" },
-  { binding = "PROOFS", id = "659e5d68ffc74e99b8b2d774c646f65b" }
+  { binding = "PROOFS", id = "659e5d68ffc74e99b8b2d774c646f65b" },
+  { binding = "INVITES", id = "5cc6339044944d088e4c182c15b10cfe" }
 ]

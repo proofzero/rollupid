@@ -50,6 +50,8 @@ export const loader: LoaderFunction = () => {
       INVITE_CONTRACT_ADDRESS: INVITE_CONTRACT_ADDRESS,
       // @ts-ignore
       TWITTER_BEARER_TOKEN: TWITTER_BEARER_TOKEN,
+      // @ts-ignore
+      CHAIN_ID: CHAIN_ID,
     },
   })
 }
@@ -125,11 +127,6 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
-        <script
-          async
-          src="https://platform.twitter.com/widgets.js"
-          charSet="utf-8"
-        ></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
