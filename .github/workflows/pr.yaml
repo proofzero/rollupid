@@ -56,8 +56,7 @@ jobs:
         working-directory: redeem
       - name: Build and Test
         run: npm run build # TODO: add test
-        with: 
-          working-directory: redeem
+        working-directory: redeem
         
   # threeid
   # ----------------------------------------------------------------------------
@@ -90,5 +89,49 @@ jobs:
         working-directory: threeid
       - name: Build and Test
         run: npm run build # TODO: add test
+        workingDirectory: 'threeid'
+
+  # nftar
+  # ----------------------------------------------------------------------------
+  build-test-nftar:
+    needs: changes
+    if: needs.changes.outputs.nftar == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
         with:
-          workingDirectory: 'threeid'
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/nftar/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: 'npm'
+          cache-dependency-path: ./redeem/package-lock.json
+      - run: npm install
+        working-directory: nftar
+      - name: Build and Test
+        run: npm test
+        working-directory: nftar
+        env:
+          CHAIN: "ethereum"
+          CHAIN_ID: 5
+          OORT_URL: oort-devnet.kubelt.com
+          STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
+          WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
+          ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
+          ALCHEMY_NETWORK: "ETH_MAINNET"
+          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
+          PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          NFTAR_API_KEY: "test"

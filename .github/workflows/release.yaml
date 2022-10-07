@@ -6,32 +6,12 @@ on:
     types: [published]
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      www: ${{ steps.changes.outputs.www }}
-      threeid: ${{ steps.changes.outputs.threeid }}
-      redeem: ${{ steps.changes.outputs.redeem }}
-      nftar: ${{ steps.changes.outputs.nftar }}
-    steps:
-      # find out what deploy stack to use
-      - uses: actions/checkout@master
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            www: 'www/**'
-            threeid: 'threeid/**'
-            redeem: 'redeem/**'
-            nftar: 'nftar/**'
-
   # redeem
   # ----------------------------------------------------------------------------
   build-publish-test-redeem-current:
-    needs: changes
-    if: needs.changes.outputs.redeem == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    permissions:
+      packages: read
     steps:
       - uses: actions/checkout@v2
       - name: Cache node modules
@@ -73,6 +53,9 @@ jobs:
             NFTAR_CHAIN_ID
             INVITE_OPERATOR_PRIVATE_KEY
             TWITTER_BEARER_TOKEN
+            ALCHEMY_API_KEY
+            ALCHEMY_API_URL
+            ALCHEMY_NFT_URL
         env:
           # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
@@ -86,12 +69,15 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
-          INVITE_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-          NFTAR_CHAIN_ID: 5
-          INVITE_OPERATOR_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }}
+          NFTAR_URL: ${{ secrets.NFTAR_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
+          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_CONTRACT_ADDRESS }}
+          NFTAR_CHAIN_ID: 1
+          INVITE_OPERATOR_PRIVATE_KEY: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
           TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_DEV_BEARER_TOKEN }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_KEY }}
+          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_URL }}
+          ALCHEMY_NFT_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_NFT_URL }}
 
   # threeid
   # ----------------------------------------------------------------------------
