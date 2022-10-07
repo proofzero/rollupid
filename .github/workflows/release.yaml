@@ -8,7 +8,7 @@ on:
 jobs:
   # redeem
   # ----------------------------------------------------------------------------
-  build-publish-test-redeem-current:
+  build-publish-current-redeem-current:
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -84,7 +84,7 @@ jobs:
   # threeid
   # ----------------------------------------------------------------------------
 
-  build-publish-test-threeid-current:
+  build-publish-current-threeid-current:
     runs-on: ubuntu-latest
     permissions:
       packages: read
