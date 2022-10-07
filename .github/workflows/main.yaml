@@ -49,7 +49,7 @@ jobs:
             NFTAR_URL
             NFTAR_AUTHORIZATION
             INVITE_CONTRACT_ADDRESS
-            NFTAR_CHAIN_ID
+            CHAIN_ID
             INVITE_OPERATOR_PRIVATE_KEY
             TWITTER_BEARER_TOKEN
             ALCHEMY_API_KEY
