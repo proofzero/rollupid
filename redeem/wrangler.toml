@@ -16,7 +16,15 @@ kv_namespaces = [
   { binding = "RESERVE", id = "f3392c3f50f24fcb981c3df5aa266224" },
   { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271" },
   { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
+]
 
+[env.next]
+name = "three-id-next"
+route = { pattern = "get-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+kv_namespaces = [
+  { binding = "RESERVE", id = "3949ffe367e34bcb85193788baa4807d" },
+  { binding = "PROOFS", id = "6dfcdfbffe11401fa82b895e5e7b4ab1" },
+  { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
 ]
 
 [env.current]

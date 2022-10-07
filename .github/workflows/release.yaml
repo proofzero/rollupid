@@ -72,7 +72,7 @@ jobs:
           NFTAR_URL: ${{ secrets.NFTAR_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
           INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_CONTRACT_ADDRESS }}
-          NFTAR_CHAIN_ID: 1
+          CHAIN_ID: 1
           INVITE_OPERATOR_PRIVATE_KEY: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
           TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_DEV_BEARER_TOKEN }}
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_KEY }}
