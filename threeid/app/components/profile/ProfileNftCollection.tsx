@@ -15,9 +15,22 @@ import noNfts from "~/assets/No_NFT_Found.svg";
 
 import { ButtonAnchor } from "../buttons";
 
+import Masonry from "react-masonry-css";
+
+import ProfileNftCollectionStyles from "./ProfileNftCollection.css";
+import { LinksFunction } from "@remix-run/cloudflare";
+
+import InfiniteScroll from "react-infinite-scroll-component";
+import { useEffect, useState } from "react";
+import Spinner from "../spinner";
+
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: ProfileNftCollectionStyles },
+];
+
 export type ProfileNftCollectionProps = {
   account: string;
-  nfts?: [];
+  nfts?: string[];
   isOwner?: boolean;
 };
 
@@ -68,6 +81,25 @@ const ProfileNftCollection = ({
   isOwner = true,
   account,
 }: ProfileNftCollectionProps) => {
+  const [loadedNfts, setLoadedNfts] = useState(nfts);
+
+  const getMoreNfts = async () => {
+    let newNfts = [];
+    for (let i = 0; i < Math.random() * 20; i++) {
+      newNfts.push(
+        `http://picsum.photos/${Math.floor(Math.random() * 300) + 300}/${
+          Math.floor(Math.random() * 300) + 300
+        }`
+      );
+    }
+
+    setLoadedNfts([...loadedNfts, ...newNfts]);
+  };
+
+  useEffect(() => {
+    getMoreNfts();
+  }, []);
+
   return (
     <>
       <Text
@@ -78,7 +110,7 @@ const ProfileNftCollection = ({
         NFT Collection
       </Text>
 
-      {!isOwner && nfts.length === 0 && (
+      {!isOwner && loadedNfts.length === 0 && (
         <Text
           className="text-center"
           size={TextSize.XL2}
@@ -88,7 +120,7 @@ const ProfileNftCollection = ({
           Looks like {account} doesn't own any NFTs
         </Text>
       )}
-      {isOwner && nfts.length === 0 && (
+      {isOwner && loadedNfts.length === 0 && (
         <>
           <div className="my-9 flex flex-row justify-center items-center">
             <img src={noNfts} className="w-[119px] h-[127px]" />
@@ -151,6 +183,29 @@ const ProfileNftCollection = ({
             </div>
           </div>
         </>
+      )}
+      {isOwner && loadedNfts.length > 0 && (
+        <InfiniteScroll
+          dataLength={loadedNfts.length} //This is important field to render the next data
+          next={getMoreNfts}
+          hasMore={true}
+          loader={<Spinner />}
+        >
+          <Masonry
+            breakpointCols={{
+              default: 5,
+              1024: 3,
+              768: 2,
+              640: 1,
+            }}
+            className="my-masonry-grid space-x-10"
+            columnClassName="my-masonry-grid_column"
+          >
+            {loadedNfts.map((nft) => (
+              <img key={nft} className="w-full" src={nft} />
+            ))}
+          </Masonry>
+        </InfiniteScroll>
       )}
     </>
   );

@@ -10,20 +10,19 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import {
-  Button,
-  ButtonAnchor,
-  ButtonSize,
-} from "~/components/buttons";
+import { Button, ButtonAnchor, ButtonSize } from "~/components/buttons";
 import HeadNav from "~/components/head-nav";
 import { useEffect, useState } from "react";
 
 import { links as spinnerLinks } from "~/components/spinner";
+import { links as nftCollLinks } from "~/components/profile/ProfileNftCollection";
+
 import { FaBriefcase, FaCamera, FaEdit, FaMapMarkerAlt } from "react-icons/fa";
 import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export function links() {
-  return [...spinnerLinks()];
+  return [...spinnerLinks(), ...nftCollLinks()];
 }
 
 export const loader: LoaderFunction = async (args) => {
@@ -71,13 +70,13 @@ const ProfileRoute = () => {
           }
         );
     } else if (fetcher.type === "done") {
-      // if(!fetcher.data.metadata) {
-      //   throw new Error("Unable to assess PFP metadata");
-      // }
+      if (!fetcher.data.metadata) {
+        throw new Error("Unable to assess PFP metadata");
+      }
 
-      // setPfpUrl(gatewayFromIpfs(fetcher.data.metadata.image));
-      // setCoverUrl(gatewayFromIpfs(fetcher.data.metadata.cover));
-      // setMinted(fetcher.data.minted);
+      setPfpUrl(gatewayFromIpfs(fetcher.data.metadata.image));
+      setCoverUrl(gatewayFromIpfs(fetcher.data.metadata.cover));
+      setMinted(fetcher.data.minted);
 
       setLoading(false);
     }
@@ -187,7 +186,10 @@ const ProfileRoute = () => {
         )}
 
         <div className="mt-20">
-          <ProfileNftCollection account={displayname ?? targetAddress} isOwner={isOwner} />
+          <ProfileNftCollection
+            account={displayname ?? targetAddress}
+            isOwner={isOwner}
+          />
         </div>
       </div>
     </div>
