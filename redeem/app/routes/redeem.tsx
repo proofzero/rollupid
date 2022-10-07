@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  useLoaderData,
-  useSubmit,
-  useTransition,
-} from '@remix-run/react'
+import { useLoaderData, useSubmit, useTransition } from '@remix-run/react'
 
 import { keccak256 } from '@ethersproject/solidity'
 import { BigNumber } from '@ethersproject/bignumber'
@@ -29,11 +25,9 @@ import Text, {
   TextWeight,
 } from '~/components/typography/Text'
 
-import Spinner from "~/components/spinner";
-
+import Spinner from '~/components/spinner'
 
 import { abi } from '~/assets/abi.json'
-
 
 // @ts-ignore
 export const loader = async ({ request }) => {
@@ -48,18 +42,21 @@ export const loader = async ({ request }) => {
 
   // check if address already has an invite
   // @ts-ignore
-  const holderRes = await fetch(`${ALCHEMY_NFT_URL}/isHolderOfCollection?wallet=${address}&contractAddress=${INVITE_CONTRACT_ADDRESS}`, {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/json; charset=utf-8',
-    }
-  })
+  const holderRes = await fetch(
+    `${ALCHEMY_NFT_URL}/isHolderOfCollection?wallet=${address}&contractAddress=${INVITE_CONTRACT_ADDRESS}`,
+    {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json; charset=utf-8',
+      },
+    },
+  )
 
   if (holderRes.status !== 200) {
     throw new Error('Error checking if address is holder of collection')
   }
-  const holderJson = await holderRes.json();
+  const holderJson = await holderRes.json()
   if (holderJson.isHolderOfCollection) {
     throw Error(`Address (${address}) already has an invite`)
   }
@@ -83,7 +80,11 @@ export const loader = async ({ request }) => {
 
   // The reservation exists and it belongs to someone else make them wait
   if (reservation && reservation.address != address) {
-    return redirect(`/queue?address=${address}&signature=${signature}${invite ? `&invite=${invite}` : ''}`)
+    return redirect(
+      `/queue?address=${address}&signature=${signature}${
+        invite ? `&invite=${invite}` : ''
+      }`,
+    )
   }
 
   // No reservation so let's lock one in
@@ -94,7 +95,6 @@ export const loader = async ({ request }) => {
   })
 
   try {
-
     // ask the contract for the next invite id
     // @ts-ignore
     const tokenIdRes = await fetch(`${ALCHEMY_API_URL}`, {
@@ -188,28 +188,35 @@ export const loader = async ({ request }) => {
 }
 
 export default function Redeem() {
-  const { address: invitee, invite, voucher, embed, expiration } = useLoaderData()
-  const submit = useSubmit();
-  const transition = useTransition();
+  const {
+    address: invitee,
+    invite,
+    voucher,
+    embed,
+    expiration,
+  } = useLoaderData()
+  const submit = useSubmit()
+  const transition = useTransition()
 
   const [expired, setExpired] = useState(false)
 
   const { address, isConnected } = useAccount()
   const { chain } = useNetwork()
-  const { pendingChainId, switchNetwork } =  useSwitchNetwork()
+  const { pendingChainId, switchNetwork } = useSwitchNetwork()
   const {
     config,
     error: prepareError,
     isError: isPrepareError,
   } = usePrepareContractWrite({
     //@ts-ignore
-    addressOrName: typeof window !== 'undefined' && window.ENV.INVITE_CONTRACT_ADDRESS,
+    addressOrName:
+      typeof window !== 'undefined' && window.ENV.INVITE_CONTRACT_ADDRESS,
     contractInterface: abi,
     functionName: 'awardInvite',
     args: [invitee, voucher],
     overrides: {
       gasLimit: 1000000,
-    }
+    },
   })
   const { data, error, isError, write } = useContractWrite({
     ...config,
@@ -228,13 +235,16 @@ export default function Redeem() {
 
   useEffect(() => {
     if (data?.hash) {
-      submit({
-        address: invitee,
-        hash: data.hash,
-        invite,
-        voucher: JSON.stringify(voucher),
-        embed: JSON.stringify(embed),
-      }, {method: "post", action:"/success"})
+      submit(
+        {
+          address: invitee,
+          hash: data.hash,
+          invite,
+          voucher: JSON.stringify(voucher),
+          embed: JSON.stringify(embed),
+        },
+        { method: 'post', action: '/success' },
+      )
     }
   }, [isSuccess])
 
@@ -250,11 +260,10 @@ export default function Redeem() {
         weight={TextWeight.Regular400}
       >
         {completed
-        ?
-          "Invite has expired. Refresh the page to try again."
-        :
-          `Invite is reserved for: ${minutes < 10 ? `0${minutes}` : minutes}:${seconds < 10 ? `0${seconds}` : seconds}`
-        }
+          ? 'Invite has expired. Refresh the page to try again.'
+          : `Invite is reserved for: ${
+              minutes < 10 ? `0${minutes}` : minutes
+            }:${seconds < 10 ? `0${seconds}` : seconds}`}
       </Text>
     )
   }
@@ -268,8 +277,12 @@ export default function Redeem() {
         alignItems: 'center',
       }}
     >
-      <Text className="text-center" size={TextSize.XL3} weight={TextWeight.SemiBold600}>
-          You can now mint your invite. 👀
+      <Text
+        className="text-center"
+        size={TextSize.XL3}
+        weight={TextWeight.SemiBold600}
+      >
+        You can now mint your invite. 👀
       </Text>
 
       <div
@@ -290,27 +303,33 @@ export default function Redeem() {
 
       <Countdown date={expiration} renderer={countdownRender} />
 
-      {!isConnected &&
+      {!isConnected && (
         <Text size={TextSize.SM} className="text-center mb-2">
-          Wallet not connected.<br/>Please unlock wallet and refresh page.
+          Wallet not connected.
+          <br />
+          Please unlock wallet and refresh page.
         </Text>
-      }
+      )}
       <button
         className="py-4 px-6 text-white"
         style={{
           width: 233,
-          backgroundColor: !isConnected || !write || isPrepareError || isLoading || expired ? '#ccc' : '#1f2937',
+          backgroundColor:
+            !isConnected || !write || isPrepareError || isLoading || expired
+              ? '#ccc'
+              : '#1f2937',
         }}
-        disabled={!isConnected || !write || isPrepareError || isLoading || expired}
+        disabled={
+          !isConnected || !write || isPrepareError || isLoading || expired
+        }
         onClick={write}
       >
         {isLoading ? 'Minting...' : 'Mint NFT'}
       </button>
-      {transition.state === "loading" ?? <Spinner />}
+      {transition.state === 'loading' ?? <Spinner />}
       {(isPrepareError || isError) && (
         <div>Error: {(prepareError || error)?.message}</div>
       )}
     </div>
   )
 }
-
