@@ -4,6 +4,7 @@ import {
   useNavigate,
   useLoaderData,
   useActionData,
+  useTransition,
 } from '@remix-run/react'
 
 import { json, redirect } from '@remix-run/cloudflare'
@@ -71,7 +72,7 @@ export const action = async ({ request }) => {
   }
   const tweets = await tweetsRes.json()
   const tweet = tweets.data[0].text
-  const signature = tweet.split(':')[1]
+  const signature = tweet.split(':')[2]
 
   // Verify signature when sign message succeeds
   const recoveredAddress = verifyMessage(message, signature)
@@ -104,6 +105,7 @@ export default function Proof() {
 
   const { invite } = useLoaderData()
   const proofError = useActionData()
+  const tranistion = useTransition()
 
   // NOTE: state is all messed if we render this component with SSR
   if (typeof document === 'undefined') {
@@ -120,7 +122,7 @@ export default function Proof() {
       // Show tweet status verification
       // setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/${address} %23Web3 sig:${data.toString()}`);
       setTweetStatus(
-        `I'm claiming my decentralized identity @threeid_xyz %23Web3 sig:${data.toString()}`,
+        `I'm claiming my decentralized identity @threeid_xyz https://get.threeid.xyz %23Web3 sig:${data.toString()}`,
       )
     },
   })
@@ -161,7 +163,8 @@ export default function Proof() {
           }}
         >
           {/* I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/{address} #Web3 sig:{signature} */}
-          I'm claiming my decentralized identity @threeid_xyz #Web3 sig:
+          I'm claiming my decentralized identity @threeid_xyz
+          https://get.threeid.xyz #Web3 sig:
           {signature}
         </div>
         {!tweetStatus && !showVerify && (
@@ -236,7 +239,7 @@ export default function Proof() {
               type="submit"
               disabled={!tweetId}
             >
-              Validate
+              {tranistion.state !== 'loading' ? 'Validate' : <Spinner />}
             </button>
             {proofError && <p className="error">{proofError.error}</p>}
           </Form>
