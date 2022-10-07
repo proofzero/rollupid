@@ -1,0 +1,29 @@
+name = "threeid-invite"
+
+workers_dev = true
+main = "./build/index.js"
+# https://developers.cloudflare.com/workers/platform/compatibility-dates
+compatibility_date = "2022-04-05"
+
+[site]
+  bucket = "./public"
+
+[build]
+  command = "npm run build"
+
+[env.development]
+kv_namespaces = [
+  { binding = "RESERVE", id = "f3392c3f50f24fcb981c3df5aa266224" },
+  { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271" },
+  { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
+
+]
+
+[env.current]
+name = "three-id-current"
+route = { pattern = "get.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+kv_namespaces = [
+  { binding = "RESERVE", id = "1d694284252c4653a444dde3ab4bb28a" },
+  { binding = "PROOFS", id = "659e5d68ffc74e99b8b2d774c646f65b" },
+  { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
+]
