@@ -1,9 +1,9 @@
-# .github/workflows/release.yaml
 ---
-name: release
+name: test and build
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   changes:
@@ -27,7 +27,7 @@ jobs:
 
   # redeem
   # ----------------------------------------------------------------------------
-  build-publish-test-redeem-current:
+  build-publish-test-redeem-dev:
     needs: changes
     if: needs.changes.outputs.redeem == 'true'
     runs-on: ubuntu-latest
@@ -60,8 +60,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'redeem'
-          command: publish --env current
-          environment: 'current'
+          command: publish
+          # environment: "development"
           secrets: |
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -80,7 +80,7 @@ jobs:
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: current
+          DATADOG_ENV: development
           DATADOG_SERVICE_NAME: 3id-redeem
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -95,13 +95,26 @@ jobs:
 
   # threeid
   # ----------------------------------------------------------------------------
-
-  build-publish-test-threeid-current:
+  build-publish-test-threeid-dev:
+    needs: changes
+    if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      packages: read
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/threeid/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -109,14 +122,14 @@ jobs:
           cache-dependency-path: ./threeid/package-lock.json
       - run: npm install
         working-directory: threeid
-      - name: Publish
+      - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
-          environment: 'current'
-          command: publish --env current
+          command: publish
+          # environment: "development"
           secrets: |
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
@@ -132,42 +145,51 @@ jobs:
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
         env:
-          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          SESSION_SECRET: 'secret'
+          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: current
+          DATADOG_ENV: development
           DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          OORT_HOST: oort-mainnet.kubelt.com
+          OORT_HOST: oort-devnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
-          NFTAR_URL: ${{ secrets.NFTAR_URL }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
-          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINTPFP_CONTRACT_ADDRESS }}
-          NFTAR_CHAIN_ID: 1
-          VALID_CHAIN_ID_NAME: mainnet
-      # - name: Install Playwright Browsers
-      #   run: npx playwright install --with-deps
-      #   working-directory: threeid
-      # - name: Run Playwright tests
-      #   run: npx playwright test
-      #   env:
-      #     NODE_ENV: production
-      #     ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }} # TODO: setup prod pk
-      #     DAPP_HOST: dapp.threeid.xyz
-      #     DAPP_PORT: 443
-      #     DAPP_SCHEMA: https
-      #   working-directory: threeid
-      # - uses: actions/upload-artifact@v2
-      #   if: always()
+          NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
+          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          NFTAR_CHAIN_ID: 5
+          VALID_CHAIN_ID_NAME: goerli
+      # - name: Cache playwright binaries
+      #   id: playwright-cache
+      #   uses: actions/cache@v3
       #   with:
-      #     name: playwright-report
-      #     path: playwright-report/
-      #     retention-days: 5
+      #     path: |
+      #       ~/.cache/ms-playwright
+      #     key: cache-playwright-linux-1.25.2
+      - name: Install Playwright Browsers
+        # if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+        working-directory: threeid
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          NODE_ENV: development
+          TEST_ENV: true
+          ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
+          DAPP_HOST: three-id-dev.admin1337.workers.dev
+          DAPP_PORT: 443
+          DAPP_SCHEMA: https
+        working-directory: threeid
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 5
