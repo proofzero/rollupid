@@ -6,30 +6,9 @@ on:
       - main
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      www: ${{ steps.changes.outputs.www }}
-      threeid: ${{ steps.changes.outputs.threeid }}
-      redeem: ${{ steps.changes.outputs.redeem }}
-      nftar: ${{ steps.changes.outputs.nftar }}
-    steps:
-      # find out what deploy stack to use
-      - uses: actions/checkout@master
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            www: 'www/**'
-            threeid: 'threeid/**'
-            redeem: 'redeem/**'
-            nftar: 'nftar/**'
-
   # redeem
   # ----------------------------------------------------------------------------
   build-publish-test-redeem-dev:
-    needs: changes
-    if: needs.changes.outputs.redeem == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -102,8 +81,6 @@ jobs:
   # threeid
   # ----------------------------------------------------------------------------
   build-publish-test-threeid-dev:
-    needs: changes
-    if: needs.changes.outputs.threeid == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -203,8 +180,6 @@ jobs:
   # nftar
   # ----------------------------------------------------------------------------
   build-test-nftar:
-    needs: changes
-    if: needs.changes.outputs.nftar == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
