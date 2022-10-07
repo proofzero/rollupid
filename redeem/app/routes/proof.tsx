@@ -4,6 +4,7 @@ import {
   useNavigate,
   useLoaderData,
   useActionData,
+  useTransition,
 } from '@remix-run/react'
 
 import { json, redirect } from '@remix-run/cloudflare'
@@ -104,6 +105,7 @@ export default function Proof() {
 
   const { invite } = useLoaderData()
   const proofError = useActionData()
+  const tranistion = useTransition()
 
   // NOTE: state is all messed if we render this component with SSR
   if (typeof document === 'undefined') {
@@ -237,7 +239,7 @@ export default function Proof() {
               type="submit"
               disabled={!tweetId}
             >
-              Validate
+              {tranistion.state !== 'loading' ? 'Validate' : <Spinner />}
             </button>
             {proofError && <p className="error">{proofError.error}</p>}
           </Form>
