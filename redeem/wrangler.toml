@@ -1,4 +1,4 @@
-name = "threeid-invite"
+name = "threeid-invite-dev"
 
 workers_dev = true
 main = "./build/index.js"
@@ -13,8 +13,8 @@ compatibility_date = "2022-04-05"
 
 [env.development]
 kv_namespaces = [
-  { binding = "RESERVE", id = "f3392c3f50f24fcb981c3df5aa266224" },
-  { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271" },
+  { binding = "RESERVE", id = "f3392c3f50f24fcb981c3df5aa266224", preview_id = "70fbdb836a844c30a6d8b1efceb60ed4" },
+  { binding = "PROOFS", id = "a450cca35d754b588bf3788ee7baf271", preview_id = "a2e2bffcd03640c290c2cbbcd449470c" },
   { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
 ]
 
@@ -22,8 +22,8 @@ kv_namespaces = [
 name = "three-id-next"
 route = { pattern = "get-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 kv_namespaces = [
-  { binding = "RESERVE", id = "3949ffe367e34bcb85193788baa4807d" },
-  { binding = "PROOFS", id = "6dfcdfbffe11401fa82b895e5e7b4ab1" },
+  { binding = "RESERVE", id = "3949ffe367e34bcb85193788baa4807d", preview_id = "f3241c1e778745ceb54cc0de9d2869e0" },
+  { binding = "PROOFS", id = "6dfcdfbffe11401fa82b895e5e7b4ab1", preview_id = "123f0983d76a432ca02624534b32af9f" },
   { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
 ]
 
@@ -31,7 +31,7 @@ kv_namespaces = [
 name = "three-id-current"
 route = { pattern = "get.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 kv_namespaces = [
-  { binding = "RESERVE", id = "1d694284252c4653a444dde3ab4bb28a" },
-  { binding = "PROOFS", id = "659e5d68ffc74e99b8b2d774c646f65b" },
+  { binding = "RESERVE", id = "1d694284252c4653a444dde3ab4bb28a", preview_id = "2f15b459e88e46ec8815b04acd8f2f69" },
+  { binding = "PROOFS", id = "659e5d68ffc74e99b8b2d774c646f65b", preview_id = "9c1a79337b25498d82e5b32185a11727" },
   { binding = "THREEID_INVITE_CODES", id = "6fba3800bb194781bbcc6e37428d34aa", preview_id = "f0181776b1c5499f8c1b48c91392ad17" },
 ]
