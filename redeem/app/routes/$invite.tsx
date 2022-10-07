@@ -8,11 +8,11 @@ import { useLoaderData } from '@remix-run/react'
 import IndexLayout from '~/routes/index'
 
 //@ts-ignore
-export const loader = async ({ request }) => {
-  const url = new URL(request.url)
-  const invite = url.searchParams.get('invite')
+export const loader = async ({ params }) => {
+  const invite = params.invite
   // @ts-ignore
   const inviteRec = await THREEID_INVITE_CODES.get(invite, { type: 'json' })
+  console.log("invite found for:", inviteRec && invite)
   return json({ invite: inviteRec && invite }) // if invite is found, return invite else return false
 }
 
