@@ -46,6 +46,7 @@ jobs:
             DATADOG_APPLICATION_ID
             DATADOG_ENV
             DATADOG_SERVICE_NAME
+            OORT_HOST
             NFTAR_URL
             NFTAR_AUTHORIZATION
             INVITE_CONTRACT_ADDRESS
@@ -68,6 +69,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # Cloudflare zone identifier for threeid.xyz.
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          OORT_HOST: oort-devnet.kubelt.com
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
           INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
