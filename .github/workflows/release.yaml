@@ -8,7 +8,7 @@ on:
 jobs:
   # redeem
   # ----------------------------------------------------------------------------
-  build-publish-current-redeem-current:
+  build-publish-redeem-current:
     runs-on: ubuntu-latest
     permissions:
       packages: read
@@ -34,7 +34,7 @@ jobs:
           cache-dependency-path: ./redeem/package-lock.json
       - run: npm install
         working-directory: redeem
-      - name: Deploy to Dev Worker
+      - name: Deploy to Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -84,7 +84,7 @@ jobs:
   # threeid
   # ----------------------------------------------------------------------------
 
-  build-publish-current-threeid-current:
+  build-publish-threeid-current:
     runs-on: ubuntu-latest
     permissions:
       packages: read
