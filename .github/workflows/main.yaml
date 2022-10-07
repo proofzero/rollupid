@@ -40,7 +40,7 @@ jobs:
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'redeem'
           command: publish --env development
-          # environment: "development"
+          environment: 'development'
           secrets: |
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -112,7 +112,7 @@ jobs:
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'threeid'
           command: publish --env development
-          # environment: "development"
+          environment: 'development'
           secrets: |
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
