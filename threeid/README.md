@@ -1,8 +1,4 @@
-# Welcome to Remix!
-
-- [Remix Docs](https://remix.run/docs)
-
-## Development
+# 3ID dApp
 
 You will be running two processes during development:
 
@@ -25,23 +21,3 @@ npm start
 ```
 
 Then refresh the same URL in your browser (no live reload for production builds).
-
-## Deployment
-
-If you don't already have an account, then [create a cloudflare account here](https://dash.cloudflare.com/sign-up) and after verifying your email address with Cloudflare, go to your dashboard and set up your free custom Cloudflare Workers subdomain.
-
-Once that's done, you should be able to deploy your app:
-
-```sh
-npm run deploy
-```
-
-## Testing
-
-We use https://playwright.dev/ for end-to-end testing. To run the tests, run the following command:
-
-```sh
-npx playwright test
-```
-
-Tests are located in `/tests` and are written in TypeScript. If using VSCode you can also install the playwright extension.

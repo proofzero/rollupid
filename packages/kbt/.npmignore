@@ -1,4 +1,0 @@
-# packages/kbt/.npmignore
-
-# Babashka tasks
-bb.edn

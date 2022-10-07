@@ -4,10 +4,12 @@
 
 ![Build](https://github.com/kubelt/kubelt/actions/workflows/next.yaml/badge.svg)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
-[![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/m8NbsgByA9)
+[![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
 ![Version badge](https://img.shields.io/badge/Version-pre%20alpha-orange.svg)
 
-Kubelt is a fully managed decentralized application platform. Easily deploy dApps with standardized identity, storage, messaging services over a unified serverless RPC API, and more.
+Kubelt is a decentralized identity provider that connects users and developers together in a secure, private, and engaging decentralized protocol.
+
+With Kubelt, users are in control of aggregating their data and connections across multiple identity solutions, creating a secure environment for developers to access rich user data.
 
 This repository hosts Kubelt's libraries, client source code and documentation.
 
@@ -17,54 +19,29 @@ To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
 
 Let's take a look around at the Kubelt Monorepo layout...
 
-### SDK
+### 3ID
 
-The [src/](src/) directory contains the Kubelt SDK source code. The Kubelt SDK is written in Clojurescript and use to build the Kubelt client libraries and tools.
+The [threeid/](threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging and more. For more information visit [3ID](https://threeid.xyz).
+
+### Starbase
+
+The [starbase/](starbase/) directory contains a web application for interacting with Kubelt and setting up applications on the platform.
+
+### Smart Contracts
+
+The [smartcontracts/](smartcontracts/) directory contains all of our smart contract code.
 
 ### Packages
 
 The [packages/](packages/) directory contains package configuration for the things we release to package repository sites like [npm](https://npmjs.com). The current target packages are:
 
-- [Kubelt JS](packages/sdk-js): Kubelt library targeted for node.
-- [Kubelt Web](packages/sdk-web): Kubelt library targeted for browser.
-- [Kubelt CLJ](packages/sdk-clj): Kubelt library targeted for Clojure.
-- [Kubelt CLJS](packages/sdk-clj): Kubelt library targeted for Clojurescript.
-- [IPFS JS](packages/ipfs-js): Kubelt utility library for working with IPFS.
-- [Kubelt CLI](packages/kbt): Kubelt command line tool.
-- [Kubelt Debug CLI](packages/ddt): Kubelt debug command line tool.
-- [Kubelt Oort Cloud](oort): Self-Hosted Kubelt backend.
-
 ### Website / Docs
 
 The [www/](www/) directory contains the Kubelt.com static website documentation portal.
 
-### Starbase
-
-The [starbase/](starbase/) directory contains a web application for interacting with Kubelt as a customer.
-
-### 3ID
-
-The [threeid/](threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging. For more information visit [3ID](https://threeid.xyz).
-
 ### Redeem
 
 THe [redeem/](redeem/) directory contains a web application for minting 3ID invites.
-
-### Browser Extension
-
-The [ext/](ext/) directory contains an experimental browser extension.
-
-### Tooling / Scripts
-
-The Kubelt monorepo tooling configuration and scripts:
-
-- [bb/](bb/) directory contains some build tooling for use with [babashka](https://babashka.org).
-- [bzl/](bzl/) directory contains miscellaneous tooling for [Bazel](https://bazel.build/), one of the build tools that we use.
-
-### Other
-
-- [rdf/](rdf/) directory contains various RDF vocabularies, examples, and data fixtures used during development.
-- [fix/](fix/) directory contains fixture data for testing.
 
 ## Develop
 
@@ -73,18 +50,12 @@ The Kubelt monorepo tooling configuration and scripts:
 Please use the following tools and versions when developing with this repository:
 
 - Node.js v17+
-- Java SDK v8+
-- Babashaka 0.7.x
 
 #### NIX ENV
 
 Install NIX and run `nix-build` to install nix packages and `nix-shell` to execute a shell with a fully configured development environment.
 
 Note that docker doesn't fully work using nix packages.
-
-### Build
-
-Run `bb run test:all:develop` to make sure everything is setup correctly. Then use `bb tasks` to see what other build and test tasks are available.
 
 ## Contributing
 
