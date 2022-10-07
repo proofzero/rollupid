@@ -42,14 +42,14 @@ export const action = async ({ request }) => {
 
   if (invite) {
     // @ts-ignore
-    const inviteRecord = await THREEID_INVITE_CODES.get(invite, { type: 'json' })
+    const inviteRecord = await THREEID_INVITE_CODES.get(invite)
     if (inviteRecord) {
       if (!inviteRecord.holders) {
         inviteRecord.holders = []
       }
       inviteRecord.holders.push({ address, hash, timestamp: Date.now() })
       // @ts-ignore
-      await THREEID_INVITE_CODES.put(invite, JSON.stringify(inviteRecord))
+      await THREEID_INVITE_CODES.put(invite, inviteRecord)
     }
   }
 
