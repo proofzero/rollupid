@@ -27,7 +27,7 @@ jobs:
 
   # redeem
   # ----------------------------------------------------------------------------
-  build-test-threeid:
+  build-test-redeem:
     needs: changes
     if: needs.changes.outputs.redeem == 'true'
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
       - name: Build and Test
         run: npm run build # TODO: add test
         working-directory: redeem
-        
+
   # threeid
   # ----------------------------------------------------------------------------
   build-test-threeid:
@@ -124,14 +124,14 @@ jobs:
         run: npm test
         working-directory: nftar
         env:
-          CHAIN: "ethereum"
+          CHAIN: 'ethereum'
           CHAIN_ID: 5
           OORT_URL: oort-devnet.kubelt.com
           STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
           WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
           ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
-          ALCHEMY_NETWORK: "ETH_MAINNET"
+          ALCHEMY_NETWORK: 'ETH_MAINNET'
           INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
           PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-          NFTAR_API_KEY: "test"
+          NFTAR_API_KEY: 'test'
