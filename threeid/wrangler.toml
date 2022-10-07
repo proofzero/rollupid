@@ -3,7 +3,7 @@ compatibility_date = "2022-04-05"
 
 main = "./build/index.js"
 
-name = "three-id-dev"
+name = "threeid-dapp"
 
 # Whether or not the worker should be deployed to *.workers.dev. Can use
 # either route or workers_dev, but not both.
@@ -34,7 +34,6 @@ kv_namespaces = [
 # next (staging)
 # ------------------------------------------------------------------------------
 [env.next]
-name = "three-id-next"
 routes = [
   { pattern = "dapp-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "dapp-preview.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
@@ -48,7 +47,6 @@ kv_namespaces = [
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
-name = "three-id-current"
 route = { pattern = "dapp.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
