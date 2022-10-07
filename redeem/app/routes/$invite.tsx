@@ -11,7 +11,7 @@ import IndexLayout from '~/routes/index'
 export const loader = async ({ params }) => {
   const invite = params.invite
   // @ts-ignore
-  const inviteRec = await THREEID_INVITE_CODES.get(invite, { type: 'json' })
+  const inviteRec = await THREEID_INVITE_CODES.get(invite)
   console.log("invite found for:", inviteRec && invite)
   return json({ invite: inviteRec && invite }) // if invite is found, return invite else return false
 }
