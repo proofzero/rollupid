@@ -57,7 +57,7 @@ jobs:
             ALCHEMY_API_URL
             ALCHEMY_NFT_URL
         env:
-          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
+          # CF_ROUTE: https://3id-dev.kubelt.com/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.
@@ -160,7 +160,7 @@ jobs:
           NODE_ENV: next
           TEST_ENV: true
           ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-          DAPP_HOST: dapp-next.threeid.xyz
+          DAPP_HOST: 3id-next.kubelt.com
           DAPP_PORT: 443
           DAPP_SCHEMA: https
         working-directory: threeid

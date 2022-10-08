@@ -19,7 +19,7 @@ To request a user's 3iD profile simply construct a [JSON RPC](https://www.jsonrp
 
 **Request**
 ```
-POST https://dapp.threeid.xyz/<wallet address>/jsonrpc
+POST https://3id.kubelt.com/<wallet address>/jsonrpc
 {
   "id": 1,
   "jsonrpc": "2.0",

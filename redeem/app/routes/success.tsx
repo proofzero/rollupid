@@ -121,7 +121,7 @@ export default function Success() {
             marginBottom: "0.5em"
           }}
           className="action-button"
-          href="https://dapp.threeid.xyz"
+          href="https://3id.kubelt.com"
         >
           Claim your 3ID!
         </a>

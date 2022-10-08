@@ -96,7 +96,7 @@ curl localhost:3000/api -s -H 'Accept: application/json' -H 'Content-type: appli
 		"metadata": {
 			"name": "3ID PFP: GEN 0",
 			"description": "3ID PFP for 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52",
-			"external_url": "https://dapp.threeid.xyz/0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52",
+			"external_url": "https://3id.kubekt.com/0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52",
 			"properties": {
 				"metadata": {
 					"name": "ethereum",

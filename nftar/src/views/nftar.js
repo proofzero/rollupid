@@ -19,7 +19,7 @@ function animationViewer (account, traits) {
                     <meta charset="utf-8">
                     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome-1">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
-                    <link rel="icon" type="image/png" href="https://dapp.threeid.xyz/favicon.ico"/>
+                    <link rel="icon" type="image/png" href="https://3id.kubelt.com/favicon.ico"/>
                     <title>NFTar ${account}</title>
                     <style>
                         * {

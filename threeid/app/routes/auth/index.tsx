@@ -54,7 +54,7 @@ export default function AuthIndex() {
                 
             </div>}
             <div className="open-metamask-app">
-                <a href={`https://metamask.app.link/dapp/dapp.threeid.xyz`}>
+                <a href={`https://metamask.app.link/dapp/3id.kubelt.com`}>
                     Open in Metamask Mobile App
                 </a>
             </div>
