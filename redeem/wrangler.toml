@@ -16,6 +16,8 @@ kv_namespaces = [
   { binding = "RESERVE", id = "95fa7b71d274466aa4d0730a9f58824d", preview_id = "42d20f457b934849ad994fd2649edf38" },
   { binding = "PROOFS", id = "4600d9fe1c57424b8d4a1bf82a315084", preview_id = "c9a57e77459e41ada486aaf898a2b9aa" },
   { binding = "THREEID_INVITE_CODES", id = "0008c652ee39403798524a301f2c3617", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+  { binding = "VOUCHER_CACHE", id = "41b33df6040f48b8988a8feeec8adcd3", preview_id = "856e53f4fdc049c1badddcb4854c9a98" },
+
 ]
 
 [env.next]
@@ -24,6 +26,8 @@ kv_namespaces = [
   { binding = "RESERVE", id = "ad43bb2fa1474a8fb1f7965b748d9fbc", preview_id = "912d630a9e8643c4bfd3e84ac15ee565" },
   { binding = "PROOFS", id = "6b4acb9a432a484f9644e9b12a990ddb", preview_id = "faec0e8ffc9c4b3f90a2b21e7fdf2fce" },
   { binding = "THREEID_INVITE_CODES", id = "0008c652ee39403798524a301f2c3617", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+  { binding = "VOUCHER_CACHE", id = "b99f064f42a945feace9a6f36b5d9c62" },
+
 ]
 
 [env.current]
@@ -32,4 +36,7 @@ kv_namespaces = [
   { binding = "RESERVE", id = "a63ffd60fcfb43a49634485a51bbb896" },
   { binding = "PROOFS", id = "c073dd1f6fc84d94b1c7113cd2760823"},
   { binding = "THREEID_INVITE_CODES", id = "c1f29225728047df8ce27d610ff79c5c" },
+  { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
+
 ]
+

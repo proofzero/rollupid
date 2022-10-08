@@ -24,54 +24,51 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const queryAddress = url.searchParams.get("address");
   const address = queryAddress ?? session.get("address");
 
-  let cachedVoucher = await getCachedVoucher(address);
+  let voucher = await getCachedVoucher(address);
 
-  if (cachedVoucher && !cachedVoucher.minted) {
-    // Check mint status
-    const pfpDataRes = await oortSend("kb_getObject", ["3id.profile", "pfp"], {
-      jwt
-    });
+  const pfpDataRes = await oortSend("kb_getObject", ["3id.profile", "pfp"], {
+    jwt,
+  });
+  const pfpData = pfpDataRes.result?.value;
 
-    const pfpData = pfpDataRes.result?.value;
-
-    // If minted update voucher cache
-    if (pfpData.isToken) {
-      cachedVoucher = await putCachedVoucher(address, {
-        ...cachedVoucher,
+  if (voucher) {
+    if (!voucher.minted && pfpData?.isToken) {
+      // If minted update voucher cache
+      voucher = await putCachedVoucher(address, {
+        ...voucher,
         minted: true,
       });
     }
-
-    return cachedVoucher;
+  } else {
+    voucher = await fetchVoucher({ address, skipImage: !!voucher });
+    voucher = await putCachedVoucher(address, voucher);
   }
 
-  let voucher = await fetchVoucher({ address, skipImage: !!cachedVoucher });
-  voucher = await putCachedVoucher(address, voucher);
-
-  const setDataRes = await oortSend(
-    "kb_putObject",
-    [
-      "3id.profile",
-      "pfp",
+  if (!pfpData?.url) {
+    const setDataRes = await oortSend(
+      "kb_putObject",
+      [
+        "3id.profile",
+        "pfp",
+        {
+          url: voucher.metadata.image,
+          cover: voucher.metadata.cover,
+          //@ts-ignore
+          contractAddress: MINTPFP_CONTRACT_ADDRESS,
+          isToken: false,
+        },
+        {
+          visibility: "public",
+        },
+      ],
       {
-        url: voucher.metadata.image,
-        cover: voucher.metadata.cover,
-        //@ts-ignore
-        contractAddress: MINTPFP_CONTRACT_ADDRESS,
-        isToken: false,
-      },
-      {
-        visibility: "public"
+        jwt,
       }
-    ],
-    {
-      jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
-    }
-  );
+    );
 
-  if (setDataRes.error) {
-    throw new Error("Unable to persist pfp data");
+    if (setDataRes.error) {
+      throw new Error("Unable to persist pfp data");
+    }
   }
 
   return json(voucher);

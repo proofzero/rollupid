@@ -1,0 +1,9 @@
+name = "galaxy"
+main = "src/index.ts"
+compatibility_date = "2022-10-19"
+node_compat = true
+
+[env.dev]
+services = [
+  { binding = "OORT", service = "oort-dev"}
+]

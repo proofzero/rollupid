@@ -31,16 +31,15 @@ export const loader = async ({ request }) => {
   if (session.has("jwt")) {
     const claimsRes = await oortSend("kb_getCoreClaims", [], {
       jwt: session.get("jwt"),
-      cookie: request.headers.get("Cookie"),
     });
 
     if (claimsRes.result && claimsRes.result.includes("3id.enter")) {
       return redirect("/account");
     }
 
-    requireJWT(request)
+    requireJWT(request);
   }
-  
+
   return null;
 };
 
@@ -78,9 +77,8 @@ export default function Auth() {
       </article>
       <footer className="col-span-3">
         <p>
-          3ID is non-custodial and secure.
-          <br />
-          We will never request access to your assets.
+          3ID is non-custodial and secure. We will never request access to your
+          assets.
         </p>
       </footer>
     </div>

@@ -5,14 +5,13 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import styles from "~/styles/auth.css";
 import logo from "~/assets/three-id-logo.svg";
 
-import { getUserSession, requireJWT } from "~/utils/session.server";
+import { requireJWT } from "~/utils/session.server";
 import { oortSend } from "~/utils/rpc.server";
 
 import {
   configureChains,
   createClient,
   defaultChains,
-  useNetwork,
   WagmiConfig,
 } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
@@ -25,22 +24,16 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request);
+  await requireJWT(request);
 
-  const claimsRes = await oortSend("kb_getCoreClaims", [], {
-    jwt: jwt,
-    cookie: request.headers.get("Cookie"),
-  });
-
-  if (!claimsRes.result || !claimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth`);
-  }
-
-  if (!request.url.includes("name") && !request.url.includes("mint") && !request.url.includes("ens")) {
+  if (
+    !request.url.includes("name") &&
+    !request.url.includes("mint") &&
+    !request.url.includes("ens")
+  ) {
     return redirect(`/onboard/name`);
-  }  
+  }
   return null;
-
 };
 
 const Onboard = () => {

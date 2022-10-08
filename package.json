@@ -1,0 +1,28 @@
+{
+  "name": "kubelt",
+  "version": "0.1.0",
+  "private": true,
+  "useWorkspaces": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "gql:galaxy": "graphql-codegen --config graphql.config.js --watch --project galaxy",
+    "gql:threeid": "graphql-codegen --config graphql.config.js --watch --project threeid",
+    "gql": "run-p \"gql:*\"",
+    "dev": "yarn gql && lerna exec yarn dev",
+    "storybook": "lerna run --scope@storybook"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "2.13.7",
+    "@graphql-codegen/client-preset": "1.1.1",
+    "@graphql-codegen/typescript-graphql-request": "4.5.7",
+    "@graphql-codegen/typescript-resolvers": "2.7.5",
+    "graphql": "16.6.0",
+    "lerna": "6.0.1",
+    "typescript": "4.8.4",
+    "yarn-run-all": "3.1.1"
+  },
+  "dependencies": {}
+}

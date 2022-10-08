@@ -36,7 +36,7 @@ const InviteCode = ({ invite }: InviteCodeProps) => {
         subtitle="Share an invite link with your friends"
       />
 
-      {invite.code && (
+      {invite?.code && (
         <div>
           <div className="invite-link-wrapper">
             <div className="invite-link">

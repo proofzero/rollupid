@@ -1,9 +1,7 @@
-import { redirect, json} from "@remix-run/cloudflare";
+import { redirect, json } from "@remix-run/cloudflare";
 import { useLoaderData, useSubmit, NavLink } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
-
-import { useState } from "react";
 
 import { BiCog, BiIdCard, BiLink } from "react-icons/bi";
 import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
@@ -35,40 +33,25 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, "/auth")
+  const jwt = await requireJWT(request, "/auth");
 
   const session = await getUserSession(request);
   const address = session.get("address");
-  const core = session.get("core")
+  const core = session.get("core");
 
   const oortOptions = {
     jwt: jwt,
-    cookie: request.headers.get("Cookie"),
-  }
+  };
+
+  // @ts-ignore
+  const proof = await PROOFS.get(address);
+  !proof && redirect("/auth");
 
   // TODO remove session address param when RPC url is changed
-  const [coreClaimsRes, pfpRes, displaynameRes] = await Promise.all([
-    oortSend(
-      "kb_getCoreClaims",
-      [],
-      oortOptions,
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "pfp"],
-      oortOptions,
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "displayname"],
-      oortOptions,
-    )
+  const [pfpRes, displaynameRes] = await Promise.all([
+    oortSend("kb_getObject", ["3id.profile", "pfp"], oortOptions),
+    oortSend("kb_getObject", ["3id.profile", "displayname"], oortOptions),
   ]);
-
-
-  if (!coreClaimsRes.result || !coreClaimsRes.result.includes("3id.enter")) {
-    return redirect(`/auth`);
-  }
 
   // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core);
@@ -79,15 +62,11 @@ export const loader = async ({ request }) => {
     return redirect(`/onboard/name`);
   }
 
-  const [
-    pfp,
-    displayname,
-  ] = [
-    pfpRes.result,
-    displaynameRes.result,
-  ];
+  // @ts-ignore
+  const [pfp, displayname] = [pfpRes.result, displaynameRes.result];
 
   return json({
+    address,
     pfp,
     displayname,
   });
@@ -96,20 +75,18 @@ export const loader = async ({ request }) => {
 const subNavigation = [
   {
     name: "Dashboard",
-    href: "/account",
+    href: "/account/dashboard",
     icon: HiOutlineHome,
-    current: true,
     exists: true,
   },
   {
     name: "NFT Gallery",
     href: "#",
     icon: HiOutlineViewGridAdd,
-    current: false,
   },
-  { name: "KYC", href: "#", icon: BiIdCard, current: false },
-  { name: "0xAuth3", href: "#", icon: BiLink, current: false },
-  { name: "Settings", href: "#", icon: BiCog, current: false },
+  { name: "KYC", href: "#", icon: BiIdCard },
+  { name: "Apps", href: "#", icon: BiLink },
+  { name: "Settings", href: "settings", icon: BiCog, exists: true },
 ];
 
 function classNames(...classes: any) {
@@ -117,12 +94,12 @@ function classNames(...classes: any) {
 }
 
 export default function AccountLayout() {
-  const {pfp, displayname} = useLoaderData();
+  const { address, pfp, displayname } = useLoaderData();
   return (
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav pfp={pfp?.value} />
+          <HeadNav pfp={pfp?.value} loggedIn={{ address }} />
         </div>
 
         <main className="-mt-72">
@@ -153,34 +130,31 @@ type SideNavItemProps = {
     name: string;
     href: string;
     icon: any;
-    current: boolean;
     exists?: boolean;
   };
 };
 
 const SideNavItem = ({ item }: SideNavItemProps) => {
-  const activeStyle = {};
+  const activeStyle = {
+    backgroundColor: "rgb(243 244 246)",
+  };
   return (
-    <div
-      className={`${item.current ? "bg-gray-100" : "lg:bg-transparent hover:bg-gray-100"
-        } basis-1/4 lg:w-100`}
-    >
+    <div className={"basis-1/4 lg:w-100 content-center self-center"}>
       <NavLink
         to={item.href}
-        aria-current={item.current ? "page" : undefined}
-        className="group lg:border-l-4 px-3 py-2 flex justify-center items-center flex-row lg:justify-start lg:items-start"
-      // if href is "" or "#" isActive is true so we can't use this yet
-      // style={({ isActive }) =>
-      //     isActive ? activeStyle : undefined
-      // }
+        // @ts-ignore
+        style={({ isActive }) => {
+          return isActive && item.href != "#" ? activeStyle : undefined;
+        }}
+        className="text-sm group lg:border-l-4 px-3 py-2 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
       >
         <item.icon
           className={classNames(
-            !item.current && "opacity-25",
-            "flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6"
+            !item.exists && "opacity-25",
+            "text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center"
           )}
           style={{
-            color: item.current ? "#4B5563" : "#9CA3AF",
+            color: "#4B5563",
           }}
           aria-hidden="true"
         />
@@ -188,30 +162,18 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
           <span
             className={classNames(
-              !item.current && "opacity-25",
-              "hidden lg:block"
+              !item.exists && "opacity-25",
+              "hidden lg:block self-center"
             )}
           >
-            {item.current && (
-              <Text
-                className="truncate"
-                size={TextSize.Base}
-                weight={TextWeight.Medium500}
-                color={TextColor.Gray600}
-              >
-                {item.name}
-              </Text>
-            )}
-            {!item.current && (
-              <Text
-                className="truncate"
-                size={TextSize.Base}
-                weight={TextWeight.Medium500}
-                color={TextColor.Gray400}
-              >
-                {item.name}
-              </Text>
-            )}
+            <Text
+              className="truncate self-center"
+              size={TextSize.SM}
+              weight={TextWeight.Medium500}
+              color={TextColor.Gray600}
+            >
+              {item.name}
+            </Text>
           </span>
         </ConditionalTooltip>
       </NavLink>

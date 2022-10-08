@@ -1,81 +1,24 @@
 import { LoaderFunction, json } from "@remix-run/cloudflare";
-import {
-  fetchVoucher,
-  getCachedVoucher,
-  putCachedVoucher,
-} from "~/helpers/voucher";
-import { oortSend } from "~/utils/rpc.server";
+import { GraphQLClient } from "graphql-request";
+import { getSdk } from "~/utils/galaxy.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.profile) {
     throw new Error("Profile address required");
   }
 
-  // @ts-ignore
-  const url = `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/3id/profile`;
-
-  const publicProfile = await fetch(url, {
-    headers: {
-      "X-Kubelt-Core-Address": params.profile
-    }
+  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+    fetch,
   });
 
-  // Core wasn't claimed
-  if (publicProfile.status === 404) {
-    let voucher = await getCachedVoucher(params.profile);
-    if (!voucher) {
-      voucher = await fetchVoucher({
-        address: params.profile,
-        skipImage: !!voucher,
-      });
-      voucher = await putCachedVoucher(params.profile, voucher);
-    }
+  const galaxySdk = getSdk(gqlClient);
 
-    return json({
-      pfp: {
-        url: voucher.metadata.image,
-        cover: voucher.metadata.cover,
-        isToken: false,
-      },
-      claimed: false,
-    });
-  }
-
-  const publicProfileJson = await publicProfile.json();
-
-  if (publicProfileJson.error) {
-    throw new Error(publicProfileJson.error);
-  }
-
-  const [description, job, location] = await Promise.all([
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "description"],
-      {
-        address: params.profile
-      }
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "job"],
-      {
-        address: params.profile
-      }
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "location"],
-      {
-        address: params.profile
-      }
-    ),
-  ])
+  const profileRes = await galaxySdk.getProfileFromAddress({
+    address: params.profile,
+  });
 
   return json({
-    ...publicProfileJson,
-    description: description.result?.value,
-    location: location.result?.value,
-    job: job.result?.value,
+    ...profileRes.profileFromAddress,
     claimed: true,
   });
 };

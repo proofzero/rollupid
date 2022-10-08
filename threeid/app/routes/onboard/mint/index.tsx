@@ -1,4 +1,8 @@
-import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
+import {
+  ActionFunction,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
@@ -8,14 +12,24 @@ import {
 } from "@remix-run/react";
 
 import Heading from "~/components/typography/Heading";
-import Text, { TextColor, TextSize, TextWeight } from "~/components/typography/Text";
+import Text, {
+  TextColor,
+  TextSize,
+  TextWeight,
+} from "~/components/typography/Text";
 
 import styles from "~/styles/onboard.css";
 
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import { BiInfoCircle } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { useContractWrite, useAccount, useNetwork, useWaitForTransaction } from "wagmi";
+import {
+  useContractWrite,
+  useAccount,
+  useNetwork,
+  useWaitForTransaction,
+  useSwitchNetwork,
+} from "wagmi";
 import { Spinner } from "flowbite-react";
 import { HiCheckCircle, HiXCircle } from "react-icons/hi";
 
@@ -40,24 +54,45 @@ export const action: ActionFunction = async ({ request }) => {
 
   const imgUrl = formData.get("imgUrl");
   const contractAddress = formData.get("contractAddress");
+  const isToken = formData.get("isToken");
+
+  // Get existing object | error
+  const profileData = await oortSend(
+    "kb_getObject",
+    ["3id.profile", "public_profile"],
+    {
+      jwt,
+    }
+  );
+
+  let profile = null;
+
+  // Create new profile object
+  if (!profileData.result?.value) {
+    profile = {};
+  } else {
+    // Populate profile object with stored properties
+    profile = profileData.result.value;
+  }
+
+  profile.pfp = {
+    url: imgUrl,
+    contractAddress: contractAddress,
+    isToken: true,
+  };
 
   await oortSend(
     "kb_putObject",
     [
       "3id.profile",
-      "pfp",
+      "public_profile",
+      profile,
       {
-        url: imgUrl,
-        contractAddress: contractAddress,
-        isToken: true,
+        visibility: "public",
       },
-      {
-        visibility: "public"
-      }
     ],
     {
       jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
     }
   );
 
@@ -65,7 +100,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 type OnboardMintLandingProps = {
-  account: string,
+  account: string;
   minted: boolean;
   isInvalidAddress: boolean;
   isInvalidChain: boolean;
@@ -79,33 +114,39 @@ const OnboardMintLand = ({
   isInvalidChain,
   onClick,
 }: OnboardMintLandingProps) => {
-
   const traitNames = {
-    "trait0": "Generation",
-    "trait1": "Priority",
-    "trait2": "Friend",
-    "trait3": "Points",
-  }
+    trait0: "Generation",
+    trait1: "Priority",
+    trait2: "Friend",
+    trait3: "Points",
+  };
 
   return (
     <>
-    {!minted && !isInvalidChain && !isInvalidAddress && (
-      <Button size={ButtonSize.L} onClick={onClick}>
-        Mint NFT
-      </Button>
-    )}
-    {isInvalidChain && <Text
-        className="mt-4 flex flex-row space-x-4 items-center"
-        color={TextColor.Gray400}
-        size={TextSize.SM}>
-        **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
-      </Text>}
-      {isInvalidAddress && <Text
-        className="mt-4 flex flex-row space-x-4 items-center"
-        color={TextColor.Gray400}
-        size={TextSize.SM}>
-        **Please connect your wallet to {account}**
-      </Text>}
+      {!minted && !isInvalidChain && !isInvalidAddress && (
+        <Button size={ButtonSize.L} onClick={onClick}>
+          Mint NFT
+        </Button>
+      )}
+      {isInvalidChain && (
+        <Text
+          className="mt-4 flex flex-row space-x-4 items-center"
+          color={TextColor.Gray400}
+          size={TextSize.SM}
+        >
+          **Please select switch your network to{" "}
+          {window.ENV.VALID_CHAIN_ID_NAME}**
+        </Text>
+      )}
+      {isInvalidAddress && (
+        <Text
+          className="mt-4 flex flex-row space-x-4 items-center"
+          color={TextColor.Gray400}
+          size={TextSize.SM}
+        >
+          **Please connect your wallet to {account}**
+        </Text>
+      )}
     </>
   );
 };
@@ -124,7 +165,8 @@ const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
       <Text
         className="mt-4 flex flex-row space-x-4 items-center"
         color={TextColor.Gray400}
-        size={TextSize.SM}>
+        size={TextSize.SM}
+      >
         **Please unlock your wallet to mint your NFT**
       </Text>
     </>
@@ -186,7 +228,7 @@ type OnboardMintSuccessProps = {
   data?: object;
 };
 
-const OnboardMintSuccess = ({data}: OnboardMintSuccessProps) => {
+const OnboardMintSuccess = ({ data }: OnboardMintSuccessProps) => {
   return (
     <>
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
@@ -204,23 +246,27 @@ const OnboardMintSuccess = ({data}: OnboardMintSuccessProps) => {
 
 const OnboardMint = () => {
   const traitNames = {
-    "trait0": "Generation",
-    "trait1": "Priority",
-    "trait2": "Friend",
-    "trait3": "Points",
-  }
+    trait0: "Generation",
+    trait1: "Priority",
+    trait2: "Friend",
+    trait3: "Points",
+  };
 
   const [screen, setScreen] = useState<
     "land" | "sign" | "proc" | "success" | "error"
   >("land");
 
   const { metadata, voucher, contractAddress, minted } = useLoaderData();
-  console.log("contractAddress", contractAddress);
   const account = metadata?.properties?.metadata.account;
   const recipient = metadata?.properties?.metadata.account;
   const [imgUrl, setImgUrl] = useState<string>(metadata?.image);
+  const [invalidChain, setInvalidChain] = useState(false);
 
   const navigate = useNavigate();
+  const transition = useTransition();
+  const { chain } = useNetwork();
+  const { pendingChainId, switchNetwork } = useSwitchNetwork();
+  const { isConnected, address } = useAccount();
 
   const { data, write, isError } = useContractWrite({
     // https://github.com/wagmi-dev/wagmi/issues/899
@@ -234,12 +280,8 @@ const OnboardMint = () => {
   });
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
-  })
+  });
 
-  const { isConnected, address } = useAccount()
-  const { chain } = useNetwork();
-
-  const [invalidChain, setInvalidChain] = useState(false);
   useEffect(() => {
     if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
       setInvalidChain(true);
@@ -273,6 +315,14 @@ const OnboardMint = () => {
     }
   }, [isConnected, minted]);
 
+  useEffect(() => {
+    //@ts-ignore
+    if (switchNetwork && chain?.id != window.ENV.NFTAR_CHAIN_ID) {
+      //@ts-ignore
+      switchNetwork(`0x${window.ENV.NFTAR_CHAIN_ID}`);
+    }
+  }, [pendingChainId, switchNetwork]);
+
   const signMessage = () => {
     if (write) write();
   };
@@ -282,9 +332,9 @@ const OnboardMint = () => {
     case "connect":
       screenActionComponent = (
         <OnboardMintConnect
-         onClick={() => {
-          window.location.reload()
-         }}
+          onClick={() => {
+            window.location.reload();
+          }}
         />
       );
       break;
@@ -329,29 +379,40 @@ const OnboardMint = () => {
       );
   }
 
-  const transition = useTransition();
-
   return (
     <>
       <ol role="list" className="mx-auto flex items-center space-x-5">
         <li>
-          <a href="/onboard/name" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+          <a
+            href="/onboard/name"
+            className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900"
+          >
             <span className="sr-only">{"Display Name"}</span>
           </a>
         </li>
 
         <li>
-          <a href={"/onboard/mint"} className="relative flex items-center justify-center" aria-current="step">
+          <a
+            href={"/onboard/mint"}
+            className="relative flex items-center justify-center"
+            aria-current="step"
+          >
             <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
               <span className="h-full w-full rounded-full bg-indigo-200" />
             </span>
-            <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span
+              className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600"
+              aria-hidden="true"
+            />
             <span className="sr-only">{"Mint"}</span>
           </a>
         </li>
 
         <li>
-          <a href="/onboard/ens" className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400">
+          <a
+            href="/onboard/ens"
+            className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400"
+          >
             <span className="sr-only">{"ENS"}</span>
           </a>
         </li>
@@ -373,7 +434,7 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24"/>}
+          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24" />}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -386,133 +447,176 @@ const OnboardMint = () => {
               transform: "scale(1.2)",
             }}
           >
-           <img src={imgUrl} className="w-24 h-24" />
+            <img src={imgUrl} className="w-24 h-24" />
           </div>
-
         </div>
-        
+
         <Text
           className="mb-4 flex flex-row space-x-2 items-center"
-          color={TextColor.Gray400}>
+          color={TextColor.Gray400}
+        >
           <BiInfoCircle />
           <span>
             This image was generated using the assets in your{" "}
             <b className="cursor-default" title={account}>
               blockchain account.
             </b>
-            <br/>
+            <br />
           </span>
         </Text>
         <Text
           className="mb-4 flex flex-row space-x-2 items-center"
           color={TextColor.Gray400}
-          size={TextSize.XS}>
-            <u><i><a onClick={()=> {
-              let img = imgUrl;
-              setImgUrl("")
-              setTimeout(() => {
-                setImgUrl(img)
-              }, 1000)
-            }}>If image is not loading press here to refresh.</a></i></u>
+          size={TextSize.XS}
+        >
+          <u>
+            <i>
+              <a
+                onClick={() => {
+                  let img = imgUrl;
+                  setImgUrl("");
+                  setTimeout(() => {
+                    setImgUrl(img);
+                  }, 1000);
+                }}
+              >
+                If image is not loading press here to refresh.
+              </a>
+            </i>
+          </u>
         </Text>
 
-        <ul role="list" className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        <ul
+          role="list"
+          className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+        >
           {[...Array(4).keys()].map((i) => {
             const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
             const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
             const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
             const bg = `rgb(${r}, ${g}, ${b})`;
-            return (<li key={i} className="col-span-1 flex flex-col rounded-md shadow-sm">
-              <div style={{fontSize: 12}} className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate">
-                {traitNames[`trait${i}`].toUpperCase()}
-              </div>
-              <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">        
-                <div className={
-                    'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
-                  }
+            return (
+              <li
+                key={i}
+                className="col-span-1 flex flex-col rounded-md shadow-sm"
+              >
+                <div
+                  style={{ fontSize: 12 }}
+                  className="-mb-2 flex flex-1 font-bold text-gray-400 items-center truncate"
                 >
-                  <span style={{
-                    backgroundColor: bg,
-                  }} className="my-4 ml-1 rounded-md w-10 h-10"></span>
+                  {traitNames[`trait${i}`].toUpperCase()}
                 </div>
-                <div className="flex flex-1 items-center justify-between truncate bg-white">
-                  <div className="flex-1 truncate px-4 py-4 text-sm">
-                    <Text 
-                      color={TextColor.Gray700}
-                      size={TextSize.SM}
-                      className="font-bold">
-                      {metadata.properties.traits[`trait${i}`].value.name}
-                    </Text>
-                    <Text className=""
-                      color={TextColor.Gray400}
-                      weight={TextWeight.Medium500}
-                      size={TextSize.XS}>
-                      {metadata.properties.traits[`trait${i}`].type[0] + metadata.properties.traits[`trait${i}`].type.toLowerCase().slice(1)}
-                    </Text>
+                <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">
+                  <div
+                    className={
+                      "flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md"
+                    }
+                  >
+                    <span
+                      style={{
+                        backgroundColor: bg,
+                      }}
+                      className="my-4 ml-1 rounded-md w-10 h-10"
+                    ></span>
+                  </div>
+                  <div className="flex flex-1 items-center justify-between truncate bg-white">
+                    <div className="flex-1 truncate px-4 py-4 text-sm">
+                      <Text
+                        color={TextColor.Gray700}
+                        size={TextSize.SM}
+                        className="font-bold"
+                      >
+                        {metadata.properties.traits[`trait${i}`].value.name}
+                      </Text>
+                      <Text
+                        className=""
+                        color={TextColor.Gray400}
+                        weight={TextWeight.Medium500}
+                        size={TextSize.XS}
+                      >
+                        {metadata.properties.traits[`trait${i}`].type[0] +
+                          metadata.properties.traits[`trait${i}`].type
+                            .toLowerCase()
+                            .slice(1)}
+                      </Text>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          )})}
+              </li>
+            );
+          })}
         </ul>
 
         {screenActionComponent}
 
         {minted && <Text>Your PPF has already been minted</Text>}
-
       </section>
 
       <section
         id="onboard-ens-actions"
         className="flex justify-between lg:justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
-          {screen !== "sign" && screen !== "success" && (
-            <>
+        {transition.state === "submitting" || transition.state === "loading" ? (
+          <Spinner />
+        ) : (
+          <>
+            {screen !== "sign" && screen !== "success" && (
+              <>
+                <Button
+                  type={ButtonType.Secondary}
+                  size={ButtonSize.L}
+                  onClick={() => {
+                    // @ts-ignore
+                    navigate(`/onboard/name`);
+                  }}
+                >
+                  Back
+                </Button>
+
+                <Button
+                  type={ButtonType.Secondary}
+                  size={ButtonSize.L}
+                  onClick={() => {
+                    submit(
+                      {
+                        imgUrl,
+                        contractAddress,
+                      },
+                      {
+                        method: "post",
+                      }
+                    );
+                    // navigate("/onboard/ens");
+                  }}
+                >
+                  Skip
+                </Button>
+              </>
+            )}
+
+            {screen === "success" && (
               <Button
-                type={ButtonType.Secondary}
+                type={ButtonType.Primary}
                 size={ButtonSize.L}
                 onClick={() => {
-                  // @ts-ignore
-                  navigate(`/onboard/name`);
+                  // Go back
+                  submit(
+                    {
+                      imgUrl,
+                      contractAddress,
+                      isToken: "true",
+                    },
+                    {
+                      method: "post",
+                    }
+                  );
                 }}
               >
-                Back
+                Continue
               </Button>
-
-              <Button
-                type={ButtonType.Secondary}
-                size={ButtonSize.L}
-                onClick={() => {
-                  navigate("/onboard/ens");
-                }}
-              >
-                Skip
-              </Button>
-            </>
-          )}
-
-          {screen === "success" && (
-            <Button
-              type={ButtonType.Primary}
-              size={ButtonSize.L}
-              onClick={() => {
-                // Go back
-                submit(
-                  {
-                    imgUrl,
-                    contractAddress,
-                  },
-                  {
-                    method: "post",
-                  }
-                );
-              }}
-            >
-              Continue
-            </Button>
-          )}
-        </>)}
+            )}
+          </>
+        )}
       </section>
     </>
   );

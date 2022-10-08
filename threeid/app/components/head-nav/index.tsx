@@ -1,8 +1,7 @@
 import { Fragment, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, NavLink } from "@remix-run/react";
 
-import ConditionalTooltip from "~/components/conditional-tooltip";
 import Text, {
   TextColor,
   TextSize,
@@ -21,13 +20,6 @@ import hexStyle from "~/helpers/hex-style";
 import styles from "./headNav.css";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
-
-const navigation = [
-  { name: "My Profile", to: "", disabled: true, current: false },
-  { name: "inb0x", to: "", disabled: true, current: false },
-  { name: "b0x", to: "", disabled: true, current: false },
-  { name: "Account", to: "/account", current: true },
-];
 
 // TODO: this should be it's own component. These are also function calls not links
 const userNavigation = [
@@ -49,10 +41,21 @@ type HeadNavProps = {
     url: string;
     isToken: boolean;
   };
-  loggedIn?: boolean;
+  loggedIn?: {
+    address: string;
+  };
 };
 
-export default function HeadNav({ pfp, loggedIn = true }: HeadNavProps) {
+export default function HeadNav({ pfp, loggedIn }: HeadNavProps) {
+  const activeStyle = {
+    color: "white",
+    backgroundColor: "rgb(31 41 55)", // bg-gray-800
+  };
+  const navigation = [
+    { name: "My Profile", to: `/${loggedIn?.address}` },
+    { name: "Account", to: "/account" },
+  ];
+
   return (
     <Disclosure as="nav">
       {({ open }) => (
@@ -69,34 +72,26 @@ export default function HeadNav({ pfp, loggedIn = true }: HeadNavProps) {
                     {loggedIn &&
                       navigation.map((item) => (
                         // TODO: convert to NavLink to remove "disabled" and "current" https://remix.run/docs/en/v1/api/remix#navlink
-                        <Link
+                        <NavLink
                           key={item.name}
                           to={item.to}
-                          className={classNames(
-                            item.current
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-700 hover:bg-gray-700 hover:text-white",
+                          // @ts-ignore
+                          style={({ isActive }) => {
+                            console.log("isActive", item.to, isActive);
+                            return isActive ? activeStyle : undefined;
+                          }}
+                          className={
                             "px-3 py-2 text-sm font-medium nav-link-text"
-                          )}
-                          aria-current={item.current ? "page" : undefined}
+                          }
                         >
-                          <ConditionalTooltip
-                            content="Coming Soon"
-                            condition={!item.current}
+                          <Text
+                            size={TextSize.SM}
+                            weight={TextWeight.Medium500}
+                            color={TextColor.White}
                           >
-                            <Text
-                              size={TextSize.SM}
-                              weight={TextWeight.Medium500}
-                              color={
-                                item.current
-                                  ? TextColor.White
-                                  : TextColor.Gray700
-                              }
-                            >
-                              {item.name}
-                            </Text>
-                          </ConditionalTooltip>
-                        </Link>
+                            {item.name}
+                          </Text>
+                        </NavLink>
                       ))}
                   </div>
                 </div>

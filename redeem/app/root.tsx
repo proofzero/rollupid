@@ -2,7 +2,7 @@ import type {
   MetaFunction,
   LoaderFunction,
   LinksFunction,
-} from '@remix-run/cloudflare'
+} from "@remix-run/cloudflare";
 import {
   Links,
   LiveReload,
@@ -10,30 +10,30 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from '@remix-run/react'
-import { json } from '@remix-run/cloudflare'
-import { useLoaderData, useCatch, useNavigate } from '@remix-run/react'
+} from "@remix-run/react";
+import { json } from "@remix-run/cloudflare";
+import { useLoaderData, useCatch, useNavigate } from "@remix-run/react";
 
 import {
   WagmiConfig,
   createClient,
   defaultChains,
   configureChains,
-} from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+} from "wagmi";
+import { publicProvider } from "wagmi/providers/public";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
 // import styles from "~/assets/styles.css";
-import styles from './tailwind.css'
-import baseStyles from './base.css'
+import styles from "./tailwind.css";
+import baseStyles from "./base.css";
 
-import blankCard from '~/assets/blankcard.png'
-import logo from '~/assets/logo.png'
-import sad from '~/assets/sad.png'
-import faviconSvg from '~/assets/favicon.svg'
+import blankCard from "~/assets/blankcard.png";
+import logo from "~/assets/logo.png";
+import sad from "~/assets/sad.png";
+import faviconSvg from "~/assets/favicon.svg";
 
-import { startSession } from '~/datadog.client'
+import { startSession } from "~/datadog.client";
 
 export const loader: LoaderFunction = () => {
   return json({
@@ -53,37 +53,37 @@ export const loader: LoaderFunction = () => {
       // @ts-ignore
       CHAIN_ID: CHAIN_ID,
     },
-  })
-}
+  });
+};
 
 export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: '3ID Redeem',
-  viewport: 'width=device-width,initial-scale=1',
-  'og:title': 'Get 3ID - Decentralized Web Passport',
-  'og:site_name': 'Get 3ID',
-  'og:url': 'https://get.threeid.xyz',
-  'og:description': 'Claim your 3ID Invite.',
-  'og:image': blankCard,
-  'theme-color': '#673ab8',
-  'mobile-web-app-capable': 'yes',
-  'apple-mobile-web-app-capable': 'yes',
-})
+  charset: "utf-8",
+  title: "3ID Redeem",
+  viewport: "width=device-width,initial-scale=1",
+  "og:title": "Get 3ID - Decentralized Web Passport",
+  "og:site_name": "Get 3ID",
+  "og:url": "https://get.threeid.xyz",
+  "og:description": "Claim your 3ID Invite.",
+  "og:image": blankCard,
+  "theme-color": "#673ab8",
+  "mobile-web-app-capable": "yes",
+  "apple-mobile-web-app-capable": "yes",
+});
 
 export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: styles },
-  { rel: 'stylesheet', href: baseStyles },
-  { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
-]
+  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: baseStyles },
+  { rel: "shortcut icon", type: "image/svg+xml", href: faviconSvg },
+];
 
 export default function App() {
-  const browserEnv = useLoaderData()
-  typeof window !== 'undefined' && startSession()
+  const browserEnv = useLoaderData();
+  typeof window !== "undefined" && startSession();
 
   const { chains, provider, webSocketProvider } = configureChains(
     defaultChains,
-    [publicProvider()],
-  )
+    [publicProvider()]
+  );
 
   const client = createClient({
     autoConnect: true,
@@ -92,14 +92,14 @@ export default function App() {
       new InjectedConnector({
         chains,
         options: {
-          name: 'Injected',
+          name: "Injected",
           shimDisconnect: true,
         },
       }),
     ],
     provider,
     webSocketProvider,
-  })
+  });
 
   return (
     <html lang="en">
@@ -134,7 +134,7 @@ export default function App() {
         />
       </body>
     </html>
-  )
+  );
 }
 
 // https://remix.run/docs/en/v1/guides/errors
@@ -154,7 +154,9 @@ export function ErrorBoundary({ error }) {
           <article className="content col-span-3 flex flex-col gap-4">
             <div className="error justify-center items-center gap-4">
               <img className="m-auto pb-12" src={sad} />
-              <p className="error-message mx-auto">Something went terribly wrong!</p>
+              <p className="error-message mx-auto">
+                Something went terribly wrong!
+              </p>
               <p className="error-secondary-message mx-auto">{error.message}</p>
               <p className="error-secondary-message mx-auto">
                 If this problem persists please join Discord for help
@@ -164,10 +166,10 @@ export function ErrorBoundary({ error }) {
                 <a
                   style={{
                     // width: '100%',
-                    maxWidth: '480px',
-                    padding: '0.75em 2.5em',
-                    textDecoration: 'none',
-                    fontSize: '1.25em',
+                    maxWidth: "480px",
+                    padding: "0.75em 2.5em",
+                    textDecoration: "none",
+                    fontSize: "1.25em",
                     marginBottom: "0.5em",
                     marginTop: "0.5em",
                   }}
@@ -192,15 +194,15 @@ export function ErrorBoundary({ error }) {
         <LiveReload port={8002} />
       </body>
     </html>
-  )
+  );
 }
 
 export function CatchBoundary() {
-  const caught = useCatch()
-  const navigate = useNavigate()
+  const caught = useCatch();
+  const navigate = useNavigate();
   const goBack = () => {
-    navigate(-1)
-  }
+    navigate(-1);
+  };
   return (
     <html lang="en">
       <head>
@@ -227,10 +229,10 @@ export function CatchBoundary() {
                 <a
                   style={{
                     // width: '100%',
-                    maxWidth: '480px',
-                    padding: '0.75em 2.5em',
-                    textDecoration: 'none',
-                    fontSize: '1.25em',
+                    maxWidth: "480px",
+                    padding: "0.75em 2.5em",
+                    textDecoration: "none",
+                    fontSize: "1.25em",
                     marginBottom: "0.5em",
                     marginTop: "0.5em",
                   }}
@@ -250,5 +252,5 @@ export function CatchBoundary() {
         <LiveReload port={8002} />
       </body>
     </html>
-  )
+  );
 }

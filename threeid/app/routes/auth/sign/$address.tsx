@@ -64,7 +64,6 @@ export async function action({ request, params }) {
     // }
 
     // on success create a cookie/session for the user
-
     return createUserSession(signRes.result, `/account`, params.address);
 }
 
@@ -76,7 +75,6 @@ export default function AuthSign() {
 
     let navigate = useNavigate();
     let submit = useSubmit();
-
 
     // // NOTE: state is all messed if we render this component with SSR
     if (typeof document === "undefined") {

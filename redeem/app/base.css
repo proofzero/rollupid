@@ -54,14 +54,14 @@ footer p {
   color: #374151;
 }
 
-div[data-testid='flowbite-tooltip'] div {
+div[data-testid="flowbite-tooltip"] div {
   font-family: Inter_500Medium;
 }
 
 .grid-shrink {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas: 'shrink expand';
+  grid-template-areas: "shrink expand";
 }
 
 @font-face {
@@ -106,8 +106,6 @@ div[data-testid='flowbite-tooltip'] div {
   margin: auto;
   display: flex;
   flex-grow: 1;
-  min-width: 300px;
-  width: 100%;
 }
 
 .auth-message,

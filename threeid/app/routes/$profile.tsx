@@ -1,5 +1,6 @@
-import { DataFunctionArgs, json, LoaderFunction } from "@remix-run/cloudflare";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { json, LoaderFunction } from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
+
 import ProfileCard from "~/components/profile/ProfileCard";
 
 import { loader as profileLoader } from "~/routes/$profile.json";
@@ -10,7 +11,9 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
+
 import { Button } from "~/components/buttons";
+
 import HeadNav from "~/components/head-nav";
 
 import { links as spinnerLinks } from "~/components/spinner";
@@ -26,12 +29,14 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args;
 
-  const profileJson = await profileLoader(args).then((profileRes: Response) => profileRes.json());
+  const profileJson = await profileLoader(args).then((profileRes: Response) =>
+    profileRes.json()
+  );
 
   let isOwner = false;
 
   const session = await getUserSession(request);
-  const jwt = await session.get("jwt");
+  const jwt = session.get("jwt");
   const address = session.get("address");
 
   if (address === params.profile) {
@@ -47,8 +52,16 @@ export const loader: LoaderFunction = async (args) => {
 };
 
 const ProfileRoute = () => {
-  const { targetAddress, claimed, pfp, displayname, description, job, location, isOwner, loggedIn } =
-    useLoaderData();
+  const {
+    targetAddress,
+    claimed,
+    displayName,
+    bio,
+    job,
+    location,
+    isOwner,
+    loggedIn,
+  } = useLoaderData();
 
   return (
     <div className="bg-white h-full min-h-screen">
@@ -57,13 +70,13 @@ const ProfileRoute = () => {
           backgroundColor: "#192030",
         }}
       >
-        <HeadNav loggedIn={loggedIn} pfp={pfp} />
+        <HeadNav loggedIn={loggedIn} pfp={undefined} />
       </div>
 
       <div
         className="h-80 w-full relative flex justify-center"
         style={{
-          backgroundImage: pfp.cover ? `url(${pfp.cover})` : undefined,
+          backgroundImage: undefined,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
@@ -73,10 +86,10 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={pfp.url ? pfp.url : undefined}
+              avatarUrl={undefined}
               claimed={claimed ? new Date() : undefined}
-              displayName={displayname}
-              isNft={pfp.isToken}
+              displayName={displayName}
+              isNft={undefined}
             />
           </div>
         </div>
@@ -118,15 +131,18 @@ const ProfileRoute = () => {
         )}
 
         {claimed && (
-          <div className="lg:ml-[19rem] py-4 px-6" style={{
-            minHeight: '8rem'
-          }}>
+          <div
+            className="lg:ml-[19rem] py-4 px-6"
+            style={{
+              minHeight: "8rem",
+            }}
+          >
             <Text
               size={TextSize.Base}
               weight={TextWeight.Medium500}
               color={TextColor.Gray500}
             >
-              {description}
+              {bio}
             </Text>
 
             <hr className="my-6" />
@@ -156,7 +172,7 @@ const ProfileRoute = () => {
         <div className="mt-20">
           <ProfileNftCollection
             account={targetAddress}
-            displayname={displayname}
+            displayname={displayName}
             isOwner={isOwner}
           />
         </div>
