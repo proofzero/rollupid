@@ -67,8 +67,6 @@ jobs:
           DATADOG_SERVICE_NAME: get-3id
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # Cloudflare zone identifier for kubelt.com.
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           OORT_HOST: oort-devnet.kubelt.com
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
@@ -141,8 +139,6 @@ jobs:
           DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # Cloudflare zone identifier for kubelt.com.
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
           OORT_HOST: oort-devnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
