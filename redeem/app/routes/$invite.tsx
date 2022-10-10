@@ -13,7 +13,7 @@ export const loader = async ({ params }) => {
   // @ts-ignore
   const inviteRec = await THREEID_INVITE_CODES.get(invite)
   console.log("invite found for:", inviteRec && invite)
-  return json({ invite: inviteRec && invite }) // if invite is found, return invite else return false
+  return json({ inviteCode: inviteRec && invite }) // if invite is found, return invite else return false
 }
 
 export default function Index() {

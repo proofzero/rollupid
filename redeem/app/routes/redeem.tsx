@@ -58,7 +58,7 @@ export const loader = async ({ request }) => {
   }
   const holderJson = await holderRes.json()
   if (holderJson.isHolderOfCollection) {
-    throw json("Address ${address} already has an invite code, can't redeem another", {status: 409})
+    throw json(`Address ${address} already has an invite code, can't redeem another`, {status: 409})
   }
 
   //@ts-ignore
