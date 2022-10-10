@@ -138,7 +138,7 @@ export default function App() {
 }
 
 // https://remix.run/docs/en/v1/guides/errors
-
+// @ts-ignore
 export function ErrorBoundary({ error }) {
   return (
     <html lang="en">
@@ -219,6 +219,7 @@ export function CatchBoundary() {
               <p className="error-secondary-message">
                 {caught.status} {caught.statusText}
               </p>
+              <p className="error-secondary-message">{caught.data}</p>
               <div className="error-buttons grid grid-rows-1 text-center">
                 {/* <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} /> */}
               </div>

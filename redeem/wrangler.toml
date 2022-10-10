@@ -15,7 +15,7 @@ compatibility_date = "2022-04-05"
 kv_namespaces = [
   { binding = "RESERVE", id = "95fa7b71d274466aa4d0730a9f58824d", preview_id = "42d20f457b934849ad994fd2649edf38" },
   { binding = "PROOFS", id = "4600d9fe1c57424b8d4a1bf82a315084", preview_id = "c9a57e77459e41ada486aaf898a2b9aa" },
-  { binding = "THREEID_INVITE_CODES", id = "a89fd66cd1d74147924e0b870b0afb8e", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+  { binding = "THREEID_INVITE_CODES", id = "0008c652ee39403798524a301f2c3617", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
 ]
 
 [env.next]
@@ -23,7 +23,7 @@ route = { pattern = "get-next.threeid.xyz", custom_domain = true, zone_name = "t
 kv_namespaces = [
   { binding = "RESERVE", id = "ad43bb2fa1474a8fb1f7965b748d9fbc", preview_id = "912d630a9e8643c4bfd3e84ac15ee565" },
   { binding = "PROOFS", id = "6b4acb9a432a484f9644e9b12a990ddb", preview_id = "faec0e8ffc9c4b3f90a2b21e7fdf2fce" },
-  { binding = "THREEID_INVITE_CODES", id = "a89fd66cd1d74147924e0b870b0afb8e", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+  { binding = "THREEID_INVITE_CODES", id = "0008c652ee39403798524a301f2c3617", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
 ]
 
 [env.current]

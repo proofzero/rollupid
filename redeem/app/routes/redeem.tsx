@@ -37,12 +37,12 @@ export const loader = async ({ request }) => {
   const signature = url.searchParams.get('signature')
 
   if (!address) {
-    throw new Error('No address provided')
+    throw json("No address provided", {status: 400})
   }
 
   // check if address already has an invite
-  // @ts-ignore
   const holderRes = await fetch(
+    // @ts-ignore
     `${ALCHEMY_NFT_URL}/isHolderOfCollection?wallet=${address}&contractAddress=${INVITE_CONTRACT_ADDRESS}`,
     {
       method: 'GET',
@@ -54,11 +54,11 @@ export const loader = async ({ request }) => {
   )
 
   if (holderRes.status !== 200) {
-    throw new Error('Error checking if address is holder of collection')
+    throw json("Error checking if address is holder of collection'", {status: 500})
   }
   const holderJson = await holderRes.json()
   if (holderJson.isHolderOfCollection) {
-    throw Error(`Address (${address}) already has an invite`)
+    throw json("Address ${address} already has an invite code, can't redeem another", {status: 409})
   }
 
   //@ts-ignore
