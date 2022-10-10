@@ -72,7 +72,7 @@ export const action = async ({ request }) => {
   }
   const tweets = await tweetsRes.json()
   const tweet = tweets.data[0].text
-  const signature = tweet.split(':')[2]
+  const signature = tweet.split('sig:')[1]
 
   // Verify signature when sign message succeeds
   const recoveredAddress = verifyMessage(message, signature)
