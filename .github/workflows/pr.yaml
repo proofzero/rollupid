@@ -89,7 +89,7 @@ jobs:
         working-directory: threeid
       - name: Build and Test
         run: npm run build # TODO: add test
-        workingDirectory: 'threeid'
+        working-directory: 'threeid'
 
   # nftar
   # ----------------------------------------------------------------------------

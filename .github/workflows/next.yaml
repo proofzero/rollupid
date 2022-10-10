@@ -33,7 +33,7 @@ jobs:
           cache-dependency-path: ./redeem/package-lock.json
       - run: npm install
         working-directory: redeem
-      - name: Deploy to Dev Worker
+      - name: Deploy to Next Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
