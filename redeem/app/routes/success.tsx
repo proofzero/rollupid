@@ -41,16 +41,16 @@ export const action = async ({ request }) => {
   await RESERVE.delete('reservation') // clear the reservation
 
   if (invite) {
-    // @ts-ignore
-    const inviteRecord = await THREEID_INVITE_CODES.get(invite)
-    if (inviteRecord) {
-      if (!inviteRecord.holders) {
-        inviteRecord.holders = []
-      }
-      inviteRecord.holders.push({ address, hash, timestamp: Date.now() })
-      // @ts-ignore
-      await THREEID_INVITE_CODES.put(invite, inviteRecord)
-    }
+    // no need to check response, if it fails, it fails because invite is invalid
+    //@ts-ignore
+    fetch(`https://${OORT_HOST}/invite/submit/${invite}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ address: address, hash: hash }),
+    })
   }
 
   return json({
