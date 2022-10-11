@@ -1,0 +1,11 @@
+.*
+!.gitignore
+!.gitattributes
+
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+
+# NPM
+node_modules/

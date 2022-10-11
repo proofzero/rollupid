@@ -106,7 +106,7 @@ Note: requires that you've updated `invite.secret.ts` with the new address (see 
 
 `npx hardhat run scripts/deploy.js --network <network-name>`
 
-Where `<network-name>` is `goerli`, `rinkeby`, `mainnet`, etc.
+Where `<network-name>` is `goerli`, `mainnet`, etc.
 
 ### Destroy the Contract
 

@@ -1,0 +1,19 @@
+{
+  "name": "crdt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test"
+  },
+  "author": "",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "2.0.0",
+    "@nomiclabs/hardhat-solhint": "2.0.1",
+    "@openzeppelin/contracts-upgradeable": "4.8.0-rc.1",
+    "@openzeppelin/hardhat-upgrades": "1.21.0",
+    "hardhat": "2.12.0",
+    "ts-node": "10.9.1"
+  }
+}
