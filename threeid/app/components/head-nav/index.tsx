@@ -19,8 +19,6 @@ import SignOutLink from "~/components/sign-out-link";
 import hexStyle from "~/helpers/hex-style";
 
 import styles from "./headNav.css";
-import { json, LoaderFunction } from "@remix-run/cloudflare";
-import { getUserSession } from "~/utils/session.server";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 

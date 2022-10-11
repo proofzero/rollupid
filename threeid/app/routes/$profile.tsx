@@ -35,6 +35,7 @@ export const loader: LoaderFunction = async (args) => {
   let isOwner = false;
 
   const session = await getUserSession(request);
+  const jwt = await session.get("jwt");
   const address = session.get("address");
 
   if (address === params.profile) {
@@ -45,11 +46,12 @@ export const loader: LoaderFunction = async (args) => {
     ...profileJson,
     isOwner,
     targetAddress: params.profile,
+    loggedIn: jwt ? true : false
   });
 };
 
 const ProfileRoute = () => {
-  const { targetAddress, claimed, pfp, displayname, isOwner } = useLoaderData();
+  const { targetAddress, claimed, pfp, displayname, isOwner, loggedIn } = useLoaderData();
   const [loading, setLoading] = useState(!claimed);
 
   const [pfpUrl, setPfpUrl] = useState<string | undefined>(pfp?.url);
@@ -89,7 +91,7 @@ const ProfileRoute = () => {
           backgroundColor: "#192030",
         }}
       >
-        <HeadNav />
+        <HeadNav loggedIn={loggedIn} pfp={pfp} />
       </div>
 
       <div
