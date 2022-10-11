@@ -1,4 +1,0 @@
-# packages/ddt/.npmignore
-
-# Babashka tasks
-bb.edn
