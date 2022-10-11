@@ -28,7 +28,7 @@ export const loader = async ({ request }) => {
   const address = url.searchParams.get('address')
 
   if (!address) {
-    throw new Error('No address provided')
+    throw json("No address provided", {status: 400})
   }
 
   //@ts-ignore
@@ -215,7 +215,7 @@ export default function Proof() {
               required={true}
               onChange={(event) => setTweetId(event.target.value)}
               value={tweetId}
-              className="w-full py-4 px-2 flex flex-1"
+              className="w-full py-4 px-2 flex flex-1 border border-slate-700"
             />
             <input
               id="message"
@@ -232,7 +232,7 @@ export default function Proof() {
               value={address}
             />
             <button
-              className="py-4 px-6 rounded w-full text-white"
+              className="py-4 px-6 rounded w-full text-white font-bold"
               style={{
                 backgroundColor: '#1F2937',
               }}

@@ -220,8 +220,26 @@ export function CatchBoundary() {
                 {caught.status} {caught.statusText}
               </p>
               <p className="error-secondary-message">{caught.data}</p>
-              <div className="error-buttons grid grid-rows-1 text-center">
-                {/* <BaseButton onClick={goBack} text={"Go Back"} color={"dark"} /> */}
+              <p className="error-secondary-message mx-auto">
+                If this problem persists please join Discord for help
+              </p>
+              <div className="error-buttons text-center mx-auto w-full flex justify-center align-center">
+                <a
+                  style={{
+                    // width: '100%',
+                    maxWidth: '480px',
+                    padding: '0.75em 2.5em',
+                    textDecoration: 'none',
+                    fontSize: '1.25em',
+                    marginBottom: "0.5em",
+                    marginTop: "0.5em",
+                  }}
+                  target="_blank"
+                  className="action-button"
+                  href="https://discord.gg/threeid"
+                >
+                  Go to Discord
+                </a>
               </div>
             </div>
           </article>

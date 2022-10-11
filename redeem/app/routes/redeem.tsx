@@ -54,7 +54,7 @@ export const loader = async ({ request }) => {
   )
 
   if (holderRes.status !== 200) {
-    throw json("Error checking if address is holder of collection'", {status: 500})
+    throw json("Error checking if address is holder of collection", {status: 500})
   }
   const holderJson = await holderRes.json()
   if (holderJson.isHolderOfCollection) {
@@ -117,7 +117,7 @@ export const loader = async ({ request }) => {
       }),
     })
     if (tokenIdRes.status != 200) {
-      throw new Error('Error reaching blockchain node')
+      throw json(`'Error reaching blockchain node`, {status: 500})
     }
     const tokenId = BigNumber.from((await tokenIdRes.json()).result).toNumber()
 
@@ -147,11 +147,11 @@ export const loader = async ({ request }) => {
     })
 
     if (nftarRes.status != 200) {
-      throw new Error('Error reaching invite generator')
+      throw json(`Error reaching invite generator`, {status: 500})
     }
     const nftar = await nftarRes.json()
     if (nftar.error) {
-      throw new Error(`Failed to generate invite: ${nftar.error.message}`)
+      throw json(`Failed to generate invite: ${nftar.error.message}`, {status: 500})
     }
 
     // generate the voucher
@@ -183,7 +183,7 @@ export const loader = async ({ request }) => {
     // delete the optimistic reservation
     // @ts-ignore
     await RESERVE.delete('reservation')
-    throw Error("Couldn't reserve invite")
+    throw json(`Couldn't reserve invite`, {status: 500})
   }
 }
 
