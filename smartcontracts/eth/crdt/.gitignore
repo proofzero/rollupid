@@ -3,6 +3,9 @@
 !.gitattributes
 !.github
 
+# Utilities
+bin/
+
 # Secrets
 *secret*
 

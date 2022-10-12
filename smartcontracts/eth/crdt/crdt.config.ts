@@ -12,7 +12,7 @@ import { subtask, task } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-solhint";
-import '@openzeppelin/hardhat-upgrades';
+import "@openzeppelin/hardhat-upgrades";
 
 import {
   // Plugin configuration
@@ -29,6 +29,7 @@ import {
   ChainnetConfiguration,
 } from "./crdt.secret"; // Get this from 1Password: https://start.1password.com/open/i?a=ZJM7Z47Z3ZE6PBNEPK6MAP2YBA&v=kwywqdgenebhkdbycqestmjtry&i=vwzlndlo3cxcbtcajd77yr5udq&h=pz3r0.1password.com
 
+
 // definitions
 // -----------------------------------------------------------------------------
 
@@ -41,7 +42,9 @@ const MUMBAI_CHAIN_ID = 80001;
 const POLYGON_CHAIN_ID = 137;
 
 // From the TypeScript built from the Solidity code.
+// const CRDT_CONTRACT_NAME = "contracts/CRDT.sol:KubeltPlatformCredits";
 const CRDT_CONTRACT_NAME = "KubeltPlatformCredits";
+const CRDT_CONTRACT_NAME_V2 = "KubeltPlatformCreditsV2";
 
 subtask("network:config", "Return network-specific configuration map")
   .setAction(async (taskArgs, hre) => {
@@ -104,7 +107,7 @@ task("crdt:upgrade", "Upgrade the Kubelt Credit contract")
   .addOptionalParam("contract", "The contract (proxy) address to upgrade.")
   .setAction(async (taskArgs, hre) => {
     const contract = await hre.run("crdt:proxy", { contract: taskArgs.contract });
-    const CRDT = await hre.ethers.getContractFactory(CRDT_CONTRACT_NAME);
+    const CRDT = await hre.ethers.getContractFactory(CRDT_CONTRACT_NAME_V2);
     const crdt = await hre.upgrades.upgradeProxy(contract, CRDT);
     await crdt.deployed();
 
@@ -131,9 +134,15 @@ task("crdt:message", "Get the message for testing upgrades")
 
 // config
 // -----------------------------------------------------------------------------
-const config: HardhatUserConfig = {
+const config: any = {
   defaultNetwork: "localhost",
   solidity: "0.8.12",
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 1000,
+    },
+  },
   etherscan: {
     apiKey: `${ETHERSCAN.apiKey}`,
   },

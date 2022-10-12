@@ -6,13 +6,13 @@ on:
       - main
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      crdt: ${{ steps.changes.outputs.crdt }}
-    steps:
-      # find out what deploy stack to use
-      - uses: actions/checkout@master
+  # changes:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     crdt: ${{ steps.changes.outputs.crdt }}
+  #   steps:
+  #     # find out what deploy stack to use
+  #     - uses: actions/checkout@master
       # - uses: dorny/paths-filter@v2
       #   id: changes
       #   with:
