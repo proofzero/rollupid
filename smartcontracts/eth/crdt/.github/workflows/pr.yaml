@@ -9,10 +9,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      www: ${{ steps.changes.outputs.www }}
-      threeid: ${{ steps.changes.outputs.threeid }}
-      redeem: ${{ steps.changes.outputs.redeem }}
-      nftar: ${{ steps.changes.outputs.nftar }}
+      crdt: ${{ steps.changes.outputs.crdt }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
@@ -20,16 +17,13 @@ jobs:
         id: changes
         with:
           filters: |
-            www: 'www/**'
-            threeid: 'threeid/**'
-            redeem: 'redeem/**'
-            nftar: 'nftar/**'
+            crdt: 'crdt/**'
 
-  # redeem
+  # crdt
   # ----------------------------------------------------------------------------
-  build-test-redeem:
+  build-test-crdt:
     needs: changes
-    if: needs.changes.outputs.redeem == 'true'
+    if: needs.changes.outputs.crdt == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -42,7 +36,7 @@ jobs:
         with:
           # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/redeem/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/crdt/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -51,87 +45,11 @@ jobs:
         with:
           node-version: lts/gallium
           cache: 'npm'
-          cache-dependency-path: ./redeem/package-lock.json
+          cache-dependency-path: ./package-lock.json
       - run: npm install
-        working-directory: redeem
-      - name: Build and Test
-        run: npm run build # TODO: add test
-        working-directory: redeem
-
-  # threeid
-  # ----------------------------------------------------------------------------
-  build-test-threeid:
-    needs: changes
-    if: needs.changes.outputs.threeid == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/threeid/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/gallium
-          cache: 'npm'
-          cache-dependency-path: ./threeid/package-lock.json
-      - run: npm install
-        working-directory: threeid
-      - name: Build and Test
-        run: npm run build # TODO: add test
-        working-directory: 'threeid'
-
-  # nftar
-  # ----------------------------------------------------------------------------
-  build-test-nftar:
-    needs: changes
-    if: needs.changes.outputs.nftar == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/nftar/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/gallium
-          cache: 'npm'
-          cache-dependency-path: ./redeem/package-lock.json
-      - run: npm install
-        working-directory: nftar
+        working-directory: crdt
       - name: Build and Test
         run: npm test
-        working-directory: nftar
+        working-directory: crdt
         env:
-          CHAIN: 'ethereum'
-          CHAIN_ID: 5
-          OORT_URL: oort-devnet.kubelt.com
-          STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
-          WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
-          ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
-          ALCHEMY_NETWORK: 'ETH_MAINNET'
-          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
-          PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-          NFTAR_API_KEY: 'test'
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
