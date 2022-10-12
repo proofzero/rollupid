@@ -2,6 +2,9 @@
 !.gitignore
 !.gitattributes
 
+# Secrets
+*secret*
+
 # Hardhat
 artifacts/
 cache/
