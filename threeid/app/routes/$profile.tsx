@@ -46,12 +46,13 @@ export const loader: LoaderFunction = async (args) => {
     ...profileJson,
     isOwner,
     targetAddress: params.profile,
-    loggedIn: jwt ? true : false
+    loggedIn: jwt ? true : false,
   });
 };
 
 const ProfileRoute = () => {
-  const { targetAddress, claimed, pfp, displayname, isOwner, loggedIn } = useLoaderData();
+  const { targetAddress, claimed, pfp, displayname, isOwner, loggedIn } =
+    useLoaderData();
   const [loading, setLoading] = useState(!claimed);
 
   const [pfpUrl, setPfpUrl] = useState<string | undefined>(pfp?.url);
@@ -72,7 +73,7 @@ const ProfileRoute = () => {
           }
         );
     } else if (fetcher.type === "done") {
-      if (!fetcher.data.metadata) {
+      if (!fetcher.data?.metadata) {
         throw new Error("Unable to assess PFP metadata");
       }
 
@@ -189,7 +190,8 @@ const ProfileRoute = () => {
 
         <div className="mt-20">
           <ProfileNftCollection
-            account={displayname ?? targetAddress}
+            account={targetAddress}
+            displayname={displayname}
             isOwner={isOwner}
           />
         </div>

@@ -30,6 +30,7 @@ export const links: LinksFunction = () => [
 
 export type ProfileNftCollectionProps = {
   account: string;
+  displayname?: string;
   nfts?: string[];
   isOwner?: boolean;
 };
@@ -80,20 +81,24 @@ const ProfileNftCollection = ({
   nfts = [],
   isOwner = true,
   account,
+  displayname,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts);
+  const [pageKey, setPageLink] = useState<string | undefined>();
+  const [loading, setLoading] = useState(true);
 
   const getMoreNfts = async () => {
-    let newNfts = [];
-    for (let i = 0; i < Math.random() * 20; i++) {
-      newNfts.push(
-        `http://picsum.photos/${Math.floor(Math.random() * 300) + 300}/${
-          Math.floor(Math.random() * 300) + 300
-        }`
-      );
-    }
+    const nftReq = await fetch(
+      `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ""}`
+    );
+    const nftRes = await nftReq.json();
 
+    const newNfts = nftRes.ownedNfts.map((nft: { url: string }) => nft.url);
+
+    setPageLink(nftRes.pageKey);
     setLoadedNfts([...loadedNfts, ...newNfts]);
+
+    if (loading) setLoading(false);
   };
 
   useEffect(() => {
@@ -110,17 +115,17 @@ const ProfileNftCollection = ({
         NFT Collection
       </Text>
 
-      {!isOwner && loadedNfts.length === 0 && (
+      {!loading && !isOwner && loadedNfts.length === 0 && (
         <Text
           className="text-center"
           size={TextSize.XL2}
           weight={TextWeight.Medium500}
           color={TextColor.Gray300}
         >
-          Looks like {account} doesn't own any NFTs
+          Looks like {displayname ?? account} doesn't own any NFTs
         </Text>
       )}
-      {isOwner && loadedNfts.length === 0 && (
+      {!loading && isOwner && loadedNfts.length === 0 && (
         <>
           <div className="my-9 flex flex-row justify-center items-center">
             <img src={noNfts} className="w-[119px] h-[127px]" />
@@ -184,11 +189,12 @@ const ProfileNftCollection = ({
           </div>
         </>
       )}
-      {isOwner && loadedNfts.length > 0 && (
+
+      {loadedNfts.length > 0 && (
         <InfiniteScroll
           dataLength={loadedNfts.length} //This is important field to render the next data
           next={getMoreNfts}
-          hasMore={true}
+          hasMore={pageKey != null}
           loader={<Spinner />}
         >
           <Masonry
@@ -201,8 +207,12 @@ const ProfileNftCollection = ({
             className="my-masonry-grid space-x-10"
             columnClassName="my-masonry-grid_column"
           >
-            {loadedNfts.map((nft) => (
-              <img key={nft} className="w-full" src={nft} />
+            {loadedNfts.map((nft, i) => (
+              // Filtering collection by
+              // unique values
+              // breaks the infinite scroll
+              // plugin I resorted to this
+              <img key={`${nft}_${i}`} className="w-full" src={nft} />
             ))}
           </Masonry>
         </InfiniteScroll>
