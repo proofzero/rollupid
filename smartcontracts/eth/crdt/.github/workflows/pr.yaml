@@ -13,17 +13,17 @@ jobs:
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            crdt: 'crdt/**'
+      # - uses: dorny/paths-filter@v2
+      #   id: changes
+      #   with:
+      #     filters: |
+      #       crdt: 'crdt/**'
 
   # crdt
   # ----------------------------------------------------------------------------
   build-test-crdt:
-    needs: changes
-    if: needs.changes.outputs.crdt == 'true'
+    # needs: changes
+    # if: needs.changes.outputs.crdt == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -47,9 +47,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
       - run: npm install
-        working-directory: crdt
+        # working-directory: crdt
       - name: Build and Test
         run: npm test
-        working-directory: crdt
+        # working-directory: crdt
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
