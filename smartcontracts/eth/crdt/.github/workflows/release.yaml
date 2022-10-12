@@ -1,0 +1,161 @@
+# .github/workflows/release.yaml
+---
+name: release
+on:
+  release:
+    types: [published]
+
+jobs:
+  # redeem
+  # ----------------------------------------------------------------------------
+  build-publish-redeem-current:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/redeem/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: 'npm'
+          cache-dependency-path: ./redeem/package-lock.json
+      - run: npm install
+        working-directory: redeem
+      - name: Deploy to Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          workingDirectory: 'redeem'
+          command: publish --env current
+          environment: 'current'
+          secrets: |
+            DATADOG_CLIENT_TOKEN
+            DATADOG_APPLICATION_ID
+            DATADOG_ENV
+            DATADOG_SERVICE_NAME
+            OORT_HOST
+            NFTAR_URL
+            NFTAR_AUTHORIZATION
+            INVITE_CONTRACT_ADDRESS
+            CHAIN_ID
+            INVITE_OPERATOR_PRIVATE_KEY
+            TWITTER_BEARER_TOKEN
+            ALCHEMY_API_KEY
+            ALCHEMY_API_URL
+            ALCHEMY_NFT_URL
+        env:
+          # CF_ROUTE: https://dev.dapp.threeid.xyz/*
+          # These values are injected into the generated wrangler.toml.
+          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          # The Datadog client token.
+          DATADOG_CLIENT_TOKEN: ${{ secrets.GET_THREEID_DATADOG_CLIENT_TOKEN }}
+          DATADOG_APPLICATION_ID: ${{ secrets.GET_THREEID_DATADOG_APPLICATION_ID }}
+          DATADOG_ENV: current
+          DATADOG_SERVICE_NAME: get-3id
+          # The Cloudflare API token used by wrangler.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # Cloudflare zone identifier for threeid.xyz.
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          OORT_HOST: oort.kubelt.com
+          NFTAR_URL: ${{ secrets.NFTAR_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
+          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_CONTRACT_ADDRESS }}
+          CHAIN_ID: 1
+          INVITE_OPERATOR_PRIVATE_KEY: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
+          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_DEV_BEARER_TOKEN }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_KEY }}
+          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_URL }}
+          ALCHEMY_NFT_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_NFT_URL }}
+
+  # threeid
+  # ----------------------------------------------------------------------------
+
+  build-publish-threeid-current:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: 'npm'
+          cache-dependency-path: ./threeid/package-lock.json
+      - run: npm install
+        working-directory: threeid
+      - name: Publish
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          workingDirectory: 'threeid'
+          environment: 'current'
+          command: publish --env current
+          secrets: |
+            SESSION_SECRET
+            DATADOG_CLIENT_TOKEN
+            DATADOG_APPLICATION_ID
+            DATADOG_ENV
+            DATADOG_SERVICE_NAME
+            OORT_HOST
+            OORT_SCHEMA
+            OORT_PORT
+            NFTAR_URL
+            NFTAR_AUTHORIZATION
+            MINTPFP_CONTRACT_ADDRESS
+            NFTAR_CHAIN_ID
+            VALID_CHAIN_ID_NAME
+        env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          # These values are injected into the generated wrangler.toml.
+          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          # The Datadog client token.
+          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+          DATADOG_ENV: current
+          DATADOG_SERVICE_NAME: 3id-application
+          # The Cloudflare API token used by wrangler.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # Cloudflare zone identifier for threeid.xyz.
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          OORT_HOST: oort-mainnet.kubelt.com
+          OORT_SCHEMA: https
+          OORT_PORT: 443
+          NFTAR_URL: ${{ secrets.NFTAR_URL }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
+          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINTPFP_CONTRACT_ADDRESS }}
+          NFTAR_CHAIN_ID: 1
+          VALID_CHAIN_ID_NAME: mainnet
+      # - name: Install Playwright Browsers
+      #   run: npx playwright install --with-deps
+      #   working-directory: threeid
+      # - name: Run Playwright tests
+      #   run: npx playwright test
+      #   env:
+      #     NODE_ENV: production
+      #     ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }} # TODO: setup prod pk
+      #     DAPP_HOST: dapp.threeid.xyz
+      #     DAPP_PORT: 443
+      #     DAPP_SCHEMA: https
+      #   working-directory: threeid
+      # - uses: actions/upload-artifact@v2
+      #   if: always()
+      #   with:
+      #     name: playwright-report
+      #     path: playwright-report/
+      #     retention-days: 5
