@@ -115,6 +115,8 @@ const ProfileNftCollection = ({
         NFT Collection
       </Text>
 
+      {loading && <Spinner />}
+
       {!loading && !isOwner && loadedNfts.length === 0 && (
         <Text
           className="text-center"

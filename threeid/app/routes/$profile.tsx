@@ -1,5 +1,5 @@
 import { DataFunctionArgs, json, LoaderFunction } from "@remix-run/cloudflare";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import ProfileCard from "~/components/profile/ProfileCard";
 
 import { loader as profileLoader } from "~/routes/$profile.json";
@@ -147,7 +147,9 @@ const ProfileRoute = () => {
               </Text>
             </div>
 
-            <Button>Claim This Account</Button>
+            <a href="https://get.threeid.xyz/">
+              <Button>Claim This Account</Button>
+            </a>
           </div>
         )}
 
