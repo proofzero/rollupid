@@ -13,7 +13,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   url.searchParams.set("owner", owner);
-  url.searchParams.set("pageSize", "3");
 
   const pageKey = srcUrl.searchParams.get("pageKey");
   if (pageKey) {
