@@ -28,7 +28,7 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args;
 
-  const profileJson = await profileLoader(args);
+  const profileJson = await profileLoader(args).then((profileRes: Response) => profileRes.json());
 
   let isOwner = false;
 
@@ -40,12 +40,12 @@ export const loader: LoaderFunction = async (args) => {
     isOwner = true;
   }
 
-  return {
+  return json({
     ...profileJson,
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? true : false,
-  };
+  });
 };
 
 const ProfileRoute = () => {

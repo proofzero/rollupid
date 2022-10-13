@@ -72,5 +72,5 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error("Unable to persist pfp data");
   }
 
-  return voucher;
+  return json(voucher);
 };

@@ -26,14 +26,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       voucher = await putCachedVoucher(params.profile, voucher);
     }
 
-    return {
+    return json({
       pfp: {
         url: voucher.metadata.image,
         cover: voucher.metadata.cover,
         isToken: false,
       },
       claimed: false,
-    };
+    });
   }
 
   const publicProfileJson = await publicProfile.json();
