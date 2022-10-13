@@ -10,16 +10,13 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { Button, ButtonAnchor, ButtonSize } from "~/components/buttons";
+import { Button } from "~/components/buttons";
 import HeadNav from "~/components/head-nav";
-import { useEffect, useState } from "react";
 
 import { links as spinnerLinks } from "~/components/spinner";
 import { links as nftCollLinks } from "~/components/profile/ProfileNftCollection";
 
-import { FaBriefcase, FaCamera, FaEdit, FaMapMarkerAlt } from "react-icons/fa";
 import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()];
@@ -83,13 +80,13 @@ const ProfileRoute = () => {
           </div>
         </div>
 
-        {isOwner && (
+        {/* {isOwner && (
           <div className="absolute top-0 lg:top-auto lg:bottom-0 right-0 my-8 mx-6">
             <ButtonAnchor size={ButtonSize.SM} href="#" Icon={FaCamera}>
               Edit Cover Photo
             </ButtonAnchor>
           </div>
-        )}
+        )} */}
       </div>
 
       <div className="mt-44 lg:mt-0 p-3 max-w-7xl w-full mx-auto">
@@ -120,7 +117,9 @@ const ProfileRoute = () => {
         )}
 
         {claimed && (
-          <div className="lg:ml-[19rem] py-4 px-6">
+          <div className="lg:ml-[19rem] py-4 px-6" style={{
+            minHeight: '8rem'
+          }}>
             {/* <Text
               size={TextSize.Base}
               weight={TextWeight.Medium500}
@@ -145,13 +144,13 @@ const ProfileRoute = () => {
                 </div>
               </div> */}
 
-              {isOwner && isOwner && (
+              {/* {isOwner && isOwner && (
                 <div>
                   <ButtonAnchor size={ButtonSize.SM} href="#" Icon={FaEdit}>
                     Edit Profile
                   </ButtonAnchor>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         )}
