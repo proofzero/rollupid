@@ -1,75 +1,12 @@
-import { MIN } from "@datadog/datadog-api-client/dist/packages/datadog-api-client-v1/models/FormulaAndFunctionEventAggregation";
-import { LoaderFunction, redirect } from "@remix-run/cloudflare";
+import { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import {
+  fetchVoucher,
+  getCachedVoucher,
+  putCachedVoucher,
+} from "~/helpers/voucher";
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
-
-type LoadVoucherParams = {
-  address: string;
-  skipImage?: boolean;
-};
-
-const loadVoucher = async ({ address, skipImage }: LoadVoucherParams) => {
-  // @ts-ignore
-  const nftarUrl = NFTAR_URL;
-  // @ts-ignore
-  const nftarToken = NFTAR_AUTHORIZATION;
-  // @ts-ignore
-  const contractAddress = MINTPFP_CONTRACT_ADDRESS;
-  // @ts-ignore
-  const chainId = NFTAR_CHAIN_ID;
-
-  const nftarFetch = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${nftarToken}`,
-    },
-    body: JSON.stringify({
-      id: 1,
-      jsonrpc: "2.0",
-      method: "3id_genPFP",
-      params: {
-        account: address,
-        blockchain: {
-          name: "ethereum",
-          chainId,
-        },
-      },
-    }),
-  };
-
-  const response = await fetch(
-    `${nftarUrl}${skipImage ? "/?skipImage=true" : ""}`,
-    nftarFetch
-  );
-
-  const jsonRes = await response.json();
-
-  if (jsonRes.error) {
-    throw new Error(jsonRes.error.data.message);
-  }
-
-  if (skipImage) {
-    return {
-      contractAddress,
-    };
-  }
-
-  let res = {
-    ...jsonRes.result,
-    contractAddress,
-  };
-
-  res.metadata.cover = gatewayFromIpfs(jsonRes.result.metadata.cover) as string;
-  res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string;
-
-  fetch(res.metadata.image);
-  fetch(res.metadata.cover);
-
-  return res;
-};
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request);
@@ -87,67 +24,53 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const queryAddress = url.searchParams.get("address");
   const address = queryAddress ?? session.get("address");
 
-  // @ts-ignore
-  const cachedVoucher = await VOUCHER_CACHE.get(address, { type: "json" });
+  let cachedVoucher = await getCachedVoucher(address);
 
-  try {
-    const voucher = await loadVoucher({ address, skipImage: !!cachedVoucher });
+  if (cachedVoucher && !cachedVoucher.minted) {
+    // Check mint status
+    const pfpDataRes = await oortSend("kb_getData", ["3id.profile", "pfp"], {
+      jwt,
+      cookie: request.headers.get("Cookie") as string | undefined,
+    });
 
-    if (cachedVoucher) {
-      return json({
-        minted: false,
-        //@ts-ignore
-        chainId: NFTAR_CHAIN_ID,
+    const pfpData = pfpDataRes.result?.value;
+
+    // If minted update voucher cache
+    if (pfpData.isToken) {
+      cachedVoucher = await putCachedVoucher(address, {
         ...cachedVoucher,
-        //@ts-ignore
-        contractAddress: MINTPFP_CONTRACT_ADDRESS,
-      });
-    } else {
-      // @ts-ignore
-      await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
-
-      const data = await oortSend(
-        "kb_putObject",
-        [
-          "3id.profile",
-          "pfp",
-          {
-            url: voucher.metadata.image,
-            cover: voucher.metadata.cover,
-            //@ts-ignore
-            contractAddress: MINTPFP_CONTRACT_ADDRESS,
-            isToken: false,
-          },
-          {
-            visibility: "public"
-          }
-        ],
-        {
-          jwt,
-          cookie: request.headers.get("Cookie") as string | undefined,
-        }
-      );
-
-      if (data.error) {
-        throw new Error("Unable to persist pfp data");
-      }
-
-      return json({
-        minted: false,
-        //@ts-ignore
-        chainId: NFTAR_CHAIN_ID,
-        ...voucher,
+        minted: true,
       });
     }
-  } catch (ex) {
-    // remove the voucher info to remove chances of reminting
-    delete cachedVoucher["voucher"];
 
-    return json({
-      minted: true,
-      //@ts-ignore
-      chainId: NFTAR_CHAIN_ID,
-      ...cachedVoucher,
-    });
+    return cachedVoucher;
   }
+
+  let voucher = await fetchVoucher({ address, skipImage: !!cachedVoucher });
+  voucher = await putCachedVoucher(address, voucher);
+
+  const setDataRes = await oortSend(
+    "kb_setData",
+    [
+      "3id.profile",
+      "pfp",
+      {
+        url: voucher.metadata.image,
+        cover: voucher.metadata.cover,
+        //@ts-ignore
+        contractAddress: MINTPFP_CONTRACT_ADDRESS,
+        isToken: false,
+      },
+    ],
+    {
+      jwt,
+      cookie: request.headers.get("Cookie") as string | undefined,
+    }
+  );
+
+  if (setDataRes.error) {
+    throw new Error("Unable to persist pfp data");
+  }
+
+  return voucher;
 };

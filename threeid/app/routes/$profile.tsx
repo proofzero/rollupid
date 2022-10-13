@@ -28,9 +28,7 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args;
 
-  const profileJson = await profileLoader(args).then((res: Response) =>
-    res.json()
-  );
+  const profileJson = await profileLoader(args);
 
   let isOwner = false;
 
@@ -42,48 +40,17 @@ export const loader: LoaderFunction = async (args) => {
     isOwner = true;
   }
 
-  return json({
+  return {
     ...profileJson,
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? true : false,
-  });
+  };
 };
 
 const ProfileRoute = () => {
   const { targetAddress, claimed, pfp, displayname, isOwner, loggedIn } =
     useLoaderData();
-  const [loading, setLoading] = useState(!claimed);
-
-  const [pfpUrl, setPfpUrl] = useState<string | undefined>(pfp?.url);
-  const [coverUrl, setCoverUrl] = useState<string | undefined>(pfp?.cover);
-  const [minted, setMinted] = useState(pfp?.isToken);
-
-  const fetcher = useFetcher();
-  useEffect(() => {
-    if (fetcher.type === "init") {
-      if (!claimed)
-        fetcher.submit(
-          {
-            address: targetAddress,
-          },
-          {
-            action: "/onboard/mint/load-voucher",
-            method: "get",
-          }
-        );
-    } else if (fetcher.type === "done") {
-      if (!fetcher.data?.metadata) {
-        throw new Error("Unable to assess PFP metadata");
-      }
-
-      setPfpUrl(gatewayFromIpfs(fetcher.data.metadata.image));
-      setCoverUrl(gatewayFromIpfs(fetcher.data.metadata.cover));
-      setMinted(fetcher.data.minted);
-
-      setLoading(false);
-    }
-  }, [fetcher]);
 
   return (
     <div className="bg-white h-full min-h-screen">
@@ -98,8 +65,7 @@ const ProfileRoute = () => {
       <div
         className="h-80 w-full relative flex justify-center"
         style={{
-          backgroundImage:
-            !loading && coverUrl ? `url(${coverUrl})` : undefined,
+          backgroundImage: pfp.cover ? `url(${pfp.cover})` : undefined,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
@@ -109,10 +75,10 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={!loading && pfpUrl ? pfpUrl : undefined}
+              avatarUrl={pfp.url ? pfp.url : undefined}
               claimed={claimed ? new Date() : undefined}
               displayName={displayname}
-              isNft={minted}
+              isNft={pfp.isToken}
             />
           </div>
         </div>
@@ -155,7 +121,7 @@ const ProfileRoute = () => {
 
         {claimed && (
           <div className="lg:ml-[19rem] py-4 px-6">
-            <Text
+            {/* <Text
               size={TextSize.Base}
               weight={TextWeight.Medium500}
               color={TextColor.Gray500}
@@ -164,12 +130,12 @@ const ProfileRoute = () => {
               auctor. Etiam dui sem, fermentum vitae, sagittis id, malesuada in,
               quam. Nullam lectus justo, vulputate eget mollis sed, tempor sed
               magna. Nullam sapien sem, ornare ac, nonummy non, lobortis a enim.{" "}
-            </Text>
+            </Text> */}
 
             <hr className="my-6" />
 
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-              <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
+              {/* <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
                 <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
                   <FaMapMarkerAlt /> <Text>Fubar</Text>
                 </div>
@@ -177,7 +143,7 @@ const ProfileRoute = () => {
                 <div className="flex flex-row space-x-4 justify-center items-center">
                   <FaBriefcase /> <Text>Fubar</Text>
                 </div>
-              </div>
+              </div> */}
 
               {isOwner && isOwner && (
                 <div>
