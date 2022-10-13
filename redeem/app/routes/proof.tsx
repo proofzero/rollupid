@@ -120,7 +120,7 @@ export default function Proof() {
       setShowVerify(true)
 
       // Show tweet status verification
-      // setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/${address} %23Web3 sig:${data.toString()}`);
+      // setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz https://3id.kubelt.com/${address} %23Web3 sig:${data.toString()}`);
       setTweetStatus(
         `I'm claiming my decentralized identity @threeid_xyz https://get.threeid.xyz %23Web3 sig:${data.toString()}`,
       )
@@ -162,7 +162,7 @@ export default function Proof() {
             color: !showVerify ? '#D1D5DB' : 'inherit',
           }}
         >
-          {/* I'm claiming my decentralized identity @threeid_xyz https://dapp.threeid.xyz/{address} #Web3 sig:{signature} */}
+          {/* I'm claiming my decentralized identity @threeid_xyz https://3id.kubelt.com/{address} #Web3 sig:{signature} */}
           I'm claiming my decentralized identity @threeid_xyz
           https://get.threeid.xyz #Web3 sig:
           {signature}

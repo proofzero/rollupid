@@ -23,7 +23,7 @@ workers_dev = true
 # # either route or workers_dev, but not both.
 # workers_dev = true
 # routes = [
-#   "dapp-dev.threeid.xyz/*",
+#   "3id-dev.kubelt.com/*",
 # ]
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "41b33df6040f48b8988a8feeec8adcd3", preview_id = "856e53f4fdc049c1badddcb4854c9a98" },
@@ -35,8 +35,8 @@ kv_namespaces = [
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-  { pattern = "dapp-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-  { pattern = "dapp-preview.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+  { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b99f064f42a945feace9a6f36b5d9c62" },
@@ -47,7 +47,7 @@ kv_namespaces = [
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
-route = { pattern = "dapp.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
+route = { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
   { binding = "ONBOARD_STATE", id = "b1959de0b0974c26b3bc83576a259db7" },

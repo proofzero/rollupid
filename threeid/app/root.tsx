@@ -41,7 +41,7 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
   "og:title": "3ID - Decentralized Web Passport",
   "og:site_name": "3ID",
-  "og:url": "https://dapp.threeid.xyz",
+  "og:url": "https://3id.kubelt.com",
   "og:description":
     "3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.",
   "og:image": social,
