@@ -22,7 +22,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const req = await fetch(url.toString());
 
   let res = await req.json();
-  console.log(JSON.stringify(res, null, 2));
   res.ownedNfts = res.ownedNfts.map(
     (nft: {
       media: [
