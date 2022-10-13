@@ -42,7 +42,7 @@ export const action: ActionFunction = async ({ request }) => {
   const contractAddress = formData.get("contractAddress");
 
   await oortSend(
-    "kb_setData",
+    "kb_putObject",
     [
       "3id.profile",
       "pfp",
@@ -51,6 +51,9 @@ export const action: ActionFunction = async ({ request }) => {
         contractAddress: contractAddress,
         isToken: true,
       },
+      {
+        visibility: "public"
+      }
     ],
     {
       jwt,

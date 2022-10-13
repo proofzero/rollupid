@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
 
-  const data = await oortSend("kb_getData", ["3id.profile", "displayname"], {
+  const data = await oortSend("kb_getObject", ["3id.profile", "displayname"], {
     jwt,
     cookie: request.headers.get("Cookie") as string | undefined,
   });
@@ -58,8 +58,10 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const data = await oortSend(
-    "kb_setData",
-    ["3id.profile", "displayname", displayname],
+    "kb_putObject",
+    ["3id.profile", "displayname", displayname, {
+      visibility: "public"
+    }],
     {
       jwt,
       cookie: request.headers.get("Cookie") as string | undefined,

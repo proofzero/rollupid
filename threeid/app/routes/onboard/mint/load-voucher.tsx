@@ -107,7 +107,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
 
       const data = await oortSend(
-        "kb_setData",
+        "kb_putObject",
         [
           "3id.profile",
           "pfp",
@@ -118,6 +118,9 @@ export const loader: LoaderFunction = async ({ request }) => {
             contractAddress: MINTPFP_CONTRACT_ADDRESS,
             isToken: false,
           },
+          {
+            visibility: "public"
+          }
         ],
         {
           jwt,
