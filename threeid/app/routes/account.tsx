@@ -54,12 +54,12 @@ export const loader = async ({ request }) => {
       oortOptions,
     ),
     oortSend(
-      "kb_getData",
+      "kb_getObject",
       ["3id.profile", "pfp"],
       oortOptions,
     ),
     oortSend(
-      "kb_getData",
+      "kb_getObject",
       ["3id.profile", "displayname"],
       oortOptions,
     )
