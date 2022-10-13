@@ -48,17 +48,17 @@ export const loader = async ({ request, params }) => {
     ),
     oortSend(
       "kb_getObject",
-      ["3id.app", "feature_vote_count"],
+      ["3id_app", "feature_vote_count"],
       oortOptions,
     ),
     oortSend(
       "kb_getObject",
-      ["3id.profile", "pfp"],
+      ["3id_profile", "pfp"],
       oortOptions,
     ),
     oortSend(
       "kb_getObject",
-      ["3id.profile", "displayname"],
+      ["3id_profile", "displayname"],
       oortOptions,
     ),
     oortSend(
@@ -101,7 +101,7 @@ export const action = async ({ request }: any) => {
 
   oortSend(
     "kb_setObject",
-    ["3id.app", "feature_vote_count", votes],
+    ["3id_app", "feature_vote_count", votes],
     {
       jwt, cookie: request.headers.get("Cookie")
     }

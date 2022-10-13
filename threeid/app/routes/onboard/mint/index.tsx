@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({ request }) => {
   await oortSend(
     "kb_setObject",
     [
-      "3id.profile",
+      "3id_profile",
       "pfp",
       {
         url: imgUrl,
