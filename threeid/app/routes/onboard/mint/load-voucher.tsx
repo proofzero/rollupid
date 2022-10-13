@@ -107,9 +107,9 @@ export const loader: LoaderFunction = async ({ request }) => {
       await VOUCHER_CACHE.put(address, JSON.stringify(voucher));
 
       const data = await oortSend(
-        "kb_setObject",
+        "kb_putObject",
         [
-          "3id_profile",
+          "3id.profile",
           "pfp",
           {
             url: voucher.metadata.image,

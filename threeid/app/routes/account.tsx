@@ -55,12 +55,12 @@ export const loader = async ({ request }) => {
     ),
     oortSend(
       "kb_getObject",
-      ["3id_profile", "pfp"],
+      ["3id.profile", "pfp"],
       oortOptions,
     ),
     oortSend(
       "kb_getObject",
-      ["3id_profile", "displayname"],
+      ["3id.profile", "displayname"],
       oortOptions,
     )
   ]);

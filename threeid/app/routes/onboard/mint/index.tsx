@@ -42,9 +42,9 @@ export const action: ActionFunction = async ({ request }) => {
   const contractAddress = formData.get("contractAddress");
 
   await oortSend(
-    "kb_setObject",
+    "kb_putObject",
     [
-      "3id_profile",
+      "3id.profile",
       "pfp",
       {
         url: imgUrl,

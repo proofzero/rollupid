@@ -22,7 +22,7 @@ export const loader = async ({ request, params }) => {
     const nonceRes = await oortSend("kb_getNonce", [
             params.address,
             signMessageTemplate,
-            {"3id_profile": ["read", "write"], "3id_app": ["read", "write"]},
+            {"3id.profile": ["read", "write"], "3id.app": ["read", "write"]},
             // TODO: add support for { "blockchain": "ethereum", "chain": "goerli", "chainId": 5 } in JWT
         ], {address: params.address})
     
