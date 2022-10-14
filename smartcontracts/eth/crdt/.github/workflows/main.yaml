@@ -38,3 +38,10 @@ jobs:
         run: npm test
         # working-directory: crdt
         env:
+          CRDT_ETHERSCAN_API_KEY: ${{ secrets.CRDT_ETHERSCAN_API_KEY }}
+          CRDT_GOERLI_OWNER_PRIVATE: ${{ secrets.CRDT_GOERLI_OWNER_PRIVATE }}
+          CRDT_GOERLI_OWNER_ADDRESS: ${{ secrets.CRDT_GOERLI_OWNER_ADDRESS }}
+          CRDT_GOERLI_ALCHEMY_URL: ${{ secrets.CRDT_GOERLI_ALCHEMY_URL }}
+          CRDT_MUMBAI_ALCHEMY_URL: ${{ secrets.CRDT_MUMBAI_ALCHEMY_URL }}
+          CRDT_POLYGON_ALCHEMY_URL: ${{ secrets.CRDT_POLYGON_ALCHEMY_URL }}
+          CRDT_ETHEREUM_ALCHEMY_URL: ${{ secrets.CRDT_ETHEREUM_ALCHEMY_URL }}

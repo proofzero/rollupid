@@ -112,7 +112,7 @@ const PROXY_CONTRACT_ETHEREUM = "NOT_DEPLOYED";
 // -----------------------------------------------------------------------------
 
 export const ETHERSCAN = {
-  apiKey: process.env.ETHERSCAN_API_KEY,
+  apiKey: process.env.CRDT_ETHERSCAN_API_KEY,
 };
 
 // NET_LOCALHOST
@@ -169,14 +169,14 @@ export const NET_LOCALHOST: ChainnetConfiguration = {
 // NET_GOERLI
 // -----------------------------------------------------------------------------
 // Constants for usage with Goerli test network.
-const goerli_owner = new AccountConfiguration(process.env.GOERLI_OWNER_PRIVATE, process.env.GOERLI_OWNER_ADDRESS);
+const goerli_owner = new AccountConfiguration(process.env.CRDT_GOERLI_OWNER_PRIVATE, process.env.CRDT_GOERLI_OWNER_ADDRESS);
 // TODO: Connect operators in the types up top, then throughout, including here.
 // const goerli_operator = new AccountConfiguration("ethereum goerli owner private key not set", "ethereum goerli owner address not set");...
 
 export const NET_GOERLI: ChainnetConfiguration = {
   contract: PROXY_CONTRACT_GOERLI,
   // TODO: Replace either here for $CRDT or create an Alchemy app for Hardhat. 
-  alchemy: new AlchemyConfiguration(process.env.GOERLI_ALCHEMY_URL),
+  alchemy: new AlchemyConfiguration(process.env.CRDT_GOERLI_ALCHEMY_URL),
   wallet: {
     ownerKey: goerli_owner.privateKey,
     // operatorKey: goerli_operator.privateKey,
@@ -207,7 +207,7 @@ const mumbai_owner = new AccountConfiguration("ac0974bec39a17e36ba4a6b4d238ff944
 export const NET_MUMBAI: ChainnetConfiguration = {
   contract: PROXY_CONTRACT_MUMBAI,
   // TODO: Replace either here for $CRDT or create an Alchemy app for Hardhat. 
-  alchemy: new AlchemyConfiguration(process.env.MUMBAI_ALCHEMY_URL),
+  alchemy: new AlchemyConfiguration(process.env.CRDT_MUMBAI_ALCHEMY_URL),
   wallet: {
     ownerKey: mumbai_owner.privateKey,
     // operatorKey: mumbai_operator.privateKey,
@@ -231,7 +231,7 @@ const polygon_owner = new AccountConfiguration("ac0974bec39a17e36ba4a6b4d238ff94
 export const NET_POLYGON: ChainnetConfiguration = {
   contract: PROXY_CONTRACT_POLYGON,
   // TODO: Replace either here for $CRDT or create an Alchemy app for Hardhat. 
-  alchemy: new AlchemyConfiguration(process.env.POLYGON_ALCHEMY_URL),
+  alchemy: new AlchemyConfiguration(process.env.CRDT_POLYGON_ALCHEMY_URL),
   wallet: {
     ownerKey: polygon_owner.privateKey,
     // operatorKey: polygon_operator.privateKey,
@@ -255,7 +255,7 @@ const mainnet_owner = new AccountConfiguration("ac0974bec39a17e36ba4a6b4d238ff94
 export const NET_MAINNET: ChainnetConfiguration = {
   contract: PROXY_CONTRACT_ETHEREUM,
   // TODO: Replace either here for $CRDT or create an Alchemy app for Hardhat. 
-  alchemy: new AlchemyConfiguration(process.env.ETHEREUM_ALCHEMY_URL),
+  alchemy: new AlchemyConfiguration(process.env.CRDT_ETHEREUM_ALCHEMY_URL),
   wallet: {
     ownerKey: mainnet_owner.privateKey,
     // operatorKey: mainnet_operator.privateKey,
