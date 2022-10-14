@@ -1,9 +1,5 @@
-/// @file: crdt.secret.ts
+/// @file: crdt.networks.ts
 //
-// NB: s3kri7! Don't check this in!
-//
-// NB: To export your private key from Metamask, open Metamask and go to
-// Account Details > Export Private Key.
 // *Beware: NEVER put real Ether into testing accounts*
 
 // Types
@@ -13,9 +9,8 @@
 // contructor and provides access to the related public key and eth address.
 // This avoids having to juggle the private key and address separately because
 // ethers Wallets don't have an accessor for the private key.
-// TODO: Disabled because this file needs to avoid imports (for NFTar deployments).
 // TODO: The link between address and key, and address checksum validation can
-// be added back, in future. This is re-validated in the config file tasks though.
+// be added back, in future. This is re-validated in the config file tasks.
 class AccountConfiguration {
   #key: string;
   #address: string;
