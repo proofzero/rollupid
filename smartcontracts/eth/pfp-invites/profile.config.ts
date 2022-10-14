@@ -20,7 +20,6 @@ import {
   // Network-specific configuration
   NET_LOCALHOST,
   NET_GOERLI,
-  NET_RINKEBY,
   NET_MUMBAI,
   NET_POLYGON,
   NET_MAINNET,
@@ -40,7 +39,6 @@ const OUTPUT_DIR = path.resolve("outputs");
 // bit of validation that you're talking to the network you think you're
 // talking to.
 const MAINNET_CHAIN_ID = 1;
-const RINKEBY_CHAIN_ID = 4;
 const GOERLI_CHAIN_ID = 5;
 const MUMBAI_CHAIN_ID = 80001;
 const POLYGON_CHAIN_ID = 137;
@@ -70,9 +68,6 @@ subtask("network:config", "Return network-specific configuration map")
         break;
       case "goerli":
         return NET_GOERLI;
-        break;
-      case "rinkeby":
-        return NET_RINKEBY;
         break;
       case "mumbai":
         return NET_MUMBAI;
@@ -561,18 +556,6 @@ const config: HardhatUserConfig = {
       accounts: [
         NET_GOERLI.wallet.ownerKey,
         NET_GOERLI.wallet.operatorKey,
-      ],
-    },
-    rinkeby: {
-      // For optional validation.
-      chainId: RINKEBY_CHAIN_ID,
-      url: NET_RINKEBY.alchemy.appURL,
-      // Account to use as the default sender. If not supplied, the
-      // first account of the node is used.
-      //from: "",
-      accounts: [
-        NET_RINKEBY.wallet.ownerKey,
-        NET_RINKEBY.wallet.operatorKey,
       ],
     },
     mumbai: {

@@ -19,5 +19,8 @@
     "cheerio": "1.0.0-rc.12",
     "hardhat": "2.10.2",
     "nft.storage": "7.0.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-upgradeable": "4.8.0-rc.1"
   }
 }
