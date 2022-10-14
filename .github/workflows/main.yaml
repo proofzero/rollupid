@@ -177,7 +177,7 @@ jobs:
 
   # nftar
   # ----------------------------------------------------------------------------
-  build-test-nftar:
+  build-test-nftar-dev:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -221,7 +221,7 @@ jobs:
 
   # crdt
   # ----------------------------------------------------------------------------
-  build-test-crdt:
+  build-test-crdt-dev:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
