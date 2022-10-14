@@ -6,9 +6,6 @@
 # Utilities
 bin/
 
-# Secrets
-*secret*
-
 # Hardhat
 artifacts/
 cache/
