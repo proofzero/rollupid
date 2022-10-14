@@ -27,7 +27,7 @@ import {
 
   // Types
   ChainnetConfiguration,
-} from "./crdt.secret"; // Get this from 1Password: https://start.1password.com/open/i?a=ZJM7Z47Z3ZE6PBNEPK6MAP2YBA&v=kwywqdgenebhkdbycqestmjtry&i=vwzlndlo3cxcbtcajd77yr5udq&h=pz3r0.1password.com
+} from "./crdt.networks";
 
 
 // definitions
