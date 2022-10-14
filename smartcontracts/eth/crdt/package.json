@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "clean": "rm -rf typechain-types && hardhat clean",
+    "build": "hardhat compile",
+    "rebuild": "npm run clean && npm run build"
   },
   "author": "",
   "license": "SEE LICENSE IN LICENSE.md",

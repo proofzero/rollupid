@@ -100,10 +100,4 @@ contract KubeltPlatformCreditsV2 is Initializable, ERC20Upgradeable, AccessContr
     // {
     //     super._burn(account, amount);
     // }
-
-    function getMessage() public view returns (uint) {
-        uint message = 1;
-        console.log(message);
-        return message;
-    }
 }

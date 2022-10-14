@@ -34,7 +34,9 @@ jobs:
           cache-dependency-path: ./package-lock.json
       - run: npm install
         # working-directory: crdt
-      - name: Build and Test
+      - name: Build
+        run: npm run build
+      - name: Test
         run: npm test
         # working-directory: crdt
         env:
@@ -45,3 +47,4 @@ jobs:
           CRDT_MUMBAI_ALCHEMY_URL: ${{ secrets.CRDT_MUMBAI_ALCHEMY_URL }}
           CRDT_POLYGON_ALCHEMY_URL: ${{ secrets.CRDT_POLYGON_ALCHEMY_URL }}
           CRDT_ETHEREUM_ALCHEMY_URL: ${{ secrets.CRDT_ETHEREUM_ALCHEMY_URL }}
+

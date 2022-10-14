@@ -31,10 +31,4 @@ contract KubeltPlatformCredits is Initializable, ERC20Upgradeable, AccessControl
         onlyRole(UPGRADER_ROLE)
         override
     {}
-
-    function getMessage() public view returns (uint) {
-        uint message = 0;
-        console.log(message);
-        return message;
-    }
 }
