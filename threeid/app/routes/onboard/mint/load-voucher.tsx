@@ -29,8 +29,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (cachedVoucher && !cachedVoucher.minted) {
     // Check mint status
     const pfpDataRes = await oortSend("kb_getObject", ["3id.profile", "pfp"], {
-      jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
+      jwt
     });
 
     const pfpData = pfpDataRes.result?.value;
