@@ -24,14 +24,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   let res = await req.json();
   res.ownedNfts = res.ownedNfts.map(
     (nft: {
+      title: string,
       media: [
         {
           gateway: string;
           raw: string;
         }
-      ];
+      ],
+      contractMetadata?: {
+        name: string;
+      }
     }) => ({
       url: gatewayFromIpfs(nft.media[0].raw),
+      title: nft.title,
+      collectionTitle: nft.contractMetadata?.name
     })
   );
 
