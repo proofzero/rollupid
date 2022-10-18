@@ -19,8 +19,6 @@ import SignOutLink from "~/components/sign-out-link";
 import hexStyle from "~/helpers/hex-style";
 
 import styles from "./headNav.css";
-import { json, LoaderFunction } from "@remix-run/cloudflare";
-import { getUserSession } from "~/utils/session.server";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
@@ -118,14 +116,14 @@ export default function HeadNav({ pfp, loggedIn = true }: HeadNavProps) {
                         </Text>
                       </Link>
 
-                      <Link
-                        to="/"
+                      <a
+                        href="https://get.threeid.xyz"
                         className="button-base w-full lg:w-fit bg-white py-3 px-8"
                       >
                         <Text weight={TextWeight.Bold700} size={TextSize.SM}>
                           Claim your 3ID
                         </Text>
-                      </Link>
+                      </a>
                     </div>
                   )}
 
