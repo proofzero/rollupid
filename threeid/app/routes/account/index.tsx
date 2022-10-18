@@ -40,7 +40,7 @@ export const loader = async ({ request, params }) => {
   }
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, pfpRes, displaynameRes, namesRes] = await Promise.all([
+  const [inviteCodeRes, votesRes, publicProfileRes, namesRes] = await Promise.all([
     oortSend(
       "3id_getInviteCode",
       [],
@@ -53,12 +53,7 @@ export const loader = async ({ request, params }) => {
     ),
     oortSend(
       "kb_getObject",
-      ["3id.profile", "pfp"],
-      oortOptions,
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "displayname"],
+      ["3id.profile", "public_profile"],
       oortOptions,
     ),
     oortSend(
@@ -80,8 +75,8 @@ export const loader = async ({ request, params }) => {
   ] = [
     inviteCodeRes.result,
     votesRes.result,
-    pfpRes.result,
-    displaynameRes.result,
+    publicProfileRes.result?.value?.pfp,
+    publicProfileRes.result?.value?.displayname,
     namesRes.result
   ];
 
@@ -240,7 +235,7 @@ export default function Welcome() {
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
-          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID, {displayname.value}!</span>
+          <span className="order-2 text-center justify-center align-center lg:order-1">Welcome to 3ID, {displayname}!</span>
           <span className="order-1 text-center justify-center align-center lg:order-2">🎉</span>
           </Heading>
 

@@ -1,4 +1,4 @@
-import { ActionFunction, LoaderFunction, redirect} from "@remix-run/cloudflare";
+import { ActionFunction, LoaderFunction, redirect } from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
@@ -41,23 +41,33 @@ export const action: ActionFunction = async ({ request }) => {
   const imgUrl = formData.get("imgUrl");
   const contractAddress = formData.get("contractAddress");
 
+  // Get existing object | error
+  const profileData = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
+    jwt
+  });
+
+  let profile = null;
+
+  // Create new profile object
+  if (!profileData.result?.value) {
+    profile = {}
+  } else { // Populate profile object with stored properties
+    profile = profileData.result.value;
+  }
+
+  profile.pfp = {
+    url: imgUrl,
+    contractAddress: contractAddress,
+    isToken: true,
+  };
+
   await oortSend(
     "kb_putObject",
-    [
-      "3id.profile",
-      "pfp",
-      {
-        url: imgUrl,
-        contractAddress: contractAddress,
-        isToken: true,
-      },
-      {
-        visibility: "public"
-      }
-    ],
+    ["3id.profile", "public_profile", profile, {
+      visibility: "public"
+    }],
     {
       jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
     }
   );
 

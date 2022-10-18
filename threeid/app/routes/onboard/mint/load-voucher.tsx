@@ -26,20 +26,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let cachedVoucher = await getCachedVoucher(address);
 
+  const publicProfileRes = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
+    jwt
+  });
+
+  let profile = publicProfileRes.result?.value;
+
   if (cachedVoucher && !cachedVoucher.minted) {
     // Check mint status
-    const pfpDataRes = await oortSend("kb_getObject", ["3id.profile", "pfp"], {
-      jwt
-    });
-
-    const pfpData = pfpDataRes.result?.value;
-
-    // If minted update voucher cache
-    if (pfpData.isToken) {
-      cachedVoucher = await putCachedVoucher(address, {
-        ...cachedVoucher,
-        minted: true,
-      });
+    let pfpData = profile?.pfp;
+    if (pfpData) {
+      // If minted update voucher cache
+      if (pfpData.isToken) {
+        cachedVoucher = await putCachedVoucher(address, {
+          ...cachedVoucher,
+          minted: true,
+        });
+      }
     }
 
     return cachedVoucher;
@@ -48,25 +51,26 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let voucher = await fetchVoucher({ address, skipImage: !!cachedVoucher });
   voucher = await putCachedVoucher(address, voucher);
 
+  profile.pfp = {
+    url: voucher.metadata.image,
+    cover: voucher.metadata.cover,
+    //@ts-ignore
+    contractAddress: MINTPFP_CONTRACT_ADDRESS,
+    isToken: false,
+  }
+
   const setDataRes = await oortSend(
     "kb_putObject",
     [
       "3id.profile",
-      "pfp",
-      {
-        url: voucher.metadata.image,
-        cover: voucher.metadata.cover,
-        //@ts-ignore
-        contractAddress: MINTPFP_CONTRACT_ADDRESS,
-        isToken: false,
-      },
+      "public_profile",
+      profile,
       {
         visibility: "public"
       }
     ],
     {
       jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
     }
   );
 

@@ -31,14 +31,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
 
-  const data = await oortSend("kb_getObject", ["3id.profile", "displayname"], {
-    jwt,
-    cookie: request.headers.get("Cookie") as string | undefined,
+  const data = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
+    jwt
   });
 
-  const displayname = data.result?.value;
   return json({
-    displayname,
+    displayname: data.result?.value?.displayname,
   });
 };
 
@@ -50,6 +48,7 @@ export const action: ActionFunction = async ({ request }) => {
   const displayname = form.get("displayname");
 
   const errors: {
+    profile?: string;
     displayname?: string;
   } = {};
 
@@ -57,18 +56,39 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayname = "Display Name needs to be provided";
   }
 
-  const data = await oortSend(
+  // Get existing object | error
+  const profileData = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
+    jwt
+  });
+
+  if (profileData.error) {
+    errors.profile = "Failed persisting displayname";
+  }
+
+  let profile = null;
+
+  // Create new profile object
+  if (!profileData.result?.value) {
+    profile = {}
+  } else { // Populate profile object with stored properties
+    profile = profileData.result.value;
+  }
+
+  // Update properties
+  profile.displayname = displayname;
+
+  // PUT new object
+  const updatedProfileData = await oortSend(
     "kb_putObject",
-    ["3id.profile", "displayname", displayname, {
+    ["3id.profile", "public_profile", profile, {
       visibility: "public"
     }],
     {
       jwt,
-      cookie: request.headers.get("Cookie") as string | undefined,
     }
   );
 
-  if (data.error) {
+  if (updatedProfileData.error) {
     errors.displayname = "Failed persisting displayname";
   }
 

@@ -1,4 +1,4 @@
-import { redirect, json} from "@remix-run/cloudflare";
+import { redirect, json } from "@remix-run/cloudflare";
 import { useLoaderData, useSubmit, NavLink } from "@remix-run/react";
 
 import { Outlet } from "@remix-run/react";
@@ -43,11 +43,10 @@ export const loader = async ({ request }) => {
 
   const oortOptions = {
     jwt: jwt,
-    cookie: request.headers.get("Cookie"),
   }
 
   // TODO remove session address param when RPC url is changed
-  const [coreClaimsRes, pfpRes, displaynameRes] = await Promise.all([
+  const [coreClaimsRes, publicProfileRes] = await Promise.all([
     oortSend(
       "kb_getCoreClaims",
       [],
@@ -55,12 +54,7 @@ export const loader = async ({ request }) => {
     ),
     oortSend(
       "kb_getObject",
-      ["3id.profile", "pfp"],
-      oortOptions,
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "displayname"],
+      ["3id.profile", "public_profile"],
       oortOptions,
     )
   ]);
@@ -83,9 +77,9 @@ export const loader = async ({ request }) => {
     pfp,
     displayname,
   ] = [
-    pfpRes.result,
-    displaynameRes.result,
-  ];
+      publicProfileRes.result?.value?.pfp,
+      publicProfileRes.result?.value?.displayname,
+    ];
 
   return json({
     pfp,

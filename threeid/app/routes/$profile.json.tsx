@@ -20,8 +20,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   });
 
+  const publicProfileRes = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
+    address: params.profile
+  });
+
   // Core wasn't claimed
-  if (publicProfile.status === 404) {
+  if (publicProfileRes.error) {
     let voucher = await getCachedVoucher(params.profile);
     if (!voucher) {
       voucher = await fetchVoucher({
@@ -41,11 +45,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     });
   }
 
-  const publicProfileJson = await publicProfile.json();
-
-  if (publicProfileJson.error) {
-    throw new Error(publicProfileJson.error);
-  }
+  const profile = publicProfileRes.result?.value;
 
   const [description, job, location] = await Promise.all([
     oortSend(
@@ -72,7 +72,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   ])
 
   return json({
-    ...publicProfileJson,
+    ...profile,
     description: description.result?.value,
     location: location.result?.value,
     job: job.result?.value,
