@@ -17,6 +17,7 @@ import { links as spinnerLinks } from "~/components/spinner";
 import { links as nftCollLinks } from "~/components/profile/ProfileNftCollection";
 
 import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
+import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()];
@@ -26,6 +27,7 @@ export const loader: LoaderFunction = async (args) => {
   const { request, params } = args;
 
   const profileJson = await profileLoader(args).then((profileRes: Response) => profileRes.json());
+  console.log(profileJson);
 
   let isOwner = false;
 
@@ -46,7 +48,7 @@ export const loader: LoaderFunction = async (args) => {
 };
 
 const ProfileRoute = () => {
-  const { targetAddress, claimed, pfp, displayname, isOwner, loggedIn } =
+  const { targetAddress, claimed, pfp, displayname, description, job, location, isOwner, loggedIn } =
     useLoaderData();
 
   return (
@@ -120,29 +122,26 @@ const ProfileRoute = () => {
           <div className="lg:ml-[19rem] py-4 px-6" style={{
             minHeight: '8rem'
           }}>
-            {/* <Text
+            <Text
               size={TextSize.Base}
               weight={TextWeight.Medium500}
               color={TextColor.Gray500}
             >
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nunc
-              auctor. Etiam dui sem, fermentum vitae, sagittis id, malesuada in,
-              quam. Nullam lectus justo, vulputate eget mollis sed, tempor sed
-              magna. Nullam sapien sem, ornare ac, nonummy non, lobortis a enim.{" "}
-            </Text> */}
+              {description}
+            </Text>
 
             <hr className="my-6" />
 
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-              {/* <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
+              <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
                 <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
-                  <FaMapMarkerAlt /> <Text>Fubar</Text>
+                  <FaMapMarkerAlt /> <Text>{location}</Text>
                 </div>
 
                 <div className="flex flex-row space-x-4 justify-center items-center">
-                  <FaBriefcase /> <Text>Fubar</Text>
+                  <FaBriefcase /> <Text>{job}</Text>
                 </div>
-              </div> */}
+              </div>
 
               {/* {isOwner && isOwner && (
                 <div>

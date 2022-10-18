@@ -6,6 +6,7 @@ type HeadersObject = {
     // "Access-Control-Allow-Origin": string,
     "Content-Type": string,
     "KBT-Access-JWT-Assertion"?: string,
+    "X-Kubelt-Core-Address"?: string,
     "Cookie"?: string,
 }
 
@@ -31,9 +32,12 @@ export async function oortSend(method: string, params: any[], options: OortOptio
     if (options.cookie) {
         headers['Cookie'] = options.cookie;
     }
+    if (options.address) {
+        headers['X-Kubelt-Core-Address'] = options.address;
+    }
 
     //@ts-ignore
-    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}${options.address ? `/@${options.address}` : ''}/jsonrpc`, {
+    const response = await fetch(`${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/jsonrpc`, {
         method: "POST",
         headers,
         body: JSON.stringify({

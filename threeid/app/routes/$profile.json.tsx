@@ -4,6 +4,7 @@ import {
   getCachedVoucher,
   putCachedVoucher,
 } from "~/helpers/voucher";
+import { oortSend } from "~/utils/rpc.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.profile) {
@@ -11,9 +12,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   // @ts-ignore
-  const url = `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/@${params.profile}/3id/profile`;
+  const url = `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/3id/profile`;
 
-  const publicProfile = await fetch(url);
+  const publicProfile = await fetch(url, {
+    headers: {
+      "X-Kubelt-Core-Address": params.profile
+    }
+  });
 
   // Core wasn't claimed
   if (publicProfile.status === 404) {
@@ -42,8 +47,41 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error(publicProfileJson.error);
   }
 
+  const [description, job, location] = await Promise.all([
+    oortSend(
+      "kb_getObject",
+      ["3id.profile", "description"],
+      {
+        address: params.profile
+      }
+    ),
+    oortSend(
+      "kb_getObject",
+      ["3id.profile", "job"],
+      {
+        address: params.profile
+      }
+    ),
+    oortSend(
+      "kb_getObject",
+      ["3id.profile", "location"],
+      {
+        address: params.profile
+      }
+    ),
+  ])
+
+  console.log({
+    description,
+    job,
+    location
+  })
+
   return json({
     ...publicProfileJson,
+    description: description.result?.value,
+    location: location.result?.value,
+    job: job.result?.value,
     claimed: true,
   });
 };
