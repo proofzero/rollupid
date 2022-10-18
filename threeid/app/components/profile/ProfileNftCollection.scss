@@ -24,13 +24,21 @@
 
 .overlay-img-wrapper {
   div {
-    display: none;
+    visibility: hidden;
+
+    p {
+      visibility: hidden;
+    }
   }
 
   &:hover {
     div {
-      display: flex;
-      background-color: rgba(0, 0, 0, 0.25);
+      visibility: visible;
+      background-color: rgba(0, 0, 0, 0.4);
+
+      p {
+        visibility: visible;
+      }
     }
   }
 }

@@ -220,7 +220,7 @@ const ProfileNftCollection = ({
                 key={`${nft.url}_${i}`}
                 className="relative overlay-img-wrapper"
               >
-                <div className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end">
+                <div className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300">
                   <Text
                     size={TextSize.SM}
                     weight={TextWeight.SemiBold600}
