@@ -31,7 +31,11 @@ export const links: LinksFunction = () => [
 export type ProfileNftCollectionProps = {
   account: string;
   displayname?: string;
-  nfts?: string[];
+  nfts?: {
+    url: string;
+    title: string;
+    collectionTitle: string;
+  }[];
   isOwner?: boolean;
 };
 
@@ -93,10 +97,8 @@ const ProfileNftCollection = ({
     );
     const nftRes = await nftReq.json();
 
-    const newNfts = nftRes.ownedNfts.map((nft: { url: string }) => nft.url);
-
     setPageLink(nftRes.pageKey);
-    setLoadedNfts([...loadedNfts, ...newNfts]);
+    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts]);
 
     if (loading) setLoading(false);
   };
@@ -214,7 +216,29 @@ const ProfileNftCollection = ({
               // unique values
               // breaks the infinite scroll
               // plugin I resorted to this
-              <img key={`${nft}_${i}`} className="w-full" src={nft} />
+              <div
+                key={`${nft.url}_${i}`}
+                className="relative overlay-img-wrapper"
+              >
+                <div className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end">
+                  <Text
+                    size={TextSize.SM}
+                    weight={TextWeight.SemiBold600}
+                    color={TextColor.White}
+                  >
+                    {nft.collectionTitle}
+                  </Text>
+                  <Text
+                    size={TextSize.SM}
+                    weight={TextWeight.SemiBold600}
+                    color={TextColor.White}
+                  >
+                    {nft.title}
+                  </Text>
+                </div>
+
+                <img className="w-full" src={nft.url} />
+              </div>
             ))}
           </Masonry>
         </InfiniteScroll>
