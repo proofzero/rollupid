@@ -23,6 +23,7 @@ import { LinksFunction } from "@remix-run/cloudflare";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import Spinner from "../spinner";
+import NftModal from "./NftModal";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: ProfileNftCollectionStyles },
@@ -88,6 +89,10 @@ const ProfileNftCollection = ({
   displayname,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts);
+
+  const [selectedNft, setSelectedNft] = useState<any>();
+  const [showModal, setShowModal] = useState<boolean>(false);
+
   const [pageKey, setPageLink] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
 
@@ -194,6 +199,12 @@ const ProfileNftCollection = ({
         </>
       )}
 
+      <NftModal
+        nft={selectedNft}
+        isOpen={showModal}
+        handleClose={() => setShowModal(false)}
+      />
+
       {loadedNfts.length > 0 && (
         <InfiniteScroll
           dataLength={loadedNfts.length} //This is important field to render the next data
@@ -220,7 +231,13 @@ const ProfileNftCollection = ({
                 key={`${nft.url}_${i}`}
                 className="relative overlay-img-wrapper"
               >
-                <div className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300">
+                <div
+                  onClick={() => {
+                    setSelectedNft(nft);
+                    setShowModal(true);
+                  }}
+                  className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
+                >
                   <Text
                     size={TextSize.SM}
                     weight={TextWeight.SemiBold600}
