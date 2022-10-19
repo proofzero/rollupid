@@ -71,12 +71,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     ),
   ])
 
-  console.log({
-    description,
-    job,
-    location
-  })
-
   return json({
     ...publicProfileJson,
     description: description.result?.value,

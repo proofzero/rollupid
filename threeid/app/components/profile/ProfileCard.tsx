@@ -122,11 +122,12 @@ const ProfileCard = ({
         color={TextColor.Gray300}
         size={TextSize.XS}
       >
-        {`${
+        &nbsp;
+        {/* {`${
           claimed
             ? `Joined ${formattedDate} ${claimed.getFullYear()}`
             : "Unclaimed Profile"
-        }`}
+        }`} */}
       </Text>
     </div>
   );

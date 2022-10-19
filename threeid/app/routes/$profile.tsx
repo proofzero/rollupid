@@ -27,7 +27,6 @@ export const loader: LoaderFunction = async (args) => {
   const { request, params } = args;
 
   const profileJson = await profileLoader(args).then((profileRes: Response) => profileRes.json());
-  console.log(profileJson);
 
   let isOwner = false;
 
