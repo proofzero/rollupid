@@ -11,15 +11,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error("Profile address required");
   }
 
-  // @ts-ignore
-  const url = `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/3id/profile`;
-
-  const publicProfile = await fetch(url, {
-    headers: {
-      "X-Kubelt-Core-Address": params.profile
-    }
-  });
-
   const publicProfileRes = await oortSend("kb_getObject", ["3id.profile", "public_profile"], {
     address: params.profile
   });
@@ -47,35 +38,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const profile = publicProfileRes.result?.value;
 
-  const [description, job, location] = await Promise.all([
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "description"],
-      {
-        address: params.profile
-      }
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "job"],
-      {
-        address: params.profile
-      }
-    ),
-    oortSend(
-      "kb_getObject",
-      ["3id.profile", "location"],
-      {
-        address: params.profile
-      }
-    ),
-  ])
 
   return json({
     ...profile,
-    description: description.result?.value,
-    location: location.result?.value,
-    job: job.result?.value,
     claimed: true,
   });
 };
