@@ -1,0 +1,14 @@
+# web/.gitignore
+
+node_modules
+
+/.cache
+/build
+/dist
+/public/build
+/.mf
+.env
+
+# styles
+**/*.css
+**/*.css.amp
