@@ -46,7 +46,7 @@ export async function oortSend(method: string, params: any[], options: OortOptio
     "Content-Type": "application/json;charset=UTF-8",
   }
   if (options.address) {
-    headers["X-Kubelt-Core-Address"] = options.address;
+    headers["KBT-Core-Address"] = options.address;
   }
   if (options.jwt) {
     headers["KBT-Access-JWT-Assertion"] = options.jwt;
