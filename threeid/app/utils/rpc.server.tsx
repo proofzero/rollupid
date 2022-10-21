@@ -6,7 +6,7 @@ type HeadersObject = {
     // "Access-Control-Allow-Origin": string,
     "Content-Type": string,
     "KBT-Access-JWT-Assertion"?: string,
-    "X-Kubelt-Core-Address"?: string,
+    "KBT-Core-Address"?: string,
     "Cookie"?: string,
 }
 
@@ -33,7 +33,7 @@ export async function oortSend(method: string, params: any[], options: OortOptio
         headers['Cookie'] = options.cookie;
     }
     if (options.address) {
-        headers['X-Kubelt-Core-Address'] = options.address;
+        headers['KBT-Core-Address'] = options.address;
     }
 
     //@ts-ignore
