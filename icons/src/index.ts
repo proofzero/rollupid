@@ -118,8 +118,8 @@ export default {
     //   "errors": [],
     //   "messages": [],
     //   "result": {
-    //     "uploadURL": "https://upload.imagedelivery.net/FxUufywByo0m2v3xhKSiU8/e22e9e6b-c02b-42fd-c405-6c32af5fe600",
-    //     "id": "e22e9e6b-c02b-42fd-c405-6c32af5fe600"
+    //     "uploadURL": "https://upload.imagedelivery.net/<acct-id>/<image-id>",
+    //     "id": "<image-id>"
     //   }
     // }
     const direct_upload = await response.json();
