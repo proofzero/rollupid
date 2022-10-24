@@ -1,0 +1,96 @@
+name = "oort"
+main = "dist/shim.mjs"
+compatibility_date = "2022-09-26"
+workers_dev = true
+node_compat = true
+
+[build]
+command = "npm run build:production"
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Address"]
+
+[env.dev]
+name="oort-dev"
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
+kv_namespaces = [
+  { binding = "CORE_CLAIMS", id = "ec4086c00b29472a8af96a6238490a5e", preview_id = "d1f72c20862741f5a887f4d6fa1966b8" },
+  { binding = "THREEID", id = "637013c6396f40bdad6d089522c573f1", preview_id = "e41ef4effc8643b6954b5b3348ffa4ec" },
+  { binding = "THREEID_INVITE_CODES", id = "a89fd66cd1d74147924e0b870b0afb8e", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+]
+r2_buckets = [
+  { binding = "OBJECTS", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+
+[env.dev.build]
+command = "npm run build:dev"
+
+[env.test]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
+kv_namespaces = [
+  { binding = "CORE_CLAIMS", id = "ec4086c00b29472a8af96a6238490a5e", preview_id = "d1f72c20862741f5a887f4d6fa1966b8" },
+  { binding = "THREEID", id = "637013c6396f40bdad6d089522c573f1", preview_id = "e41ef4effc8643b6954b5b3348ffa4ec" },
+  { binding = "THREEID_INVITE_CODES", id = "a89fd66cd1d74147924e0b870b0afb8e", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
+]
+r2_buckets = [
+  { binding = "OBJECTS", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+
+[env.test.build]
+command = "npm run build:test"
+
+[env.test.build.upload]
+format = "modules"
+
+[env.devnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
+kv_namespaces = [
+  { binding = "CORE_CLAIMS", id = "e2d48ea134874b048f49d8514e940fdb" },
+  { binding = "THREEID", id = "0e056cfbebc3412199d57e8ff7579a5d" },
+  { binding = "THREEID_INVITE_CODES", id = "0008c652ee39403798524a301f2c3617" },
+]
+r2_buckets = [
+  { binding = "OBJECTS", bucket_name = "oort-objects-devnet" },
+]
+
+[env.testnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
+kv_namespaces = [
+  { binding = "CORE_CLAIMS", id = "d2a39af5349c4c929c125176113a4430" },
+  { binding = "THREEID", id = "ccbdddcdb23e41c5b6adbad935f158f0" },
+  { binding = "THREEID_INVITE_CODES", id = "f5402b053d5e4a3ab100d439a06dd6b7" },
+]
+r2_buckets = [
+  { binding = "OBJECTS", bucket_name = "oort-objects-testnet" },
+]
+
+[env.mainnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
+kv_namespaces = [
+  { binding = "CORE_CLAIMS", id = "8dddff01c3b24395b5a0ea05e59dcc18" },
+  { binding = "THREEID", id = "f3b97d8f6223418592174769492cc28f" },
+  { binding = "THREEID_INVITE_CODES", id = "c1f29225728047df8ce27d610ff79c5c" },
+]
+r2_buckets = [
+  { binding = "OBJECTS", bucket_name = "oort-objects-mainnet" },
+]
