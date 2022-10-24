@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "app_fetch",
+  "params": {
+    "ownerId": "robert",
+    "appId": "example"
+  }
+}
