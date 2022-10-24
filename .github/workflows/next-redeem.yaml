@@ -1,5 +1,5 @@
 ---
-name: Next Deply and Test Redeem App
+name: Next Deploy and Test Redeem App
 on:
   push:
     tags:
