@@ -1,0 +1,84 @@
+name: oort mono worker
+
+on:
+  push:
+    paths:
+      - 'oort/packages/mono/**'
+
+defaults:
+  run:
+    working-directory: oort/packages/mono
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: oort/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: oort/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+
+  lint:
+    needs: [format]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: oort/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: oort/package-lock.json
+      - run: npm ci
+      - run: npm run lint:check
+
+  types:
+    needs: [format, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: oort/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: oort/package-lock.json
+      - run: npm ci
+      - run: npm run types:check
+
+  build:
+    needs: [format, lint, types]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: oort/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: oort/package-lock.json
+      - run: npm ci
+      - run: npm run build:test
+
+  test:
+    needs: [format, lint, types, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: oort/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: oort/package-lock.json
+      - run: npm ci
+      - run: npm run test:ci
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
+          NODE_NO_WARNINGS: 1
+          SITE: oort-ci
+          ENVIRONMENT: production
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
+          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL_DEVNET }}
+          ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_NFT_API_URL_DEVNET }}
