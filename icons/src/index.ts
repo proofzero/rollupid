@@ -100,7 +100,7 @@ export default {
       },
       // NB: do *not* explicitly set the Content-Type header to
       // "multipart/form-data"; this prevents the header from being set
-      // with the correct boundary expression used to delimite form
+      // with the correct boundary expression used to delimit form
       // fields in the request body.
       body: formData,
     });
