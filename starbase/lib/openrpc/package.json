@@ -1,0 +1,25 @@
+{
+  "name": "@kubelt/openrpc",
+  "version": "0.1.0",
+  "description": "An OpenRPC framework for Cloudflare Workers",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ProofZero Inc.",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@cloudflare/workers-types": "3.18.0",
+    "@types/itty-router-extras": "0.4.0",
+    "@types/lodash": "4.14.186",
+    "typescript": "4.8.4"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "1.12.5",
+    "@open-rpc/meta-schema": "1.14.2",
+    "itty-router": "2.6.6",
+    "itty-router-extras": "0.4.2",
+    "lodash": "4.17.21",
+    "reflect-metadata": "0.1.13",
+    "ts-set-utils": "0.2.0"
+  }
+}
