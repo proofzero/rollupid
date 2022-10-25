@@ -3,14 +3,25 @@
   "version": "0.1.0",
   "description": "An OpenRPC framework for Cloudflare Workers",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:test": "node build.js",
+    "types:check": "tsc --project tsconfig.json --noEmit",
+    "test:unit": "tap",
+    "test": "run-s types:check build:test test:unit"
   },
   "author": "ProofZero Inc.",
   "license": "UNLICENSED",
+  "tap": {
+    "check-coverage": true
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
     "@types/itty-router-extras": "0.4.0",
     "@types/lodash": "4.14.186",
+    "@types/tap": "15.0.7",
+    "esbuild": "0.15.12",
+    "fast-check": "3.3.0",
+    "npm-run-all": "4.1.5",
+    "tap": "16.3.0",
     "typescript": "4.8.4"
   },
   "dependencies": {
@@ -20,6 +31,7 @@
     "itty-router-extras": "0.4.2",
     "lodash": "4.17.21",
     "reflect-metadata": "0.1.13",
+    "tiny-invariant": "1.3.1",
     "ts-set-utils": "0.2.0"
   }
 }

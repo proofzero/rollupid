@@ -8,17 +8,19 @@ import type {
   RpcResponse,
 } from "@kubelt/openrpc";
 
+import * as openrpc from "@kubelt/openrpc";
+
 import {
-  rpcObject,
-  rpcScopes,
-  rpcMethod,
+  component,
+  scopes,
+  method,
   requiredScope,
 } from "@kubelt/openrpc/component";
 
 // The OpenRPC schema that defines the RPC API provided by the Durable Object.
 import schema from "./schema";
 
-// StarbaseApp
+// StarbaseApplication
 // -----------------------------------------------------------------------------
 // A Durable Object for storing Kubelt Application state.
 
@@ -28,11 +30,24 @@ import schema from "./schema";
  * @note This class needs to implement all of the methods defined in
  * the OpenRPC schema or an error will be thrown upon construction.
  */
-@rpcObject(schema)
-@rpcScopes([
+@component(schema)
+@scopes([
+  "owner",
   "starbase.read",
   "starbase.write",
 ])
+
+// TODO this decorator adds RPC methods that allow the component to
+// be treated as a graph node.
+// - [optional] constrain the types of edges
+// - [optional] provide edge type (allowed properties)
+// - [optional] constrain types of target node?
+// - [optional] conform to EdgeStorage interface
+//   - [default] ComponentStorage: store in DO state
+//   - KVStorage: store in KV store
+//   - D1Storage: store in D1 database
+//   - RPCStorage: make remote RPC call to store edge
+//@node()
 
 // TODO list allowed signers (provide public key(s))
 // @signerPublicKey()
@@ -45,11 +60,12 @@ import schema from "./schema";
 //   default: "",
 //   validator: (x) => { return true },
 // })
-export class StarbaseApp {
+export class StarbaseApplication {
 
   // app_name
   // ---------------------------------------------------------------------------
 
+  /*
   // Mark this method as being the implementation of a specific method
   // from the OpenRPC schema.
   @rpcMethod("app_name")
@@ -70,7 +86,7 @@ export class StarbaseApp {
   // the scope they receive an error method indicating that they lack
   // permission, and this method handler is not invoked.
   @requiredScope("starbase.read")
-  @requiredScope("starbase.xxx")
+  @requiredScope("starbase.write")
 
   // A list of state fields that this method may read. They are injected
   // as the "state" method parameter, a map.
@@ -100,7 +116,7 @@ export class StarbaseApp {
     state: Map<string, any>,
     context: Map<string, any>,
     remote: Map<string, any>,
-  ): RpcResponse {
+  ): Promise<RpcResponse> {
     // Indicate a reply by using request ID (if provided).
     const replyId = (undefined !== request?.id) ? request.id : null;
     return {
@@ -113,43 +129,60 @@ export class StarbaseApp {
     };
     // TODO return updated state
   }
+  */
 
-  // app_create
+  // app_store
   // ---------------------------------------------------------------------------
 
-  /*
-  @rpcMethod("app_create")
+  @method("app_store")
   @requiredScope("starbase.write")
-  appCreate(
+  appStore(
     request: RpcRequest,
     state: Map<string, any>,
     context: Map<string, any>,
     remote: Map<string, any>,
-  ) {
-    // Indicate a reply by using request ID (if provided).
-    const replyId = (undefined !== request?.id) ? request.id : null;
-    return {
-      jsonrpc: "2.0",
-      id: replyId,
-      result: {
-        invoked: "app_create",
-      },
-    };
+  ): Promise<RpcResponse> {
     // TODO return updated state
+    return openrpc.response(request, {
+      invoked: "app_store",
+    });
   }
-  */
 
   // app_fetch
   // -----------------------------------------------------------------------------
 
-  // app_update
+  @method("app_fetch")
+  @requiredScope("starbase.read")
+  appFetch(
+    request: RpcRequest,
+    state: Map<string,any>,
+    context: Map<string, any>,
+    remote: Map<string, any>,
+  ): Promise<RpcResponse> {
+    // TODO return updated state
+    return openrpc.response(request, {
+      invoked: "app_fetch",
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // COMPONENT
   // ---------------------------------------------------------------------------
 
-  // app_delete
+  // rpc.discover
   // ---------------------------------------------------------------------------
+  // Fetch the schema declared by the component.
+  //
+  // NB: this is a native feature of our underlying OpenRPC library. We don't
+  // need special support for it at the component level, unlike with our extensions.
 
-  // app_list
+  // cmp.delete
   // ---------------------------------------------------------------------------
+  // NB: we delete a durable object by deleting everything within it
+  // (storage.deleteAll). Once the DO shuts down the DO ceases to exist.
 
+  // cmp.scopes
+  // -----------------------------------------------------------------------------
+  // Returns a list of the scopes declared by the component.
 
 } // END StarbaseApp

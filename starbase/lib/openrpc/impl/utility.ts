@@ -1,15 +1,6 @@
 /**
- * @file src/utility.ts
+ * @file impl/utility.ts
  */
-
-/**
- * Generic assertion using an "assertion signature".
- */
-export function assert (condition: any, msg?: string): asserts condition {
-  if (!condition) {
-    throw new Error(msg);
-  }
-}
 
 /**
  * Checks whether x is iterable or not.

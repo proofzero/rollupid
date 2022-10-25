@@ -18,9 +18,15 @@ USER_NAME = "Robert"
 
 [durable_objects]
 bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApp" },
+  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
+  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
+  { name = "STARBASE_USER", class_name = "StarbaseUser" },
 ]
 
 [[migrations]]
 tag = "v1"
-new_classes = ["StarbaseApp"]
+new_classes = [
+  "StarbaseApplication",
+  "StarbaseContract",
+  "StarbaseUser",
+]

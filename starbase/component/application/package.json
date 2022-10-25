@@ -1,0 +1,13 @@
+{
+  "name": "@kubelt/do.starbase-application",
+  "version": "0.1.0",
+  "description": "A durable object for the Starbase application",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@kubelt/openrpc": "file:../../lib/openrpc"
+  }
+}

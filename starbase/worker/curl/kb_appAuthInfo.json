@@ -1,7 +1,7 @@
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "method": "app_list",
+  "method": "kb_appAuthInfo",
   "params": {
   }
 }

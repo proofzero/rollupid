@@ -3,16 +3,23 @@
  * @file src/component/index.ts
  */
 
-import { difference as setDifference } from "ts-set-utils";
-
 import type {
+  MiddlewareFn,
+  MiddlewareResult,
   OpenRpcHandler,
+  RpcContext,
   RpcHandler,
+  RpcMethod,
+  // TODO rename to RpcTable, RpcDispatch, RpcTable?
+  RpcMethods,
   RpcRequest,
   RpcResponse,
   RpcSchema,
+  Scope,
+  ScopeSet,
 } from "../index";
 
+//import * as jsonrpc from "../jsonrpc";
 import * as openrpc from "../index";
 
 // Definitions
@@ -29,18 +36,12 @@ const _SCOPES_REQUIRED = "_requiredScopes";
 // Types
 // -----------------------------------------------------------------------------
 
-// A permission representing the ability to invoke an RPC method.
-type Scope = Symbol;
-
-// A collection of scopes.
-type ScopeSet = Set<Scope>;
-
 // The mapping from method name to its required scopes.
 type RequiredScopes = Map<Symbol, ScopeSet>;
 
 // Defines the signature for an OpenRPC handler method defined on a Durable
-// Object and which is marked as an @rpcMethod.
-type RpcMethod = (
+// Object and which is marked as an @method.
+type RpcCallable = (
   request: RpcRequest,
   state: Map<string, any>,
   context: Map<string, any>,
@@ -49,7 +50,28 @@ type RpcMethod = (
 
 type Env = unknown;
 
-// rpcObject
+// Middlware
+// -----------------------------------------------------------------------------
+// TODO move these into separate middleware module.
+
+// Check the token including in the request.
+function mwAuthenticate(): MiddlewareFn {
+  return async (request: Request, context: RpcContext): MiddlewareResult => {
+    // TODO check for valid token attached to request
+  };
+}
+
+// Check that the caller has the required scopes to invoke the requested method.
+function mwCheckScopes(scopes: RequiredScopes): MiddlewareFn {
+  return async (request: Request, context: RpcContext): MiddlewareResult => {
+    // TODO check that the incoming request provides a valid claim for the
+    // scopes required by the method that is being invoked.
+  };
+}
+
+// TODO check required user
+
+// @component
 // -----------------------------------------------------------------------------
 
 /**
@@ -61,79 +83,77 @@ type Env = unknown;
  * we must take care to maintain the original prototype. The logic that applies
  * decorators at runtime does *not* do this for you.
  */
-export function rpcObject(schema: RpcSchema) {
-
-  // Check that the set of scopes required on methods is a subset of all scopes
-  // declared on the object. Any required scopes that aren't declared by the class
-  // are returned; if this set is non-empty that indicates an error by the developer.
-  function checkScopes(declaredScopes: ScopeSet, reqScopes: RequiredScopes): ScopeSet {
-    // *sigh* there's no Set.union() method so do it ourselves.
-    const unionScopes: ScopeSet = new Set();
-    for (const method of reqScopes.keys()) {
-      const methodScopes: ScopeSet | undefined = reqScopes.get(method);
-      if (undefined === methodScopes) {
-        throw new Error(`missing scope set for method '${method.description}'`);
-      }
-      for (const scope of methodScopes.values()) {
-        unionScopes.add(scope);
-      }
-    }
-
-    const extraScopes = setDifference(unionScopes, declaredScopes);
-
-    // FIXME ensure multiple scopes are collected correctly
-
-    // TEMP
-    console.log("declared scopes:");
-    for (const scope of declaredScopes) {
-      console.log(scope);
-    }
-    console.log("union scopes:");
-    for (const scope of unionScopes) {
-      console.log(scope);
-    }
-    console.log("extra scopes:");
-    for (const scope of extraScopes) {
-      console.log(scope);
-    }
-
-    // TODO Compute the difference between all declared scopes and the set of scopes the
-    // user has indic,ated are required.
-    return extraScopes;
-  }
+export function component(schema: RpcSchema) {
 
   return function<T extends { new (...args: any[]): {} }>(constructor: T) {
-    /*
-    console.log(`@rpcObject`);
-    console.log(`@rpcObject.name: ${constructor.name}`);
-    console.log(`@rpcObject.prototype: ${JSON.stringify(constructor.prototype, null, 2)}`);
-    constructor.prototype._scopes.forEach((v: Symbol) => {
-      console.log(`@rpcObject._scope: ${v.toString()}`);
-    });
-    console.log(`Reflect.ownKeys(rpcObject): ${Reflect.ownKeys(constructor)}`);
-    */
 
-    const methods = Reflect.get(constructor, _METHODS);
-    console.log(`@rpcObject.methods: ${methods}`);
+    const scopesRequired = Reflect.get(constructor, _SCOPES_REQUIRED);
+    //console.log(scopesRequired);
 
-    // Check that union of required scopes from all methods are
-    // contained in the set of scopes defined by @rpcScopes. If the user
-    // requires a scope on a method that isn't declared on the class using
-    // @rpcScopes, throw an error.
-    const allScopes = Reflect.get(constructor, _SCOPES_ALL);
-    const reqScopes = Reflect.get(constructor, _SCOPES_REQUIRED);
-    // END TEMP
-    const undeclaredScopes = checkScopes(allScopes, reqScopes);
-    if (undeclaredScopes.size > 0) {
-      const errorScopes = [];
-      for (const scope in undeclaredScopes.values()) {
-        errorScopes.push(scope.toString());
-      }
-      throw Error(`undeclared scopes: ${errorScopes.join(", ")}`);
+    // Get the mapping from RPC method name to class method name and then
+    // delete the property. It was only a temporary means of passing data
+    // from decorators up to this "top-level" decorator that constructs the
+    // class.
+    const rpcMethodMap = Reflect.get(constructor, _METHODS);
+    Reflect.deleteProperty(constructor, _METHODS);
+
+    // TODO import type RpcMethodSet for this?
+    const methods: Array<RpcMethod> = [];
+
+    // - rpcName: the name of the RPC method
+    // - className: the name of the corresponding class method
+    for (const [rpcName, className] of rpcMethodMap.entries()) {
+      // We use a symbol to identify RPC methods.
+      const methodSym = Symbol.for(rpcName);
+      const classSym = Symbol.for(className);
+
+      //console.log(`${methodSym.description} => ${classSym.description}`);
+
+      // The scopes required to be able to invoke the RPC method. The returned value
+      // is a Set of Symbol values representing the required scope names.
+      const scopes = scopesRequired.get(classSym) || [];
+      //console.log(scopes);
+
+      // The RPC method implementation on the class. This is what we'll
+      // invoke, pass the requested state, context, etc. configured using
+      // decorators on the method definition.
+      const methodFn: RpcCallable = Reflect.get(constructor, className);
+      // The handler for the RPC call.
+      const handler = openrpc.handler(async (request, context): Promise<RpcResponse> => {
+        // TODO check scopes on incoming request, make sure that the required scopes
+        // have been granted to the caller. Checked in middleware already?
+
+        // TODO invoke the decorated method with:
+        // - inject readable state (object with readable property)
+        // - inject writable state (object with writable property)
+        const inState: Map<string, any> = new Map();
+        const inContext: Map<string, any> = new Map();
+        const inRemote: Map<string, any> = new Map();
+
+        const methodResult = methodFn(request, inState, inContext, inRemote);
+
+        return openrpc.response(request, methodResult);
+      });
+      // Construct a handler for the RPC method.
+      const rpcMethod = openrpc.method(schema, {
+        name: rpcName,
+        scopes,
+        handler,
+      });
+
+      methods.push(rpcMethod);
     }
 
-    // TODO seal the generated object so that all fields, etc. must be defined declaratively
-    // using decorators. Stay out of trouble, friends!
+    // Check that union of required scopes from all methods are
+    // contained in the set of scopes defined by @scopes. If the user
+    // requires a scope on a method that isn't declared on the class using
+    // @scopes, throw an error.
+    const allScopes = Reflect.get(constructor, _SCOPES_ALL);
+    const reqScopes = Reflect.get(constructor, _SCOPES_REQUIRED);
+
+    // TODO seal the generated object so that all fields, etc. must be
+    // defined declaratively using decorators. Stay out of trouble,
+    // friends!
 
     /**
      * @param {state} a transactional storage API
@@ -147,6 +167,9 @@ export function rpcObject(schema: RpcSchema) {
       // A map from method to the set of scopes that it requires to be invoke.
       private readonly _scopes: RequiredScopes;
 
+      // The set of all scopes declared by the component.
+      private readonly _allScopes: ScopeSet;
+
       // Access to Cloudflare transactional storage API.
       private readonly _state: DurableObjectState;
 
@@ -154,7 +177,8 @@ export function rpcObject(schema: RpcSchema) {
       private readonly _env: Env;
 
       // The collection of RPC method implementations defined in a subclass.
-      private readonly _methods: Array<RpcHandler> = [];
+      //private readonly _methods: RpcMethods;
+      //private readonly _methods: RpcMethodSet;
 
       // A functional OpenRPC request handler. It should be invoked as:
       //   rpcHandler(request: Request, context?: RpcContext);
@@ -162,8 +186,6 @@ export function rpcObject(schema: RpcSchema) {
       private readonly _rpcHandler: OpenRpcHandler;
 
       constructor(...args: any[]) {
-        //console.log(`@rpcObject.constructor`);
-        //console.log(args);
         super();
 
         // TODO Define all these properties to be non-enumerable. There's a proposal
@@ -171,8 +193,11 @@ export function rpcObject(schema: RpcSchema) {
         // but that's likely not happening soon, so prefer Object.defineProperty() for now.
         this._schema = schema;
         this._scopes = reqScopes;
+        this._allScopes = allScopes;
         this._state = <DurableObjectState>args[0];
         this._env = <Env>args[1];
+
+        //this._methods = methods;
 
         // Construct RPC handler that conforms to the schema, using the
         // supplied methods to implement the defined service methods.
@@ -185,7 +210,7 @@ export function rpcObject(schema: RpcSchema) {
         // the same object, it is then possible to return any initialized
         // values without making further calls to persistent storage.
         /*
-        this.state.blockConcurrencyWhile(async () => {
+        this._state.blockConcurrencyWhile(async () => {
           const stored = await this.state.storage.get("value");
           // After init, future reads do not need to access storage.
           // Use this.value rather than storage in fetch() afterwards.
@@ -194,28 +219,140 @@ export function rpcObject(schema: RpcSchema) {
         */
       }
 
+      // TODO extensions define required scopes. Those need to be checked against
+      // the set of declared scopes and included in the result of cmp.scopes.
+
       /**
        *
        */
-      initRPC(rpcSchema: RpcSchema, rpcMethods: Array<RpcHandler>): OpenRpcHandler {
-        // Construct a sequence of middleware to execute.
-        const chain = openrpc.chain([
-          // Authenticate using a JWT in the request.
-          //mwAuthenticate,
-          // Extra geolocation data provided by Cloudflare.
-          //mwGeolocation,
-          // Cloudflare Worker analytics.
-          //mwAnalytics,
-          // Construct a Datadog client for sending metrics.
-          //mwDatadog,
-          // Construct an Oort client for talking to the Kubelt backend.
-          //mwOort,
-          // An example middleware defined locally.
-          //middle.example,
-        ]);
+      initRPC(rpcSchema: RpcSchema, rpcMethods: Array<RpcMethod>): OpenRpcHandler {
+        // Defines an "extension" (an RPC method not declared in the
+        // schema, but which bundles its own method schema) to return a
+        // set of the scopes declared by a component.
+        //
+        // TODO define require scope(s) to invoke
+        // TODO update handler signature to match pure handler impl
+        const cmpScopes = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "cmp.scopes",
+            summary: "Return scopes declared by component",
+            params: [],
+            result: {
+              name: "scopes",
+              description: "A collection of scopes",
+              schema: {
+                type: "array",
+              },
+            },
+            errors: [],
+          },
+          scopes: openrpc.scopes([
+            "owner",
+          ]),
+          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
+            // Construct the result object describing the available methods and
+            // their required scopes. Note that this._methods is an array of RPC method
+            // implementations (functions); each has a ._method property (a Symbol) that
+            // is the key in the this._scopes map that can be used to look up the scopes
+            // required to invoke the method.
+            const scopes = [];
+            for (const scope of allScopes) {
+              scopes.push(scope.description);
+            }
+            const result = {
+              scopes,
+            };
+
+            // TODO result doesn't yet include scopes for "extensions", the methods we
+            // implement internally.
+            return openrpc.response(request, result)
+          }),
+        });
+
+        // TODO define required scopes(s) to invoke.
+        // TODO update handler signature to match pure handler impl
+        const cmpDelete = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "cmp.delete",
+            summary: "Delete all component state",
+            params: [],
+            result: {
+              name: "success",
+              description: "Was the component successfully deleted",
+              schema: {
+                type: "boolean",
+              },
+            },
+            errors: [],
+          },
+          scopes: openrpc.scopes([
+            "owner",
+          ]),
+          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
+            // Deletes all keys and values, effectively deallocating all storage
+            // used by the durable object. NB: If a failure occurs while deletion
+            // is in progess, only a subset of the data may be deleted.
+            await this._state.storage.deleteAll();
+            const result = {
+              deleted: true,
+            };
+            return openrpc.response(request, result)
+          }),
+        });
+
+        // TODO make this part of graph.@node decorator.
+        const graphLink = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "graph.link",
+            summary: "Create a link to another component",
+            params: [],
+            result: {
+              "name": "success",
+              schema: {
+                type: "boolean",
+              },
+            },
+            errors: [],
+          },
+          scopes: openrpc.scopes([
+            "owner",
+          ]),
+          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
+            return openrpc.response(request, { invoked: "graph.link" });
+          }),
+        });
+
+        // TODO make this part of graph.@node decorator.
+        const graphEdges = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "graph.edges",
+            summary: "Return the list of graph edges",
+            params: [],
+            result: {
+              "name": "success",
+              schema: {
+                type: "boolean",
+              },
+            },
+            errors: [],
+          },
+          scopes: openrpc.scopes([
+            "owner",
+          ]),
+          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
+            return openrpc.response(request, { invoked: "graph.edges" });
+          }),
+        });
 
         // Supply implementations for all of the API methods in the schema.
         const methods = openrpc.methods(rpcSchema, rpcMethods);
+
+        const extensions = openrpc.extensions(rpcSchema, [
+          cmpScopes,
+          cmpDelete,
+          graphLink,
+          graphEdges,
+        ]);
 
         // Configuration options for the API.
         const options = openrpc.options({
@@ -223,20 +360,43 @@ export function rpcObject(schema: RpcSchema) {
           rpcDiscover: true,
         });
 
+        const service = openrpc.service(
+          rpcSchema,
+          allScopes,
+          methods,
+          extensions,
+          options,
+        );
+
+        //
+        // Handler
+        //
+
         const basePath = "/";
 
         const rootPath = "/openrpc";
 
+        // Construct a sequence of middleware to execute.
+        //
+        // NB: rpc.discover is built-in to the OpenRPC library
+        // because it's a standard part of that protocol. These
+        // methods are implemented here as extensions to support
+        // an RPC component-based model of interaction with DOs.
+        const chain = openrpc.chain([
+          // Authenticate using a JWT in the request.
+          mwAuthenticate(),
+          // Preflight check that supplied claims fulfill required scopes.
+          mwCheckScopes(this._scopes),
+        ]);
+
         // The returned handler validates the incoming request, routes it to the
         // correct method handler, and executes the handler on the request to
         // generate the response.
-        return openrpc.handler(
+        return openrpc.build(
+          service,
           basePath,
           rootPath,
-          schema,
-          methods,
           chain,
-          options
         );
       }
 
@@ -266,7 +426,7 @@ export function rpcObject(schema: RpcSchema) {
   }
 }
 
-// rpcScopes
+// @scopes
 // -----------------------------------------------------------------------------
 
 /**
@@ -278,13 +438,9 @@ export function rpcObject(schema: RpcSchema) {
  * Individual methods and fields may protect their invocation or access
  * with any of these scopes by using an appropriate decorator.
  */
-export function rpcScopes(scopes: Array<string>) {
-  //console.log("factory: @rpcScopes");
-  //console.log(`provided scopes: ${scopes}`);
+export function scopes(scopes: Array<string>) {
 
   return function<T extends { new (...args: any[]): {} }>(constructor: T) {
-    //console.log("@rpcScopes");
-
     // Turn each scope string into a Symbol.
     const scopeSet: ScopeSet = new Set(
       scopes.map(scope => {
@@ -305,7 +461,7 @@ export function rpcScopes(scopes: Array<string>) {
   }
 }
 
-// rpcMethod
+// @method
 // -----------------------------------------------------------------------------
 
 /**
@@ -314,7 +470,7 @@ export function rpcScopes(scopes: Array<string>) {
  * @param schemaMethod the name of the schema method the decorated class
  * method implements.
  */
-export function rpcMethod(schemaMethod: string) {
+export function method(schemaMethod: string) {
   // - target: class constructor function for static member OR the
   //   prototype of the class for an instance member
   // - propertyKey: the name of the member
@@ -329,52 +485,19 @@ export function rpcMethod(schemaMethod: string) {
     methodName: string,
     descriptor: PropertyDescriptor,
   ) {
-    /*
-    console.log(`factory: @rpcMethod`);
-    console.log(`> target: ${JSON.stringify(target, null, 2)}`);
-    console.log(`> typeof(target): ${typeof(target)}`);
-    console.log(`> instanceof(target, StarbaseApp): ${target instanceof StarbaseApp}`);
-    console.log(`> Reflect.ownKeys(target): ${Reflect.ownKeys(target)}`);
-    console.log(`> propertyKey: ${methodName}`);
-    console.log(`> descriptor: ${JSON.stringify(descriptor, null, 2)}`);
-    */
+    // Record mapping from schemaMethod (the RPC method name as defined
+    // in the schema) to the methodName (the name of the RpcCallble method
+    // defined on the class, of type RpcCallable).
+    //
+    // Use this in @component to build the method map.
 
-    // [class StarbaseApp]
-    //console.log(target.constructor);
-
-    // We use a symbol to look up metadata stored about the method.
-    const methodSym = Symbol.for(methodName);
-
-    // TODO add the method this decorator is attached to (RpcMethod) to the
-    // list of class methods stored in the class methods.
-    const method = openrpc.method(schemaMethod, async (request, context) => {
-      // The scopes required to be able to invoke the RPC method. The returned value
-      // is a Set of Symbol values representing the required scope names.
-      const requiredScopes = Reflect.get(target.constructor, _SCOPES_REQUIRED).get(methodSym) || [];
-      // The RPC method implementation.
-      const method = Reflect.get(target, methodName);
-
-      // TODO check scopes on incoming request, make sure that the required scopes
-      // have been granted to the caller. Use a middleware?
-
-      // TODO invoke the decorated method with:
-      // - check for required scopes
-      // - inject readable state (object with readable property)
-      // - inject writable state (object with writable property)
-      const result = method(request);
-
-      return openrpc.response(request, result);
-    });
-
-    // Add this handler to the set of RPC method implementations.
-    // This list of methods is used in @rpcObject to construct an RPC request
-    // handler that replies to fetch() calls to the durable object.
-    const methods = Reflect.get(target.constructor, _METHODS);
-    const updated: Array<RpcHandler> = (undefined === methods) ?
-      [method] :
-      methods.concat(method)
+    const methods = Reflect.has(target.constructor, _METHODS) ?
+      Reflect.get(target.constructor, _METHODS) :
+      new Map<string, string>()
     ;
-    Reflect.set(target.constructor, _METHODS, updated);
+    methods.set(schemaMethod, methodName);
+
+    Reflect.set(target.constructor, _METHODS, methods);
   };
 }
 
@@ -403,15 +526,20 @@ function rpcField(m: FieldSpec) {
   }
 }
 
-// requiredScope
+// @requiredScope
 // -----------------------------------------------------------------------------
 
 /**
- * Sets a scope that the user must have in order to invoke the RPC method.
+ * This decorator is applied to a class method to declare a scope that
+ * the user must have in order to invoke the RPC method implemented by the
+ * method. Any such scope must have been declared at the class level using
+ * the @scopes decorator or an error is thrown on construction.
  */
 export function requiredScope(scope: string | Symbol) {
   //console.log("factory: @requiredScope");
 
+  // The decorator argument is the name of a scope declared on the class.
+  //
   // NB: We may want to support passing in an array of scopes.
   const scopeSym: Symbol = (typeof(scope) === "string") ?
     Symbol.for(scope.trim().toLowerCase()) :
@@ -429,7 +557,30 @@ export function requiredScope(scope: string | Symbol) {
   // and make it non-enumerable (since it's an internal implementation detail).
   function getRequiredScopes(target: any): RequiredScopes {
     // TODO use a better type for target.
-    return Reflect.get(target, _SCOPES_REQUIRED) || new Map();
+    return Reflect.get(target.constructor, _SCOPES_REQUIRED) || new Map();
+  }
+
+  // Take a map of required scopes for all methods, and add the declared
+  // scope to the set of scopes required by the method with the given name.
+  function addMethodScope(requiredScopes: RequiredScopes, fieldName: string): RequiredScopes {
+    // We use symbols as map keys and set elements where possible.
+    const fieldSym = Symbol.for(fieldName);
+
+    // Get the current set of scopes for the method and add the new scope to the set.
+    const currentScopes: ScopeSet = requiredScopes.get(fieldSym) || new Set();
+    const updatedScopes: ScopeSet = currentScopes.add(scopeSym);
+
+    // Store the updated set of scopes for the method.
+    requiredScopes.set(fieldSym, updatedScopes);
+
+    return requiredScopes;
+  }
+
+  // Store the map of required scopes on the target constructor, which
+  // we use as implicit context for passing data between decorators.
+  function setRequiredScopes(target: any, requiredScopes: RequiredScopes) {
+    // TODO better argument type for target
+    Reflect.set(target.constructor, _SCOPES_REQUIRED, requiredScopes);
   }
 
   return function (
@@ -438,16 +589,17 @@ export function requiredScope(scope: string | Symbol) {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
-    const propertySym = Symbol.for(propertyKey);
-
+    // This is a map from method name into a set of its required scopes.
     const requiredScopes: RequiredScopes = getRequiredScopes(target);
 
-    const currentScopes: ScopeSet = requiredScopes.get(propertySym) || new Set();
-    const updatedScopes: ScopeSet = currentScopes.add(scopeSym);
+    // Add the provided scope to the set of required scopes for the
+    // method that the decorator was applied to.
+    const updatedScopes = addMethodScope(requiredScopes, propertyKey);
 
-    requiredScopes.set(propertySym, updatedScopes);
-
-    Reflect.set(target.constructor, _SCOPES_REQUIRED, requiredScopes);
+    // Pass the whole map along so that it can be updated in another
+    // usage of the @requiredScope decorator or used by the @rpbObject
+    // decorator.
+    setRequiredScopes(target, updatedScopes);
   }
 }
 

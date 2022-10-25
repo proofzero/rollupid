@@ -21,7 +21,9 @@
     "wrangler:remote": "wrangler --env dev dev"
   },
   "dependencies": {
-    "@kubelt/do.starbase": "file:../component",
+    "@kubelt/do.starbase-application": "file:../component/application",
+    "@kubelt/do.starbase-contract": "file:../component/contract",
+    "@kubelt/do.starbase-user": "file:../component/user",
     "@kubelt/openrpc": "file:../lib/openrpc"
   }
 }

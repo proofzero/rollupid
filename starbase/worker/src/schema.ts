@@ -18,8 +18,8 @@ const rpcSchema: RpcSchema = {
   ],
   methods: [
     {
-      name: "app_create",
-      summary: "Create an application",
+      name: "kb_appStore",
+      summary: "Store an application record",
       tags: [
         {
           name: "app",
@@ -42,7 +42,6 @@ const rpcSchema: RpcSchema = {
             "$ref": "#/components/contentDescriptors/AppId",
           }
         }
-
       ],
       result: {
         name: "appId",
@@ -57,33 +56,9 @@ const rpcSchema: RpcSchema = {
           message: "Application ID already in use",
         }
       ],
-      examples: [
-        {
-          name: "createAppExample",
-          description: "Create Application example",
-          params: [
-            {
-              name: "ownerId",
-              value: "joe",
-            },
-            {
-              name: "appId",
-              value: "foobar",
-            },
-          ],
-          result: {
-            name: "createAppResultExample",
-            value: [
-              {
-                id: "foobar",
-              },
-            ]
-          }
-        }
-      ]
     },
     {
-      name: "app_fetch",
+      name: "kb_appFetch",
       summary: "Info for a specific application",
       tags: [
         {
@@ -102,26 +77,72 @@ const rpcSchema: RpcSchema = {
           "$ref": "#/components/schemas/App",
         },
       },
-      examples: [
+    },
+    {
+      name: "kb_appList",
+      summary: "List a user's applications",
+      params: [
         {
-          name: "fetchAppExample",
-          description: "Fetch application example",
-          params: [
-            {
-              name: "appId",
-              value: "foobar",
-            },
+          "$ref": "#/components/contentDescriptors/AppSelect",
+        },
+      ],
+      result: {
+        name: "success",
+        description: "Was deletion successful?",
+        schema: {
+          type: "boolean",
+        },
+      },
+    },
+    {
+      name: "kb_appDelete",
+      summary: "Delete an application",
+      params: [
+        {
+          "$ref": "#/components/contentDescriptors/AppSelect",
+        },
+      ],
+      result: {
+        name: "success",
+        description: "Was deletion successful?",
+        schema: {
+          type: "boolean",
+        },
+      },
+    },
+    {
+      name: "kb_appAuthInfo",
+      summary: "Return authorization details for an application",
+      params: [
+        {
+          "$ref": "#/components/contentDescriptors/AppSelect",
+        },
+      ],
+      result: {
+        name: "authInfo",
+        description: "OAuth details for the app",
+        schema: {
+          type: "object",
+          required: [
           ],
-          result: {
-            name: "fetchAppExampleResult",
-            value: {
-              id: "foobar",
-              name: "Foo Bar",
+          properties: {
+            clientId: {
+              type: "string",
+            },
+            clientSecret: {
+              type: "string",
+            },
+            redirectURI: {
+              type: "string",
+              format: "uri",
+            },
+            scope: {
+              type: "string",
             },
           },
         },
-      ],
-    },
+      },
+    }
   ],
   components: {
     contentDescriptors: {
