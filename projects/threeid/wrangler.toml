@@ -13,11 +13,11 @@ workers_dev = true
   bucket = "./public"
 
 [build]
-  command = "npm run generate:css && npm run sass && npm run build"
+  command = "yarn generate:css && yarn sass && yarn build"
 
 # development (development) is the default environment
 # ------------------------------------------------------------------------------
-[env.development]
+[env.dev]
 # name = "three-id-dev"
 # # Whether or not the worker should be deployed to *.workers.dev. Can use
 # # either route or workers_dev, but not both.

@@ -1,4 +1,4 @@
-name: oort mono worker testnet
+name: Next Oort
 
 on:
   workflow_dispatch:

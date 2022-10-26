@@ -9,7 +9,7 @@ compatibility_date = "2022-04-05"
   bucket = "./public"
 
 [build]
-  command = "npm run build"
+  command = "yarn build"
 
 [env.dev]
 kv_namespaces = [

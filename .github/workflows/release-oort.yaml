@@ -1,4 +1,4 @@
-name: oort mono worker mainnet
+name: Release Oort
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: yarn.lock
       - run: npm ci
       - run: npm run wrangler:publish:mainnet

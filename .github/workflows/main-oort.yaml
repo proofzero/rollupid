@@ -1,10 +1,10 @@
-name: oort mono worker devnet
+name: Main Oort
 
 on:
   workflow_dispatch:
 
   workflow_run:
-    workflows: ['pr-oort']
+    workflows: ["pr-oort"]
     types: [requested]
     branches:
       - main
