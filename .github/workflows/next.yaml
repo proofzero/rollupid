@@ -24,7 +24,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "redeem"
+          workingDirectory: "projects/redeem"
           command: publish --env next
           environment: "next"
           secrets: |
@@ -82,7 +82,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "threeid"
+          workingDirectory: "projects/threeid"
           command: publish --env next
           environment: "next"
           secrets: |
