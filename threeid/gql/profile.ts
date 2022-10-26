@@ -1,6 +1,9 @@
 export default /* GraphQL */ `
   query getProfile {
     profile {
+      avatar,
+      cover,
+      isToken,
       displayName,
       location,
       job,
@@ -12,6 +15,8 @@ export default /* GraphQL */ `
     profileFromAddress(address: $address) {
       displayName
       avatar
+      cover
+      isToken
       bio
       job
       location

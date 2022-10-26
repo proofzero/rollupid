@@ -81,7 +81,9 @@ export type ThreeIdProfile = {
   addresses?: Maybe<Array<ThreeIdAddress>>;
   avatar?: Maybe<Scalars['String']>;
   bio?: Maybe<Scalars['String']>;
+  cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
+  isToken?: Maybe<Scalars['Boolean']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
@@ -90,8 +92,10 @@ export type ThreeIdProfile = {
 export type ThreeIdProfileInput = {
   avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
+  cover?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
+  isToken?: InputMaybe<Scalars['Boolean']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['String']>;
@@ -222,7 +226,9 @@ export type ThreeIdProfileResolvers<ContextType = any, ParentType extends Resolv
   addresses?: Resolver<Maybe<Array<ResolversTypes['ThreeIDAddress']>>, ParentType, ContextType>;
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  cover?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isToken?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   job?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

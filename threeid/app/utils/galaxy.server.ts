@@ -82,7 +82,9 @@ export type ThreeIdProfile = {
   addresses?: Maybe<Array<ThreeIdAddress>>;
   avatar?: Maybe<Scalars['String']>;
   bio?: Maybe<Scalars['String']>;
+  cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
+  isToken?: Maybe<Scalars['Boolean']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
   website?: Maybe<Scalars['String']>;
@@ -91,8 +93,10 @@ export type ThreeIdProfile = {
 export type ThreeIdProfileInput = {
   avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
+  cover?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
   id: Scalars['ID'];
+  isToken?: InputMaybe<Scalars['Boolean']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
   website?: InputMaybe<Scalars['String']>;
@@ -107,19 +111,22 @@ export enum Visibility {
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'ThreeIDProfile', displayName?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'ThreeIDProfile', avatar?: string | null, cover?: string | null, isToken?: boolean | null, displayName?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null } | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   address: Scalars['String'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', displayName?: string | null, avatar?: string | null, bio?: string | null, job?: string | null, location?: string | null, website?: string | null } | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', displayName?: string | null, avatar?: string | null, cover?: string | null, isToken?: boolean | null, bio?: string | null, job?: string | null, location?: string | null, website?: string | null } | null };
 
 
 export const GetProfileDocument = gql`
     query getProfile {
   profile {
+    avatar
+    cover
+    isToken
     displayName
     location
     job
@@ -133,6 +140,8 @@ export const GetProfileFromAddressDocument = gql`
   profileFromAddress(address: $address) {
     displayName
     avatar
+    cover
+    isToken
     bio
     job
     location

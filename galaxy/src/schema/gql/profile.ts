@@ -2,6 +2,8 @@ export default /* GraphQL */ `
   type ThreeIDProfile {
     displayName: String
     avatar: String
+    cover: String
+    isToken: Boolean
     bio: String
     job: String
     location: String
@@ -13,6 +15,8 @@ export default /* GraphQL */ `
     id: ID!
     displayName: String
     avatar: String
+    cover: String
+    isToken: Boolean
     bio: String
     job: String
     location: String
