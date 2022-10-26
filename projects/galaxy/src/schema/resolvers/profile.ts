@@ -1,5 +1,5 @@
 import { composeResolvers } from "@graphql-tools/resolvers-composition";
-
+import Env from "../../env";
 import OortClient from "./clients/oort";
 import {
   setupContext,
@@ -8,19 +8,17 @@ import {
   getRPCResult,
 } from "./utils";
 
+import { Resolvers } from "./typedefs";
+
 type ResolverContext = {
-  env?: any;
+  env: Env;
   jwt?: string;
   coreId?: string;
 };
 
-const threeIDResolvers = {
+const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (
-      _parent: any,
-      { id }: { id?: string },
-      { env, jwt, coreId }: ResolverContext
-    ) => {
+    profile: async (_parent: any, { id }, { env, jwt }: ResolverContext) => {
       const oortClient = new OortClient(env.OORT, jwt);
       const profileResponse = await oortClient.getProfile();
       checkHTTPStatus(profileResponse);
@@ -40,19 +38,10 @@ const threeIDResolvers = {
       return getRPCResult(profileResponse);
     },
   },
-  // TODO: can schema delegation solve this? https://www.the-guild.dev/graphql/tools/docs/schema-delegation
-  ThreeIDProfile: {
-    addresses: (_parent: any, _args: any, { env, jwt }: ResolverContext) => {
-      return {};
-    },
-  },
   Mutation: {
     updateThreeIDProfile: async (
       _parent: any,
-      {
-        profile,
-        visibility = "PRIVATE",
-      }: { profile: any; visibility?: string },
+      { profile, visibility = "PRIVATE" },
       { env, jwt, coreId }: ResolverContext
     ) => {
       const oortClient = new OortClient(env.OORT, jwt);

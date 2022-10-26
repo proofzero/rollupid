@@ -5,5 +5,15 @@ node_compat = true
 
 [env.dev]
 services = [
-  { binding = "OORT", service = "oort-dev"}
+  { binding = "OORT", service = "oort-devnet"}
+]
+
+[env.next]
+services = [
+  { binding = "OORT", service = "oort-testnet"}
+]
+
+[env.current]
+services = [
+  { binding = "OORT", service = "oort-mainnet"}
 ]

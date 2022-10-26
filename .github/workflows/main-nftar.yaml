@@ -1,0 +1,36 @@
+---
+name: Dev Deploy and Test NFTAR
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-nftar-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: "npm"
+          cache-dependency-path: ./nftar/package-lock.json
+      - run: yarn install
+        working-directory: nftar
+      - name: Build and Test
+        run: npm test
+        working-directory: nftar
+        env:
+          CHAIN: "ethereum"
+          CHAIN_ID: 5
+          OORT_URL: oort-devnet.kubelt.com
+          STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
+          WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
+          ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
+          ALCHEMY_NETWORK: "ETH_MAINNET"
+          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
+          PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          NFTAR_API_KEY: "test"
+      # TODO: deploy

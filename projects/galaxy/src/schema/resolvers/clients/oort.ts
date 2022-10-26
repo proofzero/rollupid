@@ -10,7 +10,7 @@ type OortOptions = {
   };
 };
 
-type OortBinding = {
+export type OortBinding = {
   fetch: (
     url: string,
     options: { method: string; headers: HeadersObject; body?: string }

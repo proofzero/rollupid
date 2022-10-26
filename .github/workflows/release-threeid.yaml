@@ -1,73 +1,10 @@
-# .github/workflows/release.yaml
 ---
-name: release
+name: Release ThreeID App
 on:
   release:
     types: [published]
 
 jobs:
-  # redeem
-  # ----------------------------------------------------------------------------
-  build-publish-redeem-current:
-    runs-on: ubuntu-latest
-    permissions:
-      packages: read
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/gallium
-          cache: "yarn"
-          cache-dependency-path: ./yarn.lock
-      - run: yarn install
-      - name: Deploy to Worker
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "projects/redeem"
-          command: publish --env current
-          environment: "current"
-          secrets: |
-            DATADOG_CLIENT_TOKEN
-            DATADOG_APPLICATION_ID
-            DATADOG_ENV
-            DATADOG_SERVICE_NAME
-            OORT_HOST
-            NFTAR_URL
-            NFTAR_AUTHORIZATION
-            INVITE_CONTRACT_ADDRESS
-            CHAIN_ID
-            INVITE_OPERATOR_PRIVATE_KEY
-            TWITTER_BEARER_TOKEN
-            ALCHEMY_API_KEY
-            ALCHEMY_API_URL
-            ALCHEMY_NFT_URL
-        env:
-          # CF_ROUTE: https://3id-dev.kubelt.com/*
-          # These values are injected into the generated wrangler.toml.
-          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          # The Datadog client token.
-          DATADOG_CLIENT_TOKEN: ${{ secrets.GET_THREEID_DATADOG_CLIENT_TOKEN }}
-          DATADOG_APPLICATION_ID: ${{ secrets.GET_THREEID_DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: current
-          DATADOG_SERVICE_NAME: get-3id
-          # The Cloudflare API token used by wrangler.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          OORT_HOST: oort.kubelt.com
-          NFTAR_URL: ${{ secrets.NFTAR_URL }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_AUTHORIZATION }}
-          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_CONTRACT_ADDRESS }}
-          CHAIN_ID: 1
-          INVITE_OPERATOR_PRIVATE_KEY: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
-          TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_DEV_BEARER_TOKEN }}
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_KEY }}
-          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_API_URL }}
-          ALCHEMY_NFT_URL: ${{ secrets.ALCHEMY_MAINNET_INVITE_NFT_URL }}
-
-  # threeid
-  # ----------------------------------------------------------------------------
-
   build-publish-threeid-current:
     runs-on: ubuntu-latest
     permissions:

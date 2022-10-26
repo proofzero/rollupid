@@ -1,7 +1,8 @@
 import { composeResolvers } from "@graphql-tools/resolvers-composition";
 import { GraphQLYogaError } from "@graphql-yoga/common";
 
-import { QueryAddressArgs, MutationUpdateThreeIdAddressArgs } from "./types";
+import { Resolvers } from "./typedefs";
+
 import OortClient from "./clients/oort";
 
 import {
@@ -11,11 +12,11 @@ import {
   getRPCResult,
 } from "./utils";
 
-const addressResolvers = {
+const addressResolvers: Resolvers = {
   Query: {
     address: (
-      _parent: any,
-      { address }: QueryAddressArgs,
+      _parent,
+      { address },
       {
         /* oort send, jwt */
       }
@@ -23,8 +24,8 @@ const addressResolvers = {
       return null;
     },
     addresses: (
-      _parent: any,
-      _args: any,
+      _parent,
+      _args,
       {
         /* oort send, jwt */
       }
@@ -32,15 +33,7 @@ const addressResolvers = {
       return [];
     },
   },
-  Mutation: {
-    updateThreeIDAddress: (
-      _parent: any,
-      { address, visible }: MutationUpdateThreeIdAddressArgs,
-      {
-        /* oort send, jwt */
-      }
-    ) => {},
-  },
+  Mutation: {},
 };
 
 const AddressResolverComposition = {
