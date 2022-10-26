@@ -28,7 +28,7 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import styles from "./tailwind.css";
 import baseStyles from "./base.css";
 
-import blankCard from "~/assets/blankcard.png";
+import ogImage from "~/assets/OG2.png";
 import logo from "~/assets/logo.png";
 import sad from "~/assets/sad.png";
 import faviconSvg from "~/assets/favicon.svg";
@@ -64,7 +64,7 @@ export const meta: MetaFunction = () => ({
   "og:site_name": "Get 3ID",
   "og:url": "https://get.threeid.xyz",
   "og:description": "Claim your 3ID Invite.",
-  "og:image": blankCard,
+  "og:image": ogImage,
   "theme-color": "#673ab8",
   "mobile-web-app-capable": "yes",
   "apple-mobile-web-app-capable": "yes",
