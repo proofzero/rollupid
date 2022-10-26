@@ -11,6 +11,10 @@ compatibility_date = "2022-04-05"
 [build]
   command = "yarn build"
 
+[dev]
+port = 9999
+local_protocol = "http"
+
 [env.dev]
 kv_namespaces = [
   { binding = "RESERVE", id = "95fa7b71d274466aa4d0730a9f58824d", preview_id = "42d20f457b934849ad994fd2649edf38" },

@@ -6,6 +6,10 @@ workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
+[dev]
+port = 9898
+local_protocol = "http"
+
 # Service Bindings
 # -----------------------------------------------------------------------------
 # TODO make service bindings work for local development using miniflare.

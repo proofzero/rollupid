@@ -15,6 +15,10 @@ workers_dev = true
 [build]
   command = "yarn generate:css && yarn sass && yarn build"
 
+[dev]
+port = 9797
+local_protocol = "http"
+
 # development (development) is the default environment
 # ------------------------------------------------------------------------------
 [env.dev]
