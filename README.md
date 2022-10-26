@@ -21,7 +21,7 @@ To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
 
 Let's take a look around at the Kubelt Monorepo layout...
 
-### 3ID
+### Galaxy
 
 The [projects/galaxy/](projects/galaxy/) directory contains our GraphQL server and schemas for stitching together logically decentralized services.
 
