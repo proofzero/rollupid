@@ -1,5 +1,5 @@
 ---
-name: Dev Deploy and Test NFTAR
+name: NFTAR
 on:
   push:
     branches:

@@ -1,5 +1,5 @@
 ---
-name: Dev Deploy and Test ThreeID App
+name: 3ID
 on:
   push:
     branches:

@@ -1,4 +1,4 @@
-name: Main Oort
+name: Oort
 
 on:
   workflow_dispatch:
