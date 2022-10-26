@@ -2,11 +2,11 @@
 module.exports = {
   projects: {
     galaxy: {
-      schema: ["galaxy/src/schema/gql/**/*.ts"],
+      schema: ["packages/galaxy/src/schema/gql/**/*.ts"],
       extensions: {
         codegen: {
           generates: {
-            "galaxy/src/schema/resolvers/galaxyTypes.ts": {
+            "packages/galaxy/src/schema/resolvers/galaxyTypes.ts": {
               plugins: ["typescript", "typescript-resolvers"],
             },
           },
@@ -14,7 +14,7 @@ module.exports = {
       },
     },
     threeid: {
-      schema: ["galaxy/src/schema/gql/**/*.ts"],
+      schema: ["packages/galaxy/src/schema/gql/**/*.ts"],
       documents: ["threeid/gql/**/*.ts"],
       extensions: {
         codegen: {

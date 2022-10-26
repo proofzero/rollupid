@@ -12,3 +12,6 @@ node_modules
 # styles
 **/*.css
 **/*.css.amp
+
+.wrangler
+.dev.vars

@@ -11,7 +11,7 @@ compatibility_date = "2022-04-05"
 [build]
   command = "npm run build"
 
-[env.development]
+[env.dev]
 kv_namespaces = [
   { binding = "RESERVE", id = "95fa7b71d274466aa4d0730a9f58824d", preview_id = "42d20f457b934849ad994fd2649edf38" },
   { binding = "PROOFS", id = "4600d9fe1c57424b8d4a1bf82a315084", preview_id = "c9a57e77459e41ada486aaf898a2b9aa" },

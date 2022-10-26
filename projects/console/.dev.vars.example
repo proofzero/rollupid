@@ -1,0 +1,2 @@
+DEPLOY_ENV = ""
+STORAGE_NAMESPACE = "starbase"

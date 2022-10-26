@@ -6,9 +6,6 @@ workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
-# rob@kubelt.com
-account_id = "c5902365738951d1946e51768978eb46"
-
 # Service Bindings
 # -----------------------------------------------------------------------------
 # TODO make service bindings work for local development using miniflare.
@@ -24,8 +21,6 @@ account_id = "c5902365738951d1946e51768978eb46"
 #
 # Set these secrets using the wrangler CLI:
 # $ echo <VALUE> | wrangler secret put <NAME>
-
-[vars]
 
 # Site
 # -----------------------------------------------------------------------------
@@ -44,9 +39,5 @@ account_id = "c5902365738951d1946e51768978eb46"
 
 [env.dev]
 kv_namespaces = [
-  { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d" },
+  { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
 ]
-
-[env.dev.vars]
-DEPLOY_ENV = "robert"
-STORAGE_NAMESPACE = "starbase"
