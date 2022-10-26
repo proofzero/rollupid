@@ -10182,7 +10182,7 @@ graphql-config@4.3.6:
     ts-node "^10.8.1"
     tslib "^2.4.0"
 
-graphql-request@^5.0.0:
+graphql-request@5.0.0, graphql-request@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-5.0.0.tgz#7504a807d0e11be11a3c448e900f0cc316aa18ef"
   integrity sha512-SpVEnIo2J5k2+Zf76cUkdvIRaq5FMZvGQYnA4lUWYbc99m+fHh4CZYRRO/Ff4tCLQ613fzCm3SiDT64ubW5Gyw==
@@ -10192,7 +10192,7 @@ graphql-request@^5.0.0:
     extract-files "^9.0.0"
     form-data "^3.0.0"
 
-graphql-tag@^2.11.0:
+graphql-tag@2.12.6, graphql-tag@^2.11.0:
   version "2.12.6"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.12.6.tgz#d441a569c1d2537ef10ca3d1633b48725329b5f1"
   integrity sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==
@@ -17410,29 +17410,6 @@ worker-rpc@^0.1.0:
   integrity sha512-P1WjMrUB3qgJNI9jfmpZ/htmBEjFh//6l/5y8SD9hg1Ef5zTTVVoRjTrTEzPrNBQvmhMxkoTsjOXN10GWU7aCg==
   dependencies:
     microevent.ts "~0.1.1"
-
-wrangler@2.1.12:
-  version "2.1.12"
-  resolved "https://registry.yarnpkg.com/wrangler/-/wrangler-2.1.12.tgz#e22e86bc7c63b072ea764641c155e04d3f42081c"
-  integrity sha512-Oe3lBVR4b2o44A90S+3Bi6gOVw7pGA1qnkhSDkAFdxv1Ttsktb2B7yINRevCPm5wpPkwwpZXS8Dq3Gk0f3Ns8w==
-  dependencies:
-    "@cloudflare/kv-asset-handler" "^0.2.0"
-    "@esbuild-plugins/node-globals-polyfill" "^0.1.1"
-    "@esbuild-plugins/node-modules-polyfill" "^0.1.4"
-    "@miniflare/core" "2.10.0"
-    "@miniflare/d1" "2.10.0"
-    "@miniflare/durable-objects" "2.10.0"
-    blake3-wasm "^2.1.5"
-    chokidar "^3.5.3"
-    esbuild "0.14.51"
-    miniflare "2.10.0"
-    nanoid "^3.3.3"
-    path-to-regexp "^6.2.0"
-    selfsigned "^2.0.1"
-    source-map "^0.7.4"
-    xxhash-wasm "^1.0.1"
-  optionalDependencies:
-    fsevents "~2.3.2"
 
 wrangler@2.1.13:
   version "2.1.13"
