@@ -1,5 +1,5 @@
 ---
-name: Dev Deploy and Test Galaxy
+name: Galaxy
 on:
   push:
     branches:

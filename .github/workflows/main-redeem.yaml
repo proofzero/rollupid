@@ -1,5 +1,5 @@
 ---
-name: Dev Deploy and Test Redeem App
+name: Redeem
 on:
   push:
     branches:

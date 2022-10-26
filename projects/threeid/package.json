@@ -16,7 +16,7 @@
     "dev:wrangler": "wrangler dev --local --port 8686 --persist --env development",
     "dev": "echo \"No dev for threeid. Please use start.\"",
     "start": "run-p \"dev:*\"",
-    "sass": "sass app/:app/",
+    "sass": "sass app/:app/ --no-source-map",
     "e2e": "cross-env NODE_ENV=test npx playwright test"
   },
   "dependencies": {

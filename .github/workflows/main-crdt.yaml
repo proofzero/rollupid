@@ -1,5 +1,5 @@
 ---
-name: Dev Test and Build CRDT Smart Contract
+name: CRDT
 on:
   push:
     branches:
