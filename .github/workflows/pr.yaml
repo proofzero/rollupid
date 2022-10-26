@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-test:
+  build-test-workspace:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
