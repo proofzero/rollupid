@@ -14,7 +14,7 @@ on:
 jobs:
   # redeem
   # ----------------------------------------------------------------------------
-  build-publish-test-dev:
+  build-publish-test-redeem-dev:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -30,7 +30,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "redeem"
+          workingDirectory: "projects/redeem"
           command: publish --env dev
           environment: "development"
           secrets: |
@@ -87,7 +87,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "threeid"
+          workingDirectory: "projects/threeid"
           command: publish --env development
           environment: "development"
           secrets: |
@@ -194,7 +194,7 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "npm"
-          cache-dependency-path: ./redeem/package-lock.json
+          cache-dependency-path: ./smartcontracts/eth/package-lock.json
       - run: npm install
         working-directory: smartcontracts/eth/crdt
       - name: Build and Test
