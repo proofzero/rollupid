@@ -1,5 +1,6 @@
 ---
 name: Galaxy
+
 on:
   push:
     branches:

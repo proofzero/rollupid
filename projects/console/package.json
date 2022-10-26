@@ -12,7 +12,7 @@
     "deploy:dev": "wrangler publish --env dev",
     "dev:css": "yarn run generate:css -- --watch",
     "dev:remix": "remix watch",
-    "dev:wrangler": "wrangler dev --local --port 8989 --persist --env dev",
+    "dev:wrangler": "wrangler dev --local --persist --env dev",
     "dev": "echo \"No dev for console. Please use start.\"",
     "start": "run-p \"dev:*\"",
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",

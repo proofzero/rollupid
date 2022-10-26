@@ -3,11 +3,13 @@ main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
 
+services = [
+  { binding = "OORT", service = "oort"}
+]
+
+[dev]
 port = 8787
 local_protocol = "http"
-services = [
-  { binding = "OORT", service = "oort-dev"}
-]
 
 [env.dev]
 route = { pattern = "galaxy-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
