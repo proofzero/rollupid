@@ -1,13 +1,13 @@
-name: oort mono worker
+name: oort
 
 on:
   push:
     paths:
-      - 'oort/packages/mono/**'
+      - 'projects/oort/**'
 
 defaults:
   run:
-    working-directory: oort/packages/mono
+    working-directory: projects/oort
 
 jobs:
   format:
@@ -16,11 +16,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
-          cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
-      - run: npm ci
-      - run: npm run format:check
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install
+      - run: yarn run format:check
 
   lint:
     needs: [format]
@@ -29,11 +29,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
-          cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
-      - run: npm ci
-      - run: npm run lint:check
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install
+      - run: yarn run lint:check
 
   types:
     needs: [format, lint]
@@ -42,11 +42,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
-          cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
-      - run: npm ci
-      - run: npm run types:check
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install
+      - run: yarn run types:check
 
   build:
     needs: [format, lint, types]
@@ -55,11 +55,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
-          cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
-      - run: npm ci
-      - run: npm run build:test
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install
+      - run: yarn run build:test
 
   test:
     needs: [format, lint, types, build]
@@ -68,11 +68,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
-          cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
-      - run: npm ci
-      - run: npm run test:ci
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install
+      - run: yarn run test:ci
         env:
           NODE_OPTIONS: --experimental-vm-modules
           NODE_NO_WARNINGS: 1
