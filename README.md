@@ -1,15 +1,20 @@
-![kubelt banner](https://kubelt.com/images/kubelt-banner.gif)
+![kubelt-banner](https://user-images.githubusercontent.com/695698/198127215-272ee281-6a3c-49f9-8ca1-ebe0b07f249a.gif)
 
-# Kubelt
+# Simple & Secure ‍User Identity
 
-## Simple & Secure ‍User Identity
-
-![Build](https://github.com/kubelt/kubelt/actions/workflows/next.yaml/badge.svg)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
 ![Version badge](https://img.shields.io/badge/Version-pre%20alpha-orange.svg)
 
-Kubelt is a decentralized identity provider that connects users and developers together in a secure, private, and engaging decentralized protocol.
+#### Build Status
+![](https://github.com/kubelt/kubelt/actions/workflows/main-galaxy.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-oort.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-threeid.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
+
+## What is Kubelt?
+
+Kubelt secures user profiles into private, decentralized identities called 3IDs. With the 0xAuth protocol, applications get to know their customers better and stay in touch with access to rich user profiles, content, services and more.
 
 With Kubelt, users are in control of aggregating their data and connections across multiple identity solutions, creating a secure environment for developers to access rich user data.
 
