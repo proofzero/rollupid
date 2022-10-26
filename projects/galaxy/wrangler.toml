@@ -3,21 +3,28 @@ main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
 
-[dev]
 port = 8787
 local_protocol = "http"
-
-[env.dev]
 services = [
   { binding = "OORT", service = "oort-dev"}
 ]
 
+[env.dev]
+route = { pattern = "galaxy-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+services = [
+  { binding = "OORT", service = "oort-devnet"}
+]
+
 [env.next]
+route = { pattern = "galaxy-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
   { binding = "OORT", service = "oort-testnet"}
 ]
 
 [env.current]
+route = { pattern = "galaxy.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
   { binding = "OORT", service = "oort-mainnet"}
 ]
+
+
