@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "start": "start-storybook -p 6006",
-    "build-storybook": "run-p \"build-storybook\"",
+    "build": "build-storybook",
     "dev": "echo \"No dev for storybook. Please use start.\""
   },
   "keywords": [],

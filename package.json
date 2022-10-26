@@ -12,7 +12,8 @@
     "gql:threeid": "graphql-codegen --config graphql.config.js --watch --project threeid",
     "gql": "run-p \"gql:*\"",
     "dev": "yarn workspaces run dev",
-    "start": "echo \"Run each frontend applications individually\""
+    "start": "echo \"Run each frontend applications individually\"",
+    "build": "yarn workspaces run build"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.7",

@@ -11,6 +11,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
+    "build": "wrangler publish --dry-run --outdir=dist",
     "dev:wrangler": "wrangler dev --local --env dev",
     "dev": "run-p \"dev:*\"",
     "start": "echo \"No start for galaxy. Please use dev.\""
@@ -20,7 +21,7 @@
     "@graphql-tools/resolvers-composition": "6.5.6",
     "@graphql-tools/schema": "9.0.4",
     "@graphql-tools/stitch": "8.7.13",
-    "@graphql-yoga/common": "2.12.12",
+    "@graphql-yoga/common": "2.12.13",
     "graphql": "16.6.0"
   }
 }
