@@ -15,7 +15,8 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "yarn"
-      - run: yarn --cached
+      - name: Install
+        run: yarn install
       - name: Build
         run: yarn build
       - name: Test
