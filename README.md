@@ -21,7 +21,11 @@ Let's take a look around at the Kubelt Monorepo layout...
 
 ### 3ID
 
-The [threeid/](threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging and more. For more information visit [3ID](https://threeid.xyz).
+The [projects/galaxy/](projects/galaxy/) directory contains our GraphQL server and schemas for stitching together logically decentralized services.
+
+### 3ID
+
+The [projects/threeid/](projects/threeid/) directory contains an Remix React Web application. 3ID is an opt-in service that providers users a super-charged “gravatar”-like service that gives users control and privacy over their application data and p2p messaging and more. For more information visit [3ID](https://threeid.xyz).
 
 ### Starbase
 
@@ -41,7 +45,7 @@ The [www/](www/) directory contains the Kubelt.com static website documentation 
 
 ### Redeem
 
-THe [redeem/](redeem/) directory contains a web application for minting 3ID invites.
+THe [projects/edeem/](projects/redeem/) directory contains a web application for minting 3ID invites.
 
 ## Develop
 

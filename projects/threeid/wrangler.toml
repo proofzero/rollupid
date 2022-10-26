@@ -1,0 +1,61 @@
+# https://developers.cloudflare.com/workers/platform/compatibility-dates
+compatibility_date = "2022-04-05"
+
+main = "./build/index.js"
+
+name = "threeid-dapp"
+
+# Whether or not the worker should be deployed to *.workers.dev. Can use
+# either route or workers_dev, but not both.
+workers_dev = true
+
+[site]
+  bucket = "./public"
+
+[build]
+  command = "npm run generate:css && npm run sass && npm run build"
+
+# development (development) is the default environment
+# ------------------------------------------------------------------------------
+[env.development]
+# name = "three-id-dev"
+# # Whether or not the worker should be deployed to *.workers.dev. Can use
+# # either route or workers_dev, but not both.
+# workers_dev = true
+# routes = [
+#   "3id-dev.kubelt.com/*",
+# ]
+kv_namespaces = [
+  { binding = "VOUCHER_CACHE", id = "41b33df6040f48b8988a8feeec8adcd3", preview_id = "856e53f4fdc049c1badddcb4854c9a98" },
+  { binding = "ONBOARD_STATE", id = "a93b535c93784db5bcb8fa084e808542", preview_id = "b4cc5928ea47429b8d1ecdf2ee05ce34" },
+  { binding = "REDEEM", id = "f4e252528b864cfa837365fa223281b7", preview_id = "8445a8a0f29a44d9b3a583036d04d8f4" },
+  { binding = "PROOFS", id = "4600d9fe1c57424b8d4a1bf82a315084", preview_id = "c9a57e77459e41ada486aaf898a2b9aa" },
+
+]
+
+# next (staging)
+# ------------------------------------------------------------------------------
+[env.next]
+routes = [
+  { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+  { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
+kv_namespaces = [
+  { binding = "VOUCHER_CACHE", id = "b99f064f42a945feace9a6f36b5d9c62" },
+  { binding = "ONBOARD_STATE", id = "ce9cd9f5838348dfb18c193757c918fd" },
+  { binding = "REDEEM", id = "dba1fdd44a4a474ba422c0f361c5a957" },
+  { binding = "PROOFS", id = "6b4acb9a432a484f9644e9b12a990ddb", preview_id = "faec0e8ffc9c4b3f90a2b21e7fdf2fce" },
+
+]
+
+# current (production)
+# ------------------------------------------------------------------------------
+[env.current]
+route = { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+kv_namespaces = [
+  { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
+  { binding = "ONBOARD_STATE", id = "b1959de0b0974c26b3bc83576a259db7" },
+  { binding = "REDEEM", id = "a5ad55acb9624ac28bf7f13d84a358f2" },
+  { binding = "PROOFS", id = "c073dd1f6fc84d94b1c7113cd2760823"},
+
+]

@@ -1,0 +1,43 @@
+# wrangler.toml
+
+name = "starbase"
+
+workers_dev = true
+main = "./build/index.js"
+compatibility_date = "2022-04-05"
+
+# Service Bindings
+# -----------------------------------------------------------------------------
+# TODO make service bindings work for local development using miniflare.
+
+# services = [
+#   { binding = "OORT", service = "oort-devnet" }
+# ]
+
+# Environment Variables
+# -----------------------------------------------------------------------------
+# Required secrets:
+# - SESSION_SECRET
+#
+# Set these secrets using the wrangler CLI:
+# $ echo <VALUE> | wrangler secret put <NAME>
+
+# Site
+# -----------------------------------------------------------------------------
+
+[site]
+  bucket = "./public"
+
+# Build
+# -----------------------------------------------------------------------------
+
+[build]
+  command = "npm run build"
+
+# development
+# -----------------------------------------------------------------------------
+
+[env.dev]
+kv_namespaces = [
+  { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
+]

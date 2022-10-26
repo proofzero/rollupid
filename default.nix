@@ -7,32 +7,22 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ pkg-config ];
   
   buildInputs = [
-    clojure
-    clojure-lsp
-    babashka
-    leiningen
     nodejs-16_x
     jdk
     docker
-    google-chrome
     chromedriver
-    act
     docker
     rustup
     libuuid
-    act
-    wayland
-    google-chrome-dev
-    firefox-bin
+    act 
   ];
 
-  APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid wayland google-chrome-dev firefox-bin]}";
+    
+  # APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid google-chrome-dev]}";
 
-
-  shellHook = ''
-    LD=$CC
-    export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
-  '';
+  # shellHook = ''
+  #   LD=$CC
+  #   export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
+  # '';
 
 }
-
