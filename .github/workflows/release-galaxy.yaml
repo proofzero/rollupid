@@ -14,8 +14,7 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "yarn"
-          cache-dependency-path: ./yarn.lock
-      - run: yarn install
+      - run: yarn --cached
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:

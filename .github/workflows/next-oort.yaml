@@ -16,8 +16,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-          cache-dependency-path: yarn.lock
-      - run: yarn install
+      - run: yarn --cached
       - run: yarn run wrangler:publish:testnet
         env:
           SITE: oort-testnet
