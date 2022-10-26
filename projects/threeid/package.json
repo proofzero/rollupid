@@ -60,12 +60,12 @@
     "concurrently": "7.3.0",
     "eslint": "8.20.0",
     "miniflare": "2.6.0",
-    "yarn-run-all": "3.1.1",
     "postcss": "8.4.16",
     "sass": "1.54.7",
     "tailwindcss": "3.1.8",
     "typescript": "4.7.4",
-    "wrangler": "2.1.13"
+    "wrangler": "2.1.13",
+    "yarn-run-all": "3.1.1"
   },
   "engines": {
     "node": ">=16.13"

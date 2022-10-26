@@ -16,7 +16,7 @@ jobs:
           node-version: lts/gallium
           cache: "npm"
           cache-dependency-path: ./nftar/package-lock.json
-      - run: yarn install
+      - run: npm install
         working-directory: nftar
       - name: Build and Test
         run: npm test

@@ -1,4 +1,4 @@
-name: oort mono worker testnet
+name: Next Oort
 
 on:
   workflow_dispatch:
@@ -16,7 +16,6 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-          cache-dependency-path: yarn.lock
       - run: yarn install
       - run: yarn run wrangler:publish:testnet
         env:

@@ -1,8 +1,8 @@
 {
-  "name": "kubelt-oort-mono",
+  "name": "oort",
   "private": true,
   "version": "1.0.0",
-  "description": "Kubelt Oort Mono Worker",
+  "description": "Kubelt Oort Worker",
   "module": "./dist/shim.mjs",
   "author": "Kubelt, Inc.",
   "homepage": "https://kubelt.com",
@@ -33,11 +33,12 @@
     "lint:check:src": "eslint src",
     "lint:check:test": "eslint test",
     "types:check": "tsc --project tsconfig.json --noEmit",
+    "dev": "run-p \"dev:*\"",
     "dev:wrangler": "run-s types:check wrangler:dev",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts",
     "test:ci": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts --reporter classic",
     "test:dev": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts --coverage --watch",
-    "wrangler:dev": "wrangler --env dev dev --local --persist --port 8888",
+    "wrangler:dev": "wrangler --env dev dev --local --persist",
     "wrangler:publish:devnet": "wrangler --env devnet publish",
     "wrangler:publish:testnet": "wrangler --env testnet publish",
     "wrangler:publish:mainnet": "wrangler --env mainnet publish"
@@ -59,7 +60,6 @@
     "eslint-config-prettier": "8.5.0",
     "miniflare": "2.10.0",
     "node-polyfill-webpack-plugin": "2.0.1",
-    "npm-run-all": "4.1.5",
     "prettier": "2.7.1",
     "tap": "16.3.0",
     "ts-loader": "9.4.1",
@@ -68,7 +68,8 @@
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
     "webpack-merge": "5.8.0",
-    "wrangler": "2.1.13"
+    "wrangler": "2.1.13",
+    "yarn-run-all": "3.1.1"
   },
   "dependencies": {
     "@datadog/datadog-api-client": "1.5.0",

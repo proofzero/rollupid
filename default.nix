@@ -8,6 +8,7 @@ stdenv.mkDerivation {
   
   buildInputs = [
     nodejs-16_x
+    yarn
     jdk
     docker
     chromedriver

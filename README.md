@@ -1,6 +1,8 @@
 ![kubelt banner](https://kubelt.com/images/kubelt-banner.gif)
 
-# Kubelt Decentralizes Applications
+# Kubelt
+
+## Simple & Secure ‍User Identity
 
 ![Build](https://github.com/kubelt/kubelt/actions/workflows/next.yaml/badge.svg)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
@@ -19,7 +21,7 @@ To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
 
 Let's take a look around at the Kubelt Monorepo layout...
 
-### 3ID
+### Galaxy
 
 The [projects/galaxy/](projects/galaxy/) directory contains our GraphQL server and schemas for stitching together logically decentralized services.
 
