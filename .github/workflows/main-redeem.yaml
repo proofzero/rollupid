@@ -1,5 +1,6 @@
 ---
 name: Redeem
+
 on:
   push:
     branches:
