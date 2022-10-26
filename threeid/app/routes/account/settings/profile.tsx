@@ -3,7 +3,7 @@ import { useLoaderData, useSubmit } from "@remix-run/react";
 import { FaAt, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import InputText from "~/components/inputs/InputText";
-import { requireJWT } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 import { GraphQLClient } from "graphql-request";
 import { useState } from "react";
@@ -15,6 +15,7 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
@@ -37,11 +38,22 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
+  const session = await getUserSession(request);
+  const address = session.get("address");
+
   const formData = await request.formData();
 
   const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
     fetch,
   });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
+
+  const prof = profileRes.profile;
 
   await gqlClient.request(
     `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
@@ -49,7 +61,10 @@ export const action: ActionFunction = async ({ request }) => {
   }`,
     {
       profile: {
-        id: "42", // TODO: Figure out what's up with ID
+        id: address, // TODO: Figure out what's up with ID
+        avatar: prof?.avatar,
+        cover: prof?.cover,
+        isToken: prof?.isToken,
         displayName: formData.get("displayName")?.toString(),
         job: formData.get("job")?.toString(),
         location: formData.get("location")?.toString(),
@@ -67,7 +82,8 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function AccountSettingsProfile() {
-  const { displayName, job, location, bio, website } = useLoaderData();
+  const { displayName, job, location, bio, website, avatar, cover, isToken } =
+    useLoaderData();
 
   const [profileData, setProfileData] = useState({
     displayName,
@@ -75,6 +91,9 @@ export default function AccountSettingsProfile() {
     location,
     bio,
     website,
+    avatar,
+    cover,
+    isToken,
   });
 
   const submit = useSubmit();
@@ -88,7 +107,7 @@ export default function AccountSettingsProfile() {
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
           <img
-            src={"https://picsum.photos/118/118"}
+            src={gatewayFromIpfs(avatar)}
             style={{
               width: 118,
               height: 118,
@@ -116,7 +135,7 @@ export default function AccountSettingsProfile() {
               </Text>
 
               <img
-                src={"https://picsum.photos/33/33"}
+                src={gatewayFromIpfs(avatar)}
                 style={{
                   width: 33,
                   height: 33,

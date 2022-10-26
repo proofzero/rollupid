@@ -21,6 +21,7 @@ import { links as nftCollLinks } from "~/components/profile/ProfileNftCollection
 
 import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
 import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()];
@@ -61,6 +62,9 @@ const ProfileRoute = () => {
     location,
     isOwner,
     loggedIn,
+    avatar,
+    cover,
+    isToken,
   } = useLoaderData();
 
   return (
@@ -70,13 +74,13 @@ const ProfileRoute = () => {
           backgroundColor: "#192030",
         }}
       >
-        <HeadNav loggedIn={loggedIn} pfp={undefined} />
+        <HeadNav loggedIn={loggedIn} pfp={avatar} />
       </div>
 
       <div
         className="h-80 w-full relative flex justify-center"
         style={{
-          backgroundImage: undefined,
+          backgroundImage: cover ? `url(${gatewayFromIpfs(cover)})` : undefined,
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
@@ -86,10 +90,10 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={undefined}
+              avatarUrl={gatewayFromIpfs(avatar)}
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
-              isNft={undefined}
+              isNft={isToken}
             />
           </div>
         </div>
