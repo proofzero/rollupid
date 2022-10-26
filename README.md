@@ -1,6 +1,8 @@
 ![kubelt banner](https://kubelt.com/images/kubelt-banner.gif)
 
-# Kubelt Decentralizes Applications
+# Kubelt
+
+## Simple & Secure ‍User Identity
 
 ![Build](https://github.com/kubelt/kubelt/actions/workflows/next.yaml/badge.svg)
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
