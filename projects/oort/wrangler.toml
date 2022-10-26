@@ -1,7 +1,7 @@
 name = "oort"
 main = "dist/shim.mjs"
 compatibility_date = "2022-09-26"
-workers_dev = true
+# workers_dev = true
 node_compat = true
 
 durable_objects.bindings = [
@@ -23,9 +23,6 @@ route = { pattern = "oort-dev.kubelt.com", custom_domain = true, zone_name = "ku
 port = 8888
 local_protocol = "http"
 
-[build]
-command = "yarn build:dev"
-
 [[migrations]]
 tag = "v0"
 new_classes = ["Core"]
@@ -34,11 +31,16 @@ new_classes = ["Core"]
 tag = "v1"
 new_classes = ["Address"]
 
+[build]
+command = "yarn build:dev"
+
+[env.test.build]
+command = "npm run build:test"
+
+[env.test.build.upload]
+format = "modules"
+
 [env.devnet]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-  { name = "Core", class_name = "Core" }
-]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "e2d48ea134874b048f49d8514e940fdb" },
   { binding = "THREEID", id = "0e056cfbebc3412199d57e8ff7579a5d" },
@@ -50,28 +52,7 @@ r2_buckets = [
 
 route = { pattern = "oort-devnet.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 
-[env.test]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-  { name = "Core", class_name = "Core" }
-]
-kv_namespaces = [
-  { binding = "CORE_CLAIMS", id = "ec4086c00b29472a8af96a6238490a5e", preview_id = "d1f72c20862741f5a887f4d6fa1966b8" },
-  { binding = "THREEID", id = "637013c6396f40bdad6d089522c573f1", preview_id = "e41ef4effc8643b6954b5b3348ffa4ec" },
-  { binding = "THREEID_INVITE_CODES", id = "a89fd66cd1d74147924e0b870b0afb8e", preview_id = "0043ac06f01941fb9ac2bfca0652d4cf" },
-]
-r2_buckets = [
-  { binding = "OBJECTS", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
-]
-
-[env.test.build]
-command = "npm run build:test"
-
 [env.testnet]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-  { name = "Core", class_name = "Core" }
-]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "d2a39af5349c4c929c125176113a4430" },
   { binding = "THREEID", id = "ccbdddcdb23e41c5b6adbad935f158f0" },
@@ -87,10 +68,6 @@ route = { pattern = "oort-testnet.kubelt.com", custom_domain = true, zone_name =
 command = "yarn build:production"
 
 [env.mainnet]
-durable_objects.bindings = [
-  { name = "Address", class_name = "Address" },
-  { name = "Core", class_name = "Core" }
-]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "8dddff01c3b24395b5a0ea05e59dcc18" },
   { binding = "THREEID", id = "f3b97d8f6223418592174769492cc28f" },
