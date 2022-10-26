@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "all:check": "run-s format:check lint:check types:check",
+    "build": "run-s all:check build:dev",
     "build:dev": "webpack -c webpack.development.ts",
     "build:test": "webpack --no-stats -c webpack.development.ts",
     "build:production": "webpack -c webpack.production.ts",
