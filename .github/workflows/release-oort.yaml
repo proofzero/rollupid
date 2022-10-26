@@ -15,10 +15,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: "npm"
+          cache: "yarn"
           cache-dependency-path: yarn.lock
-      - run: npm ci
-      - run: npm run wrangler:publish:mainnet
+      - run: yarn ci
+      - run: yarn run wrangler:publish:mainnet
         env:
           SITE: oort-mainnet
           ENVIRONMENT: production
