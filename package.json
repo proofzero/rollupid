@@ -13,7 +13,8 @@
     "gql": "run-p \"gql:*\"",
     "dev": "yarn workspaces run dev",
     "start": "echo \"Run each frontend applications individually\"",
-    "build": "yarn workspaces run build"
+    "build": "yarn workspaces run build",
+    "test": "yarn workspaces run test"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.7",
