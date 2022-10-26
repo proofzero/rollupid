@@ -1,13 +1,7 @@
-name: oort mono worker devnet
+name: oort mono worker mainnet
 
 on:
   workflow_dispatch:
-
-  workflow_run:
-    workflows: ['oort-mono-worker']
-    types: [requested]
-    branches:
-      - main
 
 defaults:
   run:
@@ -20,18 +14,18 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version-file: oort/.nvmrc
+          node-version-file: .nvmrc
           cache: 'npm'
-          cache-dependency-path: oort/package-lock.json
+          cache-dependency-path: yarn.lock
       - run: npm ci
-      - run: npm run wrangler:publish:devnet
+      - run: npm run wrangler:publish:mainnet
         env:
-          SITE: oort-devnet
+          SITE: oort-mainnet
           ENVIRONMENT: production
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
           DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
-          ENS_CONTRACT_ADDRESS: ${{ secrets.ENS_CONTRACT_ADDRESS_DEVNET }}
-          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL_DEVNET }}
-          ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_NFT_API_URL_DEVNET }}
+          ENS_CONTRACT_ADDRESS: ${{ secrets.ENS_CONTRACT_ADDRESS_MAINNET }}
+          ALCHEMY_API_URL: ${{ secrets.ALCHEMY_API_URL_MAINNET }}
+          ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_NFT_API_URL_MAINNET }}
