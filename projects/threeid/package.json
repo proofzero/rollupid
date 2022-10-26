@@ -4,6 +4,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
     "generate:css": "npx tailwindcss -o ./app/styles/tailwind.css",
     "build": "run-s \"build:*\"",
     "build:css": "npx tailwindcss -o ./app/styles/tailwind.css",
@@ -16,7 +17,7 @@
     "dev": "echo \"No dev for threeid. Please use start.\"",
     "start": "run-p \"dev:*\"",
     "sass": "sass app/:app/",
-    "test": "cross-env NODE_ENV=test npx playwright test"
+    "e2e": "cross-env NODE_ENV=test npx playwright test"
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",

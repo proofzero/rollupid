@@ -14,34 +14,20 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v2
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('/redeem/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: 'npm'
-          cache-dependency-path: ./redeem/package-lock.json
-      - run: npm install
-        working-directory: redeem
+          cache: "yarn"
+          cache-dependency-path: ./yarn.lock
+      - run: yarn install
       - name: Deploy to Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: 'redeem'
+          workingDirectory: "redeem"
           command: publish --env current
-          environment: 'current'
+          environment: "current"
           secrets: |
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -91,17 +77,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: 'npm'
-          cache-dependency-path: ./threeid/package-lock.json
-      - run: npm install
-        working-directory: threeid
+          cache: "yarn"
+          cache-dependency-path: ./yarn.lock
+      - run: yarn install
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: 'threeid'
-          environment: 'current'
+          workingDirectory: "threeid"
+          environment: "current"
           command: publish --env current
           secrets: |
             SESSION_SECRET

@@ -10,6 +10,7 @@
   },
   "private": true,
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 0",
     "dev:wrangler": "wrangler dev --local --env dev",
     "dev": "run-p \"dev:*\"",
     "start": "echo \"No start for galaxy. Please use dev.\""
