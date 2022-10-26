@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
 
+[dev]
+port = 8787
+local_protocol = "http"
+
 [env.dev]
 services = [
   { binding = "OORT", service = "oort-dev"}
