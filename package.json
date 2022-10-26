@@ -13,7 +13,7 @@
     "gql": "run-p \"gql:*\"",
     "dev": "yarn workspaces foreach -i -p run dev",
     "start": "echo \"Run each frontend applications individually\"",
-    "build": "yarn workspaces run build",
+    "build": "yarn workspaces foreach -i -p run build",
     "test": "yarn workspaces run test"
   },
   "devDependencies": {
