@@ -2082,6 +2082,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kubelt/address-worker@workspace:address-worker":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/address-worker@workspace:address-worker"
+  dependencies:
+    "@cloudflare/workers-types": 3.18.0
+    "@ethersproject/address": 5.7.0
+    "@kubelt/worker-commons": "*"
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.26.0
+    eslint-config-prettier: 8.5.0
+    itty-router: 2.6.6
+    itty-router-extras: 0.4.2
+    jose: 4.10.4
+    lodash: 4.17.21
+    prettier: 2.7.1
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    wrangler: 2.1.15
+    yarn-run-all: 3.1.1
+  languageName: unknown
+  linkType: soft
+
 "@kubelt/app.icons@workspace:icons":
   version: 0.0.0-use.local
   resolution: "@kubelt/app.icons@workspace:icons"
@@ -2183,7 +2207,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/worker-commons@workspace:worker-commons":
+"@kubelt/worker-commons@*, @kubelt/worker-commons@workspace:worker-commons":
   version: 0.0.0-use.local
   resolution: "@kubelt/worker-commons@workspace:worker-commons"
   dependencies:
@@ -7166,6 +7190,13 @@ __metadata:
   version: 4.10.3
   resolution: "jose@npm:4.10.3"
   checksum: 9fa5e1ebfbddb8924a08a3ca2789dfb63c522d615e2eb66021adc632a83efc7fc990e1abbf3546baff8913b4ee585fd86521212f47968aec27930ed658f0bea6
+  languageName: node
+  linkType: hard
+
+"jose@npm:4.10.4":
+  version: 4.10.4
+  resolution: "jose@npm:4.10.4"
+  checksum: 0e6caaae0b0303534c0ac23711d45eadfbdbff63d9aeed80965c668b5532c254ab25b48afddc3e1ecfcfd36b4275dee41174a097c5a47a25ce04268c78f3c130
   languageName: node
   linkType: hard
 
