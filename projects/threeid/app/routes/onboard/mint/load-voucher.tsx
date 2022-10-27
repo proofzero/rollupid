@@ -28,9 +28,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   let voucher = await getCachedVoucher(address);
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
@@ -49,24 +52,22 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       });
     }
   } else {
-    voucher = await fetchVoucher({ address, skipImage: !!voucher });
+    console.log("voucher", voucher);
+    try {
+      voucher = await fetchVoucher({ address, skipImage: !!voucher });
+    } catch (e) {
+      console.log("error fetching voucher", e);
+    }
     voucher = await putCachedVoucher(address, voucher);
   }
 
   if (!prof?.avatar) {
     await galaxySdk.updateProfile({
         profile: {
-          id: address, // TODO: Figure out what's up with ID
-          displayName: prof?.displayName,
-          bio: prof?.bio,
-          job: prof?.job,
-          location: prof?.location,
-          website: prof?.website,
+          ...prof,
           avatar: voucher.metadata.image,
           cover: voucher.metadata.cover,
-          isToken: prof?.isToken,
         },
-        visibility: Visibility.Public,
       },
       {
         "KBT-Access-JWT-Assertion": jwt,

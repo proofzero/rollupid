@@ -13,7 +13,7 @@
     "dev:sass": "sass --watch app/:app/",
     "deploy": "wrangler publish",
     "dev:remix": "remix watch",
-    "dev:wrangler": "wrangler dev --local --persist --env development",
+    "dev:wrangler": "wrangler dev --local --persist",
     "dev": "echo \"No dev for threeid. Please use start.\"",
     "start": "run-p \"dev:*\"",
     "e2e": "cross-env NODE_ENV=test npx playwright test"

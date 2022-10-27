@@ -11,10 +11,10 @@
     "gql:galaxy": "graphql-codegen --config graphql.config.js --watch --project galaxy",
     "gql:threeid": "graphql-codegen --config graphql.config.js --watch --project threeid",
     "gql": "run-p \"gql:*\"",
-    "dev": "yarn workspaces foreach -i -p run dev",
+    "dev": "yarn workspaces foreach -i -v -p run dev",
     "start": "echo \"Run each frontend applications individually\"",
-    "build": "yarn workspaces foreach -p -i run build",
-    "test": "yarn workspaces foreach -p -i run test"
+    "build": "yarn workspaces foreach -p -v -i run build",
+    "test": "yarn workspaces foreach -p -v -i run test"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.7",

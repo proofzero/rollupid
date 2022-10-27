@@ -31,15 +31,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
   const profileRes = await galaxySdk.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
+
+  console.log("profile", profileRes);
 
   return json({
     displayname: profileRes.profile?.displayName,
@@ -64,9 +69,12 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 

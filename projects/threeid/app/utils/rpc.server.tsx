@@ -35,8 +35,9 @@ export async function oortSend(
     headers["KBT-Core-Address"] = options.address;
   }
 
-  //@ts-ignore
+  console.log("heres", `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/jsonrpc`);
   const response = await fetch(
+    //@ts-ignore
     `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/jsonrpc`,
     {
       method: "POST",
@@ -49,6 +50,7 @@ export async function oortSend(
       }),
     }
   );
+  console.log("here2 ");
 
   const json = await response.json();
 
