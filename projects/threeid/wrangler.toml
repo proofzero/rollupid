@@ -7,8 +7,10 @@ name = "threeid-dapp"
 
 # Whether or not the worker should be deployed to *.workers.dev. Can use
 # either route or workers_dev, but not both.
-workers_dev = true
-
+routes = [
+  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
 # The default environment
 # ------------------------------------------------------------------------------
 # name = "three-id-dev"
