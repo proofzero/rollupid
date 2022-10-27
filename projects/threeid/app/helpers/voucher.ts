@@ -57,8 +57,8 @@ export const fetchVoucher = async ({ address, skipImage }: FetchVoucherParams) =
         contractAddress,
     };
 
-    res.metadata.cover = gatewayFromIpfs(jsonRes.result.metadata.cover) as string;
-    res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image) as string;
+    res.metadata.cover = jsonRes.result.metadata.cover;
+    res.metadata.image = jsonRes.result.metadata.image;
 
     fetch(res.metadata.image);
     fetch(res.metadata.cover);

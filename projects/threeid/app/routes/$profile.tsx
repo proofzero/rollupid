@@ -74,7 +74,7 @@ const ProfileRoute = () => {
           backgroundColor: "#192030",
         }}
       >
-        <HeadNav loggedIn={loggedIn} pfp={avatar} />
+        <HeadNav loggedIn={loggedIn} avatarUrl={avatar} isToken={isToken} />
       </div>
 
       <div
@@ -153,13 +153,13 @@ const ProfileRoute = () => {
 
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
               <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
-                <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
+                {location && <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
                   <FaMapMarkerAlt /> <Text>{location}</Text>
-                </div>
+                </div>}
 
-                <div className="flex flex-row space-x-4 justify-center items-center">
+                {job && <div className="flex flex-row space-x-4 justify-center items-center">
                   <FaBriefcase /> <Text>{job}</Text>
-                </div>
+                </div>}
               </div>
 
               {/* {isOwner && isOwner && (

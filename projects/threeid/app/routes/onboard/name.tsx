@@ -13,9 +13,10 @@ import {
   PrefetchPageLinks,
 } from "@remix-run/react";
 import { Label, TextInput, Spinner } from "flowbite-react";
+import { GraphQLClient } from "graphql-request";
 
 import { useEffect, useState } from "react";
-import { Button, ButtonSize, ButtonType } from "~/components/buttons";
+import { Button, ButtonSize } from "~/components/buttons";
 
 import Heading from "~/components/typography/Heading";
 import Text, {
@@ -23,29 +24,32 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { oortSend } from "~/utils/rpc.server";
-import { getUserSession } from "~/utils/session.server";
+import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getUserSession(request);
-  const jwt = session.get("jwt");
+  const jwt = await requireJWT(request);
 
-  const data = await oortSend(
-    "kb_getObject",
-    ["3id.profile", "public_profile"],
-    {
-      jwt,
-    }
-  );
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
+    fetch,
+  });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
   return json({
-    displayname: data.result?.value?.displayname,
+    displayname: profileRes.profile?.displayName,
   });
 };
 
 export const action: ActionFunction = async ({ request }) => {
+  const jwt = await requireJWT(request);
   const session = await getUserSession(request);
-  const jwt = session.get("jwt");
+  const address = session.get("address");
 
   const form = await request.formData();
   const displayname = form.get("displayname");
@@ -59,51 +63,42 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayname = "Display Name needs to be provided";
   }
 
-  // Get existing object | error
-  const profileData = await oortSend(
-    "kb_getObject",
-    ["3id.profile", "public_profile"],
-    {
-      jwt,
-    }
-  );
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
+    fetch,
+  });
 
-  if (profileData.error) {
-    errors.profile = "Failed persisting displayname";
-  }
+  const galaxySdk = getSdk(gqlClient);
 
-  let profile = null;
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
-  // Create new profile object
-  if (!profileData.result?.value) {
-    profile = {};
-  } else {
-    // Populate profile object with stored properties
-    profile = profileData.result.value;
-  }
-
-  // Update properties
-  profile.displayname = displayname;
+  let prof = profileRes.profile;
 
   // PUT new object
-  const updatedProfileData = await oortSend(
-    "kb_putObject",
-    [
-      "3id.profile",
-      "public_profile",
-      profile,
-      {
-        visibility: "public",
-      },
-    ],
+  await gqlClient.request(
+    `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+    updateThreeIDProfile(profile: $profile, visibility: $visibility)
+  }`,
     {
-      jwt,
+      profile: {
+        id: address, // TODO: Figure out what's up with ID
+        displayName: displayname?.toString(),
+        bio: prof?.bio,
+        job: prof?.job,
+        location: prof?.location,
+        website: prof?.website,
+        avatar: prof?.avatar,
+        cover: prof?.cover,
+        isToken: prof?.isToken,
+      },
+      visibility: Visibility.Public,
+    },
+    {
+      "KBT-Access-JWT-Assertion": jwt,
     }
   );
-
-  if (updatedProfileData.error) {
-    errors.displayname = "Failed persisting displayname";
-  }
 
   if (Object.keys(errors).length) {
     return json(errors, { status: 422 });

@@ -6,7 +6,6 @@ import styles from "~/styles/auth.css";
 import logo from "~/assets/three-id-logo.svg";
 
 import { requireJWT } from "~/utils/session.server";
-import { oortSend } from "~/utils/rpc.server";
 
 import {
   configureChains,

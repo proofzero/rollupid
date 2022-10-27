@@ -37,8 +37,10 @@ import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher"
 
 import { abi } from "~/assets/abi/mintpfp.json";
 
-import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
+import { GraphQLClient } from "graphql-request";
+import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -49,50 +51,54 @@ export const loader: LoaderFunction = loadVoucherLoader;
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
+  const address = session.get("address");
 
   const formData = await request.formData();
 
   const imgUrl = formData.get("imgUrl");
-  const contractAddress = formData.get("contractAddress");
   const isToken = formData.get("isToken");
 
   // Get existing object | error
-  const profileData = await oortSend(
-    "kb_getObject",
-    ["3id.profile", "public_profile"],
-    {
-      jwt,
-    }
-  );
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
+    fetch,
+  });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
   let profile = null;
 
   // Create new profile object
-  if (!profileData.result?.value) {
+  if (!profileRes.profile) {
     profile = {};
   } else {
     // Populate profile object with stored properties
-    profile = profileData.result.value;
+    profile = profileRes.profile;
   }
 
-  profile.pfp = {
-    url: imgUrl,
-    contractAddress: contractAddress,
-    isToken: true,
-  };
-
-  await oortSend(
-    "kb_putObject",
-    [
-      "3id.profile",
-      "public_profile",
-      profile,
-      {
-        visibility: "public",
-      },
-    ],
+  await gqlClient.request(
+    `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+    updateThreeIDProfile(profile: $profile, visibility: $visibility)
+  }`,
     {
-      jwt,
+      profile: {
+        id: address, // TODO: Figure out what's up with ID
+        displayName: profile.displayName,
+        bio: profile.bio,
+        job: profile.job,
+        location: profile.location,
+        website: profile.website,
+        avatar: imgUrl?.toString(),
+        isToken: isToken?.valueOf() as boolean,
+      },
+      visibility: Visibility.Public,
+    },
+    {
+      "KBT-Access-JWT-Assertion": jwt,
     }
   );
 
@@ -434,7 +440,7 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24" />}
+          {!imgUrl ? <Spinner /> : <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -447,7 +453,7 @@ const OnboardMint = () => {
               transform: "scale(1.2)",
             }}
           >
-            <img src={imgUrl} className="w-24 h-24" />
+            <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />
           </div>
         </div>
 
@@ -580,7 +586,6 @@ const OnboardMint = () => {
                     submit(
                       {
                         imgUrl,
-                        contractAddress,
                       },
                       {
                         method: "post",
@@ -603,7 +608,6 @@ const OnboardMint = () => {
                   submit(
                     {
                       imgUrl,
-                      contractAddress,
                       isToken: "true",
                     },
                     {
