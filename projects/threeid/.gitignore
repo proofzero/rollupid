@@ -22,3 +22,5 @@ deploy.edn
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+galaxy.server.ts

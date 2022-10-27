@@ -17,6 +17,8 @@ jobs:
           cache: "yarn"
       - name: Install
         run: yarn install
+      - name: Code Generation
+        run: yarn gql
       - name: Build
         run: yarn build
       - name: Test
