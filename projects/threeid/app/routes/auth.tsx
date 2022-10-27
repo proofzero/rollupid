@@ -25,24 +25,6 @@ export function links() {
   return [...spinnerLinks(), { rel: "stylesheet", href: styles }];
 }
 
-// @ts-ignore
-export const loader = async ({ request }) => {
-  const session = await getUserSession(request);
-  if (session.has("jwt")) {
-    const claimsRes = await oortSend("kb_getCoreClaims", [], {
-      jwt: session.get("jwt"),
-    });
-
-    if (claimsRes.result && claimsRes.result.includes("3id.enter")) {
-      return redirect("/account");
-    }
-
-    requireJWT(request);
-  }
-
-  return null;
-};
-
 export default function Auth() {
   const { chains, provider, webSocketProvider } = configureChains(
     defaultChains,

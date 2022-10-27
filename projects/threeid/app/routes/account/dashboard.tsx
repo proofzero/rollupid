@@ -40,9 +40,12 @@ export const loader = async ({ request }) => {
   };
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
@@ -50,19 +53,17 @@ export const loader = async ({ request }) => {
     "KBT-Access-JWT-Assertion": jwt,
   });
 
-
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, namesRes] =
-    await Promise.all([
-      oortSend("3id_getInviteCode", [], oortOptions),
-      oortSend("kb_getObject", ["3id.app", "feature_vote_count"], oortOptions),
-      oortSend("kb_getCoreAddresses", [["ens"]], oortOptions),
-    ]);
+  const [inviteCodeRes, votesRes, namesRes] = await Promise.all([
+    oortSend("3id_getInviteCode", [], oortOptions),
+    oortSend("kb_getObject", ["3id.app", "feature_vote_count"], oortOptions),
+    oortSend("kb_getCoreAddresses", [["ens"]], oortOptions),
+  ]);
 
   if (inviteCodeRes.error || votesRes.error) {
-    return json({ error: "Error fetching invite codes" }, { status: 500 });
+    console.log("error", inviteCodeRes.error, votesRes.error);
+    // return json({ error: "Error fetching invite codes" }, { status: 500 });
   }
-  console.log("HERE");
 
   if (namesRes.error) {
     return redirect("/onboard");
@@ -71,7 +72,7 @@ export const loader = async ({ request }) => {
   const [inviteCode, votes, isToken, displayname, names] = [
     inviteCodeRes.result,
     votesRes.result,
-    profileRes.profile?.isToken,
+    profileRes.profile?.pfp.isToken,
     profileRes.profile?.displayName,
     namesRes.result,
   ];

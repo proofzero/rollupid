@@ -48,7 +48,7 @@ export const loader: LoaderFunction = async (args) => {
     ...profileJson,
     isOwner,
     targetAddress: params.profile,
-    loggedIn: jwt ? true : false,
+    loggedIn: jwt ? { address } : false,
   });
 };
 
@@ -62,7 +62,7 @@ const ProfileRoute = () => {
     location,
     isOwner,
     loggedIn,
-    avatar,
+    pfp,
     cover,
     isToken,
   } = useLoaderData();
@@ -70,11 +70,16 @@ const ProfileRoute = () => {
   return (
     <div className="bg-white h-full min-h-screen">
       <div
+        className="lg:px-4"
         style={{
           backgroundColor: "#192030",
         }}
       >
-        <HeadNav loggedIn={loggedIn} avatarUrl={avatar} isToken={isToken} />
+        <HeadNav
+          loggedIn={loggedIn}
+          avatarUrl={pfp.image}
+          isToken={pfp.isToken}
+        />
       </div>
 
       <div
@@ -90,7 +95,7 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={gatewayFromIpfs(avatar)}
+              avatarUrl={gatewayFromIpfs(pfp.image)}
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
               isNft={isToken}
@@ -153,13 +158,17 @@ const ProfileRoute = () => {
 
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
               <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
-                {location && <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
-                  <FaMapMarkerAlt /> <Text>{location}</Text>
-                </div>}
+                {location && (
+                  <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
+                    <FaMapMarkerAlt /> <Text>{location}</Text>
+                  </div>
+                )}
 
-                {job && <div className="flex flex-row space-x-4 justify-center items-center">
-                  <FaBriefcase /> <Text>{job}</Text>
-                </div>}
+                {job && (
+                  <div className="flex flex-row space-x-4 justify-center items-center">
+                    <FaBriefcase /> <Text>{job}</Text>
+                  </div>
+                )}
               </div>
 
               {/* {isOwner && isOwner && (

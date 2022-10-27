@@ -1,13 +1,20 @@
 import { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { GraphQLClient } from "graphql-request";
+import { redirect } from "react-router";
 import {
   fetchVoucher,
   getCachedVoucher,
   putCachedVoucher,
 } from "~/helpers/voucher";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import {
+  getSdk,
+  ThreeIdProfile,
+  Visibility,
+  Nftpfp,
+} from "~/utils/galaxy.server";
 import { getUserSession } from "~/utils/session.server";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request);
@@ -27,21 +34,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let voucher = await getCachedVoucher(address);
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    // @ts-ignore
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
   const profileRes = await galaxySdk.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
-
-  let prof = profileRes.profile;
+  const prof = profileRes.profile;
 
   if (voucher) {
-    if (!voucher.minted && prof?.isToken) {
+    if (!voucher.minted && prof?.pfp?.isToken) {
       // If minted update voucher cache
       voucher = await putCachedVoucher(address, {
         ...voucher,
@@ -53,18 +62,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     voucher = await putCachedVoucher(address, voucher);
   }
 
-  if (!prof?.avatar) {
-    await galaxySdk.updateProfile({
+  if (!prof?.pfp) {
+    await galaxySdk.updateProfile(
+      {
         profile: {
-          id: address, // TODO: Figure out what's up with ID
-          displayName: prof?.displayName,
-          bio: prof?.bio,
-          job: prof?.job,
-          location: prof?.location,
-          website: prof?.website,
-          avatar: voucher.metadata.image,
-          cover: voucher.metadata.cover,
-          isToken: prof?.isToken,
+          pfp: {
+            image: gatewayFromIpfs(voucher?.metadata?.image),
+          },
+          cover: gatewayFromIpfs(voucher?.metadata?.cover),
         },
         visibility: Visibility.Public,
       },
@@ -72,6 +77,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         "KBT-Access-JWT-Assertion": jwt,
       }
     );
+  }
+
+  if (voucher.minted) {
+    return redirect("/onboard/ens");
   }
 
   return json(voucher);

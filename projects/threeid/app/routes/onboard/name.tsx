@@ -24,26 +24,28 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { getSdk, ThreeIdProfile, Visibility } from "~/utils/galaxy.server";
 import { getUserSession, requireJWT } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
   const profileRes = await galaxySdk.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
+  const profile = profileRes.profile;
 
-  return json({
-    displayname: profileRes.profile?.displayName,
-  });
+  return json(profile);
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -64,30 +66,20 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  let prof = profileRes.profile;
-
   // PUT new object
-  await galaxySdk.updateProfile({
+  await galaxySdk.updateProfile(
+    {
       profile: {
-        id: address, // TODO: Figure out what's up with ID
         displayName: displayname?.toString(),
-        bio: prof?.bio,
-        job: prof?.job,
-        location: prof?.location,
-        website: prof?.website,
-        avatar: prof?.avatar,
-        cover: prof?.cover,
-        isToken: prof?.isToken,
       },
       visibility: Visibility.Public,
     },
@@ -105,7 +97,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const OnboardDisplayname = () => {
-  const { displayname: storedDisplayname } = useLoaderData();
+  const { displayName: storedDisplayname } = useLoaderData();
   const [displayname, setDisplayname] = useState(storedDisplayname || "");
 
   const fetcher = useFetcher();

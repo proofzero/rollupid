@@ -1,29 +1,50 @@
 export default /* GraphQL */ `
   query getProfile {
     profile {
-      avatar,
-      cover,
-      isToken,
-      displayName,
-      location,
-      job,
-      bio,
-      website
+      displayName
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      ... on ThreeIDProfile {
+        cover
+        location
+        job
+        bio
+        website
+      }
     }
-  },
+  }
   query getProfileFromAddress($address: String!) {
     profileFromAddress(address: $address) {
       displayName
-      avatar
-      cover
-      isToken
-      bio
-      job
-      location
-      website
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      ... on ThreeIDProfile {
+        cover
+        location
+        job
+        bio
+        website
+      }
     }
-  },
-  mutation updateProfile($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+  }
+  mutation updateProfile(
+    $profile: ThreeIDProfileInput
+    $visibility: Visibility!
+  ) {
     updateThreeIDProfile(profile: $profile, visibility: $visibility)
   }
 `;

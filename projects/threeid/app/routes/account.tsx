@@ -41,42 +41,25 @@ export const loader = async ({ request }) => {
   const address = session.get("address");
   const core = session.get("core");
 
-  const oortOptions = {
-    jwt: jwt,
-  };
-
   // @ts-ignore
   const proof = await PROOFS.get(address);
-  !proof && redirect("/auth");
+  if (!proof) {
+    return redirect(`/auth/gate/${address}`);
+  }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
-  let profileRes;
-  try {
-    // Exception thrown from oort if profile object is null
-    profileRes = await galaxySdk.getProfile(undefined, {
-      "KBT-Access-JWT-Assertion": jwt,
-    });
-  } catch (x) {
-    await galaxySdk.updateProfile({
-      profile: {
-        id: address, // TODO: Figure out what's up with ID
-      },
-      visibility: Visibility.Public,
-    },
-      {
-        "KBT-Access-JWT-Assertion": jwt,
-      });
-
-    profileRes = await galaxySdk.getProfile(undefined, {
-      "KBT-Access-JWT-Assertion": jwt,
-    });
-  }
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
   // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core);
@@ -88,7 +71,10 @@ export const loader = async ({ request }) => {
   }
 
   // @ts-ignore
-  const [avatarUrl, isToken] = [profileRes.profile?.avatar, profileRes.profile?.isToken];
+  const [avatarUrl, isToken] = [
+    profileRes.profile?.pfp?.image,
+    profileRes.profile?.prp?.isToken,
+  ];
 
   return json({
     address,
@@ -124,7 +110,11 @@ export default function AccountLayout() {
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav avatarUrl={avatarUrl} isToken={isToken} loggedIn={{ address }} />
+          <HeadNav
+            avatarUrl={avatarUrl}
+            isToken={isToken}
+            loggedIn={{ address }}
+          />
         </div>
 
         <main className="-mt-72">

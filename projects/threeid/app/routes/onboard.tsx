@@ -5,7 +5,7 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import styles from "~/styles/auth.css";
 import logo from "~/assets/three-id-logo.svg";
 
-import { requireJWT } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 import {
   configureChains,
@@ -24,6 +24,13 @@ export function links() {
 // @ts-ignore
 export const loader = async ({ request }) => {
   await requireJWT(request);
+
+  const address = (await getUserSession(request)).get("address");
+  //@ts-ignore
+  const proof = await PROOFS.get(address);
+  if (!proof) {
+    return redirect(`/auth/gate/${address}`);
+  }
 
   if (
     !request.url.includes("name") &&

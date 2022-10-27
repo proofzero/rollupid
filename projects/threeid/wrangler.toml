@@ -9,19 +9,8 @@ name = "threeid-dapp"
 # either route or workers_dev, but not both.
 workers_dev = true
 
-[site]
-  bucket = "./public"
-
-[build]
-  command = "yarn generate:css && yarn build"
-
-[dev]
-port = 9797
-local_protocol = "http"
-
-# development (development) is the default environment
+# The default environment
 # ------------------------------------------------------------------------------
-[env.dev]
 # name = "three-id-dev"
 # # Whether or not the worker should be deployed to *.workers.dev. Can use
 # # either route or workers_dev, but not both.
@@ -34,8 +23,17 @@ kv_namespaces = [
   { binding = "ONBOARD_STATE", id = "a93b535c93784db5bcb8fa084e808542", preview_id = "b4cc5928ea47429b8d1ecdf2ee05ce34" },
   { binding = "REDEEM", id = "f4e252528b864cfa837365fa223281b7", preview_id = "8445a8a0f29a44d9b3a583036d04d8f4" },
   { binding = "PROOFS", id = "4600d9fe1c57424b8d4a1bf82a315084", preview_id = "c9a57e77459e41ada486aaf898a2b9aa" },
-
 ]
+
+[site]
+  bucket = "./public"
+
+[build]
+  command = "yarn generate:css && yarn build"
+
+[dev]
+port = 9797
+local_protocol = "http"
 
 # next (staging)
 # ------------------------------------------------------------------------------

@@ -35,8 +35,8 @@ export async function oortSend(
     headers["KBT-Core-Address"] = options.address;
   }
 
-  //@ts-ignore
   const response = await fetch(
+    //@ts-ignore
     `${OORT_SCHEMA}://${OORT_HOST}:${OORT_PORT}/jsonrpc`,
     {
       method: "POST",

@@ -1,24 +1,24 @@
-import { Outlet } from '@remix-run/react'
-import { NavLink, Link } from 'react-router-dom'
+import { Outlet } from "@remix-run/react";
+import { NavLink, Link } from "react-router-dom";
 
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from '~/components/typography/Text'
+} from "~/components/typography/Text";
 
 const tabs = [
-  { name: 'Profile', to: 'profile' },
-  { name: 'Integrations', to: 'integrations' },
-  { name: 'Connected Accounts', to: 'connections' },
-]
+  { name: "Profile", to: "profile" },
+  { name: "Integrations", to: "integrations", disabled: true },
+  { name: "Connected Accounts", to: "connections", disabled: true },
+];
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function AccountSetting() {
-  const activeStyle = {}
+  const activeStyle = {};
   return (
     <div>
       <div className="mb-4">
@@ -50,19 +50,20 @@ export default function AccountSetting() {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
             {tabs.map((tab) => (
-              <NavLink
+              <a
                 key={tab.name}
-                to={tab.to}
-                prefetch="render"
+                href={!tab.disabled ? tab.to : "#"}
+                // prefetch="render"
                 className={classNames(
                   tab?.current
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                  'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                    ? "border-indigo-500 text-indigo-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                  tab.disabled ? "cursor-not-allowed opacity-50" : "",
+                  "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                 )}
               >
                 {tab.name}
-              </NavLink>
+              </a>
             ))}
           </nav>
         </div>
@@ -71,5 +72,5 @@ export default function AccountSetting() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }
