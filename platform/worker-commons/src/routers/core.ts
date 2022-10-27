@@ -8,6 +8,7 @@ import { withCors } from './cors'
  * Worker packages should extend this interface for additional bindings.
  */
 export interface CoreWorkerEnvironment {
+  Address: Fetcher
   Core: DurableObjectNamespace
 }
 
