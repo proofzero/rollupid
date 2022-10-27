@@ -52,9 +52,6 @@ jobs:
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENV: development
           DATADOG_SERVICE_NAME: 3id-application
-          # The Cloudflare API token used by wrangler.
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           OORT_HOST: oort-devnet.kubelt.com
           OORT_SCHEMA: https
           OORT_PORT: 443
@@ -80,7 +77,7 @@ jobs:
           NODE_ENV: dev
           TEST_ENV: true
           ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-          DAPP_HOST: three-id-dev.admin1337.workers.dev
+          DAPP_HOST: 3id-dev.kubelt.com
           DAPP_PORT: 443
           DAPP_SCHEMA: https
         working-directory: threeid
