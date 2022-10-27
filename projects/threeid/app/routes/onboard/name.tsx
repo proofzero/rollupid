@@ -24,7 +24,7 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { getSdk, ThreeIdProfile, Visibility } from "~/utils/galaxy.server";
 import { getUserSession, requireJWT } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -38,17 +38,20 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   );
 
+  console.log("here");
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
+  let profile: ThreeIdProfile = {};
+  try {
+    const profileRes = await galaxySdk.getProfile(undefined, {
+      "KBT-Access-JWT-Assertion": jwt,
+    });
+    profile = profileRes.profile;
+  } catch (e) {
+    console.log("No profile found");
+  }
 
-  console.log("profile", profileRes);
-
-  return json({
-    displayname: profileRes.profile?.displayName,
-  });
+  return json(profile);
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -77,25 +80,18 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   const galaxySdk = getSdk(gqlClient);
+  // const profileRes = await galaxySdk.getProfile(undefined, {
+  //   "KBT-Access-JWT-Assertion": jwt,
+  // });
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  let prof = profileRes.profile;
+  // let prof = profileRes.profile;
+  // console.log("PROFILE", prof);
 
   // PUT new object
-  await galaxySdk.updateProfile({
+  await galaxySdk.updateProfile(
+    {
       profile: {
-        id: address, // TODO: Figure out what's up with ID
         displayName: displayname?.toString(),
-        bio: prof?.bio,
-        job: prof?.job,
-        location: prof?.location,
-        website: prof?.website,
-        avatar: prof?.avatar,
-        cover: prof?.cover,
-        isToken: prof?.isToken,
       },
       visibility: Visibility.Public,
     },

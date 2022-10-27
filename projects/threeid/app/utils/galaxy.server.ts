@@ -33,12 +33,31 @@ export type MutationUpdateThreeIdProfileArgs = {
   visibility: Visibility;
 };
 
+export type Nftpfp = Pfp & {
+  __typename?: 'NFTPFP';
+  image?: Maybe<Scalars['String']>;
+  isToken?: Maybe<Scalars['Boolean']>;
+};
+
+export type Pfp = {
+  image?: Maybe<Scalars['String']>;
+};
+
+export type PfpInput = {
+  image: Scalars['String'];
+  isToken?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type Profile = {
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   address?: Maybe<ThreeIdAddress>;
   addresses?: Maybe<Array<Maybe<ThreeIdAddress>>>;
-  profile?: Maybe<ThreeIdProfile>;
-  profileFromAddress?: Maybe<ThreeIdProfile>;
+  profile: Profile;
+  profileFromAddress?: Maybe<Profile>;
 };
 
 
@@ -47,13 +66,13 @@ export type QueryAddressArgs = {
 };
 
 
-export type QueryProfileArgs = {
-  id?: InputMaybe<Scalars['ID']>;
-};
-
-
 export type QueryProfileFromAddressArgs = {
   address: Scalars['String'];
+};
+
+export type StandardPfp = Pfp & {
+  __typename?: 'StandardPFP';
+  image?: Maybe<Scalars['String']>;
 };
 
 export type ThreeIdAddress = {
@@ -77,28 +96,26 @@ export enum ThreeIdAddressType {
   Ethereum = 'ETHEREUM'
 }
 
-export type ThreeIdProfile = {
+export type ThreeIdProfile = Profile & {
   __typename?: 'ThreeIDProfile';
   addresses?: Maybe<Array<ThreeIdAddress>>;
-  avatar?: Maybe<Scalars['String']>;
   bio?: Maybe<Scalars['String']>;
   cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
-  isToken?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
+  pfp?: Maybe<Pfp>;
   website?: Maybe<Scalars['String']>;
 };
 
 export type ThreeIdProfileInput = {
-  avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
   cover?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
-  id: Scalars['ID'];
-  isToken?: InputMaybe<Scalars['Boolean']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
+  pfp?: InputMaybe<PfpInput>;
   website?: InputMaybe<Scalars['String']>;
 };
 
@@ -111,14 +128,14 @@ export enum Visibility {
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'ThreeIDProfile', avatar?: string | null, cover?: string | null, isToken?: boolean | null, displayName?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile: { __typename?: 'ThreeIDProfile', cover?: string | null, displayName?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   address: Scalars['String'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', displayName?: string | null, avatar?: string | null, cover?: string | null, isToken?: boolean | null, bio?: string | null, job?: string | null, location?: string | null, website?: string | null } | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', cover?: string | null, displayName?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type UpdateProfileMutationVariables = Exact<{
   profile?: InputMaybe<ThreeIdProfileInput>;
@@ -132,28 +149,46 @@ export type UpdateProfileMutation = { __typename?: 'Mutation', updateThreeIDProf
 export const GetProfileDocument = gql`
     query getProfile {
   profile {
-    avatar
-    cover
-    isToken
-    displayName
-    location
-    job
-    bio
-    website
+    ... on ThreeIDProfile {
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      cover
+      displayName
+      location
+      job
+      bio
+      website
+    }
   }
 }
     `;
 export const GetProfileFromAddressDocument = gql`
     query getProfileFromAddress($address: String!) {
   profileFromAddress(address: $address) {
-    displayName
-    avatar
-    cover
-    isToken
-    bio
-    job
-    location
-    website
+    ... on ThreeIDProfile {
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      cover
+      displayName
+      location
+      job
+      bio
+      website
+    }
   }
 }
     `;

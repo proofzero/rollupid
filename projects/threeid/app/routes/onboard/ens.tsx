@@ -1,8 +1,4 @@
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-} from "@remix-run/cloudflare";
+import { ActionFunction, json, LoaderFunction } from "@remix-run/cloudflare";
 
 import {
   useLoaderData,
@@ -14,10 +10,7 @@ import {
   PrefetchPageLinks,
 } from "@remix-run/react";
 
-import {
-  Label,
-  Spinner,
-} from "flowbite-react";
+import { Label, Spinner } from "flowbite-react";
 
 import Heading from "~/components/typography/Heading";
 import Text, {
@@ -49,12 +42,10 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const addressLookup = await oortSend("ens_lookupAddress", [address], {
     jwt,
-    cookie: request.headers.get("Cookie") as string | undefined,
   });
 
   const coreEnsLookup = await oortSend("kb_getCoreAddresses", [["ens"]], {
     jwt,
-    cookie: request.headers.get("Cookie") as string | undefined,
   });
 
   let isSetOnCore = false;
@@ -82,12 +73,10 @@ export const action: ActionFunction = async ({ request }) => {
   if (operation === "register") {
     ensRes = await oortSend("3id_registerName", [address], {
       jwt: jwt,
-      cookie: request.headers.get("Cookie") as string,
     });
   } else {
     ensRes = await oortSend("3id_unregisterName", [address], {
       jwt: jwt,
-      cookie: request.headers.get("Cookie") as string,
     });
   }
 
@@ -103,7 +92,7 @@ const OnboardEns = () => {
 
   const submit = useSubmit();
 
-  const { isConnected, address } = useAccount()
+  const { isConnected, address } = useAccount();
   const { chain } = useNetwork();
 
   const { ensName, isSetOnCore, account } = useLoaderData();
@@ -130,7 +119,6 @@ const OnboardEns = () => {
       setInvalidAddress(false);
     }
   }, [address]);
-
 
   useEffect(() => {
     if (data?.error && data.operation === "register") {
@@ -179,23 +167,36 @@ const OnboardEns = () => {
     <>
       <ol role="list" className="mx-auto flex items-center space-x-5">
         <li>
-          <a href="/onboard/name" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+          <a
+            href="/onboard/name"
+            className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900"
+          >
             <span className="sr-only">{"Display Name"}</span>
           </a>
         </li>
 
         <li>
-          <a href="/onboard/mint" className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900">
+          <a
+            href="/onboard/mint"
+            className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900"
+          >
             <span className="sr-only">{"Mint"}</span>
           </a>
         </li>
 
         <li>
-          <a href={"/onboard/ens"} className="relative flex items-center justify-center" aria-current="step">
+          <a
+            href={"/onboard/ens"}
+            className="relative flex items-center justify-center"
+            aria-current="step"
+          >
             <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
               <span className="h-full w-full rounded-full bg-indigo-200" />
             </span>
-            <span className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600" aria-hidden="true" />
+            <span
+              className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600"
+              aria-hidden="true"
+            />
             <span className="sr-only">{"ENS"}</span>
           </a>
         </li>
@@ -242,36 +243,50 @@ const OnboardEns = () => {
               </Text>
             </div>
 
-            {invalidChain && <Text
-              className="ml-3"
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}>
-              **Please select switch your network to {window.ENV.VALID_CHAIN_ID_NAME}**
-            </Text>}
-            {invalidAddress && <Text
-              className="ml-3"
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}>
-              **Please connect your wallet to {account}**
-            </Text>}
-            {!isConnected && <Text
-              className="ml-3"
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}>
-              **Please unlock your wallet and reload the page**
-            </Text>}
-            {!invalidChain && !invalidAddress && isConnected &&
+            {invalidChain && (
+              <Text
+                className="ml-3"
+                size={TextSize.SM}
+                weight={TextWeight.Medium500}
+              >
+                **Please select switch your network to{" "}
+                {window.ENV.VALID_CHAIN_ID_NAME}**
+              </Text>
+            )}
+            {invalidAddress && (
+              <Text
+                className="ml-3"
+                size={TextSize.SM}
+                weight={TextWeight.Medium500}
+              >
+                **Please connect your wallet to {account}**
+              </Text>
+            )}
+            {!isConnected && (
+              <Text
+                className="ml-3"
+                size={TextSize.SM}
+                weight={TextWeight.Medium500}
+              >
+                **Please unlock your wallet and reload the page**
+              </Text>
+            )}
+            {!invalidChain && !invalidAddress && isConnected && (
               <Label htmlFor="use-ens">
                 <div className="flex flex-row space-x-3.5 items-center">
                   <label
                     htmlFor="use-ens"
-                    className={`inline-flex relative items-center mb-5 cursor-${!validating && !ensName ? "default" : "pointer"}`}
+                    className={`inline-flex relative items-center mb-5 cursor-${
+                      !validating && !ensName ? "default" : "pointer"
+                    }`}
                   >
                     {!validating && ensName && (
                       <>
                         <input
                           type="checkbox"
-                          onChange={(evt) => handleEnsToggle(evt.target.checked)}
+                          onChange={(evt) =>
+                            handleEnsToggle(evt.target.checked)
+                          }
                           checked={ensChecked}
                           id="use-ens"
                           className="sr-only peer"
@@ -304,7 +319,7 @@ const OnboardEns = () => {
                   </label>
                 </div>
               </Label>
-            }
+            )}
           </div>
         </div>
       </section>
@@ -313,30 +328,33 @@ const OnboardEns = () => {
         id="onboard-ens-actions"
         className="flex justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        {transition.state === "submitting" || transition.state === "loading" ? <Spinner /> : (<>
-
-          <div className="w-full lg:w-auto">
-            <Button
-              type={ButtonType.Secondary}
-              size={ButtonSize.L}
-              onClick={() => {
-                // @ts-ignore
-                navigate(`/onboard/mint`);
-              }}
+        {transition.state === "submitting" || transition.state === "loading" ? (
+          <Spinner />
+        ) : (
+          <>
+            <div className="w-full lg:w-auto">
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.L}
+                onClick={() => {
+                  // @ts-ignore
+                  navigate(`/onboard/mint`);
+                }}
+              >
+                Back
+              </Button>
+            </div>
+            <Form
+              className="w-full lg:w-auto"
+              method="post"
+              action="/onboard/complete"
             >
-              Back
-            </Button>
-          </div>
-          <Form className="w-full lg:w-auto" method="post" action="/onboard/complete">
-            <Button
-              isSubmit={true}
-              disabled={validating}
-              size={ButtonSize.L}
-            >
-              Finish
-            </Button>
-          </Form>
-        </>)}
+              <Button isSubmit={true} disabled={validating} size={ButtonSize.L}>
+                Finish
+              </Button>
+            </Form>
+          </>
+        )}
       </section>
       <PrefetchPageLinks page="/onboard/mint" />
     </>

@@ -26,20 +26,15 @@ export function links() {
 }
 
 // @ts-ignore
-export const loader = async ({ request }) => {
+export const loader = async ({ request, params }) => {
   const session = await getUserSession(request);
   if (session.has("jwt")) {
-    const claimsRes = await oortSend("kb_getCoreClaims", [], {
-      jwt: session.get("jwt"),
-    });
-
-    if (claimsRes.result && claimsRes.result.includes("3id.enter")) {
-      return redirect("/account");
+    //@ts-ignore
+    const proof = await PROOFS.get(params.address);
+    if (!proof) {
+      return redirect("/auth/gate");
     }
-
-    requireJWT(request);
   }
-
   return null;
 };
 

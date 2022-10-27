@@ -51,44 +51,25 @@ export const loader: LoaderFunction = loadVoucherLoader;
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
-  const address = session.get("address");
 
   const formData = await request.formData();
 
-  const imgUrl = formData.get("imgUrl");
+  // const imgUrl = formData.get("imgUrl");
   const isToken = formData.get("isToken");
 
   // Get existing object | error
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  let profile = null;
-
-  // Create new profile object
-  if (!profileRes.profile) {
-    profile = {};
-  } else {
-    // Populate profile object with stored properties
-    profile = profileRes.profile;
-  }
-
-  await galaxySdk.updateProfile({
+  await galaxySdk.updateProfile(
+    {
       profile: {
-        id: address, // TODO: Figure out what's up with ID
-        displayName: profile.displayName,
-        bio: profile.bio,
-        job: profile.job,
-        location: profile.location,
-        website: profile.website,
-        avatar: imgUrl?.toString(),
         isToken: isToken?.valueOf() as boolean,
       },
       visibility: Visibility.Public,
@@ -97,7 +78,6 @@ export const action: ActionFunction = async ({ request }) => {
       "KBT-Access-JWT-Assertion": jwt,
     }
   );
-
   return redirect("/onboard/ens");
 };
 
@@ -116,13 +96,6 @@ const OnboardMintLand = ({
   isInvalidChain,
   onClick,
 }: OnboardMintLandingProps) => {
-  const traitNames = {
-    trait0: "Generation",
-    trait1: "Priority",
-    trait2: "Friend",
-    trait3: "Points",
-  };
-
   return (
     <>
       {!minted && !isInvalidChain && !isInvalidAddress && (
@@ -283,6 +256,7 @@ const OnboardMint = () => {
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
   });
+  const submit = useSubmit();
 
   useEffect(() => {
     if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
@@ -300,8 +274,6 @@ const OnboardMint = () => {
       setInvalidAddress(false);
     }
   }, [address]);
-
-  const submit = useSubmit();
 
   useEffect(() => {
     if (screen === "proc" && isError) {
@@ -436,7 +408,11 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          {!imgUrl ? <Spinner /> : <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />}
+          {!imgUrl ? (
+            <Spinner />
+          ) : (
+            <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />
+          )}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -579,11 +555,13 @@ const OnboardMint = () => {
                   type={ButtonType.Secondary}
                   size={ButtonSize.L}
                   onClick={() => {
+                    console.log("skip");
                     submit(
                       {
                         imgUrl,
                       },
                       {
+                        action: "/onboard/mint?index",
                         method: "post",
                       }
                     );
@@ -607,6 +585,7 @@ const OnboardMint = () => {
                       isToken: "true",
                     },
                     {
+                      action: "/onboard/mint?index",
                       method: "post",
                     }
                   );

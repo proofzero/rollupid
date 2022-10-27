@@ -32,12 +32,31 @@ export type MutationUpdateThreeIdProfileArgs = {
   visibility: Visibility;
 };
 
+export type Nftpfp = Pfp & {
+  __typename?: 'NFTPFP';
+  image?: Maybe<Scalars['String']>;
+  isToken?: Maybe<Scalars['Boolean']>;
+};
+
+export type Pfp = {
+  image?: Maybe<Scalars['String']>;
+};
+
+export type PfpInput = {
+  image: Scalars['String'];
+  isToken?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type Profile = {
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   address?: Maybe<ThreeIdAddress>;
   addresses?: Maybe<Array<Maybe<ThreeIdAddress>>>;
-  profile?: Maybe<ThreeIdProfile>;
-  profileFromAddress?: Maybe<ThreeIdProfile>;
+  profile: Profile;
+  profileFromAddress?: Maybe<Profile>;
 };
 
 
@@ -46,13 +65,13 @@ export type QueryAddressArgs = {
 };
 
 
-export type QueryProfileArgs = {
-  id?: InputMaybe<Scalars['ID']>;
-};
-
-
 export type QueryProfileFromAddressArgs = {
   address: Scalars['String'];
+};
+
+export type StandardPfp = Pfp & {
+  __typename?: 'StandardPFP';
+  image?: Maybe<Scalars['String']>;
 };
 
 export type ThreeIdAddress = {
@@ -76,28 +95,26 @@ export enum ThreeIdAddressType {
   Ethereum = 'ETHEREUM'
 }
 
-export type ThreeIdProfile = {
+export type ThreeIdProfile = Profile & {
   __typename?: 'ThreeIDProfile';
   addresses?: Maybe<Array<ThreeIdAddress>>;
-  avatar?: Maybe<Scalars['String']>;
   bio?: Maybe<Scalars['String']>;
   cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
-  isToken?: Maybe<Scalars['Boolean']>;
+  id?: Maybe<Scalars['ID']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
+  pfp?: Maybe<Pfp>;
   website?: Maybe<Scalars['String']>;
 };
 
 export type ThreeIdProfileInput = {
-  avatar?: InputMaybe<Scalars['String']>;
   bio?: InputMaybe<Scalars['String']>;
   cover?: InputMaybe<Scalars['String']>;
   displayName?: InputMaybe<Scalars['String']>;
-  id: Scalars['ID'];
-  isToken?: InputMaybe<Scalars['Boolean']>;
   job?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
+  pfp?: InputMaybe<PfpInput>;
   website?: InputMaybe<Scalars['String']>;
 };
 
@@ -179,7 +196,12 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Mutation: ResolverTypeWrapper<{}>;
+  NFTPFP: ResolverTypeWrapper<Nftpfp>;
+  PFP: ResolversTypes['NFTPFP'] | ResolversTypes['StandardPFP'];
+  PFPInput: PfpInput;
+  Profile: ResolversTypes['ThreeIDProfile'];
   Query: ResolverTypeWrapper<{}>;
+  StandardPFP: ResolverTypeWrapper<StandardPfp>;
   String: ResolverTypeWrapper<Scalars['String']>;
   ThreeIDAddress: ResolverTypeWrapper<ThreeIdAddress>;
   ThreeIDAddressInput: ThreeIdAddressInput;
@@ -194,7 +216,12 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   ID: Scalars['ID'];
   Mutation: {};
+  NFTPFP: Nftpfp;
+  PFP: ResolversParentTypes['NFTPFP'] | ResolversParentTypes['StandardPFP'];
+  PFPInput: PfpInput;
+  Profile: ResolversParentTypes['ThreeIDProfile'];
   Query: {};
+  StandardPFP: StandardPfp;
   String: Scalars['String'];
   ThreeIDAddress: ThreeIdAddress;
   ThreeIDAddressInput: ThreeIdAddressInput;
@@ -207,11 +234,32 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updateThreeIDProfile?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationUpdateThreeIdProfileArgs, 'visibility'>>;
 };
 
+export type NftpfpResolvers<ContextType = any, ParentType extends ResolversParentTypes['NFTPFP'] = ResolversParentTypes['NFTPFP']> = {
+  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  isToken?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PfpResolvers<ContextType = any, ParentType extends ResolversParentTypes['PFP'] = ResolversParentTypes['PFP']> = {
+  __resolveType: TypeResolveFn<'NFTPFP' | 'StandardPFP', ParentType, ContextType>;
+  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+};
+
+export type ProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['Profile'] = ResolversParentTypes['Profile']> = {
+  __resolveType: TypeResolveFn<'ThreeIDProfile', ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   address?: Resolver<Maybe<ResolversTypes['ThreeIDAddress']>, ParentType, ContextType, RequireFields<QueryAddressArgs, 'address'>>;
   addresses?: Resolver<Maybe<Array<Maybe<ResolversTypes['ThreeIDAddress']>>>, ParentType, ContextType>;
-  profile?: Resolver<Maybe<ResolversTypes['ThreeIDProfile']>, ParentType, ContextType, Partial<QueryProfileArgs>>;
-  profileFromAddress?: Resolver<Maybe<ResolversTypes['ThreeIDProfile']>, ParentType, ContextType, RequireFields<QueryProfileFromAddressArgs, 'address'>>;
+  profile?: Resolver<ResolversTypes['Profile'], ParentType, ContextType>;
+  profileFromAddress?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType, RequireFields<QueryProfileFromAddressArgs, 'address'>>;
+};
+
+export type StandardPfpResolvers<ContextType = any, ParentType extends ResolversParentTypes['StandardPFP'] = ResolversParentTypes['StandardPFP']> = {
+  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ThreeIdAddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['ThreeIDAddress'] = ResolversParentTypes['ThreeIDAddress']> = {
@@ -224,20 +272,24 @@ export type ThreeIdAddressResolvers<ContextType = any, ParentType extends Resolv
 
 export type ThreeIdProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['ThreeIDProfile'] = ResolversParentTypes['ThreeIDProfile']> = {
   addresses?: Resolver<Maybe<Array<ResolversTypes['ThreeIDAddress']>>, ParentType, ContextType>;
-  avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   cover?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  isToken?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   job?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  pfp?: Resolver<Maybe<ResolversTypes['PFP']>, ParentType, ContextType>;
   website?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
   Mutation?: MutationResolvers<ContextType>;
+  NFTPFP?: NftpfpResolvers<ContextType>;
+  PFP?: PfpResolvers<ContextType>;
+  Profile?: ProfileResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  StandardPFP?: StandardPfpResolvers<ContextType>;
   ThreeIDAddress?: ThreeIdAddressResolvers<ContextType>;
   ThreeIDProfile?: ThreeIdProfileResolvers<ContextType>;
 };

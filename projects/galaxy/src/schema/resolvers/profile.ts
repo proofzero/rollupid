@@ -18,22 +18,21 @@ type ResolverContext = {
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (_parent: any, { id }, { env, jwt }: ResolverContext) => {
+    profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
       const oortClient = new OortClient(env.OORT, jwt);
       const profileResponse = await oortClient.getProfile();
       checkHTTPStatus(profileResponse);
-      return getRPCResult(profileResponse);
+      const res = getRPCResult(profileResponse);
+      console.log("profile", await res);
+      return res;
     },
     profileFromAddress: async (
       _parent: any,
       { address }: { address: string },
       { env }: ResolverContext
     ) => {
-      console.log("address", address);
-      console.log("env", env.OORT);
       const oortClient = new OortClient(env.OORT);
       const profileResponse = await oortClient.getProfileFromAddress(address);
-      console.log("profileResponse", profileResponse);
       checkHTTPStatus(profileResponse);
       return getRPCResult(profileResponse);
     },
@@ -60,6 +59,22 @@ const threeIDResolvers: Resolvers = {
       );
       checkHTTPStatus(updateResponse);
       return !!getRPCResult(updateResponse);
+    },
+  },
+  Profile: {
+    __resolveType: (obj: any) => {
+      if (obj.addresses) {
+        return "ThreeIDProfile";
+      }
+      return null;
+    },
+  },
+  PFP: {
+    __resolveType: (obj: any) => {
+      if (obj.isToken) {
+        return "NFTPFP";
+      }
+      return "StandardPFP";
     },
   },
 };

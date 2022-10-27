@@ -1,12 +1,18 @@
 import { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { GraphQLClient } from "graphql-request";
+import { redirect } from "react-router";
 import {
   fetchVoucher,
   getCachedVoucher,
   putCachedVoucher,
 } from "~/helpers/voucher";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import {
+  getSdk,
+  ThreeIdProfile,
+  Visibility,
+  Nftpfp,
+} from "~/utils/galaxy.server";
 import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -27,8 +33,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let voucher = await getCachedVoucher(address);
 
-  // @ts-ignore
   const gqlClient = new GraphQLClient(
+    // @ts-ignore
     `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
     {
       fetch,
@@ -37,14 +43,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  let prof = profileRes.profile;
-
+  let prof: ThreeIdProfile = {};
+  try {
+    const profileRes = await galaxySdk.getProfile(undefined, {
+      "KBT-Access-JWT-Assertion": jwt,
+    });
+    prof = profileRes.profile;
+  } catch (e) {
+    console.log("No profile found");
+  }
+  console.log("profile", prof);
   if (voucher) {
-    if (!voucher.minted && prof?.isToken) {
+    if (!voucher.minted && prof?.pfp?.isToken) {
       // If minted update voucher cache
       voucher = await putCachedVoucher(address, {
         ...voucher,
@@ -52,27 +62,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       });
     }
   } else {
-    console.log("voucher", voucher);
-    try {
-      voucher = await fetchVoucher({ address, skipImage: !!voucher });
-    } catch (e) {
-      console.log("error fetching voucher", e);
-    }
+    voucher = await fetchVoucher({ address, skipImage: !!voucher });
     voucher = await putCachedVoucher(address, voucher);
   }
 
-  if (!prof?.avatar) {
-    await galaxySdk.updateProfile({
+  if (!prof?.pfp) {
+    await galaxySdk.updateProfile(
+      {
         profile: {
-          ...prof,
-          avatar: voucher.metadata.image,
+          pfp: {
+            image: voucher.metadata.image,
+          },
           cover: voucher.metadata.cover,
         },
+        visibility: Visibility.Public,
       },
       {
         "KBT-Access-JWT-Assertion": jwt,
       }
     );
+  }
+
+  if (voucher.minted) {
+    return redirect("/onboard/ens");
   }
 
   return json(voucher);
