@@ -33,11 +33,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfileFromAddress({
-    address,
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
   });
 
-  let prof = profileRes.profileFromAddress;
+  let prof = profileRes.profile;
 
   if (voucher) {
     if (!voucher.minted && prof?.isToken) {

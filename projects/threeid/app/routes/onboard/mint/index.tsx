@@ -65,18 +65,18 @@ export const action: ActionFunction = async ({ request }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfileFromAddress({
-    address,
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
   });
 
   let profile = null;
 
   // Create new profile object
-  if (!profileRes.profileFromAddress) {
+  if (!profileRes.profile) {
     profile = {};
   } else {
     // Populate profile object with stored properties
-    profile = profileRes.profileFromAddress;
+    profile = profileRes.profile;
   }
 
   await gqlClient.request(

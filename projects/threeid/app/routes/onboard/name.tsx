@@ -25,11 +25,10 @@ import Text, {
   TextWeight,
 } from "~/components/typography/Text";
 import { getSdk, Visibility } from "~/utils/galaxy.server";
-import { getUserSession } from "~/utils/session.server";
+import { getUserSession, requireJWT } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getUserSession(request);
-  const address = session.get("address");
+  const jwt = await requireJWT(request);
 
   const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
     fetch,
@@ -37,19 +36,19 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfileFromAddress({
-    address,
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
   });
 
   return json({
-    displayname: profileRes.profileFromAddress?.displayName,
+    displayname: profileRes.profile?.displayName,
   });
 };
 
 export const action: ActionFunction = async ({ request }) => {
+  const jwt = await requireJWT(request);
   const session = await getUserSession(request);
   const address = session.get("address");
-  const jwt = session.get("jwt");
 
   const form = await request.formData();
   const displayname = form.get("displayname");
@@ -69,11 +68,11 @@ export const action: ActionFunction = async ({ request }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfileFromAddress({
-    address,
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
   });
 
-  let prof = profileRes.profileFromAddress;
+  let prof = profileRes.profile;
 
   // PUT new object
   await gqlClient.request(
