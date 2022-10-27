@@ -41,6 +41,10 @@ command = "npm run build:test"
 format = "modules"
 
 [env.devnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "e2d48ea134874b048f49d8514e940fdb" },
   { binding = "THREEID", id = "0e056cfbebc3412199d57e8ff7579a5d" },
@@ -53,6 +57,10 @@ r2_buckets = [
 route = { pattern = "oort-devnet.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 
 [env.testnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "d2a39af5349c4c929c125176113a4430" },
   { binding = "THREEID", id = "ccbdddcdb23e41c5b6adbad935f158f0" },
@@ -68,6 +76,10 @@ route = { pattern = "oort-testnet.kubelt.com", custom_domain = true, zone_name =
 command = "yarn build:production"
 
 [env.mainnet]
+durable_objects.bindings = [
+  { name = "Address", class_name = "Address" },
+  { name = "Core", class_name = "Core" }
+]
 kv_namespaces = [
   { binding = "CORE_CLAIMS", id = "8dddff01c3b24395b5a0ea05e59dcc18" },
   { binding = "THREEID", id = "f3b97d8f6223418592174769492cc28f" },
