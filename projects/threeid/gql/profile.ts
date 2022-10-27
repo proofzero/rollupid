@@ -1,39 +1,23 @@
 export default /* GraphQL */ `
   query getProfile {
     profile {
-      ... on ThreeIDProfile {
-        pfp {
-          ... on StandardPFP {
-            image
-          }
-          ... on NFTPFP {
-            image
-            isToken
-          }
-        }
-        cover
-        displayName
-        location
-        job
-        bio
-        website
-      }
+      displayName
     }
   }
   query getProfileFromAddress($address: String!) {
     profileFromAddress(address: $address) {
-      ... on ThreeIDProfile {
-        pfp {
-          ... on StandardPFP {
-            image
-          }
-          ... on NFTPFP {
-            image
-            isToken
-          }
+      displayName
+      pfp {
+        ... on StandardPFP {
+          image
         }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      ... on ThreeIDProfile {
         cover
-        displayName
         location
         job
         bio

@@ -46,9 +46,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     const profileRes = await galaxySdk.getProfile(undefined, {
       "KBT-Access-JWT-Assertion": jwt,
     });
+    console.log("profileRes", profileRes);
     profile = profileRes.profile;
   } catch (e) {
-    console.log("No profile found");
+    console.log("No profile found", e);
   }
 
   return json(profile);

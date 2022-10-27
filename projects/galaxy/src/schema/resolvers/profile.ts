@@ -23,8 +23,10 @@ const threeIDResolvers: Resolvers = {
       const profileResponse = await oortClient.getProfile();
       checkHTTPStatus(profileResponse);
       const res = getRPCResult(profileResponse);
-      console.log("profile", await res);
-      return res;
+      console.log("profile returned from oort", await res);
+      return {
+        displayName: "test",
+      };
     },
     profileFromAddress: async (
       _parent: any,
@@ -34,7 +36,7 @@ const threeIDResolvers: Resolvers = {
       const oortClient = new OortClient(env.OORT);
       const profileResponse = await oortClient.getProfileFromAddress(address);
       checkHTTPStatus(profileResponse);
-      return getRPCResult(profileResponse);
+      return await getRPCResult(profileResponse);
     },
   },
   Mutation: {
@@ -52,6 +54,8 @@ const threeIDResolvers: Resolvers = {
         ...currentProfile,
         ...profile,
       };
+
+      // console.log("newProfile posted to oort", newProfile);
 
       const updateResponse = await oortClient.updateProfile(
         newProfile,

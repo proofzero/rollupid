@@ -48,14 +48,15 @@ export type PfpInput = {
 };
 
 export type Profile = {
-  id?: Maybe<Scalars['ID']>;
+  displayName?: Maybe<Scalars['String']>;
+  pfp?: Maybe<Pfp>;
 };
 
 export type Query = {
   __typename?: 'Query';
   address?: Maybe<ThreeIdAddress>;
   addresses?: Maybe<Array<Maybe<ThreeIdAddress>>>;
-  profile: Profile;
+  profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
 };
 
@@ -101,7 +102,6 @@ export type ThreeIdProfile = Profile & {
   bio?: Maybe<Scalars['String']>;
   cover?: Maybe<Scalars['String']>;
   displayName?: Maybe<Scalars['String']>;
-  id?: Maybe<Scalars['ID']>;
   job?: Maybe<Scalars['String']>;
   location?: Maybe<Scalars['String']>;
   pfp?: Maybe<Pfp>;
@@ -247,13 +247,14 @@ export type PfpResolvers<ContextType = any, ParentType extends ResolversParentTy
 
 export type ProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['Profile'] = ResolversParentTypes['Profile']> = {
   __resolveType: TypeResolveFn<'ThreeIDProfile', ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  pfp?: Resolver<Maybe<ResolversTypes['PFP']>, ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   address?: Resolver<Maybe<ResolversTypes['ThreeIDAddress']>, ParentType, ContextType, RequireFields<QueryAddressArgs, 'address'>>;
   addresses?: Resolver<Maybe<Array<Maybe<ResolversTypes['ThreeIDAddress']>>>, ParentType, ContextType>;
-  profile?: Resolver<ResolversTypes['Profile'], ParentType, ContextType>;
+  profile?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType>;
   profileFromAddress?: Resolver<Maybe<ResolversTypes['Profile']>, ParentType, ContextType, RequireFields<QueryProfileFromAddressArgs, 'address'>>;
 };
 
@@ -275,7 +276,6 @@ export type ThreeIdProfileResolvers<ContextType = any, ParentType extends Resolv
   bio?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   cover?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   job?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   pfp?: Resolver<Maybe<ResolversTypes['PFP']>, ParentType, ContextType>;

@@ -1,8 +1,4 @@
 export default /* GraphQL */ `
-  interface Profile {
-    id: ID
-  }
-
   interface PFP {
     image: String
   }
@@ -16,8 +12,12 @@ export default /* GraphQL */ `
     isToken: Boolean
   }
 
+  interface Profile {
+    displayName: String
+    pfp: PFP
+  }
+
   type ThreeIDProfile implements Profile {
-    id: ID
     displayName: String
     pfp: PFP
     cover: String
@@ -44,7 +44,7 @@ export default /* GraphQL */ `
   }
 
   type Query {
-    profile: Profile!
+    profile: Profile
     profileFromAddress(address: String!): Profile
   }
 
