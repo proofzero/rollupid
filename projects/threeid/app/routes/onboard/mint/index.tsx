@@ -39,6 +39,8 @@ import { abi } from "~/assets/abi/mintpfp.json";
 
 import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
+import { GraphQLClient } from "graphql-request";
+import { getSdk, Visibility } from "~/utils/galaxy.server";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -49,50 +51,53 @@ export const loader: LoaderFunction = loadVoucherLoader;
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request);
   const jwt = session.get("jwt");
+  const address = session.get("address");
 
   const formData = await request.formData();
 
   const imgUrl = formData.get("imgUrl");
-  const contractAddress = formData.get("contractAddress");
   const isToken = formData.get("isToken");
 
   // Get existing object | error
-  const profileData = await oortSend(
-    "kb_getObject",
-    ["3id.profile", "public_profile"],
-    {
-      jwt,
-    }
-  );
+  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+    fetch,
+  });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfileFromAddress({
+    address,
+  });
 
   let profile = null;
 
   // Create new profile object
-  if (!profileData.result?.value) {
+  if (!profileRes.profileFromAddress) {
     profile = {};
   } else {
     // Populate profile object with stored properties
-    profile = profileData.result.value;
+    profile = profileRes.profileFromAddress;
   }
 
-  profile.pfp = {
-    url: imgUrl,
-    contractAddress: contractAddress,
-    isToken: true,
-  };
-
-  await oortSend(
-    "kb_putObject",
-    [
-      "3id.profile",
-      "public_profile",
-      profile,
-      {
-        visibility: "public",
-      },
-    ],
+  await gqlClient.request(
+    `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+    updateThreeIDProfile(profile: $profile, visibility: $visibility)
+  }`,
     {
-      jwt,
+      profile: {
+        id: address, // TODO: Figure out what's up with ID
+        displayName: profile.displayName,
+        bio: profile.bio,
+        job: profile.job,
+        location: profile.location,
+        website: profile.website,
+        avatar: imgUrl?.toString(),
+        isToken: isToken?.valueOf() as boolean,
+      },
+      visibility: Visibility.Public,
+    },
+    {
+      "KBT-Access-JWT-Assertion": jwt,
     }
   );
 
@@ -580,7 +585,6 @@ const OnboardMint = () => {
                     submit(
                       {
                         imgUrl,
-                        contractAddress,
                       },
                       {
                         method: "post",
@@ -603,7 +607,6 @@ const OnboardMint = () => {
                   submit(
                     {
                       imgUrl,
-                      contractAddress,
                       isToken: "true",
                     },
                     {

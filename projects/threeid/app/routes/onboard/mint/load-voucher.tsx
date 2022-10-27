@@ -1,11 +1,12 @@
 import { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
+import { GraphQLClient } from "graphql-request";
 import {
   fetchVoucher,
   getCachedVoucher,
   putCachedVoucher,
 } from "~/helpers/voucher";
-import { oortSend } from "~/utils/rpc.server";
+import { getSdk, Visibility } from "~/utils/galaxy.server";
 import { getUserSession } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -26,13 +27,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let voucher = await getCachedVoucher(address);
 
-  const pfpDataRes = await oortSend("kb_getObject", ["3id.profile", "pfp"], {
-    jwt,
+  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+    fetch,
   });
-  const pfpData = pfpDataRes.result?.value;
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfileFromAddress({
+    address,
+  });
+
+  let prof = profileRes.profileFromAddress;
 
   if (voucher) {
-    if (!voucher.minted && pfpData?.isToken) {
+    if (!voucher.minted && prof?.isToken) {
       // If minted update voucher cache
       voucher = await putCachedVoucher(address, {
         ...voucher,
@@ -44,31 +52,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     voucher = await putCachedVoucher(address, voucher);
   }
 
-  if (!pfpData?.url) {
-    const setDataRes = await oortSend(
-      "kb_putObject",
-      [
-        "3id.profile",
-        "pfp",
-        {
-          url: voucher.metadata.image,
-          cover: voucher.metadata.cover,
-          //@ts-ignore
-          contractAddress: MINTPFP_CONTRACT_ADDRESS,
-          isToken: false,
-        },
-        {
-          visibility: "public",
-        },
-      ],
+  if (!prof?.avatar) {
+    await gqlClient.request(
+      `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+      updateThreeIDProfile(profile: $profile, visibility: $visibility)
+    }`,
       {
-        jwt,
+        profile: {
+          id: address, // TODO: Figure out what's up with ID
+          displayName: prof?.displayName,
+          bio: prof?.bio,
+          job: prof?.job,
+          location: prof?.location,
+          website: prof?.website,
+          avatar: voucher.metadata.image,
+          cover: voucher.metadata.cover,
+          isToken: prof?.isToken,
+        },
+        visibility: Visibility.Public,
+      },
+      {
+        "KBT-Access-JWT-Assertion": jwt,
       }
     );
-
-    if (setDataRes.error) {
-      throw new Error("Unable to persist pfp data");
-    }
   }
 
   return json(voucher);

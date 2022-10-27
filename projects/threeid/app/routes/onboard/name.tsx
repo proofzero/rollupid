@@ -73,7 +73,7 @@ export const action: ActionFunction = async ({ request }) => {
     address,
   });
 
-  let prof = profileRes.profileFromAddress || {};
+  let prof = profileRes.profileFromAddress;
 
   // PUT new object
   await gqlClient.request(
