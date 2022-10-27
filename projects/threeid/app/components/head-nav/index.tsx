@@ -18,6 +18,7 @@ import SignOutLink from "~/components/sign-out-link";
 import hexStyle from "~/helpers/hex-style";
 
 import styles from "./headNav.css";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
@@ -138,7 +139,7 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
-                            src={avatarUrl || user.imageUrl}
+                            src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                             alt=""
                             style={
                               isToken
@@ -226,7 +227,7 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
                       style={
                         isToken ? hexStyle : { visibility: "visible" }
                       } // TODO this reloads when toggled. how do we cache?
-                      src={avatarUrl || user.imageUrl}
+                      src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                       alt=""
                     />
                   </div>

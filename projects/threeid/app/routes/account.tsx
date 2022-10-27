@@ -22,7 +22,7 @@ import Text, {
   TextWeight,
 } from "~/components/typography/Text";
 import { GraphQLClient } from "graphql-request";
-import { getSdk } from "~/utils/galaxy.server";
+import { getSdk, Visibility } from "~/utils/galaxy.server";
 
 export function links() {
   return [
@@ -56,9 +56,32 @@ export const loader = async ({ request }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
+  let profileRes;
+  try {
+    // Exception thrown from oort if profile object is null
+    profileRes = await galaxySdk.getProfile(undefined, {
+      "KBT-Access-JWT-Assertion": jwt,
+    });
+  } catch (x) {
+    await gqlClient.request(
+      `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+      updateThreeIDProfile(profile: $profile, visibility: $visibility)
+    }`,
+      {
+        profile: {
+          id: address, // TODO: Figure out what's up with ID
+        },
+        visibility: Visibility.Public,
+      },
+      {
+        "KBT-Access-JWT-Assertion": jwt,
+      }
+    );
+
+    profileRes = await galaxySdk.getProfile(undefined, {
+      "KBT-Access-JWT-Assertion": jwt,
+    });
+  }
 
   // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core);

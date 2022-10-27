@@ -20,14 +20,30 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfileFromAddress({
-    address: params.profile,
-  });
+  try {
+    const profileRes = await galaxySdk.getProfileFromAddress({
+      address: params.profile,
+    });
 
-  // TODO: Handle unclaimed core
+    return json({
+      ...profileRes.profileFromAddress,
+      claimed: true,
+    });
+  } catch (e) {
+    let voucher = await getCachedVoucher(params.profile);
+    if (!voucher) {
+      voucher = await fetchVoucher({
+        address: params.profile,
+        skipImage: !!voucher,
+      });
+      voucher = await putCachedVoucher(params.profile, voucher);
+    }
 
-  return json({
-    ...profileRes.profileFromAddress,
-    claimed: true,
-  });
+    return json({
+      avatar: voucher.metadata.image,
+      cover: voucher.metadata.cover,
+      isToken: false,
+      claimed: false,
+    });
+  }
 };

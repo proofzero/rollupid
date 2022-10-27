@@ -40,6 +40,7 @@ import { abi } from "~/assets/abi/mintpfp.json";
 import { getUserSession } from "~/utils/session.server";
 import { GraphQLClient } from "graphql-request";
 import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -439,7 +440,7 @@ const OnboardMint = () => {
         className="flex-1 flex flex-col justify-center items-center"
       >
         <div className="flex flew-row justify-center items-center mb-10">
-          {!imgUrl ? <Spinner /> : <img src={imgUrl} className="w-24 h-24" />}
+          {!imgUrl ? <Spinner /> : <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />}
 
           <Text className="mx-6">{"->"}</Text>
 
@@ -452,7 +453,7 @@ const OnboardMint = () => {
               transform: "scale(1.2)",
             }}
           >
-            <img src={imgUrl} className="w-24 h-24" />
+            <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />
           </div>
         </div>
 
