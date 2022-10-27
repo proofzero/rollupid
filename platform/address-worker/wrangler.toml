@@ -1,0 +1,13 @@
+name = "core-address"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+
+[env.dev]
+name = "core-address-dev"
+
+[env.next]
+name = "core-address-next"
+
+[env.current]
+name = "core-address-current"
