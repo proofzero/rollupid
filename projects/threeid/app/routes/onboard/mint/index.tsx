@@ -37,7 +37,6 @@ import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher"
 
 import { abi } from "~/assets/abi/mintpfp.json";
 
-import { oortSend } from "~/utils/rpc.server";
 import { getUserSession } from "~/utils/session.server";
 import { GraphQLClient } from "graphql-request";
 import { getSdk, Visibility } from "~/utils/galaxy.server";
