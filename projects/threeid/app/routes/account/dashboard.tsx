@@ -28,6 +28,8 @@ import SectionTitle from "~/components/typography/SectionTitle";
 import SectionHeading from "~/components/typography/SectionHeading";
 import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
 import { ButtonAnchor, ButtonSize } from "~/components/buttons";
+import { GraphQLClient } from "graphql-request";
+import { getSdk } from "~/utils/galaxy.server";
 
 // @ts-ignore
 export const loader = async ({ request }) => {
@@ -37,13 +39,22 @@ export const loader = async ({ request }) => {
     jwt: jwt,
   };
 
+  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+    fetch,
+  });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
+
+
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, pfpRes, displaynameRes, namesRes] =
+  const [inviteCodeRes, votesRes, namesRes] =
     await Promise.all([
       oortSend("3id_getInviteCode", [], oortOptions),
       oortSend("kb_getObject", ["3id.app", "feature_vote_count"], oortOptions),
-      oortSend("kb_getObject", ["3id.profile", "pfp"], oortOptions),
-      oortSend("kb_getObject", ["3id.profile", "displayname"], oortOptions),
       oortSend("kb_getCoreAddresses", [["ens"]], oortOptions),
     ]);
 
@@ -52,22 +63,22 @@ export const loader = async ({ request }) => {
   }
   console.log("HERE");
 
-  if (pfpRes.error || displaynameRes.error || namesRes.error) {
+  if (namesRes.error) {
     return redirect("/onboard");
   }
 
-  const [inviteCode, votes, pfp, displayname, names] = [
+  const [inviteCode, votes, isToken, displayname, names] = [
     inviteCodeRes.result,
     votesRes.result,
-    pfpRes.result,
-    displaynameRes.result,
+    profileRes.profile?.isToken,
+    profileRes.profile?.displayName,
     namesRes.result,
   ];
 
   return json({
     inviteCode,
     votes,
-    pfp,
+    isToken,
     displayname,
     names,
   });
@@ -186,10 +197,10 @@ const roadmapSteps = [
 ];
 
 export default function Welcome() {
-  const { inviteCode, votes, pfp, displayname, names } = useLoaderData();
+  const { inviteCode, votes, isToken, displayname, names } = useLoaderData();
   let submit = useSubmit();
 
-  completeSteps[1].isCompleted = pfp?.value?.isToken;
+  completeSteps[1].isCompleted = isToken;
   completeSteps[2].isCompleted = names?.ens?.length;
 
   const percentage =
@@ -221,7 +232,7 @@ export default function Welcome() {
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
           <span className="order-2 text-center justify-center align-center lg:order-1">
-            Welcome to 3ID, {displayname?.value}!
+            Welcome to 3ID, {displayname}!
           </span>
           <span className="order-1 text-center justify-center align-center lg:order-2">
             🎉
