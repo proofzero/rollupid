@@ -63,20 +63,15 @@ export const loader = async ({ request }) => {
       "KBT-Access-JWT-Assertion": jwt,
     });
   } catch (x) {
-    await gqlClient.request(
-      `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
-      updateThreeIDProfile(profile: $profile, visibility: $visibility)
-    }`,
-      {
-        profile: {
-          id: address, // TODO: Figure out what's up with ID
-        },
-        visibility: Visibility.Public,
+    await galaxySdk.updateProfile({
+      profile: {
+        id: address, // TODO: Figure out what's up with ID
       },
+      visibility: Visibility.Public,
+    },
       {
         "KBT-Access-JWT-Assertion": jwt,
-      }
-    );
+      });
 
     profileRes = await galaxySdk.getProfile(undefined, {
       "KBT-Access-JWT-Assertion": jwt,

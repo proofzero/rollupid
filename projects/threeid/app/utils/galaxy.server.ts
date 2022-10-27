@@ -120,6 +120,14 @@ export type GetProfileFromAddressQueryVariables = Exact<{
 
 export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', displayName?: string | null, avatar?: string | null, cover?: string | null, isToken?: boolean | null, bio?: string | null, job?: string | null, location?: string | null, website?: string | null } | null };
 
+export type UpdateProfileMutationVariables = Exact<{
+  profile?: InputMaybe<ThreeIdProfileInput>;
+  visibility: Visibility;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateThreeIDProfile?: boolean | null };
+
 
 export const GetProfileDocument = gql`
     query getProfile {
@@ -149,6 +157,11 @@ export const GetProfileFromAddressDocument = gql`
   }
 }
     `;
+export const UpdateProfileDocument = gql`
+    mutation updateProfile($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+  updateThreeIDProfile(profile: $profile, visibility: $visibility)
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -162,6 +175,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');
+    },
+    updateProfile(variables: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProfileMutation>(UpdateProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProfile', 'mutation');
     }
   };
 }

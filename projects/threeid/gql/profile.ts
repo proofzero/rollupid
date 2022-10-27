@@ -22,5 +22,8 @@ export default /* GraphQL */ `
       location
       website
     }
+  },
+  mutation updateProfile($profile: ThreeIDProfileInput, $visibility: Visibility!) {
+    updateThreeIDProfile(profile: $profile, visibility: $visibility)
   }
 `;

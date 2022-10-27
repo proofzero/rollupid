@@ -80,11 +80,7 @@ export const action: ActionFunction = async ({ request }) => {
     profile = profileRes.profile;
   }
 
-  await gqlClient.request(
-    `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
-    updateThreeIDProfile(profile: $profile, visibility: $visibility)
-  }`,
-    {
+  await galaxySdk.updateProfile({
       profile: {
         id: address, // TODO: Figure out what's up with ID
         displayName: profile.displayName,
