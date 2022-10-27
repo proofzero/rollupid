@@ -73,7 +73,7 @@ jobs:
       - name: Install Playwright Browsers
         # if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
-        working-directory: threeid
+        working-directory: projects/threeid
       - name: Run Playwright tests
         run: npx playwright test
         env:

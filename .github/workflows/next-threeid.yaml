@@ -61,7 +61,7 @@ jobs:
           VALID_CHAIN_ID_NAME: goerli
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-        working-directory: threeid
+        working-directory: projects/threeid
       - name: Run Playwright tests
         run: npx playwright test
         env:
