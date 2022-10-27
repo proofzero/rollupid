@@ -10,11 +10,15 @@ import sad from "../../../assets/sad.png";
 
 export const links = () => [...buttonLinks()];
 
-// Fetch the nonce for address
 // @ts-ignore
-export const loader = async ({ request }) => {
+export const loader = async ({ request, params }) => {
   await requireJWT(request);
-  return null;
+  //@ts-ignore
+  const proof = await PROOFS.get(params.address);
+  if (!proof) {
+    return null;
+  }
+  return redirect(`/account`);
 };
 
 export default function AuthGate() {

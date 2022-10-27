@@ -9,8 +9,8 @@ import Text, {
 
 const tabs = [
   { name: "Profile", to: "profile" },
-  { name: "Integrations", to: "integrations" },
-  { name: "Connected Accounts", to: "connections" },
+  { name: "Integrations", to: "integrations", disabled: true },
+  { name: "Connected Accounts", to: "connections", disabled: true },
 ];
 
 function classNames(...classes) {
@@ -52,12 +52,13 @@ export default function AccountSetting() {
             {tabs.map((tab) => (
               <a
                 key={tab.name}
-                href={tab.to}
+                href={!tab.disabled ? tab.to : "#"}
                 // prefetch="render"
                 className={classNames(
                   tab?.current
                     ? "border-indigo-500 text-indigo-600"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
+                  tab.disabled ? "cursor-not-allowed opacity-50" : "",
                   "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
                 )}
               >

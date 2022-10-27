@@ -25,19 +25,6 @@ export function links() {
   return [...spinnerLinks(), { rel: "stylesheet", href: styles }];
 }
 
-// @ts-ignore
-export const loader = async ({ request, params }) => {
-  const session = await getUserSession(request);
-  if (session.has("jwt")) {
-    //@ts-ignore
-    const proof = await PROOFS.get(params.address);
-    if (!proof) {
-      return redirect("/auth/gate");
-    }
-  }
-  return null;
-};
-
 export default function Auth() {
   const { chains, provider, webSocketProvider } = configureChains(
     defaultChains,

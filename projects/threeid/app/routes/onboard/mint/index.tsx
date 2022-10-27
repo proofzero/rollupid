@@ -538,7 +538,7 @@ const OnboardMint = () => {
           <Spinner />
         ) : (
           <>
-            {screen !== "sign" && screen !== "success" && (
+            {screen !== "sign" && screen !== "success" && screen !== "proc" && (
               <>
                 <Button
                   type={ButtonType.Secondary}

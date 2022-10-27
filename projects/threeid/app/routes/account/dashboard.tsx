@@ -60,10 +60,10 @@ export const loader = async ({ request }) => {
     oortSend("kb_getCoreAddresses", [["ens"]], oortOptions),
   ]);
 
-  // if (inviteCodeRes.error || votesRes.error) {
-  //   console.log("error", inviteCodeRes.error, votesRes.error);
-  //   return json({ error: "Error fetching invite codes" }, { status: 500 });
-  // }
+  if (inviteCodeRes.error || votesRes.error) {
+    console.log("error", inviteCodeRes.error, votesRes.error);
+    // return json({ error: "Error fetching invite codes" }, { status: 500 });
+  }
 
   if (namesRes.error) {
     return redirect("/onboard");

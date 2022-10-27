@@ -41,13 +41,11 @@ export const loader = async ({ request }) => {
   const address = session.get("address");
   const core = session.get("core");
 
-  const oortOptions = {
-    jwt: jwt,
-  };
-
   // @ts-ignore
   const proof = await PROOFS.get(address);
-  !proof && redirect("/auth");
+  if (!proof) {
+    return redirect(`/auth/gate/${address}`);
+  }
 
   // @ts-ignore
   const gqlClient = new GraphQLClient(
