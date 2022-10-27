@@ -83,6 +83,7 @@ export const loader = async ({ request }) => {
     isToken,
     displayname,
     names,
+    profile: profileRes.profile,
   });
 };
 
@@ -147,9 +148,6 @@ const completeSteps = [
       </>
     ),
   },
-];
-
-const comingNext = [
   {
     title: "Configure Profile",
     description: (
@@ -162,12 +160,24 @@ const comingNext = [
         >
           Configure your NFT avatar and profile.
         </Text>
+        <a href="/account/settings">Click here to complete.</a>
+      </>
+    ),
+  },
+];
+
+const comingNext = [
+  {
+    title: "Link More Accounts",
+    description: (
+      <>
         <Text
+          className="mb-1"
           size={TextSize.SM}
           weight={TextWeight.Regular400}
           color={TextColor.Gray400}
         >
-          Tell the world about yourself...or don't! It's up to you.
+          Connect more blockchain and social accounts to your 3ID.
         </Text>
       </>
     ),
@@ -176,10 +186,10 @@ const comingNext = [
 
 const roadmapSteps = [
   {
-    title: "Create NFT gallery",
+    title: "Permission First App",
   },
   {
-    title: "Link More Accounts",
+    title: "Create NFT gallery",
   },
   {
     title: "Receive First Credential",
@@ -193,17 +203,16 @@ const roadmapSteps = [
   {
     title: "Publish First File",
   },
-  {
-    title: "Permission First App",
-  },
 ];
 
 export default function Welcome() {
-  const { inviteCode, votes, isToken, displayname, names } = useLoaderData();
+  const { inviteCode, votes, isToken, displayname, names, profile } =
+    useLoaderData();
   let submit = useSubmit();
 
   completeSteps[1].isCompleted = isToken;
   completeSteps[2].isCompleted = names?.ens?.length;
+  completeSteps[3].isCompleted = Object.keys(profile || {}).length > 1;
 
   const percentage =
     (completeSteps.filter((step) => step.isCompleted).length /

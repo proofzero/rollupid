@@ -59,7 +59,7 @@ export const action: ActionFunction = async ({ request }) => {
   await galaxySdk.updateProfile(
     {
       profile: {
-        displayName: formData.get("displayName")?.toString(),
+        displayName: formData.get("displayName")?.toString() || null,
         job: formData.get("job")?.toString(),
         location: formData.get("location")?.toString(),
         bio: formData.get("bio")?.toString(),

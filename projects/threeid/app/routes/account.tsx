@@ -165,7 +165,7 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
       >
         <item.icon
           className={classNames(
-            !item.exists && "opacity-25",
+            !item.exists && "opacity-25 cursor-not-allowed",
             "text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center"
           )}
           style={{
@@ -177,7 +177,7 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
           <span
             className={classNames(
-              !item.exists && "opacity-25",
+              !item.exists && "opacity-25 cursor-not-allowed",
               "hidden lg:block self-center"
             )}
           >
