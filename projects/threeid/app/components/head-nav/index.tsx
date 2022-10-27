@@ -38,14 +38,18 @@ const user = {
 };
 
 type HeadNavProps = {
-  avatarUrl: string | undefined,
-  isToken: boolean,
+  avatarUrl: string | undefined;
+  isToken: boolean;
   loggedIn?: {
     address: string;
   };
 };
 
-export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNavProps) {
+export default function HeadNav({
+  avatarUrl,
+  loggedIn,
+  isToken = false,
+}: HeadNavProps) {
   const activeStyle = {
     color: "white",
     backgroundColor: "rgb(31 41 55)", // bg-gray-800
@@ -60,7 +64,7 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-16 items-center justify-between px-4 sm:px-0">
+            <div className="flex h-24 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img className="h-10 w-10" src={logo} alt="3ID" />
@@ -76,7 +80,6 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
                           to={item.to}
                           // @ts-ignore
                           style={({ isActive }) => {
-                            console.log("isActive", item.to, isActive);
                             return isActive ? activeStyle : undefined;
                           }}
                           className={
@@ -142,9 +145,7 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
                             src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                             alt=""
                             style={
-                              isToken
-                                ? hexStyle
-                                : { visibility: "visible" }
+                              isToken ? hexStyle : { visibility: "visible" }
                             }
                           />
                         </Menu.Button>
@@ -224,9 +225,7 @@ export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNa
                   <div className="flex-shrink-0">
                     <img
                       className="h-10 w-10 rounded-full"
-                      style={
-                        isToken ? hexStyle : { visibility: "visible" }
-                      } // TODO this reloads when toggled. how do we cache?
+                      style={isToken ? hexStyle : { visibility: "visible" }} // TODO this reloads when toggled. how do we cache?
                       src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                       alt=""
                     />

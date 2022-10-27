@@ -66,7 +66,8 @@ const threeIDResolvers: Resolvers = {
   },
   Profile: {
     __resolveType: (obj: any) => {
-      if (obj.addresses) {
+      if (obj.cover) {
+        // TODO: what makes a ThreeIDProfile unique from others?
         return "ThreeIDProfile";
       }
       return "DefaultProfile";

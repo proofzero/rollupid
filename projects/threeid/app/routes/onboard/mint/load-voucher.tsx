@@ -14,6 +14,7 @@ import {
   Nftpfp,
 } from "~/utils/galaxy.server";
 import { getUserSession } from "~/utils/session.server";
+import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request);
@@ -66,9 +67,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       {
         profile: {
           pfp: {
-            image: voucher.metadata.image,
+            image: gatewayFromIpfs(voucher?.metadata?.image),
           },
-          cover: voucher.metadata.cover,
+          cover: gatewayFromIpfs(voucher?.metadata?.cover),
         },
         visibility: Visibility.Public,
       },

@@ -14,12 +14,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
+  // TODO: double check that this still throws an exception
+  // TODO: remove claimed from response?
   try {
     const profileRes = await galaxySdk.getProfileFromAddress({
       address: params.profile,
@@ -40,7 +45,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     return json({
-      avatar: voucher.metadata.image,
+      pfp: {
+        image: voucher.metadata.image,
+      },
       cover: voucher.metadata.cover,
       isToken: false,
       claimed: false,

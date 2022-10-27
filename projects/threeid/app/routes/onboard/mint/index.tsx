@@ -555,7 +555,6 @@ const OnboardMint = () => {
                   type={ButtonType.Secondary}
                   size={ButtonSize.L}
                   onClick={() => {
-                    console.log("skip");
                     submit(
                       {
                         imgUrl,

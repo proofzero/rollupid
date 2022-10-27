@@ -21,9 +21,12 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
@@ -40,37 +43,30 @@ export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
   const session = await getUserSession(request);
-  const address = session.get("address");
 
   const formData = await request.formData();
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
-    fetch,
-  });
+  const gqlClient = new GraphQLClient(
+    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
+    {
+      fetch,
+    }
+  );
 
   const galaxySdk = getSdk(gqlClient);
 
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  const prof = profileRes.profile;
-
-  await galaxySdk.updateProfile({
-    profile: {
-      id: address, // TODO: Figure out what's up with ID
-      avatar: prof?.avatar,
-      cover: prof?.cover,
-      isToken: prof?.isToken,
-      displayName: formData.get("displayName")?.toString(),
-      job: formData.get("job")?.toString(),
-      location: formData.get("location")?.toString(),
-      bio: formData.get("bio")?.toString(),
-      website: formData.get("website")?.toString(),
+  await galaxySdk.updateProfile(
+    {
+      profile: {
+        displayName: formData.get("displayName")?.toString(),
+        job: formData.get("job")?.toString(),
+        location: formData.get("location")?.toString(),
+        bio: formData.get("bio")?.toString(),
+        website: formData.get("website")?.toString(),
+      },
+      visibility: Visibility.Public,
     },
-    visibility: Visibility.Public,
-  },
     {
       "KBT-Access-JWT-Assertion": jwt,
     }
