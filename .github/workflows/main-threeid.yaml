@@ -29,7 +29,6 @@ jobs:
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: "projects/threeid"
           command: publish
-          environment: "dev"
           secrets: |
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
