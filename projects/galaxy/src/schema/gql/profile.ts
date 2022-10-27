@@ -13,17 +13,17 @@ export default /* GraphQL */ `
   }
 
   interface Profile {
-    displayName: String
+    displayName: String!
     pfp: PFP
   }
 
   type DefaultProfile implements Profile {
-    displayName: String
+    displayName: String!
     pfp: PFP
   }
 
   type ThreeIDProfile implements Profile {
-    displayName: String
+    displayName: String!
     pfp: PFP
     cover: String
     bio: String
@@ -39,7 +39,7 @@ export default /* GraphQL */ `
   }
 
   input ThreeIDProfileInput {
-    displayName: String
+    displayName: String!
     pfp: PFPInput
     cover: String
     bio: String

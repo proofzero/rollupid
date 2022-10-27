@@ -47,8 +47,6 @@ const threeIDResolvers: Resolvers = {
       checkHTTPStatus(profileResponse);
       const currentProfile = await getRPCResult(profileResponse);
 
-      console.log("new profile", profile);
-      console.log("current profile", currentProfile);
       const newProfile = {
         ...currentProfile,
         ...profile,
