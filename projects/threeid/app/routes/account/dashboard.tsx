@@ -243,7 +243,7 @@ export default function Welcome() {
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
           <span className="order-2 text-center justify-center align-center lg:order-1">
-            Welcome to 3ID, {displayname}!
+            Congratulations, {displayname}!
           </span>
           <span className="order-1 text-center justify-center align-center lg:order-2">
             🎉
@@ -256,8 +256,9 @@ export default function Welcome() {
           color={TextColor.Gray500}
           className="mb-6 text-center lg:text-left"
         >
-          The app is currently in beta. We will be unlocking new features often.
-          Follow us on Twitter and join our Discord to stay updated!
+          Welcome to the 3ID app. We are currently in beta and will be unlocking
+          new features often. Follow us on Twitter and join our Discord to stay
+          updated!
         </Text>
 
         <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
