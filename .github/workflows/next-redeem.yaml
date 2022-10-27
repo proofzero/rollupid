@@ -42,7 +42,7 @@ jobs:
         env:
           # CF_ROUTE: https://3id-dev.kubelt.com/*
           # These values are injected into the generated wrangler.toml.
-          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.GET_THREEID_DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.GET_THREEID_DATADOG_APPLICATION_ID }}

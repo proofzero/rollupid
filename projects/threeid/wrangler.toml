@@ -5,12 +5,6 @@ main = "./build/index.js"
 
 name = "threeid-dapp"
 
-# Whether or not the worker should be deployed to *.workers.dev. Can use
-# either route or workers_dev, but not both.
-routes = [
-  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
-  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
-]
 # The default environment
 # ------------------------------------------------------------------------------
 # name = "three-id-dev"
@@ -36,6 +30,14 @@ kv_namespaces = [
 [dev]
 port = 9797
 local_protocol = "http"
+
+# dev (development)
+# ------------------------------------------------------------------------------
+[env.dev]
+routes = [
+  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
 
 # next (staging)
 # ------------------------------------------------------------------------------
