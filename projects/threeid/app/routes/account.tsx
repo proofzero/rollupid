@@ -49,7 +49,8 @@ export const loader = async ({ request }) => {
   const proof = await PROOFS.get(address);
   !proof && redirect("/auth");
 
-  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
     fetch,
   });
 

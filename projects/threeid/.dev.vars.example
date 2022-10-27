@@ -6,6 +6,10 @@ DAPP_HOST="localhost"
 DAPP_PORT="8787"
 DAPP_SCHEMA="http"
 
+GALAXY_HOST="127.0.0.1"
+GALAXY_PORT="8787
+GALAXY_SCHEMA="http"
+
 SESSION_SECRET="foobar"
 
 TWITTER_URL=https://twitter.com/threeid_xyz

@@ -13,7 +13,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error("Profile address required");
   }
 
-  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
     fetch,
   });
 

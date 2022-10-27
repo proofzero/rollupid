@@ -30,7 +30,8 @@ import { getUserSession, requireJWT } from "~/utils/session.server";
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
-  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
     fetch,
   });
 
@@ -62,7 +63,8 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayname = "Display Name needs to be provided";
   }
 
-  const gqlClient = new GraphQLClient("http://127.0.0.1:8787", {
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`, {
     fetch,
   });
 
