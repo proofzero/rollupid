@@ -15,6 +15,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type DefaultProfile = Profile & {
+  __typename?: 'DefaultProfile';
+  displayName?: Maybe<Scalars['String']>;
+  pfp?: Maybe<Pfp>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   updateThreeIDAddress?: Maybe<ThreeIdAddress>;
@@ -128,14 +134,14 @@ export enum Visibility {
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'ThreeIDProfile', displayName?: string | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'DefaultProfile', displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | { __typename?: 'ThreeIDProfile', cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   address: Scalars['String'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'ThreeIDProfile', cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'DefaultProfile', displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | { __typename?: 'ThreeIDProfile', cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, displayName?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null };
 
 export type UpdateProfileMutationVariables = Exact<{
   profile?: InputMaybe<ThreeIdProfileInput>;
@@ -150,6 +156,22 @@ export const GetProfileDocument = gql`
     query getProfile {
   profile {
     displayName
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    ... on ThreeIDProfile {
+      cover
+      location
+      job
+      bio
+      website
+    }
   }
 }
     `;

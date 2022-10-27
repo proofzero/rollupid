@@ -2,6 +2,22 @@ export default /* GraphQL */ `
   query getProfile {
     profile {
       displayName
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
+      }
+      ... on ThreeIDProfile {
+        cover
+        location
+        job
+        bio
+        website
+      }
     }
   }
   query getProfileFromAddress($address: String!) {

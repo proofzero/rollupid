@@ -14,6 +14,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type DefaultProfile = Profile & {
+  __typename?: 'DefaultProfile';
+  displayName?: Maybe<Scalars['String']>;
+  pfp?: Maybe<Pfp>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   updateThreeIDAddress?: Maybe<ThreeIdAddress>;
@@ -194,12 +200,13 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  DefaultProfile: ResolverTypeWrapper<DefaultProfile>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Mutation: ResolverTypeWrapper<{}>;
   NFTPFP: ResolverTypeWrapper<Nftpfp>;
   PFP: ResolversTypes['NFTPFP'] | ResolversTypes['StandardPFP'];
   PFPInput: PfpInput;
-  Profile: ResolversTypes['ThreeIDProfile'];
+  Profile: ResolversTypes['DefaultProfile'] | ResolversTypes['ThreeIDProfile'];
   Query: ResolverTypeWrapper<{}>;
   StandardPFP: ResolverTypeWrapper<StandardPfp>;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -214,12 +221,13 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  DefaultProfile: DefaultProfile;
   ID: Scalars['ID'];
   Mutation: {};
   NFTPFP: Nftpfp;
   PFP: ResolversParentTypes['NFTPFP'] | ResolversParentTypes['StandardPFP'];
   PFPInput: PfpInput;
-  Profile: ResolversParentTypes['ThreeIDProfile'];
+  Profile: ResolversParentTypes['DefaultProfile'] | ResolversParentTypes['ThreeIDProfile'];
   Query: {};
   StandardPFP: StandardPfp;
   String: Scalars['String'];
@@ -227,6 +235,12 @@ export type ResolversParentTypes = {
   ThreeIDAddressInput: ThreeIdAddressInput;
   ThreeIDProfile: ThreeIdProfile;
   ThreeIDProfileInput: ThreeIdProfileInput;
+};
+
+export type DefaultProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['DefaultProfile'] = ResolversParentTypes['DefaultProfile']> = {
+  displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  pfp?: Resolver<Maybe<ResolversTypes['PFP']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -246,7 +260,7 @@ export type PfpResolvers<ContextType = any, ParentType extends ResolversParentTy
 };
 
 export type ProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['Profile'] = ResolversParentTypes['Profile']> = {
-  __resolveType: TypeResolveFn<'ThreeIDProfile', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'DefaultProfile' | 'ThreeIDProfile', ParentType, ContextType>;
   displayName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   pfp?: Resolver<Maybe<ResolversTypes['PFP']>, ParentType, ContextType>;
 };
@@ -284,6 +298,7 @@ export type ThreeIdProfileResolvers<ContextType = any, ParentType extends Resolv
 };
 
 export type Resolvers<ContextType = any> = {
+  DefaultProfile?: DefaultProfileResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NFTPFP?: NftpfpResolvers<ContextType>;
   PFP?: PfpResolvers<ContextType>;

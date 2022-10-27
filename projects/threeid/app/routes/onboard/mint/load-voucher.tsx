@@ -43,16 +43,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
-  let prof: ThreeIdProfile = {};
-  try {
-    const profileRes = await galaxySdk.getProfile(undefined, {
-      "KBT-Access-JWT-Assertion": jwt,
-    });
-    prof = profileRes.profile;
-  } catch (e) {
-    console.log("No profile found");
-  }
-  console.log("profile", prof);
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
+  const prof = profileRes.profile;
+
   if (voucher) {
     if (!voucher.minted && prof?.pfp?.isToken) {
       // If minted update voucher cache

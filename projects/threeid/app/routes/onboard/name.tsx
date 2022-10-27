@@ -38,19 +38,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   );
 
-  console.log("here");
   const galaxySdk = getSdk(gqlClient);
 
-  let profile: ThreeIdProfile = {};
-  try {
-    const profileRes = await galaxySdk.getProfile(undefined, {
-      "KBT-Access-JWT-Assertion": jwt,
-    });
-    console.log("profileRes", profileRes);
-    profile = profileRes.profile;
-  } catch (e) {
-    console.log("No profile found", e);
-  }
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
+  const profile = profileRes.profile;
 
   return json(profile);
 };
@@ -81,12 +74,6 @@ export const action: ActionFunction = async ({ request }) => {
   );
 
   const galaxySdk = getSdk(gqlClient);
-  // const profileRes = await galaxySdk.getProfile(undefined, {
-  //   "KBT-Access-JWT-Assertion": jwt,
-  // });
-
-  // let prof = profileRes.profile;
-  // console.log("PROFILE", prof);
 
   // PUT new object
   await galaxySdk.updateProfile(
@@ -110,7 +97,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const OnboardDisplayname = () => {
-  const { displayname: storedDisplayname } = useLoaderData();
+  const { displayName: storedDisplayname } = useLoaderData();
   const [displayname, setDisplayname] = useState(storedDisplayname || "");
 
   const fetcher = useFetcher();

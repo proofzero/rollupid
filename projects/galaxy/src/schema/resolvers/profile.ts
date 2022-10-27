@@ -23,10 +23,7 @@ const threeIDResolvers: Resolvers = {
       const profileResponse = await oortClient.getProfile();
       checkHTTPStatus(profileResponse);
       const res = getRPCResult(profileResponse);
-      console.log("profile returned from oort", await res);
-      return {
-        displayName: "test",
-      };
+      return await res;
     },
     profileFromAddress: async (
       _parent: any,
@@ -48,8 +45,10 @@ const threeIDResolvers: Resolvers = {
       const oortClient = new OortClient(env.OORT, jwt);
       const profileResponse = await oortClient.getProfile();
       checkHTTPStatus(profileResponse);
-      const currentProfile = getRPCResult(profileResponse);
+      const currentProfile = await getRPCResult(profileResponse);
 
+      console.log("new profile", profile);
+      console.log("current profile", currentProfile);
       const newProfile = {
         ...currentProfile,
         ...profile,
@@ -62,7 +61,7 @@ const threeIDResolvers: Resolvers = {
         visibility
       );
       checkHTTPStatus(updateResponse);
-      return !!getRPCResult(updateResponse);
+      return !!(await getRPCResult(updateResponse));
     },
   },
   Profile: {
@@ -70,7 +69,7 @@ const threeIDResolvers: Resolvers = {
       if (obj.addresses) {
         return "ThreeIDProfile";
       }
-      return null;
+      return "DefaultProfile";
     },
   },
   PFP: {

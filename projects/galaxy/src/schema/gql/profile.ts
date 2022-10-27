@@ -17,6 +17,11 @@ export default /* GraphQL */ `
     pfp: PFP
   }
 
+  type DefaultProfile implements Profile {
+    displayName: String
+    pfp: PFP
+  }
+
   type ThreeIDProfile implements Profile {
     displayName: String
     pfp: PFP
