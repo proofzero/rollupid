@@ -54,11 +54,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   if (!prof?.avatar) {
-    await gqlClient.request(
-      `mutation ($profile: ThreeIDProfileInput, $visibility: Visibility!) {
-      updateThreeIDProfile(profile: $profile, visibility: $visibility)
-    }`,
-      {
+    await galaxySdk.updateProfile({
         profile: {
           id: address, // TODO: Figure out what's up with ID
           displayName: prof?.displayName,
