@@ -4040,6 +4040,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kubelt/worker-commons@workspace:packages/worker-commons":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/worker-commons@workspace:packages/worker-commons"
+  dependencies:
+    "@cloudflare/workers-types": 3.18.0
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.26.0
+    eslint-config-prettier: 8.5.0
+    prettier: 2.7.1
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    yarn-run-all: 3.1.1
+  peerDependencies:
+    itty-router: "*"
+    itty-router-extras: "*"
+    jose: "*"
+    lodash: "*"
+  languageName: unknown
+  linkType: soft
+
 "@mapbox/node-pre-gyp@npm:^1.0.0":
   version: 1.0.10
   resolution: "@mapbox/node-pre-gyp@npm:1.0.10"
@@ -26669,6 +26691,13 @@ __metadata:
   version: 2.7.2
   resolution: "type@npm:2.7.2"
   checksum: 0f42379a8adb67fe529add238a3e3d16699d95b42d01adfe7b9a7c5da297f5c1ba93de39265ba30ffeb37dfd0afb3fb66ae09f58d6515da442219c086219f6f4
+  languageName: node
+  linkType: hard
+
+"typed-json-rpc@npm:1.1.0":
+  version: 1.1.0
+  resolution: "typed-json-rpc@npm:1.1.0"
+  checksum: 28a730a520150d2d619f488c4b5246b451861e6c2c1595558370e1b480010de43a40497d7bb4844f4d3c52768a4cf37112395cb0cf60e91edf8e6091d4d3614d
   languageName: node
   linkType: hard
 
