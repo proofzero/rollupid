@@ -37,16 +37,14 @@ const user = {
 };
 
 type HeadNavProps = {
-  pfp?: {
-    url: string;
-    isToken: boolean;
-  };
+  avatarUrl: string | undefined,
+  isToken: boolean,
   loggedIn?: {
     address: string;
   };
 };
 
-export default function HeadNav({ pfp, loggedIn }: HeadNavProps) {
+export default function HeadNav({ avatarUrl, loggedIn, isToken = false }: HeadNavProps) {
   const activeStyle = {
     color: "white",
     backgroundColor: "rgb(31 41 55)", // bg-gray-800
@@ -140,10 +138,10 @@ export default function HeadNav({ pfp, loggedIn }: HeadNavProps) {
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
-                            src={pfp?.url || user.imageUrl}
+                            src={avatarUrl || user.imageUrl}
                             alt=""
                             style={
-                              pfp?.isToken
+                              isToken
                                 ? hexStyle
                                 : { visibility: "visible" }
                             }
@@ -226,9 +224,9 @@ export default function HeadNav({ pfp, loggedIn }: HeadNavProps) {
                     <img
                       className="h-10 w-10 rounded-full"
                       style={
-                        pfp?.isToken ? hexStyle : { visibility: "visible" }
+                        isToken ? hexStyle : { visibility: "visible" }
                       } // TODO this reloads when toggled. how do we cache?
-                      src={pfp?.url || user.imageUrl}
+                      src={avatarUrl || user.imageUrl}
                       alt=""
                     />
                   </div>
