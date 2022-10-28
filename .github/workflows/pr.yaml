@@ -52,8 +52,8 @@ jobs:
           retore-keys: |
             ${{ runner.os }}-modules-
 
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        name: List the state of node modules
+      - name: List the state of node modules
+        if: ${{ steps.cache-modules.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: npm list
 
