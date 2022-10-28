@@ -197,7 +197,6 @@ export default function AccountSettingsProfile() {
             rows={3}
             defaultValue={bio}
             error={actionData?.errors.bio}
-            required={true}
           />
 
           {actionData?.errors.bio && (

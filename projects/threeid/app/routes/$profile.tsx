@@ -65,6 +65,7 @@ const ProfileRoute = () => {
     pfp,
     cover,
     isToken,
+    website
   } = useLoaderData();
 
   return (
@@ -99,6 +100,7 @@ const ProfileRoute = () => {
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
               isNft={isToken}
+              webUrl={website}
             />
           </div>
         </div>
