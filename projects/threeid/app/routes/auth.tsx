@@ -16,9 +16,6 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import styles from "../styles/auth.css";
 import logo from "../assets/three-id-logo.svg";
 
-import { getUserSession, requireJWT } from "~/utils/session.server";
-import { oortSend } from "~/utils/rpc.server";
-
 import { links as spinnerLinks } from "~/components/spinner";
 
 export function links() {

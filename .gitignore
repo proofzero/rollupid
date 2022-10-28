@@ -208,3 +208,6 @@ act.secrets
 
 # undo tree backup files
 *.~undo-tree~
+/test-results/
+/playwright-report/
+/playwright/.cache/
