@@ -1,6 +1,5 @@
 # .github/workflows/main-console.yaml
 ---
-
 name: Console
 
 on:
@@ -14,27 +13,27 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+      - uses: cachix/install-nix-action@v18
         with:
-          node-version-file: .nvmrc
-          cache: "yarn"
+          nix_path: nixpkgs=channel:nixos-unstable
+      - run: nix-build
       - run: yarn install
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: 'projects/console'
+          workingDirectory: "projects/console"
           command: publish --env dev
-          environment: 'dev'
+          environment: "dev"
           secrets: |
             ADMIN_ACCOUNT_ID
             CLOUDFLARE_API_TOKEN
         env:
           # The name of our session cookie.
-          SESSION_NAME: 'starbase'
+          SESSION_NAME: "starbase"
           # A secret used for session encryption.
-          SESSION_SECRET: 'secret'
+          SESSION_SECRET: "secret"
           # CF_ROUTE: https://console-dev.kubelt.com/*
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}

@@ -36,13 +36,13 @@ jobs:
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-shell --run "yarn install"
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
-      # - name: Install
-      #   run: yarn install
+      - run: nix-build
+      # - uses: actions/setup-node@v3
+      #   with:
+      #     node-version-file: .nvmrc
+      #     cache: "yarn"
+      - name: Install
+        run: yarn install
       - name: Code Generation
         run: yarn gql
       - name: Build
