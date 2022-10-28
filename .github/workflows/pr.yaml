@@ -58,7 +58,6 @@ jobs:
           node-version-file: .nvmrc
           cache: "yarn"
       - name: Install
-        if: steps.cache-modules.outputs.cache-hit != 'true'
         run: yarn install
       - name: Code Generation
         run: yarn gql

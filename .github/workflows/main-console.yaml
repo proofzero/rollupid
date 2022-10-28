@@ -24,13 +24,13 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: nix-build
+        if: steps.cache-modules.outputs.cache-hit != 'true'
       - uses: actions/setup-node@v3
         if: steps.cache-modules.outputs.cache-hit == 'true'
         with:
           node-version-file: .nvmrc
           cache: "yarn"
       - name: Install
-        if: steps.cache-modules.outputs.cache-hit != 'true'
         run: yarn install
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
