@@ -39,7 +39,7 @@ export default /* GraphQL */ `
   }
 
   input ThreeIDProfileInput {
-    displayName: String!
+    displayName: String
     pfp: PFPInput
     cover: String
     bio: String
