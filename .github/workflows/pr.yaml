@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version-file: .nvmrc
           cache: "yarn"
       - name: Install
         run: yarn install
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version-file: .nvmrc
           cache: "npm"
           cache-dependency-path: ./nftar/package-lock.json
       - run: npm install
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version-file: .nvmrc
           cache: "npm"
           cache-dependency-path: ./smartcontracts/eth/crdt/package-lock.json
       - run: npm install
