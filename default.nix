@@ -1,11 +1,9 @@
 with (import <nixpkgs> {});
 let
   basePackages = [
-    ripgrep
     nodejs-18_x
     python38
     yarn
-    jdk
     docker
     chromedriver
     docker
