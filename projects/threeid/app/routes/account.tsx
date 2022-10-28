@@ -23,6 +23,7 @@ import Text, {
 } from "~/components/typography/Text";
 import { GraphQLClient } from "graphql-request";
 import { getSdk, Visibility } from "~/utils/galaxy.server";
+import validateProof from "~/helpers/validate-proof";
 
 export function links() {
   return [
@@ -41,9 +42,7 @@ export const loader = async ({ request }) => {
   const address = session.get("address");
   const core = session.get("core");
 
-  // @ts-ignore
-  const proof = await PROOFS.get(address);
-  if (!proof) {
+  if (!(await validateProof(address))) {
     return redirect(`/auth/gate/${address}`);
   }
 
@@ -73,7 +72,7 @@ export const loader = async ({ request }) => {
   // @ts-ignore
   const [avatarUrl, isToken] = [
     profileRes.profile?.pfp?.image,
-    profileRes.profile?.prp?.isToken,
+    profileRes.profile?.pfp?.isToken,
   ];
 
   return json({

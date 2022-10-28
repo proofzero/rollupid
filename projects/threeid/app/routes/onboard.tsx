@@ -16,6 +16,7 @@ import {
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { publicProvider } from "wagmi/providers/public";
+import validateProof from "~/helpers/validate-proof";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -26,9 +27,7 @@ export const loader = async ({ request }) => {
   await requireJWT(request);
 
   const address = (await getUserSession(request)).get("address");
-  //@ts-ignore
-  const proof = await PROOFS.get(address);
-  if (!proof) {
+  if (!(await validateProof(address))) {
     return redirect(`/auth/gate/${address}`);
   }
 

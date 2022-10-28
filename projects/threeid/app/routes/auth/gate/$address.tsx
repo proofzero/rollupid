@@ -1,6 +1,8 @@
 import { redirect, json } from "@remix-run/cloudflare";
 import { requireJWT } from "~/utils/session.server";
 
+import validateProof from "~/helpers/validate-proof";
+
 import BaseButton, {
   links as buttonLinks,
   BaseButtonAnchor,
@@ -13,9 +15,7 @@ export const links = () => [...buttonLinks()];
 // @ts-ignore
 export const loader = async ({ request, params }) => {
   await requireJWT(request);
-  //@ts-ignore
-  const proof = await PROOFS.get(params.address);
-  if (!proof) {
+  if (!(await validateProof(params.address))) {
     return null;
   }
   return redirect(`/account`);

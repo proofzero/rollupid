@@ -25,6 +25,7 @@ jobs:
           command: publish --env next
           environment: "next"
           secrets: |
+            TEST_ENV
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -39,7 +40,7 @@ jobs:
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
         env:
-          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          TEST_ENV: true
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # These values are injected into the generated wrangler.toml.
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}

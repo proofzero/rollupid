@@ -27,6 +27,7 @@ jobs:
           command: publish --env dev
           environment: "dev"
           secrets: |
+            TEST_ENV
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -41,6 +42,7 @@ jobs:
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
         env:
+          TEST_ENV: true
           SESSION_SECRET: "secret"
           # CF_ROUTE: https://3id-dev.kubelt.com/*
           # These values are injected into the generated wrangler.toml.
