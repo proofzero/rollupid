@@ -33,6 +33,12 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v3
+        with:
+          path: /nix/store
+          key: ${{ runner.os }}-nix
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
