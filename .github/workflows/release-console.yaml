@@ -1,0 +1,53 @@
+# .github/workflows/release-console.yaml
+---
+
+name: Console
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-publish-console-current:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: read
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: "yarn"
+      - run: yarn install
+      - name: Deploy to Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          workingDirectory: "projects/console"
+          command: publish --env current
+          environment: "current"
+          secrets: |
+            ADMIN_ACCOUNT_ID
+            CF_ZONE_ID
+            CLOUDFLARE_API_TOKEN
+            SESSION_SECRET
+        env:
+          # The Cloudflare zone ID for website domain.
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          # The name of our session cookie.
+          SESSION_NAME: starbase
+          # A secret used for session encryption.
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          # These values are injected into the generated wrangler.toml.
+          ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          # The Cloudflare API token used by wrangler.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # Icon upload service.
+          ICONS_SCHEME: https
+          ICONS_HOST: icons.kubelt.com
+          ICONS_PORT: 80
+          # Oort backend.
+          OORT_HOST: oort.kubelt.com
+          OORT_SCHEMA: https
+          OORT_PORT: 443

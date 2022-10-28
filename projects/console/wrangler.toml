@@ -1,10 +1,13 @@
-# wrangler.toml
+# projects/console/wrangler.toml
 
 name = "starbase"
 
 workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
+
+# development
+# -----------------------------------------------------------------------------
 
 [dev]
 port = 9898
@@ -18,13 +21,21 @@ local_protocol = "http"
 #   { binding = "OORT", service = "oort-devnet" }
 # ]
 
-# Environment Variables
+# Secrets
 # -----------------------------------------------------------------------------
-# Required secrets:
-# - SESSION_SECRET
-#
 # Set these secrets using the wrangler CLI:
 # $ echo <VALUE> | wrangler secret put <NAME>
+
+# Required secrets:
+# - SESSION_SECRET
+
+# Environment Variables
+# -----------------------------------------------------------------------------
+# NB: environment variable configuration is not inherited; they should be set
+# independently for each environment.
+
+[vars]
+
 
 # Site
 # -----------------------------------------------------------------------------
@@ -38,10 +49,58 @@ local_protocol = "http"
 [build]
   command = "npm run build"
 
-# development
+# Environment: dev
 # -----------------------------------------------------------------------------
 
 [env.dev]
+name = "console-dev"
+
 kv_namespaces = [
   { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
 ]
+
+routes = [
+  { pattern = "console-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
+
+[env.dev.vars]
+DEPLOY_ENV = "dev"
+SESSION_NAME = "starbase"
+# NB: can go away once support for storage API is removed
+STORAGE_NAMESPACE = "starbase"
+
+# Environment: next
+# -----------------------------------------------------------------------------
+
+[env.next]
+name = "console-next"
+kv_namespaces = [
+  { binding = "SESSIONS", id = "6c6ca075005747e3873043cdf346f438" },
+]
+routes = [
+  { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
+
+[env.next.vars]
+DEPLOY_ENV = "next"
+SESSION_NAME = "starbase"
+# NB: can go away once support for storage API is removed
+STORAGE_NAMESPACE = "starbase"
+
+# Environment: current
+# -----------------------------------------------------------------------------
+
+[env.current]
+name = "console-current"
+kv_namespaces = [
+  { binding = "SESSIONS", id = "593c81a8b57347a4b30368eabee072ef" },
+]
+routes = [
+  { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
+
+[env.current.vars]
+DEPLOY_ENV = "current"
+SESSION_NAME = "starbase"
+# NB: can go away once support for storage API is removed
+STORAGE_NAMESPACE = "starbase"
