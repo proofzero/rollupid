@@ -56,6 +56,9 @@ r2_buckets = [
 
 route = { pattern = "oort-devnet.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 
+[env.devnet.build]
+command = "yarn build:production"
+
 [env.testnet]
 durable_objects.bindings = [
   { name = "Address", class_name = "Address" },
