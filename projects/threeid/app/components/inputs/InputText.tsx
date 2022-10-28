@@ -17,6 +17,7 @@ export type InputTextProps = {
   iconPosition?: InputIconPosType;
   addon?: string;
   error?: boolean;
+  required?: boolean;
 };
 
 const InputText = ({
@@ -32,6 +33,7 @@ const InputText = ({
   iconPosition,
   addon,
   error,
+  required,
 }: InputTextProps) => {
   const computedName = name ?? id;
 
@@ -102,6 +104,7 @@ const InputText = ({
             type={type ?? "text"}
             name={computedName}
             id={id}
+            required={required}
             onChange={(e) => {
               if (onChange) onChange(e.target.value);
             }}

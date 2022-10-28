@@ -146,6 +146,7 @@ export default function AccountSettingsProfile() {
             placeholder="Your Display Name"
             Icon={FaAt}
             defaultValue={displayName}
+            required={true}
             error={actionData?.errors.displayName}
           />
 
@@ -196,6 +197,7 @@ export default function AccountSettingsProfile() {
             rows={3}
             defaultValue={bio}
             error={actionData?.errors.bio}
+            required={true}
           />
 
           {actionData?.errors.bio && (

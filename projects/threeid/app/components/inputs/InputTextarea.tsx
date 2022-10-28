@@ -12,6 +12,7 @@ export type InputTextareaProps = {
   defaultValue?: string;
   disabled?: boolean;
   error?: boolean;
+  required?: boolean;
 };
 
 const InputTextarea = ({
@@ -25,6 +26,7 @@ const InputTextarea = ({
   defaultValue,
   disabled,
   error,
+  required,
 }: InputTextareaProps) => {
   const computedName = name ?? id;
 
@@ -73,7 +75,7 @@ const InputTextarea = ({
             onChange={(e) => {
               setVal(e.target.value);
 
-              if(onChange) onChange(e.target.value);
+              if (onChange) onChange(e.target.value);
             }}
             rows={rows}
             defaultValue={defaultValue}
@@ -94,6 +96,7 @@ const InputTextarea = ({
               fontFamily: "Inter_400Regular",
             }}
             placeholder={placeholder}
+            required={required}
           />
         </div>
       </div>
