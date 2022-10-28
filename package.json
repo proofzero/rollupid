@@ -5,7 +5,8 @@
   "useWorkspaces": true,
   "workspaces": [
     "packages/*",
-    "projects/*"
+    "projects/*",
+    "smartcontracts/*"
   ],
   "scripts": {
     "gql:galaxy": "graphql-codegen --config graphql.config.js --project galaxy --aggregate-output -n -l",

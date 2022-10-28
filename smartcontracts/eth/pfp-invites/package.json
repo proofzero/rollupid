@@ -5,7 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "hardhat compile",
+    "test": "hardhat test"
   },
   "author": "Proof Zero, Inc.",
   "license": "SEE LICENSE IN LICENSE.md",

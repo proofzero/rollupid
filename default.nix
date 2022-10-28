@@ -15,7 +15,13 @@ stdenv.mkDerivation {
     docker
     rustup
     libuuid
-    act 
+    act
+    cairo
+    pango
+    pkg-config
+    nodePackages.node-gyp
+    libpng
+    llvm
   ];
 
     

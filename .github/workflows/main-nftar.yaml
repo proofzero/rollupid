@@ -14,13 +14,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: "npm"
-          cache-dependency-path: ./nftar/package-lock.json
-      - run: npm install
-        working-directory: nftar
-      - name: Build and Test
-        run: npm test
-        working-directory: nftar
+          cache: "yarn"
+      - run: yarn install
+      - name: Test
+        run: yarn test
         env:
           CHAIN: "ethereum"
           CHAIN_ID: 5

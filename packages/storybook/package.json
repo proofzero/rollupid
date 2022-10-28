@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "start": "start-storybook -p 6006",
-    "build": "build-storybook",
+    "start": "cross-env NODE_OPTIONS='--openssl-legacy-provider' start-storybook -p 6006",
+    "build": "cross-env NODE_OPTIONS='--openssl-legacy-provider' build-storybook",
     "dev": "echo \"No dev for storybook. Please use start.\""
   },
   "keywords": [],
@@ -27,6 +27,7 @@
     "@storybook/react": "^6.5.13",
     "@storybook/testing-library": "^0.0.13",
     "babel-loader": "^8.2.5",
+    "cross-env": "7.0.3",
     "yarn-run-all": "3.1.1"
   }
 }
