@@ -2,20 +2,12 @@ with (import <nixpkgs> {});
 let
   basePackages = [
     nodejs-18_x
-    python38
     yarn
-    docker
-    chromedriver
-    docker
-    rustup
-    libuuid
-    act
     cairo
     pango
     pkg-config
     nodePackages.node-gyp
     libpng
-    llvm
     librsvg
     pixman
     giflib
