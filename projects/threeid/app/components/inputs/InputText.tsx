@@ -7,7 +7,7 @@ type InputIconPosType = "leading" | "trailing";
 export type InputTextProps = {
   id?: string;
   heading: string;
-  onChange: (val: any) => void;
+  onChange?: (val: any) => void;
   name?: string;
   type?: React.HTMLInputTypeAttribute;
   placeholder?: string;
@@ -102,7 +102,9 @@ const InputText = ({
             type={type ?? "text"}
             name={computedName}
             id={id}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              if (onChange) onChange(e.target.value);
+            }}
             defaultValue={defaultValue}
             disabled={disabled ?? false}
             className={`${
