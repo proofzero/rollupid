@@ -52,7 +52,11 @@ The [www/](www/) directory contains the Kubelt.com static website documentation 
 
 ### Redeem
 
-THe [projects/edeem/](projects/redeem/) directory contains a web application for minting 3ID invites.
+The [projects/redeem/](projects/redeem/) directory contains a web application for minting 3ID invites.
+
+### Icons
+
+The [projects/icons/](projects/icons/) directory contains a simple service for generating signed URLs for image upload.
 
 ## Develop
 

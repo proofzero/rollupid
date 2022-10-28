@@ -10,7 +10,7 @@
     "build:remix": "remix build",
     "deploy": "wrangler publish",
     "dev:remix": "remix watch",
-    "dev:wranger": "wrangler dev --local --persist --env dev",
+    "dev:wrangler": "wrangler dev --local --persist --env dev",
     "dev:css": "yarn generate:css -- --watch",
     "dev": "echo \"No dev for redeem. Please use start.\"",
     "start": "run-p \"dev:*\"",
