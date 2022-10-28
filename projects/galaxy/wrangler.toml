@@ -3,6 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
 
+# Services binding for local development
 services = [
   { binding = "OORT", service = "oort"}
 ]

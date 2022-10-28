@@ -21,7 +21,6 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: "projects/threeid"
           command: publish --env next
           environment: "next"
@@ -61,7 +60,7 @@ jobs:
           VALID_CHAIN_ID_NAME: goerli
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-        working-directory: threeid
+        working-directory: projects/threeid
       - name: Run Playwright tests
         run: npx playwright test
         env:
