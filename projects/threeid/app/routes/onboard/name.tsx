@@ -97,8 +97,9 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 const OnboardDisplayname = () => {
-  const { displayName: storedDisplayname } = useLoaderData();
-  const [displayname, setDisplayname] = useState(storedDisplayname || "");
+  const profile = useLoaderData();
+
+  const [displayname, setDisplayname] = useState(profile?.displayName || "");
 
   const fetcher = useFetcher();
   useEffect(() => {

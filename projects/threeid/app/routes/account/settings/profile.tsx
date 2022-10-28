@@ -1,12 +1,11 @@
 import { ActionFunction, json, LoaderFunction } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { FaAt, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import InputText from "~/components/inputs/InputText";
-import { getUserSession, requireJWT } from "~/utils/session.server";
+import { requireJWT } from "~/utils/session.server";
 
 import { GraphQLClient } from "graphql-request";
-import { useState } from "react";
 import { getSdk, Visibility } from "~/utils/galaxy.server";
 
 import InputTextarea from "~/components/inputs/InputTextarea";
@@ -42,8 +41,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
-  const session = await getUserSession(request);
-
   const formData = await request.formData();
 
   // @ts-ignore
@@ -56,13 +53,31 @@ export const action: ActionFunction = async ({ request }) => {
 
   const galaxySdk = getSdk(gqlClient);
 
+  let errors: any = {};
+
+  const displayName = formData.get("displayName")?.toString();
+  if (!displayName || displayName === "") {
+    errors.displayName = ["Display name is required"];
+  }
+
+  const bio = formData.get("bio")?.toString();
+  if (bio && bio.length > 256) {
+    errors.bio = ["Bio must be less than 256 characters"];
+  }
+
+  if (Object.keys(errors).length) {
+    return {
+      errors,
+    };
+  }
+
   await galaxySdk.updateProfile(
     {
       profile: {
-        displayName: formData.get("displayName")?.toString() || null,
+        displayName: displayName,
         job: formData.get("job")?.toString(),
         location: formData.get("location")?.toString(),
-        bio: formData.get("bio")?.toString(),
+        bio: bio,
         website: formData.get("website")?.toString(),
       },
       visibility: Visibility.Public,
@@ -76,32 +91,16 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function AccountSettingsProfile() {
-  const { displayName, job, location, bio, website, avatar, cover, isToken } =
-    useLoaderData();
+  const { displayName, job, location, bio, website, pfp } = useLoaderData();
 
-  const [profileData, setProfileData] = useState({
-    displayName,
-    job,
-    location,
-    bio,
-    website,
-    avatar,
-    cover,
-    isToken,
-  });
-
-  const submit = useSubmit();
-
-  const postProfile = async () => {
-    submit(profileData, { method: "post" });
-  };
+  const actionData = useActionData();
 
   return (
     <>
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
           <img
-            src={gatewayFromIpfs(avatar)}
+            src={gatewayFromIpfs(pfp.image)}
             style={{
               width: 118,
               height: 118,
@@ -129,7 +128,7 @@ export default function AccountSettingsProfile() {
               </Text>
 
               <img
-                src={gatewayFromIpfs(avatar)}
+                src={gatewayFromIpfs(pfp.image)}
                 style={{
                   width: 33,
                   height: 33,
@@ -140,76 +139,84 @@ export default function AccountSettingsProfile() {
           </div>
         </div>
 
-        <InputText
-          heading="Display Name"
-          placeholder="Your Display Name"
-          Icon={FaAt}
-          defaultValue={profileData.displayName}
-          onChange={(val) => {
-            let trackedProfileData = profileData;
-            trackedProfileData.displayName = val;
-            setProfileData(trackedProfileData);
-          }}
-        />
+        <Form className="flex flex-col space-y-9 mt-12" method="post">
+          <InputText
+            id="displayName"
+            heading="Display Name"
+            placeholder="Your Display Name"
+            Icon={FaAt}
+            defaultValue={displayName}
+            required={true}
+            error={actionData?.errors.displayName}
+          />
 
-        <div className="flex flex-col lg:flex-row lg:space-x-9">
-          <div className="flex-1">
-            <InputText
-              heading="Job"
-              placeholder="Your Job"
-              Icon={FaBriefcase}
-              defaultValue={profileData.job}
-              onChange={(val) => {
-                let trackedProfileData = profileData;
-                trackedProfileData.job = val;
-                setProfileData(trackedProfileData);
-              }}
-            />
+          {actionData?.errors.displayName && (
+            <Text
+              className="mb-1.5"
+              size={TextSize.XS}
+              weight={TextWeight.Regular400}
+              color={TextColor.Gray400}
+            >
+              {actionData.errors.displayName}
+            </Text>
+          )}
+
+          <div className="flex flex-col lg:flex-row lg:space-x-9">
+            <div className="flex-1">
+              <InputText
+                id="job"
+                heading="Job"
+                placeholder="Your Job"
+                Icon={FaBriefcase}
+                defaultValue={job}
+              />
+            </div>
+
+            <div className="flex-1">
+              <InputText
+                id="location"
+                heading="Location"
+                placeholder="Your Location"
+                Icon={FaMapMarkerAlt}
+                defaultValue={location}
+              />
+            </div>
           </div>
 
-          <div className="flex-1">
-            <InputText
-              heading="Location"
-              placeholder="Your Location"
-              Icon={FaMapMarkerAlt}
-              defaultValue={profileData.location}
-              onChange={(val) => {
-                let trackedProfileData = profileData;
-                trackedProfileData.location = val;
-                setProfileData(trackedProfileData);
-              }}
-            />
+          <InputText
+            id="website"
+            heading="Website"
+            addon="http://"
+            defaultValue={website}
+          />
+
+          <InputTextarea
+            id="bio"
+            heading="Bio"
+            charLimit={256}
+            rows={3}
+            defaultValue={bio}
+            error={actionData?.errors.bio}
+            required={true}
+          />
+
+          {actionData?.errors.bio && (
+            <Text
+              className="mb-1.5"
+              size={TextSize.XS}
+              weight={TextWeight.Regular400}
+              color={TextColor.Gray400}
+            >
+              {actionData?.errors.bio}
+            </Text>
+          )}
+
+          <div className="flex lg:justify-end">
+            <Button isSubmit type={ButtonType.Primary}>
+              Save
+            </Button>
           </div>
-        </div>
-
-        <InputText
-          heading="Website"
-          addon="http://"
-          defaultValue={profileData.website}
-          onChange={(val) => {
-            let trackedProfileData = profileData;
-            trackedProfileData.website = val;
-            setProfileData(trackedProfileData);
-          }}
-        />
-
-        <InputTextarea
-          heading="Bio"
-          charLimit={256}
-          rows={3}
-          defaultValue={profileData.bio}
-          onChange={(val) => {
-            let trackedProfileData = profileData;
-            trackedProfileData.bio = val;
-            setProfileData(trackedProfileData);
-          }}
-        />
-
-        <div className="flex lg:justify-end">
-          <Button type={ButtonType.Primary} onClick={() => postProfile()}>
-            Save
-          </Button>
-        </div>
+        </Form>
       </div>
     </>
   );

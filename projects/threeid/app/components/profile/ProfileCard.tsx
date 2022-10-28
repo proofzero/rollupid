@@ -42,7 +42,7 @@ const ProfileCard = ({
       <div className="w-40 h-40 flex justify-center items-center">
         {!avatarUrl && <Spinner />}
 
-        {avatarUrl && !isNft && <img src={avatarUrl} className="w-40 h-40" />}
+        {avatarUrl && !isNft && <img src={avatarUrl} className="w-40 h-40 rounded-full" />}
         {avatarUrl && isNft && (
           <div
             className="w-40 h-40"
