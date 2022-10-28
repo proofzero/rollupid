@@ -19,15 +19,10 @@ jobs:
           path: ./node_modules
           key: ${{ runner.os }}-modules--${{ hashFiles('yarn.lock') }}
       - uses: cachix/install-nix-action@v18
-        if: steps.cache-modules.outputs.cache-hit != 'true'
         with:
           nix_path: nixpkgs=channel:nixos-unstable
       - run: nix-build
       - uses: actions/setup-node@v3
-        if: steps.cache-modules.outputs.cache-hit == 'true'
-        with:
-          node-version-file: .nvmrc
-          cache: "yarn"
       - name: Install
         run: yarn install
       - name: Code Generation
