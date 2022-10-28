@@ -8,7 +8,10 @@
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
+    "test": "echo \"Error: no test specified\" && exit 0",
+    "dev:wrangler": "wrangler dev --local --persist --env dev",
+    "dev": "echo \"No dev for redeem. Please use start.\"",
+    "start": "run-p 'dev:*'",
     "deploy": "wrangler publish"
   },
   "dependencies": {
