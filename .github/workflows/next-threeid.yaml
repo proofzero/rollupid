@@ -18,7 +18,7 @@ jobs:
       - run: nix-build
 
       - name: Install
-      - run: yarn install
+        run: yarn install
 
       - name: Code Generation
         run: yarn gql
