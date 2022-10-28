@@ -99,7 +99,7 @@ const ProfileCard = ({
         </a>
 
         <a
-          href={webUrl}
+          href={`${webUrl?.includes("://") ? webUrl : `http://${webUrl}`}`}
           target={"_blank"}
           rel={"noopener noopener noreferrer"}
           className={`${webUrl ? "text-gray-500" : "text-gray-100"}`}
