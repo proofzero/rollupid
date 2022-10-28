@@ -12,6 +12,10 @@ let
     pixman
     giflib
     libjpeg
+    # TODO: For local dev it's nice to have but you can always add them manudal
+    # docker
+    # chromedriver
+    # act
   ];
 
   inputs = basePackages
