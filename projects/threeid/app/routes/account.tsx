@@ -72,7 +72,7 @@ export const loader = async ({ request }) => {
   // @ts-ignore
   const [avatarUrl, isToken] = [
     profileRes.profile?.pfp?.image,
-    profileRes.profile?.prp?.isToken,
+    profileRes.profile?.pfp?.isToken,
   ];
 
   return json({

@@ -2,7 +2,7 @@
 module.exports = {
   projects: {
     galaxy: {
-      schema: ["projects/galaxy/src/schema/gql/**/*.ts"],
+      schema: ["projects/galaxy/src/schema/types/**/*.ts"],
       extensions: {
         codegen: {
           generates: {
@@ -14,8 +14,8 @@ module.exports = {
       },
     },
     threeid: {
-      schema: ["projects/galaxy/src/schema/gql/**/*.ts"],
-      documents: ["projects/threeid/gql/**/*.ts"],
+      schema: ["projects/galaxy/src/schema/types/**/*.ts"],
+      documents: ["projects/threeid/gql/**/*.graphql"],
       extensions: {
         codegen: {
           generates: {
