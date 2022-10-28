@@ -42,8 +42,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
-  const session = await getUserSession(request);
-
   const formData = await request.formData();
 
   // @ts-ignore
@@ -76,7 +74,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function AccountSettingsProfile() {
-  const { displayName, job, location, bio, website, avatar, cover, isToken } =
+  const { displayName, job, location, bio, website, pfp, cover, isToken } =
     useLoaderData();
 
   const [profileData, setProfileData] = useState({
@@ -85,7 +83,7 @@ export default function AccountSettingsProfile() {
     location,
     bio,
     website,
-    avatar,
+    pfp,
     cover,
     isToken,
   });
@@ -101,7 +99,7 @@ export default function AccountSettingsProfile() {
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
           <img
-            src={gatewayFromIpfs(avatar)}
+            src={gatewayFromIpfs(pfp.image)}
             style={{
               width: 118,
               height: 118,
@@ -129,7 +127,7 @@ export default function AccountSettingsProfile() {
               </Text>
 
               <img
-                src={gatewayFromIpfs(avatar)}
+                src={gatewayFromIpfs(pfp.image)}
                 style={{
                   width: 33,
                   height: 33,
