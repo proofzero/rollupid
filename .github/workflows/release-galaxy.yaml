@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version-file: .nvmrc
           cache: "yarn"
       - run: yarn install
       - name: Code Generation
