@@ -66,6 +66,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     await galaxySdk.updateProfile(
       {
         profile: {
+          displayName: prof?.displayName ?? "",
           pfp: {
             image: gatewayFromIpfs(voucher?.metadata?.image),
           },
