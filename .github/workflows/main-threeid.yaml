@@ -82,7 +82,7 @@ jobs:
           DAPP_HOST: 3id-dev.kubelt.com
           DAPP_PORT: 443
           DAPP_SCHEMA: https
-        working-directory: threeid
+        working-directory: projects/threeid
       - uses: actions/upload-artifact@v2
         if: always()
         with:
