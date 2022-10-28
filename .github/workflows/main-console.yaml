@@ -1,7 +1,7 @@
 # .github/workflows/main-console.yaml
 ---
 
-name: console
+name: Console
 
 on:
   push:

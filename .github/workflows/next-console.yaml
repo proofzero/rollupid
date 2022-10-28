@@ -1,6 +1,8 @@
 # .github/workflows/next-console.yaml
 ---
-name: Next Deploy and Test Console App
+
+name: Console
+
 on:
   push:
     tags:

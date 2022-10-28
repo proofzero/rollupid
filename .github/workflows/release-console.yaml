@@ -1,7 +1,7 @@
 # .github/workflows/release-console.yaml
 ---
 
-name: Release Console App
+name: Console
 
 on:
   release:
