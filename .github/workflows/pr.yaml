@@ -1,5 +1,5 @@
 ---
-name: pr test and build
+name: pr test and build projects
 on:
   pull_request:
     branches:

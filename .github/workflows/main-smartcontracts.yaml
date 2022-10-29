@@ -1,7 +1,7 @@
 ---
-name: main test and build
+name: main test and build smartcontracts
 on:
-  pull_request:
+  push:
     branches:
       - main
 
