@@ -54,9 +54,6 @@ jobs:
       - name: Install
         run: yarn workspaces focus -A
 
-      - name: Code Generation
-        run: yarn gql
-
       - name: Build
         run: yarn build
 
