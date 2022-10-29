@@ -79,7 +79,7 @@ jobs:
           # cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
 
       - name: Install
-        run: yarn workspaces focus
+        run: yarn workspaces focus -A
 
       - name: Build
         run: yarn build

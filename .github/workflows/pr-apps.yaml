@@ -52,7 +52,7 @@ jobs:
       - run: nix-build apps.nix
 
       - name: Install
-        run: yarn workspaces focus
+        run: yarn workspaces focus -A
 
       - name: Code Generation
         run: yarn gql

@@ -23,7 +23,7 @@ jobs:
           filters: |
             platform: 'platform/**'
 
-  build-test-workspace:
+  build-test-platform:
     needs: changes
     if: needs.changes.outputs.platform == 'true'
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
       - run: nix-build platform.nix
 
       - name: Install
-        run: yarn workspaces focus
+        run: yarn workspaces focus -A
 
       - name: Code Generation
         run: yarn gql
