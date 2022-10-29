@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./platform
+
 jobs:
   build-publish-test-threeid-dev:
     runs-on: ubuntu-latest
@@ -74,23 +78,26 @@ jobs:
       #     path: |
       #       ~/.cache/ms-playwright
       #     key: cache-playwright-linux-1.25.2
-      - name: Install Playwright Browsers
-        # if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
-        working-directory: projects/threeid
-      - name: Run Playwright tests
-        run: npx playwright test
-        env:
-          NODE_ENV: dev
-          TEST_ENV: true
-          ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-          DAPP_HOST: 3id-dev.kubelt.com
-          DAPP_PORT: 443
-          DAPP_SCHEMA: https
-        working-directory: projects/threeid
-      - uses: actions/upload-artifact@v2
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 5
+
+      # TODO: renable when new auth is in place
+      # - name: Install Playwright Browsers
+      #   # if: steps.playwright-cache.outputs.cache-hit != 'true'
+      #   run: npx playwright install --with-deps
+      #   working-directory: projects/threeid
+
+      # - name: Run Playwright tests
+      #   run: npx playwright test
+      #   env:
+      #     NODE_ENV: dev
+      #     TEST_ENV: true
+      #     ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
+      #     DAPP_HOST: 3id-dev.kubelt.com
+      #     DAPP_PORT: 443
+      #     DAPP_SCHEMA: https
+      #   working-directory: projects/threeid
+      # - uses: actions/upload-artifact@v2
+      #   if: always()
+      #   with:
+      #     name: playwright-report
+      #     path: playwright-report/
+      #     retention-days: 5

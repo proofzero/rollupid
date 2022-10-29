@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./projects
+
 jobs:
   build-publish-test-redeem-dev:
     runs-on: ubuntu-latest
