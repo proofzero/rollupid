@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "useWorkspaces": true,
-  "workspaces": [],
   "scripts": {
     "start": "yarn workspaces foreach -i -v -p run start",
     "build": "yarn workspaces foreach -p -v -i run build",

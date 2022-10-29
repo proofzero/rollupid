@@ -25,9 +25,25 @@ jobs:
         run: yarn workspaces focus -A
 
       - name: Test
-        run: yarn test
+        run: yarn workspaces foreach -i -v -t --include oort run test
 
-      - run: yarn run wrangler:publish:devnet
+      - name: Deploy Oort to Dev Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: "platform/oort"
+          command: publish --env devnet
+          environment: "devnet"
+          secrets: |
+            SITE
+            ENVIRONMENT
+            CLOUDFLARE_API_TOKEN
+            CLOUDFLARE_ACCOUNT_ID
+            DATADOG_API_KEY
+            DATADOG_APP_KEY
+            ENS_CONTRACT_ADDRESS
+            ALCHEMY_API_URL
+            ALCHEMY_NFT_API_URL
         env:
           SITE: oort-devnet
           ENVIRONMENT: production

@@ -10,9 +10,9 @@
     "gql:threeid": "graphql-codegen --config graphql.config.js --project threeid --aggregate-output -n -l",
     "gql": "run-p \"gql:*\"",
     "dev:gql": "run-p \"gql:* -- --watch\"",
-    "start": "yarn workspaces foreach -i -v -p run start",
-    "build": "yarn workspaces foreach -p -v -i run build",
-    "test": "yarn workspaces foreach -p -v -i run test"
+    "start": "yarn workspaces foreach -i -v -p -t run start",
+    "build": "yarn workspaces foreach -p -v -i -t run build",
+    "test": "yarn workspaces foreach -p -v -i -t run test"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.7",
