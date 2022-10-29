@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: projects/oort
+    working-directory: ./platform
 
 jobs:
   deploy:
@@ -19,10 +19,13 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build
+      - run: nix-build platform.nix
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces focus -A
+
+      - name: Test
+        run: yarn test
 
       - run: yarn run wrangler:publish:devnet
         env:

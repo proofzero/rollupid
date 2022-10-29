@@ -1,0 +1,64 @@
+---
+name: Platform
+on:
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: ./platform
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      platform: ${{ steps.changes.outputs.platform }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            platform: 'platform/**'
+
+  build-test-platform:
+    needs: changes
+    if: needs.changes.outputs.platform == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Modules
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            platform/node_modules
+          key: ${{ runner.os }}-platform-modules-${{ hashFiles('yarn.lock') }}
+          retore-keys: |
+            ${{ runner.os }}-platform-modules-
+
+      - name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build platform.nix
+
+      - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Code Generation
+        run: yarn gql
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test

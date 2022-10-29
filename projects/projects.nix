@@ -27,7 +27,7 @@ let
       ]);
 
 in mkShell {
-  name = "kubelt";
+  name = "kubelt/platform";
   allowUnfree = true;
 
   nativeBuildInputs = [ 
@@ -35,19 +35,6 @@ in mkShell {
   ];
 
   buildInputs = inputs;
-
-  # APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [
-  #   pkg-config
-  #   nodePackages.node-gyp
-  #   cairo
-  #   pango
-  #   libpng
-  #   llvm
-  #   librsvg
-  #   pixman
-  #   giflib
-  #   libjpeg 
-  # ]}";
 
   shellHook = ''
     LD=$CC

@@ -1,6 +1,6 @@
 # .github/workflows/next-console.yaml
 ---
-name: Console
+name: Next Console
 
 on:
   push:
@@ -13,17 +13,21 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
+
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-build
+
+      - run: nix-build --impure
+
       - run: yarn install
+
       - name: Deploy to Next Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "projects/console"
+          workingDirectory: "apps/console"
           command: publish --env next
           environment: "next"
           secrets: |

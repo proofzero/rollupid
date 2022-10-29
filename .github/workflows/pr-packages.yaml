@@ -1,15 +1,18 @@
 ---
-name: pr test and build projects
+name: Packages
 on:
   pull_request:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./packages
+
 jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      projects: ${{ steps.changes.outputs.projects }}
       packages: ${{ steps.changes.outputs.packages }}
     steps:
       # find out what deploy stack to use
@@ -18,24 +21,15 @@ jobs:
         id: changes
         with:
           filters: |
-            projects: 'projects/**'
             packages: 'packages/**'
 
-  build-test-workspace:
+  build-test-packages:
     needs: changes
-    if: needs.changes.outputs.projects == 'true' || needs.changes.outputs.packages == 'true'
+    if: needs.changes.outputs.packages == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
-
-      # TODO: b/c files store at / this creates a permission denied at recovery
-      # - name: Cache Nix
-      #   id: cache-nix
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: /nix/store
-      #     key: ${{ runner.os }}-nix
 
       - name: Cache Modules
         id: cache-modules
@@ -43,10 +37,9 @@ jobs:
         with:
           path: |
             node_modules
-            /tmp
-          key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-packages-modules-${{ hashFiles('yarn.lock') }}
           retore-keys: |
-            ${{ runner.os }}-modules-
+            ${{ runner.os }}-packages-modules-
 
       - name: List the state of node modules
         continue-on-error: true
@@ -56,7 +49,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build
+      - run: nix-build packages.nix
 
         # if: steps.cache-modules.outputs.cache-hit != 'true'
       # - uses: actions/setup-node@v3
@@ -66,10 +59,7 @@ jobs:
       #     cache: "yarn"
 
       - name: Install
-        run: yarn install --immutable
-
-      - name: Code Generation
-        run: yarn gql
+        run: yarn workspaces focus -A
 
       - name: Build
         run: yarn build

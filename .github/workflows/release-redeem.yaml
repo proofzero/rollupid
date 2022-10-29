@@ -1,8 +1,12 @@
 ---
-name: Release Redeem App
+name: Release Redeem
 on:
   release:
     types: [published]
+
+defaults:
+  run:
+    working-directory: ./apps
 
 jobs:
   build-publish-redeem-current:
@@ -11,11 +15,16 @@ jobs:
       packages: read
     steps:
       - uses: actions/checkout@v2
+
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-build
-      - run: yarn install
+
+      - run: nix-build apps.nix
+
+      - name: Install
+        run: yarn workspaces focus -A
+
       - name: Deploy to Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:

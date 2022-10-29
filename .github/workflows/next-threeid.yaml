@@ -1,9 +1,13 @@
 ---
-name: Next Deploy and Test ThreeID App
+name: Next 3ID
 on:
   push:
     tags:
       - "*"
+
+defaults:
+  run:
+    working-directory: ./apps
 
 jobs:
   build-publish-test-threeid-next:
@@ -15,19 +19,22 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build
+      - run: nix-build apps.nix
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces focus -A
 
       - name: Code Generation
         run: yarn gql
+
+      - name: Test
+        run: yarn test
 
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "projects/threeid"
+          workingDirectory: "apps/threeid"
           command: publish --env next
           environment: "next"
           secrets: |

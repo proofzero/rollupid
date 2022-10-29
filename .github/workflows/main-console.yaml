@@ -7,6 +7,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./apps
+
 jobs:
   build-publish-test-console-dev:
     runs-on: ubuntu-latest
@@ -18,17 +22,23 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build
+      - run: nix-build apps.nix
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces focus -A
 
-      - name: Deploy to Dev Worker
+      - name: Code Generation
+        run: yarn gql
+
+      - name: Test
+        run: yarn test
+
+      - name: Deploy Console to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "projects/console"
+          workingDirectory: "apps/console"
           command: publish --env dev
           environment: "dev"
           secrets: |
