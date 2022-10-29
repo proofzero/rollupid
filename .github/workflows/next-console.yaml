@@ -1,6 +1,6 @@
 # .github/workflows/next-console.yaml
 ---
-name: Console
+name: Next Console
 
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "projects/console"
+          workingDirectory: "apps/console"
           command: publish --env next
           environment: "next"
           secrets: |

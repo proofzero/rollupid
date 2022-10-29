@@ -1,9 +1,13 @@
 ---
-name: Next Deploy and Test Redeem App
+name: Next Redeem
 on:
   push:
     tags:
       - "*"
+
+defaults:
+  run:
+    working-directory: ./projects
 
 jobs:
   build-publish-test-redeem-next:
@@ -16,9 +20,13 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build  --impure
+      - run: nix-build projects.nix
 
-      - run: yarn install
+      - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Test
+        run: yarn test
 
       - name: Deploy to Next Worker
         uses: cloudflare/wrangler-action@2.0.0

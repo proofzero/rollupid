@@ -1,9 +1,13 @@
 ---
-name: Next Deploy and Test Galaxy
+name: Next Galaxy
 on:
   push:
     tags:
       - "*"
+
+defaults:
+  run:
+    working-directory: ./platform
 
 jobs:
   build-publish-test-galaxy-next:
@@ -16,18 +20,22 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build  --impure
+      - run: nix-build platform.nix
 
-      - run: yarn install
+      - name: Install
+        run: yarn workspaces focus -A
 
       - name: Code Generation
         run: yarn gql
+
+      - name: Test
+        run: yarn test
 
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "projects/galaxy"
+          workingDirectory: "platform/galaxy"
           command: publish --env next
           environment: "next"
           secrets: |

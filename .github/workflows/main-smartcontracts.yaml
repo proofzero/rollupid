@@ -1,9 +1,13 @@
 ---
-name: Smartcontracts
+name: Smart Contracts
 on:
   push:
     branches:
       - main
+
+defaults:
+  run:
+    working-directory: ./smartcontracts
 
 env:
   # NFTAR
@@ -46,44 +50,23 @@ env:
   POLYGON_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
 
 jobs:
-  build-test-pfp-invite:
+  build-test-smartcontracts:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v3
+      - uses: cachix/install-nix-action@v18
         with:
-          node-version-file: .nvmrc
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build smartcontracts.nix
 
       - name: Install
-        run: yarn install
-        working-directory: smartcontracts/eth/pfp-invites
+        run: yarn workspaces focus -A
 
       - name: Build
         run: yarn build
-        working-directory: smartcontracts/eth/pfp-invites
-
-      # - name: Test
-      #   run: yarn test
-
-  build-test-crdt:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install
-        run: yarn install
-        working-directory: smartcontracts/eth/crdt
-
-      - name: Build
-        run: yarn build
-        working-directory: smartcontracts/eth/crdt
 
       # - name: Test
       #   run: yarn test
