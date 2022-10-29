@@ -28,7 +28,7 @@ env:
   CRDT_POLYGON_ALCHEMY_URL: ${{ secrets.CRDT_POLYGON_ALCHEMY_URL }}
   CRDT_ETHEREUM_ALCHEMY_URL: ${{ secrets.CRDT_ETHEREUM_ALCHEMY_URL }}
   # SMART CONTRACT INVITE
-  # ODO: fix naming of env vars
+  # TODO: fix naming of env vars
   ETHERSCAN: ${{ secrets.CRDT_ETHERSCAN_API_KEY }}
   NFT_STORAGE_KEY_TEST: ${{ secrets.NFT_STORAGE_DEV }}
   NFT_STORAGE_KEY_MAIN: ${{ secrets.NFT_STORAGE_MAIN }}
@@ -38,12 +38,12 @@ env:
   # LOCALHOST_OPERATOR_PK:
   GOERLI_OWNER_PK: ${{ secrets.ETH_GOERLI_PK }}
   GOERLI_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }}
-  # MAINNET_OWNER_PK:
+  MAINNET_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
   MAINNET_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
-  # MUMBAI_OWNER_PK:
-  # MUMBAI_OPERATOR_PK:
-  # POLYGON_OWNER_PK:
-  # POLYGON_OPERATOR_PK:
+  MUMBAI_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  MUMBAI_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  POLYGON_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  POLYGON_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
 
 jobs:
   build-test-workspace:
@@ -64,7 +64,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ./node_modules
+            node_modules
             /tmp
           key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
           retore-keys: |
