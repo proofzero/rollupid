@@ -1,5 +1,5 @@
 ---
-name: main test and build smartcontracts
+name: Smartcontracts
 on:
   push:
     branches:
