@@ -19,19 +19,7 @@ jobs:
       #     path: /nix/store
       #     key: ${{ runner.os }}-nix
 
-      - name: Cache Modules
-        id: cache-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            node_modules
-            /tmp
-          key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
-          retore-keys: |
-            ${{ runner.os }}-modules-
-
       - name: List the state of node modules
-        if: ${{ steps.cache-modules.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: npm list
 
