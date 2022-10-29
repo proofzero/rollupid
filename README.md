@@ -13,6 +13,7 @@
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-threeid.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-redeem.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-nftar.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-smartcontracts.yaml/badge.svg)
 
 ## What is Kubelt?
