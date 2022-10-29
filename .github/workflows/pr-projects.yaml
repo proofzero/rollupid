@@ -23,7 +23,7 @@ jobs:
           filters: |
             projects: 'projects/**'
 
-  build-test-workspace:
+  build-test-packages:
     needs: changes
     if: needs.changes.outputs.projects == 'true'
     runs-on: ubuntu-latest
