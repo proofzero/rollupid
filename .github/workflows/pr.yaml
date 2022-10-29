@@ -28,6 +28,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
+
       # TODO: b/c files store at / this creates a permission denied at recovery
       # - name: Cache Nix
       #   id: cache-nix
@@ -35,6 +36,17 @@ jobs:
       #   with:
       #     path: /nix/store
       #     key: ${{ runner.os }}-nix
+
+      - name: Cache Modules
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            /tmp
+          key: ${{ runner.os }}-modules-${{ hashFiles('yarn.lock') }}
+          retore-keys: |
+            ${{ runner.os }}-modules-
 
       - name: List the state of node modules
         continue-on-error: true
@@ -54,7 +66,7 @@ jobs:
       #     cache: "yarn"
 
       - name: Install
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Code Generation
         run: yarn gql

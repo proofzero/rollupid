@@ -74,7 +74,7 @@ jobs:
           cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
 
       - name: Install
-        run: yarn install
+        run: yarn install --immutable
         working-directory: smartcontracts/eth/pfp-invites
 
       - name: Build
@@ -98,7 +98,7 @@ jobs:
           cache-dependency-path: smartcontracts/eth/crdt/yarn.lock
 
       - name: Install
-        run: yarn install
+        run: yarn install --immutable
         working-directory: smartcontracts/eth/crdt
 
       - name: Build
