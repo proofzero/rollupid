@@ -63,7 +63,7 @@ jobs:
           filters: |
             smartcontracts: 'smartcontracts/**'
 
-  build-test-packages:
+  build-test-smartcontracts:
     needs: changes
     if: needs.changes.outputs.smartcontracts == 'true'
     runs-on: ubuntu-latest

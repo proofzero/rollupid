@@ -23,7 +23,7 @@ jobs:
           filters: |
             platform: 'platform/**'
 
-  build-test-packages:
+  build-test-platform:
     needs: changes
     if: needs.changes.outputs.platform == 'true'
     runs-on: ubuntu-latest

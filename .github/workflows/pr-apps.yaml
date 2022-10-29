@@ -1,5 +1,5 @@
 ---
-name: Platform
+name: Apps
 on:
   pull_request:
     branches:
@@ -23,7 +23,7 @@ jobs:
           filters: |
             apps: 'apps/**'
 
-  build-test-workspace:
+  build-test-apps:
     needs: changes
     if: needs.changes.outputs.apps == 'true'
     runs-on: ubuntu-latest
