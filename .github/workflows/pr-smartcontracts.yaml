@@ -49,10 +49,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      www: ${{ steps.changes.outputs.www }}
-      threeid: ${{ steps.changes.outputs.threeid }}
-      redeem: ${{ steps.changes.outputs.redeem }}
-      nftar: ${{ steps.changes.outputs.nftar }}
+      smartcontracts: ${{ steps.changes.outputs.smartcontracts }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
