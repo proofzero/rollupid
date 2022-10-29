@@ -1,0 +1,64 @@
+---
+name: Projects
+on:
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: ./projects
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.changes.outputs.projects }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            projects: 'projects/**'
+
+  build-test-workspace:
+    needs: changes
+    if: needs.changes.outputs.projects == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache Modules
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            projects/node_modules
+          key: ${{ runner.os }}-projects-modules-${{ hashFiles('yarn.lock') }}
+          retore-keys: |
+            ${{ runner.os }}-projects-modules-
+
+      - name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build projects.nix
+
+      - name: Install
+        run: yarn workspaces focus
+
+      - name: Code Generation
+        run: yarn gql
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test

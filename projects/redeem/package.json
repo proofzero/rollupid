@@ -12,7 +12,6 @@
     "dev:remix": "remix watch",
     "dev:wrangler": "wrangler dev --local --persist --env dev",
     "dev:css": "yarn generate:css -- --watch",
-    "dev": "echo \"No dev for redeem. Please use start.\"",
     "start": "run-p \"dev:*\"",
     "generate:css": "npx tailwindcss -o ./app/tailwind.css"
   },

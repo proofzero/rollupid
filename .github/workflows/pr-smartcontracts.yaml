@@ -1,9 +1,13 @@
 ---
-name: pr test and build smartcontracts
+name: Smart Contracts
 on:
   pull_request:
     branches:
       - main
+
+defaults:
+  run:
+    working-directory: ./smartcontracts
 
 env:
   # NFTAR
@@ -59,7 +63,7 @@ jobs:
           filters: |
             smartcontracts: 'smartcontracts/**'
 
-  build-test-pfp-invite:
+  build-test-smartcontracts:
     needs: changes
     if: needs.changes.outputs.smartcontracts == 'true'
     runs-on: ubuntu-latest
@@ -75,37 +79,10 @@ jobs:
           # cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
 
       - name: Install
-        run: yarn install --immutable
-        working-directory: smartcontracts/eth/pfp-invites
+        run: yarn workspaces focus
 
       - name: Build
         run: yarn build
-        working-directory: smartcontracts/eth/pfp-invites
-
-      # - name: Test
-      #   run: yarn test
-
-  build-test-crdt:
-    if: needs.changes.outputs.smartcontracts == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version-file: .nvmrc
-          # DISABLE CACHE UNTIL SORTED OUT
-          # cache: "yarn"
-          # cache-dependency-path: smartcontracts/eth/crdt/yarn.lock
-
-      - name: Install
-        run: yarn install --immutable
-        working-directory: smartcontracts/eth/crdt
-
-      - name: Build
-        run: yarn build
-        working-directory: smartcontracts/eth/crdt
 
       # - name: Test
       #   run: yarn test
