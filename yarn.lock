@@ -5,6 +5,37 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"3ID-invite@workspace:smartcontracts/eth/pfp-invites":
+  version: 0.0.0-use.local
+  resolution: "3ID-invite@workspace:smartcontracts/eth/pfp-invites"
+  dependencies:
+    "@alch/alchemy-web3": 1.4.6
+    "@nomicfoundation/hardhat-chai-matchers": 1.0.4
+    "@nomicfoundation/hardhat-network-helpers": 1.0.6
+    "@nomicfoundation/hardhat-toolbox": 1.0.2
+    "@nomiclabs/hardhat-ethers": 2.1.1
+    "@nomiclabs/hardhat-etherscan": 3.1.2
+    "@nomiclabs/hardhat-solhint": 2.0.1
+    "@openzeppelin/contracts": 4.7.3
+    "@openzeppelin/contracts-upgradeable": 4.8.0-rc.1
+    "@openzeppelin/hardhat-upgrades": 1.20.0
+    "@typechain/ethers-v5": 7.0.1
+    "@typechain/hardhat": 6.1.3
+    "@types/chai": 4.3.3
+    "@types/chai-as-promised": 7.1.5
+    "@types/mocha": 10.0.0
+    chai: 4.3.6
+    cheerio: 1.0.0-rc.12
+    dotenv: 16.0.3
+    hardhat: 2.10.2
+    hardhat-gas-reporter: 1.0.9
+    nft.storage: 7.0.0
+    solidity-coverage: 0.8.2
+    ts-node: 10.9.1
+    typechain: 8.1.0
+  languageName: unknown
+  linkType: soft
+
 "3id-nftar-generator@workspace:projects/nftar":
   version: 0.0.0-use.local
   resolution: "3id-nftar-generator@workspace:projects/nftar"
@@ -3801,25 +3832,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/3iD-invite@workspace:smartcontracts/eth/pfp-invites":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/3iD-invite@workspace:smartcontracts/eth/pfp-invites"
-  dependencies:
-    "@alch/alchemy-web3": 1.4.6
-    "@nomicfoundation/hardhat-network-helpers": 1.0.6
-    "@nomicfoundation/hardhat-toolbox": 1.0.2
-    "@nomiclabs/hardhat-ethers": 2.1.1
-    "@nomiclabs/hardhat-solhint": 2.0.1
-    "@openzeppelin/contracts": 4.7.3
-    "@openzeppelin/contracts-upgradeable": 4.8.0-rc.1
-    "@openzeppelin/hardhat-upgrades": 1.20.0
-    cheerio: 1.0.0-rc.12
-    dotenv: 16.0.3
-    hardhat: 2.10.2
-    nft.storage: 7.0.0
-  languageName: unknown
-  linkType: soft
-
 "@kubelt/app.icons@workspace:projects/icons":
   version: 0.0.0-use.local
   resolution: "@kubelt/app.icons@workspace:projects/icons"
@@ -6146,7 +6158,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai-as-promised@npm:^7.1.3":
+"@types/chai-as-promised@npm:7.1.5, @types/chai-as-promised@npm:^7.1.3":
   version: 7.1.5
   resolution: "@types/chai-as-promised@npm:7.1.5"
   dependencies:
@@ -6155,7 +6167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:*":
+"@types/chai@npm:*, @types/chai@npm:4.3.3":
   version: 4.3.3
   resolution: "@types/chai@npm:4.3.3"
   checksum: 20cd094753e137cfc35939cae7f0ed78ecda7861e5c94704efab6979b9121a63807e9b631bdcf3a2792d6c6dba44050b13387262f9e63ebb040741c01c345f0a
@@ -6445,6 +6457,13 @@ __metadata:
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: b8da83c66eb4aac0440e64674b19564d9d86c80ae273144db9681e5eeff66f238ade9515f5006ffbfa955ceff8b89ad2bd8ec577d7caee74ba101431fb07045d
+  languageName: node
+  linkType: hard
+
+"@types/mocha@npm:10.0.0":
+  version: 10.0.0
+  resolution: "@types/mocha@npm:10.0.0"
+  checksum: 69e3896a63ec93374e22afd03fdea4c2f31d609d6ea111c8403508ede90da9dc0140c7bb2edff8404114d9d980308e104e4236324bf6afac1410b2cfe35f98c6
   languageName: node
   linkType: hard
 
