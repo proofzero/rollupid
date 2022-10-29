@@ -1,5 +1,7 @@
 # .gitignore
 
+.DS_Store
+
 # Ignore backup files.
 *~
 

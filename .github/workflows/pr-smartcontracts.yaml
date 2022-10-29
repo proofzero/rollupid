@@ -88,6 +88,7 @@ jobs:
       #   run: yarn test
 
   build-test-crdt:
+    if: needs.changes.outputs.smartcontracts == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
