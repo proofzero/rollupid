@@ -3,7 +3,7 @@
 name: Console
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -44,6 +44,7 @@ jobs:
           secrets: |
             ADMIN_ACCOUNT_ID
             CLOUDFLARE_API_TOKEN
+            SESSION_SECRET
         env:
           # The name of our session cookie.
           SESSION_NAME: "starbase"

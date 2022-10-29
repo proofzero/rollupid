@@ -2,7 +2,7 @@
 name: Redeem
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
@@ -17,7 +17,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build --impure
+      - run: nix-build projects.nix
 
       - name: Install
         run: yarn install
