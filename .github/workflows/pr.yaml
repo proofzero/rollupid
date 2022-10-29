@@ -6,7 +6,26 @@ on:
       - main
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      www: ${{ steps.changes.outputs.www }}
+      threeid: ${{ steps.changes.outputs.threeid }}
+      redeem: ${{ steps.changes.outputs.redeem }}
+      nftar: ${{ steps.changes.outputs.nftar }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            projects: 'projects/**'
+            packages: 'packages/**'
+
   build-test-workspace:
+    needs: changes
+    if: needs.changes.outputs.projects == 'true' || needs.changes.outputs.packages == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

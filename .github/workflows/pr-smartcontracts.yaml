@@ -46,7 +46,25 @@ env:
   POLYGON_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      www: ${{ steps.changes.outputs.www }}
+      threeid: ${{ steps.changes.outputs.threeid }}
+      redeem: ${{ steps.changes.outputs.redeem }}
+      nftar: ${{ steps.changes.outputs.nftar }}
+    steps:
+      # find out what deploy stack to use
+      - uses: actions/checkout@master
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            smartcontracts: 'smartcontracts/**'
+
   build-test-pfp-invite:
+    needs: changes
+    if: needs.changes.outputs.smartcontracts == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
