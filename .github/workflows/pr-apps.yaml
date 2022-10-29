@@ -13,7 +13,7 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
-      platform: ${{ steps.changes.outputs.apps }}
+      apps: ${{ steps.changes.outputs.apps }}
     steps:
       # find out what deploy stack to use
       - uses: actions/checkout@master
