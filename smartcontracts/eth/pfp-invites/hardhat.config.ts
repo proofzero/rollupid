@@ -1,5 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config();
 /** @type import('hardhat/config').HardhatUserConfig */
-import * as config from  './invite.config';
+import * as config from "./invite.config";
 
 // We probably don't want to use the CLI for profiles
 // so we import the invites above as default. You can

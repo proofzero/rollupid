@@ -1,29 +1,55 @@
-# { pkgs ? import <nixpkgs> {} }:
-with import <nixpkgs> {};
-
-stdenv.mkDerivation {
-  name = "kubelt";
-
-  nativeBuildInputs = [ pkg-config ];
-  
-  buildInputs = [
-    nodejs-16_x
+with (import <nixpkgs> {});
+let
+  basePackages = [
+    nodejs-18_x
     yarn
-    jdk
-    docker
-    chromedriver
-    docker
-    rustup
-    libuuid
-    act 
+    cairo
+    pango
+    pkg-config
+    nodePackages.node-gyp
+    libpng
+    librsvg
+    pixman
+    giflib
+    libjpeg
+    # TODO: For local dev it's nice to have but you can always add them manudal
+    # docker
+    # chromedriver
+    # act
   ];
 
-    
-  # APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [ libGL libuuid google-chrome-dev]}";
+  inputs = basePackages
+    ++ lib.optional stdenv.isLinux inotify-tools
+    ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
+        CoreFoundation
+        CoreServices
+        CoreText
+      ]);
 
-  # shellHook = ''
-  #   LD=$CC
-  #   export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
-  # '';
+in mkShell {
+  name = "kubelt";
 
+  nativeBuildInputs = [ 
+    pkg-config
+  ];
+
+  buildInputs = inputs;
+
+  # APPEND_LIBRARY_PATH = "${lib.makeLibraryPath [
+  #   pkg-config
+  #   nodePackages.node-gyp
+  #   cairo
+  #   pango
+  #   libpng
+  #   llvm
+  #   librsvg
+  #   pixman
+  #   giflib
+  #   libjpeg 
+  # ]}";
+
+  shellHook = ''
+    LD=$CC
+    export LD_LIBRARY_PATH="$APPEND_LIBRARY_PATH:$LD_LIBRARY_PATH"
+  '';
 }

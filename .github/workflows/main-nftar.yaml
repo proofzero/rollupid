@@ -11,16 +11,18 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
+
+      - uses: cachix/install-nix-action@v18
         with:
-          node-version-file: .nvmrc
-          cache: "npm"
-          cache-dependency-path: ./nftar/package-lock.json
-      - run: npm install
-        working-directory: nftar
-      - name: Build and Test
-        run: npm test
-        working-directory: nftar
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build
+
+      - name: Install
+        run: yarn install
+
+      - name: Test
+        run: yarn test
         env:
           CHAIN: "ethereum"
           CHAIN_ID: 5

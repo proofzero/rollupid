@@ -8,14 +8,12 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
+    "build": "echo \"NFTAR has no build\"",
     "start": "nodemon node index.js"
   },
   "devDependencies": {
     "eslint": "7.7.0",
     "jest": "29.0.3"
-  },
-  "engines": {
-    "node": ">=14"
   },
   "author": "",
   "license": "MIT",
@@ -23,7 +21,7 @@
     "@alch/alchemy-web3": "1.4.6",
     "@koalex/koa-json-rpc": "1.0.3",
     "alchemy-sdk": "2.0.2",
-    "canvas": "2.9.3",
+    "canvas": "2.10.1",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "16.0.1",
     "fabric": "5.2.1",

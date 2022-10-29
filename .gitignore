@@ -1,5 +1,7 @@
 # .gitignore
 
+.DS_Store
+
 # Ignore backup files.
 *~
 
@@ -211,3 +213,11 @@ act.secrets
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

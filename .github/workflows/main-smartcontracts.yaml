@@ -1,0 +1,93 @@
+---
+name: main test and build smartcontracts
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # NFTAR
+  # TODO: fix naming of env vars
+  CHAIN: "ethereum"
+  CHAIN_ID: 5
+  OORT_URL: oort-devnet.kubelt.com
+  STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
+  WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
+  ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
+  ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
+  ALCHEMY_NETWORK: "ETH_MAINNET"
+  INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
+  PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+  NFTAR_API_KEY: "test"
+  # SMART CONTRACT CRDT
+  CRDT_ETHERSCAN_API_KEY: ${{ secrets.CRDT_ETHERSCAN_API_KEY }}
+  CRDT_GOERLI_OWNER_PRIVATE: ${{ secrets.CRDT_GOERLI_OWNER_PRIVATE }}
+  CRDT_GOERLI_OWNER_ADDRESS: ${{ secrets.CRDT_GOERLI_OWNER_ADDRESS }}
+  CRDT_GOERLI_ALCHEMY_URL: ${{ secrets.CRDT_GOERLI_ALCHEMY_URL }}
+  CRDT_MUMBAI_ALCHEMY_URL: ${{ secrets.CRDT_MUMBAI_ALCHEMY_URL }}
+  CRDT_POLYGON_ALCHEMY_URL: ${{ secrets.CRDT_POLYGON_ALCHEMY_URL }}
+  CRDT_ETHEREUM_ALCHEMY_URL: ${{ secrets.CRDT_ETHEREUM_ALCHEMY_URL }}
+  # SMART CONTRACT INVITE
+  # TODO: fix naming of env vars
+  ETHERSCAN: ${{ secrets.CRDT_ETHERSCAN_API_KEY }}
+  NFT_STORAGE_KEY_TEST: ${{ secrets.NFT_STORAGE_DEV }}
+  NFT_STORAGE_KEY_MAIN: ${{ secrets.NFT_STORAGE_MAIN }}
+  NFTAR_API_TOKEN_TESTNET: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
+  NFTAR_API_TOKEN_MAINNET: ${{ secrets.NFTAR_AUTHORIZATION }}
+  # LOCALHOST_OWNER_PK:
+  # LOCALHOST_OPERATOR_PK:
+  GOERLI_OWNER_PK: ${{ secrets.ETH_GOERLI_PK }}
+  GOERLI_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }}
+  MAINNET_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  MAINNET_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_PRIVATE_KEY }}
+  MUMBAI_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  MUMBAI_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  POLYGON_OWNER_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+  POLYGON_OPERATOR_PK: ${{ secrets.INVITE_OPERATOR_TEST_PRIVATE_KEY }} # FIXME
+
+jobs:
+  build-test-pfp-invite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: "yarn"
+          cache-dependency-path: ./smartcontracts/eth/pfp-invites/yarn.lock
+
+      - name: Install
+        run: yarn install
+        working-directory: smartcontracts/eth/pfp-invites
+
+      - name: Build
+        run: yarn build
+        working-directory: smartcontracts/eth/pfp-invites
+
+      # - name: Test
+      #   run: yarn test
+
+  build-test-crdt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: "yarn"
+          cache-dependency-path: ./smartcontracts/eth/crdt/yarn.lock
+
+      - name: Install
+        run: yarn install
+        working-directory: smartcontracts/eth/crdt
+
+      - name: Build
+        run: yarn build
+        working-directory: smartcontracts/eth/crdt
+
+      # - name: Test
+      #   run: yarn test
