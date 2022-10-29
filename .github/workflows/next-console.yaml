@@ -7,6 +7,10 @@ on:
     tags:
       - "*"
 
+defaults:
+  run:
+    working-directory: ./apps
+
 jobs:
   build-publish-test-console-next:
     runs-on: ubuntu-latest
