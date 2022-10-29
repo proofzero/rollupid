@@ -19,7 +19,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build
+      - run: nix-build --impure
 
       - name: Install
         run: yarn install

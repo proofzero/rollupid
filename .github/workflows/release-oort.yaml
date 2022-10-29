@@ -12,11 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-build
+
+      - run: nix-build --impure
+
       - run: yarn install
+
       - run: yarn run wrangler:publish:mainnet
         env:
           SITE: oort-mainnet

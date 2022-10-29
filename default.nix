@@ -28,6 +28,7 @@ let
 
 in mkShell {
   name = "kubelt";
+  allowUnfree = true;
 
   nativeBuildInputs = [ 
     pkg-config
