@@ -70,8 +70,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: "yarn"
-          cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
+          # DISABLE CACHE UNTIL SORTED OUT
+          # cache: "yarn"
+          # cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
 
       - name: Install
         run: yarn install --immutable
@@ -94,8 +95,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
-          cache: "yarn"
-          cache-dependency-path: smartcontracts/eth/crdt/yarn.lock
+          # DISABLE CACHE UNTIL SORTED OUT
+          # cache: "yarn"
+          # cache-dependency-path: smartcontracts/eth/crdt/yarn.lock
 
       - name: Install
         run: yarn install --immutable
