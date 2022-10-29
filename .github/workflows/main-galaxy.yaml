@@ -30,7 +30,7 @@ jobs:
         run: yarn gql
 
       - name: Test
-        run: yarn test
+        run: yarn workspaces foreach -i -v -t --include galaxy run test
 
       - name: Deploy Galaxy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0

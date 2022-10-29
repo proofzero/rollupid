@@ -20,7 +20,11 @@ jobs:
 
       - run: nix-build apps.nix
 
-      - run: yarn install
+      - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Test
+        run: yarn workspaces foreach -i -v -t --include console run test
 
       - name: Deploy to Next Worker
         uses: cloudflare/wrangler-action@2.0.0

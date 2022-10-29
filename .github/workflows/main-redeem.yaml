@@ -24,7 +24,7 @@ jobs:
       - run: nix-build projects.nix
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces foreach -i -v -t --include redeem run test
 
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0

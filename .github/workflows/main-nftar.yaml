@@ -26,7 +26,7 @@ jobs:
         run: yarn workspaces focus -A
 
       - name: Test
-        run: yarn test
+        run: yarn workspaces foreach -i -v -t --include nftar run test
         env:
           CHAIN: "ethereum"
           CHAIN_ID: 5
