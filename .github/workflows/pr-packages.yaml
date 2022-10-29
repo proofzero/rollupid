@@ -37,7 +37,6 @@ jobs:
         with:
           path: |
             node_modules
-            /tmp
           key: ${{ runner.os }}-packages-modules-${{ hashFiles('yarn.lock') }}
           retore-keys: |
             ${{ runner.os }}-packages-modules-
@@ -61,9 +60,6 @@ jobs:
 
       - name: Install
         run: yarn workspaces focus -A
-
-      - name: Code Generation
-        run: yarn gql
 
       - name: Build
         run: yarn build
