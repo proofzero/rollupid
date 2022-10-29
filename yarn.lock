@@ -3740,9 +3740,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/app.icons@workspace:projects/icons":
+"@kubelt/app.icons@workspace:platform/icons":
   version: 0.0.0-use.local
-  resolution: "@kubelt/app.icons@workspace:projects/icons"
+  resolution: "@kubelt/app.icons@workspace:platform/icons"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     date-fns: 2.29.3
@@ -9177,9 +9177,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"console@workspace:projects/console":
+"console@workspace:platform/console":
   version: 0.0.0-use.local
-  resolution: "console@workspace:projects/console"
+  resolution: "console@workspace:platform/console"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@headlessui/react": 1.7.3
@@ -12954,9 +12954,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"galaxy@workspace:projects/galaxy":
+"galaxy@workspace:platform/galaxy":
   version: 0.0.0-use.local
-  resolution: "galaxy@workspace:projects/galaxy"
+  resolution: "galaxy@workspace:platform/galaxy"
   dependencies:
     "@cloudflare/workers-types": 3.17.0
     "@graphql-tools/merge": 8.3.6
@@ -18870,9 +18870,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oort@workspace:projects/oort":
+"oort@workspace:platform/oort":
   version: 0.0.0-use.local
-  resolution: "oort@workspace:projects/oort"
+  resolution: "oort@workspace:platform/oort"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@datadog/datadog-api-client": 1.5.0
@@ -22951,9 +22951,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"threeid@workspace:projects/threeid":
+"threeid@workspace:platform/threeid":
   version: 0.0.0-use.local
-  resolution: "threeid@workspace:projects/threeid"
+  resolution: "threeid@workspace:platform/threeid"
   dependencies:
     "@cloudflare/workers-types": 3.14.1
     "@datadog/browser-rum": 4.19.0
