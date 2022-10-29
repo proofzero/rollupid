@@ -2,7 +2,7 @@
 
 // import * as cheerio from "cheerio";
 // import * as path from "path";
-import chalk from 'chalk';
+import chalk from "chalk";
 // import fs from "fs";
 // import https from "node:https";
 // import { NFTStorage, File } from "nft.storage";
@@ -29,7 +29,6 @@ import {
   ChainnetConfiguration,
 } from "./crdt.networks";
 
-
 // definitions
 // -----------------------------------------------------------------------------
 
@@ -46,28 +45,30 @@ const POLYGON_CHAIN_ID = 137;
 const CRDT_CONTRACT_NAME = "KubeltPlatformCredits";
 const CRDT_CONTRACT_NAME_V2 = "KubeltPlatformCreditsV2";
 
-subtask("network:config", "Return network-specific configuration map")
-  .setAction(async (taskArgs, hre) => {
-    switch (hre.network.name) {
-      case "localhost":
-        return NET_LOCALHOST;
-        break;
-      case "goerli":
-        return NET_GOERLI;
-        break;
-      case "mumbai":
-        return NET_MUMBAI;
-        break;
-      case "polygon":
-        return NET_POLYGON;
-        break;
-      case "mainnet":
-        return NET_MAINNET;
-        break;
-      default:
-        throw "no configuration defined";
-    }
-  });
+subtask(
+  "network:config",
+  "Return network-specific configuration map"
+).setAction(async (taskArgs, hre) => {
+  switch (hre.network.name) {
+    case "localhost":
+      return NET_LOCALHOST;
+      break;
+    case "goerli":
+      return NET_GOERLI;
+      break;
+    case "mumbai":
+      return NET_MUMBAI;
+      break;
+    case "polygon":
+      return NET_POLYGON;
+      break;
+    case "mainnet":
+      return NET_MAINNET;
+      break;
+    default:
+      throw "no configuration defined";
+  }
+});
 
 subtask("crdt:proxy", "Return contract (proxy) address for selected network")
   .addOptionalParam("contract", "A contract address")
@@ -81,11 +82,12 @@ subtask("crdt:proxy", "Return contract (proxy) address for selected network")
     }
   });
 
-task("crdt:deploy", "Deploy the Kubelt Credit proxy and contract")
-  .setAction(async (taskArgs, hre) => {
-
+task("crdt:deploy", "Deploy the Kubelt Credit proxy and contract").setAction(
+  async (taskArgs, hre) => {
     const CRDT = await hre.ethers.getContractFactory(CRDT_CONTRACT_NAME);
-    const crdt = await hre.upgrades.deployProxy(CRDT, [/* Params */]);
+    const crdt = await hre.upgrades.deployProxy(CRDT, [
+      /* Params */
+    ]);
     await crdt.deployed();
 
     console.log("KubeltPlatformCredits proxy deployed to:", crdt.address);
@@ -93,20 +95,32 @@ task("crdt:deploy", "Deploy the Kubelt Credit proxy and contract")
     // Check stored proxy address and prompt user to update secrets.
     const proxyAddress = await hre.run("crdt:proxy");
     if (proxyAddress !== crdt.address) {
-      console.log(chalk.red(`Proxy contract address has changed! Please update PROXY_ADDRESS.`));
+      console.log(
+        chalk.red(
+          `Proxy contract address has changed! Please update PROXY_ADDRESS.`
+        )
+      );
     }
-  });
+  }
+);
 
-task("crdt:update", "Upgrade the Kubelt Credit contract")
-  .setAction(async (taskArgs, hre) => {
-    console.log(chalk.red(`Contracts are 'upgraded', not 'updated'. This is an alias, so let's upgrayedd...`));
+task("crdt:update", "Upgrade the Kubelt Credit contract").setAction(
+  async (taskArgs, hre) => {
+    console.log(
+      chalk.red(
+        `Contracts are 'upgraded', not 'updated'. This is an alias, so let's upgrayedd...`
+      )
+    );
     await hre.run("crdt:upgrade", taskArgs);
-  });
+  }
+);
 
 task("crdt:upgrade", "Upgrade the Kubelt Credit contract")
   .addOptionalParam("contract", "The contract (proxy) address to upgrade.")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("crdt:proxy", { contract: taskArgs.contract });
+    const contract = await hre.run("crdt:proxy", {
+      contract: taskArgs.contract,
+    });
     const CRDT = await hre.ethers.getContractFactory(CRDT_CONTRACT_NAME_V2);
     const crdt = await hre.upgrades.upgradeProxy(contract, CRDT);
     await crdt.deployed();
@@ -115,17 +129,23 @@ task("crdt:upgrade", "Upgrade the Kubelt Credit contract")
     // For upgrades this codepath shouldn't happen.
     const proxyAddress = await hre.run("crdt:proxy");
     if (proxyAddress !== crdt.address) {
-      console.log(chalk.red(`Proxy contract address has changed! Please update PROXY_ADDRESS.`));
+      console.log(
+        chalk.red(
+          `Proxy contract address has changed! Please update PROXY_ADDRESS.`
+        )
+      );
     }
   });
 
 task("crdt:message", "Get the message for testing upgrades")
   .addOptionalParam("contract", "The address of the contract (proxy).")
   .setAction(async (taskArgs, hre) => {
-    const address = await hre.run("crdt:proxy", { contract: taskArgs.contract });
+    const address = await hre.run("crdt:proxy", {
+      contract: taskArgs.contract,
+    });
     if (!address) {
       console.log(chalk.red(`Missing --contract or PROXY_ADDRESS!`));
-      return
+      return;
     }
 
     const crdt = await hre.ethers.getContractAt(CRDT_CONTRACT_NAME, address);
@@ -178,7 +198,7 @@ const config: any = {
         NET_MAINNET.wallet.ownerKey,
         // NET_MAINNET.wallet.operatorKey,
       ],
-    }
+    },
   },
 };
 

@@ -2,7 +2,7 @@
 
 import * as cheerio from "cheerio";
 import * as path from "path";
-import chalk from 'chalk';
+import chalk from "chalk";
 import fs from "fs";
 import https from "node:https";
 import url from "node:url";
@@ -25,7 +25,7 @@ import {
   NET_MAINNET,
   // Types
   ChainnetConfiguration,
-} from "./invite.secret";
+} from "./invite.network";
 
 // definitions
 // -----------------------------------------------------------------------------
@@ -62,28 +62,30 @@ const POLYGON_CHAIN_ID = 137;
 //   - runSuper: when overriding an existing task, allows to invoke the
 //     super implementation
 
-subtask("network:config", "Return network-specific configuration map")
-  .setAction(async (taskArgs, hre) => {
-    switch (hre.network.name) {
-      case "localhost":
-        return NET_LOCALHOST;
-        break;
-      case "goerli":
-        return NET_GOERLI;
-        break;
-      case "mumbai":
-        return NET_MUMBAI;
-        break;
-      case "polygon":
-        return NET_POLYGON;
-        break;
-      case "mainnet":
-        return NET_MAINNET;
-        break;
-      default:
-        throw "no configuration defined";
-    }
-  });
+subtask(
+  "network:config",
+  "Return network-specific configuration map"
+).setAction(async (taskArgs, hre) => {
+  switch (hre.network.name) {
+    case "localhost":
+      return NET_LOCALHOST;
+      break;
+    case "goerli":
+      return NET_GOERLI;
+      break;
+    case "mumbai":
+      return NET_MUMBAI;
+      break;
+    case "polygon":
+      return NET_POLYGON;
+      break;
+    case "mainnet":
+      return NET_MAINNET;
+      break;
+    default:
+      throw "no configuration defined";
+  }
+});
 
 subtask("invite:contract", "Return contract address for selected network")
   .addOptionalParam("contract", "A contract address")
@@ -97,11 +99,12 @@ subtask("invite:contract", "Return contract address for selected network")
     }
   });
 
-subtask("config:nftar", "Get the NFTar config")
-  .setAction(async (taskArgs, hre) => {
+subtask("config:nftar", "Get the NFTar config").setAction(
+  async (taskArgs, hre) => {
     const config: ChainnetConfiguration = await hre.run("network:config");
     return config.nftar;
-});
+  }
+);
 
 subtask("config:account", "Return account address for selected network")
   .addParam("account", "An account name or address")
@@ -124,42 +127,53 @@ subtask("config:account", "Return account address for selected network")
     }
   });
 
-subtask("config:alchemyURL", "Return alchemy invite application URL")
-  .setAction(async (taskArgs, hre) => {
+subtask("config:alchemyURL", "Return alchemy invite application URL").setAction(
+  async (taskArgs, hre) => {
     const config = await hre.run("network:config");
     // NB: This dereference will fail for localhost -- no alchemy config.
     // Hard-failing is acceptable for CLI so leaving it. Could check the
     // dereferences and intelligently exit, but ¯\_(ツ)_/¯
     return config.alchemy.appURL;
-  });
+  }
+);
 
-subtask("config:storageKey", "Return nft.storage API key")
-  .setAction(async (taskArgs, hre) => {
+subtask("config:storageKey", "Return nft.storage API key").setAction(
+  async (taskArgs, hre) => {
     const config = await hre.run("network:config");
     return config.storage.apiKey;
-  });
+  }
+);
 
-subtask("config:operator:privateKey", "Return operator wallet private key")
-  .setAction(async (taskArgs, hre) => {
-    const config = await hre.run("network:config");
-    return config.wallet.operatorKey;
-  });
+subtask(
+  "config:operator:privateKey",
+  "Return operator wallet private key"
+).setAction(async (taskArgs, hre) => {
+  const config = await hre.run("network:config");
+  return config.wallet.operatorKey;
+});
 
-subtask("config:owner:privateKey", "Return owner wallet private key")
-  .setAction(async (taskArgs, hre) => {
+subtask("config:owner:privateKey", "Return owner wallet private key").setAction(
+  async (taskArgs, hre) => {
     const config = await hre.run("network:config");
     return config.wallet.ownerKey;
-  });
+  }
+);
 
 subtask("call:maxInvites", `Return result of ThreeId_Invitations.maxInvites()`)
   .addParam("contract", "The address of the invite contract")
   .setAction(async (taskArgs, hre) => {
     const contract = taskArgs.contract;
-    const invite = await hre.ethers.getContractAt('ThreeId_Invitations', contract);
+    const invite = await hre.ethers.getContractAt(
+      "ThreeId_Invitations",
+      contract
+    );
     return invite.maxInvitations();
   });
 
-subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract')
+subtask(
+  "call:ownerOf",
+  "Return result of ownerOf(tokenId) on the given contract"
+)
   .addParam("contract", "The address of the contract")
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
@@ -170,7 +184,10 @@ subtask("call:ownerOf", 'Return result of ownerOf(tokenId) on the given contract
     return invite.ownerOf(inviteId);
   });
 
-subtask("call:tokenURI", 'Return result of tokenURI(tokenId) on the given contract')
+subtask(
+  "call:tokenURI",
+  "Return result of tokenURI(tokenId) on the given contract"
+)
   .addParam("contract", "The address of the invite contract")
   .addParam("inviteId", "The invitation number")
   .setAction(async (taskArgs, hre) => {
@@ -196,7 +213,9 @@ subtask("call:awardInvite", "Mint invitation NFT")
   .addParam("tokenUri", "The URI to set for the invitation")
   .addParam("voucher", "The signed voucher")
   .setAction(async (taskArgs, hre) => {
-    const account = await hre.run("config:account", { account: taskArgs.account });
+    const account = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     const contract = taskArgs.contract;
     const tokenURI = taskArgs.tokenUri;
     // HAXX
@@ -228,31 +247,35 @@ subtask("fetch:metadata", "Display the metadata for the invite")
     const uri = await hre.run("call:tokenURI", { contract, inviteId });
 
     // The uri looks something like ipfs://<cid>/metadata.json.
-    const cid = (new URL(uri)).host;
+    const cid = new URL(uri).host;
     const url = await hre.run("storage:url", { cid, path: "/metadata.json" });
 
     return new Promise((resolve, reject) => {
-      https.get(url.href, (res) => {
-        const { statusCode } = res;
+      https
+        .get(url.href, (res) => {
+          const { statusCode } = res;
 
-        res.setEncoding('utf8');
+          res.setEncoding("utf8");
 
-        let rawData = '';
-        res.on('data', (chunk) => { rawData += chunk; });
-        res.on('end', () => {
-          const parsedData = JSON.parse(rawData);
-          resolve(parsedData);
+          let rawData = "";
+          res.on("data", (chunk) => {
+            rawData += chunk;
+          });
+          res.on("end", () => {
+            const parsedData = JSON.parse(rawData);
+            resolve(parsedData);
+          });
+        })
+        .on("error", (e) => {
+          let message;
+          if (e instanceof Error) {
+            message = e.message;
+          } else {
+            message = String(e);
+          }
+          console.error(message);
+          reject(message);
         });
-      }).on('error', (e) => {
-        let message;
-        if (e instanceof Error) {
-          message = e.message;
-        } else {
-          message = String(e);
-        }
-        console.error(message);
-        reject(message);
-      });
     });
   });
 
@@ -267,8 +290,9 @@ subtask("invite:generate-nft-asset", "Generate custom NFT image asset")
     const assetFile = taskArgs.assetFile;
     const outputFile = taskArgs.outputFile;
 
-    return fs.promises.readFile(assetFile, 'utf8')
-      .then(data => {
+    return fs.promises
+      .readFile(assetFile, "utf8")
+      .then((data) => {
         // Parse the SVG XML data and return a query context.
         return cheerio.load(data, {
           xml: {},
@@ -283,9 +307,9 @@ subtask("invite:generate-nft-asset", "Generate custom NFT image asset")
         </svg>
         */
         // Set the issue date.
-        $('#ISSUED').text(issueDate);
+        $("#ISSUED").text(issueDate);
         // Set the invite identifier.
-        $('#NUMBER').text(`#${inviteId}`);
+        $("#NUMBER").text(`#${inviteId}`);
 
         const svgText = $.root().html();
         if (null === svgText) {
@@ -293,9 +317,9 @@ subtask("invite:generate-nft-asset", "Generate custom NFT image asset")
         }
         return svgText.trim();
       })
-      .then(svgText => {
+      .then((svgText) => {
         return fs.promises.writeFile(outputFile, svgText);
-      })
+      });
   });
 
 subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
@@ -324,17 +348,15 @@ subtask("invite:publish-nft-storage", "Publish invite asset to nft.storage")
     const metadata = {
       name: `3ID Invite #${inviteId}`,
       description: `${titleCase(inviteTier)} 3ID Invite`,
-      image: new File(
-        [await fs.promises.readFile(outputFile)],
-        baseName,
-        { type: 'image/svg+xml' },
-      ),
+      image: new File([await fs.promises.readFile(outputFile)], baseName, {
+        type: "image/svg+xml",
+      }),
       properties: {
         inviteId,
         inviteTier,
         issueDate,
-      }
-    }
+      },
+    };
 
     const result = await client.store(metadata);
 
@@ -362,7 +384,9 @@ task("accounts:list", "Prints the list of accounts", async (taskArgs, hre) => {
 task("account:balance", "Prints an account balance")
   .addParam("account", "The account address")
   .setAction(async (taskArgs, hre) => {
-    const account = await hre.run("config:account", { account: taskArgs.account });
+    const account = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     const balance = await hre.ethers.provider.getBalance(account);
 
     console.log(hre.ethers.utils.formatEther(balance), chalk.cyan("ETH"));
@@ -373,7 +397,9 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
   .setAction(async (taskArgs, hre) => {
     // If given an account (0x...) it is returned, and if given a string attempt to
     // look it up in network-specific configuration and return an account address.
-    const account = await hre.run("config:account", { account: taskArgs.account });
+    const account = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     const alchemyURL = await hre.run("config:alchemyURL");
 
     // Construct the Alchemy client.
@@ -400,7 +426,10 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
       console.log(chalk.green("-> contract:"), nft.contract.address);
       console.log(chalk.green("-> token ID:"), nft.id.tokenId);
       console.log(chalk.green("->     name:"), response.title);
-      console.log(chalk.green("->     type:"), response.id?.tokenMetadata?.tokenType);
+      console.log(
+        chalk.green("->     type:"),
+        response.id?.tokenMetadata?.tokenType
+      );
       console.log(chalk.green("->      uri:"), response.tokenUri?.gateway);
       console.log(chalk.green("->    image:"), response.metadata?.image);
       console.log(chalk.green("->  updated:"), response.timeLastUpdated);
@@ -410,7 +439,9 @@ task("account:nfts", "Gets the NFTs for an account (via Alchemy)")
 task("invite:maximum", "Return maximum number of invites")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     const maxInvites = await hre.run("call:maxInvites", { contract });
 
     console.log(`> maximum ${maxInvites} invites`);
@@ -419,7 +450,9 @@ task("invite:maximum", "Return maximum number of invites")
 task("invite:next", "Return ID of next invite that will be awarded")
   .addOptionalParam("contract", "The invite contract address")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     const nextInvite = await hre.run("call:nextInvite", { contract });
 
     console.log(`> next invite is #${nextInvite.toString().padStart(4, "0")}`);
@@ -429,14 +462,19 @@ task("invite:owner", "Return owner of an invite")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     const inviteId = taskArgs.invite;
 
     const owner = await hre.run("call:ownerOf", { contract, inviteId });
 
     console.log(chalk.red("OWNER"));
     console.log(chalk.green("-> contract:"), contract);
-    console.log(chalk.green("->   invite:"), `#${inviteId.toString().padStart(4, "0")}`);
+    console.log(
+      chalk.green("->   invite:"),
+      `#${inviteId.toString().padStart(4, "0")}`
+    );
     console.log(chalk.green("->    owner:"), owner);
   });
 
@@ -444,7 +482,9 @@ task("invite:metadata", "Display the metadata for an invitation")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     const invite = taskArgs.invite;
 
     const metadata = await hre.run("fetch:metadata", { contract, invite });
@@ -455,7 +495,9 @@ task("invite:image", "Print the image URL for an invitation")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("invite", "The invitation # to check")
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     const invite = taskArgs.invite;
 
     const metadata = await hre.run("fetch:metadata", { contract, invite });
@@ -469,9 +511,18 @@ task("invite:image", "Print the image URL for an invitation")
   });
 
 task("invite:premint", "Store the reserved invitation (#0000) asset")
-  .addParam("assetFile", "Path to SVG membership card template", "./assets/3ID_NFT_CARD_NO_BG.svg", types.inputFile)
+  .addParam(
+    "assetFile",
+    "Path to SVG membership card template",
+    "./assets/3ID_NFT_CARD_NO_BG.svg",
+    types.inputFile
+  )
   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
-  .addOptionalParam("inviteId", "Invitation ID for the reserved preminted invite", "0000")
+  .addOptionalParam(
+    "inviteId",
+    "Invitation ID for the reserved preminted invite",
+    "0000"
+  )
   .setAction(async (taskArgs, hre) => {
     // Location of generated asset files.
     const outputDir = taskArgs.outputDir;
@@ -489,7 +540,7 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
     // Returns ms since epoch if valid date string, or NaN if invalid
     // date string. We format it as an ISO 8601 date string in UTC.
     const issueDateParsed = Date.now();
-    const issueDate = new Intl.DateTimeFormat('utc').format(issueDateParsed);
+    const issueDate = new Intl.DateTimeFormat("utc").format(issueDateParsed);
 
     const inviteId = taskArgs.inviteId;
 
@@ -505,7 +556,7 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
       inviteId,
       issueDate,
       assetFile,
-      outputFile
+      outputFile,
     });
     // Publish the generated asset to our storage provider.
     const publishResult = await hre.run("invite:publish-nft-storage", {
@@ -523,36 +574,49 @@ task("invite:premint", "Store the reserved invitation (#0000) asset")
     return publishResult;
   });
 
-subtask("check:operator", "Check that operator address and wallet private key match")
-  .setAction(async (taskArgs, hre) => {
-    // Get the address of the operator wallet instance that we
-    // constructed. Check that it has the expected value as contained in
-    // the configuration file.
-    const operatorKey = await hre.run("config:operator:privateKey");
-    const operator = new hre.ethers.Wallet(operatorKey);
-    const operatorAddress = await operator.getAddress();
-    // Configured wallet address in config for NET_XXX.user.operator.
-    const operatorWallet = await hre.run("config:account", { account: "operator" });
-    if (operatorWallet !== operatorAddress) {
-      throw new Error("operator wallet address doesn't match configured private key!");
-    }
+subtask(
+  "check:operator",
+  "Check that operator address and wallet private key match"
+).setAction(async (taskArgs, hre) => {
+  // Get the address of the operator wallet instance that we
+  // constructed. Check that it has the expected value as contained in
+  // the configuration file.
+  const operatorKey = await hre.run("config:operator:privateKey");
+  const operator = new hre.ethers.Wallet(operatorKey);
+  const operatorAddress = await operator.getAddress();
+  // Configured wallet address in config for NET_XXX.user.operator.
+  const operatorWallet = await hre.run("config:account", {
+    account: "operator",
   });
+  if (operatorWallet !== operatorAddress) {
+    throw new Error(
+      "operator wallet address doesn't match configured private key!"
+    );
+  }
+});
 
-subtask("check:owner", "Check that operator address and wallet private key match")
-  .setAction(async (taskArgs, hre) => {
-    // Check that the owner wallet instance has the same address that is
-    // set in the configuration file for the owner alias.
-    const ownerKey = await hre.run("config:owner:privateKey");
-    const owner = new hre.ethers.Wallet(ownerKey);
-    const ownerAddress = await owner.getAddress();
-    // Configured wallet address in config for NET_XXX.user.owner.
-    const ownerWallet = await hre.run("config:account", { account: "owner" });
-    if (ownerWallet !== ownerAddress) {
-      throw new Error("owner wallet address doesn't match configured private key!");
-    }
-  });
+subtask(
+  "check:owner",
+  "Check that operator address and wallet private key match"
+).setAction(async (taskArgs, hre) => {
+  // Check that the owner wallet instance has the same address that is
+  // set in the configuration file for the owner alias.
+  const ownerKey = await hre.run("config:owner:privateKey");
+  const owner = new hre.ethers.Wallet(ownerKey);
+  const ownerAddress = await owner.getAddress();
+  // Configured wallet address in config for NET_XXX.user.owner.
+  const ownerWallet = await hre.run("config:account", { account: "owner" });
+  if (ownerWallet !== ownerAddress) {
+    throw new Error(
+      "owner wallet address doesn't match configured private key!"
+    );
+  }
+});
 
-subtask("check:recovery", "Ensure recovery address matches operator wallet address")
+subtask(
+  "check:recovery",
+  "Ensure recovery address matches operator wallet address"
+)
   .addParam("messageHashBinary", "Message hash as array", [], types.any)
   .addParam("signature", "Signature computed for voucher")
   .addParam("operatorAddress", "Operator wallet address")
@@ -562,10 +626,12 @@ subtask("check:recovery", "Ensure recovery address matches operator wallet addre
     const recoveryAddress = await hre.ethers.utils.verifyMessage(
       taskArgs.messageHashBinary,
       taskArgs.signature
-    )
+    );
     if (operatorAddress !== recoveryAddress) {
-      throw new Error(`These should be equal: ${operatorAddress}, ${recoveryAddress}`);
-    };
+      throw new Error(
+        `These should be equal: ${operatorAddress}, ${recoveryAddress}`
+      );
+    }
   });
 
 task("invite:sign-voucher", "Sign an invite voucher")
@@ -574,7 +640,9 @@ task("invite:sign-voucher", "Sign an invite voucher")
   .addParam("invite", "The invitation number to award")
   .setAction(async (taskArgs, hre) => {
     // This lets us use an account alias from secret.ts to sign a voucher.
-    const recipient = await hre.run("config:account", { account: taskArgs.account });
+    const recipient = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     const uri = taskArgs.tokenUri;
     const tokenId = taskArgs.invite;
 
@@ -584,8 +652,8 @@ task("invite:sign-voucher", "Sign an invite voucher")
     // See https://ethereum.stackexchange.com/questions/111549/cant-validate-authenticated-message-with-ethers-js
     // See also https://github.com/ethers-io/ethers.js/issues/468#issuecomment-475895074
     const message = hre.ethers.utils.solidityKeccak256(
-      [ "address", "string", "uint" ],
-      [ recipient, uri, tokenId ]
+      ["address", "string", "uint"],
+      [recipient, uri, tokenId]
     );
     // console.log('message: ' + message)
     // console.log('message: ' + message.length)
@@ -612,23 +680,28 @@ task("invite:sign-voucher", "Sign an invite voucher")
       uri,
       tokenId,
       // messageHash: message,
-      signature
+      signature,
     };
 
     // Sanity check the recovery address matches operator address.
     await hre.run("check:recovery", {
       messageHashBinary,
       signature,
-      operatorAddress: operator.address
+      operatorAddress: operator.address,
     });
 
-    console.log('signed voucher: ', voucher);
+    console.log("signed voucher: ", voucher);
 
-    return voucher
-})
+    return voucher;
+  });
 
 task("invite:deploy", "Deploy the invitation contract")
-  .addOptionalParam("maxInvites", "Maximum number of invitations to allow", 10000, types.int)
+  .addOptionalParam(
+    "maxInvites",
+    "Maximum number of invitations to allow",
+    10000,
+    types.int
+  )
   .setAction(async (taskArgs, hre) => {
     // Pre-flight sanity checks.
     await hre.run("check:owner");
@@ -639,17 +712,19 @@ task("invite:deploy", "Deploy the invitation contract")
     // The ID of the reserved preminted invite.
     const inviteId = "0000";
     // The voucher recipient should be the "operator" account.
-    const operatorAddress = await hre.run("config:account", { account: "operator" });
+    const operatorAddress = await hre.run("config:account", {
+      account: "operator",
+    });
 
     // When network is localhost, use an already baked asset for the premint.
     let publishResult;
-    if (hre.network.name == 'localhost') {
+    if (hre.network.name == "localhost") {
       publishResult = {
         url: "ipfs://bafyreigtb2quz6kcyix5dw5cknfarhosz4t43ze4egvt2ufoybjhgy6qty/metadata.json",
       };
     } else {
       // The URL of the published asset.
-      publishResult = await hre.run("invite:premint", { inviteId, });
+      publishResult = await hre.run("invite:premint", { inviteId });
     }
 
     // Create and sign a voucher.
@@ -660,7 +735,11 @@ task("invite:deploy", "Deploy the invitation contract")
     });
 
     const Invite = await hre.ethers.getContractFactory("ThreeId_Invitations");
-    const invite = await Invite.deploy(operatorAddress, maxInvites, zeroVoucher);
+    const invite = await Invite.deploy(
+      operatorAddress,
+      maxInvites,
+      zeroVoucher
+    );
 
     await invite.deployed();
 
@@ -671,31 +750,51 @@ task("invite:deploy", "Deploy the invitation contract")
     // deployed.
     const contractAddress = await hre.run("invite:contract");
     if (contractAddress !== invite.address) {
-      console.log(chalk.red(`Invite contract address has changed! Please update invite.secret.ts`));
+      console.log(
+        chalk.red(
+          `Invite contract address has changed! Please update invite.secret.ts`
+        )
+      );
     }
   });
 
 task("invite:destroy", "Send the selfdestruct message to a given contract")
   .addOptionalParam("contract", "The invite contract address")
-  .addParam("account", "The account address to which we transfer contract contents (must be operator)")
+  .addParam(
+    "account",
+    "The account address to which we transfer contract contents (must be operator)"
+  )
   .setAction(async (taskArgs, hre) => {
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
-    const account = await hre.run("config:account", { account: taskArgs.account });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
+    const account = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     const contractName = "ThreeId_Invitations";
     const invite = await hre.ethers.getContractAt(contractName, contract);
     return invite.destructor(account);
-  })
+  });
 
 task("invite:award", "Mint an invite for an account")
   .addOptionalParam("contract", "The invite contract address")
   .addParam("account", "The account address")
-  .addParam("assetFile", "Path to SVG membership card template", "./assets/3ID_NFT_CARD_NO_BG.svg", types.inputFile)
+  .addParam(
+    "assetFile",
+    "Path to SVG membership card template",
+    "./assets/3ID_NFT_CARD_NO_BG.svg",
+    types.inputFile
+  )
   .addParam("outputDir", "Location of generated asset files", OUTPUT_DIR)
   .setAction(async (taskArgs, hre) => {
     // The invitation smart contract address.
-    const contract = await hre.run("invite:contract", { contract: taskArgs.contract });
+    const contract = await hre.run("invite:contract", {
+      contract: taskArgs.contract,
+    });
     // The recipient address for the invitation.
-    const account = await hre.run("config:account", { account: taskArgs.account });
+    const account = await hre.run("config:account", {
+      account: taskArgs.account,
+    });
     // Location of generated asset files.
     const outputDir = taskArgs.outputDir;
 
@@ -712,7 +811,7 @@ task("invite:award", "Mint an invite for an account")
     // Returns ms since epoch if valid date string, or NaN if invalid
     // date string. We format it as an ISO 8601 date string in UTC.
     const issueDateParsed = Date.now();
-    const issueDate = new Intl.DateTimeFormat('utc').format(issueDateParsed);
+    const issueDate = new Intl.DateTimeFormat("utc").format(issueDateParsed);
 
     // Get the tokenId of the next invitation.
     // **WARNING** potential race condition here!
@@ -733,7 +832,7 @@ task("invite:award", "Mint an invite for an account")
       inviteId,
       issueDate,
       assetFile,
-      outputFile
+      outputFile,
     });
 
     // Publish the generated asset to our storage provider.
@@ -773,7 +872,7 @@ task("invite:award", "Mint an invite for an account")
 // config
 // -----------------------------------------------------------------------------
 
-const config: HardhatUserConfig = {
+const config: any = {
   defaultNetwork: "localhost",
   solidity: "0.8.12",
   etherscan: {
@@ -787,10 +886,7 @@ const config: HardhatUserConfig = {
       // Account to use as the default sender. If not supplied, the
       // first account of the node is used.
       //from: "",
-      accounts: [
-        NET_GOERLI.wallet.ownerKey,
-        NET_GOERLI.wallet.operatorKey,
-      ],
+      accounts: [NET_GOERLI.wallet.ownerKey, NET_GOERLI.wallet.operatorKey],
     },
     mumbai: {
       // For optional validation.
@@ -799,10 +895,7 @@ const config: HardhatUserConfig = {
       // Account to use as the default sender. If not supplied, the
       // first account of the node is used.
       //from: "",
-      accounts: [
-        NET_MUMBAI.wallet.ownerKey,
-        NET_MUMBAI.wallet.operatorKey,
-      ],
+      accounts: [NET_MUMBAI.wallet.ownerKey, NET_MUMBAI.wallet.operatorKey],
     },
     polygon: {
       // For optional validation.
@@ -811,10 +904,7 @@ const config: HardhatUserConfig = {
       // Account to use as the default sender. If not supplied, the
       // first account of the node is used.
       //from: "",
-      accounts: [
-        NET_POLYGON.wallet.ownerKey,
-        NET_POLYGON.wallet.operatorKey,
-      ],
+      accounts: [NET_POLYGON.wallet.ownerKey, NET_POLYGON.wallet.operatorKey],
     },
     mainnet: {
       // For optional validation.
@@ -823,11 +913,8 @@ const config: HardhatUserConfig = {
       // Account to use as the default sender. If not supplied, the
       // first account of the node is used.
       //from: "",
-      accounts: [
-        NET_MAINNET.wallet.ownerKey,
-        NET_MAINNET.wallet.operatorKey,
-      ],
-    }
+      accounts: [NET_MAINNET.wallet.ownerKey, NET_MAINNET.wallet.operatorKey],
+    },
   },
 };
 

@@ -12,16 +12,16 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "devDependencies": {
     "@alch/alchemy-web3": "1.4.6",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.6",
     "@nomicfoundation/hardhat-toolbox": "1.0.2",
     "@nomiclabs/hardhat-ethers": "2.1.1",
     "@nomiclabs/hardhat-solhint": "2.0.1",
     "@openzeppelin/contracts": "4.7.3",
+    "@openzeppelin/contracts-upgradeable": "4.8.0-rc.1",
     "@openzeppelin/hardhat-upgrades": "1.20.0",
     "cheerio": "1.0.0-rc.12",
+    "dotenv": "16.0.3",
     "hardhat": "2.10.2",
     "nft.storage": "7.0.0"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts-upgradeable": "4.8.0-rc.1"
   }
 }
