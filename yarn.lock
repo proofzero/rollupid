@@ -3860,6 +3860,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kubelt/packages@workspace:packages":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/packages@workspace:packages"
+  dependencies:
+    yarn-run-all: 3.1.1
+  languageName: unknown
+  linkType: soft
+
 "@kubelt/platform@workspace:platform":
   version: 0.0.0-use.local
   resolution: "@kubelt/platform@workspace:platform"
