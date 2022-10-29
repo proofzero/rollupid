@@ -55,9 +55,9 @@ local_protocol = "http"
 [env.dev]
 name = "console-dev"
 
-kv_namespaces = [
-  { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
-]
+# kv_namespaces = [
+#   { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
+# ]
 
 routes = [
   { pattern = "console-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
@@ -74,9 +74,9 @@ STORAGE_NAMESPACE = "starbase"
 
 [env.next]
 name = "console-next"
-kv_namespaces = [
-  { binding = "SESSIONS", id = "6c6ca075005747e3873043cdf346f438" },
-]
+# kv_namespaces = [
+#   { binding = "SESSIONS", id = "6c6ca075005747e3873043cdf346f438" },
+# ]
 routes = [
   { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
@@ -92,9 +92,9 @@ STORAGE_NAMESPACE = "starbase"
 
 [env.current]
 name = "console-current"
-kv_namespaces = [
-  { binding = "SESSIONS", id = "593c81a8b57347a4b30368eabee072ef" },
-]
+# kv_namespaces = [
+#   { binding = "SESSIONS", id = "593c81a8b57347a4b30368eabee072ef" },
+# ]
 routes = [
   { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
