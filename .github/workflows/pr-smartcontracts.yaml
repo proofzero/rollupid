@@ -71,7 +71,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: "yarn"
-          cache-dependency-path: ./smartcontracts/eth/pfp-invites/yarn.lock
+          cache-dependency-path: smartcontracts/eth/pfp-invites/yarn.lock
 
       - name: Install
         run: yarn install
@@ -95,7 +95,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: "yarn"
-          cache-dependency-path: ./smartcontracts/eth/crdt/yarn.lock
+          cache-dependency-path: smartcontracts/eth/crdt/yarn.lock
 
       - name: Install
         run: yarn install
