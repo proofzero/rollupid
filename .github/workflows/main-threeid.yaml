@@ -8,7 +8,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./platform
+    working-directory: ./apps
 
 jobs:
   build-publish-test-threeid-dev:

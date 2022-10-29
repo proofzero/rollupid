@@ -24,6 +24,9 @@ jobs:
       - run: nix-build projects.nix
 
       - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Test
         run: yarn workspaces foreach -i -v -t --include redeem run test
 
       - name: Deploy to Dev Worker
