@@ -39,13 +39,10 @@ export const loader = async ({ request }) => {
     jwt: jwt,
   };
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
+    // @ts-ignore
+    fetch: GALAXY.fetch,
+  });
 
   const galaxySdk = getSdk(gqlClient);
 

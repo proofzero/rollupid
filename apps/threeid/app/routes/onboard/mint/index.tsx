@@ -63,12 +63,10 @@ export const action: ActionFunction = async ({ request }) => {
 
   // Get existing object | error
   // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
+    // @ts-ignore
+    fetch: GALAXY.fetch,
+  });
 
   const galaxySdk = getSdk(gqlClient);
   await galaxySdk.updateProfile(

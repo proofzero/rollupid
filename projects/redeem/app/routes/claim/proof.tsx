@@ -124,19 +124,23 @@ export const action = async ({ request }) => {
   const recoveredAddress = verifyMessage(message, signature);
 
   if (recoveredAddress == address) {
-    // boostrap the pfp image
-    let voucher = await getCachedVoucher(address);
-    if (!voucher) {
-      voucher = await fetchVoucher({ address, skipImage: false });
-      voucher = await putCachedVoucher(address, voucher);
-    }
-
     // store that the proof has been sucessfully posted to twitter
     // @ts-ignore
     await PROOFS.put(
       address,
       JSON.stringify({ statusId, tweet, signature, message })
     );
+
+    // boostrap the pfp image
+    let voucher = await getCachedVoucher(address);
+    if (!voucher) {
+      try {
+        voucher = await fetchVoucher({ address, skipImage: false });
+        voucher = await putCachedVoucher(address, voucher);
+      } catch (e) {
+        console.log("error fetching voucher", e);
+      }
+    }
 
     if (nonce) {
       const signRes = await oortSend("kb_verifyNonce", [nonce, signature], {

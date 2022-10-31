@@ -73,25 +73,3 @@ jobs:
           NFTAR_CHAIN_ID: 5
           VALID_CHAIN_ID_NAME: goerli
           ALCHEMY_PUBLIC_API_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
-
-      # - name: Install Playwright Browsers
-      #   run: npx playwright install --with-deps
-      #   working-directory: projects/threeid
-
-      # - name: Run Playwright tests
-      #   run: npx playwright test
-      #   env:
-      #     NODE_ENV: next
-      #     TEST_ENV: true
-      #     ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }}
-      #     DAPP_HOST: 3id-next.kubelt.com
-      #     DAPP_PORT: 443
-      #     DAPP_SCHEMA: https
-      #   working-directory: threeid
-
-      # - uses: actions/upload-artifact@v2
-      #   if: always()
-      #   with:
-      #     name: playwright-report
-      #     path: playwright-report/
-      #     retention-days: 5

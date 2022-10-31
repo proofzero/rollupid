@@ -46,6 +46,7 @@ export const fetchVoucher = async ({
   const jsonRes = await response.json();
 
   if (jsonRes.error) {
+    console.log("Error fetching voucher", jsonRes.error);
     throw new Error(jsonRes.error.data.message);
   }
 

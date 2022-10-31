@@ -30,19 +30,21 @@ import { getUserSession, requireJWT } from "~/utils/session.server";
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
+  console.log("GALAXY", GALAXY);
   // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
+    // @ts-ignore
+    fetch: GALAXY.fetch,
+  });
 
   const galaxySdk = getSdk(gqlClient);
 
   const profileRes = await galaxySdk.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
+
+  console.log("PROFILE RES", profileRes);
+
   const profile = profileRes.profile;
 
   return json(profile);
@@ -65,13 +67,13 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayname = "Display Name needs to be provided";
   }
 
+  console.log("GALAXY", GALAXY);
+
   // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
+    // @ts-ignore
+    fetch: GALAXY.fetch,
+  });
 
   const galaxySdk = getSdk(gqlClient);
 

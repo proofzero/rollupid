@@ -47,20 +47,6 @@ export const loader = async ({ request }) => {
   }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core);
   if (!onboardData) {
     // @ts-ignore
@@ -68,6 +54,19 @@ export const loader = async ({ request }) => {
 
     return redirect(`/onboard/name`);
   }
+  // @ts-ignore
+  console.log("GALAXY", GALAXY);
+  // @ts-ignore
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
+    // @ts-ignore
+    fetch: GALAXY.fetch,
+  });
+
+  const galaxySdk = getSdk(gqlClient);
+
+  const profileRes = await galaxySdk.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
   // @ts-ignore
   const [avatarUrl, isToken] = [

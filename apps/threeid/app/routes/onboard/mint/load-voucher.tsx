@@ -34,13 +34,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let voucher = await getCachedVoucher(address);
 
-  const gqlClient = new GraphQLClient(
+  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
     // @ts-ignore
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
+    fetch: GALAXY.fetch,
+  });
 
   const galaxySdk = getSdk(gqlClient);
 
