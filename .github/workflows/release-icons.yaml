@@ -1,0 +1,45 @@
+# .github/workflows/release-icons.yaml
+---
+name: Release Icons
+
+on:
+  release:
+    types: [published]
+
+defaults:
+  run:
+    working-directory: ./platform
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build platform.nix
+
+      - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Deploy Oort to Test Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: "platform/icons"
+          command: publish --env current
+          environment: "current"
+          # This causes secrets to be set as if by: $ wrangler secret put.
+          # Each supplied name must be defined in the env: config stanza.
+          secrets: |
+            CLOUDFLARE_ACCOUNT_ID
+            CLOUDFLARE_AUTH_EMAIL
+            CLOUDFLARE_AUTH_KEY
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_AUTH_EMAIL: ${{ secrets.CLOUDFLARE_AUTH_EMAIL }}
+          CLOUDFLARE_AUTH_KEY: ${{ secrets.CLOUDFLARE_IMAGES_KEY }}

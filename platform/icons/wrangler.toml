@@ -14,21 +14,15 @@ route = { pattern = "icons-dev.kubelt.com/*", zone_name = "kubelt.com" }
 # Required secrets:
 # - AUTH_EMAIL
 # - AUTH_KEY
-[vars]
-# The account ID that owns uploaded images.
-ACCOUNT_ID = "2906425795180ede5ac707178f96406d"
-# The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes
-# - maximum: 6 hours
-UPLOAD_WINDOW_SECONDS = 15
+
+# NB: set the value for ACCOUNT_ID when publishing worker:
+# npx wrangler --var ACCOUNT_ID=<...>
 
 [env.dev]
 name = "icons-dev"
 route = { pattern = "icons-dev.kubelt.com/*", zone_name = "kubelt.com" }
 
 [env.dev.vars]
-# The account ID that owns uploaded images.
-ACCOUNT_ID = "2906425795180ede5ac707178f96406d"
 # The duration in seconds that returned upload URL is good for.
 # - minimum: 2 minutes
 # - maximum: 6 hours
@@ -39,8 +33,6 @@ name = "icons-next"
 route = { pattern = "icons-next.kubelt.com/*", zone_name = "kubelt.com" }
 
 [env.next.vars]
-# The account ID that owns uploaded images.
-ACCOUNT_ID = "2906425795180ede5ac707178f96406d"
 # The duration in seconds that returned upload URL is good for.
 # - minimum: 2 minutes
 # - maximum: 6 hours
@@ -51,8 +43,6 @@ name = "icons-prod"
 route = { pattern = "icons.kubelt.com/*", zone_name = "kubelt.com" }
 
 [env.current.vars]
-# The account ID that owns uploaded images.
-ACCOUNT_ID = "2906425795180ede5ac707178f96406d"
 # The duration in seconds that returned upload URL is good for.
 # - minimum: 2 minutes
 # - maximum: 6 hours

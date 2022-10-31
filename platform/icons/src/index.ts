@@ -24,22 +24,23 @@ export interface Env {
   // Secrets
   // ---------------------------------------------------------------------------
 
+  // The Cloudflare account identifier that uploaded images will be
+  // associated with.
+  CLOUDFLARE_ACCOUNT_ID: string;
+
   // The e-mail address associated with the owner account.
-  AUTH_EMAIL: string;
+  CLOUDFLARE_AUTH_EMAIL: string;
 
   // A bearer token providing access to the Cloudflare Images API.
-  AUTH_KEY: string;
+  CLOUDFLARE_AUTH_KEY: string;
 
   // Environment variables
   // ---------------------------------------------------------------------------
 
-  // The Cloudflare account identifier that uploaded images will be
-  // associated with.
-  ACCOUNT_ID: string;
-
   // Duration in seconds of the upload window, i.e. how long the
   // returned image upload URL can be used to upload an image.
   UPLOAD_WINDOW_SECONDS: number;
+
 };
 
 // Service
@@ -81,7 +82,7 @@ export default {
     formData.append("expiry", expiry);
 
     // URL for "Create authenticated direct upload URL V2" endpoint.
-    const url = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/images/v2/direct_upload`;
+    const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`;
 
     // Direct uploads allow users to upload images without API keys. A
     // common use case are web apps, client-side applications, or mobile
@@ -95,8 +96,8 @@ export default {
     const uploadRequest = new Request(url, {
       method: "POST",
       headers: {
-        "X-Auth-Email": env.AUTH_EMAIL,
-        "X-Auth-Key": env.AUTH_KEY,
+        "X-Auth-Email": env.CLOUDFLARE_AUTH_EMAIL,
+        "X-Auth-Key": env.CLOUDFLARE_AUTH_KEY,
       },
       // NB: do *not* explicitly set the Content-Type header to
       // "multipart/form-data"; this prevents the header from being set

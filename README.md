@@ -10,7 +10,8 @@
 
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-galaxy.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-startbase.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-icons.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-starbase.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-oort.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-threeid.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-redeem.yaml/badge.svg)
