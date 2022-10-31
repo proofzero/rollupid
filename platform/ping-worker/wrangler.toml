@@ -1,0 +1,46 @@
+name = "ping"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[dev]
+port = 9191
+local_protocol = "http"
+
+[env.dev]
+name = "ping-dev"
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address-dev" }
+]
+
+[env.next]
+name = "ping-next"
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address-next" }
+]
+
+[env.current]
+name = "ping-current"
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address-current" }
+]
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]
