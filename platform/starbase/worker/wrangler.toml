@@ -1,0 +1,32 @@
+# cfw/starbase/wrangler.toml
+name = "starbase"
+main = "src/index.ts"
+compatibility_date = "2022-09-14"
+
+# A list of other Clouflare services bound to this service.
+# services = [
+#   { binding = "RELAY", service = "kubelt-svc-relay", environment = "production" },
+# ]
+
+# Secrets are set via the dashboard, or using the wrangler CLI:
+# $ wrangler secret put <KEY> [--env]
+#
+# Required secrets:
+# - DATADOG_TOKEN
+[vars]
+USER_NAME = "Robert"
+
+[durable_objects]
+bindings = [
+  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
+  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
+  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = [
+  "StarbaseApplication",
+  "StarbaseContract",
+  "StarbaseUser",
+]
