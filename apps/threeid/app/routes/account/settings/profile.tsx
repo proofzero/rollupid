@@ -12,11 +12,16 @@ import Text, {
   TextSize,
   TextWeight,
 } from '~/components/typography/Text'
+
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
+import PfpNftModal from "~/components/accounts/settings/PfpNftModal";
+
 export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
+  const jwt = await requireJWT(request);
+  const session = await getUserSession(request);
+  const address = await session.get("address");
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
@@ -24,6 +29,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
 
   return json({
+    address,
     ...profileRes.profile,
   })
 }
@@ -72,12 +78,15 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsProfile() {
-  const { displayName, job, location, bio, website, pfp } = useLoaderData()
+  const { displayName, job, location, bio, website, pfp, address } =
+    useLoaderData();
 
   const actionData = useActionData()
 
   return (
     <>
+      <PfpNftModal account={address} isOpen={true} handleClose={() => {}} />
+
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
           <img

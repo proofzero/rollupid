@@ -38,6 +38,7 @@ export type ProfileNftCollectionProps = {
     collectionTitle: string;
   }[];
   isOwner?: boolean;
+  preload?: boolean;
 };
 
 type PartnerUrlProps = {
@@ -87,6 +88,7 @@ const ProfileNftCollection = ({
   isOwner = true,
   account,
   displayname,
+  preload = false,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts);
 
@@ -105,7 +107,11 @@ const ProfileNftCollection = ({
     setPageLink(nftRes.pageKey);
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts]);
 
-    if (loading) setLoading(false);
+    if (nftRes.pageKey && preload) {
+      getMoreNfts();
+    } else {
+      if (loading) setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -114,14 +120,6 @@ const ProfileNftCollection = ({
 
   return (
     <>
-      <Text
-        className="mb-12"
-        size={TextSize.SM}
-        weight={TextWeight.SemiBold600}
-      >
-        NFT Collection
-      </Text>
-
       {loading && <Spinner />}
 
       {!loading && !isOwner && loadedNfts.length === 0 && (

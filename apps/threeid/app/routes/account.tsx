@@ -9,11 +9,15 @@ import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
 import { getUserSession, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
+
 import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
 import { links as invCodeStyles } from '~/components/invite-code'
+import { links as profileNftCollectionLinks } from "~/components/profile/ProfileNftCollection";
+
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
+
 import Text, {
   TextColor,
   TextSize,
@@ -27,8 +31,9 @@ export function links() {
     ...invCodeStyles(),
     ...buttonStyles(),
     ...faqStyles(),
-    { rel: 'stylesheet', href: styles },
-  ]
+    ...profileNftCollectionLinks(),
+    { rel: "stylesheet", href: styles },
+  ];
 }
 
 // @ts-ignore
