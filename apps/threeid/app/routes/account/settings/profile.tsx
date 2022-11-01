@@ -85,7 +85,7 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
-      <PfpNftModal account={address} isOpen={true} handleClose={() => {}} />
+      <PfpNftModal account={address} />
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
