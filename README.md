@@ -10,6 +10,7 @@
 
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-galaxy.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-icons.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-starbase.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-oort.yaml/badge.svg)

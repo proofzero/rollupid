@@ -1,0 +1,13 @@
+{
+  "name": "@kubelt/components",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "bit start"
+  },
+  "devDependencies": {
+    "@teambit/bvm": "^0.2.3",
+    "yarn-run-all": "3.1.1"
+  },
+  "packageManager": "yarn@3.2.4"
+}
