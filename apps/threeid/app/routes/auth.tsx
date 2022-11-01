@@ -1,6 +1,4 @@
-import { json, redirect } from "@remix-run/cloudflare";
-
-import { Outlet } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 
 import {
   WagmiConfig,
@@ -9,7 +7,6 @@ import {
   configureChains,
 } from "wagmi";
 
-import { publicProvider } from "wagmi/providers/public";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 
@@ -18,14 +15,38 @@ import logo from "../assets/three-id-logo.svg";
 
 import { links as spinnerLinks } from "~/components/spinner";
 
+import { LoaderFunction } from "@remix-run/cloudflare";
+
+import { publicProvider } from "wagmi/providers/public";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+
 export function links() {
   return [...spinnerLinks(), { rel: "stylesheet", href: styles }];
 }
 
+export const loader: LoaderFunction = () => {
+  return {
+    // @ts-ignore
+    ALCHEMY_PUBLIC_API_KEY: ALCHEMY_PUBLIC_API_KEY,
+  };
+};
+
 export default function Auth() {
-  const { chains, provider, webSocketProvider } = configureChains(
+  const ld = useLoaderData();
+
+  const { chains, provider } = configureChains(
     defaultChains,
-    [publicProvider()]
+    [
+      publicProvider(),
+      alchemyProvider({
+        // @ts-ignore
+        apiKey: ld.ALCHEMY_PUBLIC_API_KEY,
+      }),
+    ],
+    {
+      targetQuorum: 1,
+      pollingInterval: 5_000,
+    }
   );
 
   const client = createClient({
@@ -41,7 +62,6 @@ export default function Auth() {
       }),
     ],
     provider,
-    webSocketProvider,
   });
 
   return (

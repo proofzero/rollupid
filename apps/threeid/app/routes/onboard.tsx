@@ -15,8 +15,10 @@ import {
 } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { InjectedConnector } from "wagmi/connectors/injected";
-import { publicProvider } from "wagmi/providers/public";
 import validateProof from "~/helpers/validate-proof";
+
+import { publicProvider } from "wagmi/providers/public";
+import { alchemyProvider } from "wagmi/providers/alchemy";
 
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
@@ -38,15 +40,29 @@ export const loader = async ({ request }) => {
   ) {
     return redirect(`/onboard/name`);
   }
-  return null;
+
+  return {
+    // @ts-ignore
+    ALCHEMY_PUBLIC_API_KEY: ALCHEMY_PUBLIC_API_KEY,
+  };
 };
 
 const Onboard = () => {
-  useLoaderData();
+  const ld = useLoaderData();
 
-  const { chains, provider, webSocketProvider } = configureChains(
+  const { chains, provider } = configureChains(
     defaultChains,
-    [publicProvider()]
+    [
+      publicProvider(),
+      alchemyProvider({
+        // @ts-ignore
+        apiKey: ld.ALCHEMY_PUBLIC_API_KEY,
+      }),
+    ],
+    {
+      targetQuorum: 1,
+      pollingInterval: 5_000,
+    }
   );
 
   const client = createClient({
@@ -62,7 +78,6 @@ const Onboard = () => {
       }),
     ],
     provider,
-    webSocketProvider,
   });
 
   return (
