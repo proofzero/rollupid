@@ -48,7 +48,6 @@ kv_namespaces = [
 ]
 routes = [
   { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
-  { pattern = "3id-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
 services = [
   { binding = "OORT", service = "oort-devnet"},
@@ -59,7 +58,6 @@ services = [
 # ------------------------------------------------------------------------------
 [env.next]
 routes = [
-  { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
   { pattern = "3id-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
 kv_namespaces = [
