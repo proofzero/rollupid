@@ -5,8 +5,8 @@ node_modules
 /dist
 /public/build
 /.mf
+.wrangler
 .env
-
 .dev.vars
 
 **/*.css
