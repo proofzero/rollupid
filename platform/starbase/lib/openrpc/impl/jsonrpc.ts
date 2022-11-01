@@ -17,9 +17,9 @@ import {
 type ID = string | number;
 
 // RPC request params can be supplied as an array of values.
-type ParamsArray = Array<any>;
+export type ParamsArray = Array<any>;
 // RPC request params can be supplied as an object keyed by the parameter name.
-type ParamsObject = Record<string, unknown>;
+export type ParamsObject = Record<string, unknown>;
 
 export type RequestParams = ParamsArray | ParamsObject | undefined;
 

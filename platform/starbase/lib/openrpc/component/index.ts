@@ -3,6 +3,9 @@
  * @file src/component/index.ts
  */
 
+import * as _ from "lodash";
+import * as set from "ts-set-utils";
+
 import type {
   MiddlewareFn,
   MiddlewareResult,
@@ -19,12 +22,19 @@ import type {
   ScopeSet,
 } from "../index";
 
-//import * as jsonrpc from "../jsonrpc";
+import type {
+  ParamsObject,
+} from "../impl/jsonrpc";
+
 import * as openrpc from "../index";
 
 // Definitions
 // -----------------------------------------------------------------------------
 
+// The key used to store a set of field specs on the constructor.
+const _FIELDS = "_fields";
+
+// The name of the map that is used to accumulate RPC method descriptors.
 const _METHODS = "_rpcMethods";
 
 // Internal field name for set of all scopes declared by the object.
@@ -33,24 +43,91 @@ const _SCOPES_ALL = "_allScopes";
 // Internal field name for map of method to set of required scopes.
 const _SCOPES_REQUIRED = "_requiredScopes";
 
+const _FIELDS_REQUIRED = "_requiredFields";
+
 // Types
 // -----------------------------------------------------------------------------
+
+// A map from RPC method name to implementing class method name.
+type MethodMap = Map<string, string>;
 
 // The mapping from method name to its required scopes.
 type RequiredScopes = Map<Symbol, ScopeSet>;
 
+// The parameters from the JSON-RPC request converted into a Map.
+export type RpcParams = Map<string, any>;
+
+// The map of input data passed to an RpcCallable.
+export type RpcInput = Map<string, any>;
+
+// The map of output data passed from an RpcCallable.
+export type RpcOutput = Map<string, any>;
+
+// The value returned by the RpcCallable and injected into the RpcResponse.
+export type RpcResult = any;
+
 // Defines the signature for an OpenRPC handler method defined on a Durable
 // Object and which is marked as an @method.
 type RpcCallable = (
-  request: RpcRequest,
-  state: Map<string, any>,
-  context: Map<string, any>,
-  remote: Map<string, any>,
-) => RpcResponse;
+  // The incoming RPC request.
+  params: RpcParams,
+  // A map that is used to pass in fields values as configured
+  // by @requireField decorations on the called method.
+  input: RpcInput,
+  // A map that is used to set writable state for fields configured
+  // by @requiredField decorations on the called method.
+  output: RpcOutput,
+
+  // TODO context values: envvar, secrets, buckets, etc.
+  // TODO clients for remote objects/workers
+
+  //context: Map<string, any>,
+  //remote: Map<string, any>,
+) => RpcResult;
+
+/**
+ * Defines a data field that this object manages. These fields may be
+ * read or written to if a method has permission (provided by applying
+ * the @readState and @writeState decorators.
+ */
+type ValidatorFn = (x: any) => boolean;
+
+type FieldSpec = {
+  // The name of the field.
+  name: string;
+  // Documentation for the field.
+  doc: string;
+  // The default value of the field.
+  defaultValue: any;
+  // The validation function to apply before updating the field.
+  //validator: ValidatorFn;
+};
+
+export enum FieldAccess {
+  Read = "read",
+  Write = "write",
+};
+
+type FieldName = symbol;
+
+type FieldPerms = Array<FieldAccess>;
+
+type Fields = Map<FieldName, FieldSpec>;
+
+interface RequiredField {
+  name: FieldName;
+  perms: Set<FieldAccess>;
+}
+
+type FieldSet = Set<RequiredField>;
+
+type FieldMap = Map<FieldName, RequiredField>;
+
+type RequiredFields = Map<FieldName, FieldSet>;
 
 type Env = unknown;
 
-// Middlware
+// Middleware
 // -----------------------------------------------------------------------------
 // TODO move these into separate middleware module.
 
@@ -87,69 +164,49 @@ export function component(schema: RpcSchema) {
 
   return function<T extends { new (...args: any[]): {} }>(constructor: T) {
 
-    const scopesRequired = Reflect.get(constructor, _SCOPES_REQUIRED);
+    // Various decorators are applied to the class, methods, etc. the
+    // configuration from which is stored on the class constructor. We
+    // retrieve that data and delete the corresponding property as it
+    // was only a temporary means of passing data from decorators up to
+    // this "top-level" decorator that constructs the class.
+
+    // Collect the component fields (specified using @field decorators
+    // on the class) and perform necessary initialization, e.g. set the
+    // default values.
+    const fields: Fields = Reflect.get(constructor, _FIELDS);
+    Reflect.deleteProperty(constructor, _FIELDS);
+    //console.log("fields:");
+    //console.log(fields);
+
+    // This is the mapping from class method name to the set of
+    // component fields that the method requires access to (along with
+    // associated permissions, e.g. read, write).
+    const fieldsRequired: RequiredFields = Reflect.get(constructor, _FIELDS_REQUIRED);
+    Reflect.deleteProperty(constructor, _FIELDS_REQUIRED);
+    //console.log("fields required:");
+    //console.log(fieldsRequired);
+
+    // This is the mapping from class method name to the set of scopes
+    // that are required to invoke the corresponding RPC method.
+    const scopesRequired: RequiredScopes = Reflect.get(constructor, _SCOPES_REQUIRED);
+    Reflect.deleteProperty(constructor, _SCOPES_REQUIRED);
+    //console.log("scopes required:");
     //console.log(scopesRequired);
-
-    // Get the mapping from RPC method name to class method name and then
-    // delete the property. It was only a temporary means of passing data
-    // from decorators up to this "top-level" decorator that constructs the
-    // class.
-    const rpcMethodMap = Reflect.get(constructor, _METHODS);
-    Reflect.deleteProperty(constructor, _METHODS);
-
-    // TODO import type RpcMethodSet for this?
-    const methods: Array<RpcMethod> = [];
-
-    // - rpcName: the name of the RPC method
-    // - className: the name of the corresponding class method
-    for (const [rpcName, className] of rpcMethodMap.entries()) {
-      // We use a symbol to identify RPC methods.
-      const methodSym = Symbol.for(rpcName);
-      const classSym = Symbol.for(className);
-
-      //console.log(`${methodSym.description} => ${classSym.description}`);
-
-      // The scopes required to be able to invoke the RPC method. The returned value
-      // is a Set of Symbol values representing the required scope names.
-      const scopes = scopesRequired.get(classSym) || [];
-      //console.log(scopes);
-
-      // The RPC method implementation on the class. This is what we'll
-      // invoke, pass the requested state, context, etc. configured using
-      // decorators on the method definition.
-      const methodFn: RpcCallable = Reflect.get(constructor, className);
-      // The handler for the RPC call.
-      const handler = openrpc.handler(async (request, context): Promise<RpcResponse> => {
-        // TODO check scopes on incoming request, make sure that the required scopes
-        // have been granted to the caller. Checked in middleware already?
-
-        // TODO invoke the decorated method with:
-        // - inject readable state (object with readable property)
-        // - inject writable state (object with writable property)
-        const inState: Map<string, any> = new Map();
-        const inContext: Map<string, any> = new Map();
-        const inRemote: Map<string, any> = new Map();
-
-        const methodResult = methodFn(request, inState, inContext, inRemote);
-
-        return openrpc.response(request, methodResult);
-      });
-      // Construct a handler for the RPC method.
-      const rpcMethod = openrpc.method(schema, {
-        name: rpcName,
-        scopes,
-        handler,
-      });
-
-      methods.push(rpcMethod);
-    }
 
     // Check that union of required scopes from all methods are
     // contained in the set of scopes defined by @scopes. If the user
     // requires a scope on a method that isn't declared on the class using
     // @scopes, throw an error.
-    const allScopes = Reflect.get(constructor, _SCOPES_ALL);
-    const reqScopes = Reflect.get(constructor, _SCOPES_REQUIRED);
+    const allScopes: ScopeSet = Reflect.get(constructor, _SCOPES_ALL);
+    Reflect.deleteProperty(constructor, _SCOPES_ALL);
+    //console.log("all scopes:");
+    //console.log(allScopes);
+
+    // Get the mapping from RPC method name to class method name.
+    const rpcMethodMap: MethodMap = Reflect.get(constructor, _METHODS);
+    Reflect.deleteProperty(constructor, _METHODS);
+    //console.log("rpc method map:");
+    //console.log(rpcMethodMap);
 
     // TODO seal the generated object so that all fields, etc. must be
     // defined declaratively using decorators. Stay out of trouble,
@@ -167,6 +224,9 @@ export function component(schema: RpcSchema) {
       // A map from method to the set of scopes that it requires to be invoke.
       private readonly _scopes: RequiredScopes;
 
+      // A map from field name (a symbol) to a field descriptor.
+      private readonly _fields: Fields;
+
       // The set of all scopes declared by the component.
       private readonly _allScopes: ScopeSet;
 
@@ -176,10 +236,6 @@ export function component(schema: RpcSchema) {
       // The wrangler-configured environment context.
       private readonly _env: Env;
 
-      // The collection of RPC method implementations defined in a subclass.
-      //private readonly _methods: RpcMethods;
-      //private readonly _methods: RpcMethodSet;
-
       // A functional OpenRPC request handler. It should be invoked as:
       //   rpcHandler(request: Request, context?: RpcContext);
       // It returns a Response containing a JSON-RPC format response body.
@@ -188,35 +244,291 @@ export function component(schema: RpcSchema) {
       constructor(...args: any[]) {
         super();
 
-        // TODO Define all these properties to be non-enumerable. There's a proposal
-        // for nonenum keyword here: https://github.com/microsoft/TypeScript/issues/9726
-        // but that's likely not happening soon, so prefer Object.defineProperty() for now.
+        // TODO Define all these properties to be non-enumerable.
+        // There's a proposal for nonenum keyword here:
+        //
+        //   https://github.com/microsoft/TypeScript/issues/9726
+        //
+        // but that's likely not happening soon, so prefer
+        // Object.defineProperty() for now.
+        //
+        // TODO decide which of these we need at runtime; don't bother
+        // storing anything we don't need.
         this._schema = schema;
-        this._scopes = reqScopes;
+        this._scopes = scopesRequired;
+        this._fields = fields;
         this._allScopes = allScopes;
         this._state = <DurableObjectState>args[0];
         this._env = <Env>args[1];
 
-        //this._methods = methods;
+        // Ensure that the default values for all fields are stored.
+        this._setFieldDefaults();
+
+        // Construct the RPC method handlers that perform pre- and
+        // post-setup around invoking the RpcCallables defined on the
+        // component class by the user.
+        const methods: Array<RpcMethod> = this._initMethods();
 
         // Construct RPC handler that conforms to the schema, using the
         // supplied methods to implement the defined service methods.
         this._rpcHandler = this.initRPC(schema, methods);
+      }
 
-        // Variables in a Durable Object will maintain state as long as your
-        // DO is not evicted from memory. A common pattern is to initialize
-        // an object from persistent storage and set instance variables the
-        // first time it is accessed. Since future accesses are routed to
-        // the same object, it is then possible to return any initialized
-        // values without making further calls to persistent storage.
-        /*
+      /**
+       *
+       */
+      private _initMethods() {
+        // TODO import type RpcMethodSet for this?
+        const methods: Array<RpcMethod> = [];
+
+        // - rpcName: the name of the RPC method
+        // - className: the name of the corresponding class method
+        for (const [rpcName, className] of rpcMethodMap.entries()) {
+          // We use a symbol to identify RPC methods.
+          const methodSym = Symbol.for(rpcName);
+          const classSym = Symbol.for(className);
+          //console.log(`RPC.${methodSym.description} => Class.${classSym.description}`);
+
+          // The scopes required to be able to invoke the RPC method. The returned value
+          // is a Set of Symbol values representing the required scope names.
+          const scopes: ScopeSet = scopesRequired.get(classSym) || new Set();
+          //console.log(scopes);
+
+          const fieldSet: FieldSet = fieldsRequired.get(classSym) || new Set();
+          //console.log(fields);
+
+          const fieldMap: FieldMap = new Map();
+          for (const field of fieldSet) {
+            fieldMap.set(field.name, field);
+          }
+
+          // The RPC method implementation on the class. This is what we'll
+          // invoke, pass the requested state, context, etc. configured using
+          // decorators on the method definition.
+          const methodFn: RpcCallable = Reflect.get(this, className);
+          //console.log(`methodFn: ${methodFn} (for ${className})`);
+
+          // The handler for the RPC call.
+          const handler = openrpc.handler(async (request, context): Promise<RpcResponse> => {
+            // TODO check scopes on incoming request, make sure that the required scopes
+            // have been granted to the caller. Checked in middleware already?
+
+            // Convert request params into a Map.
+            const requestParams: RpcParams = this._prepareParams(request);
+
+            // For each field, if read permission for this method, read
+            // the value and store in the map.
+            const fieldInput = await this._prepareInput(fieldSet);
+
+            // The map we inject into the RpcCallable to allow the developer to provide
+            // output values to save.
+            const fieldOutput: RpcOutput = new Map();
+
+            // Invoke the RpcCallable method.
+            const requestResult = await methodFn(
+              requestParams,
+              fieldInput,
+              fieldOutput,
+            );
+
+            // TODO validate that the returned result conforms to the OpenRPC schema.
+
+            // Keep outputs for which there is write permission and
+            // which are valid (conform to their associated schemas).
+            const checkedOutput = this._checkOutput(fieldMap, fieldOutput);
+
+            // Write the output values to durable storage.
+            await this._storeOutput(fieldSet, checkedOutput);
+
+            return openrpc.response(request, requestResult);
+          });
+          // Construct a handler for the RPC method.
+          const rpcMethod: RpcMethod = openrpc.method(schema, {
+            name: rpcName,
+            scopes,
+            handler,
+          });
+
+          methods.push(rpcMethod);
+        }
+        //console.log("rpc methods:");
+        //console.log(methods);
+
+        return methods;
+      }
+
+      /**
+       * Extract the JSON-RPC request params and return them as a Map.
+       */
+      private _prepareParams(request: RpcRequest): RpcParams {
+        const requestParams: RpcParams = new Map();
+
+        if (_.isArray(request.params)) {
+          throw new Error("array params not yet implemented");
+        }
+        if (_.isPlainObject(request.params)) {
+          const params: ParamsObject = request?.params || {};
+          for (const paramName in params) {
+            const paramValue = params[paramName];
+            requestParams.set(paramName, paramValue);
+          }
+        }
+
+        return requestParams;
+      }
+
+      /**
+       * Return the set of fields that the user has declared and
+       * provided read access to.
+       */
+      private async _prepareInput(fields: FieldSet): Promise<RpcInput> {
+        const fieldInput: RpcInput = new Map();
+
+        console.log(fields);
+
+        // Produce a list of keys to read from storage.
+        const readKeys: Array<string> = [];
+        for (const field of fields.values()) {
+          const fieldName = field.name.description;
+          if (fieldName !== undefined) {
+            if (field.perms.has(FieldAccess.Read)) {
+              // Push the string name of the state to read.
+              readKeys.push(fieldName);
+            } else {
+              console.warn(`tried to read "${fieldName}" without permission; ignored`);
+            }
+          }
+        }
+
+        // Read the values of our list of keys and store the key/value
+        // pairs in the RpcInput map.
+        const values: Map<string, any> = await this._state.storage.get(readKeys) || new Map();
+        for (const [fieldName, fieldValue] of values.entries()) {
+          fieldInput.set(fieldName, fieldValue);
+        }
+
+        return fieldInput;
+      }
+
+      /**
+       *
+       */
+      private _checkOutput(fieldMap: FieldMap, output: RpcOutput): RpcOutput {
+        // Drop any outputs that are not declared as required.
+        const declared = this._checkOutputDeclared(fieldMap, output);
+        // Drop any outputs that there is no write permission for.
+        const permitted = this._checkOutputPermitted(fieldMap, declared);
+
+        // TODO validate value to be stored against schema
+        // TODO validate value to be stored using provided validator fn
+        // TODO return JSON-RPC error if output value doesn't conform?
+
+        return permitted;
+      }
+
+      /**
+       *
+       */
+      private _checkOutputDeclared(fields: FieldMap, output: RpcOutput): RpcOutput {
+        // Utility to return the keys of a map as a set of symbols.
+        function keysToSymbolSet(m: Map<string, any>): Set<Symbol> {
+          const s: Set<Symbol> = new Set();
+          for (const k of m.keys()) {
+            s.add(Symbol.for(k));
+          }
+          return s;
+        }
+
+        // Compute the set of fields that should be updated, i.e. that
+        // are marked as required on the RpcCallable method. This is
+        // necessary because the developer might set an arbitrary
+        // key/value pair in the output map, but we don't want to store
+        // anything that hasn't been declared.
+        const outputKeys: Set<Symbol> = keysToSymbolSet(output);
+        const fieldKeys = new Set(fields.keys());
+        const updateKeys = set.intersection(outputKeys, fieldKeys);
+
+        for (const [fieldName, fieldValue] of output.entries()) {
+          if (!updateKeys.has(Symbol.for(fieldName))) {
+            console.warn(`tried storing output "${fieldName}" without declaration; ignored`);
+            output.delete(field.name);
+          }
+        }
+
+        return output;
+      }
+
+      /**
+       *
+       */
+      private _checkOutputPermitted(fields: FieldMap, output: RpcOutput): RpcOutput {
+        for (const [fieldName, fieldValue] of output.entries()) {
+          const field = fields.get(Symbol.for(fieldName));
+          if (field && !field.perms.has(FieldAccess.Write)) {
+            const fieldName = field.name.description;
+            if (fieldName !== undefined) {
+              console.warn(`tried storing output "${fieldName}" without write permission; ignored`);
+              output.delete(fieldName);
+            }
+          }
+        }
+
+        return output;
+      }
+
+      /**
+       * Store the output fields produced by an invocation of an RpcCallable.
+       */
+      private async _storeOutput(
+        fields: FieldSet,
+        fieldOutput: RpcOutput,
+      ): Promise<any> {
+        // Construct an object containing the values to be stored;
+        // property names are used as the key name of the value to
+        // store.
+        interface StorageObject {
+          [index: string]: any;
+        }
+        const entries: StorageObject = {};
+        for (const [outName, outValue] of fieldOutput) {
+          console.log(`setting field ${outName} => ${outValue}`);
+          entries[outName] = outValue;
+        }
+
+        return this._state.storage.put(entries);
+      }
+
+      /**
+       *
+       */
+      private _setFieldDefaults() {
+        // Set the initial values of component fields.
         this._state.blockConcurrencyWhile(async () => {
-          const stored = await this.state.storage.get("value");
-          // After init, future reads do not need to access storage.
-          // Use this.value rather than storage in fetch() afterwards.
-          this.value = stored || 0;
+          // Generate a list of storage promises, one for each field
+          // whose default value is being set.
+          let wait: Array<Promise<any>> = [];
+
+          this._fields.forEach(async (fieldSpec: FieldSpec) => {
+            // Try getting the values first; only set default if the
+            // value isn't already defined.
+            const value = await this._state.storage.get(fieldSpec.name);
+            if (value === undefined) {
+              const valueStr = JSON.stringify(fieldSpec.defaultValue);
+              console.log(`setting field "${fieldSpec.name}" default to: ${valueStr}`);
+              const put: Promise<any> = this._state.storage.put(
+                fieldSpec.name,
+                fieldSpec.defaultValue,
+              );
+              wait.push(put);
+            } else {
+              const valueStr = JSON.stringify(value, null, 2);
+              console.log(`found field "${fieldSpec.name}" value: ${valueStr}`);
+            }
+          });
+
+          // Await all the promises at once; take advantage of write coalescing.
+          const values = await Promise.all(wait);
         });
-        */
       }
 
       // TODO extensions define required scopes. Those need to be checked against
@@ -440,14 +752,14 @@ export function component(schema: RpcSchema) {
  */
 export function scopes(scopes: Array<string>) {
 
-  return function<T extends { new (...args: any[]): {} }>(constructor: T) {
-    // Turn each scope string into a Symbol.
-    const scopeSet: ScopeSet = new Set(
-      scopes.map(scope => {
-        return Symbol.for(scope.trim().toLowerCase());
-      })
-    );
+  // Turn each scope string into a Symbol.
+  const scopeSet: ScopeSet = new Set(
+    scopes.map(scope => {
+      return Symbol.for(scope.trim().toLowerCase());
+    })
+  );
 
+  return function<T extends { new (...args: any[]): {} }>(constructor: T) {
     // Define this property so as to be read-only and non-enumerable, i.e. it
     // won't show up if the user should iterate over the keys of the target.
     // NB: we define the property on the constructor and not the prototype
@@ -458,6 +770,28 @@ export function scopes(scopes: Array<string>) {
       enumerable: false,
       writable: false,
     });
+
+    return constructor;
+  }
+}
+
+// @field
+// -----------------------------------------------------------------------------
+
+export function field(fieldSpec: FieldSpec) {
+
+  // TODO get collection of fields defined so far
+  // TODO check that current field name doesn't conflict with existing fields
+  // TODO add field spec to the set
+  // TODO (component): store collection of all defined fields
+
+  return function<T extends { new (...args: any[]): {} }>(constructor: T) {
+
+    const fieldName = Symbol.for(fieldSpec.name.trim());
+    const fields = Reflect.get(constructor, _FIELDS) || new Map<Symbol, FieldSpec>();
+    fields.set(fieldName, fieldSpec);
+
+    Reflect.set(constructor, _FIELDS, fields);
   }
 }
 
@@ -491,7 +825,7 @@ export function method(schemaMethod: string) {
     //
     // Use this in @component to build the method map.
 
-    const methods = Reflect.has(target.constructor, _METHODS) ?
+    const methods: MethodMap = Reflect.has(target.constructor, _METHODS) ?
       Reflect.get(target.constructor, _METHODS) :
       new Map<string, string>()
     ;
@@ -499,31 +833,6 @@ export function method(schemaMethod: string) {
 
     Reflect.set(target.constructor, _METHODS, methods);
   };
-}
-
-// rpcField
-// -----------------------------------------------------------------------------
-
-/**
- * Defines a data field that this object manages. These fields may be
- * read or written to if a method has permission (provided by applying
- * the @readState and @writeState decorators.
- */
-type ValidatorFn = (x: any) => boolean;
-
-type FieldSpec = {
-  // The name of the field.
-  name: string;
-  // The default value of the field.
-  default: any;
-  // The validation function to apply before updating the field.
-  validator: ValidatorFn;
-};
-function rpcField(m: FieldSpec) {
-  console.log("factory: field");
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    console.log("field");
-  }
 }
 
 // @requiredScope
@@ -587,7 +896,7 @@ export function requiredScope(scope: string | Symbol) {
     // TODO better type here
     target: any,
     propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     // This is a map from method name into a set of its required scopes.
     const requiredScopes: RequiredScopes = getRequiredScopes(target);
@@ -600,6 +909,52 @@ export function requiredScope(scope: string | Symbol) {
     // usage of the @requiredScope decorator or used by the @rpbObject
     // decorator.
     setRequiredScopes(target, updatedScopes);
+  }
+}
+
+// @requiredField
+// -----------------------------------------------------------------------------
+
+export function requiredField(name: string, perms: FieldPerms) {
+
+  const fieldName = Symbol.for(name.trim());
+
+  const fieldPerms = new Set(perms);
+
+  function getRequiredFields(target: any): RequiredFields {
+    // TODO use a better type for target.
+    return Reflect.get(target.constructor, _FIELDS_REQUIRED) || new Map();
+  }
+
+  function addMethodField(
+    requiredFields: RequiredFields,
+    methodName: symbol,
+    reqField: RequiredField,
+  ): RequiredFields {
+    const currentFields: FieldSet = requiredFields.get(methodName) || new Set();
+    const updatedFields: FieldSet = currentFields.add(reqField);
+    return requiredFields.set(methodName, updatedFields);
+  }
+
+  function setRequiredFields(target: any, requiredFields: RequiredFields) {
+    // TODO Better type for target.
+    Reflect.set(target.constructor, _FIELDS_REQUIRED, requiredFields);
+  }
+
+  return function (
+    // TODO better type here
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const methodName = Symbol.for(propertyKey);
+    // A map from method name to the fields that it requires.
+    const requiredFields: RequiredFields = getRequiredFields(target);
+    const updatedFields = addMethodField(requiredFields, methodName, {
+      name: fieldName,
+      perms: fieldPerms,
+    });
+    setRequiredFields(target, updatedFields);
   }
 }
 
@@ -642,32 +997,5 @@ function requiredRemote() {
   console.log("factory: requiredRemote");
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     console.log("requiredRemote");
-  }
-}
-
-// readState
-// -----------------------------------------------------------------------------
-
-/**
- * Lists the state fields that a method is allowed to read. Injects
- * those values into a method.
- */
-function readState(names: Array<string>) {
-  console.log("factory: requiredState");
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    console.log("requiredState");
-  }
-}
-
-// writeState
-// -----------------------------------------------------------------------------
-
-/**
- * Lists the state fields that a method is allowed to update.
- */
-function writeState(names: Array<string>) {
-  console.log("factory: requiredState");
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    console.log("requiredState");
   }
 }

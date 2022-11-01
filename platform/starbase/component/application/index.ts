@@ -3,18 +3,23 @@
  * @file src/index.ts
  */
 
-import type {
-  RpcRequest,
-  RpcResponse,
-} from "@kubelt/openrpc";
-
 import * as openrpc from "@kubelt/openrpc";
 
+import type {
+  RpcInput,
+  RpcOutput,
+  RpcParams,
+  RpcResult,
+} from "@kubelt/openrpc/component";
+
 import {
+  FieldAccess,
   component,
-  scopes,
+  field,
   method,
+  requiredField,
   requiredScope,
+  scopes,
 } from "@kubelt/openrpc/component";
 
 // The OpenRPC schema that defines the RPC API provided by the Durable Object.
@@ -23,19 +28,6 @@ import schema from "./schema";
 // StarbaseApplication
 // -----------------------------------------------------------------------------
 // A Durable Object for storing Kubelt Application state.
-
-/**
- * Stores state that describes a Starbase application.
- *
- * @note This class needs to implement all of the methods defined in
- * the OpenRPC schema or an error will be thrown upon construction.
- */
-@component(schema)
-@scopes([
-  "owner",
-  "starbase.read",
-  "starbase.write",
-])
 
 // TODO this decorator adds RPC methods that allow the component to
 // be treated as a graph node.
@@ -50,100 +42,61 @@ import schema from "./schema";
 //@node()
 
 // TODO list allowed signers (provide public key(s))
-// @signerPublicKey()
+// @signer()
 
-// TODO define data fields
-// @field({
-//   name: "app_name",
-//   doc: "docs about this state"
-//   scopes: [<required scopes to access?>]
-//   default: "",
-//   validator: (x) => { return true },
-// })
-export class StarbaseApplication {
-
-  // app_name
-  // ---------------------------------------------------------------------------
-
+/**
+ * Stores state that describes a Starbase application.
+ *
+ * @note This class needs to implement all of the methods defined in
+ * the OpenRPC schema or an error will be thrown upon construction.
+ */
+@component(schema)
+@scopes([
+  "owner",
+  "starbase.read",
+  "starbase.write",
+])
+@field({
+  name: "app",
+  doc: "An application object",
+  defaultValue: {},
   /*
-  // Mark this method as being the implementation of a specific method
-  // from the OpenRPC schema.
-  @rpcMethod("app_name")
-
-  // Defines the JWT issuer(s) that must have issued the JWT provided with
-  // a request that invokes this method. This is determined by the "iss"
-  // field of the incoming request JWT. Possibly this can also be specified
-  // at the class level to set a default for all methods.
-  //@requiredIssuer()
-
-  // Defines the set of users allowed to invoke this method. This can be
-  // a predefined user identifier, a list of user identifiers, or a predicate
-  // that tests whether or not the user should be permitted. The user is
-  // determined by the "sub" (subject) field of the request JWT.
-  //@requiredUser(["joe", "@xdeadbeef"])
-
-  // A scope that is required to invoke this method. If the caller lacks
-  // the scope they receive an error method indicating that they lack
-  // permission, and this method handler is not invoked.
-  @requiredScope("starbase.read")
-  @requiredScope("starbase.write")
-
-  // A list of state fields that this method may read. They are injected
-  // as the "state" method parameter, a map.
-  //@readState(["app_name"])
-
-  // A list of the state fields that this method may update. The method
-  // returns a map of these state fields in order to update the state
-  // stored for the object. State field validators are applied and if any
-  // fields fail validation an error response is returned. If any state
-  // fields are returned that are not listed here we can return an error
-  // (strict mode) or ignore them without updating state (permissive mode).
-  //@writeState([])
-
-  // Inject an environment variable value (defined in wrangler.toml).
-  //@requiredEnvironment("USER_NAME")
-
-  // Inject a secret value (defined using the wrangler CLI or in the CF console).
-  //@requiredSecret("DATADOG_API_KEY")
-
-  // Indicates which remote service RPC clients are required. These are
-  // injected to allow the user to make RPC calls to remote services
-  // that have configured service bindings.
-  //@requiredRemote()
-
-  appName(
-    request: RpcRequest,
-    state: Map<string, any>,
-    context: Map<string, any>,
-    remote: Map<string, any>,
-  ): Promise<RpcResponse> {
-    // Indicate a reply by using request ID (if provided).
-    const replyId = (undefined !== request?.id) ? request.id : null;
-    return {
-      jsonrpc: "2.0",
-      id: replyId,
-      result: {
-        invoked: "app_name",
-        context: "StarbaseApp",
-      },
-    };
-    // TODO return updated state
-  }
+  scopes: {
+    read: ["starbase.read"],
+    write: ["starbase.write"],
+  },
+  validator: (x) => { return true },
   */
+})
+export class StarbaseApplication {
 
   // app_store
   // ---------------------------------------------------------------------------
 
+  // Mark this method as being the implementation of the app_store method
+  // from the OpenRPC schema.
   @method("app_store")
+  // The write scope is required to invoke this method. If the caller lacks
+  // the scope they receive an error method indicating that they lack
+  // permission, and this method handler is not invoked.
   @requiredScope("starbase.write")
-  appStore(
-    request: RpcRequest,
-    state: Map<string, any>,
-    context: Map<string, any>,
-    remote: Map<string, any>,
-  ): Promise<RpcResponse> {
-    // TODO return updated state
-    return openrpc.response(request, {
+  // Allow this method to update the value of the "app" field of the
+  // component.
+  @requiredField("app", [FieldAccess.Write])
+  // The RPC method implementation.
+  async appStore(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
+
+    if (params.has("app")) {
+      output.set("app", params.get("app"));
+    } else {
+      console.error(`missing parameter "app" from request`);
+    }
+
+    return Promise.resolve({
       invoked: "app_store",
     });
   }
@@ -153,15 +106,16 @@ export class StarbaseApplication {
 
   @method("app_fetch")
   @requiredScope("starbase.read")
+  @requiredField("app", [FieldAccess.Read])
   appFetch(
-    request: RpcRequest,
-    state: Map<string,any>,
-    context: Map<string, any>,
-    remote: Map<string, any>,
-  ): Promise<RpcResponse> {
-    // TODO return updated state
-    return openrpc.response(request, {
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
+    const app = input.get("app");
+    return Promise.resolve({
       invoked: "app_fetch",
+      app,
     });
   }
 

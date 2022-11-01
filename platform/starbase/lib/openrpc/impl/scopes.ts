@@ -26,24 +26,6 @@ function getExtraScopes(
   declaredScopes: ScopeSet,
   reqScopes: ScopeSet,
 ): ScopeSet {
-  console.log(declaredScopes.size);
-  for (const x of declaredScopes.values()) {
-    console.log(x);
-  }
-
-  console.log(reqScopes.size);
-  for (const x of reqScopes.values()) {
-    console.log(x);
-  }
-
-  const diffScopes = set.difference(declaredScopes, reqScopes);
-  console.log(diffScopes.size);
-  for (const x of diffScopes.values()) {
-    console.log(x);
-  }
-
-  console.log("-----");
-
   return set.difference(declaredScopes, reqScopes);
 }
 
@@ -100,7 +82,6 @@ function checkExtraneous(
   if (extraScopes.size > 0) {
     const errorScopes = [];
     for (const scope of extraScopes.values()) {
-      console.log(scope);
       errorScopes.push(scope.description);
     }
     const scopeMsg = errorScopes.join(", ");
