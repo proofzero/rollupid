@@ -34,16 +34,15 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "projects/redeem"
+          workingDirectory: 'projects/redeem'
           command: publish --env dev
-          environment: "dev"
+          environment: 'dev'
           secrets: |
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
             DATADOG_ENV
             DATADOG_SERVICE_NAME
-            OORT_HOST
             NFTAR_URL
             NFTAR_AUTHORIZATION
             INVITE_CONTRACT_ADDRESS
@@ -56,7 +55,7 @@ jobs:
             ALCHEMY_API_URL
             ALCHEMY_NFT_URL
         env:
-          SESSION_SECRET: "secret"
+          SESSION_SECRET: 'secret'
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.GET_THREEID_DATADOG_CLIENT_TOKEN }}
