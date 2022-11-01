@@ -38,9 +38,9 @@ import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher"
 import { abi } from "~/assets/abi/mintpfp.json";
 
 import { getUserSession } from "~/utils/session.server";
-import { GraphQLClient } from "graphql-request";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { Visibility } from "~/utils/galaxy.server";
 import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import galaxyClient from "~/helpers/galaxyClient";
 
 export const links = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -61,15 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const isToken = formData.get("isToken");
 
-  // Get existing object | error
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(`http://127.0.0.1`, {
-    // @ts-ignore
-    fetch: GALAXY.fetch,
-  });
-
-  const galaxySdk = getSdk(gqlClient);
-  await galaxySdk.updateProfile(
+  await galaxyClient.updateProfile(
     {
       profile: {
         pfp: {

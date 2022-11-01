@@ -50,8 +50,6 @@ export async function oortSend(
     }),
   };
 
-  console.log("fetching nonce from oort", OORT_URL, oortRequest);
-
   //@ts-ignore
   const response = await OORT.fetch(OORT_URL, oortRequest);
 
