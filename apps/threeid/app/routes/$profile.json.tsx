@@ -47,9 +47,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       pfp: {
         image: voucher.metadata.image,
+        isToken: false,
       },
       cover: voucher.metadata.cover,
-      isToken: false,
       claimed: false,
     });
   }
