@@ -34,8 +34,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     "KBT-Access-JWT-Assertion": jwt,
   });
 
-  console.log("PROFILE RES", profileRes);
-
   const profile = profileRes.profile;
 
   return json(profile);

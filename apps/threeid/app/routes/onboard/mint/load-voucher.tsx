@@ -47,7 +47,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       voucher = await fetchVoucher({ address, skipImage: !!voucher });
       voucher = await putCachedVoucher(address, voucher);
     } catch (e) {
-      console.log("ERROR FETCHING VOUCHER", e);
+      console.error("ERROR FETCHING VOUCHER", e);
       // TODO: it is unlikely a user would have no voucher and no profile
       // if this is an issue we should handle it here
     }
