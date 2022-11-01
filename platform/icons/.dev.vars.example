@@ -1,0 +1,12 @@
+# .dev.vars.example
+#
+# Rename this file to .dev.vars and set the owning Cloudflare account ID.
+
+# The account ID that owns uploaded images.
+CLOUDFLARE_ACCOUNT_ID = "<replace-me>"
+
+# The e-mail address associated with the owner account.
+CLOUDFLARE_AUTH_EMAIL = "<replace-me>"
+
+# A bearer token providing access to the Cloudflare Images API.
+CLOUDFLARE_AUTH_KEY = "<replace-me>"
