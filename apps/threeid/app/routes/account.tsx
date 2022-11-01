@@ -8,8 +8,6 @@ import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
 
 import { getUserSession, requireJWT } from "~/utils/session.server";
 
-import { oortSend } from "~/utils/rpc.server";
-
 import styles from "~/styles/account.css";
 import { links as buttonStyles } from "~/components/base-button";
 import { links as faqStyles } from "~/components/FAQ";
@@ -21,9 +19,8 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { GraphQLClient } from "graphql-request";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
 import validateProof from "~/helpers/validate-proof";
+import galaxyClient from "~/helpers/galaxyClient";
 
 export function links() {
   return [
@@ -47,20 +44,6 @@ export const loader = async ({ request }) => {
   }
 
   // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
-
-  // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core);
   if (!onboardData) {
     // @ts-ignore
@@ -68,6 +51,10 @@ export const loader = async ({ request }) => {
 
     return redirect(`/onboard/name`);
   }
+
+  const profileRes = await galaxyClient.getProfile(undefined, {
+    "KBT-Access-JWT-Assertion": jwt,
+  });
 
   // @ts-ignore
   const [avatarUrl, isToken] = [

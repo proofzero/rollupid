@@ -13,7 +13,6 @@ import {
   PrefetchPageLinks,
 } from "@remix-run/react";
 import { Label, TextInput, Spinner } from "flowbite-react";
-import { GraphQLClient } from "graphql-request";
 
 import { useEffect, useState } from "react";
 import { Button, ButtonSize } from "~/components/buttons";
@@ -24,25 +23,17 @@ import Text, {
   TextSize,
   TextWeight,
 } from "~/components/typography/Text";
-import { getSdk, ThreeIdProfile, Visibility } from "~/utils/galaxy.server";
+import galaxyClient from "~/helpers/galaxyClient";
+import { Visibility } from "~/utils/galaxy.server";
 import { getUserSession, requireJWT } from "~/utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
+  const profileRes = await galaxyClient.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
+
   const profile = profileRes.profile;
 
   return json(profile);
@@ -65,18 +56,8 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayname = "Display Name needs to be provided";
   }
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
   // PUT new object
-  await galaxySdk.updateProfile(
+  await galaxyClient.updateProfile(
     {
       profile: {
         displayName: displayname?.toString(),

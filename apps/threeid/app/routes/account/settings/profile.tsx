@@ -4,9 +4,7 @@ import { FaAt, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { Button, ButtonSize, ButtonType } from "~/components/buttons";
 import InputText from "~/components/inputs/InputText";
 import { requireJWT } from "~/utils/session.server";
-
-import { GraphQLClient } from "graphql-request";
-import { getSdk, Visibility } from "~/utils/galaxy.server";
+import { Visibility } from "~/utils/galaxy.server";
 
 import InputTextarea from "~/components/inputs/InputTextarea";
 import Text, {
@@ -15,21 +13,12 @@ import Text, {
   TextWeight,
 } from "~/components/typography/Text";
 import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import galaxyClient from "~/helpers/galaxyClient";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
+  const profileRes = await galaxyClient.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
 
@@ -42,16 +31,6 @@ export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
 
   const formData = await request.formData();
-
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
 
   let errors: any = {};
 
@@ -71,7 +50,7 @@ export const action: ActionFunction = async ({ request }) => {
     };
   }
 
-  await galaxySdk.updateProfile(
+  await galaxyClient.updateProfile(
     {
       profile: {
         displayName: displayName,

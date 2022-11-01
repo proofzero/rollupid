@@ -28,8 +28,7 @@ import SectionTitle from "~/components/typography/SectionTitle";
 import SectionHeading from "~/components/typography/SectionHeading";
 import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
 import { ButtonAnchor, ButtonSize } from "~/components/buttons";
-import { GraphQLClient } from "graphql-request";
-import { getSdk } from "~/utils/galaxy.server";
+import galaxyClient from "~/helpers/galaxyClient";
 
 // @ts-ignore
 export const loader = async ({ request }) => {
@@ -39,17 +38,7 @@ export const loader = async ({ request }) => {
     jwt: jwt,
   };
 
-  // @ts-ignore
-  const gqlClient = new GraphQLClient(
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
+  const profileRes = await galaxyClient.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
 

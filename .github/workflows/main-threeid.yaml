@@ -71,7 +71,7 @@ jobs:
           OORT_SCHEMA: https
           OORT_PORT: 443
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
+          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_DEV_AUTHORIZATION }}
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
           NFTAR_CHAIN_ID: 5
           VALID_CHAIN_ID_NAME: goerli

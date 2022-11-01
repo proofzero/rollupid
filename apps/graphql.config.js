@@ -13,6 +13,9 @@ module.exports = {
                 "typescript-operations",
                 "typescript-graphql-request",
               ],
+              config: {
+                rawRequest: false,
+              },
             },
           },
         },

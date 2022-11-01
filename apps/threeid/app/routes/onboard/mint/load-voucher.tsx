@@ -1,20 +1,15 @@
 import { LoaderFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { GraphQLClient } from "graphql-request";
 import { redirect } from "react-router";
 import {
   fetchVoucher,
   getCachedVoucher,
   putCachedVoucher,
 } from "~/helpers/voucher";
-import {
-  getSdk,
-  ThreeIdProfile,
-  Visibility,
-  Nftpfp,
-} from "~/utils/galaxy.server";
+import { Visibility } from "~/utils/galaxy.server";
 import { getUserSession } from "~/utils/session.server";
 import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import galaxyClient from "~/helpers/galaxyClient";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request);
@@ -34,17 +29,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let voucher = await getCachedVoucher(address);
 
-  const gqlClient = new GraphQLClient(
-    // @ts-ignore
-    `${GALAXY_SCHEMA}://${GALAXY_HOST}:${GALAXY_PORT}`,
-    {
-      fetch,
-    }
-  );
-
-  const galaxySdk = getSdk(gqlClient);
-
-  const profileRes = await galaxySdk.getProfile(undefined, {
+  const profileRes = await galaxyClient.getProfile(undefined, {
     "KBT-Access-JWT-Assertion": jwt,
   });
   const prof = profileRes.profile;
@@ -58,12 +43,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       });
     }
   } else {
-    voucher = await fetchVoucher({ address, skipImage: !!voucher });
-    voucher = await putCachedVoucher(address, voucher);
+    try {
+      voucher = await fetchVoucher({ address, skipImage: !!voucher });
+      voucher = await putCachedVoucher(address, voucher);
+    } catch (e) {
+      console.error("ERROR FETCHING VOUCHER", e);
+      // TODO: it is unlikely a user would have no voucher and no profile
+      // if this is an issue we should handle it here
+    }
   }
 
   if (!prof?.pfp) {
-    await galaxySdk.updateProfile(
+    await galaxyClient.updateProfile(
       {
         profile: {
           pfp: {
