@@ -54,7 +54,11 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData();
 
-  // const imgUrl = formData.get("imgUrl");
+  const imgUrl = formData.get("imgUrl");
+  if (!imgUrl) {
+    throw new Error("imgUrl expected");
+  }
+
   const isToken = formData.get("isToken");
 
   // Get existing object | error
@@ -70,7 +74,10 @@ export const action: ActionFunction = async ({ request }) => {
   await galaxySdk.updateProfile(
     {
       profile: {
-        isToken: isToken?.valueOf() as boolean,
+        pfp: {
+          isToken: !!isToken,
+          image: imgUrl.toString(),
+        },
       },
       visibility: Visibility.Public,
     },

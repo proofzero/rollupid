@@ -64,7 +64,6 @@ const ProfileRoute = () => {
     loggedIn,
     pfp,
     cover,
-    isToken,
     website
   } = useLoaderData();
 
@@ -99,7 +98,7 @@ const ProfileRoute = () => {
               avatarUrl={gatewayFromIpfs(pfp.image)}
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
-              isNft={isToken}
+              isNft={pfp.isToken}
               webUrl={website}
             />
           </div>

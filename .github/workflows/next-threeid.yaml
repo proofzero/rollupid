@@ -52,6 +52,7 @@ jobs:
             MINTPFP_CONTRACT_ADDRESS
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
+            ALCHEMY_PUBLIC_API_KEY
         env:
           TEST_ENV: true
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
@@ -71,6 +72,7 @@ jobs:
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
           NFTAR_CHAIN_ID: 5
           VALID_CHAIN_ID_NAME: goerli
+          ALCHEMY_PUBLIC_API_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
 
       # - name: Install Playwright Browsers
       #   run: npx playwright install --with-deps

@@ -49,6 +49,7 @@ jobs:
             MINTPFP_CONTRACT_ADDRESS
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
+            ALCHEMY_PUBLIC_API_KEY
         env:
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
@@ -68,6 +69,7 @@ jobs:
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINTPFP_CONTRACT_ADDRESS }}
           NFTAR_CHAIN_ID: 1
           VALID_CHAIN_ID_NAME: mainnet
+          ALCHEMY_PUBLIC_API_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
       # - name: Install Playwright Browsers
       #   run: npx playwright install --with-deps
       #   working-directory: threeid
