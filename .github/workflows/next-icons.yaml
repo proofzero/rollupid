@@ -3,7 +3,9 @@
 name: Next Icons
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 defaults:
   run:
@@ -31,9 +33,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/icons"
+          workingDirectory: 'platform/icons'
           command: publish --env next
-          environment: "next"
+          environment: 'next'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
           secrets: |
