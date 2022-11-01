@@ -8,7 +8,7 @@ type PfpNftModalProps = {
 const PfpNftModal = ({ account }: PfpNftModalProps) => {
   return (
     <Modal isOpen={true}>
-      <ProfileNftCollection account={account} />
+      <ProfileNftCollection account={account} preload={true} />
     </Modal>
   );
 };

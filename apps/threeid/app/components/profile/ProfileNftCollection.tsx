@@ -104,15 +104,18 @@ const ProfileNftCollection = ({
     );
     const nftRes = await nftReq.json();
 
-    setPageLink(nftRes.pageKey);
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts]);
-
-    if (nftRes.pageKey && preload) {
-      getMoreNfts();
-    } else {
-      if (loading) setLoading(false);
-    }
+    setPageLink(nftRes.pageKey ?? null);
   };
+
+  useEffect(() => {
+    if (pageKey) {
+      setLoading(true);
+      getMoreNfts();
+    } else if (pageKey === null) {
+      setLoading(false);
+    }
+  }, [pageKey]);
 
   useEffect(() => {
     getMoreNfts();
@@ -120,8 +123,6 @@ const ProfileNftCollection = ({
 
   return (
     <>
-      {loading && <Spinner />}
-
       {!loading && !isOwner && loadedNfts.length === 0 && (
         <Text
           className="text-center"
@@ -206,8 +207,8 @@ const ProfileNftCollection = ({
       {loadedNfts.length > 0 && (
         <InfiniteScroll
           dataLength={loadedNfts.length} //This is important field to render the next data
-          next={getMoreNfts}
-          hasMore={pageKey != null}
+          next={preload ? () => {} : getMoreNfts}
+          hasMore={preload ? false : pageKey != null}
           loader={<Spinner />}
         >
           <Masonry
@@ -258,6 +259,8 @@ const ProfileNftCollection = ({
           </Masonry>
         </InfiniteScroll>
       )}
+
+      {loading && <Spinner />}
     </>
   );
 };
