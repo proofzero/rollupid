@@ -24,6 +24,9 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useState } from "react";
 import Spinner from "../spinner";
 import NftModal from "./NftModal";
+import InputText from "../inputs/InputText";
+
+import { FaGuilded } from "react-icons/fa";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: ProfileNftCollectionStyles },
@@ -97,6 +100,9 @@ const ProfileNftCollection = ({
 
   const [pageKey, setPageLink] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+
+  const [textFilter, setTextFilter] = useState("");
+  const [colFilter, setColFilter] = useState("All Collections");
 
   const getMoreNfts = async () => {
     const nftReq = await fetch(
@@ -204,6 +210,38 @@ const ProfileNftCollection = ({
         handleClose={() => setShowModal(false)}
       />
 
+      {!loading && !pageKey && loadedNfts.length > 0 && (
+        <div className="flex flex-col lg:flex-row justify-between items-center my-5">
+          <select
+            id="collection"
+            name="collection"
+            className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            defaultValue="All Collections"
+            value={colFilter}
+            onChange={(evt) => {
+              setColFilter(evt.target.value);
+            }}
+          >
+            <option selected>All Collections</option>
+
+            {loadedNfts
+              .map((n) => n.collectionTitle)
+              .filter((val, ind, arr) => arr.indexOf(val) === ind)
+              .map((colName) => (
+                <option>{colName}</option>
+              ))}
+          </select>
+
+          <InputText
+            heading=""
+            Icon={FaGuilded}
+            onChange={(val) => {
+              setTextFilter(val);
+            }}
+          />
+        </div>
+      )}
+
       {loadedNfts.length > 0 && (
         <InfiniteScroll
           dataLength={loadedNfts.length} //This is important field to render the next data
@@ -221,41 +259,54 @@ const ProfileNftCollection = ({
             className="my-masonry-grid space-x-10"
             columnClassName="my-masonry-grid_column"
           >
-            {loadedNfts.map((nft, i) => (
-              // Filtering collection by
-              // unique values
-              // breaks the infinite scroll
-              // plugin I resorted to this
-              <div
-                key={`${nft.url}_${i}`}
-                className="relative overlay-img-wrapper"
-              >
+            {loadedNfts
+              .filter(
+                (nft) =>
+                  colFilter === "All Collections" ||
+                  nft.collectionTitle === colFilter
+              )
+              .filter(
+                (nft) =>
+                  nft.title?.toLowerCase().includes(textFilter.toLowerCase()) ||
+                  nft.collectionTitle
+                    ?.toLowerCase()
+                    .includes(textFilter.toLowerCase())
+              )
+              .map((nft, i) => (
+                // Filtering collection by
+                // unique values
+                // breaks the infinite scroll
+                // plugin I resorted to this
                 <div
-                  onClick={() => {
-                    setSelectedNft(nft);
-                    setShowModal(true);
-                  }}
-                  className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
+                  key={`${nft.url}_${i}`}
+                  className="relative overlay-img-wrapper"
                 >
-                  <Text
-                    size={TextSize.SM}
-                    weight={TextWeight.SemiBold600}
-                    color={TextColor.White}
+                  <div
+                    onClick={() => {
+                      setSelectedNft(nft);
+                      setShowModal(true);
+                    }}
+                    className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
                   >
-                    {nft.collectionTitle}
-                  </Text>
-                  <Text
-                    size={TextSize.SM}
-                    weight={TextWeight.SemiBold600}
-                    color={TextColor.White}
-                  >
-                    {nft.title}
-                  </Text>
-                </div>
+                    <Text
+                      size={TextSize.SM}
+                      weight={TextWeight.SemiBold600}
+                      color={TextColor.White}
+                    >
+                      {nft.collectionTitle}
+                    </Text>
+                    <Text
+                      size={TextSize.SM}
+                      weight={TextWeight.SemiBold600}
+                      color={TextColor.White}
+                    >
+                      {nft.title}
+                    </Text>
+                  </div>
 
-                <img className="w-full" src={nft.url} />
-              </div>
-            ))}
+                  <img className="w-full" src={nft.url} />
+                </div>
+              ))}
           </Masonry>
         </InfiniteScroll>
       )}
