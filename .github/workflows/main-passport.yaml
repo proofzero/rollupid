@@ -1,0 +1,56 @@
+---
+name: Passport
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: ./apps
+
+jobs:
+  build-publish-test-threeid-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build apps.nix
+
+      - name: Install
+        run: yarn workspaces focus -A
+
+      - name: Code Generation
+        run: yarn gql
+
+      - name: Test
+        run: yarn workspaces foreach -i -v -t --include passport run test
+
+      - name: Deploy to Dev Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: 'apps/passport'
+          command: publish --env dev
+          environment: 'dev'
+          secrets: |
+            TEST_ENV
+            SESSION_SECRET
+            DATADOG_CLIENT_TOKEN
+            DATADOG_APPLICATION_ID
+            DATADOG_ENV
+            DATADOG_SERVICE_NAME
+        env:
+          TEST_ENV: true
+          SESSION_SECRET: 'secret'
+          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
+          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
+          DATADOG_ENV: development
+          DATADOG_SERVICE_NAME: 3id-passport
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}

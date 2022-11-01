@@ -1,6 +1,5 @@
-name = "remix-cloudflare-workers"
+name = "passport"
 
-workers_dev = true
 main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
@@ -10,3 +9,22 @@ compatibility_date = "2022-04-05"
 
 [build]
   command = "yarn generate:css && yarn build"
+
+[dev]
+port = 9696
+local_protocol = "http"
+
+[env.dev]
+routes = [
+  { pattern = "passport-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
+
+[env.next]
+routes = [
+  { pattern = "passport-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
+
+[env.current]
+routes = [
+  { pattern = "passport-current.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
+]
