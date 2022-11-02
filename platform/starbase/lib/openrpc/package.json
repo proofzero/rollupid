@@ -11,7 +11,7 @@
   "author": "ProofZero Inc.",
   "license": "UNLICENSED",
   "tap": {
-    "check-coverage": true
+    "check-coverage": false
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
