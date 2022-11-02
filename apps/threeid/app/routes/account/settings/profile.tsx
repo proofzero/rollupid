@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { FaAt, FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 import InputText from '~/components/inputs/InputText'
-import { requireJWT } from '~/utils/session.server'
+import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'

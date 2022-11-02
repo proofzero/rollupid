@@ -6,15 +6,22 @@ export type ModalProps = {
 
   isOpen: boolean;
   handleClose?: (value: boolean) => void;
+
+  fixed?: boolean;
 };
 
-const Modal = ({ children, isOpen, handleClose }: ModalProps) => {
+const Modal = ({
+  children,
+  isOpen,
+  handleClose,
+  fixed = false,
+}: ModalProps) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="relative z-10"
-        onClose={(val) => {
+        onClose={(val: boolean) => {
           if (handleClose) handleClose(val);
         }}
       >
@@ -42,10 +49,11 @@ const Modal = ({ children, isOpen, handleClose }: ModalProps) => {
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <Dialog.Panel
-                className="relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto max-w-[75vw] lg:max-w-[50vw]"
-                style={{
-                  maxHeight: "80vh",
-                }}
+                className={`relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto ${
+                  fixed
+                    ? `w-[75vw] lg:w-[50vw] h-[75vh]`
+                    : `max-w-[75vw] lg:max-w-[50vw] max-h-[75vh]`
+                }`}
               >
                 {children}
               </Dialog.Panel>
