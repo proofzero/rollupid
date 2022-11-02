@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from './button';
-import styles from './button.module.scss';
 
 export const PrimaryButton = () => {
   return <Button>hello world!</Button>;

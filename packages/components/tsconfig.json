@@ -2,6 +2,7 @@
   "extends": "./node_modules/@teambit/react/typescript/tsconfig.json",
   // "include": [],
   "compilerOptions": {
+    "jsx": "react",
     "noEmit": true
   },
   "exclude": ["dist"]

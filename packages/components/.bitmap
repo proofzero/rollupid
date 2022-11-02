@@ -10,128 +10,34 @@
 
 {
     "themes/base-theme": {
-        "scope": "",
-        "version": "",
-        "defaultScope": "kubelt.threeid",
+        "scope": "kubelt.threeid",
+        "version": "05450877644b41bf3d700e68e0515f99ba7b093d",
         "mainFile": "index.ts",
-        "rootDir": "threeid/themes/base-theme",
-        "config": {
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            },
-            "teambit.component/dev-files": {},
-            "teambit.compositions/compositions": {},
-            "teambit.docs/docs": {},
-            "teambit.dependencies/dependency-resolver": {},
-            "teambit.pipelines/builder": {},
-            "teambit.component/renaming": {
-                "renamedFrom": {
-                    "scope": "teambit.design",
-                    "name": "ui/theme/base-theme",
-                    "version": "1.90.4"
-                }
-            },
-            "teambit.react/react": {},
-            "teambit.compilation/compiler": {},
-            "teambit.harmony/application": {},
-            "teambit.preview/preview": {},
-            "teambit.component/forking": {
-                "forkedFrom": {
-                    "scope": "teambit.design",
-                    "name": "themes/base-theme",
-                    "version": "0.1.1"
-                }
-            }
-        }
+        "rootDir": "threeid/themes/base-theme"
     },
     "themes/dark-theme": {
-        "scope": "",
-        "version": "",
-        "defaultScope": "kubelt.threeid",
+        "scope": "kubelt.threeid",
+        "version": "e11c9300d5fb7235aff7783eeed53d9a6caf6385",
         "mainFile": "index.ts",
-        "rootDir": "threeid/themes/dark-theme",
-        "config": {
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            },
-            "teambit.react/react": {},
-            "teambit.component/dev-files": {},
-            "teambit.compositions/compositions": {},
-            "teambit.docs/docs": {},
-            "teambit.dependencies/dependency-resolver": {},
-            "teambit.pipelines/builder": {},
-            "teambit.compilation/compiler": {},
-            "teambit.harmony/application": {},
-            "teambit.preview/preview": {},
-            "teambit.component/forking": {
-                "forkedFrom": {
-                    "scope": "teambit.design",
-                    "name": "themes/dark-theme",
-                    "version": "1.91.4"
-                }
-            }
-        }
+        "rootDir": "threeid/themes/dark-theme"
     },
     "themes/theme-toggler": {
-        "scope": "",
-        "version": "",
-        "defaultScope": "kubelt.threeid",
+        "scope": "kubelt.threeid",
+        "version": "848a468104f47d447ef84ddd8afcba07f7f2407d",
         "mainFile": "index.ts",
-        "rootDir": "threeid/themes/theme-toggler",
-        "config": {
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            },
-            "teambit.component/dev-files": {},
-            "teambit.compositions/compositions": {},
-            "teambit.docs/docs": {},
-            "teambit.dependencies/dependency-resolver": {},
-            "teambit.pipelines/builder": {},
-            "teambit.component/renaming": {
-                "renamedFrom": {
-                    "scope": "teambit.design",
-                    "name": "ui/theme/theme-toggler",
-                    "version": "1.90.4"
-                }
-            },
-            "teambit.react/react": {},
-            "teambit.compilation/compiler": {},
-            "teambit.harmony/application": {},
-            "teambit.preview/preview": {},
-            "teambit.component/forking": {
-                "forkedFrom": {
-                    "scope": "teambit.design",
-                    "name": "themes/theme-toggler",
-                    "version": "0.1.7"
-                }
-            }
-        }
+        "rootDir": "threeid/themes/theme-toggler"
     },
     "ui/button": {
-        "scope": "",
-        "version": "",
-        "defaultScope": "kubelt.threeid",
+        "scope": "kubelt.threeid",
+        "version": "f905187759b03f75e3bf22575179f17ae7e87561",
         "mainFile": "index.ts",
-        "rootDir": "threeid/ui/button",
-        "config": {
-            "teambit.react/react": {},
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            }
-        }
+        "rootDir": "threeid/ui/button"
     },
     "ui/heading": {
-        "scope": "",
-        "version": "",
-        "defaultScope": "kubelt.threeid",
+        "scope": "kubelt.threeid",
+        "version": "60a66130ff229ecdc14f2841fc3dd514a125fc5f",
         "mainFile": "index.ts",
-        "rootDir": "threeid/ui/heading",
-        "config": {
-            "teambit.react/react": {},
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            }
-        }
+        "rootDir": "threeid/ui/heading"
     },
     "$schema-version": "15.0.0"
 }

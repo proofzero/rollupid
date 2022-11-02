@@ -20,6 +20,7 @@
     "@datadog/datadog-api-client": "^1.3.0",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "2.0.10",
+    "@kubelt/threeid.themes.base-theme": "0.0.0-05450877644b41bf3d700e68e0515f99ba7b093d",
     "@remix-run/cloudflare": "^1.7.4",
     "@remix-run/cloudflare-workers": "^1.7.4",
     "@remix-run/react": "^1.7.4",

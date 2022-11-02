@@ -1,9 +1,9 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { BasicHeading } from './heading.composition';
+import { HeadingXl } from './heading.composition';
 
 it('should render with the correct text', () => {
-  const { getByText } = render(<BasicHeading />);
-  const rendered = getByText('hello world!');
+  const { getByText } = render(<HeadingXl />);
+  const rendered = getByText('main header');
   expect(rendered).toBeTruthy();
 });
