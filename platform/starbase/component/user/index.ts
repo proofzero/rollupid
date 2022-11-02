@@ -3,12 +3,14 @@
  * @file src/index.ts
  */
 
-import type {
-  RpcRequest,
-  RpcResponse,
-} from "@kubelt/openrpc";
-
 import * as openrpc from "@kubelt/openrpc";
+
+import type {
+  RpcInput,
+  RpcOutput,
+  RpcParams,
+  RpcResult,
+} from "@kubelt/openrpc/component";
 
 import {
   component,
@@ -41,13 +43,12 @@ export class StarbaseUser {
   @method("user_name")
   @requiredScope("starbase.user")
   userName(
-    request: RpcRequest,
-    state: Map<string, any>,
-    context: Map<string, any>,
-    remote: Map<string, any>,
-  ): Promise<RpcResponse> {
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
     // TODO return updated state
-    return openrpc.response(request, {
+    return Promise.resolve({
       invoked: "user_name",
       context: "StarbaseUser",
     });

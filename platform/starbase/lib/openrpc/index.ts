@@ -118,7 +118,7 @@ export type RpcMethod = {
 };
 
 // A map from RPC request method to handler function.
-export type RpcMethods = Map<Symbol, RpcMethod>;
+export type RpcMethods = Map<symbol, RpcMethod>;
 
 interface Options {
   // Whether or not to enable OpenRPC service discovery.
@@ -302,22 +302,30 @@ export function methods(schema: RpcSchema, methodSet: RpcMethodSet): RpcMethods 
   for (const m of methodSet) {
     //const { name: methodName, handler: methodFn, scopes: methodScopes } = m;
     //const methodSym = Symbol.for(methodName.trim());
-//const methodSchema = findMethod(schema, methodName);
-/*
-methodSym, {
-      name: methodSym,
-      schema: methodSchema,
-      scopes: methodScopes,
-      handler: methodFn,
-})
-*/
+    //const methodSchema = findMethod(schema, methodName);
+    /*
+      methodSym, {
+        name: methodSym,
+        schema: methodSchema,
+        scopes: methodScopes,
+        handler: methodFn,
+      })
+    */
     methodMap.set(m.name, m);
   }
 
   // Extract the collection of expected method names.
-  const required = new Set(_.map(schema.methods, method => Symbol.for(_.get(method, 'name'))));
+  const required: Set<symbol> = new Set(
+    schema.methods.map((method: MethodOrReference): symbol => {
+      if (method.hasOwnProperty("name")) {
+        return Symbol.for((<MethodObject>method).name);
+      } else {
+        throw new Error("schema method references are not currently supported");
+      }
+    })
+  );
   // Extract the collection of supplied method names.
-  const supplied = new Set(methodMap.keys());
+  const supplied: Set<symbol> = new Set(methodMap.keys());
   // Ensure that every RPC method defined in the schema has a matching
   // handler function in the method map.
   if (!set.subset(supplied, required)) {

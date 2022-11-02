@@ -11,7 +11,7 @@
   "author": "ProofZero Inc.",
   "license": "UNLICENSED",
   "tap": {
-    "check-coverage": true
+    "check-coverage": false
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
@@ -27,6 +27,7 @@
   "dependencies": {
     "@cfworker/json-schema": "1.12.5",
     "@open-rpc/meta-schema": "1.14.2",
+    "cross-env": "7.0.3",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "lodash": "4.17.21",

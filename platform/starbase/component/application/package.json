@@ -4,10 +4,11 @@
   "description": "A durable object for the Starbase application",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "@kubelt/openrpc": "file:../../lib/openrpc"
+    "@kubelt/openrpc": "file:../../lib/openrpc",
+    "cross-env": "7.0.3"
   }
 }

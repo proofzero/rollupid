@@ -112,7 +112,12 @@ const kb_appStore = openrpc.method(schema, {
     const nameRequest = {
       jsonrpc: "2.0",
       id: 1,
-      method: "cmp.scopes",
+      method: "app_fetch",
+      params: {
+        app: {
+          xxx: "yyy",
+        }
+      }
     };
     // Note that workers can pass state to durable objects via headers, the
     // HTTP method, the Request body, or the Request URI. Does it make sense
