@@ -1,5 +1,10 @@
 import Modal from "~/components/modal/Modal";
 import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
+import Text, {
+  TextColor,
+  TextSize,
+  TextWeight,
+} from "~/components/typography/Text";
 
 type PfpNftModalProps = {
   account: string;
@@ -16,12 +21,23 @@ const PfpNftModal = ({
 }: PfpNftModalProps) => {
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
-      <ProfileNftCollection
-        account={account}
-        preload={true}
-        filters
-        handleSelectedNft={handleSelectedNft}
-      />
+      <>
+        <Text
+          className="pb-1"
+          size={TextSize.XL2}
+          weight={TextWeight.Bold700}
+          color={TextColor.Gray800}
+        >
+          Select NFT Avatar
+        </Text>
+
+        <ProfileNftCollection
+          account={account}
+          preload={true}
+          filters
+          handleSelectedNft={handleSelectedNft}
+        />
+      </>
     </Modal>
   );
 };

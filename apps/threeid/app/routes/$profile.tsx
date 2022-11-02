@@ -113,7 +113,7 @@ const ProfileRoute = () => {
         )} */}
       </div>
 
-      <div className="mt-44 lg:mt-0 p-3 max-w-7xl w-full mx-auto">
+      <div className="mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
         {!claimed && (
           <div className="lg:ml-[19rem] rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
@@ -184,6 +184,15 @@ const ProfileRoute = () => {
         )}
 
         <div className="mt-20">
+          <Text
+            className="pb-4"
+            size={TextSize.SM}
+            weight={TextWeight.SemiBold600}
+            color={TextColor.Gray600}
+          >
+            NFT Collection
+          </Text>
+
           <ProfileNftCollection
             account={targetAddress}
             displayname={displayName}
