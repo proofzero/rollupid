@@ -2,18 +2,18 @@ import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
-import Modal from "../modal/Modal";
+import Modal from '~/components/modal/Modal'
 
 const NftModal = ({
   isOpen,
   nft,
   handleClose,
 }: {
-  isOpen: boolean;
-  nft: any;
-  handleClose: (evt: any) => void;
+  isOpen: boolean
+  nft: any
+  handleClose: (evt: any) => void
 }) => {
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
@@ -83,7 +83,7 @@ const NftModal = ({
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default NftModal;
+export default NftModal

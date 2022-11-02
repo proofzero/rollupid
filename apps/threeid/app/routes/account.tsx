@@ -13,7 +13,7 @@ import styles from '~/styles/account.css'
 import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
 import { links as invCodeStyles } from '~/components/invite-code'
-import { links as profileNftCollectionLinks } from "~/components/profile/ProfileNftCollection";
+import { links as profileNftCollectionLinks } from "~/components/nft-collection/ProfileNftCollection";
 
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'

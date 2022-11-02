@@ -1,47 +1,47 @@
-import { json, LoaderFunction } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { useLoaderData } from '@remix-run/react'
 
-import ProfileCard from "~/components/profile/ProfileCard";
+import ProfileCard from '~/components/profile/ProfileCard'
 
-import { loader as profileLoader } from "~/routes/$profile.json";
-import { getUserSession } from "~/utils/session.server";
+import { loader as profileLoader } from '~/routes/$profile.json'
+import { getUserSession } from '~/utils/session.server'
 
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
-import { Button } from "~/components/buttons";
+import { Button } from '~/components/buttons'
 
-import HeadNav from "~/components/head-nav";
+import HeadNav from '~/components/head-nav'
 
-import { links as spinnerLinks } from "~/components/spinner";
-import { links as nftCollLinks } from "~/components/profile/ProfileNftCollection";
+import { links as spinnerLinks } from '~/components/spinner'
+import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 
-import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
-import { FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
+import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
 export function links() {
-  return [...spinnerLinks(), ...nftCollLinks()];
+  return [...spinnerLinks(), ...nftCollLinks()]
 }
 
 export const loader: LoaderFunction = async (args) => {
-  const { request, params } = args;
+  const { request, params } = args
 
   const profileJson = await profileLoader(args).then((profileRes: Response) =>
     profileRes.json()
-  );
+  )
 
-  let isOwner = false;
+  let isOwner = false
 
-  const session = await getUserSession(request);
-  const jwt = session.get("jwt");
-  const address = session.get("address");
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
+  const address = session.get('address')
 
   if (address === params.profile) {
-    isOwner = true;
+    isOwner = true
   }
 
   return json({
@@ -49,8 +49,8 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? { address } : false,
-  });
-};
+  })
+}
 
 const ProfileRoute = () => {
   const {
@@ -65,14 +65,14 @@ const ProfileRoute = () => {
     pfp,
     cover,
     website,
-  } = useLoaderData();
+  } = useLoaderData()
 
   return (
     <div className="bg-white h-full min-h-screen">
       <div
         className="lg:px-4"
         style={{
-          backgroundColor: "#192030",
+          backgroundColor: '#192030',
         }}
       >
         <HeadNav
@@ -86,9 +86,9 @@ const ProfileRoute = () => {
         className="h-80 w-full relative flex justify-center"
         style={{
           backgroundImage: cover ? `url(${gatewayFromIpfs(cover)})` : undefined,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
         }}
       >
         <div className="mt-[6.5rem] lg:mt-28 max-w-7xl w-full mx-auto justify-center lg:justify-start flex">
@@ -144,7 +144,7 @@ const ProfileRoute = () => {
           <div
             className="lg:ml-[19rem] py-4 px-6"
             style={{
-              minHeight: "8rem",
+              minHeight: '8rem',
             }}
           >
             <Text
@@ -202,7 +202,7 @@ const ProfileRoute = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProfileRoute;
+export default ProfileRoute

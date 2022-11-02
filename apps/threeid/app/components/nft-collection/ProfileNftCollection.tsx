@@ -22,13 +22,13 @@ import ProfileNftCollectionStyles from './ProfileNftCollection.css'
 import { LinksFunction } from '@remix-run/cloudflare'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { FunctionComponent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Spinner from '../spinner'
-import NftModal from './NftModal'
 import InputText from '../inputs/InputText'
 
 import { FaGuilded } from 'react-icons/fa'
 import ModaledNft from './ModaledNft'
+import SelectableNft from './SelectableNft'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: ProfileNftCollectionStyles },

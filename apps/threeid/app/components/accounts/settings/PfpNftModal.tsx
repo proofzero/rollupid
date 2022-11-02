@@ -1,17 +1,18 @@
-import Modal from "~/components/modal/Modal";
-import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
+import Modal from '~/components/modal/Modal'
+import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
+import SelectableNft from '~/components/nft-collection/SelectableNft'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
 type PfpNftModalProps = {
-  account: string;
-  isOpen: boolean;
-  handleClose: (value: boolean) => void;
-  handleSelectedNft: (nft: any) => void;
-};
+  account: string
+  isOpen: boolean
+  handleClose: (value: boolean) => void
+  handleSelectedNft: (nft: any) => void
+}
 
 const PfpNftModal = ({
   account,
@@ -36,10 +37,11 @@ const PfpNftModal = ({
           preload={true}
           filters
           handleSelectedNft={handleSelectedNft}
+          nftRenderer={(nft) => <SelectableNft nft={nft} />}
         />
       </>
     </Modal>
-  );
-};
+  )
+}
 
-export default PfpNftModal;
+export default PfpNftModal
