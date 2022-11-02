@@ -1,66 +1,63 @@
-import {
-  ActionFunction,
-  LoaderFunction,
-  redirect,
-} from "@remix-run/cloudflare";
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/cloudflare'
 
 import {
   useLoaderData,
   useNavigate,
   useSubmit,
   useTransition,
-} from "@remix-run/react";
+} from '@remix-run/react'
 
-import Heading from "~/components/typography/Heading";
+import Heading from '~/components/typography/Heading'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
-import styles from "~/styles/onboard.css";
+import styles from '~/styles/onboard.css'
 
-import { Button, ButtonSize, ButtonType } from "~/components/buttons";
-import { BiInfoCircle } from "react-icons/bi";
-import { useEffect, useState } from "react";
+import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import { BiInfoCircle } from 'react-icons/bi'
+import { useEffect, useState } from 'react'
 import {
   useContractWrite,
   useAccount,
   useNetwork,
   useWaitForTransaction,
   useSwitchNetwork,
-} from "wagmi";
-import { Spinner } from "flowbite-react";
-import { HiCheckCircle, HiXCircle } from "react-icons/hi";
+} from 'wagmi'
+import { Spinner } from 'flowbite-react'
+import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 
-import { loader as loadVoucherLoader } from "~/routes/onboard/mint/load-voucher";
+import { loader as loadVoucherLoader } from '~/routes/onboard/mint/load-voucher'
 
-import { abi } from "~/assets/abi/mintpfp.json";
+import { abi } from '~/assets/abi/mintpfp.json'
 
-import { getUserSession } from "~/utils/session.server";
-import { Visibility } from "~/utils/galaxy.server";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
-import galaxyClient from "~/helpers/galaxyClient";
+import { getUserSession } from '~/utils/session.server'
+import { Visibility } from '~/utils/galaxy.server'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export const links = () => {
-  return [{ rel: "stylesheet", href: styles }];
-};
+  return [{ rel: 'stylesheet', href: styles }]
+}
 
-export const loader: LoaderFunction = loadVoucherLoader;
+export const loader: LoaderFunction = loadVoucherLoader
 
 export const action: ActionFunction = async ({ request }) => {
-  const session = await getUserSession(request);
-  const jwt = session.get("jwt");
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
 
-  const formData = await request.formData();
+  const formData = await request.formData()
 
-  const imgUrl = formData.get("imgUrl");
+  const imgUrl = formData.get('imgUrl')
   if (!imgUrl) {
-    throw new Error("imgUrl expected");
+    throw new Error('imgUrl expected')
   }
 
-  const isToken = formData.get("isToken");
+  const isToken = formData.get('isToken')
 
+  const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
     {
       profile: {
@@ -72,19 +69,19 @@ export const action: ActionFunction = async ({ request }) => {
       visibility: Visibility.Public,
     },
     {
-      "KBT-Access-JWT-Assertion": jwt,
+      'KBT-Access-JWT-Assertion': jwt,
     }
-  );
-  return redirect("/onboard/ens");
-};
+  )
+  return redirect('/onboard/ens')
+}
 
 type OnboardMintLandingProps = {
-  account: string;
-  minted: boolean;
-  isInvalidAddress: boolean;
-  isInvalidChain: boolean;
-  onClick: () => void;
-};
+  account: string
+  minted: boolean
+  isInvalidAddress: boolean
+  isInvalidChain: boolean
+  onClick: () => void
+}
 
 const OnboardMintLand = ({
   account,
@@ -106,7 +103,7 @@ const OnboardMintLand = ({
           color={TextColor.Gray400}
           size={TextSize.SM}
         >
-          **Please select switch your network to{" "}
+          **Please select switch your network to{' '}
           {window.ENV.VALID_CHAIN_ID_NAME}**
         </Text>
       )}
@@ -120,12 +117,12 @@ const OnboardMintLand = ({
         </Text>
       )}
     </>
-  );
-};
+  )
+}
 
 type OnboardMintConnectProps = {
-  onClick: () => void;
-};
+  onClick: () => void
+}
 
 const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
   return (
@@ -142,13 +139,13 @@ const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
         **Please unlock your wallet to mint your NFT**
       </Text>
     </>
-  );
-};
+  )
+}
 
 type OnboardMintSignProps = {
-  isLoading: boolean;
-  onClick: () => void;
-};
+  isLoading: boolean
+  onClick: () => void
+}
 
 const OnboardMintSign = ({ onClick, isLoading }: OnboardMintSignProps) => {
   return (
@@ -161,8 +158,8 @@ const OnboardMintSign = ({ onClick, isLoading }: OnboardMintSignProps) => {
         Try Again
       </Button>
     </>
-  );
-};
+  )
+}
 
 const OnboardMintProc = () => {
   return (
@@ -173,12 +170,12 @@ const OnboardMintProc = () => {
         <Text color={TextColor.Gray400}>Minting, please wait</Text>
       </section>
     </>
-  );
-};
+  )
+}
 
 type OnboardMintErrorProps = {
-  onClick: () => void;
-};
+  onClick: () => void
+}
 
 const OnboardMintError = ({ onClick }: OnboardMintErrorProps) => {
   return (
@@ -193,12 +190,12 @@ const OnboardMintError = ({ onClick }: OnboardMintErrorProps) => {
         Try Again
       </Button>
     </>
-  );
-};
+  )
+}
 
 type OnboardMintSuccessProps = {
-  data?: object;
-};
+  data?: object
+}
 
 const OnboardMintSuccess = ({ data }: OnboardMintSuccessProps) => {
   return (
@@ -213,128 +210,128 @@ const OnboardMintSuccess = ({ data }: OnboardMintSuccessProps) => {
         <a href={`https://etherscan.io/tx/${data?.hash}`}>View on Etherscan</a>
       </Text>
     </>
-  );
-};
+  )
+}
 
 const OnboardMint = () => {
   const traitNames = {
-    trait0: "Generation",
-    trait1: "Priority",
-    trait2: "Friend",
-    trait3: "Points",
-  };
+    trait0: 'Generation',
+    trait1: 'Priority',
+    trait2: 'Friend',
+    trait3: 'Points',
+  }
 
   const [screen, setScreen] = useState<
-    "land" | "sign" | "proc" | "success" | "error"
-  >("land");
+    'land' | 'sign' | 'proc' | 'success' | 'error'
+  >('land')
 
-  const { metadata, voucher, contractAddress, minted } = useLoaderData();
-  const account = metadata?.properties?.metadata.account;
-  const recipient = metadata?.properties?.metadata.account;
-  const [imgUrl, setImgUrl] = useState<string>(metadata?.image);
-  const [invalidChain, setInvalidChain] = useState(false);
+  const { metadata, voucher, contractAddress, minted } = useLoaderData()
+  const account = metadata?.properties?.metadata.account
+  const recipient = metadata?.properties?.metadata.account
+  const [imgUrl, setImgUrl] = useState<string>(metadata?.image)
+  const [invalidChain, setInvalidChain] = useState(false)
 
-  const navigate = useNavigate();
-  const transition = useTransition();
-  const { chain } = useNetwork();
-  const { pendingChainId, switchNetwork } = useSwitchNetwork();
-  const { isConnected, address } = useAccount();
+  const navigate = useNavigate()
+  const transition = useTransition()
+  const { chain } = useNetwork()
+  const { pendingChainId, switchNetwork } = useSwitchNetwork()
+  const { isConnected, address } = useAccount()
 
   const { data, write, isError } = useContractWrite({
     // https://github.com/wagmi-dev/wagmi/issues/899
     // https://github.com/wagmi-dev/wagmi/issues/891
     // https://github.com/wagmi-dev/wagmi/discussions/880#discussioncomment-3516226
-    mode: "recklesslyUnprepared",
+    mode: 'recklesslyUnprepared',
     addressOrName: contractAddress,
     contractInterface: abi,
-    functionName: "awardPFP",
+    functionName: 'awardPFP',
     args: [recipient, voucher],
-  });
+  })
   const { isLoading, isSuccess } = useWaitForTransaction({
     hash: data?.hash,
-  });
-  const submit = useSubmit();
+  })
+  const submit = useSubmit()
 
   useEffect(() => {
     if (chain && chain.id != window.ENV.NFTAR_CHAIN_ID) {
-      setInvalidChain(true);
+      setInvalidChain(true)
     } else {
-      setInvalidChain(false);
+      setInvalidChain(false)
     }
-  }, [chain]);
+  }, [chain])
 
-  const [invalidAddress, setInvalidAddress] = useState(false);
+  const [invalidAddress, setInvalidAddress] = useState(false)
   useEffect(() => {
     if (address && address !== account) {
-      setInvalidAddress(true);
+      setInvalidAddress(true)
     } else {
-      setInvalidAddress(false);
+      setInvalidAddress(false)
     }
-  }, [address]);
+  }, [address])
 
   useEffect(() => {
-    if (screen === "proc" && isError) {
-      setScreen("error");
-    } else if (screen === "proc" && isSuccess) {
-      setScreen("success");
+    if (screen === 'proc' && isError) {
+      setScreen('error')
+    } else if (screen === 'proc' && isSuccess) {
+      setScreen('success')
     }
-  }, [screen, isError, isSuccess]);
+  }, [screen, isError, isSuccess])
 
   useEffect(() => {
     if (!isConnected && !minted) {
-      setScreen("connect");
+      setScreen('connect')
     }
-  }, [isConnected, minted]);
+  }, [isConnected, minted])
 
   useEffect(() => {
     //@ts-ignore
     if (switchNetwork && chain?.id != window.ENV.NFTAR_CHAIN_ID) {
       //@ts-ignore
-      switchNetwork(`0x${window.ENV.NFTAR_CHAIN_ID}`);
+      switchNetwork(`0x${window.ENV.NFTAR_CHAIN_ID}`)
     }
-  }, [pendingChainId, switchNetwork]);
+  }, [pendingChainId, switchNetwork])
 
   const signMessage = () => {
-    if (write) write();
-  };
+    if (write) write()
+  }
 
-  let screenActionComponent = null;
+  let screenActionComponent = null
   switch (screen) {
-    case "connect":
+    case 'connect':
       screenActionComponent = (
         <OnboardMintConnect
           onClick={() => {
-            window.location.reload();
+            window.location.reload()
           }}
         />
-      );
-      break;
-    case "sign":
+      )
+      break
+    case 'sign':
       screenActionComponent = (
         <OnboardMintSign
           isLoading={isLoading}
           onClick={() => {
-            setScreen("land");
+            setScreen('land')
           }}
         />
-      );
-      break;
-    case "proc":
-      screenActionComponent = <OnboardMintProc />;
-      break;
-    case "error":
+      )
+      break
+    case 'proc':
+      screenActionComponent = <OnboardMintProc />
+      break
+    case 'error':
       screenActionComponent = (
         <OnboardMintError
           onClick={() => {
-            setScreen("land");
+            setScreen('land')
           }}
         />
-      );
-      break;
-    case "success":
-      screenActionComponent = <OnboardMintSuccess data={data} />;
-      break;
-    case "land":
+      )
+      break
+    case 'success':
+      screenActionComponent = <OnboardMintSuccess data={data} />
+      break
+    case 'land':
     default:
       screenActionComponent = (
         <OnboardMintLand
@@ -343,11 +340,11 @@ const OnboardMint = () => {
           isInvalidAddress={invalidAddress}
           isInvalidChain={invalidChain}
           onClick={() => {
-            setScreen("proc");
-            signMessage();
+            setScreen('proc')
+            signMessage()
           }}
         />
-      );
+      )
   }
 
   return (
@@ -358,13 +355,13 @@ const OnboardMint = () => {
             href="/onboard/name"
             className="block h-2.5 w-2.5 rounded-full bg-indigo-600 hover:bg-indigo-900"
           >
-            <span className="sr-only">{"Display Name"}</span>
+            <span className="sr-only">{'Display Name'}</span>
           </a>
         </li>
 
         <li>
           <a
-            href={"/onboard/mint"}
+            href={'/onboard/mint'}
             className="relative flex items-center justify-center"
             aria-current="step"
           >
@@ -375,7 +372,7 @@ const OnboardMint = () => {
               className="relative block h-2.5 w-2.5 rounded-full bg-indigo-600"
               aria-hidden="true"
             />
-            <span className="sr-only">{"Mint"}</span>
+            <span className="sr-only">{'Mint'}</span>
           </a>
         </li>
 
@@ -384,7 +381,7 @@ const OnboardMint = () => {
             href="/onboard/ens"
             className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400"
           >
-            <span className="sr-only">{"ENS"}</span>
+            <span className="sr-only">{'ENS'}</span>
           </a>
         </li>
       </ol>
@@ -411,15 +408,15 @@ const OnboardMint = () => {
             <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />
           )}
 
-          <Text className="mx-6">{"->"}</Text>
+          <Text className="mx-6">{'->'}</Text>
 
           <div
             className="w-24 h-24"
             style={{
               clipPath:
-                "polygon(92.32051% 40%, 93.79385% 43.1596%, 94.69616% 46.52704%, 95% 50%, 94.69616% 53.47296%, 93.79385% 56.8404%, 92.32051% 60%, 79.82051% 81.65064%, 77.82089% 84.50639%, 75.35575% 86.97152%, 72.5% 88.97114%, 69.3404% 90.44449%, 65.97296% 91.34679%, 62.5% 91.65064%, 37.5% 91.65064%, 34.02704% 91.34679%, 30.6596% 90.44449%, 27.5% 88.97114%, 24.64425% 86.97152%, 22.17911% 84.50639%, 20.17949% 81.65064%, 7.67949% 60%, 6.20615% 56.8404%, 5.30384% 53.47296%, 5% 50%, 5.30384% 46.52704%, 6.20615% 43.1596%, 7.67949% 40%, 20.17949% 18.34936%, 22.17911% 15.49361%, 24.64425% 13.02848%, 27.5% 11.02886%, 30.6596% 9.55551%, 34.02704% 8.65321%, 37.5% 8.34936%, 62.5% 8.34936%, 65.97296% 8.65321%, 69.3404% 9.55551%, 72.5% 11.02886%, 75.35575% 13.02848%, 77.82089% 15.49361%, 79.82051% 18.34936%)",
-              boxShadow: "inset 0px 10px 100px 10px white",
-              transform: "scale(1.2)",
+                'polygon(92.32051% 40%, 93.79385% 43.1596%, 94.69616% 46.52704%, 95% 50%, 94.69616% 53.47296%, 93.79385% 56.8404%, 92.32051% 60%, 79.82051% 81.65064%, 77.82089% 84.50639%, 75.35575% 86.97152%, 72.5% 88.97114%, 69.3404% 90.44449%, 65.97296% 91.34679%, 62.5% 91.65064%, 37.5% 91.65064%, 34.02704% 91.34679%, 30.6596% 90.44449%, 27.5% 88.97114%, 24.64425% 86.97152%, 22.17911% 84.50639%, 20.17949% 81.65064%, 7.67949% 60%, 6.20615% 56.8404%, 5.30384% 53.47296%, 5% 50%, 5.30384% 46.52704%, 6.20615% 43.1596%, 7.67949% 40%, 20.17949% 18.34936%, 22.17911% 15.49361%, 24.64425% 13.02848%, 27.5% 11.02886%, 30.6596% 9.55551%, 34.02704% 8.65321%, 37.5% 8.34936%, 62.5% 8.34936%, 65.97296% 8.65321%, 69.3404% 9.55551%, 72.5% 11.02886%, 75.35575% 13.02848%, 77.82089% 15.49361%, 79.82051% 18.34936%)',
+              boxShadow: 'inset 0px 10px 100px 10px white',
+              transform: 'scale(1.2)',
             }}
           >
             <img src={gatewayFromIpfs(imgUrl)} className="w-24 h-24" />
@@ -432,7 +429,7 @@ const OnboardMint = () => {
         >
           <BiInfoCircle />
           <span>
-            This image was generated using the assets in your{" "}
+            This image was generated using the assets in your{' '}
             <b className="cursor-default" title={account}>
               blockchain account.
             </b>
@@ -448,11 +445,11 @@ const OnboardMint = () => {
             <i>
               <a
                 onClick={() => {
-                  let img = imgUrl;
-                  setImgUrl("");
+                  let img = imgUrl
+                  setImgUrl('')
                   setTimeout(() => {
-                    setImgUrl(img);
-                  }, 1000);
+                    setImgUrl(img)
+                  }, 1000)
                 }}
               >
                 If image is not loading press here to refresh.
@@ -466,10 +463,10 @@ const OnboardMint = () => {
           className="mt-2 mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
         >
           {[...Array(4).keys()].map((i) => {
-            const r = metadata.properties.traits[`trait${i}`].value.rgb.r;
-            const g = metadata.properties.traits[`trait${i}`].value.rgb.g;
-            const b = metadata.properties.traits[`trait${i}`].value.rgb.b;
-            const bg = `rgb(${r}, ${g}, ${b})`;
+            const r = metadata.properties.traits[`trait${i}`].value.rgb.r
+            const g = metadata.properties.traits[`trait${i}`].value.rgb.g
+            const b = metadata.properties.traits[`trait${i}`].value.rgb.b
+            const bg = `rgb(${r}, ${g}, ${b})`
             return (
               <li
                 key={i}
@@ -484,7 +481,7 @@ const OnboardMint = () => {
                 <div className="flex flex-1 grow items-center justify-between truncate rounded-md border border-gray-200 bg-white">
                   <div
                     className={
-                      "flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md"
+                      'flex-shrink-0 flex items-center justify-center text-white text-sm font-medium rounded-l-md'
                     }
                   >
                     <span
@@ -518,7 +515,7 @@ const OnboardMint = () => {
                   </div>
                 </div>
               </li>
-            );
+            )
           })}
         </ul>
 
@@ -531,18 +528,18 @@ const OnboardMint = () => {
         id="onboard-ens-actions"
         className="flex justify-between lg:justify-end items-center space-x-4 pt-10 lg:pt-0"
       >
-        {transition.state === "submitting" || transition.state === "loading" ? (
+        {transition.state === 'submitting' || transition.state === 'loading' ? (
           <Spinner />
         ) : (
           <>
-            {screen !== "sign" && screen !== "success" && screen !== "proc" && (
+            {screen !== 'sign' && screen !== 'success' && screen !== 'proc' && (
               <>
                 <Button
                   type={ButtonType.Secondary}
                   size={ButtonSize.L}
                   onClick={() => {
                     // @ts-ignore
-                    navigate(`/onboard/name`);
+                    navigate(`/onboard/name`)
                   }}
                 >
                   Back
@@ -557,10 +554,10 @@ const OnboardMint = () => {
                         imgUrl,
                       },
                       {
-                        action: "/onboard/mint?index",
-                        method: "post",
+                        action: '/onboard/mint?index',
+                        method: 'post',
                       }
-                    );
+                    )
                     // navigate("/onboard/ens");
                   }}
                 >
@@ -569,7 +566,7 @@ const OnboardMint = () => {
               </>
             )}
 
-            {screen === "success" && (
+            {screen === 'success' && (
               <Button
                 type={ButtonType.Primary}
                 size={ButtonSize.L}
@@ -578,13 +575,13 @@ const OnboardMint = () => {
                   submit(
                     {
                       imgUrl,
-                      isToken: "true",
+                      isToken: 'true',
                     },
                     {
-                      action: "/onboard/mint?index",
-                      method: "post",
+                      action: '/onboard/mint?index',
+                      method: 'post',
                     }
-                  );
+                  )
                 }}
               >
                 Continue
@@ -594,7 +591,7 @@ const OnboardMint = () => {
         )}
       </section>
     </>
-  );
-};
+  )
+}
 
-export default OnboardMint;
+export default OnboardMint

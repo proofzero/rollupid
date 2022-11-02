@@ -1,97 +1,98 @@
-import { redirect, json } from "@remix-run/cloudflare";
-import { useLoaderData, useSubmit, NavLink } from "@remix-run/react";
+import { redirect, json } from '@remix-run/cloudflare'
+import { useLoaderData, useSubmit, NavLink } from '@remix-run/react'
 
-import { Outlet } from "@remix-run/react";
+import { Outlet } from '@remix-run/react'
 
-import { BiCog, BiIdCard, BiLink } from "react-icons/bi";
-import { HiOutlineHome, HiOutlineViewGridAdd } from "react-icons/hi";
+import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
+import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
 
-import { getUserSession, requireJWT } from "~/utils/session.server";
+import { getUserSession, requireJWT } from '~/utils/session.server'
 
-import styles from "~/styles/account.css";
-import { links as buttonStyles } from "~/components/base-button";
-import { links as faqStyles } from "~/components/FAQ";
-import { links as invCodeStyles } from "~/components/invite-code";
-import HeadNav from "~/components/head-nav";
-import ConditionalTooltip from "~/components/conditional-tooltip";
+import styles from '~/styles/account.css'
+import { links as buttonStyles } from '~/components/base-button'
+import { links as faqStyles } from '~/components/FAQ'
+import { links as invCodeStyles } from '~/components/invite-code'
+import HeadNav from '~/components/head-nav'
+import ConditionalTooltip from '~/components/conditional-tooltip'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
-import validateProof from "~/helpers/validate-proof";
-import galaxyClient from "~/helpers/galaxyClient";
+} from '~/components/typography/Text'
+import validateProof from '~/helpers/validate-proof'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
   return [
     ...invCodeStyles(),
     ...buttonStyles(),
     ...faqStyles(),
-    { rel: "stylesheet", href: styles },
-  ];
+    { rel: 'stylesheet', href: styles },
+  ]
 }
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, "/auth");
+  const jwt = await requireJWT(request, '/auth')
 
-  const session = await getUserSession(request);
-  const address = session.get("address");
-  const core = session.get("core");
+  const session = await getUserSession(request)
+  const address = session.get('address')
+  const core = session.get('core')
 
   if (!(await validateProof(address))) {
-    return redirect(`/auth/gate/${address}`);
+    return redirect(`/auth/gate/${address}`)
   }
 
   // @ts-ignore
-  const onboardData = await ONBOARD_STATE.get(core);
+  const onboardData = await ONBOARD_STATE.get(core)
   if (!onboardData) {
     // @ts-ignore
-    await ONBOARD_STATE.put(address, "true");
+    await ONBOARD_STATE.put(address, 'true')
 
-    return redirect(`/onboard/name`);
+    return redirect(`/onboard/name`)
   }
 
+  const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
+    'KBT-Access-JWT-Assertion': jwt,
+  })
 
   // @ts-ignore
   const [avatarUrl, isToken] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,
-  ];
+  ]
 
   return json({
     address,
     avatarUrl,
     isToken,
-  });
-};
+  })
+}
 
 const subNavigation = [
   {
-    name: "Dashboard",
-    href: "/account/dashboard",
+    name: 'Dashboard',
+    href: '/account/dashboard',
     icon: HiOutlineHome,
     exists: true,
   },
   {
-    name: "NFT Gallery",
-    href: "#",
+    name: 'NFT Gallery',
+    href: '#',
     icon: HiOutlineViewGridAdd,
   },
-  { name: "KYC", href: "#", icon: BiIdCard },
-  { name: "Apps", href: "#", icon: BiLink },
-  { name: "Settings", href: "settings", icon: BiCog, exists: true },
-];
+  { name: 'KYC', href: '#', icon: BiIdCard },
+  { name: 'Apps', href: '#', icon: BiLink },
+  { name: 'Settings', href: 'settings', icon: BiCog, exists: true },
+]
 
 function classNames(...classes: any) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ')
 }
 
 export default function AccountLayout() {
-  const { address, avatarUrl, isToken } = useLoaderData();
+  const { address, avatarUrl, isToken } = useLoaderData()
   return (
     <>
       <div className="min-h-full">
@@ -123,39 +124,39 @@ export default function AccountLayout() {
         </main>
       </div>
     </>
-  );
+  )
 }
 
 type SideNavItemProps = {
   item: {
-    name: string;
-    href: string;
-    icon: any;
-    exists?: boolean;
-  };
-};
+    name: string
+    href: string
+    icon: any
+    exists?: boolean
+  }
+}
 
 const SideNavItem = ({ item }: SideNavItemProps) => {
   const activeStyle = {
-    backgroundColor: "rgb(243 244 246)",
-  };
+    backgroundColor: 'rgb(243 244 246)',
+  }
   return (
-    <div className={"basis-1/4 lg:w-100 content-center self-center"}>
+    <div className={'basis-1/4 lg:w-100 content-center self-center'}>
       <NavLink
         to={item.href}
         // @ts-ignore
         style={({ isActive }) => {
-          return isActive && item.href != "#" ? activeStyle : undefined;
+          return isActive && item.href != '#' ? activeStyle : undefined
         }}
         className="text-sm group lg:border-l-4 px-3 py-2 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
       >
         <item.icon
           className={classNames(
-            !item.exists && "opacity-25 cursor-not-allowed",
-            "text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center"
+            !item.exists && 'opacity-25 cursor-not-allowed',
+            'text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center'
           )}
           style={{
-            color: "#4B5563",
+            color: '#4B5563',
           }}
           aria-hidden="true"
         />
@@ -163,8 +164,8 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
           <span
             className={classNames(
-              !item.exists && "opacity-25 cursor-not-allowed",
-              "hidden lg:block self-center"
+              !item.exists && 'opacity-25 cursor-not-allowed',
+              'hidden lg:block self-center'
             )}
           >
             <Text
@@ -179,5 +180,5 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         </ConditionalTooltip>
       </NavLink>
     </div>
-  );
-};
+  )
+}

@@ -1,78 +1,80 @@
-import { ActionFunction, json, LoaderFunction } from "@remix-run/cloudflare";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { FaAt, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
-import { Button, ButtonSize, ButtonType } from "~/components/buttons";
-import InputText from "~/components/inputs/InputText";
-import { requireJWT } from "~/utils/session.server";
-import { Visibility } from "~/utils/galaxy.server";
+import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { FaAt, FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
+import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import InputText from '~/components/inputs/InputText'
+import { requireJWT } from '~/utils/session.server'
+import { Visibility } from '~/utils/galaxy.server'
 
-import InputTextarea from "~/components/inputs/InputTextarea";
+import InputTextarea from '~/components/inputs/InputTextarea'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
-import galaxyClient from "~/helpers/galaxyClient";
+} from '~/components/typography/Text'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request);
+  const jwt = await requireJWT(request)
 
+  const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
+    'KBT-Access-JWT-Assertion': jwt,
+  })
 
   return json({
     ...profileRes.profile,
-  });
-};
+  })
+}
 
 export const action: ActionFunction = async ({ request }) => {
-  const jwt = await requireJWT(request);
+  const jwt = await requireJWT(request)
 
-  const formData = await request.formData();
+  const formData = await request.formData()
 
-  let errors: any = {};
+  let errors: any = {}
 
-  const displayName = formData.get("displayName")?.toString();
-  if (!displayName || displayName === "") {
-    errors.displayName = ["Display name is required"];
+  const displayName = formData.get('displayName')?.toString()
+  if (!displayName || displayName === '') {
+    errors.displayName = ['Display name is required']
   }
 
-  const bio = formData.get("bio")?.toString();
+  const bio = formData.get('bio')?.toString()
   if (bio && bio.length > 256) {
-    errors.bio = ["Bio must be less than 256 characters"];
+    errors.bio = ['Bio must be less than 256 characters']
   }
 
   if (Object.keys(errors).length) {
     return {
       errors,
-    };
+    }
   }
 
+  const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
     {
       profile: {
         displayName: displayName,
-        job: formData.get("job")?.toString(),
-        location: formData.get("location")?.toString(),
+        job: formData.get('job')?.toString(),
+        location: formData.get('location')?.toString(),
         bio: bio,
-        website: formData.get("website")?.toString(),
+        website: formData.get('website')?.toString(),
       },
       visibility: Visibility.Public,
     },
     {
-      "KBT-Access-JWT-Assertion": jwt,
+      'KBT-Access-JWT-Assertion': jwt,
     }
-  );
+  )
 
-  return null;
-};
+  return null
+}
 
 export default function AccountSettingsProfile() {
-  const { displayName, job, location, bio, website, pfp } = useLoaderData();
+  const { displayName, job, location, bio, website, pfp } = useLoaderData()
 
-  const actionData = useActionData();
+  const actionData = useActionData()
 
   return (
     <>
@@ -197,5 +199,5 @@ export default function AccountSettingsProfile() {
         </Form>
       </div>
     </>
-  );
+  )
 }

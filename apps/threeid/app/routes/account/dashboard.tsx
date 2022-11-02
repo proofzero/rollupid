@@ -1,61 +1,62 @@
-import { json, redirect } from "@remix-run/cloudflare";
+import { json, redirect } from '@remix-run/cloudflare'
 
 import {
   useFetcher,
   useLoaderData,
   useSubmit,
   useFetchers,
-} from "@remix-run/react";
-import { useEffect, useState } from "react";
-import { FaDiscord, FaTwitter, FaCaretUp } from "react-icons/fa";
+} from '@remix-run/react'
+import { useEffect, useState } from 'react'
+import { FaDiscord, FaTwitter, FaCaretUp } from 'react-icons/fa'
 
-import { getUserSession, requireJWT } from "~/utils/session.server";
-import { oortSend } from "~/utils/rpc.server";
-import datadogRum from "~/utils/datadog.client";
+import { getUserSession, requireJWT } from '~/utils/session.server'
+import { oortSend } from '~/utils/rpc.server'
+import datadogRum from '~/utils/datadog.client'
 
-import FAQ from "~/components/FAQ";
-import InviteCode from "~/components/invite-code";
+import FAQ from '~/components/FAQ'
+import InviteCode from '~/components/invite-code'
 
-import stepComplete from "~/assets/step_complete.png";
-import stepSoon from "~/assets/step_soon.png";
+import stepComplete from '~/assets/step_complete.png'
+import stepSoon from '~/assets/step_soon.png'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
-import Heading from "~/components/typography/Heading";
-import SectionTitle from "~/components/typography/SectionTitle";
-import SectionHeading from "~/components/typography/SectionHeading";
-import SectionHeadingSubtle from "~/components/typography/SectionHeadingSubtle";
-import { ButtonAnchor, ButtonSize } from "~/components/buttons";
-import galaxyClient from "~/helpers/galaxyClient";
+} from '~/components/typography/Text'
+import Heading from '~/components/typography/Heading'
+import SectionTitle from '~/components/typography/SectionTitle'
+import SectionHeading from '~/components/typography/SectionHeading'
+import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
+import { ButtonAnchor, ButtonSize } from '~/components/buttons'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, "/auth");
+  const jwt = await requireJWT(request, '/auth')
 
   const oortOptions = {
     jwt: jwt,
-  };
+  }
 
+  const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    "KBT-Access-JWT-Assertion": jwt,
-  });
+    'KBT-Access-JWT-Assertion': jwt,
+  })
 
   // TODO remove session address param when RPC url is changed
   const [inviteCodeRes, votesRes, namesRes] = await Promise.all([
-    oortSend("3id_getInviteCode", [], oortOptions),
-    oortSend("kb_getObject", ["3id.app", "feature_vote_count"], oortOptions),
-    oortSend("kb_getCoreAddresses", [["ens"]], oortOptions),
-  ]);
+    oortSend('3id_getInviteCode', [], oortOptions),
+    oortSend('kb_getObject', ['3id.app', 'feature_vote_count'], oortOptions),
+    oortSend('kb_getCoreAddresses', [['ens']], oortOptions),
+  ])
 
   if (inviteCodeRes.error || votesRes.error) {
-    console.log("error", inviteCodeRes.error, votesRes.error);
+    console.log('error', inviteCodeRes.error, votesRes.error)
     // return json({ error: "Error fetching invite codes" }, { status: 500 });
   }
 
   if (namesRes.error) {
-    return redirect("/onboard");
+    return redirect('/onboard')
   }
 
   const [inviteCode, votes, isToken, displayname, names] = [
@@ -64,7 +65,7 @@ export const loader = async ({ request }) => {
     profileRes.profile?.pfp.isToken,
     profileRes.profile?.displayName,
     namesRes.result,
-  ];
+  ]
 
   return json({
     inviteCode,
@@ -73,38 +74,38 @@ export const loader = async ({ request }) => {
     displayname,
     names,
     profile: profileRes.profile,
-  });
-};
+  })
+}
 
 export const action = async ({ request }: any) => {
-  const votes = (await request.formData()).get("votes");
-  const session = await getUserSession(request);
-  const jwt = session.get("jwt");
+  const votes = (await request.formData()).get('votes')
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
 
   oortSend(
-    "kb_putObject",
+    'kb_putObject',
     [
-      "3id.app",
-      "feature_vote_count",
+      '3id.app',
+      'feature_vote_count',
       votes,
       {
-        visibility: "private",
+        visibility: 'private',
       },
     ],
     {
       jwt,
     }
-  );
-  return json({ votes });
-};
+  )
+  return json({ votes })
+}
 
 const completeSteps = [
   {
-    title: "Claim your 3ID",
+    title: 'Claim your 3ID',
     isCompleted: true,
   },
   {
-    title: "Claim your PFP",
+    title: 'Claim your PFP',
     isCompleted: false,
     description: (
       <>
@@ -121,7 +122,7 @@ const completeSteps = [
     ),
   },
   {
-    title: "Verify ENS",
+    title: 'Verify ENS',
     isCompleted: false,
     description: (
       <>
@@ -138,7 +139,7 @@ const completeSteps = [
     ),
   },
   {
-    title: "Configure Profile",
+    title: 'Configure Profile',
     description: (
       <>
         <Text
@@ -153,11 +154,11 @@ const completeSteps = [
       </>
     ),
   },
-];
+]
 
 const comingNext = [
   {
-    title: "Link More Accounts",
+    title: 'Link More Accounts',
     description: (
       <>
         <Text
@@ -171,63 +172,63 @@ const comingNext = [
       </>
     ),
   },
-];
+]
 
 const roadmapSteps = [
   {
-    title: "Permission First App",
+    title: 'Permission First App',
   },
   {
-    title: "Create NFT gallery",
+    title: 'Create NFT gallery',
   },
   {
-    title: "Receive First Credential",
+    title: 'Receive First Credential',
   },
   {
-    title: "Setup Secure KYC",
+    title: 'Setup Secure KYC',
   },
   {
-    title: "Send First Message",
+    title: 'Send First Message',
   },
   {
-    title: "Publish First File",
+    title: 'Publish First File',
   },
-];
+]
 
 export default function Welcome() {
   const { inviteCode, votes, isToken, displayname, names, profile } =
-    useLoaderData();
-  let submit = useSubmit();
+    useLoaderData()
+  let submit = useSubmit()
 
-  completeSteps[1].isCompleted = isToken;
-  completeSteps[2].isCompleted = names?.ens?.length;
-  completeSteps[3].isCompleted = Object.keys(profile || {}).length > 1;
+  completeSteps[1].isCompleted = isToken
+  completeSteps[2].isCompleted = names?.ens?.length
+  completeSteps[3].isCompleted = Object.keys(profile || {}).length > 1
 
   const percentage =
     (completeSteps.filter((step) => step.isCompleted).length /
       (completeSteps.length + comingNext.length + roadmapSteps.length)) *
-    100;
+    100
 
-  const currentVotes = votes?.value ? JSON.parse(votes.value) : [];
+  const currentVotes = votes?.value ? JSON.parse(votes.value) : []
 
   const [featureVotes, setFeatureVotes] = useState<Set<string>>(
     currentVotes.length ? new Set<string>(currentVotes) : new Set<string>()
-  );
+  )
 
   useEffect(() => {
     submit(
       { votes: JSON.stringify(Array.from(featureVotes)) },
-      { action: "", method: "post" }
-    );
-  }, [featureVotes]);
+      { action: '', method: 'post' }
+    )
+  }, [featureVotes])
 
   return (
     <div className="dashboard flex flex-col gap-4">
       <div
         className="welcome-banner basis-full"
         style={{
-          backgroundColor: "#F9FAFB",
-          padding: "30px 30px 23px 16px",
+          backgroundColor: '#F9FAFB',
+          padding: '30px 30px 23px 16px',
         }}
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
@@ -311,7 +312,7 @@ export default function Welcome() {
                         weight={TextWeight.Regular400}
                         color={TextColor.Gray500}
                       >
-                        {step.isCompleted ? "Completed" : step.description}
+                        {step.isCompleted ? 'Completed' : step.description}
                       </Text>
                     </div>
                   </div>
@@ -365,11 +366,11 @@ export default function Welcome() {
                         : false
                     }
                     onClick={(e) => {
-                      featureVotes.add(step.title);
-                      setFeatureVotes(new Set(featureVotes));
-                      datadogRum.addAction("featureVote", {
+                      featureVotes.add(step.title)
+                      setFeatureVotes(new Set(featureVotes))
+                      datadogRum.addAction('featureVote', {
                         value: step.title,
-                      });
+                      })
                     }}
                   >
                     <FaCaretUp />
@@ -389,5 +390,5 @@ export default function Welcome() {
         </div>
       </div>
     </div>
-  );
+  )
 }
