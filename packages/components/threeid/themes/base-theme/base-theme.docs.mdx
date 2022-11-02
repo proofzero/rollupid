@@ -1,0 +1,55 @@
+---
+description: 'A standard theme for the Bit design language.'
+labels: ['bit', 'theme', 'design', 'base']
+---
+
+import { BaseTheme, useTheme } from './base-theme';
+
+Bit flavored theme with default light theme values, using the [Theme Provider](https://bit.dev/teambit/base-react/theme/theme-provider).  
+Here we set the schema for our theme, and provide the defaults values (light ones).
+
+## Basic usage
+
+```tsx
+function App() {
+  return (
+    <BaseTheme>
+      {/* components here will now have access to the theme */}
+      <ThemedButton />
+    </BaseTheme>
+  );
+}
+
+// consuming the theme:
+function ThemedButton() {
+  // as react context
+  const theme = useTheme();
+
+  return (
+    <button
+      style={{
+        background: theme.surfaceColor,
+        // as css variables
+        color: 'var(--on-surface-color)',
+      }}
+    >
+      click here
+    </button>
+  );
+}
+```
+
+## Overriding
+
+You can override the base theme with a specific set of values, for example, to apply a dark theme:
+
+```tsx
+function App() {
+  return (
+    <BaseTheme overrides={darkTheme.values}>
+      {/* components here will be colored dark */}
+      <ThemedButton />
+    </BaseTheme>
+  );
+}
+```

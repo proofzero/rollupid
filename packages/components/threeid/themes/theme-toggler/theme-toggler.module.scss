@@ -1,0 +1,16 @@
+.toggler {
+  border-radius: 8px;
+  padding: 0.5em;
+  cursor: pointer;
+  user-select: none;
+
+  transition: color 180ms, background-color 180ms;
+  background: var(--surface-color, #ffffff);
+
+  &:hover {
+    background: var(--surface-hover-color, #edebfc);
+  }
+  &:active {
+    background: var(--surface-active-color, #dcd8f9);
+  }
+}

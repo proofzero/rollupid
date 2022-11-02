@@ -9,12 +9,123 @@
  */
 
 {
+    "themes/base-theme": {
+        "scope": "",
+        "version": "",
+        "defaultScope": "kubelt.threeid",
+        "mainFile": "index.ts",
+        "rootDir": "threeid/themes/base-theme",
+        "config": {
+            "teambit.envs/envs": {
+                "env": "teambit.react/react"
+            },
+            "teambit.component/dev-files": {},
+            "teambit.compositions/compositions": {},
+            "teambit.docs/docs": {},
+            "teambit.dependencies/dependency-resolver": {},
+            "teambit.pipelines/builder": {},
+            "teambit.component/renaming": {
+                "renamedFrom": {
+                    "scope": "teambit.design",
+                    "name": "ui/theme/base-theme",
+                    "version": "1.90.4"
+                }
+            },
+            "teambit.react/react": {},
+            "teambit.compilation/compiler": {},
+            "teambit.harmony/application": {},
+            "teambit.preview/preview": {},
+            "teambit.component/forking": {
+                "forkedFrom": {
+                    "scope": "teambit.design",
+                    "name": "themes/base-theme",
+                    "version": "0.1.1"
+                }
+            }
+        }
+    },
+    "themes/dark-theme": {
+        "scope": "",
+        "version": "",
+        "defaultScope": "kubelt.threeid",
+        "mainFile": "index.ts",
+        "rootDir": "threeid/themes/dark-theme",
+        "config": {
+            "teambit.envs/envs": {
+                "env": "teambit.react/react"
+            },
+            "teambit.react/react": {},
+            "teambit.component/dev-files": {},
+            "teambit.compositions/compositions": {},
+            "teambit.docs/docs": {},
+            "teambit.dependencies/dependency-resolver": {},
+            "teambit.pipelines/builder": {},
+            "teambit.compilation/compiler": {},
+            "teambit.harmony/application": {},
+            "teambit.preview/preview": {},
+            "teambit.component/forking": {
+                "forkedFrom": {
+                    "scope": "teambit.design",
+                    "name": "themes/dark-theme",
+                    "version": "1.91.4"
+                }
+            }
+        }
+    },
+    "themes/theme-toggler": {
+        "scope": "",
+        "version": "",
+        "defaultScope": "kubelt.threeid",
+        "mainFile": "index.ts",
+        "rootDir": "threeid/themes/theme-toggler",
+        "config": {
+            "teambit.envs/envs": {
+                "env": "teambit.react/react"
+            },
+            "teambit.component/dev-files": {},
+            "teambit.compositions/compositions": {},
+            "teambit.docs/docs": {},
+            "teambit.dependencies/dependency-resolver": {},
+            "teambit.pipelines/builder": {},
+            "teambit.component/renaming": {
+                "renamedFrom": {
+                    "scope": "teambit.design",
+                    "name": "ui/theme/theme-toggler",
+                    "version": "1.90.4"
+                }
+            },
+            "teambit.react/react": {},
+            "teambit.compilation/compiler": {},
+            "teambit.harmony/application": {},
+            "teambit.preview/preview": {},
+            "teambit.component/forking": {
+                "forkedFrom": {
+                    "scope": "teambit.design",
+                    "name": "themes/theme-toggler",
+                    "version": "0.1.7"
+                }
+            }
+        }
+    },
     "ui/button": {
         "scope": "",
         "version": "",
         "defaultScope": "kubelt.threeid",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/button",
+        "config": {
+            "teambit.react/react": {},
+            "teambit.envs/envs": {
+                "env": "teambit.react/react"
+            }
+        }
+    },
+    "ui/heading": {
+        "scope": "",
+        "version": "",
+        "defaultScope": "kubelt.threeid",
+        "mainFile": "index.ts",
+        "rootDir": "threeid/ui/heading",
         "config": {
             "teambit.react/react": {},
             "teambit.envs/envs": {

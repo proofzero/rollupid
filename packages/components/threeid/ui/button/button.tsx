@@ -1,12 +1,45 @@
 import React, { ReactNode } from 'react';
-import { Button as TeambitButton } from '@teambit/design.ui.buttons.button';
-export type ButtonProps = {
-  /**
-   * a node to be rendered in the special component.
-   */
-  children?: ReactNode;
-};
+import classNames from 'classnames';
 
-export function Button({ children }: ButtonProps) {
-  return <TeambitButton>{children}</TeambitButton>;
+import {
+  Button as TeambitButton,
+  ButtonProps as TeambitButtonProps,
+} from '@teambit/design.ui.buttons.button';
+import styles from './button.module.scss';
+// import { interFont } from '@kubelt/threeid.themes.base-theme/inter-font';
+
+export type ButtonProps = {
+  secondary?: boolean;
+
+  disabled?: boolean;
+
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+  children?: ReactNode;
+} & TeambitButtonProps;
+
+export function Button({
+  children,
+  className,
+  secondary,
+  disabled,
+  size,
+}: ButtonProps) {
+  const secondaryClass = secondary ? styles.secondary : styles.primary;
+  const disabledClass = disabled ? styles.disabled : '';
+  const sizeClass = size ? styles[size] : styles.md;
+  return (
+    <TeambitButton
+      disabled
+      className={classNames(
+        styles.base,
+        className,
+        secondaryClass,
+        disabledClass,
+        sizeClass
+      )}
+    >
+      {children}
+    </TeambitButton>
+  );
 }

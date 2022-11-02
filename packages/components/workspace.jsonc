@@ -1,7 +1,7 @@
 /**
  * this is the main configuration file of your bit workspace.
  * for full documentation, please see: https://bit.dev/docs/workspace/workspace-configuration
- **/{
+ **/ {
   "$schema": "https://static.bit.dev/teambit/schemas/schema.json",
   /**
    * main configuration of the Bit workspace.
@@ -42,6 +42,13 @@
         "@teambit/design.ui.buttons.button": "1.96.5",
         "@teambit/eslint-config-bit-react": "~0.0.367",
         "@typescript-eslint/eslint-plugin": "4.29.3",
+        "@teambit/base-react.theme.theme-provider": "1.95.3",
+        "@teambit/base-react.themes.theme-switcher": "1.0.2",
+        "@teambit/base-ui.text.heading": "1.0.4",
+        "@teambit/community.envs.community-react": "2.1.5",
+        "@teambit/design.envs.react": "2.0.7",
+        "@teambit/design.theme.icons-font": "1.0.8",
+        "@teambit/design.themes.color-schema": "0.0.3",
         "eslint-import-resolver-node": "0.3.6",
         "eslint-plugin-import": "2.22.1",
         "eslint-plugin-jest": "24.4.0",

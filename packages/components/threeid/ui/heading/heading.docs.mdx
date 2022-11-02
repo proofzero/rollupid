@@ -1,0 +1,28 @@
+---
+labels: ['react', 'typescript', 'heading', 'h']
+description: 'concrete heading'
+---
+
+import { H1, H2, H3, H4, H5, H6 } from './heading';
+
+### Overview
+
+A set of concrete heading for the workspace docs.  
+H1, H2, H3, H4, H5, H6.  
+Each header is equivalent to its html element (e.g. `<H1/>` is `<h1/>`, etc).
+
+To keep a consistent look to the site, headers come in a limited set of sizes.  
+While each header corresponds to a default font-size, it can be overridden using the size prop.
+
+For example:
+
+```js live
+<div>
+  <H1>Page title</H1>
+  <H2>Section title</H2>
+  <H3>Section title</H3>
+  <H4>Section title</H4>
+  <H5>Section title</H5>
+  <H6>Section title</H6>
+</div>
+```

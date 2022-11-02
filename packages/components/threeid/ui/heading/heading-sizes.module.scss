@@ -1,0 +1,29 @@
+// font sizes only!
+
+.xxs {
+  font-size: var(--bit-h-xxs, 16px);
+}
+
+.xs {
+  font-size: var(--bit-h-xs, 18px);
+}
+
+.sm {
+  font-size: var(--bit-h-sm, 24px);
+}
+
+.md {
+  font-size: var(--bit-h-md, 26px);
+}
+
+.lg {
+  font-size: var(--bit-h-lg, 36px);
+}
+
+.xl {
+  font-size: var(--bit-h-xl, 40px);
+}
+
+.xxl {
+  font-size: var(--bit-h-xxl, 50px);
+}
