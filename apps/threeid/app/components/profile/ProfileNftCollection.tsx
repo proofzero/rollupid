@@ -42,6 +42,8 @@ export type ProfileNftCollectionProps = {
   }[];
   isOwner?: boolean;
   preload?: boolean;
+  detailsModal?: boolean;
+  filters?: boolean;
 };
 
 type PartnerUrlProps = {
@@ -92,6 +94,8 @@ const ProfileNftCollection = ({
   account,
   displayname,
   preload = false,
+  detailsModal = false,
+  filters = false,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts);
 
@@ -204,13 +208,15 @@ const ProfileNftCollection = ({
         </>
       )}
 
-      <NftModal
-        nft={selectedNft}
-        isOpen={showModal}
-        handleClose={() => setShowModal(false)}
-      />
+      {detailsModal && (
+        <NftModal
+          nft={selectedNft}
+          isOpen={showModal}
+          handleClose={() => setShowModal(false)}
+        />
+      )}
 
-      {!loading && !pageKey && loadedNfts.length > 0 && (
+      {!loading && !pageKey && loadedNfts.length > 0 && filters && (
         <div className="flex flex-col lg:flex-row justify-between items-center my-5">
           <select
             id="collection"
@@ -282,7 +288,10 @@ const ProfileNftCollection = ({
                   <div
                     onClick={() => {
                       setSelectedNft(nft);
-                      setShowModal(true);
+
+                      if (detailsModal) {
+                        setShowModal(true);
+                      }
                     }}
                     className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
                   >

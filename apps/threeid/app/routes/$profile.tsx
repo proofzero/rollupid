@@ -64,7 +64,7 @@ const ProfileRoute = () => {
     loggedIn,
     pfp,
     cover,
-    website
+    website,
   } = useLoaderData();
 
   return (
@@ -188,6 +188,7 @@ const ProfileRoute = () => {
             account={targetAddress}
             displayname={displayName}
             isOwner={isOwner}
+            detailsModal
           />
         </div>
       </div>
