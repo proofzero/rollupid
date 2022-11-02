@@ -217,18 +217,16 @@ const ProfileNftCollection = ({
             name="collection"
             className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             defaultValue="All Collections"
-            value={colFilter}
             onChange={(evt) => {
               setColFilter(evt.target.value);
             }}
           >
-            <option selected>All Collections</option>
-
+            <option>All Collections</option>
             {loadedNfts
               .map((n) => n.collectionTitle)
               .filter((val, ind, arr) => arr.indexOf(val) === ind)
-              .map((colName) => (
-                <option>{colName}</option>
+              .map((colName, i) => (
+                <option key={`${colName}_${i}`}>{colName}</option>
               ))}
           </select>
 
@@ -278,7 +276,7 @@ const ProfileNftCollection = ({
                 // breaks the infinite scroll
                 // plugin I resorted to this
                 <div
-                  key={`${nft.url}_${i}`}
+                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
                   className="relative overlay-img-wrapper"
                 >
                   <div
