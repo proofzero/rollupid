@@ -1,5 +1,5 @@
 import { createContext, ComponentType } from 'react';
-import type { BaseThemeProps } from '@kubelt/threeid.themes.base-theme';
+import type { BaseThemeProps } from '@kubelt-ui/threeid.themes.base-theme';
 
 export type ThemeOption = ComponentType<BaseThemeProps> & {
   /**

@@ -1,4 +1,4 @@
-import { BaseThemeSchema } from '@kubelt/threeid.themes.base-theme';
+import { BaseThemeSchema } from '@kubelt-ui/threeid.themes.base-theme';
 
 export const darkThemeValues: Partial<BaseThemeSchema> = {
   backgroundColor: '#121212',

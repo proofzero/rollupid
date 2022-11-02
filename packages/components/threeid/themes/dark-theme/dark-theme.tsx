@@ -1,5 +1,8 @@
 import React from 'react';
-import { BaseTheme, BaseThemeProps } from '@kubelt/threeid.themes.base-theme';
+import {
+  BaseTheme,
+  BaseThemeProps,
+} from '@kubelt-ui/threeid.themes.base-theme';
 import { darkThemeValues } from './dark-theme.values';
 import { DarkThemeIcon } from './dark-theme.icon';
 

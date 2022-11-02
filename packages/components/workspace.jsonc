@@ -27,7 +27,7 @@
     /**
      * default scope for all components in workspace.
      **/
-    "defaultScope": "kubelt.threeid"
+    "defaultScope": "kubelt-ui.threeid"
   },
   /**
    * main configuration for component dependency resolution.

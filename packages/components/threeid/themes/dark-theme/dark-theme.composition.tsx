@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '@kubelt/threeid.themes.base-theme';
+import { useTheme } from '@kubelt-ui/threeid.themes.base-theme';
 import {
   ColorSchema,
   SchemaTestPage,

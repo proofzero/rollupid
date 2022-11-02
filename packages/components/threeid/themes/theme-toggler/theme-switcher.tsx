@@ -1,5 +1,5 @@
 import React from 'react';
-import type { BaseThemeProps } from '@kubelt/threeid.themes.base-theme';
+import type { BaseThemeProps } from '@kubelt-ui/threeid.themes.base-theme';
 import {
   ThemeSwitcher as ThemeSwitcherBase,
   ThemeSwitcherProps as BaseProps,

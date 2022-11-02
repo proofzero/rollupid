@@ -10,32 +10,32 @@
 
 {
     "themes/base-theme": {
-        "scope": "kubelt.threeid",
-        "version": "05450877644b41bf3d700e68e0515f99ba7b093d",
+        "scope": "kubelt-ui.threeid",
+        "version": "24b4397f498cd16a5c8ab054dc6be17396ad19c1",
         "mainFile": "index.ts",
         "rootDir": "threeid/themes/base-theme"
     },
     "themes/dark-theme": {
-        "scope": "kubelt.threeid",
-        "version": "e11c9300d5fb7235aff7783eeed53d9a6caf6385",
+        "scope": "kubelt-ui.threeid",
+        "version": "bc8ba2aa183ab2d05f520fc996f84e9cb91f5d82",
         "mainFile": "index.ts",
         "rootDir": "threeid/themes/dark-theme"
     },
     "themes/theme-toggler": {
-        "scope": "kubelt.threeid",
-        "version": "848a468104f47d447ef84ddd8afcba07f7f2407d",
+        "scope": "kubelt-ui.threeid",
+        "version": "a9d75a949b7d2a977771bffe0f5552c2318ed3b0",
         "mainFile": "index.ts",
         "rootDir": "threeid/themes/theme-toggler"
     },
     "ui/button": {
-        "scope": "kubelt.threeid",
-        "version": "f905187759b03f75e3bf22575179f17ae7e87561",
+        "scope": "kubelt-ui.threeid",
+        "version": "5f7529e79d91e3a23b160c338391abfd412a7455",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/button"
     },
     "ui/heading": {
-        "scope": "kubelt.threeid",
-        "version": "60a66130ff229ecdc14f2841fc3dd514a125fc5f",
+        "scope": "kubelt-ui.threeid",
+        "version": "fcbfc503969e70a9076d9fb871fc90e580cd1fda",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/heading"
     },
