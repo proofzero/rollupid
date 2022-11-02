@@ -21,6 +21,8 @@
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "2.0.10",
     "@kubelt/threeid.themes.base-theme": "0.0.0-05450877644b41bf3d700e68e0515f99ba7b093d",
+    "@kubelt/threeid.ui.button": "0.0.0-f905187759b03f75e3bf22575179f17ae7e87561",
+    "@kubelt/threeid.ui.heading": "0.0.0-60a66130ff229ecdc14f2841fc3dd514a125fc5f",
     "@remix-run/cloudflare": "^1.7.4",
     "@remix-run/cloudflare-workers": "^1.7.4",
     "@remix-run/react": "^1.7.4",
