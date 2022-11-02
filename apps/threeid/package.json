@@ -14,8 +14,7 @@
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "echo \"No dev for threeid. Please use start.\"",
     "start": "run-p \"dev:*\"",
-    "e2e": "cross-env NODE_ENV=test npx playwright test",
-    "postinstall": "patch-package"
+    "e2e": "cross-env NODE_ENV=test npx playwright test"
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
@@ -35,7 +34,6 @@
     "graphql-request": "5.0.0",
     "graphql-tag": "2.12.6",
     "history": "5.3.0",
-    "postinstall-postinstall": "2.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "4.4.0",
