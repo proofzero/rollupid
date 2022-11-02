@@ -2,59 +2,63 @@ import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
-import SectionTitle from "../typography/SectionTitle";
+} from '~/components/typography/Text'
 
-import opensea from "~/assets/partners/opensea.svg";
-import rarible from "~/assets/partners/rarible.svg";
-import superrare from "~/assets/partners/superrare.svg";
-import polygon from "~/assets/partners/polygon.svg";
-import book from "~/assets/book.svg";
+import SectionTitle from '../typography/SectionTitle'
 
-import noNfts from "~/assets/No_NFT_Found.svg";
+import opensea from '~/assets/partners/opensea.svg'
+import rarible from '~/assets/partners/rarible.svg'
+import superrare from '~/assets/partners/superrare.svg'
+import polygon from '~/assets/partners/polygon.svg'
+import book from '~/assets/book.svg'
 
-import { ButtonAnchor } from "../buttons";
+import noNfts from '~/assets/No_NFT_Found.svg'
 
-import Masonry from "react-masonry-css";
+import { ButtonAnchor } from '../buttons'
 
-import ProfileNftCollectionStyles from "./ProfileNftCollection.css";
-import { LinksFunction } from "@remix-run/cloudflare";
+import Masonry from 'react-masonry-css'
 
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useEffect, useState } from "react";
-import Spinner from "../spinner";
-import NftModal from "./NftModal";
-import InputText from "../inputs/InputText";
+import ProfileNftCollectionStyles from './ProfileNftCollection.css'
+import { LinksFunction } from '@remix-run/cloudflare'
 
-import { FaGuilded } from "react-icons/fa";
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { FunctionComponent, useEffect, useState } from 'react'
+import Spinner from '../spinner'
+import NftModal from './NftModal'
+import InputText from '../inputs/InputText'
+
+import { FaGuilded } from 'react-icons/fa'
+import ModaledNft from './ModaledNft'
 
 export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: ProfileNftCollectionStyles },
-];
+  { rel: 'stylesheet', href: ProfileNftCollectionStyles },
+]
 
 export type ProfileNftCollectionProps = {
-  account: string;
-  displayname?: string;
+  account: string
+  displayname?: string
   nfts?: {
-    url: string;
-    title: string;
-    collectionTitle: string;
-  }[];
-  isOwner?: boolean;
-  preload?: boolean;
-  detailsModal?: boolean;
-  filters?: boolean;
+    url: string
+    title: string
+    collectionTitle: string
+  }[]
+  isOwner?: boolean
+  preload?: boolean
+  detailsModal?: boolean
+  filters?: boolean
 
-  handleSelectedNft?: (nft: any) => void;
-};
+  handleSelectedNft?: (nft: any) => void
+
+  nftRenderer?: (nft: any, handleSelectedNft?: any) => JSX.Element
+}
 
 type PartnerUrlProps = {
-  title: string;
-  description?: string;
-  imgSrc?: string;
-  assetSrc?: string;
-  url: string;
-};
+  title: string
+  description?: string
+  imgSrc?: string
+  assetSrc?: string
+  url: string
+}
 
 const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
   return (
@@ -87,8 +91,8 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
         <ButtonAnchor href={url}>Visit website</ButtonAnchor>
       </span>
     </div>
-  );
-};
+  )
+}
 
 const ProfileNftCollection = ({
   nfts = [],
@@ -96,43 +100,40 @@ const ProfileNftCollection = ({
   account,
   displayname,
   preload = false,
-  detailsModal = false,
   filters = false,
   handleSelectedNft,
+  nftRenderer = (nft) => <ModaledNft nft={nft} />,
 }: ProfileNftCollectionProps) => {
-  const [loadedNfts, setLoadedNfts] = useState(nfts);
+  const [loadedNfts, setLoadedNfts] = useState(nfts)
 
-  const [selectedNft, setSelectedNft] = useState<any>();
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
 
-  const [pageKey, setPageLink] = useState<string | undefined>();
-  const [loading, setLoading] = useState(true);
-
-  const [textFilter, setTextFilter] = useState("");
-  const [colFilter, setColFilter] = useState("All Collections");
+  const [textFilter, setTextFilter] = useState('')
+  const [colFilter, setColFilter] = useState('All Collections')
 
   const getMoreNfts = async () => {
     const nftReq = await fetch(
-      `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ""}`
-    );
-    const nftRes = await nftReq.json();
+      `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ''}`
+    )
+    const nftRes = await nftReq.json()
 
-    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts]);
-    setPageLink(nftRes.pageKey ?? null);
-  };
+    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
+    setPageLink(nftRes.pageKey ?? null)
+  }
 
   useEffect(() => {
     if (pageKey) {
-      setLoading(true);
-      getMoreNfts();
+      setLoading(true)
+      getMoreNfts()
     } else if (pageKey === null) {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [pageKey]);
+  }, [pageKey])
 
   useEffect(() => {
-    getMoreNfts();
-  }, []);
+    getMoreNfts()
+  }, [])
 
   return (
     <>
@@ -211,14 +212,6 @@ const ProfileNftCollection = ({
         </>
       )}
 
-      {detailsModal && (
-        <NftModal
-          nft={selectedNft}
-          isOpen={showModal}
-          handleClose={() => setShowModal(false)}
-        />
-      )}
-
       {!loading && !pageKey && loadedNfts.length > 0 && filters && (
         <div className="flex flex-col lg:flex-row justify-between items-center my-5">
           <select
@@ -227,7 +220,7 @@ const ProfileNftCollection = ({
             className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             defaultValue="All Collections"
             onChange={(evt) => {
-              setColFilter(evt.target.value);
+              setColFilter(evt.target.value)
             }}
           >
             <option>All Collections</option>
@@ -243,7 +236,7 @@ const ProfileNftCollection = ({
             heading=""
             Icon={FaGuilded}
             onChange={(val) => {
-              setTextFilter(val);
+              setTextFilter(val)
             }}
           />
         </div>
@@ -269,7 +262,7 @@ const ProfileNftCollection = ({
             {loadedNfts
               .filter(
                 (nft) =>
-                  colFilter === "All Collections" ||
+                  colFilter === 'All Collections' ||
                   nft.collectionTitle === colFilter
               )
               .filter(
@@ -286,39 +279,8 @@ const ProfileNftCollection = ({
                 // plugin I resorted to this
                 <div
                   key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                  className="relative overlay-img-wrapper"
                 >
-                  <div
-                    onClick={() => {
-                      setSelectedNft(nft);
-
-                      if (handleSelectedNft) {
-                        handleSelectedNft(nft);
-                      }
-
-                      if (detailsModal) {
-                        setShowModal(true);
-                      }
-                    }}
-                    className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
-                  >
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.SemiBold600}
-                      color={TextColor.White}
-                    >
-                      {nft.collectionTitle}
-                    </Text>
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.SemiBold600}
-                      color={TextColor.White}
-                    >
-                      {nft.title}
-                    </Text>
-                  </div>
-
-                  <img className="w-full" src={nft.url} />
+                  {nftRenderer(nft, handleSelectedNft)}
                 </div>
               ))}
           </Masonry>
@@ -327,7 +289,7 @@ const ProfileNftCollection = ({
 
       {loading && <Spinner />}
     </>
-  );
-};
+  )
+}
 
-export default ProfileNftCollection;
+export default ProfileNftCollection
