@@ -44,6 +44,8 @@ export type ProfileNftCollectionProps = {
   preload?: boolean;
   detailsModal?: boolean;
   filters?: boolean;
+
+  handleSelectedNft?: (nft: any) => void;
 };
 
 type PartnerUrlProps = {
@@ -96,6 +98,7 @@ const ProfileNftCollection = ({
   preload = false,
   detailsModal = false,
   filters = false,
+  handleSelectedNft,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts);
 
@@ -288,6 +291,10 @@ const ProfileNftCollection = ({
                   <div
                     onClick={() => {
                       setSelectedNft(nft);
+
+                      if (handleSelectedNft) {
+                        handleSelectedNft(nft);
+                      }
 
                       if (detailsModal) {
                         setShowModal(true);

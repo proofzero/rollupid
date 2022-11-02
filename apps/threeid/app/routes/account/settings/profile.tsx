@@ -17,6 +17,7 @@ import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 import PfpNftModal from "~/components/accounts/settings/PfpNftModal";
+import { useState } from "react";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request);
@@ -83,9 +84,24 @@ export default function AccountSettingsProfile() {
 
   const actionData = useActionData()
 
+  const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false);
+
+  const handlePfpModalClose = (val: boolean) => {
+    setNftPfpModalOpen(val);
+  };
+
+  const handleSelectedNft = (nft: any) => {
+    console.log(nft);
+  };
+
   return (
     <>
-      <PfpNftModal account={address} />
+      <PfpNftModal
+        account={address}
+        isOpen={nftPfpModalOpen}
+        handleClose={handlePfpModalClose}
+        handleSelectedNft={handleSelectedNft}
+      />
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
@@ -100,9 +116,16 @@ export default function AccountSettingsProfile() {
 
           <div className="flex flex-col justify-between">
             <div className="flex flex-row space-x-3.5">
-              <Button type={ButtonType.Secondary} size={ButtonSize.SM} disabled>
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.SM}
+                onClick={() => {
+                  if (!nftPfpModalOpen) setNftPfpModalOpen(true);
+                }}
+              >
                 Change NFT Avatar
               </Button>
+
               <Button type={ButtonType.Secondary} size={ButtonSize.SM} disabled>
                 Upload an Image
               </Button>

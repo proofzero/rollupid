@@ -3,12 +3,25 @@ import ProfileNftCollection from "~/components/profile/ProfileNftCollection";
 
 type PfpNftModalProps = {
   account: string;
+  isOpen: boolean;
+  handleClose: (value: boolean) => void;
+  handleSelectedNft: (nft: any) => void;
 };
 
-const PfpNftModal = ({ account }: PfpNftModalProps) => {
+const PfpNftModal = ({
+  account,
+  isOpen,
+  handleClose,
+  handleSelectedNft,
+}: PfpNftModalProps) => {
   return (
-    <Modal isOpen={true} fixed>
-      <ProfileNftCollection account={account} preload={true} filters />
+    <Modal isOpen={isOpen} fixed handleClose={handleClose}>
+      <ProfileNftCollection
+        account={account}
+        preload={true}
+        filters
+        handleSelectedNft={handleSelectedNft}
+      />
     </Modal>
   );
 };
