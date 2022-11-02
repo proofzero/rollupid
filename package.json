@@ -11,9 +11,7 @@
     "smartcontracts"
   ],
   "scripts": {
-    "gql:galaxy": "graphql-codegen --config graphql.config.js --project galaxy --aggregate-output -n -l",
-    "gql:threeid": "graphql-codegen --config graphql.config.js --project threeid --aggregate-output -n -l",
-    "gql": "run-p \"gql:*\"",
+    "gql": "yarn workspaces foreach -p -v -i run gql",
     "dev:gql": "run-p \"gql:* -- --watch\"",
     "dev": "yarn workspaces foreach -i -v -p run dev",
     "start": "echo \"Run each frontend applications individually\"",

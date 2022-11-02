@@ -19,7 +19,7 @@ services = [
   bucket = "./public"
 
 [build]
-  command = "yarn build"
+  command = "yarn build && remix build --sourcemap"
 
 [dev]
 port = 9999
@@ -48,6 +48,8 @@ kv_namespaces = [
 services = [
   { binding = "OORT", service = "oort-testnet"}
 ]
+[env.next.build]
+  command = "yarn build && remix build"
 
 [env.current]
 route = { pattern = "get.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
@@ -60,4 +62,6 @@ kv_namespaces = [
 services = [
   { binding = "OORT", service = "oort-mainnet"}
 ]
+[env.current.build]
+  command = "yarn build && remix build"
 
