@@ -3,11 +3,17 @@ import Text, {
   TextSize,
   TextWeight,
 } from '~/components/typography/Text'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
-const SelectableNft = ({ nft, handleSelectedNft }: any) => {
+const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
   return (
-    <div className="relative border" onClick={() => handleSelectedNft(nft)}>
-      <img className="w-full" src={nft.url} />
+    <div
+      className={`relative border cursor-pointer hover:scale-105 ${
+        selected ? 'scale-105' : ''
+      }`}
+      onClick={() => handleSelectedNft(nft)}
+    >
+      <img className="w-full" src={gatewayFromIpfs(nft.url)} />
 
       <Text
         className="my-2.5 mx-2 bg-white"

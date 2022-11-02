@@ -37,7 +37,13 @@ const PfpNftModal = ({
           preload={true}
           filters
           handleSelectedNft={handleSelectedNft}
-          nftRenderer={(nft) => <SelectableNft nft={nft} />}
+          nftRenderer={(nft, selected, handleSelectedNft) => (
+            <SelectableNft
+              nft={nft}
+              selected={selected}
+              handleSelectedNft={handleSelectedNft}
+            />
+          )}
         />
       </>
     </Modal>

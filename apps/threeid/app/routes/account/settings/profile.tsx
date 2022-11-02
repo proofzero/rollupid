@@ -1,4 +1,3 @@
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { FaAt, FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
@@ -16,13 +15,14 @@ import Text, {
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
-import PfpNftModal from "~/components/accounts/settings/PfpNftModal";
-import { useState } from "react";
+import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
+import { useState } from 'react'
+import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request);
-  const session = await getUserSession(request);
-  const address = await session.get("address");
+  const jwt = await requireJWT(request)
+  const session = await getUserSession(request)
+  const address = await session.get('address')
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
@@ -67,6 +67,10 @@ export const action: ActionFunction = async ({ request }) => {
         location: formData.get('location')?.toString(),
         bio: bio,
         website: formData.get('website')?.toString(),
+        pfp: {
+          image: formData.get('pfp_url'),
+          isToken: !!formData.get('pfp_isToken'),
+        },
       },
       visibility: Visibility.Public,
     },
@@ -80,19 +84,24 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function AccountSettingsProfile() {
   const { displayName, job, location, bio, website, pfp, address } =
-    useLoaderData();
+    useLoaderData()
+
+  const [pfpUrl, setPfpUrl] = useState(pfp.image)
+  const [isToken, setIsToken] = useState(pfp.isToken)
 
   const actionData = useActionData()
 
-  const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false);
+  const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
 
   const handlePfpModalClose = (val: boolean) => {
-    setNftPfpModalOpen(val);
-  };
+    setNftPfpModalOpen(val)
+  }
 
   const handleSelectedNft = (nft: any) => {
-    console.log(nft);
-  };
+    setPfpUrl(nft.url)
+    setIsToken(true)
+    setNftPfpModalOpen(false)
+  }
 
   return (
     <>
@@ -106,7 +115,7 @@ export default function AccountSettingsProfile() {
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
           <img
-            src={gatewayFromIpfs(pfp.image)}
+            src={gatewayFromIpfs(pfpUrl)}
             style={{
               width: 118,
               height: 118,
@@ -120,7 +129,7 @@ export default function AccountSettingsProfile() {
                 type={ButtonType.Secondary}
                 size={ButtonSize.SM}
                 onClick={() => {
-                  if (!nftPfpModalOpen) setNftPfpModalOpen(true);
+                  if (!nftPfpModalOpen) setNftPfpModalOpen(true)
                 }}
               >
                 Change NFT Avatar
@@ -153,6 +162,9 @@ export default function AccountSettingsProfile() {
         </div>
 
         <Form className="flex flex-col space-y-9 mt-12" method="post">
+          <input name="pfp_url" type="hidden" value={pfpUrl} />
+          <input name="pfp_isToken" type="hidden" value={isToken} />
+
           <InputText
             id="displayName"
             heading="Display Name"

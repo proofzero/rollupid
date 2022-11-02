@@ -8,7 +8,7 @@ import Text, {
   TextWeight,
 } from '~/components/typography/Text'
 
-const ModaledNft = ({ nft, handleSelectedNft }: any) => {
+const ModaledNft = ({ nft }: any) => {
   const [showModal, setShowModal] = useState(false)
 
   return (
@@ -23,10 +23,6 @@ const ModaledNft = ({ nft, handleSelectedNft }: any) => {
         <div
           onClick={() => {
             setShowModal(true)
-
-            if (handleSelectedNft) {
-              handleSelectedNft(nft)
-            }
           }}
           className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
         >

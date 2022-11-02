@@ -49,7 +49,11 @@ export type ProfileNftCollectionProps = {
 
   handleSelectedNft?: (nft: any) => void
 
-  nftRenderer?: (nft: any, handleSelectedNft?: any) => JSX.Element
+  nftRenderer?: (
+    nft: any,
+    selected: boolean,
+    handleSelectedNft?: any
+  ) => JSX.Element
 }
 
 type PartnerUrlProps = {
@@ -111,6 +115,8 @@ const ProfileNftCollection = ({
 
   const [textFilter, setTextFilter] = useState('')
   const [colFilter, setColFilter] = useState('All Collections')
+
+  const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
     const nftReq = await fetch(
@@ -280,7 +286,20 @@ const ProfileNftCollection = ({
                 <div
                   key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
                 >
-                  {nftRenderer(nft, handleSelectedNft)}
+                  {nftRenderer(
+                    nft,
+                    selectedNft ===
+                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                    (selectedNft: any) => {
+                      setSelectedNft(
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                      )
+
+                      if (handleSelectedNft) {
+                        handleSelectedNft(selectedNft)
+                      }
+                    }
+                  )}
                 </div>
               ))}
           </Masonry>
