@@ -26,7 +26,8 @@ import { useEffect, useState } from 'react'
 import Spinner from '../spinner'
 import InputText from '../inputs/InputText'
 
-import { FaGuilded } from 'react-icons/fa'
+import { FaSearch } from 'react-icons/fa'
+
 import ModaledNft from './ModaledNft'
 import SelectableNft from './SelectableNft'
 
@@ -240,7 +241,7 @@ const ProfileNftCollection = ({
 
           <InputText
             heading=""
-            Icon={FaGuilded}
+            Icon={FaSearch}
             onChange={(val) => {
               setTextFilter(val)
             }}

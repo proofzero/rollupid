@@ -190,22 +190,18 @@ export default function AccountSettingsProfile() {
                   Or use your 1/1 gradient
                 </Text>
 
-                <div
-                  className="cursor-pointer"
+                <img
+                  src={gatewayFromIpfs(generatedPfp)}
+                  style={{
+                    width: 33,
+                    height: 33,
+                  }}
+                  className="rounded-md cursor-pointer"
                   onClick={() => {
                     setPfpUrl(generatedPfp)
                     setIsToken(generatedPfpMinted)
                   }}
-                >
-                  <img
-                    src={gatewayFromIpfs(generatedPfp)}
-                    style={{
-                      width: 33,
-                      height: 33,
-                    }}
-                    className="rounded-md"
-                  />
-                </div>
+                />
               </div>
             )}
           </div>
