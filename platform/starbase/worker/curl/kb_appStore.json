@@ -7,7 +7,8 @@
     "appId": "81cc0dab-2c0a-412d-b82f-0a392823a15f",
     "app": {
       "published": false,
-      "secret": "",
+      "clientId": "deadbeefdeadbeefdeadbeefdeadbeef",
+      "clientSecret": "secret:0000000000000000000000000000000000000000",
       "redirectURL": "",
       "termsURL": "",
       "websiteURL": "",

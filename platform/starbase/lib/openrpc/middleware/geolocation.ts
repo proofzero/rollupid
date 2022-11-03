@@ -7,6 +7,11 @@
 
 import * as _ from "lodash";
 
+import type {
+  RpcContext,
+  RpcRequest,
+} from "..";
+
 import { middleware } from "..";
 
 // geolocation
@@ -18,15 +23,15 @@ import { middleware } from "..";
  *
  * @return the context map updated with geolocation information.
  */
-export default middleware(async (request, context) => {
+export default middleware(async (request: RpcRequest, context: RpcContext) => {
   // TODO make this a Map.
-  const geo = _.pick(request.cf, [
-    "colo",
-    "timezone",
-    "city",
-    "region",
-    "regionCode",
-    "postalCode",
+  const geo = _.pick(request, [
+    "cf.colo",
+    "cf.timezone",
+    "cf.city",
+    "cf.region",
+    "cf.regionCode",
+    "cf.postalCode",
   ]);
   // NB: this mutates context.
   _.set(context, "com.kubelt.geo/location", geo)

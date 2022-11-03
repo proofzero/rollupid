@@ -18,6 +18,11 @@
 
 import * as _ from "lodash";
 
+import type {
+  RpcContext,
+  RpcRequest,
+} from "@kubelt/openrpc";
+
 import * as openrpc from "@kubelt/openrpc";
 
 // example
@@ -26,7 +31,7 @@ import * as openrpc from "@kubelt/openrpc";
 /**
  * An example extension.
  */
-export const example = openrpc.middleware(async (request, context) => {
+export const example = openrpc.middleware(async (request: RpcRequest, context: RpcContext) => {
   // TODO
   return context;
 });

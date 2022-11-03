@@ -199,7 +199,10 @@ const rpcSchema: RpcSchema = {
           published: {
             type: "boolean",
           },
-          secret: {
+          clientId: {
+            type: "string",
+          },
+          clientSecret: {
             type: "string",
           },
           redirectURL: {

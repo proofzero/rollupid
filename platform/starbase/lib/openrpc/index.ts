@@ -5,35 +5,50 @@
  */
 
 import * as _ from "lodash";
-import * as set from "ts-set-utils";
+
 import invariant from "tiny-invariant";
 
-// TODO use for JSON-Schema validation.
-/*
-import {
-  Validator
-} from "@cfworker/json-schema";
-*/
-
-// Load the OpenRPC JSON Schema for a schema document.
 import type {
-  ContentDescriptorObject,
-  ContentDescriptorObjectName,
-  MethodObject,
-  MethodOrReference,
-  OpenrpcDocument,
-} from "@open-rpc/meta-schema";
+  RpcResult,
+} from "./component/index";
+
+import type {
+  RpcClient,
+  RpcClientOptions,
+} from "./impl/client";
+
+import type {
+  RpcContext,
+} from "./impl/context";
+
+import type {
+  OpenRpcHandler,
+  RpcChain,
+  RpcChainFn,
+  RpcError,
+  RpcErrorDetail,
+  RpcHandler,
+  RpcMethod,
+  RpcMethodSet,
+  RpcMethods,
+  RpcOptions,
+  RpcPath,
+  RpcRequest,
+  RpcResponse,
+  RpcSchema,
+  RpcService,
+  Scope,
+  ScopeSet,
+  ServiceExtension,
+  ServiceMethod,
+} from "./impl/index";
 
 import type {
   MiddlewareFn,
   MiddlewareResult,
 } from "./impl/router";
 
-import * as jsonrpc from "./impl/jsonrpc";
-import * as router from "./impl/router";
-import { preflight as preflightScopes } from "./impl/scopes";
-
-// TODO push implementations into sub-module
+import * as impl from "./impl/index";
 
 // Types
 // -----------------------------------------------------------------------------
@@ -41,211 +56,83 @@ import { preflight as preflightScopes } from "./impl/scopes";
 export type {
   MiddlewareFn,
   MiddlewareResult,
+  OpenRpcHandler,
+  RpcChain,
+  RpcContext,
+  RpcError,
+  RpcErrorDetail,
+  RpcHandler,
+  RpcMethod,
+  RpcMethodSet,
+  RpcMethods,
+  RpcOptions,
+  RpcPath,
+  RpcRequest,
+  RpcResponse,
+  RpcSchema,
+  RpcService,
+  Scope,
+  ScopeSet,
+  ServiceExtension,
+  ServiceMethod,
 };
 
-// An RpcRequest represents a parsed Request that conforms to the
-// JSON-RPC request spec.
-export type RpcRequest = jsonrpc.JsonRpcRequest;
 
-export type RpcResponse = jsonrpc.JsonRpcResponse;
-
-export type RpcError = jsonrpc.JsonRpcErrorResponse;
-
-// The standard JSON-RPC object that describes the error that occurred.
-export type RpcErrorDetail = jsonrpc.JsonRpcError;
-
-export type RpcPath = string;
-
-// Type alias for an @openrpc/meta-schema. The user should define their
-// RPC service schema as this type to ensure that it conforms with the
-// OpenRPC spec.
-export type RpcSchema = OpenrpcDocument;
-
-// Extra context to make available while processing a request.
-
-// We specialize Map to use _.set() and _.get() for setting and
-// retrieving values as these methods do a good job of handling
-// path-like keys, i.e. com.kubelt.geo/location gets mapped into:
-// {
-//   com: {
-//     kubelt: {
-//       "geo/location": {
-//         ...
-//       }
-//     }
-//   }
-// }
-export class RpcContext extends Map<string|Symbol, any> {
-  get(k: string|Symbol): any {
-    if (k instanceof Symbol) {
-      k = k.toString();
-    }
-    return _.get(this, k);
-  }
-  set(k: string|Symbol, v: any): this {
-    if (k instanceof Symbol) {
-      k = k.toString();
-    }
-    _.set(this, k, v);
-    return this;
-  }
-};
-
-// When a chain function returns null/undefined, processing of the chain
-// continues. If a Response is returned execution of the chain is
-// short-circuited and the Response is returned.
-export type RpcChainResult = RpcResponse | RpcContext;
-
-// A chain function maps a request and associated context map into a new
-// context map.
-type RpcChainFn = (request: Request, ctx: RpcContext) => Promise<RpcChainResult>;
-
-// A chain is a sequence of router handler functions.
-export type RpcChain = Array<MiddlewareFn>;
-
-export type RpcHandler = (request: RpcRequest, context: RpcContext) => Promise<RpcResponse>;
-
-// TODO collect readable, writable state.
-export type RpcMethod = {
-  // The name of the method.
-  name: symbol,
-  // An OpenRPC partial schema for a single method.
-  schema: MethodObject,
-  // The set of scopes required to call the method.
-  scopes: ScopeSet,
-  // An RPC handler function to invoke when method is called.
-  handler: RpcHandler,
-};
-
-// A map from RPC request method to handler function.
-export type RpcMethods = Map<symbol, RpcMethod>;
-
-interface Options {
-  // Whether or not to enable OpenRPC service discovery.
-  rpcDiscover: boolean,
-};
-export type RpcOptions = Partial<Options>;
-
-// This is the type of an RPC handler that takes a Request provided by
-// Cloudflare (and an optional context map), and returns a Response to
-// be returned to the caller. The Request is expected to contain a JSON-RPC
-// format request and the returned Response is also JSON-RPC format.
-export type OpenRpcHandler = (request: Request, context?: RpcContext) => Promise<Response>;
-
-// A permission representing the ability to invoke an RPC method.
-export type Scope = Symbol;
-
-// A collection of scopes.
-export type ScopeSet = Set<Scope>;
-
-export type RpcService = {
-  // The OpenRPC schema defining the service.
-  schema: RpcSchema;
-  // Set of all declared scopes.
-  scopes: ScopeSet;
-  // The set of method implementations.
-  methods: RpcMethods;
-};
-
-// The name of an OpenRPC method as per the meta-schema.
-type RpcMethodName = ContentDescriptorObjectName;
-
-type ServiceMethod = {
-  name: RpcMethodName,
-  scopes: ScopeSet,
-  handler: RpcHandler,
-}
-
-type ServiceExtension = {
-  schema: MethodObject,
-  scopes: ScopeSet,
-  handler: RpcHandler,
-};
-
-type RpcMethodSet = Array<RpcMethod>;
-
-//
-// INTERNAL
-//
-
-// TODO move to impl
-function findMethod(schema: RpcSchema, methodName: string): MethodObject {
-    // TODO the method description is a MethodOrReference; only the MethodObject
-    // has a .name property. ReferenceObject needs to be expanded.
-    const methodOrReference: MethodOrReference | undefined = schema.methods.find(methodObj => {
-      if (methodObj.hasOwnProperty("name")) {
-        return (<MethodObject>methodObj).name === methodName;
-      }
-      return false;
-    });
-    if (undefined === methodOrReference) {
-      throw new Error(`schema description for ${methodName} not found`);
-    }
-    // FIXME check that we have a MethodObject
-    if (!methodOrReference.hasOwnProperty("name")) {
-      throw new Error(`schema description for ${methodName} must be expanded`);
-    }
-    return <MethodObject>methodOrReference;
-}
-
-//
+// -----------------------------------------------------------------------------
 // PUBLIC
-//
+// -----------------------------------------------------------------------------
+
 
 // context
 // -----------------------------------------------------------------------------
-// TODO move to impl/context
 
 /**
  * Construct a new request context.
  */
-export const context = (): RpcContext => {
-  return new RpcContext();
+export function context(): RpcContext {
+  return impl.context();
 };
 
 // options
 // -----------------------------------------------------------------------------
-// TODO move to impl/service
 
-export const options = (opt: RpcOptions): RpcOptions => {
-  return opt;
+/**
+ *
+ */
+export function options(
+  opt: Readonly<RpcOptions>,
+): RpcOptions {
+  return impl.options(opt);
 };
 
 // chain
 // -----------------------------------------------------------------------------
-// TODO move to impl/middleware? impl/router?
 
-export const chain = (rpcChain: RpcChain): RpcChain => {
-  return rpcChain;
+export function chain(
+  rpcChain: Readonly<RpcChain>,
+): Readonly<RpcChain> {
+  return impl.chain(rpcChain);
 }
 
 // middleware
 // -----------------------------------------------------------------------------
-// TODO move to impl/middleware? impl/router?
 
 /**
- * Turn an RpcChainFn, that returns either a Response or an updated
+ * Turn an RpcChainFn that returns either a Response or an updated
  * Context into a handler function that implements the expected
- * behaviour of an itty handler function, i.e. returns null (to continue
- * executing) or a Response (to stop routing and return the response
- * immediately).
+ * behaviour of an itty handler function:
+ * - returns null to continue executing
+ * - returns a Response to stop routing and return the response
+ *   immediately
  */
-export const middleware = (f: RpcChainFn): MiddlewareFn => {
-  // The itty router invokes treats handler functions as middleware if
-  // they have no return value, but if a Response is returned it
-  // short-circuits and returns the Response directly without evaluating
-  // any more handlers.
-  return async (request: Request, context: RpcContext): MiddlewareResult => {
-    const result = await f(request, context);
-    if (result instanceof Response) {
-      return Promise.resolve(result);
-    }
-  };
+export function middleware(
+  f: Readonly<RpcChainFn>,
+): MiddlewareFn {
+  return impl.middleware(f);
 };
 
 // response
 // -----------------------------------------------------------------------------
-// TODO move to impl/response?
 
 /**
  * Return an RPC response for a given request. The result to include in
@@ -257,13 +144,11 @@ export const middleware = (f: RpcChainFn): MiddlewareFn => {
  *
  * @return
  */
-export const response = async (request: RpcRequest, result: any): Promise<RpcResponse> => {
-  // TODO use jsonrpc methods to construct response
-  return Promise.resolve({
-    jsonrpc: "2.0",
-    id: request.id || null,
-    result,
-  });
+export async function response(
+  request: Readonly<RpcRequest>,
+  result: any,
+): Promise<Readonly<RpcResponse>> {
+  return impl.response(request, result);
 }
 
 // error
@@ -271,21 +156,24 @@ export const response = async (request: RpcRequest, result: any): Promise<RpcRes
 // TODO move to impl/response?
 
 /**
+ * @param request
+ * @param detail
  *
+ * @return
  */
-export function error(request: RpcRequest, detail: RpcErrorDetail): Promise<RpcError> {
-  return Promise.resolve(jsonrpc.error(request, detail));
+export function error(
+  request: Readonly<RpcRequest>,
+  detail: Readonly<RpcErrorDetail>,
+): Promise<Readonly<RpcError>> {
+  return impl.error(request, detail);
 };
 
 // methods
 // -----------------------------------------------------------------------------
-// TODO move to impl/method? impl/service?
-
 // NB: Symbol('...') always returns a *new* Symbol even if the symbol
-// key is the same. To intern a symbol in the "global symbol table"
-// use Symbol.for('...'), which returns the unique symbol
-// corresponding to the key. Use Symbol.keyFor() to extract the symbol
-// key from a Symbol.
+// key is the same. To intern a symbol in the "global symbol table" use
+// Symbol.for('...'), which returns the unique symbol corresponding to
+// the key. Use Symbol.keyFor() to extract the symbol key from a Symbol.
 
 /**
  * Given an OpenRPC schema and a sequence of RPC method implementations,
@@ -297,292 +185,140 @@ export function error(request: RpcRequest, detail: RpcErrorDetail): Promise<RpcE
  * @param schema An OpenRPC schema defining the API
  * @param methodList An array of RPC request method implementations
  */
-export function methods(schema: RpcSchema, methodSet: RpcMethodSet): RpcMethods {
-  const methodMap: RpcMethods = new Map();
-  for (const m of methodSet) {
-    //const { name: methodName, handler: methodFn, scopes: methodScopes } = m;
-    //const methodSym = Symbol.for(methodName.trim());
-    //const methodSchema = findMethod(schema, methodName);
-    /*
-      methodSym, {
-        name: methodSym,
-        schema: methodSchema,
-        scopes: methodScopes,
-        handler: methodFn,
-      })
-    */
-    methodMap.set(m.name, m);
-  }
-
-  // Extract the collection of expected method names.
-  const required: Set<symbol> = new Set(
-    schema.methods.map((method: MethodOrReference): symbol => {
-      if (method.hasOwnProperty("name")) {
-        return Symbol.for((<MethodObject>method).name);
-      } else {
-        throw new Error("schema method references are not currently supported");
-      }
-    })
-  );
-  // Extract the collection of supplied method names.
-  const supplied: Set<symbol> = new Set(methodMap.keys());
-  // Ensure that every RPC method defined in the schema has a matching
-  // handler function in the method map.
-  if (!set.subset(supplied, required)) {
-    const missing = set.difference(required, supplied);
-    const message = _.join(_.map([...missing], Symbol.keyFor), ', ');
-    throw new Error(`missing RPC methods: ${message}`);
-  }
-
-  return methodMap;
+export function methods(
+  schema: Readonly<RpcSchema>,
+  methodSet: Readonly<RpcMethodSet>,
+): Readonly<RpcMethods> {
+  return impl.methods(schema, methodSet);
 };
 
 // method
 // -----------------------------------------------------------------------------
-// TODO move to impl/method?
 
 /**
  *
  */
 export function method(
-  schema: RpcSchema,
-  serviceMethod: ServiceMethod,
-): RpcMethod {
-  const { name, scopes: methodScopes, handler: methodHandler } = serviceMethod;
-
-  const methodName = name.trim();
-  // TODO utility fn to make method symbol
-  const methodSym = Symbol.for(methodName);
-
-  // [ { <method> }, ..., { <method } ]
-  const methods: Array<MethodOrReference> = schema.methods;
-  // Look up the partial schema that describes the method being implemented.
-  const methodSchema = findMethod(schema, methodName);
-
-  if (undefined === methodSchema) {
-    throw Error(`can't find method ${name} in the schema`);
-  }
-
-  return {
-    name: methodSym,
-    schema: methodSchema,
-    scopes: methodScopes,
-    handler: methodHandler,
-  };
+  schema: Readonly<RpcSchema>,
+  serviceMethod: Readonly<ServiceMethod>,
+): Readonly<RpcMethod> {
+  return impl.method(schema, serviceMethod);
 }
 
 // handler
 // -----------------------------------------------------------------------------
 
-export function handler(f: RpcHandler): RpcHandler {
-  return f;
+/**
+ * @param f An RPC method handler function
+ * @param target The element to bind as "this" inside the handler
+ */
+export function handler(
+  f: Readonly<RpcHandler>,
+): Readonly<RpcHandler> {
+  return impl.handler(f);
 }
 
 // extensions
 // -----------------------------------------------------------------------------
 
 /**
- *
+ * @param schema
+ * @param methodSet
+ * @return
  */
-export function extensions(schema: RpcSchema, methodSet: RpcMethodSet): RpcMethods {
-  const methodMap: RpcMethods = new Map();
-  for (const m of methodSet) {
-    methodMap.set(m.name, m);
-  }
-  return methodMap;
+export function extensions(
+  schema: Readonly<RpcSchema>,
+  methodSet: Readonly<RpcMethodSet>,
+): Readonly<RpcMethods> {
+  return impl.extensions(schema, methodSet);
 }
 
 // extension
 // -----------------------------------------------------------------------------
 
-export function extension(schema: RpcSchema, ext: ServiceExtension): RpcMethod {
-  const { schema: methodSchema, scopes: methodScopes, handler: methodFn } = ext;
-
-  // TODO expand the method schema against the provided service schema.
-
-  const methodName = methodSchema.name.trim();
-  const methodSym = Symbol.for(methodName);
-
-  return {
-    name: methodSym,
-    schema: methodSchema,
-    scopes: methodScopes,
-    handler: methodFn,
-  };
-}
-
-// implement
-// -----------------------------------------------------------------------------
-// TODO move to impl/service
-
 /**
- * @param name the name of an RPC method name from your schema
- * @param f the RpcHandler function for the API method
+ * @param schema
+ * @param ext
+ * @return
  */
-/*
-function implement(
-  service: RpcService,
-  name: string,
-  handler: RpcHandler,
-  scopes: ScopeSet,
-): RpcService {
-  // [ { <method> }, ..., { <method } ]
-  const methods: Array<MethodOrReference> = service.schema.methods;
-
-  // Look up the partial schema that describes the method being implemented.
-  const schema = methods.find(method => ( method.name === name.trim() ));
-  if (undefined === schema) {
-    throw Error(`can't find ${name} in the schema`);
-  }
-
-  const methodName = Symbol.for(name.trim());
-
-  service.methods = service.methods.add(methodName, {
-    name: methodName,
-    schema,
-    scopes,
-    handler,
-  });
-
-  return service;
-};
-*/
+export function extension(
+  schema: Readonly<RpcSchema>,
+  ext: Readonly<ServiceExtension>,
+): Readonly<RpcMethod> {
+  return impl.extension(schema, ext);
+}
 
 // extend
 // -----------------------------------------------------------------------------
-// TODO move to impl/service
 
 /**
  * Extend a service with a method that isn't defined in the schema.
+ *
+ * @param service
+ * @param method
  */
 function extend(
-  service: RpcService,
-  ext: ServiceExtension,
-): RpcService {
-  const { schema: methodSchema, scopes: methodScopes, handler: methodFn } = ext;
-
-  const methodName = methodSchema.name.trim();
-  const methodSym = Symbol.for(methodName);
-
-  if (service.methods.has(methodSym)) {
-    throw new Error(`cannot replace method ${methodName} in service`);
-  }
-
-  // Add the supplied method schema to the service schema.
-  service.schema.methods.push(methodSchema);
-
-  const rpcMethod: RpcMethod = {
-    name: methodSym,
-    schema: methodSchema,
-    scopes: methodScopes,
-    handler: methodFn,
-  };
-
-  service.methods = service.methods.set(methodSym, rpcMethod);
-
-  return service;
+  service: Readonly<RpcService>,
+  method: Readonly<RpcMethod>,
+): Readonly<RpcService> {
+  return impl.extend(service, method);
 }
 
 // scope
 // -----------------------------------------------------------------------------
-// TODO move implementation to impl/scope.
 
 /**
- *
+ * @param name
+ * @return
  */
-export function scope(name: string | Scope): Scope {
-  return (typeof(name) === "string") ?
-    Symbol.for(name.trim().toLowerCase()) :
-    name
-  ;
+export function scope(
+  name: string | Scope,
+): Scope {
+  return impl.scope(name);
 }
 
 // scopes
 // -----------------------------------------------------------------------------
-// TODO move implementation to impl/scope.
 
 /**
- *
+ * @param list
+ * @return
  */
-export function scopes(list: Array<string|Scope>): ScopeSet {
-  return new Set(list.map(x => scope(x)));
+export function scopes(
+  list: ReadonlyArray<string|Scope>,
+): Readonly<ScopeSet> {
+  return impl.scopes(list);
 }
 
 // service
 // -----------------------------------------------------------------------------
-// TODO move implementation to impl/service.
 
 /**
- *
+ * @param schema
+ * @param allScopes
+ * @param methods
+ * @param extensions
+ * @param clientOptions
+ * @return
  */
 export function service(
-  schema: RpcSchema,
-  allScopes: ScopeSet,
-  methods: RpcMethods,
-  extensions: RpcMethods,
-  options: RpcOptions,
-): RpcService {
-  // We include the service discovery method by default.
-  options.rpcDiscover = (options?.rpcDiscover !== undefined) ?
-    options.rpcDiscover :
-    true
-  ;
-
-  // Add any extensions provided by the user or defined internally.
-  extensions.forEach((rpcMethod, rpcName) => {
-    methods.set(rpcName, rpcMethod);
-    // TODO full schema expansion; assuming we allow the extension
-    // schema to include references to component descriptions, etc.
-    // in the schema, we'll need to expand the definition.
-    schema.methods.push(rpcMethod.schema);
-  });
-
-  // Checks that all scopes required by methods AND extensions are
-  // declared at the component level. Throws if that is not the case.
-  preflightScopes(allScopes, methods, extensions);
-
-  let svc: RpcService = {
+  schema: Readonly<RpcSchema>,
+  allScopes: Readonly<ScopeSet>,
+  methods: Readonly<RpcMethods>,
+  extensions: Readonly<RpcMethods>,
+  clientOptions: Readonly<RpcOptions>,
+): Readonly<RpcService> {
+  return impl.service(
     schema,
-    scopes: allScopes,
+    allScopes,
     methods,
-  };
-
-  // The OpenRPC spec defines a mechanism for service discovery. The
-  // request method rpc.discover is added by default and when called
-  // returns an OpenRPC schema document (as JSON) for the service.
-  if (options.rpcDiscover) {
-    // TODO move into impl/discover.
-
-    // Because service discovery is enabled, add the standard rpc.discover
-    // RPC method (as defined by the OpenRPC specification) into the method map
-    // and update the schema.
-    svc = extend(svc, {
-      schema: {
-        name: "rpc.discover",
-        description: "Returns an OpenRPC schema as a description of this service",
-        params: [],
-        result: {
-          name: "OpenRPC Schema",
-          schema: {
-            "$ref": "https://raw.githubusercontent.com/open-rpc/meta-schema/master/schema.json"
-          }
-        }
-      },
-      // No scopes required to call rpc.discover.
-      scopes: scopes([]),
-      handler: handler(async (request, context): Promise<RpcResponse> => {
-        // TODO include extensions.
-        return response(request, schema);
-      }),
-    });
-  }
-
-  return svc;
+    extensions,
+    clientOptions,
+  );
 }
 
 // build
 // -----------------------------------------------------------------------------
-// TODO move implementation to impl/handler.
 
 /**
  * Construct an RPC request handler function.
@@ -597,41 +333,64 @@ export function service(
  * (optionally including an additional context Map), and which returns
  * an HTTP Response object.
  */
-export function build (
-  service: RpcService,
-  base: RpcPath,
-  root: RpcPath,
-  chain: RpcChain = [],
+export function build(
+  service: Readonly<RpcService>,
+  base: Readonly<RpcPath>,
+  root: Readonly<RpcPath>,
+  chain: Readonly<RpcChain> = [],
 ): OpenRpcHandler {
-  // Construct URL instances for validation purposes, even though we
-  // only bother with the path component of the resulting URLs.
-  const ignoredBase = "https://ignore.me";
+  return impl.build(
+    service,
+    base,
+    root,
+    chain,
+  );
+}
 
-  const baseURL = new URL(base, ignoredBase);
-  const basePath = baseURL.pathname;
+// client
+// -----------------------------------------------------------------------------
 
-  const rootURL = new URL(root, ignoredBase);
-  const rootPath = rootURL.pathname;
+/**
+ * @param durableObject
+ * @param name
+ * @param schema
+ * @param options
+ * @return
+ */
+export function client(
+  // TODO better type?
+  durableObject: DurableObjectNamespace,
+  name: string,
+  schema: RpcSchema,
+  options: RpcClientOptions = {},
+): RpcClient {
+  return impl.client(
+    durableObject,
+    name,
+    schema,
+    options,
+  );
+}
 
-  // The router handles POSTS to the rootPath by invoking an appropriate
-  // method from the method map to generate the result. Everything else
-  // generates a 404.
-  const rpcRouter = router.init(service, basePath, rootPath, chain);
+// discover
+// -----------------------------------------------------------------------------
 
-  // Return an RPC request handler.
-  //
-  // We pass in a context map to supply extra information during request
-  // handling. Extensions may be registered to populate the context with
-  // useful information, e.g. host-supplied information attached to the
-  // incoming request.
-  return async (request: Request, context: RpcContext = new Map()): Promise<Response> => {
-    // Returns a Promise<any> that resolves with the first matching
-    // route handler that returns something (or none at all if there is
-    // no match). In the case where no route matches we return an
-    // appropriate RPC error message.
-    //
-    // Make sure we clone the request we're handling, as each request
-    // can only be read once.
-    return rpcRouter.handle(request.clone(), context);
-  };
-};
+/**
+ * @param durableObject
+ * @param name
+ * @param options
+ *
+ * @return an RPC client stub for the discovered OpenRPC service
+ */
+export async function discover(
+  // TODO better type?
+  durableObject: DurableObjectNamespace,
+  name: string,
+  options: RpcClientOptions = {},
+): Promise<RpcClient> {
+  return impl.discover(
+    durableObject,
+    name,
+    options,
+  );
+}

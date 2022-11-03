@@ -2,6 +2,11 @@
  * @file src/middleware/authenticate.ts
  */
 
+import type {
+  RpcContext,
+  RpcRequest,
+} from "..";
+
 import { middleware } from "..";
 
 // TODO import jose
@@ -17,7 +22,7 @@ import { middleware } from "..";
  * @return a HTTP 401 error if the JWT is invalid, otherwise returns the
  * context updated with the set of claims contained within the JWT.
  */
-export default middleware(async (request, context) => {
+export default middleware(async (request: RpcRequest, context: RpcContext) => {
   // TODO
   return context;
-})
+});

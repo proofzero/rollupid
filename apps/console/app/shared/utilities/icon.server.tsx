@@ -46,7 +46,7 @@ type HeadersObject = {
 async function getUploadURL(
   metadata: ImageMetadata,
 ) {
-  const url = `${ICONS_SCHEMA}://${ICONS_HOST}/`;
+  const url = `${ICONS_SCHEMA}://${ICONS_HOST}:${ICONS_PORT}/`;
 
   const headers: HeadersObject = {
     "Content-Type": "application/json",

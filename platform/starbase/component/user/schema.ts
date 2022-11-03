@@ -1,6 +1,6 @@
-// schema.ts
+// user/schema.ts
 
-import { RpcSchema } from "@kubelt/openrpc";
+import type { RpcSchema } from "@kubelt/openrpc";
 
 const rpcSchema: RpcSchema = {
   openrpc: "1.0.0-rc1",

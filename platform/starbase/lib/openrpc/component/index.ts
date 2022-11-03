@@ -18,6 +18,7 @@ import type {
   RpcRequest,
   RpcResponse,
   RpcSchema,
+  RpcService,
   Scope,
   ScopeSet,
 } from "../index";
@@ -70,10 +71,10 @@ export type RpcResult = any;
 // Object and which is marked as an @method.
 type RpcCallable = (
   // The incoming RPC request.
-  params: RpcParams,
+  params: Readonly<RpcParams>,
   // A map that is used to pass in fields values as configured
   // by @requireField decorations on the called method.
-  input: RpcInput,
+  input: Readonly<RpcInput>,
   // A map that is used to set writable state for fields configured
   // by @requiredField decorations on the called method.
   output: RpcOutput,
@@ -83,7 +84,7 @@ type RpcCallable = (
 
   //context: Map<string, any>,
   //remote: Map<string, any>,
-) => RpcResult;
+) => Readonly<RpcResult>;
 
 /**
  * Defines a data field that this object manages. These fields may be
@@ -139,7 +140,7 @@ function mwAuthenticate(): MiddlewareFn {
 }
 
 // Check that the caller has the required scopes to invoke the requested method.
-function mwCheckScopes(scopes: RequiredScopes): MiddlewareFn {
+function mwCheckScopes(scopes: Readonly<RequiredScopes>): MiddlewareFn {
   return async (request: Request, context: RpcContext): MiddlewareResult => {
     // TODO check that the incoming request provides a valid claim for the
     // scopes required by the method that is being invoked.
@@ -160,7 +161,9 @@ function mwCheckScopes(scopes: RequiredScopes): MiddlewareFn {
  * we must take care to maintain the original prototype. The logic that applies
  * decorators at runtime does *not* do this for you.
  */
-export function component(schema: RpcSchema) {
+export function component(
+  schema: Readonly<RpcSchema>,
+) {
 
   return function<T extends { new (...args: any[]): {} }>(constructor: T) {
 
@@ -271,7 +274,7 @@ export function component(schema: RpcSchema) {
 
         // Construct RPC handler that conforms to the schema, using the
         // supplied methods to implement the defined service methods.
-        this._rpcHandler = this.initRPC(schema, methods);
+        this._rpcHandler = this._initRPC(schema, methods);
       }
 
       /**
@@ -309,7 +312,11 @@ export function component(schema: RpcSchema) {
           //console.log(`methodFn: ${methodFn} (for ${className})`);
 
           // The handler for the RPC call.
-          const handler = openrpc.handler(async (request, context): Promise<RpcResponse> => {
+          const handler = async (
+            service: Readonly<RpcService>,
+            request: Readonly<RpcRequest>,
+            context: Readonly<RpcContext>,
+          ): Promise<Readonly<RpcResponse>> => {
             // TODO check scopes on incoming request, make sure that the required scopes
             // have been granted to the caller. Checked in middleware already?
 
@@ -317,7 +324,7 @@ export function component(schema: RpcSchema) {
             const requestParams: RpcParams = this._prepareParams(request);
 
             // For each field, if read permission for this method, read
-            // the value and store in the map.
+            // the value from durable object state and store in the map.
             const fieldInput = await this._prepareInput(fieldSet);
 
             // The map we inject into the RpcCallable to allow the developer to provide
@@ -340,8 +347,11 @@ export function component(schema: RpcSchema) {
             // Write the output values to durable storage.
             await this._storeOutput(fieldSet, checkedOutput);
 
+            // Gets all state stored in the object.
+            //console.log(await this._state.storage.list());
+
             return openrpc.response(request, requestResult);
-          });
+          };
           // Construct a handler for the RPC method.
           const rpcMethod: RpcMethod = openrpc.method(schema, {
             name: rpcName,
@@ -351,8 +361,6 @@ export function component(schema: RpcSchema) {
 
           methods.push(rpcMethod);
         }
-        //console.log("rpc methods:");
-        //console.log(methods);
 
         return methods;
       }
@@ -360,7 +368,9 @@ export function component(schema: RpcSchema) {
       /**
        * Extract the JSON-RPC request params and return them as a Map.
        */
-      private _prepareParams(request: RpcRequest): RpcParams {
+      private _prepareParams(
+        request: Readonly<RpcRequest>,
+      ): Readonly<RpcParams> {
         const requestParams: RpcParams = new Map();
 
         if (_.isArray(request.params)) {
@@ -381,10 +391,10 @@ export function component(schema: RpcSchema) {
        * Return the set of fields that the user has declared and
        * provided read access to.
        */
-      private async _prepareInput(fields: FieldSet): Promise<RpcInput> {
+      private async _prepareInput(
+        fields: Readonly<FieldSet>,
+      ): Promise<RpcInput> {
         const fieldInput: RpcInput = new Map();
-
-        console.log(fields);
 
         // Produce a list of keys to read from storage.
         const readKeys: Array<string> = [];
@@ -413,7 +423,10 @@ export function component(schema: RpcSchema) {
       /**
        *
        */
-      private _checkOutput(fieldMap: FieldMap, output: RpcOutput): RpcOutput {
+      private _checkOutput(
+        fieldMap: Readonly<FieldMap>,
+        output: RpcOutput,
+      ): RpcOutput {
         // Drop any outputs that are not declared as required.
         const declared = this._checkOutputDeclared(fieldMap, output);
         // Drop any outputs that there is no write permission for.
@@ -429,7 +442,10 @@ export function component(schema: RpcSchema) {
       /**
        *
        */
-      private _checkOutputDeclared(fields: FieldMap, output: RpcOutput): RpcOutput {
+      private _checkOutputDeclared(
+        fields: Readonly<FieldMap>,
+        output: RpcOutput,
+      ): RpcOutput {
         // Utility to return the keys of a map as a set of symbols.
         function keysToSymbolSet(m: Map<string, any>): Set<Symbol> {
           const s: Set<Symbol> = new Set();
@@ -461,7 +477,10 @@ export function component(schema: RpcSchema) {
       /**
        *
        */
-      private _checkOutputPermitted(fields: FieldMap, output: RpcOutput): RpcOutput {
+      private _checkOutputPermitted(
+        fields: Readonly<FieldMap>,
+        output: Readonly<RpcOutput>,
+      ): Readonly<RpcOutput> {
         for (const [fieldName, fieldValue] of output.entries()) {
           const field = fields.get(Symbol.for(fieldName));
           if (field && !field.perms.has(FieldAccess.Write)) {
@@ -480,19 +499,27 @@ export function component(schema: RpcSchema) {
        * Store the output fields produced by an invocation of an RpcCallable.
        */
       private async _storeOutput(
-        fields: FieldSet,
-        fieldOutput: RpcOutput,
+        fields: Readonly<FieldSet>,
+        fieldOutput: Readonly<RpcOutput>,
       ): Promise<any> {
         // Construct an object containing the values to be stored;
         // property names are used as the key name of the value to
         // store.
         interface StorageObject {
-          [index: string]: any;
+          [key: string]: any;
         }
         const entries: StorageObject = {};
         for (const [outName, outValue] of fieldOutput) {
-          console.log(`setting field ${outName} => ${outValue}`);
+          console.log(`setting field "${outName}" => ${JSON.stringify(outValue, null, 2)}`);
           entries[outName] = outValue;
+        }
+
+        // NB: storage.put() supports up to 128 key/value pairs at a
+        // time.  Each key is limited to a maximum size of 2048 bytes
+        // and each value is limited to 128 KiB (131072 bytes).
+        const maxPairs = 128;
+        if (fieldOutput.size > maxPairs) {
+          console.warn(`tried to store more than ${maxPairs} at a time`);
         }
 
         return this._state.storage.put(entries);
@@ -537,13 +564,41 @@ export function component(schema: RpcSchema) {
       /**
        *
        */
-      initRPC(rpcSchema: RpcSchema, rpcMethods: Array<RpcMethod>): OpenRpcHandler {
+      _initRPC(
+        rpcSchema: Readonly<RpcSchema>,
+        rpcMethods: ReadonlyArray<RpcMethod>,
+      ): OpenRpcHandler {
         // Defines an "extension" (an RPC method not declared in the
         // schema, but which bundles its own method schema) to return a
         // set of the scopes declared by a component.
-        //
-        // TODO define require scope(s) to invoke
-        // TODO update handler signature to match pure handler impl
+
+        // TODO update handler signatures to match pure handler impl
+
+        const cmdPing = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "cmp.ping",
+            summary: "Reply to a PING with a PONG",
+            params: [],
+            result: {
+              name: "result",
+              description: "The eternal reply to a PING",
+              schema: {
+                "const": "PONG",
+              },
+            },
+          },
+          scopes: openrpc.scopes([]),
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              return openrpc.response(request, "PONG");
+            },
+          ),
+        });
+
         const cmpScopes = openrpc.extension(rpcSchema, {
           schema: {
             name: "cmp.scopes",
@@ -561,24 +616,58 @@ export function component(schema: RpcSchema) {
           scopes: openrpc.scopes([
             "owner",
           ]),
-          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
-            // Construct the result object describing the available methods and
-            // their required scopes. Note that this._methods is an array of RPC method
-            // implementations (functions); each has a ._method property (a Symbol) that
-            // is the key in the this._scopes map that can be used to look up the scopes
-            // required to invoke the method.
-            const scopes = [];
-            for (const scope of allScopes) {
-              scopes.push(scope.description);
-            }
-            const result = {
-              scopes,
-            };
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              // Construct the result object describing the available methods and
+              // their required scopes. Note that this._methods is an array of RPC method
+              // implementations (functions); each has a ._method property (a Symbol) that
+              // is the key in the this._scopes map that can be used to look up the scopes
+              // required to invoke the method.
+              const scopes = [];
+              for (const scope of allScopes) {
+                scopes.push(scope.description);
+              }
+              const result = {
+                scopes,
+              };
 
-            // TODO result doesn't yet include scopes for "extensions", the methods we
-            // implement internally.
-            return openrpc.response(request, result)
-          }),
+              // TODO result doesn't yet include scopes for "extensions", the methods we
+              // implement internally.
+              return openrpc.response(request, result);
+            },
+          ),
+        });
+
+        const cmpSnapshot = openrpc.extension(rpcSchema, {
+          schema: {
+            name: "cmp.snapshot",
+            summary: "Store a snapshot of the component data",
+            params: [],
+            result: {
+              name: "version",
+              description: "A version number for the snapshot",
+              schema: {
+                type: "integer",
+              },
+            },
+            errors: [],
+          },
+          scopes: openrpc.scopes([
+            "owner",
+          ]),
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              return openrpc.response(request, "Not Yet Implemented");
+            },
+          ),
         });
 
         // TODO define required scopes(s) to invoke.
@@ -600,16 +689,22 @@ export function component(schema: RpcSchema) {
           scopes: openrpc.scopes([
             "owner",
           ]),
-          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
-            // Deletes all keys and values, effectively deallocating all storage
-            // used by the durable object. NB: If a failure occurs while deletion
-            // is in progess, only a subset of the data may be deleted.
-            await this._state.storage.deleteAll();
-            const result = {
-              deleted: true,
-            };
-            return openrpc.response(request, result)
-          }),
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              // Deletes all keys and values, effectively deallocating all storage
+              // used by the durable object. NB: If a failure occurs while deletion
+              // is in progess, only a subset of the data may be deleted.
+              await this._state.storage.deleteAll();
+              const result = {
+                deleted: true,
+              };
+              return openrpc.response(request, result);
+            },
+          ),
         });
 
         // TODO make this part of graph.@node decorator.
@@ -629,9 +724,15 @@ export function component(schema: RpcSchema) {
           scopes: openrpc.scopes([
             "owner",
           ]),
-          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
-            return openrpc.response(request, { invoked: "graph.link" });
-          }),
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              return openrpc.response(request, { invoked: "graph.link" });
+            },
+          ),
         });
 
         // TODO make this part of graph.@node decorator.
@@ -651,16 +752,24 @@ export function component(schema: RpcSchema) {
           scopes: openrpc.scopes([
             "owner",
           ]),
-          handler: openrpc.handler(async (request, context): Promise<RpcResponse> => {
-            return openrpc.response(request, { invoked: "graph.edges" });
-          }),
+          handler: openrpc.handler(
+            async (
+              service: Readonly<RpcService>,
+              request: Readonly<RpcRequest>,
+              context: Readonly<RpcContext>,
+            ): Promise<RpcResponse> => {
+              return openrpc.response(request, { invoked: "graph.edges" });
+            },
+          ),
         });
 
         // Supply implementations for all of the API methods in the schema.
         const methods = openrpc.methods(rpcSchema, rpcMethods);
 
         const extensions = openrpc.extensions(rpcSchema, [
+          cmdPing,
           cmpScopes,
+          cmpSnapshot,
           cmpDelete,
           graphLink,
           graphEdges,
@@ -750,8 +859,9 @@ export function component(schema: RpcSchema) {
  * Individual methods and fields may protect their invocation or access
  * with any of these scopes by using an appropriate decorator.
  */
-export function scopes(scopes: Array<string>) {
-
+export function scopes(
+  scopes: ReadonlyArray<string>,
+) {
   // Turn each scope string into a Symbol.
   const scopeSet: ScopeSet = new Set(
     scopes.map(scope => {
@@ -778,7 +888,12 @@ export function scopes(scopes: Array<string>) {
 // @field
 // -----------------------------------------------------------------------------
 
-export function field(fieldSpec: FieldSpec) {
+/**
+ *
+ */
+export function field(
+  fieldSpec: Readonly<FieldSpec>,
+) {
 
   // TODO get collection of fields defined so far
   // TODO check that current field name doesn't conflict with existing fields
@@ -804,7 +919,9 @@ export function field(fieldSpec: FieldSpec) {
  * @param schemaMethod the name of the schema method the decorated class
  * method implements.
  */
-export function method(schemaMethod: string) {
+export function method(
+  schemaMethod: string,
+) {
   // - target: class constructor function for static member OR the
   //   prototype of the class for an instance member
   // - propertyKey: the name of the member
@@ -844,9 +961,9 @@ export function method(schemaMethod: string) {
  * method. Any such scope must have been declared at the class level using
  * the @scopes decorator or an error is thrown on construction.
  */
-export function requiredScope(scope: string | Symbol) {
-  //console.log("factory: @requiredScope");
-
+export function requiredScope(
+  scope: string | Symbol,
+) {
   // The decorator argument is the name of a scope declared on the class.
   //
   // NB: We may want to support passing in an array of scopes.
@@ -915,7 +1032,10 @@ export function requiredScope(scope: string | Symbol) {
 // @requiredField
 // -----------------------------------------------------------------------------
 
-export function requiredField(name: string, perms: FieldPerms) {
+export function requiredField(
+  name: string,
+  perms: Readonly<FieldPerms>,
+) {
 
   const fieldName = Symbol.for(name.trim());
 

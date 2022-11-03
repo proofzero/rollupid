@@ -121,7 +121,9 @@ function checkRequestValidFn(): MiddlewareFn {
  * @param methods A map of the available RPC methods
  * @return a router middleware
  */
-const checkMethodExistsFn = (methods: RpcMethods): MiddlewareFn => {
+const checkMethodExistsFn = (
+  service: Readonly<RpcService>,
+): MiddlewareFn => {
   /**
    * @param request
    * @param context
@@ -129,7 +131,7 @@ const checkMethodExistsFn = (methods: RpcMethods): MiddlewareFn => {
   return async (request: Request, context: RpcContext): MiddlewareResult => {
     const rpcRequest = context.get(REQUEST_CONTEXT_KEY);
     const rpcMethod = Symbol.for(rpcRequest.method.trim());
-    if (!methods.has(rpcMethod)) {
+    if (!service.methods.has(rpcMethod) && !service.extensions.has(rpcMethod)) {
       const rpcError = jsonrpc.error(rpcRequest, jsonrpc.ERROR_METHOD_NOT_FOUND);
       return jsonrpc.response(rpcError);
     }
@@ -143,7 +145,11 @@ const checkMethodExistsFn = (methods: RpcMethods): MiddlewareFn => {
  * Return a middleware that checks that the incoming RPC request
  * parameters conform to what is described in the schema.
  */
-function checkParamsValidFn(schema: RpcSchema): MiddlewareFn {
+function checkParamsValidFn(
+  service: Readonly<RpcService>,
+): MiddlewareFn {
+
+  const schema = service.schema;
 
   // TODO perform schema expansion, replacing all $ref by the referents.
   //const expanded = schema.expand(schema);
@@ -171,7 +177,10 @@ function checkParamsValidFn(schema: RpcSchema): MiddlewareFn {
   /**
    *
    */
-  return async (request: Request, context: RpcContext): MiddlewareResult => {
+  return async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>,
+  ): MiddlewareResult => {
 
     const rpcRequest = context.get(REQUEST_CONTEXT_KEY);
     // TODO extract request parameters
@@ -187,17 +196,25 @@ function checkParamsValidFn(schema: RpcSchema): MiddlewareFn {
  * Return an RPC handler function that executes after all middleware
  * have completed to process the RPC request.
  */
-function rpcHandlerFn(methods: RpcMethods): MiddlewareFn {
+function rpcHandlerFn(
+  service: Readonly<RpcService>,
+): MiddlewareFn {
 
   // Is there a better place for this?
-  function errorHandler(error: JsonRpcError): RpcHandler {
-    return (request: RpcRequest, context: RpcContext): Promise<RpcError> => {
+  function errorHandler(error: JsonRpcError): Readonly<RpcHandler> {
+    return (
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ): Promise<RpcError> => {
       return Promise.resolve(jsonrpc.error(request, error));
     };
   }
 
   const internalError = errorHandler(jsonrpc.ERROR_INTERNAL);
   const notFoundError = errorHandler(jsonrpc.ERROR_METHOD_NOT_FOUND);
+
+  const methods: RpcMethods = service.methods;
+  const extensions: RpcMethods = service.extensions;
 
   /**
    * Invoked by the router to handle a Request to the RPC endpoint.
@@ -208,19 +225,31 @@ function rpcHandlerFn(methods: RpcMethods): MiddlewareFn {
    * @return A function that handles the a valid RPC request by
    * dispatching it to the appropriate service method.
    */
-  return async (request: Request, context: RpcContext): MiddlewareResult => {
+  return async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>,
+  ): MiddlewareResult => {
 
     const rpcRequest = context.get(REQUEST_CONTEXT_KEY);
 
-    const rpcMethod = methods.get(Symbol.for(rpcRequest.method));
+    const method = methods.get(Symbol.for(rpcRequest.method));
+    const extension = extensions.get(Symbol.for(rpcRequest.method));
+
+    const found = method || extension;
 
     // This returns the RPC method implementation function. These return
-    // a Response when invoked.
-    const handler = ( undefined === rpcMethod ) ?
-      notFoundError :
-      ( rpcMethod?.handler || internalError );
+    // a Response when invoked. Note that the handler is propagated as a
+    // Readonly<RpcHandler> so we need to "unwrap" it in order to be
+    // able to call it (otherwise we get the error "Type
+    // Readonly<RpcHandler> has no call signatures).
+    const handler: RpcHandler = <RpcHandler>(
+      ( undefined === found ) ?
+        notFoundError :
+        ( found?.handler || internalError )
+    );
+
     // Generate a JSON-RPC response.
-    const rpcResponse = await handler(rpcRequest, context);
+    const rpcResponse = await handler(service, rpcRequest, context);
     // Translate JSON-RPC response into Response.
     const response = jsonrpc.response(rpcResponse);
 
@@ -244,10 +273,10 @@ function rpcHandlerFn(methods: RpcMethods): MiddlewareFn {
  * @return a Router instance
  */
 export function init(
-  service: RpcService,
+  service: Readonly<RpcService>,
   basePath: string,
   rootPath: string,
-  chain: RpcChain,
+  chain: Readonly<RpcChain>,
 ): Router {
   // Requests under the base path are managed by the router, by default
   // returning a 404 response. If the request happens to match the root path,
@@ -269,12 +298,12 @@ export function init(
   const validRequest = checkRequestValidFn();
   // A handler that checks for the existence of a handler for the
   // incoming method.
-  const methodExists = checkMethodExistsFn(service.methods);
+  const methodExists = checkMethodExistsFn(service);
   // A handler that checks whether or not the request parameters are valid.
-  const validParams = checkParamsValidFn(service.schema);
+  const validParams = checkParamsValidFn(service);
   // The chain terminating handler that invokes the requested method to
   // generate the RPC response.
-  const handler = rpcHandlerFn(service.methods);
+  const handler = rpcHandlerFn(service);
 
   const handlerChain = _.concat(chain, [
     parse,

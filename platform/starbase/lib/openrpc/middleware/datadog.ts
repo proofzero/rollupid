@@ -2,6 +2,11 @@
  * @file src/middleware/datadog.ts
  */
 
+import type {
+  RpcContext,
+  RpcRequest,
+} from "..";
+
 import { middleware } from "..";
 
 // datadog
@@ -13,7 +18,7 @@ import { middleware } from "..";
  * @todo add constructor function to inject secrets/config and return
  * this fn.
  */
-export default middleware(async (request, context) => {
+export default middleware(async (request: RpcRequest, context: RpcContext) => {
   // TODO
   return context;
 });
