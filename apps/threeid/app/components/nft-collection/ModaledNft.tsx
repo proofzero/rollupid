@@ -7,6 +7,7 @@ import Text, {
   TextSize,
   TextWeight,
 } from '~/components/typography/Text'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
 const ModaledNft = ({ nft }: any) => {
   const [showModal, setShowModal] = useState(false)
@@ -42,7 +43,7 @@ const ModaledNft = ({ nft }: any) => {
           </Text>
         </div>
 
-        <img className="w-full" src={nft.url} />
+        <img className="w-full" src={gatewayFromIpfs(nft.url)} />
       </div>
     </>
   )
