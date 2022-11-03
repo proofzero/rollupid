@@ -3896,7 +3896,7 @@ __metadata:
     date-fns: 2.29.3
     tiny-invariant: 1.3.1
     typescript: 4.8.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
   languageName: unknown
   linkType: soft
 
@@ -3916,7 +3916,7 @@ __metadata:
     lodash: 4.17.21
     npm-run-all: 4.1.5
     typescript: 4.8.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
   languageName: unknown
   linkType: soft
 
@@ -3965,11 +3965,11 @@ __metadata:
 
 "@kubelt/do.starbase-contract@file:../component/contract::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
   version: 0.1.0
-  resolution: "@kubelt/do.starbase-contract@file:../component/contract#../component/contract::hash=d04920&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
+  resolution: "@kubelt/do.starbase-contract@file:../component/contract#../component/contract::hash=bb5d20&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
   dependencies:
     "@kubelt/openrpc": "file:../../lib/openrpc"
     cross-env: 7.0.3
-  checksum: 00d12ff0b3d02c6f98d180711ffa5b886a5165e2963f8cbb74e2ef82b3d89cd07c89608f2038178ccc010b9cb245e7fdf5e27ff2695bead6a45ad0f882baa495
+  checksum: 04d1156a1f880e9c33c395220b3c32f9de9003d1f0fcd108a46995be26d27234326ce5c636a4dce2561a0d9155cb6eaf3b166e4e9c757a020de55e815f6668cc
   languageName: node
   linkType: hard
 
@@ -3984,11 +3984,11 @@ __metadata:
 
 "@kubelt/do.starbase-user@file:../component/user::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
   version: 0.1.0
-  resolution: "@kubelt/do.starbase-user@file:../component/user#../component/user::hash=8de8cc&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
+  resolution: "@kubelt/do.starbase-user@file:../component/user#../component/user::hash=95c2e3&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
   dependencies:
     "@kubelt/openrpc": "file:../../lib/openrpc"
     cross-env: 7.0.3
-  checksum: afe1892c7c2b3bf0613849d5bfcf50d3a5f66dbabfbb5d92fd5c33c9e9af2e4b4b0563d0cfbe44b87b226c634e808aa0f8eb682f1e8d02dfdb49c29ffc4ac980
+  checksum: 59d97df5d8c30eccdb318e0eec7c1c5dbd14dc508f3400a519b69ef8445b8febb4fe1942f89edc4bc303057d173d6c6e493e4daa196c709517670308feed4ec1
   languageName: node
   linkType: hard
 
@@ -4035,9 +4035,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3Dd04920%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3Dbb5d20%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
   version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=1eb72c&locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3Dd04920%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=1eb72c&locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3Dbb5d20%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
   dependencies:
     "@cfworker/json-schema": 1.12.5
     "@open-rpc/meta-schema": 1.14.2
@@ -4069,9 +4069,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D8de8cc%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D95c2e3%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
   version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=1eb72c&locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D8de8cc%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=1eb72c&locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D95c2e3%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
   dependencies:
     "@cfworker/json-schema": 1.12.5
     "@open-rpc/meta-schema": 1.14.2
@@ -11974,7 +11974,7 @@ __metadata:
     tiny-invariant: 1.3.1
     typescript: 4.8.4
     wagmi: 0.7.5
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -16622,7 +16622,7 @@ __metadata:
     concurrently: 7.5.0
     graphql: 16.6.0
     typescript: 4.8.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -20579,7 +20579,7 @@ __metadata:
     "@playwright/test": ^1.27.1
     graphql: 16.6.0
     typescript: 4.8.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -23822,7 +23822,7 @@ __metadata:
     webpack: 5.74.0
     webpack-cli: 4.10.0
     webpack-merge: 5.8.0
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -24407,7 +24407,7 @@ __metadata:
     tailwindcss: 3.1.8
     typescript: 4.7.4
     wagmi: 0.6.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -25898,7 +25898,7 @@ __metadata:
     tailwindcss: 3.1.8
     typescript: 4.7.4
     wagmi: 0.6.7
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -28787,7 +28787,7 @@ __metadata:
     tw-elements: 1.0.0-alpha12
     typescript: 4.7.4
     wagmi: 0.6.4
-    wrangler: 2.1.13
+    wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -31528,9 +31528,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:2.1.13":
-  version: 2.1.13
-  resolution: "wrangler@npm:2.1.13"
+"wrangler@npm:2.1.15":
+  version: 2.1.15
+  resolution: "wrangler@npm:2.1.15"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.2.0
     "@esbuild-plugins/node-globals-polyfill": ^0.1.1
@@ -31554,7 +31554,7 @@ __metadata:
   bin:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
-  checksum: 042b393ffb698cf1c10b9079b12d2081a7c77ca27d3f6cc610287bbcb6a7a8269f10e1108dcd0ff62e95f61113661795f7bc62618c8f0ddc87460ae5f07aba22
+  checksum: 77a56118256b24f87cd5cd87dca25488d71774f1af970d1eb1d617208fcb9cca144f659be65c4350671e46fff9d2de4ae89b751edc1af07a7569cb0ee3f86a8d
   languageName: node
   linkType: hard
 
