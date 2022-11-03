@@ -6,44 +6,46 @@ compatibility_date = "2022-10-05"
 
 # We'll access these services through their external names.
 workers_dev = false
-route = { pattern = "icons-dev.kubelt.com/*", zone_name = "kubelt.com" }
 
 # Secrets are set via the dashboard, or using the wrangler CLI:
 # $ wrangler secret put <KEY> [--env]
 #
 # Required secrets:
-# - AUTH_EMAIL
-# - AUTH_KEY
-
-# NB: set the value for ACCOUNT_ID when publishing worker:
-# npx wrangler --var ACCOUNT_ID=<...>
+# - CLOUDFLARE_ACCOUNT_ID: the CF account ID of the uploaded image owner
+# - CLOUDFLARE_IMAGES_KEY: an API token with Images permissions
 
 [env.dev]
 name = "icons-dev"
-route = { pattern = "icons-dev.kubelt.com/*", zone_name = "kubelt.com" }
+routes = [
+  { pattern = "icons-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
 
 [env.dev.vars]
 # The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes
-# - maximum: 6 hours
-UPLOAD_WINDOW_SECONDS = 15
+# - minimum: 2 minutes (120)
+# - maximum: 6 hours (21600)
+UPLOAD_WINDOW_SECONDS = 200
 
 [env.next]
 name = "icons-next"
-route = { pattern = "icons-next.kubelt.com/*", zone_name = "kubelt.com" }
+routes = [
+  { pattern = "icons-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
 
 [env.next.vars]
 # The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes
-# - maximum: 6 hours
-UPLOAD_WINDOW_SECONDS = 15
+# - minimum: 2 minutes (120)
+# - maximum: 6 hours (21600)
+UPLOAD_WINDOW_SECONDS = 200
 
 [env.current]
 name = "icons-prod"
-route = { pattern = "icons.kubelt.com/*", zone_name = "kubelt.com" }
+routes = [
+  { pattern = "icons.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+]
 
 [env.current.vars]
 # The duration in seconds that returned upload URL is good for.
-# - minimum: 2 minutes
-# - maximum: 6 hours
-UPLOAD_WINDOW_SECONDS = 15
+# - minimum: 2 minutes (120)
+# - maximum: 6 hours (21600)
+UPLOAD_WINDOW_SECONDS = 200

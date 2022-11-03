@@ -28,11 +28,8 @@ export interface Env {
   // associated with.
   CLOUDFLARE_ACCOUNT_ID: string;
 
-  // The e-mail address associated with the owner account.
-  CLOUDFLARE_AUTH_EMAIL: string;
-
-  // A bearer token providing access to the Cloudflare Images API.
-  CLOUDFLARE_AUTH_KEY: string;
+  // An API token with write permissions for the Images service.
+  CLOUDFLARE_IMAGES_KEY: string;
 
   // Environment variables
   // ---------------------------------------------------------------------------
@@ -96,8 +93,7 @@ export default {
     const uploadRequest = new Request(url, {
       method: "POST",
       headers: {
-        "X-Auth-Email": env.CLOUDFLARE_AUTH_EMAIL,
-        "X-Auth-Key": env.CLOUDFLARE_AUTH_KEY,
+        "Authorization": `Bearer ${env.CLOUDFLARE_IMAGES_KEY}`,
       },
       // NB: do *not* explicitly set the Content-Type header to
       // "multipart/form-data"; this prevents the header from being set
@@ -136,10 +132,11 @@ export default {
     const result = JSON.stringify(direct_upload.result);
 
     return new Response(result, {
-       headers: {
-         "Content-Type": "application/json",
-       },
-       status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      status: 200,
     });
+
   },
 };
