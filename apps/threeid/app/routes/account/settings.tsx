@@ -55,9 +55,9 @@ export default function AccountSetting() {
           >
             <span className="mr-3.5">
               {notifyPillVal.success ? (
-                <HiCheckCircle className="text-green-800" />
+                <HiCheckCircle className="text-green-400" />
               ) : (
-                <HiXCircle className="text-red-800" />
+                <HiXCircle className="text-red-400" />
               )}
             </span>
 
