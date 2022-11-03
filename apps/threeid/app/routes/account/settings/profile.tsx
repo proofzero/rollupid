@@ -120,7 +120,7 @@ export default function AccountSettingsProfile() {
 
   const transition = useTransition()
   useEffect(() => {
-    if (transition.state === 'loading') {
+    if (transition.type === 'actionReload') {
       notificationHandler(!!!actionData?.errors)
     }
   }, [transition])
