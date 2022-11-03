@@ -1,7 +1,7 @@
 /**
  * this is the main configuration file of your bit workspace.
  * for full documentation, please see: https://bit.dev/docs/workspace/workspace-configuration
- **/{
+ **/ {
   "$schema": "https://static.bit.dev/teambit/schemas/schema.json",
   /**
    * main configuration of the Bit workspace.
@@ -10,11 +10,11 @@
     /**
      * the name of the component workspace. used for development purposes.
      **/
-    "name": "components",
+    "name": "UI Components",
     /**
      * set the icon to be shown on the Bit server.
      **/
-    "icon": "https://static.bit.dev/bit-logo.svg",
+    "icon": "https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/889da8f8-6299-4b34-e463-3606b5925100/public",
     /**
      * default directory to place a component during `bit import` and `bit create`.
      * the following placeholders are available:

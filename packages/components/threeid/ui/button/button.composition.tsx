@@ -9,6 +9,10 @@ export const SecondaryButton = () => {
   return <Button secondary>hello world!</Button>;
 };
 
+export const TertiaryButton = () => {
+  return <Button tertiary>hello world!</Button>;
+};
+
 export const DisabledButton = () => {
   return <Button disabled>hello world!</Button>;
 };
