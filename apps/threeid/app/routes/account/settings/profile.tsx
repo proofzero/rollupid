@@ -1,4 +1,10 @@
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useOutletContext,
+  useTransition,
+} from '@remix-run/react'
 import { FaAt, FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 import InputText from '~/components/inputs/InputText'
@@ -16,7 +22,7 @@ import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getCachedVoucher } from '~/helpers/voucher'
 
@@ -93,6 +99,8 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsProfile() {
+  const { notificationHandler } = useOutletContext<any>()
+
   const {
     displayName,
     job,
@@ -109,6 +117,13 @@ export default function AccountSettingsProfile() {
   const [isToken, setIsToken] = useState(pfp.isToken)
 
   const actionData = useActionData()
+
+  const transition = useTransition()
+  useEffect(() => {
+    if (transition.state === 'loading') {
+      notificationHandler(!!!actionData?.errors)
+    }
+  }, [transition])
 
   const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
 
