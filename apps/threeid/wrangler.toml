@@ -24,7 +24,8 @@ kv_namespaces = [
 # Services binding for local development
 services = [
   { binding = "OORT", service = "oort"},
-  { binding = "GALAXY", service = "galaxy"}
+  { binding = "GALAXY", service = "galaxy"},
+  { binding = "ICONS", service = "icons-dev"},
 ]
 
 [site]
@@ -51,7 +52,8 @@ routes = [
 ]
 services = [
   { binding = "OORT", service = "oort-devnet"},
-  { binding = "GALAXY", service = "galaxy-dev"}
+  { binding = "GALAXY", service = "galaxy-dev"},
+  { binding = "ICONS", service = "icons-dev"},
 ]
 
 # next (staging)
@@ -68,7 +70,8 @@ kv_namespaces = [
 ]
 services = [
   { binding = "OORT", service = "oort-testnet"},
-  { binding = "GALAXY", service = "galaxy-next"}
+  { binding = "GALAXY", service = "galaxy-next"},
+  { binding = "ICONS", service = "icons-next"},
 ]
 [env.next.build]
   command = "yarn build && remix build"
@@ -85,7 +88,8 @@ kv_namespaces = [
 ]
 services = [
   { binding = "OORT", service = "oort-mainnet"},
-  { binding = "GALAXY", service = "galaxy-current"}
+  { binding = "GALAXY", service = "galaxy-current"},
+  { binding = "ICONS", service = "icons-current"},
 ]
 [env.current.build]
   command = "yarn build && remix build"

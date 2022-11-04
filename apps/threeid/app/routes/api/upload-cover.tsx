@@ -8,50 +8,26 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  let cfUploadUrlRes: {
+  const cfUploadUrlRes: {
     id: string
     uploadURL: string
-  }
+    // @ts-ignore
+  } = await ICONS.fetch('http://127.0.0.1/').then((res) => res.json())
 
-  try {
-    // TODO: Replace with service binding
-    cfUploadUrlRes = await fetch('https://icons.kubelt.com').then((res) =>
-      res.json()
-    )
-  } catch (ex) {
-    return json('Unable to generate upload URL', {
-      status: 500,
-    })
-  }
-
-  let cfUploadRes: {
+  const cfUploadRes: {
     success: boolean
     result: {
       variants: string[]
     }
-  }
-
-  try {
-    cfUploadRes = await fetch(cfUploadUrlRes.uploadURL, {
-      method: 'POST',
-      body: formData,
-    }).then((res) => res.json())
-  } catch (ex) {
-    return json('Unable to upload image', {
-      status: 500,
-    })
-  }
+  } = await fetch(cfUploadUrlRes.uploadURL, {
+    method: 'POST',
+    body: formData,
+  }).then((res) => res.json())
 
   // Assuming public variant is the intended one for now
   const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
     v.endsWith('public')
   )
-
-  if (publicVariantUrls.length === 0) {
-    return json('Unable to locate public variant', {
-      status: 500,
-    })
-  }
 
   const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
