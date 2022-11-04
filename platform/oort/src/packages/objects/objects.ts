@@ -52,6 +52,10 @@ export default class Objects extends JSONRPC {
     if (version > 0) {
       const objectKey = getObjectKey(this.core.id, baseKey, version)
       const stored = await OBJECTS.get(objectKey, options)
+      if (!stored) {
+        await this.deleteIndexRecord(indexKey)
+        return { value, version }
+      }
       if ((stored as R2ObjectBody).body) {
         value = await (stored as R2ObjectBody).json()
       }
@@ -112,6 +116,10 @@ export default class Objects extends JSONRPC {
 
   async putIndexRecord(indexKey: string, record: IndexRecord): Promise<void> {
     await this.core.storage.put(indexKey, record)
+  }
+
+  async deleteIndexRecord(indexKey: string): Promise<void> {
+    await this.core.storage.delete(indexKey)
   }
 
   checkClaim(context: Context, namespace: string, operation: string) {
