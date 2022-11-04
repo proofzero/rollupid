@@ -13,6 +13,9 @@ workers_dev = false
 # Required secrets:
 # - CLOUDFLARE_ACCOUNT_ID: the CF account ID of the uploaded image owner
 # - CLOUDFLARE_IMAGES_KEY: an API token with Images permissions
+[dev]
+port = 8989
+local_protocol = "http"
 
 [env.dev]
 name = "icons-dev"
