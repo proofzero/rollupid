@@ -1,6 +1,7 @@
 import {
   Form,
   useActionData,
+  useFetcher,
   useLoaderData,
   useOutletContext,
   useTransition,
@@ -81,6 +82,9 @@ export const action: ActionFunction = async ({ request }) => {
     }
   }
 
+  let computedIsToken =
+    formData.get('pfp_isToken')?.valueOf() === 1 ? true : false
+
   const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
     {
@@ -92,7 +96,7 @@ export const action: ActionFunction = async ({ request }) => {
         website: formData.get('website')?.toString(),
         pfp: {
           image: formData.get('pfp_url') as string,
-          isToken: !!!formData.get('pfp_isToken'),
+          isToken: computedIsToken,
         },
       },
       visibility: Visibility.Public,
@@ -121,7 +125,7 @@ export default function AccountSettingsProfile() {
   } = useLoaderData()
 
   const [pfpUrl, setPfpUrl] = useState(pfp.image)
-  const [isToken, setIsToken] = useState(pfp.isToken)
+  const [isToken, setIsToken] = useState<boolean>(pfp.isToken ?? false)
 
   const actionData = useActionData()
 
@@ -147,6 +151,18 @@ export default function AccountSettingsProfile() {
   const pfpUploadRef = useRef<HTMLInputElement>(null)
   const [pfpUploading, setPfpUploading] = useState(false)
 
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.type === 'done') {
+      if (fetcher.data) {
+        setPfpUrl(fetcher.data)
+        setIsToken(false)
+      }
+
+      setPfpUploading(false)
+    }
+  }, [fetcher])
+
   const handlePfpUpload = async (e: any) => {
     const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
     if (!pfpFile) {
@@ -156,39 +172,13 @@ export default function AccountSettingsProfile() {
     const formData = new FormData()
     formData.append('file', pfpFile)
 
+    fetcher.submit(formData, {
+      encType: 'multipart/form-data',
+      method: 'post',
+      action: '/api/upload-image',
+    })
+
     setPfpUploading(true)
-
-    // Get upload URL
-    // TODO: Replace with service binding
-    // QUESTION: Should this be in BFF? I think so
-    const cfUploadUrlRes: {
-      id: string
-      uploadURL: string
-    } = await fetch('https://icons.kubelt.com').then((res) => res.json())
-
-    // QUESTION: Should this be in BFF? I think so
-    const cfUploadRes = (await fetch(cfUploadUrlRes.uploadURL, {
-      method: 'POST',
-      body: formData,
-    }).then((res) => res.json())) as {
-      success: boolean
-      result: {
-        variants: string[]
-      }
-    }
-
-    setPfpUploading(false)
-
-    if (!cfUploadRes.success) {
-      throw new Error('Error uploading PFP')
-    }
-
-    const publicVariantUrl = cfUploadRes.result.variants.filter((v) =>
-      v.endsWith('public')
-    )[0]
-
-    setPfpUrl(publicVariantUrl)
-    setIsToken(false)
   }
 
   return (
@@ -293,7 +283,7 @@ export default function AccountSettingsProfile() {
 
         <Form className="flex flex-col space-y-9 mt-12" method="post">
           <input name="pfp_url" type="hidden" value={pfpUrl} />
-          <input name="pfp_isToken" type="hidden" value={isToken} />
+          <input name="pfp_isToken" type="hidden" value={isToken ? 1 : 0} />
 
           <InputText
             id="displayName"
