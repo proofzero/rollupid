@@ -114,6 +114,10 @@ export default class Objects extends JSONRPC {
     await this.core.storage.put(indexKey, record)
   }
 
+  async deleteIndexRecord(indexKey: string): Promise<void> {
+    await this.core.storage.delete(indexKey)
+  }
+
   checkClaim(context: Context, namespace: string, operation: string) {
     const path = ['claims', 'capabilities', namespace, operation]
     const claim = _.get(context, path)
