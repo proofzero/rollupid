@@ -445,7 +445,6 @@ jsonrpc.method('describe', (ctx, next) => {
 
 router.post('/api', jsonrpc.middleware);
 
-// TODO: Factor the process envs into the index.js file.
 // REST handler for op-image verification.
 router.post('/api/v0/og-image', async (ctx, next) => {
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
@@ -458,30 +457,53 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
 
-    // TODO: Remove testing defaults.
-    const bkg = ctx.request.body.bkg || 'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/close-up-of-cat-wearing-sunglasses-while-sitting-royalty-free-image-1571755145.jpg';
-    const hex = ctx.request.body.hex || 'https://www.rollingstone.com/wp-content/uploads/2020/07/Screen-Shot-2020-07-15-at-11.24.37-AM.jpg?w=1024';
-    
+    if (!ctx.cloudflare || !ctx.cloudflare.accountId || !ctx.cloudflare.accountHash || !ctx.cloudflare.imageToken) {
+        ctx.throw(500, 'Missing image service configuration');
+    }
+
+    const bkg = ctx.request.body.bkg;
+    const hex = ctx.request.body.hex;
+
+    if (!bkg || !hex) {
+        ctx.throw(500, 'Missing bkg or hex parameter');
+    }
+
+    let bkgURL, hexURL;
+
+    // Validate that we've been passed well-formed URLs.
+    try {
+        bkgURL = new URL(ctx.request.body.bkg);
+        hexURL = new URL(ctx.request.body.hex);
+    } catch (e) {
+        ctx.throw(500, 'Malformed bkg or hex parameter');
+    }
+
     // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
-    const filename = Web3.utils.keccak256(bkg + hex);
+    const filename = Web3.utils.keccak256(bkgURL.href + hexURL.href);
 
     // Check the image service to see if the cache key already exists.
-    
     const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
     console.log('Checking cache:', url);
-    const imgcheck = await fetch(url);
+    const cacheCheck = await fetch(url);
     
-    if (imgcheck.status === 200) {
+    if (cacheCheck.status === 200) {
         console.log('Returning cached image url for ', filename);
         ctx.set('Content-Type', 'application/json');
         ctx.body = { url };
-    } else if (imgcheck.status === 404) {
+    } else if (cacheCheck.status === 404) {
         console.log(`Cache miss for ${filename}. Generating new image.`);
-        
+
         // Images that are remote need to be converted to Data URIs so that we can
         // render the SVG without triggering a cross-origin security violation.
-        const bkg_uri = await imageDataURI.encodeFromURL(bkg);
-        const hex_uri = await imageDataURI.encodeFromURL(hex);
+        const bkgURI = await imageDataURI.encodeFromURL(bkgURL.href).catch((e) => {
+            console.log(filename, 'failed to encode background image');
+            ctx.throw(500, `Image encoding error: ${JSON.stringify(e)}`);
+        });
+
+        const hexURI = await imageDataURI.encodeFromURL(hexURL.href).catch((e) => {
+            console.log(filename, 'failed to encode hexagon image');
+            ctx.throw(500, `Image encoding error: ${JSON.stringify(e)}`);
+        });
 
         // Constants for populating the SVG (optional).
         const OG_WIDTH = 1200;
@@ -505,8 +527,8 @@ router.post('/api/v0/og-image', async (ctx, next) => {
             <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
                 <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
             </pattern>
-            <image id="backroundimage" width="64" height="64" xlink:href="${bkg_uri}"/>
-            <image id="hexagonimage" width="2128" height="428" xlink:href="${hex_uri}"/>
+            <image id="backroundimage" width="64" height="64" xlink:href="${bkgURI}"/>
+            <image id="hexagonimage" width="2128" height="428" xlink:href="${hexURI}"/>
             </defs>
         </svg>`;
 
@@ -533,15 +555,13 @@ router.post('/api/v0/og-image', async (ctx, next) => {
             headers
         });
 
-        //console.log(await (await uploadResponse).text());
-
         ctx.set('Content-Type', 'application/json');
         ctx.body = { url };
     } else {
         ctx.set('Content-Type', 'application/json');
         ctx.status = 500;
-        ctx.body = `{ "err": "Application Error: Image Service returned bad non-200, non-404 response '${imgcheck.status}' for ${filename} (search for this in logs)." }`;
-        console.log(filename, JSON.stringify(imgcheck));
+        ctx.body = `{ "err": "Application Error: Image Service returned bad non-200, non-404 response '${cacheCheck.status}' for ${filename} (search for this in logs)." }`;
+        console.log(filename, JSON.stringify(cacheCheck));
     }
 
     return next();
