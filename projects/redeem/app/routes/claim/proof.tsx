@@ -138,27 +138,31 @@ export const action = async ({ request }) => {
         voucher = await fetchVoucher({ address, skipImage: false });
         voucher = await putCachedVoucher(address, voucher);
       } catch (e) {
-        console.log("error fetching voucher", e);
+        console.error("error fetching voucher", e);
       }
     }
 
-    if (nonce) {
-      const signRes = await oortSend("kb_verifyNonce", [nonce, signature], {
-        address: address,
-      }); // TODO remove address param when RPC url is changed
+    try {
+      if (nonce) {
+        const signRes = await oortSend("kb_verifyNonce", [nonce, signature], {
+          address: address,
+        }); // TODO remove address param when RPC url is changed
 
-      console.log("signRes", signRes);
+        console.log("signRes", signRes);
 
-      // the nonce may have expired. We would still be able to validate the signature
-      // but not log the user in
-      if (!signRes.error) {
-        // on success create a cookie/session for the user and redirect to the app
-        return createUserSession(
-          signRes.result,
-          `https://3id.kubelt.com/account`,
-          address
-        );
+        // the nonce may have expired. We would still be able to validate the signature
+        // but not log the user in
+        if (!signRes.error) {
+          // on success create a cookie/session for the user and redirect to the app
+          return createUserSession(
+            signRes.result,
+            `https://3id.kubelt.com/account`,
+            address
+          );
+        }
       }
+    } catch (e) {
+      console.error("error verifying nonce", e);
     }
 
     return redirect(`/claim/complete?address=${address}`);
