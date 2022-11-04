@@ -83,7 +83,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   let computedIsToken =
-    formData.get('pfp_isToken')?.valueOf() === 1 ? true : false
+    formData.get('pfp_isToken')?.toString() === "1" ? true : false
 
   const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
