@@ -151,34 +151,41 @@ export default function AccountSettingsProfile() {
   const pfpUploadRef = useRef<HTMLInputElement>(null)
   const [pfpUploading, setPfpUploading] = useState(false)
 
-  const fetcher = useFetcher()
-  useEffect(() => {
-    if (fetcher.type === 'done') {
-      if (fetcher.data) {
-        setPfpUrl(fetcher.data)
-        setIsToken(false)
-      }
-
-      setPfpUploading(false)
-    }
-  }, [fetcher])
-
   const handlePfpUpload = async (e: any) => {
     const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
     if (!pfpFile) {
       return
     }
 
+    setPfpUploading(true)
+
+    const imgUploadUrl = (await fetch('/api/image-upload-url', {
+      method: 'post',
+    }).then((res) => res.json())) as string
+
     const formData = new FormData()
     formData.append('file', pfpFile)
 
-    fetcher.submit(formData, {
-      encType: 'multipart/form-data',
-      method: 'post',
-      action: '/api/upload-image',
-    })
+    const cfUploadRes: {
+      success: boolean
+      result: {
+        variants: string[]
+      }
+    } = await fetch(imgUploadUrl, {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json())
 
-    setPfpUploading(true)
+    const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
+      v.endsWith('public')
+    )
+
+    if (publicVariantUrls.length) {
+      setPfpUrl(publicVariantUrls[0])
+      setIsToken(false)
+    }
+
+    setPfpUploading(false)
   }
 
   return (
