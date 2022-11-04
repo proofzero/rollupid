@@ -100,7 +100,7 @@ export default function Index({ inviteCode }: IndexProps) {
                   setOpen(true);
                 }}
               >
-                Claim your 3ID
+                Submit a Proof
               </button>
             </div>
           </div>
