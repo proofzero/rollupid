@@ -51,8 +51,8 @@ jobs:
       - name: Install Dependencies
         run: yarn workspaces focus --all
 
-      - name: Build
-        run: yarn build
-
       - name: Test
         run: yarn test
+
+      - name: Build
+        run: yarn build

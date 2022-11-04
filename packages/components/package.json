@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "bit install && bit build --skip-tests && bit link && bit snap --skip-tests",
+    "build": "bit install && bit build --skip-tests && bit link && bit snap --skip-tests && bit export",
     "test": "bit test",
     "start": "bit start"
   },
