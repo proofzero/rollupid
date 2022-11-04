@@ -170,6 +170,7 @@ const ProfileRoute = () => {
           isToken={pfp.isToken}
         />
       </div>
+
       <div
         className="h-80 w-full relative flex justify-center"
         style={{
