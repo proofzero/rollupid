@@ -83,7 +83,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   let computedIsToken =
-    formData.get('pfp_isToken')?.toString() === "1" ? true : false
+    formData.get('pfp_isToken')?.toString() === '1' ? true : false
 
   const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
@@ -191,7 +191,7 @@ export default function AccountSettingsProfile() {
       />
 
       <div className="flex flex-col space-y-9 mt-12">
-        <div className="flex flex-row space-x-10">
+        <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
           {!pfpUploading && !isToken && (
             <img
               src={gatewayFromIpfs(pfpUrl)}
@@ -221,7 +221,7 @@ export default function AccountSettingsProfile() {
             </div>
           )}
 
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-between space-y-3.5">
             <div className="flex flex-row space-x-3.5">
               <Button
                 type={ButtonType.Secondary}
@@ -255,7 +255,7 @@ export default function AccountSettingsProfile() {
             </div>
 
             {generatedPfp && (
-              <div className="flex flex-col space-y-2.5">
+              <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text
                   size={TextSize.SM}
                   weight={TextWeight.Medium500}
@@ -285,15 +285,16 @@ export default function AccountSettingsProfile() {
           <input name="pfp_url" type="hidden" value={pfpUrl} />
           <input name="pfp_isToken" type="hidden" value={isToken ? 1 : 0} />
 
-          <InputText
-            id="displayName"
-            heading="Display Name"
-            placeholder="Your Display Name"
-            Icon={FaAt}
-            defaultValue={displayName}
-            required={true}
-            error={actionData?.errors.displayName}
-          />
+          <div className="lg:w-3/6 lg:pr-4">
+            <InputText
+              id="displayName"
+              heading="Display Name *"
+              placeholder="Your Display Name"
+              defaultValue={displayName}
+              required={true}
+              error={actionData?.errors.displayName}
+            />
+          </div>
 
           {actionData?.errors.displayName && (
             <Text

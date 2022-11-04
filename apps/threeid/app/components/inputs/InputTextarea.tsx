@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import Text, { TextColor, TextSize, TextWeight } from "../typography/Text";
+import { useEffect, useState } from 'react'
+import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
 
 export type InputTextareaProps = {
-  id?: string;
-  heading: string;
-  onChange?: (val: any) => void;
-  rows?: number;
-  charLimit?: number;
-  name?: string;
-  placeholder?: string;
-  defaultValue?: string;
-  disabled?: boolean;
-  error?: boolean;
-  required?: boolean;
-};
+  id?: string
+  heading: string
+  onChange?: (val: any) => void
+  rows?: number
+  charLimit?: number
+  name?: string
+  placeholder?: string
+  defaultValue?: string
+  disabled?: boolean
+  error?: boolean
+  required?: boolean
+}
 
 const InputTextarea = ({
   id,
@@ -28,18 +28,18 @@ const InputTextarea = ({
   error,
   required,
 }: InputTextareaProps) => {
-  const computedName = name ?? id;
+  const computedName = name ?? id
 
-  const [val, setVal] = useState<undefined | string>(defaultValue);
-  const [computedError, setComputedError] = useState<undefined | boolean>();
+  const [val, setVal] = useState<undefined | string>(defaultValue)
+  const [computedError, setComputedError] = useState<undefined | boolean>()
 
   useEffect(() => {
     if (error || (val && charLimit && val.length > charLimit)) {
-      setComputedError(true);
+      setComputedError(true)
     } else {
-      setComputedError(false);
+      setComputedError(false)
     }
-  }, [error, val]);
+  }, [error, val])
 
   return (
     <div>
@@ -66,34 +66,36 @@ const InputTextarea = ({
       <div className="mt-1 text-base flex">
         <div
           className={`relative text-${
-            computedError ? "red" : "gray"
+            computedError ? 'red' : 'gray'
           }-900 flex flex-1`}
         >
           <textarea
             name={computedName}
             id={id}
             onChange={(e) => {
-              setVal(e.target.value);
+              setVal(e.target.value)
 
-              if (onChange) onChange(e.target.value);
+              if (onChange) onChange(e.target.value)
             }}
             rows={rows}
             defaultValue={defaultValue}
             disabled={disabled ?? false}
             className={`border-${
-              computedError ? "red-500" : "gray-300"
+              computedError ? 'red-500' : 'gray-300'
             } shadow-sm focus:border-${
-              computedError ? "red" : "indigo"
+              computedError ? 'red' : 'indigo'
             }-500 focus:ring-${
-              computedError ? "red" : "indigo"
+              computedError ? 'red' : 'indigo'
             }-500 disabled:cursor-not-allowed disabled:border-${
-              computedError ? "red" : "gray"
+              computedError ? 'red' : 'gray'
             }-200 disabled:bg-${
-              computedError ? "red" : "gray"
-            }-50 placeholder-${computedError ? "red" : "gray"}-400 w-full`}
+              computedError ? 'red' : 'gray'
+            }-50 placeholder-${
+              computedError ? 'red' : 'gray'
+            }-400 w-full rounded-md`}
             style={{
               fontWeight: 400,
-              fontFamily: "Inter_400Regular",
+              fontFamily: 'Inter_400Regular',
             }}
             placeholder={placeholder}
             required={required}
@@ -101,7 +103,7 @@ const InputTextarea = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default InputTextarea;
+export default InputTextarea
