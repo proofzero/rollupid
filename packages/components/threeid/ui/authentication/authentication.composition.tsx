@@ -1,8 +1,7 @@
 import React from 'react';
-import { Authentication } from './authentication';
+import { Authentication, SocialLoginProviders } from './authentication';
 
 export const BasicAuthentication = () => {
   return (
-    <Authentication>hello world!</Authentication>
-  );
+    <Authentication socialLoginProviders={[SocialLoginProviders.GOOGLE]} />);
 }

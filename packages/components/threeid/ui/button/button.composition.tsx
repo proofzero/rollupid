@@ -5,6 +5,10 @@ export const PrimaryButton = () => {
   return <Button>hello world!</Button>;
 };
 
+export const AltPrimaryButton = () => {
+  return <Button alt>hello world!</Button>;
+};
+
 export const SecondaryButton = () => {
   return <Button secondary>hello world!</Button>;
 };

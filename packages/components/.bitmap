@@ -29,20 +29,14 @@
     },
     "ui/authentication": {
         "scope": "",
-        "version": "",
+        "version": "9663757fb8f2b9bbcb77215b4d7725c0cdfe1777",
         "defaultScope": "kubelt-ui.threeid",
         "mainFile": "index.ts",
-        "rootDir": "threeid/ui/authentication",
-        "config": {
-            "teambit.react/react": {},
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            }
-        }
+        "rootDir": "threeid/ui/authentication"
     },
     "ui/button": {
         "scope": "kubelt-ui.threeid",
-        "version": "5f7529e79d91e3a23b160c338391abfd412a7455",
+        "version": "72c9e7d34ec97479949bd519234d90711882203e",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/button"
     },
@@ -54,16 +48,10 @@
     },
     "ui/login-button": {
         "scope": "",
-        "version": "",
+        "version": "e53ca5b4521d60bdb56d1775582a38e0b3a19890",
         "defaultScope": "kubelt-ui.threeid",
         "mainFile": "index.ts",
-        "rootDir": "threeid/ui/login-button",
-        "config": {
-            "teambit.react/react": {},
-            "teambit.envs/envs": {
-                "env": "teambit.react/react"
-            }
-        }
+        "rootDir": "threeid/ui/login-button"
     },
     "$schema-version": "15.0.0"
 }

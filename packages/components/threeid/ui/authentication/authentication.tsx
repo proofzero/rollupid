@@ -1,7 +1,9 @@
 import React, { ReactNode } from 'react';
 import { Button } from '@kubelt-ui/threeid.ui.button';
 
-export enum SocialLoginProviders {}
+export enum SocialLoginProviders {
+  GOOGLE = 1,
+}
 // GOOGLE = 1,
 // TWITTER = 2,
 // DISCORD = 3,

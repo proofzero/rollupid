@@ -10,6 +10,8 @@ export type Sizes = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export type ButtonProps = {
   disabled?: boolean;
+
+  alt?: boolean;
   tertiary?: boolean;
 
   size?: Sizes;
@@ -20,12 +22,14 @@ export type ButtonProps = {
 export function Button({
   children,
   className,
+  alt,
   secondary,
   tertiary,
   disabled,
   size,
   ...rest
 }: ButtonProps) {
+  const altClass = alt ? styles.alt : styles.primary;
   const secondaryClass = secondary ? styles.secondary : styles.primary;
   const tertiaryClass = tertiary ? styles.tertiary : '';
   const disabledClass = disabled ? styles.disabled : '';
@@ -38,6 +42,7 @@ export function Button({
       className={classNames(
         styles.base,
         className,
+        altClass,
         secondaryClass,
         tertiaryClass,
         disabledClass,
