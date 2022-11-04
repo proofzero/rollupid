@@ -92,11 +92,35 @@ const ProfileRoute = () => {
     const formData = new FormData()
     formData.append('file', coverFile)
 
-    fetcher.submit(formData, {
-      encType: 'multipart/form-data',
+    const imgUploadUrl = (await fetch('/api/image-upload-url', {
       method: 'post',
-      action: '/api/upload-cover',
-    })
+    }).then((res) => res.json())) as string
+
+    const cfUploadRes: {
+      success: boolean
+      result: {
+        variants: string[]
+      }
+    } = await fetch(imgUploadUrl, {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json())
+
+    const publicVariantUrls = cfUploadRes.result.variants.filter((v) =>
+      v.endsWith('public')
+    )
+
+    if (publicVariantUrls.length) {
+      fetcher.submit(
+        {
+          url: publicVariantUrls[0],
+        },
+        {
+          method: 'post',
+          action: '/api/update-cover',
+        }
+      )
+    }
   }
 
   return (
