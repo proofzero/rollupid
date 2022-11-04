@@ -1,5 +1,5 @@
 import { json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 
 import ProfileCard from '~/components/profile/ProfileCard'
 
@@ -12,7 +12,7 @@ import Text, {
   TextWeight,
 } from '~/components/typography/Text'
 
-import { Button, ButtonSize } from '~/components/buttons'
+import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
 import HeadNav from '~/components/head-nav'
 
@@ -20,9 +20,10 @@ import { links as spinnerLinks } from '~/components/spinner'
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
-import { FaBriefcase, FaEdit, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaBriefcase, FaCamera, FaEdit, FaMapMarkerAlt } from 'react-icons/fa'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import ButtonLink from '~/components/buttons/ButtonLink'
+import { useEffect, useRef, useState } from 'react'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -68,6 +69,36 @@ const ProfileRoute = () => {
     website,
   } = useLoaderData()
 
+  const [coverUrl, setCoverUrl] = useState(cover)
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.type === 'done') {
+      if (fetcher.data) {
+        setCoverUrl(fetcher.data)
+      }
+    }
+  }, [fetcher])
+
+  const coverUploadRef = useRef<HTMLInputElement>(null)
+  const handleCoverUpload = async (e: any) => {
+    const coverFile = (e.target as HTMLInputElement & EventTarget).files?.item(
+      0
+    )
+    if (!coverFile) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('file', coverFile)
+
+    fetcher.submit(formData, {
+      encType: 'multipart/form-data',
+      method: 'post',
+      action: '/api/upload-cover',
+    })
+  }
+
   return (
     <div className="bg-white h-full min-h-screen">
       <div
@@ -86,7 +117,9 @@ const ProfileRoute = () => {
       <div
         className="h-80 w-full relative flex justify-center"
         style={{
-          backgroundImage: cover ? `url(${gatewayFromIpfs(cover)})` : undefined,
+          backgroundImage: coverUrl
+            ? `url(${gatewayFromIpfs(coverUrl)})`
+            : undefined,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
@@ -105,13 +138,30 @@ const ProfileRoute = () => {
           </div>
         </div>
 
-        {/* {isOwner && (
+        {isOwner && (
           <div className="absolute top-0 lg:top-auto lg:bottom-0 right-0 my-8 mx-6">
-            <ButtonAnchor size={ButtonSize.SM} href="#" Icon={FaCamera}>
-              Edit Cover Photo
-            </ButtonAnchor>
+            <input
+              ref={coverUploadRef}
+              type="file"
+              id="pfp-upload"
+              name="pfp"
+              accept="image/png, image/jpeg"
+              className="sr-only"
+              onChange={handleCoverUpload}
+            />
+
+            <Button
+              type={ButtonType.Secondary}
+              size={ButtonSize.SM}
+              Icon={FaCamera}
+              onClick={() => {
+                coverUploadRef.current?.click()
+              }}
+            >
+              Edit cover photo
+            </Button>
           </div>
-        )} */}
+        )}
       </div>
 
       <div className="mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
