@@ -22,9 +22,16 @@ import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getCachedVoucher } from '~/helpers/voucher'
+
+import { links as spinnerLinks } from '~/components/spinner'
+import Spinner from '~/components/spinner'
+
+export function links() {
+  return [...spinnerLinks()]
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -85,7 +92,7 @@ export const action: ActionFunction = async ({ request }) => {
         website: formData.get('website')?.toString(),
         pfp: {
           image: formData.get('pfp_url') as string,
-          isToken: !!formData.get('pfp_isToken'),
+          isToken: !!!formData.get('pfp_isToken'),
         },
       },
       visibility: Visibility.Public,
@@ -137,6 +144,53 @@ export default function AccountSettingsProfile() {
     setNftPfpModalOpen(false)
   }
 
+  const pfpUploadRef = useRef<HTMLInputElement>(null)
+  const [pfpUploading, setPfpUploading] = useState(false)
+
+  const handlePfpUpload = async (e: any) => {
+    const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
+    if (!pfpFile) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('file', pfpFile)
+
+    setPfpUploading(true)
+
+    // Get upload URL
+    // TODO: Replace with service binding
+    // QUESTION: Should this be in BFF? I think so
+    const cfUploadUrlRes: {
+      id: string
+      uploadURL: string
+    } = await fetch('https://icons.kubelt.com').then((res) => res.json())
+
+    // QUESTION: Should this be in BFF? I think so
+    const cfUploadRes = (await fetch(cfUploadUrlRes.uploadURL, {
+      method: 'POST',
+      body: formData,
+    }).then((res) => res.json())) as {
+      success: boolean
+      result: {
+        variants: string[]
+      }
+    }
+
+    setPfpUploading(false)
+
+    if (!cfUploadRes.success) {
+      throw new Error('Error uploading PFP')
+    }
+
+    const publicVariantUrl = cfUploadRes.result.variants.filter((v) =>
+      v.endsWith('public')
+    )[0]
+
+    setPfpUrl(publicVariantUrl)
+    setIsToken(false)
+  }
+
   return (
     <>
       <PfpNftModal
@@ -148,18 +202,14 @@ export default function AccountSettingsProfile() {
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-row space-x-10">
-          {!isToken && (
+          {!pfpUploading && !isToken && (
             <img
               src={gatewayFromIpfs(pfpUrl)}
-              style={{
-                width: 118,
-                height: 118,
-              }}
-              className="rounded-full"
+              className="rounded-full w-[118px] h-[118px]"
             />
           )}
 
-          {isToken && (
+          {!pfpUploading && isToken && (
             <div
               style={{
                 clipPath:
@@ -169,12 +219,15 @@ export default function AccountSettingsProfile() {
               }}
             >
               <img
+                className="w-[118px] h-[118px]"
                 src={gatewayFromIpfs(pfpUrl)}
-                style={{
-                  width: 118,
-                  height: 118,
-                }}
               />
+            </div>
+          )}
+
+          {pfpUploading && (
+            <div className="flex justify-center items-center w-[118px] h-[118px]">
+              <Spinner />
             </div>
           )}
 
@@ -190,7 +243,23 @@ export default function AccountSettingsProfile() {
                 Change NFT Avatar
               </Button>
 
-              <Button type={ButtonType.Secondary} size={ButtonSize.SM} disabled>
+              <input
+                ref={pfpUploadRef}
+                type="file"
+                id="pfp-upload"
+                name="pfp"
+                accept="image/png, image/jpeg"
+                className="sr-only"
+                onChange={handlePfpUpload}
+              />
+
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.SM}
+                onClick={() => {
+                  pfpUploadRef.current?.click()
+                }}
+              >
                 Upload an Image
               </Button>
             </div>
