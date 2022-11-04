@@ -12,7 +12,7 @@ import Text, {
   TextWeight,
 } from '~/components/typography/Text'
 
-import { Button } from '~/components/buttons'
+import { Button, ButtonSize } from '~/components/buttons'
 
 import HeadNav from '~/components/head-nav'
 
@@ -20,8 +20,9 @@ import { links as spinnerLinks } from '~/components/spinner'
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
-import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaBriefcase, FaEdit, FaMapMarkerAlt } from 'react-icons/fa'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import ButtonLink from '~/components/buttons/ButtonLink'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -172,13 +173,15 @@ const ProfileRoute = () => {
                 )}
               </div>
 
-              {/* {isOwner && isOwner && (
-                <div>
-                  <ButtonAnchor size={ButtonSize.SM} href="#" Icon={FaEdit}>
-                    Edit Profile
-                  </ButtonAnchor>
-                </div>
-              )} */}
+              {isOwner && (
+                <ButtonLink
+                  size={ButtonSize.SM}
+                  to="/account/settings/profile"
+                  Icon={FaEdit}
+                >
+                  Edit Profile
+                </ButtonLink>
+              )}
             </div>
           </div>
         )}
