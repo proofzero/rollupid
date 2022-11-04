@@ -1,6 +1,7 @@
 import {
   Form,
   useActionData,
+  useFetcher,
   useLoaderData,
   useOutletContext,
   useTransition,
@@ -22,9 +23,16 @@ import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getCachedVoucher } from '~/helpers/voucher'
+
+import { links as spinnerLinks } from '~/components/spinner'
+import Spinner from '~/components/spinner'
+
+export function links() {
+  return [...spinnerLinks()]
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -74,6 +82,9 @@ export const action: ActionFunction = async ({ request }) => {
     }
   }
 
+  let computedIsToken =
+    formData.get('pfp_isToken')?.toString() === '1' ? true : false
+
   const galaxyClient = await getGalaxyClient()
   await galaxyClient.updateProfile(
     {
@@ -85,7 +96,7 @@ export const action: ActionFunction = async ({ request }) => {
         website: formData.get('website')?.toString(),
         pfp: {
           image: formData.get('pfp_url') as string,
-          isToken: !!formData.get('pfp_isToken'),
+          isToken: computedIsToken,
         },
       },
       visibility: Visibility.Public,
@@ -114,7 +125,7 @@ export default function AccountSettingsProfile() {
   } = useLoaderData()
 
   const [pfpUrl, setPfpUrl] = useState(pfp.image)
-  const [isToken, setIsToken] = useState(pfp.isToken)
+  const [isToken, setIsToken] = useState<boolean>(pfp.isToken ?? false)
 
   const actionData = useActionData()
 
@@ -137,6 +148,39 @@ export default function AccountSettingsProfile() {
     setNftPfpModalOpen(false)
   }
 
+  const pfpUploadRef = useRef<HTMLInputElement>(null)
+  const [pfpUploading, setPfpUploading] = useState(false)
+
+  const fetcher = useFetcher()
+  useEffect(() => {
+    if (fetcher.type === 'done') {
+      if (fetcher.data) {
+        setPfpUrl(fetcher.data)
+        setIsToken(false)
+      }
+
+      setPfpUploading(false)
+    }
+  }, [fetcher])
+
+  const handlePfpUpload = async (e: any) => {
+    const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
+    if (!pfpFile) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('file', pfpFile)
+
+    fetcher.submit(formData, {
+      encType: 'multipart/form-data',
+      method: 'post',
+      action: '/api/upload-image',
+    })
+
+    setPfpUploading(true)
+  }
+
   return (
     <>
       <PfpNftModal
@@ -147,19 +191,15 @@ export default function AccountSettingsProfile() {
       />
 
       <div className="flex flex-col space-y-9 mt-12">
-        <div className="flex flex-row space-x-10">
-          {!isToken && (
+        <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
+          {!pfpUploading && !isToken && (
             <img
               src={gatewayFromIpfs(pfpUrl)}
-              style={{
-                width: 118,
-                height: 118,
-              }}
-              className="rounded-full"
+              className="rounded-full w-[118px] h-[118px]"
             />
           )}
 
-          {isToken && (
+          {!pfpUploading && isToken && (
             <div
               style={{
                 clipPath:
@@ -169,16 +209,19 @@ export default function AccountSettingsProfile() {
               }}
             >
               <img
+                className="w-[118px] h-[118px]"
                 src={gatewayFromIpfs(pfpUrl)}
-                style={{
-                  width: 118,
-                  height: 118,
-                }}
               />
             </div>
           )}
 
-          <div className="flex flex-col justify-between">
+          {pfpUploading && (
+            <div className="flex justify-center items-center w-[118px] h-[118px]">
+              <Spinner />
+            </div>
+          )}
+
+          <div className="flex flex-col justify-between space-y-3.5">
             <div className="flex flex-row space-x-3.5">
               <Button
                 type={ButtonType.Secondary}
@@ -190,13 +233,29 @@ export default function AccountSettingsProfile() {
                 Change NFT Avatar
               </Button>
 
-              <Button type={ButtonType.Secondary} size={ButtonSize.SM} disabled>
+              <input
+                ref={pfpUploadRef}
+                type="file"
+                id="pfp-upload"
+                name="pfp"
+                accept="image/png, image/jpeg"
+                className="sr-only"
+                onChange={handlePfpUpload}
+              />
+
+              <Button
+                type={ButtonType.Secondary}
+                size={ButtonSize.SM}
+                onClick={() => {
+                  pfpUploadRef.current?.click()
+                }}
+              >
                 Upload an Image
               </Button>
             </div>
 
             {generatedPfp && (
-              <div className="flex flex-col space-y-2.5">
+              <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text
                   size={TextSize.SM}
                   weight={TextWeight.Medium500}
@@ -224,17 +283,18 @@ export default function AccountSettingsProfile() {
 
         <Form className="flex flex-col space-y-9 mt-12" method="post">
           <input name="pfp_url" type="hidden" value={pfpUrl} />
-          <input name="pfp_isToken" type="hidden" value={isToken} />
+          <input name="pfp_isToken" type="hidden" value={isToken ? 1 : 0} />
 
-          <InputText
-            id="displayName"
-            heading="Display Name"
-            placeholder="Your Display Name"
-            Icon={FaAt}
-            defaultValue={displayName}
-            required={true}
-            error={actionData?.errors.displayName}
-          />
+          <div className="lg:w-3/6 lg:pr-4">
+            <InputText
+              id="displayName"
+              heading="Display Name *"
+              placeholder="Your Display Name"
+              defaultValue={displayName}
+              required={true}
+              error={actionData?.errors.displayName}
+            />
+          </div>
 
           {actionData?.errors.displayName && (
             <Text

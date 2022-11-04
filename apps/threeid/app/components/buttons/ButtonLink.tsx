@@ -1,47 +1,41 @@
-import { IconType } from 'react-icons'
+import { Link } from '@remix-run/react'
+import { IconType } from 'react-icons/lib'
+
 import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from '.'
 
 import Text from '../typography/Text'
 
-export type ButtonProps = {
+type ButtonLinkProps = {
   children: string
 
   type?: ButtonType
   size?: ButtonSize
 
-  isSubmit?: boolean
-
-  onClick?: () => void
-
-  disabled?: boolean
-
   Icon?: IconType
   iconColor?: string
+
+  to: string
+
+  disabled?: boolean
 }
 
-const Button = ({
-  onClick,
+const ButtonLink = ({
+  to,
   children,
-  type = ButtonType.Primary,
-  isSubmit = false,
+  type = ButtonType.Secondary,
   size = ButtonSize.Base,
-  disabled,
   Icon,
   iconColor,
-}: ButtonProps) => {
-  const computedType = disabled ? ButtonType.Disabled : type
-
+}: ButtonLinkProps) => {
   return (
-    <button
-      disabled={disabled}
-      className={`button-base ${buttonTypeDict[computedType].className} ${buttonSizeDict[size].className} w-full lg:w-fit rounded-md`}
-      onClick={onClick}
-      type={isSubmit ? 'submit' : 'button'}
+    <Link
+      className={`button-base ${buttonTypeDict[type].className} ${buttonSizeDict[size].className} rounded-md`}
+      to={to}
     >
       <Text
         type="span"
         size={buttonSizeDict[size].textSize}
-        color={buttonTypeDict[computedType].textColor}
+        color={buttonTypeDict[type].textColor}
         weight={buttonSizeDict[size].textWeight}
       >
         <span className="flex flex-row justify-center items-center">
@@ -59,8 +53,8 @@ const Button = ({
           {children}
         </span>
       </Text>
-    </button>
+    </Link>
   )
 }
 
-export default Button
+export default ButtonLink
