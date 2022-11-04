@@ -49,6 +49,13 @@ const main = async (api) => {
     // when requesting generation of a PFP that already exists. For testing.
     api.context.devKey = process.env.NFTAR_DEV_KEY;
 
+    // Cloudflare environment configuration.
+    api.context.cloudflare = {
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+        accountHash: process.env.CLOUDFLARE_ACCOUNT_HASH,
+        imageToken: process.env.IMAGE_SERVICE_API_TOKEN,
+    };
+
     // The port to listen on.
     const port = parseInt(process.env.PORT) || 3000;
 

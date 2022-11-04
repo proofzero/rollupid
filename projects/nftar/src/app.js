@@ -467,7 +467,7 @@ router.post('/api/v0/og-image', async (ctx, next) => {
 
     // Check the image service to see if the cache key already exists.
     
-    const url = `https://imagedelivery.net/${process.env.CLOUDFLARE_ACCOUNT_HASH}/${filename}/public`;
+    const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
     console.log('Checking cache:', url);
     const imgcheck = await fetch(url);
     
@@ -522,12 +522,12 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         // Get the headers from the FormData object so that we can pick up
         // the dynamically generated multipart boundary.
         const headers = form.getHeaders();
-        headers['authorization'] = `bearer ${process.env.IMAGE_SERVICE_API_TOKEN}`;
+        headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
         
         // This fire-and-forget call could fail because the image service has a race condition on uploads.
         // It might cache miss above, get here, and then try to upload something that already exists,
         // which will cause this to return "ERROR 5409: Resource already exists".
-        fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/images/v1`, {
+        fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
             method: 'POST',
             body: form,
             headers
