@@ -10,7 +10,7 @@ defaults:
     working-directory: ./apps
 
 jobs:
-  build-publish-test-threeid-next:
+  build-publish-test-passport-next:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

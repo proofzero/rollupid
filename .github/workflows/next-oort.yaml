@@ -1,7 +1,9 @@
 name: Next Oort
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - '*'
 
 defaults:
   run:
