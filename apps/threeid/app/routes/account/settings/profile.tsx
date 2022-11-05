@@ -124,8 +124,8 @@ export default function AccountSettingsProfile() {
     generatedPfpMinted,
   } = useLoaderData()
 
-  const [pfpUrl, setPfpUrl] = useState(pfp.image)
-  const [isToken, setIsToken] = useState<boolean>(pfp.isToken ?? false)
+  const [pfpUrl, setPfpUrl] = useState(pfp?.image)
+  const [isToken, setIsToken] = useState<boolean>(pfp?.isToken ?? false)
 
   const actionData = useActionData()
 
