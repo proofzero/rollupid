@@ -38,15 +38,8 @@ export const loader: LoaderFunction = async (args) => {
     profileRes.json()
   )
 
-  let hex, bkg;
-
-  if (profileJson && profileJson.pfp && profileJson.pfp.image) {
-    hex = gatewayFromIpfs(profileJson.pfp.image);
-  }
-
-  if (profileJson && profileJson.cover) {
-    bkg = gatewayFromIpfs(profileJson.cover);
-  }
+  let hex = gatewayFromIpfs(profileJson?.pfp?.image);
+  let bkg = gatewayFromIpfs(profileJson?.cover);
 
   // Attempt to get a default profile pic and cover from NFTar.
   if (!hex && !bkg) {
@@ -101,7 +94,7 @@ export const loader: LoaderFunction = async (args) => {
 // Wire the loaded profile json, above, to the og meta tags.
 export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
-    'og:title': displayName,
+    'og:title': `${displayName}'s 3ID Profile`,
     'og:description': bio,
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
