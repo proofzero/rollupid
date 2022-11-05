@@ -1,25 +1,25 @@
-import { redirect, json } from "@remix-run/cloudflare";
-import { requireJWT } from "~/utils/session.server";
+import { redirect, json } from '@remix-run/cloudflare'
+import { requireJWT } from '~/utils/session.server'
 
-import validateProof from "~/helpers/validate-proof";
+import validateProof from '~/helpers/validate-proof'
 
 import BaseButton, {
   links as buttonLinks,
   BaseButtonAnchor,
-} from "~/components/base-button";
+} from '~/components/base-button'
 
-import sad from "../../../assets/sad.png";
+import sad from '../../../assets/sad.png'
 
-export const links = () => [...buttonLinks()];
+export const links = () => [...buttonLinks()]
 
 // @ts-ignore
 export const loader = async ({ request, params }) => {
-  await requireJWT(request);
+  await requireJWT(request)
   if (!(await validateProof(params.address))) {
-    return null;
+    return null
   }
-  return redirect(`/account`);
-};
+  return redirect(`/account`)
+}
 
 export default function AuthGate() {
   return (
@@ -31,16 +31,16 @@ export default function AuthGate() {
       </p>
       <div className="error-buttons grid grid-rows-2 lg:grid-cols-2">
         <BaseButtonAnchor
-          color={"dark"}
-          text={"Create a Proof"}
-          href={"https://proof.kubelt.com"}
+          color={'dark'}
+          text={'Create a Proof'}
+          href={'https://get.threeid.xyz'}
         />
         <BaseButtonAnchor
-          text={"Join Discord"}
-          color={"light"}
-          href={"https://discord.gg/threeid"}
+          text={'Join Discord'}
+          color={'light'}
+          href={'https://discord.gg/threeid'}
         />
       </div>
     </div>
-  );
+  )
 }

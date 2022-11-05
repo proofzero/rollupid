@@ -34,7 +34,6 @@ kv_namespaces = [
 ]
 routes = [
   { pattern = "get-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz"},
-  { pattern = "proof-dev.threeid.xyz", custom_domain = true, zone_name = "kubelt.com"},
 ]
 services = [
   { binding = "OORT", service = "oort-devnet"}
@@ -43,7 +42,6 @@ services = [
 [env.next]
 routes = [
   { pattern = "get-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz"},
-  { pattern = "proof-next.threeid.xyz", custom_domain = true, zone_name = "kubelt.com"},
 ]
 kv_namespaces = [
   { binding = "RESERVE", id = "ad43bb2fa1474a8fb1f7965b748d9fbc", preview_id = "912d630a9e8643c4bfd3e84ac15ee565" },
@@ -60,7 +58,6 @@ services = [
 [env.current]
 routes = [
   { pattern = "get.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz"},
-  { pattern = "proof.threeid.xyz", custom_domain = true, zone_name = "kubelt.com"},
 ]
 kv_namespaces = [
   { binding = "RESERVE", id = "a63ffd60fcfb43a49634485a51bbb896" },
