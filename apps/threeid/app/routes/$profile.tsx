@@ -41,6 +41,7 @@ export const loader: LoaderFunction = async (args) => {
   let hex = gatewayFromIpfs(profileJson?.pfp?.image);
   let bkg = gatewayFromIpfs(profileJson?.cover);  
 
+  // check generate and return og image
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
     headers: {
@@ -67,11 +68,12 @@ export const loader: LoaderFunction = async (args) => {
   const jwt = session.get('jwt')
   const address = session.get('address')
 
+  console.log("session", session)
+  console.log("address", address)
+
   if (address === params.profile) {
     isOwner = true
   }
-
-  console.log("params.profile", params.profile)
 
   return json({
     ...profileJson,
