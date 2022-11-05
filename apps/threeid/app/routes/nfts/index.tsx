@@ -1,5 +1,6 @@
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { AlchemyClient } from '~/utils/alchemy.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
@@ -9,51 +10,24 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error("Make sure 'ALCHEMY_NFT_API_URL' env variable is set.")
   }
   
-  // @ts-ignore
-  const url = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
-
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
     throw new Error('Owner required')
   }
 
-  url.searchParams.set('owner', owner)
-
   const pageKey = srcUrl.searchParams.get('pageKey')
-  if (pageKey) {
-    url.searchParams.set('pageKey', pageKey)
-  }
-
-  const req = await fetch(url.toString())
-
-  let res = await req.json()
-  res.ownedNfts = res.ownedNfts.map(
-    (nft: {
-      title: string
-      media: [
-        {
-          gateway: string
-          raw: string
-        }
-      ]
-      contractMetadata?: {
-        name: string
-      }
-      metadata: {
-        properties?: any
-        attributes?: {
-          display_type: string
-          trait_type: string
-          value: any
-        }[]
-      }
-    }) => {
+  
+  const alchemy = new AlchemyClient()
+  const res = await alchemy.getNFTsForOwner(owner, {pageKey})
+  const ownedNfts = res.ownedNfts.map(
+    (nft) => {
       let properties: {
         name: string
         value: any
         display: string
       }[] = []
 
+      // TODO: is this here b/c pfp does not conform to standard?
       if (nft.metadata.properties) {
         const validProps = Object.keys(nft.metadata.properties)
           .filter((k) => typeof nft.metadata.properties[k] !== 'object')
@@ -70,14 +44,16 @@ export const loader: LoaderFunction = async ({ request }) => {
         const mappedAttributes = nft.metadata.attributes.map((a) => ({
           name: a.trait_type,
           value: a.value,
-          display: a.display_type,
+          display: a.display_type || "string", // TODO: @Cosmin this field is not in the alchemy schema. Is it needed at all?
         }))
-
+        
         properties = properties.concat(mappedAttributes)
       }
 
+      const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+
       return {
-        url: nft.media[0].raw,
+        url: gatewayFromIpfs(media.raw),
         title: nft.title,
         collectionTitle: nft.contractMetadata?.name,
         properties,
@@ -85,5 +61,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   )
 
-  return json(res)
+  return json({ownedNfts})
 }

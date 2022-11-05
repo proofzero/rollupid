@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   } else {
     try {
-      voucher = await fetchVoucher({ address, skipImage: !!voucher })
+      voucher = await fetchVoucher({ address })
       voucher = await putCachedVoucher(address, voucher)
     } catch (e) {
       console.error('ERROR FETCHING VOUCHER', e)

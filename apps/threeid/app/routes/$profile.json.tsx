@@ -18,7 +18,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const profileRes = await galaxyClient.getProfileFromAddress({
       address: params.profile,
     })
-
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,
@@ -28,7 +27,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     if (!voucher) {
       voucher = await fetchVoucher({
         address: params.profile,
-        skipImage: !!voucher,
       })
       voucher = await putCachedVoucher(params.profile, voucher)
     }
