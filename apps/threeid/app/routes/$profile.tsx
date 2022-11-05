@@ -38,8 +38,19 @@ export const loader: LoaderFunction = async (args) => {
     profileRes.json()
   )
 
-  const hex = gatewayFromIpfs(profileJson.pfp.image);
-  const bkg = gatewayFromIpfs(profileJson.cover);
+  let hex = gatewayFromIpfs(profileJson?.pfp?.image);
+  let bkg = gatewayFromIpfs(profileJson?.cover);
+
+  // Attempt to get a default profile pic and cover from NFTar.
+  if (!hex && !bkg) {
+    const voucherResponse = await fetchVoucher({
+      address: params.profile,
+      skipImage: false,
+    });
+
+    hex = voucherResponse.metadata.image;
+    bkg = voucherResponse.metadata.cover;
+  }
 
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
@@ -76,13 +87,17 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? { address } : false,
-    ogImage: url,
+    ogImageURL: url,
   })
-}
+};
 
-export const meta: MetaFunction = ({ data: { ogImage } }) => {
+// Wire the loaded profile json, above, to the og meta tags.
+export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
-      'og:image': ogImage,
+    'og:title': `${displayName}'s 3ID Profile`,
+    'og:description': bio,
+    'og:url': `https://3id.kubelt.com/${targetAddress}`,
+    'og:image': ogImageURL,
   }
 };
 
@@ -99,7 +114,6 @@ const ProfileRoute = () => {
     pfp,
     cover,
     website,
-    ogImage,
   } = useLoaderData()
 
   const [coverUrl, setCoverUrl] = useState(cover)
