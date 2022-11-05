@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from '@remix-run/cloudflare'
+import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { useFetcher, useLoaderData } from '@remix-run/react'
 
 import ProfileCard from '~/components/profile/ProfileCard'
@@ -25,6 +25,8 @@ import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
+import social from '~/assets/social.png'
+
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
 }
@@ -35,6 +37,29 @@ export const loader: LoaderFunction = async (args) => {
   const profileJson = await profileLoader(args).then((profileRes: Response) =>
     profileRes.json()
   )
+
+  const hex = gatewayFromIpfs(profileJson.pfp.image);
+  const bkg = gatewayFromIpfs(profileJson.cover);
+
+  const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
+    method: 'POST',
+    headers: {
+      'authorization': `Bearer ${NFTAR_AUTHORIZATION}`,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      bkg,
+      hex
+    })
+  });
+
+  let url;
+  try {
+    url = (await ogImage.json()).url;
+  } catch {
+    console.error('JSON converstion failed for og:image generator. Using default social image.');
+    url = social;
+  }
 
   let isOwner = false
 
@@ -51,8 +76,15 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? { address } : false,
+    ogImage: url,
   })
 }
+
+export const meta: MetaFunction = ({ data: { ogImage } }) => {
+  return {
+      'og:image': ogImage,
+  }
+};
 
 const ProfileRoute = () => {
   const {
@@ -67,6 +99,7 @@ const ProfileRoute = () => {
     pfp,
     cover,
     website,
+    ogImage,
   } = useLoaderData()
 
   const [coverUrl, setCoverUrl] = useState(cover)

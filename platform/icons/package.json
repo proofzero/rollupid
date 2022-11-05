@@ -9,8 +9,8 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "dev:wrangler": "wrangler dev --local --persist --env dev",
-    "dev": "echo \"No dev for redeem. Please use start.\"",
+    "dev:wrangler": "wrangler dev --local --persist",
+    "dev": "run-p \"dev:*\"",
     "start": "run-p 'dev:*'",
     "deploy": "wrangler publish"
   },
