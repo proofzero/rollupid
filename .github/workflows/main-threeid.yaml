@@ -55,6 +55,7 @@ jobs:
             NFTAR_CHAIN_ID
             VALID_CHAIN_ID_NAME
             ALCHEMY_PUBLIC_API_KEY
+            ALCHEMY_NFT_API_URL
         env:
           TEST_ENV: true
           SESSION_SECRET: "secret"
@@ -76,6 +77,7 @@ jobs:
           NFTAR_CHAIN_ID: 5
           VALID_CHAIN_ID_NAME: goerli
           ALCHEMY_PUBLIC_API_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
+          ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_NFT_API_URL }}
       # - name: Cache playwright binaries
       #   id: playwright-cache
       #   uses: actions/cache@v3

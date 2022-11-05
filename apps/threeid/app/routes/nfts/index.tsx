@@ -5,6 +5,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
 
   // @ts-ignore
+  if(!ALCHEMY_NFT_API_URL) {
+    throw new Error("Make sure 'ALCHEMY_NFT_API_URL' env variable is set.")
+  }
+  
+  // @ts-ignore
   const url = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
 
   const owner = srcUrl.searchParams.get('owner')
