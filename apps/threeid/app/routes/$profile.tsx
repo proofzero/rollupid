@@ -68,9 +68,6 @@ export const loader: LoaderFunction = async (args) => {
   const jwt = session.get('jwt')
   const address = session.get('address')
 
-  console.log("session", session)
-  console.log("address", address)
-
   if (address === params.profile) {
     isOwner = true
   }
