@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       }
 
       return {
-        url: nft.media[0].raw, // TODO: @Cosmin why is this an array?
+        url: nft.media.raw, // TODO: @Cosmin why is this an array?
         title: nft.title,
         collectionTitle: nft.contractMetadata?.name,
         properties,
@@ -60,5 +60,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   )
 
-  return json(res)
+  return json({res: ownedNfts})
 }

@@ -18,7 +18,9 @@ export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
 
   // check if the user has already minted
   const alchemy = new AlchemyClient()
-  const nfts = await alchemy.getNFTsForOwner(address, contractAddress)
+  const nfts = await alchemy.getNFTsForOwner(address, {
+    contracts: [contractAddress],
+  })
   if (nfts.ownedNfts.length > 0) {
     const voucher = {
       chainId,

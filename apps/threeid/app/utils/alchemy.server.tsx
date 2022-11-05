@@ -68,12 +68,13 @@ export class AlchemyClient {
   ): Promise<GetNFTsResponse> {
     // @ts-ignore
     const reqUrl = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
+    reqUrl.searchParams.set('owner', address)
     options?.contracts && reqUrl.searchParams.set('contractAddresses', options.contracts.join(','))
     options?.pageKey && reqUrl.searchParams.set('pageKey', options.pageKey)
     options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.toString())
 
     console.log("requesting", reqUrl)
-    const response = await fetch(reqUrl, {headers: {'accept': 'application/json'}})
+    const response = await fetch(reqUrl.toString(), {headers: {'accept': 'application/json'}})
 
     if (response.status !== 200) {
       throw new Error(`Failed to fetch NFTs with request: ${await response.text()}`)
