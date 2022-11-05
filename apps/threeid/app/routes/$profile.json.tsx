@@ -28,7 +28,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     if (!voucher) {
       voucher = await fetchVoucher({
         address: params.profile,
-        skipImage: !!voucher,
       })
       voucher = await putCachedVoucher(params.profile, voucher)
     }
