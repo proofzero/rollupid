@@ -39,18 +39,7 @@ export const loader: LoaderFunction = async (args) => {
   )
 
   let hex = gatewayFromIpfs(profileJson?.pfp?.image);
-  let bkg = gatewayFromIpfs(profileJson?.cover);
-
-  // Attempt to get a default profile pic and cover from NFTar.
-  if (!hex && !bkg) {
-    const voucherResponse = await fetchVoucher({
-      address: params.profile,
-      skipImage: false,
-    });
-
-    hex = voucherResponse.metadata.image;
-    bkg = voucherResponse.metadata.cover;
-  }
+  let bkg = gatewayFromIpfs(profileJson?.cover);  
 
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
@@ -81,6 +70,8 @@ export const loader: LoaderFunction = async (args) => {
   if (address === params.profile) {
     isOwner = true
   }
+
+  console.log("params.profile", params.profile)
 
   return json({
     ...profileJson,

@@ -18,7 +18,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const profileRes = await galaxyClient.getProfileFromAddress({
       address: params.profile,
     })
-
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,

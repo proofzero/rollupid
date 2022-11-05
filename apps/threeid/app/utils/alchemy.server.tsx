@@ -64,9 +64,9 @@ export class AlchemyClient {
     // @ts-ignore
     const reqUrl = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
     reqUrl.searchParams.set('owner', address)
-    options?.contracts && reqUrl.searchParams.set('contractAddresses', options.contracts.join(','))
+    options?.contracts && (options.contracts.forEach((contract, idx) => reqUrl.searchParams.append("contractAddresses\[\]", contract)))
     options?.pageKey && reqUrl.searchParams.set('pageKey', options.pageKey)
-    options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.tostring())
+    options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.toString())
 
     const response = await fetch(reqUrl.toString(), {headers: {'accept': 'application/json'}})
 

@@ -44,7 +44,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         const mappedAttributes = nft.metadata.attributes.map((a) => ({
           name: a.trait_type,
           value: a.value,
-          display: a.display_type || "string", // TODO: @Cosmin this field is not in the alchemy schema. 
+          display: a.display_type || "string", // TODO: @Cosmin this field is not in the alchemy schema. Is it needed at all?
         }))
         
         properties = properties.concat(mappedAttributes)
