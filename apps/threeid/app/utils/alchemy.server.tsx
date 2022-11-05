@@ -22,7 +22,8 @@ export type GetNFTsResponse = {
       background_color: String
       name: String
       description: String
-      attributes: Array<{ value: String; trait_type: String }>
+      properties?: any
+      attributes: Array<{ value: String; trait_type: String; display_type?: String }>
       media: {
         raw: String
         gateway: String
@@ -31,6 +32,22 @@ export type GetNFTsResponse = {
         bytes: Number
       }
       timeLastUpdated: Number
+    },
+    contractMetadata: {
+      name: String,
+      symbol: String,
+      totalSupply: String,
+      tokenType: String,
+      openSeaObject: {
+        floorPrice: String,
+        collectionName: String,
+        safeListRequestStatus: String,
+        imageUrl: String,
+        description: String,
+        externalUrl: String,
+        twitterUsername: String,
+        discordUrl: String,
+      }
     }
   }[]
   pageKey: String
@@ -43,13 +60,18 @@ export class AlchemyClient {
 
   async getNFTsForOwner(
     address: string,
-    contract: string
+    options?: {
+      contracts?: string[] | null,
+      pageKey?: string | null,
+      withMetadata?: boolean | null,
+    }
   ): Promise<GetNFTsResponse> {
-    const reqUrl = `${ALCHEMY_NFT_API_URL}/getNFTs?${new URLSearchParams({
-      owner: address,
-      contractAddresses: [contract].join(','),
-      withMetadata: 'true',
-    })}`
+    // @ts-ignore
+    const reqUrl = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
+    options?.contracts && reqUrl.searchParams.set('contractAddresses', options.contracts.join(','))
+    options?.pageKey && reqUrl.searchParams.set('pageKey', options.pageKey)
+    options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.toString())
+
     console.log("requesting", reqUrl)
     const response = await fetch(reqUrl, {headers: {'accept': 'application/json'}})
 
