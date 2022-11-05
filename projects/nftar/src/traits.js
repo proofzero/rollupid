@@ -112,7 +112,23 @@ const SPECIAL_COLLECTIONS = {
     }
 }
 
+// Return a list of all contract addresses we care about (primarily
+// a helper function for filtering Alchemy getNFTsForOwner calls).
+function getContractAddresses () {
+    // We use a set to make sure contract addresses are unique.
+    const addressSet = new Set(Object.keys(POPULAR_COLLECTIONS));
+
+    // Iterate and add the elements of the "second set" to the first
+    // because there is no out-of-the-box set union function.
+    const specialKeys = Object.keys(SPECIAL_COLLECTIONS);
+    for (let i = 0; i < specialKeys.length; i++) addressSet.add(specialKeys[i]);
+
+    // Return the set, expanded back into an array.
+    return [...addressSet];
+}
+
 module.exports = {
+    getContractAddresses,
     TRAIT_CATEGORIES,
     V0_COLORS,
     POPULAR_COLLECTIONS,

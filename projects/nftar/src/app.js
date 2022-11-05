@@ -28,6 +28,10 @@ const {
     generateTraits
 } = require('./utils.js');
 
+const {
+    getContractAddresses,
+} = require('./traits.js');
+
 const canvas = require('./canvas/canvas.js');
 
 // const {
@@ -96,23 +100,6 @@ const METHOD_PARAMS = {
     'describe': {},
 };
 
-// If the user owns an NFT from the PFP contract this will throw a 409
-// error UNLESS ctx.devKey is set (via the NFTAR_DEV_KEY envvar) and used.
-const handleDuplicateGenerationRequest = function(contract, nfts, account, key, ctx) {
-    // If the key from the header is not undefined AND the devKey from the 
-    // environment is not undefined AND the two are equal THEN we're in
-    // development mode and will skip the duplicate PFP check.
-    const isDevMode = (key !== undefined && ctx.devKey !== undefined && key === ctx.devKey);
-    if (isDevMode) {
-        return true;
-    }
-
-    // If the user owns an NFT from the given contract, 409 error.
-    if (nfts.ownedNfts.length) {
-        ctx.throw(409, `${account} already owns an NFT from ${contract}!`);
-    }    
-};
-
 // Accepts a blockchain account to generate a unique PFP.
 //
 // Properties are generated per account and saved; will check if a
@@ -150,15 +137,20 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     let t0, t1;
     const weightInc = {};
     t0 = performance.now();
+
+    // Alchemy accepts a maximum of 20 contracts.
+    // cf. https://docs.alchemy.com/reference/sdk-getnfts
+    const MAX_ALCHEMY_CONTRACT_ARRAY_SIZE = 20;
+    const contractAddresses = getContractAddresses().slice(0, MAX_ALCHEMY_CONTRACT_ARRAY_SIZE);
+    console.log('contractAddresses list:', JSON.stringify(contractAddresses));
+
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account, {
-        contractAddresses: [ctx.pfp_contract]
+        contractAddresses
     });
+    console.log('nftsForOwner:', JSON.stringify(nftsForOwner));
+
     t1 = performance.now();
     console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
-
-    // If the user owns an NFT from the PFP contract this will throw a 409
-    // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
-    handleDuplicateGenerationRequest(ctx.pfp_contract, nftsForOwner, account, key, ctx);
 
     // If the client wants us to check Alchemy to see if the NFT has been
     // minted, but has the image and wants to skip expensive operations, it
@@ -270,9 +262,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     //console.log('metadata.json contents:\n', metadata.data);
     //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
     
-    //fire and forget to gateway
     t0 = performance.now();
-    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`)
+    // Fire-and-forget to prewarm gateway. Catch (particularly) ETIMEDOUT to stop the container crashing.
+    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`).catch(e => console.log('fire-and-forget failed:', JSON.stringify(e)));
     t1 = performance.now();
     console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
     
@@ -345,19 +337,6 @@ const genInvite = async (ctx, next) => {
         inviteTier,
         issueDate,
     }), 'with API key:', key === ctx.apiKey, 'with DEV key:', key === ctx.devKey);
-
-    let t0 = performance.now();
-    if (recipient) {
-        const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(recipient, {
-            contractAddresses: [ctx.invite_contract]
-        });
-        
-        // If the user owns an NFT from the invite contract this will throw a 409
-        // error UNLESS ctx.devKey is used (set via the NFTAR_DEV_KEY envvar).
-        handleDuplicateGenerationRequest(ctx.invite_contract, nftsForOwner, recipient, key, ctx);
-    }
-    let t1 = performance.now();
-    console.log(`genInvite: recipient ownership check took ${t1 - t0} milliseconds.`);
     
     await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
     const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
