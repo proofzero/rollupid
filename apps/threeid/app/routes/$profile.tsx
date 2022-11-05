@@ -84,7 +84,7 @@ export const loader: LoaderFunction = async (args) => {
 // Wire the loaded profile json, above, to the og meta tags.
 export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
-    'og:title': `${displayName}'s 3ID Profile`,
+    'og:title': `${displayName || targetAddress}'s 3ID Profile`,
     'og:description': bio,
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
