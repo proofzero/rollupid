@@ -1,58 +1,53 @@
+export type NFTMedia = {
+  raw: string
+  gateway: string
+  thumbnail: string
+  format: string
+  bytes: number
+}
 export type GetNFTsResponse = {
   ownedNfts: {
     contract: {
-      address: String
+      address: string
     }
-    title: String
-    description: String
+    title: string
+    description: string
     tokenUri: {
-      raw: String
-      gateway: String
+      raw: string
+      gateway: string
     }
-    media: {
-      raw: String
-      gateway: String
-      thumbnail: String
-      format: String
-      bytes: Number
-    }
+    media: NFTMedia | NFTMedia[]
     metadata: {
-      image: String
-      extneral_url: String
-      background_color: String
-      name: String
-      description: String
+      image: string
+      external_url: string
+      background_color: string
+      name: string
+      description: string
       properties?: any
-      attributes: Array<{ value: String; trait_type: String; display_type?: String }>
-      media: {
-        raw: String
-        gateway: String
-        thumbnail: String
-        format: String
-        bytes: Number
-      }
-      timeLastUpdated: Number
+      attributes: Array<{ value: string; trait_type: string; display_type?: string }>
+      media: NFTMedia | NFTMedia[]
+      timeLastUpdated: number
     },
     contractMetadata: {
-      name: String,
-      symbol: String,
-      totalSupply: String,
-      tokenType: String,
+      name: string,
+      symbol: string,
+      totalSupply: string,
+      tokenType: string,
       openSeaObject: {
-        floorPrice: String,
-        collectionName: String,
-        safeListRequestStatus: String,
-        imageUrl: String,
-        description: String,
-        externalUrl: String,
-        twitterUsername: String,
-        discordUrl: String,
+        floorPrice: string,
+        collectionName: string,
+        safeListRequestStatus: string,
+        imageUrl: string,
+        description: string,
+        externalUrl: string,
+        twitterUsername: string,
+        discordUrl: string,
       }
     }
   }[]
-  pageKey: String
-  totalCount: String
-  blockHash: String
+  pageKey: string
+  totalCount: string
+  blockHash: string
 }
 
 export class AlchemyClient {
@@ -71,9 +66,8 @@ export class AlchemyClient {
     reqUrl.searchParams.set('owner', address)
     options?.contracts && reqUrl.searchParams.set('contractAddresses', options.contracts.join(','))
     options?.pageKey && reqUrl.searchParams.set('pageKey', options.pageKey)
-    options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.toString())
+    options?.withMetadata && reqUrl.searchParams.set('withMetadata', options.withMetadata.tostring())
 
-    console.log("requesting", reqUrl)
     const response = await fetch(reqUrl.toString(), {headers: {'accept': 'application/json'}})
 
     if (response.status !== 200) {

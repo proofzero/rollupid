@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         display: string
       }[] = []
 
-      // TODO: @Cosmin this field is not in the alchemy schema. Does why check?
+      // TODO: is this here b/c pfp does not conform to standard?
       if (nft.metadata.properties) {
         const validProps = Object.keys(nft.metadata.properties)
           .filter((k) => typeof nft.metadata.properties[k] !== 'object')
@@ -40,19 +40,20 @@ export const loader: LoaderFunction = async ({ request }) => {
         properties = properties.concat(validProps)
       }
 
-      // TODO: @Cosmin why no just use nft.metadata.attributes?
       if (nft.metadata.attributes?.length) {
         const mappedAttributes = nft.metadata.attributes.map((a) => ({
           name: a.trait_type,
           value: a.value,
-          display: a.display_type, // TODO: @Cosmin this field is not in the alchemy schema. 
+          display: a.display_type || "string", // TODO: @Cosmin this field is not in the alchemy schema. 
         }))
-
+        
         properties = properties.concat(mappedAttributes)
       }
 
+      const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
+
       return {
-        url: nft.media.raw, // TODO: @Cosmin why is this an array?
+        url: gatewayFromIpfs(media.raw),
         title: nft.title,
         collectionTitle: nft.contractMetadata?.name,
         properties,
@@ -60,5 +61,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   )
 
-  return json({res: ownedNfts})
+  return json({ownedNfts})
 }
