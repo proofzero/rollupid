@@ -3968,11 +3968,11 @@ __metadata:
 
 "@kubelt/do.starbase-contract@file:../component/contract::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
   version: 0.1.0
-  resolution: "@kubelt/do.starbase-contract@file:../component/contract#../component/contract::hash=0120bb&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
+  resolution: "@kubelt/do.starbase-contract@file:../component/contract#../component/contract::hash=4f8f43&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
   dependencies:
     "@kubelt/openrpc": "file:../../lib/openrpc"
     cross-env: 7.0.3
-  checksum: c348b2726295cabf4d07da3aa347cd503dfd06d88e5615b8d229ab3d414957fbcc12d40f0e1bf8b3574a5d15cc795c95de67c01786d6cb2c3d9ce5405a5f0d6a
+  checksum: a73ab47949af0f26dfa603d21e81f8ba2e1fe233b0bb2010335cac04994b43a069ad347695cca0d699cbac8d5c50a39be1cb03184fe598a6362ec62f572dbb26
   languageName: node
   linkType: hard
 
@@ -3987,11 +3987,11 @@ __metadata:
 
 "@kubelt/do.starbase-user@file:../component/user::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
   version: 0.1.0
-  resolution: "@kubelt/do.starbase-user@file:../component/user#../component/user::hash=9a3099&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
+  resolution: "@kubelt/do.starbase-user@file:../component/user#../component/user::hash=755cad&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
   dependencies:
     "@kubelt/openrpc": "file:../../lib/openrpc"
     cross-env: 7.0.3
-  checksum: 148fea3cdf6f95730f80c38712d62ef00020c3638c348097998ffcc720fc48265c597cbcd3393ff4cb2125743ab6efcd0223983af561066bca0efa35a2982f92
+  checksum: 1e4271652361ea6b4212fb79324507914b09ae094c59cca8f0ff4d6743d837b659bc869acc61ebf779ad3f4122b3acced73bf9ab06b4a43e9d737fc810f195ad
   languageName: node
   linkType: hard
 
@@ -4038,9 +4038,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D0120bb%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D4f8f43%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
   version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D0120bb%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D4f8f43%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
   dependencies:
     "@cfworker/json-schema": 1.12.5
     "@open-rpc/meta-schema": 1.14.2
@@ -4072,9 +4072,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D9a3099%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D755cad%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
   version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D9a3099%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D755cad%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
   dependencies:
     "@cfworker/json-schema": 1.12.5
     "@open-rpc/meta-schema": 1.14.2

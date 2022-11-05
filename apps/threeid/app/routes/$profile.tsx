@@ -41,6 +41,7 @@ export const loader: LoaderFunction = async (args) => {
   let hex = gatewayFromIpfs(profileJson?.pfp?.image);
   let bkg = gatewayFromIpfs(profileJson?.cover);  
 
+  // check generate and return og image
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
     headers: {
@@ -71,8 +72,6 @@ export const loader: LoaderFunction = async (args) => {
     isOwner = true
   }
 
-  console.log("params.profile", params.profile)
-
   return json({
     ...profileJson,
     isOwner,
@@ -85,8 +84,8 @@ export const loader: LoaderFunction = async (args) => {
 // Wire the loaded profile json, above, to the og meta tags.
 export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
-    'og:title': `${displayName}'s 3ID Profile`,
-    'og:description': bio,
+    'og:title': `${displayName || targetAddress}'s 3ID Profile`,
+    'og:description': bio || "Claim yours now!",
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
   }
