@@ -1,5 +1,6 @@
 import { json } from 'stream/consumers'
 import { AlchemyClient } from '~/utils/alchemy.server'
+import { gatewayFromIpfs } from './gateway-from-ipfs'
 
 type FetchVoucherParams = {
   address: string
@@ -7,20 +8,18 @@ type FetchVoucherParams = {
 
 export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
   // @ts-ignore
-  const nftarUrl = NFTAR_URL
+  const nftarUrl: string = NFTAR_URL
   // @ts-ignore
-  const nftarToken = NFTAR_AUTHORIZATION
+  const nftarToken: string = NFTAR_AUTHORIZATION
   // @ts-ignore
-  const contractAddress = MINTPFP_CONTRACT_ADDRESS as string
+  const contractAddress: string = MINTPFP_CONTRACT_ADDRESS
   // @ts-ignore
-  const chainId = NFTAR_CHAIN_ID
+  const chainId: string = NFTAR_CHAIN_ID
 
   // check if the user has already minted
   const alchemy = new AlchemyClient()
   const nfts = await alchemy.getNFTsForOwner(address, contractAddress)
-
   if (nfts.ownedNfts.length > 0) {
-    console.log('owner already has a pfp', nfts.ownedNfts[0])
     const voucher = {
       chainId,
       contractAddress,
@@ -28,7 +27,7 @@ export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
       metadata: nfts.ownedNfts[0].metadata,
     }
     await putCachedVoucher(address, voucher)
-    return json({ contractAddress, voucher })
+    return { contractAddress, voucher }
   }
 
   const nftarFetch = {
@@ -64,9 +63,10 @@ export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
     contractAddress,
   }
 
-  res.metadata.cover = jsonRes.result.metadata.cover
-  res.metadata.image = jsonRes.result.metadata.image
+  res.metadata.cover = gatewayFromIpfs(jsonRes.result.metadata.cover)
+  res.metadata.image = gatewayFromIpfs(jsonRes.result.metadata.image)
 
+  // fire and forget to hotload image
   fetch(res.metadata.image)
   fetch(res.metadata.cover)
 
