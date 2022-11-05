@@ -172,7 +172,7 @@ const ProfileRoute = () => {
       </div>
 
       <div
-        className="h-80 w-full relative flex justify-center"
+        className="h-80 w-full relative flex justify-center p-3"
         style={{
           backgroundImage: coverUrl
             ? `url(${gatewayFromIpfs(coverUrl)})`
@@ -221,7 +221,7 @@ const ProfileRoute = () => {
         )}
       </div>
 
-      <div className="mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
+      <div className="p-3 mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
         {!claimed && (
           <div className="lg:ml-[19rem] rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
