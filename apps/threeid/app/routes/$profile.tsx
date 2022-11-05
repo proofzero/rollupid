@@ -71,18 +71,6 @@ export const loader: LoaderFunction = async (args) => {
     })
   });
 
-  const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
-    method: 'POST',
-    headers: {
-      'authorization': `Bearer ${NFTAR_AUTHORIZATION}`,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      bkg,
-      hex
-    })
-  });
-
   let url;
   try {
     url = (await ogImage.json()).url;
@@ -106,17 +94,17 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? { address } : false,
-    ogImage: url,
+    ogImageURL: url,
   })
 };
 
 // Wire the loaded profile json, above, to the og meta tags.
-export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImage } }) => {
+export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
     'og:title': displayName,
     'og:description': bio,
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
-    'og:image': ogImage,
+    'og:image': ogImageURL,
   }
 };
 
