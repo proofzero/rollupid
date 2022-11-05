@@ -85,7 +85,7 @@ export const loader: LoaderFunction = async (args) => {
 export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
   return {
     'og:title': `${displayName || targetAddress}'s 3ID Profile`,
-    'og:description': bio,
+    'og:description': bio || "Claim yours now!",
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
   }
