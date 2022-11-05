@@ -78,11 +78,14 @@ export const loader: LoaderFunction = async (args) => {
     loggedIn: jwt ? { address } : false,
     ogImage: url,
   })
-}
+};
 
-export const meta: MetaFunction = ({ data: { ogImage } }) => {
+export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImage } }) => {
   return {
-      'og:image': ogImage,
+    'og:title': displayName,
+    'og:description': bio,
+    'og:url': targetAddress,
+    'og:image': ogImage,
   }
 };
 
@@ -99,7 +102,6 @@ const ProfileRoute = () => {
     pfp,
     cover,
     website,
-    ogImage,
   } = useLoaderData()
 
   const [coverUrl, setCoverUrl] = useState(cover)
