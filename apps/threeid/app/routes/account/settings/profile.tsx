@@ -6,7 +6,7 @@ import {
   useOutletContext,
   useTransition,
 } from '@remix-run/react'
-import { FaAt, FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 import InputText from '~/components/inputs/InputText'
 import { getUserSession, requireJWT } from '~/utils/session.server'
@@ -339,7 +339,7 @@ export default function AccountSettingsProfile() {
           <InputText
             id="website"
             heading="Website"
-            addon="http://"
+            Icon={FaGlobe}
             defaultValue={website}
           />
 

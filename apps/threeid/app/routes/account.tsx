@@ -13,7 +13,7 @@ import styles from '~/styles/account.css'
 import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
 import { links as invCodeStyles } from '~/components/invite-code'
-import { links as profileNftCollectionLinks } from "~/components/nft-collection/ProfileNftCollection";
+import { links as profileNftCollectionLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
@@ -32,8 +32,8 @@ export function links() {
     ...buttonStyles(),
     ...faqStyles(),
     ...profileNftCollectionLinks(),
-    { rel: "stylesheet", href: styles },
-  ];
+    { rel: 'stylesheet', href: styles },
+  ]
 }
 
 // @ts-ignore
@@ -109,11 +109,11 @@ export default function AccountLayout() {
           />
         </div>
 
-        <main className="-mt-72">
+        <main className="-mt-72 pb-12">
           <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
             <div className="overflow-hidden bg-white shadow">
-              <div className="divide-y divide-gray-200 pb-4 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
-                <aside className="fixed bottom-0 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
+              <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+                <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
                   <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
                     {subNavigation.map((item) => (
                       <SideNavItem key={item.name} item={item} />
@@ -146,14 +146,14 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
     backgroundColor: 'rgb(243 244 246)',
   }
   return (
-    <div className={'basis-1/4 lg:w-100 content-center self-center'}>
+    <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
       <NavLink
         to={item.href}
         // @ts-ignore
         style={({ isActive }) => {
           return isActive && item.href != '#' ? activeStyle : undefined
         }}
-        className="text-sm group lg:border-l-4 px-3 py-2 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
+        className="text-sm group lg:border-l-4 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
       >
         <item.icon
           className={classNames(
