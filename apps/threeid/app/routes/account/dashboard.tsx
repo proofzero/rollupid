@@ -14,7 +14,6 @@ import { oortSend } from '~/utils/rpc.server'
 import datadogRum from '~/utils/datadog.client'
 
 import FAQ from '~/components/FAQ'
-import InviteCode from '~/components/invite-code'
 
 import stepComplete from '~/assets/step_complete.png'
 import stepSoon from '~/assets/step_soon.png'
@@ -176,6 +175,9 @@ const comingNext = [
 
 const roadmapSteps = [
   {
+    title: 'Setup Address Profiles',
+  },
+  {
     title: 'Permission First App',
   },
   {
@@ -191,7 +193,7 @@ const roadmapSteps = [
     title: 'Send First Message',
   },
   {
-    title: 'Publish First File',
+    title: 'Save First File',
   },
 ]
 
@@ -270,13 +272,49 @@ export default function Welcome() {
         </div>
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="invite basis-full lg:basis-6/12 order-1 lg:order-2">
-          <InviteCode invite={inviteCode} />
-          <div className="faq hidden lg:block">
-            <FAQ />
+        <div className="invite basis-full lg:basis-6/12 order-2 lg:order-2">
+          <div className="roadmap-vote">
+            <SectionHeadingSubtle
+              title="Tell us what's next"
+              subtitle={`Vote for your favorite features (${
+                3 - featureVotes.size
+              } votes left)`}
+            />
+
+            <div className="roadmap-vote__steps steps grid grid-rows gap-4">
+              {roadmapSteps.map((step, index) => (
+                <div
+                  className="roadmap-vote__step step flex flex-row gap-4 items-center"
+                  key={index}
+                >
+                  <button
+                    className="roadmap-vote__button mt-1 flex items-center justify-center"
+                    disabled={
+                      featureVotes.size >= 3 || featureVotes.has(step.title)
+                        ? true
+                        : false
+                    }
+                    onClick={(e) => {
+                      featureVotes.add(step.title)
+                      setFeatureVotes(new Set(featureVotes))
+                      datadogRum.addAction('featureVote', {
+                        value: step.title,
+                      })
+                    }}
+                  >
+                    <FaCaretUp />
+                  </button>
+                  <div className="col-span-5">
+                    <SectionHeading className="mb-1">
+                      {step.title}
+                    </SectionHeading>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="roadmap basis-full lg:basis-6/12 order-2 lg:order-1">
+        <div className="roadmap basis-full lg:basis-6/12 order-1 lg:order-1">
           <SectionTitle
             title="Roadmap"
             subtitle="Discover and try new features as we roll them out"
@@ -344,51 +382,10 @@ export default function Welcome() {
               ))}
             </div>
           </div>
-          <div className="roadmap-vote">
-            <SectionHeadingSubtle
-              title="Tell us what's next"
-              subtitle={`Vote for your favorite features (${
-                3 - featureVotes.size
-              } votes left)`}
-            />
-
-            <div className="roadmap-vote__steps steps grid grid-rows gap-4">
-              {roadmapSteps.map((step, index) => (
-                <div
-                  className="roadmap-vote__step step flex flex-row gap-4 items-center"
-                  key={index}
-                >
-                  <button
-                    className="roadmap-vote__button mt-1 flex items-center justify-center"
-                    disabled={
-                      featureVotes.size >= 3 || featureVotes.has(step.title)
-                        ? true
-                        : false
-                    }
-                    onClick={(e) => {
-                      featureVotes.add(step.title)
-                      setFeatureVotes(new Set(featureVotes))
-                      datadogRum.addAction('featureVote', {
-                        value: step.title,
-                      })
-                    }}
-                  >
-                    <FaCaretUp />
-                  </button>
-                  <div className="col-span-5">
-                    <SectionHeading className="mb-1">
-                      {step.title}
-                    </SectionHeading>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-        <div className="faq basis-full lg:basis-6/12 lg:hidden order-3">
-          <FAQ />
-        </div>
+        <div className="faq basis-full lg:basis-6/12 lg:hidden order-3"></div>
       </div>
+      <FAQ />
     </div>
   )
 }
