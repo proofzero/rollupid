@@ -37,6 +37,8 @@ jobs:
         with:
           path: |
             node_modules
+            packages/node_modules
+            .yarn
           key: ${{ runner.os }}-packages-modules-${{ hashFiles('yarn.lock') }}
           retore-keys: |
             ${{ runner.os }}-packages-modules-
