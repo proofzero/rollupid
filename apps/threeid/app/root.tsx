@@ -47,6 +47,9 @@ export const meta: MetaFunction = () => ({
   'og:description':
     '3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
   'og:image': social,
+  'twitter:card': 'summary_large_image',
+  'twitter:site': '@threeid_xyz',
+  'twitter:creator': '@threeid_xyz',
   'theme-color': '#673ab8',
   'mobile-web-app-capable': 'yes',
   'apple-mobile-web-app-capable': 'yes',

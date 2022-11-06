@@ -26,6 +26,7 @@ import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
 import social from '~/assets/social.png'
+import { datadogRum } from '@datadog/browser-rum'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -38,28 +39,30 @@ export const loader: LoaderFunction = async (args) => {
     profileRes.json()
   )
 
-  let hex = gatewayFromIpfs(profileJson?.pfp?.image);
-  let bkg = gatewayFromIpfs(profileJson?.cover);  
+  let hex = gatewayFromIpfs(profileJson?.pfp?.image)
+  let bkg = gatewayFromIpfs(profileJson?.cover)
 
   // check generate and return og image
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
     headers: {
-      'authorization': `Bearer ${NFTAR_AUTHORIZATION}`,
-      'content-type': 'application/json'
+      authorization: `Bearer ${NFTAR_AUTHORIZATION}`,
+      'content-type': 'application/json',
     },
     body: JSON.stringify({
       bkg,
-      hex
-    })
-  });
+      hex,
+    }),
+  })
 
-  let url;
+  let url
   try {
-    url = (await ogImage.json()).url;
+    url = (await ogImage.json()).url
   } catch {
-    console.error('JSON converstion failed for og:image generator. Using default social image.');
-    url = social;
+    console.error(
+      'JSON converstion failed for og:image generator. Using default social image.'
+    )
+    url = social
   }
 
   let isOwner = false
@@ -79,23 +82,25 @@ export const loader: LoaderFunction = async (args) => {
     loggedIn: jwt ? { address } : false,
     ogImageURL: url,
   })
-};
+}
 
 // Wire the loaded profile json, above, to the og meta tags.
-export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, ogImageURL } }) => {
+export const meta: MetaFunction = ({
+  data: { targetAddress, displayName, bio, ogImageURL, twitterHandle },
+}) => {
   return {
     'og:title': `${displayName || targetAddress}'s 3ID Profile`,
-    'og:description': bio || "Claim yours now!",
+    'og:description': bio || 'Claim yours now!',
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
     // Twitter-specific meta tags.
     // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
     'twitter:card': 'summary_large_image',
     'twitter:site': '@threeid_xyz',
-    // TODO: If the user has connected Twitter, this should be their handle.
-    'twitter:creator': '@threeid_xyz',
+    // TODO: Hook this up
+    'twitter:creator': twitterHandle || '@threeid_xyz',
   }
-};
+}
 
 const ProfileRoute = () => {
   const {

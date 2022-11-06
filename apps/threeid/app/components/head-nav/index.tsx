@@ -1,49 +1,49 @@
-import { Fragment, useState } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Link, useLoaderData, NavLink } from "@remix-run/react";
+import { Fragment, useState } from 'react'
+import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { Link, useLoaderData, NavLink } from '@remix-run/react'
 
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
-import { HiOutlineBell } from "react-icons/hi";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { HiOutlineBell } from 'react-icons/hi'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-import logo from "~/assets/three-id-logo-white.svg";
-import defaultAvatar from "~/assets/circle_gradient.png";
-import SignOutLink from "~/components/sign-out-link";
+import logo from '~/assets/three-id-logo-white.svg'
+import defaultAvatar from '~/assets/circle_gradient.png'
+import SignOutLink from '~/components/sign-out-link'
 
-import hexStyle from "~/helpers/hex-style";
+import hexStyle from '~/helpers/hex-style'
 
-import styles from "./headNav.css";
-import { gatewayFromIpfs } from "~/helpers/gateway-from-ipfs";
+import styles from './headNav.css'
+import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
-export const links = () => [{ rel: "stylesheet", href: styles }];
+export const links = () => [{ rel: 'stylesheet', href: styles }]
 
 // TODO: this should be it's own component. These are also function calls not links
 const userNavigation = [
   // { name: 'Copy Address', href: '#' },
   // { name: 'Account', href: '#' },
-  { name: "Sign out", component: SignOutLink },
-];
+  { name: 'Sign out', component: SignOutLink },
+]
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ')
 }
 
 const user = {
   imageUrl: defaultAvatar,
-};
+}
 
 type HeadNavProps = {
-  avatarUrl: string | undefined;
-  isToken: boolean;
+  avatarUrl: string | undefined
+  isToken: boolean
   loggedIn?: {
-    address: string;
-  };
-};
+    address: string
+  }
+}
 
 export default function HeadNav({
   avatarUrl,
@@ -51,13 +51,13 @@ export default function HeadNav({
   isToken = false,
 }: HeadNavProps) {
   const activeStyle = {
-    color: "white",
-    backgroundColor: "rgb(31 41 55)", // bg-gray-800
-  };
+    color: 'white',
+    backgroundColor: 'rgb(31 41 55)', // bg-gray-800
+  }
   const navigation = [
-    { name: "My Profile", to: `/${loggedIn?.address}` },
-    { name: "Account", to: "/account" },
-  ];
+    { name: 'My Profile', to: `/${loggedIn?.address}` },
+    { name: 'Account', to: '/account' },
+  ]
 
   return (
     <Disclosure as="nav">
@@ -80,10 +80,10 @@ export default function HeadNav({
                           to={item.to}
                           // @ts-ignore
                           style={({ isActive }) => {
-                            return isActive ? activeStyle : undefined;
+                            return isActive ? activeStyle : undefined
                           }}
                           className={
-                            "px-3 py-2 text-sm font-medium nav-link-text"
+                            'px-3 py-2 text-sm font-medium nav-link-text'
                           }
                         >
                           <Text
@@ -145,7 +145,7 @@ export default function HeadNav({
                             src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                             alt=""
                             style={
-                              isToken ? hexStyle : { visibility: "visible" }
+                              isToken ? hexStyle : { visibility: 'visible' }
                             }
                           />
                         </Menu.Button>
@@ -166,8 +166,8 @@ export default function HeadNav({
                                 {({ active }) => (
                                   <item.component
                                     className={classNames(
-                                      active ? "bg-gray-100" : "",
-                                      "block px-4 py-2 text-sm text-gray-700"
+                                      active ? 'bg-gray-100' : '',
+                                      'block px-4 py-2 text-sm text-gray-700'
                                     )}
                                   />
                                 )}
@@ -197,25 +197,25 @@ export default function HeadNav({
             <div className="space-y-1 px-2 py-3 sm:px-3">
               {loggedIn &&
                 navigation.map((item) => (
-                  <Disclosure.Button
+                  <NavLink
                     key={item.name}
-                    as="a"
-                    className={classNames(
-                      item.current
-                        ? "bg-gray-800 text-white"
-                        : "text-gray-700 hover:bg-gray-700 hover:text-white",
-                      "px-3 py-2 text-sm font-medium nav-link-text block"
-                    )}
-                    aria-current={item.current ? "page" : undefined}
+                    to={item.to}
+                    // @ts-ignore
+                    style={({ isActive }) => {
+                      return isActive ? activeStyle : undefined
+                    }}
+                    className={
+                      'block px-3 py-2 text-sm font-medium nav-link-text'
+                    }
                   >
                     <Text
                       size={TextSize.SM}
                       weight={TextWeight.Medium500}
-                      color={item.current ? TextColor.White : TextColor.Gray700}
+                      color={TextColor.White}
                     >
                       {item.name}
                     </Text>
-                  </Disclosure.Button>
+                  </NavLink>
                 ))}
             </div>
 
@@ -225,7 +225,7 @@ export default function HeadNav({
                   <div className="flex-shrink-0">
                     <img
                       className="h-10 w-10 rounded-full"
-                      style={isToken ? hexStyle : { visibility: "visible" }} // TODO this reloads when toggled. how do we cache?
+                      style={isToken ? hexStyle : { visibility: 'visible' }} // TODO this reloads when toggled. how do we cache?
                       src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                       alt=""
                     />
@@ -255,5 +255,5 @@ export default function HeadNav({
         </>
       )}
     </Disclosure>
-  );
+  )
 }

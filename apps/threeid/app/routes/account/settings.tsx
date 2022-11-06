@@ -1,7 +1,7 @@
 import { Outlet } from '@remix-run/react'
+import { Toast } from 'flowbite-react'
 import { useState } from 'react'
-import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
-
+import { Toaster, toast } from 'react-hot-toast'
 import Text, {
   TextColor,
   TextSize,
@@ -19,25 +19,20 @@ function classNames(...classes) {
 }
 
 export default function AccountSetting() {
-  const [notifyPillVal, setNotifyPillVal] = useState<{
-    message: string
-    success: boolean
-  } | null>(null)
-
   const notify = (success: boolean = true) => {
-    setNotifyPillVal({
-      message: success ? 'Saved' : 'Save Failed - Please try again',
-      success,
-    })
-
-    setTimeout(() => {
-      setNotifyPillVal(null)
-    }, 2500)
+    if (success) {
+      toast.success('Saved')
+    } else {
+      toast.error('Save Failed -- Please try again')
+    }
   }
 
   return (
     <div>
-      <div className="mb-4 flex flex-row justify-between">
+      <div
+        className="mb-4 flex flex-row justify-between
+      "
+      >
         <Text
           size={TextSize.XL}
           weight={TextWeight.Bold700}
@@ -47,31 +42,7 @@ export default function AccountSetting() {
           Settings
         </Text>
 
-        {notifyPillVal && (
-          <div
-            className={`p-4 flex flex-row items-center bg-${
-              notifyPillVal.success ? 'green' : 'red'
-            }-50 rounded-md`}
-          >
-            <span className="mr-3.5">
-              {notifyPillVal.success ? (
-                <HiCheckCircle className="text-green-400" />
-              ) : (
-                <HiXCircle className="text-red-400" />
-              )}
-            </span>
-
-            <Text
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}
-              color={
-                notifyPillVal.success ? TextColor.Green800 : TextColor.Red800
-              }
-            >
-              {notifyPillVal.message}
-            </Text>
-          </div>
-        )}
+        <Toaster position="top-right" reverseOrder={false} />
       </div>
       <div className="sm:hidden">
         <label htmlFor="tabs" className="sr-only">
