@@ -8,7 +8,8 @@
     "platform",
     "projects",
     "apps",
-    "smartcontracts"
+    "smartcontracts",
+    "www"
   ],
   "scripts": {
     "gql": "yarn workspaces foreach -p -v -i run gql",
