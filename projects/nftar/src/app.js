@@ -120,7 +120,12 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     if (!account){
         ctx.throw(401, 'account is required');
     }
-    
+
+    // Check the images config.
+    if (!ctx.cloudflare || !ctx.cloudflare.accountId || !ctx.cloudflare.accountHash || !ctx.cloudflare.imageToken) {
+        ctx.throw(500, 'Missing image service configuration');
+    }
+
     const blockchain = ctx.jsonrpc.params['blockchain'];
     if (!blockchain){
         ctx.throw(401, 'blockchain is required');
@@ -206,7 +211,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     let pfp_stream;
     let cvr_stream;
-    
+
     if (isNode()) {
         // Generate a single frame; call animate() to produce an animation.
         pfp_stream = pfp_gradient.snapshot();
@@ -226,13 +231,53 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     t1 = performance.now();
     console.log(`Generating image took ${t1 - t0} milliseconds.`);
 
-    // nft.storage File objects are automatically uploaded.
     t0 = performance.now();
-    const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
-    const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
-    //const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
+    // Cloudflare Image service requires we submit by POSTing FormData in order
+    // to set our own filename (cache key).
+    let form = new FormData();
+    form.append('file', pfp_blob, { filename: 'threeid.png' });
+    
+    // Get the headers from the FormData object so that we can pick up
+    // the dynamically generated multipart boundary.
+    let headers = form.getHeaders();
+    headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
+
+    const pfpResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
+        method: 'POST',
+        body: form,
+        headers
+    }).catch(e => console.log('cloudflare upload error', JSON.stringify(e)));
+    console.log(JSON.stringify(pfpResponse));
     t1 = performance.now();
-    console.log(`File blobbing took ${t1 - t0} milliseconds.`);
+    console.log(`Hex upload took ${t1 - t0} milliseconds.`);
+
+    t0 = performance.now();
+    // Cloudflare Image service requires we submit by POSTing FormData in order
+    // to set our own filename (cache key).
+    form = new FormData();
+    form.append('file', cvr_blob, { filename: 'cover.png' });
+    
+    // Get the headers from the FormData object so that we can pick up
+    // the dynamically generated multipart boundary.
+    headers = form.getHeaders();
+    headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
+
+    const cvrResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
+        method: 'POST',
+        body: form,
+        headers
+    });
+    console.log(JSON.stringify(cvrResponse));
+    t1 = performance.now();
+    console.log(`Cover upload took ${t1 - t0} milliseconds.`);
+
+    // nft.storage File objects are automatically uploaded.
+    // t0 = performance.now();
+    // const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
+    // const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
+    // //const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
+    // t1 = performance.now();
+    // console.log(`File blobbing took ${t1 - t0} milliseconds.`);
 
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
@@ -258,15 +303,15 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     t1 = performance.now();
     console.log(`NFT.storage took ${t1 - t0} milliseconds.`);
 
-    //console.log('IPFS URL for the metadata:', metadata.url);
-    //console.log('metadata.json contents:\n', metadata.data);
-    //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
+    console.log('IPFS URL for the metadata:', metadata.url);
+    console.log('metadata.json contents:\n', metadata.data);
+    console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
     
-    t0 = performance.now();
-    // Fire-and-forget to prewarm gateway. Catch (particularly) ETIMEDOUT to stop the container crashing.
-    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`).catch(e => console.log('fire-and-forget failed:', JSON.stringify(e)));
-    t1 = performance.now();
-    console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
+    // t0 = performance.now();
+    // // Fire-and-forget to prewarm gateway. Catch (particularly) ETIMEDOUT to stop the container crashing.
+    // fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`).catch(e => console.log('fire-and-forget failed:', JSON.stringify(e)));
+    // t1 = performance.now();
+    // console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
     
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
