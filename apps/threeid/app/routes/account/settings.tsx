@@ -82,7 +82,7 @@ export default function AccountSetting() {
           </nav>
         </div>
       </div>
-      <div className="mb-8">
+      <div>
         <Outlet
           context={{
             notificationHandler: notify,

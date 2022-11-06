@@ -60,7 +60,7 @@ export default function HeadNav({
   ]
 
   return (
-    <Disclosure as="nav" className={'sm:pb-0'}>
+    <Disclosure as="nav">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4">
