@@ -88,6 +88,12 @@ export const meta: MetaFunction = ({ data: { targetAddress, displayName, bio, og
     'og:description': bio || "Claim yours now!",
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL,
+    // Twitter-specific meta tags.
+    // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
+    'twitter:card': 'summary_large_image',
+    'twitter:site': '@threeid_xyz',
+    // TODO: If the user has connected Twitter, this should be their handle.
+    'twitter:creator': '@threeid_xyz',
   }
 };
 
