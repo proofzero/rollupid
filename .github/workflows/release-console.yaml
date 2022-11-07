@@ -13,8 +13,6 @@ defaults:
 jobs:
   build-publish-console-current:
     runs-on: ubuntu-latest
-    permissions:
-      packages: read
     steps:
       - uses: actions/checkout@v2
 
@@ -32,9 +30,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "apps/console"
+          workingDirectory: 'apps/console'
           command: publish --env current
-          environment: "current"
+          environment: 'current'
           secrets: |
             ADMIN_ACCOUNT_ID
             CF_ZONE_ID

@@ -11,8 +11,6 @@ defaults:
 jobs:
   build-publish-redeem-current:
     runs-on: ubuntu-latest
-    permissions:
-      packages: read
     steps:
       - uses: actions/checkout@v2
 
