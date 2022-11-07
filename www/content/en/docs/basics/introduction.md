@@ -72,5 +72,5 @@ Kubelt also provides a [community forum](https://github.com/kubelt/kubelt/discus
 #### Join the community
 
 - Join our [Discord](https://discord.gg/UgwAsJf6C5) community to ask questions.
-- Follow us on [Twitter](https://twitter.com/kubeltcms) for updates.
+- Follow us on [Twitter](https://twitter.com/kubelt) for updates.
 - Become a [contributor]({{< relref "contributing" >}}).

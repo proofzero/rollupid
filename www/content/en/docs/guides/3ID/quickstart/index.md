@@ -15,7 +15,7 @@ toc: true
 
 3ID is the easiest way for developers to give users a consistent, friendly experience across apps. You're one query away from giving users a personalized experience that increases their trust and joy in using your product.
 
-### 3ID Profile Request
+### 3ID Profile URLs
 
 Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). All resolvers for the same person link to the same 3ID profile, so someone can sign in with a wallet or login with their Google Account and have the same experience.
 
@@ -28,7 +28,7 @@ __This makes it really easy to onboard Web 2.0 users to web3 products.__
 | Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
 | ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
 
-Make a request like this:
+### Making a Request
 
 ```bash
 curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
