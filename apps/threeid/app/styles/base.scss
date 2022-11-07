@@ -1,129 +1,139 @@
-@import "./variables.scss";
+@import './variables.scss';
 
 @font-face {
-    font-family: Inter_400Regular;
-    src: url("/fonts/Inter-Regular.ttf");
+  font-family: Inter_400Regular;
+  src: url('/fonts/Inter-Regular.ttf');
 }
 
 @font-face {
-    font-family: Inter_500Medium;
-    src: url("/fonts/Inter-Medium.ttf");
+  font-family: Inter_500Medium;
+  src: url('/fonts/Inter-Medium.ttf');
 }
 
 @font-face {
-    font-family: Inter_600SemiBold;
-    src: url("/fonts/Inter-SemiBold.ttf");
+  font-family: Inter_600SemiBold;
+  src: url('/fonts/Inter-SemiBold.ttf');
 }
 
 @font-face {
-    font-family: Inter_700Bold;
-    src: url("/fonts/Inter-Bold.ttf");
+  font-family: Inter_700Bold;
+  src: url('/fonts/Inter-Bold.ttf');
 }
 
 html {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    height: calc(100% + env(safe-area-inset-top));
-    -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
-
-
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  height: calc(100% + env(safe-area-inset-top));
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 body {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    -ms-overflow-style: scrollbar;
-    overscroll-behavior-y: none;
-    min-height: 100%;
-    background-color: $threeid-white;
-    margin: 0px;
-    padding: 0px;
-    min-height: 100vh;
-    background-color: $threeid-white;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -ms-overflow-style: scrollbar;
+  overscroll-behavior-y: none;
+  min-height: 100%;
+  background-color: $threeid-white;
+  margin: 0px;
+  padding: 0px;
+  min-height: 100vh;
+  background-color: $threeid-white;
 }
 
 footer {
-    padding: 1em;
-    justify-content: center;
-    align-items: center;
-    p {
-        font-family: Inter_400Regular;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: 24px;
-        text-align: center;
-        color: $threeid-darkgrey;
-    }
+  padding: 1em;
+  justify-content: center;
+  align-items: center;
+  p {
+    font-family: Inter_400Regular;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+    color: $threeid-darkgrey;
+  }
 }
 
-div[data-testid="flowbite-tooltip"] div {
-    font-family: Inter_500Medium;
+.header {
+  background-color: $threeid-header;
+  // padding-left: 1em;
+  // padding-right: 1em;
+
+  nav {
+    margin-right: auto;
+    margin-left: auto;
+    // padding-top: 1em;
+    max-width: 1214px;
+    z-index: 2;
+  }
+}
+
+div[data-testid='flowbite-tooltip'] div {
+  font-family: Inter_500Medium;
 }
 
 .grid-shrink {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr); // see note below
-    grid-template-areas: "shrink expand";
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr); // see note below
+  grid-template-areas: 'shrink expand';
 
-    .expand {
-        grid-area: expand;
-    }
+  .expand {
+    grid-area: expand;
+  }
 
-    .shrink {
-        padding-right: 1em;
-        grid-area: shrink;
-        font-weight: 700;
-    }
+  .shrink {
+    padding-right: 1em;
+    grid-area: shrink;
+    font-weight: 700;
+  }
 }
 
-
 .error-screen {
-    .wrapper {
-        // margin: auto;
-        // display: flex;
-        height: 100vh;
+  .wrapper {
+    // margin: auto;
+    // display: flex;
+    height: 100vh;
+  }
+
+  nav {
+    padding: 1em;
+
+    img {
+      width: 36.56px;
     }
+  }
 
-    nav {
-        padding: 1em;
+  .content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    display: flex;
+    flex-grow: 1;
+    min-width: 300px;
+  }
 
-        img {
-            width: 36.56px;
-        }
-    }
+  .error-message {
+    font-family: Inter_500Medium;
+    font-size: 24px;
+    font-weight: 700;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-dark;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .content {
-        justify-content: center;
-        align-items: center;
-        margin: auto;
-        display: flex;
-        flex-grow: 1;
-        min-width: 300px;
-    }
-
-
-    .error-message {
-        font-family: Inter_500Medium;
-        font-size: 24px;
-        font-weight: 700;
-        max-width: 758px;
-        text-align: center;
-        margin-right: 0;
-        color: $threeid-dark;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .error-secondary-message {
-        padding: 1em;
-        font-family: Inter_400regular;
-        font-size: 18px;
-        font-weight: 400;
-        max-width: 758px;
-        text-align: center;
-        margin-right: 0;
-        color: $threeid-dark;
-        justify-content: center;
-        align-items: center;
-    }
+  .error-secondary-message {
+    padding: 1em;
+    font-family: Inter_400regular;
+    font-size: 18px;
+    font-weight: 400;
+    max-width: 758px;
+    text-align: center;
+    margin-right: 0;
+    color: $threeid-dark;
+    justify-content: center;
+    align-items: center;
+  }
 }

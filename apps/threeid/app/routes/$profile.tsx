@@ -174,7 +174,7 @@ const ProfileRoute = () => {
   return (
     <div className="bg-white h-full min-h-screen">
       <div
-        className="lg:px-4"
+        className="header lg:px-4"
         style={{
           backgroundColor: '#192030',
         }}

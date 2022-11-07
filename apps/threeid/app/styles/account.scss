@@ -1,23 +1,11 @@
 @import './variables.scss';
 @import './base.scss';
 
-// .wrapper {
-
-// }
-
 .header {
-  background-color: $threeid-header;
   padding-bottom: 280px;
-  // padding-left: 1em;
-  // padding-right: 1em;
 
   nav {
-    margin-right: auto;
-    margin-left: auto;
-    // padding-top: 1em;
     padding-bottom: 1em;
-    max-width: 1214px;
-    z-index: 2;
   }
 }
 
