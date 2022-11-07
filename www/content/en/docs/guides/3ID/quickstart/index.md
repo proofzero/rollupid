@@ -19,7 +19,7 @@ toc: true
 
 Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
 
-| Resolver    | Description                | Example                                      | Status      |
+| Resolver    | Description                | Example *                                    | Status      |
 | ----------- | -------------------------- | -------------------------------------------- | ----------- |
 | Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
 | ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
@@ -28,8 +28,10 @@ Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `
 | Solana      | Solana account addresses   | Bkfg6t8tyLrDEksB3Ch8GMBbo5f33zy9hhDkX3FvTuRR | Coming soon |
 | Twitter     | Twitter Account Login      | @alfl                                        | Coming soon |
 | Google      | Google Account Login       | alex.flanagan@gmail.com                      | Coming soon |
-| Email   | Text        |         |         |
-| Phone   | Text        |         |         |
+| Email       | Oldschool email account    | alex@kubelt.com                              | Coming soon |
+| Phone       | Phone number / SMS         | (647) 927-4901                               | Coming soon |
+
+** * NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before you use them. **
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
