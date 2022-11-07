@@ -33,20 +33,43 @@ Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `
 
 __* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before you use them.__
 
+Make a request like this:
+
+```bash
+curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
+```
+
+Or with `fetch`:
+
+```javascript
+fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json').then(p => p.json()).then(profile => {
+	console.log('User-set display name:', profile.displayName)
+	console.log('URL for user-set PFP: ', profile.pfp.image)
+	console.log('URL for user-set cover photo: ', profile.cover)
+	console.log('Where the user says they are:', profile.location)
+	console.log('What the user says their job is:', profile.job)
+	console.log('User-specified biography text (256 characters):', profile.bio)
+	console.log('User-specified website URL:', profile.website)
+	console.log('System-set boolean indicating if a user has claimed this profile:', profile.claimed)
+})
+```
+
 ### 3ID Profile Response
+
+If you feed the above `curl` through a tool like `jq`, for example with `curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
 
 ```json
 {
-	"displayName": "Polynomics",
-	"pfp": {
-		"image": "https://nftstorage.link/ipfs/bafybeiagnu4c32iqr2frinkoiwngzdkk24f4b2ivdwvqldfxnqfhpepdty/threeid.png"
-	},
-	"cover": "https://nftstorage.link/ipfs/bafybeid6dvlznmbv3wnuclmpgdxfkyzea65yve2gpjebj2eamlb2bifsoq/cover.png",
-	"location": null,
-	"job": null,
-	"bio": null,
-	"website": null,
-	"claimed": true
+  "displayName": "Polynomics",
+  "pfp": {
+    "image": "https://nftstorage.link/ipfs/bafybeiagnu4c32iqr2frinkoiwngzdkk24f4b2ivdwvqldfxnqfhpepdty/threeid.png"
+  },
+  "cover": "https://nftstorage.link/ipfs/bafybeid6dvlznmbv3wnuclmpgdxfkyzea65yve2gpjebj2eamlb2bifsoq/cover.png",
+  "location": "Metaverse",
+  "job": "Innovator",
+  "bio": "Polynomics comes from the concepts of \"polyphonic\" sound and \"nomic\" games (see: https://en.wikipedia.org/wiki/Nomic), meaning something like \"many games with negotiable rules\".",
+  "website": "https://kubelt.com",
+  "claimed": true
 }
 ```
 
