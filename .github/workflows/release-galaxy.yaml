@@ -11,7 +11,6 @@ defaults:
 jobs:
   build-publish-test-galaxy-current:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2
 
@@ -31,9 +30,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/galaxy"
+          workingDirectory: 'platform/galaxy'
           command: publish --env current
-          environment: "current"
+          environment: 'current'
           secrets: |
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -42,7 +41,7 @@ jobs:
             NFTAR_URL
             NFTAR_AUTHORIZATION
         env:
-          SESSION_SECRET: "secret"
+          SESSION_SECRET: 'secret'
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}

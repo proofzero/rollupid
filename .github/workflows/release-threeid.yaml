@@ -11,8 +11,6 @@ defaults:
 jobs:
   build-publish-threeid-current:
     runs-on: ubuntu-latest
-    permissions:
-      packages: read
     steps:
       - uses: actions/checkout@v2
 
