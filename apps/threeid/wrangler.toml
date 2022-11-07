@@ -66,7 +66,7 @@ kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b99f064f42a945feace9a6f36b5d9c62" },
   { binding = "ONBOARD_STATE", id = "ce9cd9f5838348dfb18c193757c918fd" },
   { binding = "REDEEM", id = "dba1fdd44a4a474ba422c0f361c5a957" },
-  { binding = "PROOFS", id = "6b4acb9a432a484f9644e9b12a990ddb", preview_id = "faec0e8ffc9c4b3f90a2b21e7fdf2fce" },
+  { binding = "PROOFS", id = "6b4acb9a432a484f9644e9b12a990ddb" },
 ]
 services = [
   { binding = "OORT", service = "oort-testnet"},
@@ -80,7 +80,7 @@ services = [
 # ------------------------------------------------------------------------------
 [env.current]
 routes = [
-  { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
