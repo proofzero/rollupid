@@ -27,13 +27,6 @@ __This makes it really easy to onboard Web 2.0 users to web3 products.__
 | ----------- | -------------------------- | -------------------------------------------- | ----------- |
 | Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
 | ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
-| Discord     | Discord User ID            | alfl.eth#4625                                | Up next     |
-| Telegram    | Telegram Account           | @alfl_eth                                    | Up next     |
-| Solana      | Solana account addresses   | Bkfg6t8tyLrDEksB3Ch8GMBbo5f33zy9hhDkX3FvTuRR | Coming soon |
-| Twitter     | Twitter Account Login      | @alfl                                        | Coming soon |
-| Google      | Google Account Login       | alex.flanagan@gmail.com                      | Coming soon |
-| Email       | Oldschool email account    | alex@kubelt.com                              | Coming soon |
-| Phone       | Phone number / SMS         | (647) 927-4901                               | Coming soon |
 
 __* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before use.__
 
