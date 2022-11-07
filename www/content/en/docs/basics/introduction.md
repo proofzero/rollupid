@@ -32,7 +32,7 @@ It all starts with 3ID, our user identity solution:
 <div class="container" style="padding: 0px;">
   <div class="row" style="margin-top: 32px">
     <div class="col col--6">
-      <a class="card" href='{{<relref "3id-quick-start">}}' style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
+      <a class="card" href='{{<relref "3id">}}' style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">
           <h4>🆔 3ID</h4>
           <p>Decentralized user passport, database, and storage.</p>
@@ -54,7 +54,7 @@ It all starts with 3ID, our user identity solution:
     </div>
   </div>
 </div>
-
+Juan <juanriveraperez00@gmail.com>
 ---
 
 All of our code is open source, so check out our [📦 Github Repo](https://github.com/kubelt/kubelt) to learn more.

@@ -73,19 +73,13 @@ navbarHiringCopy = "We’re hiring"
 accessUrl = "https://omq1ez0wxhd.typeform.com/to/IXfcN3Xf"
 accessCopy = "Get Access"
 
-# Whitepaper
-whitepaperUrl = "/docs/next/basics/kubelt-cms-whitepaper"
-
-# Docs
-howItWorks = "/docs/next/basics/how-it-works"
-
 # Footer
 footer = "Powered by Hugo and Kubelt"
 footerIcon = "images/Asset-4.svg"
 footerCopy = "Decentralize applications."
 
 # Feed
-copyrightHolder = "Kubelt"
+copyrightHolder = "Proof Zero Inc."
 
 # Alert
 alert = false
