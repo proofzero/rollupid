@@ -19,16 +19,17 @@ toc: true
 
 Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
 
-| Syntax      | Description | Example |
-| ----------- | ----------- | ------- |
-| Header      | Title       |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
-| Paragraph   | Text        |         |
+| Resolver    | Description | Example | Status |
+| ----------- | ----------- | ------- | ------ |
+| Ethereum    | Ethereum account addresses       | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live |
+| ENS    | ENS domain names       | alfl.eth | On Deck |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
+| Paragraph   | Text        |         |         |
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
