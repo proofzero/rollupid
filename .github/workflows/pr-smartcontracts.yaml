@@ -78,7 +78,7 @@ jobs:
           path: |
             smartcontracts/node_modules
           key: ${{ runner.os }}-smartcontracts-modules-${{ hashFiles('yarn.lock') }}
-          retore-keys: |
+          restore-keys: |
             ${{ runner.os }}-smartcontracts-modules-
 
       - name: List the state of node modules

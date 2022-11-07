@@ -40,7 +40,7 @@ jobs:
             platform/node_modules
             .yarn
           key: ${{ runner.os }}-platform-modules-${{ hashFiles('yarn.lock') }}
-          retore-keys: |
+          restore-keys: |
             ${{ runner.os }}-platform-modules-
 
       - name: List the state of node modules
