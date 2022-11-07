@@ -76,9 +76,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            node_modules
-            .yarn
-          key: ${{ runner.os }}-smartcontracts-modules-${{ hashFiles('yarn.lock') }}
+            smartcontracts/node_modules
+            smartcontracts/.yarn
+          key: ${{ runner.os }}-smartcontracts-modules-${{ hashFiles('smartcontracts/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-smartcontracts-modules-
 
@@ -93,7 +93,7 @@ jobs:
       - run: nix-build smartcontracts.nix
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Build
         run: yarn build

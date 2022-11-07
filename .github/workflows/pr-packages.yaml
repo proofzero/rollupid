@@ -36,9 +36,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            node_modules
-            .yarn
-          key: ${{ runner.os }}-packages-modules-${{ hashFiles('yarn.lock') }}
+            packages/node_modules
+            packages/.yarn
+          key: ${{ runner.os }}-packages-modules-${{ hashFiles('packages/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-packages-modules-
 
@@ -60,7 +60,7 @@ jobs:
       #     cache: "yarn"
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Build
         run: yarn build
