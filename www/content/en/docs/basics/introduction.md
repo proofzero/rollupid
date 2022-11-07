@@ -28,25 +28,7 @@ Easily deploy dApps with standardized identity, storage, messaging services over
 </style>
 
 <div class="container" style="padding: 0px;">
-  <div class="row">
-    <div class="col col--6">
-      <a class="card" href="{{<relref \"starport\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
-        <div class="card__body">
-          <h4>🚀 Starport DApps</h4>
-          <p>Instant serverless dApp backends with auth, messaging and more.</p>
-        </div>
-      </a>
-    </div>
-  </div>
   <div class="row" style="margin-top: 32px">
-    <div class="col col--6">
-      <a class="card" href="{{<relref \"orbit\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 00px 18px 12px 18px; color: #dee2e6;">
-        <div class="card__body">
-          <h4>🪐 Orbit CDN</h4>
-          <p>IPFS powered content addressing and delivery.</p>
-        </div>
-      </a>
-    </div>
     <div class="col col--6">
       <a class="card" href="{{<relref \"3id\">}}" style="height: 100%;border: none; background-color: #343a40; padding: 0px 18px 12px 18px; color: #dee2e6;">
         <div class="card__body">

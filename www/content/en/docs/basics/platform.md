@@ -54,7 +54,7 @@ Find out how to contribute to Kubelt. [Contributing →]({{< relref "contributin
 
 ## Resources
 
-- Get started with [Starport]({{< relref "starport" >}}).
+- Get started with [3ID]({{< relref "3ID" >}}).
 - Read our [whitepaper]({{< relref "whitepaper" >}}) to learn more.
 - Check out our [SDK Reference](#) docs.
 - FAQ and troubleshooting in our [help]({{< relref "help" >}}) section.

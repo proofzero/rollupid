@@ -2,7 +2,7 @@
   name = "Quick Start"
   weight = 10
   identifier = "quick-start"
-  url = "/docs/next/guides/quick-start/"
+  url = "/docs/next/guides/3id/3id-quick-start/"
 
 [[main]]
   name = "Docs"
