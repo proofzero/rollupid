@@ -97,6 +97,7 @@ export const meta: MetaFunction = ({
     'og:image': ogImageURL + `?${Date.now()}`,
     'twitter:image': ogImageURL + `?${Date.now()}`,
     'twitter:image:alt': social,
+    'twitter:site': '@threeid_xyz',
     // Twitter-specific meta tags.
     // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
     'twitter:card': 'summary_large_image',
