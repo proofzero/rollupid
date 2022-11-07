@@ -23,12 +23,10 @@ __This makes it really easy to onboard Web 2.0 users to web3 products.__
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
 
-| Resolver    | Description                | Example *                                    | Status      |
+| Resolver    | Description                | Example                                      | Status      |
 | ----------- | -------------------------- | -------------------------------------------- | ----------- |
 | Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
 | ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
-
-__* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before use.__
 
 Make a request like this:
 
