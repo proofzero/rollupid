@@ -60,7 +60,7 @@ jobs:
       #     cache: "yarn"
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Build
         run: yarn build

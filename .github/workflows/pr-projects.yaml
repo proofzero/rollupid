@@ -53,7 +53,7 @@ jobs:
       - run: nix-build projects.nix
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Build
         run: yarn build
