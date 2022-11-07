@@ -79,7 +79,7 @@ services = [
 # current (production)
 # ------------------------------------------------------------------------------
 [env.current]
-route = { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+routes = { pattern = "3id.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 kv_namespaces = [
   { binding = "VOUCHER_CACHE", id = "b85e684fbb294ff8b7359e9bb9200e10" },
   { binding = "ONBOARD_STATE", id = "b1959de0b0974c26b3bc83576a259db7" },

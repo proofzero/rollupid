@@ -30,9 +30,10 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'apps/threeid'
-          environment: 'current'
           command: publish --env current
+          environment: 'current'
           secrets: |
             TEST_ENV
             SESSION_SECRET
@@ -72,21 +73,3 @@ jobs:
           VALID_CHAIN_ID_NAME: mainnet
           ALCHEMY_PUBLIC_API_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
           ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_NFT_API_URL }}
-      # - name: Install Playwright Browsers
-      #   run: npx playwright install --with-deps
-      #   working-directory: threeid
-      # - name: Run Playwright tests
-      #   run: npx playwright test
-      #   env:
-      #     NODE_ENV: production
-      #     ETH_GOERLI_PK: ${{ secrets.ETH_GOERLI_PK }} # TODO: setup prod pk
-      #     DAPP_HOST: 3id.kubelt.com
-      #     DAPP_PORT: 443
-      #     DAPP_SCHEMA: https
-      #   working-directory: threeid
-      # - uses: actions/upload-artifact@v2
-      #   if: always()
-      #   with:
-      #     name: playwright-report
-      #     path: playwright-report/
-      #     retention-days: 5
