@@ -21,11 +21,12 @@
     "wrangler:remote": "wrangler --env dev dev"
   },
   "dependencies": {
-    "@kubelt/do.starbase-application": "file:../component/application",
-    "@kubelt/do.starbase-contract": "file:../component/contract",
-    "@kubelt/do.starbase-user": "file:../component/user",
-    "@kubelt/openrpc": "file:../lib/openrpc",
+    "@kubelt/do.starbase-application": "*",
+    "@kubelt/do.starbase-contract": "*",
+    "@kubelt/do.starbase-user": "*",
+    "@kubelt/openrpc": "*",
     "cross-env": "7.0.3",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "multiformats": "10.0.2"
   }
 }
