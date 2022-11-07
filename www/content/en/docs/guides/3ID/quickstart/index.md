@@ -1,5 +1,5 @@
 ---
-title: "3ID Quick Start"
+xtitle: "3ID Quick Start"
 description: ""
 lead: ""
 date: 2020-11-16T13:59:39+01:00
@@ -17,7 +17,7 @@ toc: true
 
 ### 3ID Profile Request
 
-Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
+Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
 
 | Resolver    | Description                | Example *                                    | Status      |
 | ----------- | -------------------------- | -------------------------------------------- | ----------- |
@@ -31,9 +31,7 @@ Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `
 | Email       | Oldschool email account    | alex@kubelt.com                              | Coming soon |
 | Phone       | Phone number / SMS         | (647) 927-4901                               | Coming soon |
 
-** * NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before you use them. **
-
-[Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
+__* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before you use them.__
 
 ### 3ID Profile Response
 
