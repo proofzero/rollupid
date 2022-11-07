@@ -36,9 +36,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            node_modules
-            .yarn
-          key: ${{ runner.os }}-projects-modules-${{ hashFiles('yarn.lock') }}
+            projects/node_modules
+            projects/.yarn
+          key: ${{ runner.os }}-projects-modules-${{ hashFiles('projects/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-projects-modules-
 
