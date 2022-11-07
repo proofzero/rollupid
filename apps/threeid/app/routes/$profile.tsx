@@ -92,7 +92,8 @@ export const meta: MetaFunction = ({
     'og:title': `${displayName || targetAddress}'s 3ID Profile`,
     'og:description': bio || 'Claim yours now!',
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
-    'og:image': ogImageURL,
+    'og:image': ogImageURL + `?${Date.now()}`,
+    'twitter:image': ogImageURL + `?${Date.now()}`,
     // Twitter-specific meta tags.
     // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
     'twitter:card': 'summary_large_image',
