@@ -36,6 +36,10 @@ Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `
 }
 ```
 
+### GraphQL Types
+
+
+
 ### Custom User Data
 
 Using 3ID means you don't have to worry about storing user data -- your users can store it themselves!
