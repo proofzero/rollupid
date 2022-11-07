@@ -10,11 +10,6 @@
   identifier = "docs"
   url = "/docs/next/basics/introduction/"
 
-[[main]]
- name = "SDK"
- url = "https://sdk.kubelt.com"
- weight = 20
-
 #[[main]]
   #name = "Showcase"
   #url = "/showcase/"
