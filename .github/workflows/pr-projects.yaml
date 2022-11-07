@@ -37,10 +37,9 @@ jobs:
         with:
           path: |
             node_modules
-            projects/node_modules
             .yarn
           key: ${{ runner.os }}-projects-modules-${{ hashFiles('yarn.lock') }}
-          retore-keys: |
+          restore-keys: |
             ${{ runner.os }}-projects-modules-
 
       - name: List the state of node modules
