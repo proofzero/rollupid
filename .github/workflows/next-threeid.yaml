@@ -34,6 +34,7 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
           workingDirectory: 'apps/threeid'
           command: publish --env next
           environment: 'next'
