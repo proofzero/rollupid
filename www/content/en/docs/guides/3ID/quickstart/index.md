@@ -17,7 +17,11 @@ toc: true
 
 ### 3ID Profile Request
 
-Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
+Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). All resolvers for the same person link to the same 3ID profile, so someone can sign in with a wallet or login with their Google Account and have the same experience.
+
+__This makes it really easy to onboard Web 2.0 users to web3 products.__
+
+[Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
 
 | Resolver    | Description                | Example *                                    | Status      |
 | ----------- | -------------------------- | -------------------------------------------- | ----------- |
