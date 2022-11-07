@@ -38,6 +38,7 @@ jobs:
           command: publish --env next
           environment: 'next'
           secrets: |
+            TEST_ENV
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -54,6 +55,7 @@ jobs:
             ALCHEMY_PUBLIC_API_KEY
             ALCHEMY_NFT_API_URL
         env:
+          TEST_ENV: ''
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}

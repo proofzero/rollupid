@@ -32,10 +32,11 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "apps/threeid"
-          environment: "current"
+          workingDirectory: 'apps/threeid'
+          environment: 'current'
           command: publish --env current
           secrets: |
+            TEST_ENV
             SESSION_SECRET
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -52,6 +53,7 @@ jobs:
             ALCHEMY_PUBLIC_API_KEY
             ALCHEMY_NFT_API_URL
         env:
+          TEST_ENV: ''
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # The Datadog client token.
