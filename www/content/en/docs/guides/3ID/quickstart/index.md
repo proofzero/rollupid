@@ -19,17 +19,17 @@ toc: true
 
 Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
 
-| Resolver    | Description | Example | Status |
-| ----------- | ----------- | ------- | ------ |
-| Ethereum    | Ethereum account addresses       | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live |
-| ENS    | ENS domain names       | alfl.eth | On Deck |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
-| Paragraph   | Text        |         |         |
+| Resolver    | Description                | Example                                      | Status      |
+| ----------- | -------------------------- | -------------------------------------------- | ----------- |
+| Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
+| ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
+| Discord     | Discord User ID            | alfl.eth#4625                                | Up next     |
+| Telegram    | Telegram Account           | @alfl_eth                                    | Up next     |
+| Solana      | Solana account addresses   | Bkfg6t8tyLrDEksB3Ch8GMBbo5f33zy9hhDkX3FvTuRR | Coming soon |
+| Twitter     | Twitter Account Login      | @alfl                                        | Coming soon |
+| Google      | Google Account Login       | alex.flanagan@gmail.com                      | Coming soon |
+| Email   | Text        |         |         |
+| Phone   | Text        |         |         |
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
@@ -49,10 +49,6 @@ Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `
 	"claimed": true
 }
 ```
-
-### GraphQL Types
-
-
 
 ### Custom User Data
 
