@@ -77,7 +77,7 @@ export default class ThreeID extends JSONRPC {
     params: GetInviteCodeParams,
     context: Context
   ): Promise<GetInviteCodeResult> {
-    await this.authorize(context, '3id.enter')
+    await this.authorize(context)
     const { storage } = this.core
     const { THREEID, THREEID_INVITE_CODES } = this.core.env
 
@@ -218,7 +218,7 @@ export default class ThreeID extends JSONRPC {
   }
 
   async getNFTs(params, context) {
-    await this.authorize(context, '3id.enter')
+    await this.authorize(context)
     return getNFTs(params)
   }
 
@@ -226,7 +226,7 @@ export default class ThreeID extends JSONRPC {
     params: RegisterNameParams,
     context: RPCContext
   ): Promise<RegisterNameResult> {
-    await this.authorize(context, '3id.enter')
+    await this.authorize(context)
     const [address] = params
     const name = await context.packages.ens.lookupAddress(params, context)
 
@@ -247,7 +247,7 @@ export default class ThreeID extends JSONRPC {
     params: UnregisterNameParams,
     context: RPCContext
   ): Promise<UnregisterNameResult> {
-    await this.authorize(context, '3id.enter')
+    await this.authorize(context)
     const [address] = params
     const name = await context.packages.ens.lookupAddress(params, context)
     const { Address } = this.core.env

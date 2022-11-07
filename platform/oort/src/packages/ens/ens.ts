@@ -38,7 +38,7 @@ export default class EthereumNameService extends JSONRPC {
     params: LookupAddressParams,
     context: RPCContext
   ): Promise<LookupAddressResult> {
-    await this.authorize(context, '3id.enter')
+    await this.authorize(context)
     const [address] = params
     const { eth: known }: { eth: string[] } = await this.core.storage.get(
       'core/addressMap'
