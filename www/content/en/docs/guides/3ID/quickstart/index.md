@@ -17,7 +17,20 @@ toc: true
 
 ### 3ID Profile Request
 
-Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). 
+Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
+
+| Syntax      | Description | Example |
+| ----------- | ----------- | ------- |
+| Header      | Title       |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+| Paragraph   | Text        |         |
+
+[Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
 ### 3ID Profile Response
 
