@@ -26,7 +26,7 @@ import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
 import social from '~/assets/social.png'
-import { datadogRum } from '@datadog/browser-rum'
+// import { datadogRum } from '@datadog/browser-rum'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -90,15 +90,19 @@ export const meta: MetaFunction = ({
 }) => {
   return {
     'og:title': `${displayName || targetAddress}'s 3ID Profile`,
+    'twitter:title': `${displayName || targetAddress}'s 3ID Profile`,
     'og:description': bio || 'Claim yours now!',
+    'twitter:description': bio || 'Claim yours now!',
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
-    'og:image': ogImageURL,
+    'og:image': ogImageURL + `?${Date.now()}`,
+    'twitter:image': ogImageURL + `?${Date.now()}`,
+    'twitter:image:alt': social,
+    'twitter:site': '@threeid_xyz',
     // Twitter-specific meta tags.
     // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
     'twitter:card': 'summary_large_image',
-    'twitter:site': '@threeid_xyz',
     // TODO: Hook this up
-    'twitter:creator': twitterHandle || '@threeid_xyz',
+    // 'twitter:creator': twitterHandle || '@threeid_xyz',
   }
 }
 
