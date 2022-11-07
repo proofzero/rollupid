@@ -8,7 +8,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "@kubelt/openrpc": "file:../../lib/openrpc",
+    "@kubelt/openrpc": "*",
     "cross-env": "7.0.3"
   }
 }
