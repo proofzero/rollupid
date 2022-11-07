@@ -35,7 +35,7 @@ __This makes it really easy to onboard Web 2.0 users to web3 products.__
 | Email       | Oldschool email account    | alex@kubelt.com                              | Coming soon |
 | Phone       | Phone number / SMS         | (647) 927-4901                               | Coming soon |
 
-__* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before you use them.__
+__* NOTE: Examples are presented as plaintext but might need some processing (hashing, login, validation, etc.) before use.__
 
 Make a request like this:
 
@@ -43,7 +43,7 @@ Make a request like this:
 curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
 ```
 
-Or with `fetch`:
+Or with `fetch` on the client or server:
 
 ```javascript
 fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json').then(p => p.json()).then(profile => {
@@ -76,6 +76,17 @@ If you feed the above `curl` through a tool like `jq`, for example with `curl ht
   "claimed": true
 }
 ```
+
+| Profile Field | Description                                             |
+| ------------- | ------------------------------------------------------- |
+| displayName   | The user's preferred display name.                      |
+| pfp.image     | The URL for the user's selected (optionally NFT) PFP.   |
+| cover         | The URL for the user's cover photo (optionally an NFT). |
+| location      | Text description of the user's location.                |
+| job           | Text description of the user's job.                     |
+| bio           | Longer text (256 characters) of the user's bio.         |
+| website       | User-specified URL for their website.                   |
+| claimed       | JSON boolean indicating whether the profile is claimed. |
 
 ### Custom User Data
 
