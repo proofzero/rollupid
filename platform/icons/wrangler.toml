@@ -30,7 +30,6 @@ routes = [
 UPLOAD_WINDOW_SECONDS = 200
 
 [env.next]
-name = "icons-next"
 routes = [
   { pattern = "icons-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
@@ -42,7 +41,6 @@ routes = [
 UPLOAD_WINDOW_SECONDS = 200
 
 [env.current]
-name = "icons-prod"
 routes = [
   { pattern = "icons.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
