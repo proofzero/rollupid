@@ -3908,15 +3908,16 @@ __metadata:
   resolution: "@kubelt/app.starbase@workspace:platform/starbase/worker"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
-    "@kubelt/do.starbase-application": "file:../component/application"
-    "@kubelt/do.starbase-contract": "file:../component/contract"
-    "@kubelt/do.starbase-user": "file:../component/user"
-    "@kubelt/openrpc": "file:../lib/openrpc"
+    "@kubelt/do.starbase-application": "*"
+    "@kubelt/do.starbase-contract": "*"
+    "@kubelt/do.starbase-user": "*"
+    "@kubelt/openrpc": "*"
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.187
     cross-env: 7.0.3
     esbuild: 0.15.12
     lodash: 4.17.21
+    multiformats: 10.0.2
     npm-run-all: 4.1.5
     typescript: 4.8.4
     wrangler: 2.1.15
@@ -3947,17 +3948,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/do.starbase-application@file:../component/application::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/do.starbase-application@file:../component/application#../component/application::hash=8c0739&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
-  dependencies:
-    "@kubelt/openrpc": "file:../../lib/openrpc"
-    cross-env: 7.0.3
-  checksum: dd09dfc235302ee88581ab8b316b6348b471df009fc65c061549d5401c92d8ffa2eddb8021f78032eff5206a9626bb82a073cff18f6a70ce464b9bd8d85587a0
-  languageName: node
-  linkType: hard
-
-"@kubelt/do.starbase-application@workspace:platform/starbase/component/application":
+"@kubelt/do.starbase-application@*, @kubelt/do.starbase-application@workspace:platform/starbase/component/application":
   version: 0.0.0-use.local
   resolution: "@kubelt/do.starbase-application@workspace:platform/starbase/component/application"
   dependencies:
@@ -3966,17 +3957,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/do.starbase-contract@file:../component/contract::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/do.starbase-contract@file:../component/contract#../component/contract::hash=0120bb&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
-  dependencies:
-    "@kubelt/openrpc": "file:../../lib/openrpc"
-    cross-env: 7.0.3
-  checksum: c348b2726295cabf4d07da3aa347cd503dfd06d88e5615b8d229ab3d414957fbcc12d40f0e1bf8b3574a5d15cc795c95de67c01786d6cb2c3d9ce5405a5f0d6a
-  languageName: node
-  linkType: hard
-
-"@kubelt/do.starbase-contract@workspace:platform/starbase/component/contract":
+"@kubelt/do.starbase-contract@*, @kubelt/do.starbase-contract@workspace:platform/starbase/component/contract":
   version: 0.0.0-use.local
   resolution: "@kubelt/do.starbase-contract@workspace:platform/starbase/component/contract"
   dependencies:
@@ -3985,17 +3966,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/do.starbase-user@file:../component/user::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/do.starbase-user@file:../component/user#../component/user::hash=9a3099&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
-  dependencies:
-    "@kubelt/openrpc": "file:../../lib/openrpc"
-    cross-env: 7.0.3
-  checksum: 148fea3cdf6f95730f80c38712d62ef00020c3638c348097998ffcc720fc48265c597cbcd3393ff4cb2125743ab6efcd0223983af561066bca0efa35a2982f92
-  languageName: node
-  linkType: hard
-
-"@kubelt/do.starbase-user@workspace:platform/starbase/component/user":
+"@kubelt/do.starbase-user@*, @kubelt/do.starbase-user@workspace:platform/starbase/component/user":
   version: 0.0.0-use.local
   resolution: "@kubelt/do.starbase-user@workspace:platform/starbase/component/user"
   dependencies:
@@ -4004,126 +3975,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-application%40file%3A..%2Fcomponent%2Fapplication%23..%2Fcomponent%2Fapplication%3A%3Ahash%3D8c0739%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-application%40file%3A..%2Fcomponent%2Fapplication%23..%2Fcomponent%2Fapplication%3A%3Ahash%3D8c0739%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-application%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fapplication":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-application%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fapplication"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D0120bb%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-contract%40file%3A..%2Fcomponent%2Fcontract%23..%2Fcomponent%2Fcontract%3A%3Ahash%3D0120bb%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fcontract":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-contract%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fcontract"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D9a3099%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-user%40file%3A..%2Fcomponent%2Fuser%23..%2Fcomponent%2Fuser%3A%3Ahash%3D9a3099%26locator%3D%2540kubelt%252Fapp.starbase%2540workspace%253Aplatform%252Fstarbase%252Fworker"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fuser":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fdo.starbase-user%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fuser"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@file:../lib/openrpc::locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker":
-  version: 0.1.0
-  resolution: "@kubelt/openrpc@file:../lib/openrpc#../lib/openrpc::hash=cc2b5e&locator=%40kubelt%2Fapp.starbase%40workspace%3Aplatform%2Fstarbase%2Fworker"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@open-rpc/meta-schema": 1.14.2
-    cross-env: 7.0.3
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    lodash: 4.17.21
-    reflect-metadata: 0.1.13
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-  checksum: fe1e8095d7f8de5abf5802310111dada61ae991c615ae882cf3f08f5f6808246b8f1d05090b2497e87724306dd9ae8575abe9e5c4b0d7f2b9c21f48c1c87e226
-  languageName: node
-  linkType: hard
-
-"@kubelt/openrpc@workspace:platform/starbase/lib/openrpc":
+"@kubelt/openrpc@*, @kubelt/openrpc@workspace:platform/starbase/lib/openrpc":
   version: 0.0.0-use.local
   resolution: "@kubelt/openrpc@workspace:platform/starbase/lib/openrpc"
   dependencies:
@@ -4138,6 +3990,7 @@ __metadata:
     fast-check: 3.3.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
+    js-convert-case: 4.2.0
     lodash: 4.17.21
     npm-run-all: 4.1.5
     reflect-metadata: 0.1.13
@@ -4147,6 +4000,60 @@ __metadata:
     typescript: 4.8.4
   languageName: unknown
   linkType: soft
+
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-application%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fapplication":
+  version: 0.1.0
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=a1c38f&locator=%40kubelt%2Fdo.starbase-application%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fapplication"
+  dependencies:
+    "@cfworker/json-schema": 1.12.5
+    "@open-rpc/meta-schema": 1.14.2
+    cross-env: 7.0.3
+    itty-router: 2.6.6
+    itty-router-extras: 0.4.2
+    js-convert-case: 4.2.0
+    lodash: 4.17.21
+    reflect-metadata: 0.1.13
+    tiny-invariant: 1.3.1
+    ts-set-utils: 0.2.0
+  checksum: b6928a25d6ef50784df16fa42c7c877cd109a26ef9e49b78bf21110ef53cc209f82e116f68c05cd37ade5da6bfd2f7083db3958793d1db6ee93a728c101f1880
+  languageName: node
+  linkType: hard
+
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-contract%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fcontract":
+  version: 0.1.0
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=a1c38f&locator=%40kubelt%2Fdo.starbase-contract%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fcontract"
+  dependencies:
+    "@cfworker/json-schema": 1.12.5
+    "@open-rpc/meta-schema": 1.14.2
+    cross-env: 7.0.3
+    itty-router: 2.6.6
+    itty-router-extras: 0.4.2
+    js-convert-case: 4.2.0
+    lodash: 4.17.21
+    reflect-metadata: 0.1.13
+    tiny-invariant: 1.3.1
+    ts-set-utils: 0.2.0
+  checksum: b6928a25d6ef50784df16fa42c7c877cd109a26ef9e49b78bf21110ef53cc209f82e116f68c05cd37ade5da6bfd2f7083db3958793d1db6ee93a728c101f1880
+  languageName: node
+  linkType: hard
+
+"@kubelt/openrpc@file:../../lib/openrpc::locator=%40kubelt%2Fdo.starbase-user%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fuser":
+  version: 0.1.0
+  resolution: "@kubelt/openrpc@file:../../lib/openrpc#../../lib/openrpc::hash=a1c38f&locator=%40kubelt%2Fdo.starbase-user%40workspace%3Aplatform%2Fstarbase%2Fcomponent%2Fuser"
+  dependencies:
+    "@cfworker/json-schema": 1.12.5
+    "@open-rpc/meta-schema": 1.14.2
+    cross-env: 7.0.3
+    itty-router: 2.6.6
+    itty-router-extras: 0.4.2
+    js-convert-case: 4.2.0
+    lodash: 4.17.21
+    reflect-metadata: 0.1.13
+    tiny-invariant: 1.3.1
+    ts-set-utils: 0.2.0
+  checksum: b6928a25d6ef50784df16fa42c7c877cd109a26ef9e49b78bf21110ef53cc209f82e116f68c05cd37ade5da6bfd2f7083db3958793d1db6ee93a728c101f1880
+  languageName: node
+  linkType: hard
 
 "@kubelt/packages@workspace:packages":
   version: 0.0.0-use.local
@@ -20180,6 +20087,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-convert-case@npm:4.2.0":
+  version: 4.2.0
+  resolution: "js-convert-case@npm:4.2.0"
+  checksum: cb94edecc1fa896221aafc6be548482adadfe1cde291793d47886ed14da6416ba06d22daebb59cfe462b9bb402dfbadc1e06cba1ec088513ee896c37dbb863e7
+  languageName: node
+  linkType: hard
+
 "js-sdsl@npm:^4.1.4":
   version: 4.1.5
   resolution: "js-sdsl@npm:4.1.5"
@@ -23091,6 +23005,13 @@ __metadata:
     buffer: ^5.6.0
     varint: ^5.0.0
   checksum: e6a2916fa76c023b1c90b32ae74f8a781cf0727f71660b245a5ed1db46add6f2ce1586bee5713b16caf0a724e81bfe0678d89910c20d3bb5fd9649dacb2be79e
+  languageName: node
+  linkType: hard
+
+"multiformats@npm:10.0.2":
+  version: 10.0.2
+  resolution: "multiformats@npm:10.0.2"
+  checksum: 8807dd130ed44f12713e9e85932e582b321e4c75be373ecb0e14393fe8c44663455357ee25d3710ad7df9bab6fd0127f8797f3ceb80f503ad664f3ff684daef3
   languageName: node
   linkType: hard
 
