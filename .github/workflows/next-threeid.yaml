@@ -3,7 +3,7 @@ name: Next 3ID
 on:
   push:
     tags:
-      - "*"
+      - '*'
 
 defaults:
   run:
@@ -34,9 +34,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "apps/threeid"
+          workingDirectory: 'apps/threeid'
           command: publish --env next
-          environment: "next"
+          environment: 'next'
           secrets: |
             TEST_ENV
             SESSION_SECRET
@@ -55,7 +55,6 @@ jobs:
             ALCHEMY_PUBLIC_API_KEY
             ALCHEMY_NFT_API_URL
         env:
-          TEST_ENV: true
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # The Datadog client token.
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
