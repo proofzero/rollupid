@@ -4,11 +4,11 @@
   "private": true,
   "useWorkspaces": true,
   "workspaces": [
-    "packages",
-    "platform",
-    "projects",
-    "apps",
-    "smartcontracts"
+    "packages/*",
+    "platform/*",
+    "projects/*",
+    "apps/*",
+    "smartcontracts/*"
   ],
   "scripts": {
     "gql": "yarn workspaces foreach -p -v -i run gql",
