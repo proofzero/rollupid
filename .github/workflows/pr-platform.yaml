@@ -37,7 +37,6 @@ jobs:
         with:
           path: |
             node_modules
-            platform/node_modules
             .yarn
           key: ${{ runner.os }}-platform-modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
