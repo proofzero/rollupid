@@ -71,6 +71,18 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayName = ['Display name is required']
   }
 
+  const website = formData.get('website')?.toString()
+  if (website) {
+    let url;
+    try {
+      // URL throws exception
+      // if website is invalid
+      url = new URL(website);
+    } catch (ex) {
+      errors.website = ['Website must be a valid URL']
+    }
+  }
+
   const bio = formData.get('bio')?.toString()
   if (bio && bio.length > 256) {
     errors.bio = ['Bio must be less than 256 characters']
@@ -337,11 +349,24 @@ export default function AccountSettingsProfile() {
           </div>
 
           <InputText
+            type="url"
             id="website"
             heading="Website"
             Icon={FaGlobe}
             defaultValue={website}
+            error={actionData?.errors?.website}
           />
+
+          {actionData?.errors?.website && (
+            <Text
+              className="mb-1.5"
+              size={TextSize.XS}
+              weight={TextWeight.Regular400}
+              color={TextColor.Gray400}
+            >
+              {actionData.errors.website}
+            </Text>
+          )}
 
           <InputTextarea
             id="bio"
