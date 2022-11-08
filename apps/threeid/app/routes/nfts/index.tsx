@@ -50,25 +50,24 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
 
     const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-
-    let mediaUri = media?.raw
-    if (nft.contractMetadata?.openSeaObject) {
-      mediaUri = nft.contractMetadata.openSeaObject.imageUrl
+    let error = false
+    if (nft.error) {
+      error = true
     }
-    if (nft.contractMetadata?.openSea) {
-      mediaUri = nft.contractMetadata.openSea.imageUrl
-    }
-
     return {
-      url: gatewayFromIpfs(mediaUri),
+      url: gatewayFromIpfs(media?.raw),
+      thumbnailUrl: gatewayFromIpfs(media?.thumbnail),
+      error: error,
       title: nft.title,
       collectionTitle: nft.contractMetadata?.name,
       properties,
     }
   })
 
+  const filteredNfts = ownedNfts.filter((n) => !n.error && n.thumbnailUrl)
+
   return json({
-    ownedNfts,
+    ownedNfts: filteredNfts,
     pageKey: res.pageKey,
   })
 }

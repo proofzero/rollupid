@@ -52,7 +52,11 @@ const ModaledNft = ({ nft }: any) => {
 
         <img
           className="w-full"
-          src={loadFail ? missingNftSvg : gatewayFromIpfs(nft.url)}
+          src={
+            loadFail
+              ? missingNftSvg
+              : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+          }
           onError={(e) => setLoadFail(true)}
         />
       </div>
