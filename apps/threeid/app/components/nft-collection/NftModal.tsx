@@ -46,7 +46,7 @@ const NftModal = ({
 
           <hr />
 
-          {nft?.properties?.length && (
+          {nft?.properties?.length > 0 && (
             <div className="mt-8">
               <Text
                 className="ml-1 mb-4"

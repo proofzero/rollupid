@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
     return {
       url: gatewayFromIpfs(media?.raw),
-      thumbnailUrl: gatewayFromIpfs(media?.thumbnail),
+      thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
       error: error,
       title: nft.title,
       collectionTitle: nft.contractMetadata?.name,
