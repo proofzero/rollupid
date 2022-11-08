@@ -29,7 +29,7 @@
     },
     "ui/authentication": {
         "scope": "kubelt-ui.threeid",
-        "version": "a085ae823dd16cbfd6cbbf56144afad11ca0a4ff",
+        "version": "b89a5052c4df128fa03d99cc5a6a14a2f819bcd9",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/authentication"
     },

@@ -2,7 +2,6 @@ with (import <nixpkgs> {});
 let
   basePackages = [
     nodejs-18_x
-    yarn
   ];
 
   inputs = basePackages

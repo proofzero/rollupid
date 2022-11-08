@@ -1,5 +1,5 @@
 ---
-description: A Authentication component.
+description: Authentication Component
 ---
 
 import { Authentication } from './authentication';
@@ -7,12 +7,15 @@ import { Authentication } from './authentication';
 A component that does something special and renders text in a div.
 
 ### Component usage
+
 ```js
-<Authentication>Hello world!</Authentication>
+import { getDefaultProvider } from 'ethers';
+
+<Authentication provider={getDefaultProvider()} />;
 ```
 
-### Render hello world!
+### Render Authentication
 
 ```js live
-<Authentication>Hello world!</Authentication>
+<Authentication />
 ```

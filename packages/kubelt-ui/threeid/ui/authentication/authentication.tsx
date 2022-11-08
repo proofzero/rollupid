@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Button } from '@kubelt-ui/threeid.ui.button';
 import { BaseTheme } from '@kubelt-ui/threeid.themes.base-theme';
 import classNames from 'classnames';
@@ -21,24 +21,29 @@ export enum SocialLoginProviders {
 // ...
 
 export type AuthenticationProps = {
-  provider: Provider;
-  socialLoginProviders: SocialLoginProviders[];
+  provider?: Provider;
+  socialLoginProviders?: SocialLoginProviders[];
 };
 
 export function Authentication({ provider }: AuthenticationProps) {
-  console.log('provider', provider);
+  const [error, setError] = useState<Error | null>(null);
   const client = createClient({
     autoConnect: false,
-    provider: provider,
+    provider: provider || getDefaultProvider(),
   });
+
+  function errorCallback(error: Error) {
+    setError(error);
+  }
 
   return (
     <BaseTheme>
+      {error && <div>{error.message}</div>}
       <WagmiConfig client={client}>
         <ConnectButton
           className={classNames(styles.button)}
           tertiary
-          disabled={!provider}
+          errorCallback={errorCallback}
         >
           <span
             className={classNames(styles.icon, styles.walletIcon)}
