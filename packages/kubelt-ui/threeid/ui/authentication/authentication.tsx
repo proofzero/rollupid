@@ -4,7 +4,7 @@ import { BaseTheme } from '@kubelt-ui/threeid.themes.base-theme';
 import classNames from 'classnames';
 
 import { WagmiConfig, createClient } from 'wagmi';
-import { getDefaultProvider, Provider } from 'ethers';
+import { getDefaultProvider } from 'ethers';
 
 import { ConnectButton } from './connect-button';
 
@@ -21,7 +21,7 @@ export enum SocialLoginProviders {
 // ...
 
 export type AuthenticationProps = {
-  provider?: Provider;
+  provider?: any;
   socialLoginProviders?: SocialLoginProviders[];
 };
 
