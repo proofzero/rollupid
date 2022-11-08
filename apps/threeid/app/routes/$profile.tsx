@@ -26,7 +26,8 @@ import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
 import social from '~/assets/social.png'
-// import { datadogRum } from '@datadog/browser-rum'
+
+import { oortSend } from '~/utils/rpc.server'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -71,7 +72,11 @@ export const loader: LoaderFunction = async (args) => {
   const jwt = session.get('jwt')
   const address = session.get('address')
 
-  if (address === params.profile) {
+  const addressLookup = await oortSend('ens_lookupAddress', [address], {
+    jwt,
+  })
+
+  if (address === params.profile || addressLookup?.result === params.profile) {
     isOwner = true
   }
 
