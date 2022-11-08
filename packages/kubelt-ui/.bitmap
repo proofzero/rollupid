@@ -28,15 +28,14 @@
         "rootDir": "threeid/themes/theme-toggler"
     },
     "ui/authentication": {
-        "scope": "",
-        "version": "9663757fb8f2b9bbcb77215b4d7725c0cdfe1777",
-        "defaultScope": "kubelt-ui.threeid",
+        "scope": "kubelt-ui.threeid",
+        "version": "a085ae823dd16cbfd6cbbf56144afad11ca0a4ff",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/authentication"
     },
     "ui/button": {
         "scope": "kubelt-ui.threeid",
-        "version": "72c9e7d34ec97479949bd519234d90711882203e",
+        "version": "4e85e099ca0aebd651eddd08e98f31e900018088",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/button"
     },
@@ -47,9 +46,8 @@
         "rootDir": "threeid/ui/heading"
     },
     "ui/login-button": {
-        "scope": "",
-        "version": "e53ca5b4521d60bdb56d1775582a38e0b3a19890",
-        "defaultScope": "kubelt-ui.threeid",
+        "scope": "kubelt-ui.threeid",
+        "version": "75c018ebeed5c6bf0db5e49b84192d1523b89fd2",
         "mainFile": "index.ts",
         "rootDir": "threeid/ui/login-button"
     },
