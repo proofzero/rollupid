@@ -280,6 +280,7 @@ const ProfileRoute = () => {
             }}
           >
             <Text
+              className="break-all"
               size={TextSize.Base}
               weight={TextWeight.Medium500}
               color={TextColor.Gray500}
