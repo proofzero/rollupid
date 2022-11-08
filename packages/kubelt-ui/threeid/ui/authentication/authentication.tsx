@@ -17,7 +17,10 @@ export type AuthenticationProps = {
 export function Authentication({}: AuthenticationProps) {
   return (
     <div>
-      <Button tertiary>Connect with Wallet</Button>
+      <Button tertiary>
+        <span id="wallets-icon" />
+        Connect with Wallet
+      </Button>
       <Button tertiary disabled>
         Connect with Email
       </Button>
