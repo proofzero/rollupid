@@ -4,9 +4,9 @@
   versions:
     - v: "next"
 
-- group: v8.x
-  baseurl: "/docs"
-  description: "Every minor and patch release from v8 is listed below."
-  versions:
-    - v: "v8"
-    - v: "v8.1"
+# - group: v8.x
+#   baseurl: "/docs"
+#   description: "Every minor and patch release from v8 is listed below."
+#   versions:
+#     - v: "v8"
+#     - v: "v8.1"
