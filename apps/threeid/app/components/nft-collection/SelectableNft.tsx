@@ -3,17 +3,31 @@ import Text, {
   TextSize,
   TextWeight,
 } from '~/components/typography/Text'
+
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
+import missingNftSvg from '~/assets/missing-nft.svg'
+import { useState } from 'react'
+
 const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
+  const [loadFail, setLoadFail] = useState(false)
+
   return (
     <div
-      className={`relative border cursor-pointer hover:scale-105 ${
-        selected ? 'scale-105' : ''
-      }`}
-      onClick={() => handleSelectedNft(nft)}
+      className={`relative border ${
+        loadFail ? '' : 'cursor-pointer'
+      } hover:scale-105 ${selected ? 'scale-105' : ''}`}
+      onClick={() => {
+        if (!loadFail) {
+          handleSelectedNft(nft)
+        }
+      }}
     >
-      <img className="w-full" src={gatewayFromIpfs(nft.url)} />
+      <img
+        className="w-full"
+        src={loadFail ? missingNftSvg : gatewayFromIpfs(nft.url)}
+        onError={(e) => setLoadFail(true)}
+      />
 
       <Text
         className="my-2.5 mx-2 bg-white"
