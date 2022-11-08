@@ -1,14 +1,14 @@
-import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
+import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from 'react'
 
 export type ModalProps = {
-  children: any;
+  children: any
 
-  isOpen: boolean;
-  handleClose?: (value: boolean) => void;
+  isOpen: boolean
+  handleClose?: (value: boolean) => void
 
-  fixed?: boolean;
-};
+  fixed?: boolean
+}
 
 const Modal = ({
   children,
@@ -20,9 +20,9 @@ const Modal = ({
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-10"
+        className="relative z-[100]"
         onClose={(val: boolean) => {
-          if (handleClose) handleClose(val);
+          if (handleClose) handleClose(val)
         }}
       >
         <Transition.Child
@@ -37,7 +37,7 @@ const Modal = ({
           <div className="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity" />
         </Transition.Child>
 
-        <div className="fixed inset-0 z-10 overflow-y-auto">
+        <div className="fixed inset-0 z-[101] overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <Transition.Child
               as={Fragment}
@@ -62,7 +62,7 @@ const Modal = ({
         </div>
       </Dialog>
     </Transition.Root>
-  );
-};
+  )
+}
 
-export default Modal;
+export default Modal
