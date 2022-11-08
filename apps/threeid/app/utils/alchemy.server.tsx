@@ -37,7 +37,17 @@ export type GetNFTsResponse = {
       symbol: string
       totalSupply: string
       tokenType: string
-      openSeaObject: {
+      openSea?: {
+        floorPrice: string
+        collectionName: string
+        safeListRequestStatus: string
+        imageUrl: string
+        description: string
+        externalUrl: string
+        twitterUsername: string
+        discordUrl: string
+      }
+      openSeaObject?: {
         floorPrice: string
         collectionName: string
         safeListRequestStatus: string

@@ -61,7 +61,7 @@ const NftModal = ({
                 {nft?.properties.map(
                   (p: { name: string; value: any; display: string }) => (
                     <div
-                      key={p.name}
+                      key={p.name ?? `${new Date().getTime()}`}
                       className="m-1 py-2 px-4 border rounded-md"
                     >
                       <Text
@@ -69,7 +69,7 @@ const NftModal = ({
                         weight={TextWeight.Medium500}
                         color={TextColor.Gray400}
                       >
-                        {p.name.toUpperCase()}
+                        {p.name?.toUpperCase()}
                       </Text>
                       <Text
                         size={TextSize.SM}

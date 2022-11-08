@@ -55,6 +55,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     if (nft.contractMetadata?.openSeaObject) {
       mediaUri = nft.contractMetadata.openSeaObject.imageUrl
     }
+    if (nft.contractMetadata?.openSea) {
+      mediaUri = nft.contractMetadata.openSea.imageUrl
+    }
 
     return {
       url: gatewayFromIpfs(mediaUri),
