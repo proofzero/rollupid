@@ -17,6 +17,7 @@ export type GetNFTsResponse = {
       gateway: string
     }
     media: NFTMedia | NFTMedia[]
+    error?: string
     metadata: {
       image: string
       external_url: string
@@ -38,16 +39,6 @@ export type GetNFTsResponse = {
       totalSupply: string
       tokenType: string
       openSea?: {
-        floorPrice: string
-        collectionName: string
-        safeListRequestStatus: string
-        imageUrl: string
-        description: string
-        externalUrl: string
-        twitterUsername: string
-        discordUrl: string
-      }
-      openSeaObject?: {
         floorPrice: string
         collectionName: string
         safeListRequestStatus: string
