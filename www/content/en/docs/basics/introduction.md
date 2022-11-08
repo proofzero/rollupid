@@ -42,6 +42,8 @@ It all starts with 3ID, our user identity solution:
   </div>
 </div>
 
+To go further, sign-in to Starbase to build your own onboarding experience:
+
 <div class="container" style="padding: 0px;">
   <div class="row" style="margin-top: 32px">
     <div class="col col--6">
@@ -54,7 +56,7 @@ It all starts with 3ID, our user identity solution:
     </div>
   </div>
 </div>
-Juan <juanriveraperez00@gmail.com>
+
 ---
 
 All of our code is open source, so check out our [📦 Github Repo](https://github.com/kubelt/kubelt) to learn more.
