@@ -4,9 +4,7 @@
 {{- end }}
 {{- end -}}
 
-# /docs/1.0/prologue/   /docs/1.0/prologue/introduction/
 /docs/guides/quick-start/       /docs/next/guides/quick-start
-/docs/basics/introduction/       /docs/next/basics/introduction
-/docs/next/            /docs/next/basics/introduction/
-/docs/                /docs/next/basics/introduction/
-#
+/docs/basics/introduction/      /docs/next/basics/introduction
+/docs/next/                     /docs/next/basics/introduction/
+/docs/                          /docs/next/basics/introduction/

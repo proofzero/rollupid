@@ -3,15 +3,8 @@ let
   basePackages = [
     nodejs-18_x
     yarn
-    cairo
-    pango
     pkg-config
     nodePackages.node-gyp
-    libpng
-    librsvg
-    pixman
-    giflib
-    libjpeg
     hugo
     # TODO: For local dev it's nice to have but you can always add them manudal
     # docker
@@ -22,9 +15,6 @@ let
   inputs = basePackages
     ++ lib.optional stdenv.isLinux inotify-tools
     ++ lib.optionals stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
-        CoreFoundation
-        CoreServices
-        CoreText
       ]);
 
 in mkShell {

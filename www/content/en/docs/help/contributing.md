@@ -22,5 +22,3 @@ Want to contribute? Why not jump into our GitHub [repo](https://github.com/kubel
 - Translate our [Readme](https://github.com/kubelt/kubelt/blob/main/README.md).
 - Try our products and give feedback.
 - Spread the word if you like what we are doing.
-
-# Sponsors
