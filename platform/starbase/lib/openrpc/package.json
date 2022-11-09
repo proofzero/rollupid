@@ -30,6 +30,7 @@
     "cross-env": "7.0.3",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
+    "jose": "4.11.0",
     "js-convert-case": "4.2.0",
     "lodash": "4.17.21",
     "reflect-metadata": "0.1.13",

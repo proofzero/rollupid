@@ -3,6 +3,9 @@ name = "starbase"
 main = "src/index.ts"
 compatibility_date = "2022-09-14"
 
+# Don't automatically expose this service at <worker-name>.<account-name>.workers.dev.
+workers_dev = false
+
 # A list of other Clouflare services bound to this service.
 # services = [
 #   { binding = "RELAY", service = "kubelt-svc-relay", environment = "production" },

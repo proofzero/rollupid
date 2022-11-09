@@ -19,6 +19,7 @@ import { default as mwAnalytics } from "@kubelt/openrpc/middleware/analytics";
 import { default as mwAuthenticate } from "@kubelt/openrpc/middleware/authenticate";
 import { default as mwDatadog } from "@kubelt/openrpc/middleware/datadog";
 import { default as mwGeolocation } from "@kubelt/openrpc/middleware/geolocation";
+import { default as mwOnlyLocal } from "@kubelt/openrpc/middleware/local";
 import { default as mwOort } from "@kubelt/openrpc/middleware/oort";
 
 import { StarbaseApplication } from "@kubelt/do.starbase-application";
@@ -26,7 +27,6 @@ import { StarbaseContract } from "@kubelt/do.starbase-contract";
 import { StarbaseUser } from "@kubelt/do.starbase-user";
 
 import * as secret from "./secret";
-import * as middle from "./middleware";
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -419,7 +419,7 @@ const service = openrpc.service(
 // dispatches the request to the correct RPC service method.
 
 // All requests whose path is "under" this location are handled by
-// returned a 404 *unless* the request happens to be the root path.
+// returning a 404 *unless* the request happens to be the root path.
 // If the base path is the same as the root path, you will need to handle
 // any request that isn't to the root path yourself.
 const basePath = "/";
@@ -431,6 +431,9 @@ const rootPath = "/openrpc";
 // are invoked. These may short-circuit, directly returning a response
 // to the incoming request, e.g. if authentication fails.
 const chain = openrpc.chain([
+  // This middleware rejects any requests that don't originate at
+  // localhost.
+  mwOnlyLocal,
   // Authenticate using a JWT in the request.
   mwAuthenticate,
   // Extra geolocation data provided by Cloudflare.
@@ -441,8 +444,6 @@ const chain = openrpc.chain([
   mwDatadog,
   // Construct an Oort client for talking to the Kubelt backend.
   mwOort,
-  // An example middleware defined locally.
-  middle.example,
 ]);
 
 // The returned handler validates the incoming request, routes it to the

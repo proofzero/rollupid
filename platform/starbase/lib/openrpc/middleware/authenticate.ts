@@ -2,14 +2,14 @@
  * @file src/middleware/authenticate.ts
  */
 
+import * as jose from "jose";
+
 import type {
   RpcContext,
   RpcRequest,
-} from "..";
+} from "@kubelt/openrpc";
 
-import { middleware } from "..";
-
-// TODO import jose
+import * as openrpc from "@kubelt/openrpc";
 
 // authenticate
 // -----------------------------------------------------------------------------
@@ -22,7 +22,12 @@ import { middleware } from "..";
  * @return a HTTP 401 error if the JWT is invalid, otherwise returns the
  * context updated with the set of claims contained within the JWT.
  */
-export default middleware(async (request: RpcRequest, context: RpcContext) => {
-  // TODO
-  return context;
-});
+export default openrpc.middleware(
+  async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>,
+  ) => {
+    // TODO
+    return context;
+  },
+);

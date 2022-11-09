@@ -2157,6 +2157,7 @@ __metadata:
     fast-check: 3.3.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
+    jose: 4.11.0
     js-convert-case: 4.2.0
     lodash: 4.17.21
     npm-run-all: 4.1.5
@@ -7144,6 +7145,13 @@ __metadata:
   version: 4.10.3
   resolution: "jose@npm:4.10.3"
   checksum: 9fa5e1ebfbddb8924a08a3ca2789dfb63c522d615e2eb66021adc632a83efc7fc990e1abbf3546baff8913b4ee585fd86521212f47968aec27930ed658f0bea6
+  languageName: node
+  linkType: hard
+
+"jose@npm:4.11.0":
+  version: 4.11.0
+  resolution: "jose@npm:4.11.0"
+  checksum: 8d81e978e0da306911b61b1de1e2d78bd4903b4aa68a4b338b7c89c41edc3d56aea4d5ef4784a078a630dd6aa81f6328901ae3ce215f33b90d51ee8ebf4c9dbd
   languageName: node
   linkType: hard
 
