@@ -30,14 +30,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       address: params.profile,
     })
 
+    console.log('HEREHEHR')
+
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,
     })
   } catch (e) {
+    console.error("Couldn't find profile", e.response.errors[0])
     if (e.response.errors) {
       // we have a handled exception from galaxy
       const status = e.response.errors[0].extensions.extensions.http.status
+      console.log('here', status)
       const error = `Failed to fetch profile with with resolver ${params.profile}: ${e.response.errors[0].message}`
       console.error(status, error)
       return json(error, {

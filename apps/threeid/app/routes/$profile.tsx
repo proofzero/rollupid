@@ -61,6 +61,7 @@ export const loader: LoaderFunction = async (args) => {
 
   const profileJsonRes = await profileLoader(args)
   if (profileJsonRes.status !== 200) {
+    console.log('profileJsonRes', profileJsonRes)
     const resData = {
       error: await profileJsonRes.text(),
       targetAddress: params.profile,
