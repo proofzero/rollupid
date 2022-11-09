@@ -2,16 +2,16 @@
 module.exports = {
   projects: {
     galaxy: {
-      schema: ["galaxy/src/schema/types/**/*.ts"],
+      schema: ['galaxy/src/schema/types/**/*.ts'],
       extensions: {
         codegen: {
           generates: {
-            "galaxy/src/schema/resolvers/typedefs.ts": {
-              plugins: ["typescript", "typescript-resolvers"],
+            'galaxy/src/schema/resolvers/typedefs.ts': {
+              plugins: ['typescript', 'typescript-resolvers'],
             },
           },
         },
       },
     },
   },
-};
+}

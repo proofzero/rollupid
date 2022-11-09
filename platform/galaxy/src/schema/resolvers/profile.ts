@@ -1,4 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
+import { getDefaultProvider, AlchemyProvider } from '@ethersproject/providers'
+
 import Env from '../../env'
 import OortClient from './clients/oort'
 import {
@@ -9,6 +11,7 @@ import {
 } from './utils'
 
 import { Resolvers } from './typedefs'
+import { GraphQLYogaError } from '@graphql-yoga/common'
 
 type ResolverContext = {
   env: Env
@@ -35,6 +38,33 @@ const threeIDResolvers: Resolvers = {
       checkHTTPStatus(profileResponse)
       return await getRPCResult(profileResponse)
     },
+    profileFromName: async (
+      _parent: any,
+      { name }: { name: string },
+      { env }: ResolverContext
+    ) => {
+      const oortClient = new OortClient(env.OORT)
+      const provider = new AlchemyProvider( // #TODO: consider using Etherscan provider?
+        env.ALCHEMY_NETWORK,
+        env.ALCHEMY_API_KEY
+      )
+      const address = await provider.resolveName(name)
+      if (!address) {
+        throw new GraphQLYogaError(
+          `Error: 404 Not Found: No address found for name ${name}`,
+          {
+            extensions: {
+              http: {
+                status: 404,
+              },
+            },
+          }
+        )
+      }
+      const profileResponse = await oortClient.getProfileFromAddress(address)
+      checkHTTPStatus(profileResponse)
+      return await getRPCResult(profileResponse)
+    },
   },
   Mutation: {
     updateThreeIDProfile: async (
@@ -51,8 +81,6 @@ const threeIDResolvers: Resolvers = {
         ...currentProfile,
         ...profile,
       }
-
-      // console.log("newProfile posted to oort", newProfile);
 
       const updateResponse = await oortClient.updateProfile(
         newProfile,

@@ -24,8 +24,6 @@ import appleIcon from './assets/apple-touch-icon.png'
 import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
 import faviconSvg from './assets/favicon.svg'
-import favicon from './assets/favicon.ico'
-import manifest from './assets/site.webmanifest'
 import maskIcon from './assets/safari-pinned-tab.svg'
 import sad from './assets/sad.png'
 import logo from './assets/three-id-logo.svg'
@@ -61,9 +59,7 @@ export const links: LinksFunction = () => [
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
   { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
-  { rel: 'manifest', href: manifest },
   { rel: 'mask-icon', href: maskIcon, color: '#5bbad5' },
-  { rel: 'shortcut icon', href: favicon },
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
   ...baseButtonLinks(),
   ...buttonLinks(),
@@ -130,8 +126,10 @@ export function ErrorBoundary({ error }) {
           <article className="content col-span-3">
             <div className="error justify-center items-center">
               <img className="m-auto pb-12" src={sad} />
-              <p className="error-message">Something went terribly wrong!</p>
-              <p className="error-secondary-message">{error.message}</p>
+              <p className="error-message">500</p>
+              <p className="error-secondary-message">
+                Something went terribly wrong!
+              </p>
               <p className="error-secondary-message">
                 If this problem persists please join Discord for help
               </p>

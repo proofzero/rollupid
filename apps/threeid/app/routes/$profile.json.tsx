@@ -15,14 +15,36 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // TODO: remove claimed from response?
   try {
     const galaxyClient = await getGalaxyClient()
+    // TODO: can we use one call to do the check instead of here?
+    // TODO: consider how we would support muliple name services
+    if (params.profile.endsWith('.eth')) {
+      const profileRes = await galaxyClient.getProfileFromName({
+        name: params.profile,
+      })
+      return json({
+        ...profileRes.profileFromName,
+        claimed: true,
+      })
+    }
     const profileRes = await galaxyClient.getProfileFromAddress({
       address: params.profile,
     })
+
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,
     })
   } catch (e) {
+    if (e.response.errors) {
+      // we have a handled exception from galaxy
+      const status = e.response.errors[0].extensions.extensions.http.status
+      const error = `Failed to fetch profile with with resolver ${params.profile}: ${e.response.errors[0].message}`
+      console.error(status, error)
+      return json(error, {
+        status: status,
+      })
+    }
+
     let voucher = await getCachedVoucher(params.profile)
     if (!voucher) {
       voucher = await fetchVoucher({

@@ -1,5 +1,13 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { useFetcher, useLoaderData } from '@remix-run/react'
+import {
+  Links,
+  Meta,
+  Scripts,
+  ScrollRestoration,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 
 import ProfileCard from '~/components/profile/ProfileCard'
 
@@ -26,8 +34,10 @@ import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
 import social from '~/assets/social.png'
+import pepe from '~/assets/pepe.svg'
 
 import { oortSend } from '~/utils/rpc.server'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -36,9 +46,34 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
 
-  const profileJson = await profileLoader(args).then((profileRes: Response) =>
-    profileRes.json()
-  )
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
+  const address = session.get('address')
+
+  let loggedInUserProfile = {}
+  if (jwt) {
+    const galaxyClient = await getGalaxyClient()
+    const profileRes = await galaxyClient.getProfile(undefined, {
+      'KBT-Access-JWT-Assertion': jwt,
+    })
+    loggedInUserProfile = profileRes
+  }
+
+  const profileJsonRes = await profileLoader(args)
+  if (profileJsonRes.status !== 200) {
+    const resData = {
+      error: await profileJsonRes.text(),
+      targetAddress: params.profile,
+      displayName: null,
+      bio: null,
+      loggedInUserProfile,
+      ogImageUrl: social,
+      loggedIn: jwt ? { address } : false,
+    }
+    throw json(resData, { status: profileJsonRes.status as number })
+  }
+
+  const profileJson = await profileJsonRes.json()
 
   let hex = gatewayFromIpfs(profileJson?.pfp?.image)
   let bkg = gatewayFromIpfs(profileJson?.cover)
@@ -68,10 +103,6 @@ export const loader: LoaderFunction = async (args) => {
 
   let isOwner = false
 
-  const session = await getUserSession(request)
-  const jwt = session.get('jwt')
-  const address = session.get('address')
-
   const addressLookup = await oortSend('ens_lookupAddress', [address], {
     jwt,
   })
@@ -82,6 +113,7 @@ export const loader: LoaderFunction = async (args) => {
 
   return json({
     ...profileJson,
+    loggedInUserProfile,
     isOwner,
     targetAddress: params.profile,
     loggedIn: jwt ? { address } : false,
@@ -91,14 +123,20 @@ export const loader: LoaderFunction = async (args) => {
 
 // Wire the loaded profile json, above, to the og meta tags.
 export const meta: MetaFunction = ({
-  data: { targetAddress, displayName, bio, ogImageURL, twitterHandle },
+  data: { targetAddress, displayName, bio, ogImageURL, twitterHandle } = {},
 }) => {
+  const title =
+    displayName || targetAddress
+      ? `${displayName || targetAddress}'s 3ID Profile`
+      : '3ID Decentralized Profile'
   return {
-    'og:title': `${displayName || targetAddress}'s 3ID Profile`,
-    'twitter:title': `${displayName || targetAddress}'s 3ID Profile`,
+    'og:title': title,
+    'twitter:title': title,
     'og:description': bio || 'Claim yours now!',
     'twitter:description': bio || 'Claim yours now!',
-    'og:url': `https://3id.kubelt.com/${targetAddress}`,
+    'og:url': targetAddress
+      ? `https://3id.kubelt.com/${targetAddress}`
+      : 'https://3id.kubelt.com',
     'og:image': ogImageURL + `?${Date.now()}`,
     'og:image:alt': `${displayName || targetAddress}'s 3ID Profile`,
     'og:site_name': '3ID',
@@ -116,6 +154,8 @@ export const meta: MetaFunction = ({
 
 const ProfileRoute = () => {
   const {
+    error,
+    loggedInUserProfile,
     targetAddress,
     claimed,
     displayName,
@@ -193,8 +233,8 @@ const ProfileRoute = () => {
       >
         <HeadNav
           loggedIn={loggedIn}
-          avatarUrl={pfp.image}
-          isToken={pfp.isToken}
+          avatarUrl={loggedInUserProfile?.pfp?.image}
+          isToken={loggedInUserProfile?.pfp?.isToken}
         />
       </div>
 
@@ -213,10 +253,10 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={gatewayFromIpfs(pfp.image)}
+              avatarUrl={gatewayFromIpfs(pfp?.image)}
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
-              isNft={pfp.isToken}
+              isNft={pfp?.isToken}
               webUrl={website}
             />
           </div>
@@ -344,3 +384,55 @@ const ProfileRoute = () => {
 }
 
 export default ProfileRoute
+
+export function CatchBoundary() {
+  const caught = useCatch()
+
+  let secondary = 'Something went wrong'
+  switch (caught.status) {
+    case 404:
+      secondary = 'Page not found'
+      break
+    case 500:
+      secondary = 'Internal Server Error'
+      break
+  }
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body className="error-screen">
+        <div className="bg-white h-full min-h-screen">
+          <div
+            style={{
+              backgroundColor: '#192030',
+            }}
+          >
+            <HeadNav
+              loggedIn={caught.data?.loggedIn}
+              avatarUrl={caught.data.loggedInUserProfile?.pfp?.image}
+              isToken={caught.data.loggedInUserProfile?.pfp?.isToken}
+            />
+          </div>
+          <div className="wrapper grid grid-row-3 gap-4">
+            <article className="content col-span-3">
+              <div className="error justify-center items-center">
+                <p className="error-message text-center">{caught.status}</p>
+                <p className="error-secondary-message text-center">
+                  {secondary}
+                </p>
+              </div>
+              <div className="relative">
+                <img alt="pepe" className="m-auto pb-12" src={pepe} />
+              </div>
+            </article>
+          </div>
+        </div>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  )
+}
