@@ -125,7 +125,8 @@ export default function HeadNav({
                     </div>
                   )}
 
-                  {loggedIn && (
+                  {/* Disabled by design request */}
+                  {/* {loggedIn && (
                     <button
                       type="button"
                       className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -133,13 +134,13 @@ export default function HeadNav({
                       <span className="sr-only">View notifications</span>
                       <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                     </button>
-                  )}
+                  )} */}
 
                   {/* Profile dropdown */}
                   {loggedIn && (
                     <Menu as="div" className="relative ml-3">
                       <div>
-                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm hover:outline-none hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-gray-800">
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
