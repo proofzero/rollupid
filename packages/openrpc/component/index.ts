@@ -11,15 +11,11 @@ import type {
   MiddlewareResult,
   OpenRpcHandler,
   RpcContext,
-  RpcHandler,
   RpcMethod,
-  // TODO rename to RpcTable, RpcDispatch, RpcTable?
-  RpcMethods,
   RpcRequest,
   RpcResponse,
   RpcSchema,
   RpcService,
-  Scope,
   ScopeSet,
 } from "../index";
 
@@ -53,7 +49,7 @@ const _FIELDS_REQUIRED = "_requiredFields";
 type MethodMap = Map<string, string>;
 
 // The mapping from method name to its required scopes.
-type RequiredScopes = Map<Symbol, ScopeSet>;
+type RequiredScopes = Map<symbol, ScopeSet>;
 
 // The parameters from the JSON-RPC request converted into a Map.
 export type RpcParams = Map<string, any>;
@@ -294,11 +290,14 @@ export function component(
 
           // The scopes required to be able to invoke the RPC method. The returned value
           // is a Set of Symbol values representing the required scope names.
-          const scopes: ScopeSet = scopesRequired.get(classSym) || new Set();
+          //
+          // NB: it might be the case that no scopes are required by any methods.
+          const scopes: ScopeSet = scopesRequired?.get(classSym) || new Set();
           //console.log(scopes);
 
-          const fieldSet: FieldSet = fieldsRequired.get(classSym) || new Set();
-          //console.log(fields);
+          // NB: it might be the case that no fields are required by any methods.
+          const fieldSet: FieldSet = fieldsRequired?.get(classSym) || new Set();
+          console.log(fields);
 
           const fieldMap: FieldMap = new Map();
           for (const field of fieldSet) {
@@ -447,8 +446,8 @@ export function component(
         output: RpcOutput,
       ): RpcOutput {
         // Utility to return the keys of a map as a set of symbols.
-        function keysToSymbolSet(m: Map<string, any>): Set<Symbol> {
-          const s: Set<Symbol> = new Set();
+        function keysToSymbolSet(m: Map<string, any>): Set<symbol> {
+          const s: Set<symbol> = new Set();
           for (const k of m.keys()) {
             s.add(Symbol.for(k));
           }
@@ -460,7 +459,7 @@ export function component(
         // necessary because the developer might set an arbitrary
         // key/value pair in the output map, but we don't want to store
         // anything that hasn't been declared.
-        const outputKeys: Set<Symbol> = keysToSymbolSet(output);
+        const outputKeys: Set<symbol> = keysToSymbolSet(output);
         const fieldKeys = new Set(fields.keys());
         const updateKeys = set.intersection(outputKeys, fieldKeys);
 
@@ -962,12 +961,12 @@ export function method(
  * the @scopes decorator or an error is thrown on construction.
  */
 export function requiredScope(
-  scope: string | Symbol,
+  scope: string | symbol,
 ) {
   // The decorator argument is the name of a scope declared on the class.
   //
   // NB: We may want to support passing in an array of scopes.
-  const scopeSym: Symbol = (typeof(scope) === "string") ?
+  const scopeSym: symbol = (typeof(scope) === "string") ?
     Symbol.for(scope.trim().toLowerCase()) :
     scope
   ;

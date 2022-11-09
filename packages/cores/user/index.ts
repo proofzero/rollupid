@@ -33,6 +33,7 @@ import schema from "./schema";
  */
 @component(schema)
 @scopes([
+  "owner",
   "starbase.user",
 ])
 export class StarbaseUser {

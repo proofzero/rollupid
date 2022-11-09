@@ -1,8 +1,10 @@
+// platform/starbase/src/index.ts
+
 /**
- * @file src/index.ts
- *
  * This Cloudflare worker provides an OpenRPC backend for the Kubelt
  * Starbase application.
+ *
+ * @packageDocumentation
  */
 
 import * as _ from "lodash";
@@ -84,7 +86,7 @@ const kb_appStore = openrpc.method(schema, {
       // an HTTP Request that we can forward directly to the durable object!
 
       // Get a reference to the StarbaseApplication Durable Object.
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
       // TODO better typing
       const appData = _.get(request, ['params', 'app'], {});
@@ -122,7 +124,7 @@ const kb_appStore = openrpc.method(schema, {
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
       // returned schema to define an RPC proxy stub.
-      const app = await openrpc.discover(starbase, objName, {
+      const app = await openrpc.discover(sbApplication, objName, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
@@ -154,7 +156,6 @@ const kb_appFetch = openrpc.method(schema, {
       const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
       // TODO better typing
-      const appData = _.get(request, ['params', 'app'], {});
       const ownerId = _.get(request, ["params", "ownerId"]);
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
@@ -213,7 +214,6 @@ const kb_appDelete = openrpc.method(schema, {
       const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
       // TODO better typing
-      const appData = _.get(request, ['params', 'app'], {});
       const ownerId = _.get(request, ["params", "ownerId"]);
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
@@ -268,18 +268,36 @@ const kb_appList = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>,
     ) => {
-      // TODO call user.appList()
-      const result = {
+      // Get a reference to the StarbaseApplication Durable Object.
+      const sbUser: DurableObjectNamespace = context.get(KEY_USER);
+
+      // TEMP
+      const token = "FIXME";
+      const objName = "@kubelt/robert";
+
+      const user = await openrpc.discover(sbUser, objName, {
+        // TODO This auth token is sent with every RPC call.
+        token,
+        // This tag is used when logging requests.
+        tag: "starbase-user",
+      });
+
+      // TODO filter the edges to only include those linking to apps.
+      const result = await user._.graph.edges();
+
+      return openrpc.response(request, {
         invoked: "kb_appList",
         implemented: false,
-      };
-      return openrpc.response(request, result);
+        result,
+      });
     },
   ),
 });
 
 // kb_appAuthInfo
 // -----------------------------------------------------------------------------
+// This method is for use during the auth flow. It returns the auth-related
+// details of an application.
 
 const kb_appAuthInfo = openrpc.method(schema, {
   name: "kb_appAuthInfo",
@@ -294,7 +312,6 @@ const kb_appAuthInfo = openrpc.method(schema, {
       const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
       // TODO better typing
-      const appData = _.get(request, ['params', 'app'], {});
       const ownerId = _.get(request, ["params", "ownerId"]);
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
@@ -336,7 +353,8 @@ const kb_appAuthInfo = openrpc.method(schema, {
       const authInfo = _.pick(result, [
         "app.id",
         "app.clientId",
-        "app.clientSecret",
+        "app.redirectURL",
+        "app.scopes",
       ]);
 
       return openrpc.response(request, authInfo);
@@ -514,11 +532,11 @@ export interface Env {
 // -----------------------------------------------------------------------------
 
 /**
- * @param request A Request instance containing the request to handle.
- * @param env An object containing environment bindings.
- * @param ctx A request execution context.
+ * @param request - A Request instance containing the request to handle.
+ * @param env - An object containing environment bindings.
+ * @param ctx - A request execution context.
  *
- * @return An HTTP response.
+ * @returns An HTTP response.
  */
 export default {
   async fetch(
