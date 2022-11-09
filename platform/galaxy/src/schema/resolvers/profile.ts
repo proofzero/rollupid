@@ -24,7 +24,7 @@ const threeIDResolvers: Resolvers = {
     profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
       const oortClient = new OortClient(env.OORT, jwt)
       const profileResponse = await oortClient.getProfile()
-      checkHTTPStatus(profileResponse)
+      await checkHTTPStatus(profileResponse)
       const res = getRPCResult(profileResponse)
       return await res
     },
@@ -35,7 +35,7 @@ const threeIDResolvers: Resolvers = {
     ) => {
       const oortClient = new OortClient(env.OORT)
       const profileResponse = await oortClient.getProfileFromAddress(address)
-      checkHTTPStatus(profileResponse)
+      await checkHTTPStatus(profileResponse)
       return await getRPCResult(profileResponse)
     },
     profileFromName: async (
@@ -62,7 +62,7 @@ const threeIDResolvers: Resolvers = {
         )
       }
       const profileResponse = await oortClient.getProfileFromAddress(address)
-      checkHTTPStatus(profileResponse)
+      await checkHTTPStatus(profileResponse)
       return await getRPCResult(profileResponse)
     },
   },
@@ -74,7 +74,7 @@ const threeIDResolvers: Resolvers = {
     ) => {
       const oortClient = new OortClient(env.OORT, jwt)
       const profileResponse = await oortClient.getProfile()
-      checkHTTPStatus(profileResponse)
+      await checkHTTPStatus(profileResponse)
       const currentProfile = await getRPCResult(profileResponse)
 
       const newProfile = {
@@ -86,7 +86,7 @@ const threeIDResolvers: Resolvers = {
         newProfile,
         visibility
       )
-      checkHTTPStatus(updateResponse)
+      await checkHTTPStatus(updateResponse)
       return !!(await getRPCResult(updateResponse))
     },
   },
