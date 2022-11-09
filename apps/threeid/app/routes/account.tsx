@@ -144,6 +144,7 @@ type SideNavItemProps = {
 const SideNavItem = ({ item }: SideNavItemProps) => {
   const activeStyle = {
     backgroundColor: 'rgb(243 244 246)',
+    borderColor: '#6366f1',
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
@@ -153,7 +154,7 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
         style={({ isActive }) => {
           return isActive && item.href != '#' ? activeStyle : undefined
         }}
-        className="text-sm group lg:border-l-4 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
+        className="text-sm group lg:border-l-2 hover:border-indigo-500 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start"
       >
         <item.icon
           className={classNames(
