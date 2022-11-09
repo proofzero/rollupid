@@ -38,8 +38,8 @@ const user = {
 }
 
 type HeadNavProps = {
-  avatarUrl: string | undefined
-  isToken: boolean
+  avatarUrl?: string | undefined
+  isToken?: boolean | undefined
   loggedIn?: {
     address: string
   }

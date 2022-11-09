@@ -37,11 +37,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   } catch (e) {
     if (e.response.errors) {
       // we have a handled exception from galaxy
-      const status = e.response.errors[0].status
+      const status = e.response.errors[0].extensions.extensions.http.status
       const error = `Failed to fetch profile with with resolver ${params.profile}: ${e.response.errors[0].message}`
-      console.error(error)
-      return json({
-        error,
+      console.error(status, error)
+      return json(error, {
         status: status,
       })
     }

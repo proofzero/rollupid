@@ -12,8 +12,6 @@ import {
 
 import { Resolvers } from './typedefs'
 import { GraphQLYogaError } from '@graphql-yoga/common'
-import { StatusExtensionCodes } from './utils/responseCode'
-import { GraphQLError } from 'graphql'
 
 type ResolverContext = {
   env: Env
