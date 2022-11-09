@@ -71,13 +71,27 @@ export const action: ActionFunction = async ({ request }) => {
     errors.displayName = ['Display name is required']
   }
 
+  if (displayName && displayName.length > 50) {
+    errors.displayName = ['Display name is maximum 50 characters']
+  }
+
+  const job = formData.get('job')?.toString()
+  if (job && job.length > 30) {
+    errors.job = ['Job is maximum 30 characters']
+  }
+
+  const location = formData.get('job')?.toString()
+  if (location && location.length > 30) {
+    errors.location = ['Location is maximum 30 characters']
+  }
+
   const website = formData.get('website')?.toString()
   if (website) {
-    let url;
+    let url
     try {
       // URL throws exception
       // if website is invalid
-      url = new URL(website);
+      url = new URL(website)
     } catch (ex) {
       errors.website = ['Website must be a valid URL']
     }
@@ -102,8 +116,8 @@ export const action: ActionFunction = async ({ request }) => {
     {
       profile: {
         displayName: displayName,
-        job: formData.get('job')?.toString(),
-        location: formData.get('location')?.toString(),
+        job: job,
+        location: location,
         bio: bio,
         website: formData.get('website')?.toString(),
         pfp: {
@@ -312,6 +326,7 @@ export default function AccountSettingsProfile() {
               defaultValue={displayName}
               required={true}
               error={actionData?.errors.displayName}
+              maxChars={50}
             />
           </div>
 
@@ -334,7 +349,19 @@ export default function AccountSettingsProfile() {
                 placeholder="Your Job"
                 Icon={FaBriefcase}
                 defaultValue={job}
+                maxChars={30}
               />
+
+              {actionData?.errors.job && (
+                <Text
+                  className="mb-1.5"
+                  size={TextSize.XS}
+                  weight={TextWeight.Regular400}
+                  color={TextColor.Gray400}
+                >
+                  {actionData.errors.job}
+                </Text>
+              )}
             </div>
 
             <div className="flex-1">
@@ -344,7 +371,19 @@ export default function AccountSettingsProfile() {
                 placeholder="Your Location"
                 Icon={FaMapMarkerAlt}
                 defaultValue={location}
+                maxChars={30}
               />
+
+              {actionData?.errors.location && (
+                <Text
+                  className="mb-1.5"
+                  size={TextSize.XS}
+                  weight={TextWeight.Regular400}
+                  color={TextColor.Gray400}
+                >
+                  {actionData.errors.location}
+                </Text>
+              )}
             </div>
           </div>
 

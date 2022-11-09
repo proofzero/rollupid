@@ -1,24 +1,25 @@
-import { IconType } from "react-icons/lib";
-import Text, { TextColor, TextSize, TextWeight } from "../typography/Text";
+import { IconType } from 'react-icons/lib'
+import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
 
-type InputTextValType = string | number;
-type InputIconPosType = "leading" | "trailing";
+type InputTextValType = string | number
+type InputIconPosType = 'leading' | 'trailing'
 
 export type InputTextProps = {
-  id?: string;
-  heading: string;
-  onChange?: (val: any) => void;
-  name?: string;
-  type?: React.HTMLInputTypeAttribute;
-  placeholder?: string;
-  defaultValue?: InputTextValType;
-  disabled?: boolean;
-  Icon?: IconType;
-  iconPosition?: InputIconPosType;
-  addon?: string;
-  error?: boolean;
-  required?: boolean;
-};
+  id?: string
+  heading: string
+  onChange?: (val: any) => void
+  name?: string
+  type?: React.HTMLInputTypeAttribute
+  placeholder?: string
+  defaultValue?: InputTextValType
+  disabled?: boolean
+  Icon?: IconType
+  iconPosition?: InputIconPosType
+  addon?: string
+  error?: boolean
+  required?: boolean
+  maxChars?: number
+}
 
 const InputText = ({
   id,
@@ -34,8 +35,9 @@ const InputText = ({
   addon,
   error,
   required,
+  maxChars,
 }: InputTextProps) => {
-  const computedName = name ?? id;
+  const computedName = name ?? id
 
   return (
     <div>
@@ -53,15 +55,15 @@ const InputText = ({
         {addon && (
           <span
             className={`inline-flex items-center rounded-l-md border border-r-0 border-${
-              error ? "red-500" : "gray-300"
+              error ? 'red-500' : 'gray-300'
             } shadow-sm focus:border-${
-              error ? "red" : "indigo"
+              error ? 'red' : 'indigo'
             }-500 focus:ring-${
-              error ? "red" : "indigo"
+              error ? 'red' : 'indigo'
             }-500 disabled:cursor-not-allowed disabled:border-${
-              error ? "red" : "gray"
-            }-200 disabled:bg-${error ? "red" : "gray"}-50 placeholder-${
-              error ? "red" : "gray"
+              error ? 'red' : 'gray'
+            }-200 disabled:bg-${error ? 'red' : 'gray'}-50 placeholder-${
+              error ? 'red' : 'gray'
             }-400 bg-gray-50 px-3`}
           >
             <Text
@@ -74,20 +76,20 @@ const InputText = ({
           </span>
         )}
         <div
-          className={`relative text-${error ? "red" : "gray"}-900 flex flex-1`}
+          className={`relative text-${error ? 'red' : 'gray'}-900 flex flex-1`}
         >
           {Icon && (
             <div
               style={{
                 // Seems to be a problem with the `pr-3` class not adding padding
-                paddingRight: iconPosition === "trailing" ? "0.75rem" : 0,
+                paddingRight: iconPosition === 'trailing' ? '0.75rem' : 0,
               }}
               className={`text-${
-                error ? "red" : "gray"
+                error ? 'red' : 'gray'
               }-400 pointer-events-none absolute inset-y-0 ${
-                iconPosition === "trailing" ? "right-0" : "left-0"
+                iconPosition === 'trailing' ? 'right-0' : 'left-0'
               } flex items-center p${
-                iconPosition === "trailing" ? "r" : "l"
+                iconPosition === 'trailing' ? 'r' : 'l'
               }-3`}
             >
               <Icon
@@ -101,38 +103,39 @@ const InputText = ({
           )}
 
           <input
-            type={type ?? "text"}
+            type={type ?? 'text'}
             name={computedName}
             id={id}
             required={required}
             onChange={(e) => {
-              if (onChange) onChange(e.target.value);
+              if (onChange) onChange(e.target.value)
             }}
             defaultValue={defaultValue}
             disabled={disabled ?? false}
             className={`${
-              addon ? "rounded-none rounded-r-md" : "rounded-md"
-            } border-${error ? "red-500" : "gray-300"} shadow-sm focus:border-${
-              error ? "red" : "indigo"
+              addon ? 'rounded-none rounded-r-md' : 'rounded-md'
+            } border-${error ? 'red-500' : 'gray-300'} shadow-sm focus:border-${
+              error ? 'red' : 'indigo'
             }-500 focus:ring-${
-              error ? "red" : "indigo"
+              error ? 'red' : 'indigo'
             }-500 disabled:cursor-not-allowed disabled:border-${
-              error ? "red" : "gray"
-            }-200 disabled:bg-${error ? "red" : "gray"}-50 placeholder-${
-              error ? "red" : "gray"
+              error ? 'red' : 'gray'
+            }-200 disabled:bg-${error ? 'red' : 'gray'}-50 placeholder-${
+              error ? 'red' : 'gray'
             }-400 ${
-              Icon ? `p${iconPosition === "trailing" ? "r" : "l"}-10` : ""
+              Icon ? `p${iconPosition === 'trailing' ? 'r' : 'l'}-10` : ''
             } w-full`}
             style={{
               fontWeight: 400,
-              fontFamily: "Inter_400Regular",
+              fontFamily: 'Inter_400Regular',
             }}
+            maxLength={maxChars}
             placeholder={placeholder}
           />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default InputText;
+export default InputText
