@@ -36,9 +36,22 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
 
-  const profileJson = await profileLoader(args).then((profileRes: Response) =>
-    profileRes.json()
-  )
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
+  const address = session.get('address')
+
+  const profileJsonRes = await profileLoader(args)
+
+  if (profileJsonRes.status !== 200) {
+    return json({
+      error: await profileJsonRes.text(),
+      ogImageUrl: social,
+      loggedIn: jwt ? { address } : false,
+      targetAddress: params.profile,
+    })
+  }
+
+  const profileJson = await profileJsonRes.json()
 
   let hex = gatewayFromIpfs(profileJson?.pfp?.image)
   let bkg = gatewayFromIpfs(profileJson?.cover)
@@ -67,10 +80,6 @@ export const loader: LoaderFunction = async (args) => {
   }
 
   let isOwner = false
-
-  const session = await getUserSession(request)
-  const jwt = session.get('jwt')
-  const address = session.get('address')
 
   const addressLookup = await oortSend('ens_lookupAddress', [address], {
     jwt,
@@ -113,6 +122,7 @@ export const meta: MetaFunction = ({
 
 const ProfileRoute = () => {
   const {
+    error,
     targetAddress,
     claimed,
     displayName,
@@ -178,6 +188,15 @@ const ProfileRoute = () => {
         }
       )
     }
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <h1 className="text-3xl font-bold">Error</h1>
+        <p className="text-xl">{error}</p>
+      </div>
+    )
   }
 
   return (

@@ -1,5 +1,5 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { getDefaultProvider } from '@ethersproject/providers'
+import { getDefaultProvider, AlchemyProvider } from '@ethersproject/providers'
 
 import Env from '../../env'
 import OortClient from './clients/oort'
@@ -44,8 +44,13 @@ const threeIDResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const oortClient = new OortClient(env.OORT)
-      const provider = getDefaultProvider()
+      const provider = new AlchemyProvider( // #TODO: consider using Etherscan provider?
+        env.ALCHEMY_NETWORK,
+        env.ALCHEMY_API_KEY
+      )
+      console.log('provider', provider)
       const address = await provider.resolveName(name)
+      console.log('address', address)
       if (!address) {
         throw new GraphQLYogaError(
           `Error: 404 Not Found: No address found for name ${name}`

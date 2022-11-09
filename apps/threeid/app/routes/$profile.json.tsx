@@ -15,9 +15,28 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // TODO: remove claimed from response?
   try {
     const galaxyClient = await getGalaxyClient()
+    // TODO: can we use one call to do the check instead of here?
+    // TODO: consider how we would support muliple name services
+    if (params.profile.includes('.eth')) {
+      try {
+        const profileRes = await galaxyClient.getProfileFromName({
+          name: params.profile,
+        })
+        console.log('profileRes', profileRes)
+        return json({
+          ...profileRes.profileFromName,
+          claimed: true,
+        })
+      } catch (e) {
+        return json(`Profile with name ${params.profile} not found`, {
+          status: 404,
+        })
+      }
+    }
     const profileRes = await galaxyClient.getProfileFromAddress({
       address: params.profile,
     })
+
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,

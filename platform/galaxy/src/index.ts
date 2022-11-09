@@ -1,9 +1,9 @@
-import { createServer } from "@graphql-yoga/common";
+import { createServer } from '@graphql-yoga/common'
 
-import Env from "./env";
-import schema from "./schema";
+import Env from './env'
+import schema from './schema'
 
-const yoga = createServer<{ env: Env; ctx: ExecutionContext }>({ schema });
+const yoga = createServer<{ env: Env; ctx: ExecutionContext }>({ schema })
 
 export default {
   async fetch(
@@ -12,8 +12,14 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     if (!env.OORT) {
-      throw Error("OORT not set");
+      throw Error('OORT not set')
     }
-    return yoga.handleRequest(request, { env, ctx });
+    if (!env.ALCHEMY_API_KEY) {
+      throw Error('ALCHEMY_API_URL not set')
+    }
+    if (!env.ALCHEMY_NETWORK) {
+      throw Error('ALCHEMY_NETWORK not set')
+    }
+    return yoga.handleRequest(request, { env, ctx })
   },
-};
+}
