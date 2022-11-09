@@ -100,11 +100,14 @@ export const meta: MetaFunction = ({
     'twitter:description': bio || 'Claim yours now!',
     'og:url': `https://3id.kubelt.com/${targetAddress}`,
     'og:image': ogImageURL + `?${Date.now()}`,
-    'twitter:image': ogImageURL + `?${Date.now()}`,
-    'twitter:image:alt': social,
-    'twitter:site': '@threeid_xyz',
+    'og:image:alt': `${displayName || targetAddress}'s 3ID Profile`,
+    'og:site_name': '3ID',
+    'og:type': 'profile',
     // Twitter-specific meta tags.
     // See: https://developer.twitter.com/en/docs/twitter-for-websites/cards/guides/getting-started
+    'twitter:image': ogImageURL + `?${Date.now()}`,
+    'twitter:image:alt': `${displayName || targetAddress}'s 3ID Profile`,
+    'twitter:site': '@threeid_xyz',
     'twitter:card': 'summary_large_image',
     // TODO: Hook this up
     // 'twitter:creator': twitterHandle || '@threeid_xyz',
