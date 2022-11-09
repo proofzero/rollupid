@@ -8,17 +8,25 @@
 import * as _ from "lodash";
 
 import * as openrpc from "@kubelt/openrpc";
+
+import type {
+  RpcContext,
+  RpcRequest,
+  RpcService,
+} from "@kubelt/openrpc";
+
 import { default as mwAnalytics } from "@kubelt/openrpc/middleware/analytics";
 import { default as mwAuthenticate } from "@kubelt/openrpc/middleware/authenticate";
 import { default as mwDatadog } from "@kubelt/openrpc/middleware/datadog";
 import { default as mwGeolocation } from "@kubelt/openrpc/middleware/geolocation";
+import { default as mwOnlyLocal } from "@kubelt/openrpc/middleware/local";
 import { default as mwOort } from "@kubelt/openrpc/middleware/oort";
 
 import { StarbaseApplication } from "@kubelt/do.starbase-application";
 import { StarbaseContract } from "@kubelt/do.starbase-contract";
 import { StarbaseUser } from "@kubelt/do.starbase-user";
 
-import * as middle from "./middleware";
+import * as secret from "./secret";
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -66,79 +74,68 @@ const noScope = openrpc.scopes([]);
 const kb_appStore = openrpc.method(schema, {
   name: "kb_appStore",
   scopes: noScope,
-  handler: openrpc.handler(async (request, context) => {
-    // Note that the request we are given is a parsed RpcRequest. It's not
-    // an HTTP Request that we can forward directly to the durable object!
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      // Note that the request we are given is a parsed RpcRequest. It's not
+      // an HTTP Request that we can forward directly to the durable object!
 
-    //console.log(request);
-    //console.log(context);
+      // Get a reference to the StarbaseApplication Durable Object.
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
-    // Get a reference to the StarbaseApplication Durable Object.
-    const starbase = context.get(KEY_APPLICATION);
-
-    // TODO Initialize an RPC client for the DO:
-    // - openrpc.client(schema); <= when schema already available
-    // - openrpc.discover(url); <= for OpenRPC discovery
-    //
-    // TODO Make the desired call(s) against the object.
-
-    // TEMP make this type check so we can run dev:miniflare. It would be
-    // better if these types were generated from the schema.
-    type AppCreateParams = {
-      ownerId: string;
-      appId: string;
-    };
-    const params = <AppCreateParams>request?.params;
-    const ownerId = params?.ownerId;
-    const appId = params?.appId;
-
-    // Should we use randomly generated name for better performance? Alternately,
-    // should we hash our own identifier into a hex string to use as the name?
-    const objName = `${ownerId}/${appId}`;
-    const objId = starbase.idFromName(objName);
-    const app = starbase.get(objId);
-
-    // This base URL is ignored for routing purposes since the calls are
-    // dispatched using an object stub. Instead we encode the name of the
-    // durable object into the URL for informational purposes, e.g. when
-    // logging.
-    const baseURL = `https://do.starbase`;
-
-    // If we use ${objId} in the URL it is REDACTED in the logs.
-    const url = new URL(`/openrpc`, baseURL);
-    //console.log(url);
-
-    // The RPC request to make to the remote object.
-    const nameRequest = {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "app_fetch",
-      params: {
-        app: {
-          xxx: "yyy",
-        }
+      // TODO better typing
+      const appData = _.get(request, ['params', 'app'], {});
+      const ownerId = _.get(request, ["params", "ownerId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === ownerId) {
+        throw new Error("missing ownerId param");
       }
-    };
-    // Note that workers can pass state to durable objects via headers, the
-    // HTTP method, the Request body, or the Request URI. Does it make sense
-    // to supply that information as part of the RpcRequest as extra context?
-    const doRequest = new Request(url.toString(), {
-      body: JSON.stringify(nameRequest),
-      headers: { "Example-Header": "example", "Content-Type": "application/json", },
-      method: "POST",
-      //redirect
-      //cf
-    });
-    const sbResponse = await app.fetch(doRequest);
-    const doText = await sbResponse.json();
+      const appId = _.get(request, ["params", "appId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === appId) {
+        throw new Error("missing appId param");
+      }
 
-    // TODO
-    const result = {
-      invoked: "kb_appStore",
-      doText,
-    };
-    return openrpc.response(request, result);
-  }),
+      // Hash application clientSecret before storing in app core.
+      const clientSecret = appData.clientSecret;
+      const hashedSecret = await secret.hash(clientSecret);
+      //const cid = secret.parse(hashedSecret);
+      appData.clientSecret = hashedSecret;
+
+      // TODO forward the JWT used to make the current request. Send as
+      // "KBT-Authorization" header?
+      const token = "FIXME";
+
+      // The name of the component that we need to update with new
+      // application data.
+      //
+      // TODO Should we use randomly generated name for better
+      // performance? Alternately, should we hash our own identifier into
+      // a hex string to use as the name?
+      const objName = `${ownerId}/${appId}`;
+
+      // Construct an RPC client for the named component (a durable
+      // object) by calling its OpenRPC rpc.discover method and using the
+      // returned schema to define an RPC proxy stub.
+      const app = await openrpc.discover(starbase, objName, {
+        // TODO This auth token is sent with every RPC call.
+        token,
+        // This tag is used when logging requests.
+        tag: "starbase-app",
+      });
+
+      const result = await app.appStore({
+        app: appData,
+      });
+
+      return openrpc.response(request, result);
+    },
+  ),
 });
 
 // kb_appFetch
@@ -147,28 +144,57 @@ const kb_appStore = openrpc.method(schema, {
 const kb_appFetch = openrpc.method(schema, {
   name: "kb_appFetch",
   scopes: noScope,
-  handler: openrpc.handler(async (request, context) => {
-    // TODO use a task orchestration library?
-    /*
-    const userId = "<userId>";
-    const user = openrpc.discover(userId);
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      // Get a reference to the StarbaseApplication Durable Object.
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
-    const appId = request.appId;
-    const appCore = user.lookupApp(appId);
+      // TODO better typing
+      const appData = _.get(request, ['params', 'app'], {});
+      const ownerId = _.get(request, ["params", "ownerId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === ownerId) {
+        throw new Error("missing ownerId param");
+      }
+      const appId = _.get(request, ["params", "appId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === appId) {
+        throw new Error("missing appId param");
+      }
 
-    let result;
-    if (appCore !== undefined) {
-      // fetch app
-    } else {
-      // return error
-    }
-    */
+      // TODO forward the JWT used to make the current request. Send as
+      // "KBT-Authorization" header?
+      const token = "FIXME";
 
-    const result = {
-      invoked: "kb_appFetch",
-    };
-    return openrpc.response(request, result);
-  }),
+      // The name of the component that we need to update with new
+      // application data.
+      //
+      // TODO Should we use randomly generated name for better
+      // performance? Alternately, should we hash our own identifier into
+      // a hex string to use as the name?
+      const objName = `${ownerId}/${appId}`;
+
+      // Construct an RPC client for the named component (a durable
+      // object) by calling its OpenRPC rpc.discover method and using the
+      // returned schema to define an RPC proxy stub.
+      const app = await openrpc.discover(starbase, objName, {
+        // TODO This auth token is sent with every RPC call.
+        token,
+        // This tag is used when logging requests.
+        tag: "starbase-app",
+      });
+
+      const result = await app.appFetch();
+
+      return openrpc.response(request, result);
+    },
+  ),
 });
 
 // kb_appDelete
@@ -177,13 +203,57 @@ const kb_appFetch = openrpc.method(schema, {
 const kb_appDelete = openrpc.method(schema, {
   name: "kb_appDelete",
   scopes: noScope,
-  handler: openrpc.handler(async (request, context) => {
-    // TODO
-    const result = {
-      invoked: "kb_appDelete",
-    };
-    return openrpc.response(request, result);
-  }),
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      // Get a reference to the StarbaseApplication Durable Object.
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+
+      // TODO better typing
+      const appData = _.get(request, ['params', 'app'], {});
+      const ownerId = _.get(request, ["params", "ownerId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === ownerId) {
+        throw new Error("missing ownerId param");
+      }
+      const appId = _.get(request, ["params", "appId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === appId) {
+        throw new Error("missing appId param");
+      }
+
+      // TODO forward the JWT used to make the current request. Send as
+      // "KBT-Authorization" header?
+      const token = "FIXME";
+
+      // The name of the component that we need to update with new
+      // application data.
+      //
+      // TODO Should we use randomly generated name for better
+      // performance? Alternately, should we hash our own identifier into
+      // a hex string to use as the name?
+      const objName = `${ownerId}/${appId}`;
+
+      // Construct an RPC client for the named component (a durable
+      // object) by calling its OpenRPC rpc.discover method and using the
+      // returned schema to define an RPC proxy stub.
+      const app = await openrpc.discover(starbase, objName, {
+        // TODO This auth token is sent with every RPC call.
+        token,
+        // This tag is used when logging requests.
+        tag: "starbase-app",
+      });
+
+      const result = await app._.cmp.delete();
+
+      return openrpc.response(request, result);
+    },
+  ),
 });
 
 // kb_appList
@@ -192,13 +262,20 @@ const kb_appDelete = openrpc.method(schema, {
 const kb_appList = openrpc.method(schema, {
   name: "kb_appList",
   scopes: noScope,
-  handler: openrpc.handler(async (request, context) => {
-    // TODO call the user.listApps method
-    const result = {
-      invoked: "kb_appList",
-    };
-    return openrpc.response(request, result);
-  }),
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      // TODO call user.appList()
+      const result = {
+        invoked: "kb_appList",
+        implemented: false,
+      };
+      return openrpc.response(request, result);
+    },
+  ),
 });
 
 // kb_appAuthInfo
@@ -207,15 +284,65 @@ const kb_appList = openrpc.method(schema, {
 const kb_appAuthInfo = openrpc.method(schema, {
   name: "kb_appAuthInfo",
   scopes: noScope,
-  handler: openrpc.handler(async (request, context) => {
-    // TODO call the user.listApps method
-    const result = {
-      invoked: "kb_appAuthInfo",
-    };
-    return openrpc.response(request, result);
-  }),
-});
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      // Get a reference to the StarbaseApplication Durable Object.
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
 
+      // TODO better typing
+      const appData = _.get(request, ['params', 'app'], {});
+      const ownerId = _.get(request, ["params", "ownerId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === ownerId) {
+        throw new Error("missing ownerId param");
+      }
+      const appId = _.get(request, ["params", "appId"]);
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      if (undefined === appId) {
+        throw new Error("missing appId param");
+      }
+
+      // TODO forward the JWT used to make the current request. Send as
+      // "KBT-Authorization" header?
+      const token = "FIXME";
+
+      // The name of the component that we need to update with new
+      // application data.
+      //
+      // TODO Should we use randomly generated name for better
+      // performance? Alternately, should we hash our own identifier into
+      // a hex string to use as the name?
+      const objName = `${ownerId}/${appId}`;
+
+      // Construct an RPC client for the named component (a durable
+      // object) by calling its OpenRPC rpc.discover method and using the
+      // returned schema to define an RPC proxy stub.
+      const app = await openrpc.discover(starbase, objName, {
+        // TODO This auth token is sent with every RPC call.
+        token,
+        // This tag is used when logging requests.
+        tag: "starbase-app",
+      });
+
+      const result = await app.appFetch();
+
+      // Keep only the app object properties that we want in the result.
+      const authInfo = _.pick(result, [
+        "app.id",
+        "app.clientId",
+        "app.clientSecret",
+      ]);
+
+      return openrpc.response(request, authInfo);
+    },
+  ),
+});
 
 // extra_example
 // -----------------------------------------------------------------------------
@@ -233,17 +360,26 @@ const extra_example = openrpc.extension(schema, {
     errors: [],
   },
   scopes: openrpc.scopes([]),
-  handler: openrpc.handler(async (request, context) => {
-    const result = {
-      invoked: "extra_example",
-    };
-    return openrpc.response(request, result);
-  }),
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>,
+    ) => {
+      const result = {
+        invoked: "extra_example",
+      };
+      return openrpc.response(request, result);
+    },
+  ),
 });
 
 // Service
 // -----------------------------------------------------------------------------
 // Define an OpenRPC service.
+
+// This service doesn't current require scopes to invoke RPC methods.
+const scopes = noScope;
 
 // These are the implementations of the RPC methods described in the schema.
 const methods = openrpc.methods(schema, [
@@ -269,7 +405,7 @@ const options = openrpc.options({
 // Supply implementations for all of the API methods in the schema.
 const service = openrpc.service(
   schema,
-  noScope,
+  scopes,
   methods,
   extensions,
   options,
@@ -283,7 +419,7 @@ const service = openrpc.service(
 // dispatches the request to the correct RPC service method.
 
 // All requests whose path is "under" this location are handled by
-// returned a 404 *unless* the request happens to be the root path.
+// returning a 404 *unless* the request happens to be the root path.
 // If the base path is the same as the root path, you will need to handle
 // any request that isn't to the root path yourself.
 const basePath = "/";
@@ -291,8 +427,13 @@ const basePath = "/";
 // The RPC resource endpoint; requests to this path are handled as RPC requests.
 const rootPath = "/openrpc";
 
-// Construct a sequence of middleware to execute.
+// Construct a sequence of middleware to execute before any RPC methods
+// are invoked. These may short-circuit, directly returning a response
+// to the incoming request, e.g. if authentication fails.
 const chain = openrpc.chain([
+  // This middleware rejects any requests that don't originate at
+  // localhost.
+  mwOnlyLocal,
   // Authenticate using a JWT in the request.
   mwAuthenticate,
   // Extra geolocation data provided by Cloudflare.
@@ -303,8 +444,6 @@ const chain = openrpc.chain([
   mwDatadog,
   // Construct an Oort client for talking to the Kubelt backend.
   mwOort,
-  // An example middleware defined locally.
-  middle.example,
 ]);
 
 // The returned handler validates the incoming request, routes it to the

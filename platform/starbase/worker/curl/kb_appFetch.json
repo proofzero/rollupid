@@ -4,6 +4,6 @@
   "method": "kb_appFetch",
   "params": {
     "ownerId": "robert",
-    "appId": "example"
+    "appId": "81cc0dab-2c0a-412d-b82f-0a392823a15f"
   }
 }

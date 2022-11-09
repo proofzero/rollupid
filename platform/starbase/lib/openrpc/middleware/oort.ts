@@ -2,7 +2,12 @@
  * @file src/middleware/oort.ts
  */
 
-import { middleware } from "..";
+import type {
+  RpcContext,
+  RpcRequest,
+} from "@kubelt/openrpc";
+
+import * as openrpc from "@kubelt/openrpc";
 
 // oort
 // -----------------------------------------------------------------------------
@@ -10,7 +15,11 @@ import { middleware } from "..";
 /**
  * An extension that injects an Oort client into the context.
  */
-export default middleware(async (request, context) => {
+export default openrpc.middleware(
+  async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>,
+  ) => {
   // TODO
   return context;
 });

@@ -73,16 +73,16 @@ export class StarbaseApplication {
   // app_store
   // ---------------------------------------------------------------------------
 
-  // Mark this method as being the implementation of the app_store method
-  // from the OpenRPC schema.
+  // Mark this method as being the implementation of the app_store
+  // method from the OpenRPC schema.
   @method("app_store")
-  // The write scope is required to invoke this method. If the caller lacks
-  // the scope they receive an error method indicating that they lack
-  // permission, and this method handler is not invoked.
+  // The write scope is required to invoke this method. If the caller
+  // lacks the scope they receive an error method indicating that they
+  // lack permission, and this method handler is not invoked.
   @requiredScope("starbase.write")
   // Allow this method to update the value of the "app" field of the
   // component.
-  @requiredField("app", [FieldAccess.Write])
+  @requiredField("app", [FieldAccess.Read, FieldAccess.Write])
   // The RPC method implementation.
   async appStore(
     params: RpcParams,
@@ -90,14 +90,28 @@ export class StarbaseApplication {
     output: RpcOutput,
   ): Promise<RpcResult> {
 
-    if (params.has("app")) {
-      output.set("app", params.get("app"));
-    } else {
-      console.error(`missing parameter "app" from request`);
+    if (!params.has("app")) {
+      const message = `missing parameter "app" from request`;
+      console.error(message);
+      // TODO need a better way to return errors:
+      // - additional RpcCallable parameter that is an error map; errors
+      //   set on that map trigger the return of a JSON-RPC error
+      //   response.
+      // - exceptions
+      return Promise.resolve({
+        invoked: "app_store",
+        error: message,
+      });
     }
+
+    // Read the supplied "app" request parameter and write it to the
+    // output "app" field.
+    const app = params.get("app");
+    output.set("app", app);
 
     return Promise.resolve({
       invoked: "app_store",
+      stored: app,
     });
   }
 
@@ -113,6 +127,7 @@ export class StarbaseApplication {
     output: RpcOutput,
   ): Promise<RpcResult> {
     const app = input.get("app");
+
     return Promise.resolve({
       invoked: "app_fetch",
       app,
