@@ -140,7 +140,7 @@ export default function HeadNav({
                   {loggedIn && (
                     <Menu as="div" className="relative ml-3">
                       <div>
-                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm hover:outline-none hover:ring-2 hover:ring-white hover:ring-offset-2 hover:ring-offset-gray-800">
+                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
