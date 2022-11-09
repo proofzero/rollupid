@@ -1,4 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
+import { getDefaultProvider } from '@ethersproject/providers'
+
 import Env from '../../env'
 import OortClient from './clients/oort'
 import {
@@ -9,6 +11,7 @@ import {
 } from './utils'
 
 import { Resolvers } from './typedefs'
+import { GraphQLYogaError } from '@graphql-yoga/common'
 
 type ResolverContext = {
   env: Env
@@ -31,6 +34,23 @@ const threeIDResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const oortClient = new OortClient(env.OORT)
+      const profileResponse = await oortClient.getProfileFromAddress(address)
+      checkHTTPStatus(profileResponse)
+      return await getRPCResult(profileResponse)
+    },
+    profileFromName: async (
+      _parent: any,
+      { name }: { name: string },
+      { env }: ResolverContext
+    ) => {
+      const oortClient = new OortClient(env.OORT)
+      const provider = getDefaultProvider()
+      const address = await provider.resolveName(name)
+      if (!address) {
+        throw new GraphQLYogaError(
+          `Error: 404 Not Found: No address found for name ${name}`
+        )
+      }
       const profileResponse = await oortClient.getProfileFromAddress(address)
       checkHTTPStatus(profileResponse)
       return await getRPCResult(profileResponse)
