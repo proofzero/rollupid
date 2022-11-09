@@ -111,7 +111,7 @@ export default function AccountLayout() {
 
         <main className="-mt-72 pb-12">
           <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
-            <div className="overflow-hidden bg-white shadow">
+            <div className="overflow-hidden bg-white shadow rounded-lg">
               <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
                 <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
                   <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
@@ -146,7 +146,7 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
     backgroundColor: 'rgb(243 244 246)',
     borderColor: '#6366f1',
     fontWeight: 600,
-    color: '#1f2937'
+    color: '#1f2937',
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
