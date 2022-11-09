@@ -51,6 +51,7 @@ export default function HeadNav({
   isToken = false,
 }: HeadNavProps) {
   const activeStyle = {
+    fontWeight: 600,
     color: 'white',
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
@@ -83,7 +84,7 @@ export default function HeadNav({
                             return isActive ? activeStyle : undefined
                           }}
                           className={
-                            'px-3 py-2 text-sm font-medium nav-link-text'
+                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800 hover:font-semibold'
                           }
                         >
                           <Text
@@ -124,7 +125,8 @@ export default function HeadNav({
                     </div>
                   )}
 
-                  {loggedIn && (
+                  {/* Disabled by design request */}
+                  {/* {loggedIn && (
                     <button
                       type="button"
                       className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -132,13 +134,13 @@ export default function HeadNav({
                       <span className="sr-only">View notifications</span>
                       <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
                     </button>
-                  )}
+                  )} */}
 
                   {/* Profile dropdown */}
                   {loggedIn && (
                     <Menu as="div" className="relative ml-3">
                       <div>
-                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
@@ -159,7 +161,7 @@ export default function HeadNav({
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-md">
                           {loggedIn &&
                             userNavigation.map((item) => (
                               <Menu.Item key={item.name}>
@@ -167,7 +169,7 @@ export default function HeadNav({
                                   <item.component
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
-                                      'block px-4 py-2 text-sm text-gray-700'
+                                      'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
                                     )}
                                   />
                                 )}

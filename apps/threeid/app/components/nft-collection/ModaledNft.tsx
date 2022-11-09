@@ -32,7 +32,7 @@ const ModaledNft = ({ nft }: any) => {
               setShowModal(true)
             }
           }}
-          className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300"
+          className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300 rounded-lg"
         >
           <Text
             size={TextSize.SM}
@@ -51,7 +51,7 @@ const ModaledNft = ({ nft }: any) => {
         </div>
 
         <img
-          className="w-full"
+          className="w-full rounded-lg"
           src={
             loadFail
               ? missingNftSvg

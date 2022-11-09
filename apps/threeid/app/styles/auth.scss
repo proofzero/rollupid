@@ -65,14 +65,17 @@ footer {
 }
 
 .connector {
+    display: flex;
     background-color: white;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
     margin-top: 0.5em;
     padding: 1em 2em;
     font-family: Inter_500Medium;
     font-weight: 500;
     width: 100%;
     border: 1px solid $threeid-lightgrey;
+    border-radius: 6px;
 
     svg {
         float: left;
