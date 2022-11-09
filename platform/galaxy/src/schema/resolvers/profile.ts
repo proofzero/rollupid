@@ -12,6 +12,8 @@ import {
 
 import { Resolvers } from './typedefs'
 import { GraphQLYogaError } from '@graphql-yoga/common'
+import { StatusExtensionCodes } from './utils/responseCode'
+import { GraphQLError } from 'graphql'
 
 type ResolverContext = {
   env: Env
@@ -48,12 +50,17 @@ const threeIDResolvers: Resolvers = {
         env.ALCHEMY_NETWORK,
         env.ALCHEMY_API_KEY
       )
-      console.log('provider', provider)
       const address = await provider.resolveName(name)
-      console.log('address', address)
       if (!address) {
         throw new GraphQLYogaError(
-          `Error: 404 Not Found: No address found for name ${name}`
+          `Error: 404 Not Found: No address found for name ${name}`,
+          {
+            extensions: {
+              http: {
+                status: 404,
+              },
+            },
+          }
         )
       }
       const profileResponse = await oortClient.getProfileFromAddress(address)
@@ -76,8 +83,6 @@ const threeIDResolvers: Resolvers = {
         ...currentProfile,
         ...profile,
       }
-
-      // console.log("newProfile posted to oort", newProfile);
 
       const updateResponse = await oortClient.updateProfile(
         newProfile,

@@ -190,6 +190,7 @@ const ProfileRoute = () => {
     }
   }
 
+  // # TODO: design a profile 404
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
@@ -209,8 +210,8 @@ const ProfileRoute = () => {
       >
         <HeadNav
           loggedIn={loggedIn}
-          avatarUrl={pfp.image}
-          isToken={pfp.isToken}
+          avatarUrl={pfp?.image}
+          isToken={pfp?.isToken}
         />
       </div>
 
@@ -229,10 +230,10 @@ const ProfileRoute = () => {
           <div className="absolute">
             <ProfileCard
               account={targetAddress}
-              avatarUrl={gatewayFromIpfs(pfp.image)}
+              avatarUrl={gatewayFromIpfs(pfp?.image)}
               claimed={claimed ? new Date() : undefined}
               displayName={displayName}
-              isNft={pfp.isToken}
+              isNft={pfp?.isToken}
               webUrl={website}
             />
           </div>
