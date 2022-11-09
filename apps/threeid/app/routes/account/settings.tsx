@@ -1,4 +1,4 @@
-import { Outlet } from '@remix-run/react'
+import { NavLink, Outlet } from '@remix-run/react'
 import { Toast } from 'flowbite-react'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
@@ -14,11 +14,17 @@ const tabs = [
   { name: 'Connected Accounts', to: 'connections', disabled: true },
 ]
 
+let firstEnabledTab = tabs.filter((t) => !!!t.disabled)[0]
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function AccountSetting() {
+  const [currentTab, setCurrentTab] = useState<string | undefined>(
+    firstEnabledTab?.name
+  )
+
   const notify = (success: boolean = true) => {
     if (success) {
       toast.success('Saved')
@@ -67,10 +73,17 @@ export default function AccountSetting() {
               <a
                 key={tab.name}
                 href={!tab.disabled ? tab.to : '#'}
+                onClick={() => {
+                  if (tab.disabled) {
+                    return
+                  }
+
+                  setCurrentTab(tab.name)
+                }}
                 // prefetch="render"
                 className={classNames(
-                  tab?.current
-                    ? 'border-indigo-500 text-indigo-600'
+                  tab.name === currentTab
+                    ? 'border-indigo-500 font-semibold text-gray-800'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
                   tab.disabled ? 'cursor-not-allowed opacity-50' : '',
                   'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
