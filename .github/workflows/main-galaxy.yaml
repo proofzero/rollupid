@@ -36,9 +36,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/galaxy"
+          workingDirectory: 'platform/galaxy'
           command: publish --env dev
-          environment: "dev"
+          environment: 'dev'
           secrets: |
             DATADOG_CLIENT_TOKEN
             DATADOG_APPLICATION_ID
@@ -46,8 +46,10 @@ jobs:
             DATADOG_SERVICE_NAME
             NFTAR_URL
             NFTAR_AUTHORIZATION
+            ALCHEMY_API_KEY
+            ALCHEMY_NETWORK
         env:
-          SESSION_SECRET: "secret"
+          SESSION_SECRET: 'secret'
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
           DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
           DATADOG_ENV: development
@@ -57,3 +59,5 @@ jobs:
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          ALCHEMY_API_KEY: ${{ secrets.GALAXY_ALCHEMY_GOERLI_API_KEY}}
+          ALCHEMY_NETWORK: 'goerli'

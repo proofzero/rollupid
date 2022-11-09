@@ -52,3 +52,5 @@ jobs:
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          ALCHEMY_API_KEY: ${{ secrets.GALAXY_ALCHEMY_API_KEY}}
+          ALCHEMY_NETWORK: 'mainnet'
