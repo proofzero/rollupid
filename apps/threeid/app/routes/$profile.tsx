@@ -60,7 +60,6 @@ export const loader: LoaderFunction = async (args) => {
   }
 
   const profileJsonRes = await profileLoader(args)
-  console.log('HERHERHE', profileJsonRes.status)
   if (profileJsonRes.status !== 200) {
     const resData = {
       error: await profileJsonRes.text(),
@@ -151,7 +150,6 @@ export const meta: MetaFunction = ({
 }
 
 const ProfileRoute = () => {
-  console.log('PROFILE ROUTE')
   const {
     error,
     loggedInUserProfile,
@@ -386,8 +384,6 @@ export default ProfileRoute
 
 export function CatchBoundary() {
   const caught = useCatch()
-  console.log('caught', caught)
-  console.log('stat is', caught?.status)
 
   let secondary = 'Something went wrong'
   switch (caught.status) {
