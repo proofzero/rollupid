@@ -40,6 +40,8 @@ jobs:
             DATADOG_SERVICE_NAME
             NFTAR_URL
             NFTAR_AUTHORIZATION
+            ALCHEMY_API_KEY
+            ALCHEMY_NETWORK
         env:
           SESSION_SECRET: 'secret'
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
@@ -52,3 +54,5 @@ jobs:
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          ALCHEMY_API_KEY: ${{ secrets.GALAXY_ALCHEMY_API_KEY}}
+          ALCHEMY_NETWORK: 'homestead'
