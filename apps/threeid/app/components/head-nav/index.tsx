@@ -51,6 +51,7 @@ export default function HeadNav({
   isToken = false,
 }: HeadNavProps) {
   const activeStyle = {
+    fontWeight: 600,
     color: 'white',
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
@@ -83,7 +84,7 @@ export default function HeadNav({
                             return isActive ? activeStyle : undefined
                           }}
                           className={
-                            'px-3 py-2 text-sm font-medium nav-link-text'
+                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800 hover:font-semibold'
                           }
                         >
                           <Text
