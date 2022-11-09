@@ -154,7 +154,6 @@ export const meta: MetaFunction = ({
 
 const ProfileRoute = () => {
   const {
-    error,
     loggedInUserProfile,
     targetAddress,
     claimed,
