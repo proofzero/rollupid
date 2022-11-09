@@ -31,6 +31,8 @@ import pepe from '~/assets/pepe.svg'
 import { oortSend } from '~/utils/rpc.server'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
+import hexStyle from '~/helpers/hex-style'
+
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
 }
@@ -246,7 +248,7 @@ const ProfileRoute = () => {
       </div>
 
       <div
-        className="h-80 w-full relative flex justify-center p-3"
+        className="h-[300px] w-full max-w-7xl mx-auto relative flex justify-center rounded-b-xl"
         style={{
           backgroundImage: coverUrl
             ? `url(${gatewayFromIpfs(coverUrl)})`
@@ -256,19 +258,6 @@ const ProfileRoute = () => {
           backgroundPosition: 'center',
         }}
       >
-        <div className="mt-[6.5rem] lg:mt-28 max-w-7xl w-full mx-auto justify-center lg:justify-start flex">
-          <div className="absolute">
-            <ProfileCard
-              account={targetAddress}
-              avatarUrl={gatewayFromIpfs(pfp?.image)}
-              claimed={claimed ? new Date() : undefined}
-              displayName={displayName}
-              isNft={pfp?.isToken}
-              webUrl={website}
-            />
-          </div>
-        </div>
-
         {isOwner && (
           <div className="absolute top-0 lg:top-auto lg:bottom-0 right-0 my-8 mx-6">
             <input
@@ -295,9 +284,43 @@ const ProfileRoute = () => {
         )}
       </div>
 
-      <div className="p-3 mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
+      <div className="max-w-7xl w-full min-h-[192px] mx-auto flex justify-between items-end px-8 mt-[-6em]">
+        <img
+          src={gatewayFromIpfs(pfp.image)}
+          className="w-48 bg-white border border-white"
+          style={
+            pfp.isToken
+              ? {
+                  ...hexStyle,
+                  transform: 'scale(1.0)',
+                }
+              : undefined
+          }
+        />
+
+        {isOwner && (
+          <ButtonLink
+            size={ButtonSize.SM}
+            to="/account/settings/profile"
+            Icon={FaEdit}
+          >
+            Edit Profile
+          </ButtonLink>
+        )}
+
+        {/* <ProfileCard
+              account={targetAddress}
+              avatarUrl={gatewayFromIpfs(pfp.image)}
+              claimed={claimed ? new Date() : undefined}
+              displayName={displayName}
+              isNft={pfp.isToken}
+              webUrl={website}
+            /> */}
+      </div>
+
+      <div className="p-8 mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
         {!claimed && (
-          <div className="lg:ml-[19rem] rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
+          <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
               <Text
                 size={TextSize.LG}
@@ -323,12 +346,16 @@ const ProfileRoute = () => {
         )}
 
         {claimed && (
-          <div
-            className="lg:ml-[19rem] py-4 px-6"
-            style={{
-              minHeight: '8rem',
-            }}
-          >
+          <div>
+            <Text
+              className="mt-5 mb-2.5"
+              weight={TextWeight.Bold700}
+              color={TextColor.Gray600}
+              size={TextSize.XL2}
+            >
+              {displayName ?? shortenedAccount}
+            </Text>
+
             <Text
               className="break-all"
               size={TextSize.Base}
@@ -353,17 +380,16 @@ const ProfileRoute = () => {
                     <FaBriefcase /> <Text>{job}</Text>
                   </div>
                 )}
-              </div>
 
-              {isOwner && (
-                <ButtonLink
-                  size={ButtonSize.SM}
-                  to="/account/settings/profile"
-                  Icon={FaEdit}
-                >
-                  Edit Profile
-                </ButtonLink>
-              )}
+                {website && (
+                  <div className="flex flex-row space-x-4 justify-center items-center">
+                    <FaBriefcase />{' '}
+                    <a href={website} target="_blank">
+                      <Text>{website}</Text>
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
