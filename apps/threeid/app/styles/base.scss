@@ -137,3 +137,15 @@ div[data-testid='flowbite-tooltip'] div {
     align-items: center;
   }
 }
+
+.hover-child-visible {
+  * {
+    visibility: hidden;
+  }
+
+  &:hover {
+    * {
+      visibility: visible;
+    }
+  }
+}
