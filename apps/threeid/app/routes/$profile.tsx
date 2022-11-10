@@ -354,18 +354,36 @@ const ProfileRoute = () => {
       </div>
 
       <div className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-end px-8 mt-[-6em]">
-        <img
-          src={gatewayFromIpfs(pfp.image)}
-          className="w-48 bg-white border border-white"
+        <div
+          className={`w-48 h-48 bg-white z-[100] ${
+            pfp.isToken ? '' : 'rounded-full'
+          }`}
           style={
             pfp.isToken
               ? {
                   ...hexStyle,
                   transform: 'scale(1.0)',
                 }
-              : undefined
+              : {
+                transform: 'scale(0.9)'
+              }
           }
-        />
+        >
+          <img
+            src={gatewayFromIpfs(pfp.image)}
+            className={`w-48 h-48 bg-white border-8 border-white ${
+              pfp.isToken ? '' : 'rounded-full'
+            }`}
+            style={
+              pfp.isToken
+                ? {
+                    ...hexStyle,
+                    transform: 'scale(0.9)',
+                  }
+                : undefined
+            }
+          />
+        </div>
 
         {isOwner && (
           <ButtonLink
