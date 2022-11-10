@@ -1,13 +1,5 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import {
-  Links,
-  Meta,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-  useFetcher,
-  useLoaderData,
-} from '@remix-run/react'
+import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 
 import ProfileCard from '~/components/profile/ProfileCard'
 
@@ -100,8 +92,6 @@ export const loader: LoaderFunction = async (args) => {
     profileJson = loggedInUserProfile
     isOwner = true
   }
-
-  console.log('profileJson', profileJson)
 
   // Setup og tag data
   let hex = gatewayFromIpfs(profileJson?.pfp?.image)
@@ -239,8 +229,6 @@ const ProfileRoute = () => {
       )
     }
   }
-
-  const isWindow = typeof window != 'undefined'
 
   return (
     <div className="bg-white h-full min-h-screen">

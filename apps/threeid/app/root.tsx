@@ -25,13 +25,12 @@ import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
 import faviconSvg from './assets/favicon.svg'
 import maskIcon from './assets/safari-pinned-tab.svg'
-import sad from './assets/sad.png'
 import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
 import { links as buttonLinks } from '~/components/buttons'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
-import BaseButton, {
+import {
   links as baseButtonLinks,
   BaseButtonAnchor,
 } from '~/components/base-button'
