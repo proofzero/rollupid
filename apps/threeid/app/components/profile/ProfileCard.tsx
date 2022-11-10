@@ -36,17 +36,15 @@ const ProfileCard = ({
     account.length - 4
   )}`
 
-  const isWindow = typeof window != 'undefined'
-
   return (
     <div className="rounded-xl shadow-lg py-8 px-14 bg-white flex flex-col items-center">
       <div className="w-40 h-40 flex justify-center items-center">
-        {!avatarUrl || (!isWindow && <Spinner />)}
+        {!avatarUrl && <Spinner />}
 
-        {isWindow && avatarUrl && !isNft && (
+        {avatarUrl && !isNft && (
           <img src={avatarUrl} className="w-40 h-40 rounded-full" />
         )}
-        {isWindow && avatarUrl && isNft && (
+        {avatarUrl && isNft && (
           <div
             className="w-40 h-40"
             style={{

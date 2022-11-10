@@ -38,6 +38,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     let targetAddress = params.profile
+    let profile = {}
     // convert eth name to address (only works on mainnet)
     // this way we set the correct targetAddress for the voucher
     if (targetAddress?.endsWith('.eth')) {
@@ -45,8 +46,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       const ensRes = await fetch(
         `https://api.ensideas.com/ens/resolve/${targetAddress}`
       )
-      const { address } = await ensRes.json()
-      targetAddress = address || targetAddress
+      const res: {
+        address: string
+        avatar: string | null
+        displayName: string | null
+      } = await ensRes.json()
+      targetAddress = res.address || targetAddress
+      profile = {
+        ...profile,
+        pfp: { image: res.avatar, isToken: true },
+        displayName: res.displayName,
+      }
     }
 
     let voucher = await getCachedVoucher(targetAddress)
@@ -57,13 +67,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       voucher = await putCachedVoucher(targetAddress, voucher)
     }
 
-    return json({
-      pfp: {
-        image: voucher.metadata.image,
-        isToken: false,
-      },
+    profile = {
+      pfp: { image: voucher.metadata.image, isToken: false },
       cover: voucher.metadata.cover,
-      claimed: false,
+      ...profile,
+    }
+
+    return json({
+      ...profile,
     })
   }
 }
