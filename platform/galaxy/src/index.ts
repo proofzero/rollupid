@@ -20,9 +20,6 @@ export default {
     if (!env.OORT) {
       throw Error('OORT service bind not set')
     }
-    if (!env.ALCHEMY_NETWORK) {
-      throw Error('ALCHEMY_NETWORK not set')
-    }
     return yoga.handleRequest(request, { env, ctx })
   },
 }

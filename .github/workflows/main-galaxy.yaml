@@ -46,7 +46,6 @@ jobs:
             DATADOG_SERVICE_NAME
             NFTAR_URL
             NFTAR_AUTHORIZATION
-            ALCHEMY_NETWORK
         env:
           SESSION_SECRET: 'secret'
           DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
@@ -58,4 +57,3 @@ jobs:
           NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
           MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-          ALCHEMY_NETWORK: 'goerli'

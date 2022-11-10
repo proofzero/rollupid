@@ -11,5 +11,4 @@ export default interface Env {
   // MY_BUCKET: R2Bucket;
 
   OORT: OortBinding
-  ALCHEMY_NETWORK: string
 }
