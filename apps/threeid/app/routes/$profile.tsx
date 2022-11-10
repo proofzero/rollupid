@@ -441,7 +441,7 @@ export function CatchBoundary() {
             <p className="error-message text-center">{caught.status}</p>
             <p className="error-secondary-message text-center">{secondary}</p>
           </div>
-          <div className="relative">
+          <div className="relative -mr-20">
             <img alt="pepe" className="m-auto pb-12" src={pepe} />
           </div>
         </article>
