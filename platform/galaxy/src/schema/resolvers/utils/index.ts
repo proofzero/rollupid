@@ -43,6 +43,7 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {
     const json: { error: string } = await response.json()
+    console.log('json status', json)
     throw new GraphQLYogaError(
       `Error: ${response.status} ${response.statusText}: ${json.error}`,
       {
@@ -61,11 +62,16 @@ export async function getRPCResult(response: Response) {
     error?: { message: string; code: string }
     result?: { value: any }
   } = await response.json()
+  console.log('json', json)
+
   if (json.error) {
     // TODO: we should get proper error codes from the RPC
-    let status = 400
-    if (json.error.message == 'cannot authorize') {
-      status = 401
+    let status = parseInt(json.error.code) > 0 ? json.error.code : 400
+    console.log('json.error', json.error)
+    switch (json.error.message) {
+      case 'cannot authorize':
+        status = 401
+        break
     }
     throw new GraphQLYogaError(
       `Error: ${json.error?.code} ${json.error?.message}`,

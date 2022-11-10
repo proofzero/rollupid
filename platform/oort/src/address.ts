@@ -100,7 +100,7 @@ export default class Address extends DurableObject {
       await this.bindCoreToAddress({ type, address, coreId })
       return status(200, { coreId })
     } else {
-      return error(404)
+      return error(404, 'not found')
     }
   }
 }
