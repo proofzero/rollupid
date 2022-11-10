@@ -59,7 +59,7 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    loggedInUserProfile = profileRes
+    loggedInUserProfile = profileRes.profile
 
     if (params.address?.endsWith('.eth')) {
       // get the 0x address for the eth name
@@ -71,6 +71,8 @@ export const loader: LoaderFunction = async (args) => {
       if (addressLookup?.result == params.address) {
         targetAddress = address
       }
+    } else if (address == params.address) {
+      targetAddress = address
     }
   }
 
