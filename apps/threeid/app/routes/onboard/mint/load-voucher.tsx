@@ -25,6 +25,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const jwt = session.get('jwt')
+  const ç = session.get('core')
 
   const url = new URL(request.url)
   const queryAddress = url.searchParams.get('address')

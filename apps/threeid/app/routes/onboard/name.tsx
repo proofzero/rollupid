@@ -61,6 +61,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
+  const session = await getUserSession(request)
+  const address = session.get('address')
 
   const form = await request.formData()
   const displayname = form.get('displayname')

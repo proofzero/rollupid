@@ -47,6 +47,7 @@ export const loader: LoaderFunction = loadVoucherLoader
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
+  const core = session.get('core')
 
   const formData = await request.formData()
 
@@ -72,6 +73,9 @@ export const action: ActionFunction = async ({ request }) => {
       'KBT-Access-JWT-Assertion': jwt,
     }
   )
+  // @ts-ignore
+  await ONBOARD_STATE.put(core, 'complete')
+
   return redirect('/account')
 }
 
@@ -540,7 +544,10 @@ const OnboardMint = () => {
                   type={ButtonType.Secondary}
                   size={ButtonSize.L}
                   onClick={() => {
-                    navigate(`/account`)
+                    submit(null, {
+                      action: '/onboard/complete',
+                      method: 'post',
+                    })
                   }}
                 >
                   Skip

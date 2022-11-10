@@ -51,9 +51,6 @@ export const loader = async ({ request }) => {
   // @ts-ignore
   const onboardData = await ONBOARD_STATE.get(core)
   if (!onboardData) {
-    // @ts-ignore
-    await ONBOARD_STATE.put(address, 'true')
-
     return redirect(`/onboard/name`)
   }
 
