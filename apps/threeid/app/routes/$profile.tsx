@@ -59,7 +59,10 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    loggedInUserProfile = profileRes
+    loggedInUserProfile = {
+      ...profileRes.profile,
+      claimed: true,
+    }
 
     if (params.address?.endsWith('.eth')) {
       // get the 0x address for the eth name
@@ -71,6 +74,8 @@ export const loader: LoaderFunction = async (args) => {
       if (addressLookup?.result == params.address) {
         targetAddress = address
       }
+    } else if (address == params.address) {
+      targetAddress = address
     }
   }
 
@@ -232,6 +237,8 @@ const ProfileRoute = () => {
       )
     }
   }
+
+  const isWindow = typeof window != 'undefined'
 
   return (
     <div className="bg-white h-full min-h-screen">
@@ -411,41 +418,32 @@ export function CatchBoundary() {
       break
   }
   return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body className="error-screen">
-        <div className="bg-white h-full min-h-screen">
-          <div
-            style={{
-              backgroundColor: '#192030',
-            }}
-          >
-            <HeadNav
-              loggedIn={caught.data?.loggedIn}
-              avatarUrl={caught.data.loggedInUserProfile?.pfp?.image}
-              isToken={caught.data.loggedInUserProfile?.pfp?.isToken}
-            />
+    <div className="error-screen bg-white h-full min-h-screen">
+      <div
+        style={{
+          backgroundColor: '#192030',
+        }}
+      >
+        <HeadNav
+          loggedIn={caught.data.loggedIn}
+          avatarUrl={caught.data.loggedInUserProfile?.pfp?.image}
+          isToken={caught.data.loggedInUserProfile?.pfp?.isToken}
+        />
+      </div>
+      <div
+        className="wrapper grid grid-row-3 gap-4"
+        style={{ marginTop: '-128px' }}
+      >
+        <article className="content col-span-3">
+          <div className="error justify-center items-center">
+            <p className="error-message text-center">{caught.status}</p>
+            <p className="error-secondary-message text-center">{secondary}</p>
           </div>
-          <div className="wrapper grid grid-row-3 gap-4">
-            <article className="content col-span-3">
-              <div className="error justify-center items-center">
-                <p className="error-message text-center">{caught.status}</p>
-                <p className="error-secondary-message text-center">
-                  {secondary}
-                </p>
-              </div>
-              <div className="relative">
-                <img alt="pepe" className="m-auto pb-12" src={pepe} />
-              </div>
-            </article>
+          <div className="relative">
+            <img alt="pepe" className="m-auto pb-12" src={pepe} />
           </div>
-        </div>
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+        </article>
+      </div>
+    </div>
   )
 }

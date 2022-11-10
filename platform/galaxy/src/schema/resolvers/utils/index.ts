@@ -63,9 +63,11 @@ export async function getRPCResult(response: Response) {
   } = await response.json()
   if (json.error) {
     // TODO: we should get proper error codes from the RPC
-    let status = 400
-    if (json.error.message == 'cannot authorize') {
-      status = 401
+    let status = parseInt(json.error.code) > 0 ? json.error.code : 400
+    switch (json.error.message) {
+      case 'cannot authorize':
+        status = 401
+        break
     }
     throw new GraphQLYogaError(
       `Error: ${json.error?.code} ${json.error?.message}`,
