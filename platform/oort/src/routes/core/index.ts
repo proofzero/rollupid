@@ -65,10 +65,6 @@ const withCore = async (
       return error(400, 'address type cannot be used to create a core')
     }
 
-    // TODO: always creating a core means when we connect an address to another
-    // core we will lose the old core. We should probably have seperate code paths
-    // for registering an address to a core and creating a new core. I'd prefer
-    // to return a 404 and let the bff deal with displaying eth account profile data
     const core = Core.get(Core.newUniqueId())
     const coreId = core.id.toString()
     const response = await client.fetch(`http://localhost`, {
