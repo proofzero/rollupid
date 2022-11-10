@@ -34,10 +34,7 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn workspaces focus --all
-
-      - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Deploy to Worker
         uses: cloudflare/wrangler-action@2.0.0

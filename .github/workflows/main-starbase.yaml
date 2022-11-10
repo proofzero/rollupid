@@ -24,7 +24,7 @@ jobs:
       - run: nix-build platform.nix
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn install
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include starbase run test
