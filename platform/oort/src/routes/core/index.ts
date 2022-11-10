@@ -40,6 +40,7 @@ const withCore = async (
   } else if (address.endsWith('.eth')) {
     type = 'ens'
     // TODO: stop gap unti we can sort out lookupName with ethers on worker
+    // this only works for mainnet so it needs to be replaced
     const ensRes = await fetch(
       `https://api.ensideas.com/ens/resolve/${address}`
     )
