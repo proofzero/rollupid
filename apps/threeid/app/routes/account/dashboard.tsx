@@ -1,11 +1,6 @@
 import { json, redirect } from '@remix-run/cloudflare'
 
-import {
-  useFetcher,
-  useLoaderData,
-  useSubmit,
-  useFetchers,
-} from '@remix-run/react'
+import { useLoaderData, useSubmit } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import { FaDiscord, FaTwitter, FaCaretUp } from 'react-icons/fa'
 
@@ -26,7 +21,7 @@ import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
 import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
-import { ButtonAnchor, ButtonSize } from '~/components/buttons'
+import { ButtonAnchor } from '~/components/buttons'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 // @ts-ignore
@@ -43,35 +38,20 @@ export const loader = async ({ request }) => {
   })
 
   // TODO remove session address param when RPC url is changed
-  const [inviteCodeRes, votesRes, namesRes] = await Promise.all([
-    oortSend('3id_getInviteCode', [], oortOptions),
+  const [votesRes] = await Promise.all([
     oortSend('kb_getObject', ['3id.app', 'feature_vote_count'], oortOptions),
-    oortSend('kb_getCoreAddresses', [['ens']], oortOptions),
   ])
 
-  if (inviteCodeRes.error || votesRes.error) {
-    console.log('error', inviteCodeRes.error, votesRes.error)
-    // return json({ error: "Error fetching invite codes" }, { status: 500 });
-  }
-
-  if (namesRes.error) {
-    return redirect('/onboard')
-  }
-
-  const [inviteCode, votes, isToken, displayname, names] = [
-    inviteCodeRes.result,
+  const [votes, isToken, displayname] = [
     votesRes.result,
     profileRes.profile?.pfp.isToken,
     profileRes.profile?.displayName,
-    namesRes.result,
   ]
 
   return json({
-    inviteCode,
     votes,
     isToken,
     displayname,
-    names,
     profile: profileRes.profile,
   })
 }
@@ -117,23 +97,6 @@ const completeSteps = [
           Mint your very own 3ID 1/1 PFP.
         </Text>
         <a href="/onboard/mint">Click here to complete.</a>
-      </>
-    ),
-  },
-  {
-    title: 'Verify ENS',
-    isCompleted: false,
-    description: (
-      <>
-        <Text
-          className="mb-1"
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
-        >
-          Connect your ENS name to your 3ID.
-        </Text>
-        <a href="/onboard/ens">Click here to complete.</a>
       </>
     ),
   },
@@ -198,13 +161,11 @@ const roadmapSteps = [
 ]
 
 export default function Welcome() {
-  const { inviteCode, votes, isToken, displayname, names, profile } =
-    useLoaderData()
+  const { votes, isToken, displayname, profile } = useLoaderData()
   let submit = useSubmit()
 
   completeSteps[1].isCompleted = isToken
-  completeSteps[2].isCompleted = names?.ens?.length
-  completeSteps[3].isCompleted = Object.keys(profile || {}).length > 1
+  completeSteps[2].isCompleted = Object.keys(profile || {}).length > 1
 
   const percentage =
     (completeSteps.filter((step) => step.isCompleted).length /
