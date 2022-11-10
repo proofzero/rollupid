@@ -12,17 +12,17 @@ defaults:
 env:
   # NFTAR
   # TODO: fix naming of env vars
-  CHAIN: "ethereum"
+  CHAIN: 'ethereum'
   CHAIN_ID: 5
   OORT_URL: oort-devnet.kubelt.com
   STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
   WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
   ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
   ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
-  ALCHEMY_NETWORK: "ETH_MAINNET"
+  ALCHEMY_NETWORK: 'ETH_MAINNET'
   INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
   PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-  NFTAR_API_KEY: "test"
+  NFTAR_API_KEY: 'test'
   # SMART CONTRACT CRDT
   CRDT_ETHERSCAN_API_KEY: ${{ secrets.CRDT_ETHERSCAN_API_KEY }}
   CRDT_GOERLI_OWNER_PRIVATE: ${{ secrets.CRDT_GOERLI_OWNER_PRIVATE }}
@@ -71,29 +71,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache Modules
-        id: cache-modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            smartcontracts/node_modules
-            smartcontracts/.yarn
-          key: ${{ runner.os }}-smartcontracts-modules-${{ hashFiles('smartcontracts/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-smartcontracts-modules-
-
-      - name: List the state of node modules
-        continue-on-error: true
-        run: npm list
-
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
       - run: nix-build smartcontracts.nix
 
-      - name: Install
-        run: yarn install
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn workspaces focus --all
 
       - name: Build
         run: yarn build

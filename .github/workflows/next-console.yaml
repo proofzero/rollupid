@@ -5,7 +5,7 @@ name: Next Console
 on:
   push:
     tags:
-      - "*"
+      - '*'
 
 defaults:
   run:
@@ -24,8 +24,19 @@ jobs:
 
       - run: nix-build apps.nix
 
-      - name: Install
-        run: yarn workspaces focus -A
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn workspaces focus --all
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include console run test
@@ -35,9 +46,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          workingDirectory: "apps/console"
+          workingDirectory: 'apps/console'
           command: publish --env next
-          environment: "next"
+          environment: 'next'
           secrets: |
             ADMIN_ACCOUNT_ID
             CLOUDFLARE_API_TOKEN

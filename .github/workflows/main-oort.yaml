@@ -21,8 +21,19 @@ jobs:
 
       - run: nix-build platform.nix
 
-      - name: Install
-        run: yarn workspaces focus -A
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn workspaces focus --all
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include oort run test
@@ -31,9 +42,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/oort"
+          workingDirectory: 'platform/oort'
           command: publish --env devnet
-          environment: "devnet"
+          environment: 'devnet'
           secrets: |
             SITE
             ENVIRONMENT

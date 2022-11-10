@@ -23,8 +23,19 @@ jobs:
 
       - run: nix-build platform.nix
 
-      - name: Install
-        run: yarn workspaces focus -A
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn workspaces focus --all
 
       # - name: Test
       #  run: yarn workspaces foreach -i -v -t --include icons run test
@@ -33,9 +44,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/icons"
+          workingDirectory: 'platform/icons'
           command: publish --env dev
-          environment: "dev"
+          environment: 'dev'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
           secrets: |
