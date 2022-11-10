@@ -93,7 +93,7 @@ interface Options {
 export type RpcOptions = Partial<Options>;
 
 // A permission representing the ability to invoke an RPC method.
-export type Scope = Symbol;
+export type Scope = symbol;
 
 // A collection of scopes.
 export type ScopeSet = Set<Scope>;
