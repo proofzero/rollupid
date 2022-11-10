@@ -6,20 +6,14 @@ workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
+# TODO make service bindings work for local development using miniflare.
+
 # development
 # -----------------------------------------------------------------------------
 
 [dev]
 port = 9898
 local_protocol = "http"
-
-# Service Bindings
-# -----------------------------------------------------------------------------
-# TODO make service bindings work for local development using miniflare.
-
-# services = [
-#   { binding = "OORT", service = "oort-devnet" }
-# ]
 
 # Secrets
 # -----------------------------------------------------------------------------
@@ -35,7 +29,6 @@ local_protocol = "http"
 # independently for each environment.
 
 [vars]
-
 
 # Site
 # -----------------------------------------------------------------------------
@@ -53,7 +46,10 @@ local_protocol = "http"
 # -----------------------------------------------------------------------------
 
 [env.dev]
-name = "console-dev"
+
+services = [
+  { binding = "STARBASE", service = "starbase-dev", environment = "production" }
+]
 
 # kv_namespaces = [
 #   { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
@@ -73,10 +69,15 @@ STORAGE_NAMESPACE = "starbase"
 # -----------------------------------------------------------------------------
 
 [env.next]
-name = "console-next"
+
+services = [
+  { binding = "STARBASE", service = "starbase-next", environment = "production" }
+]
+
 # kv_namespaces = [
 #   { binding = "SESSIONS", id = "6c6ca075005747e3873043cdf346f438" },
 # ]
+
 routes = [
   { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
@@ -91,10 +92,15 @@ STORAGE_NAMESPACE = "starbase"
 # -----------------------------------------------------------------------------
 
 [env.current]
-name = "console-current"
+
+services = [
+  { binding = "STARBASE", service = "starbase", environment = "production" }
+]
+
 # kv_namespaces = [
 #   { binding = "SESSIONS", id = "593c81a8b57347a4b30368eabee072ef" },
 # ]
+
 routes = [
   { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
