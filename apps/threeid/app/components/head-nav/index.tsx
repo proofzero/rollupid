@@ -183,14 +183,28 @@ export default function HeadNav({
               </div>
               <div className="-mr-2 flex md:hidden">
                 {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span className="sr-only">Open main menu</span>
-                  {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                  ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                  )}
-                </Disclosure.Button>
+                {loggedIn && (
+                  <Disclosure.Button className="inline-flex items-center justify-center bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
+                )}
+                {!loggedIn && (
+                  <div className="flex flex-row items-center space-x-8">
+                    <a
+                      href="https://get.threeid.xyz"
+                      className="button-base w-full lg:w-fit bg-white py-3 px-8"
+                    >
+                      <Text weight={TextWeight.Bold700} size={TextSize.SM}>
+                        Claim your 3ID
+                      </Text>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -232,13 +246,13 @@ export default function HeadNav({
                       alt=""
                     />
                   </div>
-                  <button
+                  {/* <button
                     type="button"
                     className="ml-auto flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                   >
                     <span className="sr-only">View notifications</span>
                     <HiOutlineBell className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                  </button> */}
                 </div>
               )}
 
