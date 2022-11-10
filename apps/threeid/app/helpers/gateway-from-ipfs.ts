@@ -1,9 +1,17 @@
 export const gatewayFromIpfs = (
   ipfsUrl: string | undefined
 ): string | undefined => {
-  if (!ipfsUrl?.startsWith("ipfs://")) return ipfsUrl;
+  const regex =
+    /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w\.\-]+)+)?/
+  const match = ipfsUrl?.match(regex)
 
-  const resLocation = ipfsUrl.replace("ipfs://", "");
+  if (!ipfsUrl || !match) return ipfsUrl
 
-  return `https://nftstorage.link/ipfs/${resLocation}`;
-};
+  const prefix = match[1]
+  const cid = match[2]
+  const path = match[3]
+
+  return `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
+    path ? `${path}` : ''
+  }`
+}

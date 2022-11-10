@@ -1,10 +1,10 @@
-import { TextColor, TextSize, TextWeight } from "../typography/Text";
-import buttonStyles from "./Button.css";
+import { TextColor, TextSize, TextWeight } from '../typography/Text'
+import buttonStyles from './Button.css'
 
-import Button from "./Button";
-import ButtonAnchor from "./ButtonAnchor";
+import Button from './Button'
+import ButtonAnchor from './ButtonAnchor'
 
-export const links = () => [{ rel: "stylesheet", href: buttonStyles }];
+export const links = () => [{ rel: 'stylesheet', href: buttonStyles }]
 
 export enum ButtonSize {
   XS,
@@ -15,65 +15,70 @@ export enum ButtonSize {
 }
 
 export type ButtonSizeProps = {
-  className: string;
+  className: string
 
-  textSize: TextSize;
-  textWeight: TextWeight;
-};
+  textSize: TextSize
+  textWeight: TextWeight
+}
 
 export const buttonSizeDict: { [key in ButtonSize]: ButtonSizeProps } = {
   [ButtonSize.XS]: {
-    className: "button-size-xs",
+    className: 'button-size-xs',
     textSize: TextSize.XS,
     textWeight: TextWeight.Medium500,
   },
   [ButtonSize.SM]: {
-    className: "button-size-sm",
+    className: 'button-size-sm',
     textSize: TextSize.SM,
     textWeight: TextWeight.Medium500,
   },
   [ButtonSize.Base]: {
-    className: "button-size-base",
+    className: 'button-size-base',
     textSize: TextSize.SM,
     textWeight: TextWeight.Medium500,
   },
   [ButtonSize.L]: {
-    className: "button-size-l",
+    className: 'button-size-l',
     textSize: TextSize.Base,
     textWeight: TextWeight.Medium500,
   },
   [ButtonSize.XL]: {
-    className: "button-size-xl",
+    className: 'button-size-xl',
     textSize: TextSize.Base,
     textWeight: TextWeight.Medium500,
   },
-};
+}
 
 export enum ButtonType {
   Primary,
   Secondary,
   Disabled,
+  Contrast,
 }
 
 export type ButtonTypeProps = {
-  className: string;
+  className: string
 
-  textColor: TextColor;
-};
+  textColor: TextColor
+}
 
 export const buttonTypeDict: { [key in ButtonType]: ButtonTypeProps } = {
   [ButtonType.Primary]: {
-    className: "button-type-primary",
+    className: 'button-type-primary',
     textColor: TextColor.White,
   },
   [ButtonType.Secondary]: {
-    className: "button-type-secondary",
+    className: 'button-type-secondary',
     textColor: TextColor.Gray700,
   },
   [ButtonType.Disabled]: {
-    className: "button-type-disabled",
+    className: 'button-type-disabled',
     textColor: TextColor.Gray300,
   },
-};
+  [ButtonType.Contrast]: {
+    className: 'button-type-contrast',
+    textColor: TextColor.White,
+  },
+}
 
-export { Button, ButtonAnchor };
+export { Button, ButtonAnchor }
