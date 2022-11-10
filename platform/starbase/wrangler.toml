@@ -3,28 +3,36 @@ name = "starbase"
 main = "src/index.ts"
 compatibility_date = "2022-09-14"
 
-# Don't automatically expose this service at <worker-name>.<account-name>.workers.dev.
+# #############################################################################
+# NB: we don't supply an external route for this service as it is
+# intended to be service-bound.
+# #############################################################################
+
+# Don't automatically expose this service at:
+# <worker-name>.<account-name>.workers.dev.
 workers_dev = false
+
+# Services
+# -----------------------------------------------------------------------------
 
 # A list of other Clouflare services bound to this service.
 # services = [
-#   { binding = "RELAY", service = "kubelt-svc-relay", environment = "production" },
+#   { binding = "AUTH", service = "auth", environment = "production" },
 # ]
+
+# Secrets
+# -----------------------------------------------------------------------------
 
 # Secrets are set via the dashboard, or using the wrangler CLI:
 # $ wrangler secret put <KEY> [--env]
 #
 # Required secrets:
-# - DATADOG_TOKEN
-[vars]
-USER_NAME = "Robert"
+# N/A
 
-[durable_objects]
-bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
-  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
-  { name = "STARBASE_USER", class_name = "StarbaseUser" },
-]
+# Durable Objects
+# -----------------------------------------------------------------------------
+
+[dev]
 
 [[migrations]]
 tag = "v1"
@@ -33,3 +41,45 @@ new_classes = [
   "StarbaseContract",
   "StarbaseUser",
 ]
+
+# Environment: dev
+# -----------------------------------------------------------------------------
+
+[env.dev]
+name = "starbase-dev"
+
+durable_objects.bindings = [
+  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
+  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
+  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+]
+
+[env.dev.vars]
+
+# Environment: next
+# -----------------------------------------------------------------------------
+
+[env.next]
+name = "starbase-next"
+
+durable_objects.bindings = [
+  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
+  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
+  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+]
+
+[env.next.vars]
+
+# Environment: current
+# -----------------------------------------------------------------------------
+
+[env.current]
+name = "starbase-current"
+
+durable_objects.bindings = [
+  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
+  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
+  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+]
+
+[env.current.vars]
