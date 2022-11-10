@@ -312,18 +312,9 @@ const ProfileRoute = () => {
             Edit Profile
           </ButtonLink>
         )}
-
-        {/* <ProfileCard
-              account={targetAddress}
-              avatarUrl={gatewayFromIpfs(pfp.image)}
-              claimed={claimed ? new Date() : undefined}
-              displayName={displayName}
-              isNft={pfp.isToken}
-              webUrl={website}
-            /> */}
       </div>
 
-      <div className="p-8 mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
+      <div className="mt-3 max-w-7xl w-full mx-auto">
         {!claimed && (
           <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
@@ -390,7 +381,7 @@ const ProfileRoute = () => {
                   <div className="flex flex-row space-x-4 justify-center items-center">
                     <FaBriefcase />{' '}
                     <a href={website} target="_blank">
-                      <Text>{website}</Text>
+                      <Text color={TextColor.Indigo500}>{website}</Text>
                     </a>
                   </div>
                 )}
@@ -399,9 +390,9 @@ const ProfileRoute = () => {
           </div>
         )}
 
-        <div className="mt-20">
+        <div className="mt-24">
           <Text
-            className="pb-4"
+            className="mb-16"
             size={TextSize.SM}
             weight={TextWeight.SemiBold600}
             color={TextColor.Gray600}
