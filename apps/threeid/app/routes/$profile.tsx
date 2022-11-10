@@ -1,13 +1,5 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import {
-  Links,
-  Meta,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-  useFetcher,
-  useLoaderData,
-} from '@remix-run/react'
+import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 
 import ProfileCard from '~/components/profile/ProfileCard'
 
@@ -238,8 +230,6 @@ const ProfileRoute = () => {
     }
   }
 
-  const isWindow = typeof window != 'undefined'
-
   return (
     <div className="bg-white h-full min-h-screen">
       <div
@@ -439,7 +429,7 @@ export function CatchBoundary() {
             <p className="error-message text-center">{caught.status}</p>
             <p className="error-secondary-message text-center">{secondary}</p>
           </div>
-          <div className="relative">
+          <div className="relative -mr-20">
             <img alt="pepe" className="m-auto pb-12" src={pepe} />
           </div>
         </article>

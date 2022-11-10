@@ -25,12 +25,12 @@ import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
 import faviconSvg from './assets/favicon.svg'
 import maskIcon from './assets/safari-pinned-tab.svg'
-import sad from './assets/sad.png'
+import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
 import { links as buttonLinks } from '~/components/buttons'
-import { links as headNavLink } from '~/components/head-nav'
-import BaseButton, {
+import HeadNav, { links as headNavLink } from '~/components/head-nav'
+import {
   links as baseButtonLinks,
   BaseButtonAnchor,
 } from '~/components/base-button'
@@ -88,6 +88,7 @@ export const loader: LoaderFunction = () => {
 export default function App() {
   const browserEnv = useLoaderData()
   typeof window !== 'undefined' && startSession()
+
   return (
     <html lang="en">
       <head>
@@ -118,6 +119,7 @@ export function ErrorBoundary({ error }) {
         <Meta />
         <Links />
       </head>
+
       <body className="error-screen">
         <div className="wrapper grid grid-row-3 gap-4">
           <nav className="col-span-3">
@@ -125,22 +127,27 @@ export function ErrorBoundary({ error }) {
           </nav>
           <article className="content col-span-3">
             <div className="error justify-center items-center">
-              <img className="m-auto pb-12" src={sad} />
-              <p className="error-message">500</p>
-              <p className="error-secondary-message">
+              <p className="error-message text-center">500</p>
+              <p className="error-secondary-message text-center">
+                {' '}
                 Something went terribly wrong!
               </p>
+            </div>
+            <div className="relative -mr-20">
+              <img alt="pepe" className="m-auto pb-12" src={pepe} />
+            </div>
+          </article>
+          <article className="content col-span-3 m-12">
+            <div className="error justify-center items-center grid grid-rows-1 text-center">
               <p className="error-secondary-message">
                 If this problem persists please join Discord for help
               </p>
 
-              <div className="error-buttons grid grid-rows-1 text-center">
-                <BaseButtonAnchor
-                  text={'Go to Discord'}
-                  color={'dark'}
-                  href={'https://discord.gg/threeid'}
-                />
-              </div>
+              <BaseButtonAnchor
+                text={'Go to Discord'}
+                color={'dark'}
+                href={'https://discord.gg/threeid'}
+              />
             </div>
           </article>
           <article className="content col-span-3 m-12">
@@ -160,9 +167,18 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  const navigate = useNavigate()
-  const goBack = () => {
-    navigate(-1)
+
+  let secondary = 'Something went wrong'
+  switch (caught.status) {
+    case 404:
+      secondary = 'Page not found'
+      break
+    case 400:
+      secondary = 'Bad Request'
+      break
+    case 500:
+      secondary = 'Internal Server Error'
+      break
   }
   return (
     <html lang="en">
@@ -170,25 +186,31 @@ export function CatchBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="error-screen">
-        <div className="wrapper grid grid-row-3 gap-4">
-          <nav className="col-span-3">
-            <img src={logo} alt="threeid" />
-          </nav>
+      <body className="error-screen bg-white h-full min-h-screen">
+        <div
+          style={{
+            backgroundColor: '#192030',
+          }}
+        >
+          <HeadNav
+            loggedIn={caught.data?.loggedIn}
+            avatarUrl={caught.data?.loggedInUserProfile?.pfp?.image}
+            isToken={caught.data?.loggedInUserProfile?.pfp?.isToken}
+          />
+        </div>
+        <div
+          className="wrapper grid grid-row-3 gap-4"
+          style={{ marginTop: '-128px' }}
+        >
           <article className="content col-span-3">
             <div className="error justify-center items-center">
-              <img className="m-auto pb-12" src={sad} />
-              <p className="error-message">Oops!</p>
-              <p className="error-secondary-message">{caught.data}</p>
-              <p className="error-secondary-message">
-                {caught.status} {caught.statusText}
-              </p>
-              <div className="error-buttons grid grid-rows-1 text-center">
-                <BaseButton onClick={goBack} text={'Go Back'} color={'dark'} />
-              </div>
+              <p className="error-message text-center">{caught.status}</p>
+              <p className="error-secondary-message text-center">{secondary}</p>
+            </div>
+            <div className="relative -mr-20">
+              <img alt="pepe" className="m-auto pb-12" src={pepe} />
             </div>
           </article>
-          <div> </div>
         </div>
         <ScrollRestoration />
         <Scripts />
