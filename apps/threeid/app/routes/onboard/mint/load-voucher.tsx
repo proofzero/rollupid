@@ -10,6 +10,9 @@ import { Visibility } from '~/utils/galaxy.server'
 import { getUserSession } from '~/utils/session.server'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { oortSend } from '~/utils/rpc.server'
+
+import deafaultPfp from '~/assets/circle_gradient.png'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const session = await getUserSession(request)
@@ -22,6 +25,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const jwt = session.get('jwt')
+  const ç = session.get('core')
 
   const url = new URL(request.url)
   const queryAddress = url.searchParams.get('address')
@@ -35,15 +39,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   })
   const prof = profileRes.profile
 
-  if (voucher) {
-    if (!voucher.minted && prof?.pfp?.isToken) {
-      // If minted update voucher cache
-      voucher = await putCachedVoucher(address, {
-        ...voucher,
-        minted: true,
-      })
-    }
-  } else {
+  if (!voucher) {
     try {
       voucher = await fetchVoucher({ address })
       voucher = await putCachedVoucher(address, voucher)
@@ -55,11 +51,30 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   if (!prof?.pfp) {
+    const addressLookup = await oortSend('ens_lookupAddress', [address], {
+      jwt,
+    })
+
+    let ensAvatar = null
+    if (addressLookup?.result?.endsWith('.eth')) {
+      const ensRes = await fetch(
+        `https://api.ensideas.com/ens/resolve/${addressLookup?.result}`
+      )
+      const res: {
+        avatar: string | null
+      } = await ensRes.json()
+
+      ensAvatar = res.avatar
+    }
+
     await galaxyClient.updateProfile(
       {
         profile: {
           pfp: {
-            image: gatewayFromIpfs(voucher?.metadata?.image),
+            image:
+              ensAvatar ||
+              gatewayFromIpfs(voucher?.metadata?.image) ||
+              deafaultPfp,
           },
           cover: gatewayFromIpfs(voucher?.metadata?.cover),
         },
@@ -72,7 +87,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   if (voucher.minted) {
-    return redirect('/onboard/ens')
+    return redirect('/account')
   }
 
   return json(voucher)

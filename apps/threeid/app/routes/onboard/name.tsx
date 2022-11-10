@@ -25,16 +25,36 @@ import Text, {
 } from '~/components/typography/Text'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { Visibility } from '~/utils/galaxy.server'
+import { oortSend } from '~/utils/rpc.server'
 import { getUserSession, requireJWT } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
+  const session = await getUserSession(request)
+  const address = session.get('address')
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const profile = profileRes.profile
+  let profile = profileRes.profile || { displayName: '' }
+
+  if (!profileRes.profile?.displayName) {
+    const addressLookup = await oortSend('ens_lookupAddress', [address], {
+      jwt,
+    })
+
+    if (addressLookup?.result?.endsWith('.eth')) {
+      const ensRes = await fetch(
+        `https://api.ensideas.com/ens/resolve/${addressLookup?.result}`
+      )
+      const res: {
+        displayName: string | null
+      } = await ensRes.json()
+
+      profile.displayName = res.displayName || addressLookup?.result
+    }
+  }
 
   return json(profile)
 }
@@ -119,15 +139,6 @@ const OnboardDisplayname = () => {
             className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400"
           >
             <span className="sr-only">{'Mint'}</span>
-          </a>
-        </li>
-
-        <li>
-          <a
-            href="/onboard/ens"
-            className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400"
-          >
-            <span className="sr-only">{'ENS'}</span>
           </a>
         </li>
       </ol>

@@ -47,6 +47,7 @@ export const loader: LoaderFunction = loadVoucherLoader
 export const action: ActionFunction = async ({ request }) => {
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
+  const core = session.get('core')
 
   const formData = await request.formData()
 
@@ -72,7 +73,10 @@ export const action: ActionFunction = async ({ request }) => {
       'KBT-Access-JWT-Assertion': jwt,
     }
   )
-  return redirect('/onboard/ens')
+  // @ts-ignore
+  await ONBOARD_STATE.put(core, 'complete')
+
+  return redirect('/account')
 }
 
 type OnboardMintLandingProps = {
@@ -375,15 +379,6 @@ const OnboardMint = () => {
             <span className="sr-only">{'Mint'}</span>
           </a>
         </li>
-
-        <li>
-          <a
-            href="/onboard/ens"
-            className="block h-2.5 w-2.5 rounded-full bg-gray-200 hover:bg-gray-400"
-          >
-            <span className="sr-only">{'ENS'}</span>
-          </a>
-        </li>
       </ol>
 
       <Heading className="text-center">Congratulations!</Heading>
@@ -549,16 +544,10 @@ const OnboardMint = () => {
                   type={ButtonType.Secondary}
                   size={ButtonSize.L}
                   onClick={() => {
-                    submit(
-                      {
-                        imgUrl,
-                      },
-                      {
-                        action: '/onboard/mint?index',
-                        method: 'post',
-                      }
-                    )
-                    // navigate("/onboard/ens");
+                    submit(null, {
+                      action: '/onboard/complete',
+                      method: 'post',
+                    })
                   }}
                 >
                   Skip
