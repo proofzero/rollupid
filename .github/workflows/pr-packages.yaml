@@ -31,7 +31,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache Modules
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build packages.nix
+
+      - name: Cache Dependencies
         id: cache-modules
         uses: actions/cache@v3
         with:
@@ -42,24 +48,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node_modules-
 
-      - name: List the state of node modules
-        continue-on-error: true
-        run: npm list
-
-      - uses: cachix/install-nix-action@v18
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
-
-      - run: nix-build packages.nix
-
-        # if: steps.cache-modules.outputs.cache-hit != 'true'
-      # - uses: actions/setup-node@v3
-      #   if: steps.cache-modules.outputs.cache-hit == 'true'
-      #   with:
-      #     node-version-file: .nvmrc
-      #     cache: "yarn"
-
-      - name: Install
+      - name: Install Dependencies
         run: yarn workspaces focus --all
 
       - name: Build
