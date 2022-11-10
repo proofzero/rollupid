@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node build.js",
     "deploy": "wrangler publish",
+    "deploy:dev": "wrangler publish --env dev",
     "dev:local": "run-s types:check build wrangler:local",
     "dev:remote": "run-s types:check build wrangler:remote",
     "format": "run-s format:src",
@@ -17,8 +18,8 @@
     "lint:check": "run-s lint:check:*",
     "lint:check:src": "eslint src",
     "types:check": "tsc --project tsconfig.json --noEmit",
-    "wrangler:local": "wrangler dev --local",
-    "wrangler:remote": "wrangler --env dev dev"
+    "wrangler:local": "wrangler dev --env dev --local --persist",
+    "wrangler:remote": "wrangler dev --env dev"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
