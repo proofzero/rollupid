@@ -36,11 +36,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            platform/node_modules
-            platform/.yarn
-          key: ${{ runner.os }}-platform-modules-${{ hashFiles('platform/yarn.lock') }}
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-platform-modules-
+            ${{ runner.os }}-node_modules-
 
       - name: List the state of node modules
         continue-on-error: true
@@ -53,7 +53,7 @@ jobs:
       - run: nix-build platform.nix
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces focus --all
 
       - name: Code Generation
         run: yarn gql

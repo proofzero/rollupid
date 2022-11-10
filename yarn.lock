@@ -3315,6 +3315,7 @@ __metadata:
     fast-check: 3.3.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
+    jose: 4.11.0
     js-convert-case: 4.2.0
     lodash: 4.17.21
     npm-run-all: 4.1.5
@@ -3323,6 +3324,28 @@ __metadata:
     tiny-invariant: 1.3.1
     ts-set-utils: 0.2.0
     typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/worker-commons@workspace:platform/worker-commons":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/worker-commons@workspace:platform/worker-commons"
+  dependencies:
+    "@cloudflare/workers-types": 3.18.0
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.26.0
+    eslint-config-prettier: 8.5.0
+    prettier: 2.7.1
+    typed-json-rpc: 1.1.0
+    typescript: 4.8.4
+    yarn-run-all: 3.1.1
+  peerDependencies:
+    itty-router: "*"
+    itty-router-extras: "*"
+    jose: "*"
+    lodash: "*"
   languageName: unknown
   linkType: soft
 
@@ -13968,6 +13991,7 @@ __metadata:
   resolution: "galaxy@workspace:platform/galaxy"
   dependencies:
     "@cloudflare/workers-types": 3.17.0
+    "@ethersproject/providers": 5.7.2
     "@graphql-tools/merge": 8.3.6
     "@graphql-tools/resolvers-composition": 6.5.6
     "@graphql-tools/schema": 9.0.4
@@ -16869,6 +16893,13 @@ __metadata:
   version: 4.10.3
   resolution: "jose@npm:4.10.3"
   checksum: 9fa5e1ebfbddb8924a08a3ca2789dfb63c522d615e2eb66021adc632a83efc7fc990e1abbf3546baff8913b4ee585fd86521212f47968aec27930ed658f0bea6
+  languageName: node
+  linkType: hard
+
+"jose@npm:4.11.0":
+  version: 4.11.0
+  resolution: "jose@npm:4.11.0"
+  checksum: 8d81e978e0da306911b61b1de1e2d78bd4903b4aa68a4b338b7c89c41edc3d56aea4d5ef4784a078a630dd6aa81f6328901ae3ce215f33b90d51ee8ebf4c9dbd
   languageName: node
   linkType: hard
 
@@ -25223,6 +25254,13 @@ __metadata:
   version: 2.7.2
   resolution: "type@npm:2.7.2"
   checksum: 0f42379a8adb67fe529add238a3e3d16699d95b42d01adfe7b9a7c5da297f5c1ba93de39265ba30ffeb37dfd0afb3fb66ae09f58d6515da442219c086219f6f4
+  languageName: node
+  linkType: hard
+
+"typed-json-rpc@npm:1.1.0":
+  version: 1.1.0
+  resolution: "typed-json-rpc@npm:1.1.0"
+  checksum: 28a730a520150d2d619f488c4b5246b451861e6c2c1595558370e1b480010de43a40497d7bb4844f4d3c52768a4cf37112395cb0cf60e91edf8e6091d4d3614d
   languageName: node
   linkType: hard
 

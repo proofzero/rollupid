@@ -36,11 +36,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            packages/node_modules
-            packages/.yarn
-          key: ${{ runner.os }}-packages-modules-${{ hashFiles('packages/yarn.lock') }}
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-packages-modules-
+            ${{ runner.os }}-node_modules-
 
       - name: List the state of node modules
         continue-on-error: true
@@ -60,7 +60,7 @@ jobs:
       #     cache: "yarn"
 
       - name: Install
-        run: yarn install
+        run: yarn workspaces focus --all
 
       - name: Build
         run: yarn build
