@@ -46,7 +46,6 @@ local_protocol = "http"
 # -----------------------------------------------------------------------------
 
 [env.dev]
-name = "console-dev"
 
 services = [
   { binding = "STARBASE", service = "starbase-dev", environment = "production" }
@@ -70,7 +69,6 @@ STORAGE_NAMESPACE = "starbase"
 # -----------------------------------------------------------------------------
 
 [env.next]
-name = "console-next"
 
 services = [
   { binding = "STARBASE", service = "starbase-next", environment = "production" }
@@ -94,7 +92,6 @@ STORAGE_NAMESPACE = "starbase"
 # -----------------------------------------------------------------------------
 
 [env.current]
-name = "console-current"
 
 services = [
   { binding = "STARBASE", service = "starbase", environment = "production" }
