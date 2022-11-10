@@ -101,6 +101,8 @@ export const loader: LoaderFunction = async (args) => {
     isOwner = true
   }
 
+  console.log('profileJson', profileJson)
+
   // Setup og tag data
   let hex = gatewayFromIpfs(profileJson?.pfp?.image)
   let bkg = gatewayFromIpfs(profileJson?.cover)

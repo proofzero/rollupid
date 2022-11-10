@@ -38,7 +38,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
 
     let targetAddress = params.profile
-    let profile = {}
+    let profile: {
+      displayName: string | null
+      pfp: {
+        image: string | null
+        isToken: boolean
+      }
+      cover: string | null
+    } = {
+      displayName: null,
+      pfp: {
+        image: null,
+        isToken: false,
+      },
+      cover: null,
+    }
     // convert eth name to address (only works on mainnet)
     // this way we set the correct targetAddress for the voucher
     if (targetAddress?.endsWith('.eth')) {
@@ -67,11 +81,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       voucher = await putCachedVoucher(targetAddress, voucher)
     }
 
-    profile = {
-      pfp: { image: voucher.metadata.image, isToken: false },
-      cover: voucher.metadata.cover,
-      ...profile,
-    }
+    profile.pfp.image ||= voucher.metadata.image
+    profile.cover ||= voucher.metadata.cover
 
     return json({
       ...profile,
