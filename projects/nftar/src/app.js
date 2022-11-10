@@ -16,8 +16,8 @@ const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
 const Web3 = require('web3');
-const sharp = require('sharp');
 const imageDataURI = require('image-data-uri');
+const { convert } = require('convert-svg-to-png');
 const FormData = require('form-data');
 
 const {
@@ -512,13 +512,21 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         </svg>`;
 
         // Convert the populated SVG template into a PNG byte stream.
-        const pngBuffer = await sharp(Buffer.from(svg)).toFormat('png').toBuffer();
+        const pngBuffer = await convert(svg, {
+            puppeteer: {
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            }
+        });
         
         // Cloudflare Image service requires we submit by POSTing FormData in order
         // to set our own filename (cache key).
         const form = new FormData();
-        form.append('file', pngBuffer, { filename }); // Name file after cache key.
-        form.append('id', filename); // Set the cache key as the Cloudflare "Custom ID".
+
+         // Name file after cache key with the correct content-type.
+        form.append('file', pngBuffer, { filename, contentType: 'image/png' });
+
+        // Set the cache key as the Cloudflare "Custom ID".
+        form.append('id', filename);
         
         // Get the headers from the FormData object so that we can pick up
         // the dynamically generated multipart boundary.
