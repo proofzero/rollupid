@@ -232,6 +232,11 @@ const ProfileRoute = () => {
     }
   }
 
+  const shortenedAccount = `${targetAddress.substring(
+    0,
+    4
+  )} ... ${targetAddress.substring(targetAddress.length - 4)}`
+
   return (
     <div className="bg-white h-full min-h-screen">
       <div
