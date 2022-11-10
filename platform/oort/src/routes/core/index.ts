@@ -23,7 +23,7 @@ const withCore = async (
 ): Promise<void | Response> => {
   const { Address, Core } = env
 
-  const address = request.headers.get('KBT-Core-Address')
+  let address = request.headers.get('KBT-Core-Address')
   if (!address && request.headers.has('KBT-Access-JWT-Assertion')) {
     const token = request.headers.get('KBT-Access-JWT-Assertion')
     const payload = jose.decodeJwt(token)
@@ -39,6 +39,16 @@ const withCore = async (
     type = 'eth'
   } else if (address.endsWith('.eth')) {
     type = 'ens'
+    // TODO: stop gap unti we can sort out lookupName with ethers on worker
+    // this only works for mainnet so it needs to be replaced
+    const ensRes = await fetch(
+      `https://api.ensideas.com/ens/resolve/${address}`
+    )
+    const res: { address: string } = await ensRes.json()
+    if (!res?.address) {
+      return error(404, 'no address linked to eth address')
+    }
+    address = res?.address
   } else {
     return error(400, 'unsupported address type')
   }
@@ -54,6 +64,10 @@ const withCore = async (
       return error(400, 'address type cannot be used to create a core')
     }
 
+    // TODO: always creating a core means when we connect an address to another
+    // core we will lose the old core. We should probably have seperate code paths
+    // for registering an address to a core and creating a new core. I'd prefer
+    // to return a 404 and let the bff deal with displaying eth account profile data
     const core = Core.get(Core.newUniqueId())
     const coreId = core.id.toString()
     const response = await client.fetch(`http://localhost`, {

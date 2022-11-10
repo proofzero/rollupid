@@ -15,17 +15,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // TODO: remove claimed from response?
   try {
     const galaxyClient = await getGalaxyClient()
-    // TODO: can we use one call to do the check instead of here?
-    // TODO: consider how we would support muliple name services
-    if (params.profile.endsWith('.eth')) {
-      const profileRes = await galaxyClient.getProfileFromName({
-        name: params.profile,
-      })
-      return json({
-        ...profileRes.profileFromName,
-        claimed: true,
-      })
-    }
     const profileRes = await galaxyClient.getProfileFromAddress({
       address: params.profile,
     })
@@ -39,19 +28,33 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     if (e?.response?.errors) {
       // we have a handled exception from galaxy
       const status = e.response.errors[0]?.extensions?.extensions.http.status
-      const error = `Failed to fetch profile with with resolver ${params.profile}: ${e.response.errors[0]?.message}`
-      console.error(status, error)
-      return json(error, {
-        status: status,
-      })
+      if (status === 404 || status === 400) {
+        const error = `Failed to fetch profile with with resolver ${params.profile}: ${e.response.errors[0]?.message}`
+        console.error(status, error)
+        return json(error, {
+          status: status,
+        })
+      }
     }
 
-    let voucher = await getCachedVoucher(params.profile)
+    let targetAddress = params.profile
+    // convert eth name to address (only works on mainnet)
+    // this way we set the correct targetAddress for the voucher
+    if (targetAddress?.endsWith('.eth')) {
+      // TODO: stop gap unti we can sort out lookupName with ethers on worker
+      const ensRes = await fetch(
+        `https://api.ensideas.com/ens/resolve/${targetAddress}`
+      )
+      const { address } = await ensRes.json()
+      targetAddress = address || targetAddress
+    }
+
+    let voucher = await getCachedVoucher(targetAddress)
     if (!voucher) {
       voucher = await fetchVoucher({
-        address: params.profile,
+        address: targetAddress,
       })
-      voucher = await putCachedVoucher(params.profile, voucher)
+      voucher = await putCachedVoucher(targetAddress, voucher)
     }
 
     return json({

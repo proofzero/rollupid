@@ -44,7 +44,7 @@ export default class EthereumNameService extends JSONRPC {
       'core/addressMap'
     )
     if ((known || []).indexOf(address) == -1) {
-      this.error(null, 'cannot lookup unknown address')
+      // this.error(null, 'cannot lookup unknown address')
     }
 
     const reverseAddress = this.getReverseAddress(address)

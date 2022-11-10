@@ -68,6 +68,7 @@ export class AlchemyClient {
     }
   ): Promise<GetNFTsResponse> {
     // @ts-ignore
+    console.log('address', address)
     const reqUrl = new URL(`${ALCHEMY_NFT_API_URL}/getNFTs`)
     reqUrl.searchParams.set('owner', address)
     options?.contracts &&

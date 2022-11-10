@@ -26,7 +26,7 @@ export const setupContext = () => (next) => (root, args, context, info) => {
 }
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {
-  // TODO: update to check if user is authorized too with authorzation header
+  // TODO: update to check if user is authorized with authorzation header
   if (!context.jwt) {
     throw new GraphQLYogaError('You are not authenticated!', {
       extensions: {
