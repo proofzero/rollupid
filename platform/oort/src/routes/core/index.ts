@@ -44,7 +44,7 @@ const withCore = async (
     const ensRes = await fetch(
       `https://api.ensideas.com/ens/resolve/${address}`
     )
-    const res = await ensRes.json()
+    const res: { address: string } = await ensRes.json()
     if (!res?.address) {
       return error(404, 'no address linked to eth address')
     }
