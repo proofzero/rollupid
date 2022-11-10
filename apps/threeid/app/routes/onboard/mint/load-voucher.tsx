@@ -55,7 +55,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
 
     let ensAvatar = null
-    if (addressLookup?.result.endsWith('.eth')) {
+    if (addressLookup?.result?.endsWith('.eth')) {
       const ensRes = await fetch(
         `https://api.ensideas.com/ens/resolve/${addressLookup?.result}`
       )
