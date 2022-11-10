@@ -59,7 +59,10 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    loggedInUserProfile = profileRes.profile
+    loggedInUserProfile = {
+      ...profileRes.profile,
+      claimed: true,
+    }
 
     if (params.address?.endsWith('.eth')) {
       // get the 0x address for the eth name
