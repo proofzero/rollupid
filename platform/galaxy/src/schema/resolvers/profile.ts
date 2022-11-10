@@ -38,33 +38,6 @@ const threeIDResolvers: Resolvers = {
       await checkHTTPStatus(profileResponse)
       return await getRPCResult(profileResponse)
     },
-    profileFromName: async (
-      _parent: any,
-      { name }: { name: string },
-      { env }: ResolverContext
-    ) => {
-      const oortClient = new OortClient(env.OORT)
-      const provider = new AlchemyProvider( // #TODO: consider using Etherscan provider?
-        env.ALCHEMY_NETWORK,
-        env.ALCHEMY_API_KEY
-      )
-      const address = await provider.resolveName(name)
-      if (!address) {
-        throw new GraphQLYogaError(
-          `Error: 404 Not Found: No address found for name ${name}`,
-          {
-            extensions: {
-              http: {
-                status: 404,
-              },
-            },
-          }
-        )
-      }
-      const profileResponse = await oortClient.getProfileFromAddress(address)
-      await checkHTTPStatus(profileResponse)
-      return await getRPCResult(profileResponse)
-    },
   },
   Mutation: {
     updateThreeIDProfile: async (

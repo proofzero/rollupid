@@ -50,6 +50,9 @@ export const loader: LoaderFunction = async (args) => {
   const jwt = session.get('jwt')
   const address = session.get('address')
 
+  let targetAddress = params.profile
+
+  // get the logged in user profile for the UI
   let loggedInUserProfile = {}
   if (jwt) {
     const galaxyClient = await getGalaxyClient()
@@ -57,24 +60,43 @@ export const loader: LoaderFunction = async (args) => {
       'KBT-Access-JWT-Assertion': jwt,
     })
     loggedInUserProfile = profileRes
-  }
 
-  const profileJsonRes = await profileLoader(args)
-  if (profileJsonRes.status !== 200) {
-    const resData = {
-      error: await profileJsonRes.text(),
-      targetAddress: params.profile,
-      displayName: null,
-      bio: null,
-      loggedInUserProfile,
-      ogImageUrl: social,
-      loggedIn: jwt ? { address } : false,
+    if (params.address?.endsWith('.eth')) {
+      // get the 0x address for the eth name
+      const addressLookup = await oortSend('ens_lookupAddress', [address], {
+        jwt,
+      })
+
+      // the ens name is the same as the logged in user
+      if (addressLookup?.result == params.address) {
+        targetAddress = address
+      }
     }
-    throw json(resData, { status: profileJsonRes.status as number })
   }
 
-  const profileJson = await profileJsonRes.json()
+  let profileJson = {}
+  let isOwner = false
+  if (address !== targetAddress) {
+    const profileJsonRes = await profileLoader(args)
+    if (profileJsonRes.status !== 200) {
+      const resData = {
+        error: await profileJsonRes.text(),
+        targetAddress: params.profile,
+        displayName: null,
+        bio: null,
+        loggedInUserProfile,
+        ogImageUrl: social,
+        loggedIn: jwt ? { address } : false,
+      }
+      throw json(resData, { status: profileJsonRes.status as number })
+    }
+    profileJson = await profileJsonRes.json()
+  } else {
+    profileJson = loggedInUserProfile
+    isOwner = true
+  }
 
+  // Setup og tag data
   let hex = gatewayFromIpfs(profileJson?.pfp?.image)
   let bkg = gatewayFromIpfs(profileJson?.cover)
 
@@ -100,22 +122,12 @@ export const loader: LoaderFunction = async (args) => {
     )
     url = social
   }
-
-  let isOwner = false
-
-  const addressLookup = await oortSend('ens_lookupAddress', [address], {
-    jwt,
-  })
-
-  if (address === params.profile || addressLookup?.result === params.profile) {
-    isOwner = true
-  }
-
+  console.log('my profile', profileJson)
   return json({
     ...profileJson,
     loggedInUserProfile,
     isOwner,
-    targetAddress: params.profile,
+    targetAddress: targetAddress,
     loggedIn: jwt ? { address } : false,
     ogImageURL: url,
   })
@@ -391,6 +403,9 @@ export function CatchBoundary() {
   switch (caught.status) {
     case 404:
       secondary = 'Page not found'
+      break
+    case 400:
+      secondary = 'Invalid address'
       break
     case 500:
       secondary = 'Internal Server Error'

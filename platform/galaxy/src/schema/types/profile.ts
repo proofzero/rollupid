@@ -51,7 +51,6 @@ export default /* GraphQL */ `
   type Query {
     profile: Profile
     profileFromAddress(address: String!): Profile
-    profileFromName(name: String!): Profile
   }
 
   type Mutation {
