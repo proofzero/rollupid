@@ -95,7 +95,7 @@ const POPULAR_COLLECTIONS = {
 }
 
 const SPECIAL_COLLECTIONS = {
-    "0x581425c638882bd8169dae6f2995878927c9fe70": { // TODO: this is on polygon?
+    "0xd4ac3ce8e1e14cd60666d49ac34ff2d2937cf6fa": {
         name: "Courtyard",
         kind: "EPIC",
         value: 2,
