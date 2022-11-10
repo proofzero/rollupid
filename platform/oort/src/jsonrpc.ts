@@ -76,6 +76,7 @@ export default class JSONRPC extends Package {
   }
 
   error(code?: number | null, message?: string, data?: object) {
+    // TODO: we should set proper codes for all errors
     code ||= Server.errors.INTERNAL_ERROR
     message ||= Server.errorMessages[code]
     throw {
