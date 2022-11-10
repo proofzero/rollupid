@@ -20,9 +20,6 @@ export default {
     if (!env.OORT) {
       throw Error('OORT service bind not set')
     }
-    if (!env.ALCHEMY_API_KEY) {
-      throw Error('ALCHEMY_API_URL not set')
-    }
     if (!env.ALCHEMY_NETWORK) {
       throw Error('ALCHEMY_NETWORK not set')
     }
