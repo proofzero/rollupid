@@ -1,8 +1,6 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 
-import ProfileCard from '~/components/profile/ProfileCard'
-
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
@@ -16,11 +14,18 @@ import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
 import HeadNav from '~/components/head-nav'
 
-import { links as spinnerLinks } from '~/components/spinner'
+import Spinner, { links as spinnerLinks } from '~/components/spinner'
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
-import { FaBriefcase, FaCamera, FaEdit, FaMapMarkerAlt } from 'react-icons/fa'
+import {
+  FaBriefcase,
+  FaCamera,
+  FaEdit,
+  FaGlobe,
+  FaMapMarkerAlt,
+  FaTrash,
+} from 'react-icons/fa'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
@@ -30,6 +35,9 @@ import pepe from '~/assets/pepe.svg'
 
 import { oortSend } from '~/utils/rpc.server'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
+
+import hexStyle from '~/helpers/hex-style'
+import { getCachedVoucher } from '~/helpers/voucher'
 
 export function links() {
   return [...spinnerLinks(), ...nftCollLinks()]
@@ -119,8 +127,25 @@ export const loader: LoaderFunction = async (args) => {
     )
     url = social
   }
+
+  let originalCoverUrl
+  try {
+    if (!targetAddress) {
+      throw new Error(
+        'Target address expected to recover original cover gradient'
+      )
+    }
+
+    const voucher = await getCachedVoucher(targetAddress)
+    originalCoverUrl = voucher?.metadata?.cover
+  } catch (ex) {
+    console.debug('Error trying to retrieve cached voucher')
+    console.error(ex)
+  }
+
   return json({
     ...profileJson,
+    originalCoverUrl,
     loggedInUserProfile,
     isOwner,
     targetAddress: targetAddress,
@@ -163,6 +188,7 @@ export const meta: MetaFunction = ({
 const ProfileRoute = () => {
   const {
     loggedInUserProfile,
+    originalCoverUrl,
     targetAddress,
     claimed,
     displayName,
@@ -177,6 +203,7 @@ const ProfileRoute = () => {
   } = useLoaderData()
 
   const [coverUrl, setCoverUrl] = useState(cover)
+  const [handlingCover, setHandlingCover] = useState<boolean>(false)
 
   const fetcher = useFetcher()
   useEffect(() => {
@@ -184,11 +211,29 @@ const ProfileRoute = () => {
       if (fetcher.data) {
         setCoverUrl(fetcher.data)
       }
+
+      setHandlingCover(false)
     }
   }, [fetcher])
 
+  const handleCoverReset = async () => {
+    setHandlingCover(true)
+
+    fetcher.submit(
+      {
+        url: originalCoverUrl,
+      },
+      {
+        method: 'post',
+        action: '/api/update-cover',
+      }
+    )
+  }
+
   const coverUploadRef = useRef<HTMLInputElement>(null)
   const handleCoverUpload = async (e: any) => {
+    setHandlingCover(true)
+
     const coverFile = (e.target as HTMLInputElement & EventTarget).files?.item(
       0
     )
@@ -230,6 +275,11 @@ const ProfileRoute = () => {
     }
   }
 
+  const shortenedAccount = `${targetAddress.substring(
+    0,
+    4
+  )} ... ${targetAddress.substring(targetAddress.length - 4)}`
+
   return (
     <div className="bg-white h-full min-h-screen">
       <div
@@ -246,7 +296,9 @@ const ProfileRoute = () => {
       </div>
 
       <div
-        className="h-80 w-full relative flex justify-center p-3"
+        className={`h-[300px] w-full max-w-7xl mx-auto relative flex justify-center rounded-b-xl ${
+          !handlingCover ? 'hover-child-visible' : ''
+        }`}
         style={{
           backgroundImage: coverUrl
             ? `url(${gatewayFromIpfs(coverUrl)})`
@@ -256,21 +308,8 @@ const ProfileRoute = () => {
           backgroundPosition: 'center',
         }}
       >
-        <div className="mt-[6.5rem] lg:mt-28 max-w-7xl w-full mx-auto justify-center lg:justify-start flex">
-          <div className="absolute">
-            <ProfileCard
-              account={targetAddress}
-              avatarUrl={gatewayFromIpfs(pfp?.image)}
-              claimed={claimed ? new Date() : undefined}
-              displayName={displayName}
-              isNft={pfp?.isToken}
-              webUrl={website}
-            />
-          </div>
-        </div>
-
         {isOwner && (
-          <div className="absolute top-0 lg:top-auto lg:bottom-0 right-0 my-8 mx-6">
+          <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-800/25 rounded-b-xl">
             <input
               ref={coverUploadRef}
               type="file"
@@ -281,23 +320,85 @@ const ProfileRoute = () => {
               onChange={handleCoverUpload}
             />
 
-            <Button
-              type={ButtonType.Secondary}
-              size={ButtonSize.SM}
-              Icon={FaCamera}
-              onClick={() => {
-                coverUploadRef.current?.click()
-              }}
-            >
-              Edit cover photo
-            </Button>
+            {handlingCover && <Spinner color="#ffffff" />}
+
+            {!handlingCover && (
+              <div className="flex flex-row space-x-4 items-center">
+                {originalCoverUrl && coverUrl !== originalCoverUrl && (
+                  <Button
+                    type={ButtonType.Contrast}
+                    size={ButtonSize.SM}
+                    Icon={FaTrash}
+                    onClick={async () => {
+                      await handleCoverReset()
+                    }}
+                  >
+                    Delete
+                  </Button>
+                )}
+
+                <Button
+                  type={ButtonType.Contrast}
+                  size={ButtonSize.SM}
+                  Icon={FaCamera}
+                  onClick={() => {
+                    coverUploadRef.current?.click()
+                  }}
+                >
+                  Upload
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      <div className="p-3 mt-44 lg:mt-0 max-w-7xl w-full mx-auto">
+      <div className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-end px-8 mt-[-6em]">
+        <div
+          className={`w-48 h-48 bg-white z-[100] ${
+            pfp.isToken ? '' : 'rounded-full'
+          }`}
+          style={
+            pfp.isToken
+              ? {
+                  ...hexStyle,
+                  transform: 'scale(1.0)',
+                }
+              : {
+                transform: 'scale(0.9)'
+              }
+          }
+        >
+          <img
+            src={gatewayFromIpfs(pfp.image)}
+            className={`w-48 h-48 bg-white border-8 border-white ${
+              pfp.isToken ? '' : 'rounded-full'
+            }`}
+            style={
+              pfp.isToken
+                ? {
+                    ...hexStyle,
+                    transform: 'scale(0.9)',
+                  }
+                : undefined
+            }
+          />
+        </div>
+
+        {isOwner && (
+          <ButtonLink
+            size={ButtonSize.SM}
+            to="/account/settings/profile"
+            Icon={FaEdit}
+          >
+            Edit Profile
+          </ButtonLink>
+        )}
+      </div>
+
+      <div className="mt-3 max-w-7xl w-full mx-auto p-3 lg:p-0">
         {!claimed && (
-          <div className="lg:ml-[19rem] rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
+          <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
               <Text
                 size={TextSize.LG}
@@ -323,12 +424,16 @@ const ProfileRoute = () => {
         )}
 
         {claimed && (
-          <div
-            className="lg:ml-[19rem] py-4 px-6"
-            style={{
-              minHeight: '8rem',
-            }}
-          >
+          <div>
+            <Text
+              className="mt-5 mb-2.5"
+              weight={TextWeight.Bold700}
+              color={TextColor.Gray600}
+              size={TextSize.XL2}
+            >
+              {displayName ?? shortenedAccount}
+            </Text>
+
             <Text
               className="break-all"
               size={TextSize.Base}
@@ -340,37 +445,34 @@ const ProfileRoute = () => {
 
             <hr className="my-6" />
 
-            <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
-              <div className="flex flex-row space-x-10 justify-start items-center text-gray-500 font-size-lg">
-                {location && (
-                  <div className="flex flex-row space-x-3.5 justify-center items-center wrap">
-                    <FaMapMarkerAlt /> <Text>{location}</Text>
-                  </div>
-                )}
+            <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
+              {location && (
+                <div className="flex flex-row space-x-4 items-center wrap">
+                  <FaMapMarkerAlt /> <Text>{location}</Text>
+                </div>
+              )}
 
-                {job && (
-                  <div className="flex flex-row space-x-4 justify-center items-center">
-                    <FaBriefcase /> <Text>{job}</Text>
-                  </div>
-                )}
-              </div>
+              {job && (
+                <div className="flex flex-row space-x-4 items-center">
+                  <FaBriefcase /> <Text>{job}</Text>
+                </div>
+              )}
 
-              {isOwner && (
-                <ButtonLink
-                  size={ButtonSize.SM}
-                  to="/account/settings/profile"
-                  Icon={FaEdit}
-                >
-                  Edit Profile
-                </ButtonLink>
+              {website && (
+                <div className="flex flex-row space-x-4 items-center">
+                  <FaGlobe />{' '}
+                  <a href={website} target="_blank">
+                    <Text color={TextColor.Indigo500}>{website}</Text>
+                  </a>
+                </div>
               )}
             </div>
           </div>
         )}
 
-        <div className="mt-20">
+        <div className="mt-12 lg:mt-24">
           <Text
-            className="pb-4"
+            className="mb-8 lg:mb-16"
             size={TextSize.SM}
             weight={TextWeight.SemiBold600}
             color={TextColor.Gray600}
