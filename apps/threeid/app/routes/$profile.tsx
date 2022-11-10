@@ -122,7 +122,6 @@ export const loader: LoaderFunction = async (args) => {
     )
     url = social
   }
-  console.log('my profile', profileJson)
   return json({
     ...profileJson,
     loggedInUserProfile,

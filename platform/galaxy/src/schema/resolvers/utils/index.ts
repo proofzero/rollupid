@@ -41,8 +41,6 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
 }
 
 export async function checkHTTPStatus(response: Response) {
-  console.log('response', response)
-
   if (response.status !== 200) {
     const json: { error: string } = await response.json()
     throw new GraphQLYogaError(
