@@ -21,12 +21,12 @@ const NftModal = ({
       <div className="flex flex-col lg:flex-row max-w-full">
         <div className="max-w-full lg:max-w-sm flex justify-center items-center">
           <img
-            className="object-cover rounded"
+            className="object-cover rounded-lg"
             src={gatewayFromIpfs(nft?.url)}
           />
         </div>
 
-        <div className="p-4 max-w-full lg:max-w-md">
+        <div className="p-0 lg:p-4 max-w-full lg:max-w-md mt-3">
           <Text
             className="mb-2"
             size={TextSize.LG}
@@ -36,7 +36,7 @@ const NftModal = ({
             {nft?.collectionTitle}
           </Text>
           <Text
-            className="mb-10"
+            className="mb-5 lg:mb-10"
             size={TextSize.XL4}
             weight={TextWeight.SemiBold600}
             color={TextColor.Gray900}
@@ -47,7 +47,7 @@ const NftModal = ({
           <hr />
 
           {nft?.properties?.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-4 lg:mt-8">
               <Text
                 className="ml-1 mb-4"
                 size={TextSize.LG}
