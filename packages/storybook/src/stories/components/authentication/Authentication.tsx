@@ -70,7 +70,7 @@ export function Authentication({
 
   return (
     <BaseTheme>
-      {/* {error && <div>{error.message}</div>} */}
+      {error && <div>{error.message}</div>}
       <WagmiConfig client={client}>
         <ConnectButton
           className={classNames(styles.button)}

@@ -48,7 +48,7 @@ export function ConnectButton({
 
   return (
     <>
-      {status}
+      {/* {status} */}
       <Button
         className={classNames(className)}
         disabled={status !== 'disconnected'}
