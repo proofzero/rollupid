@@ -25,7 +25,7 @@ const ModaledNft = ({ nft }: any) => {
         handleClose={() => setShowModal(false)}
       />
 
-      <div className="relative overlay-img-wrapper">
+      <div className="relative overlay-img-wrapper cursor-pointer">
         <div
           onClick={() => {
             if (!loadFail) {
