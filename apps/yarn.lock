@@ -3061,13 +3061,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@headlessui/react@npm:1.7.3"
+"@headlessui/react@npm:1.7.4":
+  version: 1.7.4
+  resolution: "@headlessui/react@npm:1.7.4"
+  dependencies:
+    client-only: ^0.0.1
   peerDependencies:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
-  checksum: c9391e15e63dc7e459d42125a94e22f964419c440d9f37fd85f6f501612aad42b3e30e79f712e8097c66e08891c26dcd662863e572ff21cc6cf34a3185ae4aa5
+  checksum: cd7192aa0748d715ed0da94435f217a1a618894a09df722c8b6ac0967c0c2f93b4c1e6b29c4993a3303dc453b20b05323d2a37239408740391989a64b7dce38c
   languageName: node
   linkType: hard
 
@@ -3080,12 +3082,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@heroicons/react@npm:2.0.12":
-  version: 2.0.12
-  resolution: "@heroicons/react@npm:2.0.12"
+"@heroicons/react@npm:2.0.13":
+  version: 2.0.13
+  resolution: "@heroicons/react@npm:2.0.13"
   peerDependencies:
     react: ">= 16"
-  checksum: d8e52410890db3337c3c82dcc223eeb3d88badcf96438e38fd9f4cc7aaafa41eb3653dcea6d9f1a8cac55e1076ac3b7a53fb87bfae71b5b202abf0e85066d004
+  checksum: f03c393a129cb468d103e4334815df956d7afa9d0756ee09b33e9396214d39b786523a5e650709de73c68ba085facda3fe01984ff137bcc16c85d4ed2498e663
   languageName: node
   linkType: hard
 
@@ -4188,19 +4190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/cloudflare-workers@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@remix-run/cloudflare-workers@npm:1.7.3"
-  dependencies:
-    "@cloudflare/kv-asset-handler": ^0.1.3
-    "@remix-run/cloudflare": 1.7.3
-  peerDependencies:
-    "@cloudflare/workers-types": ^2.0.0 || ^3.0.0
-  checksum: 2639b5f74dd12dc5dd74e4412244aabd71e2a5c80d1f1544a6dafc375a97f2d4ac2cb4b8a68188071585c5158e6696d0c059866b5eb49308fbf45df8d2d6228f
-  languageName: node
-  linkType: hard
-
-"@remix-run/cloudflare-workers@npm:^1.7.4":
+"@remix-run/cloudflare-workers@npm:1.7.5, @remix-run/cloudflare-workers@npm:^1.7.4":
   version: 1.7.5
   resolution: "@remix-run/cloudflare-workers@npm:1.7.5"
   dependencies:
@@ -4221,18 +4211,6 @@ __metadata:
   peerDependencies:
     "@cloudflare/workers-types": ^2.0.0 || ^3.0.0
   checksum: 095f90912279d5eace0bc086d5b0e913c72d9c1a72dff91603e7e24d0da55ba7b275f6baec54c45bf427f3192040a0c1f08ec776d2948544b7ef5f8ed58f9dd2
-  languageName: node
-  linkType: hard
-
-"@remix-run/cloudflare@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@remix-run/cloudflare@npm:1.7.3"
-  dependencies:
-    "@cloudflare/kv-asset-handler": ^0.1.3
-    "@remix-run/server-runtime": 1.7.3
-  peerDependencies:
-    "@cloudflare/workers-types": ^2.0.0 || ^3.0.0
-  checksum: c79f2793adf817312af67dea17433d53f405b504f0b94c0f34342feccc6145d6ad9e8a77b5884ad6863fd96239f6a130be771dd826101b5e632faaba9dbb1689
   languageName: node
   linkType: hard
 
@@ -4302,61 +4280,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/dev@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@remix-run/dev@npm:1.7.3"
-  dependencies:
-    "@babel/core": ^7.18.6
-    "@babel/plugin-syntax-jsx": ^7.18.6
-    "@babel/preset-env": ^7.18.6
-    "@babel/preset-typescript": ^7.18.6
-    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
-    "@npmcli/package-json": ^2.0.0
-    "@remix-run/server-runtime": 1.7.3
-    "@yarnpkg/esbuild-plugin-pnp": 3.0.0-rc.11
-    arg: ^5.0.1
-    cacache: ^15.0.5
-    chalk: ^4.1.2
-    chokidar: ^3.5.1
-    dotenv: ^16.0.0
-    esbuild: 0.14.51
-    exit-hook: 2.2.1
-    express: ^4.17.1
-    fast-glob: 3.2.11
-    fs-extra: ^10.0.0
-    get-port: ^5.1.1
-    gunzip-maybe: ^1.4.2
-    inquirer: ^8.2.1
-    jscodeshift: ^0.13.1
-    jsesc: 3.0.2
-    json5: ^2.2.1
-    lodash: ^4.17.21
-    lodash.debounce: ^4.0.8
-    minimatch: ^3.0.4
-    node-fetch: ^2.6.7
-    ora: ^5.4.1
-    prettier: 2.7.1
-    pretty-ms: ^7.0.1
-    proxy-agent: ^5.0.0
-    remark-frontmatter: 4.0.1
-    remark-mdx-frontmatter: ^1.0.1
-    semver: ^7.3.7
-    sort-package-json: ^1.55.0
-    tar-fs: ^2.1.1
-    tsconfig-paths: ^4.0.0
-    ws: ^7.4.5
-    xdm: ^2.0.0
-  peerDependencies:
-    "@remix-run/serve": 1.7.3
-  peerDependenciesMeta:
-    "@remix-run/serve":
-      optional: true
-  bin:
-    remix: dist/cli.js
-  checksum: 7d9d8191190d7e78a0ec0f9e25e25025aef9dae2b9105a990711b123b2cba7c50ea69160ace9952ab7421d0c58b92cad88906648bfc3ba73238942709502f6ad
-  languageName: node
-  linkType: hard
-
 "@remix-run/dev@npm:1.7.4":
   version: 1.7.4
   resolution: "@remix-run/dev@npm:1.7.4"
@@ -4412,6 +4335,61 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/dev@npm:1.7.5":
+  version: 1.7.5
+  resolution: "@remix-run/dev@npm:1.7.5"
+  dependencies:
+    "@babel/core": ^7.18.6
+    "@babel/plugin-syntax-jsx": ^7.18.6
+    "@babel/preset-env": ^7.18.6
+    "@babel/preset-typescript": ^7.18.6
+    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
+    "@npmcli/package-json": ^2.0.0
+    "@remix-run/server-runtime": 1.7.5
+    "@yarnpkg/esbuild-plugin-pnp": 3.0.0-rc.11
+    arg: ^5.0.1
+    cacache: ^15.0.5
+    chalk: ^4.1.2
+    chokidar: ^3.5.1
+    dotenv: ^16.0.0
+    esbuild: 0.14.51
+    exit-hook: 2.2.1
+    express: ^4.17.1
+    fast-glob: 3.2.11
+    fs-extra: ^10.0.0
+    get-port: ^5.1.1
+    gunzip-maybe: ^1.4.2
+    inquirer: ^8.2.1
+    jscodeshift: ^0.13.1
+    jsesc: 3.0.2
+    json5: ^2.2.1
+    lodash: ^4.17.21
+    lodash.debounce: ^4.0.8
+    minimatch: ^3.0.4
+    node-fetch: ^2.6.7
+    ora: ^5.4.1
+    prettier: 2.7.1
+    pretty-ms: ^7.0.1
+    proxy-agent: ^5.0.0
+    remark-frontmatter: 4.0.1
+    remark-mdx-frontmatter: ^1.0.1
+    semver: ^7.3.7
+    sort-package-json: ^1.55.0
+    tar-fs: ^2.1.1
+    tsconfig-paths: ^4.0.0
+    ws: ^7.4.5
+    xdm: ^2.0.0
+  peerDependencies:
+    "@remix-run/serve": 1.7.5
+  peerDependenciesMeta:
+    "@remix-run/serve":
+      optional: true
+  bin:
+    remix: dist/cli.js
+  checksum: 42b54a80a14fde2c973ba69266fd7ac081f787fda808b3dae0a6239507ffef4b625a249ae08368620de9731aba67934a7f73c150ae580eb55819b71b4d95332c
+  languageName: node
+  linkType: hard
+
 "@remix-run/eslint-config@npm:1.7.0":
   version: 1.7.0
   resolution: "@remix-run/eslint-config@npm:1.7.0"
@@ -4444,38 +4422,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/eslint-config@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@remix-run/eslint-config@npm:1.7.3"
-  dependencies:
-    "@babel/core": ^7.19.1
-    "@babel/eslint-parser": ^7.19.1
-    "@babel/preset-react": ^7.18.6
-    "@rushstack/eslint-patch": ^1.2.0
-    "@typescript-eslint/eslint-plugin": ^5.38.0
-    "@typescript-eslint/parser": ^5.38.0
-    eslint-import-resolver-node: 0.3.6
-    eslint-import-resolver-typescript: ^3.5.1
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-jest: ^26.9.0
-    eslint-plugin-jest-dom: ^4.0.2
-    eslint-plugin-jsx-a11y: ^6.6.1
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-react: ^7.31.8
-    eslint-plugin-react-hooks: ^4.6.0
-    eslint-plugin-testing-library: ^5.6.4
-  peerDependencies:
-    eslint: ^8.0.0
-    react: ^17.0.0 || ^18.0.0
-    react-dom: ^17.0.0 || ^18.0.0
-    typescript: ^4.0.0
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 84a5eca6eee98cfa07329a6ea5b60131966a2ef75aedba07805031f6117bc7d69004c3085f07be7c117fbdc06a8e1b71bdc8887bbf56b3d46630612abe1076ab
-  languageName: node
-  linkType: hard
-
 "@remix-run/eslint-config@npm:1.7.4":
   version: 1.7.4
   resolution: "@remix-run/eslint-config@npm:1.7.4"
@@ -4504,6 +4450,37 @@ __metadata:
     typescript:
       optional: true
   checksum: 1bf6de0df40dd304dc35ccac528be1880ab40e4c4b73146829cd8f35a78f4199aea133c41a5d1021da6311ed5120fdb9ea285810a49571c0290ae9e2d006717b
+  languageName: node
+  linkType: hard
+
+"@remix-run/eslint-config@npm:1.7.5":
+  version: 1.7.5
+  resolution: "@remix-run/eslint-config@npm:1.7.5"
+  dependencies:
+    "@babel/core": ^7.19.1
+    "@babel/eslint-parser": ^7.19.1
+    "@babel/preset-react": ^7.18.6
+    "@rushstack/eslint-patch": ^1.2.0
+    "@typescript-eslint/eslint-plugin": ^5.38.0
+    "@typescript-eslint/parser": ^5.38.0
+    eslint-import-resolver-node: 0.3.6
+    eslint-import-resolver-typescript: ^3.5.1
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-jest: ^26.9.0
+    eslint-plugin-jest-dom: ^4.0.2
+    eslint-plugin-jsx-a11y: ^6.6.1
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-react: ^7.31.8
+    eslint-plugin-react-hooks: ^4.6.0
+    eslint-plugin-testing-library: ^5.6.4
+  peerDependencies:
+    eslint: ^8.0.0
+    react: ^17.0.0 || ^18.0.0
+    typescript: ^4.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 973b86d4a58e89e5028915fa1bf14ae192560a8f6c22faa31d442b0a89338d259ae0493e84b2199efcf4601aad96a94776da4858acc624d20258b7c7532313e6
   languageName: node
   linkType: hard
 
@@ -4610,23 +4587,6 @@ __metadata:
     react: ">=16.8"
     react-dom: ">=16.8"
   checksum: 2aceb0d36795822a44e14fbb828053bc5f88740b61b3697782bcb4910b747a69422cf27a5deacd5f718325dfc2f160cc6ec6f685d453394b8f40da899da251f3
-  languageName: node
-  linkType: hard
-
-"@remix-run/server-runtime@npm:1.7.3":
-  version: 1.7.3
-  resolution: "@remix-run/server-runtime@npm:1.7.3"
-  dependencies:
-    "@types/cookie": ^0.4.0
-    "@web3-storage/multipart-parser": ^1.0.0
-    cookie: ^0.4.1
-    react-router-dom: 6.3.0
-    set-cookie-parser: ^2.4.8
-    source-map: ^0.7.3
-  peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 5c8c0ffc019646e757b4897f51040f526b9b2975a93d604f329f85ce361f3fbdafc22b6db1ebfc8fbf2adb7f14d04aa5456ab48d7f976dfbb6d99d012dd8a3ec
   languageName: node
   linkType: hard
 
@@ -6005,7 +5965,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-sync-storage-persister@npm:^4.0.10, @tanstack/query-sync-storage-persister@npm:^4.10.1":
+"@tanstack/query-sync-storage-persister@npm:^4.0.10, @tanstack/query-sync-storage-persister@npm:^4.14.5":
   version: 4.14.5
   resolution: "@tanstack/query-sync-storage-persister@npm:4.14.5"
   dependencies:
@@ -6014,7 +5974,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query-persist-client@npm:^4.0.10, @tanstack/react-query-persist-client@npm:^4.10.1":
+"@tanstack/react-query-persist-client@npm:^4.0.10":
   version: 4.14.5
   resolution: "@tanstack/react-query-persist-client@npm:4.14.5"
   dependencies:
@@ -6022,6 +5982,17 @@ __metadata:
   peerDependencies:
     "@tanstack/react-query": 4.14.5
   checksum: 14a943ba2952b3f4e56774a52d5c6a6f323a3347339ef97a7fa578bf40499f5af80ebaf51421157caf47aaa2b1b3462131b55e861c85d72593f6134aa05edaf1
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query-persist-client@npm:^4.14.5":
+  version: 4.14.6
+  resolution: "@tanstack/react-query-persist-client@npm:4.14.6"
+  dependencies:
+    "@tanstack/query-persist-client-core": 4.14.5
+  peerDependencies:
+    "@tanstack/react-query": 4.14.6
+  checksum: c6929cf215dd6bcfd25a6f9ab3e1c2f913736a09098421e87a3287d2a135010f2ceaf1d074371c3cb6aa914d1f1ceeb80364b7febab98cbe469084211f593c69
   languageName: node
   linkType: hard
 
@@ -6045,7 +6016,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^4.0.10, @tanstack/react-query@npm:^4.10.1":
+"@tanstack/react-query@npm:^4.0.10":
   version: 4.14.5
   resolution: "@tanstack/react-query@npm:4.14.5"
   dependencies:
@@ -6061,6 +6032,25 @@ __metadata:
     react-native:
       optional: true
   checksum: fe98c7900c989512c5818b7aa3c81d81ce2c1149a25e9279f8efcf462a00a156c78c398b5e01c50e5da23788709ed36f8dae4236a51fde459a427a5ece474b0f
+  languageName: node
+  linkType: hard
+
+"@tanstack/react-query@npm:^4.14.5":
+  version: 4.14.6
+  resolution: "@tanstack/react-query@npm:4.14.6"
+  dependencies:
+    "@tanstack/query-core": 4.14.5
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-native: "*"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 38e293616aa04ccfe2fec47315c5b98f0b157ee6548b4dbb6a8ca01c90de113e437f5effbc82884f2d860bde54eeb07335e9ed4e233543c7039f717d9855ab9e
   languageName: node
   linkType: hard
 
@@ -6655,16 +6645,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:18.0.7":
-  version: 18.0.7
-  resolution: "@types/react-dom@npm:18.0.7"
+"@types/react-dom@npm:18.0.8":
+  version: 18.0.8
+  resolution: "@types/react-dom@npm:18.0.8"
   dependencies:
     "@types/react": "*"
-  checksum: 4fd47dd114d61e7228637de9bee685b81ea18b89b220a67662b05ebe74f69aad7cd929ebe69e8fd572cc8e0e9adf9bba1ea5586cfd37eb9045778851e78bcd66
+  checksum: 522e5e949d05f35c6037a2290838c9c7ff92a9d06f7d96b993c7c3f5a86d8f3a6337e059c94e6fb0920227f445e5d1ce10fbfe3d9bbd95fb82a5539249d90646
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
+"@types/react@npm:*, @types/react@npm:18.0.25":
   version: 18.0.25
   resolution: "@types/react@npm:18.0.25"
   dependencies:
@@ -6683,17 +6673,6 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 2e7fe0eb630cb77da03b6da308c58728c01b38e878118e9ff5cd8045181c8d4f32dc936e328f46a62cadb56e1fe4c5a911b5113584f93a99e1f35df7f059246b
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:18.0.22":
-  version: 18.0.22
-  resolution: "@types/react@npm:18.0.22"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: e9e294c1b5467c502936f964be68e7284ec6a5d40c703e7429037d9b39ba5f9b0299d303dde06d0468e4e79957ac71ab5ab3ee8252bf6ff3cc09c2ee03695789
   languageName: node
   linkType: hard
 
@@ -7053,6 +7032,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wagmi/core@npm:0.7.1":
+  version: 0.7.1
+  resolution: "@wagmi/core@npm:0.7.1"
+  dependencies:
+    abitype: ^0.1.7
+    eventemitter3: ^4.0.7
+    zustand: ^4.1.1
+  peerDependencies:
+    "@coinbase/wallet-sdk": ">=3.3.0"
+    "@walletconnect/ethereum-provider": ">=1.7.5"
+    ethers: ">=5.5.1"
+  peerDependenciesMeta:
+    "@coinbase/wallet-sdk":
+      optional: true
+    "@walletconnect/ethereum-provider":
+      optional: true
+  checksum: 8ccb9261723ac096d930acaaa930d5a5d68e8e52149205f60ea07ff29bfcdfca761e4cbfd5b9f6a35cc75dc2c2964a5f2bcb46fa2c699126ac489c2714d49312
+  languageName: node
+  linkType: hard
+
 "@wagmi/core@npm:^0.5.4":
   version: 0.5.8
   resolution: "@wagmi/core@npm:0.5.8"
@@ -7069,26 +7068,6 @@ __metadata:
     "@walletconnect/ethereum-provider":
       optional: true
   checksum: 013a4571039f555234b2fd5341a77d8908616da1159089cb875265b0d606db4b223ca40f9cf280e2c56d4e19054596b6efe6761a6ce4c26ca8420239c469bafb
-  languageName: node
-  linkType: hard
-
-"@wagmi/core@npm:^0.6.4":
-  version: 0.6.11
-  resolution: "@wagmi/core@npm:0.6.11"
-  dependencies:
-    abitype: ^0.1.7
-    eventemitter3: ^4.0.7
-    zustand: ^4.1.1
-  peerDependencies:
-    "@coinbase/wallet-sdk": ">=3.3.0"
-    "@walletconnect/ethereum-provider": ">=1.7.5"
-    ethers: ">=5.5.1"
-  peerDependenciesMeta:
-    "@coinbase/wallet-sdk":
-      optional: true
-    "@walletconnect/ethereum-provider":
-      optional: true
-  checksum: 82be92cf950b6c844686fcd3bc855a672126f98cc2145a251ad9cb3d84a5f145088411221c15125dddedc4d17d8420b87eecd73a01a2973f09449d668cb5051c
   languageName: node
   linkType: hard
 
@@ -9888,6 +9867,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"client-only@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "client-only@npm:0.0.1"
+  checksum: 0c16bf660dadb90610553c1d8946a7fdfb81d624adea073b8440b7d795d5b5b08beb3c950c6a2cf16279365a3265158a236876d92bce16423c485c322d7dfaf8
+  languageName: node
+  linkType: hard
+
 "cliui@npm:^5.0.0":
   version: 5.0.0
   resolution: "cliui@npm:5.0.0"
@@ -10224,30 +10210,29 @@ __metadata:
   resolution: "console@workspace:console"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
-    "@headlessui/react": 1.7.3
-    "@heroicons/react": 2.0.12
-    "@remix-run/cloudflare": 1.7.3
-    "@remix-run/cloudflare-workers": 1.7.3
-    "@remix-run/dev": 1.7.3
-    "@remix-run/eslint-config": 1.7.3
+    "@headlessui/react": 1.7.4
+    "@heroicons/react": 2.0.13
+    "@remix-run/cloudflare": 1.7.5
+    "@remix-run/cloudflare-workers": 1.7.5
+    "@remix-run/dev": 1.7.5
+    "@remix-run/eslint-config": 1.7.5
     "@remix-run/react": 1.7.3
     "@tailwindcss/forms": 0.5.3
-    "@types/react": 18.0.22
-    "@types/react-dom": 18.0.7
+    "@types/react": 18.0.25
+    "@types/react-dom": 18.0.8
     bcryptjs: 2.4.3
     cross-env: 7.0.3
-    eslint: 8.26.0
+    eslint: 8.27.0
     ethers: 5.7.2
     lodash: 4.17.21
-    miniflare: 2.10.0
     npm-run-all: 4.1.5
     react: 18.2.0
     react-dom: 18.2.0
-    tailwindcss: 3.2.1
+    tailwindcss: 3.2.4
     tiny-invariant: 1.3.1
     typescript: 4.8.4
-    wagmi: 0.7.5
-    wrangler: 2.1.15
+    wagmi: 0.8.1
+    wrangler: 2.2.1
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -12274,9 +12259,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:8.26.0":
-  version: 8.26.0
-  resolution: "eslint@npm:8.26.0"
+"eslint@npm:8.27.0":
+  version: 8.27.0
+  resolution: "eslint@npm:8.27.0"
   dependencies:
     "@eslint/eslintrc": ^1.3.3
     "@humanwhocodes/config-array": ^0.11.6
@@ -12319,7 +12304,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: a2aced939ea060f77d10dcfced5cfeb940f63f383fd7ab1decadea64170ab552582e1c5909db1db641d4283178c9bc569f19b0f8900e00314a5f783e4b3f759d
+  checksum: 153b022d309e1b647a73b1bb0fa98912add699b06e279084155f23c6f2b5fc5abd05411fc1ba81608a24bbfaf044ca079544c16fffa6fc987b8f676c9960a2c4
   languageName: node
   linkType: hard
 
@@ -19528,7 +19513,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.14, postcss@npm:^8.4.17, postcss@npm:^8.4.18":
+"postcss@npm:^8.4.14, postcss@npm:^8.4.18":
   version: 8.4.18
   resolution: "postcss@npm:8.4.18"
   dependencies:
@@ -22337,9 +22322,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:3.2.1":
-  version: 3.2.1
-  resolution: "tailwindcss@npm:3.2.1"
+"tailwindcss@npm:3.2.4":
+  version: 3.2.4
+  resolution: "tailwindcss@npm:3.2.4"
   dependencies:
     arg: ^5.0.2
     chokidar: ^3.5.3
@@ -22355,7 +22340,7 @@ __metadata:
     normalize-path: ^3.0.0
     object-hash: ^3.0.0
     picocolors: ^1.0.0
-    postcss: ^8.4.17
+    postcss: ^8.4.18
     postcss-import: ^14.1.0
     postcss-js: ^4.0.0
     postcss-load-config: ^3.1.4
@@ -22369,7 +22354,7 @@ __metadata:
   bin:
     tailwind: lib/cli.js
     tailwindcss: lib/cli.js
-  checksum: 8479f6e469b3ac3146fec5bf4b5ec411f24f481087d9db9a9e16bd5169cfe5f6af082b8fe656bbb8829faa8805765104843f549b08b4ba34e972d0743d0c7e94
+  checksum: ec187d180c722ec4f57537f2216c7b21269b525f12aaf353cea464d939c3e6286a1221eb3e1206e45d1f015f296171309ad4d9952899b0245cd07d9500a9401f
   languageName: node
   linkType: hard
 
@@ -23891,22 +23876,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wagmi@npm:0.7.5":
-  version: 0.7.5
-  resolution: "wagmi@npm:0.7.5"
+"wagmi@npm:0.8.1":
+  version: 0.8.1
+  resolution: "wagmi@npm:0.8.1"
   dependencies:
     "@coinbase/wallet-sdk": ^3.5.3
-    "@tanstack/query-sync-storage-persister": ^4.10.1
-    "@tanstack/react-query": ^4.10.1
-    "@tanstack/react-query-persist-client": ^4.10.1
-    "@wagmi/core": ^0.6.4
+    "@tanstack/query-sync-storage-persister": ^4.14.5
+    "@tanstack/react-query": ^4.14.5
+    "@tanstack/react-query-persist-client": ^4.14.5
+    "@wagmi/core": 0.7.1
     "@walletconnect/ethereum-provider": ^1.8.0
     abitype: ^0.1.7
     use-sync-external-store: ^1.2.0
   peerDependencies:
     ethers: ">=5.5.1"
     react: ">=17.0.0"
-  checksum: ecdd9b56c070f2e9a16ceeb3ac840f41146f3d0aa46f83ecdbf2363df96beccab86c5b5da31eb269e60e1a23af7f53996c80c28875b083b98d43e9ef9ba0467a
+  checksum: 1197d9dbb432a078cbebaa1c5dfac769606a26db3e5b02600db32f47783ebbf95f517c640e371d9ff0d2cc57789eb15852d3f4ce2a11aa25cadfabff67b8734e
   languageName: node
   linkType: hard
 
@@ -24344,6 +24329,36 @@ __metadata:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
   checksum: 77a56118256b24f87cd5cd87dca25488d71774f1af970d1eb1d617208fcb9cca144f659be65c4350671e46fff9d2de4ae89b751edc1af07a7569cb0ee3f86a8d
+  languageName: node
+  linkType: hard
+
+"wrangler@npm:2.2.1":
+  version: 2.2.1
+  resolution: "wrangler@npm:2.2.1"
+  dependencies:
+    "@cloudflare/kv-asset-handler": ^0.2.0
+    "@esbuild-plugins/node-globals-polyfill": ^0.1.1
+    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
+    "@miniflare/core": 2.10.0
+    "@miniflare/d1": 2.10.0
+    "@miniflare/durable-objects": 2.10.0
+    blake3-wasm: ^2.1.5
+    chokidar: ^3.5.3
+    esbuild: 0.14.51
+    fsevents: ~2.3.2
+    miniflare: 2.10.0
+    nanoid: ^3.3.3
+    path-to-regexp: ^6.2.0
+    selfsigned: ^2.0.1
+    source-map: ^0.7.4
+    xxhash-wasm: ^1.0.1
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    wrangler: bin/wrangler.js
+    wrangler2: bin/wrangler.js
+  checksum: 0fc230783aa9d45e71237d72673fa9aab349955041422f62ac66ce259733e62f7d565ed3750536dd8a590ecd57003d718fb17d972ef8951aa3d16eb00fa9539b
   languageName: node
   linkType: hard
 
