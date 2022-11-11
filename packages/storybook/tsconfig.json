@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "exclude": ["../../node_modules", "node_modules", "dist", "package.json"],
+  "exclude": ["dist", "package.json"],
   "include": ["src/**/*", "src/**/*.json"]
 }
