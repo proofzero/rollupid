@@ -36,7 +36,7 @@ const NftModal = ({
             {nft?.collectionTitle}
           </Text>
           <Text
-            className="mb-10"
+            className="mb-5 lg:mb-10"
             size={TextSize.XL4}
             weight={TextWeight.SemiBold600}
             color={TextColor.Gray900}
@@ -47,7 +47,7 @@ const NftModal = ({
           <hr />
 
           {nft?.properties?.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-4 lg:mt-8">
               <Text
                 className="ml-1 mb-4"
                 size={TextSize.LG}
