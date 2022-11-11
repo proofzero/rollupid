@@ -32,7 +32,7 @@ const ModaledNft = ({ nft }: any) => {
               setShowModal(true)
             }
           }}
-          className="absolute left-0 right-0 top-0 bottom-0 p-4 flex flex-col justify-end transition-all duration-300 rounded-lg"
+          className="absolute left-0 right-0 top-0 bottom-0 p-0 lg:p-4 flex flex-col justify-end transition-all duration-300 rounded-lg"
         >
           <Text
             size={TextSize.SM}
