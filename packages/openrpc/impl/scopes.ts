@@ -2,12 +2,9 @@
  * @file impl/scopes.ts
  */
 
-import * as set from "ts-set-utils";
+import * as set from 'ts-set-utils'
 
-import type {
-  RpcMethods,
-  ScopeSet,
-} from "../index";
+import type { RpcMethods, ScopeSet } from '../index'
 
 // internal
 // -----------------------------------------------------------------------------
@@ -17,75 +14,70 @@ import type {
 // are returned; if this set is non-empty that indicates an error by the developer.
 function getUndeclaredScopes(
   declaredScopes: ScopeSet,
-  reqScopes: ScopeSet,
+  reqScopes: ScopeSet
 ): ScopeSet {
-  return set.difference(reqScopes, declaredScopes);
+  return set.difference(reqScopes, declaredScopes)
 }
 
 function getExtraScopes(
   declaredScopes: ScopeSet,
-  reqScopes: ScopeSet,
+  reqScopes: ScopeSet
 ): ScopeSet {
-  return set.difference(declaredScopes, reqScopes);
+  return set.difference(declaredScopes, reqScopes)
 }
 
 // Collect all scopes required by RPC methods, including standard
 // "methods" (declared in the schema) and "extensions" (defined
 // programmatically).
-function gatherScopes(
-  methods: RpcMethods,
-  extensions: RpcMethods,
-): ScopeSet {
-  let scopes: ScopeSet = new Set();
+function gatherScopes(methods: RpcMethods, extensions: RpcMethods): ScopeSet {
+  let scopes: ScopeSet = new Set()
 
   for (const methodSym of methods.keys()) {
-    const method = methods.get(methodSym);
+    const method = methods.get(methodSym)
     if (method !== undefined) {
-      scopes = set.union(scopes, method.scopes);
+      scopes = set.union(scopes, method.scopes)
     } else {
-      throw new Error(`missing method configuration for ${methodSym.description}`);
+      throw new Error(
+        `missing method configuration for ${methodSym.description}`
+      )
     }
   }
   for (const methodSym of extensions.keys()) {
-    const extension = extensions.get(methodSym);
+    const extension = extensions.get(methodSym)
     if (extension !== undefined) {
-      scopes = set.union(scopes, extension.scopes);
+      scopes = set.union(scopes, extension.scopes)
     } else {
-      throw new Error(`missing method configuration for ${methodSym.description}`);
+      throw new Error(
+        `missing method configuration for ${methodSym.description}`
+      )
     }
   }
- return scopes;
+  return scopes
 }
 
-function checkUndeclared(
-  allScopes: ScopeSet,
-  svcScopes: ScopeSet,
-) {
-  const undeclaredScopes = getUndeclaredScopes(allScopes, svcScopes);
+function checkUndeclared(allScopes: ScopeSet, svcScopes: ScopeSet) {
+  const undeclaredScopes = getUndeclaredScopes(allScopes, svcScopes)
 
   if (undeclaredScopes.size > 0) {
-    const errorScopes = [];
+    const errorScopes = []
     for (const scope of undeclaredScopes.values()) {
-      errorScopes.push(scope.description);
+      errorScopes.push(scope.description)
     }
-    const scopeMsg = errorScopes.join(", ");
-    throw Error(`undeclared scopes: ${scopeMsg}; try adding to @scopes`);
+    const scopeMsg = errorScopes.join(', ')
+    throw Error(`undeclared scopes: ${scopeMsg}; try adding to @scopes`)
   }
 }
 
-function checkExtraneous(
-  allScopes: ScopeSet,
-  svcScopes: ScopeSet,
-) {
-  const extraScopes = getExtraScopes(allScopes, svcScopes);
+function checkExtraneous(allScopes: ScopeSet, svcScopes: ScopeSet) {
+  const extraScopes = getExtraScopes(allScopes, svcScopes)
 
   if (extraScopes.size > 0) {
-    const errorScopes = [];
+    const errorScopes = []
     for (const scope of extraScopes.values()) {
-      errorScopes.push(scope.description);
+      errorScopes.push(scope.description)
     }
-    const scopeMsg = errorScopes.join(", ");
-    throw Error(`extra scopes: ${scopeMsg}; try removing from @scopes`);
+    const scopeMsg = errorScopes.join(', ')
+    throw Error(`extra scopes: ${scopeMsg}; try removing from @scopes`)
   }
 }
 
@@ -101,13 +93,13 @@ function checkExtraneous(
 export function preflight(
   allScopes: ScopeSet,
   methods: RpcMethods,
-  extensions: RpcMethods,
+  extensions: RpcMethods
 ) {
   // Get the combined set of scopes required by all methods and extensions.
-  const svcScopes = gatherScopes(methods, extensions);
+  const svcScopes = gatherScopes(methods, extensions)
 
   // Check for scopes that are required but not declared on the component level.
-  checkUndeclared(allScopes, svcScopes);
+  checkUndeclared(allScopes, svcScopes)
   // Check for scopes that are declared but never required by a method/extension.
-  checkExtraneous(allScopes, svcScopes);
+  checkExtraneous(allScopes, svcScopes)
 }

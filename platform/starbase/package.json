@@ -32,10 +32,10 @@
     "wrangler": "2.1.15"
   },
   "dependencies": {
-    "@kubelt/do.starbase-application": "*",
-    "@kubelt/do.starbase-contract": "*",
-    "@kubelt/do.starbase-user": "*",
-    "@kubelt/openrpc": "*",
+    "@kubelt/do.starbase-application": "workspace:*",
+    "@kubelt/do.starbase-contract": "workspace:*",
+    "@kubelt/do.starbase-user": "workspace:*",
+    "@kubelt/openrpc": "workspace:*",
     "cross-env": "7.0.3",
     "lodash": "4.17.21",
     "multiformats": "10.0.2"

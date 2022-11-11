@@ -7,69 +7,61 @@
  * @packageDocumentation
  */
 
-import * as _ from "lodash";
+import * as _ from 'lodash'
 
-import * as openrpc from "@kubelt/openrpc";
+import * as openrpc from '@kubelt/openrpc'
 
-import type {
-  RpcContext,
-  RpcRequest,
-  RpcService,
-} from "@kubelt/openrpc";
+import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { default as mwAnalytics } from "@kubelt/openrpc/middleware/analytics";
-import { default as mwAuthenticate } from "@kubelt/openrpc/middleware/authenticate";
-import { default as mwDatadog } from "@kubelt/openrpc/middleware/datadog";
-import { default as mwGeolocation } from "@kubelt/openrpc/middleware/geolocation";
-import { default as mwOnlyLocal } from "@kubelt/openrpc/middleware/local";
-import { default as mwOort } from "@kubelt/openrpc/middleware/oort";
+import { default as mwAnalytics } from '@kubelt/openrpc/middleware/analytics'
+import { default as mwAuthenticate } from '@kubelt/openrpc/middleware/authenticate'
+import { default as mwDatadog } from '@kubelt/openrpc/middleware/datadog'
+import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation'
+import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
+import { default as mwOort } from '@kubelt/openrpc/middleware/oort'
 
-import { StarbaseApplication } from "@kubelt/do.starbase-application";
-import { StarbaseContract } from "@kubelt/do.starbase-contract";
-import { StarbaseUser } from "@kubelt/do.starbase-user";
+import { StarbaseApplication } from '@kubelt/do.starbase-application'
+import { StarbaseContract } from '@kubelt/do.starbase-contract'
+import { StarbaseUser } from '@kubelt/do.starbase-user'
 
-import * as secret from "./secret";
+import * as secret from './secret'
 
 // Schema
 // -----------------------------------------------------------------------------
 
 // Import the OpenRPC schema for this API.
-import schema from "./schema";
+import schema from './schema'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
 // We need to export any Durable Objects we use.
 
-export {
-  StarbaseApplication,
-  StarbaseContract,
-  StarbaseUser,
-};
+export { StarbaseApplication, StarbaseContract, StarbaseUser }
 
 // Definitions
 // -----------------------------------------------------------------------------
 
 // Context key for a KV store binding.
-const KEY_FIXTURES = "com.kubelt.kv/fixtures";
+const KEY_FIXTURES = 'com.kubelt.kv/fixtures'
 
 // Context key for a KV value containing name of platform app core owner.
-const KEY_PLATFORM_OWNER = "com.kubelt.value/platform_owner";
+const KEY_PLATFORM_OWNER = 'com.kubelt.value/platform_owner'
 // Context key for a KV value containing name of current environment.
-const KEY_ENVIRONMENT = "com.kubelt.value/environment";
+const KEY_ENVIRONMENT = 'com.kubelt.value/environment'
 
 // Context key for looking up StarbaseApplication durable object.
-const KEY_APPLICATION = "com.kubelt.object/application";
+const KEY_APPLICATION = 'com.kubelt.object/application'
 // Context key for looking up StarbaseContract durable object.
-const KEY_CONTRACT = "com.kubelt.object/contract";
+const KEY_CONTRACT = 'com.kubelt.object/contract'
 // Context key for looking up StarbaseUser durable object.
-const KEY_USER = "com.kubelt.object/user";
+const KEY_USER = 'com.kubelt.object/user'
 
 // Scopes
 // -----------------------------------------------------------------------------
 // This service doesn't use scopes, we can use this everywhere a set of scopes
 // are required.
 
-const noScope = openrpc.scopes([]);
+const noScope = openrpc.scopes([])
 
 // Methods
 // -----------------------------------------------------------------------------
@@ -82,44 +74,44 @@ const noScope = openrpc.scopes([]);
 // -----------------------------------------------------------------------------
 
 const kb_appStore = openrpc.method(schema, {
-  name: "kb_appStore",
+  name: 'kb_appStore',
   scopes: noScope,
   handler: openrpc.handler(
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       // Note that the request we are given is a parsed RpcRequest. It's not
       // an HTTP Request that we can forward directly to the durable object!
 
       // Get a reference to the StarbaseApplication Durable Object.
-      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
       // TODO better typing
-      const appData = _.get(request, ['params', 'app'], {});
-      const ownerId = _.get(request, ["params", "ownerId"]);
+      const appData = _.get(request, ['params', 'app'], {})
+      const ownerId = _.get(request, ['params', 'ownerId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === ownerId) {
-        throw new Error("missing ownerId param");
+        throw new Error('missing ownerId param')
       }
-      const appId = _.get(request, ["params", "appId"]);
+      const appId = _.get(request, ['params', 'appId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === appId) {
-        throw new Error("missing appId param");
+        throw new Error('missing appId param')
       }
 
       // Hash application clientSecret before storing in app core.
-      const clientSecret = appData.clientSecret;
-      const hashedSecret = await secret.hash(clientSecret);
+      const clientSecret = appData.clientSecret
+      const hashedSecret = await secret.hash(clientSecret)
       //const cid = secret.parse(hashedSecret);
-      appData.clientSecret = hashedSecret;
+      appData.clientSecret = hashedSecret
 
       // TODO forward the JWT used to make the current request. Send as
       // "KBT-Authorization" header?
-      const token = "FIXME";
+      const token = 'FIXME'
 
       // The name of the component that we need to update with new
       // application data.
@@ -127,7 +119,7 @@ const kb_appStore = openrpc.method(schema, {
       // TODO Should we use randomly generated name for better
       // performance? Alternately, should we hash our own identifier into
       // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`;
+      const objName = `${ownerId}/${appId}`
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
@@ -136,50 +128,50 @@ const kb_appStore = openrpc.method(schema, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
-        tag: "starbase-app",
-      });
+        tag: 'starbase-app',
+      })
 
       const result = await app.appStore({
         app: appData,
-      });
+      })
 
-      return openrpc.response(request, result);
-    },
+      return openrpc.response(request, result)
+    }
   ),
-});
+})
 
 // kb_appFetch
 // -----------------------------------------------------------------------------
 
 const kb_appFetch = openrpc.method(schema, {
-  name: "kb_appFetch",
+  name: 'kb_appFetch',
   scopes: noScope,
   handler: openrpc.handler(
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       // Get a reference to the StarbaseApplication Durable Object.
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
       // TODO better typing
-      const ownerId = _.get(request, ["params", "ownerId"]);
+      const ownerId = _.get(request, ['params', 'ownerId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === ownerId) {
-        throw new Error("missing ownerId param");
+        throw new Error('missing ownerId param')
       }
-      const appId = _.get(request, ["params", "appId"]);
+      const appId = _.get(request, ['params', 'appId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === appId) {
-        throw new Error("missing appId param");
+        throw new Error('missing appId param')
       }
 
       // TODO forward the JWT used to make the current request. Send as
       // "KBT-Authorization" header?
-      const token = "FIXME";
+      const token = 'FIXME'
 
       // The name of the component that we need to update with new
       // application data.
@@ -187,7 +179,7 @@ const kb_appFetch = openrpc.method(schema, {
       // TODO Should we use randomly generated name for better
       // performance? Alternately, should we hash our own identifier into
       // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`;
+      const objName = `${ownerId}/${appId}`
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
@@ -196,48 +188,48 @@ const kb_appFetch = openrpc.method(schema, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
-        tag: "starbase-app",
-      });
+        tag: 'starbase-app',
+      })
 
-      const result = await app.appFetch();
+      const result = await app.appFetch()
 
-      return openrpc.response(request, result);
-    },
+      return openrpc.response(request, result)
+    }
   ),
-});
+})
 
 // kb_appDelete
 // -----------------------------------------------------------------------------
 
 const kb_appDelete = openrpc.method(schema, {
-  name: "kb_appDelete",
+  name: 'kb_appDelete',
   scopes: noScope,
   handler: openrpc.handler(
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       // Get a reference to the StarbaseApplication Durable Object.
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
       // TODO better typing
-      const ownerId = _.get(request, ["params", "ownerId"]);
+      const ownerId = _.get(request, ['params', 'ownerId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === ownerId) {
-        throw new Error("missing ownerId param");
+        throw new Error('missing ownerId param')
       }
-      const appId = _.get(request, ["params", "appId"]);
+      const appId = _.get(request, ['params', 'appId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === appId) {
-        throw new Error("missing appId param");
+        throw new Error('missing appId param')
       }
 
       // TODO forward the JWT used to make the current request. Send as
       // "KBT-Authorization" header?
-      const token = "FIXME";
+      const token = 'FIXME'
 
       // The name of the component that we need to update with new
       // application data.
@@ -245,7 +237,7 @@ const kb_appDelete = openrpc.method(schema, {
       // TODO Should we use randomly generated name for better
       // performance? Alternately, should we hash our own identifier into
       // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`;
+      const objName = `${ownerId}/${appId}`
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
@@ -254,53 +246,53 @@ const kb_appDelete = openrpc.method(schema, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
-        tag: "starbase-app",
-      });
+        tag: 'starbase-app',
+      })
 
-      const result = await app._.cmp.delete();
+      const result = await app._.cmp.delete()
 
-      return openrpc.response(request, result);
-    },
+      return openrpc.response(request, result)
+    }
   ),
-});
+})
 
 // kb_appList
 // -----------------------------------------------------------------------------
 
 const kb_appList = openrpc.method(schema, {
-  name: "kb_appList",
+  name: 'kb_appList',
   scopes: noScope,
   handler: openrpc.handler(
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       // Get a reference to the StarbaseApplication Durable Object.
-      const sbUser: DurableObjectNamespace = context.get(KEY_USER);
+      const sbUser: DurableObjectNamespace = context.get(KEY_USER)
 
       // TEMP
-      const token = "FIXME";
-      const objName = "@kubelt/robert";
+      const token = 'FIXME'
+      const objName = '@kubelt/robert'
 
       const user = await openrpc.discover(sbUser, objName, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
-        tag: "starbase-user",
-      });
+        tag: 'starbase-user',
+      })
 
       // TODO filter the edges to only include those linking to apps.
-      const result = await user._.graph.edges();
+      const result = await user._.graph.edges()
 
       return openrpc.response(request, {
-        invoked: "kb_appList",
+        invoked: 'kb_appList',
         implemented: false,
         result,
-      });
-    },
+      })
+    }
   ),
-});
+})
 
 // kb_appAuthInfo
 // -----------------------------------------------------------------------------
@@ -308,34 +300,34 @@ const kb_appList = openrpc.method(schema, {
 // details of an application.
 
 const kb_appAuthInfo = openrpc.method(schema, {
-  name: "kb_appAuthInfo",
+  name: 'kb_appAuthInfo',
   scopes: noScope,
   handler: openrpc.handler(
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       // Get a reference to the StarbaseApplication Durable Object.
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
       // TODO better typing
-      const ownerId = _.get(request, ["params", "ownerId"]);
+      const ownerId = _.get(request, ['params', 'ownerId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === ownerId) {
-        throw new Error("missing ownerId param");
+        throw new Error('missing ownerId param')
       }
-      const appId = _.get(request, ["params", "appId"]);
+      const appId = _.get(request, ['params', 'appId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === appId) {
-        throw new Error("missing appId param");
+        throw new Error('missing appId param')
       }
 
       // TODO forward the JWT used to make the current request. Send as
       // "KBT-Authorization" header?
-      const token = "FIXME";
+      const token = 'FIXME'
 
       // The name of the component that we need to update with new
       // application data.
@@ -343,7 +335,7 @@ const kb_appAuthInfo = openrpc.method(schema, {
       // TODO Should we use randomly generated name for better
       // performance? Alternately, should we hash our own identifier into
       // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`;
+      const objName = `${ownerId}/${appId}`
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
@@ -352,23 +344,23 @@ const kb_appAuthInfo = openrpc.method(schema, {
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
-        tag: "starbase-app",
-      });
+        tag: 'starbase-app',
+      })
 
-      const result = await app.appFetch();
+      const result = await app.appFetch()
 
       // Keep only the app object properties that we want in the result.
       const authInfo = _.pick(result, [
-        "app.id",
-        "app.clientId",
-        "app.redirectURL",
-        "app.scopes",
-      ]);
+        'app.id',
+        'app.clientId',
+        'app.redirectURL',
+        'app.scopes',
+      ])
 
-      return openrpc.response(request, authInfo);
-    },
+      return openrpc.response(request, authInfo)
+    }
   ),
-});
+})
 
 // kb_initPlatform
 // -----------------------------------------------------------------------------
@@ -378,15 +370,15 @@ const kb_appAuthInfo = openrpc.method(schema, {
 
 const kb_initPlatform = openrpc.extension(schema, {
   schema: {
-    name: "kb_initPlatform",
+    name: 'kb_initPlatform',
     params: [],
     result: {
-      name: "keys",
-      description: "The KV keys set during initialization",
+      name: 'keys',
+      description: 'The KV keys set during initialization',
       schema: {
-        type: "array",
+        type: 'array',
         items: {
-          "type": "string",
+          type: 'string',
         },
       },
     },
@@ -397,77 +389,96 @@ const kb_initPlatform = openrpc.extension(schema, {
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
-      const env = context.get(KEY_ENVIRONMENT);
-      const kv = context.get(KEY_FIXTURES);
+      const env = context.get(KEY_ENVIRONMENT)
+      const kv = context.get(KEY_FIXTURES)
       const ownerId = context.get(KEY_PLATFORM_OWNER)
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
-      const token = "FIXME";
+      const token = 'FIXME'
+
+      // The keys that were updated, i.e. for which we found fixture
+      // data, created a corresponding app core, and deleted the key.
+      const keys = []
 
       //
       // CONSOLE
       //
 
       // Fetch fixture data for "console" platform app.
-      const consoleName = "console";
-      const consoleKey = `${env}-${consoleName}`;
-      const consoleData = await kv.get(consoleKey, { type: "json" });
+      const consoleName = 'console'
+      const consoleKey = `${env}-${consoleName}`
+      const consoleData = await kv.get(consoleKey, { type: 'json' })
 
-      const con = await openrpc.discover(starbase, `${ownerId}/${consoleName}`, {
-        token,
-        tag: "starbase-app",
-      });
+      // If the key was not present we get a null response.
+      if (consoleData) {
+        const con = await openrpc.discover(
+          starbase,
+          `${ownerId}/${consoleName}`,
+          {
+            token,
+            tag: 'starbase-app',
+          }
+        )
 
-      const conResult = await con.appStore({
-        app: consoleData,
-      });
+        const conResult = await con.appStore({
+          app: consoleData,
+        })
 
-      // Delete the stored fixture data now that the DO has been created.
-      await kv.delete(consoleKey);
+        // Delete the stored fixture data now that the DO has been created.
+        await kv.delete(consoleKey)
+
+        keys.push(consoleKey)
+      }
 
       //
       // THREEID
       //
 
       // Fetch fixture data for "threeid" platform app.
-      const threeidName = "threeid";
-      const threeidKey = `${env}-${threeidName}`;
-      const threeidData = await kv.get(threeidKey, { type: "json" });
+      const threeidName = 'threeid'
+      const threeidKey = `${env}-${threeidName}`
+      const threeidData = await kv.get(threeidKey, { type: 'json' })
 
-      const threeid = await openrpc.discover(starbase, `${ownerId}/${threeidName}`, {
-        token,
-        tag: "starbase-app",
-      });
+      // If the key was not present we get a null response.
+      if (threeidData) {
+        const threeid = await openrpc.discover(
+          starbase,
+          `${ownerId}/${threeidName}`,
+          {
+            token,
+            tag: 'starbase-app',
+          }
+        )
 
-      const threeidResult = await threeid.appStore({
-        app: threeidData,
-      });
+        const threeidResult = await threeid.appStore({
+          app: threeidData,
+        })
 
-      // Delete the stored fixture data now that the DO has been created.
-      await kv.delete(threeidKey);
+        // Delete the stored fixture data now that the DO has been created.
+        await kv.delete(threeidKey)
+
+        keys.push(threeidKey)
+      }
 
       // RESULT
 
       const result = {
-        invoked: "kb_initPlatform",
-        keys: [
-          consoleKey,
-          threeidKey,
-        ],
-      };
-      return openrpc.response(request, result);
-    },
+        invoked: 'kb_initPlatform',
+        keys,
+      }
+      return openrpc.response(request, result)
+    }
   ),
-});
+})
 
 // Service
 // -----------------------------------------------------------------------------
 // Define an OpenRPC service.
 
 // This service doesn't current require scopes to invoke RPC methods.
-const scopes = noScope;
+const scopes = noScope
 
 // These are the implementations of the RPC methods described in the schema.
 const methods = openrpc.methods(schema, [
@@ -476,28 +487,20 @@ const methods = openrpc.methods(schema, [
   kb_appFetch,
   kb_appList,
   kb_appStore,
-]);
+])
 
 // These are RPC methods not described in the schema but which are provided
 // by the service.
-const extensions = openrpc.extensions(schema, [
-  kb_initPlatform,
-]);
+const extensions = openrpc.extensions(schema, [kb_initPlatform])
 
 // Configuration options for the API.
 const options = openrpc.options({
   // Enable OpenRPC service discovery.
   rpcDiscover: true,
-});
+})
 
 // Supply implementations for all of the API methods in the schema.
-const service = openrpc.service(
-  schema,
-  scopes,
-  methods,
-  extensions,
-  options,
-);
+const service = openrpc.service(schema, scopes, methods, extensions, options)
 
 // Handler
 // -----------------------------------------------------------------------------
@@ -510,10 +513,10 @@ const service = openrpc.service(
 // returning a 404 *unless* the request happens to be the root path.
 // If the base path is the same as the root path, you will need to handle
 // any request that isn't to the root path yourself.
-const basePath = "/";
+const basePath = '/'
 
 // The RPC resource endpoint; requests to this path are handled as RPC requests.
-const rootPath = "/openrpc";
+const rootPath = '/openrpc'
 
 // Construct a sequence of middleware to execute before any RPC methods
 // are invoked. These may short-circuit, directly returning a response
@@ -532,17 +535,12 @@ const chain = openrpc.chain([
   mwDatadog,
   // Construct an Oort client for talking to the Kubelt backend.
   mwOort,
-]);
+])
 
 // The returned handler validates the incoming request, routes it to the
 // correct method handler, and executes the handler on the request to
 // generate the response.
-const rpcHandler = openrpc.build(
-  service,
-  basePath,
-  rootPath,
-  chain,
-);
+const rpcHandler = openrpc.build(service, basePath, rootPath, chain)
 
 // Environment
 // -----------------------------------------------------------------------------
@@ -554,7 +552,7 @@ export interface Env {
   // Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 
   // The source of fixture data for platform app cores.
-  FIXTURES: KVNamespace;
+  FIXTURES: KVNamespace
 
   // Durable Objects
   // ---------------------------------------------------------------------------
@@ -562,15 +560,15 @@ export interface Env {
 
   // A component representing a single Starbase application. This includes an OAuth
   // configuration profile and other metadata about the application.
-  STARBASE_APP: StarbaseApplication;
+  STARBASE_APP: StarbaseApplication
 
   // A component representing a proxied smart contract. Can be configured to proxy requests
   // to the remote contract, providing value-added capabilities along the way.
-  STARBASE_CONTRACT: StarbaseContract;
+  STARBASE_CONTRACT: StarbaseContract
 
   // A component representing a Starbase user. Manages the references to other components
   // That the user owns.
-  STARBASE_USER: StarbaseUser;
+  STARBASE_USER: StarbaseUser
 
   // Buckets
   // ---------------------------------------------------------------------------
@@ -589,16 +587,16 @@ export interface Env {
   // ---------------------------------------------------------------------------
 
   // The name of the current deployment environment.
-  ENVIRONMENT: string,
+  ENVIRONMENT: string
 
   // The name of the owner of platform app cores.
-  PLATFORM_OWNER: string,
+  PLATFORM_OWNER: string
 
   // Secrets
   // ---------------------------------------------------------------------------
 
   // Datadog client token.
-  DATADOG_TOKEN: string,
+  DATADOG_TOKEN: string
 }
 
 // Worker
@@ -632,8 +630,6 @@ export default {
     // - store data files in a KV and special case fetch them?
     // - add kbt_init handler that creates the fixtures, then invoke it from wrangler.toml build command?
 
-
-
     // Use this Map to inject per-request context into the request
     // handlers. This might include:
     // - environment variables
@@ -653,28 +649,28 @@ export default {
     // NBB: secrets are set via the dashboard or using the wrangler CLI tool.
 
     // TODO allow context to be initialized in this function.
-    const context = openrpc.context();
+    const context = openrpc.context()
 
     // A secret value; the API token for Datadog metrics collection.
-    context.set('com.datadog/token', env.DATADOG_TOKEN);
+    context.set('com.datadog/token', env.DATADOG_TOKEN)
 
     // Store the current environment name.
-    context.set(KEY_ENVIRONMENT, env.ENVIRONMENT);
+    context.set(KEY_ENVIRONMENT, env.ENVIRONMENT)
 
     // Store the name of the owner of platform app cores.
-    context.set(KEY_PLATFORM_OWNER, env.PLATFORM_OWNER);
+    context.set(KEY_PLATFORM_OWNER, env.PLATFORM_OWNER)
 
     // A KV store containing fixture data.
-    context.set(KEY_FIXTURES, env.FIXTURES);
+    context.set(KEY_FIXTURES, env.FIXTURES)
 
     // A durable object containing Starbase App state.
-    context.set(KEY_APPLICATION, env.STARBASE_APP);
+    context.set(KEY_APPLICATION, env.STARBASE_APP)
     // A durable object containing Starbase App state.
-    context.set(KEY_CONTRACT, env.STARBASE_CONTRACT);
+    context.set(KEY_CONTRACT, env.STARBASE_CONTRACT)
     // A durable object containing Starbase App state.
-    context.set(KEY_USER, env.STARBASE_USER);
+    context.set(KEY_USER, env.STARBASE_USER)
 
     // NB: the handler clones the request; we don't need to do it here.
-    return rpcHandler(request, context);
+    return rpcHandler(request, context)
   },
-};
+}

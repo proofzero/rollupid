@@ -2,19 +2,17 @@
  * @file impl/schema.ts
  */
 
-import invariant from "tiny-invariant";
+import invariant from 'tiny-invariant'
 
-import { isIterable } from "./utility";
+import { isIterable } from './utility'
 
-import type {
-  RpcSchema,
-} from "../index";
+import type { RpcSchema } from '../index'
 
 // Types
 // -----------------------------------------------------------------------------
 
 // A function that takes a $ref and dereferences it to returns the result.
-type LookupFn = (ref: string) => any;
+type LookupFn = (ref: string) => any
 
 // makeLookupFn
 // -----------------------------------------------------------------------------
@@ -28,16 +26,16 @@ type LookupFn = (ref: string) => any;
 // an in-schema reference.
 function makeLookupFn(schema: RpcSchema): LookupFn {
   return (ref: string): any => {
-    const parts = ref.split("/");
-    invariant(parts[0] === "#", "expected a JSON Pointer for same document");
+    const parts = ref.split('/')
+    invariant(parts[0] === '#', 'expected a JSON Pointer for same document')
     // Drop the initial '#' and iterate over the remaining path segments.
-    let cursor = schema;
+    let cursor = schema
     for (const part of parts.slice(1)) {
-      cursor = cursor[part];
+      cursor = cursor[part]
     }
-    return cursor;
-  };
-};
+    return cursor
+  }
+}
 
 // expand
 // -----------------------------------------------------------------------------
@@ -71,5 +69,5 @@ export function expand(schema: RpcSchema, lookup: LookupFn): RpcSchema {
     }
   }
   */
-  return schema;
-};
+  return schema
+}
