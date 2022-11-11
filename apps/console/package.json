@@ -2,7 +2,7 @@
   "name": "console",
   "version": "0.1.0",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s \"build:*\"",
@@ -19,10 +19,10 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint ."
   },
   "dependencies": {
-    "@headlessui/react": "1.7.3",
-    "@heroicons/react": "2.0.12",
-    "@remix-run/cloudflare": "1.7.3",
-    "@remix-run/cloudflare-workers": "1.7.3",
+    "@headlessui/react": "1.7.4",
+    "@heroicons/react": "2.0.13",
+    "@remix-run/cloudflare": "1.7.5",
+    "@remix-run/cloudflare-workers": "1.7.5",
     "@remix-run/react": "1.7.3",
     "@tailwindcss/forms": "0.5.3",
     "bcryptjs": "2.4.3",
@@ -36,16 +36,15 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
-    "@remix-run/dev": "1.7.3",
-    "@remix-run/eslint-config": "1.7.3",
-    "@types/react": "18.0.22",
-    "@types/react-dom": "18.0.7",
-    "eslint": "8.26.0",
-    "miniflare": "2.10.0",
+    "@remix-run/dev": "1.7.5",
+    "@remix-run/eslint-config": "1.7.5",
+    "@types/react": "18.0.25",
+    "@types/react-dom": "18.0.8",
+    "eslint": "8.27.0",
     "npm-run-all": "4.1.5",
-    "tailwindcss": "3.2.1",
+    "tailwindcss": "3.2.4",
     "typescript": "4.8.4",
-    "wrangler": "2.1.15",
+    "wrangler": "2.2.1",
     "yarn-run-all": "3.1.1"
   },
   "engines": {
