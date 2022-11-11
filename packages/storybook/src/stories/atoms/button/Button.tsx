@@ -1,9 +1,6 @@
 import React, { ReactNode, useRef } from 'react'
 import classNames from 'classnames'
-import {
-  Button as BaseButton,
-  ButtonProps as BaseButtonProps,
-} from '@teambit/base-react.buttons.button'
+import { IconButton as BaseButton, IconButtonProps } from '@codecademy/gamut'
 
 import styles from './button.module.scss'
 
@@ -11,27 +8,24 @@ export type Sizes = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 export type ButtonProps = {
   disabled?: boolean
-
   alt?: boolean
-
   secondary?: boolean
   tertiary?: boolean
-
   size?: Sizes
-
   className?: string
-
   children?: ReactNode
-} & BaseButtonProps
+  onClick?: () => void
+} & IconButtonProps
 
 export function Button({
-  children,
-  className,
+  disabled,
   alt,
   secondary,
   tertiary,
-  disabled,
   size,
+  className,
+  children,
+  onClick,
   ...rest
 }: ButtonProps) {
   const altClass = alt ? styles.alt : styles.primary
@@ -54,6 +48,7 @@ export function Button({
         disabledClass,
         sizeClass
       )}
+      onClick={onClick}
     >
       {children}
     </BaseButton>

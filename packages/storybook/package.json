@@ -6,6 +6,8 @@
     "@codecademy/gamut-kit": "0.6.228",
     "@emotion/react": "11.10.5",
     "@emotion/styled": "11.10.5",
+    "@kaizen/button": "2.0.5",
+    "@kaizen/component-library": "16.1.7",
     "@primer/react": "35.14.2",
     "@storybook/design-system": "7.9.0",
     "cra-template-typescript": "1.2.0",
@@ -66,6 +68,8 @@
     "@storybook/react": "6.5.13",
     "@storybook/testing-library": "0.0.13",
     "@teambit/base-react.buttons.button": "1.96.5",
+    "@teambit/base-react.theme.theme-provider": "1.96.5",
+    "@teambit/design.theme.icons-font": "2.0.24",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "babel-plugin-named-exports-order": "0.0.2",
@@ -89,6 +93,16 @@
     "style-loader": "3.3.1",
     "wagmi": "0.8.1",
     "webpack": "5.75.0"
+  },
+  "peerDependencies": {
+    "@codecademy/gamut": "*",
+    "@codecademy/gamut-icons": "*",
+    "@codecademy/gamut-illustrations": "*",
+    "@codecademy/gamut-labs": "*",
+    "@codecademy/gamut-patterns": "*",
+    "@codecademy/gamut-styles": "*",
+    "@codecademy/gamut-tests": "*",
+    "@codecademy/variance": "*"
   },
   "readme": "ERROR: No README data found!",
   "_id": "@proofzero/storybook@0.1.0"

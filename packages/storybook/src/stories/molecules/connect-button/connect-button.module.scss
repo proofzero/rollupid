@@ -1,0 +1,20 @@
+.button {
+  width: 328px;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  margin: 7px 0px;
+}
+
+.icon {
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 20px;
+  width: 20px;
+  margin: 0 7px;
+}
+
+.walletIcon {
+  background-image: url('./wallets.svg');
+}
