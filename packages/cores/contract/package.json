@@ -15,7 +15,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "@kubelt/openrpc": "*",
+    "@kubelt/openrpc": "workspace:*",
     "cross-env": "7.0.3"
   },
   "devDependencies": {

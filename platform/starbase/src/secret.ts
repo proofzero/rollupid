@@ -5,7 +5,7 @@
  * application record.
  */
 
-import { CID } from "multiformats/cid";
+import { CID } from 'multiformats/cid'
 
 // json
 // -----------------------------------------------------------------------------
@@ -26,20 +26,20 @@ import * as json from 'multiformats/codecs/json'
 // NB: This works when deployed on CF, we don't need to bother with
 // building our own MultihashHasher.
 
-import { sha256 } from "multiformats/hashes/sha2";
+import { sha256 } from 'multiformats/hashes/sha2'
 
 // hash
 // -----------------------------------------------------------------------------
 
 export async function hash(s: string): Promise<string> {
-  const bytes = await sha256.digest(json.encode(s));
-  const cid = CID.create(1, json.code, bytes);
-  return cid.toString();
-};
+  const bytes = await sha256.digest(json.encode(s))
+  const cid = CID.create(1, json.code, bytes)
+  return cid.toString()
+}
 
 // parse
 // -----------------------------------------------------------------------------
 
 export function parse(s: string): CID {
-  return CID.parse(s);
-};
+  return CID.parse(s)
+}

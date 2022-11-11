@@ -1,11 +1,7 @@
+// @kubelt/openrpc:middleware/local.ts
+
 /**
- * @file component/local.ts
- *
- * Middleware handlers take a request and a context object accumulated
- * up to the current point, and return an updated context
- * object. Requests are read-only, so this provides an opportunity to
- * provide context information to the RPC request handlers that perform
- * the work of the service.
+ * Defines a middleware that rejects any non-local requests.
  */
 
 // TODO implement guards for middleware that assert what data they expect to be in the context
@@ -16,12 +12,9 @@
 // namespace that is used to constrain what values are injected into the
 // context.
 
-import type {
-  RpcContext,
-  RpcRequest,
-} from "@kubelt/openrpc";
+import type { RpcContext } from '@kubelt/openrpc'
 
-import * as openrpc from "@kubelt/openrpc";
+import * as openrpc from '@kubelt/openrpc'
 
 // local
 // -----------------------------------------------------------------------------
@@ -34,35 +27,35 @@ import * as openrpc from "@kubelt/openrpc";
  * configured).
  */
 export default openrpc.middleware(
-  async (
-    request: Readonly<Request>,
-    context: Readonly<RpcContext>,
-  ) => {
+  async (request: Readonly<Request>, context: Readonly<RpcContext>) => {
     // NB: These are the request headers that seem relevant to the
     // determination of whether or not the incoming request is from a
     // bound service. Once we have an approach that is known good,
     // remove reference to any unnecessary headers.
 
     // "http", "https"
-    const forwardedProto = request.headers.get("x-forwarded-proto");
+    //const forwardedProto = request.headers.get("x-forwarded-proto");
+
     // Request host, including port number if supplied.
-    const hostIP = request.headers.get("host");
+    //const hostIP = request.headers.get("host");
+
     // E.g. "127.0.0.1"
-    const realIP = request.headers.get("x-real-ip");
+    //const realIP = request.headers.get("x-real-ip");
+
     // E.g. "127.0.0.1"
-    const connectingIP = request.headers.get("cf-connecting-ip");
+    const connectingIP = request.headers.get('cf-connecting-ip')
 
     //console.log(forwardedProto, hostIP, realIP, connectingIP);
 
-    const allowedOrigin = "127.0.0.1";
+    const allowedOrigin = '127.0.0.1'
 
     if (connectingIP === allowedOrigin) {
       // Allow middleware chain to continue.
-      return context;
+      return context
     }
 
-    const message = `rejecting request from non-local address: ${connectingIP}`;
-    console.warn(message);
+    const message = `rejecting request from non-local address: ${connectingIP}`
+    console.warn(message)
 
     // Should we return a JSON-RPC response? If so, the following call
     // required an RpcRequest as first argument, rather than a Request.
@@ -79,6 +72,6 @@ export default openrpc.middleware(
     // Return a response to short-circuit execution of the middleware.
     // - 401 Unauthorized: must authenticate for access
     // - 403 Forbidden: authenticated (client ID known), but not allowed
-    return new Response(message, { status: 401 });
-  },
-);
+    return new Response(message, { status: 401 })
+  }
+)

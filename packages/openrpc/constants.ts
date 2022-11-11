@@ -6,4 +6,4 @@
 //
 // TODO once extracted and validated, pass in the RpcRequest instance as
 // an additional handler parameter alongside request and context?
-export const REQUEST_CONTEXT_KEY = "com.kubelt.openrpc/request";
+export const REQUEST_CONTEXT_KEY = 'com.kubelt.openrpc/request'

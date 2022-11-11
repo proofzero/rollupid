@@ -2,7 +2,7 @@
  * @file impl/context.ts
  */
 
-import * as _ from "lodash";
+import * as _ from 'lodash'
 
 // RpcContext
 // -----------------------------------------------------------------------------
@@ -20,18 +20,18 @@ import * as _ from "lodash";
 //     }
 //   }
 // }
-export class RpcContext extends Map<string|Symbol, any> {
-  get(k: string|Symbol): any {
+export class RpcContext extends Map<string | Symbol, any> {
+  get(k: string | Symbol): any {
     if (k instanceof Symbol) {
-      k = k.toString();
+      k = k.toString()
     }
-    return _.get(this, k);
+    return _.get(this, k)
   }
-  set(k: string|Symbol, v: any): this {
+  set(k: string | Symbol, v: any): this {
     if (k instanceof Symbol) {
-      k = k.toString();
+      k = k.toString()
     }
-    _.set(this, k, v);
-    return this;
+    _.set(this, k, v)
+    return this
   }
-};
+}

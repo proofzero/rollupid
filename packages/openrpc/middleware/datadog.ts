@@ -1,29 +1,23 @@
+// @kubelt/openrpc:middleware/datadog.ts
+
 /**
- * @file src/middleware/datadog.ts
+ * Provides a middleware that injects a Datadog
  */
 
-import type {
-  RpcContext,
-  RpcRequest,
-} from "@kubelt/openrpc";
+import type { RpcContext } from '@kubelt/openrpc'
 
-import * as openrpc from "@kubelt/openrpc";
+import * as openrpc from '@kubelt/openrpc'
 
 // datadog
 // -----------------------------------------------------------------------------
+// TODO add constructor function to inject secrets/config and return this fn.
 
 /**
- * An extension that injects a Datadog client into the context.
- *
- * @todo add constructor function to inject secrets/config and return
- * this fn.
+ * A middleware that injects a Datadog client into the context.
  */
 export default openrpc.middleware(
-  async (
-    request: Readonly<Request>,
-    context: Readonly<RpcContext>,
-  ) => {
+  async (request: Readonly<Request>, context: Readonly<RpcContext>) => {
     // TODO
-    return context;
-  },
-);
+    return context
+  }
+)
