@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "An OpenRPC framework for Cloudflare Workers",
   "scripts": {
+    "build:dev": "tsc",
     "build:test": "node build.js",
+    "docs": "run-s build:* docs:*",
+    "docs:build": "api-extractor run --local",
     "format": "run-s format:src",
     "format:src": "prettier --write *.ts component/ impl/ middleware/",
     "format:check": "run-s format:check:*",
@@ -37,6 +40,7 @@
   },
   "dependencies": {
     "@cfworker/json-schema": "1.12.5",
+    "@microsoft/api-extractor": "7.33.6",
     "@open-rpc/meta-schema": "1.14.2",
     "cross-env": "7.0.3",
     "itty-router": "2.6.6",

@@ -223,3 +223,6 @@ act.secrets
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# api-extractor
+temp

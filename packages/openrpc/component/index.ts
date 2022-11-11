@@ -169,7 +169,7 @@ function mwCheckScopes(scopes: Readonly<RequiredScopes>): MiddlewareFn {
  * decorators at runtime does *not* do this for you.
  */
 export function component(schema: Readonly<RpcSchema>) {
-  return function <T extends { new (...args: any[]): {} }>(constructor: T) {
+  return function <T extends { new (...args: any[]): {} }>(constructor: T): T {
     // Various decorators are applied to the class, methods, etc. the
     // configuration from which is stored on the class constructor. We
     // retrieve that data and delete the corresponding property as it
