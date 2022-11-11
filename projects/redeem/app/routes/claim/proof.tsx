@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useWindowWidth, useWindowHeight } from "@react-hook/window-size";
-import Confetti from "react-confetti";
+import { useEffect, useState } from 'react'
+import { useWindowWidth, useWindowHeight } from '@react-hook/window-size'
+import Confetti from 'react-confetti'
 
 import {
   Form,
@@ -8,120 +8,127 @@ import {
   useLoaderData,
   useActionData,
   useTransition,
-} from "@remix-run/react";
+} from '@remix-run/react'
 
-import { json, redirect } from "@remix-run/cloudflare";
+import { json, redirect } from '@remix-run/cloudflare'
 
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage } from 'wagmi'
 
-import { verifyMessage } from "ethers/lib/utils";
+import { verifyMessage } from 'ethers/lib/utils'
 import {
   getCachedVoucher,
   putCachedVoucher,
   fetchVoucher,
-} from "~/helpers/voucher";
+} from '~/helpers/voucher'
 
-import { Button, ButtonSize, ButtonType } from "~/components/buttons";
-import Spinner from "~/components/spinner";
+import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import Spinner from '~/components/spinner'
 import Text, {
   TextColor,
   TextSize,
   TextWeight,
-} from "~/components/typography/Text";
+} from '~/components/typography/Text'
 
-import { oortSend } from "~/utils/rpc.server";
+import { oortSend } from '~/utils/rpc.server'
 import {
   createUserSession,
   createNonceSession,
   getNonceSession,
-} from "~/utils/session.server";
+} from '~/utils/session.server'
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const url = new URL(request.url);
-  const invite = url.searchParams.get("invite");
-  const address = url.searchParams.get("address");
+  const url = new URL(request.url)
+  const invite = url.searchParams.get('invite')
+  const address = url.searchParams.get('address')
 
   if (!address) {
-    throw json("No address provided", { status: 400 });
+    throw json('No address provided', { status: 400 })
   }
 
   //@ts-ignore
-  const voucher = await getCachedVoucher(address);
-  const proof = await PROOFS.get(address, { type: "json" });
+  const voucher = await getCachedVoucher(address)
+  const proof = await PROOFS.get(address, { type: 'json' })
   if (proof) {
-    return redirect(`/claim/complete?address=${address}`);
+    return redirect(`/claim/complete?address=${address}`)
   }
 
-  const messageTemplate = `I'm claiming my decentralized identity! {{nonce}}`;
+  const messageTemplate = `I'm claiming my decentralized identity! {{nonce}}`
 
-  const session = await getNonceSession(request);
-  const jwt = session.get("jwt");
+  const session = await getNonceSession(request)
+  const jwt = session.get('jwt')
   if (jwt) {
-    redirect("https://3id.kubelt.com/account");
+    redirect('https://3id.kubelt.com/account')
   }
-  let nonce = session.get("nonce");
+  let nonce = session.get('nonce')
   if (!nonce) {
     // @ts-ignore
     const nonceRes = await oortSend(
-      "kb_getNonce",
+      'kb_getNonce',
       [
         address,
         messageTemplate,
-        { "3id.profile": ["read", "write"], "3id.app": ["read", "write"] },
+        { '3id.profile': ['read', 'write'], '3id.app': ['read', 'write'] },
       ],
       { address: address }
-    );
+    )
     // reload page with nonce stored in session
     return createNonceSession(
       nonceRes.result.nonce,
       `/claim/proof?address=${address}`
-    );
+    )
   }
 
-  const signingMessage = messageTemplate.replace("{{nonce}}", nonce);
+  const signingMessage = messageTemplate.replace('{{nonce}}', nonce)
 
   return json({
     invite,
     signingMessage,
     voucher,
     nonce,
-  });
-};
+  })
+}
 
 // @ts-ignore
 export const action = async ({ request }) => {
   // get tweet url from link
-  const form = await request.formData();
-  const address = form.get("address");
-  const message = form.get("message");
-  const tweetstatus = form.get("tweetstatus");
-  const nonce = form.get("nonce");
-  const statusId = tweetstatus.substring(tweetstatus.lastIndexOf("/") + 1);
+  const form = await request.formData()
+  const address = form.get('address')
+  const message = form.get('message')
+  const tweetstatus = form.get('tweetstatus')
+  const nonce = form.get('nonce')
+  const statusId = tweetstatus.substring(tweetstatus.lastIndexOf('/') + 1)
 
   const tweetsRes = await fetch(
     `https://api.twitter.com/2/tweets?ids=${statusId}`,
     {
-      method: "GET",
+      method: 'GET',
       headers: {
         // @ts-ignore
         Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
       },
     }
-  );
+  )
 
-  if (tweetsRes.status != 200) {
+  if (tweetsRes?.status != 200) {
     return json(
       { error: `Invalid tweet status: ${tweetsRes.statusText}` },
       { status: tweetsRes.status }
-    );
+    )
   }
-  const tweets = await tweetsRes.json();
-  const tweet = tweets.data[0].text;
-  const signature = tweet.split("sig:")[1];
+  const tweets = await tweetsRes.json()
+  if (!tweets?.data || tweets.data.length == 0) {
+    return json({ error: `Invalid tweet status` }, { status: 400 })
+  }
+  const tweet = tweets?.data[0].text
+  const signature = tweet.split('sig:')[1]
+
+  if (!signature) {
+    return json({ error: 'Invalid tweet status' }, { status: 400 })
+  }
 
   // Verify signature when sign message succeeds
-  const recoveredAddress = verifyMessage(message, signature);
+  const recoveredAddress = verifyMessage(message, signature)
 
   if (recoveredAddress == address) {
     // store that the proof has been sucessfully posted to twitter
@@ -129,26 +136,26 @@ export const action = async ({ request }) => {
     await PROOFS.put(
       address,
       JSON.stringify({ statusId, tweet, signature, message })
-    );
+    )
 
     // boostrap the pfp image
-    let voucher = await getCachedVoucher(address);
+    let voucher = await getCachedVoucher(address)
     if (!voucher) {
       try {
-        voucher = await fetchVoucher({ address, skipImage: false });
-        voucher = await putCachedVoucher(address, voucher);
+        voucher = await fetchVoucher({ address, skipImage: false })
+        voucher = await putCachedVoucher(address, voucher)
       } catch (e) {
-        console.error("error fetching voucher", e);
+        console.error('error fetching voucher', e)
       }
     }
 
     try {
       if (nonce) {
-        const signRes = await oortSend("kb_verifyNonce", [nonce, signature], {
+        const signRes = await oortSend('kb_verifyNonce', [nonce, signature], {
           address: address,
-        }); // TODO remove address param when RPC url is changed
+        }) // TODO remove address param when RPC url is changed
 
-        console.log("signRes", signRes);
+        console.log('signRes', signRes)
 
         // the nonce may have expired. We would still be able to validate the signature
         // but not log the user in
@@ -158,66 +165,71 @@ export const action = async ({ request }) => {
             signRes.result,
             `https://3id.kubelt.com/account`,
             address
-          );
+          )
         }
       }
     } catch (e) {
-      console.error("error verifying nonce", e);
+      console.error('error verifying nonce', e)
     }
 
-    return redirect(`/claim/complete?address=${address}`);
+    return redirect(`/claim/complete?address=${address}`)
   }
-  return json({ error: "Invalid signature" }, { status: 400 });
-};
+  return json({ error: 'Invalid signature' }, { status: 400 })
+}
 
 export default function Proof() {
-  const [showVerify, setShowVerify] = useState(false);
-  const [tweetStatus, setTweetStatus] = useState("");
-  const [tweetId, setTweetId] = useState("");
-  const [message, setMessage] = useState("");
-  const [signature, setSignature] = useState("");
+  const { signingMessage, invite, proof, voucher, nonce } = useLoaderData()
+  const proofError = useActionData()
+  const tranistion = useTransition()
 
-  const { signingMessage, invite, proof, voucher, nonce } = useLoaderData();
-  const proofError = useActionData();
-  const tranistion = useTransition();
+  const [showVerify, setShowVerify] = useState(false)
+  const [tweetStatus, setTweetStatus] = useState('')
+  const [tweetId, setTweetId] = useState('')
+  const [message, setMessage] = useState('')
+  const [signature, setSignature] = useState('')
+  const [submitError, setSubmitError] = useState(proofError?.error)
 
   // NOTE: state is all messed if we render this component with SSR
-  if (typeof document === "undefined") {
-    return null;
+  if (typeof document === 'undefined') {
+    return null
   }
 
-  const { address, isConnected } = useAccount();
+  const { address, isConnected } = useAccount()
   const { data, error, isLoading, signMessage } = useSignMessage({
     onSuccess(data, variables) {
-      setMessage(variables.message.toString());
-      setSignature(data);
-      setShowVerify(true);
+      setMessage(variables.message.toString())
+      setSignature(data)
+      setShowVerify(true)
 
       // Show tweet status verification
       // setTweetStatus(`I'm claiming my decentralized identity @threeid_xyz https://3id.kubelt.com/${address} %23Web3 sig:${data.toString()}`);
       setTweetStatus(
         `I'm claiming my decentralized identity @threeid_xyz https://get.threeid.xyz %23Web3 sig:${data.toString()}`
-      );
+      )
     },
-  });
+  })
 
-  let navigate = useNavigate();
+  let navigate = useNavigate()
 
   useEffect(() => {
     if (!isConnected) {
-      navigate(`${invite ? `/${invite}` : "/"}`);
+      navigate(`${invite ? `/${invite}` : '/'}`)
     }
-  }, [isConnected]);
+  }, [isConnected])
+
+  useEffect(() => {
+    setSubmitError(proofError?.error)
+  }, [proofError])
 
   const handleProof = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${tweetStatus}`);
-    setShowVerify(true);
-  };
+    window.open(`https://twitter.com/intent/tweet?text=${tweetStatus}`)
+    setShowVerify(true)
+  }
 
   return (
     <div className="mx-auto justify-center items-center text-center">
       <Text size={TextSize.XL4} weight={TextWeight.SemiBold600}>
-        {!showVerify ? "Verify your account" : "Verify your identity"}
+        {!showVerify ? 'Verify your account' : 'Verify your identity'}
       </Text>
       <Text
         className="mt-4 mb-8"
@@ -225,8 +237,8 @@ export default function Proof() {
         weight={TextWeight.Regular400}
       >
         {!showVerify
-          ? "Sign this message with your wallet to verify account ownership"
-          : "Verify your identity by tweeting the signed message"}
+          ? 'Sign this message with your wallet to verify account ownership'
+          : 'Verify your identity by tweeting the signed message'}
       </Text>
 
       <div className="flex flex-1 flex-col mt-2 gap-4 bg-white p-8 text-left break-words">
@@ -236,8 +248,8 @@ export default function Proof() {
         <div
           className="min-h-36 p-4 leading-6 text-lg break-words whitespace-pre-wrap max-w-2xl"
           style={{
-            backgroundColor: "#F9FAFB",
-            color: !showVerify ? "#D1D5DB" : "inherit",
+            backgroundColor: '#F9FAFB',
+            color: !showVerify ? '#D1D5DB' : 'inherit',
           }}
         >
           {/* I'm claiming my decentralized identity @threeid_xyz https://3id.kubelt.com/{address} #Web3 sig:{signature} */}
@@ -291,7 +303,21 @@ export default function Proof() {
               placeholder="https://twitter.com/username/status/1234567890"
               autoFocus={true}
               required={true}
-              onChange={(event) => setTweetId(event.target.value)}
+              onChange={(event) => {
+                try {
+                  setSubmitError(null)
+                  setTweetId(event.target.value)
+                  const url = new URL(event.target.value)
+                  if (url.hostname === 'twitter.com') {
+                    const formatted = `${url.origin}${url.pathname}`
+                    setTweetId(formatted)
+                    return
+                  }
+                  setSubmitError('Invalid tweet URL')
+                } catch (e) {
+                  setSubmitError('Invalid tweet URL')
+                }
+              }}
               value={tweetId}
               className="w-full py-4 px-2 flex flex-1 border border-slate-700"
             />
@@ -319,17 +345,17 @@ export default function Proof() {
             <button
               className="py-4 px-6 rounded w-full text-white font-bold"
               style={{
-                backgroundColor: "#1F2937",
+                backgroundColor: '#1F2937',
               }}
               type="submit"
               disabled={!tweetId}
             >
-              {tranistion.state !== "loading" ? "Validate" : <Spinner />}
+              {tranistion.state !== 'loading' ? 'Validate' : <Spinner />}
             </button>
-            {proofError && <p className="error">{proofError.error}</p>}
+            {submitError && <p className="error">{submitError}</p>}
           </Form>
         </div>
       )}
     </div>
-  );
+  )
 }
