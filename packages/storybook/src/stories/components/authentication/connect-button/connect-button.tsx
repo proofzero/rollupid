@@ -2,10 +2,16 @@ import React, { ReactNode, useEffect, useState } from 'react'
 import { Button, ButtonProps } from '../../../modules/button/Button'
 import classNames from 'classnames'
 
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
+// import { alchemyProvider } from 'wagmi/providers/alchemy'
+import { publicProvider } from 'wagmi/providers/public'
+import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 
-// import styles from './authentication.module.scss';
+function deconstructConnectors(connectors: Connector<any, any, any>[]) {
+  return {
+    injectedConnector: connectors.find((c) => c.id === 'injected'),
+    wcConnector: connectors.find((c) => c.id === 'walletConnect'),
+  }
+}
 
 export type ConnectButtonProps = {
   errorCallback: (error: Error) => void
@@ -18,9 +24,13 @@ export function ConnectButton({
   ...rest
 }: ConnectButtonProps) {
   const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect({
-      connector: new InjectedConnector(),
-    })
+    useConnect()
+
+  const { injectedConnector, wcConnector } = deconstructConnectors(connectors)
+
+  console.log('injected connectors', injectedConnector)
+  console.log('wc connectors', wcConnector)
+
   const { disconnect } = useDisconnect()
 
   const { address, isConnected, status } = useAccount()
@@ -43,10 +53,13 @@ export function ConnectButton({
       {status}
       <Button
         className={classNames(className)}
-        // tertiary
         disabled={status !== 'disconnected'}
         onPress={() => {
-          connect()
+          if (injectedConnector.ready) {
+            connect({ connector: wcConnector })
+          } else {
+            connect({ connector: wcConnector })
+          }
         }}
         {...rest}
       >

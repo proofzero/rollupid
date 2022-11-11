@@ -3,8 +3,15 @@ import { Button } from '../../modules/button/Button'
 import { BaseTheme } from '../../themes/base-theme/BaseTheme'
 import classNames from 'classnames'
 
-import { WagmiConfig, createClient } from 'wagmi'
-import { getDefaultProvider } from 'ethers'
+import {
+  WagmiConfig,
+  createClient,
+  defaultChains,
+  configureChains,
+} from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 import { ConnectButton } from './connect-button'
 
@@ -21,15 +28,36 @@ export enum SocialLoginProviders {
 // ...
 
 export type AuthenticationProps = {
-  provider?: any
   socialLoginProviders?: SocialLoginProviders[]
 }
 
-export function Authentication({ provider }: AuthenticationProps) {
+export function Authentication({ socialLoginProviders }: AuthenticationProps) {
   const [error, setError] = useState<Error | null>(null)
+
+  const { chains, provider, webSocketProvider } = configureChains(
+    defaultChains,
+    [publicProvider()] // TODO: add non default provider selection via props
+  )
+
   const client = createClient({
     autoConnect: false,
-    provider: provider || getDefaultProvider(),
+    connectors: [
+      new WalletConnectConnector({
+        chains,
+        options: {
+          qrcode: true,
+        },
+      }),
+      new InjectedConnector({
+        chains,
+        options: {
+          name: 'Injected',
+          shimDisconnect: true,
+        },
+      }),
+    ],
+    provider,
+    webSocketProvider,
   })
 
   function errorCallback(error: Error) {
@@ -45,10 +73,7 @@ export function Authentication({ provider }: AuthenticationProps) {
           tertiary
           errorCallback={errorCallback}
         >
-          <span
-            className={classNames(styles.icon, styles.walletIcon)}
-            onClick={() => null}
-          />
+          <span className={classNames(styles.icon, styles.walletIcon)} />
           Connect with Wallet
         </ConnectButton>
       </WagmiConfig>
