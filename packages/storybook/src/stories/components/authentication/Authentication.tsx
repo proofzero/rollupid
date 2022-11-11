@@ -28,10 +28,14 @@ export enum SocialLoginProviders {
 // ...
 
 export type AuthenticationProps = {
+  connectCallback: (address: string) => void
   socialLoginProviders?: SocialLoginProviders[]
 }
 
-export function Authentication({ socialLoginProviders }: AuthenticationProps) {
+export function Authentication({
+  socialLoginProviders,
+  connectCallback,
+}: AuthenticationProps) {
   const [error, setError] = useState<Error | null>(null)
 
   const { chains, provider, webSocketProvider } = configureChains(
@@ -66,11 +70,12 @@ export function Authentication({ socialLoginProviders }: AuthenticationProps) {
 
   return (
     <BaseTheme>
-      {error && <div>{error.message}</div>}
+      {/* {error && <div>{error.message}</div>} */}
       <WagmiConfig client={client}>
         <ConnectButton
           className={classNames(styles.button)}
           tertiary
+          connectCallback={connectCallback}
           errorCallback={errorCallback}
         >
           <span className={classNames(styles.icon, styles.walletIcon)} />

@@ -2,8 +2,6 @@ import React, { ReactNode, useEffect, useState } from 'react'
 import { Button, ButtonProps } from '../../../modules/button/Button'
 import classNames from 'classnames'
 
-// import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { publicProvider } from 'wagmi/providers/public'
 import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 
 function deconstructConnectors(connectors: Connector<any, any, any>[]) {
@@ -15,10 +13,12 @@ function deconstructConnectors(connectors: Connector<any, any, any>[]) {
 
 export type ConnectButtonProps = {
   errorCallback: (error: Error) => void
+  connectCallback: (address: string) => void
 } & ButtonProps
 
 export function ConnectButton({
   errorCallback,
+  connectCallback,
   className,
   children,
   ...rest
@@ -28,9 +28,6 @@ export function ConnectButton({
 
   const { injectedConnector, wcConnector } = deconstructConnectors(connectors)
 
-  console.log('injected connectors', injectedConnector)
-  console.log('wc connectors', wcConnector)
-
   const { disconnect } = useDisconnect()
 
   const { address, isConnected, status } = useAccount()
@@ -38,6 +35,7 @@ export function ConnectButton({
   useEffect(() => {
     if (isConnected) {
       console.log('Connected to wallet', address)
+      connectCallback(address)
     }
   }, [isConnected])
 
