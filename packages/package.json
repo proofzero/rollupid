@@ -9,7 +9,8 @@
   "scripts": {
     "start": "yarn workspaces foreach -i -v -p run start",
     "build": "yarn workspaces foreach -p -v -i run build",
-    "test": "yarn workspaces foreach -p -v -i run test"
+    "test": "yarn workspaces foreach -p -v -i run test",
+    "post-install": "yarn workspaces foreach -p -v -i --include packages/components run bit import && bit link"
   },
   "devDependencies": {
     "yarn-run-all": "3.1.1"

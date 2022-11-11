@@ -8,7 +8,7 @@ compatibility_date = "2022-04-05"
   bucket = "./public"
 
 [build]
-  command = "yarn generate:css && yarn build"
+  command = "yarn build && remix build --sourcemap"
 
 [dev]
 port = 9696
@@ -23,8 +23,12 @@ routes = [
 routes = [
   { pattern = "passport-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
+[env.next.build]
+  command = "yarn build && remix build"
 
 [env.current]
 routes = [
   { pattern = "passport-current.kubelt.com", custom_domain = true, zone_name = "kubelt.com" },
 ]
+[env.current.build]
+  command = "yarn build && remix build"

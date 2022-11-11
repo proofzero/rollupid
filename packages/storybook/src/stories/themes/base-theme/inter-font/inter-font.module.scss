@@ -1,0 +1,115 @@
+.interFont {
+  font-family: 'Inter', 'Gill Sans', 'Gill Sans MT', 'Helvetica Neue', Helvetica,
+    Arial, sans-serif;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-Light.ttf');
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-Medium.ttf');
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-SemiBold.ttf');
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-Bold.ttf');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./Inter-Bold.ttf');
+  font-weight: 700;
+}
+
+// /**
+//  * Define `@font-face` rules for font-family Circular Pro Book, including bold and italic.
+//  * Provides a handy class name to add to root component.
+//  */
+
+// // default
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-Regular.woff2');
+// }
+
+// // bold
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-Bold.woff2');
+//   font-weight: bold;
+// }
+
+// // // bold-er
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-Black.woff2');
+//   font-weight: 800;
+// }
+
+// // italic
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-Italic.woff2');
+//   font-style: italic;
+// }
+
+// // bold + italic
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-BoldItalic.woff2');
+//   font-style: italic;
+//   font-weight: bold;
+// }
+
+// // bold-er + italic
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CirculrXXWeb-BlackItalic.woff2');
+//   font-style: italic;
+//   font-weight: 800;
+// }
+
+// // light
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-light.woff2');
+//   font-weight: 300;
+// }
+
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-lightItalic.woff2');
+//   font-style: italic;
+//   font-weight: 300;
+// }
+
+// // medium (between regular and bold)
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-Medium.woff2');
+//   font-weight: 500;
+// }
+
+// @font-face {
+//   font-family: 'CircularXX';
+//   src: url('https://static.bit.dev/circular-xx/CircularXXWeb-MediumItalic.woff2');
+//   font-style: italic;
+//   font-weight: 500;
+// }
