@@ -1,5 +1,5 @@
 {
-  "name": "storybook",
+  "name": "@proofzero/storybook",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -14,7 +14,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "chromatic": "npx chromatic --project-token=a11e21c521b0"
   },
   "eslintConfig": {
     "extends": [
@@ -63,6 +64,7 @@
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "babel-plugin-named-exports-order": "^0.0.2",
+    "chromatic": "6.11.4",
     "css-loader": "6.7.1",
     "eslint": "8.27.0",
     "eslint-config-airbnb-typescript": "17.0.0",
@@ -82,5 +84,7 @@
     "style-loader": "3.3.1",
     "wagmi": "0.8.1",
     "webpack": "^5.75.0"
-  }
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "@proofzero/storybook@0.1.0"
 }

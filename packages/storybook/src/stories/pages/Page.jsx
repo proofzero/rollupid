@@ -6,7 +6,7 @@ export const Page = () => {
   return (
     <article>
       <section>
-        <h2>Pages in Storybook</h2>
+        <h2>Example Pages in Storybook</h2>
         <p>
           We recommend building UIs with a{' '}
           <a
