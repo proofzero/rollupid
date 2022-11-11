@@ -7,190 +7,190 @@ export interface BaseThemeSchema {
   /**
    * general purpose background color.
    */
-  backgroundColor: string;
+  backgroundColor: string
   /**
    * color of content on top of `onBackgroundColor`
    * (e.g. text, icons)
    */
-  onBackgroundColor: string;
+  onBackgroundColor: string
   /**
    * color of low-emphesis content on top of `onBackgroundColor`
    * (e.g. text, icons)
    */
-  onBackgroundLowColor: string;
+  onBackgroundLowColor: string
   /**
    * color of medium-emphesis content on top of `onBackgroundColor`
    * (e.g. text, icons)
    */
-  onBackgroundMediumColor: string;
+  onBackgroundMediumColor: string
   /**
    * color of high-emphesis content on top of `onBackgroundColor`
    * (e.g. text, icons)
    */
-  onBackgroundHighColor: string;
+  onBackgroundHighColor: string
 
   // accents colors:
 
   /**
    * primary color.
    */
-  primaryColor: string;
+  primaryColor: string
   /**
    * color of content on top of `primaryColor`
    */
-  onPrimaryColor: string;
+  onPrimaryColor: string
 
   // borders:
 
   /**
    * color of the border (neutral)
    */
-  borderMediumColor: string;
+  borderMediumColor: string
   /**
    * color of the border (neutral), when in :hover
    */
-  borderMediumHoverColor: string;
+  borderMediumHoverColor: string
   /**
    * color of the border (neutral), when in :focus
    */
-  borderMediumFocusColor: string;
+  borderMediumFocusColor: string
   /**
    * color of the border (neutral), when in :active
    */
-  borderMediumActiveColor: string;
+  borderMediumActiveColor: string
   /**
    * color of high-emphesis border (neutral)
    */
-  borderHighColor: string;
+  borderHighColor: string
   /**
    * color of high-emphesis border (neutral), when in :hover
    */
-  borderHighHoverColor: string;
+  borderHighHoverColor: string
   /**
    * color of high-emphesis border (neutral), when in :focus
    */
-  borderHighFocusColor: string;
+  borderHighFocusColor: string
   /**
    * color of high-emphesis border (neutral), when in :active
    */
-  borderHighActiveColor: string;
+  borderHighActiveColor: string
   /**
    * primary color of the border
    */
-  borderPrimaryColor: string;
+  borderPrimaryColor: string
   /**
    * primary color of the border when in :hover
    */
-  borderPrimaryHoverColor: string;
+  borderPrimaryHoverColor: string
   /**
    * primary color of the border when in :focus
    */
-  borderPrimaryFocusColor: string;
+  borderPrimaryFocusColor: string
   /**
    * primary color of the border when in :active
    */
-  borderPrimaryActiveColor: string;
+  borderPrimaryActiveColor: string
 
   // surfaces (backgrounds):
 
   /**
    * background color of the default flat layer
    */
-  surfaceColor: string;
+  surfaceColor: string
   /**
    * background color of the default flat layer, when in :hover
    */
-  surfaceHoverColor: string;
+  surfaceHoverColor: string
   /**
    * background color of the default flat layer, when in :active
    */
-  surfaceActiveColor: string;
+  surfaceActiveColor: string
   /**
    * background color of the default flat layer, when in :focus
    */
-  surfaceFocusColor: string;
+  surfaceFocusColor: string
 
   /**
    * color to be used on top of the surfaceColor (for texts, icons, etc)
    */
-  onSurfaceColor: string;
+  onSurfaceColor: string
   /**
    * medium emphesis color to be used on top of the surfaceColor (for texts, icons, etc)
    */
-  onSurfaceMediumColor: string;
+  onSurfaceMediumColor: string
   /**
    * low emphesis color to be used on top of the surfaceColor (for texts, icons, etc)
    */
-  onSurfaceLowColor: string;
+  onSurfaceLowColor: string
 
   /**
    * background color of a level 01 layer
    */
-  surface01Color: string;
+  surface01Color: string
   /**
    * background color of a level 02 layer
    */
-  surface02Color: string;
+  surface02Color: string
 
   /**
    * primary background color for surfaces
    */
-  surfacePrimaryColor: string;
+  surfacePrimaryColor: string
   /**
    * primary background color for surfaces, while in :hover
    */
-  surfacePrimaryHoverColor: string;
+  surfacePrimaryHoverColor: string
   /**
    * primary background color for surfaces while in :active
    */
-  surfacePrimaryActiveColor: string;
+  surfacePrimaryActiveColor: string
   /**
    * primary background color for surfaces while in :focus
    */
-  surfacePrimaryFocusColor: string;
+  surfacePrimaryFocusColor: string
   /**
    * color to be used on top of the surfacePrimary (for texts, icons, etc)
    */
-  onSurfacePrimaryColor: string;
+  onSurfacePrimaryColor: string
 
   /**
    * background color of a neutral flat layer
    */
-  surfaceNeutralColor: string;
+  surfaceNeutralColor: string
   /**
    * background color of a neutral flat layer when in :hover
    */
-  surfaceNeutralHoverColor: string;
+  surfaceNeutralHoverColor: string
   /**
    * background color of a neutral flat layer when in :focus
    */
-  surfaceNeutralFocusColor: string;
+  surfaceNeutralFocusColor: string
   /**
    * background color of a neutral flat layer when in :active
    */
-  surfaceNeutralActiveColor: string;
+  surfaceNeutralActiveColor: string
   /**
    * high emphesis color to be used on top of the surfacePrimary (for texts, icons, etc)
    */
-  onSurfaceNeutralHighColor: string;
+  onSurfaceNeutralHighColor: string
   /**
    * medium emphesis color to be used on top of the surfacePrimary (for texts, icons, etc)
    */
-  onSurfaceNeutralMediumColor: string;
+  onSurfaceNeutralMediumColor: string
   /**
    * low emphesis color to be used on top of the surfacePrimary (for texts, icons, etc)
    */
-  onSurfaceNeutralLowColor: string;
+  onSurfaceNeutralLowColor: string
 
   // // intents: //
   // primaryColor: string;
-  positiveColor: string;
-  negativeColor: string;
-  warningColor: string;
-  processColor: string;
-  primarySurfaceColor: string; // WIP
-  positiveSurfaceColor: string;
-  negativeSurfaceColor: string;
-  warningSurfaceColor: string;
-  processSurfaceColor: string;
+  positiveColor: string
+  negativeColor: string
+  warningColor: string
+  processColor: string
+  primarySurfaceColor: string // WIP
+  positiveSurfaceColor: string
+  negativeSurfaceColor: string
+  warningSurfaceColor: string
+  processSurfaceColor: string
 }

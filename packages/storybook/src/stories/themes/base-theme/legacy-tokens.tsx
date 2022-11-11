@@ -1,5 +1,5 @@
-import React from 'react';
-import { BaseThemeSchema } from './base-theme-schema';
+import React from 'react'
+import { BaseThemeSchema } from './base-theme-schema'
 
 export function getLegacyTokens(theme: BaseThemeSchema): React.CSSProperties {
   return {
@@ -48,16 +48,19 @@ export function getLegacyTokens(theme: BaseThemeSchema): React.CSSProperties {
 
     // not final
     '--bit-shadow-faint': '0 2px 10px 0 rgba(0, 0, 0, 0.1)',
-    '--bit-shadow-resting': '0px 0px 4px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.08)',
+    '--bit-shadow-resting':
+      '0px 0px 4px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.08)',
 
     // raised, ie attached to background
-    '--bit-shadow-raised-low': '0 -1px 1px 0 rgba(0, 0, 0, 0.09), 0 2px 2px 0 rgba(0, 0, 0, 0.23)',
+    '--bit-shadow-raised-low':
+      '0 -1px 1px 0 rgba(0, 0, 0, 0.09), 0 2px 2px 0 rgba(0, 0, 0, 0.23)',
     //' --bit-shadow-raised-medium': '',
     //' --bit-shadow-raised-hight': '',
 
     // hover, as in floating above
     '--bit-shadow-hover-low': '0 2px 8px 0 rgba(0, 0, 0, 0.2)',
-    '--bit-shadow-hover-medium': '0 0 20px 0 rgba(0, 0, 0, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.24)',
+    '--bit-shadow-hover-medium':
+      '0 0 20px 0 rgba(0, 0, 0, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.24)',
     '--bit-shadow-hover-high': '0px 11px 29px 0px rgba(0, 0, 0, 0.23)',
 
     // # font sizes:
@@ -91,5 +94,5 @@ export function getLegacyTokens(theme: BaseThemeSchema): React.CSSProperties {
     '--bit-accent-process-color': theme.processColor,
     '--bit-accent-success-color': theme.positiveColor,
     '--bit-accent-success-bg': theme.positiveSurfaceColor,
-  } as React.CSSProperties;
+  } as React.CSSProperties
 }

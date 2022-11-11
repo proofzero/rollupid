@@ -1,4 +1,4 @@
-import { BaseThemeSchema } from './base-theme-schema';
+import { BaseThemeSchema } from './base-theme-schema'
 
 /**
  * maintained by design tokens go here!
@@ -84,4 +84,4 @@ export const baseThemeDefaults: BaseThemeSchema = {
   negativeSurfaceColor: '#FDF2F5',
   warningSurfaceColor: '#FFFCF4',
   processSurfaceColor: '#F0F8FD',
-};
+}
