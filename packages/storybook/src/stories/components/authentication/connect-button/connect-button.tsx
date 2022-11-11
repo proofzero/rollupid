@@ -56,7 +56,7 @@ export function ConnectButton({
         disabled={status !== 'disconnected'}
         onPress={() => {
           if (injectedConnector.ready) {
-            connect({ connector: wcConnector })
+            connect({ connector: injectedConnector })
           } else {
             connect({ connector: wcConnector })
           }
