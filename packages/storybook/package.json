@@ -1,18 +1,18 @@
 {
-  "name": "@kubelt/storybook",
+  "name": "storybook",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@storybook/addon-docs": "6.5.13",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "cra-template-typescript": "1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "react-scripts": "5.0.1"
   },
   "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },
@@ -24,8 +24,7 @@
     "overrides": [
       {
         "files": [
-          "**/*.stories.*",
-          "**/**/*.stories.*"
+          "**/*.stories.*"
         ],
         "rules": {
           "import/no-anonymous-default-export": "off"
@@ -47,22 +46,33 @@
   },
   "devDependencies": {
     "@mdx-js/react": "^1.6.22",
-    "@storybook/addon-a11y": "6.5.13",
     "@storybook/addon-actions": "^6.5.13",
+    "@storybook/addon-docs": "^6.5.13",
     "@storybook/addon-essentials": "^6.5.13",
-    "@storybook/addon-interactions": "6.5.13",
+    "@storybook/addon-interactions": "^6.5.13",
     "@storybook/addon-links": "^6.5.13",
-    "@storybook/addon-storysource": "6.5.13",
     "@storybook/builder-webpack5": "^6.5.13",
-    "@storybook/jest": "0.0.10",
     "@storybook/manager-webpack5": "^6.5.13",
     "@storybook/node-logger": "^6.5.13",
-    "@storybook/preset-create-react-app": "^4.1.2",
+    "@storybook/preset-create-react-app": "4.1.2",
     "@storybook/react": "^6.5.13",
-    "@storybook/testing-library": "0.0.13",
+    "@storybook/testing-library": "^0.0.13",
+    "@typescript-eslint/eslint-plugin": "5.42.1",
+    "@typescript-eslint/parser": "5.42.1",
     "babel-plugin-named-exports-order": "^0.0.2",
+    "eslint": "8.27.0",
+    "eslint-config-airbnb-typescript": "17.0.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-config-standard": "17.0.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jest": "27.1.5",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-promise": "6.1.1",
+    "eslint-plugin-react": "7.31.10",
+    "eslint-plugin-standard": "5.0.0",
+    "prettier": "2.7.1",
     "prop-types": "^15.8.1",
-    "storybook-addon-pseudo-states": "1.15.1",
-    "webpack": "^5.74.0"
+    "webpack": "^5.75.0"
   }
 }
