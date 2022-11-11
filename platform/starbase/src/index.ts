@@ -49,6 +49,14 @@ export {
 // Definitions
 // -----------------------------------------------------------------------------
 
+// Context key for a KV store binding.
+const KEY_FIXTURES = "com.kubelt.kv/fixtures";
+
+// Context key for a KV value containing name of platform app core owner.
+const KEY_PLATFORM_OWNER = "com.kubelt.value/platform_owner";
+// Context key for a KV value containing name of current environment.
+const KEY_ENVIRONMENT = "com.kubelt.value/environment";
+
 // Context key for looking up StarbaseApplication durable object.
 const KEY_APPLICATION = "com.kubelt.object/application";
 // Context key for looking up StarbaseContract durable object.
@@ -362,17 +370,24 @@ const kb_appAuthInfo = openrpc.method(schema, {
   ),
 });
 
-// extra_example
+// kb_initPlatform
 // -----------------------------------------------------------------------------
+// TODO add an option to allow an extension method to remain hidden,
+// rather than adding it to the OpenRPC schema returned by the
+// rpc.discover call.
 
-const extra_example = openrpc.extension(schema, {
+const kb_initPlatform = openrpc.extension(schema, {
   schema: {
-    name: "extra_example",
+    name: "kb_initPlatform",
     params: [],
     result: {
-      name: "success",
+      name: "keys",
+      description: "The KV keys set during initialization",
       schema: {
-        type: "boolean",
+        type: "array",
+        items: {
+          "type": "string",
+        },
       },
     },
     errors: [],
@@ -384,8 +399,63 @@ const extra_example = openrpc.extension(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>,
     ) => {
+      const env = context.get(KEY_ENVIRONMENT);
+      const kv = context.get(KEY_FIXTURES);
+      const ownerId = context.get(KEY_PLATFORM_OWNER)
+      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION);
+
+      const token = "FIXME";
+
+      //
+      // CONSOLE
+      //
+
+      // Fetch fixture data for "console" platform app.
+      const consoleName = "console";
+      const consoleKey = `${env}-${consoleName}`;
+      const consoleData = await kv.get(consoleKey, { type: "json" });
+
+      const con = await openrpc.discover(starbase, `${ownerId}/${consoleName}`, {
+        token,
+        tag: "starbase-app",
+      });
+
+      const conResult = await con.appStore({
+        app: consoleData,
+      });
+
+      // Delete the stored fixture data now that the DO has been created.
+      await kv.delete(consoleKey);
+
+      //
+      // THREEID
+      //
+
+      // Fetch fixture data for "threeid" platform app.
+      const threeidName = "threeid";
+      const threeidKey = `${env}-${threeidName}`;
+      const threeidData = await kv.get(threeidKey, { type: "json" });
+
+      const threeid = await openrpc.discover(starbase, `${ownerId}/${threeidName}`, {
+        token,
+        tag: "starbase-app",
+      });
+
+      const threeidResult = await threeid.appStore({
+        app: threeidData,
+      });
+
+      // Delete the stored fixture data now that the DO has been created.
+      await kv.delete(threeidKey);
+
+      // RESULT
+
       const result = {
-        invoked: "extra_example",
+        invoked: "kb_initPlatform",
+        keys: [
+          consoleKey,
+          threeidKey,
+        ],
       };
       return openrpc.response(request, result);
     },
@@ -411,7 +481,7 @@ const methods = openrpc.methods(schema, [
 // These are RPC methods not described in the schema but which are provided
 // by the service.
 const extensions = openrpc.extensions(schema, [
-  extra_example,
+  kb_initPlatform,
 ]);
 
 // Configuration options for the API.
@@ -483,8 +553,8 @@ export interface Env {
   // ---------------------------------------------------------------------------
   // Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
 
-  // Example binding to KV.
-  // MY_KV_NAMESPACE: KVNamespace;
+  // The source of fixture data for platform app cores.
+  FIXTURES: KVNamespace;
 
   // Durable Objects
   // ---------------------------------------------------------------------------
@@ -513,13 +583,16 @@ export interface Env {
   // ---------------------------------------------------------------------------
 
   // A binding to the relay service.
-  //RELAY: Fetcher;
+  //AUTH: Auth;
 
   // Environment variables
   // ---------------------------------------------------------------------------
 
-  // Example environment variable.
-  USER_NAME: string,
+  // The name of the current deployment environment.
+  ENVIRONMENT: string,
+
+  // The name of the owner of platform app cores.
+  PLATFORM_OWNER: string,
 
   // Secrets
   // ---------------------------------------------------------------------------
@@ -544,6 +617,23 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
+    // TODO forward request to authorization service.
+    // NB: request must be cloned as it may only be read once.
+    /*
+    const authResponse = await env.AUTH.fetch(request.clone());
+    if (!authResponse.ok) {
+      return authResponse;
+    }
+    */
+
+    // TEMP Install fixture data; there should be a core for the
+    // "console" and for the "threeid" applications.
+    // - create App DOs on first run?
+    // - store data files in a KV and special case fetch them?
+    // - add kbt_init handler that creates the fixtures, then invoke it from wrangler.toml build command?
+
+
+
     // Use this Map to inject per-request context into the request
     // handlers. This might include:
     // - environment variables
@@ -565,9 +655,17 @@ export default {
     // TODO allow context to be initialized in this function.
     const context = openrpc.context();
 
-    context.set('com.example/username', env.USER_NAME);
     // A secret value; the API token for Datadog metrics collection.
     context.set('com.datadog/token', env.DATADOG_TOKEN);
+
+    // Store the current environment name.
+    context.set(KEY_ENVIRONMENT, env.ENVIRONMENT);
+
+    // Store the name of the owner of platform app cores.
+    context.set(KEY_PLATFORM_OWNER, env.PLATFORM_OWNER);
+
+    // A KV store containing fixture data.
+    context.set(KEY_FIXTURES, env.FIXTURES);
 
     // A durable object containing Starbase App state.
     context.set(KEY_APPLICATION, env.STARBASE_APP);
@@ -575,26 +673,6 @@ export default {
     context.set(KEY_CONTRACT, env.STARBASE_CONTRACT);
     // A durable object containing Starbase App state.
     context.set(KEY_USER, env.STARBASE_USER);
-
-    // An internal service binding to the "relay" service.
-    //context.set('com.kubelt.service/relay', env.RELAY);
-    // An R2 bucket where we store uploaded application icons.
-    //context.set('com.kubelt.bucket/icons', env.ICON_BUCKET);
-
-    // TODO forward request to authorization service.
-    // TODO perform rpc.discover on auth service and create client.
-
-    // TEMP forward requests to relay (just to test!).
-    // NB: request must be cloned as it may only be read once.
-    /*
-    const relayResponse = await env.RELAY.fetch(request.clone());
-    if (relayResponse.status !== 200) {
-      return new Response(`relay request failed: ${relayResponse.status}`);
-    } else {
-      const responseText = await relayResponse.text();
-      return new Response(`relay result: ${relayResponse.status} ${responseText}`);
-    }
-    */
 
     // NB: the handler clones the request; we don't need to do it here.
     return rpcHandler(request, context);

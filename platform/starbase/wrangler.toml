@@ -42,6 +42,24 @@ new_classes = [
   "StarbaseUser",
 ]
 
+# KV
+# -----------------------------------------------------------------------------
+# We use a KV store to contain application core fixture data for
+# platform applications. When an "init" RPC call is made to the service
+# this fixture data is retrieved and a core is created for each
+# application.
+#
+# The key at which each fixture object is stored looks like:
+#   ${env-name}-${app-name}
+# E.g.
+#   dev-appname
+#   next-appname
+#   current/appname
+#
+# $ npx wrangler kv:key put dev-console --path <fixture.json> --namespace-id <preview_id>
+#
+# NB: Each key is deleted after initialization has completed.
+
 # Environment: dev
 # -----------------------------------------------------------------------------
 
@@ -53,7 +71,13 @@ durable_objects.bindings = [
   { name = "STARBASE_USER", class_name = "StarbaseUser" },
 ]
 
+kv_namespaces = [
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+]
+
 [env.dev.vars]
+ENVIRONMENT = "dev"
+PLATFORM_OWNER = "@kubelt"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -66,7 +90,13 @@ durable_objects.bindings = [
   { name = "STARBASE_USER", class_name = "StarbaseUser" },
 ]
 
+kv_namespaces = [
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+]
+
 [env.next.vars]
+ENVIRONMENT = "next"
+PLATFORM_OWNER = "@kubelt"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -79,4 +109,10 @@ durable_objects.bindings = [
   { name = "STARBASE_USER", class_name = "StarbaseUser" },
 ]
 
+kv_namespaces = [
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+]
+
 [env.current.vars]
+ENVIRONMENT = "current"
+PLATFORM_OWNER = "@kubelt"

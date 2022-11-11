@@ -528,6 +528,11 @@ export function component(
        *
        */
       private _setFieldDefaults() {
+        // If no fields have been defined we have no default values to set.
+        if (this._fields === undefined) {
+          return;
+        }
+
         // Set the initial values of component fields.
         this._state.blockConcurrencyWhile(async () => {
           // Generate a list of storage promises, one for each field
