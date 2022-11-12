@@ -1,6 +1,5 @@
 import React, { ReactNode, useRef } from 'react'
 import classNames from 'classnames'
-import { IconButton as BaseButton, IconButtonProps } from '@codecademy/gamut'
 
 import styles from './button.module.scss'
 
@@ -15,7 +14,7 @@ export type ButtonProps = {
   className?: string
   children?: ReactNode
   onClick?: () => void
-} & IconButtonProps
+}
 
 export function Button({
   disabled,
@@ -35,7 +34,7 @@ export function Button({
   const sizeClass = size ? styles[size] : styles.md
 
   return (
-    <BaseButton
+    <button
       {...rest}
       disabled
       className={classNames(
@@ -51,6 +50,6 @@ export function Button({
       onClick={onClick}
     >
       {children}
-    </BaseButton>
+    </button>
   )
 }

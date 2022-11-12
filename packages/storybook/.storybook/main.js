@@ -22,8 +22,9 @@ module.exports = {
     // Make whatever fine-grained changes you need
     // config.module.rules.push({
     //   test: /\.scss$/,
-    //   use: ['style-loader', 'css-loader', 'sass-loader'],
-    //   include: path.resolve(__dirname, '../'),
+    //   sideEffects: true, //scss is considered a side effect of sass
+    //   use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+    //   // include: path.resolve(__dirname, '../src'), // I didn't need this path set
     // })
 
     config.plugins.push(

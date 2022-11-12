@@ -1,8 +1,6 @@
 import React, { ReactNode, useState, useEffect } from 'react'
 // import { Button, ButtonProps } from '../../atoms/button/Button'
-import { IconButton, IconButtonProps } from '@codecademy/gamut'
 
-import { BaseTheme } from '../../themes/base-theme/BaseTheme'
 import classNames from 'classnames'
 
 import {
@@ -30,7 +28,8 @@ function deconstructConnectors(connectors: Connector<any, any, any>[]) {
 export type ConnectButtonHandlerProps = {
   connectCallback: (address: string) => void
   errorCallback: (error: Error) => void
-} & IconButtonProps
+  className?: string
+}
 
 export function ConnectButtonWrapper({
   errorCallback,
@@ -64,9 +63,9 @@ export function ConnectButtonWrapper({
   return (
     <>
       {/* {status} */}
-      <IconButton
+      <button
         // className={classNames(className)}
-        icon={<span className={classNames(styles.icon, styles.walletIcon)} />}
+        // icon={<span className={classNames(styles.icon, styles.walletIcon)} />}
         disabled={status !== 'disconnected'}
         onClick={() => {
           if (injectedConnector.ready) {
@@ -78,7 +77,7 @@ export function ConnectButtonWrapper({
         {...rest}
       >
         Connect With Wallet
-      </IconButton>
+      </button>
     </>
   )
 }
@@ -86,7 +85,7 @@ export function ConnectButtonWrapper({
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
   errorCallback: (error: Error) => void
-} & IconButtonProps
+}
 
 export function ConnectButton({
   connectCallback,
