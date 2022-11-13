@@ -260,13 +260,16 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const opts = {}
 
     // Fire-and-forget uploads.
-    const u0 = performance.now();
+    let u0, u1, u2, cid
+    u0 = performance.now();
     ctx.storage.storeCar(car, opts)
-        .then(cid => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
-        .then(() => { const u1 = performance.now(); console.log(`Warming fires took ${u1 - u0} milliseconds.`); })
-        .catch(e => { const u1 = performance.now(); console.log(`fire-and-forget store-and-warm failed in ${u1 -u0} milliseconds with:`, JSON.stringify(e)) })
+        .then(_cid => { cid = _cid; u1 = performance.now(); console.log(`NFT.storage took ${u1 - u0} milliseconds for ${cid}.`); })
+        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
+        .then(() => { u2 = performance.now(); console.log(`Warming fires took ${u2 - u1} milliseconds for ${cid}`); })
+        .catch(e => { u2 = performance.now(); console.log(`Fire-and-forget store-and-warm failed in ${u2 -u1} milliseconds for ${cid} with:`, JSON.stringify(e)) })
+        .finally(() => console.log(`NFT.storage store-and-warm took ${u2 - u0} milliseconds for ${cid} end-to-end.`))
     t1 = performance.now();
-    console.log(`NFT.storage took ${t1 - t0} milliseconds.`);
+    console.log(`NFT.storage metadata generation and upload scheduling took ${t1 - t0} milliseconds.`);
     
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
