@@ -15,6 +15,7 @@ const Jsonrpc = require('@koalex/koa-json-rpc');
 const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
+const storagePlatform = require('nft.storage/src/platform.js')
 const Web3 = require('web3');
 const imageDataURI = require('image-data-uri');
 const { convert } = require('convert-svg-to-png');
@@ -106,6 +107,12 @@ const METHOD_PARAMS = {
 // property has already been generated.
 jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const s0 = performance.now();
+    // Async import of multiformats into our CJS function (TODO: Fix).
+    const multiformats = await import('multiformats');
+    const rawCodec = await import('multiformats/codecs/raw');
+    const sha2Hashes = await import('multiformats/hashes/sha2');
+    const { pack } = await import('ipfs-car/pack');
+
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
     
     if (ctx.apiKey && !key) {
@@ -196,8 +203,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         colors
     );
 
-    // We make a double-width version with the same color seeds for the cover
-    // image.
+    // We make a double-width version with the same color seeds for the cover image.
     t0 = performance.now();
     const cvr_gradient = new canvas(
         new fabric.StaticCanvas(null, { width: PFP_WIDTH * 2, height: PFP_HEIGHT }),
@@ -237,9 +243,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
 
-    t0 = performance.now();
-    // Upload to NFT.storage.
-    const metadata = await ctx.storage.store({
+    const nft = {
         name: `3ID PFP: GEN 0`,
         description: `3ID PFP for ${account}`,
         image: png,
@@ -254,19 +258,22 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
         },
-    });
+    };
+
+    t0 = performance.now();
+
+    const { token, car } = await storage.NFTStorage.encodeNFT(nft)
+    const metadata = token
+    const opts = {}
+
+    // Fire-and-forget uploads.
+    const u0 = performance.now();
+    ctx.storage.storeCar(car, opts)
+        .then(cid => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
+        .then(() => { const u1 = performance.now(); console.log(`Warming fires took ${u1 - u0} milliseconds.`); })
+        .catch(e => { const u1 = performance.now(); console.log(`fire-and-forget store-and-warm failed in ${u1 -u0} milliseconds with:`, JSON.stringify(e)) })
     t1 = performance.now();
     console.log(`NFT.storage took ${t1 - t0} milliseconds.`);
-
-    //console.log('IPFS URL for the metadata:', metadata.url);
-    //console.log('metadata.json contents:\n', metadata.data);
-    //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
-    
-    t0 = performance.now();
-    // Fire-and-forget to prewarm gateway. Catch (particularly) ETIMEDOUT to stop the container crashing.
-    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`).catch(e => console.log('fire-and-forget failed:', JSON.stringify(e)));
-    t1 = performance.now();
-    console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
     
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
