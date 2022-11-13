@@ -15,7 +15,6 @@ const Jsonrpc = require('@koalex/koa-json-rpc');
 const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
-const storagePlatform = require('nft.storage/src/platform.js')
 const Web3 = require('web3');
 const imageDataURI = require('image-data-uri');
 const { convert } = require('convert-svg-to-png');
@@ -107,12 +106,6 @@ const METHOD_PARAMS = {
 // property has already been generated.
 jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const s0 = performance.now();
-    // Async import of multiformats into our CJS function (TODO: Fix).
-    const multiformats = await import('multiformats');
-    const rawCodec = await import('multiformats/codecs/raw');
-    const sha2Hashes = await import('multiformats/hashes/sha2');
-    const { pack } = await import('ipfs-car/pack');
-
     const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
     
     if (ctx.apiKey && !key) {
