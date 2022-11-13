@@ -1,4 +1,5 @@
 import jose from 'jose'
+import { Func } from 'typed-json-rpc'
 
 export interface KeyPair {
   publicKey: jose.KeyLike | Uint8Array
@@ -16,6 +17,7 @@ export interface Environment {
 }
 
 export interface Api {
+  [key: string]: Func
   kb_getNonce(address: string, template: string): Promise<string>
   kb_verifyNonce(nonce: string, signature: string): Promise<string>
   kb_isAuthenticated(token: string): Promise<boolean>
