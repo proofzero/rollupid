@@ -7,7 +7,7 @@ import { withCors } from './cors'
  *
  * Worker packages should extend this interface for additional bindings.
  */
-export interface CoreWorkerEnvironment {
+interface Environment {
   Address: Fetcher
   Core: DurableObjectNamespace
 }
@@ -18,9 +18,7 @@ export interface CoreWorkerEnvironment {
  * `getCoreId` utility function is called to get the durable object instance
  * associated with the request.
  */
-export const coreRequestHandler = async <
-  Environment extends CoreWorkerEnvironment
->(
+export const coreRequestHandler = async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
@@ -30,7 +28,8 @@ export const coreRequestHandler = async <
     withCors(request, response)
     return response
   }
-  const core = env.Core.get(coreId)
+  const { Core } = env
+  const core = Core.get(Core.idFromString(coreId))
   const init = await core.fetch(request)
   const response = new Response(init.body, init)
   withCors(request, response)
