@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Procedural NFT generator for 3iD",
   "private": true,
-  "main": "./index.js",
+  "main": "index.js",
   "scripts": {
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
     "build": "gcloud builds submit --project threeid-nftar",
-    "start": "node ./index.js"
+    "start": "node index.js"
   },
   "devDependencies": {
     "eslint": "7.7.0",
