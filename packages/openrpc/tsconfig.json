@@ -11,9 +11,7 @@
     // Set the JavaScript language version for emitted JavaScript and include compatible library declarations.
     "target": "esnext",
     // Specify a set of bundled library declaration files that describe the target runtime environment.
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     // Specify what JSX code is generated.
     "jsx": "react",
     // Enable experimental support for TC39 stage 2 draft decorators.
@@ -41,7 +39,7 @@
     // Generate .d.ts.map files so that tooling can refer to accurate source line numbers.
     "declarationMap": true,
     // Only emit .d.ts typings files.
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     // Disable emitting files from a compilation.
     "noEmit": false,
     // Ensure that each file can be safely transpiled without relying on other imports.
