@@ -196,8 +196,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         colors
     );
 
-    // We make a double-width version with the same color seeds for the cover
-    // image.
+    // We make a double-width version with the same color seeds for the cover image.
     t0 = performance.now();
     const cvr_gradient = new canvas(
         new fabric.StaticCanvas(null, { width: PFP_WIDTH * 2, height: PFP_HEIGHT }),
@@ -237,9 +236,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // Put the account in the metadata object so it's not a trait.
     blockchain.account = account;
 
-    t0 = performance.now();
-    // Upload to NFT.storage.
-    const metadata = await ctx.storage.store({
+    const nft = {
         name: `3ID PFP: GEN 0`,
         description: `3ID PFP for ${account}`,
         image: png,
@@ -254,19 +251,25 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
             "Friend": genTraits.trait2.value.name,
             "Points": genTraits.trait3.value.name,
         },
-    });
-    t1 = performance.now();
-    console.log(`NFT.storage took ${t1 - t0} milliseconds.`);
+    };
 
-    //console.log('IPFS URL for the metadata:', metadata.url);
-    //console.log('metadata.json contents:\n', metadata.data);
-    //console.log('metadata.json with IPFS gateway URLs:', metadata.embed());
-    
     t0 = performance.now();
-    // Fire-and-forget to prewarm gateway. Catch (particularly) ETIMEDOUT to stop the container crashing.
-    fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`).catch(e => console.log('fire-and-forget failed:', JSON.stringify(e)));
+
+    const { token, car } = await storage.NFTStorage.encodeNFT(nft)
+    const metadata = token
+    const opts = {}
+
+    // Fire-and-forget uploads.
+    let u0, u1, u2, cid
+    u0 = performance.now();
+    ctx.storage.storeCar(car, opts)
+        .then(_cid => { cid = _cid; u1 = performance.now(); console.log(`NFT.storage took ${u1 - u0} milliseconds for ${cid}.`); })
+        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
+        .then(() => { u2 = performance.now(); console.log(`Warming fires took ${u2 - u1} milliseconds for ${cid}`); })
+        .catch(e => { u2 = performance.now(); console.log(`Fire-and-forget store-and-warm failed in ${u2 -u1} milliseconds for ${cid} with:`, JSON.stringify(e)) })
+        .finally(() => console.log(`NFT.storage store-and-warm took ${u2 - u0} milliseconds for ${cid} end-to-end.`))
     t1 = performance.now();
-    console.log(`Fire and forget took ${t1 - t0} milliseconds.`);
+    console.log(`NFT.storage metadata generation and upload scheduling took ${t1 - t0} milliseconds.`);
     
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;

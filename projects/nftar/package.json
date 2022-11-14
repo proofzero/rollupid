@@ -8,8 +8,8 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
-    "build": "echo \"NFTAR has no build\"",
-    "start": "nodemon node index.js"
+    "build": "echo 'gcloud builds submit --project threeid-nftar'",
+    "start": "node index.js"
   },
   "devDependencies": {
     "eslint": "7.7.0",
@@ -33,7 +33,6 @@
     "koa-logger": "3.2.1",
     "koa-router": "12.0.0",
     "nft.storage": "7.0.0",
-    "nodemon": "2.0.19",
     "path": "0.12.7",
     "stream-to-blob": "2.0.1",
     "streaming-json-stringify": "3.1.0",
