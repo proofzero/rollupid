@@ -22,6 +22,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     return json({
       ...profileRes.profileFromAddress,
       claimed: true,
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
     })
   } catch (e) {
     console.error("Couldn't find profile", e)
@@ -86,6 +90,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     return json({
       ...profile,
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
     })
   }
 }
