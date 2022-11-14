@@ -7,8 +7,8 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { createFetcherJsonRpcClient } from '../../commons/src/jsonrpc'
-import { getCoreId, isAuthenticated } from '../../commons/src/utils'
+import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import { getCoreId, isAuthenticated } from '@kubelt/platform.commons/src/utils'
 
 import {
   AccessApi,

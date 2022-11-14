@@ -1,8 +1,8 @@
 import { Router } from 'itty-router'
 
-import { coreRequestHandler } from '../../commons/src/routers/core'
-import { handleOptions } from '../../commons/src/routers/cors'
-import { discoveryHandler } from '../../commons/src/routers/openrpc'
+import { coreRequestHandler } from '@kubelt/platform.commons/src/routers/core'
+import { handleOptions } from '@kubelt/platform.commons/src/routers/cors'
+import { discoveryHandler } from '@kubelt/platform.commons/src/routers/openrpc'
 
 import Core from './core'
 import serviceDescription from './openrpc.json'

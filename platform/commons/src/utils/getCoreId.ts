@@ -1,6 +1,6 @@
 import * as jose from 'jose'
 
-import type { WorkerApi } from '../../../address/src/types'
+import type { WorkerApi } from '@kubelt/platform.address/src/types'
 
 import { createFetcherJsonRpcClient } from '../jsonrpc'
 

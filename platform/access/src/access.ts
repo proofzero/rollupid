@@ -2,7 +2,7 @@ import * as jose from 'jose'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
-import { DurableObject } from '../../commons/src'
+import { DurableObject } from '@kubelt/platform.commons'
 
 import { JWT_OPTIONS } from './constants'
 

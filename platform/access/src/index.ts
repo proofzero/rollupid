@@ -1,7 +1,7 @@
 import { Router } from 'itty-router'
 
-import { handleOptions } from '../../commons/src/routers/cors'
-import { discoveryHandler } from '../../commons/src/routers/openrpc'
+import { handleOptions } from '@kubelt/platform.commons/src/routers/cors'
+import { discoveryHandler } from '@kubelt/platform.commons/src/routers/openrpc'
 
 import Access from './access'
 import Authorization from './authorization'

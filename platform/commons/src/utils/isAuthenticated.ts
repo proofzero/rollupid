@@ -1,6 +1,6 @@
 import { HEADER_CORE_AUTHENTICATION } from '../constants'
 import { createFetcherJsonRpcClient } from '../jsonrpc'
-import type { Api as AccountApi } from '../../../account/src/types'
+import type { Api as AccountApi } from '@kubelt/platform.account/src/types'
 
 export interface Environment {
   Account: Fetcher
