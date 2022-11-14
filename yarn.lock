@@ -5307,7 +5307,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/platform.commons@*, @kubelt/platform.commons@workspace:platform/commons":
+"@kubelt/platform.commons@*, @kubelt/platform.commons@workspace:*, @kubelt/platform.commons@workspace:platform/commons":
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.commons@workspace:platform/commons"
   dependencies:
@@ -5445,6 +5445,7 @@ __metadata:
     "@kubelt/do.starbase-contract": "workspace:*"
     "@kubelt/do.starbase-user": "workspace:*"
     "@kubelt/openrpc": "workspace:*"
+    "@kubelt/platform.commons": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.187
     cross-env: 7.0.3
@@ -27491,8 +27492,6 @@ __metadata:
   resolution: "kubelt@workspace:."
   dependencies:
     auto: 10.37.6
-    classnames: 2.3.2
-    wagmi: 0.8.1
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft

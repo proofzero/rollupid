@@ -22,9 +22,5 @@
     "auto": "10.37.6",
     "yarn-run-all": "3.1.1"
   },
-  "packageManager": "yarn@3.2.4",
-  "dependencies": {
-    "classnames": "2.3.2",
-    "wagmi": "0.8.1"
-  }
+  "packageManager": "yarn@3.2.4"
 }

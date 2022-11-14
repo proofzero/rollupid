@@ -14,11 +14,11 @@ workers_dev = false
 
 # Services
 # -----------------------------------------------------------------------------
-
 # A list of other Clouflare services bound to this service.
-# services = [
-#   { binding = "AUTH", service = "auth", environment = "production" },
-# ]
+
+services = [
+  { binding = "Account", service = "account" }
+]
 
 # Secrets
 # -----------------------------------------------------------------------------
@@ -65,6 +65,10 @@ new_classes = [
 
 [env.dev]
 
+services = [
+  { binding = "Account", service = "account-dev", environment = "production" }
+]
+
 durable_objects.bindings = [
   { name = "STARBASE_APP", class_name = "StarbaseApplication" },
   { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
@@ -84,6 +88,10 @@ PLATFORM_OWNER = "@kubelt"
 
 [env.next]
 
+services = [
+  { binding = "Account", service = "account-next", environment = "production" }
+]
+
 durable_objects.bindings = [
   { name = "STARBASE_APP", class_name = "StarbaseApplication" },
   { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
@@ -102,6 +110,10 @@ PLATFORM_OWNER = "@kubelt"
 # -----------------------------------------------------------------------------
 
 [env.current]
+
+services = [
+  { binding = "Account", service = "account-current", environment = "production" }
+]
 
 durable_objects.bindings = [
   { name = "STARBASE_APP", class_name = "StarbaseApplication" },
