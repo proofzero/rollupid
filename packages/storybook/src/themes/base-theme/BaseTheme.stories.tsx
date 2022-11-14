@@ -8,6 +8,6 @@ export default {
   component: BaseTheme,
 }
 
-export const ColorScheme = () => {
+export const HelloWorld = () => {
   return <BaseTheme>Hello World</BaseTheme>
 }
