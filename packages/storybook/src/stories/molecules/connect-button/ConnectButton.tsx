@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from 'react'
-// import { Button, ButtonProps } from '../../atoms/button/Button'
+import { Button, ButtonProps } from '../../atoms/button/Button'
 
 import classNames from 'classnames'
 
@@ -29,7 +29,7 @@ export type ConnectButtonHandlerProps = {
   connectCallback: (address: string) => void
   errorCallback: (error: Error) => void
   className?: string
-}
+} & ButtonProps
 
 export function ConnectButtonWrapper({
   errorCallback,
@@ -63,11 +63,11 @@ export function ConnectButtonWrapper({
   return (
     <>
       {/* {status} */}
-      <button
-        // className={classNames(className)}
-        // icon={<span className={classNames(styles.icon, styles.walletIcon)} />}
-        disabled={status !== 'disconnected'}
+      <Button
+        className={classNames(className)}
+        // disabled={status !== 'disconnected'}
         onClick={() => {
+          console.log('here')
           if (injectedConnector.ready) {
             connect({ connector: injectedConnector })
           } else {
@@ -76,8 +76,9 @@ export function ConnectButtonWrapper({
         }}
         {...rest}
       >
+        <span className={classNames(styles.icon, styles.walletIcon)} />
         Connect With Wallet
-      </button>
+      </Button>
     </>
   )
 }
@@ -90,7 +91,6 @@ export type ConnectButtonProps = {
 export function ConnectButton({
   connectCallback,
   errorCallback,
-  children,
   ...rest
 }: ConnectButtonProps) {
   // TODO: what to do with errors?
@@ -129,13 +129,12 @@ export function ConnectButton({
       {error && <div>{error.message}</div>}
       <WagmiConfig client={client}>
         <ConnectButtonWrapper
-          // className={classNames(styles.button, className)}
-          // tertiary
+          className={classNames(styles.button)}
+          tertiary
           connectCallback={connectCallback}
           errorCallback={errorCallback}
           {...rest}
         />
-        {/* <span className={classNames(styles.icon, styles.walletIcon)} /> */}
       </WagmiConfig>
     </>
   )

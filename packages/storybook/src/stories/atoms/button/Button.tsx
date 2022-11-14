@@ -33,10 +33,10 @@ export function Button({
   const disabledClass = disabled ? styles.disabled : ''
   const sizeClass = size ? styles[size] : styles.md
 
+  console.log('onClick is', onClick)
   return (
     <button
-      {...rest}
-      disabled
+      // disabled
       className={classNames(
         styles.button,
         styles.base,
@@ -47,7 +47,11 @@ export function Button({
         disabledClass,
         sizeClass
       )}
-      onClick={onClick}
+      onClick={() => {
+        console.log('clciked')
+        onClick()
+      }}
+      {...rest}
     >
       {children}
     </button>
