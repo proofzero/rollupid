@@ -1,4 +1,18 @@
-import '../stories/base.scss'
+import { BaseTheme } from '../../../packages/storybook/src/themes/base-theme/BaseTheme'
+import BaseStyles from '../../../packages/storybook/src/themes/base-theme/base-theme.module.scss'
+
+const withTheme = (Story, context) => {
+  // Get the active theme value from the story parameter
+  // const { theme } = context.parameters
+  // const storyTheme = theme === 'dark' ? darkTheme : lightTheme
+  return (
+    <BaseTheme theme={BaseStyles}>
+      <Story />
+    </BaseTheme>
+  )
+}
+
+export const decorators = [withTheme]
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

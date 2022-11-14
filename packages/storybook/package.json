@@ -6,6 +6,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-scripts": "5.0.1",
+    "styled-components": "5.3.6",
     "wagmi": "0.8.1"
   },
   "scripts": {
@@ -43,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "7.19.3",
     "@mdx-js/react": "1.6.22",
     "@storybook/addon-actions": "6.5.13",
     "@storybook/addon-docs": "6.5.13",
@@ -62,6 +64,7 @@
     "autoprefixer": "10.4.13",
     "babel-plugin-named-exports-order": "0.0.2",
     "chromatic": "6.11.4",
+    "cross-env": "7.0.3",
     "css-loader": "6.7.1",
     "eslint": "8.27.0",
     "eslint-config-airbnb-typescript": "17.0.0",
