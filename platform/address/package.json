@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
-    "@kubelt/worker-commons": "*",
+    "@kubelt/platform.commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "jose": "4.11.0",

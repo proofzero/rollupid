@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
-    "@kubelt/address-worker": "workspace:*",
-    "@kubelt/passport-worker": "workspace:*",
+    "@kubelt/platform.account": "workspace:*",
+    "@kubelt/platform.address": "workspace:*",
     "@types/itty-router-extras": "0.4.0",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",

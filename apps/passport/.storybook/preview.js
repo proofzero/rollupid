@@ -1,5 +1,5 @@
-import { BaseTheme } from '../../../packages/storybook/src/themes/base-theme/BaseTheme'
-import BaseStyles from '../../../packages/storybook/src/themes/base-theme/base-theme.module.scss'
+import { BaseTheme } from '@kubelt/design-system/src/themes/base-theme/BaseTheme'
+import BaseStyles from '@kubelt/design-system/src/themes/base-theme/base-theme.module.scss'
 
 const withTheme = (Story, context) => {
   // Get the active theme value from the story parameter
