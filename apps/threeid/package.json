@@ -4,7 +4,6 @@
   "private": true,
   "sideEffects": true,
   "scripts": {
-    "chromatic": "npx chromatic --project-token=a11e21c521b0",
     "storybook": "start-storybook -p 6007 -s public",
     "build-storybook": "build-storybook -s public",
     "test": "echo \"Error: no test specified\" && exit 0",

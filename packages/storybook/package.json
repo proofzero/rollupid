@@ -11,7 +11,6 @@
   "scripts": {
     "test": "echo \"no tests. tests executed on chromatic \"",
     "eject": "react-scripts eject",
-    "chromatic": "npx chromatic --project-token=a11e21c521b0",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },

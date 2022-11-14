@@ -1,6 +1,15 @@
 const webpack = require('webpack')
 
 module.exports = {
+  refs: {
+    react: {
+      title: 'Design System',
+      url: 'http://localhost:6006',
+    },
+  },
+  features: {
+    buildStoriesJson: true,
+  },
   stories: [
     '../stories/**/*.stories.mdx',
     '../stories/**/*.stories.@(js|jsx|ts|tsx)',

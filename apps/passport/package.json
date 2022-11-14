@@ -1,9 +1,11 @@
 {
-  "name": "passport",
+  "name": "@proofzero/passport-app",
   "version": "0.1.0",
   "private": true,
   "sideEffects": false,
   "scripts": {
+    "storybook": "start-storybook -p 6008 -s public",
+    "build-storybook": "build-storybook -s public",
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s \"build:*\"",
     "build:css": "npx tailwindcss -o ./app/styles/tailwind.css",
@@ -13,9 +15,7 @@
     "dev:remix": "remix watch",
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "echo \"No dev for passport. Please use start.\"",
-    "start": "run-p \"dev:*\"",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "start": "run-p \"dev:*\""
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
