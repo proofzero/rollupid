@@ -1,5 +1,5 @@
 {
-  "name": "@proofzero/threeid-app",
+  "name": "@kubelt/app.threeid",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
@@ -24,6 +24,7 @@
     "@datadog/datadog-api-client": "^1.3.0",
     "@headlessui/react": "1.6.6",
     "@heroicons/react": "2.0.10",
+    "@kubelt/design-system": "*",
     "@remix-run/cloudflare": "1.7.0",
     "@remix-run/cloudflare-workers": "1.7.0",
     "@remix-run/react": "1.7.0",
@@ -105,6 +106,5 @@
   },
   "engines": {
     "node": ">=16.13"
-  },
-  "_id": "@proofzero/threeid-app@0.1.0"
+  }
 }

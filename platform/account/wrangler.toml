@@ -1,0 +1,43 @@
+name = "account"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[dev]
+port = 9292
+local_protocol = "http"
+
+[env.dev]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[env.next]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[env.current]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]

@@ -1,4 +1,5 @@
 {
+  "name": "@kubelt/cores",
   "private": true,
   "workspaces": [
     "*"

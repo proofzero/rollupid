@@ -1,5 +1,5 @@
 {
-  "name": "oort",
+  "name": "@kubelt/platform.oort",
   "private": true,
   "version": "1.0.0",
   "description": "Kubelt Oort Worker",

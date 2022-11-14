@@ -1,4 +1,4 @@
-import { BaseTheme } from '@kubelt/design-system/src/themes/base-theme/BaseTheme'
+import { BaseTheme } from '../src/themes/base-theme/BaseTheme'
 
 const withTheme = (Story, context) => {
   // Get the active theme value from the story parameter
@@ -15,6 +15,7 @@ export const decorators = [withTheme]
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
+  theme: 'base',
   controls: {
     matchers: {
       color: /(background|color)$/i,

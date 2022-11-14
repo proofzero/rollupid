@@ -1,0 +1,51 @@
+name = "access"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+
+durable_objects.bindings = [
+  { name = "Access", class_name = "Access" },
+  { name = "Authorization", class_name = "Authorization" },
+]
+services = [
+  { binding = "Address", service = "address" },
+  { binding = "Passport", service = "passport" },
+]
+
+[dev]
+port = 9393
+local_protocol = "http"
+
+[env.dev]
+durable_objects.bindings = [
+  { name = "Access", class_name = "Access" },
+  { name = "Authorization", class_name = "Authorization" },
+]
+services = [
+  { binding = "Address", service = "address" },
+  { binding = "Passport", service = "passport" },
+]
+
+[env.next]
+durable_objects.bindings = [
+  { name = "Access", class_name = "Access" },
+  { name = "Authorization", class_name = "Authorization" },
+]
+services = [
+  { binding = "Address", service = "address" },
+  { binding = "Passport", service = "passport" },
+]
+
+[env.current]
+durable_objects.bindings = [
+  { name = "Access", class_name = "Access" },
+  { name = "Authorization", class_name = "Authorization" },
+]
+services = [
+  { binding = "Address", service = "address" },
+  { binding = "Passport", service = "passport" },
+]
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Access", "Authorization"]

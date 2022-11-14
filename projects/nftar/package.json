@@ -1,5 +1,5 @@
 {
-  "name": "3id-nftar-generator",
+  "name": "@kubelt/projects.nftar",
   "version": "1.0.0",
   "description": "Procedural NFT generator for 3iD",
   "private": true,

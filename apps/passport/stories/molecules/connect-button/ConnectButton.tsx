@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useEffect } from 'react'
 import {
   Button,
   ButtonProps,
-} from '../../../../../packages/storybook/src/atoms/button/Button'
+} from '@kubelt/design-system/src/atoms/button/Button'
 import classNames from 'classnames'
 
 import {

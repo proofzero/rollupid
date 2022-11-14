@@ -18,7 +18,6 @@ port = 8989
 local_protocol = "http"
 
 [env.dev]
-name = "icons-dev"
 routes = [
   { pattern = "icons-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]

@@ -1,0 +1,44 @@
+{
+  "name": "@kubelt/platform.commons",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Kubelt Worker Commons",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Kubelt, Inc.",
+  "main": "src/index.ts",
+  "scripts": {
+    "all:check": "run-s format:check lint:check types:check",
+    "format": "run-s format:src",
+    "format:src": "prettier --write src",
+    "format:check": "run-s format:check:src",
+    "format:check:src": "prettier --check src",
+    "lint": "eslint --fix src test",
+    "lint:check": "run-s lint:check:src",
+    "lint:check:src": "eslint src",
+    "types:check": "tsc --project tsconfig.json",
+    "test": "run-s all:check"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "3.18.0",
+    "@kubelt/platform.account": "workspace:*",
+    "@kubelt/platform.address": "workspace:*",
+    "@types/itty-router-extras": "0.4.0",
+    "@typescript-eslint/eslint-plugin": "5.41.0",
+    "@typescript-eslint/parser": "5.41.0",
+    "eslint": "8.26.0",
+    "eslint-config-prettier": "8.5.0",
+    "prettier": "2.7.1",
+    "typescript": "4.8.4",
+    "yarn-run-all": "3.1.1"
+  },
+  "peerDependencies": {
+    "itty-router": "*",
+    "itty-router-extras": "*",
+    "jose": "*",
+    "lodash": "*"
+  },
+  "dependencies": {
+    "typed-json-rpc": "1.1.0"
+  }
+}
