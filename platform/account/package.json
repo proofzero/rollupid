@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/access-worker",
+  "name": "@kubelt/platform.account",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -29,8 +29,7 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
-    "@ethersproject/bytes": "5.7.0",
-    "@ethersproject/random": "5.7.0",
+    "@ethersproject/address": "5.7.0",
     "@kubelt/worker-commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",

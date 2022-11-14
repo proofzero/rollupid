@@ -1,4 +1,4 @@
-name = "passport"
+name = "ping"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
@@ -11,34 +11,31 @@ services = [
 ]
 
 [dev]
-port = 9292
+port = 9191
 local_protocol = "http"
 
 [env.dev]
-name = "passport-dev"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-dev" }
 ]
 
 [env.next]
-name = "passport-next"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-next" }
 ]
 
 [env.current]
-name = "passport-current"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-current" }
 ]
 
 [[migrations]]

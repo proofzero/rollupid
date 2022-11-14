@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/ping-worker",
+  "name": "@kubelt/platform.access",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -18,6 +18,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
     "@types/itty-router-extras": "0.4.0",
+    "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "eslint": "8.27.0",
@@ -28,6 +29,8 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
+    "@ethersproject/bytes": "5.7.0",
+    "@ethersproject/random": "5.7.0",
     "@kubelt/worker-commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",

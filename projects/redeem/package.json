@@ -1,5 +1,5 @@
 {
-  "name": "redeem",
+  "name": "@kubelt/projects.redeem",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,

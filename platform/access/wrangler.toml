@@ -17,7 +17,6 @@ port = 9393
 local_protocol = "http"
 
 [env.dev]
-name = "access-dev"
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
   { name = "Authorization", class_name = "Authorization" },
@@ -28,7 +27,6 @@ services = [
 ]
 
 [env.next]
-name = "access-next"
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
   { name = "Authorization", class_name = "Authorization" },
@@ -39,7 +37,6 @@ services = [
 ]
 
 [env.current]
-name = "access-current"
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
   { name = "Authorization", class_name = "Authorization" },

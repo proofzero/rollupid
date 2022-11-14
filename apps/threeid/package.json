@@ -1,5 +1,5 @@
 {
-  "name": "@proofzero/threeid-app",
+  "name": "@kubelt/app.threeid",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
@@ -105,6 +105,5 @@
   },
   "engines": {
     "node": ">=16.13"
-  },
-  "_id": "@proofzero/threeid-app@0.1.0"
+  }
 }

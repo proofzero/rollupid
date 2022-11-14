@@ -12,7 +12,7 @@ import { keccak256 } from '@ethersproject/keccak256'
 import { recoverPublicKey } from '@ethersproject/signing-key'
 import { computeAddress } from '@ethersproject/transactions'
 
-import { DurableObject } from '@kubelt/worker-commons'
+import { DurableObject } from '../../commons/src'
 
 import { JWT_OPTIONS, NONCE_OPTIONS } from './constants'
 import {

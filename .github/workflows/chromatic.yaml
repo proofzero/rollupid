@@ -27,7 +27,7 @@ jobs:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           onlyChanged: true
-          workingDir: packages/storybook
+          workingDir: packages/design-system
   chromatic-deployment-passport:
     # Operating System
     runs-on: ubuntu-latest

@@ -1,5 +1,5 @@
 {
-  "name": "@proofzero/console-app",
+  "name": "@kubelt/app.console",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,

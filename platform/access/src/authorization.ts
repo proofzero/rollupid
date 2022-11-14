@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { DurableObject } from '@kubelt/worker-commons'
+import { DurableObject } from '../../commons/src'
 
-import { createFetcherJsonRpcClient } from '@kubelt/worker-commons/src/jsonrpc'
+import { createFetcherJsonRpcClient } from '../../commons/src/jsonrpc'
 
 import { CODE_OPTIONS } from './constants'
 

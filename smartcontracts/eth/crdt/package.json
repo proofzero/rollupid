@@ -1,5 +1,5 @@
 {
-  "name": "crdt",
+  "name": "@kubelt/smartcontracts.crdt",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

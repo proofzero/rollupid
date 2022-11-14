@@ -1,5 +1,5 @@
 {
-  "name": "3ID-invite",
+  "name": "@kubelt/smartcontracts.invite",
   "version": "0.1.0",
   "description": "Mint 3iD invitation NFTs",
   "main": "index.js",

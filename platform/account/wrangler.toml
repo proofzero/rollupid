@@ -1,4 +1,4 @@
-name = "ping"
+name = "account"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
@@ -11,34 +11,31 @@ services = [
 ]
 
 [dev]
-port = 9191
+port = 9292
 local_protocol = "http"
 
 [env.dev]
-name = "ping-dev"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-dev" }
+  { binding = "Address", service = "address" }
 ]
 
 [env.next]
-name = "ping-next"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-next" }
+  { binding = "Address", service = "address" }
 ]
 
 [env.current]
-name = "ping-current"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-current" }
+  { binding = "Address", service = "address" }
 ]
 
 [[migrations]]
