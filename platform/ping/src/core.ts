@@ -1,4 +1,4 @@
-import { DurableObject } from '@kubelt/worker-commons'
+import { DurableObject } from '@kubelt/platform.commons'
 
 import { Api, Environment, PingResult, PongResult } from './types'
 

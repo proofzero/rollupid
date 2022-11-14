@@ -1,4 +1,4 @@
-import { DurableObject } from '@kubelt/worker-commons'
+import { DurableObject } from '@kubelt/platform.commons'
 
 import { Environment, CoreApi } from './types'
 import { getType } from './utils'

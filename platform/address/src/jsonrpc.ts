@@ -6,7 +6,7 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { createFetcherJsonRpcClient } from '@kubelt/worker-commons/src/jsonrpc'
+import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import { Environment } from './types'
 import { CoreApi, WorkerApi } from './types'

@@ -45,3 +45,4 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PASSPORT_PROJECT_TOKEN }}
           onlyChanged: true
           workingDir: apps/passport
+# TODO: add a workflow for threeid and console

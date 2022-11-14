@@ -1,18 +1,18 @@
 import { HEADER_CORE_AUTHENTICATION } from '../constants'
 import { createFetcherJsonRpcClient } from '../jsonrpc'
-import type { Api as PassportApi } from '@kubelt/passport-worker/src/types'
+import type { Api as AccountApi } from '../../../account/src/types'
 
 export interface Environment {
-  Passport: Fetcher
+  Account: Fetcher
 }
 
 export default async (request: Request, env: Environment): Promise<void> => {
-  const { Passport } = env
+  const { Account: Account } = env
   const authentication = request.headers.get(HEADER_CORE_AUTHENTICATION)
   if (!authentication) {
     throw 'not authenticated'
   }
-  const client = createFetcherJsonRpcClient<PassportApi>(Passport, {
+  const client = createFetcherJsonRpcClient<AccountApi>(Account, {
     headers: {
       [HEADER_CORE_AUTHENTICATION]: authentication,
     },
