@@ -65,9 +65,8 @@ export function ConnectButtonWrapper({
       {/* {status} */}
       <Button
         className={classNames(className)}
-        // disabled={status !== 'disconnected'}
+        disabled={status !== 'disconnected'}
         onClick={() => {
-          console.log('here')
           if (injectedConnector.ready) {
             connect({ connector: injectedConnector })
           } else {

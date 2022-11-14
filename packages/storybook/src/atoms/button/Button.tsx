@@ -36,7 +36,8 @@ export function Button({
   console.log('onClick is', onClick)
   return (
     <button
-      // disabled
+      {...rest}
+      disabled={disabled}
       className={classNames(
         styles.button,
         styles.base,
@@ -47,11 +48,7 @@ export function Button({
         disabledClass,
         sizeClass
       )}
-      onClick={() => {
-        console.log('clciked')
-        onClick()
-      }}
-      {...rest}
+      onClick={onClick}
     >
       {children}
     </button>

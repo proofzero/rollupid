@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { BaseTheme } from '../../themes/base-theme/BaseTheme'
+// import { BaseTheme } from '../../themes/base-theme/BaseTheme'
 import { Button } from './Button'
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -15,9 +15,9 @@ export default {
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 const Template = (args) => (
-  <BaseTheme>
-    <Button {...args}>hello world</Button>
-  </BaseTheme>
+  // <BaseTheme>
+  <Button {...args}>hello world</Button>
+  // </BaseTheme>
 )
 
 export const PrimaryButton = Template.bind({})
