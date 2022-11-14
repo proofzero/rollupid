@@ -4761,7 +4761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/address-worker@workspace:platform/address-worker":
+"@kubelt/address-worker@workspace:*, @kubelt/address-worker@workspace:platform/address-worker":
   version: 0.0.0-use.local
   resolution: "@kubelt/address-worker@workspace:platform/address-worker"
   dependencies:
@@ -4887,7 +4887,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/passport-worker@workspace:platform/passport-worker":
+"@kubelt/passport-worker@workspace:*, @kubelt/passport-worker@workspace:platform/passport-worker":
   version: 0.0.0-use.local
   resolution: "@kubelt/passport-worker@workspace:platform/passport-worker"
   dependencies:
@@ -4993,6 +4993,8 @@ __metadata:
   resolution: "@kubelt/worker-commons@workspace:platform/worker-commons"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
+    "@kubelt/address-worker": "workspace:*"
+    "@kubelt/passport-worker": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.41.0
     "@typescript-eslint/parser": 5.41.0

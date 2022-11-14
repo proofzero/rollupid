@@ -1,3 +1,4 @@
 import getCoreId from './getCoreId'
+import isAuthenticated from './isAuthenticated'
 
-export { getCoreId }
+export { getCoreId, isAuthenticated }

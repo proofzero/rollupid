@@ -5,7 +5,6 @@ import { handleOptions } from '@kubelt/worker-commons/src/routers/cors'
 import { discoveryHandler } from '@kubelt/worker-commons/src/routers/openrpc'
 
 import Core from './core'
-import { Environment } from './types'
 import serviceDescription from './openrpc.json'
 
 const index = Router()
@@ -16,7 +15,7 @@ const index = Router()
       headers: ['Content-Type', 'KBT-Access-JWT-Assertion'],
     })
   )
-  .post('/jsonrpc', coreRequestHandler<Environment>)
+  .post('/jsonrpc', coreRequestHandler)
 
 export { Core }
 export default { fetch: index.handle }
