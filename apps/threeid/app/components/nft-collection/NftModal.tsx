@@ -17,16 +17,20 @@ const NftModal = ({
   nft: any
   handleClose: (evt: any) => void
 }) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false)
 
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div className="flex flex-col lg:flex-row max-w-full">
         <div className="max-w-full lg:max-w-sm flex justify-center items-center">
-          {!imgLoaded && <div className="w-[24rem] h-[24rem] bg-gray-100 rounded-lg animate-pulse"></div>}
+          {!imgLoaded && (
+            <div className="w-[24rem] h-[24rem] bg-gray-100 rounded-lg animate-pulse"></div>
+          )}
 
           <img
-            className={`object-cover rounded-lg ${imgLoaded ? "visible" : "invisible absolute w-3 h-3"}`}
+            className={`object-cover rounded-lg ${
+              imgLoaded ? 'visible' : 'invisible absolute w-3 h-3'
+            }`}
             src={gatewayFromIpfs(nft?.url)}
             onLoad={() => setImgLoaded(true)}
           />
