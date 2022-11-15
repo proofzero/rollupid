@@ -149,28 +149,30 @@ export const action = async ({ request }) => {
       }
     }
 
-    try {
-      if (nonce) {
-        const signRes = await oortSend('kb_verifyNonce', [nonce, signature], {
-          address: address,
-        }) // TODO remove address param when RPC url is changed
+    // Always redirect to complete page
 
-        console.log('signRes', signRes)
+    // try {
+    //   if (nonce) {
+    //     const signRes = await oortSend('kb_verifyNonce', [nonce, signature], {
+    //       address: address,
+    //     }) // TODO remove address param when RPC url is changed
 
-        // the nonce may have expired. We would still be able to validate the signature
-        // but not log the user in
-        if (!signRes.error) {
-          // on success create a cookie/session for the user and redirect to the app
-          return createUserSession(
-            signRes.result,
-            `https://3id.kubelt.com/account`,
-            address
-          )
-        }
-      }
-    } catch (e) {
-      console.error('error verifying nonce', e)
-    }
+    //     console.log('signRes', signRes)
+
+    //     // the nonce may have expired. We would still be able to validate the signature
+    //     // but not log the user in
+    //     if (!signRes.error) {
+    //       // on success create a cookie/session for the user and redirect to the app
+    //       return createUserSession(
+    //         signRes.result,
+    //         `https://3id.kubelt.com/account`,
+    //         address
+    //       )
+    //     }
+    //   }
+    // } catch (e) {
+    //   console.error('error verifying nonce', e)
+    // }
 
     return redirect(`/claim/complete?address=${address}`)
   }
