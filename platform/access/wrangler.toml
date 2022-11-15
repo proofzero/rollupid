@@ -8,8 +8,8 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
+  { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Passport", service = "passport" },
 ]
 
 [dev]
@@ -22,8 +22,8 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
+  { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Passport", service = "passport" },
 ]
 
 [env.next]
@@ -32,8 +32,8 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
+  { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Passport", service = "passport" },
 ]
 
 [env.current]
@@ -42,8 +42,8 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
+  { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Passport", service = "passport" },
 ]
 
 [[migrations]]

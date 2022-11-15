@@ -13,9 +13,9 @@ export interface KeyPairSerialized {
 
 export interface Environment {
   Access: DurableObjectNamespace
+  Account: Fetcher
   Address: Fetcher
   Authorization: DurableObjectNamespace
-  Passport: Fetcher
 }
 
 export type Scope = string[]
