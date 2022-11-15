@@ -25,9 +25,53 @@ const rpcSchema: RpcSchema = {
       },
       errors: [],
     },
+    {
+      name: "add_application",
+      summary: "Add an application ID to list of user's applications",
+      params: [
+        {
+          name: "appId",
+          schema: {
+            "$ref": "#/components/contentDescriptors/AppId",
+          },
+        },
+      ],
+      result: {
+        name: "appId",
+        description: "The application ID that was added",
+        schema: {
+          "$ref": "#components/contentDescriptors/AppId",
+        },
+      },
+      errors: [],
+    },
+    {
+      name: "list_applications",
+      summary: "Return a list of the user's application IDs",
+      params: [],
+      result: {
+        name: "appIds",
+        description: "The list of user's application IDs",
+        schema: {
+          type: "array",
+          items: {
+            "$ref": "#components/contentDescriptors/AppId",
+          },
+        },
+      },
+      errors: [],
+    },
   ],
   components: {
     contentDescriptors: {
+      "AppId": {
+        name: "appId",
+        required: true,
+        description: "An application ID",
+        schema: {
+          "$ref": "#/components/schema/AppId",
+        },
+      },
       "UserName": {
         name: "userName",
         required: true,
@@ -38,6 +82,9 @@ const rpcSchema: RpcSchema = {
       },
     },
     schemas: {
+      "AppId": {
+        type: "string",
+      },
       "UserName": {
         type: "string",
       },
