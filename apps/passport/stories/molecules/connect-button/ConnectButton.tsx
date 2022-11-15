@@ -64,7 +64,6 @@ export function ConnectButtonWrapper({
 
   return (
     <>
-      {/* {status} */}
       <Button
         className={classNames(className)}
         disabled={status !== 'disconnected'}

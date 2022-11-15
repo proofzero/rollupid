@@ -39,6 +39,8 @@ export function Button({
       {...rest}
       disabled={disabled}
       className={classNames(
+        'fixed',
+        'right-0',
         styles.button,
         styles.base,
         className,

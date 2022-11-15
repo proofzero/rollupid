@@ -1,4 +1,5 @@
 import { BaseTheme } from '@kubelt/design-system/src/themes/base-theme/BaseTheme'
+import './global.css'
 
 const withTheme = (Story, context) => {
   // Get the active theme value from the story parameter

@@ -1,4 +1,5 @@
 const webpack = require('webpack')
+const path = require('path')
 
 module.exports = {
   refs: {
@@ -15,10 +16,9 @@ module.exports = {
     '../stories/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [
-    '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
-    '@storybook/preset-scss',
+    // '@storybook/preset-scss',
   ],
   framework: '@storybook/react',
   core: {
@@ -30,11 +30,27 @@ module.exports = {
     // 'PRODUCTION' is used when building the static version of storybook.
 
     // Make whatever fine-grained changes you need
-    // config.module.rules.push({
-    //   test: /\.scss$/,
-    //   use: ['style-loader', 'css-loader', 'sass-loader'],
-    //   include: path.resolve(__dirname, '../'),
-    // })
+    config.module.rules.push({
+      test: /\.scss$/,
+      sideEffects: true, //scss is considered a side effect of sass
+      use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      // include: path.resolve(__dirname, '../src'), // I didn't need this path set
+    })
+
+    config.module.rules.push({
+      test: /\.css$/,
+      use: [
+        {
+          loader: 'postcss-loader',
+          options: {
+            postcssOptions: {
+              plugins: [require('tailwindcss'), require('autoprefixer')],
+            },
+          },
+        },
+      ],
+      include: path.resolve(__dirname, '../'),
+    })
 
     config.plugins.push(
       new webpack.ProvidePlugin({

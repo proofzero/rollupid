@@ -5115,6 +5115,7 @@ __metadata:
     "@storybook/addon-essentials": 6.5.13
     "@storybook/addon-interactions": 6.5.13
     "@storybook/addon-links": 6.5.13
+    "@storybook/addon-postcss": 2.0.0
     "@storybook/builder-webpack5": 6.5.13
     "@storybook/manager-webpack5": 6.5.13
     "@storybook/node-logger": 6.5.13
@@ -5125,7 +5126,7 @@ __metadata:
     "@storybook/testing-library": 0.0.13
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    autoprefixer: 10.4.13
+    autoprefixer: latest
     babel-plugin-named-exports-order: 0.0.2
     chromatic: 6.11.4
     cra-template-typescript: 1.2.0
@@ -5142,7 +5143,7 @@ __metadata:
     eslint-plugin-promise: 6.1.1
     eslint-plugin-react: 7.31.10
     eslint-plugin-standard: 5.0.0
-    postcss: 8.4.19
+    postcss: latest
     prettier: 2.7.1
     prop-types: 15.8.1
     react: 18.2.0
@@ -5150,9 +5151,10 @@ __metadata:
     react-scripts: 5.0.1
     sass-loader: 13.2.0
     storybook-addon-sass-postcss: 0.1.3
+    storybook-css-modules-preset: 1.1.1
     style-loader: 3.3.1
     styled-components: 5.3.6
-    tailwindcss: 3.2.4
+    tailwindcss: latest
     webpack: 5.75.0
   languageName: unknown
   linkType: soft
@@ -8566,6 +8568,19 @@ __metadata:
     react-dom:
       optional: true
   checksum: f9ea9278ba7dd118b9db2dc8b695d661d2d289d4e52f5af02ba0e30f13245043f0c565a71925d8111694a3a02e6b8b459fbd42786fe794895cdb5c8345adf5f5
+  languageName: node
+  linkType: hard
+
+"@storybook/addon-postcss@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@storybook/addon-postcss@npm:2.0.0"
+  dependencies:
+    "@storybook/node-logger": ^6.1.14
+    css-loader: ^3.6.0
+    postcss: ^7.0.35
+    postcss-loader: ^4.2.0
+    style-loader: ^1.3.0
+  checksum: 3dee9003a5fa3d6348c093308b3264d58d415be06b01092c1f62e52a22c3a44f4575a49f3960fbc0f211de0608728fdb139fa0501897221fed5ffc04cd11fa09
   languageName: node
   linkType: hard
 
@@ -13434,24 +13449,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.4.13, autoprefixer@npm:^10.4.13":
-  version: 10.4.13
-  resolution: "autoprefixer@npm:10.4.13"
-  dependencies:
-    browserslist: ^4.21.4
-    caniuse-lite: ^1.0.30001426
-    fraction.js: ^4.2.0
-    normalize-range: ^0.1.2
-    picocolors: ^1.0.0
-    postcss-value-parser: ^4.2.0
-  peerDependencies:
-    postcss: ^8.1.0
-  bin:
-    autoprefixer: bin/autoprefixer
-  checksum: dcb1cb7ae96a3363d65d82e52f9a0a7d8c982256f6fd032d7e1ec311f099c23acfebfd517ff8e96bf93f716a66c4ea2b80c60aa19efd2f474ce434bd75ef7b79
-  languageName: node
-  linkType: hard
-
 "autoprefixer@npm:10.4.8":
   version: 10.4.8
   resolution: "autoprefixer@npm:10.4.8"
@@ -13467,6 +13464,24 @@ __metadata:
   bin:
     autoprefixer: bin/autoprefixer
   checksum: 06cb4c497bb948714d5b1b4f7e7465fd88c50f90788fc2020b3d97d7661fb4dd0d9918c1b09dd3e909acd4485cbb27ad99085487d8ed5d75915e646d2b535770
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:^10.4.13, autoprefixer@npm:latest":
+  version: 10.4.13
+  resolution: "autoprefixer@npm:10.4.13"
+  dependencies:
+    browserslist: ^4.21.4
+    caniuse-lite: ^1.0.30001426
+    fraction.js: ^4.2.0
+    normalize-range: ^0.1.2
+    picocolors: ^1.0.0
+    postcss-value-parser: ^4.2.0
+  peerDependencies:
+    postcss: ^8.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: dcb1cb7ae96a3363d65d82e52f9a0a7d8c982256f6fd032d7e1ec311f099c23acfebfd517ff8e96bf93f716a66c4ea2b80c60aa19efd2f474ce434bd75ef7b79
   languageName: node
   linkType: hard
 
@@ -32872,7 +32887,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.19, postcss@npm:^8.2.15, postcss@npm:^8.3.5, postcss@npm:^8.4.14, postcss@npm:^8.4.18, postcss@npm:^8.4.4, postcss@npm:^8.4.7":
+"postcss@npm:8.4.19, postcss@npm:^8.2.15, postcss@npm:^8.3.5, postcss@npm:^8.4.14, postcss@npm:^8.4.18, postcss@npm:^8.4.4, postcss@npm:^8.4.7, postcss@npm:latest":
   version: 8.4.19
   resolution: "postcss@npm:8.4.19"
   dependencies:
@@ -36643,6 +36658,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"storybook-css-modules-preset@npm:1.1.1":
+  version: 1.1.1
+  resolution: "storybook-css-modules-preset@npm:1.1.1"
+  checksum: 67c622d7b4b04c258c044bd8afc6448133d51f181fd47242a6617d1d34c01b692f2208d68c1a74f6950d0563c7277e54dd22e33408e0003992dd5481829cd3c0
+  languageName: node
+  linkType: hard
+
 "stream-browserify@npm:^2.0.1":
   version: 2.0.2
   resolution: "stream-browserify@npm:2.0.2"
@@ -37498,7 +37520,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwindcss@npm:3.2.4, tailwindcss@npm:^3.0.2, tailwindcss@npm:^3.0.7":
+"tailwindcss@npm:3.2.4, tailwindcss@npm:^3.0.2, tailwindcss@npm:^3.0.7, tailwindcss@npm:latest":
   version: 3.2.4
   resolution: "tailwindcss@npm:3.2.4"
   dependencies:
