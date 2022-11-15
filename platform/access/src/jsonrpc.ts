@@ -50,7 +50,7 @@ export default async (
     async kb_authorize(
       clientId: string,
       redirectUri: string,
-      scope: string,
+      scope: string[],
       state: string
     ): Promise<AuthorizeResult> {
       await isAuthenticated(request, env)
@@ -76,7 +76,7 @@ export default async (
         coreId,
         clientId,
         redirectUri,
-        scope.split(' ').sort(),
+        scope,
         state
       )
     },
