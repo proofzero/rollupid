@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react'
 import { ThemeProvider } from 'styled-components'
 import BaseStyles from './base-theme.module.scss'
-import '../../../.storybook/global.css'
 
 export interface BaseThemeProps extends React.HTMLAttributes<HTMLDivElement> {
   // theme?: any

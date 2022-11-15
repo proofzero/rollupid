@@ -33,14 +33,11 @@ export function Button({
   const disabledClass = disabled ? styles.disabled : ''
   const sizeClass = size ? styles[size] : styles.md
 
-  console.log('onClick is', onClick)
   return (
     <button
       {...rest}
       disabled={disabled}
       className={classNames(
-        'fixed',
-        'right-0',
         styles.button,
         styles.base,
         className,

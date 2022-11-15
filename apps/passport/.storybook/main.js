@@ -29,14 +29,6 @@ module.exports = {
     // You can change the configuration based on that.
     // 'PRODUCTION' is used when building the static version of storybook.
 
-    // Make whatever fine-grained changes you need
-    config.module.rules.push({
-      test: /\.scss$/,
-      sideEffects: true, //scss is considered a side effect of sass
-      use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
-      // include: path.resolve(__dirname, '../src'), // I didn't need this path set
-    })
-
     config.module.rules.push({
       test: /\.css$/,
       use: [
@@ -50,6 +42,14 @@ module.exports = {
         },
       ],
       include: path.resolve(__dirname, '../'),
+    })
+
+    // Make whatever fine-grained changes you need
+    config.module.rules.push({
+      test: /\.scss$/,
+      sideEffects: true, //scss is considered a side effect of sass
+      use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      // include: path.resolve(__dirname, '../src'), // I didn't need this path set
     })
 
     config.plugins.push(

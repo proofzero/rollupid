@@ -9,7 +9,7 @@ export type AuthenticationProps = {
 export function Authentication({ logoURL }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
-    <div className={'fixed right-0'}>
+    <div className={'flex flex-col items-start gap-6'}>
       <div className={'justify-center'}>
         <img className={''} src={logo} alt="3ID Logo" />
       </div>
