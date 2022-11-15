@@ -9,7 +9,10 @@ import { Authentication } from './Authentication'
 # Authentication
 
 <Canvas>
-  <Story name="authentication">
-    <Authentication />
+  <Story name="Auth with Wallet">
+    <Authentication
+      connectCallback={(address) => alert(`connected to ${address}`)}
+      errorCallback={(error) => alert(`Failed to connect: ${error}`)}
+    />
   </Story>
 </Canvas>
