@@ -1,14 +1,13 @@
-import { BaseTheme } from '@kubelt/design-system/src/themes/base-theme/BaseTheme'
-import './global.css'
+import '../app/styles/global.css'
+
+import { GlobalStyle } from '@kubelt/design-system/src/styles/GlobalStyles'
 
 const withTheme = (Story, context) => {
-  // Get the active theme value from the story parameter
-  // const { theme } = context.parameters
-  // const storyTheme = theme === 'dark' ? darkTheme : lightTheme
   return (
-    <BaseTheme>
+    <>
+      <GlobalStyle />
       <Story />
-    </BaseTheme>
+    </>
   )
 }
 

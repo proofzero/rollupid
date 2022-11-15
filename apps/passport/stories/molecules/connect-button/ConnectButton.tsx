@@ -4,6 +4,8 @@ import {
   ButtonProps,
 } from '@kubelt/design-system/src/atoms/button/Button'
 import classNames from 'classnames'
+import styled from 'styled-components'
+import walletsSvg from './wallets.svg'
 
 import {
   WagmiConfig,
@@ -17,8 +19,6 @@ import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 
 // import { ConnectButton } from './connect-button'
-
-import styles from './connect-button.module.scss'
 
 function deconstructConnectors(connectors: Connector<any, any, any>[]) {
   return {
@@ -62,9 +62,24 @@ export function ConnectButtonWrapper({
     disconnect()
   }, [error])
 
+  const StyledConnectButton = styled(Button)`
+    width: 328px !important;
+    .icon {
+      background-repeat: no-repeat;
+      background-size: 100%;
+      height: 20px;
+      width: 20px;
+      margin: 0 7px;
+    }
+
+    .walletIcon {
+      background-image: url('${walletsSvg}');
+    }
+  `
+
   return (
     <>
-      <Button
+      <StyledConnectButton
         className={classNames(className)}
         disabled={status !== 'disconnected'}
         onClick={() => {
@@ -76,9 +91,9 @@ export function ConnectButtonWrapper({
         }}
         {...rest}
       >
-        <span className={classNames(styles.icon, styles.walletIcon)} />
+        <span className={classNames('icon', 'walletIcon')} />
         Connect With Wallet
-      </Button>
+      </StyledConnectButton>
     </>
   )
 }
@@ -129,7 +144,7 @@ export function ConnectButton({
       {error && <div>{error.message}</div>}
       <WagmiConfig client={client}>
         <ConnectButtonWrapper
-          className={classNames(styles.button)}
+          // className={classNames('button')}
           tertiary
           connectCallback={connectCallback}
           errorCallback={errorCallback}

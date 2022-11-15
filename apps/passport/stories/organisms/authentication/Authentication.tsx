@@ -1,5 +1,4 @@
 import { ConnectButton } from '../../molecules/connect-button/ConnectButton'
-import styles from './authentication.module.scss'
 import circleLogo from './circle-logo.svg'
 
 export type AuthenticationProps = {

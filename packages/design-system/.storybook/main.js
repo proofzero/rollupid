@@ -22,6 +22,21 @@ module.exports = {
     // You can change the configuration based on that.
     // 'PRODUCTION' is used when building the static version of storybook.
 
+    // config.module.rules.push({
+    //   test: /\.(ttf|woff|woff2|eot|svg|png|jpg)$/,
+    //   use: [
+    //     {
+    //       loader: 'file-loader',
+    //       options: {
+    //         query: {
+    //           name: '[name].[ext]',
+    //         },
+    //       },
+    //     },
+    //   ],
+    //   include: path.resolve(__dirname, '../'),
+    // })
+
     config.module.rules.push({
       test: /\.css$/,
       use: [

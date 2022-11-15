@@ -1,14 +1,16 @@
-import { BaseTheme } from '../src/themes/base-theme/BaseTheme'
-import './global.css'
+import '../src/styles/global.css'
+
+import { GlobalStyle } from '../src/styles/GlobalStyles'
 
 const withTheme = (Story, context) => {
   // Get the active theme value from the story parameter
   // const { theme } = context.parameters
   // const storyTheme = theme === 'dark' ? darkTheme : lightTheme
   return (
-    <BaseTheme>
+    <>
+      <GlobalStyle />
       <Story />
-    </BaseTheme>
+    </>
   )
 }
 
