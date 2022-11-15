@@ -24,6 +24,8 @@ import { StarbaseApplication } from '@kubelt/do.starbase-application'
 import { StarbaseContract } from '@kubelt/do.starbase-contract'
 import { StarbaseUser } from '@kubelt/do.starbase-user'
 
+import { isAuthenticated } from '@kubelt/platform.commons/src/utils'
+
 import * as secret from './secret'
 
 // Schema
@@ -43,6 +45,9 @@ export { StarbaseApplication, StarbaseContract, StarbaseUser }
 
 // Context key for a KV store binding.
 const KEY_FIXTURES = 'com.kubelt.kv/fixtures'
+
+// Context key for the KV value containing the Datadog API token.
+const KEY_DATADOG = 'com.datadog/token'
 
 // Context key for a KV value containing name of platform app core owner.
 const KEY_PLATFORM_OWNER = 'com.kubelt.value/platform_owner'
@@ -580,8 +585,8 @@ export interface Env {
   // Service bindings
   // ---------------------------------------------------------------------------
 
-  // A binding to the relay service.
-  //AUTH: Auth;
+  // A binding to the authentication service.
+  Account: Fetcher,
 
   // Environment variables
   // ---------------------------------------------------------------------------
@@ -615,14 +620,17 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    // TODO forward request to authorization service.
+    // Forward request to authorization service. This throws if the
+    // authentication doesn't succeed. It relies on service bindings to
+    // communicate with the authorization service ("passport"):
+    // - env.PASSPORT
+    //
     // NB: request must be cloned as it may only be read once.
-    /*
-    const authResponse = await env.AUTH.fetch(request.clone());
-    if (!authResponse.ok) {
-      return authResponse;
+    try {
+      await isAuthenticated(request.clone(), env)
+    } catch (err) {
+      return new Response("Unauthorized", { status: 401 })
     }
-    */
 
     // TEMP Install fixture data; there should be a core for the
     // "console" and for the "threeid" applications.
@@ -652,7 +660,7 @@ export default {
     const context = openrpc.context()
 
     // A secret value; the API token for Datadog metrics collection.
-    context.set('com.datadog/token', env.DATADOG_TOKEN)
+    context.set(KEY_DATADOG, env.DATADOG_TOKEN)
 
     // Store the current environment name.
     context.set(KEY_ENVIRONMENT, env.ENVIRONMENT)

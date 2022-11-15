@@ -6,6 +6,7 @@
     "build": "node build.js",
     "deploy": "wrangler publish",
     "deploy:dev": "wrangler publish --env dev",
+    "dev": "run-s dev:local",
     "dev:local": "run-s types:check build wrangler:local",
     "dev:remote": "run-s types:check build wrangler:remote",
     "format": "run-s format:src",
@@ -36,6 +37,7 @@
     "@kubelt/do.starbase-contract": "workspace:*",
     "@kubelt/do.starbase-user": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
+    "@kubelt/platform.commons": "workspace:*",
     "cross-env": "7.0.3",
     "lodash": "4.17.21",
     "multiformats": "10.0.2"
