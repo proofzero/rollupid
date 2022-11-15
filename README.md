@@ -36,51 +36,15 @@ Let's take a look around at the Kubelt Monorepo layout...
 
 ## Platform
 
-Below is a list of the main platform components that make up Kubelt.
-
-### Galaxy
-
-The [platform/galaxy/](platform/galaxy/) directory contains our GraphQL server and schemas for stitching together logically decentralized services.
-
-### Oort
-
-The [platform/oort/](platform/oort/) directory contains the logically decentralized identity services.
-
-### Passport
-
-(coming soon)
-
-### Starbase
-
-The [starbase/](starbase/) directory contains a web application for interacting with Kubelt and setting up applications on the platform.
-
-### Icons
-
-The [platform/icons/](platform/icons/) directory contains a simple service for generating signed URLs for image upload.
+The [platform/](platform) directory is where all the core identity services. The Kubelt platformed is organized by "local-first" (or logically local) nodes (accounts, address, acccount, and more) organized in a graph by the Galaxy service.
 
 ## Apps
 
-Below is a list of the main apps that make up Kubelt user and developer experiences.
-
-### 3ID
-
-The [apps/threeid/](apps/threeid/) is the 3ID web app. For more information visit [3ID](https://threeid.xyz).
-
-### Console
-
-The [apps/console/](apps/console/) is the developer application portal for configuring 0xAuth apps. For more information visit [3ID](https://kubelt.com).
+The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps inclide the 3ID user experience as well as the Developer Console app.
 
 ## Projects
 
-Kubelt projects are a collection microservices that help support the platform and apps experiences.
-
-### Redeem
-
-The [projects/redeem/](projects/redeem/) directory contains a web application for minting 3ID invites and submitting social proofs.
-
-### NFTAR
-
-The [projects/nftar/](projects/nftar/) directory contains a web application generating 3ID pfps.
+The [projects/](projects) directory is where non-core applications live such as the PFP generation service and more.
 
 ## Smart Contracts
 
@@ -88,11 +52,11 @@ The [smartcontracts/](smartcontracts/) directory contains all of our smart contr
 
 ## Packages
 
-The [packages/](packages/) directory contains package configuration for the things we release to package repository sites like [npm](https://npmjs.com). The current target packages are:
+The [packages/](packages/) directory contains our libraries and other share components.
 
 ### Website / Docs
 
-The [www/](www/) directory contains the Kubelt.com static website documentation portal.
+The [docs/](docs/) directory contains the developer documentation portal.
 
 ## Develop
 
