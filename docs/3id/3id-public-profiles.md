@@ -51,16 +51,6 @@ fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
   })
 ```
 
-## Mermaid Test
-
-```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
-```
-
 ## 3ID Profile Response
 
 If you feed the above `curl` through a tool like `jq`, for example with `curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
