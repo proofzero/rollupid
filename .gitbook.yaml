@@ -1,0 +1,9 @@
+# Note that Webflow manages the public-facing /docs routes for threeid.xyz and kubelt.com.
+root: ./docs/
+
+structure:
+  readme: 3id/3id-public-profiles.md
+  summary: CONTENTS.md
+
+# redirects:
+#  previous/page: new-folder/page.md
