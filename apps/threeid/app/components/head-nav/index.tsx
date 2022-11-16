@@ -65,7 +65,7 @@ export default function HeadNav({
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-24 items-center justify-between px-4 sm:px-0">
+            <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img className="h-10 w-10" src={logo} alt="3ID" />
