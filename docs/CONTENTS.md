@@ -1,12 +1,10 @@
 # Table of contents
 
-## Latest
-
-* [🆔 3ID Public Profiles](latest/3id/3id-public-profiles.md)
-
-## v8.x
+* [🆔 3ID Public Profiles](next/3id/3id-public-profiles.md)
+  * [Some child page](next/3id/child.md)
 
 * [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
+  * [Some child page](v8.x/3id/child.md)
 
 <!--
 ## Use headings to create page groups like this one​
