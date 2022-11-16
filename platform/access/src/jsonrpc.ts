@@ -28,7 +28,7 @@ export default async (
   const getAuthorizationClient = (
     name: string
   ): JsonRpcClient<AuthorizationApi> => {
-    const fetcher = Authorization.get(Authorization.idFromString(name))
+    const fetcher = Authorization.get(Authorization.idFromName(name))
     return createFetcherJsonRpcClient<AuthorizationApi>(fetcher)
   }
 
