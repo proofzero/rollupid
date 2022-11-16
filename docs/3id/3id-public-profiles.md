@@ -10,50 +10,45 @@ description: 3ID Public Profiles are the easiest way for developers to personali
 
 Simply look up a unique account resolver (see below) and onboard your users into a personalized experience, with their familiar display name, profile picture, cover photo, bio, and more.
 
+## Getting Started
 
+To get a user's public profile make an HTTP API call to https://3id.kubelt.com/<resolver>/json, where <resolver> is a unique account identifier (e.g. an Ethereum address).
 
+### Resolvers
 
+Resolvers uniquely identify accounts (e.g., an Ethereum address or Google Account). All resolvers for the same person link to the same 3ID Public Profile, so a user signing in with a crypto wallet or logging with their Google Account has the same account data.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-[Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
+Here is the current list of resolvers. [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
 | Resolver | Description                | Example                                    | Status |
 | -------- | -------------------------- | ------------------------------------------ | ------ |
 | Ethereum | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live   |
 | ENS      | ENS domain names           | alfl.eth                                   | Live   |
+| Google Account | Classic OAuth2 Google Login | alex.flanagan@gmail.com | On Deck |
 
 ## Making a Request
+
+If you visit a profile link in a browser (e.g., [https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722)](https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722) you can see our own rendering of profile data. If you append `/json` to that URL you can query the same API directly:
 
 ```bash
 curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
 ```
 
-Or with `fetch` on the client or server:
+Or, for example, with Javascript `fetch`:
 
 ```javascript
-fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json').then(p => p.json()).then(profile => {
-	console.log('User-set display name:', profile.displayName)
-	console.log('URL for user-set PFP: ', profile.pfp.image)
-	console.log('URL for user-set cover photo: ', profile.cover)
-	console.log('Where the user says they are:', profile.location)
-	console.log('What the user says their job is:', profile.job)
-	console.log('User-specified biography text (256 characters):', profile.bio)
-	console.log('User-specified website URL:', profile.website)
-	console.log('System-set boolean indicating if a user has claimed this profile:', profile.claimed)
-})
+fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
+  .then(p => p.json())
+  .then(profile => {
+    console.log('User-set display name:', profile.displayName)
+    console.log('URL for user-set PFP: ', profile.pfp.image)
+    console.log('URL for user-set cover photo: ', profile.cover)
+    console.log('Where the user says they are:', profile.location)
+    console.log('What the user says their job is:', profile.job)
+    console.log('User-specified biography text (256 characters):', profile.bio)
+    console.log('User-specified website URL:', profile.website)
+    console.log('If a user has claimed this profile:', profile.claimed)
+  })
 ```
 
 ## 3ID Profile Response
