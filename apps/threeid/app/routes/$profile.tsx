@@ -365,8 +365,8 @@ const ProfileRoute = () => {
                   transform: 'scale(1.0)',
                 }
               : {
-                transform: 'scale(0.9)'
-              }
+                  transform: 'scale(0.9)',
+                }
           }
         >
           <img
@@ -447,22 +447,33 @@ const ProfileRoute = () => {
 
             <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
               {location && (
-                <div className="flex flex-row space-x-4 items-center wrap">
-                  <FaMapMarkerAlt /> <Text>{location}</Text>
+                <div className="flex flex-row space-x-2 items-center wrap">
+                  <FaMapMarkerAlt />
+                  <Text weight={TextWeight.Medium500} color={TextColor.Gray500}>
+                    {location}
+                  </Text>
                 </div>
               )}
 
               {job && (
-                <div className="flex flex-row space-x-4 items-center">
-                  <FaBriefcase /> <Text>{job}</Text>
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaBriefcase />
+                  <Text weight={TextWeight.Medium500} color={TextColor.Gray500}>
+                    {job}
+                  </Text>
                 </div>
               )}
 
               {website && (
-                <div className="flex flex-row space-x-4 items-center">
-                  <FaGlobe />{' '}
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaGlobe />
                   <a href={website} target="_blank">
-                    <Text color={TextColor.Indigo500}>{website}</Text>
+                    <Text
+                      weight={TextWeight.Medium500}
+                      color={TextColor.Indigo500}
+                    >
+                      {website}
+                    </Text>
                   </a>
                 </div>
               )}
