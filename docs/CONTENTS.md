@@ -1,6 +1,12 @@
 # Table of contents
 
-* [🆔 3ID Public Profiles](3id/3id-public-profiles.md)
+## Latest
+
+* [🆔 3ID Public Profiles](latest/3id/3id-public-profiles.md)
+
+## v8.x
+
+* [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
 
 <!--
 ## Use headings to create page groups like this one​
