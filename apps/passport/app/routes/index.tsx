@@ -1,39 +1,12 @@
-import { LinksFunction } from '@remix-run/cloudflare'
-import { ConnectButton } from '~/components/connect-button/ConnectButton'
+import { Authentication } from '~/components/authentication/Authentication'
 
 export default function Index() {
   return (
-    <div>
-      <ConnectButton
-        connectCallback={() => alert('connect')}
-        errorCallback={() => alert('error')}
+    <div className={'flex flex-col h-screen justify-center items-center'}>
+      <Authentication
+        connectCallback={(address) => console.log(address)}
+        errorCallback={(error) => console.error(error)}
       />
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
     </div>
   )
 }

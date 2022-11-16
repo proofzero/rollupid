@@ -8,7 +8,6 @@ import {
   ScrollRestoration,
 } from '@remix-run/react'
 
-// import styles from './styles/global.css'
 import styles from './styles/tailwind.css'
 import globalStyles from '@kubelt/design-system/dist/index.css'
 import { links as componentLinks } from '~/components'

@@ -13,9 +13,12 @@
   "scripts": {
     "test": "echo \"no tests. tests executed on chromatic \"",
     "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public",
-    "build": "microbundle stories/index.ts --inline-css --jsx React.createElement"
+    "start:package": "microbundle stories/index.ts --inline-css --jsx React.createElement -w",
+    "start:storybook": "start-storybook -p 6006 -s public",
+    "start": "run-p \"start:*\"",
+    "build:storybook": "build-storybook -s public",
+    "build:package": "microbundle stories/index.ts --inline-css --jsx React.createElement",
+    "build": "run-p \"build:*\""
   },
   "eslintConfig": {
     "extends": [
@@ -88,6 +91,7 @@
     "storybook-css-modules-preset": "1.1.1",
     "style-loader": "3.3.1",
     "tailwindcss": "latest",
-    "webpack": "5.75.0"
+    "webpack": "5.75.0",
+    "yarn-run-all": "3.1.1"
   }
 }

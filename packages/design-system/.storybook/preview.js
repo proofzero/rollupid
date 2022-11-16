@@ -1,14 +1,11 @@
 import '../src/styles/global.css'
 
-import { GlobalStyle } from '../src/styles/GlobalStyles'
-
 const withTheme = (Story, context) => {
   // Get the active theme value from the story parameter
   // const { theme } = context.parameters
   // const storyTheme = theme === 'dark' ? darkTheme : lightTheme
   return (
     <>
-      <GlobalStyle />
       <Story />
     </>
   )
