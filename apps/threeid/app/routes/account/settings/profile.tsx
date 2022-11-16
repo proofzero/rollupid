@@ -80,7 +80,7 @@ export const action: ActionFunction = async ({ request }) => {
     errors.job = ['Job is maximum 30 characters']
   }
 
-  const location = formData.get('job')?.toString()
+  const location = formData.get('location')?.toString()
   if (location && location.length > 30) {
     errors.location = ['Location is maximum 30 characters']
   }

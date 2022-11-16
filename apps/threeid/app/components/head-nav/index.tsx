@@ -65,7 +65,7 @@ export default function HeadNav({
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-24 items-center justify-between px-4 sm:px-0">
+            <div className="flex h-20 items-center justify-between px-4 sm:px-0">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img className="h-10 w-10" src={logo} alt="3ID" />
@@ -84,7 +84,7 @@ export default function HeadNav({
                             return isActive ? activeStyle : undefined
                           }}
                           className={
-                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800 hover:font-semibold'
+                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800'
                           }
                         >
                           <Text
@@ -106,7 +106,7 @@ export default function HeadNav({
                     <div className="flex flex-row items-center space-x-8">
                       <Link to="/">
                         <Text
-                          weight={TextWeight.Bold700}
+                          weight={TextWeight.SemiBold600}
                           size={TextSize.SM}
                           color={TextColor.White}
                         >
@@ -116,9 +116,12 @@ export default function HeadNav({
 
                       <a
                         href="https://get.threeid.xyz"
-                        className="button-base w-full lg:w-fit bg-white py-3 px-8"
+                        className="button-base w-full lg:w-fit bg-white py-3 px-8 rounded-md"
                       >
-                        <Text weight={TextWeight.Bold700} size={TextSize.SM}>
+                        <Text
+                          weight={TextWeight.SemiBold600}
+                          size={TextSize.SM}
+                        >
                           Claim your 3ID
                         </Text>
                       </a>
