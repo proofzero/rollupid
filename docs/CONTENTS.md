@@ -1,10 +1,10 @@
 # Table of contents
 
-* [🆔 3ID Public Profiles](next/3id/3id-public-profiles.md)
-  * [Some child page](next/3id/child.md)
+* [Next](next/3id/README.md)
+  * [🆔 3ID Public Profiles](next/3id/3id-public-profiles.md)
 
-* [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
-  * [Some child page](v8.x/3id/child.md)
+* [v8.x](v8.x/3id/README.md)
+  * [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
 
 <!--
 ## Use headings to create page groups like this one​
