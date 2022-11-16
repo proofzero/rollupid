@@ -1,6 +1,13 @@
+import { LinksFunction } from '@remix-run/cloudflare'
+import { ConnectButton } from '~/components/connect-button/ConnectButton'
+
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
+    <div>
+      <ConnectButton
+        connectCallback={() => alert('connect')}
+        errorCallback={() => alert('error')}
+      />
       <h1>Welcome to Remix</h1>
       <ul>
         <li>
@@ -28,5 +35,5 @@ export default function Index() {
         </li>
       </ul>
     </div>
-  );
+  )
 }

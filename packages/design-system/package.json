@@ -2,6 +2,8 @@
   "name": "@kubelt/design-system",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
   "dependencies": {
     "cra-template-typescript": "1.2.0",
     "react": "18.2.0",
@@ -12,7 +14,8 @@
     "test": "echo \"no tests. tests executed on chromatic \"",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "build": "cross-env BABEL_ENV=production babel src -d dist --extensions \".ts,.tsx\""
   },
   "eslintConfig": {
     "extends": [
@@ -62,7 +65,6 @@
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "autoprefixer": "latest",
-    "babel-plugin-named-exports-order": "0.0.2",
     "chromatic": "6.11.4",
     "cross-env": "7.0.3",
     "css-loader": "6.7.1",
@@ -77,6 +79,7 @@
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.31.10",
     "eslint-plugin-standard": "5.0.0",
+    "microbundle": "0.15.1",
     "postcss": "latest",
     "prettier": "2.7.1",
     "prop-types": "15.8.1",

@@ -1,11 +1,6 @@
 import React, { ReactNode, useState, useEffect } from 'react'
-import {
-  Button,
-  ButtonProps,
-} from '@kubelt/design-system/src/atoms/button/Button'
+import { Button, ButtonProps } from '@kubelt/design-system'
 import classNames from 'classnames'
-import styled from 'styled-components'
-import walletsSvg from './wallets.svg'
 
 import {
   WagmiConfig,
@@ -17,8 +12,11 @@ import { publicProvider } from 'wagmi/providers/public'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
+import { LinksFunction } from '@remix-run/cloudflare'
 
-// import { ConnectButton } from './connect-button'
+import styles from './ConnectButton.css'
+
+export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 function deconstructConnectors(connectors: Connector<any, any, any>[]) {
   return {
@@ -62,24 +60,9 @@ export function ConnectButtonWrapper({
     disconnect()
   }, [error])
 
-  const StyledConnectButton = styled(Button)`
-    width: 328px !important;
-    .icon {
-      background-repeat: no-repeat;
-      background-size: 100%;
-      height: 20px;
-      width: 20px;
-      margin: 0 7px;
-    }
-
-    .walletIcon {
-      background-image: url('${walletsSvg}');
-    }
-  `
-
   return (
     <>
-      <StyledConnectButton
+      <Button
         className={classNames(className)}
         disabled={status !== 'disconnected'}
         onClick={() => {
@@ -91,9 +74,9 @@ export function ConnectButtonWrapper({
         }}
         {...rest}
       >
-        <span className={classNames('icon', 'walletIcon')} />
+        <span className={classNames('icon', 'wallet-icon')} />
         Connect With Wallet
-      </StyledConnectButton>
+      </Button>
     </>
   )
 }
@@ -144,7 +127,7 @@ export function ConnectButton({
       {error && <div>{error.message}</div>}
       <WagmiConfig client={client}>
         <ConnectButtonWrapper
-          // className={classNames('button')}
+          className={classNames('button')}
           tertiary
           connectCallback={connectCallback}
           errorCallback={errorCallback}

@@ -1,4 +1,4 @@
-import { ConnectButton } from '../../molecules/connect-button/ConnectButton'
+import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
 import circleLogo from './circle-logo.svg'
 
 export type AuthenticationProps = {

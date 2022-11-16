@@ -3,7 +3,6 @@ import {
   Button,
   ButtonProps,
 } from '@kubelt/design-system/src/atoms/button/Button'
-import classNames from 'classnames'
 
 import threeIdLogo from './3id.svg'
 
