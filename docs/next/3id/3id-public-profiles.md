@@ -4,7 +4,7 @@ description: 3ID Public Profiles are the easiest way for developers to personali
 
 # 🆔 3ID Public Profiles
 
-## Introduction
+## Introductiono
 
 3ID Public Profiles help you customize your application for your users with one API call.
 
