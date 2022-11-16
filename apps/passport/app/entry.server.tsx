@@ -12,6 +12,8 @@ export default function handleRequest(
     <RemixServer context={remixContext} url={request.url} />
   )
 
+  // TODO: add service bindings to request context
+
   responseHeaders.set('Content-Type', 'text/html')
 
   return new Response('<!DOCTYPE html>' + markup, {

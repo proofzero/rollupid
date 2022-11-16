@@ -1,19 +1,10 @@
 import React, { ReactNode, useState, useEffect } from 'react'
-import { Button, ButtonProps } from '@kubelt/design-system'
 import classNames from 'classnames'
-
-import {
-  WagmiConfig,
-  createClient,
-  defaultChains,
-  configureChains,
-} from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { Button, ButtonProps } from '@kubelt/design-system'
 import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
 import { LinksFunction } from '@remix-run/cloudflare'
 
+import walletsSvg from './wallets.svg'
 import styles from './ConnectButton.css'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
@@ -74,8 +65,12 @@ export function ConnectButtonWrapper({
         }}
         {...rest}
       >
-        <span className={classNames('icon', 'wallet-icon')} />
-        Connect With Wallet
+        <span className={classNames('icon')}>
+          <img src={walletsSvg} />
+        </span>
+        {pendingConnector || isLoading
+          ? 'Connect With Wallet'
+          : '...Connecting'}
       </Button>
     </>
   )
@@ -94,46 +89,17 @@ export function ConnectButton({
   // TODO: what to do with errors?
   const [error, setError] = useState<Error | null>(null)
 
-  // Setup client for connecting to wallets
-  const { chains, provider, webSocketProvider } = configureChains(
-    defaultChains,
-    [publicProvider()] // TODO: add non default provider selection via props
-  )
-
-  const client = createClient({
-    autoConnect: false,
-    connectors: [
-      new WalletConnectConnector({
-        chains,
-        options: {
-          qrcode: true,
-        },
-      }),
-      new InjectedConnector({
-        chains,
-        options: {
-          name: 'Injected',
-          shimDisconnect: true,
-        },
-      }),
-    ],
-    provider,
-    webSocketProvider,
-  })
-
   return (
     <>
       {/* {status} */}
       {error && <div>{error.message}</div>}
-      <WagmiConfig client={client}>
-        <ConnectButtonWrapper
-          className={classNames('button')}
-          tertiary
-          connectCallback={connectCallback}
-          errorCallback={errorCallback}
-          {...rest}
-        />
-      </WagmiConfig>
+      <ConnectButtonWrapper
+        className={classNames('button')}
+        tertiary
+        connectCallback={connectCallback}
+        errorCallback={errorCallback}
+        {...rest}
+      />
     </>
   )
 }

@@ -1,8 +1,5 @@
 import React, { ReactNode, useState, useEffect } from 'react'
-import {
-  Button,
-  ButtonProps,
-} from '@kubelt/design-system/src/atoms/button/Button'
+import { Button, ButtonProps } from '@kubelt/design-system'
 
 import threeIdLogo from './3id.svg'
 
