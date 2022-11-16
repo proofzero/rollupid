@@ -1,3 +1,4 @@
+# Note that Webflow manages the public-facing /docs routes for threeid.xyz and kubelt.com.
 root: ./docs/
 
 structure:
