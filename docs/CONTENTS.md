@@ -1,9 +1,9 @@
 # Table of contents
 
-* [next](next/3id/README.md)
+* [next](next/3id/)
   * [🆔 3ID Public Profiles](next/3id/3id-public-profiles.md)
 
-* [v8.x](v8.x/3id/README.md)
+* [v8.x](v8.x/3id/)
   * [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
 
 <!--
