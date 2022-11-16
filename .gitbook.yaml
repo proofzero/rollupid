@@ -5,5 +5,4 @@ structure:
   summary: CONTENTS.md
 
 redirects:
-  "/": next/3id/3id-public-profiles.md
-#  "/3id-1": v8.x/3id/3id-public-profiles.md
+  next/3id/README.md: next/3id/3id-public-profiles.md
