@@ -1,16 +1,32 @@
 ---
-description: This is a page description
+description: 3ID Public Profiles are the easiest way for developers to personalize their apps for users.
 ---
 
 # 🆔 3ID Public Profiles
 
-3ID is the easiest way for developers to give users a consistent, friendly experience across apps. You're one query away from giving users a personalized experience that increases their trust and joy in using your product.
+## Introduction
 
-## 3ID Profile URLs
+3ID Public Profiles help you customize your application for your users with one API call.
 
-Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). All resolvers for the same person link to the same 3ID profile, so someone can sign in with a wallet or login with their Google Account and have the same experience.
+Simply look up a unique account resolver (see below) and onboard your users into a personalized experience, with their familiar display name, profile picture, cover photo, bio, and more.
 
-**This makes it really easy to onboard Web 2.0 users to web3 products.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
 
