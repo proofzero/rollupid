@@ -1,2 +1,0 @@
-# Yet another page
-
