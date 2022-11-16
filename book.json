@@ -1,0 +1,13 @@
+{
+  "root": "./docs/",
+  "structure": {
+    "readme": "3id/3id-public-profiles.md",
+    "summary": "CONTENTS.md"
+  },
+  "plugins": [ "versions" ],
+  "pluginsConfig": {
+    "versions": {
+      "type": "tags"
+    }
+  }
+}
