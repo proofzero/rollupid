@@ -428,8 +428,8 @@ const ProfileRoute = () => {
             <Text
               className="mt-5 mb-2.5"
               weight={TextWeight.Bold700}
-              color={TextColor.Gray600}
-              size={TextSize.XL2}
+              color={TextColor.Gray800}
+              size={TextSize.XL4}
             >
               {displayName ?? shortenedAccount}
             </Text>
