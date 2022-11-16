@@ -84,7 +84,7 @@ export default function HeadNav({
                             return isActive ? activeStyle : undefined
                           }}
                           className={
-                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800 hover:font-semibold'
+                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800'
                           }
                         >
                           <Text
