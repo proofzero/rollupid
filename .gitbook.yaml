@@ -2,8 +2,8 @@
 root: ./docs/
 
 structure:
-#  readme: 3id.md
-  summary: SUMMARY.md
+  readme: 3id.md
+  summary: CONTENTS.md
 
 # redirects:
 #  previous/page: new-folder/page.md
