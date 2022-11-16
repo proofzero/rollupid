@@ -1,17 +1,3 @@
----
-title: 3ID Quick Start
-lead: ''
-date: 2020-11-16T12:59:39.000Z
-lastmod: 2020-11-16T12:59:39.000Z
-draft: false
-images: []
-menu:
-  docs:
-    parent: 3id
-weight: 700
-toc: true
----
-
 # 🆔 3ID Public Profiles
 
 3ID is the easiest way for developers to give users a consistent, friendly experience across apps. You're one query away from giving users a personalized experience that increases their trust and joy in using your product.

@@ -1,6 +1,6 @@
 # Table of contents
 
-* [🆔 3ID Public Profiles](3id.md)
+* [🆔 3ID Public Profiles](3id/3id-public-profiles.md)
 
 <!--
 ## Use headings to create page groups like this one​
