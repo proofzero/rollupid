@@ -2,7 +2,7 @@
 root: ./docs/
 
 structure:
-  readme: 3id.md
+  readme: 3id/3id-public-profiles.md
   summary: CONTENTS.md
 
 # redirects:
