@@ -1,15 +1,16 @@
-# Summary​
+# Table of contents
+
+* [🆔 3ID Public Profiles](3id.md)
 
 ## Use headings to create page groups like this one​
 
-* [First page's title](page1/README.md)    
-    * [Some child page](page1/page1-1.md)    
-    * [Some other child page](part1/page1-2.md)
-
-* [Second page's title](page2/README.md)    
-    * [Some child page](page2/page2-1.md)    
-    * [Some other child page](part2/page2-2.md)    
+* [First page's title](use-headings-to-create-page-groups-like-this-one/first-pages-title/README.md)
+  * [Some child page](use-headings-to-create-page-groups-like-this-one/first-pages-title/some-child-page.md)
+  * [Some other child page](use-headings-to-create-page-groups-like-this-one/first-pages-title/some-other-child-page.md)
+* [Second page's title](use-headings-to-create-page-groups-like-this-one/second-pages-title/README.md)
+  * [Some child page](use-headings-to-create-page-groups-like-this-one/second-pages-title/some-child-page.md)
+  * [Some other child page](use-headings-to-create-page-groups-like-this-one/second-pages-title/some-other-child-page.md)
 
 ## A second-page group​
 
-* [Yet another page](another-page.md)
+* [Yet another page](a-second-page-group/yet-another-page.md)

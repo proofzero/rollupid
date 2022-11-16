@@ -1,34 +1,35 @@
 ---
-title: "3ID Quick Start"
-description: ""
-lead: ""
-date: 2020-11-16T13:59:39+01:00
-lastmod: 2020-11-16T13:59:39+01:00
+title: 3ID Quick Start
+lead: ''
+date: 2020-11-16T12:59:39.000Z
+lastmod: 2020-11-16T12:59:39.000Z
 draft: false
 images: []
 menu:
   docs:
-    parent: "3id"
+    parent: 3id
 weight: 700
 toc: true
 ---
 
+# 🆔 3ID Public Profiles
+
 3ID is the easiest way for developers to give users a consistent, friendly experience across apps. You're one query away from giving users a personalized experience that increases their trust and joy in using your product.
 
-### 3ID Profile URLs
+## 3ID Profile URLs
 
 Profile requests take the form `https://3id.kubelt.com/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address). All resolvers for the same person link to the same 3ID profile, so someone can sign in with a wallet or login with their Google Account and have the same experience.
 
-__This makes it really easy to onboard Web 2.0 users to web3 products.__
+**This makes it really easy to onboard Web 2.0 users to web3 products.**
 
 [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want. Here's the current list:
 
-| Resolver    | Description                | Example                                      | Status      |
-| ----------- | -------------------------- | -------------------------------------------- | ----------- |
-| Ethereum    | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52   | Live        |
-| ENS         | ENS domain names           | alfl.eth                                     | On Deck     |
+| Resolver | Description                | Example                                    | Status |
+| -------- | -------------------------- | ------------------------------------------ | ------ |
+| Ethereum | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live   |
+| ENS      | ENS domain names           | alfl.eth                                   | Live   |
 
-### Making a Request
+## Making a Request
 
 ```bash
 curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
@@ -49,7 +50,7 @@ fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json').
 })
 ```
 
-### 3ID Profile Response
+## 3ID Profile Response
 
 If you feed the above `curl` through a tool like `jq`, for example with `curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
 
@@ -79,12 +80,12 @@ If you feed the above `curl` through a tool like `jq`, for example with `curl ht
 | website       | User-specified URL for their website.                   |
 | claimed       | JSON boolean indicating whether the profile is claimed. |
 
-### Custom User Data
+## Custom User Data
 
 Using 3ID means you don't have to worry about storing user data -- your users can store it themselves!
 
 In order to store your own custom application data within a user's 3ID profile you will need to use a custom application namespace as well as our new encrypted storage RPC methods. [Join our Discord](https://discord.gg/UgwAsJf6C5) to talk to us about your use case and get beta access.
 
-### FAQ
+## FAQ
 
 Joining our [Discord →](https://discord.gg/UgwAsJf6C5) is the fastest way to get your question answered.
