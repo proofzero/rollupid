@@ -106,7 +106,7 @@ export default function HeadNav({
                     <div className="flex flex-row items-center space-x-8">
                       <Link to="/">
                         <Text
-                          weight={TextWeight.Bold700}
+                          weight={TextWeight.SemiBold600}
                           size={TextSize.SM}
                           color={TextColor.White}
                         >
@@ -116,9 +116,12 @@ export default function HeadNav({
 
                       <a
                         href="https://get.threeid.xyz"
-                        className="button-base w-full lg:w-fit bg-white py-3 px-8"
+                        className="button-base w-full lg:w-fit bg-white py-3 px-8 rounded-md"
                       >
-                        <Text weight={TextWeight.Bold700} size={TextSize.SM}>
+                        <Text
+                          weight={TextWeight.SemiBold600}
+                          size={TextSize.SM}
+                        >
                           Claim your 3ID
                         </Text>
                       </a>
