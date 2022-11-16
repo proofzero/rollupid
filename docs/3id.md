@@ -1,3 +1,7 @@
+---
+description: This is a page description
+---
+
 # 🆔 3ID Public Profiles
 
 3ID is the easiest way for developers to give users a consistent, friendly experience across apps. You're one query away from giving users a personalized experience that increases their trust and joy in using your product.
