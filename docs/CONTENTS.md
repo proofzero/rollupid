@@ -2,6 +2,7 @@
 
 * [🆔 3ID Public Profiles](3id.md)
 
+<!--
 ## Use headings to create page groups like this one​
 
 * [First page's title](use-headings-to-create-page-groups-like-this-one/first-pages-title/README.md)
@@ -14,3 +15,4 @@
 ## A second-page group​
 
 * [Yet another page](a-second-page-group/yet-another-page.md)
+-->
