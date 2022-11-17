@@ -56,7 +56,7 @@ export interface WorkerApi {
   kb_authorize(
     clientId: string,
     redirectUri: string,
-    scope: string,
+    scope: Scope,
     state: string
   ): Promise<AuthorizeResult>
   kb_exchangeCode(

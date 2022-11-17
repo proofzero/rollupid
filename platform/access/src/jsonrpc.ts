@@ -17,6 +17,7 @@ import {
   Environment,
   ExchangeCodeResult,
   RefreshResult,
+  Scope,
   WorkerApi,
 } from './types'
 
@@ -50,7 +51,7 @@ export default async (
     async kb_authorize(
       clientId: string,
       redirectUri: string,
-      scope: string[],
+      scope: Scope,
       state: string
     ): Promise<AuthorizeResult> {
       await isAuthenticated(request, env)
