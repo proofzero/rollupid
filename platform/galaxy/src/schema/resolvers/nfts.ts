@@ -5,6 +5,12 @@ import NFTScanClient from './clients/nftscan'
 
 import { Resolvers } from "./typedefs";
 
+import Env from '../../env'
+
+type ResolverContext = {
+  env: Env
+}
+
 import {
   setupContext,
   isAuthorized,
@@ -14,19 +20,17 @@ import {
 
 const nftsResolver: Resolvers = {
   Query: {
-    nftsForAddress: (
-      _parent,
-      { address },
-      {
-        /* oort send, jwt */
-      }
+    nftsForAddress: async (
+      _parent: any,
+      { address }: { address: string },
+      { env }: ResolverContext
     ) => {
-      // const nftScanClient = new NFTScanClient()
-      // const response = nftScanClient.getTokensForAccount(address)
-      // console.log(response)
+      const nftScanClient = new NFTScanClient(env.NFT_SCAN_API_KEY)
+      const response = await nftScanClient.getTokensForAccount(address)
+      // console.log(await response.text())
       return {
         total: 1,
-        next: 'yo',
+        next: await response.text(),
         content: [{
           contract_address: '123',
           contract_name: 'BAYC:3ID',
