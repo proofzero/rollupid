@@ -1,0 +1,5 @@
+query getNFTsForAddress($address: String!) {
+  nftsForAddress(address: $address) {
+    total
+  }
+}

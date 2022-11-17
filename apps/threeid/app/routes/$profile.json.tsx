@@ -19,8 +19,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       address: params.profile,
     })
 
+    const nftsRes = await galaxyClient.getNFTsForAddress({
+      address: params.profile,
+    })
+
     return json({
       ...profileRes.profileFromAddress,
+      nfts: {
+        ...nftsRes,
+      },
       claimed: true,
     }, {
       headers: {
