@@ -6,6 +6,10 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
+export interface BaseApi {
+  [key: string]: Func
+}
+
 /**
  * Instantiates a client object decorated with methods specified in `Api` type.
  *
