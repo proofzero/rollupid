@@ -6,6 +6,14 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
+export interface BaseApi {
+  [key: string]: Func
+}
+
+export interface DurableObjectApi extends BaseApi {
+  get(key: string): Promise<unknown>
+}
+
 /**
  * Instantiates a client object decorated with methods specified in `Api` type.
  *

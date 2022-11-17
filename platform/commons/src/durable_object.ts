@@ -33,7 +33,7 @@ export interface Context {
 export default class DurableObject<
   Environment,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Methods extends { [key: string]: any }
+  Api extends { [key: string]: any }
 > {
   id: string
   state: DurableObjectState
@@ -49,8 +49,12 @@ export default class DurableObject<
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  methods(proxy: object): Methods {
+  methods(proxy: object): Api {
     throw new Error('not implemented')
+  }
+
+  get(key: string): Promise<unknown> {
+    return this.storage.get(key)
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -69,7 +73,7 @@ export default class DurableObject<
     })
 
     const methods = this.methods(proxy)
-    const requestHandler = createRequestHandler<Methods>(methods)
+    const requestHandler = createRequestHandler<Api>(methods)
     try {
       const jsonRpcRequest: JsonRpcRequest = await request.json()
       const jsonRpcResponse: JsonRpcResponse =
