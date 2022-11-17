@@ -16,13 +16,13 @@ export default class NFTScanClient {
     this.jwt = jwt
   }
 
-  requestFactory(_url: URL): Request {
+  requestFactory(url: URL): Request {
     const headers: HeadersObject = {
       'X-API-KEY': this.nftScanAPIKey
     }
 
     return new Request(
-      _url.href,
+      url.href,
       {
         headers,
       }
@@ -41,6 +41,9 @@ export default class NFTScanClient {
     // url.searchParams.append('cursor', next)
     // url.searchParams.append('limit', 1000) // default 1000
     url.searchParams.append('show_attribute', 'true') // default false    
+    // TODO: Pagination and 1155s
     return this.send(url)
+      .then(r => r?.json())
+      .then(r => r?.data)
   }
 }

@@ -1,22 +1,21 @@
 import { composeResolvers } from "@graphql-tools/resolvers-composition";
-import { GraphQLYogaError } from "@graphql-yoga/common";
+// import { GraphQLYogaError } from "@graphql-yoga/common";
 
 import NFTScanClient from './clients/nftscan'
 
 import { Resolvers } from "./typedefs";
-
 import Env from '../../env'
 
 type ResolverContext = {
   env: Env
 }
 
-import {
-  setupContext,
-  isAuthorized,
-  checkHTTPStatus,
-  getRPCResult,
-} from "./utils";
+// import {
+//   setupContext,
+//   isAuthorized,
+//   checkHTTPStatus,
+//   getRPCResult,
+// } from "./utils";
 
 const nftsResolver: Resolvers = {
   Query: {
@@ -26,10 +25,7 @@ const nftsResolver: Resolvers = {
       { env }: ResolverContext
     ) => {
       const nftScanClient = new NFTScanClient(env.NFT_SCAN_API_KEY)
-      const responseJSON = await nftScanClient.getTokensForAccount(address)
-        .then(r => r?.json())
-        .then(r => r?.data)
-      return responseJSON
+      return nftScanClient.getTokensForAccount(address)
     }
   },
   Mutation: {},
