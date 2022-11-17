@@ -20,46 +20,26 @@ export default class NFTScanClient {
     this.jwt = jwt
   }
 
-  async send(
-  ): Promise<Response> {
-    const id = method
-      .replace(/^.+_/, '')
-      .replace(/[A-Z]/g, (m) => '-' + m.toLowerCase())
-
+  async send(url: URL): Promise<Response> {
     const headers: HeadersObject = {
       'X-API-KEY': 'whatever'
     }
 
-    if (this.jwt) {
-      headers['KBT-Access-JWT-Assertion'] = this.jwt
-    }
-    if (options?.route?.address) {
-      headers['KBT-Core-Address'] = options.route.address
-    }
-
     const request = new Request(
-      //@ts-ignore
-      `https://127.0.0.1/jsonrpc`,
+      url.href,
       {
-        method: 'POST',
         headers,
-        body: JSON.stringify({
-          id,
-          jsonrpc: '2.0',
-          method,
-          params,
-        }),
       }
     )
 
     //@ts-ignore
-    const response = await this.oort.fetch(request)
+    const response = await this.nftScan.fetch(request)
 
     return response
   }
 
   async getTokensForAccount(address: string): Promise<Response> {
-    const url = new URL(`/v2/account/own/${address}`, this.baseURL)
+    const url = new URL(`/v2/account/own/${address}`, this.baseURL.href)
     return this.send(url)
   }
 }

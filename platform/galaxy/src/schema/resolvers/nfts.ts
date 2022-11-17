@@ -1,6 +1,8 @@
 import { composeResolvers } from "@graphql-tools/resolvers-composition";
 import { GraphQLYogaError } from "@graphql-yoga/common";
 
+import NFTScanClient from './clients/nftscan'
+
 import { Resolvers } from "./typedefs";
 
 import {
@@ -19,9 +21,12 @@ const nftsResolver: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
+      const nftScanClient = new NFTScanClient()
+      const response = nftScanClient.getTokensForAccount(address)
+      console.log(response)
       return {
         total: 0,
-        next: null,
+        next: ,
         content: [null]
       };
     }
