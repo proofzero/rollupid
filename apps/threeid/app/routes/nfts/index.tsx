@@ -1,6 +1,7 @@
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { AlchemyClient } from '~/utils/alchemy.server'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
