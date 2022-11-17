@@ -1,8 +1,17 @@
 import { Button } from '@kubelt/design-system'
 
+import authorizeCheck from '../../assets/authorize-check.svg'
+import publicProfileScopeIcon from './public-profile-scope-icon.svg'
+
+export type Scope = {
+  id: string
+  name: string
+  description: string
+}
 export type AppProfile = {
   name: string
   logo: string
+  scopes: Scope[]
 }
 
 export type UserProfile = {
@@ -21,23 +30,45 @@ export type AuthorizationProps = {
 export function Authorization({ appProfile, userProfile }: AuthorizationProps) {
   return (
     <div className={'flex flex-col gap-4 basis-96'}>
-      <div className={'flex flex-col items-center justify-center'}>
+      <div className={'flex flex-row items-center justify-center'}>
         <img className={''} src={appProfile.logo} alt="App Logo" />
+        <img src={authorizeCheck} alt="Authorize Check" />
+        {/* TODO: replace with avatar component */}
+        <img
+          src={userProfile.pfp.url}
+          style={{ width: 50 }}
+          alt="User Profile"
+        />
+        {/*  */}
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
         <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
-        <h2 style={{ color: '#6B7280' }} className={'font-light text-base'}>
+        <p style={{ color: '#6B7280' }} className={'font-light text-base'}>
           Would like access to the following information
-        </h2>
+        </p>
       </div>
-      <div className={'flex flex-col gap-2 items-start justify-start'}>
+      <div className={'flex flex-col gap-4 items-start justify-start'}>
         <div className={'items-start justify-start'}>
-          <h2
+          <p
             style={{ color: '#6B7280' }}
-            className={'font-extralight text-sm'}
+            className={'mb-2 font-extralight text-sm'}
           >
             Available
-          </h2>
+          </p>
+          <ul
+            style={{ color: '#6B7280' }}
+            className={'flex flex-col font-light text-base'}
+          >
+            <li className={'flex flex-row gap-4 items-center'}>
+              <span>
+                <img
+                  src={publicProfileScopeIcon}
+                  alt="Public Profile Scope IconIcon"
+                />
+              </span>
+              Edit Public Profile
+            </li>
+          </ul>
         </div>
       </div>
       <div className={'flex flex-row items-center justify-center gap-4'}>

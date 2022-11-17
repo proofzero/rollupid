@@ -12,6 +12,13 @@ export const Template = (args) => <Authorization {...args} />
 
 <Canvas>
   <Story
+    decorators={[
+      (Story) => (
+        <div style={{ width: 482, padding: 12, margin: 'auto' }}>
+          <Story />
+        </div>
+      ),
+    ]}
     name="Authorization"
     args={{
       appProfile: {
@@ -21,7 +28,7 @@ export const Template = (args) => <Authorization {...args} />
       userProfile: {
         name: 'John Doe',
         pfp: {
-          url: 'https://i.imgur.com/8Qq7ZQx.jpg',
+          url: 'https://data.rareapepes.com/5400.png',
           isToken: false,
         },
       },
