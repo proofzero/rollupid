@@ -15,8 +15,8 @@ import {
   AuthorizationApi,
   AuthorizeResult,
   Environment,
-  ExchangeCodeResult,
-  RefreshResult,
+  ExchangeAuthorizationCodeResult,
+  RefreshAuthorizationResult,
   Scope,
   WorkerApi,
 } from './types'
@@ -83,12 +83,12 @@ export default async (
         state
       )
     },
-    async kb_exchangeCode(
+    async kb_exchangeAuthorizationCode(
       code: string,
       redirectUri: string,
       clientId: string,
       clientSecret: string
-    ): Promise<ExchangeCodeResult> {
+    ): Promise<ExchangeAuthorizationCodeResult> {
       await isAuthenticated(request, env)
       const coreId = await getCoreId(request, env)
       if (!coreId) {
@@ -130,7 +130,9 @@ export default async (
         return false
       }
     },
-    async kb_refreshToken(token: string): Promise<RefreshResult> {
+    async kb_refreshAuthorization(
+      token: string
+    ): Promise<RefreshAuthorizationResult> {
       return getAccessClient(token).refresh(token)
     },
   })

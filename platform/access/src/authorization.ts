@@ -13,7 +13,7 @@ import {
   AuthorizationRequest,
   AuthorizeResult,
   Environment,
-  ExchangeCodeResult,
+  ExchangeAuthorizationCodeResult,
   Scope,
 } from './types'
 
@@ -52,9 +52,8 @@ export default class Authorization extends DurableObject<Environment, Api> {
     appId: string,
     code: string,
     redirectUri: string,
-    clientId: string,
-    clientSecret: string
-  ): Promise<ExchangeCodeResult> {
+    clientId: string
+  ): Promise<ExchangeAuthorizationCodeResult> {
     const { Access } = this.env
 
     const coreId = await this.storage.get<string>('coreId')

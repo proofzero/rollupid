@@ -49,9 +49,10 @@ export type GenerateResult = {
   refreshToken: string
 }
 
-export type ExchangeCodeResult = GenerateResult
+export type ExchangeAuthorizationCodeResult = GenerateResult
 
-export type RefreshResult = GenerateResult
+export type VerifyAuthorizationResult = boolean
+export type RefreshAuthorizationResult = GenerateResult
 
 export interface WorkerApi {
   kb_authorize(
@@ -61,14 +62,14 @@ export interface WorkerApi {
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult>
-  kb_exchangeCode(
+  kb_exchangeAuthorizationCode(
     code: string,
     redirectUri: string,
     clientId: string,
     clientSecret: string
-  ): Promise<ExchangeCodeResult>
-  kb_verifyAuthorization(token: string): Promise<boolean>
-  kb_refreshToken(token: string): Promise<RefreshResult>
+  ): Promise<ExchangeAuthorizationCodeResult>
+  kb_verifyAuthorization(token: string): Promise<VerifyAuthorizationResult>
+  kb_refreshAuthorization(token: string): Promise<RefreshAuthorizationResult>
 }
 
 export interface AuthorizationApi extends DurableObjectApi {
@@ -84,9 +85,8 @@ export interface AuthorizationApi extends DurableObjectApi {
     appId: string,
     code: string,
     redirectUri: string,
-    clientId: string,
-    clientSecret: string
-  ): Promise<ExchangeCodeResult>
+    clientId: string
+  ): Promise<ExchangeAuthorizationCodeResult>
 }
 
 export interface AccessApi extends BaseApi {
@@ -97,5 +97,5 @@ export interface AccessApi extends BaseApi {
     scope: Scope
   ): Promise<GenerateResult>
   verify(token: string): Promise<jose.JWTVerifyResult>
-  refresh(token: string): Promise<RefreshResult>
+  refresh(token: string): Promise<RefreshAuthorizationResult>
 }

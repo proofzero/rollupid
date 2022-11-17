@@ -13,7 +13,7 @@ import {
   GenerateResult,
   KeyPair,
   KeyPairSerialized,
-  RefreshResult,
+  RefreshAuthorizationResult,
   Scope,
 } from './types'
 
@@ -74,7 +74,7 @@ export default class Access extends DurableObject<Environment, Api> {
     return jose.jwtVerify(token, key, options)
   }
 
-  async refresh(token: string): Promise<RefreshResult> {
+  async refresh(token: string): Promise<RefreshAuthorizationResult> {
     await this.verify(token)
     const params = await this.storage.get<AccessParameters>('params')
     if (!params) {
