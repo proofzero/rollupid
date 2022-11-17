@@ -3,14 +3,16 @@ import circleLogo from './circle-logo.svg'
 
 export type AuthenticationProps = {
   logoURL?: string
+  enableWalletConnect: boolean
   connectCallback: (address: string) => void
   errorCallback: (error: Error) => void
 }
 
 export function Authentication({
   logoURL,
+  enableWalletConnect = true,
   connectCallback,
-  errorCallback,
+  errorCallback: connectErrorCallback,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
@@ -25,8 +27,9 @@ export function Authentication({
         </h2>
       </div>
       <ConnectButton
+        disabled={!enableWalletConnect}
         connectCallback={connectCallback}
-        errorCallback={errorCallback}
+        connectErrorCallback={connectErrorCallback}
       />
     </div>
   )

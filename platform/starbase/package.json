@@ -9,6 +9,7 @@
     "dev": "run-s dev:local",
     "dev:local": "run-s types:check build wrangler:local",
     "dev:remote": "run-s types:check build wrangler:remote",
+    "dev:wrangler": "wrangler dev --local --persist",
     "format": "run-s format:src",
     "format:src": "prettier --write src/",
     "format:test": "prettier --write test/",

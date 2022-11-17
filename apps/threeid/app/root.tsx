@@ -39,7 +39,7 @@ export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: '3ID',
   viewport: 'width=device-width,initial-scale=1',
-  'og:title': '3ID - Decentralized Web Passport',
+  'og:title': '3ID - Decentralized Identity',
   'og:site_name': '3ID',
   'og:url': 'https://3id.kubelt.com',
   'og:description':

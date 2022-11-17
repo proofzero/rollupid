@@ -18,12 +18,12 @@ function deconstructConnectors(connectors: Connector<any, any, any>[]) {
 
 export type ConnectButtonHandlerProps = {
   connectCallback: (address: string) => void
-  errorCallback: (error: Error) => void
+  connectErrorCallback: (error: Error) => void
   className?: string
 } & ButtonProps
 
 export function ConnectButtonWrapper({
-  errorCallback,
+  connectErrorCallback,
   connectCallback,
   className,
   ...rest
@@ -39,16 +39,15 @@ export function ConnectButtonWrapper({
 
   useEffect(() => {
     if (isConnected) {
-      console.log('Connected to wallet', address)
       connectCallback(address)
     }
   }, [isConnected])
 
   useEffect(() => {
     if (error) {
-      errorCallback(error)
+      disconnect()
+      connectErrorCallback(error)
     }
-    disconnect()
   }, [error])
 
   return (
@@ -68,22 +67,22 @@ export function ConnectButtonWrapper({
         <span className={classNames('icon')}>
           <img src={walletsSvg} />
         </span>
-        {pendingConnector || isLoading
-          ? 'Connect With Wallet'
-          : '...Connecting'}
+        {!pendingConnector || !isLoading ? 'Connect With Wallet' : 'Connecting'}
       </Button>
     </>
   )
 }
 
 export type ConnectButtonProps = {
+  disabled?: boolean
   connectCallback: (address: string) => void
-  errorCallback: (error: Error) => void
+  connectErrorCallback: (error: Error) => void
 }
 
 export function ConnectButton({
+  disabled = false,
   connectCallback,
-  errorCallback,
+  connectErrorCallback,
   ...rest
 }: ConnectButtonProps) {
   // TODO: what to do with errors?
@@ -95,9 +94,10 @@ export function ConnectButton({
       {error && <div>{error.message}</div>}
       <ConnectButtonWrapper
         className={classNames('button')}
+        disabled={disabled}
         tertiary
         connectCallback={connectCallback}
-        errorCallback={errorCallback}
+        connectErrorCallback={connectErrorCallback}
         {...rest}
       />
     </>

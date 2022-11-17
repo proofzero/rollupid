@@ -9,6 +9,7 @@ services = [
   { binding = "Account", service = "account"},
   { binding = "Access", service = "access"},
   { binding = "Galaxy", service = "galaxy"},
+  { binding = "Starbase", service = "starbase"},
 ]
 
 [site]
@@ -21,6 +22,10 @@ services = [
 port = 9696
 local_protocol = "http"
 
+[vars]
+THREEID_APP_URL = "http://localhost:9797"
+
+
 [env.dev]
 routes = [
   { pattern = "passport-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
@@ -29,7 +34,11 @@ services = [
   { binding = "Account", service = "account-dev"},
   { binding = "Access", service = "access-dev"},
   { binding = "Galaxy", service = "galaxy-dev"},
+  { binding = "Starbase", service = "starbase-dev"},
 ]
+
+[env.dev.vars]
+THREEID_APP_URL = "https://3id-dev.kubelt.com"
 
 [env.next]
 routes = [
@@ -39,7 +48,12 @@ services = [
   { binding = "Account", service = "account-next"},
   { binding = "Access", service = "access-next"},
   { binding = "Galaxy", service = "galaxy-next"},
+  { binding = "Starbase", service = "starbase-next"},
+
 ]
+
+[env.next.vars]
+THREEID_APP_URL = "https://3id-next.kubelt.com"
 
 [env.next.build]
   command = "yarn build"
@@ -52,7 +66,12 @@ services = [
   { binding = "Account", service = "account-current"},
   { binding = "Access", service = "access-current"},
   { binding = "Galaxy", service = "galaxy-current"},
+  { binding = "Starbase", service = "starbase-current"},
+
 ]
+
+[env.current.vars]
+THREEID_APP_URL = "https://3id.kubelt.com"
 
 [env.current.build]
   command = "yarn build"
