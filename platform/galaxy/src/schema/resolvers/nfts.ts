@@ -21,12 +21,12 @@ const nftsResolver: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
-      const nftScanClient = new NFTScanClient()
-      const response = nftScanClient.getTokensForAccount(address)
-      console.log(response)
+      // const nftScanClient = new NFTScanClient()
+      // const response = nftScanClient.getTokensForAccount(address)
+      // console.log(response)
       return {
         total: 0,
-        next: ,
+        next: 'yo',
         content: [null]
       };
     }
