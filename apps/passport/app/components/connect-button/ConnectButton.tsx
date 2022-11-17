@@ -1,41 +1,40 @@
 import React, { ReactNode, useState, useEffect } from 'react'
 import classNames from 'classnames'
-import { Button, ButtonProps } from '@kubelt/design-system'
-import { Connector, useAccount, useConnect, useDisconnect } from 'wagmi'
-import { LinksFunction } from '@remix-run/cloudflare'
+import { Button } from '@kubelt/design-system'
+import type { ButtonProps } from '@kubelt/design-system'
+import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import type { LinksFunction } from '@remix-run/cloudflare'
+import {
+  ConnectKitProvider,
+  ConnectKitButton,
+  getDefaultClient,
+} from 'connectkit'
 
 import walletsSvg from './wallets.svg'
 import styles from './ConnectButton.css'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
-function deconstructConnectors(connectors: Connector<any, any, any>[]) {
-  return {
-    injectedConnector: connectors.find((c) => c.id === 'injected'),
-    wcConnector: connectors.find((c) => c.id === 'walletConnect'),
-  }
-}
-
-export type ConnectButtonHandlerProps = {
+export type ConnectButtonProps = {
   connectCallback: (address: string) => void
   connectErrorCallback: (error: Error) => void
+  disabled?: boolean
+  provider?: string
   className?: string
 } & ButtonProps
 
-export function ConnectButtonWrapper({
-  connectErrorCallback,
+export function ConnectButton({
+  disabled = false,
   connectCallback,
+  connectErrorCallback,
+  provider,
   className,
   ...rest
-}: ConnectButtonHandlerProps) {
-  const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect()
-
-  const { injectedConnector, wcConnector } = deconstructConnectors(connectors)
-
+}: ConnectButtonProps) {
   const { disconnect } = useDisconnect()
-
-  const { address, isConnected, status } = useAccount()
+  const { error } = useConnect()
+  const { address, isConnected, isConnecting, isDisconnected, status } =
+    useAccount()
 
   useEffect(() => {
     if (isConnected) {
@@ -51,55 +50,24 @@ export function ConnectButtonWrapper({
   }, [error])
 
   return (
-    <>
-      <Button
-        className={classNames(className)}
-        disabled={status !== 'disconnected'}
-        onClick={() => {
-          if (injectedConnector.ready) {
-            connect({ connector: injectedConnector })
-          } else {
-            connect({ connector: wcConnector })
-          }
+    <ConnectKitProvider>
+      <ConnectKitButton.Custom>
+        {({ isConnected, isConnecting, show, hide, address, ensName }) => {
+          return (
+            <Button
+              tertiary
+              className={classNames('button', className)}
+              disabled={status !== 'disconnected'}
+              onClick={show}
+            >
+              <span className={classNames('icon')}>
+                <img src={walletsSvg} />
+              </span>
+              {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
+            </Button>
+          )
         }}
-        {...rest}
-      >
-        <span className={classNames('icon')}>
-          <img src={walletsSvg} />
-        </span>
-        {!pendingConnector || !isLoading ? 'Connect With Wallet' : 'Connecting'}
-      </Button>
-    </>
-  )
-}
-
-export type ConnectButtonProps = {
-  disabled?: boolean
-  connectCallback: (address: string) => void
-  connectErrorCallback: (error: Error) => void
-}
-
-export function ConnectButton({
-  disabled = false,
-  connectCallback,
-  connectErrorCallback,
-  ...rest
-}: ConnectButtonProps) {
-  // TODO: what to do with errors?
-  const [error, setError] = useState<Error | null>(null)
-
-  return (
-    <>
-      {/* {status} */}
-      {error && <div>{error.message}</div>}
-      <ConnectButtonWrapper
-        className={classNames('button')}
-        disabled={disabled}
-        tertiary
-        connectCallback={connectCallback}
-        connectErrorCallback={connectErrorCallback}
-        {...rest}
-      />
-    </>
+      </ConnectKitButton.Custom>
+    </ConnectKitProvider>
   )
 }
