@@ -27,6 +27,7 @@ export default class Access extends DurableObject<Environment, Api> {
   }
 
   async generate(
+    appId: string,
     coreId: string,
     clientId: string,
     scope: Scope
@@ -34,6 +35,7 @@ export default class Access extends DurableObject<Environment, Api> {
     const { alg, ttl } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
     await this.storage.put<AccessParameters>('params', {
+      appId,
       coreId,
       clientId,
       scope,
@@ -43,7 +45,7 @@ export default class Access extends DurableObject<Environment, Api> {
 
     const accessToken = await new jose.SignJWT({ client_id: clientId, scope })
       .setProtectedHeader({ alg })
-      .setAudience(coreId)
+      .setAudience(appId)
       .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
       .setIssuedAt()
       .setIssuer(objectId)
@@ -79,8 +81,8 @@ export default class Access extends DurableObject<Environment, Api> {
       throw 'missing access parameters'
     }
 
-    const { coreId, clientId, scope } = params
-    return this.generate(coreId, clientId, scope)
+    const { appId, coreId, clientId, scope } = params
+    return this.generate(appId, coreId, clientId, scope)
   }
 
   async getJWTSigningKeyPair(): Promise<KeyPair> {

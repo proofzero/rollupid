@@ -49,6 +49,7 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
+      appId: string,
       clientId: string,
       redirectUri: string,
       scope: Scope,
@@ -74,6 +75,7 @@ export default async (
 
       const client = getAuthorizationClient(`${coreId}/${clientId}`)
       return client.authorize(
+        appId,
         coreId,
         clientId,
         redirectUri,
@@ -82,6 +84,7 @@ export default async (
       )
     },
     async kb_exchangeCode(
+      appId: string,
       code: string,
       redirectUri: string,
       clientId: string,
@@ -110,7 +113,13 @@ export default async (
       }
 
       const client = getAuthorizationClient(`${coreId}/${clientId}`)
-      return client.exchangeCode(code, redirectUri, clientId, clientSecret)
+      return client.exchangeCode(
+        appId,
+        code,
+        redirectUri,
+        clientId,
+        clientSecret
+      )
     },
     async kb_verifyAuthorization(token: string): Promise<boolean> {
       const client = getAccessClient(token)

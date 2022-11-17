@@ -31,6 +31,7 @@ export type AuthorizationRequest = {
 }
 
 export type AccessParameters = {
+  appId: string
   coreId: string
   clientId: string
   scope: Scope
@@ -54,12 +55,14 @@ export type RefreshResult = GenerateResult
 
 export interface WorkerApi {
   kb_authorize(
+    appId: string,
     clientId: string,
     redirectUri: string,
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult>
   kb_exchangeCode(
+    appId: string,
     code: string,
     redirectUri: string,
     clientId: string,
@@ -71,6 +74,7 @@ export interface WorkerApi {
 
 export interface AuthorizationApi extends DurableObjectApi {
   authorize(
+    appId: string,
     coreId: string,
     clientId: string,
     redirectUri: string,
@@ -78,6 +82,7 @@ export interface AuthorizationApi extends DurableObjectApi {
     state: string
   ): Promise<AuthorizeResult>
   exchangeCode(
+    appId: string,
     code: string,
     redirectUri: string,
     clientId: string,
@@ -87,6 +92,7 @@ export interface AuthorizationApi extends DurableObjectApi {
 
 export interface AccessApi extends BaseApi {
   generate(
+    appId: string,
     coreId: string,
     clientId: string,
     scope: Scope
