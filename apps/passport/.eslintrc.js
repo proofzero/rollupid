@@ -1,4 +1,4 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
-  extends: ["@remix-run/eslint-config", "@remix-run/eslint-config/node", "plugin:storybook/recommended"]
+  extends: ["@remix-run/eslint-config", "@remix-run/eslint-config/node", "plugin:storybook/recommended", "plugin:storybook/recommended"]
 };

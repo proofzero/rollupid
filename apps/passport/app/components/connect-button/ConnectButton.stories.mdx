@@ -1,0 +1,68 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+
+import { ConnectButton } from './ConnectButton'
+import {
+  WagmiConfig,
+  createClient,
+  defaultChains,
+  configureChains,
+} from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+
+<Meta title="Components/ConnectButton" component={ConnectButton} />
+
+export const Template = (args) => <ConnectButton {...args} />
+
+# Authentication
+
+<Canvas>
+  <Story
+    decorators={[
+      (Story) => {
+        const { chains, provider, webSocketProvider } = configureChains(
+          defaultChains,
+          [publicProvider()] // TODO: add non default provider selection via props
+        )
+        const client = createClient({
+          autoConnect: true,
+          connectors: [
+            new WalletConnectConnector({
+              chains,
+              options: {
+                qrcode: true,
+              },
+            }),
+            new InjectedConnector({
+              chains,
+              options: {
+                name: 'Injected',
+                shimDisconnect: true,
+              },
+            }),
+          ],
+          provider,
+          webSocketProvider,
+        })
+        return (
+          <WagmiConfig client={client}>
+            <Story />
+          </WagmiConfig>
+        )
+      },
+    ]}
+    name="Connect Button"
+    args={{
+      disabled: false,
+      connectCallback: (address) => {
+        alert(`Connected to ${address}`)
+      },
+      connectErrorCallback: (error) => {
+        alert(`Error connecting: ${error}`)
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

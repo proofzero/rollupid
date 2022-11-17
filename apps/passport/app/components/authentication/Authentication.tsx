@@ -5,14 +5,14 @@ export type AuthenticationProps = {
   logoURL?: string
   enableWalletConnect: boolean
   connectCallback: (address: string) => void
-  errorCallback: (error: Error) => void
+  connectErrorCallback: (error: Error) => void
 }
 
 export function Authentication({
   logoURL,
   enableWalletConnect = true,
   connectCallback,
-  errorCallback: connectErrorCallback,
+  connectErrorCallback,
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (

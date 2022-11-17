@@ -5,7 +5,7 @@ import threeIdLogo from './3id.svg'
 
 export type ThreeIdButtonProps = {
   href: string
-  text: string
+  text?: string
 } & ButtonProps
 
 export function ThreeIdButton({
