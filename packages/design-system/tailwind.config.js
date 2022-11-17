@@ -19,6 +19,8 @@ module.exports = {
     'text-3xl',
     'text-4xl',
     'text-5xl',
-    'text-gray-500'
+    'text-gray-500',
+    'mt-8',
+    'mt-2'
   ]
 }
