@@ -53,6 +53,10 @@ export default class DurableObject<
     throw new Error('not implemented')
   }
 
+  get(key: string): Promise<unknown> {
+    return this.storage.get(key)
+  }
+
   async fetch(request: Request): Promise<Response> {
     const context: Context = {}
     context.address = request.headers.get(HEADER_CORE_ADDRESS) || ''
