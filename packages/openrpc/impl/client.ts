@@ -20,6 +20,9 @@ type RpcDispatch = {
   [index: string]: any
 }
 
+// A map of data properties we expose with the .$ accessor.
+type RpcProperties = Record<string, unknown>
+
 // RpcRequestOptions
 // -----------------------------------------------------------------------------
 
@@ -60,7 +63,7 @@ export class RpcClient {
   // The DO that is a client for.
   private readonly _durableObject: DurableObjectNamespace
   // The name of the durable object.
-  private readonly _name: string
+  private readonly _id: DurableObjectId
   // The OpenRPC schema with method references resolved.
   private readonly _schema: RpcExpandedSchema
   // The options configuration map.
@@ -91,22 +94,20 @@ export class RpcClient {
   constructor(
     // TODO better type
     durableObject: DurableObjectNamespace,
-    // TODO better type
-    name: string,
+    id: DurableObjectId,
     schema: RpcSchema,
     options: RpcClientOptions = {}
   ) {
     const expandedSchema: RpcExpandedSchema = this._expand(schema)
 
     this._durableObject = durableObject
-    this._name = name
+    this._id = id
     this._schema = expandedSchema
     this._options = options
     // TODO better to try and derive a tag name from durableObject, if possible.
     this._tag = options?.tag || 'do.unknown'
 
-    const objId = durableObject.idFromName(name)
-    this._stub = durableObject.get(objId)
+    this._stub = durableObject.get(id)
 
     // Filter schema methods into internal / external lists.
     // TODO pass in regex from options that is used to split on method name.
@@ -119,6 +120,8 @@ export class RpcClient {
     this._internal = this._internalMethods({}, internal)
     // Add a method to the client stub for each "external" RPC method.
     this._externalMethods(this, external)
+    // Define a collection of properties to expose with the $ accessor.
+    this._properties = this._initProperties(id)
 
     // TODO seal object? this._seal();
     Object.freeze(this)
@@ -197,10 +200,33 @@ export class RpcClient {
     })
   }
 
+  /**
+   * Define the collection of properties we expose to describe the client.
+   */
+  private _initProperties(id: DurableObjectId) {
+    const props = {}
+
+    // Return the ID of the durable object this client is for.
+    Object.defineProperty(props, 'id', {
+      value: id.toString(),
+      writable: false,
+    })
+
+    return props
+  }
+
   // Access the "internal" method table.
   get _(): RpcDispatch {
     // This nested namespace object should be sealed.
     return this._internal
+  }
+
+  /**
+   * Access properties on the stub without colliding with exposed RPC
+   * methods.
+   */
+  get $(): RpcProperties {
+    return this._properties
   }
 
   /**

@@ -12,6 +12,7 @@ import type { RpcContext } from './impl/context'
 
 import type {
   OpenRpcHandler,
+  RpcAuthHandler,
   RpcChain,
   RpcChainFn,
   RpcError,
@@ -43,6 +44,7 @@ export type {
   MiddlewareFn,
   MiddlewareResult,
   OpenRpcHandler,
+  RpcAuthHandler,
   RpcChain,
   RpcContext,
   RpcError,
@@ -73,8 +75,12 @@ export type {
 /**
  * Construct a new request context.
  */
-export function context(): RpcContext {
-  return impl.context()
+export function context<Env = unknown>(
+  request: Request,
+  env?: Env,
+  ctx?: ExecutionContext
+): RpcContext {
+  return impl.context(request, env, ctx)
 }
 
 // options
@@ -379,7 +385,7 @@ export function build(
 export function client(
   // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string,
+  name: string | undefined,
   schema: RpcSchema,
   options: RpcClientOptions = {}
 ): RpcClient {
@@ -403,7 +409,7 @@ export function client(
 export async function discover(
   // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string,
+  name: string | undefined,
   options: RpcClientOptions = {}
 ): Promise<RpcClient> {
   return impl.discover(durableObject, name, options)

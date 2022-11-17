@@ -51,6 +51,11 @@ import schema from "./schema";
   validator: (x) => { return true },
   */
 })
+@field({
+  name: "index",
+  doc: "An index from app attributes into app IDs",
+  defaultValue: {},
+})
 export class StarbaseUser {
 
   // user_name
@@ -70,27 +75,6 @@ export class StarbaseUser {
     });
   }
 
-  // add_application
-  // ---------------------------------------------------------------------------
-
-  @method("add_application")
-  @requiredScope("starbase.user")
-  @requiredField("apps", [FieldAccess.Read, FieldAccess.Write])
-  addApplication(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput,
-  ): Promise<RpcResult> {
-    const appSet = input.get("apps")
-    const appId = params.get("appId")
-    // Add the supplied application ID to the list of user's applications.
-    if (appId !== undefined) {
-      appSet.add(appId)
-      output.set("apps", appSet)
-    }
-    return Promise.resolve(appId);
-  }
-
   // list_applications
   // ---------------------------------------------------------------------------
 
@@ -105,6 +89,51 @@ export class StarbaseUser {
     const appList = Array.from(appSet)
 
     return Promise.resolve(appList)
+  }
+
+  // index_application
+  // ---------------------------------------------------------------------------
+
+  @method("index_application")
+  @requiredScope("starbase.user")
+  @requiredField("apps", [FieldAccess.Read, FieldAccess.Write])
+  @requiredField("index", [FieldAccess.Read, FieldAccess.Write])
+  appIndex(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
+    // Unique identifier
+    const id = params.get("id")
+    console.log(`id = ${id}`)
+    const data = params.get("data")
+    console.log(`data = ${data}`)
+    const fields = params.get("fields")
+    console.log(`fields = ${fields}`)
+
+    // Store the application ID.
+    if (id !== undefined) {
+      const apps = input.get("apps")
+      apps.add(id)
+      output.set("apps", apps)
+    }
+
+    // Index the data by the request fields.
+
+    return Promise.resolve({fixme: true})
+  }
+
+  // lookup_application
+  // ---------------------------------------------------------------------------
+
+  @method("lookup_application")
+  @requiredScope("starbase.user")
+  @requiredField("apps", [FieldAccess.Read])
+  appLookup(
+    params: RpcParams,
+    input: RpcInput,
+  ): Promise<RpcResult> {
+    return Promise.resolve("")
   }
 
 } // END StarbaseUser
