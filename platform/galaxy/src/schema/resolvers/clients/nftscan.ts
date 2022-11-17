@@ -1,3 +1,6 @@
+import { Token } from 'graphql'
+import { TokenType } from  '../typedefs'
+
 type HeadersObject = {
   'X-API-KEY': string
 }
@@ -17,6 +20,7 @@ export default class NFTScanClient {
     const headers: HeadersObject = {
       'X-API-KEY': this.nftScanAPIKey
     }
+
     return new Request(
       _url.href,
       {
@@ -30,7 +34,13 @@ export default class NFTScanClient {
   }
 
   async getTokensForAccount(address: string): Promise<Response> {
-    const url = new URL(`/v2/account/own/${address}`, this.baseURL.href)
+    const url = new URL(`v2/account/own/${address}`, this.baseURL.href)
+    url.searchParams.append('erc_type', TokenType.Erc721)
+    // url.searchParams.append('erc_type', TokenType.Erc1155)
+    // url.searchParams.append('contract_address', contract_address)
+    // url.searchParams.append('cursor', next)
+    // url.searchParams.append('limit', 1000) // default 1000
+    url.searchParams.append('show_attribute', 'true') // default false    
     return this.send(url)
   }
 }

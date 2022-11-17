@@ -26,19 +26,10 @@ const nftsResolver: Resolvers = {
       { env }: ResolverContext
     ) => {
       const nftScanClient = new NFTScanClient(env.NFT_SCAN_API_KEY)
-      const response = await nftScanClient.getTokensForAccount(address)
-      // console.log(await response.text())
-      return {
-        total: 1,
-        next: await response.text(),
-        content: [{
-          contract_address: '123',
-          contract_name: 'BAYC:3ID',
-          contract_token_id: 456,
-          token_id: '0x000456',
-          erc_type: 'erc721'
-        }],
-      };
+      const responseJSON = await nftScanClient.getTokensForAccount(address)
+        .then(r => r?.json())
+        .then(r => r?.data)
+      return responseJSON
     }
   },
   Mutation: {},
