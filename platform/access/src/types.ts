@@ -1,5 +1,9 @@
 import jose from 'jose'
-import { Func } from 'typed-json-rpc'
+
+import type {
+  BaseApi,
+  DurableObjectApi,
+} from '@kubelt/platform.commons/src/jsonrpc'
 
 export interface KeyPair {
   publicKey: jose.KeyLike | Uint8Array
@@ -65,8 +69,7 @@ export interface WorkerApi {
   kb_refreshToken(token: string): Promise<RefreshResult>
 }
 
-export interface AuthorizationApi {
-  [key: string]: Func
+export interface AuthorizationApi extends DurableObjectApi {
   authorize(
     coreId: string,
     clientId: string,
@@ -82,8 +85,7 @@ export interface AuthorizationApi {
   ): Promise<ExchangeCodeResult>
 }
 
-export interface AccessApi {
-  [key: string]: Func
+export interface AccessApi extends BaseApi {
   generate(
     coreId: string,
     clientId: string,

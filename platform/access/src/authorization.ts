@@ -20,6 +20,7 @@ import {
 export default class Authorization extends DurableObject<Environment, Api> {
   methods(): Api {
     return {
+      get: this.get.bind(this),
       authorize: this.authorize.bind(this),
       exchangeCode: this.exchangeCode.bind(this),
     }
