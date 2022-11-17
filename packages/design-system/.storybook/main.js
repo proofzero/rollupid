@@ -1,4 +1,5 @@
 const webpack = require('webpack')
+const path = require('path')
 
 module.exports = {
   features: {
@@ -6,11 +7,10 @@ module.exports = {
   },
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
-    '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     // '@storybook/preset-create-react-app',
-    '@storybook/preset-scss',
+    // '@storybook/preset-scss',
     // '@storybook/preset-typescript',
   ],
   framework: '@storybook/react',
@@ -22,13 +22,43 @@ module.exports = {
     // You can change the configuration based on that.
     // 'PRODUCTION' is used when building the static version of storybook.
 
-    // Make whatever fine-grained changes you need
     // config.module.rules.push({
-    //   test: /\.scss$/,
-    //   sideEffects: true, //scss is considered a side effect of sass
-    //   use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
-    //   // include: path.resolve(__dirname, '../src'), // I didn't need this path set
+    //   test: /\.(ttf|woff|woff2|eot|svg|png|jpg)$/,
+    //   use: [
+    //     {
+    //       loader: 'file-loader',
+    //       options: {
+    //         query: {
+    //           name: '[name].[ext]',
+    //         },
+    //       },
+    //     },
+    //   ],
+    //   include: path.resolve(__dirname, '../'),
     // })
+
+    config.module.rules.push({
+      test: /\.css$/,
+      use: [
+        {
+          loader: 'postcss-loader',
+          options: {
+            postcssOptions: {
+              plugins: [require('tailwindcss'), require('autoprefixer')],
+            },
+          },
+        },
+      ],
+      include: path.resolve(__dirname, '../'),
+    })
+
+    // Make whatever fine-grained changes you need
+    config.module.rules.push({
+      test: /\.scss$/,
+      sideEffects: true, //scss is considered a side effect of sass
+      use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      // include: path.resolve(__dirname, '../src'), // I didn't need this path set
+    })
 
     config.plugins.push(
       new webpack.ProvidePlugin({

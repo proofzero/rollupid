@@ -49,10 +49,12 @@ kv_namespaces = [
 ENVIRONMENT = "local"
 PLATFORM_OWNER = "@kubelt"
 
-# Dev: Migrations
+# Dev
 # -----------------------------------------------------------------------------
 
 [dev]
+port = 9090
+local_protocol = "http"
 
 [[migrations]]
 tag = "v1"

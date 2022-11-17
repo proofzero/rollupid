@@ -1,17 +1,5 @@
-import { BaseTheme } from '@kubelt/design-system/src/themes/base-theme/BaseTheme'
-
-const withTheme = (Story, context) => {
-  // Get the active theme value from the story parameter
-  // const { theme } = context.parameters
-  // const storyTheme = theme === 'dark' ? darkTheme : lightTheme
-  return (
-    <BaseTheme>
-      <Story />
-    </BaseTheme>
-  )
-}
-
-export const decorators = [withTheme]
+import '../app/styles/tailwind.css'
+import '@kubelt/design-system/dist/index.css'
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

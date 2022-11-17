@@ -1,7 +1,7 @@
-import React, { ReactNode, useRef } from 'react'
+import React, { ReactNode } from 'react'
 import classNames from 'classnames'
 
-import styles from './button.module.scss'
+import styles from './Button.module.css'
 
 export type Sizes = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -29,14 +29,11 @@ export function Button({
 }: ButtonProps) {
   const altClass = alt ? styles.alt : styles.primary
   const secondaryClass = secondary ? styles.secondary : styles.primary
-  const tertiaryClass = tertiary ? styles.tertiary : ''
-  const disabledClass = disabled ? styles.disabled : ''
+  const tertiaryClass = tertiary ? styles.tertiary : styles.primary
+  const disabledClass = disabled ? styles.disabled : null
   const sizeClass = size ? styles[size] : styles.md
-
-  console.log('onClick is', onClick)
   return (
     <button
-      {...rest}
       disabled={disabled}
       className={classNames(
         styles.button,
@@ -49,6 +46,7 @@ export function Button({
         sizeClass
       )}
       onClick={onClick}
+      {...rest}
     >
       {children}
     </button>

@@ -1,0 +1,70 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+
+import { Authentication } from './Authentication'
+import {
+  WagmiConfig,
+  createClient,
+  defaultChains,
+  configureChains,
+} from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import circleLogo from './circle-logo.svg'
+
+<Meta title="Components/Authentication" component={Authentication} />
+
+export const Template = (args) => <Authentication {...args} />
+
+# Authentication
+
+<Canvas>
+  <Story
+    decorators={[
+      (Story) => {
+        const { chains, provider, webSocketProvider } = configureChains(
+          defaultChains,
+          [publicProvider()] // TODO: add non default provider selection via props
+        )
+        const client = createClient({
+          autoConnect: true,
+          connectors: [
+            new WalletConnectConnector({
+              chains,
+              options: {
+                qrcode: true,
+              },
+            }),
+            new InjectedConnector({
+              chains,
+              options: {
+                name: 'Injected',
+                shimDisconnect: true,
+              },
+            }),
+          ],
+          provider,
+          webSocketProvider,
+        })
+        return (
+          <WagmiConfig client={client}>
+            <Story />
+          </WagmiConfig>
+        )
+      },
+    ]}
+    name="3ID Authentication"
+    args={{
+      logoURL: circleLogo,
+      enableWalletConnect: true,
+      connectCallback: (address) => {
+        alert(`Connected to ${address}`)
+      },
+      connectErrorCallback: (error) => {
+        alert(`Error connecting: ${error}`)
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
