@@ -1,6 +1,5 @@
-import { LoaderFunction } from '@remix-run/cloudflare'
+import { LoaderFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { redirect } from 'react-router'
 import {
   fetchVoucher,
   getCachedVoucher,

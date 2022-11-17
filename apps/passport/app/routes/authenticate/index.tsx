@@ -14,7 +14,7 @@ export default function Authenticate() {
           action: `/authenticate/sign/${address}${window.location.search}`,
         })
       }}
-      errorCallback={(error) => {
+      connectErrorCallback={(error) => {
         console.error(error)
         alert('Error connecting to wallet')
         setEnableWalletConnect(false)
