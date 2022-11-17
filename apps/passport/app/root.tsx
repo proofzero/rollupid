@@ -1,4 +1,10 @@
-import type { MetaFunction, LinksFunction } from '@remix-run/cloudflare'
+import {
+  MetaFunction,
+  LinksFunction,
+  LoaderFunction,
+  json,
+} from '@remix-run/cloudflare'
+import { useLoaderData } from '@remix-run/react'
 import {
   Links,
   LiveReload,
@@ -10,7 +16,7 @@ import {
   useParams,
 } from '@remix-run/react'
 
-import { links as componentLinks } from '~/components'
+import { links as componentLinks, ThreeIdButton } from '~/components'
 
 import styles from './styles/tailwind.css'
 import globalStyles from '@kubelt/design-system/dist/index.css'
@@ -20,7 +26,6 @@ import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/three-id-logo.svg'
 import social from '~/assets/social.png'
-import { Button } from '@kubelt/design-system'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -48,7 +53,17 @@ export const links: LinksFunction = () => [
   ...componentLinks(),
 ]
 
+export const loader: LoaderFunction = () => {
+  return json({
+    ENV: {
+      THREEID_APP_URL,
+    },
+  })
+}
+
 export default function App() {
+  const browserEnv = useLoaderData()
+  console.log('browserEnv', browserEnv)
   return (
     <html lang="en">
       <head>
@@ -60,6 +75,11 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
       </body>
     </html>
   )
@@ -90,6 +110,8 @@ export function ErrorBoundary({ error }) {
 }
 
 export function CatchBoundary() {
+  const { ENV } = useLoaderData()
+
   const caught = useCatch()
   const params = useParams()
   const { message, isAuthenticated } = caught.data
@@ -113,14 +135,21 @@ export function CatchBoundary() {
         <Links />
       </head>
       <body>
-        <div className={'flex flex-col h-screen justify-center items-center'}>
+        <div
+          className={'flex flex-col h-screen gap-4 justify-center items-center'}
+        >
           <h1>{caught.status}</h1>
           <p>
             {secondary}
             {message && `: ${message}`}
           </p>
+          {isAuthenticated && (
+            <ThreeIdButton
+              text={'Continue to 3ID'}
+              href={ENV.THREEID_APP_URL}
+            />
+          )}
         </div>
-        {isAuthenticated && <Button size={'xl'}>Go to the 3ID App</Button>}
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />

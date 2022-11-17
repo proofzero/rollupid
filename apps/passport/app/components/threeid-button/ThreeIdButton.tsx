@@ -1,13 +1,17 @@
-import React, { ReactNode, useState, useEffect } from 'react'
+import React, { ReactNode } from 'react'
 import { Button, ButtonProps } from '@kubelt/design-system'
 
 import threeIdLogo from './3id.svg'
 
 export type ThreeIdButtonProps = {
   href: string
+  text: string
 } & ButtonProps
 
-export function ThreeIdButton({ href }: ThreeIdButtonProps) {
+export function ThreeIdButton({
+  href,
+  text = 'Private Login',
+}: ThreeIdButtonProps) {
   return (
     <Button
       onClick={() => {
@@ -19,7 +23,7 @@ export function ThreeIdButton({ href }: ThreeIdButtonProps) {
       <span className={''}>
         <img src={threeIdLogo} />
       </span>
-      Private Login
+      {text}
     </Button>
   )
 }

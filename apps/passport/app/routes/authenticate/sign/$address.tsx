@@ -74,7 +74,6 @@ export default function Sign() {
   const { disconnect } = useDisconnect()
   const { data, error, signMessage } = useSignMessage({
     onSuccess(data, variables) {
-      console.log('success loaded', isLoading)
       submit(
         { signature: data, nonce },
         {
