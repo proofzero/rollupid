@@ -20,6 +20,7 @@ export interface Environment {
   Account: Fetcher
   Address: Fetcher
   Authorization: DurableObjectNamespace
+  Starbase: Fetcher
 }
 
 export type Scope = string[]
@@ -98,4 +99,14 @@ export interface AccessApi extends BaseApi {
   ): Promise<GenerateResult>
   verify(token: string): Promise<jose.JWTVerifyResult>
   refresh(token: string): Promise<RefreshAuthorizationResult>
+}
+
+export interface StarbaseApi extends BaseApi {
+  kb_checkClientAuthorization(
+    appId: string,
+    redirectUri: string,
+    scope: Scope,
+    clientId: string,
+    clientSecret: string
+  ): Promise<boolean>
 }
