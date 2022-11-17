@@ -13,11 +13,13 @@ import { getCoreId, isAuthenticated } from '@kubelt/platform.commons/src/utils'
 import {
   AccessApi,
   AuthorizationApi,
+  AuthorizationRequest,
   AuthorizeResult,
   Environment,
   ExchangeAuthorizationCodeResult,
   RefreshAuthorizationResult,
   Scope,
+  StarbaseApi,
   WorkerApi,
 } from './types'
 
@@ -111,14 +113,35 @@ export default async (
         throw 'missing client secret'
       }
 
-      const client = getAuthorizationClient(`${coreId}/${clientId}`)
-      return client.exchangeCode(
-        appId,
-        code,
-        redirectUri,
-        clientId,
-        clientSecret
+      const authorizationClient = getAuthorizationClient(
+        `${coreId}/${clientId}`
       )
+      const appId = (await authorizationClient.get('appId')) as string
+      const { scope } = (await authorizationClient.get(
+        `codes/${code}`
+      )) as AuthorizationRequest
+      const validated = true
+
+      // const { Starbase } = env
+      // const starbaseClient = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
+      // const validated = await starbaseClient.kb_checkClientAuthorization(
+      //   appId,
+      //   redirectUri,
+      //   scope,
+      //   clientId,
+      //   clientSecret
+      // )
+
+      if (validated) {
+        return authorizationClient.exchangeCode(
+          appId,
+          code,
+          redirectUri,
+          clientId
+        )
+      } else {
+        throw 'failed authorization attempt'
+      }
     },
     async kb_verifyAuthorization(token: string): Promise<boolean> {
       const client = getAccessClient(token)

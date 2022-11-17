@@ -74,8 +74,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
 
     await this.storage.delete(`codes/${code}`)
 
-    // TODO: check client secret somehow
-
     const { scope } = request
     const access = Access.get(Access.newUniqueId())
     const client = createFetcherJsonRpcClient<AccessApi>(access)
