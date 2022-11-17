@@ -1,0 +1,32 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+
+import { Authorization } from './Authorization'
+
+import circleLogo from '../../assets/circle-logo.svg'
+
+<Meta title="Components/Authorization" component={Authorization} />
+
+export const Template = (args) => <Authorization {...args} />
+
+# Authorization
+
+<Canvas>
+  <Story
+    name="Authorization"
+    args={{
+      appProfile: {
+        name: '3ID',
+        logo: circleLogo,
+      },
+      userProfile: {
+        name: 'John Doe',
+        pfp: {
+          url: 'https://i.imgur.com/8Qq7ZQx.jpg',
+          isToken: false,
+        },
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>
