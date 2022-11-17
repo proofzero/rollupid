@@ -25,9 +25,15 @@ const nftsResolver: Resolvers = {
       // const response = nftScanClient.getTokensForAccount(address)
       // console.log(response)
       return {
-        total: 0,
+        total: 1,
         next: 'yo',
-        content: [null]
+        content: [{
+          contract_address: '123',
+          contract_name: 'BAYC:3ID',
+          contract_token_id: 456,
+          token_id: '0x000456',
+          erc_type: 'erc721'
+        }],
       };
     }
   },

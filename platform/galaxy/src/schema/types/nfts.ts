@@ -29,7 +29,7 @@ export default /* GraphQL */ `
     type NFTs {
         total: Int
         next: ID
-        content: [Token!]
+        content: [Token]
     }
 
     type Query {
