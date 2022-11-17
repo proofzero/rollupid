@@ -10,6 +10,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Starbase", service = "starbase" },
 ]
 
 [dev]
@@ -24,6 +25,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Starbase", service = "starbase" },
 ]
 
 [env.next]
@@ -34,6 +36,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Starbase", service = "starbase" },
 ]
 
 [env.current]
@@ -44,6 +47,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Starbase", service = "starbase" },
 ]
 
 [[migrations]]

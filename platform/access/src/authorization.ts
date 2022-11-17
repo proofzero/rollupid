@@ -13,19 +13,21 @@ import {
   AuthorizationRequest,
   AuthorizeResult,
   Environment,
-  ExchangeCodeResult,
+  ExchangeAuthorizationCodeResult,
   Scope,
 } from './types'
 
 export default class Authorization extends DurableObject<Environment, Api> {
   methods(): Api {
     return {
+      get: this.get.bind(this),
       authorize: this.authorize.bind(this),
       exchangeCode: this.exchangeCode.bind(this),
     }
   }
 
   async authorize(
+    appId: string,
     coreId: string,
     clientId: string,
     redirectUri: string,
@@ -37,6 +39,7 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const isAuthorized = diff.length == 0
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     await this.storage.put({
+      appId,
       coreId,
       clientId,
       [`codes/${code}`]: { redirectUri, scope, state },
@@ -46,11 +49,11 @@ export default class Authorization extends DurableObject<Environment, Api> {
   }
 
   async exchangeCode(
+    appId: string,
     code: string,
     redirectUri: string,
-    clientId: string,
-    clientSecret: string
-  ): Promise<ExchangeCodeResult> {
+    clientId: string
+  ): Promise<ExchangeAuthorizationCodeResult> {
     const { Access } = this.env
 
     const coreId = await this.storage.get<string>('coreId')
@@ -71,11 +74,9 @@ export default class Authorization extends DurableObject<Environment, Api> {
 
     await this.storage.delete(`codes/${code}`)
 
-    // TODO: check client secret somehow
-
     const { scope } = request
     const access = Access.get(Access.newUniqueId())
     const client = createFetcherJsonRpcClient<AccessApi>(access)
-    return client.generate(coreId, clientId, scope)
+    return client.generate(appId, coreId, clientId, scope)
   }
 }

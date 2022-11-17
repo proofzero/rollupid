@@ -1,5 +1,9 @@
 import jose from 'jose'
-import { Func } from 'typed-json-rpc'
+
+import type {
+  BaseApi,
+  DurableObjectApi,
+} from '@kubelt/platform.commons/src/jsonrpc'
 
 export interface KeyPair {
   publicKey: jose.KeyLike | Uint8Array
@@ -16,6 +20,7 @@ export interface Environment {
   Account: Fetcher
   Address: Fetcher
   Authorization: DurableObjectNamespace
+  Starbase: Fetcher
 }
 
 export type Scope = string[]
@@ -27,6 +32,7 @@ export type AuthorizationRequest = {
 }
 
 export type AccessParameters = {
+  appId: string
   coreId: string
   clientId: string
   scope: Scope
@@ -44,30 +50,32 @@ export type GenerateResult = {
   refreshToken: string
 }
 
-export type ExchangeCodeResult = GenerateResult
+export type ExchangeAuthorizationCodeResult = GenerateResult
 
-export type RefreshResult = GenerateResult
+export type VerifyAuthorizationResult = boolean
+export type RefreshAuthorizationResult = GenerateResult
 
 export interface WorkerApi {
   kb_authorize(
+    appId: string,
     clientId: string,
     redirectUri: string,
-    scope: string,
+    scope: Scope,
     state: string
   ): Promise<AuthorizeResult>
-  kb_exchangeCode(
+  kb_exchangeAuthorizationCode(
     code: string,
     redirectUri: string,
     clientId: string,
     clientSecret: string
-  ): Promise<ExchangeCodeResult>
-  kb_verifyAuthorization(token: string): Promise<boolean>
-  kb_refreshToken(token: string): Promise<RefreshResult>
+  ): Promise<ExchangeAuthorizationCodeResult>
+  kb_verifyAuthorization(token: string): Promise<VerifyAuthorizationResult>
+  kb_refreshAuthorization(token: string): Promise<RefreshAuthorizationResult>
 }
 
-export interface AuthorizationApi {
-  [key: string]: Func
+export interface AuthorizationApi extends DurableObjectApi {
   authorize(
+    appId: string,
     coreId: string,
     clientId: string,
     redirectUri: string,
@@ -75,20 +83,30 @@ export interface AuthorizationApi {
     state: string
   ): Promise<AuthorizeResult>
   exchangeCode(
+    appId: string,
     code: string,
     redirectUri: string,
-    clientId: string,
-    clientSecret: string
-  ): Promise<ExchangeCodeResult>
+    clientId: string
+  ): Promise<ExchangeAuthorizationCodeResult>
 }
 
-export interface AccessApi {
-  [key: string]: Func
+export interface AccessApi extends BaseApi {
   generate(
+    appId: string,
     coreId: string,
     clientId: string,
     scope: Scope
   ): Promise<GenerateResult>
   verify(token: string): Promise<jose.JWTVerifyResult>
-  refresh(token: string): Promise<RefreshResult>
+  refresh(token: string): Promise<RefreshAuthorizationResult>
+}
+
+export interface StarbaseApi extends BaseApi {
+  kb_checkClientAuthorization(
+    appId: string,
+    redirectUri: string,
+    scope: Scope,
+    clientId: string,
+    clientSecret: string
+  ): Promise<boolean>
 }

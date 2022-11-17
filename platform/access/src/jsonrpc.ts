@@ -13,10 +13,13 @@ import { getCoreId, isAuthenticated } from '@kubelt/platform.commons/src/utils'
 import {
   AccessApi,
   AuthorizationApi,
+  AuthorizationRequest,
   AuthorizeResult,
   Environment,
-  ExchangeCodeResult,
-  RefreshResult,
+  ExchangeAuthorizationCodeResult,
+  RefreshAuthorizationResult,
+  Scope,
+  StarbaseApi,
   WorkerApi,
 } from './types'
 
@@ -48,9 +51,10 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
+      appId: string,
       clientId: string,
       redirectUri: string,
-      scope: string[],
+      scope: Scope,
       state: string
     ): Promise<AuthorizeResult> {
       await isAuthenticated(request, env)
@@ -73,6 +77,7 @@ export default async (
 
       const client = getAuthorizationClient(`${coreId}/${clientId}`)
       return client.authorize(
+        appId,
         coreId,
         clientId,
         redirectUri,
@@ -80,12 +85,12 @@ export default async (
         state
       )
     },
-    async kb_exchangeCode(
+    async kb_exchangeAuthorizationCode(
       code: string,
       redirectUri: string,
       clientId: string,
       clientSecret: string
-    ): Promise<ExchangeCodeResult> {
+    ): Promise<ExchangeAuthorizationCodeResult> {
       await isAuthenticated(request, env)
       const coreId = await getCoreId(request, env)
       if (!coreId) {
@@ -108,8 +113,35 @@ export default async (
         throw 'missing client secret'
       }
 
-      const client = getAuthorizationClient(`${coreId}/${clientId}`)
-      return client.exchangeCode(code, redirectUri, clientId, clientSecret)
+      const authorizationClient = getAuthorizationClient(
+        `${coreId}/${clientId}`
+      )
+      const appId = (await authorizationClient.get('appId')) as string
+      const { scope } = (await authorizationClient.get(
+        `codes/${code}`
+      )) as AuthorizationRequest
+      const validated = true
+
+      // const { Starbase } = env
+      // const starbaseClient = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
+      // const validated = await starbaseClient.kb_checkClientAuthorization(
+      //   appId,
+      //   redirectUri,
+      //   scope,
+      //   clientId,
+      //   clientSecret
+      // )
+
+      if (validated) {
+        return authorizationClient.exchangeCode(
+          appId,
+          code,
+          redirectUri,
+          clientId
+        )
+      } else {
+        throw 'failed authorization attempt'
+      }
     },
     async kb_verifyAuthorization(token: string): Promise<boolean> {
       const client = getAccessClient(token)
@@ -121,7 +153,9 @@ export default async (
         return false
       }
     },
-    async kb_refreshToken(token: string): Promise<RefreshResult> {
+    async kb_refreshAuthorization(
+      token: string
+    ): Promise<RefreshAuthorizationResult> {
       return getAccessClient(token).refresh(token)
     },
   })
