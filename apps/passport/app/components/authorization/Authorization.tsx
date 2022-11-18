@@ -3,14 +3,15 @@ import { Button } from '@kubelt/design-system'
 import authorizeCheck from '../../assets/authorize-check.svg'
 import publicProfileScopeIcon from './profile-scope-icon.svg'
 
-export type Scope = {
+export type ScopeMeta = {
   name: string
   description: string
 }
+
 export type AppProfile = {
   name: string
   logo: string
-  scopes: Record<string, Scope>
+  scopes: string[]
 }
 
 export type UserProfile = {
@@ -24,6 +25,7 @@ export type UserProfile = {
 export type AuthorizationProps = {
   userProfile: UserProfile
   appProfile: AppProfile
+  scopeMeta: Record<string, ScopeMeta>
 }
 
 export function Authorization({ appProfile, userProfile }: AuthorizationProps) {
