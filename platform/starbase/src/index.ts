@@ -725,7 +725,7 @@ const service = openrpc.service(schema, scopes, methods, extensions, options)
 const basePath = '/'
 
 // The RPC resource endpoint; requests to this path are handled as RPC requests.
-const rootPath = '/openrpc'
+const rootPath = '/jsonrpc'
 
 // Construct a sequence of middleware to execute before any RPC methods
 // are invoked. These may short-circuit, directly returning a response

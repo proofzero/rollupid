@@ -28,8 +28,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const ids = await sbClient.kb_initPlatform() // TODO: temporary until console is complete
     console.log('ids', ids)
+    if (!ids.keys.length) {
+      console.error('No apps initialized')
+      throw json({ message: 'No apps initialized' }, 400)
+    }
     return null
   } catch (e) {
+    console.error(e)
     throw json({ message: 'Failed to init starbase' }, 500)
   }
   // ======================= TEMPOARY =======================
