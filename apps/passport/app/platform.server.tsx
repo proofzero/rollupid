@@ -1,5 +1,6 @@
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import type { Func } from 'typed-json-rpc'
+import type { Api as AuthenticationApi } from '@kubelt/platform.account/src/types'
+import type { Func, JsonRpcClient } from 'typed-json-rpc'
 import type { ScopeMeta } from './components/authorization/Authorization'
 
 interface StarbaseApi {
@@ -11,4 +12,14 @@ interface StarbaseApi {
 
 export function getStabaseClient() {
   return createFetcherJsonRpcClient<StarbaseApi>(Starbase)
+}
+
+export const getAuthenticationClientWithAddress = (
+  address: string
+): JsonRpcClient<AuthenticationApi> => {
+  return createFetcherJsonRpcClient<AuthenticationApi>(Account, {
+    headers: {
+      'KBT-Core-Address': address as string,
+    },
+  })
 }

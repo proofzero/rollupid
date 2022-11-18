@@ -504,7 +504,6 @@ const kb_initPlatform = openrpc.extension(schema, {
       const kv = context.get(KEY_FIXTURES)
       const ownerId = context.get(KEY_PLATFORM_OWNER)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
-      const sbUser: DurableObjectNamespace = context.get(KEY_USER)
 
       const token = context.get(KEY_TOKEN)
 
@@ -562,27 +561,6 @@ const kb_initPlatform = openrpc.extension(schema, {
         await kv.delete(threeidKey)
 
         keys.push(threeidKey)
-      }
-
-      //
-      // User
-      //
-
-      if (consoleData || threeidData) {
-        const user = await openrpc.discover(sbUser, ownerId, {
-          token,
-          tag: 'starbase-user',
-        })
-        const conResult = await user.indexApplication({
-          id: consoleId,
-          data: consoleData,
-          fields: ['clientId'],
-        })
-        const threeResult = await user.indexApplication({
-          id: threeidId,
-          data: threeidData,
-          fields: ['clientId'],
-        })
       }
 
       // RESULT

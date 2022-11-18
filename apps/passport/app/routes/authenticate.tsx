@@ -3,6 +3,7 @@ import { redirect } from '@remix-run/cloudflare'
 import { Outlet } from '@remix-run/react'
 import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
+
 import { getUserSession } from '~/session.server'
 
 // TODO: loader function check if we have a session already
