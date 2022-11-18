@@ -432,11 +432,11 @@ const kb_appAuthCheck = openrpc.method(schema, {
   ),
 })
 
-// kb_authScopes
+// kb_appScopes
 // -----------------------------------------------------------------------------
 // Return a list of scopes with their metadata.
 
-const kb_authScopes = openrpc.method(schema, {
+const kb_appScopes = openrpc.method(schema, {
   name: 'kb_appScopes',
   scopes: noScope,
   handler: openrpc.handler(
@@ -695,6 +695,7 @@ const methods = openrpc.methods(schema, [
   kb_appPublish,
   kb_appRotateSecret,
   kb_appStore,
+  kb_appScopes,
 ])
 
 // These are RPC methods not described in the schema but which are provided
