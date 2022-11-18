@@ -6,4 +6,5 @@ declare global {
   const Starbase: Fetcher
 
   const THREEID_APP_URL: string
+  const ALCHEMY_KEY: string
 }

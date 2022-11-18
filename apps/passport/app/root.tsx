@@ -63,7 +63,6 @@ export const loader: LoaderFunction = () => {
 
 export default function App() {
   const browserEnv = useLoaderData()
-  console.log('browserEnv', browserEnv)
   return (
     <html lang="en">
       <head>
@@ -110,6 +109,8 @@ export function ErrorBoundary({ error }) {
 }
 
 export function CatchBoundary() {
+  const browserEnv = useLoaderData()
+
   const caught = useCatch()
   const params = useParams()
   const { status } = caught
@@ -144,13 +145,18 @@ export function CatchBoundary() {
           {caught.data?.isAuthenticated && (
             <ThreeIdButton
               text={'Continue to 3ID'}
-              href={window.ENV.THREEID_APP_URL}
+              href={typeof window !== 'undefined' && window.ENV.THREEID_APP_URL}
             />
           )}
         </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
       </body>
     </html>
   )

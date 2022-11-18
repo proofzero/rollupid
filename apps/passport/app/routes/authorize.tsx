@@ -1,9 +1,8 @@
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import type { Func } from 'typed-json-rpc'
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 import { Outlet } from '@remix-run/react'
 import { requireJWT } from '~/session.server'
+import { getStabaseClient } from '~/starbase.server'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -24,16 +23,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 
   // ======================= TEMPOARY =======================
-  interface StarbaseApi {
-    [key: string]: Func
-    kb_initPlatform(): Promise<string[]>
+  const sbClient = getStabaseClient()
+  console.log('init platform')
+  try {
+    const ids = await sbClient.kb_initPlatform() // TODO: temporary until console is complete
+    console.log('ids', ids)
+    return null
+  } catch (e) {
+    throw json({ message: 'Failed to init starbase' }, 500)
   }
-  // const client = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
-  // const ids = await client.kb_initPlatform() // TODO: temporary until console is complete
-  // console.log('ids', ids)
   // ======================= TEMPOARY =======================
-
-  return null
 }
 
 export default function Authorize() {

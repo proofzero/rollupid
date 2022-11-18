@@ -10,6 +10,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const app = url.searchParams.get('app')
 
   const sbClient = getStabaseClient()
+  const scopes = await sbClient.kb_appScopes()
   // TODO: fetch app profile using app id
   console.log('app', app)
 
