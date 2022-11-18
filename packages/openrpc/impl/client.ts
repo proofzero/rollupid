@@ -46,6 +46,14 @@ export interface RpcExpandedSchema extends Omit<RpcSchema, 'methods'> {
 export type AuthToken = string
 
 interface ClientOptions {
+  // An object ID that is converted into an object ID using
+  // OBJECT_NAMESPACE.isFromString(). If you have a DurableObjectId and
+  // convert it to a string using toString(), supplying that ID string
+  // as the ID parameter will generate original DurableObjectId.
+  id: string
+  // An object name that is converted/hashed into an object ID using
+  // OBJECT_NAMESPACE.idFromName().
+  name: string
   // A token that, if provided, is sent with all requests sent by the
   // client.
   token: AuthToken

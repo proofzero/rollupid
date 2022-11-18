@@ -62,36 +62,31 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
-      name: 'kb_appStore',
-      summary: 'Store an application record',
-      tags: [
-        {
-          name: 'app',
-        },
-      ],
+      name: 'kb_appUpdate',
+      summary: 'Update an application public profile',
       params: [
         {
-          name: 'ownerId',
-          description: 'The ID of the application owner',
+          name: 'clientId',
+          description: 'The application OAuth client ID',
           required: true,
           schema: {
-            $ref: '#/components/contentDescriptors/OwnerId',
+            $ref: '#/components/contentDescriptors/ClientId',
           },
         },
         {
-          name: 'appId',
-          description: 'A unique identifier for the application',
+          name: 'profile',
+          description: 'The public application profile fields',
           required: true,
           schema: {
-            $ref: '#/components/contentDescriptors/AppId',
+            $ref: '#/components/contentDescriptors/Profile',
           },
         },
       ],
       result: {
         name: 'appId',
-        description: 'The ID of the newly created application',
+        description: 'The ID of the updated application',
         schema: {
-          $ref: '#/components/contentDescriptors/AppId',
+          $ref: '#/components/contentDescriptors/ClientId',
         },
       },
       errors: [
@@ -100,27 +95,6 @@ const rpcSchema: RpcSchema = {
           message: 'Application ID already in use',
         },
       ],
-    },
-    {
-      name: 'kb_appFetch',
-      summary: 'Info for a specific application',
-      tags: [
-        {
-          name: 'app',
-        },
-      ],
-      params: [
-        {
-          $ref: '#/components/contentDescriptors/AppSelect',
-        },
-      ],
-      result: {
-        name: 'app',
-        description: 'Details for a specific application',
-        schema: {
-          $ref: '#/components/schemas/App',
-        },
-      },
     },
     {
       name: 'kb_appList',
@@ -276,12 +250,17 @@ const rpcSchema: RpcSchema = {
           $ref: '#/components/schemas/AppSelect',
         },
       },
+      Profile: {
+        name: 'profile',
+        required: true,
+        description: 'The public profile of an application',
+        schema: {
+          $ref: '#/components/schema/Profile',
+        },
+      }
     },
     schemas: {
-      OwnerId: {
-        type: 'string',
-      },
-      AppId: {
+      ClientId: {
         type: 'string',
       },
       AppSelect: {
@@ -351,6 +330,12 @@ const rpcSchema: RpcSchema = {
             type: 'string',
           },
         },
+      },
+      Profile: {
+        type: 'object',
+        items: [
+
+        ]
       },
       Apps: {
         type: 'array',

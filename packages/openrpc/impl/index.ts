@@ -37,6 +37,8 @@ import * as jsonrpc from './jsonrpc'
 
 import * as router from './router'
 
+import * as util from './utility'
+
 // Types
 // -----------------------------------------------------------------------------
 
@@ -585,19 +587,11 @@ export function build(
 // (camelCased)
 
 export function client(
-  // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string | undefined,
   schema: RpcSchema,
   options: RpcClientOptions
 ): RpcClient {
-  let objId: DurableObjectId
-  if (name === undefined || name === '') {
-    objId = durableObject.newUniqueId()
-  } else {
-    objId = durableObject.idFromName(name)
-  }
-
+  const objId: DurableObjectId = util.idFromOptions(durableObject, options)
   // TODO call cmp.ping with client to validate, only if it exists.
   return new RpcClient(durableObject, objId, schema, options)
 }
@@ -606,20 +600,12 @@ export function client(
 // -----------------------------------------------------------------------------
 
 export async function discover(
-  // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string | undefined,
   options: RpcClientOptions
 ): Promise<RpcClient> {
-  let objId: DurableObjectId
-  if (name === undefined || name === '') {
-    // When no object ID is supplied we generate one randomly.
-    objId = durableObject.newUniqueId()
-  } else {
-    objId = durableObject.idFromName(name)
-  }
+  const objId: DurableObjectId = util.idFromOptions(durableObject, options)
   // Get a reference to the named durable object.
-  const app = durableObject.get(objId)
+  const obj = durableObject.get(objId)
 
   // This base URL is ignored for routing purposes since the calls are
   // dispatched using an object stub. Instead we encode the name of the
@@ -651,11 +637,10 @@ export async function discover(
     body,
   })
 
-  // TODO check response status
-  const response = await app.fetch(request)
+  const response = await obj.fetch(request)
   if (!response.ok) {
     // TODO
-    // FIXME
+    throw new Error(`error calling rpc.discover for ${objId.toString()}`)
   }
 
   // TODO handle parse errors
@@ -665,9 +650,12 @@ export async function discover(
 
   // TODO check for .result or .error
   if (rpcJSON.hasOwnProperty('result')) {
-    const schemaJSON = _.get(rpcJSON, 'result')
-    const schema: RpcSchema = schemaJSON
-    return client(durableObject, objId.toString(), schema, options)
+    const schemaJSON: unknown = _.get(rpcJSON, 'result')
+    const schema: RpcSchema = schemaJSON as RpcSchema
+    // Make sure we construct a client for the same object.
+    const clientOptions = _.set(options, 'id', objId.toString())
+
+    return client(durableObject, schema, clientOptions)
   }
 
   // TODO better error handling
