@@ -53,7 +53,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   )
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
-  console.log('searchParams:', searchParams)
   return createUserSession(
     authenticationToken,
     `/authorize?${searchParams}`,

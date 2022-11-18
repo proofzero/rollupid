@@ -110,14 +110,12 @@ export function ErrorBoundary({ error }) {
 }
 
 export function CatchBoundary() {
-  const { ENV } = useLoaderData()
-
   const caught = useCatch()
   const params = useParams()
-  const { message, isAuthenticated } = caught.data
+  const { status } = caught
 
   let secondary = 'Something went wrong'
-  switch (caught.status) {
+  switch (status) {
     case 404:
       secondary = 'Page not found'
       break
@@ -138,15 +136,15 @@ export function CatchBoundary() {
         <div
           className={'flex flex-col h-screen gap-4 justify-center items-center'}
         >
-          <h1>{caught.status}</h1>
+          <h1>{status}</h1>
           <p>
             {secondary}
-            {message && `: ${message}`}
+            {caught.data?.message && `: ${caught.data?.message}`}
           </p>
-          {isAuthenticated && (
+          {caught.data?.isAuthenticated && (
             <ThreeIdButton
               text={'Continue to 3ID'}
-              href={ENV.THREEID_APP_URL}
+              href={window.ENV.THREEID_APP_URL}
             />
           )}
         </div>
