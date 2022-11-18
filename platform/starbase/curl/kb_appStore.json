@@ -6,7 +6,7 @@
     "published": false,
     "clientId": "deadbeefdeadbeefdeadbeefdeadbeef",
     "clientSecret": "secret:0000000000000000000000000000000000000000",
-    "redirectURL": "https://example.com/auth/successful",
+    "redirectURI": "https://example.com/auth/successful",
     "domains": [],
     "scopes": [],
     "termsURL": "",

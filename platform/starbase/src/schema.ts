@@ -139,7 +139,7 @@ const rpcSchema: RpcSchema = {
           },
         },
         {
-          name: 'redirectURL',
+          name: 'redirectURI',
           schema: {
             type: 'string',
           },
@@ -295,10 +295,10 @@ const rpcSchema: RpcSchema = {
           clientSecret: {
             type: 'string',
           },
-          redirectURL: {
+          redirectURI: {
             type: 'string',
             format: 'uri',
-            pattern: '^https?://',
+            pattern: '^([a-z][a-z0-9\+\-\.])*://',
           },
           termsURL: {
             type: 'string',
