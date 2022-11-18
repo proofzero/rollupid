@@ -1,0 +1,18 @@
+{
+  "id": "",
+  "published": false,
+  "clientId": "f5f43b2354c644360f6ba49c9e7b5e5a",
+  "clientSecret": "secret:3a9d793f64b8a05a3905a729f16cb03ff29be10c",
+  "redirectURL": "https://console.kubelt.com/dashboard",
+  "domains": [],
+  "scopes": [],
+  "termsURL": "",
+  "websiteURL": "",
+  "mirrorURL": "",
+  "discordURL": "",
+  "mediumUser": "",
+  "twitterUser": "",
+  "createdDate": "Tue, 18 Oct 2022 19:34:07 GMT",
+  "name": "Console",
+  "icon": "https://imagedelivery.net/GpF42-mqjMIqmRcX5aE9gQ/29ba0048-1c8e-44e5-23d2-2f61b7fb0100/icon"
+}
