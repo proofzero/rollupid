@@ -51,6 +51,7 @@ export default /* GraphQL */ `
   type Query {
     profile: Profile
     profileFromAddress(address: String!): Profile
+    profileNFTsFromAddress(address: String, pageKey: String): Profile
   }
 
   type Mutation {

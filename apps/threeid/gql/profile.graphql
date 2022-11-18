@@ -42,6 +42,11 @@ query getProfileFromAddress($address: String!) {
   }
 }
 
+query getProfileNFTs($address: String, $pageKey: String) {
+  profileNFTsFromAddress(address: $address, pageKey: $pageKey) {
+  }
+}
+
 mutation updateProfile(
   $profile: ThreeIDProfileInput
   $visibility: Visibility!
