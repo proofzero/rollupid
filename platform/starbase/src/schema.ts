@@ -36,6 +36,32 @@ const rpcSchema: RpcSchema = {
       ],
     },
     {
+      name: 'kb_appScopes',
+      summary: 'A list of scopes with their metadata.',
+      tags: [
+        {
+          name: 'app',
+        },
+      ],
+      params: [],
+      result: {
+        name: 'scopes',
+        description: 'A list of scopes with their metadata.',
+        schema: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+            },
+            description: {
+              type: 'string',
+            },
+          },
+        },
+      },
+      errors: [],
+    },
+    {
       name: 'kb_appStore',
       summary: 'Store an application record',
       tags: [
@@ -298,7 +324,7 @@ const rpcSchema: RpcSchema = {
           redirectURI: {
             type: 'string',
             format: 'uri',
-            pattern: '^([a-z][a-z0-9\+\-\.])*://',
+            pattern: '^([a-z][a-z0-9+-.])*://',
           },
           termsURL: {
             type: 'string',

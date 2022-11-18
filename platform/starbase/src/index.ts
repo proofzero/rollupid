@@ -404,7 +404,7 @@ const kb_appAuthCheck = openrpc.method(schema, {
       const token = context.get(KEY_TOKEN)
 
       const appId = _.get(request, ['params', 'appId'])
-      if (appId == undefined || appId === null || appId === "") {
+      if (appId == undefined || appId === null || appId === '') {
         throw new Error(`application ID was not supplied`)
       }
 
@@ -420,7 +420,7 @@ const kb_appAuthCheck = openrpc.method(schema, {
         redirectURL: _.get(request, ['params', 'redirectURL']),
         scopes: _.get(request, ['params', 'scopes']),
         clientId: _.get(request, ['params', 'clientId']),
-        clientSecret: _.get(request, ['params', 'clientSecret'])
+        clientSecret: _.get(request, ['params', 'clientSecret']),
       }
 
       // Check that these supplied values match what is stored for the
@@ -428,6 +428,45 @@ const kb_appAuthCheck = openrpc.method(schema, {
       const allowed = _.isEqual(input, _.pick(stored, _.keys(input)))
 
       return openrpc.response(request, allowed)
+    }
+  ),
+})
+
+// kb_authScopes
+// -----------------------------------------------------------------------------
+// Return a list of scopes with their metadata.
+
+const kb_authScopes = openrpc.method(schema, {
+  name: 'kb_appScopes',
+  scopes: noScope,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      // TODO: mover the following data into a security package so we can
+      // abstract it away from the RPC implementation.
+      return openrpc.response(request, {
+        scopes: {
+          'profile.read': {
+            name: 'Public Profile',
+            description: 'Read your profile data.',
+          },
+          'profile.write': {
+            name: 'Edit Profile',
+            description: 'Write your profile data.',
+          },
+          'accounts.read': {
+            name: 'Accounts',
+            description: 'Read your connected accounts.',
+          },
+          'accounts.write': {
+            name: 'Modify Accounts',
+            description: 'Modify your connected accounts.',
+          },
+        },
+      })
     }
   ),
 })
@@ -784,7 +823,17 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    // TODO need to revisit how scopes work!
+    // Forward request to authorization service. This throws if the
+    // authentication doesn't succeed. It relies on service bindings to
+    // communicate with the authorization service ("passport"):
+    // - env.PASSPORT
+    //
+    // NB: request must be cloned as it may only be read once.
+    try {
+      await isAuthenticated(request.clone(), env)
+    } catch (err) {
+      return new Response('Unauthorized', { status: 401 })
+    }
 
     // TEMP Install fixture data; there should be a core for the
     // "console" and for the "threeid" applications.
