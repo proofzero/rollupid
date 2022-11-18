@@ -23,8 +23,19 @@ jobs:
 
       - run: nix-build platform.nix
 
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
       - name: Install
-        run: yarn workspaces focus --all
+        run: yarn install
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include starbase run test
@@ -33,9 +44,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/starbase"
+          workingDirectory: 'platform/starbase'
           command: publish --env next
-          environment: "next"
+          environment: 'next'
           secrets:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

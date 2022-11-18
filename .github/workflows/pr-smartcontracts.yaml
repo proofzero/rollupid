@@ -61,7 +61,9 @@ jobs:
         id: changes
         with:
           filters: |
-            smartcontracts: 'smartcontracts/**'
+            smartcontracts:
+              - 'smartcontracts/**'
+              - '.github/workflows/pr-smartcontracts.yaml'
 
   build-test-smartcontracts:
     needs: changes
@@ -89,7 +91,7 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn workspaces focus --all
+        run: yarn install
 
       - name: Build
         run: yarn build

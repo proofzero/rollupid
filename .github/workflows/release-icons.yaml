@@ -34,15 +34,15 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn workspaces focus --all
+        run: yarn install
 
       - name: Deploy Oort to Test Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          workingDirectory: "platform/icons"
+          workingDirectory: 'platform/icons'
           command: publish --env current
-          environment: "current"
+          environment: 'current'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
           secrets: |

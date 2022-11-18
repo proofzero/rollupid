@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn workspaces focus --all
+        run: yarn install
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include oort run test
