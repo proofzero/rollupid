@@ -19,7 +19,17 @@ export const getAuthenticationClientWithAddress = (
 ): JsonRpcClient<AuthenticationApi> => {
   return createFetcherJsonRpcClient<AuthenticationApi>(Account, {
     headers: {
-      'KBT-Core-Address': address as string,
+      'KBT-Core-Address': address,
+    },
+  })
+}
+
+export const getAccountClientWithJWT = (
+  jwt: string
+): JsonRpcClient<AuthenticationApi> => {
+  return createFetcherJsonRpcClient<AuthenticationApi>(Account, {
+    headers: {
+      'KBT-Access-JWT-Assertion': jwt,
     },
   })
 }

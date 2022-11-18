@@ -3,7 +3,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 import { useLoaderData } from '@remix-run/react'
 
-import { getStabaseClient } from '~/platform.server'
+import { getAccountClientWithJWT, getStabaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession } from '~/session.server'
 
@@ -13,9 +13,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await getUserSession(request)
 
   const sbClient = getStabaseClient()
+  const acctClient = getAccountClientWithJWT(jwt.get('jwt'))
   try {
     const scopeMeta = await sbClient.kb_appScopes()
     const appProfile = await sbClient.kb_appProfile(client_id)
+
+    // const scopeFamilies = new Set(
+    //   appProfile.scopes.map((scope: string) => scope.split('.')[0])
+    // )
 
     return json({ appProfile, userProfile: {}, scopeMeta })
   } catch (e) {

@@ -28,7 +28,20 @@ export type AuthorizationProps = {
   scopeMeta: Record<string, ScopeMeta>
 }
 
-export function Authorization({ appProfile, userProfile }: AuthorizationProps) {
+export function Authorization({
+  appProfile,
+  userProfile,
+  scopeMeta,
+}: AuthorizationProps) {
+  const scopeFamilies = new Set(
+    appProfile.scopes.map((scope) => scope.split('.')[0])
+  )
+  let collapsedScopes: Record<string, ScopeMeta> = {}
+  scopeFamilies.forEach((family) => {
+    collapsedScopes[family] =
+      scopeMeta[`${family}.write`] || scopeMeta[`${family}.read`]
+  })
+
   return (
     <div className={'flex flex-col gap-4 basis-96'}>
       <div className={'flex flex-row items-center justify-center'}>
@@ -60,15 +73,19 @@ export function Authorization({ appProfile, userProfile }: AuthorizationProps) {
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base'}
           >
-            <li className={'flex flex-row gap-4 items-center'}>
-              <span>
-                <img
-                  src={publicProfileScopeIcon}
-                  alt="Public Profile Scope IconIcon"
-                />
-              </span>
-              Edit Public Profile
-            </li>
+            {Object.keys(collapsedScopes).map((scope, i) => {
+              return (
+                <li key={i} className={'flex flex-row gap-4 items-center'}>
+                  <span>
+                    <img
+                      src={publicProfileScopeIcon}
+                      alt={`${collapsedScopes[scope].name} Icon`}
+                    />
+                  </span>
+                  {collapsedScopes[scope].name}
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
