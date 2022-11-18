@@ -21,7 +21,9 @@ jobs:
         id: changes
         with:
           filters: |
-            apps: 'apps/**'
+            apps:
+              - 'apps/**'
+              - '.github/workflows/pr-apps.yaml'
 
   build-test-apps:
     needs: changes

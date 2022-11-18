@@ -21,7 +21,9 @@ jobs:
         id: changes
         with:
           filters: |
-            projects: 'projects/**'
+            projects:
+              - 'projects/**'
+              - '.github/workflows/pr-projects.yaml'
 
   build-test-projects:
     needs: changes

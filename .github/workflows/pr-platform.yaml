@@ -21,7 +21,9 @@ jobs:
         id: changes
         with:
           filters: |
-            platform: 'platform/**'
+            platform:
+              - 'platform/**'
+              - '.github/workflows/pr-platform.yaml'
 
   build-test-platform:
     needs: changes

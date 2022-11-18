@@ -61,7 +61,9 @@ jobs:
         id: changes
         with:
           filters: |
-            smartcontracts: 'smartcontracts/**'
+            smartcontracts:
+              - 'smartcontracts/**'
+              - '.github/workflows/pr-smartcontracts.yaml'
 
   build-test-smartcontracts:
     needs: changes
