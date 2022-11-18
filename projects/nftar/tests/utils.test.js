@@ -640,10 +640,10 @@ const ALCHEMY_NFTS_FIXTURE = {
 describe('Utilities', () => {
 
   test('getContractAddress return is expected', () => {
-	const CONTRACT_ADDRESSES_FIXTURE = ["0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d","0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb","0x60e4d786628fea6478f785a6d7e704777c86a7c6","0x23581767a106ae21c074b2276d25e5c3e136a68b","0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b","0x8a90cab2b38dba80c64b7734e58ee1db38b8992e","0xed5af388653567af2f388e6224dc7c4b3241c544","0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb","0xe785e82358879f061bc3dcac6f0444462d4b5330","0xd4ac3ce8e1e14cd60666d49ac34ff2d2937cf6fa","0xcd79de06dd12b09c5beb567f83b2e9a51a4aafd6","0x92ce069c08e39bca867d45d2bdc4ebe94e28321a"]
-	const contractAddresses = traits.getContractAddresses();
-	expect(contractAddresses).toEqual(expect.arrayContaining(CONTRACT_ADDRESSES_FIXTURE));
-	expect(contractAddresses.length).toEqual(CONTRACT_ADDRESSES_FIXTURE.length);
+    const CONTRACT_ADDRESSES_FIXTURE = ["0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d","0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb","0x60e4d786628fea6478f785a6d7e704777c86a7c6","0x23581767a106ae21c074b2276d25e5c3e136a68b","0x49cf6f5d44e70224e2e23fdcdd2c053f30ada28b","0x8a90cab2b38dba80c64b7734e58ee1db38b8992e","0xed5af388653567af2f388e6224dc7c4b3241c544","0xa3aee8bce55beea1951ef834b99f3ac60d1abeeb","0xe785e82358879f061bc3dcac6f0444462d4b5330","0xd4ac3ce8e1e14cd60666d49ac34ff2d2937cf6fa","0xcd79de06dd12b09c5beb567f83b2e9a51a4aafd6","0x92ce069c08e39bca867d45d2bdc4ebe94e28321a"]
+    const contractAddresses = traits.getContractAddresses();
+    expect(contractAddresses).toEqual(expect.arrayContaining(CONTRACT_ADDRESSES_FIXTURE));
+    expect(contractAddresses.length).toEqual(CONTRACT_ADDRESSES_FIXTURE.length);
   });
 
   test('calculateNFTWeight null test', () => {

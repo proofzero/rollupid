@@ -16,16 +16,15 @@ const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
 const Web3 = require('web3');
-const imageDataURI = require('image-data-uri');
 const { convert } = require('convert-svg-to-png');
 const FormData = require('form-data');
 
 const {
-    isPFPOwner,
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
-    generateTraits
+    generateTraits,
+    encodeDataURI
 } = require('./utils.js');
 
 const {
@@ -33,6 +32,7 @@ const {
 } = require('./traits.js');
 
 const canvas = require('./canvas/canvas.js');
+const { encode } = require('node:punycode');
 
 // const {
 //     animationViewer
@@ -477,15 +477,8 @@ router.post('/api/v0/og-image', async (ctx, next) => {
 
         // Images that are remote need to be converted to Data URIs so that we can
         // render the SVG without triggering a cross-origin security violation.
-        const bkgURI = await imageDataURI.encodeFromURL(bkgURL.href).catch((e) => {
-            console.log(filename, 'failed to encode background image');
-            ctx.throw(500, `Image encoding error: ${JSON.stringify(e)}`);
-        });
-
-        const hexURI = await imageDataURI.encodeFromURL(hexURL.href).catch((e) => {
-            console.log(filename, 'failed to encode hexagon image');
-            ctx.throw(500, `Image encoding error: ${JSON.stringify(e)}`);
-        });
+        const hexURI = await encodeDataURI(hexURL.href)
+        const bkgURI = await encodeDataURI(bkgURL.href)
 
         // Constants for populating the SVG (optional).
         const OG_WIDTH = 1200;

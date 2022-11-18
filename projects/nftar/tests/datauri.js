@@ -1,7 +1,6 @@
 // Tests for various Data URI libraries to see their image support.
 const fs = require('fs')
 const imageDataURI = require('image-data-uri')
-const sharp = require('sharp')
 const chromiumConverter = require('convert-svg-to-png')
 
 // Constants for populating the SVG (optional).
@@ -43,8 +42,6 @@ const test = async (hexURL, outfile) => {
 
     fs.writeFileSync(`${outfile}.svg`, svg)
     await chromiumConverter.convertFile(`${outfile}.svg`)
-
-    //await sharp(Buffer.from(svg)).toFormat('png').toFile(outfile);
 }
 
 const path = '/mnt/c/projects/images/'
@@ -64,3 +61,6 @@ test('https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg',
 
 // WEBP
 test('https://www.silverdisc.co.uk/sites/default/files/sd_importer/lion_webp_10.webp', `${path}test-webp.png`)
+
+// Cryptopunks are tricky.
+test('https://cryptopunks.app/cryptopunks/cryptopunk0294.png?customColor=638596', `${path}test-punk.png`)
