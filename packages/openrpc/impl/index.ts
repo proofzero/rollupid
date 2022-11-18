@@ -31,6 +31,8 @@ import { RpcContext } from './context'
 
 import { preflight as preflightScopes } from './scopes'
 
+import { KEY_REQUEST_CTX, KEY_REQUEST_ENV, KEY_REQUEST_RAW } from '../constants'
+
 import * as jsonrpc from './jsonrpc'
 
 import * as router from './router'
@@ -94,6 +96,8 @@ export type RpcMethod = {
   name: symbol
   // An OpenRPC partial schema for a single method.
   schema: Readonly<MethodObject>
+  // An auth checking function.
+  auth: Readonly<RpcAuthHandler>
   // The set of scopes required to call the method.
   scopes: Readonly<ScopeSet>
   // An RPC handler function to invoke when method is called.
@@ -107,14 +111,36 @@ export type RpcMethods = Map<symbol, RpcMethod>
 
 // When the user supplies a ServiceExtension definition it's so that the
 // canonical name of the method, stored at the "name" property of an
-// Rpcmethod, will be created from the given schema's name string.
-export type ServiceExtension = Omit<RpcMethod, 'name'>
+// RpcMethod, will be created from the given schema's name string.
+//
+// TODO revist this type definition that omits RpcMethod name and makes
+// 'auth' optional, making other fields required:
+// Omit<RpcMethod, 'name'> & Pick<RpcMethod, 'schema' | 'scopes' | 'handler'>
+
+export type ServiceExtension = {
+  schema: Readonly<MethodObject>
+  auth?: Readonly<RpcAuthHandler>
+  // TODO make scopes optional
+  scopes: Readonly<ScopeSet>
+  handler: Readonly<RpcHandler>
+}
 
 // The name of an OpenRPC method as per the meta-schema.
 type RpcMethodName = ContentDescriptorObjectName
 
+/*
+export type RpcAuthHandler = (
+  request: Readonly<Request>,
+  context: Readonly<RpcContext>,
+) => MiddlewareResult
+*/
+export type RpcAuthHandler = MiddlewareFn
+
 export type ServiceMethod = {
   name: RpcMethodName
+  // An optional authentication checking fn.
+  auth?: Readonly<RpcAuthHandler>
+  // TODO make scopes optional
   scopes: Readonly<ScopeSet>
   handler: Readonly<RpcHandler>
 }
@@ -143,8 +169,24 @@ export type OpenRpcHandler = (
 // context
 // -----------------------------------------------------------------------------
 
-export function context(): RpcContext {
-  return new RpcContext()
+export function context<Env = unknown>(
+  request: Request,
+  env?: Env,
+  ctx?: ExecutionContext
+): RpcContext {
+  const context = new RpcContext()
+
+  context.set(KEY_REQUEST_RAW, request)
+
+  if (env !== undefined) {
+    context.set(KEY_REQUEST_ENV, env)
+  }
+
+  if (ctx !== undefined) {
+    context.set(KEY_REQUEST_CTX, ctx)
+  }
+
+  return context
 }
 
 // options
@@ -297,10 +339,18 @@ export function method(
     throw Error(`can't find method ${name} in the schema`)
   }
 
+  // AUTH
+
+  const authPass = () => {}
+  // Auth guard function; if it returns a response that method handler
+  // is never invoked, and the response is returned instead.
+  const authHandler: Readonly<RpcAuthHandler> = serviceMethod?.auth || authPass
+
   return {
     name: methodSym,
     schema: methodSchema,
     scopes: methodScopes,
+    auth: authHandler,
     handler: methodHandler,
   }
 }
@@ -326,7 +376,7 @@ export function extensions(
   return methodMap
 }
 
-// extension
+// extension()
 // -----------------------------------------------------------------------------
 
 export function extension(
@@ -340,9 +390,15 @@ export function extension(
   const methodName = methodSchema.name.trim()
   const methodSym = Symbol.for(methodName)
 
+  // AUTH
+
+  const authPass = () => {}
+  const authHandler: Readonly<RpcAuthHandler> = ext?.auth || authPass
+
   return {
     name: methodSym,
     schema: methodSchema,
+    auth: authHandler,
     scopes: methodScopes,
     handler: methodFn,
   }
@@ -475,7 +531,7 @@ export function service(
   return svc
 }
 
-// build
+// build()
 // -----------------------------------------------------------------------------
 
 export function build(
@@ -505,10 +561,10 @@ export function build(
   // handling. Extensions may be registered to populate the context with
   // useful information, e.g. host-supplied information attached to the
   // incoming request.
-  return async (
+  return async function (
     request: Request,
     context: RpcContext = new Map()
-  ): Promise<Response> => {
+  ): Promise<Response> {
     // Returns a Promise<any> that resolves with the first matching
     // route handler that returns something (or none at all if there is
     // no match). In the case where no route matches we return an
@@ -520,7 +576,7 @@ export function build(
   }
 }
 
-// client
+// client()
 // -----------------------------------------------------------------------------
 // TODO add options to specify a prefix or otherwise determine which are
 // "internal" and "external" methods
@@ -531,12 +587,19 @@ export function build(
 export function client(
   // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string,
+  name: string | undefined,
   schema: RpcSchema,
   options: RpcClientOptions
 ): RpcClient {
+  let objId: DurableObjectId
+  if (name === undefined || name === '') {
+    objId = durableObject.newUniqueId()
+  } else {
+    objId = durableObject.idFromName(name)
+  }
+
   // TODO call cmp.ping with client to validate, only if it exists.
-  return new RpcClient(durableObject, name, schema, options)
+  return new RpcClient(durableObject, objId, schema, options)
 }
 
 // discover
@@ -545,11 +608,17 @@ export function client(
 export async function discover(
   // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string,
+  name: string | undefined,
   options: RpcClientOptions
 ): Promise<RpcClient> {
+  let objId: DurableObjectId
+  if (name === undefined || name === '') {
+    // When no object ID is supplied we generate one randomly.
+    objId = durableObject.newUniqueId()
+  } else {
+    objId = durableObject.idFromName(name)
+  }
   // Get a reference to the named durable object.
-  const objId = durableObject.idFromName(name)
   const app = durableObject.get(objId)
 
   // This base URL is ignored for routing purposes since the calls are
@@ -586,6 +655,7 @@ export async function discover(
   const response = await app.fetch(request)
   if (!response.ok) {
     // TODO
+    // FIXME
   }
 
   // TODO handle parse errors
@@ -597,7 +667,7 @@ export async function discover(
   if (rpcJSON.hasOwnProperty('result')) {
     const schemaJSON = _.get(rpcJSON, 'result')
     const schema: RpcSchema = schemaJSON
-    return client(durableObject, name, schema, options)
+    return client(durableObject, objId.toString(), schema, options)
   }
 
   // TODO better error handling

@@ -26,29 +26,68 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
-      name: "add_application",
-      summary: "Add an application ID to list of user's applications",
-      params: [
-        {
-          name: "appId",
-          schema: {
-            "$ref": "#/components/contentDescriptors/AppId",
-          },
-        },
-      ],
+      name: "list_applications",
+      summary: "Return a list of the user's application IDs",
+      params: [],
       result: {
-        name: "appId",
-        description: "The application ID that was added",
+        name: "appIds",
+        description: "The list of user's application IDs",
         schema: {
-          "$ref": "#components/contentDescriptors/AppId",
+          type: "array",
+          items: {
+            "$ref": "#components/contentDescriptors/AppId",
+          },
         },
       },
       errors: [],
     },
     {
-      name: "list_applications",
-      summary: "Return a list of the user's application IDs",
-      params: [],
+      name: "index_application",
+      summary: "Index an application to enable lookup",
+      params: [
+        {
+          name: "id",
+          summary: "The unique application identifier",
+          required: true,
+          schema: {
+            type: "string",
+          },
+        },
+        {
+          name: "data",
+          summary: "An application record",
+          required: true,
+          schema: {
+            type: "object"
+          }
+        },
+        {
+          name: "fields",
+          summary: "A list of field names to index",
+          required: true,
+          schema: {
+            type: "array",
+            items: {
+              type: "string",
+            },
+          },
+        },
+      ],
+      result: {
+        name: "appId",
+        description: "The ID of the indexed application",
+        schema: {
+          type: "string",
+        },
+      },
+      errors: [],
+    },
+    {
+      name: "lookup_application",
+      summary: "Find an application ID by indexed field(s)",
+      params: [
+
+      ],
       result: {
         name: "appIds",
         description: "The list of user's application IDs",

@@ -1,9 +1,0 @@
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "kb_appAuthInfo",
-  "params": {
-    "ownerId": "robert",
-    "appId": "81cc0dab-2c0a-412d-b82f-0a392823a15f"
-  }
-}

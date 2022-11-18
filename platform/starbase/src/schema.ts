@@ -18,6 +18,24 @@ const rpcSchema: RpcSchema = {
   ],
   methods: [
     {
+      name: 'kb_appCreate',
+      summary: 'Create a new application record',
+      params: [],
+      result: {
+        name: 'appId',
+        description: 'The ID of the newly created application',
+        schema: {
+          $ref: '#/components/contentDescriptors/AppId',
+        },
+      },
+      errors: [
+        {
+          code: 100,
+          message: 'Application ID already in use',
+        },
+      ],
+    },
+    {
       name: 'kb_appStore',
       summary: 'Store an application record',
       tags: [
@@ -111,36 +129,114 @@ const rpcSchema: RpcSchema = {
       },
     },
     {
-      name: 'kb_appAuthInfo',
-      summary: 'Return authorization details for an application',
+      name: 'kb_appAuthCheck',
+      summary: 'Check whether or not an access should be allowed',
       params: [
         {
-          $ref: '#/components/contentDescriptors/AppSelect',
+          name: 'appId',
+          schema: {
+            type: 'string',
+          },
         },
-      ],
-      result: {
-        name: 'authInfo',
-        description: 'OAuth details for the app',
-        schema: {
-          type: 'object',
-          required: [],
-          properties: {
-            clientId: {
-              type: 'string',
-            },
-            clientSecret: {
-              type: 'string',
-            },
-            redirectURI: {
-              type: 'string',
-              format: 'uri',
-            },
-            scope: {
+        {
+          name: 'redirectURI',
+          schema: {
+            type: 'string',
+          },
+        },
+        {
+          name: 'scopes',
+          schema: {
+            type: 'array',
+            items: {
               type: 'string',
             },
           },
         },
+        {
+          name: 'clientId',
+          schema: {
+            type: 'string',
+          },
+        },
+        {
+          name: 'clientSecret',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'allowed',
+        description: 'Is access allowed?',
+        schema: {
+          type: 'boolean',
+        },
       },
+    },
+    {
+      name: 'kb_appRotateSecret',
+      summary: 'Invalidate an old secret and replace it with a new value',
+      params: [
+        {
+          // TODO refer to a secret content descriptor
+          name: 'secret',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'success',
+        schema: {
+          type: 'boolean',
+        },
+      },
+      errors: [],
+    },
+    {
+      name: 'kb_appPublish',
+      summary: 'Set the publication status of an application',
+      params: [
+        {
+          name: 'published',
+          required: true,
+          schema: {
+            type: 'boolean',
+          },
+        },
+      ],
+      result: {
+        name: 'status',
+        summary: 'The new publication status',
+        schema: {
+          type: 'boolean',
+        },
+      },
+      errors: [],
+    },
+    {
+      name: 'kb_appProfile',
+      summary: 'Return the public application profile',
+      params: [
+        {
+          name: 'appId',
+          required: true,
+          schema: {
+            // TODO app core ID, needs better type here
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'status',
+        summary: 'The new publication status',
+        schema: {
+          $ref: '#/components/schema/AppProfile',
+        },
+      },
+      errors: [],
     },
   ],
   components: {
@@ -199,10 +295,10 @@ const rpcSchema: RpcSchema = {
           clientSecret: {
             type: 'string',
           },
-          redirectURL: {
+          redirectURI: {
             type: 'string',
             format: 'uri',
-            pattern: '^https?://',
+            pattern: '^([a-z][a-z0-9\+\-\.])*://',
           },
           termsURL: {
             type: 'string',

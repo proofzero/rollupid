@@ -38,6 +38,19 @@ const rpcSchema: RpcSchema = {
       },
       errors: [],
     },
+    {
+      name: "public_profile",
+      summary: "Return public view of application data",
+      params: [],
+      result: {
+        name: "profile",
+        description: "Public application data",
+        schema: {
+          type: "object"
+        }
+      },
+      errors: [],
+    },
   ],
   components: {
     contentDescriptors: {

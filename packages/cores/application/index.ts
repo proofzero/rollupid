@@ -3,6 +3,8 @@
  * @file src/index.ts
  */
 
+import * as _ from "lodash";
+
 import * as openrpc from "@kubelt/openrpc";
 
 import type {
@@ -128,10 +130,33 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const app = input.get("app");
 
-    return Promise.resolve({
-      invoked: "app_fetch",
-      app,
-    });
+    return Promise.resolve(app);
+  }
+
+  // public_profile
+  // -----------------------------------------------------------------------------
+
+  @method("public_profile")
+  @requiredScope("starbase.read")
+  @requiredField("app", [FieldAccess.Read])
+  publicProfile(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
+    const app = input.get("app")
+
+    // If the application is not published we shouldn't return any
+    // information.
+    let profile = {}
+    if (app?.published == true) {
+      profile = _.omit(app, [
+        'clientSecret',
+        'published',
+      ])
+    }
+
+    return Promise.resolve(profile)
   }
 
   // ---------------------------------------------------------------------------

@@ -14,6 +14,7 @@ import * as schema from './schema'
 import type { JsonRpcError } from './jsonrpc'
 
 import type {
+  RpcAuthHandler,
   RpcChain,
   RpcContext,
   RpcError,
@@ -27,7 +28,23 @@ import type {
 // Definitions
 // -----------------------------------------------------------------------------
 
-import { REQUEST_CONTEXT_KEY } from '../constants'
+import { KEY_REQUEST_RPC } from '../constants'
+
+// Errors
+// -----------------------------------------------------------------------------
+// Is there a better place for this?
+
+function errorHandler(error: JsonRpcError): Readonly<RpcHandler> {
+  return (
+    request: Readonly<RpcRequest>,
+    context: Readonly<RpcContext>
+  ): Promise<RpcError> => {
+    return Promise.resolve(jsonrpc.error(request, error))
+  }
+}
+
+const internalError = errorHandler(jsonrpc.ERROR_INTERNAL)
+const notFoundError = errorHandler(jsonrpc.ERROR_METHOD_NOT_FOUND)
 
 // Types
 // -----------------------------------------------------------------------------
@@ -39,8 +56,8 @@ import { REQUEST_CONTEXT_KEY } from '../constants'
 export type MiddlewareResult = Promise<Response | void>
 
 export type MiddlewareFn = (
-  request: Request,
-  context: RpcContext
+  request: Readonly<Request>,
+  context: Readonly<RpcContext>
 ) => MiddlewareResult
 
 // parseRequestFn
@@ -68,13 +85,16 @@ function parseRequestFn(): MiddlewareFn {
    * @param context a map of context information
    * @return either a Response to return, or void to continue processing
    */
-  return async (request: Request, context: RpcContext): MiddlewareResult => {
+  return async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>
+  ): MiddlewareResult => {
     // Extract the request body as a JSON-RPC request.
     let rpcRequest: RpcRequest
     try {
       rpcRequest = await request.json()
       // Put the parsed request into the context.
-      context.set(REQUEST_CONTEXT_KEY, rpcRequest)
+      context.set(KEY_REQUEST_RPC, rpcRequest)
     } catch (error) {
       console.error(error)
       const detail = { ...jsonrpc.ERROR_PARSE, data: error }
@@ -105,7 +125,10 @@ function checkRequestValidFn(): MiddlewareFn {
   /**
    *
    */
-  return async (request: Request, context: RpcContext): MiddlewareResult => {
+  return async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>
+  ): MiddlewareResult => {
     // TODO
   }
 }
@@ -128,7 +151,7 @@ const checkMethodExistsFn = (service: Readonly<RpcService>): MiddlewareFn => {
    * @param context
    */
   return async (request: Request, context: RpcContext): MiddlewareResult => {
-    const rpcRequest = context.get(REQUEST_CONTEXT_KEY)
+    const rpcRequest = context.get(KEY_REQUEST_RPC)
     const rpcMethod = Symbol.for(rpcRequest.method.trim())
     if (!service.methods.has(rpcMethod) && !service.extensions.has(rpcMethod)) {
       const rpcError = jsonrpc.error(rpcRequest, jsonrpc.ERROR_METHOD_NOT_FOUND)
@@ -177,10 +200,50 @@ function checkParamsValidFn(service: Readonly<RpcService>): MiddlewareFn {
     request: Readonly<Request>,
     context: Readonly<RpcContext>
   ): MiddlewareResult => {
-    const rpcRequest = context.get(REQUEST_CONTEXT_KEY)
+    const rpcRequest = context.get(KEY_REQUEST_RPC)
     // TODO extract request parameters
     // TODO extract correct validator from validator map
     // TODO perform validation, short-circuiting middleware evaluation on error
+  }
+}
+
+// checkAuthFn
+// -----------------------------------------------------------------------------
+
+/**
+ * Call the authorization function associated with a method to determine
+ * if the user is allowed to invoke it.
+ */
+function checkAuthFn(service: Readonly<RpcService>): MiddlewareFn {
+  const methods: RpcMethods = service.methods
+  const extensions: RpcMethods = service.extensions
+
+  /**
+   *
+   */
+  return async (
+    request: Readonly<Request>,
+    context: Readonly<RpcContext>
+  ): MiddlewareResult => {
+    const rpcRequest = context.get(KEY_REQUEST_RPC)
+
+    const method = methods.get(Symbol.for(rpcRequest.method))
+    const extension = extensions.get(Symbol.for(rpcRequest.method))
+
+    const found = method || extension
+
+    const authFn: RpcAuthHandler = <RpcAuthHandler>(
+      (undefined === found ? internalError : found.auth)
+    )
+
+    // If the auth check returns a Response, an authorization failure
+    // has occurred; return the response and short-circuit request
+    // handling.
+    const response = await authFn(request, context)
+
+    if (response) {
+      return response
+    }
   }
 }
 
@@ -192,19 +255,6 @@ function checkParamsValidFn(service: Readonly<RpcService>): MiddlewareFn {
  * have completed to process the RPC request.
  */
 function rpcHandlerFn(service: Readonly<RpcService>): MiddlewareFn {
-  // Is there a better place for this?
-  function errorHandler(error: JsonRpcError): Readonly<RpcHandler> {
-    return (
-      request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>
-    ): Promise<RpcError> => {
-      return Promise.resolve(jsonrpc.error(request, error))
-    }
-  }
-
-  const internalError = errorHandler(jsonrpc.ERROR_INTERNAL)
-  const notFoundError = errorHandler(jsonrpc.ERROR_METHOD_NOT_FOUND)
-
   const methods: RpcMethods = service.methods
   const extensions: RpcMethods = service.extensions
 
@@ -221,7 +271,7 @@ function rpcHandlerFn(service: Readonly<RpcService>): MiddlewareFn {
     request: Readonly<Request>,
     context: Readonly<RpcContext>
   ): MiddlewareResult => {
-    const rpcRequest = context.get(REQUEST_CONTEXT_KEY)
+    const rpcRequest = context.get(KEY_REQUEST_RPC)
 
     const method = methods.get(Symbol.for(rpcRequest.method))
     const extension = extensions.get(Symbol.for(rpcRequest.method))
@@ -255,10 +305,10 @@ function rpcHandlerFn(service: Readonly<RpcService>): MiddlewareFn {
  * least one of the handlers must return a Response that will be
  * returned to the caller.
  *
- * @param rootPath the URL path at which the router is based
- * @param chain a sequence of handler functions
+ * @param rootPath - the URL path at which the router is based
+ * @param chain - a sequence of handler functions
  *
- * @return a Router instance
+ * @returns a Router instance
  */
 export function init(
   service: Readonly<RpcService>,
@@ -289,6 +339,8 @@ export function init(
   const methodExists = checkMethodExistsFn(service)
   // A handler that checks whether or not the request parameters are valid.
   const validParams = checkParamsValidFn(service)
+  // A handler that invokes the user supplied auth checking function.
+  const checkAuth = checkAuthFn(service)
   // The chain terminating handler that invokes the requested method to
   // generate the RPC response.
   const handler = rpcHandlerFn(service)
@@ -298,6 +350,7 @@ export function init(
     validRequest,
     methodExists,
     validParams,
+    checkAuth,
     handler,
   ])
 

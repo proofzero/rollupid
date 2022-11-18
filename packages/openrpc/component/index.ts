@@ -850,7 +850,7 @@ export function component(schema: Readonly<RpcSchema>) {
         // - @rpcBucket: adds an R2 bucket to the context
         // - @rpcKV: adds a KV store to the context
         // etc.
-        const context = openrpc.context()
+        const context = openrpc.context(request)
 
         return await this._rpcHandler(request, context)
       }

@@ -1,0 +1,8 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "kb_appProfile",
+  "params": {
+    "appId": "@kubelt/console"
+  }
+}

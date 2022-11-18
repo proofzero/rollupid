@@ -40,6 +40,7 @@
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "cross-env": "7.0.3",
+    "jose": "4.11.0",
     "lodash": "4.17.21",
     "multiformats": "10.0.2"
   }
