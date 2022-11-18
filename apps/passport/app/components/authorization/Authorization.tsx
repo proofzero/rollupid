@@ -1,17 +1,16 @@
 import { Button } from '@kubelt/design-system'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
-import publicProfileScopeIcon from './public-profile-scope-icon.svg'
+import publicProfileScopeIcon from './profile-scope-icon.svg'
 
 export type Scope = {
-  id: string
   name: string
   description: string
 }
 export type AppProfile = {
   name: string
   logo: string
-  scopes: Scope[]
+  scopes: Record<string, Scope>
 }
 
 export type UserProfile = {
