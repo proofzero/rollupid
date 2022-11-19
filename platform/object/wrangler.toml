@@ -1,0 +1,55 @@
+name = "object"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+r2_buckets = [
+  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+services = [
+  { binding = "Address", service = "address" }
+]
+
+[dev]
+port = 9595
+local_protocol = "http"
+
+[env.dev]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+r2_buckets = [
+  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+services = [
+  { binding = "Address", service = "address-dev" }
+]
+
+[env.next]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+r2_buckets = [
+  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+services = [
+  { binding = "Address", service = "address-next" }
+]
+
+[env.current]
+durable_objects.bindings = [
+  { name = "Core", class_name = "Core" }
+]
+r2_buckets = [
+  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
+]
+services = [
+  { binding = "Address", service = "address-current" }
+]
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]
