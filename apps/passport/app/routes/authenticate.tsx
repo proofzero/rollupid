@@ -11,7 +11,9 @@ import gradientBG from '~/assets/gradient.jpg'
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
   const session = await getUserSession(request)
-  if (session.get('jwt')) {
+  const searchParams = new URL(request.url).searchParams
+
+  if (session.get('jwt') && searchParams.get('client_id')) {
     const searchParams = new URL(request.url).searchParams
     return redirect(`/authorize?${searchParams}`)
   }

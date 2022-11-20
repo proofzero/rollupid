@@ -156,7 +156,7 @@ export function CatchBoundary() {
         <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
           }}
         />
       </body>

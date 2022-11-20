@@ -10,13 +10,21 @@ import { getUserSession } from '~/session.server'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
   const client_id = url.searchParams.get('client_id')
+
+  if (!client_id) {
+    throw json(
+      { message: 'No app to authorize provided', isAuthenticated: true },
+      400
+    )
+  }
+
   const jwt = await getUserSession(request)
 
   const sbClient = getStabaseClient()
   const acctClient = getAccountClientWithJWT(jwt.get('jwt'))
   try {
     const scopeMeta = await sbClient.kb_appScopes()
-    // const appProfile = await sbClient.kb_appProfile(client_id)
+    const appProfile = await sbClient.kb_appProfile(client_id)
 
     // const scopeFamilies = new Set(
     //   appProfile.scopes.map((scope: string) => scope.split('.')[0])
