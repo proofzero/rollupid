@@ -5,6 +5,7 @@ import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 
 import { getUserSession } from '~/session.server'
+import gradientBG from '~/assets/gradient.jpg'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -26,10 +27,20 @@ export default function Index() {
     })
   )
   return (
-    <div className={'flex flex-col h-screen justify-center items-center'}>
-      <WagmiConfig client={client}>
-        <Outlet />
-      </WagmiConfig>
+    <div className={'flex flex-row h-screen justify-center items-center'}>
+      <div
+        style={{
+          backgroundImage: `url(${gradientBG})`,
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+        }}
+        className={'basis-2/5 h-screen w-full hidden lg:block'}
+      ></div>
+      <div className={'basis-full basis-full lg:basis-3/5'}>
+        <WagmiConfig client={client}>
+          <Outlet />
+        </WagmiConfig>
+      </div>
     </div>
   )
 }

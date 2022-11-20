@@ -3,6 +3,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Outlet } from '@remix-run/react'
 import { requireJWT } from '~/session.server'
 import { getStabaseClient } from '~/platform.server'
+import gradientBG from '~/assets/gradient.jpg'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -38,8 +39,18 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
 export default function Authorize() {
   return (
-    <div className={'flex flex-col h-screen justify-center items-center'}>
-      <Outlet />
+    <div className={'flex flex-row h-screen justify-center items-center'}>
+      <div
+        style={{
+          backgroundImage: `url(${gradientBG})`,
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+        }}
+        className={'basis-2/5 h-screen w-full hidden lg:block'}
+      ></div>
+      <div className={'basis-full basis-full lg:basis-3/5'}>
+        <Outlet />
+      </div>
     </div>
   )
 }
