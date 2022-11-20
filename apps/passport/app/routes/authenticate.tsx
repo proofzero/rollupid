@@ -9,8 +9,8 @@ import { getUserSession } from '~/session.server'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const jwt = await getUserSession(request)
-  if (jwt) {
+  const session = await getUserSession(request)
+  if (session.get('jwt')) {
     const searchParams = new URL(request.url).searchParams
     return redirect(`/authorize?${searchParams}`)
   }
@@ -22,7 +22,7 @@ export default function Index() {
   const client = createClient(
     getDefaultClient({
       appName: '3ID',
-      alchemyId: ALCHEMY_KEY,
+      alchemyId: typeof window !== 'undefined' && window.ENV.ALCHEMY_KEY,
     })
   )
   return (

@@ -16,13 +16,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const acctClient = getAccountClientWithJWT(jwt.get('jwt'))
   try {
     const scopeMeta = await sbClient.kb_appScopes()
-    const appProfile = await sbClient.kb_appProfile(client_id)
+    // const appProfile = await sbClient.kb_appProfile(client_id)
 
     // const scopeFamilies = new Set(
     //   appProfile.scopes.map((scope: string) => scope.split('.')[0])
     // )
 
-    return json({ appProfile, userProfile: {}, scopeMeta })
+    return json({ appProfile: {}, userProfile: {}, scopeMeta })
   } catch (e) {
     console.error(e)
     throw json({ message: 'Failed to fetch application info' }, 400)

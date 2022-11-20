@@ -34,7 +34,7 @@ export function Authorization({
   scopeMeta,
 }: AuthorizationProps) {
   const scopeFamilies = new Set(
-    appProfile.scopes.map((scope) => scope.split('.')[0])
+    appProfile?.scopes.map((scope) => scope.split('.')[0])
   )
   let collapsedScopes: Record<string, ScopeMeta> = {}
   scopeFamilies.forEach((family) => {
