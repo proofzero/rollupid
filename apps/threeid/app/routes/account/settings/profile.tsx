@@ -13,11 +13,7 @@ import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
@@ -290,9 +286,9 @@ export default function AccountSettingsProfile() {
             {generatedPfp && (
               <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text
-                  size={TextSize.SM}
-                  weight={TextWeight.Medium500}
-                  color={TextColor.Gray400}
+                  className="text-gray-400"
+                  size="sm"
+                  weight="medium"
                 >
                   Or use your 1/1 gradient
                 </Text>
@@ -332,10 +328,9 @@ export default function AccountSettingsProfile() {
 
           {actionData?.errors.displayName && (
             <Text
-              className="mb-1.5"
-              size={TextSize.XS}
-              weight={TextWeight.Regular400}
-              color={TextColor.Gray400}
+              className="mb-1.5 text-gray-400"
+              size="xs"
+              weight="normal"
             >
               {actionData.errors.displayName}
             </Text>
@@ -354,10 +349,9 @@ export default function AccountSettingsProfile() {
 
               {actionData?.errors.job && (
                 <Text
-                  className="mb-1.5"
-                  size={TextSize.XS}
-                  weight={TextWeight.Regular400}
-                  color={TextColor.Gray400}
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
                 >
                   {actionData.errors.job}
                 </Text>
@@ -376,10 +370,9 @@ export default function AccountSettingsProfile() {
 
               {actionData?.errors.location && (
                 <Text
-                  className="mb-1.5"
-                  size={TextSize.XS}
-                  weight={TextWeight.Regular400}
-                  color={TextColor.Gray400}
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
                 >
                   {actionData.errors.location}
                 </Text>
@@ -398,10 +391,9 @@ export default function AccountSettingsProfile() {
 
           {actionData?.errors?.website && (
             <Text
-              className="mb-1.5"
-              size={TextSize.XS}
-              weight={TextWeight.Regular400}
-              color={TextColor.Gray400}
+              className="mb-1.5 text-gray-400"
+              size="xs"
+              weight="normal"
             >
               {actionData.errors.website}
             </Text>
@@ -418,10 +410,9 @@ export default function AccountSettingsProfile() {
 
           {actionData?.errors.bio && (
             <Text
-              className="mb-1.5"
-              size={TextSize.XS}
-              weight={TextWeight.Regular400}
-              color={TextColor.Gray400}
+              className="mb-1.5 text-gray-400"
+              size="xs"
+              weight="normal"
             >
               {actionData?.errors.bio}
             </Text>

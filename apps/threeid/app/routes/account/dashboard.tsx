@@ -12,11 +12,7 @@ import FAQ from '~/components/FAQ'
 
 import stepComplete from '~/assets/step_complete.png'
 import stepSoon from '~/assets/step_soon.png'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
@@ -89,10 +85,9 @@ const completeSteps = [
     description: (
       <>
         <Text
-          className="mb-1"
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
+          className="mb-1 text-gray-400"
+          size="sm"
+          weight="normal"
         >
           Mint your very own 3ID 1/1 PFP.
         </Text>
@@ -105,10 +100,9 @@ const completeSteps = [
     description: (
       <>
         <Text
-          className="mb-1"
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
+          className="mb-1 text-gray-400"
+          size="sm"
+          weight="normal"
         >
           Configure your NFT avatar and profile.
         </Text>
@@ -124,10 +118,9 @@ const comingNext = [
     description: (
       <>
         <Text
-          className="mb-1"
-          size={TextSize.SM}
-          weight={TextWeight.Regular400}
-          color={TextColor.Gray400}
+          className="mb-1 text-gray-400"
+          size="sm"
+          weight="normal"
         >
           Connect more blockchain and social accounts to your 3ID.
         </Text>
@@ -204,10 +197,9 @@ export default function Welcome() {
         </Heading>
 
         <Text
-          weight={TextWeight.Regular400}
-          size={TextSize.Base}
-          color={TextColor.Gray500}
-          className="mb-6 text-center lg:text-left"
+          weight="normal"
+          size="base"
+          className="mb-6 text-center lg:text-left text-gray-500"
         >
           Welcome to the 3ID app. We are currently in beta and will be unlocking
           new features often. Follow us on Twitter and join our Discord to stay
@@ -307,9 +299,9 @@ export default function Welcome() {
                     <SectionHeading>{step.title}</SectionHeading>
                     <div className="col-span-5">
                       <Text
-                        size={TextSize.SM}
-                        weight={TextWeight.Regular400}
-                        color={TextColor.Gray500}
+                        size="sm"
+                        weight="normal"
+                        className="text-gray-500"
                       >
                         {step.isCompleted ? 'Completed' : step.description}
                       </Text>

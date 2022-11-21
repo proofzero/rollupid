@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from "~/components/typography/Text";
+import { Text } from '@kubelt/design-system'
 
 export type SectionTitleProps = {
   className?: string;
@@ -17,19 +13,18 @@ const SectionTitle = ({ className, title, subtitle }: SectionTitleProps) => {
   return (
     <div className={cleanedClassName}>
       <Text
-        className="mb-1"
-        weight={TextWeight.SemiBold600}
-        size={TextSize.XL}
-        color={TextColor.Gray800}
+        className="mb-1 text-gray-800"
+        weight="semibold"
+        size="xl"
       >
         {title}
       </Text>
 
       {subtitle && (
         <Text
-          weight={TextWeight.Regular400}
-          size={TextSize.SM}
-          color={TextColor.Gray400}
+          weight="normal"
+          size="sm"
+          className="text-gray-400"
         >
           {subtitle}
         </Text>

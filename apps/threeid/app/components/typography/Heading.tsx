@@ -1,9 +1,4 @@
-import Text, {
-  TextColor,
-  TextProps,
-  TextSize,
-  TextWeight,
-} from "~/components/typography/Text";
+import { Text } from '@kubelt/design-system'
 
 export type HeadingProps = {
   className?: string;
@@ -13,10 +8,9 @@ export type HeadingProps = {
 const Heading = ({ children, className }: HeadingProps) => {
   return (
     <Text
-      className={className}
-      weight={TextWeight.Medium500}
-      size={TextSize.XL4}
-      color={TextColor.Gray800}
+      className={`${className} text-gray-800`}
+      weight="medium"
+      size="4xl"
     >
       {children}
     </Text>

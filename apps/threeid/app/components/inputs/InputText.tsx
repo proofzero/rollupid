@@ -43,8 +43,8 @@ const InputText = ({
     <div>
       <label htmlFor={id}>
         <Text
-          size={TextSize.SM}
-          weight={TextWeight.Medium500}
+          size="sm"
+          weight="medium"
           color={error ? TextColor.Red500 : TextColor.Gray700}
         >
           {heading}
@@ -67,8 +67,8 @@ const InputText = ({
             }-400 bg-gray-50 px-3`}
           >
             <Text
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}
+              size="sm"
+              weight="medium"
               color={error ? TextColor.Red500 : TextColor.Gray700}
             >
               {addon}

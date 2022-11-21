@@ -1,9 +1,5 @@
 import { useSubmit } from '@remix-run/react'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 export default function SignOut({ className }: { className: string }) {
   let submit = useSubmit()
@@ -15,10 +11,9 @@ export default function SignOut({ className }: { className: string }) {
       onClick={() => submit(null, { method: 'post', action: `/auth/signout/` })}
     >
       <Text
-        className="truncate"
-        size={TextSize.SM}
-        weight={TextWeight.Medium500}
-        color={TextColor.Gray800}
+        className="truncate text-gray-800"
+        size="sm"
+        weight="medium"
       >
         Sign Out
       </Text>

@@ -1,10 +1,6 @@
 import { Tooltip } from 'flowbite-react'
 import { FaCopy, FaDiscord, FaGlobe, FaTwitter } from 'react-icons/fa'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 import Spinner from '../spinner'
 
 export type ProfileCardProps = {
@@ -60,10 +56,9 @@ const ProfileCard = ({
       </div>
 
       <Text
-        className="mt-5 mb-2.5"
-        weight={TextWeight.Bold700}
-        color={TextColor.Gray600}
-        size={TextSize.XL2}
+        className="mt-5 mb-2.5 text-gray-600"
+        weight="bold"
+        size="2xl"
       >
         {displayName ?? shortenedAccount}
       </Text>
@@ -76,9 +71,9 @@ const ProfileCard = ({
       >
         <Tooltip content="Copied!" trigger="click" animation="duration-1000">
           <Text
-            weight={TextWeight.SemiBold600}
-            color={TextColor.Gray400}
-            size={TextSize.XS}
+            weight="semibold"
+            className="text-gray-400"
+            size="xs"
           >
             <span className="flex flex-row items-center">
               <FaCopy className="mr-3" />
@@ -119,9 +114,9 @@ const ProfileCard = ({
       </div>
 
       <Text
-        weight={TextWeight.Medium500}
-        color={TextColor.Gray300}
-        size={TextSize.XS}
+        weight="medium"
+        size="xs"
+        className="text-gray-300"
       >
         &nbsp;
         {/* {`${
