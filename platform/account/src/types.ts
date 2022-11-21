@@ -1,37 +1,42 @@
-import jose from 'jose'
-import { Func } from 'typed-json-rpc'
-
-export interface KeyPair {
-  publicKey: jose.KeyLike | Uint8Array
-  privateKey: jose.KeyLike | Uint8Array
-}
-
-export interface KeyPairSerialized {
-  publicKey: jose.JWK
-  privateKey: jose.JWK
-}
+import { BaseApi } from '@kubelt/platform.commons/src/jsonrpc'
+import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
 
 export interface Environment {
   Address: Fetcher
+  Access: Fetcher
   Core: DurableObjectNamespace
-}
-
-export interface Api {
-  [key: string]: Func
-  kb_getNonce(address: string, template: string): Promise<string>
-  kb_verifyNonce(nonce: string, signature: string): Promise<string>
-}
-
-export type GetNonceResult = {
-  nonce: string
 }
 
 export interface Challenge {
   address: string
   nonce: string
   template: string
+  clientId: string
+  redirectUri: string
+  scope: string[]
+  state: string
 }
 
-export interface GenerateJWTOptions {
-  payload: jose.JWTPayload
+export interface WorkerApi extends BaseApi {
+  kb_getNonce(
+    address: string,
+    template: string,
+    clientId: string,
+    redirectUri: string,
+    scope: string[],
+    state: string
+  ): Promise<string>
+  kb_verifyNonce(nonce: string, signature: string): Promise<AuthorizeResult>
+}
+
+export interface CoreApi extends BaseApi {
+  getNonce(
+    address: string,
+    template: string,
+    clientId: string,
+    redirectUri: string,
+    scope: string[],
+    state: string
+  ): Promise<string>
+  verifyNonce(nonce: string, signature: string): Promise<Challenge>
 }

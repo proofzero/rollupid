@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
+    "@kubelt/platform.access": "workspace:*",
     "@kubelt/platform.commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
