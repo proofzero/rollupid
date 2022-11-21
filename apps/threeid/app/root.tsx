@@ -19,6 +19,8 @@ import { startSession } from '~/utils/datadog.client'
 
 import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
+import designStyles from '@kubelt/design-system/dist/index.css'
+
 import social from './assets/social.png'
 import appleIcon from './assets/apple-touch-icon.png'
 import icon32 from './assets/favicon-32x32.png'
@@ -56,6 +58,7 @@ export const meta: MetaFunction = () => ({
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   { rel: 'stylesheet', href: baseStyles },
+  { rel: 'stylesheet', href: designStyles },
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
   { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
