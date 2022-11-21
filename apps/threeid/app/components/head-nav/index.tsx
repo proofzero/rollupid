@@ -1,12 +1,8 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Link, useLoaderData, NavLink } from '@remix-run/react'
+import { Link, NavLink } from '@remix-run/react'
 
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import { HiOutlineBell } from 'react-icons/hi'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
@@ -84,16 +80,10 @@ export default function HeadNav({
                             return isActive ? activeStyle : undefined
                           }}
                           className={
-                            'px-3 py-2 text-sm font-medium nav-link-text rounded-md hover:bg-gray-800'
+                            'px-3 py-2 text-white text-sm font-medium nav-link-text rounded-md hover:bg-gray-800'
                           }
                         >
-                          <Text
-                            size={TextSize.SM}
-                            weight={TextWeight.Medium500}
-                            color={TextColor.White}
-                          >
-                            {item.name}
-                          </Text>
+                          {item.name}
                         </NavLink>
                       ))}
                   </div>
@@ -106,9 +96,9 @@ export default function HeadNav({
                     <div className="flex flex-row items-center space-x-8">
                       <Link to="/">
                         <Text
-                          weight={TextWeight.SemiBold600}
-                          size={TextSize.SM}
-                          color={TextColor.White}
+                          weight="semibold"
+                          size="sm"
+                          className="text-white"
                         >
                           Login
                         </Text>
@@ -118,10 +108,7 @@ export default function HeadNav({
                         href="https://get.threeid.xyz"
                         className="button-base w-full lg:w-fit bg-white py-3 px-8 rounded-md"
                       >
-                        <Text
-                          weight={TextWeight.SemiBold600}
-                          size={TextSize.SM}
-                        >
+                        <Text weight="semibold" size="sm">
                           Claim your 3ID
                         </Text>
                       </a>
@@ -202,7 +189,7 @@ export default function HeadNav({
                       href="https://get.threeid.xyz"
                       className="button-base w-full lg:w-fit bg-white py-3 px-8"
                     >
-                      <Text weight={TextWeight.Bold700} size={TextSize.SM}>
+                      <Text weight="bold" size="sm">
                         Claim your 3ID
                       </Text>
                     </a>
@@ -227,11 +214,7 @@ export default function HeadNav({
                       'block px-3 py-2 text-sm font-medium nav-link-text'
                     }
                   >
-                    <Text
-                      size={TextSize.SM}
-                      weight={TextWeight.Medium500}
-                      color={TextColor.White}
-                    >
+                    <Text size="sm" weight="medium" className="text-white">
                       {item.name}
                     </Text>
                   </NavLink>
