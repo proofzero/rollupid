@@ -8,7 +8,7 @@ import {
 } from 'typed-json-rpc'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import { getCoreId, isAuthenticated } from '@kubelt/platform.commons/src/utils'
+import { getCoreId } from '@kubelt/platform.commons/src/utils'
 
 import {
   AccessApi,
@@ -56,7 +56,6 @@ export default async (
       scope: Scope,
       state: string
     ): Promise<AuthorizeResult> {
-      await isAuthenticated(request, env)
       const coreId = await getCoreId(request, env)
       if (!coreId) {
         throw 'missing core identifier'
@@ -83,7 +82,6 @@ export default async (
       clientId: string,
       clientSecret: string
     ): Promise<ExchangeAuthorizationCodeResult> {
-      await isAuthenticated(request, env)
       const coreId = await getCoreId(request, env)
       if (!coreId) {
         throw 'missing core identifier'

@@ -29,8 +29,6 @@ import { StarbaseApplication } from '@kubelt/do.starbase-application'
 import { StarbaseContract } from '@kubelt/do.starbase-contract'
 import { StarbaseUser } from '@kubelt/do.starbase-user'
 
-import { isAuthenticated } from '@kubelt/platform.commons/src/utils'
-
 import * as secret from './secret'
 import * as tokenUtil from './token'
 
@@ -102,15 +100,6 @@ const authCheck: RpcAuthHandler = async (
   const env = context.get(KEY_REQUEST_ENV)
   if (undefined === env || '' === env) {
     throw new Error("missing account service binding; can't perform auth check")
-  }
-
-  // Create a version of isAuthenticated() that doesn't require entire
-  // Env, just the specific service binding proxy for Account?
-  try {
-    // NB: request must be cloned as it may only be read once.
-    await isAuthenticated(request.clone(), env)
-  } catch (err) {
-    return new Response('Unauthorized', { status: 401 })
   }
 }
 
@@ -802,18 +791,6 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    // Forward request to authorization service. This throws if the
-    // authentication doesn't succeed. It relies on service bindings to
-    // communicate with the authorization service ("passport"):
-    // - env.PASSPORT
-    //
-    // NB: request must be cloned as it may only be read once.
-    try {
-      await isAuthenticated(request.clone(), env)
-    } catch (err) {
-      return new Response('Unauthorized', { status: 401 })
-    }
-
     // TEMP Install fixture data; there should be a core for the
     // "console" and for the "threeid" applications.
     // - create App DOs on first run?

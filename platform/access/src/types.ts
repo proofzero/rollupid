@@ -17,7 +17,6 @@ export interface KeyPairSerialized {
 
 export interface Environment {
   Access: DurableObjectNamespace
-  Account: Fetcher
   Address: Fetcher
   Authorization: DurableObjectNamespace
   Starbase: Fetcher

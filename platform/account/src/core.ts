@@ -29,7 +29,6 @@ export default class Core extends DurableObject<Environment, Api> {
     return {
       kb_getNonce: this.getNonce.bind(proxy),
       kb_verifyNonce: this.verifyNonce.bind(proxy),
-      kb_isAuthenticated: this.isAuthenticated.bind(proxy),
     }
   }
 
@@ -159,18 +158,5 @@ export default class Core extends DurableObject<Environment, Api> {
 
   computeAddress(publicKey: BytesLike): string {
     return computeAddress(publicKey)
-  }
-
-  async isAuthenticated(): Promise<boolean> {
-    const { authentication: token } = this.context || {}
-    if (!token) {
-      return false
-    }
-    try {
-      await this.verifyJWT(token)
-      return true
-    } catch (err) {
-      return false
-    }
   }
 }

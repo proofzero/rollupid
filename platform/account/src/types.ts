@@ -20,7 +20,6 @@ export interface Api {
   [key: string]: Func
   kb_getNonce(address: string, template: string): Promise<string>
   kb_verifyNonce(nonce: string, signature: string): Promise<string>
-  kb_isAuthenticated(): Promise<boolean>
 }
 
 export type GetNonceResult = {
