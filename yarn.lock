@@ -5258,7 +5258,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/platform.access@workspace:platform/access":
+"@kubelt/platform.access@workspace:*, @kubelt/platform.access@workspace:platform/access":
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.access@workspace:platform/access"
   dependencies:
@@ -5290,6 +5290,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@ethersproject/address": 5.7.0
+    "@kubelt/platform.access": "workspace:*"
     "@kubelt/platform.commons": "*"
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
