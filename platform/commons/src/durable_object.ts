@@ -5,7 +5,7 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { HEADER_CORE_ADDRESS, HEADER_CORE_AUTHENTICATION } from './constants'
+import { HEADER_CORE_ADDRESS, HEADER_ACCESS_TOKEN } from './constants'
 
 /**
  * The context of a JSON-RPC request contains data from the environment related
@@ -13,7 +13,7 @@ import { HEADER_CORE_ADDRESS, HEADER_CORE_AUTHENTICATION } from './constants'
  */
 export interface Context {
   address?: string
-  authentication?: string
+  token?: string
 }
 
 /**
@@ -60,8 +60,7 @@ export default class DurableObject<
   async fetch(request: Request): Promise<Response> {
     const context: Context = {}
     context.address = request.headers.get(HEADER_CORE_ADDRESS) || ''
-    context.authentication =
-      request.headers.get(HEADER_CORE_AUTHENTICATION) || ''
+    context.token = request.headers.get(HEADER_ACCESS_TOKEN) || ''
 
     const proxy = new Proxy(this, {
       get(target: object, prop: string, receiver: object) {

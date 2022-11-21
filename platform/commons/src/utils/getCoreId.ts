@@ -3,17 +3,15 @@ import * as jose from 'jose'
 import type { WorkerApi } from '@kubelt/platform.address/src/types'
 
 import { createFetcherJsonRpcClient } from '../jsonrpc'
+import { HEADER_CORE_ADDRESS, HEADER_ACCESS_TOKEN } from '../constants'
 
 interface Environment {
   Address: Fetcher
 }
 
-export default async (
-  request: Request,
-  env: Environment
-): Promise<string | null> => {
+export default async (request: Request, env: Environment): Promise<string> => {
   const { Address } = env
-  const address = request.headers.get('KBT-Core-Address')
+  const address = request.headers.get(HEADER_CORE_ADDRESS)
   if (address) {
     const client = createFetcherJsonRpcClient<WorkerApi>(Address)
     const coreId = await client.kb_resolveAddress(address)
@@ -21,14 +19,14 @@ export default async (
       return coreId
     }
   } else {
-    const authentication = request.headers.get('KBT-Access-JWT-Assertion')
-    if (authentication) {
-      const payload = jose.decodeJwt(authentication)
-      if (payload.iss) {
-        return payload.iss
+    const token = request.headers.get(HEADER_ACCESS_TOKEN)
+    if (token) {
+      const payload = jose.decodeJwt(token)
+      if (payload.sub) {
+        return payload.sub
       }
     }
   }
 
-  return null
+  throw 'address not found'
 }

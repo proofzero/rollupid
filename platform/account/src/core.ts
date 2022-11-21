@@ -4,9 +4,6 @@
    This module implements zero-knowledge proof for authentication.
  */
 
-import _ from 'lodash'
-import * as jose from 'jose'
-
 import { BytesLike, hexlify } from '@ethersproject/bytes'
 import { keccak256 } from '@ethersproject/keccak256'
 import { recoverPublicKey } from '@ethersproject/signing-key'
@@ -14,25 +11,25 @@ import { computeAddress } from '@ethersproject/transactions'
 
 import { DurableObject } from '@kubelt/platform.commons/src'
 
-import { JWT_OPTIONS, NONCE_OPTIONS } from './constants'
-import {
-  Api,
-  Challenge,
-  Environment,
-  GenerateJWTOptions,
-  KeyPair,
-  KeyPairSerialized,
-} from './types'
+import { NONCE_OPTIONS } from './constants'
+import { CoreApi as Api, Challenge, Environment } from './types'
 
 export default class Core extends DurableObject<Environment, Api> {
-  methods(proxy: object): Api {
+  methods(): Api {
     return {
-      kb_getNonce: this.getNonce.bind(proxy),
-      kb_verifyNonce: this.verifyNonce.bind(proxy),
+      getNonce: this.getNonce.bind(this),
+      verifyNonce: this.verifyNonce.bind(this),
     }
   }
 
-  async getNonce(address: string, template: string): Promise<string> {
+  async getNonce(
+    address: string,
+    template: string,
+    clientId: string,
+    redirectUri: string,
+    scope: string[],
+    state: string
+  ): Promise<string> {
     if (!address) {
       throw 'missing address'
     }
@@ -52,7 +49,15 @@ export default class Core extends DurableObject<Environment, Api> {
     const buffer = new Uint8Array(NONCE_OPTIONS.length)
     const nonce = hexlify(crypto.getRandomValues(buffer))
 
-    const challenge: Challenge = { address, nonce, template }
+    const challenge: Challenge = {
+      address,
+      nonce,
+      template,
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    }
     await this.storage.put(`challenge/${nonce}`, challenge)
 
     if (NONCE_OPTIONS.ttl) {
@@ -65,7 +70,7 @@ export default class Core extends DurableObject<Environment, Api> {
     return nonce
   }
 
-  async verifyNonce(nonce: string, signature: string): Promise<string> {
+  async verifyNonce(nonce: string, signature: string): Promise<Challenge> {
     const challenge = await this.storage.get<Challenge>(`challenge/${nonce}`)
 
     if (!challenge) {
@@ -86,66 +91,7 @@ export default class Core extends DurableObject<Environment, Api> {
       throw 'not matching nonce'
     }
 
-    const payload: jose.JWTPayload = {}
-    const jwt = await this.generateJWT({ payload })
-
-    return jwt
-  }
-
-  async generateJWT(options: GenerateJWTOptions): Promise<string> {
-    const { payload } = options
-    const { alg, ttl } = JWT_OPTIONS
-    const { privateKey: key }: KeyPair = await this.getJWTSigningKeyPair()
-
-    const { id: coreId } = this
-
-    _.defaults(payload, {
-      aud: [coreId],
-      sub: coreId,
-    })
-
-    _.assign(payload, {
-      iss: coreId,
-    })
-
-    return new jose.SignJWT(payload)
-      .setProtectedHeader({ alg })
-      .setIssuedAt()
-      .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
-      .sign(key)
-  }
-
-  async verifyJWT(token: string): Promise<jose.JWTVerifyResult> {
-    const { alg } = JWT_OPTIONS
-    const { publicKey: key } = await this.getJWTSigningKeyPair()
-    const options = { algorithms: [alg] }
-    return jose.jwtVerify(token, key, options)
-  }
-
-  async getJWTSigningKeyPair(): Promise<KeyPair> {
-    const stored = await this.storage.get<KeyPairSerialized>(
-      'auth/jwt/signingKey'
-    )
-
-    const { alg } = JWT_OPTIONS
-
-    if (stored) {
-      return {
-        publicKey: await jose.importJWK(stored.publicKey, alg),
-        privateKey: await jose.importJWK(stored.privateKey, alg),
-      }
-    }
-
-    const generated: KeyPair = await jose.generateKeyPair(alg, {
-      extractable: true,
-    })
-
-    await this.storage.put('auth/jwt/signingKey', {
-      publicKey: await jose.exportJWK(generated.publicKey),
-      privateKey: await jose.exportJWK(generated.privateKey),
-    })
-
-    return generated
+    return challenge
   }
 
   recoverPublicKey(message: string, signature: string): string {

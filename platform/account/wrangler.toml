@@ -4,12 +4,12 @@ compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
 
-
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address" },
+  { binding = "Access", service = "access" },
 ]
 
 [dev]
@@ -21,7 +21,8 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-dev" }
+  { binding = "Address", service = "address-dev" },
+  { binding = "Access", service = "access-dev" },
 ]
 
 [env.next]
@@ -29,7 +30,8 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-next" }
+  { binding = "Address", service = "address-next" },
+  { binding = "Access", service = "access-next" },
 ]
 
 [env.current]
@@ -37,7 +39,8 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address-current" }
+  { binding = "Address", service = "address-current" },
+  { binding = "Access", service = "access-current" },
 ]
 
 [[migrations]]

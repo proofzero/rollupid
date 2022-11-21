@@ -53,7 +53,7 @@ export type ExchangeAuthorizationCodeResult = GenerateResult
 export type VerifyAuthorizationResult = boolean
 export type RefreshAuthorizationResult = GenerateResult
 
-export interface WorkerApi {
+export interface WorkerApi extends BaseApi {
   kb_authorize(
     clientId: string,
     redirectUri: string,
