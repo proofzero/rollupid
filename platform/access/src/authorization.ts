@@ -27,7 +27,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
   }
 
   async authorize(
-    appId: string,
     coreId: string,
     clientId: string,
     redirectUri: string,
@@ -39,7 +38,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const isAuthorized = diff.length == 0
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     await this.storage.put({
-      appId,
       coreId,
       clientId,
       [`codes/${code}`]: { redirectUri, scope, state },
@@ -49,7 +47,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
   }
 
   async exchangeCode(
-    appId: string,
     code: string,
     redirectUri: string,
     clientId: string
@@ -77,6 +74,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const { scope } = request
     const access = Access.get(Access.newUniqueId())
     const client = createFetcherJsonRpcClient<AccessApi>(access)
-    return client.generate(appId, coreId, clientId, scope)
+    return client.generate(coreId, clientId, scope)
   }
 }

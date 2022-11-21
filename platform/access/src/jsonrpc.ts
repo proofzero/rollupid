@@ -51,7 +51,6 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
-      appId: string,
       clientId: string,
       redirectUri: string,
       scope: Scope,
@@ -76,14 +75,7 @@ export default async (
       }
 
       const client = getAuthorizationClient(`${coreId}/${clientId}`)
-      return client.authorize(
-        appId,
-        coreId,
-        clientId,
-        redirectUri,
-        scope,
-        state
-      )
+      return client.authorize(coreId, clientId, redirectUri, scope, state)
     },
     async kb_exchangeAuthorizationCode(
       code: string,
@@ -116,7 +108,6 @@ export default async (
       const authorizationClient = getAuthorizationClient(
         `${coreId}/${clientId}`
       )
-      const appId = (await authorizationClient.get('appId')) as string
       const { scope } = (await authorizationClient.get(
         `codes/${code}`
       )) as AuthorizationRequest
@@ -125,7 +116,6 @@ export default async (
       // const { Starbase } = env
       // const starbaseClient = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
       // const validated = await starbaseClient.kb_checkClientAuthorization(
-      //   appId,
       //   redirectUri,
       //   scope,
       //   clientId,
@@ -133,12 +123,7 @@ export default async (
       // )
 
       if (validated) {
-        return authorizationClient.exchangeCode(
-          appId,
-          code,
-          redirectUri,
-          clientId
-        )
+        return authorizationClient.exchangeCode(code, redirectUri, clientId)
       } else {
         throw 'failed authorization attempt'
       }
