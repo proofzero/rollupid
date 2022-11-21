@@ -23,7 +23,7 @@ export type TextProps = HTMLAttributes<
   type?: TextType
 }
 
-const Text = ({
+export const Text = ({
   size = 'base',
   weight = 'normal',
   type = 'p',
@@ -40,5 +40,3 @@ const Text = ({
     children
   )
 }
-
-export default Text

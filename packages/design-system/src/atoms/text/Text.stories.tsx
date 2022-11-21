@@ -1,5 +1,5 @@
 import React from 'react'
-import Text, { TextProps } from './Text'
+import { Text, TextProps } from './Text'
 
 // @ts-ignore
 import MDXDoc from './Text.documentation.mdx'
