@@ -4912,9 +4912,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt/app.console@workspace:apps/console":
+"@kubelt/apps.console@workspace:apps/console":
   version: 0.0.0-use.local
-  resolution: "@kubelt/app.console@workspace:apps/console"
+  resolution: "@kubelt/apps.console@workspace:apps/console"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@headlessui/react": 1.7.4
@@ -4944,9 +4944,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/app.passport@workspace:apps/passport":
+"@kubelt/apps.passport@workspace:apps/passport":
   version: 0.0.0-use.local
-  resolution: "@kubelt/app.passport@workspace:apps/passport"
+  resolution: "@kubelt/apps.passport@workspace:apps/passport"
   dependencies:
     "@babel/core": ^7.20.2
     "@cloudflare/workers-types": 3.14.1
@@ -5025,16 +5025,16 @@ __metadata:
     tailwindcss: 3.1.8
     typed-json-rpc: 1.1.0
     typescript: 4.7.4
-    wagmi: 0.6.4
+    wagmi: 0.8.5
     webpack: 5.75.0
     wrangler: 2.1.15
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
 
-"@kubelt/app.threeid@workspace:apps/threeid":
+"@kubelt/apps.threeid@workspace:apps/threeid":
   version: 0.0.0-use.local
-  resolution: "@kubelt/app.threeid@workspace:apps/threeid"
+  resolution: "@kubelt/apps.threeid@workspace:apps/threeid"
   dependencies:
     "@cloudflare/workers-types": 3.14.1
     "@datadog/browser-rum": 4.19.0
@@ -11580,6 +11580,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wagmi/core@npm:0.7.4":
+  version: 0.7.4
+  resolution: "@wagmi/core@npm:0.7.4"
+  dependencies:
+    abitype: ^0.1.8
+    eventemitter3: ^4.0.7
+    zustand: ^4.1.4
+  peerDependencies:
+    "@coinbase/wallet-sdk": ">=3.3.0"
+    "@walletconnect/ethereum-provider": ">=1.7.5"
+    ethers: ">=5.5.1"
+  peerDependenciesMeta:
+    "@coinbase/wallet-sdk":
+      optional: true
+    "@walletconnect/ethereum-provider":
+      optional: true
+  checksum: a71ab7ac6897e4e4ec402ce8b3e85db4a8cad348b0d8104b1cc1170a2abaddf3145124564adbb09093392c7884baa6b0434363d1bf808536c722bd656a537cdd
+  languageName: node
+  linkType: hard
+
 "@wagmi/core@npm:^0.5.4, @wagmi/core@npm:^0.5.7":
   version: 0.5.8
   resolution: "@wagmi/core@npm:0.5.8"
@@ -12369,7 +12389,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abitype@npm:^0.1.7":
+"abitype@npm:^0.1.7, abitype@npm:^0.1.8":
   version: 0.1.8
   resolution: "abitype@npm:0.1.8"
   peerDependencies:
@@ -40337,6 +40357,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"wagmi@npm:0.8.5":
+  version: 0.8.5
+  resolution: "wagmi@npm:0.8.5"
+  dependencies:
+    "@coinbase/wallet-sdk": ^3.5.3
+    "@tanstack/query-sync-storage-persister": ^4.14.5
+    "@tanstack/react-query": ^4.14.5
+    "@tanstack/react-query-persist-client": ^4.14.5
+    "@wagmi/core": 0.7.4
+    "@walletconnect/ethereum-provider": ^1.8.0
+    abitype: ^0.1.7
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    ethers: ">=5.5.1"
+    react: ">=17.0.0"
+  checksum: a42a04bdf13e1c30642262e1a01772bd27528c0832fa420855a70fb745b5b4b636aaa87925d8aaeb467cde0ff71825975bf4260a561dca4fb1b93b2e14ac9921
+  languageName: node
+  linkType: hard
+
 "walker@npm:^1.0.7, walker@npm:^1.0.8, walker@npm:~1.0.5":
   version: 1.0.8
   resolution: "walker@npm:1.0.8"
@@ -42782,7 +42821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:^4.0.0, zustand@npm:^4.1.1":
+"zustand@npm:^4.0.0, zustand@npm:^4.1.1, zustand@npm:^4.1.4":
   version: 4.1.4
   resolution: "zustand@npm:4.1.4"
   dependencies:

@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/app.threeid",
+  "name": "@kubelt/apps.threeid",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
