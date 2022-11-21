@@ -2,7 +2,7 @@
 
 import * as jose from 'jose'
 
-import { HEADER_CORE_AUTHENTICATION } from '@kubelt/platform.commons/src/constants'
+import { HEADER_ACCESS_TOKEN } from '@kubelt/platform.commons/src/constants'
 
 // fromRequest()
 // -----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ import { HEADER_CORE_AUTHENTICATION } from '@kubelt/platform.commons/src/constan
  * @returns the JWT associated with the request
  */
 export function fromRequest(request: Request): string {
-  return request.headers.get(HEADER_CORE_AUTHENTICATION) || ''
+  return request.headers.get(HEADER_ACCESS_TOKEN) || ''
 }
 
 // getUserId()
