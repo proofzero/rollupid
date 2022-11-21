@@ -18,7 +18,6 @@ workers_dev = false
 # A list of other Clouflare services bound to this service.
 
 services = [
-  { binding = "Account", service = "account" }
 ]
 
 # Durable Objects
@@ -34,7 +33,8 @@ durable_objects.bindings = [
 # -----------------------------------------------------------------------------
 
 kv_namespaces = [
-  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
+  { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
 # Secrets
@@ -48,7 +48,6 @@ kv_namespaces = [
 
 [vars]
 ENVIRONMENT = "local"
-PLATFORM_OWNER = "@kubelt"
 
 # Dev
 # -----------------------------------------------------------------------------
@@ -95,7 +94,6 @@ new_classes = [
 [env.dev]
 
 services = [
-  { binding = "Account", service = "account-dev", environment = "production" }
 ]
 
 durable_objects.bindings = [
@@ -105,12 +103,12 @@ durable_objects.bindings = [
 ]
 
 kv_namespaces = [
-  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
+  { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
 [env.dev.vars]
 ENVIRONMENT = "dev"
-PLATFORM_OWNER = "@kubelt"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -118,7 +116,6 @@ PLATFORM_OWNER = "@kubelt"
 [env.next]
 
 services = [
-  { binding = "Account", service = "account-next", environment = "production" }
 ]
 
 durable_objects.bindings = [
@@ -128,7 +125,8 @@ durable_objects.bindings = [
 ]
 
 kv_namespaces = [
-  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
+  { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
 [env.next.vars]
@@ -151,9 +149,9 @@ durable_objects.bindings = [
 ]
 
 kv_namespaces = [
-  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" }
+  { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
+  { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
 [env.current.vars]
 ENVIRONMENT = "current"
-PLATFORM_OWNER = "@kubelt"

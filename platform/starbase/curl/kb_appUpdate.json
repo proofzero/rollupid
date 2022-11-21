@@ -1,0 +1,22 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "kb_appUpdate",
+  "params": {
+    "clientId": "f5f43b2354c644360f6ba49c9e7b5e5a",
+    "profile": {
+      "redirectURI": "https://example.com/auth/successful",
+      "domains": [],
+      "scopes": [],
+      "termsURL": "",
+      "websiteURL": "",
+      "mirrorURL": "",
+      "discordURL": "",
+      "mediumUser": "",
+      "twitterUser": "",
+      "createdDate": "Tue, 18 Oct 2022 19:34:07 GMT",
+      "name": "Cat Party",
+      "icon": "https://imagedelivery.net/GpF42-mqjMIqmRcX5aE9gQ/29ba0048-1c8e-44e5-23d2-2f61b7fb0100/icon"
+    }
+  }
+}

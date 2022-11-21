@@ -47,8 +47,8 @@
     "@cloudflare/workers-types": "3.18.0",
     "@ethersproject/wallet": "5.7.0",
     "@types/itty-router-extras": "0.4.0",
-    "@types/lodash": "4.14.186",
-    "@types/node": "18.11.4",
+    "@types/lodash": "4.14.189",
+    "@types/node": "18.11.9",
     "@types/tap": "15.0.7",
     "@types/webpack": "5.28.0",
     "@typescript-eslint/eslint-plugin": "5.41.0",
@@ -68,7 +68,7 @@
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0",
     "webpack-merge": "5.8.0",
-    "wrangler": "2.1.15",
+    "wrangler": "2.4.2",
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {

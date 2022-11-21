@@ -383,13 +383,11 @@ export function build(
  * @returns A client for the component service.
  */
 export function client(
-  // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string | undefined,
   schema: RpcSchema,
   options: RpcClientOptions = {}
 ): RpcClient {
-  return impl.client(durableObject, name, schema, options)
+  return impl.client(durableObject, schema, options)
 }
 
 // discover
@@ -407,10 +405,8 @@ export function client(
  * @returns an RPC client stub for the discovered OpenRPC service
  */
 export async function discover(
-  // TODO better type?
   durableObject: DurableObjectNamespace,
-  name: string | undefined,
   options: RpcClientOptions = {}
 ): Promise<RpcClient> {
-  return impl.discover(durableObject, name, options)
+  return impl.discover(durableObject, options)
 }

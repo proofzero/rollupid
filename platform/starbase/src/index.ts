@@ -9,7 +9,11 @@
 
 import * as _ from 'lodash'
 
+import * as set from 'ts-set-utils'
+
 import * as openrpc from '@kubelt/openrpc'
+
+import invariant from 'tiny-invariant'
 
 import type {
   RpcAuthHandler,
@@ -29,6 +33,7 @@ import { StarbaseApplication } from '@kubelt/do.starbase-application'
 import { StarbaseContract } from '@kubelt/do.starbase-contract'
 import { StarbaseUser } from '@kubelt/do.starbase-user'
 
+import * as oauth from './oauth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
 
@@ -49,8 +54,10 @@ export { StarbaseApplication, StarbaseContract, StarbaseUser }
 // Definitions
 // -----------------------------------------------------------------------------
 
-// Context key for a KV store binding.
+// Context key for a KV store binding containing fixture data.
 const KEY_FIXTURES = 'com.kubelt.kv/fixtures'
+// Context key for a KV store binding containing a client ID => app ID mapping.
+const KEY_LOOKUP = 'com.kubelt.kv/lookup'
 
 // Context key for the KV value containing the Datadog API token.
 const KEY_DATADOG = 'com.datadog/token'
@@ -60,8 +67,6 @@ const KEY_TOKEN = 'com.kubelt.security/jwt'
 // Context key for the user ID associated with the request (if any).
 const KEY_USER_ID = 'com.kubelt.security/user.id'
 
-// Context key for a KV value containing name of platform app core owner.
-const KEY_PLATFORM_OWNER = 'com.kubelt.value/platform.owner'
 // Context key for a KV value containing name of current environment.
 const KEY_ENVIRONMENT = 'com.kubelt.value/environment'
 
@@ -99,8 +104,19 @@ const authCheck: RpcAuthHandler = async (
   // perform the auth check.
   const env = context.get(KEY_REQUEST_ENV)
   if (undefined === env || '' === env) {
-    throw new Error("missing account service binding; can't perform auth check")
+    throw new Error("missing environment; can't perform auth check")
   }
+
+  // Create a version of isAuthenticated() that doesn't require entire
+  // Env, just the specific service binding proxy for Account?
+  /*
+  try {
+    // NB: request must be cloned as it may only be read once.
+    await isAuthenticated(request, env)
+  } catch (err) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+  */
 }
 
 // Methods
@@ -127,17 +143,61 @@ const kb_appCreate = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      // TODO
-      return openrpc.response(request, 'not yet implemented')
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      // TODO better type for JWT?
+      const token: string = context.get(KEY_TOKEN)
+
+      const clientId = oauth.makeClientId()
+      const clientSecret = oauth.makeClientSecret()
+      const hashedSecret = await secret.hash(clientSecret)
+
+      // When the component ID is undefined (neither .id or .name is set
+      // as an option) a randomly assigned ID is used.
+      const app = await openrpc.discover(sbApplication, {
+        token,
+        tag: 'starbase-app'
+      })
+
+      // We store the hashed version of the secret; the plaintext is
+      // returned for one-time display to the user and is never again
+      // available in unhashed form in the system.
+      const result = app.appStore({
+        clientId,
+        clientSecret: hashedSecret,
+      })
+
+      // Get the ID of the created durable object and store it in the
+      // mapping table.
+      const appId: string = <string>app.$.id
+
+      await lookup.put(clientId, appId)
+
+      //console.log(`stored clientId:${clientId} => appId:${appId}`)
+
+      // -----------------------------------------------------------------------
+      // TODO record the fact that this app is owned by ownerId by
+      // creating an edge (once that capability is online).
+      // -----------------------------------------------------------------------
+
+      const ownerId: string = _.get(request, ["params", "ownerId"]) || ""
+
+      // Return clientId to caller to allow for later interaction with
+      // app record.
+      return openrpc.response(request, {
+        ownerId,
+        clientId,
+        clientSecret,
+      })
     }
   ),
 })
 
-// kb_appStore
+// kb_appUpdate
 // -----------------------------------------------------------------------------
 
-const kb_appStore = openrpc.method(schema, {
-  name: 'kb_appStore',
+const kb_appUpdate = openrpc.method(schema, {
+  name: 'kb_appUpdate',
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -148,129 +208,56 @@ const kb_appStore = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
       // The JWT provided with the current request.
       const token = context.get(KEY_TOKEN)
+
+      // The user that owns the app is determined by the supplied token.
       const userId = tokenUtil.getUserId(token)
       if (undefined === userId) {
         throw new Error('missing user ID in JWT')
       }
       console.log(`storing app for user ${userId}`)
 
+      const clientId = _.get(request, ['params', 'clientId'])
+      if (clientId === undefined) {
+        throw new Error(`missing clientId parameter`)
+      }
+
+      const appId = await lookup.get(clientId)
+      if (appId === null) {
+        throw new Error(`missing app ID mapping for ${clientId}`)
+      }
+
       // TODO better typing, impl/jsonrpc utility?
+      // TODO guarantee that only public fields are being stored; apply
+      // schema to incoming profile data.
       // NB: we should always have data here after JSON-RPC checking in place
-      const appData = _.get(request, ['params'], {})
-
-      // Get a reference to the StarbaseUser Durable Object.
-      const sbUser: DurableObjectNamespace = context.get(KEY_USER)
-      const user = await openrpc.discover(sbUser, userId, {
-        // TODO This auth token is sent with every RPC call.
-        token,
-        // This tag is used when logging requests.
-        // TODO auto-discover this tag name.
-        tag: 'starbase-user',
-      })
-
-      // Look for the ID of the app in user core.
-      const lookupField = 'clientId'
-      const lookupValue = _.get(appData, 'clientId')
-      const appId = await user.lookupApplication(lookupField, lookupValue)
-      if ('' === appId || appId === undefined) {
-        // We know that this is a new application record.
-        console.log(`no such app ID: ${lookupValue}; storing new record`)
+      const profile = _.get(request, ['params', 'profile'])
+      if (profile === null) {
+        throw new Error(`missing profile data`)
       }
 
-      // Construct an RPC client for the named component (a durable
-      // object) by calling its OpenRPC rpc.discover method and using the
-      // returned schema to define an RPC proxy stub.
-      //
-      // NB: if the appId is empty string or undefined, an new random ID
-      // is generated.
-      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
-      const app = await openrpc.discover(sbApplication, appId, {
+      const app = await openrpc.discover(sbApplication, {
+        // The object ID is contained in the lookup table.
+        id: appId,
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
         tag: 'starbase-app',
       })
 
-      // Hash application clientSecret before storing in app core.
-      const clientSecret: string = _.get(appData, 'clientSecret') || ''
-      const hashedSecret = await secret.hash(clientSecret)
-      //const cid = secret.parse(hashedSecret);
-      _.set(appData, 'clientSecret', hashedSecret)
-      console.log(JSON.stringify(appData, null, 2))
-
-      // Store application data in the app component.
-      const appResult = await app.appStore({
-        app: appData,
+      // Store application profile data in the app component.
+      const appResult = await app.update({
+        profile,
       })
 
-      // Index the app data with user component.
-      const indexResult = await user.indexApplication({
-        id: app.$.id,
-        data: appData,
-        fields: ['clientId'],
+      return openrpc.response(request, {
+        userId,
+        clientId,
+        profile,
       })
-
-      return openrpc.response(request, { userId, appId: app.$.id })
-      //return openrpc.response(request, appResult)
-    }
-  ),
-})
-
-// kb_appFetch
-// -----------------------------------------------------------------------------
-
-const kb_appFetch = openrpc.method(schema, {
-  name: 'kb_appFetch',
-  auth: authCheck,
-  scopes: noScope,
-  handler: openrpc.handler(
-    async (
-      service: Readonly<RpcService>,
-      request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>
-    ) => {
-      // Get a reference to the StarbaseApplication Durable Object.
-      const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
-
-      // TODO better typing
-      const ownerId = _.get(request, ['params', 'ownerId'])
-      // TODO once we conformance check the request against the schema, we
-      // can be sure that the required parameter(s) are present.
-      if (undefined === ownerId) {
-        throw new Error('missing ownerId param')
-      }
-      const appId = _.get(request, ['params', 'appId'])
-      // TODO once we conformance check the request against the schema, we
-      // can be sure that the required parameter(s) are present.
-      if (undefined === appId) {
-        throw new Error('missing appId param')
-      }
-
-      const token = context.get(KEY_TOKEN)
-
-      // The name of the component that we need to update with new
-      // application data.
-      //
-      // TODO Should we use randomly generated name for better
-      // performance? Alternately, should we hash our own identifier into
-      // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`
-
-      // Construct an RPC client for the named component (a durable
-      // object) by calling its OpenRPC rpc.discover method and using the
-      // returned schema to define an RPC proxy stub.
-      const app = await openrpc.discover(starbase, objName, {
-        // TODO This auth token is sent with every RPC call.
-        token,
-        // This tag is used when logging requests.
-        tag: 'starbase-app',
-      })
-
-      const result = await app.appFetch()
-
-      return openrpc.response(request, result)
     }
   ),
 })
@@ -288,39 +275,33 @@ const kb_appDelete = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      // Get a reference to the StarbaseApplication Durable Object.
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      // TODO better token type
+      const token: string = context.get(KEY_TOKEN)
 
       // TODO better typing
-      const ownerId = _.get(request, ['params', 'ownerId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
-      if (undefined === ownerId) {
-        throw new Error('missing ownerId param')
-      }
-      const appId = _.get(request, ['params', 'appId'])
+      const clientId = _.get(request, ['params', 'clientId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
-      if (undefined === appId) {
-        throw new Error('missing appId param')
+      if (undefined === clientId) {
+        throw new Error('missing clientId param')
       }
 
-      // TODO forward the JWT used to make the current request. Send as
-      // "KBT-Authorization" header?
-      const token = context.get(KEY_TOKEN)
-
-      // The name of the component that we need to update with new
-      // application data.
-      //
-      // TODO Should we use randomly generated name for better
-      // performance? Alternately, should we hash our own identifier into
-      // a hex string to use as the name?
-      const objName = `${ownerId}/${appId}`
+      // The mapping table stores the durable object ID for the
+      // application core.
+      const appId = await lookup.get(clientId)
+      if (null === appId) {
+        throw new Error('missing appId mapping')
+      }
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
       // returned schema to define an RPC proxy stub.
-      const app = await openrpc.discover(starbase, objName, {
+      const app = await openrpc.discover(starbase, {
+        id: appId,
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
@@ -354,7 +335,9 @@ const kb_appList = openrpc.method(schema, {
       // TODO better typing
       const userName = _.get(request, ['params', 'ownerId'])
 
-      const user = await openrpc.discover(sbUser, userName, {
+      const user = await openrpc.discover(sbUser, {
+        // Derive the name of the object from user ID.
+        name: userName,
         // TODO This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
@@ -388,33 +371,45 @@ const kb_appAuthCheck = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
+      // Our mapping from application OAuth client ID to internal app ID.
+      const lookup = context.get(KEY_LOOKUP)
       // Get a reference to the StarbaseApplication Durable Object.
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
-      const token = context.get(KEY_TOKEN)
 
-      const appId = _.get(request, ['params', 'appId'])
-      if (appId == undefined || appId === null || appId === '') {
-        throw new Error(`application ID was not supplied`)
+      const clientId = _.get(request, ['params', 'clientId'])
+      if (clientId == undefined || clientId === null || clientId === "") {
+        throw new Error(`client ID was not supplied`)
       }
 
-      const app = await openrpc.discover(sbApplication, appId, {
-        token,
+      const appId = await lookup.get(clientId)
+      if (appId === null) {
+        throw new Error(`missing app ID mapping for ${clientId}`)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
         tag: 'starbase-app',
       })
 
       // The stored application data.
-      const stored = await app.appFetch()
+      const stored = await app.fetch()
 
+      // The supplied scopes must be a *subset* of the scopes stored on
+      // the application.
+      const inputScopes = new Set(_.get(request, ['params', 'scopes']))
+      const appScopes = new Set(_.get(stored, ['scopes']))
+      const setCheck = set.subset(inputScopes, appScopes)
+
+      // All of these fields must match identically.
       const input = {
-        redirectURL: _.get(request, ['params', 'redirectURL']),
-        scopes: _.get(request, ['params', 'scopes']),
+        redirectURI: _.get(request, ['params', 'redirectURI']),
         clientId: _.get(request, ['params', 'clientId']),
         clientSecret: _.get(request, ['params', 'clientSecret']),
       }
 
       // Check that these supplied values match what is stored for the
       // application.
-      const allowed = _.isEqual(input, _.pick(stored, _.keys(input)))
+      const allowed = _.isEqual(input, _.pick(stored, _.keys(input))) && setCheck
 
       return openrpc.response(request, allowed)
     }
@@ -489,12 +484,10 @@ const kb_initPlatform = openrpc.extension(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      const env = context.get(KEY_ENVIRONMENT)
-      const kv = context.get(KEY_FIXTURES)
-      const ownerId = context.get(KEY_PLATFORM_OWNER)
+      const env: Env = context.get(KEY_ENVIRONMENT)
+      const fixtures: KVNamespace = context.get(KEY_FIXTURES)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
-
-      const token = context.get(KEY_TOKEN)
 
       // The keys that were updated, i.e. for which we found fixture
       // data, created a corresponding app core, and deleted the key.
@@ -507,21 +500,38 @@ const kb_initPlatform = openrpc.extension(schema, {
       // Fetch fixture data for "console" platform app.
       const consoleName = 'console'
       const consoleKey = `${env}-${consoleName}`
-      const consoleData = await kv.get(consoleKey, { type: 'json' })
-      const consoleId = `${ownerId}/${consoleName}`
+      const consoleData = await fixtures.get(consoleKey, { type: 'json' })
+      const consoleSecret = _.get(consoleData, 'clientSecret')
+      if (consoleSecret === undefined) {
+        throw new Error(`console fixture missing "clientSecret" property`)
+      }
 
       // If the key was not present we get a null response.
       if (consoleData) {
-        const con = await openrpc.discover(sbApplication, consoleId, {
-          token,
+        // NB: when core .name or .id is undefined a randomly generated
+        // ID is used.
+        const con = await openrpc.discover(sbApplication, {
           tag: 'starbase-app',
         })
-        const conResult = await con.appStore({
-          app: consoleData,
+        const conResult = await con.init({
+          app: _.set(consoleData, 'clientSecret', consoleSecret),
         })
+        if (conResult.error) {
+          throw new Error(conResult.error)
+        }
 
         // Delete the stored fixture data now that the DO has been created.
-        await kv.delete(consoleKey)
+        await fixtures.delete(consoleKey)
+
+        const clientId = _.get(consoleData, 'clientId')
+        if (clientId === undefined) {
+          throw new Error(`console fixture missing "clientId" property`)
+        }
+        const appId: string = <string>con.$.id
+
+        await lookup.put(clientId, appId)
+
+        console.log(`console: clientId:${clientId} => appId:${appId}`)
 
         keys.push(consoleKey)
       }
@@ -533,32 +543,47 @@ const kb_initPlatform = openrpc.extension(schema, {
       // Fetch fixture data for "threeid" platform app.
       const threeidName = 'threeid'
       const threeidKey = `${env}-${threeidName}`
-      const threeidData = await kv.get(threeidKey, { type: 'json' })
-      const threeidId = `${ownerId}/${threeidName}`
+      const threeidData = await fixtures.get(threeidKey, { type: 'json' })
+      const threeidSecret = _.get(threeidData, 'clientSecret')
+      if (threeidSecret === undefined) {
+        throw new Error(`threeid fixture missing "clientSecret" property`)
+      }
 
       // If the key was not present we get a null response.
       if (threeidData) {
-        const threeid = await openrpc.discover(sbApplication, threeidId, {
-          token,
+        // NB: when core name is undefined a randomly generated ID is used.
+        const threeid = await openrpc.discover(sbApplication, {
           tag: 'starbase-app',
         })
-        const threeidResult = await threeid.appStore({
-          app: threeidData,
+        const threeidResult = await threeid.init({
+          app: _.set(threeidData, 'clientSecret', threeidSecret),
         })
+        if (threeidResult.error) {
+          throw new Error(threeidResult.error)
+        }
 
         // Delete the stored fixture data now that the DO has been created.
-        await kv.delete(threeidKey)
+        await fixtures.delete(threeidKey)
+
+        const clientId = _.get(threeidData, 'clientId')
+        if (clientId === undefined) {
+          throw new Error(`threeid fixture missing "clientId" property`)
+        }
+        const appId: string = <string>threeid.$.id
+
+        await lookup.put(clientId, appId)
+
+        console.log(`threeid: clientId:${clientId} => appId:${appId}`)
 
         keys.push(threeidKey)
       }
 
       // RESULT
 
-      const result = {
+      return openrpc.response(request, {
         invoked: 'kb_initPlatform',
         keys,
-      }
-      return openrpc.response(request, result)
+      })
     }
   ),
 })
@@ -581,7 +606,7 @@ const kb_appRotateSecret = openrpc.method(schema, {
       const token = context.get(KEY_TOKEN)
       const userId = context.get(KEY_USER_ID)
 
-      // TODO Regenerate client ID, client secret
+      // TODO Generate new client secret
       // TODO trigger invalidation of access tokens?
 
       return openrpc.response(request, 'not yet implemented')
@@ -624,20 +649,30 @@ const kb_appProfile = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      const token = context.get(KEY_TOKEN)
-      const sbApplication = context.get(KEY_APPLICATION)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
-      const appId = _.get(request, ['params', 'appId'])
-      if (!appId) {
-        throw new Error(`missing application ID`)
+      const clientId = _.get(request, ['params', 'clientId'])
+      if (!clientId) {
+        throw new Error(`missing client ID`)
       }
 
-      const app = await openrpc.discover(sbApplication, appId, {
-        token,
+      // Map the client ID into an application ID.
+      const appId = await lookup.get(clientId)
+      if (appId === null) {
+        throw new Error(`missing app ID`)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
         tag: 'starbase-app',
       })
+      //console.log("clientId:", clientId)
+      //console.log("   appId:", appId)
+      //console.log("app.$.id:", app.$.id)
+      invariant(appId === app.$.id, 'object IDs must match')
 
-      const appProfile = await app.publicProfile()
+      const appProfile = await app.profile()
 
       return openrpc.response(request, appProfile)
     }
@@ -656,13 +691,12 @@ const methods = openrpc.methods(schema, [
   kb_appAuthCheck,
   kb_appCreate,
   kb_appDelete,
-  kb_appFetch,
   kb_appList,
   kb_appProfile,
   kb_appPublish,
   kb_appRotateSecret,
-  kb_appStore,
   kb_appScopes,
+  kb_appUpdate,
 ])
 
 // These are RPC methods not described in the schema but which are provided
@@ -729,6 +763,9 @@ export interface Env {
 
   // The source of fixture data for platform app cores.
   FIXTURES: KVNamespace
+
+  // A mapping from application OAuth client ID to internall application ID.
+  LOOKUP: KVNamespace
 
   // Durable Objects
   // ---------------------------------------------------------------------------
@@ -828,12 +865,14 @@ export default {
 
     // A secret value; the API token for Datadog metrics collection.
     context.set(KEY_DATADOG, env.DATADOG_TOKEN)
-    // Store the current environment name.
+    // Store the current environment name, e.g. local, dev.
     context.set(KEY_ENVIRONMENT, env.ENVIRONMENT)
-    // Store the name of the owner of platform app cores.
-    context.set(KEY_PLATFORM_OWNER, env.PLATFORM_OWNER)
+
     // A KV store containing fixture data.
     context.set(KEY_FIXTURES, env.FIXTURES)
+    // A KV store for mapping application client ID into app ID.
+    context.set(KEY_LOOKUP, env.LOOKUP)
+
     // A durable object containing Starbase App state.
     context.set(KEY_APPLICATION, env.STARBASE_APP)
     // A durable object containing Starbase App state.

@@ -27,9 +27,9 @@
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
     "@types/itty-router-extras": "0.4.0",
-    "@types/lodash": "4.14.186",
+    "@types/lodash": "4.14.189",
     "@types/tap": "15.0.7",
-    "esbuild": "0.15.12",
+    "esbuild": "0.15.15",
     "eslint": "8.27.0",
     "eslint-plugin-tsdoc": "0.2.17",
     "fast-check": "3.3.0",

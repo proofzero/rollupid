@@ -13,8 +13,38 @@ const rpcSchema: RpcSchema = {
   },
   methods: [
     {
-      name: "app_store",
-      summary: "Store an application record",
+      name: "init",
+      summary: "Store the initial copy of the application record",
+      params: [
+        // TODO
+      ],
+      result: {
+        name: "app",
+        description: "An application record",
+        schema: {
+          "$ref": "#/components/contentDescriptors/Application"
+        }
+      },
+      errors: [],
+    },
+    {
+      name: "update",
+      summary: "Update the public application profile",
+      params: [
+        // TODO
+      ],
+      result: {
+        name: "app",
+        description: "An application record",
+        schema: {
+          "$ref": "#/components/contentDescriptors/Application"
+        }
+      },
+      errors: [],
+    },
+    {
+      name: "fetch",
+      summary: "Fetch the complete application record",
       params: [],
       result: {
         name: "app",
@@ -26,20 +56,7 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
-      name: "app_fetch",
-      summary: "Fetch the application record",
-      params: [],
-      result: {
-        name: "app",
-        description: "An application record",
-        schema: {
-          "$ref": "#/components/contentDescriptors/Application"
-        }
-      },
-      errors: [],
-    },
-    {
-      name: "public_profile",
+      name: "profile",
       summary: "Return public view of application data",
       params: [],
       result: {

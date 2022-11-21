@@ -52,6 +52,8 @@ import schema from "./schema";
  * @note This class needs to implement all of the methods defined in
  * the OpenRPC schema or an error will be thrown upon construction.
  */
+// Should this version be an argument to @component(schema, "v1")?
+//@version("v1")
 @component(schema)
 @scopes([
   "owner",
@@ -68,16 +70,53 @@ import schema from "./schema";
     write: ["starbase.write"],
   },
   validator: (x) => { return true },
+  schemas: {
+    v1: {
+    }
+    v2: {
+      up: () => {
+        // up migrate to new version
+      }
+      down: () => {
+        // down migrate to old version
+      }
+      }
+  }
   */
 })
 export class StarbaseApplication {
 
-  // app_store
+  // init
+  // -----------------------------------------------------------------------------
+  // Store the initial copy of the application record.
+
+  @method("init")
+  @requiredScope("starbase.write")
+  @requiredField("app", [FieldAccess.Read, FieldAccess.Write])
+  init(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+  ): Promise<RpcResult> {
+    const app = params.get("app");
+
+    if (Object.keys(app).length > 0) {
+      output.set("app", app)
+    } else {
+      return Promise.resolve({
+        error: `cannot initialize app more than once`,
+      })
+    }
+
+    return Promise.resolve(app);
+  }
+
+  // update
   // ---------------------------------------------------------------------------
 
   // Mark this method as being the implementation of the app_store
   // method from the OpenRPC schema.
-  @method("app_store")
+  @method("update")
   // The write scope is required to invoke this method. If the caller
   // lacks the scope they receive an error method indicating that they
   // lack permission, and this method handler is not invoked.
@@ -86,41 +125,54 @@ export class StarbaseApplication {
   // component.
   @requiredField("app", [FieldAccess.Read, FieldAccess.Write])
   // The RPC method implementation.
-  async appStore(
+  async update(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput,
   ): Promise<RpcResult> {
 
-    if (!params.has("app")) {
-      const message = `missing parameter "app" from request`;
-      console.error(message);
+    if (!params.has("profile")) {
+      const message = `missing parameter "profile" from request`;
       // TODO need a better way to return errors:
       // - additional RpcCallable parameter that is an error map; errors
       //   set on that map trigger the return of a JSON-RPC error
       //   response.
       // - exceptions
       return Promise.resolve({
-        invoked: "app_store",
         error: message,
       });
     }
 
+    const app = input.get("app")
+
     // Read the supplied "app" request parameter and write it to the
     // output "app" field.
-    const app = params.get("app");
-    output.set("app", app);
+    const profile = params.get("profile");
+
+    // Make sure there's nothing sensitive in the parameters being
+    // updated.
+    //
+    // NB: that no extraneous fields are set should eventually be
+    // validated by application of the schema.
+    // TODO: add separate fields for secure / sensitive data
+    const updated = _.merge(app, _.omit(profile, [
+      'clientId',
+      'clientSecret',
+      'published',
+    ]))
+
+    output.set("app", updated);
+    console.log(updated)
 
     return Promise.resolve({
-      invoked: "app_store",
-      stored: app,
+      profile,
     });
   }
 
-  // app_fetch
+  // fetch
   // -----------------------------------------------------------------------------
 
-  @method("app_fetch")
+  @method("fetch")
   @requiredScope("starbase.read")
   @requiredField("app", [FieldAccess.Read])
   appFetch(
@@ -133,10 +185,10 @@ export class StarbaseApplication {
     return Promise.resolve(app);
   }
 
-  // public_profile
+  // profile
   // -----------------------------------------------------------------------------
 
-  @method("public_profile")
+  @method("profile")
   @requiredScope("starbase.read")
   @requiredField("app", [FieldAccess.Read])
   publicProfile(
@@ -144,7 +196,7 @@ export class StarbaseApplication {
     input: RpcInput,
     output: RpcOutput,
   ): Promise<RpcResult> {
-    const app = input.get("app")
+    const app = input.get('app')
 
     // If the application is not published we shouldn't return any
     // information.
