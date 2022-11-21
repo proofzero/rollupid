@@ -39,6 +39,8 @@ import * as tokenUtil from './token'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
+import { SCOPES } from '@kubelt/security/scopes'
+
 // Schema
 // -----------------------------------------------------------------------------
 
@@ -156,7 +158,7 @@ const kb_appCreate = openrpc.method(schema, {
       // as an option) a randomly assigned ID is used.
       const app = await openrpc.discover(sbApplication, {
         token,
-        tag: 'starbase-app'
+        tag: 'starbase-app',
       })
 
       // We store the hashed version of the secret; the plaintext is
@@ -180,7 +182,7 @@ const kb_appCreate = openrpc.method(schema, {
       // creating an edge (once that capability is online).
       // -----------------------------------------------------------------------
 
-      const ownerId: string = _.get(request, ["params", "ownerId"]) || ""
+      const ownerId: string = _.get(request, ['params', 'ownerId']) || ''
 
       // Return clientId to caller to allow for later interaction with
       // app record.
@@ -377,7 +379,7 @@ const kb_appAuthCheck = openrpc.method(schema, {
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
       const clientId = _.get(request, ['params', 'clientId'])
-      if (clientId == undefined || clientId === null || clientId === "") {
+      if (clientId == undefined || clientId === null || clientId === '') {
         throw new Error(`client ID was not supplied`)
       }
 
@@ -409,7 +411,8 @@ const kb_appAuthCheck = openrpc.method(schema, {
 
       // Check that these supplied values match what is stored for the
       // application.
-      const allowed = _.isEqual(input, _.pick(stored, _.keys(input))) && setCheck
+      const allowed =
+        _.isEqual(input, _.pick(stored, _.keys(input))) && setCheck
 
       return openrpc.response(request, allowed)
     }
@@ -429,27 +432,16 @@ const kb_appScopes = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      // TODO: mover the following data into a security package so we can
-      // abstract it away from the RPC implementation.
+      const scopes = {}
+
+      // Convert symbol keys to their string descriptions since
+      // JSON.stringify doesn't do symbols.
+      for (const k of Object.getOwnPropertySymbols(SCOPES)) {
+        scopes[k.description] = SCOPES[k]
+      }
+
       return openrpc.response(request, {
-        scopes: {
-          'profile.read': {
-            name: 'Public Profile',
-            description: 'Read your profile data.',
-          },
-          'profile.write': {
-            name: 'Edit Profile',
-            description: 'Write your profile data.',
-          },
-          'accounts.read': {
-            name: 'Accounts',
-            description: 'Read your connected accounts.',
-          },
-          'accounts.write': {
-            name: 'Modify Accounts',
-            description: 'Modify your connected accounts.',
-          },
-        },
+        scopes,
       })
     }
   ),
