@@ -2,6 +2,8 @@ name = "account"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
+workers_dev = false
+
 
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
@@ -19,7 +21,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-dev" }
 ]
 
 [env.next]
@@ -27,7 +29,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-next" }
 ]
 
 [env.current]
@@ -35,7 +37,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Address", service = "address" }
+  { binding = "Address", service = "address-current" }
 ]
 
 [[migrations]]

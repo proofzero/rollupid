@@ -1,0 +1,74 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+
+import { Authorization } from './Authorization'
+
+import circleLogo from '../../assets/circle-logo.svg'
+import publicProfileScopeIcon from './profile-scope-icon.svg'
+
+<Meta title="Components/Authorization" component={Authorization} />
+
+export const Template = (args) => <Authorization {...args} />
+
+# Authorization
+
+<Canvas>
+  <Story
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 988f421a (wip: authorization scope)
+    decorators={[
+      (Story) => (
+        <div style={{ width: 482, padding: 12, margin: 'auto' }}>
+          <Story />
+        </div>
+      ),
+    ]}
+<<<<<<< HEAD
+=======
+>>>>>>> 2d21c9b5 (wip)
+=======
+>>>>>>> 988f421a (wip: authorization scope)
+    name="Authorization"
+    args={{
+      appProfile: {
+        name: '3ID',
+        logo: circleLogo,
+        scopes: ['profile.read', 'profile.write', 'blockchainaccount.read'],
+      },
+      userProfile: {
+        name: 'John Doe',
+        pfp: {
+<<<<<<< HEAD
+<<<<<<< HEAD
+          url: 'https://data.rareapepes.com/5400.png',
+=======
+          url: 'https://i.imgur.com/8Qq7ZQx.jpg',
+>>>>>>> 2d21c9b5 (wip)
+=======
+          url: 'https://data.rareapepes.com/5400.png',
+>>>>>>> 988f421a (wip: authorization scope)
+          isToken: false,
+        },
+      },
+      scopeMeta: {
+        'profile.read': {
+          name: 'Read Profile',
+          description: 'Read your profile information',
+          icon: publicProfileScopeIcon,
+        },
+        'profile.write': {
+          name: 'Edit Profile',
+          description: publicProfileScopeIcon,
+        },
+        'blockchainaccount.read': {
+          name: 'Read Blockchain Accounts',
+          description: 'See your viewable connected blockchain accounts',
+          icon: '',
+        },
+      },
+    }}
+  >
+    {Template.bind({})}
+  </Story>
+</Canvas>

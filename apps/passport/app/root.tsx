@@ -57,13 +57,13 @@ export const loader: LoaderFunction = () => {
   return json({
     ENV: {
       THREEID_APP_URL,
+      ALCHEMY_KEY,
     },
   })
 }
 
 export default function App() {
   const browserEnv = useLoaderData()
-  console.log('browserEnv', browserEnv)
   return (
     <html lang="en">
       <head>
@@ -88,6 +88,8 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  console.log('here', error)
+
   return (
     <html lang="en">
       <head>
@@ -97,8 +99,8 @@ export function ErrorBoundary({ error }) {
 
       <body>
         <div className={'flex flex-col h-screen justify-center items-center'}>
-          <h1 className="text-4xl font-bold">Error</h1>
-          <p className="text-xl">{error.message}</p>
+          <h1 className="tgitext-4xl font-bold">Error</h1>
+          <p className="text-xl">{error}</p>
         </div>
         <pre>{error.stack}</pre>
         <ScrollRestoration />
@@ -110,14 +112,13 @@ export function ErrorBoundary({ error }) {
 }
 
 export function CatchBoundary() {
-  const { ENV } = useLoaderData()
-
+  const browserEnv = useLoaderData()
   const caught = useCatch()
   const params = useParams()
-  const { message, isAuthenticated } = caught.data
+  const { status } = caught
 
   let secondary = 'Something went wrong'
-  switch (caught.status) {
+  switch (status) {
     case 404:
       secondary = 'Page not found'
       break
@@ -138,21 +139,26 @@ export function CatchBoundary() {
         <div
           className={'flex flex-col h-screen gap-4 justify-center items-center'}
         >
-          <h1>{caught.status}</h1>
+          <h1>{status}</h1>
           <p>
             {secondary}
-            {message && `: ${message}`}
+            {caught.data?.message && `: ${caught.data?.message}`}
           </p>
-          {isAuthenticated && (
+          {caught.data?.isAuthenticated && (
             <ThreeIdButton
               text={'Continue to 3ID'}
-              href={ENV.THREEID_APP_URL}
+              href={typeof window !== 'undefined' && window.ENV.THREEID_APP_URL}
             />
           )}
         </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
+          }}
+        />
       </body>
     </html>
   )

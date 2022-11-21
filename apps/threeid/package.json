@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/app.threeid",
+  "name": "@kubelt/apps.threeid",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,
@@ -10,6 +10,7 @@
     "build:sass": "sass app/:app/ --no-source-map",
     "build:remix": "remix build",
     "deploy": "wrangler publish",
+    "dev:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "dev:sass": "sass --watch app/:app/",
     "dev:remix": "remix watch",
     "dev:wrangler": "wrangler dev --local --persist",

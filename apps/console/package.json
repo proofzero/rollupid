@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/app.console",
+  "name": "@kubelt/apps.console",
   "version": "0.1.0",
   "private": true,
   "sideEffects": true,

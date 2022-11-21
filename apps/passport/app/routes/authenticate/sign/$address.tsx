@@ -8,12 +8,11 @@ import {
 } from '@remix-run/react'
 import { useAccount, useSignMessage, useDisconnect, useConnect } from 'wagmi'
 
-import type { JsonRpcClient } from 'typed-json-rpc'
 import { Button } from '@kubelt/design-system'
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import type { Api as AuthenticationApi } from '@kubelt/platform.account/src/types'
+
 import { useEffect, useState } from 'react'
 import { createUserSession } from '~/session.server'
+import { getAuthenticationClientWithAddress } from '~/platform.server'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -24,19 +23,9 @@ This will not trigger a blockchain transaction or cost any gas fees.
 {{nonce}}
 `
 
-const getClientWithAddress = (
-  address: string
-): JsonRpcClient<AuthenticationApi> => {
-  return createFetcherJsonRpcClient<AuthenticationApi>(Account, {
-    headers: {
-      'KBT-Core-Address': address as string,
-    },
-  })
-}
-
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
-  const client = getClientWithAddress(address as string)
+  const client = getAuthenticationClientWithAddress(address as string)
   const nonce = await client.kb_getNonce(address as string, signMessageTemplate)
   console.log('nonce', nonce)
   // TODO: handle the error case
@@ -45,7 +34,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const client = getClientWithAddress(params.address)
+  const client = getAuthenticationClientWithAddress(params.address)
   const formData = await request.formData()
   const authenticationToken = await client.kb_verifyNonce(
     formData.get('nonce'),
@@ -53,7 +42,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   )
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
-  console.log('searchParams:', searchParams)
   return createUserSession(
     authenticationToken,
     `/authorize?${searchParams}`,

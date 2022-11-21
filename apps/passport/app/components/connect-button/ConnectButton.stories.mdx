@@ -7,6 +7,8 @@ import {
   defaultChains,
   configureChains,
 } from 'wagmi'
+import { getDefaultClient } from 'connectkit'
+
 import { publicProvider } from 'wagmi/providers/public'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
@@ -21,30 +23,11 @@ export const Template = (args) => <ConnectButton {...args} />
   <Story
     decorators={[
       (Story) => {
-        const { chains, provider, webSocketProvider } = configureChains(
-          defaultChains,
-          [publicProvider()] // TODO: add non default provider selection via props
+        const client = createClient(
+          getDefaultClient({
+            appName: '3ID',
+          })
         )
-        const client = createClient({
-          autoConnect: true,
-          connectors: [
-            new WalletConnectConnector({
-              chains,
-              options: {
-                qrcode: true,
-              },
-            }),
-            new InjectedConnector({
-              chains,
-              options: {
-                name: 'Injected',
-                shimDisconnect: true,
-              },
-            }),
-          ],
-          provider,
-          webSocketProvider,
-        })
         return (
           <WagmiConfig client={client}>
             <Story />
@@ -52,7 +35,7 @@ export const Template = (args) => <ConnectButton {...args} />
         )
       },
     ]}
-    name="Connect Button"
+    name="Connect Button with Default Provider"
     args={{
       disabled: false,
       connectCallback: (address) => {

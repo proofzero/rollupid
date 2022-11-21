@@ -6,7 +6,9 @@ workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
-# TODO make service bindings work for local development using miniflare.
+services = [
+  { binding = "STARBASE", service = "starbase", environment = "production" }
+]
 
 # development
 # -----------------------------------------------------------------------------
@@ -40,7 +42,7 @@ local_protocol = "http"
 # -----------------------------------------------------------------------------
 
 [build]
-  command = "yarn build"
+  command = "yarn build -- --sourcemap"
 
 # Environment: dev
 # -----------------------------------------------------------------------------
@@ -82,6 +84,9 @@ routes = [
   { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
 
+[env.next.build]
+  command = "yarn build"
+
 [env.next.vars]
 DEPLOY_ENV = "next"
 SESSION_NAME = "starbase"
@@ -104,6 +109,10 @@ services = [
 routes = [
   { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 ]
+
+[env.current.build]
+  command = "yarn build"
+
 
 [env.current.vars]
 DEPLOY_ENV = "current"
