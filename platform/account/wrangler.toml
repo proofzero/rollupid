@@ -7,10 +7,7 @@ workers_dev = false
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = [
-  { binding = "Address", service = "address" },
-  { binding = "Access", service = "access" },
-]
+services = []
 
 [dev]
 port = 9494
@@ -20,28 +17,19 @@ local_protocol = "http"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = [
-  { binding = "Address", service = "address-dev" },
-  { binding = "Access", service = "access-dev" },
-]
+services = []
 
 [env.next]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = [
-  { binding = "Address", service = "address-next" },
-  { binding = "Access", service = "access-next" },
-]
+services = []
 
 [env.current]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = [
-  { binding = "Address", service = "address-current" },
-  { binding = "Access", service = "access-current" },
-]
+services = []
 
 [[migrations]]
 tag = "v0"

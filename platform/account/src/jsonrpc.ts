@@ -1,81 +1,63 @@
-import { error } from 'itty-router-extras'
+import * as openrpc from '@kubelt/openrpc'
+import { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import mwOnlyLocal from '@kubelt/openrpc/middleware/local'
 
-import {
-  createRequestHandler,
-  JsonRpcRequest,
-  JsonRpcResponse,
-} from 'typed-json-rpc'
+import { KEY_OBJECT_CORE } from './constants'
+import { worker as schema } from './schema'
+import { Environment } from './types'
 
-import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
-import { getCoreId } from '@kubelt/platform.commons/src/utils'
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+const scopes = openrpc.scopes([])
 
-import type {
-  AuthorizeResult,
-  WorkerApi as AccessApi,
-} from '@kubelt/platform.access/src/types'
+const getProfile = openrpc.method(schema, {
+  name: 'kb_getProfile',
+  scopes: scopes,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      const [id] = request.params as [string]
+      const Core: DurableObjectNamespace = context.get(KEY_OBJECT_CORE)
+      const core = await openrpc.discover(Core, { id })
+      return openrpc.response(request, await core.getProfile())
+    }
+  ),
+})
 
-import { CoreApi, Environment, WorkerApi } from './types'
+const setProfile = openrpc.method(schema, {
+  name: 'kb_setProfile',
+  scopes: scopes,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      const [id, profile] = request.params as [string, object]
+      const Core: DurableObjectNamespace = context.get(KEY_OBJECT_CORE)
+      const core = await openrpc.discover(Core, { id })
+      return openrpc.response(request, await core.setProfile({ profile }))
+    }
+  ),
+})
+
+const methods = openrpc.methods(schema, [getProfile, setProfile])
+const extensions = openrpc.extensions(schema, [])
+const options = openrpc.options({ rpcDiscover: true })
+const service = openrpc.service(schema, scopes, methods, extensions, options)
+
+const basePath = '/'
+const rootPath = '/jsonrpc'
+const chain = openrpc.chain([mwOnlyLocal])
+const rpcHandler = openrpc.build(service, basePath, rootPath, chain)
 
 export default async (
   request: Request,
-  env: Environment
+  env: Environment,
+  ctx: ExecutionContext
 ): Promise<Response> => {
-  const { Access, Core } = env
-
-  const coreId = await getCoreId(request, env)
-  const core = Core.get(Core.idFromString(coreId))
-  const coreClient = createFetcherJsonRpcClient<CoreApi>(core)
-
-  const accessClient = createFetcherJsonRpcClient<AccessApi>(Access, {
-    headers: {
-      [HEADER_CORE_ADDRESS]: request.headers.get(HEADER_CORE_ADDRESS) as string,
-    },
-  })
-
-  const api = createRequestHandler<WorkerApi>({
-    async kb_getNonce(
-      address: string,
-      template: string,
-      clientId: string,
-      redirectUri: string,
-      scope: string[],
-      state: string
-    ): Promise<string> {
-      return coreClient.getNonce(
-        address,
-        template,
-        clientId,
-        redirectUri,
-        scope,
-        state
-      )
-    },
-    async kb_verifyNonce(
-      nonce: string,
-      signature: string
-    ): Promise<AuthorizeResult> {
-      const challenge = await coreClient.verifyNonce(nonce, signature)
-      const { clientId, redirectUri, scope, state } = challenge
-      return accessClient.kb_authorize(clientId, redirectUri, scope, state)
-    },
-  })
-
-  try {
-    const jsonRpcRequest: JsonRpcRequest = await request.json()
-    const jsonRpcResponse: JsonRpcResponse = await api.handleRequest(
-      jsonRpcRequest
-    )
-    if ('error' in jsonRpcResponse) {
-      console.error(jsonRpcResponse.error)
-    }
-    return new Response(JSON.stringify(jsonRpcResponse), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-  } catch (err) {
-    console.error(err)
-    return error(500, JSON.stringify(err))
-  }
+  const context = openrpc.context(request, env, ctx)
+  context.set(KEY_OBJECT_CORE, env.Core)
+  return rpcHandler(request, context)
 }
