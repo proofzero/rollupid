@@ -1,6 +1,7 @@
 // nftar/src/utils.js
 
 const Probability = require('./probability.js')
+const imageDataURI = require('image-data-uri')
 
 const {
     TRAIT_CATEGORIES,
@@ -160,9 +161,32 @@ const generateTraits = function(weightInc) {
     }
 }
 
+// Attempt to download arbitrary images and encode them as data URIs with the
+// image-data-uri library. We cannot use the remote calls offered by
+// image-data-uri because it uses a legacy HTTP library that Cryptopunks 403
+// blocks when called from GCP (for some reason). We need more control so we
+// use the fetch API and pass the bytes retrieved into the library's encoder.
+const encodeDataURI = async (url) => {
+    return fetch(url)
+    // Get the content type and unfortunately await the body. I would prefer
+    // that retrieving the body here was thennable, but need the header.
+    .then(async r => [r.headers.get('content-type'), await r.arrayBuffer()])
+
+    // Encode the bytes into a data URI, given their content type.
+    .then(([contentType, hexBuffer]) =>
+        imageDataURI.encode(Buffer.from(hexBuffer), contentType))
+
+    // Error logging and status responses.
+    .catch(e => {
+        console.log(`failed to encode image ${url} as data URI`)
+        ctx.throw(500, `Image encoding error: ${JSON.stringify(e)}`)
+    })
+}
+
 module.exports = {
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits,
+    encodeDataURI
 }
