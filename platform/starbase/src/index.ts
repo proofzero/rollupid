@@ -39,7 +39,11 @@ import * as tokenUtil from './token'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
-import { SCOPES } from '@kubelt/security/scopes'
+import type {
+  Scope,
+} from '@kubelt/security/scopes'
+
+import { SCOPES_JSON } from '@kubelt/security/scopes'
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -432,16 +436,8 @@ const kb_appScopes = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      const scopes = {}
-
-      // Convert symbol keys to their string descriptions since
-      // JSON.stringify doesn't do symbols.
-      for (const k of Object.getOwnPropertySymbols(SCOPES)) {
-        scopes[k.description] = SCOPES[k]
-      }
-
       return openrpc.response(request, {
-        scopes,
+        scopes: SCOPES_JSON,
       })
     }
   ),
