@@ -11,6 +11,9 @@ export default {
     size: {
       defaultValue: 'base',
     },
+    weight: {
+      defaultValue: 'normal',
+    },
     text: {
       control: {
         type: 'text',
