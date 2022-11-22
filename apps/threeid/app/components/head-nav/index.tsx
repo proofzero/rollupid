@@ -2,16 +2,13 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Link, NavLink } from '@remix-run/react'
 
-import { Text } from '@kubelt/design-system'
+import { Avatar, Text } from '@kubelt/design-system'
 
-import { HiOutlineBell } from 'react-icons/hi'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 import logo from '~/assets/three-id-logo-white.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
 import SignOutLink from '~/components/sign-out-link'
-
-import hexStyle from '~/helpers/hex-style'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
@@ -132,12 +129,16 @@ export default function HeadNav({
                       <div>
                         <Menu.Button className="flex max-w-xs items-center rounded-full bg-gray-800 text-sm">
                           <span className="sr-only">Open user menu</span>
-                          <img
-                            className="h-8 w-8 rounded-full"
+                          <Avatar
                             src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
-                            alt=""
+                            hex={isToken}
+                            size="sm"
                             style={
-                              isToken ? hexStyle : { visibility: 'visible' }
+                              isToken
+                                ? {
+                                    visibility: 'visible',
+                                  }
+                                : undefined
                             }
                           />
                         </Menu.Button>
@@ -225,11 +226,17 @@ export default function HeadNav({
               {loggedIn && (
                 <div className="flex items-center px-5">
                   <div className="flex-shrink-0">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      style={isToken ? hexStyle : { visibility: 'visible' }} // TODO this reloads when toggled. how do we cache?
+                    <Avatar
                       src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
-                      alt=""
+                      hex={isToken}
+                      size="sm"
+                      style={
+                        isToken
+                          ? {
+                              visibility: 'visible',
+                            }
+                          : undefined
+                      }
                     />
                   </div>
                   {/* <button
