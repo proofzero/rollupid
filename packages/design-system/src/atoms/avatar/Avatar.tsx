@@ -27,10 +27,11 @@ export const Avatar = ({
     <div
       className={classNames(
         { 'bg-white z-[100]': border },
-        { 'w-8 h-8': size === 'sm' },
+        { 'w-11 h-11': size === 'sm' },
         { 'w-28 h-28': size === 'md' },
         { 'w-48 h-48': size === 'lg' },
-        { 'rounded-full': !hex }
+        { 'rounded-full': !hex },
+        className
       )}
       style={
         hex
@@ -48,11 +49,12 @@ export const Avatar = ({
       <img
         src={src}
         className={classNames(
-          { 'bg-white border-white': border },
+          'bg-white',
+          { 'border-white': border },
           { border: border && size === 'sm' },
           { 'border-4': border && size === 'md' },
           { 'border-8': border && size === 'lg' },
-          { 'w-8 h-8': size === 'sm' },
+          { 'w-11 h-11': size === 'sm' },
           { 'w-28 h-28': size === 'md' },
           { 'w-48 h-48': size === 'lg' },
           { 'rounded-full': !hex }
