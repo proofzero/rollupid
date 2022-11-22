@@ -1,0 +1,29 @@
+{
+  /* Visit https://aka.ms/tsconfig to read more about this file */
+  "exclude": [
+    "dist",
+  ],
+  "compilerOptions": {
+    // Generate output into this directory.
+    "outDir": "dist",
+    // Generate .d.ts files alongside .js files.
+    "declaration": true,
+    // Generate .d.ts.map files so that tooling can refer to accurate source line numbers.
+    "declarationMap": true,
+    // Set the JavaScript language version for emitted JavaScript and
+    // include compatible library declarations.
+    "target": "esnext",
+    // Specify what module code is generated.
+    "module": "es2022",
+    // Emit additional JavaScript to ease support for importing CommonJS
+    // modules. This enables 'allowSyntheticDefaultImports' for type
+    // compatibility.
+    "esModuleInterop": true,
+    // Ensure that casing is correct in imports.
+    "forceConsistentCasingInFileNames": true,
+    // Enable all strict type-checking options.
+    "strict": true,
+    // Skip type checking all .d.ts files.
+    "skipLibCheck": true
+  }
+}

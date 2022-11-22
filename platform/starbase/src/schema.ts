@@ -257,7 +257,7 @@ const rpcSchema: RpcSchema = {
         schema: {
           $ref: '#/components/schema/Profile',
         },
-      }
+      },
     },
     schemas: {
       ClientId: {
@@ -333,9 +333,7 @@ const rpcSchema: RpcSchema = {
       },
       Profile: {
         type: 'object',
-        items: [
-
-        ]
+        items: [],
       },
       Apps: {
         type: 'array',

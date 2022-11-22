@@ -40,6 +40,7 @@
     "@kubelt/do.starbase-user": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
+    "@kubelt/security": "workspace:*",
     "cross-env": "7.0.3",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
