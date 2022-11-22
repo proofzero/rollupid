@@ -5,10 +5,9 @@ import Env from '../../env'
 import OortClient from './clients/oort'
 
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
+import { WorkerApi as AddressApi } from '@kubelt/platform.address/src/types'
 import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-
-import * as openrpc from '@kubelt/openrpc'
 
 import {
   setupContext,
@@ -42,13 +41,16 @@ const threeIDResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
 
-      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account, {
-        headers: {
-          [HEADER_CORE_ADDRESS]: address,
-        },
-      })
+      console.log('=-=-=-=-=-=-=-=-=-=- here 1')
+      const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
+      console.log('=-=-=-=-=-=-=-=-=-=- here 2')
+      const coreId = await addressClient.kb_resolveAddress(address)
+      console.log('=-=-=-=-=-=-=-=-=-=- here 3')
 
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      console.log('=-=-=-=-=-=-=-=-=-=- here 4')
       const oortClient = new OortClient(env.OORT)
+      console.log('=-=-=-=-=-=-=-=-=-=- here 5')
 
       // Migration logic:
       // If there's an account profile, we're done.
@@ -70,43 +72,48 @@ const threeIDResolvers: Resolvers = {
         
       //   .finally(async ([rpc, _]) => { console.log(rpc); return rpc})
         
-      let accountProfile = undefined
-      
-      try {
-        accountProfile = await accountClient.kb_getProfile(address)
-      } catch (e) {
-        console.log('falsy accountProfile:', e)
-        
-        // If there's not an account profile, check Oort.
-        const oortClient = new OortClient(env.OORT)
-        console.log('1')
-        const oortProfile = await oortClient.getProfileFromAddress(address)
-        console.log('2')
+      let accountProfile = await accountClient.kb_getProfile(coreId)
+      console.log('accountProfile -=-=-=-=-=-=-=-=-=-=-', accountProfile)
 
-        console.log('oortProfile', oortProfile)
+      // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
+      const isEmptyObject = (obj) => (
+        !(obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
+      )
 
-        if (oortProfile) {
-          // If there's an Oort profile, set it as the account profile and return.
-          accountProfile = oortProfile
-          // console.log('setting accountProfile', accountProfile)
-          // try {
-          //   const profileObject = getRPCResult(accountProfile)
-          //   console.log('profileObject', profileObject)
-          //   await accountClient.kb_setProfile(profileObject)
-          // } catch (e) {
-          //   console.log('accountClient error', e)
-          // }
-        }
-
-        // If there's no Oort profile and no Account profile, there's no profile. Return null.
+      if (isEmptyObject(accountProfile)) {
+        accountProfile = await oortClient.getProfileFromAddress(address)
+        console.log('accountProfile -=-=-=-=-=-=-=-=-=-=- from oort', accountProfile)
       }
+      // } catch (e) {
+      //   console.log('falsy accountProfile:', e)
+      //   console.log('1')
+      //   const oortProfile = await oortClient.getProfileFromAddress(address)
+      //   console.log('2')
+
+      //   console.log('oortProfile', oortProfile)
+
+      //   if (oortProfile) {
+      //     // If there's an Oort profile, set it as the account profile and return.
+      //     accountProfile = oortProfile
+      //     // console.log('setting accountProfile', accountProfile)
+      //     // try {
+      //     //   const profileObject = getRPCResult(accountProfile)
+      //     //   console.log('profileObject', profileObject)
+      //     //   await accountClient.kb_setProfile(profileObject)
+      //     // } catch (e) {
+      //     //   console.log('accountClient error', e)
+      //     // }
+      //   }
+
+      //   // If there's no Oort profile and no Account profile, there's no profile. Return null.
+      // }
 
       console.log('checking status')
       await checkHTTPStatus(accountProfile)
 
       console.log('getting result')
-      const result = await getRPCResult(accountProfile)
-        .then(r => accountClient.kb_setProfile(r))
+      const [result, _] = await getRPCResult(accountProfile)
+        .then(r => [r, accountClient.kb_setProfile(coreId, r)])
         .catch(e => console.log(e))
 
       console.log('RPC result', result)

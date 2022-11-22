@@ -12,6 +12,7 @@ export default interface Env {
 
   OORT: OortBinding
   Account: Fetcher
+  Address: Fetcher
   ALCHEMY_API_KEY: string
   ALCHEMY_NETWORK: string
 }
