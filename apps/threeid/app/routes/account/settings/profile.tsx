@@ -13,7 +13,7 @@ import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'
-import { Text } from '@kubelt/design-system'
+import { Avatar, Text } from '@kubelt/design-system'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
@@ -221,31 +221,16 @@ export default function AccountSettingsProfile() {
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
-          {!pfpUploading && !isToken && (
-            <img
-              src={gatewayFromIpfs(pfpUrl)}
-              className="rounded-full w-[118px] h-[118px]"
+          {!pfpUploading && (
+            <Avatar
+              src={gatewayFromIpfs(pfpUrl) as string}
+              size="md"
+              hex={isToken}
             />
           )}
 
-          {!pfpUploading && isToken && (
-            <div
-              style={{
-                clipPath:
-                  'polygon(92.32051% 40%, 93.79385% 43.1596%, 94.69616% 46.52704%, 95% 50%, 94.69616% 53.47296%, 93.79385% 56.8404%, 92.32051% 60%, 79.82051% 81.65064%, 77.82089% 84.50639%, 75.35575% 86.97152%, 72.5% 88.97114%, 69.3404% 90.44449%, 65.97296% 91.34679%, 62.5% 91.65064%, 37.5% 91.65064%, 34.02704% 91.34679%, 30.6596% 90.44449%, 27.5% 88.97114%, 24.64425% 86.97152%, 22.17911% 84.50639%, 20.17949% 81.65064%, 7.67949% 60%, 6.20615% 56.8404%, 5.30384% 53.47296%, 5% 50%, 5.30384% 46.52704%, 6.20615% 43.1596%, 7.67949% 40%, 20.17949% 18.34936%, 22.17911% 15.49361%, 24.64425% 13.02848%, 27.5% 11.02886%, 30.6596% 9.55551%, 34.02704% 8.65321%, 37.5% 8.34936%, 62.5% 8.34936%, 65.97296% 8.65321%, 69.3404% 9.55551%, 72.5% 11.02886%, 75.35575% 13.02848%, 77.82089% 15.49361%, 79.82051% 18.34936%)',
-                boxShadow: 'inset 0px 10px 100px 10px white',
-                transform: 'scale(1.2)',
-              }}
-            >
-              <img
-                className="w-[118px] h-[118px]"
-                src={gatewayFromIpfs(pfpUrl)}
-              />
-            </div>
-          )}
-
           {pfpUploading && (
-            <div className="flex justify-center items-center w-[118px] h-[118px]">
+            <div className="flex justify-center items-center w-40 h-40">
               <Spinner />
             </div>
           )}
@@ -285,11 +270,7 @@ export default function AccountSettingsProfile() {
 
             {generatedPfp && (
               <div className="flex flex-col space-y-2.5 items-center lg:items-start">
-                <Text
-                  className="text-gray-400"
-                  size="sm"
-                  weight="medium"
-                >
+                <Text className="text-gray-400" size="sm" weight="medium">
                   Or use your 1/1 gradient
                 </Text>
 
@@ -327,11 +308,7 @@ export default function AccountSettingsProfile() {
           </div>
 
           {actionData?.errors.displayName && (
-            <Text
-              className="mb-1.5 text-gray-400"
-              size="xs"
-              weight="normal"
-            >
+            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
               {actionData.errors.displayName}
             </Text>
           )}
@@ -390,11 +367,7 @@ export default function AccountSettingsProfile() {
           />
 
           {actionData?.errors?.website && (
-            <Text
-              className="mb-1.5 text-gray-400"
-              size="xs"
-              weight="normal"
-            >
+            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
               {actionData.errors.website}
             </Text>
           )}
@@ -409,11 +382,7 @@ export default function AccountSettingsProfile() {
           />
 
           {actionData?.errors.bio && (
-            <Text
-              className="mb-1.5 text-gray-400"
-              size="xs"
-              weight="normal"
-            >
+            <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
               {actionData?.errors.bio}
             </Text>
           )}
