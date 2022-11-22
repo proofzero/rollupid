@@ -216,8 +216,8 @@ act.secrets
 /playwright-report/
 /playwright/.cache/
 
-.pnp.*
-.yarn
+.yarn/*
+!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
