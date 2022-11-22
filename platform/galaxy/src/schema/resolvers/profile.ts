@@ -14,6 +14,7 @@ import {
   isAuthorized,
   checkHTTPStatus,
   getRPCResult,
+  isEmptyObject,
 } from './utils'
 
 import { Resolvers } from './typedefs'
@@ -40,83 +41,40 @@ const threeIDResolvers: Resolvers = {
       { address }: { address: string },
       { env }: ResolverContext
     ) => {
-
-      console.log('=-=-=-=-=-=-=-=-=-=- here 1')
       const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
-      console.log('=-=-=-=-=-=-=-=-=-=- here 2')
       const coreId = await addressClient.kb_resolveAddress(address)
-      console.log('=-=-=-=-=-=-=-=-=-=- here 3')
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      console.log('=-=-=-=-=-=-=-=-=-=- here 4')
       const oortClient = new OortClient(env.OORT)
-      console.log('=-=-=-=-=-=-=-=-=-=- here 5')
 
       // Migration logic:
       // If there's an account profile, we're done.
       // If there's not an account profile, check Oort.
       // If there's an Oort profile, set it as the account profile and return.
       // If there's no Oort profile and no Account profile, there's no profile. Return null.
-      
-      // return accountClient.kb_getProfile(address)
-      //   .catch(async (_) => oortClient.getProfileFromAddress(address))
-
-      //   .then(async (r) => [r, await checkHTTPStatus(r)])
-      //   .catch(async (e) => console.error('Error checking HTTP Status:', e))
-        
-      //   .then(async ([r, _]) => getRPCResult(r))
-      //   .catch(async (e) => console.error('Error getting RPC result:', e))
-        
-      //   .then(async (rpc) => [rpc, await accountClient.kb_setProfile(rpc)])
-      //   .catch(async (e) => console.error('Error saving to Account service:', e))
-        
-      //   .finally(async ([rpc, _]) => { console.log(rpc); return rpc})
-        
+              
       let accountProfile = await accountClient.kb_getProfile(coreId)
-      console.log('accountProfile -=-=-=-=-=-=-=-=-=-=-', accountProfile)
-
-      // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
-      const isEmptyObject = (obj) => (
-        !(obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
-      )
+      console.log(accountProfile)
 
       if (isEmptyObject(accountProfile)) {
         accountProfile = await oortClient.getProfileFromAddress(address)
-        console.log('accountProfile -=-=-=-=-=-=-=-=-=-=- from oort', accountProfile)
+        console.log(accountProfile)
       }
-      // } catch (e) {
-      //   console.log('falsy accountProfile:', e)
-      //   console.log('1')
-      //   const oortProfile = await oortClient.getProfileFromAddress(address)
-      //   console.log('2')
 
-      //   console.log('oortProfile', oortProfile)
+      // console.log('here1')
 
-      //   if (oortProfile) {
-      //     // If there's an Oort profile, set it as the account profile and return.
-      //     accountProfile = oortProfile
-      //     // console.log('setting accountProfile', accountProfile)
-      //     // try {
-      //     //   const profileObject = getRPCResult(accountProfile)
-      //     //   console.log('profileObject', profileObject)
-      //     //   await accountClient.kb_setProfile(profileObject)
-      //     // } catch (e) {
-      //     //   console.log('accountClient error', e)
-      //     // }
-      //   }
+      // if (isEmptyObject(accountProfile)) return accountProfile
 
-      //   // If there's no Oort profile and no Account profile, there's no profile. Return null.
-      // }
+      // console.log('here2')
 
-      console.log('checking status')
       await checkHTTPStatus(accountProfile)
 
-      console.log('getting result')
       const [result, _] = await getRPCResult(accountProfile)
-        .then(r => [r, accountClient.kb_setProfile(coreId, r)])
+        .then(async r => [r, await accountClient.kb_setProfile(coreId, {profile: r})])
         .catch(e => console.log(e))
 
-      console.log('RPC result', result)
+      console.log(result)
+
       return result
     },
   },
