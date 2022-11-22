@@ -7,7 +7,7 @@ export default {
   component: Cover,
   argTypes: {
     src: {
-      defaultValue: 'https://picsum.photos/128',
+      defaultValue: 'https://picsum.photos/1920/256',
     },
   },
 }
