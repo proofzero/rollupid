@@ -52,30 +52,20 @@ const threeIDResolvers: Resolvers = {
       // If there's not an account profile, check Oort.
       // If there's an Oort profile, set it as the account profile and return.
       // If there's no Oort profile and no Account profile, there's no profile. Return null.
-              
+    
       let accountProfile = await accountClient.kb_getProfile(coreId)
-      console.log(accountProfile)
-
+      
+      // Upgrayedd Oort -> Account
       if (isEmptyObject(accountProfile)) {
-        accountProfile = await oortClient.getProfileFromAddress(address)
-        console.log(accountProfile)
+        const [result, _] = await oortClient.getProfileFromAddress(address)
+          .then(async r => [r, await checkHTTPStatus(r)])
+          .then(async ([r, _]) => getRPCResult(r))
+          .then(async r => [r, await accountClient.kb_setProfile(coreId, r)])
+      
+        accountProfile = result
       }
 
-      // console.log('here1')
-
-      // if (isEmptyObject(accountProfile)) return accountProfile
-
-      // console.log('here2')
-
-      await checkHTTPStatus(accountProfile)
-
-      const [result, _] = await getRPCResult(accountProfile)
-        .then(async r => [r, await accountClient.kb_setProfile(coreId, {profile: r})])
-        .catch(e => console.log(e))
-
-      console.log(result)
-
-      return result
+      return accountProfile
     },
   },
   Mutation: {

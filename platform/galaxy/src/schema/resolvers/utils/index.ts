@@ -85,5 +85,5 @@ export async function getRPCResult(response: Response) {
 
 // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
 export function isEmptyObject(obj: any) {
-  return !(obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
+  return (obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
 }
