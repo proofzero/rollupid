@@ -5,7 +5,7 @@ import Env from '../../env'
 import OortClient from './clients/oort'
 
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
-// import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
+import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -17,6 +17,7 @@ import {
 
 import { Resolvers } from './typedefs'
 import { GraphQLYogaError } from '@graphql-yoga/common'
+import profile from '../types/profile'
 
 type ResolverContext = {
   env: Env
@@ -38,17 +39,36 @@ const threeIDResolvers: Resolvers = {
       { address }: { address: string },
       { env }: ResolverContext
     ) => {
+
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account, {
-        // headers: {
-        //   [HEADER_ACCESS_TOKEN]: request.headers.get(HEADER_CORE_ADDRESS) as string,
-        // },
+        headers: {
+          [HEADER_CORE_ADDRESS]: address,
+        },
       })
 
-      console.log('here we are', accountClient)
+      const oortClient = new OortClient(env.OORT)
 
       // Migration logic:
       // If there's an account profile, we're done.
-      let accountProfile = null
+      // If there's not an account profile, check Oort.
+      // If there's an Oort profile, set it as the account profile and return.
+      // If there's no Oort profile and no Account profile, there's no profile. Return null.
+      
+      // return accountClient.kb_getProfile(address)
+      //   .catch(async (_) => oortClient.getProfileFromAddress(address))
+
+      //   .then(async (r) => [r, await checkHTTPStatus(r)])
+      //   .catch(async (e) => console.error('Error checking HTTP Status:', e))
+        
+      //   .then(async ([r, _]) => getRPCResult(r))
+      //   .catch(async (e) => console.error('Error getting RPC result:', e))
+        
+      //   .then(async (rpc) => [rpc, await accountClient.kb_setProfile(rpc)])
+      //   .catch(async (e) => console.error('Error saving to Account service:', e))
+        
+      //   .finally(async ([rpc, _]) => { console.log(rpc); return rpc})
+        
+      let accountProfile = undefined
       
       try {
         accountProfile = await accountClient.kb_getProfile(address)
@@ -66,12 +86,14 @@ const threeIDResolvers: Resolvers = {
         if (oortProfile) {
           // If there's an Oort profile, set it as the account profile and return.
           accountProfile = oortProfile
-          console.log('setting accountProfile')
-          try {
-            await accountClient.kb_setProfile(accountProfile)
-          } catch (e) {
-            console.log('accountClient error', e)
-          }
+          // console.log('setting accountProfile', accountProfile)
+          // try {
+          //   const profileObject = getRPCResult(accountProfile)
+          //   console.log('profileObject', profileObject)
+          //   await accountClient.kb_setProfile(profileObject)
+          // } catch (e) {
+          //   console.log('accountClient error', e)
+          // }
         }
 
         // If there's no Oort profile and no Account profile, there's no profile. Return null.
@@ -79,8 +101,14 @@ const threeIDResolvers: Resolvers = {
 
       console.log('checking status')
       await checkHTTPStatus(accountProfile)
-      console.log('returning result')
-      return await getRPCResult(accountProfile)
+
+      console.log('getting result')
+      const result = await getRPCResult(accountProfile)
+        .then(r => accountClient.kb_setProfile(r))
+        .catch(e => console.log(e))
+
+      console.log('RPC result', result)
+      return result
     },
   },
   Mutation: {
