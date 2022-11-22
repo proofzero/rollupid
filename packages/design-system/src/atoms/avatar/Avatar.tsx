@@ -27,8 +27,8 @@ export const Avatar = ({
     <div
       className={classNames(
         { 'bg-white z-[100]': border },
-        { 'w-11 h-11': size === 'sm' },
-        { 'w-28 h-28': size === 'md' },
+        { 'w-12 h-12': size === 'sm' },
+        { 'w-40 h-40': size === 'md' },
         { 'w-48 h-48': size === 'lg' },
         { 'rounded-full': !hex },
         className
@@ -54,8 +54,8 @@ export const Avatar = ({
           { border: border && size === 'sm' },
           { 'border-4': border && size === 'md' },
           { 'border-8': border && size === 'lg' },
-          { 'w-11 h-11': size === 'sm' },
-          { 'w-28 h-28': size === 'md' },
+          { 'w-12 h-12': size === 'sm' },
+          { 'w-40 h-40': size === 'md' },
           { 'w-48 h-48': size === 'lg' },
           { 'rounded-full': !hex }
         )}
