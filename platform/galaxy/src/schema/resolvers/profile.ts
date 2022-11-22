@@ -8,6 +8,8 @@ import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
+import * as openrpc from '@kubelt/openrpc'
+
 import {
   setupContext,
   isAuthorized,
