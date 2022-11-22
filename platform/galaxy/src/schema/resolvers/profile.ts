@@ -3,6 +3,11 @@ import { getDefaultProvider, AlchemyProvider } from '@ethersproject/providers'
 
 import Env from '../../env'
 import OortClient from './clients/oort'
+
+import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
+// import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
+import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+
 import {
   setupContext,
   isAuthorized,
@@ -33,10 +38,49 @@ const threeIDResolvers: Resolvers = {
       { address }: { address: string },
       { env }: ResolverContext
     ) => {
-      const oortClient = new OortClient(env.OORT)
-      const profileResponse = await oortClient.getProfileFromAddress(address)
-      await checkHTTPStatus(profileResponse)
-      return await getRPCResult(profileResponse)
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account, {
+        // headers: {
+        //   [HEADER_ACCESS_TOKEN]: request.headers.get(HEADER_CORE_ADDRESS) as string,
+        // },
+      })
+
+      console.log('here we are', accountClient)
+
+      // Migration logic:
+      // If there's an account profile, we're done.
+      let accountProfile = null
+      
+      try {
+        accountProfile = await accountClient.kb_getProfile(address)
+      } catch (e) {
+        console.log('falsy accountProfile:', e)
+        
+        // If there's not an account profile, check Oort.
+        const oortClient = new OortClient(env.OORT)
+        console.log('1')
+        const oortProfile = await oortClient.getProfileFromAddress(address)
+        console.log('2')
+
+        console.log('oortProfile', oortProfile)
+
+        if (oortProfile) {
+          // If there's an Oort profile, set it as the account profile and return.
+          accountProfile = oortProfile
+          console.log('setting accountProfile')
+          try {
+            await accountClient.kb_setProfile(accountProfile)
+          } catch (e) {
+            console.log('accountClient error', e)
+          }
+        }
+
+        // If there's no Oort profile and no Account profile, there's no profile. Return null.
+      }
+
+      console.log('checking status')
+      await checkHTTPStatus(accountProfile)
+      console.log('returning result')
+      return await getRPCResult(accountProfile)
     },
   },
   Mutation: {

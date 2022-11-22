@@ -5,7 +5,8 @@ node_compat = true
 
 # Services binding for local development
 services = [
-  { binding = "OORT", service = "oort"}
+  { binding = "OORT", service = "oort"},
+  { binding = "Account", service = "account" },
 ]
 
 [dev]
@@ -15,19 +16,22 @@ local_protocol = "http"
 [env.dev]
 route = { pattern = "galaxy-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
-  { binding = "OORT", service = "oort-devnet"}
+  { binding = "OORT", service = "oort-devnet"},
+  { binding = "Account", service = "account" },
 ]
 
 [env.next]
 route = { pattern = "galaxy-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
-  { binding = "OORT", service = "oort-testnet"}
+  { binding = "OORT", service = "oort-testnet"},
+  { binding = "Account", service = "account" },
 ]
 
 [env.current]
 route = { pattern = "galaxy.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
-  { binding = "OORT", service = "oort-mainnet"}
+  { binding = "OORT", service = "oort-mainnet"},
+  { binding = "Account", service = "account" },
 ]
 
 
