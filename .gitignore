@@ -224,5 +224,8 @@ act.secrets
 !.yarn/sdks
 !.yarn/versions
 
+# Only keep contents of top-level .yarn/
+**/.yarn
+
 # api-extractor
 temp
