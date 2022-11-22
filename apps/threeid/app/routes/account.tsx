@@ -18,11 +18,7 @@ import { links as profileNftCollectionLinks } from '~/components/nft-collection/
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 import validateProof from '~/helpers/validate-proof'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
@@ -174,10 +170,9 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
             )}
           >
             <Text
-              className="truncate self-center"
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}
-              color={TextColor.Gray600}
+              className="truncate self-center text-gray-600"
+              size="sm"
+              weight="medium"
             >
               {item.name}
             </Text>

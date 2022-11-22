@@ -4,6 +4,7 @@
   "private": true,
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
+  "types": "dist/types/index.d.ts",
   "dependencies": {
     "cra-template-typescript": "1.2.0",
     "react": "18.2.0",

@@ -8,11 +8,7 @@ import {
 } from '@remix-run/react'
 
 import Heading from '~/components/typography/Heading'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import styles from '~/styles/onboard.css'
 
@@ -103,9 +99,8 @@ const OnboardMintLand = ({
       )}
       {isInvalidChain && (
         <Text
-          className="mt-4 flex flex-row space-x-4 items-center"
-          color={TextColor.Gray400}
-          size={TextSize.SM}
+          className="mt-4 flex flex-row space-x-4 items-center text-gray-400"
+          size="sm"
         >
           **Please select switch your network to{' '}
           {window.ENV.VALID_CHAIN_ID_NAME}**
@@ -113,9 +108,8 @@ const OnboardMintLand = ({
       )}
       {isInvalidAddress && (
         <Text
-          className="mt-4 flex flex-row space-x-4 items-center"
-          color={TextColor.Gray400}
-          size={TextSize.SM}
+          className="mt-4 flex flex-row space-x-4 items-center text-gray-400"
+          size="sm"
         >
           **Please connect your wallet to {account}**
         </Text>
@@ -136,9 +130,8 @@ const OnboardMintConnect = ({ onClick }: OnboardMintConnectProps) => {
       </Button>
 
       <Text
-        className="mt-4 flex flex-row space-x-4 items-center"
-        color={TextColor.Gray400}
-        size={TextSize.SM}
+        className="mt-4 flex flex-row space-x-4 items-center text-gray-400"
+        size="sm"
       >
         **Please unlock your wallet to mint your NFT**
       </Text>
@@ -154,7 +147,7 @@ type OnboardMintSignProps = {
 const OnboardMintSign = ({ onClick, isLoading }: OnboardMintSignProps) => {
   return (
     <>
-      <Text color={TextColor.Gray400} className="mb-10">
+      <Text className="mb-10 text-gray-400">
         Please confirm the transaction in your wallet or
       </Text>
 
@@ -171,7 +164,7 @@ const OnboardMintProc = () => {
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
         <Spinner color="gray" size="lg" />
 
-        <Text color={TextColor.Gray400}>Minting, please wait</Text>
+        <Text className="text-gray-400">Minting, please wait</Text>
       </section>
     </>
   )
@@ -187,7 +180,7 @@ const OnboardMintError = ({ onClick }: OnboardMintErrorProps) => {
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
         <HiXCircle color="#EF4444" />
 
-        <Text color={TextColor.Gray400}>Something went wrong</Text>
+        <Text className="text-gray-400">Something went wrong</Text>
       </section>
 
       <Button size={ButtonSize.L} onClick={onClick}>
@@ -207,10 +200,10 @@ const OnboardMintSuccess = ({ data }: OnboardMintSuccessProps) => {
       <section className="flex flex-row justify-center items-center space-x-4 mb-10">
         <HiCheckCircle color="#10B981" />
 
-        <Text color={TextColor.Gray400}>Minted successfully!</Text>
+        <Text className="text-gray-400">Minted successfully!</Text>
       </section>
 
-      <Text color={TextColor.Gray400} size={TextSize.XS}>
+      <Text className="text-gray-400" size="xs">
         <a href={`https://etherscan.io/tx/${data?.hash}`}>View on Etherscan</a>
       </Text>
     </>
@@ -383,12 +376,12 @@ const OnboardMint = () => {
 
       <Heading className="text-center">Congratulations!</Heading>
 
-      <Text className="text-center" color={TextColor.Gray600}>
+      <Text className="text-center text-gray-600">
         We just mathematically generated this 1/1 gradient PFP & cover photo for
         you.
       </Text>
 
-      <Text className="text-center" color={TextColor.Gray600}>
+      <Text className="text-center text-gray-600">
         You can mint this NFT for FREE - you only pay the gas fee.
       </Text>
 
@@ -419,8 +412,7 @@ const OnboardMint = () => {
         </div>
 
         <Text
-          className="mb-4 flex flex-row space-x-2 items-center"
-          color={TextColor.Gray400}
+          className="mb-4 flex flex-row space-x-2 items-center text-gray-400"
         >
           <BiInfoCircle />
           <span>
@@ -432,9 +424,8 @@ const OnboardMint = () => {
           </span>
         </Text>
         <Text
-          className="mb-4 flex flex-row space-x-2 items-center"
-          color={TextColor.Gray400}
-          size={TextSize.XS}
+          className="mb-4 flex flex-row space-x-2 items-center text-gray-400"
+          size="xs"
         >
           <u>
             <i>
@@ -489,17 +480,15 @@ const OnboardMint = () => {
                   <div className="flex flex-1 items-center justify-between truncate bg-white">
                     <div className="flex-1 truncate px-4 py-4 text-sm">
                       <Text
-                        color={TextColor.Gray700}
-                        size={TextSize.SM}
-                        className="font-bold"
+                        size="sm"
+                        className="font-bold text-gray-700"
                       >
                         {metadata.properties.traits[`trait${i}`].value.name}
                       </Text>
                       <Text
-                        className=""
-                        color={TextColor.Gray400}
-                        weight={TextWeight.Medium500}
-                        size={TextSize.XS}
+                        className="text-gray-400"
+                        weight="medium"
+                        size="xs"
                       >
                         {metadata.properties.traits[`trait${i}`].type[0] +
                           metadata.properties.traits[`trait${i}`].type

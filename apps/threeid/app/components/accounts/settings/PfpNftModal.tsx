@@ -1,11 +1,8 @@
 import Modal from '~/components/modal/Modal'
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
 import SelectableNft from '~/components/nft-collection/SelectableNft'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+
+import { Text } from '@kubelt/design-system'
 
 type PfpNftModalProps = {
   account: string
@@ -23,12 +20,7 @@ const PfpNftModal = ({
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
       <>
-        <Text
-          className="pb-1"
-          size={TextSize.XL2}
-          weight={TextWeight.Bold700}
-          color={TextColor.Gray800}
-        >
+        <Text className="pb-1 text-gray-800" size="2xl" weight="bold">
           Select NFT Avatar
         </Text>
 

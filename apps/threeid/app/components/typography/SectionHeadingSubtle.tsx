@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from "~/components/typography/Text";
+import { Text } from '@kubelt/design-system'
 
 export type SectionHeadingSubtleProps = {
   className?: string;
@@ -21,19 +17,18 @@ const SectionHeadingSubtle = ({
   return (
     <div className={cleanedClassName}>
       <Text
-        className="mb-1"
-        weight={TextWeight.Medium500}
-        size={TextSize.SM}
-        color={TextColor.Gray400}
+        className="mb-1 text-gray-400"
+        weight="medium"
+        size="sm"
       >
         {title.toUpperCase()}
       </Text>
 
       {subtitle && (
         <Text
-          weight={TextWeight.Regular400}
-          size={TextSize.SM}
-          color={TextColor.Gray400}
+          className="text-gray-400"
+          weight="normal"
+          size="sm"
         >
           {subtitle}
         </Text>

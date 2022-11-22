@@ -1,12 +1,8 @@
-import { NavLink, Outlet } from '@remix-run/react'
-import { Toast } from 'flowbite-react'
+import { Outlet } from '@remix-run/react'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+
+import { Text } from '@kubelt/design-system'
 
 const tabs = [
   { name: 'Profile', to: 'profile' },
@@ -40,10 +36,9 @@ export default function AccountSetting() {
       "
       >
         <Text
-          size={TextSize.XL}
-          weight={TextWeight.Bold700}
-          color={TextColor.Gray900}
-          className="my-4"
+          size="xl"
+          weight="bold"
+          className="my-4 text-gray-900"
         >
           Settings
         </Text>

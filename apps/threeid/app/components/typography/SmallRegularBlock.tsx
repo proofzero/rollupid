@@ -14,8 +14,8 @@ const SmallRegularBlock = ({
   return (
     <Text
       className={className}
-      weight={TextWeight.Regular400}
-      size={TextSize.SM}
+      weight="normal"
+      size="sm"
       color={TextColor.Gray500}
       type={type}
     >

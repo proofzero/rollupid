@@ -45,8 +45,8 @@ const InputTextarea = ({
     <div>
       <label htmlFor={id} className="flex flex-row justify-between">
         <Text
-          size={TextSize.SM}
-          weight={TextWeight.Medium500}
+          size="sm"
+          weight="medium"
           color={computedError ? TextColor.Red500 : TextColor.Gray700}
         >
           {heading}
@@ -54,8 +54,8 @@ const InputTextarea = ({
 
         {charLimit && (
           <Text
-            size={TextSize.SM}
-            weight={TextWeight.Medium500}
+            size="sm"
+            weight="medium"
             color={TextColor.Gray400}
           >
             {val?.length || 0}/{charLimit}

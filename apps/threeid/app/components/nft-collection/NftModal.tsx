@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import Modal from '~/components/modal/Modal'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
@@ -38,18 +34,17 @@ const NftModal = ({
 
         <div className="p-0 lg:p-4 max-w-full lg:max-w-md mt-3">
           <Text
-            className="mb-2"
-            size={TextSize.LG}
-            weight={TextWeight.Medium500}
-            color={TextColor.Gray900}
+            className="mb-2 text-gray-900"
+            size="lg"
+            weight="medium"
           >
             {nft?.collectionTitle}
           </Text>
+
           <Text
-            className="mb-5 lg:mb-10"
-            size={TextSize.XL4}
-            weight={TextWeight.SemiBold600}
-            color={TextColor.Gray900}
+            className="mb-5 lg:mb-10 text-gray-900"
+            size="4xl"
+            weight="semibold"
           >
             {nft?.title}
           </Text>
@@ -59,10 +54,9 @@ const NftModal = ({
           {nft?.properties?.length > 0 && (
             <div className="mt-4 lg:mt-8">
               <Text
-                className="ml-1 mb-4"
-                size={TextSize.LG}
-                weight={TextWeight.SemiBold600}
-                color={TextColor.Gray900}
+                className="ml-1 mb-4 text-gray-900"
+                size="lg"
+                weight="semibold"
               >
                 Properties
               </Text>
@@ -75,16 +69,16 @@ const NftModal = ({
                       className="m-1 py-2 px-4 border rounded-md"
                     >
                       <Text
-                        size={TextSize.XS}
-                        weight={TextWeight.Medium500}
-                        color={TextColor.Gray400}
+                        size="xs"
+                        weight="medium"
+                        className="text-gray-400"
                       >
                         {p.name?.toUpperCase()}
                       </Text>
                       <Text
-                        size={TextSize.SM}
-                        weight={TextWeight.SemiBold600}
-                        color={TextColor.Gray700}
+                        size="sm"
+                        weight="semibold"
+                        className="text-gray-700"
                       >
                         {p.value}
                       </Text>

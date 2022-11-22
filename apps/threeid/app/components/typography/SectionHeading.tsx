@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from "~/components/typography/Text";
+import { Text } from '@kubelt/design-system'
 
 export type SectionHeadingProps = {
   className?: string;
@@ -12,10 +8,9 @@ export type SectionHeadingProps = {
 const SectionHeading = ({ children, className }: SectionHeadingProps) => {
   return (
     <Text
-      className={className}
-      weight={TextWeight.Medium500}
-      size={TextSize.Base}
-      color={TextColor.Gray600}
+      className={`${className} text-gray-600`}
+      weight="medium"
+      size="base"
     >
       {children}
     </Text>

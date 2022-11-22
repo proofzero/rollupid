@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import SectionTitle from '../typography/SectionTitle'
 
@@ -77,14 +73,14 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
         )}
 
         <div className="flex-1 flex flex-col">
-          <Text size={TextSize.SM} weight={TextWeight.Medium500}>
+          <Text size="sm" weight="medium">
             {title}
           </Text>
           {description && (
             <Text
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}
-              color={TextColor.Gray500}
+              size="sm"
+              weight="medium"
+              className="text-gray-500"
             >
               {description}
             </Text>
@@ -146,10 +142,9 @@ const ProfileNftCollection = ({
     <>
       {!loading && !isOwner && loadedNfts.length === 0 && (
         <Text
-          className="text-center"
-          size={TextSize.XL2}
-          weight={TextWeight.Medium500}
-          color={TextColor.Gray300}
+          className="text-center text-gray-300"
+          size="2xl"
+          weight="medium"
         >
           Looks like {displayname ?? account} doesn't own any NFTs
         </Text>
@@ -161,16 +156,16 @@ const ProfileNftCollection = ({
 
             <div>
               <Text
-                size={TextSize.XL3}
-                weight={TextWeight.Bold700}
-                color={TextColor.Gray400}
+                size="3xl"
+                weight="bold"
+                className="text-gray-400"
               >
                 Oh no!
               </Text>
               <Text
-                size={TextSize.XL2}
-                weight={TextWeight.Medium500}
-                color={TextColor.Gray400}
+                size="2xl"
+                weight="medium"
+                className="text-gray-400"
               >
                 Looks like you don't own any NFTs
               </Text>

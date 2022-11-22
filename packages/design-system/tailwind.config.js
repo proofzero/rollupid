@@ -5,4 +5,22 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  safelist: [
+    'font-normal',
+    'font-medium',
+    'font-semibold',
+    'font-bold',
+    'text-xs',
+    'text-sm',
+    'text-base',
+    'text-lg',
+    'text-xl',
+    'text-2xl',
+    'text-3xl',
+    'text-4xl',
+    'text-5xl',
+    'text-gray-500',
+    'mt-8',
+    'mt-2'
+  ]
 }

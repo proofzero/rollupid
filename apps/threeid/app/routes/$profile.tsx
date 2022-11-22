@@ -4,11 +4,7 @@ import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
@@ -296,9 +292,8 @@ const ProfileRoute = () => {
       </div>
 
       <div
-        className={`h-[300px] w-full max-w-7xl mx-auto relative flex justify-center rounded-b-xl ${
-          !handlingCover ? 'hover-child-visible' : ''
-        }`}
+        className={`h-[300px] w-full max-w-7xl mx-auto relative flex justify-center rounded-b-xl ${!handlingCover ? 'hover-child-visible' : ''
+          }`}
         style={{
           backgroundImage: coverUrl
             ? `url(${gatewayFromIpfs(coverUrl)})`
@@ -355,31 +350,29 @@ const ProfileRoute = () => {
 
       <div className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-end px-8 mt-[-6em]">
         <div
-          className={`w-48 h-48 bg-white z-[100] ${
-            pfp.isToken ? '' : 'rounded-full'
-          }`}
+          className={`w-48 h-48 bg-white z-[100] ${pfp.isToken ? '' : 'rounded-full'
+            }`}
           style={
             pfp.isToken
               ? {
-                  ...hexStyle,
-                  transform: 'scale(1.0)',
-                }
+                ...hexStyle,
+                transform: 'scale(1.0)',
+              }
               : {
-                  transform: 'scale(0.9)',
-                }
+                transform: 'scale(0.9)',
+              }
           }
         >
           <img
             src={gatewayFromIpfs(pfp.image)}
-            className={`w-48 h-48 bg-white border-8 border-white ${
-              pfp.isToken ? '' : 'rounded-full'
-            }`}
+            className={`w-48 h-48 bg-white border-8 border-white ${pfp.isToken ? '' : 'rounded-full'
+              }`}
             style={
               pfp.isToken
                 ? {
-                    ...hexStyle,
-                    transform: 'scale(0.9)',
-                  }
+                  ...hexStyle,
+                  transform: 'scale(0.9)',
+                }
                 : undefined
             }
           />
@@ -401,17 +394,16 @@ const ProfileRoute = () => {
           <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
               <Text
-                size={TextSize.LG}
-                weight={TextWeight.SemiBold600}
-                color={TextColor.Gray600}
+                className="text-gray-600"
+                size="lg"
+                weight="semibold"
               >
                 This Account is yet to be claimed - Are you the owner?
               </Text>
               <Text
-                className="break-all"
-                size={TextSize.Base}
-                weight={TextWeight.Regular400}
-                color={TextColor.Gray500}
+                className="break-all text-gray-500"
+                size="base"
+                weight="normal"
               >
                 {targetAddress}
               </Text>
@@ -426,19 +418,17 @@ const ProfileRoute = () => {
         {claimed && (
           <div>
             <Text
-              className="mt-5 mb-2.5"
-              weight={TextWeight.Bold700}
-              color={TextColor.Gray800}
-              size={TextSize.XL4}
+              className="mt-5 mb-2.5 text-gray-800"
+              weight="bold"
+              size="4xl"
             >
               {displayName ?? shortenedAccount}
             </Text>
 
             <Text
-              className="break-all"
-              size={TextSize.Base}
-              weight={TextWeight.Medium500}
-              color={TextColor.Gray500}
+              className="break-all text-gray-500"
+              size="base"
+              weight="medium"
             >
               {bio}
             </Text>
@@ -449,7 +439,7 @@ const ProfileRoute = () => {
               {location && (
                 <div className="flex flex-row space-x-2 items-center wrap">
                   <FaMapMarkerAlt />
-                  <Text weight={TextWeight.Medium500} color={TextColor.Gray500}>
+                  <Text weight="medium" className="text-gray-500">
                     {location}
                   </Text>
                 </div>
@@ -458,7 +448,7 @@ const ProfileRoute = () => {
               {job && (
                 <div className="flex flex-row space-x-2 items-center">
                   <FaBriefcase />
-                  <Text weight={TextWeight.Medium500} color={TextColor.Gray500}>
+                  <Text weight="medium" className="text-gray-500">
                     {job}
                   </Text>
                 </div>
@@ -469,8 +459,8 @@ const ProfileRoute = () => {
                   <FaGlobe />
                   <a href={website} target="_blank">
                     <Text
-                      weight={TextWeight.Medium500}
-                      color={TextColor.Indigo500}
+                      weight="medium"
+                      className="text-indigo-500"
                     >
                       {website}
                     </Text>
@@ -483,10 +473,9 @@ const ProfileRoute = () => {
 
         <div className="mt-12 lg:mt-24">
           <Text
-            className="mb-8 lg:mb-16"
-            size={TextSize.SM}
-            weight={TextWeight.SemiBold600}
-            color={TextColor.Gray600}
+            className="mb-8 lg:mb-16 text-gray-600"
+            size="sm"
+            weight="semibold"
           >
             NFT Collection
           </Text>

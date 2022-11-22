@@ -18,11 +18,7 @@ import { useEffect, useState } from 'react'
 import { Button, ButtonSize } from '~/components/buttons'
 
 import Heading from '~/components/typography/Heading'
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { Visibility } from '~/utils/galaxy.server'
 import { oortSend } from '~/utils/rpc.server'
@@ -157,20 +153,18 @@ const OnboardDisplayname = () => {
         >
           <Label htmlFor="display-name">
             <Text
-              className="mb-1.5"
-              size={TextSize.SM}
-              weight={TextWeight.Medium500}
-              color={TextColor.Gray700}
+              className="mb-1.5 text-gray-700"
+              size="sm"
+              weight="medium"
             >
               *Display Name
             </Text>
 
             {actionErrors?.displayname && (
               <Text
-                className="mb-1.5"
-                size={TextSize.XS}
-                weight={TextWeight.Regular400}
-                color={TextColor.Gray400}
+                className="mb-1.5 text-gray-400"
+                size="xs"
+                weight="normal"
               >
                 {actionErrors.displayname}
               </Text>
@@ -189,10 +183,9 @@ const OnboardDisplayname = () => {
             helperText={
               <Text
                 type="span"
-                className="mt-2"
-                size={TextSize.XS}
-                weight={TextWeight.Regular400}
-                color={TextColor.Gray400}
+                className="mt-2 text-gray-400"
+                size="xs"
+                weight="normal"
               >
                 You can always change this later in the settings
               </Text>

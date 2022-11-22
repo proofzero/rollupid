@@ -1,8 +1,4 @@
-import Text, {
-  TextColor,
-  TextSize,
-  TextWeight,
-} from '~/components/typography/Text'
+import { Text } from '@kubelt/design-system'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
@@ -30,10 +26,9 @@ const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
       />
 
       <Text
-        className="my-2.5 mx-2 bg-white"
-        size={TextSize.XS}
-        color={TextColor.Gray900}
-        weight={TextWeight.Medium500}
+        className="my-2.5 mx-2 bg-white text-gray-900"
+        size="xs"
+        weight="medium"
       >
         {nft.title ?? 'Untitled'}
       </Text>
