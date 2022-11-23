@@ -1,4 +1,1 @@
-export const NONCE_OPTIONS = {
-  length: 24,
-  ttl: 60,
-}
+export const KEY_OBJECT_CORE = 'com.kubelt.object/core'

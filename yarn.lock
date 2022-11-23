@@ -5298,6 +5298,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@ethersproject/address": 5.7.0
+    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/platform.commons": "*"
     "@types/itty-router-extras": 0.4.0
