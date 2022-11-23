@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
 import { OortJwt } from '../clients/oort'
@@ -90,7 +91,7 @@ export function isEmptyObject(obj: any) {
   // console.log('Object.getPrototypeOf(obj)', Object.getPrototypeOf(obj))
   // console.log('Object.prototype', Object.prototype)
   // console.log('Object.getPrototypeOf(obj) == Object.prototype', Object.getPrototypeOf(obj) == Object.prototype)
-  return (obj && Object.keys(obj).length == 0) // This doesn't apply to TS: && Object.getPrototypeOf(obj) == Object.prototype)
+  return !!(obj && Object.keys(obj).length == 0) // This doesn't apply to TS: && Object.getPrototypeOf(obj) == Object.prototype)
 }
 
 export async function upgrayeddOortToAccount(coreId: string, accountClient, oortResponse) {
