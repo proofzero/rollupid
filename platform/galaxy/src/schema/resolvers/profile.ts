@@ -27,9 +27,7 @@ type ResolverContext = {
 const threeIDResolvers: Resolvers = {
   Query: {
     profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
-      // TODO: Do we need to verify the token here?
-      // See kb_verifyAuthorization @ https://github.com/kubelt/kubelt/blob/main/platform/access/src/types.ts#L69
-      // Middleware should make sure JWT is valid:
+      // console.log('query', coreId)
       const coreId = (jose.decodeJwt(jwt)).iss
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
@@ -41,7 +39,8 @@ const threeIDResolvers: Resolvers = {
         const oortResponse = await oortClient.getProfile()
         accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
       }
-
+      
+      // console.log(accountProfile)
       return accountProfile
     },
     profileFromAddress: async (
@@ -62,6 +61,7 @@ const threeIDResolvers: Resolvers = {
         accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
       }
 
+      // console.log(accountProfile)
       return accountProfile
     },
   },
@@ -85,13 +85,19 @@ const threeIDResolvers: Resolvers = {
           .catch(e => console.log(`Failed to get Oort profile`, e))
       }
 
+      // Make sure nulls are empty objects.
+      currentProfile ||= {}
+
       const newProfile = {
         ...currentProfile,
         ...profile,
       }
 
+      // TODO: Return the profile we've created. Need to enforce
+      // the GraphQL types when setting data otherwise we're able
+      // to set a value that can't be returned.
       await accountClient.kb_setProfile(coreId, newProfile)
-      return newProfile
+      return true
     },
   },
   Profile: {
@@ -117,9 +123,8 @@ const ThreeIDResolverComposition = {
   'Query.address': [setupContext()],
   'Query.addresses': [setupContext()],
   'Query.profile': [setupContext()],
-  'Mutation.updateThreeIDAddress': [setupContext(), isAuthorized()],
   'Query.profileFromAddress': [setupContext()],
-  'Mutation.updateThreeIDProfile': [setupContext(), isAuthorized()],
+  'Mutation.updateThreeIDProfile': [setupContext()],
 }
 
 export default composeResolvers(threeIDResolvers, ThreeIDResolverComposition)

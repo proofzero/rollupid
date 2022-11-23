@@ -85,7 +85,12 @@ export async function getRPCResult(response: Response) {
 
 // https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
 export function isEmptyObject(obj: any) {
-  return (obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
+  // console.log('obj', obj)
+  // console.log('Object.keys(obj).length', Object.keys(obj).length)
+  // console.log('Object.getPrototypeOf(obj)', Object.getPrototypeOf(obj))
+  // console.log('Object.prototype', Object.prototype)
+  // console.log('Object.getPrototypeOf(obj) == Object.prototype', Object.getPrototypeOf(obj) == Object.prototype)
+  return (obj && Object.keys(obj).length == 0) // This doesn't apply to TS: && Object.getPrototypeOf(obj) == Object.prototype)
 }
 
 export async function upgrayeddOortToAccount(coreId: string, accountClient, oortResponse) {
