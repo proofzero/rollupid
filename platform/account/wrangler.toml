@@ -7,7 +7,9 @@ workers_dev = false
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = []
+services = [
+  { binding = "Oort", service = "oort" },
+]
 
 [dev]
 port = 9494
@@ -17,19 +19,25 @@ local_protocol = "http"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = []
+services = [
+  { binding = "Oort", service = "oort-dev" },
+]
 
 [env.next]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = []
+services = [
+  { binding = "Oort", service = "oort-next" },
+]
 
 [env.current]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
-services = []
+services = [
+  { binding = "Oort", service = "oort-current" },
+]
 
 [[migrations]]
 tag = "v0"
