@@ -12,13 +12,13 @@ describe('Galaxy smoke tests', () => {
 })
 
 describe('Galaxy unit tests', () => {
-	test('isEmptyObject unhappy paths', async () => {
-		expect(isEmptyObject(null)).toBe(false)
-		expect(isEmptyObject(undefined)).toBe(false)
-		expect(isEmptyObject({ msg: 'I am a full object' })).toBe(false)
-	})
+  test('isEmptyObject unhappy paths', async () => {
+    expect(isEmptyObject(null)).toBe(false)
+    expect(isEmptyObject(undefined)).toBe(false)
+    expect(isEmptyObject({ msg: 'I am a full object' })).toBe(false)
+  })
 
-	test('isEmptyObject happy paths', async () => {
-		expect(isEmptyObject({})).toBe(true)
-	})
+  test('isEmptyObject happy paths', async () => {
+    expect(isEmptyObject({})).toBe(true)
+  })
 })
