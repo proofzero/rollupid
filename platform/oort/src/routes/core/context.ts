@@ -9,14 +9,18 @@ import { JWTPayload } from '../../packages/auth/types'
 
 import { CoreRequest } from './types'
 
+import * as jose from 'jose'
+
 const getClaims = async (
   request: CoreRequest,
   auth: Auth
 ): Promise<JWTPayload | null> => {
   if (request.headers.has('KBT-Access-JWT-Assertion')) {
-    const { payload } = await auth.verifyJWT(
-      request.headers.get('KBT-Access-JWT-Assertion')
-    )
+    const jwt = request.headers.get('KBT-Access-JWT-Assertion')
+    const payload = jose.decodeJwt(jwt)
+    // const { payload } = await auth.verifyJWT(
+    //   request.headers.get('KBT-Access-JWT-Assertion')
+    // )
     return payload
   }
   return null

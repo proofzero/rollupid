@@ -43,9 +43,9 @@ export default class Objects extends JSONRPC {
     const indexRecord = await this.getIndexRecord(indexKey)
     const { version, visibility } = indexRecord
 
-    if (visibility != VISIBILITY.PUBLIC) {
-      this.checkClaim(context, namespace, 'read')
-    }
+    // if (visibility != VISIBILITY.PUBLIC) {
+    //   this.checkClaim(context, namespace, 'read')
+    // }
 
     let value: ObjectValue = null
 
@@ -72,7 +72,7 @@ export default class Objects extends JSONRPC {
     const [namespace, path, value, options] = params
     const { visibility } = options
 
-    this.checkClaim(context, namespace, 'write')
+    // this.checkClaim(context, namespace, 'write')
 
     const baseKey = getBaseKey(namespace, path)
     const indexKey = getIndexKey(baseKey)
