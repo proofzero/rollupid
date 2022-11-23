@@ -42,7 +42,7 @@ export default async (
       const client = getCoreClient(address)
       return client.kb_unsetAddress()
     },
-    async kb_resolveAddress(address: string): Promise<string> {
+    async kb_resolveAddress(address: string): Promise<string | undefined> {
       const client = getCoreClient(address)
       const coreId = await client.kb_resolveAddress()
       if (coreId) {
@@ -52,7 +52,7 @@ export default async (
         if (response.ok) {
           const { coreId }: { coreId: string } = await response.json()
           await client.kb_setAddress(address, coreId)
-          return coreId
+          return client.kb_resolveAddress()
         } else {
           const type = getType(address)
           if (type != 'eth') {
@@ -61,7 +61,7 @@ export default async (
 
           const coreId = hexlify(randomBytes(ADDRESS_OPTIONS.length))
           await client.kb_setAddress(address, coreId)
-          return coreId
+          return client.kb_resolveAddress()
         }
       }
     },

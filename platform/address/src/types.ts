@@ -38,7 +38,7 @@ export interface CoreApi extends BaseApi {
 export interface WorkerApi extends BaseApi {
   kb_setAddress(address: string, coreId: string): void
   kb_unsetAddress(address: string): void
-  kb_resolveAddress(address: string): string
+  kb_resolveAddress(address: string): Promise<string | undefined>
   kb_getNonce(
     template: string,
     clientId: string,
