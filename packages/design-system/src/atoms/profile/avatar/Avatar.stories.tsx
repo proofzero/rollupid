@@ -6,7 +6,7 @@ import { Avatar, AvatarProps } from './Avatar'
 // import MDXDoc from './Text.documentation.mdx'
 
 export default {
-  title: 'Atoms/Avatar',
+  title: 'Atoms/Profile/Avatar',
   component: Avatar,
   argTypes: {
     src: {

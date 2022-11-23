@@ -4,7 +4,7 @@ import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
-import { Text, Avatar } from '@kubelt/design-system'
+import { Text, Avatar, Cover } from '@kubelt/design-system'
 
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
@@ -290,18 +290,11 @@ const ProfileRoute = () => {
         />
       </div>
 
-      <div
-        className={`h-[300px] w-full max-w-7xl mx-auto relative flex justify-center rounded-b-xl ${
+      <Cover
+        src={gatewayFromIpfs(coverUrl)}
+        className={`max-w-7xl mx-auto flex justify-center ${
           !handlingCover ? 'hover-child-visible' : ''
         }`}
-        style={{
-          backgroundImage: coverUrl
-            ? `url(${gatewayFromIpfs(coverUrl)})`
-            : undefined,
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-        }}
       >
         {isOwner && (
           <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-800/25 rounded-b-xl">
@@ -346,7 +339,7 @@ const ProfileRoute = () => {
             )}
           </div>
         )}
-      </div>
+      </Cover>
 
       <div className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-end px-8 mt-[-6em]">
         <Avatar
