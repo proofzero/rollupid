@@ -23,6 +23,12 @@ const withCore = async (
 ): Promise<void | Response> => {
   const { Address, Core } = env
 
+  const coreId = request.headers.get('KBT-Core-Id')
+  if (coreId) {
+    request.core = Core.get(Core.idFromString(coreId))
+    return
+  }
+
   let address = request.headers.get('KBT-Core-Address')
   if (!address && request.headers.has('KBT-Access-JWT-Assertion')) {
     const token = request.headers.get('KBT-Access-JWT-Assertion')
