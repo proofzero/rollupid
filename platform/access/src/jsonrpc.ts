@@ -19,6 +19,7 @@ import {
   Scope,
   WorkerApi,
 } from './types'
+import { URN } from '@kubelt/security'
 
 export default async (
   request: Request,
@@ -48,13 +49,13 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
-      coreId: string,
+      accountUrn: string,
       clientId: string,
       redirectUri: string,
       scope: Scope,
       state: string
     ): Promise<AuthorizeResult> {
-      if (!coreId) {
+      if (!accountUrn) {
         throw 'missing core identifier'
       }
 
@@ -70,16 +71,31 @@ export default async (
         throw 'missing scope'
       }
 
-      const client = getAuthorizationClient(`${coreId}/${clientId}`)
-      return client.authorize(coreId, clientId, redirectUri, scope, state)
+      const { descriptors } = await URN.parseUrn(accountUrn)
+      const { name: account } = descriptors as URN.DESCRIPTORS
+      if (!account) {
+        throw `missing account name in URN: ${accountUrn}`
+      }
+
+      const authorizationUrn = URN.generateUrn(
+        'access',
+        'threeid.xyz',
+        'authorization',
+        { account, clientId }
+      )
+
+      const client = getAuthorizationClient(authorizationUrn)
+      return client.authorize(account, clientId, redirectUri, scope, state)
     },
     async kb_exchangeToken(
+      // todo: should overload this with diff params
       grantType: GrantType,
       code: string,
       redirectUri: string,
       clientId: string,
       clientSecret: string
     ): Promise<ExchangeAuthorizationCodeResult> {
+      console.log({ clientId, clientSecret })
       if (!grantType) {
         throw 'missing grant type'
       }
@@ -102,9 +118,13 @@ export default async (
 
       switch (grantType) {
         case GrantType.AuthenticationCode: {
-          const authorizationClient = getAuthorizationClient(
-            `${clientSecret}/${clientId}`
+          const authorizationUrn = URN.generateUrn(
+            'access',
+            'threeid.xyz',
+            'authorization',
+            { account: clientSecret, clientId }
           )
+          const authorizationClient = getAuthorizationClient(authorizationUrn)
           return authorizationClient.exchangeCode(code, redirectUri, clientId)
         }
       }

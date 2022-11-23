@@ -39,9 +39,7 @@ import * as tokenUtil from './token'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
-import type {
-  Scope,
-} from '@kubelt/security/scopes'
+import type { Scope } from '@kubelt/security/scopes'
 
 import { SCOPES_JSON } from '@kubelt/security/scopes'
 
@@ -50,6 +48,7 @@ import { SCOPES_JSON } from '@kubelt/security/scopes'
 
 // Import the OpenRPC schema for this API.
 import schema from './schema'
+import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -482,36 +481,37 @@ const kb_initPlatform = openrpc.extension(schema, {
       const keys = []
 
       //
-      // StarbaseApplication: CONSOLE
+      // AcmeCorp App
       //
 
       // Fetch fixture data for "console" platform app.
-      const consoleName = 'console'
-      const consoleKey = `${env}-${consoleName}`
-      const consoleData = await fixtures.get(consoleKey, { type: 'json' })
-      const consoleSecret = _.get(consoleData, 'clientSecret')
-      if (consoleSecret === undefined) {
-        throw new Error(`console fixture missing "clientSecret" property`)
+      const acmeName = 'acmecorp'
+      const acmeKey = `${env}-${acmeName}`
+      const acmeData = await fixtures.get(acmeKey, { type: 'json' })
+      const acmeSecret = _.get(acmeData, 'clientSecret')
+
+      if (acmeSecret === undefined) {
+        console.error(`console fixture missing "clientSecret" property`)
       }
 
       // If the key was not present we get a null response.
-      if (consoleData) {
+      if (acmeData) {
         // NB: when core .name or .id is undefined a randomly generated
         // ID is used.
         const con = await openrpc.discover(sbApplication, {
-          tag: 'starbase-app',
+          tag: 'acmecorp-app',
         })
         const conResult = await con.init({
-          app: _.set(consoleData, 'clientSecret', consoleSecret),
+          app: _.set(acmeData, 'clientSecret', acmeSecret),
         })
         if (conResult.error) {
           throw new Error(conResult.error)
         }
 
         // Delete the stored fixture data now that the DO has been created.
-        await fixtures.delete(consoleKey)
+        await fixtures.delete(acmeKey)
 
-        const clientId = _.get(consoleData, 'clientId')
+        const clientId = _.get(acmeData, 'clientId')
         if (clientId === undefined) {
           throw new Error(`console fixture missing "clientId" property`)
         }
@@ -519,51 +519,9 @@ const kb_initPlatform = openrpc.extension(schema, {
 
         await lookup.put(clientId, appId)
 
-        console.log(`console: clientId:${clientId} => appId:${appId}`)
+        console.log(`acmecorp: clientId:${clientId} => appId:${appId}`)
 
-        keys.push(consoleKey)
-      }
-
-      //
-      // StarbaseApplication: THREEID
-      //
-
-      // Fetch fixture data for "threeid" platform app.
-      const threeidName = 'threeid'
-      const threeidKey = `${env}-${threeidName}`
-      const threeidData = await fixtures.get(threeidKey, { type: 'json' })
-      const threeidSecret = _.get(threeidData, 'clientSecret')
-      if (threeidSecret === undefined) {
-        throw new Error(`threeid fixture missing "clientSecret" property`)
-      }
-
-      // If the key was not present we get a null response.
-      if (threeidData) {
-        // NB: when core name is undefined a randomly generated ID is used.
-        const threeid = await openrpc.discover(sbApplication, {
-          tag: 'starbase-app',
-        })
-        const threeidResult = await threeid.init({
-          app: _.set(threeidData, 'clientSecret', threeidSecret),
-        })
-        if (threeidResult.error) {
-          throw new Error(threeidResult.error)
-        }
-
-        // Delete the stored fixture data now that the DO has been created.
-        await fixtures.delete(threeidKey)
-
-        const clientId = _.get(threeidData, 'clientId')
-        if (clientId === undefined) {
-          throw new Error(`threeid fixture missing "clientId" property`)
-        }
-        const appId: string = <string>threeid.$.id
-
-        await lookup.put(clientId, appId)
-
-        console.log(`threeid: clientId:${clientId} => appId:${appId}`)
-
-        keys.push(threeidKey)
+        keys.push(acmeKey)
       }
 
       // RESULT
@@ -640,7 +598,8 @@ const kb_appProfile = openrpc.method(schema, {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
-      const clientId = _.get(request, ['params', 'clientId'])
+      const [clientId] = request.params as ParamsArray
+      // const clientId = _.get(request, ['params', 'clientId'])
       if (!clientId) {
         throw new Error(`missing client ID`)
       }

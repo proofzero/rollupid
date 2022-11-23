@@ -29,12 +29,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const ids = await sbClient.kb_initPlatform() // TODO: temporary until console is complete
     console.log('ids', ids)
-    return null
   } catch (e) {
     console.error(e)
-    throw json({ message: 'Failed to init starbase' }, 500)
   }
   // ======================= TEMPOARY =======================
+  return null
 }
 
 export default function Authorize() {

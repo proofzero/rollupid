@@ -11,7 +11,10 @@ export interface BaseApi {
 }
 
 export interface DurableObjectApi extends BaseApi {
-  get(key: string): Promise<unknown>
+  getType(): string | undefined
+  setType(type: string): Promise<void>
+  getName(): string | undefined
+  setName(name: string): Promise<void>
 }
 
 /**

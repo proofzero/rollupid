@@ -1,11 +1,15 @@
-import { Button } from '@kubelt/design-system'
+import { Avatar, Button } from '@kubelt/design-system'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
-import publicProfileScopeIcon from './profile-scope-icon.svg'
+import subtractLogo from '../../assets/subtract-logo.svg'
+import iIcon from '../../assets/i.svg'
+import accountClassIcon from './account-class-icon.svg'
+import addressClassIcon from './address-class-icon.svg'
 
 export type ScopeMeta = {
   name: string
   description: string
+  class: string
 }
 
 export type AppProfile = {
@@ -28,32 +32,27 @@ export type AuthorizationProps = {
   scopeMeta: Record<string, ScopeMeta>
 }
 
+const scopeIcons = {
+  account: accountClassIcon,
+  address: addressClassIcon,
+}
+
 export function Authorization({
   appProfile,
   userProfile,
   scopeMeta,
 }: AuthorizationProps) {
-  const scopeFamilies = new Set(
-    appProfile?.scopes.map((scope) => scope.split('.')[0])
-  )
-  let collapsedScopes: Record<string, ScopeMeta> = {}
-  scopeFamilies.forEach((family) => {
-    collapsedScopes[family] =
-      scopeMeta[`${family}.write`] || scopeMeta[`${family}.read`]
-  })
-
   return (
     <div className={'flex flex-col gap-4 basis-96'}>
       <div className={'flex flex-row items-center justify-center'}>
-        <img className={''} src={appProfile.logo} alt="App Logo" />
-        <img src={authorizeCheck} alt="Authorize Check" />
-        {/* TODO: replace with avatar component */}
-        <img
+        <Avatar
           src={userProfile.pfp.url}
-          style={{ width: 50 }}
+          hex={userProfile.pfp.isToken}
+          size={'sm'}
           alt="User Profile"
         />
-        {/*  */}
+        <img src={authorizeCheck} alt="Authorize Check" />
+        <img className={''} src={appProfile.logo} alt="App Logo" />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
         <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
@@ -71,18 +70,41 @@ export function Authorization({
           </p>
           <ul
             style={{ color: '#6B7280' }}
-            className={'flex flex-col font-light text-base'}
+            className={'flex flex-col font-light text-base gap-2'}
           >
-            {Object.keys(collapsedScopes).map((scope, i) => {
+            {appProfile.scopes.map((scope, i) => {
               return (
                 <li key={i} className={'flex flex-row gap-4 items-center'}>
                   <span>
                     <img
-                      src={publicProfileScopeIcon}
-                      alt={`${collapsedScopes[scope].name} Icon`}
+                      src={scopeIcons[scopeMeta[scope].class]}
+                      alt={`${scope} Icon`}
                     />
                   </span>
-                  {collapsedScopes[scope].name}
+                  {scopeMeta[scope].name}
+                  <span
+                    className={'cursor-pointer'}
+                    data-popover-target={`popover-${scope}`}
+                    data-tooltip-placement="right"
+                  >
+                    <img src={iIcon} alt={`${scopeMeta[scope].name} info`} />
+                  </span>
+                  <div
+                    data-popover
+                    id={`popover-${scope}`}
+                    role="tooltip"
+                    className="absolute z-10 invisible inline-block min-w-64 text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800"
+                  >
+                    <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 rounded-t-lg dark:border-gray-600 dark:bg-gray-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {scope}
+                      </h3>
+                    </div>
+                    <div className="px-3 py-2">
+                      <p>{scopeMeta[scope].description}</p>
+                    </div>
+                    <div data-popper-arrow></div>
+                  </div>
                 </li>
               )
             })}
@@ -92,6 +114,12 @@ export function Authorization({
       <div className={'flex flex-row items-center justify-center gap-4'}>
         <Button tertiary>Cancel</Button>
         <Button alt>Continue</Button>
+      </div>
+      <div className={'flex flex-row items-center justify-center gap-2 mt-8'}>
+        <img className={'w-4'} src={subtractLogo} alt="powered by logo" />
+        <p style={{ color: '#6B7280' }} className={'font-light text-sm'}>
+          Powered by Kubelt
+        </p>
       </div>
     </div>
   )

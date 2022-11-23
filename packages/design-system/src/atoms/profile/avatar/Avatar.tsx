@@ -11,7 +11,7 @@ export type AvatarProps = HTMLAttributes<HTMLDivElement> & {
   src: string
   hex?: boolean
   border?: boolean
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'xs' | 'sm' | 'md' | 'lg'
 }
 
 export const Avatar = ({
@@ -27,7 +27,8 @@ export const Avatar = ({
     <div
       className={classNames(
         { 'bg-white z-[100]': border },
-        { 'w-12 h-12': size === 'sm' },
+        { 'w-12 h-12': size === 'xs' },
+        { 'w-16 h-16': size === 'sm' },
         { 'w-40 h-40': size === 'md' },
         { 'w-48 h-48': size === 'lg' },
         { 'rounded-full': !hex },
@@ -51,10 +52,11 @@ export const Avatar = ({
         className={classNames(
           'bg-white',
           { 'border-white': border },
-          { border: border && size === 'sm' },
+          { border: border && size === 'sm' }, // TODO: what is the xs border?
           { 'border-4': border && size === 'md' },
           { 'border-8': border && size === 'lg' },
-          { 'w-12 h-12': size === 'sm' },
+          { 'w-12 h-12': size === 'xs' },
+          { 'w-16 h-16': size === 'sm' },
           { 'w-40 h-40': size === 'md' },
           { 'w-48 h-48': size === 'lg' },
           { 'rounded-full': !hex }

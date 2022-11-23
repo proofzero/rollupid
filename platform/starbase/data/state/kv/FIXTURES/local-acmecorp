@@ -1,0 +1,21 @@
+{
+  "published": true,
+  "clientId": "f5f43b2354c644360f6ba49c9e7b5e5b",
+  "clientSecret": "3a9d793f64b8a05a3905a729f16cb03ff29be10d",
+  "redirectURI": "http://acme.co/token",
+  "domains": [
+    "http://acme.co"
+  ],
+  "scopes": [
+    "scope://threeid.xyz/profile.read"
+  ],
+  "termsURL": "http://acme.co/tos",
+  "websiteURL": "http://acme.co",
+  "mirrorURL": "",
+  "discordURL": "",
+  "mediumUser": "",
+  "twitterUser": "@acmecorp",
+  "createdDate": "Tue, 18 Oct 2022 19:34:07 GMT",
+  "name": "Acme Corp",
+  "icon": "https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/ab55f8e8-1566-44b2-0934-730b9635a000/formpreview"
+}

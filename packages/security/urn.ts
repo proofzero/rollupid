@@ -11,9 +11,12 @@ import psl from 'psl'
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type ID_DESCRIPTOR = 'id'
-export type NAME_DESCRIPTOR = 'name'
-export type DESCRIPTOR = ID_DESCRIPTOR | NAME_DESCRIPTOR
+export type URN = {
+  service: string
+  domain: string
+  object: string
+  descriptors: Partial<Record<DESCRIPTORS, string>>
+}
 
 // Definitions
 // -----------------------------------------------------------------------------
@@ -22,6 +25,14 @@ export type DESCRIPTOR = ID_DESCRIPTOR | NAME_DESCRIPTOR
 
 export const DEFAULT_DOMAIN = 'threeid.xyz'
 
+export enum DESCRIPTOR {
+  NAME = 'name',
+  TYPE = 'type',
+}
+export type DESCRIPTORS = {
+  [key: string]: string
+} & DESCRIPTOR
+
 // generateUrn()
 // -----------------------------------------------------------------------------
 
@@ -29,32 +40,37 @@ export function generateUrn(
   service: string,
   domain: string,
   object: string,
-  descriptor: DESCRIPTOR,
-  value: string
+  descriptors: Partial<Record<DESCRIPTORS, string>>
 ): string {
-  return `object://${service}.${domain}/${object}/?${descriptor}=${value}`
+  const queryParams = new URLSearchParams(descriptors)
+  return `object://${service}.${domain}/${object}/?${queryParams}`
 }
 
 // parseUrn()
 // -----------------------------------------------------------------------------
 
-export function parseUrn(urn: string): {
-  service: string
-  domain: string
-  object: string
-  descriptor: string
-  value: string
-} {
+export function parseUrn(urn: string): URN {
   const url = new URL(urn.replace('object://', 'https://'))
-  const parsed = psl.parse(urn)
+  const parsed = psl.parse(url.hostname)
   if (!parsed) {
-    throw new Error('Invalid URN')
+    throw new Error('Invalid 3RN')
   }
   const { subdomain: service, domain } = parsed as psl.ParsedDomain
   if (!service || !domain) {
-    throw new Error('Invalid URN')
+    throw new Error('Invalid 3RN')
   }
-  const object = url.pathname.replace('/', '')
-  const [descriptor, value] = url.search.replace('?', '').split('=')
-  return { service, domain, object, descriptor, value }
+  if (!url.searchParams.get(DESCRIPTOR.TYPE)) {
+    throw new Error('3RN missing type descriptor')
+  }
+  if (!url.searchParams.get(DESCRIPTOR.NAME)) {
+    throw new Error('3RN missing name descriptor')
+  }
+
+  const object = url.pathname.replace(new RegExp('/', 'g'), '')
+  return {
+    service,
+    domain,
+    object,
+    descriptors: Object.fromEntries(url.searchParams),
+  }
 }

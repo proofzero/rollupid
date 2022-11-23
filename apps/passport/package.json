@@ -16,8 +16,10 @@
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "echo \"No dev for passport. Please use start.\"",
     "start": "run-p \"dev:*\"",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
+    "storybook:start": "start-storybook -p 6006",
+    "storybook": "run-p \"storybook:*\"",
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },
   "dependencies": {
     "@datadog/browser-rum": "4.19.0",
@@ -38,6 +40,7 @@
     "connectkit": "1.0.0",
     "cross-env": "7.0.3",
     "ethers": "5.7.0",
+    "flowbite": "1.5.4",
     "graphql": "16.6.0",
     "graphql-request": "5.0.0",
     "graphql-tag": "2.12.6",
@@ -64,6 +67,7 @@
     "@storybook/builder-webpack5": "6.5.13",
     "@storybook/manager-webpack4": "^6.5.13",
     "@storybook/manager-webpack5": "6.5.13",
+    "@storybook/preset-create-react-app": "4.1.2",
     "@storybook/react": "^6.5.13",
     "@storybook/testing-library": "^0.0.13",
     "@types/node": "18.11.9",

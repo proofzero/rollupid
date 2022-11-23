@@ -8,6 +8,7 @@ compatibility_date = "2022-04-05"
 services = [
   { binding = "Account", service = "account"},
   { binding = "Access", service = "access"},
+  { binding = "Address", service = "address"},
   { binding = "Galaxy", service = "galaxy"},
   { binding = "Starbase", service = "starbase"},
 ]
@@ -24,6 +25,7 @@ local_protocol = "http"
 
 [vars]
 THREEID_APP_URL = "http://localhost:9797"
+PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 
 
 [env.dev]
@@ -33,12 +35,15 @@ routes = [
 services = [
   { binding = "Account", service = "account-dev"},
   { binding = "Access", service = "access-dev"},
+  { binding = "Address", service = "address-dev"},
   { binding = "Galaxy", service = "galaxy-dev"},
   { binding = "Starbase", service = "starbase-dev"},
 ]
 
 [env.dev.vars]
 THREEID_APP_URL = "https://3id-dev.kubelt.com"
+PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
+
 
 [env.next]
 routes = [
@@ -47,6 +52,7 @@ routes = [
 services = [
   { binding = "Account", service = "account-next"},
   { binding = "Access", service = "access-next"},
+  { binding = "Address", service = "address-next"},
   { binding = "Galaxy", service = "galaxy-next"},
   { binding = "Starbase", service = "starbase-next"},
 
@@ -54,6 +60,7 @@ services = [
 
 [env.next.vars]
 THREEID_APP_URL = "https://3id-next.kubelt.com"
+PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 
 [env.next.build]
   command = "yarn build"
@@ -65,6 +72,7 @@ routes = [
 services = [
   { binding = "Account", service = "account-current"},
   { binding = "Access", service = "access-current"},
+  { binding = "Address", service = "address-current"},
   { binding = "Galaxy", service = "galaxy-current"},
   { binding = "Starbase", service = "starbase-current"},
 
@@ -72,6 +80,7 @@ services = [
 
 [env.current.vars]
 THREEID_APP_URL = "https://3id.kubelt.com"
+PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 
 [env.current.build]
   command = "yarn build"

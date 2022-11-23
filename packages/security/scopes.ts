@@ -12,6 +12,7 @@ type Scope = symbol
 interface ScopeDescriptor {
   name: string
   description: string
+  class: string
 }
 
 interface ScopeMap {
@@ -21,40 +22,68 @@ interface ScopeMap {
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type {
-  Scope,
-}
+export type { Scope }
 
 // Definitions
 // -----------------------------------------------------------------------------
+
+// RESTRICTED
+
+/**
+ * The scope representing the admin permissions for an account.
+ *
+ * @alpha
+ */
+export const SCOPE_ADMIM: Scope = Symbol.for('scope://threeid.xyz/admin.admin')
+
+// GENERAL
 
 /**
  * The scope representing the ability to read profile data.
  *
  * @alpha
  */
-export const SCOPE_PROFILE_READ: Scope = scope('scope.kubelt.com/profile/read')
+export const SCOPE_PROFILE_READ: Scope = Symbol.for(
+  'scope://threeid.xyz/profile.read'
+)
 
 /**
  * The scope representing the ability to write profile data.
  *
  * @alpha
  */
-export const SCOPE_PROFILE_WRITE: Scope = scope('scope.kubelt.com/profile/write')
+export const SCOPE_PROFILE_WRITE: Scope = Symbol.for(
+  'scope://threeid.xyz/profile.write'
+)
 
 /**
- * The scope representing the ability to read account data.
+ * The scope representing the ability to read visible connected blockchain accounts.
  *
  * @alpha
  */
-export const SCOPE_ACCOUNT_READ: Scope = scope('scope.kubelt.com/account/read')
+export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = Symbol.for(
+  'scope://threeid.xyx/connected-accounts.read'
+)
+
+// SPECIALIZED SCOPES
 
 /**
- * The scope representing the ability to write account data.
+ * The scope representing the ability to manage and create a specific dedicated account.
  *
  * @alpha
  */
-export const SCOPE_ACCOUNT_WRITE: Scope = Symbol.for('scope.kubelt.com/account/write')
+export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = Symbol.for(
+  'scope://threeid.xyz/blockchain-account/{{ account }}.manage'
+)
+
+/**
+ * The scope representing the ability to transact using a specific dedicated account.
+ *
+ * @alpha
+ */
+export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = Symbol.for(
+  'scope://threeid.xyz/blockchain-account/transact/{{ account }}.write'
+)
 
 /**
  * All platform scopes with their descriptors.
@@ -65,19 +94,29 @@ export const SCOPES: ScopeMap = {
   [SCOPE_PROFILE_READ]: {
     name: 'Public Profile',
     description: 'Read your profile data.',
+    class: 'account',
   },
   [SCOPE_PROFILE_WRITE]: {
     name: 'Edit Profile',
     description: 'Write your profile data.',
+    class: 'account',
   },
-  [SCOPE_ACCOUNT_READ]: {
-    name: 'Accounts',
-    description: 'Read your connected accounts.',
+  [SCOPE_CONNECTED_ACCOUNTS_READ]: {
+    name: 'Connected Accounts',
+    description: 'Read your visible connected blockchain accounts.',
+    class: 'address',
   },
-  [SCOPE_ACCOUNT_WRITE]: {
-    name: 'Modify Accounts',
-    description: 'Modify your connected accounts.',
-  },
+  // NOT READY YET
+  // [SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE]: {
+  //   name: 'Create Dedicated Blockchain Account',
+  //   description:
+  //     'Create and manage a dedicated blockchain account isolated for this application.',
+  // },
+  // [SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT]: {
+  //   name: 'Transact with Dedicated Blockchain Account',
+  //   description:
+  //     'Ability to transact on your behalf for a specific dedicated blockchain account.',
+  // },
 }
 
 /**
@@ -86,7 +125,6 @@ export const SCOPES: ScopeMap = {
  * @alpha
  */
 export const ALL_SCOPES = new Set(Object.keys(SCOPES))
-
 
 /**
  * Convert symbol keys to their string descriptions since

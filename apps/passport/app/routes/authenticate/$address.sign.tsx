@@ -1,4 +1,4 @@
-import { json } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import {
   useNavigate,
@@ -12,7 +12,8 @@ import { Button } from '@kubelt/design-system'
 
 import { useEffect, useState } from 'react'
 import { createUserSession } from '~/session.server'
-import { getAuthenticationClientWithAddress } from '~/platform.server'
+import { getAccessClient, getAddressClient } from '~/platform.server'
+import { ResponseType } from '@kubelt/platform.access/src/types'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -25,27 +26,36 @@ This will not trigger a blockchain transaction or cost any gas fees.
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
-  const client = getAuthenticationClientWithAddress(address as string)
-  const nonce = await client.kb_getNonce(address as string, signMessageTemplate)
-  console.log('nonce', nonce)
+  const state = Math.random().toString(36).substring(7)
+  const addressClient = getAddressClient(address as string, 'eth')
+  const nonce = await addressClient.kb_getNonce(
+    signMessageTemplate,
+    params.address as string, // as client_id
+    PASSPORT_REDIRECT_URL,
+    ['admin'],
+    state
+  )
+  console.log('loader', { nonce })
   // TODO: handle the error case
 
   return json({ nonce, address })
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
-  const client = getAuthenticationClientWithAddress(params.address)
+  const { address } = params
+  const addressClient = getAddressClient(address as string, 'eth')
   const formData = await request.formData()
-  const authenticationToken = await client.kb_verifyNonce(
-    formData.get('nonce'),
-    formData.get('signature')
+
+  // TODO: validate from data
+  const { code } = await addressClient.kb_verifyNonce(
+    formData.get('nonce') as string,
+    formData.get('signature') as string
   )
+
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
-  return createUserSession(
-    authenticationToken,
-    `/authorize?${searchParams}`,
-    params.address
+  return redirect(
+    `/authenticate/${params.address}/token?${searchParams}&code=${code}`
   )
 }
 
@@ -53,8 +63,10 @@ export default function Sign() {
   const [signing, setSigning] = useState(false)
   const navigate = useNavigate()
   const submit = useSubmit()
-  const { nonce, address } = useLoaderData()
+  const { nonce, address, state } = useLoaderData()
   const nonceMessage = signMessageTemplate.replace('{{nonce}}', nonce)
+
+  console.log('client', { nonce })
 
   // const { connect, connectors, error, isLoading, pendingConnector } =
   //   useConnect()
@@ -66,7 +78,7 @@ export default function Sign() {
         { signature: data, nonce },
         {
           method: 'post',
-          action: `/authenticate/sign/${address}${window.location.search}`,
+          action: `/authenticate/${address}/sign/${window.location.search}`,
         }
       )
     },

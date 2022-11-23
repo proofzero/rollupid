@@ -40,12 +40,25 @@ export default class DurableObject<
   env: Environment
   storage: DurableObjectStorage
   context?: Context
+  coreType: string | undefined
+  coreName: string | undefined
 
   constructor(state: DurableObjectState, env: Environment) {
     this.id = state.id.toString()
     this.env = env
     this.state = state
     this.storage = state.storage
+
+    // TODO: what else should we bootstrap into memory?
+    // `blockConcurrencyWhile()` ensures no requests are delivered until
+    // initialization completes.
+    this.state.blockConcurrencyWhile(async () => {
+      const coreType = (await this.storage.get('core-type')) as string
+      this.coreType = coreType || undefined
+
+      const coreName = (await this.storage.get('core-name')) as string
+      this.coreName = coreName || undefined
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -53,9 +66,27 @@ export default class DurableObject<
     throw new Error('not implemented')
   }
 
-  get(key: string): Promise<unknown> {
-    return this.storage.get(key)
+  getType(): string | undefined {
+    return this.coreType
   }
+
+  setType(type: string): Promise<void> {
+    this.coreType = type
+    return this.storage.put('core-type', type)
+  }
+
+  getName(): string | undefined {
+    return this.coreName
+  }
+
+  setName(name: string): Promise<void> {
+    this.coreName = name
+    return this.storage.put('core-name', name)
+  }
+
+  // get(key: string): Promise<unknown> {
+  //   return this.storage.get(key)
+  // }
 
   async fetch(request: Request): Promise<Response> {
     const context: Context = {}

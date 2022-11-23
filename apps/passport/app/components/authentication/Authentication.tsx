@@ -1,4 +1,5 @@
 import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
+import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
 
 export type AuthenticationProps = {
@@ -31,6 +32,12 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
+      <div className={'flex flex-row items-center justify-center gap-2 mt-8'}>
+        <img className={'w-4'} src={subtractLogo} alt="powered by logo" />
+        <p style={{ color: '#6B7280' }} className={'font-light text-sm'}>
+          Powered by Kubelt
+        </p>
+      </div>
     </div>
   )
 }

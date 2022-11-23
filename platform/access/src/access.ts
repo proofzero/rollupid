@@ -27,14 +27,15 @@ export default class Access extends DurableObject<Environment, Api> {
   }
 
   async generate(
-    coreId: string,
+    account: string,
     clientId: string,
     scope: Scope
   ): Promise<GenerateResult> {
     const { alg, ttl } = JWT_OPTIONS
     const { privateKey: key } = await this.getJWTSigningKeyPair()
+
     await this.storage.put<AccessParameters>('params', {
-      coreId,
+      account,
       clientId,
       scope,
     })
@@ -47,7 +48,7 @@ export default class Access extends DurableObject<Environment, Api> {
       .setIssuedAt()
       .setIssuer(objectId)
       .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
-      .setSubject(coreId)
+      .setSubject(account) // TODO: should this be just the account name?
       .sign(key)
 
     const refreshToken = await new jose.SignJWT({})
@@ -55,7 +56,7 @@ export default class Access extends DurableObject<Environment, Api> {
       .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
       .setIssuedAt()
       .setIssuer(objectId)
-      .setSubject(coreId)
+      .setSubject(account) // TODO: should this be just the account name?
       .sign(key)
 
     return {
@@ -72,14 +73,14 @@ export default class Access extends DurableObject<Environment, Api> {
   }
 
   async refresh(token: string): Promise<RefreshAuthorizationResult> {
-    await this.verify(token)
+    await this.verify(token) // @sonmez: does this throw an exception?
     const params = await this.storage.get<AccessParameters>('params')
     if (!params) {
       throw 'missing access parameters'
     }
 
-    const { coreId, clientId, scope } = params
-    return this.generate(coreId, clientId, scope)
+    const { account, clientId, scope } = params
+    return this.generate(account, clientId, scope)
   }
 
   async getJWTSigningKeyPair(): Promise<KeyPair> {

@@ -1,6 +1,7 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { DurableObject } from '@kubelt/platform.commons'
+import { URN } from '@kubelt/security'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
@@ -19,22 +20,28 @@ import {
 export default class Authorization extends DurableObject<Environment, Api> {
   methods(): Api {
     return {
-      get: this.get.bind(this),
+      // get: this.get.bind(this),
+      getType: this.getType.bind(this),
+      setType: this.setType.bind(this),
+      getName: this.getName.bind(this),
+      setName: this.setName.bind(this),
       authorize: this.authorize.bind(this),
       exchangeCode: this.exchangeCode.bind(this),
     }
   }
 
   async authorize(
-    coreId: string,
+    account: string,
     clientId: string,
     redirectUri: string,
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult> {
+    console.log({ account, clientId, redirectUri, scope, state })
+
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     await this.storage.put({
-      coreId,
+      account,
       clientId,
       [`codes/${code}`]: { redirectUri, scope, state },
     })
@@ -49,9 +56,11 @@ export default class Authorization extends DurableObject<Environment, Api> {
   ): Promise<ExchangeAuthorizationCodeResult> {
     const { Access } = this.env
 
-    const coreId = await this.storage.get<string>('coreId')
-    if (!coreId) {
-      throw 'missing core identifier'
+    const account = await this.storage.get<string>('account')
+
+    console.log('account', account)
+    if (!account) {
+      throw 'missing account name'
     }
 
     const request = await this.storage.get<AuthorizationRequest>(
@@ -70,6 +79,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const { scope } = request
     const access = Access.get(Access.newUniqueId())
     const client = createFetcherJsonRpcClient<AccessApi>(access)
-    return client.generate(coreId, clientId, scope)
+    return client.generate(account, clientId, scope)
   }
 }

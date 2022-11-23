@@ -4994,6 +4994,7 @@ __metadata:
     "@storybook/builder-webpack5": 6.5.13
     "@storybook/manager-webpack4": ^6.5.13
     "@storybook/manager-webpack5": 6.5.13
+    "@storybook/preset-create-react-app": 4.1.2
     "@storybook/react": ^6.5.13
     "@storybook/testing-library": ^0.0.13
     "@tailwindcss/forms": 0.5.3
@@ -5025,6 +5026,7 @@ __metadata:
     eslint-plugin-standard: 5.0.0
     eslint-plugin-storybook: 0.6.7
     ethers: 5.7.0
+    flowbite: 1.5.4
     graphql: 16.6.0
     graphql-request: 5.0.0
     graphql-tag: 2.12.6
@@ -22073,6 +22075,16 @@ __metadata:
     react-dom: ^18
     tailwindcss: ^3
   checksum: 97f9770e42937d3a9f29845f6d52ffe6c76a9b76f974328ad4273c98c85e196fc58f22ca16fbadc31682af847accec1a87789c81f175baf876284731f85deeac
+  languageName: node
+  linkType: hard
+
+"flowbite@npm:1.5.4":
+  version: 1.5.4
+  resolution: "flowbite@npm:1.5.4"
+  dependencies:
+    "@popperjs/core": ^2.9.3
+    mini-svg-data-uri: ^1.4.3
+  checksum: bed458380ec26eb3007669758ccf2276017ae7d9c60c80ba4090fe119e56bab071b3dc1ad9b8a9123478b0f1a8c082be6a1676fc4a6f04a3df3c4577e916be97
   languageName: node
   linkType: hard
 
