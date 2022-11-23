@@ -1,8 +1,6 @@
 {
   /* Visit https://aka.ms/tsconfig to read more about this file */
-  "exclude": [
-    "dist",
-  ],
+  "exclude": ["dist"],
   "compilerOptions": {
     // Generate output into this directory.
     "outDir": "dist",
@@ -15,6 +13,7 @@
     "target": "esnext",
     // Specify what module code is generated.
     "module": "es2022",
+    "moduleResolution": "node",
     // Emit additional JavaScript to ease support for importing CommonJS
     // modules. This enables 'allowSyntheticDefaultImports' for type
     // compatibility.
