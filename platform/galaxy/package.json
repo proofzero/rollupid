@@ -3,14 +3,17 @@
   "version": "0.0.0",
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
+    "@jest/globals": "29.3.1",
     "concurrently": "7.5.0",
+    "jest": "29.3.1",
+    "ts-jest": "29.0.3",
     "typescript": "4.8.4",
     "wrangler": "2.4.4",
     "yarn-run-all": "3.1.1"
   },
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "jest",
     "build": "wrangler publish --dry-run --outdir=dist",
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "run-p \"dev:*\"",
