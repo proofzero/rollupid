@@ -11,7 +11,7 @@ services = [
 ]
 
 [dev]
-port = 9191
+port = 51337
 local_protocol = "http"
 
 [env.dev]

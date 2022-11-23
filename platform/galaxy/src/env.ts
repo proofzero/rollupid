@@ -11,6 +11,8 @@ export default interface Env {
   // MY_BUCKET: R2Bucket;
 
   OORT: OortBinding
+  Account: Fetcher
+  Address: Fetcher
   ALCHEMY_API_KEY: string
   ALCHEMY_NETWORK: string
 }
