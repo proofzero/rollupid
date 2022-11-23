@@ -5617,9 +5617,11 @@ __metadata:
   resolution: "@kubelt/security@workspace:packages/security"
   dependencies:
     "@microsoft/api-extractor": 7.33.6
+    "@types/psl": 1.1.0
     cross-env: 7.0.3
     eslint: 8.28.0
     prettier: 2.7.1
+    psl: 1.9.0
     typescript: 4.9.3
     yarn-run-all: 3.1.1
   languageName: unknown
@@ -10851,6 +10853,13 @@ __metadata:
   version: 15.7.5
   resolution: "@types/prop-types@npm:15.7.5"
   checksum: 5b43b8b15415e1f298243165f1d44390403bb2bd42e662bca3b5b5633fdd39c938e91b7fce3a9483699db0f7a715d08cef220c121f723a634972fdf596aec980
+  languageName: node
+  linkType: hard
+
+"@types/psl@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@types/psl@npm:1.1.0"
+  checksum: 648a4a40827fb101a05616b9c448b04d40c467db9f09e08099274759fd5e032e7d276013296679765c7d7359f43f0479094c1d8b6a56a8f9445b84b5a9af1263
   languageName: node
   linkType: hard
 
@@ -33744,7 +33753,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"psl@npm:^1.1.28, psl@npm:^1.1.33":
+"psl@npm:1.9.0, psl@npm:^1.1.28, psl@npm:^1.1.33":
   version: 1.9.0
   resolution: "psl@npm:1.9.0"
   checksum: 20c4277f640c93d393130673f392618e9a8044c6c7bf61c53917a0fddb4952790f5f362c6c730a9c32b124813e173733f9895add8d26f566ed0ea0654b2e711d

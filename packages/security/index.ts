@@ -4,22 +4,12 @@
  * Platform security definitions and utilities.
  */
 
-// Imported Types
+// Scopes
 // -----------------------------------------------------------------------------
 
-import type {
-  Scope,
-} from './scopes'
+import type { Scope } from './scopes'
 
-// Exported Types
-// -----------------------------------------------------------------------------
-
-export type {
-  Scope,
-}
-
-// Definitions
-// -----------------------------------------------------------------------------
+export type { Scope }
 
 import {
   ALL_SCOPES,
@@ -29,3 +19,9 @@ import {
   SCOPE_PROFILE_READ,
   SCOPE_PROFILE_WRITE,
 } from './scopes'
+
+// URN
+// -----------------------------------------------------------------------------
+
+import * as URN from './urn'
+export { URN }
