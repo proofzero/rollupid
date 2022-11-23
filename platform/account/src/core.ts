@@ -21,7 +21,7 @@ import { core as schema } from './schema'
 @field({
   name: 'profile',
   doc: 'Account profile object',
-  defaultValue: {},
+  defaultValue: null,
 })
 export default class Core {
   @method('getProfile')
