@@ -1,12 +1,25 @@
-import React, { HTMLAttributes } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 
 import classNames from 'classnames'
+import { Spinner } from '../../spinner/Spinner'
 
 export type CoverProps = HTMLAttributes<HTMLDivElement> & {
   src: string | undefined
 }
 
 export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    setLoaded(false)
+
+    const img = new Image()
+    img.onload = () => {
+      setLoaded(true)
+    }
+    img.src = src
+  }, [src])
+
   return (
     <div
       className={classNames(
@@ -21,7 +34,12 @@ export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
       }}
       {...rest}
     >
-      {children}
+      {loaded && children}
+      {!loaded && (
+        <div className="absolute flex left-0 right-0 top-0 bottom-0 justify-center items-center">
+          <Spinner color="#ffffff" />
+        </div>
+      )}
     </div>
   )
 }
