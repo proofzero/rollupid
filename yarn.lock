@@ -5326,6 +5326,7 @@ __metadata:
     "@cloudflare/workers-types": 3.18.0
     "@ethersproject/address": 5.7.0
     "@kubelt/platform.commons": "*"
+    "@kubelt/security": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
