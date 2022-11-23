@@ -4,23 +4,16 @@ import { error } from 'itty-router-extras'
 import { Context } from '../../types'
 import getPackages from '../../packages'
 import Core from '../../core'
-import Auth from '../../packages/auth/auth'
 import { JWTPayload } from '../../packages/auth/types'
 
 import { CoreRequest } from './types'
 
 import * as jose from 'jose'
 
-const getClaims = async (
-  request: CoreRequest,
-  auth: Auth
-): Promise<JWTPayload | null> => {
+const getClaims = async (request: CoreRequest): Promise<JWTPayload | null> => {
   if (request.headers.has('KBT-Access-JWT-Assertion')) {
     const jwt = request.headers.get('KBT-Access-JWT-Assertion')
     const payload = jose.decodeJwt(jwt)
-    // const { payload } = await auth.verifyJWT(
-    //   request.headers.get('KBT-Access-JWT-Assertion')
-    // )
     return payload
   }
   return null
@@ -40,7 +33,7 @@ const handle = async (
   }
 
   try {
-    context.claims = await getClaims(request, packages.auth)
+    context.claims = await getClaims(request)
   } catch (err) {
     console.error(err)
     if (err.code == 'ERR_JWT_EXPIRED') {

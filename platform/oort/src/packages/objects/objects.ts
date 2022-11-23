@@ -31,21 +31,14 @@ export default class Objects extends JSONRPC {
     return super.getMethodObjects(methodObjects)
   }
 
-  async getObject(
-    params: GetObjectParams,
-    context: Context
-  ): Promise<GetObjectResult> {
+  async getObject(params: GetObjectParams): Promise<GetObjectResult> {
     const { OBJECTS } = this.core.env
     const [namespace, path, options] = params
 
     const baseKey = getBaseKey(namespace, path)
     const indexKey = getIndexKey(baseKey)
     const indexRecord = await this.getIndexRecord(indexKey)
-    const { version, visibility } = indexRecord
-
-    // if (visibility != VISIBILITY.PUBLIC) {
-    //   this.checkClaim(context, namespace, 'read')
-    // }
+    const { version } = indexRecord
 
     let value: ObjectValue = null
 
@@ -64,15 +57,10 @@ export default class Objects extends JSONRPC {
     return { value, version }
   }
 
-  async putObject(
-    params: PutObjectParams,
-    context: Context
-  ): Promise<PutObjectResult> {
+  async putObject(params: PutObjectParams): Promise<PutObjectResult> {
     const { OBJECTS } = this.core.env
     const [namespace, path, value, options] = params
     const { visibility } = options
-
-    // this.checkClaim(context, namespace, 'write')
 
     const baseKey = getBaseKey(namespace, path)
     const indexKey = getIndexKey(baseKey)
