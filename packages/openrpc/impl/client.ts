@@ -86,6 +86,9 @@ export class RpcClient {
   // RPC calling stub; use its .fetch() method to reach DO.
   // TODO needs a type
   private readonly _stub;
+  // Keep track of the JSON-RPC request ID so we can assign incrementing
+  // values to subsequent requests.
+  private _requestId: number
 
   [index: string]: RpcResult
 
@@ -117,6 +120,10 @@ export class RpcClient {
 
     this._stub = durableObject.get(id)
 
+    // This is sent as the JSON-RPC request ID, and incremented with
+    // each request.
+    this._requestId = 0
+
     // Filter schema methods into internal / external lists.
     // TODO pass in regex from options that is used to split on method name.
     const [internal, external] = this._splitMethods(expandedSchema.methods)
@@ -131,8 +138,10 @@ export class RpcClient {
     // Define a collection of properties to expose with the $ accessor.
     this._properties = this._initProperties(id)
 
-    // TODO seal object? this._seal();
-    Object.freeze(this)
+    // Freeze the collection of properties that we expose as <stub.$>.
+    Object.freeze(this._properties)
+    // Freeze the hierarchical collection of methods that we expose as
+    // <stub._>.
     Object.freeze(this._internal)
   }
 
@@ -225,7 +234,7 @@ export class RpcClient {
 
   // Access the "internal" method table.
   get _(): RpcDispatch {
-    // This nested namespace object should be sealed.
+    // This nested namespace object is sealed.
     return this._internal
   }
 
@@ -307,12 +316,15 @@ export class RpcClient {
     // If we use ${objId} in the URL it is REDACTED in the logs.
     const url = new URL(`/openrpc`, baseURL)
 
+    // Increment the JSON-RPC request ID.
+    this._requestId++
+
     // TODO use generic JSON-RPC client;
     // - impl.jsonrpc.request() to build request
     // - impl.jsonrpc.execute(req) to execute request
     const rpcRequest = {
       jsonrpc: '2.0',
-      id: 1,
+      id: this._requestId,
       method,
       params,
     }
@@ -346,6 +358,14 @@ export class RpcClient {
     // TODO validate against OpenRPC meta-schema
     // TODO perform a type assertion
     const rpcJSON: RpcResponse = await response.json()
+
+    // Check that JSON-RPC response has an ID that matches the one sent
+    // in the request.
+    if (rpcJSON.hasOwnProperty('id')) {
+      if (rpcJSON.id !== this._requestId) {
+        console.warn(`mismatch in request and response ID: ${this._requestId} <> ${rpcJSON.id}`)
+      }
+    }
 
     // TODO check for .result or .error
     if (rpcJSON.hasOwnProperty('result')) {
