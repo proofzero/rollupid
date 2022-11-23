@@ -4947,7 +4947,7 @@ __metadata:
     tiny-invariant: 1.3.1
     typescript: 4.8.4
     wagmi: 0.8.1
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5035,7 +5035,7 @@ __metadata:
     typescript: 4.7.4
     wagmi: 0.8.5
     webpack: 5.75.0
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5110,7 +5110,7 @@ __metadata:
     typescript: 4.7.4
     wagmi: 0.6.4
     webpack: 5.75.0
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5287,7 +5287,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5314,7 +5314,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5338,7 +5338,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5381,7 +5381,7 @@ __metadata:
     concurrently: 7.5.0
     graphql: 16.6.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5394,7 +5394,7 @@ __metadata:
     date-fns: 2.29.3
     tiny-invariant: 1.3.1
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
   languageName: unknown
   linkType: soft
 
@@ -5416,7 +5416,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5467,7 +5467,7 @@ __metadata:
     webpack: 5.74.0
     webpack-cli: 4.10.0
     webpack-merge: 5.8.0
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5490,7 +5490,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -5521,7 +5521,7 @@ __metadata:
     tiny-invariant: 1.3.1
     ts-set-utils: 0.2.0
     typescript: 4.8.4
-    wrangler: 2.4.2
+    wrangler: 2.4.4
   languageName: unknown
   linkType: soft
 
@@ -5599,7 +5599,7 @@ __metadata:
     tailwindcss: 3.1.8
     typescript: 4.7.4
     wagmi: 0.6.7
-    wrangler: 2.4.2
+    wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
   linkType: soft
@@ -42278,9 +42278,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:2.4.2":
-  version: 2.4.2
-  resolution: "wrangler@npm:2.4.2"
+"wrangler@npm:2.4.4":
+  version: 2.4.4
+  resolution: "wrangler@npm:2.4.4"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.2.0
     "@esbuild-plugins/node-globals-polyfill": ^0.1.1
@@ -42304,7 +42304,7 @@ __metadata:
   bin:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
-  checksum: d0da35babecdea2922782e1f7c13984c737aa44acbe209286b594e069bbe99b71209963b1107aeb7e685e33e5a5871b2bee965bd493271bfa4f1500d58c9599d
+  checksum: 0548a4e79162057ea4f80ad85ecd904a78448ab114badd16ffbed679896607ada564dca9b66374079515129e5730134b582c29f29cfc9bf16ef3f84848fa533e
   languageName: node
   linkType: hard
 
