@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { DurableObject } from '@kubelt/platform.commons'
@@ -33,9 +32,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult> {
-    const authorized = (await this.storage.get<Scope>('scope')) || []
-    const diff = _.difference(scope, authorized)
-    const isAuthorized = diff.length == 0
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     await this.storage.put({
       coreId,
@@ -43,7 +39,7 @@ export default class Authorization extends DurableObject<Environment, Api> {
       [`codes/${code}`]: { redirectUri, scope, state },
     })
 
-    return { code, state, diff, isAuthorized }
+    return { code, state }
   }
 
   async exchangeCode(
