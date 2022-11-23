@@ -87,3 +87,17 @@ export async function getRPCResult(response: Response) {
 export function isEmptyObject(obj: any) {
   return (obj && Object.keys(obj).length == 0 && Object.getPrototypeOf(obj) == Object.prototype)
 }
+
+export async function upgrayeddOortToAccount(coreId: string, accountClient, oortResponse) {
+  if (!(coreId && accountClient && oortResponse)) return {}
+
+  console.log(`Migrating core ${coreId} to Account service... starting`)
+
+  const [result, _] = await checkHTTPStatus(oortResponse)
+    .then(() => getRPCResult(oortResponse))
+    .then(async r => [r, await accountClient.kb_setProfile(coreId, r)])
+    .catch(e => console.log(`Migrating core ${coreId} to Account service... failed`, e))
+
+  console.log(`Migrating core ${coreId} to Account service... complete`)
+  return result
+}

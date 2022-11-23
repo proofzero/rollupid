@@ -1,12 +1,8 @@
+import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { getDefaultProvider, AlchemyProvider } from '@ethersproject/providers'
-
-import Env from '../../env'
-import OortClient from './clients/oort'
 
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 import { WorkerApi as AddressApi } from '@kubelt/platform.address/src/types'
-import { HEADER_CORE_ADDRESS } from '@kubelt/platform.commons/src/constants'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -15,11 +11,12 @@ import {
   checkHTTPStatus,
   getRPCResult,
   isEmptyObject,
+  upgrayeddOortToAccount,
 } from './utils'
 
+import Env from '../../env'
+import OortClient from './clients/oort'
 import { Resolvers } from './typedefs'
-import { GraphQLYogaError } from '@graphql-yoga/common'
-import profile from '../types/profile'
 
 type ResolverContext = {
   env: Env
@@ -30,11 +27,22 @@ type ResolverContext = {
 const threeIDResolvers: Resolvers = {
   Query: {
     profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
-      const oortClient = new OortClient(env.OORT, jwt)
-      const profileResponse = await oortClient.getProfile()
-      await checkHTTPStatus(profileResponse)
-      const res = getRPCResult(profileResponse)
-      return await res
+      // TODO: Do we need to verify the token here?
+      // See kb_verifyAuthorization @ https://github.com/kubelt/kubelt/blob/main/platform/access/src/types.ts#L69
+      // Middleware should make sure JWT is valid:
+      const coreId = (jose.decodeJwt(jwt)).iss
+
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      let accountProfile = await accountClient.kb_getProfile(coreId)
+
+      // Upgrayedd Oort -> Account
+      if (isEmptyObject(accountProfile)) {
+        const oortClient = new OortClient(env.OORT, jwt)
+        const oortResponse = await oortClient.getProfile()
+        accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
+      }
+
+      return accountProfile
     },
     profileFromAddress: async (
       _parent: any,
@@ -42,27 +50,16 @@ const threeIDResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
-      const coreId = await addressClient.kb_resolveAddress(address)
-
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      const oortClient = new OortClient(env.OORT)
-
-      // Migration logic:
-      // If there's an account profile, we're done.
-      // If there's not an account profile, check Oort.
-      // If there's an Oort profile, set it as the account profile and return.
-      // If there's no Oort profile and no Account profile, there's no profile. Return null.
-    
+      
+      const coreId = await addressClient.kb_resolveAddress(address)  
       let accountProfile = await accountClient.kb_getProfile(coreId)
       
       // Upgrayedd Oort -> Account
       if (isEmptyObject(accountProfile)) {
-        const [result, _] = await oortClient.getProfileFromAddress(address)
-          .then(async r => [r, await checkHTTPStatus(r)])
-          .then(async ([r, _]) => getRPCResult(r))
-          .then(async r => [r, await accountClient.kb_setProfile(coreId, r)])
-      
-        accountProfile = result
+        const oortClient = new OortClient(env.OORT)
+        const oortResponse = await oortClient.getProfileFromAddress(address)
+        accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
       }
 
       return accountProfile
@@ -74,22 +71,27 @@ const threeIDResolvers: Resolvers = {
       { profile, visibility = 'PRIVATE' },
       { env, jwt, coreId }: ResolverContext
     ) => {
-      const oortClient = new OortClient(env.OORT, jwt)
-      const profileResponse = await oortClient.getProfile()
-      await checkHTTPStatus(profileResponse)
-      const currentProfile = await getRPCResult(profileResponse)
+      // Rectify coreId in case it's undefined. Middleware should make sure JWT is valid here:
+      coreId = coreId || (jose.decodeJwt(jwt)).iss
+
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      let currentProfile = await accountClient.kb_getProfile(coreId)
+
+      if (isEmptyObject(currentProfile)) {
+        const oortClient = new OortClient(env.OORT, jwt)
+        const oortResponse = await oortClient.getProfile()
+        currentProfile = await checkHTTPStatus(oortResponse)
+          .then(() => getRPCResult(oortResponse))
+          .catch(e => console.log(`Failed to get Oort profile`, e))
+      }
 
       const newProfile = {
         ...currentProfile,
         ...profile,
       }
 
-      const updateResponse = await oortClient.updateProfile(
-        newProfile,
-        visibility
-      )
-      await checkHTTPStatus(updateResponse)
-      return !!(await getRPCResult(updateResponse))
+      await accountClient.kb_setProfile(coreId, newProfile)
+      return newProfile
     },
   },
   Profile: {
