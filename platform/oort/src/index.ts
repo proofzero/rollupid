@@ -3,6 +3,7 @@ import { error } from 'itty-router-extras'
 
 import Address from './address'
 import Core from './core'
+import addressRouter from './routes/address'
 import coreRouter from './routes/core'
 import threeIdRouter from './routes/threeid'
 import { handleOptions, withCors } from './utils/cors'
@@ -15,6 +16,7 @@ const fallback = async (request: Request) => {
 
 const index = Router()
   .all('/invite/*', handleOptions(), threeIdRouter)
+  .all('/address/*', addressRouter)
   .all('*', handleOptions(), coreRouter, fallback)
 
 export { Address, Core }
