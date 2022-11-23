@@ -8,18 +8,15 @@ import {
 } from 'typed-json-rpc'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import { getCoreId } from '@kubelt/platform.commons/src/utils'
 
 import {
   AccessApi,
   AuthorizationApi,
-  AuthorizationRequest,
   AuthorizeResult,
   Environment,
   ExchangeAuthorizationCodeResult,
-  RefreshAuthorizationResult,
+  GrantType,
   Scope,
-  StarbaseApi,
   WorkerApi,
 } from './types'
 
@@ -51,12 +48,12 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
+      coreId: string,
       clientId: string,
       redirectUri: string,
       scope: Scope,
       state: string
     ): Promise<AuthorizeResult> {
-      const coreId = await getCoreId(request, env)
       if (!coreId) {
         throw 'missing core identifier'
       }
@@ -76,15 +73,15 @@ export default async (
       const client = getAuthorizationClient(`${coreId}/${clientId}`)
       return client.authorize(coreId, clientId, redirectUri, scope, state)
     },
-    async kb_exchangeAuthorizationCode(
+    async kb_exchangeToken(
+      grantType: GrantType,
       code: string,
       redirectUri: string,
       clientId: string,
       clientSecret: string
     ): Promise<ExchangeAuthorizationCodeResult> {
-      const coreId = await getCoreId(request, env)
-      if (!coreId) {
-        throw 'missing core identifier'
+      if (!grantType) {
+        throw 'missing grant type'
       }
 
       if (!code) {
@@ -103,28 +100,16 @@ export default async (
         throw 'missing client secret'
       }
 
-      const authorizationClient = getAuthorizationClient(
-        `${coreId}/${clientId}`
-      )
-      const { scope } = (await authorizationClient.get(
-        `codes/${code}`
-      )) as AuthorizationRequest
-      const validated = true
-
-      // const { Starbase } = env
-      // const starbaseClient = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
-      // const validated = await starbaseClient.kb_checkClientAuthorization(
-      //   redirectUri,
-      //   scope,
-      //   clientId,
-      //   clientSecret
-      // )
-
-      if (validated) {
-        return authorizationClient.exchangeCode(code, redirectUri, clientId)
-      } else {
-        throw 'failed authorization attempt'
+      switch (grantType) {
+        case GrantType.AuthenticationCode: {
+          const authorizationClient = getAuthorizationClient(
+            `${clientSecret}/${clientId}`
+          )
+          return authorizationClient.exchangeCode(code, redirectUri, clientId)
+        }
       }
+
+      throw 'invalid grant type'
     },
     async kb_verifyAuthorization(token: string): Promise<boolean> {
       const client = getAccessClient(token)
@@ -135,11 +120,6 @@ export default async (
         console.error(err)
         return false
       }
-    },
-    async kb_refreshAuthorization(
-      token: string
-    ): Promise<RefreshAuthorizationResult> {
-      return getAccessClient(token).refresh(token)
     },
   })
 

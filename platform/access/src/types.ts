@@ -17,7 +17,6 @@ export interface KeyPairSerialized {
 
 export interface Environment {
   Access: DurableObjectNamespace
-  Address: Fetcher
   Authorization: DurableObjectNamespace
   Starbase: Fetcher
 }
@@ -39,13 +38,21 @@ export type AccessParameters = {
 export type AuthorizeResult = {
   code: string
   state: string
-  diff?: string[]
-  isAuthorized: boolean
 }
 
 export type GenerateResult = {
   accessToken: string
   refreshToken: string
+}
+
+export enum GrantType {
+  AuthenticationCode = 'authentication_code', // validate and issue admin token from the account core
+  AuthorizationCode = 'authorization_code', // validate and issue access token from starbase app
+  RefreshToken = 'refresh_token', // valiate and refresh access token from starbase app
+}
+
+export enum ResponseType {
+  Code = 'code',
 }
 
 export type ExchangeAuthorizationCodeResult = GenerateResult
@@ -55,19 +62,21 @@ export type RefreshAuthorizationResult = GenerateResult
 
 export interface WorkerApi extends BaseApi {
   kb_authorize(
+    coreId: string,
     clientId: string,
     redirectUri: string,
     scope: Scope,
-    state: string
+    state: string,
+    responseType: ResponseType
   ): Promise<AuthorizeResult>
-  kb_exchangeAuthorizationCode(
+  kb_exchangeToken(
+    grantType: GrantType,
     code: string,
     redirectUri: string,
     clientId: string,
     clientSecret: string
   ): Promise<ExchangeAuthorizationCodeResult>
   kb_verifyAuthorization(token: string): Promise<VerifyAuthorizationResult>
-  kb_refreshAuthorization(token: string): Promise<RefreshAuthorizationResult>
 }
 
 export interface AuthorizationApi extends DurableObjectApi {

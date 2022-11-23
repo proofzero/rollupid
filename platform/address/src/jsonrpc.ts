@@ -6,16 +6,27 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
+import { hexlify } from '@ethersproject/bytes'
+import { randomBytes } from '@ethersproject/random'
+
+import {
+  AuthorizeResult,
+  ResponseType,
+  WorkerApi as AccessApi,
+} from '@kubelt/platform.access/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
-import { Environment } from './types'
-import { CoreApi, WorkerApi } from './types'
+import { ADDRESS_OPTIONS } from './constants'
+import { CoreApi, Environment, WorkerApi } from './types'
+import { getType } from './utils'
 
 export default async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
-  const { Core } = env
+  const { Access, Core, Oort } = env
+
+  const accessClient = createFetcherJsonRpcClient<AccessApi>(Access)
 
   const getCoreClient = (address: string): JsonRpcClient<CoreApi> => {
     const core = Core.get(Core.idFromName(address))
@@ -33,7 +44,57 @@ export default async (
     },
     async kb_resolveAddress(address: string): Promise<string> {
       const client = getCoreClient(address)
-      return client.kb_resolveAddress(address)
+      const coreId = await client.kb_resolveAddress()
+      if (coreId) {
+        return coreId
+      } else {
+        const response = await Oort.fetch(`http://localhost/address/${address}`)
+        if (response.ok) {
+          const { coreId }: { coreId: string } = await response.json()
+          await client.kb_setAddress(address, coreId)
+          return coreId
+        } else {
+          const type = getType(address)
+          if (type != 'eth') {
+            throw 'cannot resolve'
+          }
+
+          const coreId = hexlify(randomBytes(ADDRESS_OPTIONS.length))
+          await client.kb_setAddress(address, coreId)
+          return coreId
+        }
+      }
+    },
+    async kb_getNonce(
+      template: string,
+      clientId: string,
+      redirectUri: string,
+      scope: string[],
+      state: string
+    ): Promise<string> {
+      const client = getCoreClient(clientId)
+      return client.kb_getNonce(template, clientId, redirectUri, scope, state)
+    },
+    async kb_verifyNonce(
+      address: string,
+      nonce: string,
+      signature: string
+    ): Promise<AuthorizeResult> {
+      const client = getCoreClient(address)
+      const coreId = await client.kb_resolveAddress()
+      if (!coreId) {
+        throw 'missing core identifier'
+      }
+      const challenge = await client.kb_verifyNonce(nonce, signature)
+      const { clientId, redirectUri, scope, state } = challenge
+      return accessClient.kb_authorize(
+        coreId,
+        clientId,
+        redirectUri,
+        scope,
+        state,
+        ResponseType.Code
+      )
     },
   })
 

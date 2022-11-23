@@ -8,6 +8,11 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 
+services = [
+  { binding = "Access", service = "access" },
+  { binding = "Oort", service = "oort" },
+]
+
 [dev]
 port = 9191
 local_protocol = "http"
@@ -16,15 +21,27 @@ local_protocol = "http"
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
+services = [
+  { binding = "Access", service = "access-dev" },
+  { binding = "Oort", service = "oort-dev" },
+]
 
 [env.next]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
+services = [
+  { binding = "Access", service = "access-next" },
+  { binding = "Oort", service = "oort-next" },
+]
 
 [env.current]
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
+]
+services = [
+  { binding = "Access", service = "access-current" },
+  { binding = "Oort", service = "oort-current" },
 ]
 
 [[migrations]]
