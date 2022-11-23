@@ -34,26 +34,26 @@ export type { Scope }
  *
  * @alpha
  */
-export const SCOPE_ADMIM: Scope = Symbol.for('scope://threeid.xyz/admin.admin')
+export const SCOPE_ADMIM: Scope = scope('scope://threeid.xyz/admin.admin')
 
 // GENERAL
 
 /**
  * The scope required to read account object.
  */
-export const SCOPE_ACCOUNT_READ: Scope = Symbol.for('scope://threeid.xyz/account.read')
+export const SCOPE_ACCOUNT_READ: Scope = scope('scope://threeid.xyz/account.read')
 
 /**
  * The scope required to write to account object.
  */
-export const SCOPE_ACCOUNT_WRITE: Scope = Symbol.for('scope://threeid.xyz/account.read')
+export const SCOPE_ACCOUNT_WRITE: Scope = scope('scope://threeid.xyz/account.read')
 
 /**
  * The scope representing the ability to read profile data.
  *
  * @alpha
  */
-export const SCOPE_PROFILE_READ: Scope = Symbol.for(
+export const SCOPE_PROFILE_READ: Scope = scope(
   'scope://threeid.xyz/profile.read'
 )
 
@@ -62,7 +62,7 @@ export const SCOPE_PROFILE_READ: Scope = Symbol.for(
  *
  * @alpha
  */
-export const SCOPE_PROFILE_WRITE: Scope = Symbol.for(
+export const SCOPE_PROFILE_WRITE: Scope = scope(
   'scope://threeid.xyz/profile.write'
 )
 
@@ -71,7 +71,7 @@ export const SCOPE_PROFILE_WRITE: Scope = Symbol.for(
  *
  * @alpha
  */
-export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = Symbol.for(
+export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = scope(
   'scope://threeid.xyx/connected-accounts.read'
 )
 
@@ -82,7 +82,7 @@ export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = Symbol.for(
  *
  * @alpha
  */
-export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = Symbol.for(
+export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = scope(
   'scope://threeid.xyz/blockchain-account/{{ account }}.manage'
 )
 
@@ -91,7 +91,7 @@ export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = Symbol.for(
  *
  * @alpha
  */
-export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = Symbol.for(
+export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = scope(
   'scope://threeid.xyz/blockchain-account/transact/{{ account }}.write'
 )
 

@@ -4,9 +4,13 @@
  * Miscellaneous utilities.
  */
 
-import type {
-  RpcClientOptions,
-} from './client'
+import type { ParsedURN } from 'urns'
+
+import * as urns from 'urns'
+
+import { AnyURN } from '@kubelt/urns'
+
+import type { RpcClientOptions } from './client'
 
 // isIterable()
 // -----------------------------------------------------------------------------
@@ -34,7 +38,7 @@ export function isIterable(x: any): boolean {
  */
 export function idFromOptions(
   durableObject: DurableObjectNamespace,
-  options: RpcClientOptions,
+  options: RpcClientOptions
 ): DurableObjectId {
   let objId: DurableObjectId
 
@@ -42,6 +46,18 @@ export function idFromOptions(
     objId = durableObject.idFromString(options.id!)
   } else if (Object.hasOwn(options, 'name')) {
     objId = durableObject.idFromName(options.name!)
+  } else if (Object.hasOwn(options, 'urn')) {
+    const urn: AnyURN | ParsedURN<string, string> = options.urn!
+    let parsedURN
+    if (typeof(urn) === 'string') {
+      parsedURN = urns.parseURN(urn)
+    } else {
+      parsedURN = urn
+    }
+    // Unparse the parsed URN in a bid to normalize it. Do we need/want
+    // to do more here, e.g. sort the components to canonicalize?
+    const name = urns.unparseURN(parsedURN).toString()
+    objId = durableObject.idFromName(name)
   } else {
     objId = durableObject.newUniqueId()
   }

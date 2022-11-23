@@ -63,6 +63,8 @@ export default async (
   // TODO: JWT validation
 
   // validate 3RN
+
+  //urn:threeid:adrress/maurerbot.eth?+node_type=crypto&addr_type=eth
   const resolved3RN = await resolveAddress3RN(request)
   const { name, nodeType } = resolved3RN
   let { addressType } = resolved3RN
@@ -85,6 +87,10 @@ export default async (
           name,
           addressType
         ))
+        // TODO: change to open rpc
+        // client = openrpc.discover(CryptoCore,   { name: address})
+
+        // })
         core = CryptoCore.get(CryptoCore.idFromName(address))
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }

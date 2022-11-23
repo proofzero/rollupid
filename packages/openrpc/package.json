@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@cfworker/json-schema": "1.12.5",
+    "@kubelt/graph": "workspace:*",
     "@microsoft/api-extractor": "7.33.6",
     "@open-rpc/meta-schema": "1.14.2",
     "cross-env": "7.0.3",
