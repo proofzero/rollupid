@@ -4,6 +4,7 @@ import { randomBytes } from '@ethersproject/random'
 import { recoverPublicKey } from '@ethersproject/signing-key'
 import { computeAddress } from '@ethersproject/transactions'
 
+import { URN } from '@kubelt/security'
 import { DurableObject } from '@kubelt/platform.commons'
 
 import { NONCE_OPTIONS } from './constants'
@@ -23,7 +24,27 @@ export default class Core extends DurableObject<Environment, CoreApi> {
 
   async setAddress(address: string, coreId: string): Promise<void> {
     const type = getType(address)
-    await this.storage.put({ address, type, coreId })
+    if (!type) {
+      throw 'unsupported type'
+    }
+
+    await this.storage.put({
+      type,
+      address: URN.generateUrn(
+        'address',
+        'threeid.xyz',
+        'address',
+        'name',
+        address
+      ),
+      coreId: URN.generateUrn(
+        'account',
+        'threeid.xyz',
+        'account',
+        'name',
+        coreId
+      ),
+    })
   }
 
   async delete(): Promise<void> {
