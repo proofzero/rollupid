@@ -78,7 +78,7 @@
     "chromatic": "6.11.4",
     "concurrently": "7.3.0",
     "css-loader": "6.7.1",
-    "eslint": "8.20.0",
+    "eslint": "8.28.0",
     "eslint-config-airbnb-typescript": "17.0.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-config-standard": "17.0.0",

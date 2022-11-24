@@ -16,7 +16,7 @@ jobs:
       apps: ${{ steps.changes.outputs.apps }}
     steps:
       # find out what deploy stack to use
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Build Dependencies
         run: yarn build
