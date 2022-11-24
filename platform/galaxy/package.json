@@ -11,8 +11,9 @@
     "yarn-run-all": "3.1.1"
   },
   "private": true,
+  "type": "module",
   "scripts": {
-    "test": "tap --ts",
+    "test": "tap --ts --node-arg=--require='../../node_modules/ts-node/register'",
     "build": "wrangler publish --dry-run --outdir=dist",
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "run-p \"dev:*\"",

@@ -2,7 +2,7 @@ import tap from 'tap'
 
 import {
     isEmptyObject
-} from '../src/schema/resolvers/utils'
+} from '../src/schema/resolvers/utils/index.ts'
 
 tap.test('isEmptyObject unhappy path', async (t) => {
     t.equal(isEmptyObject({ name: 'full object' }), false)

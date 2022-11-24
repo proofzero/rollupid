@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
 import { OortJwt } from '../clients/oort'
@@ -19,14 +18,14 @@ export function parseJwt(token: string): OortJwt {
   return JSON.parse(jsonPayload)
 }
 
-export const setupContext = () => (next) => (root, args, context, info) => {
+export const setupContext = () => (next: any) => (root: any, args: any, context: any, info: any) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
   const parsedJwt = jwt && parseJwt(jwt)
   const coreId = parsedJwt && parsedJwt.iss
   return next(root, args, { ...context, jwt, coreId }, info)
 }
 
-export const isAuthorized = () => (next) => (root, args, context, info) => {
+export const isAuthorized = () => (next: any) => (root: any, args: any, context: any, info: any) => {
   // TODO: update to check if user is authorized with authorzation header
   if (!context.jwt) {
     throw new GraphQLYogaError('You are not authenticated!', {
@@ -94,12 +93,14 @@ export function isEmptyObject(obj: any) {
   return !!(obj && Object.keys(obj).length == 0) // This doesn't apply to TS: && Object.getPrototypeOf(obj) == Object.prototype)
 }
 
-export async function upgrayeddOortToAccount(coreId: string, accountClient, oortResponse) {
+export async function upgrayeddOortToAccount(coreId: string, accountClient: any, oortResponse: any) {
   if (!(coreId && accountClient && oortResponse)) return {}
 
   console.log(`Migrating core ${coreId} to Account service... starting`)
 
-  const [result, _] = await checkHTTPStatus(oortResponse)
+  type voidAnys = void | any[]
+
+  const [result, _]: voidAnys = await checkHTTPStatus(oortResponse)
     .then(() => getRPCResult(oortResponse))
     .then(async r => [r, await accountClient.kb_setProfile(coreId, r)])
     .catch(e => console.log(`Migrating core ${coreId} to Account service... failed`, e))
