@@ -34,8 +34,7 @@
   },
   "peerDependencies": {
     "itty-router": "*",
-    "itty-router-extras": "*",
-    "lodash": "*"
+    "itty-router-extras": "*"
   },
   "dependencies": {
     "typed-json-rpc": "1.1.0"
