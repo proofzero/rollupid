@@ -1,5 +1,7 @@
+// @kubelt/openrpc:impl/schema.ts
+
 /**
- * @file impl/schema.ts
+ * Tools for working with OpenRPC schemas.
  */
 
 import invariant from 'tiny-invariant'

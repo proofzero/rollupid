@@ -1,5 +1,6 @@
+// @kubelt/openrpc:impl/jsonrpc.ts
 /**
- * @file openrpc/jsonrpc/index.ts
+ * Implementation of JSON-RPC functionality.
  */
 
 // TODO

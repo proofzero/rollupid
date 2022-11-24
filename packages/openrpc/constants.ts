@@ -1,11 +1,10 @@
+// @kubelt/openrpc:constants.ts
+
 /**
- * @file constants.ts
+ * Package-level constants.
  */
 
 // The location in the context map where we store a parsed RPC request.
-//
-// TODO once extracted and validated, pass in the RpcRequest instance as
-// an additional handler parameter alongside request and context?
 export const KEY_REQUEST_RAW = 'com.kubelt.openrpc/request.raw'
 
 // The parsed RPC request.

@@ -1,5 +1,7 @@
+// @kubelt/openrpc:impl/router.ts
+
 /**
- * @file router.ts
+ * OpenRPC service routing implmentation.
  */
 
 import * as _ from 'lodash'
@@ -81,9 +83,9 @@ function parseRequestFn(): MiddlewareFn {
    * It should be extracted from the context using that key for later
    * examination in other handlers.
    *
-   * @param request a JSON-RPC HTTP Request to extract an RpcRequest from
-   * @param context a map of context information
-   * @return either a Response to return, or void to continue processing
+   * @param request - a JSON-RPC HTTP Request to extract an RpcRequest from
+   * @param context - a map of context information
+   * @returns either a Response to return, or void to continue processing
    */
   return async (
     request: Readonly<Request>,
@@ -142,13 +144,13 @@ function checkRequestValidFn(): MiddlewareFn {
  * is missing, an appropriate JSON-RPC error is returned to
  * short-circuit routing.
  *
- * @param methods A map of the available RPC methods
- * @return a router middleware
+ * @param methods - A map of the available RPC methods
+ * @returns a router middleware
  */
 const checkMethodExistsFn = (service: Readonly<RpcService>): MiddlewareFn => {
   /**
-   * @param request
-   * @param context
+   * @param request - An incoming request
+   * @param context - A context map
    */
   return async (request: Request, context: RpcContext): MiddlewareResult => {
     const rpcRequest = context.get(KEY_REQUEST_RPC)
@@ -261,8 +263,8 @@ function rpcHandlerFn(service: Readonly<RpcService>): MiddlewareFn {
   /**
    * Invoked by the router to handle a Request to the RPC endpoint.
    *
-   * @param request
-   * @param context
+   * @param request - An incoming Request
+   * @param context - A context map
    *
    * @return A function that handles the a valid RPC request by
    * dispatching it to the appropriate service method.
