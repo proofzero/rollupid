@@ -8,20 +8,7 @@ export type CoverProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    setLoaded(false)
-
-    const img = new Image()
-    img.onload = () => {
-      setLoaded(true)
-    }
-    img.src = src
-  }, [src])
-
-  return (
-    <div
+  return (<div
       className={classNames(
         'h-[300px] w-full relative rounded-b-xl',
         className
@@ -34,12 +21,7 @@ export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
       }}
       {...rest}
     >
-      {loaded && children}
-      {!loaded && (
-        <div className="absolute flex left-0 right-0 top-0 bottom-0 justify-center items-center">
-          <Spinner color="#ffffff" />
-        </div>
-      )}
+      {children}
     </div>
   )
 }
