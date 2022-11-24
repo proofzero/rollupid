@@ -1,5 +1,3 @@
-import { defaults } from 'lodash'
-
 export type Options = {
   origin: string
   methods: string[]
@@ -21,7 +19,7 @@ export const handleOptions =
       return
     }
 
-    defaults(options, defaultOptions)
+    options = { ...defaultOptions, ...options }
     const { origin, methods, headers, credentials } = options
 
     if (request.headers.get('Access-Control-Request-Method')) {
