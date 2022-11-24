@@ -35,7 +35,6 @@
   "peerDependencies": {
     "itty-router": "*",
     "itty-router-extras": "*",
-    "jose": "*",
     "lodash": "*"
   },
   "dependencies": {

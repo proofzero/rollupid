@@ -5309,7 +5309,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
-    jose: 4.11.0
     lodash: 4.17.21
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
@@ -5334,7 +5333,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
-    jose: 4.11.0
     lodash: 4.17.21
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
@@ -5363,7 +5361,6 @@ __metadata:
   peerDependencies:
     itty-router: "*"
     itty-router-extras: "*"
-    jose: "*"
     lodash: "*"
   languageName: unknown
   linkType: soft
@@ -5412,7 +5409,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
-    jose: 4.11.0
     lodash: 4.17.21
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
@@ -5486,7 +5482,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
-    jose: 4.11.0
     lodash: 4.17.21
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
