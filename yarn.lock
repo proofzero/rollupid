@@ -5208,6 +5208,7 @@ __metadata:
     "@open-rpc/meta-schema": 1.14.2
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.189
+    "@types/node": 18.11.9
     "@types/tap": 15.0.7
     cross-env: 7.0.3
     esbuild: 0.15.15

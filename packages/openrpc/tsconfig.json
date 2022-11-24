@@ -26,7 +26,8 @@
     "types": [
       "@cloudflare/workers-types",
       "@types/itty-router-extras",
-      "@types/lodash"
+      "@types/lodash",
+      "@types/node"
     ],
     // Enable importing .json files
     "resolveJsonModule": true,

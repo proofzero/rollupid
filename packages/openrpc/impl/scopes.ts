@@ -1,5 +1,7 @@
+// @kubelt/openrpc:impl/scopes.ts
+
 /**
- * @file impl/scopes.ts
+ *
  */
 
 import * as set from 'ts-set-utils'

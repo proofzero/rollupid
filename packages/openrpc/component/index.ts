@@ -102,7 +102,7 @@ type FieldSpec = {
   // The default value of the field.
   defaultValue: any
   // The validation function to apply before updating the field.
-  //validator: ValidatorFn;
+  validator?: ValidatorFn;
 }
 
 export enum FieldAccess {
@@ -478,7 +478,7 @@ export function component(schema: Readonly<RpcSchema>) {
         const fieldKeys = new Set(fields.keys())
         const updateKeys = set.intersection(outputKeys, fieldKeys)
 
-        for (const [fieldName, fieldValue] of output.entries()) {
+        for (const [fieldName,] of output.entries()) {
           if (!updateKeys.has(Symbol.for(fieldName))) {
             console.warn(
               `tried storing output "${fieldName}" without declaration; ignored`
@@ -558,7 +558,7 @@ export function component(schema: Readonly<RpcSchema>) {
         this._state.blockConcurrencyWhile(async () => {
           // Generate a list of storage promises, one for each field
           // whose default value is being set.
-          let wait: Array<Promise<any>> = []
+          const wait: Array<Promise<any>> = []
 
           this._fields.forEach(async (fieldSpec: FieldSpec) => {
             // Try getting the values first; only set default if the
@@ -909,7 +909,7 @@ export function field(fieldSpec: Readonly<FieldSpec>) {
   return function <T extends { new (...args: any[]): {} }>(constructor: T) {
     const fieldName = Symbol.for(fieldSpec.name.trim())
     const fields =
-      Reflect.get(constructor, _FIELDS) || new Map<Symbol, FieldSpec>()
+      Reflect.get(constructor, _FIELDS) || new Map<symbol, FieldSpec>()
     fields.set(fieldName, fieldSpec)
 
     Reflect.set(constructor, _FIELDS, fields)
@@ -922,7 +922,7 @@ export function field(fieldSpec: Readonly<FieldSpec>) {
 /**
  * Marks a method as being the implementation of a particular OpenRPC schema method.
  *
- * @param schemaMethod the name of the schema method the decorated class
+ * @param schemaMethod - the name of the schema method the decorated class
  * method implements.
  */
 export function method(schemaMethod: string) {

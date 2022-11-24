@@ -1,5 +1,8 @@
+// @kubelt/openrpc:impl/index.ts
+
 /**
- * @file impl/index.ts
+ * Contains an implementation for each of the top-level API methods
+ * exposed from the package.
  */
 
 import * as _ from 'lodash'
@@ -168,6 +171,21 @@ export type OpenRpcHandler = (
   context?: Readonly<RpcContext>
 ) => Promise<Response>
 
+// Auth
+// -----------------------------------------------------------------------------
+
+/**
+ * The default auth check handler used if none is provided. These
+ * methods only resolve to a value (a Response) if an error occurs.
+ */
+const authPass: RpcAuthHandler = (
+  request: Readonly<Request>,
+  context: Readonly<RpcContext>,
+): MiddlewareResult => {
+  // Resolves to nothing which indicates successful check.
+  return Promise.resolve()
+}
+
 // context
 // -----------------------------------------------------------------------------
 
@@ -275,7 +293,7 @@ export function methods(
   // Extract the collection of expected method names.
   const required: Readonly<Set<symbol>> = new Set(
     schema.methods.map((method: MethodOrReference): symbol => {
-      if (method.hasOwnProperty('name')) {
+      if (Object.hasOwn(method, 'name')) {
         return Symbol.for((<MethodObject>method).name)
       } else {
         throw new Error('schema method references are not currently supported')
@@ -313,7 +331,7 @@ export function method(
     // has a .name property. ReferenceObject needs to be expanded.
     const methodOrReference: MethodOrReference | undefined =
       schema.methods.find((methodObj) => {
-        if (methodObj.hasOwnProperty('name')) {
+        if (Object.hasOwn(methodObj, 'name')) {
           return (<MethodObject>methodObj).name === methodName
         }
         return false
@@ -322,7 +340,7 @@ export function method(
       throw new Error(`schema description for ${methodName} not found`)
     }
     // FIXME check that we have a MethodObject
-    if (!methodOrReference.hasOwnProperty('name')) {
+    if (!Object.hasOwn(methodOrReference, 'name')) {
       throw new Error(`schema description for ${methodName} must be expanded`)
     }
     return <MethodObject>methodOrReference
@@ -343,7 +361,6 @@ export function method(
 
   // AUTH
 
-  const authPass = () => {}
   // Auth guard function; if it returns a response that method handler
   // is never invoked, and the response is returned instead.
   const authHandler: Readonly<RpcAuthHandler> = serviceMethod?.auth || authPass
@@ -393,8 +410,6 @@ export function extension(
   const methodSym = Symbol.for(methodName)
 
   // AUTH
-
-  const authPass = () => {}
   const authHandler: Readonly<RpcAuthHandler> = ext?.auth || authPass
 
   return {
@@ -649,7 +664,7 @@ export async function discover(
   const rpcJSON: RpcResponse = await response.json()
 
   // TODO check for .result or .error
-  if (rpcJSON.hasOwnProperty('result')) {
+  if (Object.hasOwn(rpcJSON, 'result')) {
     const schemaJSON: unknown = _.get(rpcJSON, 'result')
     const schema: RpcSchema = schemaJSON as RpcSchema
     // Make sure we construct a client for the same object.

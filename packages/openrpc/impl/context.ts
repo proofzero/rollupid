@@ -32,15 +32,15 @@ import * as _ from 'lodash'
  * }
  * ```
  */
-export class RpcContext extends Map<string | Symbol, any> {
-  get(k: string | Symbol): any {
-    if (k instanceof Symbol) {
+export class RpcContext extends Map<string | symbol, any> {
+  get(k: string | symbol): any {
+    if (typeof(k) === 'symbol') {
       k = k.toString()
     }
     return _.get(this, k)
   }
-  set(k: string | Symbol, v: any): this {
-    if (k instanceof Symbol) {
+  set(k: string | symbol, v: any): this {
+    if (typeof(k) === 'symbol') {
       k = k.toString()
     }
     _.set(this, k, v)

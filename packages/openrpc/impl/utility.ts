@@ -38,9 +38,9 @@ export function idFromOptions(
 ): DurableObjectId {
   let objId: DurableObjectId
 
-  if (options.hasOwnProperty('id')) {
+  if (Object.hasOwn(options, 'id')) {
     objId = durableObject.idFromString(options.id!)
-  } else if (options.hasOwnProperty('name')) {
+  } else if (Object.hasOwn(options, 'name')) {
     objId = durableObject.idFromName(options.name!)
   } else {
     objId = durableObject.newUniqueId()

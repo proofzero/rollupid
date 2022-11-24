@@ -1,5 +1,20 @@
+// @kubelt/openrpc:impl/client.ts
+
 /**
- * @file impl/client.ts
+ * An OpenRPC client implementation used to construct an RPC client for
+ * an RPC service, particularly that implemented by a "component" (a
+ * Cloudflare durable object providing a standard OpenRPC interface) as
+ * defined in this package, with plans to extend the client to be more
+ * generally useful.
+ *
+ * The returned client has methods that proxy requests to the remote
+ * service. It also exposes two properties that contain nested
+ * namespaces:
+ * - <stub>.$ contains properties pertaining to the remote service, the
+ *   prime example of which is <stub>.$.id, the remote Durable Object ID
+ * - <stub>._ contains nested namespaces of "extension" functions, for
+ *   example a standard API for working with "components",
+ *   e.g. obtaining the list of scopes used by the component.
  */
 
 import * as _ from 'lodash'
@@ -10,18 +25,31 @@ import type { MethodObject, MethodOrReference } from '@open-rpc/meta-schema'
 
 import type { RpcResponse, RpcSchema } from './index'
 
+import type { RequestParams } from './jsonrpc'
+
 import type { RpcResult } from '../component/index'
 
 // Types
 // -----------------------------------------------------------------------------
 
-type RpcDispatch = {
-  // TODO tighten up this type.
-  [index: string]: any
+// A namespace into which RPC methods are added and which is exposed by
+// the ._ accessor.
+//type RpcNamespace = Record<string, Function>
+
+type RpcClientFn = (params: RequestParams) => unknown
+
+//type RpcDispatch = Record<string, RpcNamespace | Function>
+interface RpcDispatch {
+  // TODO when 'any' replaced by RpcClientFn we get a type inference
+  // error, the fn name is 'not defined' on the parent namespace object.
+  [name: string]: RpcDispatch | any //RpcClientFn
 }
 
 // A map of data properties we expose with the .$ accessor.
-type RpcProperties = Record<string, unknown>
+type RpcProperties = {
+  // TODO tighter type for stringified DurableObjectId
+  id: string
+}
 
 // RpcRequestOptions
 // -----------------------------------------------------------------------------
@@ -80,9 +108,11 @@ export class RpcClient {
   // URL when logging.
   private readonly _tag: string
   // A nested object whose properties are functions that can be called
-  // to invoke "internal" methods exposed by a component.
-  // TODO needs a type
-  private readonly _internal
+  // to invoke "internal" methods exposed by a component. These methods
+  // are exposed via the ._ accessor.
+  private readonly _internal: RpcDispatch
+  // A map of data properties we expose with the .$ accessor.
+  private readonly _properties: RpcProperties
   // RPC calling stub; use its .fetch() method to reach DO.
   // TODO needs a type
   private readonly _stub;
@@ -90,6 +120,8 @@ export class RpcClient {
   // values to subsequent requests.
   private _requestId: number
 
+  // Allow for the methods added to the client to correspond to the
+  // methods described in the schema that was used to initialize it.
   [index: string]: RpcResult
 
   // TODO dynamically extend the RpcClient base class to something that
@@ -103,7 +135,6 @@ export class RpcClient {
   // someObj.foo = "bar"
 
   constructor(
-    // TODO better type
     durableObject: DurableObjectNamespace,
     id: DurableObjectId,
     schema: RpcSchema,
@@ -126,7 +157,10 @@ export class RpcClient {
 
     // Filter schema methods into internal / external lists.
     // TODO pass in regex from options that is used to split on method name.
-    const [internal, external] = this._splitMethods(expandedSchema.methods)
+    const [internal, external]: [
+      MethodObject[],
+      MethodObject[]
+    ] = this._splitMethods(expandedSchema.methods)
     //console.log(internal);
     //console.log(external);
 
@@ -145,11 +179,17 @@ export class RpcClient {
     Object.freeze(this._internal)
   }
 
+  /**
+   * Takes an OpenRPC schema and returns that same schema with internal
+   * references expanded inline.
+   *
+   * TODO proper schema expansion
+   */
   private _expand(schema: RpcSchema): RpcExpandedSchema {
     // TODO for now, we drop any references in the methods (a method
     // with $ref property); later we need to properly expand those
     // references to include them inline!
-    const removed = _.remove(
+    _.remove(
       schema.methods,
       (method: MethodOrReference): boolean => {
         if (method['$ref']) {
@@ -163,12 +203,14 @@ export class RpcClient {
   }
 
   /**
-   *
+   * Splits array into two sub-arrays; the first sub-array is composed
+   * of elements that returned true for the supplied predicate, and the
+   * second group of elements that returned false.
    */
-  private _splitMethods(methods: Array<MethodObject>) {
-    // Splits array into two sub-arrays; the first sub-array is composed
-    // of elements that returned true for the supplied predicate, and
-    // the second group of elements that returned false.
+  private _splitMethods(methods: MethodObject[]): [
+    MethodObject[],
+    MethodObject[],
+  ] {
     return _.partition(methods, (method) => {
       // TODO make this regex a client option
       return /\./.test(method.name)
@@ -178,7 +220,7 @@ export class RpcClient {
   /**
    *
    */
-  private _internalMethods(target: Object, methods: MethodObject[]) {
+  private _internalMethods(target: RpcDispatch, methods: MethodObject[]): RpcDispatch {
     return _.reduce(
       methods,
       (ns, method) => {
@@ -200,7 +242,7 @@ export class RpcClient {
   /**
    *
    */
-  private _externalMethods(target: Object, methods: MethodObject[]) {
+  private _externalMethods(target: RpcDispatch, methods: MethodObject[]) {
     // Define a function on the target object for each RPC method
     // descriptor in methods.
     _.each(methods, (method: MethodObject): void => {
@@ -220,16 +262,11 @@ export class RpcClient {
   /**
    * Define the collection of properties we expose to describe the client.
    */
-  private _initProperties(id: DurableObjectId) {
-    const props = {}
-
-    // Return the ID of the durable object this client is for.
-    Object.defineProperty(props, 'id', {
-      value: id.toString(),
-      writable: false,
-    })
-
-    return props
+  private _initProperties(id: DurableObjectId): RpcProperties {
+    return {
+      // The ID of the durable object this client is for.
+      id: id.toString(),
+    }
   }
 
   // Access the "internal" method table.
@@ -250,15 +287,15 @@ export class RpcClient {
    *
    */
   private _rpcMethod(
-    target: Object,
+    target: RpcDispatch,
     path: string[],
     name: string,
-    method: MethodObject
-  ): Object {
+    method: Readonly<MethodObject>,
+  ): RpcDispatch {
     // Create a fn for the RPC call.
     // TODO tighten up params type
     // TODO return Promise<RpcResult>?
-    const fn = this._makeRpcFn(method, this._options)
+    const fn: RpcClientFn = this._makeRpcFn(method, this._options)
 
     if (path.length <= 0) {
       return Object.defineProperty(target, name, {
@@ -281,11 +318,11 @@ export class RpcClient {
   /**
    *
    */
-  private _makeRpcFn(method: MethodObject, clientOpt: RpcClientOptions) {
+  private _makeRpcFn(method: MethodObject, clientOpt: RpcClientOptions): RpcClientFn {
     const execute = _.bind(this._execute, this)
 
     // TODO tighten up the types on params, etc.
-    return async function (params: Object, requestOpt: RpcRequestOptions = {}) {
+    return async function (params: RequestParams, requestOpt: RpcRequestOptions = {}) {
       // Merge any per-request options on top of the options supplied
       // when constructing the client.
       const options: RpcClientOptions = _.merge({}, clientOpt, requestOpt)
@@ -303,7 +340,7 @@ export class RpcClient {
    */
   private async _execute(
     method: string,
-    params: Object,
+    params: RequestParams,
     options: RpcRequestOptions
   ): Promise<RpcResult> {
     // This base URL is ignored for routing purposes since the calls are
@@ -361,14 +398,14 @@ export class RpcClient {
 
     // Check that JSON-RPC response has an ID that matches the one sent
     // in the request.
-    if (rpcJSON.hasOwnProperty('id')) {
+    if (Object.hasOwn(rpcJSON, 'id')) {
       if (rpcJSON.id !== this._requestId) {
         console.warn(`mismatch in request and response ID: ${this._requestId} <> ${rpcJSON.id}`)
       }
     }
 
     // TODO check for .result or .error
-    if (rpcJSON.hasOwnProperty('result')) {
+    if (Object.hasOwn(rpcJSON, 'result')) {
       return _.get(rpcJSON, 'result')
     }
 
