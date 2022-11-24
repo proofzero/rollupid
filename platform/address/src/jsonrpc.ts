@@ -81,7 +81,7 @@ export default async (
       signature: string
     ): Promise<AuthorizeResult> {
       const client = getCoreClient(address)
-      const coreId = await client.kb_resolveAddress()
+      const coreId = await this.kb_resolveAddress(address)
       if (!coreId) {
         throw 'missing core identifier'
       }
