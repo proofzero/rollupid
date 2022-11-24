@@ -1,0 +1,28 @@
+name = "access-gateway"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+workers_dev = false
+
+services = [
+  { binding = "Access", service = "access" },
+]
+
+[dev]
+port = 9797
+local_protocol = "http"
+
+[env.dev]
+services = [
+  { binding = "Access", service = "access-dev" },
+]
+
+[env.next]
+services = [
+  { binding = "Access", service = "access-next" },
+]
+
+[env.current]
+services = [
+  { binding = "Access", service = "access-current" },
+]
