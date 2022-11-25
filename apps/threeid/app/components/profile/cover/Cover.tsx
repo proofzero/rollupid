@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import { HTMLAttributes, useEffect, useState } from 'react'
 
 import classNames from 'classnames'
 
@@ -6,16 +6,31 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export type CoverProps = HTMLAttributes<HTMLDivElement> & {
   src: string | undefined
-  loaded?: boolean
 }
 
 export const Cover = ({
-  loaded = true,
   src,
   className,
   children,
   ...rest
 }: CoverProps) => {
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    setLoaded(false);
+
+    if (!src) {
+      return
+    }
+
+    const img = new Image()
+    img.onload = () => {
+      setLoaded(true)
+    }
+
+    img.src = src
+  }, [src])
+
   return (
     <div
       className={classNames(
