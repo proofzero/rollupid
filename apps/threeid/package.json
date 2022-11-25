@@ -17,7 +17,7 @@
     "dev": "echo \"No dev for threeid. Please use start.\"",
     "start": "run-p \"dev:*\"",
     "e2e": "cross-env NODE_ENV=test npx playwright test",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "start-storybook -p 6007",
     "build-storybook": "build-storybook"
   },
   "dependencies": {
