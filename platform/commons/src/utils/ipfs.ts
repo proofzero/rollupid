@@ -11,7 +11,10 @@ export const gatewayFromIpfs = (
   const cid = match[2]
   const path = match[3]
 
-  return `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
+  const url = `https://nftstorage.link/${prefix ? `${prefix}` : 'ipfs/'}${cid}${
     path ? `${path}` : ''
   }`
+
+  fetch(url) // prime the gateway
+  return url
 }

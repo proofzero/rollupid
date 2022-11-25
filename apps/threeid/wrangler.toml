@@ -28,6 +28,9 @@ services = [
   { binding = "ICONS", service = "icons-dev"},
 ]
 
+[vars]
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+
 [site]
   bucket = "./public"
 

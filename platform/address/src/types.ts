@@ -1,4 +1,7 @@
-import type { BaseApi } from '@kubelt/platform.commons/src/jsonrpc'
+import type {
+  BaseApi,
+  DurableObjectApi,
+} from '@kubelt/platform.commons/src/jsonrpc'
 import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
 
 export interface Environment {
@@ -21,24 +24,36 @@ export interface Challenge {
   state: string
 }
 
-export interface CoreApi extends BaseApi {
-  kb_setAddress(address: string, coreId: string): void
-  kb_deleteAddress(): void
-  kb_resolveAddress(): Promise<string | undefined>
-  kb_getNonce(
+export interface AddressCoreApi extends DurableObjectApi {
+  getAddress(): string | undefined
+  setAddress(address: string): Promise<void>
+  setAccount(accountUrn: string): void
+  unsetAccount(): void
+  resolveAccount(): Promise<string | undefined>
+}
+
+export interface CryptoCoreApi extends AddressCoreApi {
+  getNonce(
     template: string,
     clientId: string,
     redirectUri: string,
     scope: string[],
     state: string
   ): Promise<string>
-  kb_verifyNonce(nonce: string, signature: string): Promise<Challenge>
+  verifyNonce(nonce: string, signature: string): Promise<Challenge>
+  setProfile(profile: AddressProfile): void
+  getProfile(): Promise<AddressProfile | undefined>
+  setPfpVoucher(voucher: object): void
+  getPfpVoucher(): object | undefined
 }
 
 export interface WorkerApi extends BaseApi {
-  kb_setAddress(address: string, coreId: string): void
-  kb_unsetAddress(address: string): void
-  kb_resolveAddress(address: string): Promise<string | undefined>
+  kb_setAccount(accountUrn: string): Promise<void>
+  kb_unsetAccount(): Promise<void>
+  kb_resolveAccount(): Promise<string | undefined>
+}
+
+export interface CryptoWorkerApi extends WorkerApi {
   kb_getNonce(
     template: string,
     clientId: string,
@@ -46,9 +61,32 @@ export interface WorkerApi extends BaseApi {
     scope: string[],
     state: string
   ): Promise<string>
-  kb_verifyNonce(
-    address: string,
-    nonce: string,
-    signature: string
-  ): Promise<AuthorizeResult>
+  kb_verifyNonce(nonce: string, signature: string): Promise<AuthorizeResult>
+  kb_setAddressProfile(profile: AddressProfile): Promise<void>
+  kb_getAddressProfile(): Promise<AddressProfile | undefined>
+  kb_getPfpVoucher(): Promise<object | undefined>
+}
+
+export enum CryptoAddressType {
+  ETHEREUM = 'ethereum',
+  ETH = 'eth',
+}
+export enum SocialAddressType {
+  TWITTER = 'twitter',
+  GOOGLE = 'google',
+  APPLE = 'apple',
+}
+export type EmailAddressType = 'email'
+export type AddressCoreType =
+  | CryptoAddressType
+  | SocialAddressType
+  | EmailAddressType
+
+export type AddressProfile = {
+  displayName: string
+  pfp: {
+    url: string | null | undefined
+    isToken: boolean
+  }
+  cover?: string | undefined
 }

@@ -9,7 +9,18 @@ module.exports = {
     '@storybook/addon-interactions',
   ],
   framework: '@storybook/react',
-  core: {
-    builder: 'webpack5',
+  output: {
+    hashFunction: 'xxhash64',
   },
+  core: {
+    builder: '@storybook/builder-webpack5',
+  },
+  // webpackFinal: async (config, { configType }) => {
+  //   const { module } = config
+  //   const { rules } = module
+  //   return {
+  //     ...config,
+  //     module: { ...config.module, rules: rules },
+  //   }
+  // },
 }

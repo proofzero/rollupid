@@ -221,7 +221,7 @@ const rpcSchema: RpcSchema = {
       summary: 'Return the public application profile',
       params: [
         {
-          name: 'appId',
+          name: 'clientId',
           required: true,
           schema: {
             // TODO app core ID, needs better type here

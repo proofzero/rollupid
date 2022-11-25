@@ -13,6 +13,9 @@ services = [
   { binding = "Oort", service = "oort" },
 ]
 
+[vars]
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+
 [dev]
 port = 9191
 local_protocol = "http"

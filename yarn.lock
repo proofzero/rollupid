@@ -4994,6 +4994,7 @@ __metadata:
     "@storybook/builder-webpack5": 6.5.13
     "@storybook/manager-webpack4": ^6.5.13
     "@storybook/manager-webpack5": 6.5.13
+    "@storybook/preset-create-react-app": 4.1.2
     "@storybook/react": ^6.5.13
     "@storybook/testing-library": ^0.0.13
     "@tailwindcss/forms": 0.5.3
@@ -5025,6 +5026,7 @@ __metadata:
     eslint-plugin-standard: 5.0.0
     eslint-plugin-storybook: 0.6.7
     ethers: 5.7.0
+    flowbite: 1.5.4
     graphql: 16.6.0
     graphql-request: 5.0.0
     graphql-tag: 2.12.6

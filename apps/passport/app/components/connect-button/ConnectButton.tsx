@@ -57,7 +57,7 @@ export function ConnectButton({
             <Button
               tertiary
               className={classNames('button', className)}
-              disabled={status !== 'disconnected'}
+              disabled={isConnecting}
               onClick={show}
             >
               <span className={classNames('icon')}>

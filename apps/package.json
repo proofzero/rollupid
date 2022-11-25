@@ -7,7 +7,7 @@
     "*"
   ],
   "scripts": {
-    "gql:threeid": "graphql-codegen --config graphql.config.js --project threeid --aggregate-output -n -l",
+    "gql:apps": "graphql-codegen --config graphql.config.js --project apps --aggregate-output -n -l",
     "gql": "run-p \"gql:*\"",
     "dev:gql": "run-p \"gql:* -- --watch\"",
     "storybook": "yarn workspaces foreach -i -v -p -t run storybook",

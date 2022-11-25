@@ -2,7 +2,7 @@ import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
-import { WorkerApi as AddressApi } from '@kubelt/platform.address/src/types'
+import { CryptoApi as AddressApi } from '@kubelt/platform.address/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -28,7 +28,7 @@ const threeIDResolvers: Resolvers = {
   Query: {
     profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
       // console.log('query', coreId)
-      const coreId = (jose.decodeJwt(jwt)).iss
+      const coreId = jose.decodeJwt(jwt).iss
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
@@ -37,9 +37,13 @@ const threeIDResolvers: Resolvers = {
       if (isEmptyObject(accountProfile)) {
         const oortClient = new OortClient(env.OORT, jwt)
         const oortResponse = await oortClient.getProfile()
-        accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
+        accountProfile = await upgrayeddOortToAccount(
+          coreId,
+          accountClient,
+          oortResponse
+        )
       }
-      
+
       // console.log(accountProfile)
       return accountProfile
     },
@@ -50,15 +54,19 @@ const threeIDResolvers: Resolvers = {
     ) => {
       const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      
-      const coreId = await addressClient.kb_resolveAddress(address)  
+
+      const coreId = await addressClient.kb_resolveAddress(address)
       let accountProfile = await accountClient.kb_getProfile(coreId)
-      
+
       // Upgrayedd Oort -> Account
       if (isEmptyObject(accountProfile)) {
         const oortClient = new OortClient(env.OORT)
         const oortResponse = await oortClient.getProfileFromAddress(address)
-        accountProfile = await upgrayeddOortToAccount(coreId, accountClient, oortResponse)
+        accountProfile = await upgrayeddOortToAccount(
+          coreId,
+          accountClient,
+          oortResponse
+        )
       }
 
       // console.log(accountProfile)
@@ -72,7 +80,7 @@ const threeIDResolvers: Resolvers = {
       { env, jwt, coreId }: ResolverContext
     ) => {
       // Rectify coreId in case it's undefined. Middleware should make sure JWT is valid here:
-      coreId = coreId || (jose.decodeJwt(jwt)).iss
+      coreId = coreId || jose.decodeJwt(jwt).iss
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let currentProfile = await accountClient.kb_getProfile(coreId)
@@ -82,7 +90,7 @@ const threeIDResolvers: Resolvers = {
         const oortResponse = await oortClient.getProfile()
         currentProfile = await checkHTTPStatus(oortResponse)
           .then(() => getRPCResult(oortResponse))
-          .catch(e => console.log(`Failed to get Oort profile`, e))
+          .catch((e) => console.log(`Failed to get Oort profile`, e))
       }
 
       // Make sure nulls are empty objects.

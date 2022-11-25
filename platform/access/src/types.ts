@@ -30,7 +30,7 @@ export type AuthorizationRequest = {
 }
 
 export type AccessParameters = {
-  coreId: string
+  account: string
   clientId: string
   scope: Scope
 }
@@ -62,7 +62,7 @@ export type RefreshAuthorizationResult = GenerateResult
 
 export interface WorkerApi extends BaseApi {
   kb_authorize(
-    coreId: string,
+    accountUrn: string,
     clientId: string,
     redirectUri: string,
     scope: Scope,
@@ -81,7 +81,7 @@ export interface WorkerApi extends BaseApi {
 
 export interface AuthorizationApi extends DurableObjectApi {
   authorize(
-    coreId: string,
+    account: string,
     clientId: string,
     redirectUri: string,
     scope: Scope,
@@ -96,7 +96,7 @@ export interface AuthorizationApi extends DurableObjectApi {
 
 export interface AccessApi extends BaseApi {
   generate(
-    coreId: string,
+    account: string,
     clientId: string,
     scope: Scope
   ): Promise<GenerateResult>
