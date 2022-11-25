@@ -1,4 +1,5 @@
 import profileResolver from "./profile";
 import addressResolver from "./address";
+import nftsResolver from "./nfts";
 
-export { profileResolver, addressResolver };
+export { profileResolver, addressResolver, nftsResolver };
