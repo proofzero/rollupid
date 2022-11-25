@@ -52,6 +52,7 @@ const threeIDResolvers: Resolvers = {
       { address }: { address: string },
       { env }: ResolverContext
     ) => {
+      console.log('in resolver')
       const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
 
