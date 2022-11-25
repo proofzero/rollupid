@@ -1,12 +1,22 @@
-import React, { HTMLAttributes } from 'react'
+import React from 'react'
+import { HTMLAttributes } from 'react'
 
 import classNames from 'classnames'
 
+import { Spinner } from '../../spinner/Spinner'
+
 export type CoverProps = HTMLAttributes<HTMLDivElement> & {
   src: string | undefined
+  loaded?: boolean
 }
 
-export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
+export const Cover = ({
+  loaded = true,
+  src,
+  className,
+  children,
+  ...rest
+}: CoverProps) => {
   return (
     <div
       className={classNames(
@@ -21,7 +31,13 @@ export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
       }}
       {...rest}
     >
-      {children}
+      {!loaded && (
+        <div className="absolute flex left-0 right-0 top-0 bottom-0 justify-center items-center">
+          <Spinner color="#ffffff" />
+        </div>
+      )}
+
+      {loaded && children}
     </div>
   )
 }

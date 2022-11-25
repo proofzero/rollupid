@@ -4,7 +4,9 @@ import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
-import { Text, Avatar, Cover } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Cover } from '../components/profile/cover/Cover'
 
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
@@ -275,6 +277,21 @@ const ProfileRoute = () => {
     4
   )} ... ${targetAddress.substring(targetAddress.length - 4)}`
 
+  useEffect(() => {
+    if (!coverUrl) {
+      return
+    }
+
+    setHandlingCover(true)
+
+    const img = new Image()
+    img.onload = () => {
+      setHandlingCover(false)
+    }
+
+    img.src = gatewayFromIpfs(coverUrl) as string
+  }, [coverUrl])
+
   return (
     <div className="bg-white h-full min-h-screen">
       <div
@@ -291,6 +308,7 @@ const ProfileRoute = () => {
       </div>
 
       <Cover
+        loaded={coverUrl && !handlingCover}
         src={gatewayFromIpfs(coverUrl)}
         className={`max-w-7xl mx-auto flex justify-center ${
           !handlingCover ? 'hover-child-visible' : ''

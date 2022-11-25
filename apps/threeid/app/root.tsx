@@ -18,8 +18,8 @@ import { useLoaderData, useCatch, useNavigate } from '@remix-run/react'
 import { startSession } from '~/utils/datadog.client'
 
 import styles from './styles/tailwind.css'
+import designStyles from '@kubelt/design-system/src/styles/global.css'
 import baseStyles from './styles/base.css'
-import designStyles from '@kubelt/design-system/dist/index.css'
 
 import social from './assets/social.png'
 import appleIcon from './assets/apple-touch-icon.png'
