@@ -46,6 +46,7 @@ const threeIDResolvers: Resolvers = {
       }: { address: string; nodeType: string; addrType: string },
       { env }: ResolverContext
     ) => {
+<<<<<<< HEAD
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
         env.Address,
         {
@@ -58,6 +59,11 @@ const threeIDResolvers: Resolvers = {
       if (!coreId) {
         throw 'galaxy:profileFromAddress: no coreId found'
       }
+=======
+      console.log('in resolver')
+      const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+>>>>>>> ce125d0b... wip
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
