@@ -22088,16 +22088,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flowbite@npm:1.5.4":
-  version: 1.5.4
-  resolution: "flowbite@npm:1.5.4"
-  dependencies:
-    "@popperjs/core": ^2.9.3
-    mini-svg-data-uri: ^1.4.3
-  checksum: bed458380ec26eb3007669758ccf2276017ae7d9c60c80ba4090fe119e56bab071b3dc1ad9b8a9123478b0f1a8c082be6a1676fc4a6f04a3df3c4577e916be97
-  languageName: node
-  linkType: hard
-
 "flush-write-stream@npm:^1.0.0":
   version: 1.1.1
   resolution: "flush-write-stream@npm:1.1.1"
