@@ -310,8 +310,9 @@ const ProfileRoute = () => {
       <Cover
         loaded={coverUrl && !handlingCover}
         src={gatewayFromIpfs(coverUrl)}
-        className={`max-w-7xl mx-auto flex justify-center ${!handlingCover ? 'hover-child-visible' : ''
-          }`}
+        className={`max-w-7xl mx-auto flex justify-center ${
+          !handlingCover ? 'hover-child-visible' : ''
+        }`}
       >
         {isOwner && (
           <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-800/25 rounded-b-xl">

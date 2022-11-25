@@ -8,16 +8,11 @@ export type CoverProps = HTMLAttributes<HTMLDivElement> & {
   src: string | undefined
 }
 
-export const Cover = ({
-  src,
-  className,
-  children,
-  ...rest
-}: CoverProps) => {
+export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    setLoaded(false);
+    setLoaded(false)
 
     if (!src) {
       return
