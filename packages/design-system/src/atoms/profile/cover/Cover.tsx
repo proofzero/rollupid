@@ -8,6 +8,8 @@ export type CoverProps = HTMLAttributes<HTMLDivElement> & {
 }
 
 export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
+  const [foo] = useState('bar')
+
   return (<div
       className={classNames(
         'h-[300px] w-full relative rounded-b-xl',
@@ -21,7 +23,8 @@ export const Cover = ({ src, className, children, ...rest }: CoverProps) => {
       }}
       {...rest}
     >
-      {children}
+      {/* {children} */}
+      {foo}
     </div>
   )
 }
