@@ -1,9 +1,8 @@
-import React from 'react'
-import { HTMLAttributes } from 'react'
+import React, { HTMLAttributes } from 'react'
 
 import classNames from 'classnames'
 
-import { Spinner } from '../../spinner/Spinner'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export type CoverProps = HTMLAttributes<HTMLDivElement> & {
   src: string | undefined

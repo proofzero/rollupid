@@ -4,7 +4,9 @@ import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
-import { Text, Avatar, Cover } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Cover } from '../components/profile/cover/Cover'
 
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
