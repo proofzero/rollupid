@@ -275,6 +275,21 @@ const ProfileRoute = () => {
     4
   )} ... ${targetAddress.substring(targetAddress.length - 4)}`
 
+  useEffect(() => {
+    if (!coverUrl) {
+      return
+    }
+
+    setHandlingCover(true)
+
+    const img = new Image()
+    img.onload = () => {
+      setHandlingCover(false)
+    }
+
+    img.src = gatewayFromIpfs(coverUrl) as string
+  }, [coverUrl])
+
   return (
     <div className="bg-white h-full min-h-screen">
       <div
@@ -291,10 +306,10 @@ const ProfileRoute = () => {
       </div>
 
       <Cover
+        loaded={coverUrl && !handlingCover}
         src={gatewayFromIpfs(coverUrl)}
-        className={`max-w-7xl mx-auto flex justify-center ${
-          !handlingCover ? 'hover-child-visible' : ''
-        }`}
+        className={`max-w-7xl mx-auto flex justify-center ${!handlingCover ? 'hover-child-visible' : ''
+          }`}
       >
         {isOwner && (
           <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-800/25 rounded-b-xl">
