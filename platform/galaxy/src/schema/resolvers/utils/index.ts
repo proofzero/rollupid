@@ -111,5 +111,20 @@ export async function upgrayeddOortToAccount(
   }
 
   console.log(`Migrating core ${coreId} to Account service... complete`)
+<<<<<<< HEAD
   return oortProfile
 }
+=======
+  return result
+}
+
+export function buildGQLError(code: number, msg: string) {
+  return new GraphQLYogaError(msg, {
+    extensions: {
+      http: {
+        status: code,
+      },
+    },
+  })
+}
+>>>>>>> 51002224... wip
