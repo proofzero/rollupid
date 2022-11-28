@@ -83,8 +83,8 @@ export const resolveEns = async (address: string) => {
 
 export const getNftarVoucher = async (
   address: string,
-  chain: string = 'ethereum',
-  chainId: string = NFTAR_CHAIN_ID
+  chain = 'ethereum',
+  chainId = NFTAR_CHAIN_ID
 ) => {
   const nftarFetch = {
     method: 'POST',
