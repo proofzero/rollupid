@@ -1,5 +1,4 @@
-import { json } from 'stream/consumers'
-import { AlchemyClient } from '~/utils/alchemy.server'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { gatewayFromIpfs } from './gateway-from-ipfs'
 
 type FetchVoucherParams = {
@@ -17,10 +16,12 @@ export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
   const chainId: string = NFTAR_CHAIN_ID
 
   // check if the user has already minted
-  const alchemy = new AlchemyClient()
-  const nfts = await alchemy.getNFTsForOwner(address, {
-    contracts: [contractAddress],
+  const galaxy = await getGalaxyClient()
+  const nfts = galaxy.getNftsForAddress({
+    owner: address,
+    contractAddresses: [contractAddress],
   })
+
   if (nfts.ownedNfts.length > 0) {
     const voucher = {
       chainId,
