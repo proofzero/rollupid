@@ -26,6 +26,9 @@ export default {
     if (!env.Address) {
       throw Error('Address service bind not set')
     }
+    if (!env.Icons) {
+      throw Error('Icons service bind not set')
+    }
     if (!env.ALCHEMY_KEY) {
       throw Error('ALCHEMY_KEY not set')
     }
@@ -34,7 +37,7 @@ export default {
     }
     if (!env.ALCHEMY_NETWORK) {
       throw Error('ALCHEMY_NETWORK not set')
-    }    
+    }
 
     return yoga.handleRequest(request, { env, ctx })
   },
