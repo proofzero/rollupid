@@ -1,8 +1,6 @@
 import { error } from 'itty-router-extras'
 import {
   createRequestHandler,
-  Func,
-  JsonRpcClient,
   JsonRpcRequest,
   JsonRpcResponse,
 } from 'typed-json-rpc'
