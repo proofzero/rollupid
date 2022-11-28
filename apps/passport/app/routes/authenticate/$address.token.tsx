@@ -5,10 +5,16 @@ import { createUserSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
-  const { address } = params
+  const { address, coreType, addressType } = params
+
+  // TODO validate params
 
   // TODO exchange token for access token
-  const addressClient = getAddressClient(address as string, 'eth')
+  const addressClient = getAddressClient(
+    address as string,
+    coreType as string,
+    addressType as string
+  )
   const account = await addressClient.kb_resolveAccount()
   const accessClient = getAccessClient()
   const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(

@@ -1,19 +1,12 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import {
-  useNavigate,
-  useLoaderData,
-  useActionData,
-  useSubmit,
-} from '@remix-run/react'
+import { useNavigate, useLoaderData, useSubmit } from '@remix-run/react'
 import { useAccount, useSignMessage, useDisconnect, useConnect } from 'wagmi'
 
 import { Button } from '@kubelt/design-system'
 
 import { useEffect, useState } from 'react'
-import { createUserSession } from '~/session.server'
-import { getAccessClient, getAddressClient } from '~/platform.server'
-import { ResponseType } from '@kubelt/platform.access/src/types'
+import { getAddressClient } from '~/platform.server'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -27,7 +20,7 @@ This will not trigger a blockchain transaction or cost any gas fees.
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const state = Math.random().toString(36).substring(7)
-  const addressClient = getAddressClient(address as string, 'eth')
+  const addressClient = getAddressClient(address as string, 'cyrpto', 'eth')
   const nonce = await addressClient.kb_getNonce(
     signMessageTemplate,
     params.address as string, // as client_id
@@ -43,7 +36,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { address } = params
-  const addressClient = getAddressClient(address as string, 'eth')
+  const addressClient = getAddressClient(address as string, 'crypto', 'eth')
   const formData = await request.formData()
 
   // TODO: validate from data
@@ -54,6 +47,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
+  searchParams.set('coreType', 'crypto')
+  searchParams.set('addressType', 'eth')
   return redirect(
     `/authenticate/${params.address}/token?${searchParams}&code=${code}`
   )

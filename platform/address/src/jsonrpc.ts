@@ -34,7 +34,7 @@ export default async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
-  const { Access, Core, CryptoCore, Oort } = env
+  const { Access, CryptoCore, Oort } = env
 
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
