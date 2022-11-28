@@ -86,6 +86,6 @@ export default /* GraphQL */ `
     }
 
     type Query {
-        nftsForAddress(address: String!, pageKey: String): NFTs
+        nftsForAddress(owner: String!, pageKey: String, pageSize: Int, contractAddresses: [String]): NFTs
     }
 `
