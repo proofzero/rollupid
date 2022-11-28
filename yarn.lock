@@ -4929,6 +4929,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kubelt/alchemy-client@workspace:packages/alchemy-client":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/alchemy-client@workspace:packages/alchemy-client"
+  dependencies:
+    eslint: 8.28.0
+    eslint-plugin-tsdoc: 0.2.17
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "@kubelt/apps.console@workspace:apps/console":
   version: 0.0.0-use.local
   resolution: "@kubelt/apps.console@workspace:apps/console"

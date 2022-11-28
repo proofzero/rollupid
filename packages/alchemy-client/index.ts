@@ -1,6 +1,6 @@
-import {
-  buildGQLError,
-} from '../utils'
+function buildError(code: number, message: string) {
+  return new Error(`${code}: ${message}`)
+}
 
 export type GetNFTsParams = {
   owner: string
@@ -39,11 +39,11 @@ export type AlchemyClientConfig = {
 export class AlchemyClient {
   #config: AlchemyClientConfig
 
-  getNFTAPIURL(path: string = '') {
+  getNFTAPIURL (path: string = '') {
     return new URL(path, `https://${this.#config.chain}-${this.#config.network}.g.alchemy.com/nft/v2/${this.#config.key}/`)
   }
 
-  getAPIURL(path: string = '') {
+  getAPIURL (path: string = '') {
     // Allow overriding the URL.
     if (this.#config.url) return new URL(path, this.#config.url)
     return new URL(path, `https://${this.#config.chain}-${this.#config.network}.g.alchemy.com/v2/${this.#config.key}/`)
@@ -51,7 +51,7 @@ export class AlchemyClient {
 
   constructor(config: AlchemyClientConfig) {
     if (!config || !config.key || !config.chain || !config.network) {
-      throw buildGQLError(500, `Missing or malformed Alchemy config: ${JSON.stringify(config)}`)
+      throw buildError(500, `Missing or malformed Alchemy config: ${JSON.stringify(config)}`)
     }
     this.#config = config
   }
