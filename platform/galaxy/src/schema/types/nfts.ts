@@ -86,6 +86,6 @@ export default /* GraphQL */ `
     }
 
     type Query {
-        nftsForAddress(address: String!): NFTs
+        nftsForAddress(address: String!, pageKey: String): NFTs
     }
 `

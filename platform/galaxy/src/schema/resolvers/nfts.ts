@@ -33,7 +33,7 @@ const nftsResolvers: Resolvers = {
     //@ts-ignore
     nftsForAddress: async (
       _parent: any,
-      { address }: { address: string },
+      { address, pageKey }: { address: string, pageKey: string },
       { env }: ResolverContext
     ) => {
       if (!address) buildGQLError(400, `Error: missing required argument 'address'`)
@@ -46,6 +46,7 @@ const nftsResolvers: Resolvers = {
 
       return alchemyClient.getNFTs({
         owner: address,
+        pageKey,
       } as GetNFTsParams).catch(e => {
         throw new GraphQLYogaError(e)
       })
