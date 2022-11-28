@@ -1,6 +1,7 @@
 import { isAddress } from '@ethersproject/address'
 import { URN } from '@kubelt/security'
 import { parseUrn } from '@kubelt/security/urn'
+import { JsonRpcResponse } from 'typed-json-rpc'
 import { AddressCoreType, CryptoAddressType } from './types'
 
 export const resolve3RN = async (
@@ -105,9 +106,9 @@ export const getNftarVoucher = async (
     }),
   }
   const nftarRes = await fetch(`${NFTAR_URL}`, nftarFetch)
-  const jsonRes = await nftarRes.json()
+  const jsonRes: JsonRpcResponse = await nftarRes.json()
 
-  if (jsonRes.error) {
+  if ('error' in jsonRes) {
     throw new Error(jsonRes.error.data.message)
   }
 
