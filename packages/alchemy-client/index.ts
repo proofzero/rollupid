@@ -39,57 +39,78 @@ export type AlchemyClientConfig = {
 export class AlchemyClient {
   #config: AlchemyClientConfig
 
-  getNFTAPIURL (path: string = '') {
-    return new URL(path, `https://${this.#config.chain}-${this.#config.network}.g.alchemy.com/nft/v2/${this.#config.key}/`)
+  getNFTAPIURL(path = '') {
+    return new URL(
+      path,
+      `https://${this.#config.chain}-${
+        this.#config.network
+      }.g.alchemy.com/nft/v2/${this.#config.key}/`
+    )
   }
 
-  getAPIURL (path: string = '') {
+  getAPIURL(path = '') {
     // Allow overriding the URL.
     if (this.#config.url) return new URL(path, this.#config.url)
-    return new URL(path, `https://${this.#config.chain}-${this.#config.network}.g.alchemy.com/v2/${this.#config.key}/`)
+    return new URL(
+      path,
+      `https://${this.#config.chain}-${this.#config.network}.g.alchemy.com/v2/${
+        this.#config.key
+      }/`
+    )
   }
 
   constructor(config: AlchemyClientConfig) {
     if (!config || !config.key || !config.chain || !config.network) {
-      throw buildError(500, `Missing or malformed Alchemy config: ${JSON.stringify(config)}`)
+      throw buildError(
+        500,
+        `Missing or malformed Alchemy config: ${JSON.stringify(config)}`
+      )
     }
     this.#config = config
   }
 
-  async getNFTs (
-    params: GetNFTsParams
-  ): Promise<GetNFTsResult> {
+  async getNFTs(params: GetNFTsParams): Promise<GetNFTsResult> {
     const url = this.getAPIURL('getNFTs/')
 
     url.searchParams.set('owner', params.owner)
-  
+
     params.pageKey && url.searchParams.set('pageKey', params.pageKey)
 
     params.pageSize &&
       url.searchParams.set('pageSize', params.pageSize.toString())
-  
+
     if (params.contractAddresses) {
       params.contractAddresses.forEach((address) => {
         url.searchParams.append('contractAddresses[]', address)
       })
     }
 
-    const response = await fetch(url.toString())
-    // const body = await response.json()
-    
-    return response.json()
+    return fetch(url.toString())
+      .then((r) => r.json())
+      .catch((e) => {
+        throw buildError(500, `Error calling Alchemy getNFTs: ${e.message}`)
+      })
   }
-  
+
   async getOwnersForToken(
     params: GetOwnersForTokenParams
-  ): Promise<GetOwnersForTokenResult> {
-    const url = this.getAPIURL('/getOwnersForToken/')
+  ): Promise<GetOwnersForTokenResult | unknown> {
+    const url = this.getAPIURL('getOwnersForToken/')
 
     const { contractAddress, tokenId } = params
     const urlSearchParams = new URLSearchParams({ contractAddress, tokenId })
-    const response = await fetch(`${url}?${urlSearchParams}`)
- 
-    const body: GetOwnersForTokenResult = await response.json()
-    return body
+
+    // Not currently tested. Was:
+    // const response = await fetch(`${url}?${urlSearchParams}`)
+    // const body: GetOwnersForTokenResult = await response.json()
+    // return body
+    return fetch(`${url}?${urlSearchParams}`)
+      .then((r) => r.json())
+      .catch((e) => {
+        throw buildError(
+          500,
+          `Error calling Alchemy getOwnersForToken: ${e.message}`
+        )
+      })
   }
 }
