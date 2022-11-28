@@ -39,6 +39,16 @@ export const SCOPE_ADMIM: Scope = Symbol.for('scope://threeid.xyz/admin.admin')
 // GENERAL
 
 /**
+ * The scope required to read account object.
+ */
+export const SCOPE_ACCOUNT_READ: Scope = Symbol.for('scope://threeid.xyz/account.read')
+
+/**
+ * The scope required to write to account object.
+ */
+export const SCOPE_ACCOUNT_WRITE: Scope = Symbol.for('scope://threeid.xyz/account.read')
+
+/**
  * The scope representing the ability to read profile data.
  *
  * @alpha
