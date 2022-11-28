@@ -8,6 +8,7 @@ services = [
   { binding = "Oort", service = "oort"},
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Icons", service = "icons" },
 ]
 
 [dev]
@@ -20,6 +21,7 @@ services = [
   { binding = "Oort", service = "oort-devnet"},
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Icons", service = "icons" },
 ]
 
 [env.next]
@@ -28,6 +30,7 @@ services = [
   { binding = "Oort", service = "oort-testnet"},
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Icons", service = "icons" },
 ]
 
 [env.current]
@@ -36,6 +39,7 @@ services = [
   { binding = "Oort", service = "oort-mainnet"},
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Icons", service = "icons" },
 ]
 
 

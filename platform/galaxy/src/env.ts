@@ -11,6 +11,7 @@ export default interface Env {
   Oort: Fetcher
   Account: Fetcher
   Address: Fetcher
+  Icons: Fetcher
   ALCHEMY_KEY: string
   ALCHEMY_CHAIN: string
   ALCHEMY_NETWORK: string
