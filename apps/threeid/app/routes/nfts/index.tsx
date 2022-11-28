@@ -1,14 +1,9 @@
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
-import { AlchemyClient } from '~/utils/alchemy.server'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
-
-  // @ts-ignore
-  if (!ALCHEMY_NFT_API_URL) {
-    throw new Error("Make sure 'ALCHEMY_NFT_API_URL' env variable is set.")
-  }
 
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
@@ -17,8 +12,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const pageKey = srcUrl.searchParams.get('pageKey')
 
-  const alchemy = new AlchemyClient()
-  const res = await alchemy.getNFTsForOwner(owner, { pageKey })
+  const galaxyClient = await getGalaxyClient()
+  const res = await galaxyClient.getNftsForAddress({
+    owner,
+    pageKey,
+  })
+
   const ownedNfts = res.ownedNfts.map((nft) => {
     let properties: {
       name: string
