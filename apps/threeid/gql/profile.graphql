@@ -48,3 +48,7 @@ mutation updateProfile(
 ) {
   updateThreeIDProfile(profile: $profile, visibility: $visibility)
 }
+
+query getImageUploadUrl {
+  imageUploadUrl
+}
