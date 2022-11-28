@@ -1,3 +1,5 @@
+export {}
+
 declare global {
   const ENS_RESOLVER_URL: string
   const NFTAR_CHAIN_ID: string
