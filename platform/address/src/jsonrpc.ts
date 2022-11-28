@@ -28,6 +28,7 @@ import {
 } from './types'
 import { resolve3RN } from './utils'
 import { default as CryptoCoreStatic } from './crypto-core'
+import { AccountURN } from '../../account/src/types'
 
 export default async (
   request: Request,
@@ -41,7 +42,7 @@ export default async (
   // TODO: JWT validation
 
   // validate 3RN
-  const { coreType, addressType, name, params } = await resolve3RN(request)
+  const { nodeType, name, addressType } = await resolve3RN(request)
 
   // route to correct DO
   let core = null
@@ -52,14 +53,10 @@ export default async (
     throw new Error('missing 3RN name query parameter')
   }
 
-  switch (coreType) {
+  switch (nodeType) {
     case CryptoCoreType.Crypto:
       {
-        const ens = params.get('ens') as string
-        address = await CryptoCoreStatic.validateAddress(
-          name || ens,
-          addressType
-        )
+        address = await CryptoCoreStatic.validateAddress(name, addressType)
         core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }
@@ -132,10 +129,10 @@ export default async (
       const { clientId, redirectUri, scope, state } = challenge
       const accessClient = createFetcherJsonRpcClient<AccessApi>(Access)
 
-      const accountUrn = `urn:threeid:account?=name=${account}&type=account`
+      const accountUrn = `urn:threeid:account/${account}?+node_type=account`
 
       return accessClient.kb_authorize(
-        accountUrn,
+        accountUrn as AccountURN,
         clientId,
         redirectUri,
         scope,
@@ -155,7 +152,7 @@ export default async (
   }
 
   const genApi = () => {
-    switch (coreType) {
+    switch (nodeType) {
       case CryptoCoreType.Crypto: {
         return createRequestHandler<CryptoWorkerApi>(cryptoApiHandlers)
       }

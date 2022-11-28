@@ -1,6 +1,6 @@
 import { isAddress } from '@ethersproject/address'
 import type { JsonRpcResponse } from 'typed-json-rpc'
-import { parseURN } from 'urns'
+import { parseURN, URNSpace } from 'urns'
 
 import {
   AddressURN,
@@ -11,42 +11,46 @@ import {
 
 import { AddressType } from './types'
 
+const space = new URNSpace('threeid', {
+  decode: (nss) => {
+    const [service, name] = nss.split('/')
+    if (service != 'address') {
+      throw `Invalid 3RN service name. Got ${service}, expected "address".`
+    }
+    return name
+  },
+})
+
 export const resolve3RN = async (
   request: Request
 ): Promise<{
-  coreType: CoreType
-  addressType: AddressType
+  nodeType: CoreType
   name: string
+  addressType: AddressType
   params: URLSearchParams
 }> => {
   const urn = request.headers.get('X-Resource-3RN') as AddressURN
-  // urn:threeid:address:?+<rcomponent>?=name=<do from name>#<do object class>:<class subtype>
+  // 'urn:threeid:address/0x123?+node_type=crypto&addr_type=eth'
 
   if (!urn) {
     throw new Error('missing X-Resource-3RN header')
   }
 
-  const {
-    nid: domain,
-    nss: service,
-    qcomponent,
-    fragment: addressType,
-  } = parseURN(urn)
+  const { rcomponent, qcomponent, fragment: addressType } = parseURN(urn)
 
-  if (domain != 'threeid.xyz') {
-    throw new Error(`invalid 3RN domain: ${domain}. Expected "threeid.xyz"`)
-  }
-  if (service != 'address') {
-    throw new Error(`invalid 3RN service: ${service}. Expected "address"`)
+  const name = space.decode(urn)
+
+  if (!rcomponent) {
+    throw new Error('missing r component in 3RN')
   }
   if (!qcomponent) {
     throw new Error('missing 3RN qcomponent')
   }
 
-  const qparams = new URLSearchParams(qcomponent)
+  const rparams = new URLSearchParams(rcomponent)
 
-  const coreType = qparams.get('type') as CoreType
-  if (!coreType) {
+  const nodeType = rparams.get('node_type') as CoreType
+  if (!nodeType) {
     throw new Error(
       `missing 3RN type q component parameter. Expected one of ${Object.values(
         CryptoCoreType
@@ -54,22 +58,21 @@ export const resolve3RN = async (
     )
   }
 
-  const name = qparams.get('name') as string
-  if (!name) {
-    throw new Error('missing 3RN name q component parameter')
-  }
-
-  if (!addressType) {
+  const addrType = rparams.get('addr_type') as CoreType
+  if (!addrType) {
     throw new Error(
-      `missing 3RN fragment. Expected one of ${Object.values(
+      `missing 3RN type q component parameter. Expected one of ${Object.values(
         CryptoAddressType
-      ).join(',')}`
+      )}`
     )
   }
+
+  const qparams = new URLSearchParams(qcomponent)
+
   return {
-    coreType,
-    addressType: addressType as AddressType,
+    nodeType,
     name,
+    addressType: addressType as AddressType,
     params: qparams,
   }
 }
