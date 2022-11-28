@@ -7,6 +7,9 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
+import { accountURNSpace } from '@kubelt/platform.account/src/utils'
+import { AccountURN } from '@kubelt/platform.account/src/types'
+
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -19,7 +22,6 @@ import {
   Scope,
   WorkerApi,
 } from './types'
-import { URN } from '@kubelt/security'
 
 export default async (
   request: Request,
@@ -49,7 +51,7 @@ export default async (
 
   const api = createRequestHandler<WorkerApi>({
     async kb_authorize(
-      accountUrn: string,
+      accountUrn: AccountURN,
       clientId: string,
       redirectUri: string,
       scope: Scope,
@@ -71,18 +73,11 @@ export default async (
         throw 'missing scope'
       }
 
-      const { descriptors } = await URN.parseUrn(accountUrn)
-      const { name: account } = descriptors as URN.DESCRIPTORS
-      if (!account) {
-        throw `missing account name in URN: ${accountUrn}`
-      }
+      // TODO: utility?
 
-      const authorizationUrn = URN.generateUrn(
-        'access',
-        'threeid.xyz',
-        'authorization',
-        { account, clientId }
-      )
+      const account = accountURNSpace.decode(accountUrn)
+
+      const authorizationUrn = `urn:threeid:access/${account}?+node_type=authoirzation?=clientId=${clientId}`
 
       const client = getAuthorizationClient(authorizationUrn)
       return client.authorize(account, clientId, redirectUri, scope, state)
@@ -118,12 +113,7 @@ export default async (
 
       switch (grantType) {
         case GrantType.AuthenticationCode: {
-          const authorizationUrn = URN.generateUrn(
-            'access',
-            'threeid.xyz',
-            'authorization',
-            { account: clientSecret, clientId }
-          )
+          const authorizationUrn = `urn:threeid:access/${clientSecret}?+node_type=authoirzation?=clientId=${clientId}`
           const authorizationClient = getAuthorizationClient(authorizationUrn)
           return authorizationClient.exchangeCode(code, redirectUri, clientId)
         }

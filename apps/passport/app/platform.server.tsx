@@ -1,7 +1,6 @@
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 import type { CryptoWorkerApi } from '@kubelt/platform.address/src/types'
 import type { WorkerApi as AccessApi } from '@kubelt/platform.access/src/types'
-import { URN } from '@kubelt/security'
 import type { Func, JsonRpcClient } from 'typed-json-rpc'
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
@@ -22,11 +21,12 @@ export function getAccessClient() {
   return createFetcherJsonRpcClient<AccessApi>(Access)
 }
 
-export function getAddressClient(address: string, type: string) {
-  const addressUrn = URN.generateUrn('address', 'threeid.xyz', 'address', {
-    name: address,
-    type: type,
-  })
+export function getAddressClient(
+  address: string,
+  nodeType: string,
+  addressType: string
+) {
+  const addressUrn = `urn:threeid:address/${address}?+node_type=${nodeType}&addr_type=${addressType}`
   const requestInit: RequestInit = {
     headers: {
       'X-Resource-3RN': addressUrn,

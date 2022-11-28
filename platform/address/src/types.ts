@@ -3,10 +3,14 @@ import type {
   DurableObjectApi,
 } from '@kubelt/platform.commons/src/jsonrpc'
 import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
+import type { BaseURN } from 'urns'
+
+export type AddressURN = BaseURN<'threeid', 'address'>
 
 export interface Environment {
   Access: Fetcher
   Core: DurableObjectNamespace
+  CryptoCore: DurableObjectNamespace
   Oort: Fetcher
 
   AUTH_JWT_ALG: string
@@ -67,6 +71,14 @@ export interface CryptoWorkerApi extends WorkerApi {
   kb_getPfpVoucher(): Promise<object | undefined>
 }
 
+export enum CryptoCoreType {
+  Crypto = 'crypto',
+}
+export enum SocialCoreType {
+  Social = 'social',
+}
+export type CoreType = CryptoCoreType | SocialCoreType
+
 export enum CryptoAddressType {
   ETHEREUM = 'ethereum',
   ETH = 'eth',
@@ -77,7 +89,7 @@ export enum SocialAddressType {
   APPLE = 'apple',
 }
 export type EmailAddressType = 'email'
-export type AddressCoreType =
+export type AddressType =
   | CryptoAddressType
   | SocialAddressType
   | EmailAddressType

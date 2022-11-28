@@ -1,47 +1,80 @@
 import { isAddress } from '@ethersproject/address'
-import { URN } from '@kubelt/security'
-import { parseUrn } from '@kubelt/security/urn'
-import { JsonRpcResponse } from 'typed-json-rpc'
-import { AddressCoreType, CryptoAddressType } from './types'
+import type { JsonRpcResponse } from 'typed-json-rpc'
+import { parseURN, URNSpace } from 'urns'
+
+import {
+  AddressURN,
+  CoreType,
+  CryptoAddressType,
+  CryptoCoreType,
+} from './types'
+
+import { AddressType } from './types'
+
+const space = new URNSpace('threeid', {
+  decode: (nss) => {
+    const [service, name] = nss.split('/')
+    if (service != 'address') {
+      throw `Invalid 3RN service name. Got ${service}, expected "address".`
+    }
+    return name
+  },
+})
 
 export const resolve3RN = async (
   request: Request
-): Promise<URN.URN & { address: string; type: AddressCoreType }> => {
-  const urn = request.headers.get('X-Resource-3RN')
+): Promise<{
+  nodeType: CoreType
+  name: string
+  addressType: AddressType
+  params: URLSearchParams
+}> => {
+  const urn = request.headers.get('X-Resource-3RN') as AddressURN
+  // 'urn:threeid:address/0x123?+node_type=crypto&addr_type=eth'
+
   if (!urn) {
     throw new Error('missing X-Resource-3RN header')
   }
-  const { service, domain, object, descriptors } = parseUrn(urn)
 
-  if (domain != 'threeid.xyz') {
-    throw new Error(`invalid 3RN domain: ${domain}. Expected "threeid.xyz"`)
+  const { rcomponent, qcomponent, fragment: addressType } = parseURN(urn)
+
+  const name = space.decode(urn)
+
+  if (!rcomponent) {
+    throw new Error('missing r component in 3RN')
   }
-  if (service != 'address') {
-    throw new Error(`invalid 3RN service: ${service}. Expected "address"`)
-  }
-  if (object != 'address') {
-    throw new Error(`invalid 3RN object: ${object}. Expected "address"`)
-  }
-
-  const { name, type, ens } = descriptors as URN.DESCRIPTORS
-
-  let address = name
-
-  switch (type) {
-    case CryptoAddressType.ETHEREUM:
-    case CryptoAddressType.ETH: {
-      const resolvedType = await resolveEthType(name || ens) // we may see an ens descriptor if address is unknown
-      if (!resolvedType) {
-        throw `could not resolve ethereum address type from ${urn}`
-      }
-      address = resolvedType.address
-      break
-    }
-    default:
-      throw `unsupported address type ${type}`
+  if (!qcomponent) {
+    throw new Error('missing 3RN qcomponent')
   }
 
-  return { service, domain, object, descriptors, address, type }
+  const rparams = new URLSearchParams(rcomponent)
+
+  const nodeType = rparams.get('node_type') as CoreType
+  if (!nodeType) {
+    throw new Error(
+      `missing 3RN type q component parameter. Expected one of ${Object.values(
+        CryptoCoreType
+      )}`
+    )
+  }
+
+  const addrType = rparams.get('addr_type') as CoreType
+  if (!addrType) {
+    throw new Error(
+      `missing 3RN type q component parameter. Expected one of ${Object.values(
+        CryptoAddressType
+      )}`
+    )
+  }
+
+  const qparams = new URLSearchParams(qcomponent)
+
+  return {
+    nodeType,
+    name,
+    addressType: addressType as AddressType,
+    params: qparams,
+  }
 }
 
 export const resolveEthType = async (

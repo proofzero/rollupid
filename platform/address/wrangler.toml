@@ -22,7 +22,9 @@ local_protocol = "http"
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Core", class_name = "Core" },
+  { name = "CryptoCore", class_name = "CryptoCore" }
+
 ]
 services = [
   { binding = "Access", service = "access-dev" },
@@ -31,7 +33,8 @@ services = [
 
 [env.next]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Core", class_name = "Core" },
+  { name = "CryptoCore", class_name = "CryptoCore" }
 ]
 services = [
   { binding = "Access", service = "access-next" },
@@ -40,7 +43,8 @@ services = [
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Core", class_name = "Core" },
+  { name = "CryptoCore", class_name = "CryptoCore" }
 ]
 services = [
   { binding = "Access", service = "access-current" },

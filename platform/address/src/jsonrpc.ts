@@ -1,6 +1,7 @@
 import { error } from 'itty-router-extras'
 import {
   createRequestHandler,
+  JsonRpcClient,
   JsonRpcRequest,
   JsonRpcResponse,
 } from 'typed-json-rpc'
@@ -14,7 +15,6 @@ import {
   WorkerApi as AccessApi,
 } from '@kubelt/platform.access/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import { URN } from '@kubelt/security'
 
 import { ADDRESS_OPTIONS } from './constants'
 import {
@@ -23,49 +23,66 @@ import {
   CryptoCoreApi,
   WorkerApi,
   CryptoWorkerApi,
-  CryptoAddressType,
   AddressProfile,
+  CryptoCoreType,
 } from './types'
 import { resolve3RN } from './utils'
+import { default as CryptoCoreStatic } from './crypto-core'
+import { AccountURN } from '../../account/src/types'
 
 export default async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
-  const { Access, Core, Oort } = env
+  const { Access, CryptoCore, Oort } = env
 
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
 
-  // validate 3RN
-  const { address, type } = await resolve3RN(request)
   // TODO: JWT validation
 
-  // create client
-  const core = Core.get(Core.idFromName(address))
-  const client = createFetcherJsonRpcClient(core)
+  // validate 3RN
+  const { nodeType, name, addressType } = await resolve3RN(request)
+
+  // route to correct DO
+  let core = null
+  let client: JsonRpcClient<AddressCoreApi | CryptoCoreApi>
+  let address: string
+
+  if (!name) {
+    throw new Error('missing 3RN name query parameter')
+  }
+
+  switch (nodeType) {
+    case CryptoCoreType.Crypto:
+      {
+        address = await CryptoCoreStatic.validateAddress(name, addressType)
+        core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
+        client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
+      }
+      break
+    default: // TODO: change to crypto core DO
+      throw 'invalid core type'
+  }
 
   // first time setup
-  if (
-    !(await (client as AddressCoreApi).getAddress()) ||
-    !(await (client as AddressCoreApi).getType())
-  ) {
+  if (!(await client.getAddress()) || !(await client.getType())) {
     console.log('first time setup')
-    const namePromise = (client as AddressCoreApi).setAddress(address)
-    const typePromise = (client as AddressCoreApi).setType(type)
+    const namePromise = client.setAddress(address)
+    const typePromise = client.setType(addressType)
     await Promise.all([namePromise, typePromise])
   }
   //--------------------------------------------------------------------------------
 
   const baseApiHandlers: WorkerApi = {
     async kb_setAccount(accountUrn: string): Promise<void> {
-      return (client as AddressCoreApi).setAccount(accountUrn)
+      return client.setAccount(accountUrn)
     },
     async kb_unsetAccount(): Promise<void> {
-      return (client as AddressCoreApi).kb_unsetAddress()
+      return client.kb_unsetAddress()
     },
     async kb_resolveAccount(): Promise<string | undefined> {
-      return await (client as AddressCoreApi).resolveAccount()
+      return await client.resolveAccount()
     },
   }
 
@@ -73,7 +90,7 @@ export default async (
     ...baseApiHandlers,
     // TODO: function to be deprecated pass support period for oort migration
     async kb_resolveAccount(): Promise<string> {
-      let account = await (client as CryptoCoreApi).resolveAccount()
+      let account = await client.resolveAccount()
       if (account) {
         return account
       } else {
@@ -98,13 +115,7 @@ export default async (
       scope: string[],
       state: string
     ): Promise<string> {
-      return (client as CryptoCoreApi).getNonce(
-        template,
-        clientId,
-        redirectUri,
-        scope,
-        state
-      )
+      return client.getNonce(template, clientId, redirectUri, scope, state)
     },
     async kb_verifyNonce(
       nonce: string,
@@ -118,15 +129,10 @@ export default async (
       const { clientId, redirectUri, scope, state } = challenge
       const accessClient = createFetcherJsonRpcClient<AccessApi>(Access)
 
-      const accountUrn = URN.generateUrn(
-        'account',
-        URN.DEFAULT_DOMAIN,
-        'account',
-        { [URN.DESCRIPTOR.NAME]: account, [URN.DESCRIPTOR.TYPE]: 'account' }
-      )
+      const accountUrn = `urn:threeid:account/${account}?+node_type=account`
 
       return accessClient.kb_authorize(
-        accountUrn,
+        accountUrn as AccountURN,
         clientId,
         redirectUri,
         scope,
@@ -135,20 +141,19 @@ export default async (
       )
     },
     async kb_setAddressProfile(profile: AddressProfile): Promise<void> {
-      return (client as CryptoCoreApi).setProfile(profile)
+      return client.setProfile(profile)
     },
     async kb_getAddressProfile(): Promise<AddressProfile | undefined> {
-      return (client as CryptoCoreApi).getProfile()
+      return client.getProfile()
     },
     async kb_getPfpVoucher(): Promise<object | undefined> {
-      return (client as CryptoCoreApi).getPfpVoucher()
+      return client.getPfpVoucher()
     },
   }
 
   const genApi = () => {
-    switch (type) {
-      case CryptoAddressType.ETHEREUM:
-      case CryptoAddressType.ETH: {
+    switch (nodeType) {
+      case CryptoCoreType.Crypto: {
         return createRequestHandler<CryptoWorkerApi>(cryptoApiHandlers)
       }
     }

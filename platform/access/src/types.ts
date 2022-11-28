@@ -1,9 +1,13 @@
 import jose from 'jose'
+import { BaseURN } from 'urns'
 
 import type {
   BaseApi,
   DurableObjectApi,
 } from '@kubelt/platform.commons/src/jsonrpc'
+import { AccountURN } from '@kubelt/platform.account/src/types'
+
+export type AccessURN = BaseURN<'threeid', 'access'>
 
 export interface KeyPair {
   publicKey: jose.KeyLike | Uint8Array
@@ -62,7 +66,7 @@ export type RefreshAuthorizationResult = GenerateResult
 
 export interface WorkerApi extends BaseApi {
   kb_authorize(
-    accountUrn: string,
+    accountUrn: AccountURN,
     clientId: string,
     redirectUri: string,
     scope: Scope,

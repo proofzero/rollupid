@@ -5336,6 +5336,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
+    urns: 0.6.0
     wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
@@ -5361,6 +5362,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
+    urns: 0.6.0
     wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
@@ -5384,6 +5386,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
+    urns: 0.6.0
     wrangler: 2.4.4
     yarn-run-all: 3.1.1
   languageName: unknown
@@ -40349,6 +40352,13 @@ __metadata:
   version: 4.0.3
   resolution: "urlpattern-polyfill@npm:4.0.3"
   checksum: 96ac2aea49a7b17a9ff41b2ccccdaf5e58a18c33c494cf663bea853c1ac2e70fd26a147b33b83ff7c6b77f9e34ee48409d21dbc1f2a2ad5cd9509cf3d5cb148e
+  languageName: node
+  linkType: hard
+
+"urns@npm:0.6.0":
+  version: 0.6.0
+  resolution: "urns@npm:0.6.0"
+  checksum: 0fc28a94d04a68b33f7923d015485349d950ea170273bada55376071a17f684813d9a8b3e3e431d268bd45939d7b3339b3087ad212f167e6e3c64ce499d665ae
   languageName: node
   linkType: hard
 

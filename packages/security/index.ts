@@ -19,9 +19,3 @@ import {
   SCOPE_PROFILE_READ,
   SCOPE_PROFILE_WRITE,
 } from './scopes'
-
-// URN
-// -----------------------------------------------------------------------------
-
-import * as URN from './urn'
-export { URN }
