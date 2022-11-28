@@ -1,0 +1,40 @@
+query getNftsForAddress($address: String!, $pageKey: String) {
+  nftsForAddress(address: $address, pageKey: $pageKey) {
+    pageKey
+    totalCount
+    blockHash
+    ownedNfts {
+      contract {
+        address
+      }
+      title
+      description
+      tokenUri {
+        raw
+        gateway
+      }
+      media {
+        raw
+        gateway
+        thumbnail
+        format
+        bytes
+      }
+      metadata {
+        image
+        external_url
+        background_color
+        name
+        description
+        timeLastUpdated
+      }
+      error
+      contractMetadata {
+        name
+        symbol
+        totalSupply
+        tokenType
+      }
+    } 
+  }
+}
