@@ -8,7 +8,7 @@ import {
   AlchemyClient,
   AlchemyClientConfig,
   GetNFTsParams
-} from './clients/alchemy'
+} from '../../../../../packages/alchemy-client'
 
 import {
   buildGQLError,
@@ -44,20 +44,11 @@ const nftsResolvers: Resolvers = {
         network: env.ALCHEMY_NETWORK,
       } as AlchemyClientConfig)
 
-      // let nfts = await
-      
       return alchemyClient.getNFTs({
         owner: address,
-      } as GetNFTsParams)
-
-      // return nfts
-
-      // return {
-      //   ownedNfts: nfts.ownedNfts,
-      //   totalCount: nfts.totalCount,
-      //   pageKey: nfts.pageKey,
-      //   blockHash: nfts.blockHash,
-      // }
+      } as GetNFTsParams).catch(e => {
+        throw new GraphQLYogaError(e)
+      })
     }
   },
   Mutation: {},
