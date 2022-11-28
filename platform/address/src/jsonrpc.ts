@@ -15,7 +15,6 @@ import {
   WorkerApi as AccessApi,
 } from '@kubelt/platform.access/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import { URN } from '@kubelt/security'
 
 import { ADDRESS_OPTIONS } from './constants'
 import {
