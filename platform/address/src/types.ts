@@ -3,6 +3,9 @@ import type {
   DurableObjectApi,
 } from '@kubelt/platform.commons/src/jsonrpc'
 import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
+import type { BaseURN } from 'urns'
+
+export type AddressURN = BaseURN<'threeid', 'address'>
 
 export interface Environment {
   Access: Fetcher
@@ -47,6 +50,8 @@ export interface CryptoCoreApi extends AddressCoreApi {
   getPfpVoucher(): object | undefined
 }
 
+export type CoreAPIs = AddressCoreApi | CryptoCoreApi
+
 export interface WorkerApi extends BaseApi {
   kb_setAccount(accountUrn: string): Promise<void>
   kb_unsetAccount(): Promise<void>
@@ -66,6 +71,14 @@ export interface CryptoWorkerApi extends WorkerApi {
   kb_getAddressProfile(): Promise<AddressProfile | undefined>
   kb_getPfpVoucher(): Promise<object | undefined>
 }
+
+export enum CryptoCoreType {
+  Crypto = 'crypto',
+}
+export enum SocialCoreType {
+  Social = 'social',
+}
+export type CoreType = CryptoCoreType | SocialCoreType
 
 export enum CryptoAddressType {
   ETHEREUM = 'ethereum',

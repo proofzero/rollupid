@@ -1,17 +1,27 @@
 import { isAddress } from '@ethersproject/address'
-import { URN } from '@kubelt/security'
-import { parseUrn } from '@kubelt/security/urn'
-import { JsonRpcResponse } from 'typed-json-rpc'
-import { AddressCoreType, CryptoAddressType } from './types'
+import type { JsonRpcResponse } from 'typed-json-rpc'
+import { parseURN } from 'urns'
+
+import { AddressURN, CoreType } from './types'
+
+import { AddressCoreType } from './types'
 
 export const resolve3RN = async (
   request: Request
-): Promise<URN.URN & { address: string; type: AddressCoreType }> => {
-  const urn = request.headers.get('X-Resource-3RN')
+): Promise<{
+  coreType: CoreType
+  addressType: AddressCoreType
+  params: URLSearchParams
+}> => {
+  const urn = request.headers.get('X-Resource-3RN') as AddressURN
+  // urn:threeid:address:?+<rcomponent>?=name=<do from name>#<do object class>:<class subtype>
+
   if (!urn) {
     throw new Error('missing X-Resource-3RN header')
   }
-  const { service, domain, object, descriptors } = parseUrn(urn)
+
+  const { nid: domain, nss: service, qcomponent, fragment } = parseURN(urn)
+  // const { service, domain, object, descriptors } = parseUrn(urn)
 
   if (domain != 'threeid.xyz') {
     throw new Error(`invalid 3RN domain: ${domain}. Expected "threeid.xyz"`)
@@ -19,29 +29,23 @@ export const resolve3RN = async (
   if (service != 'address') {
     throw new Error(`invalid 3RN service: ${service}. Expected "address"`)
   }
-  if (object != 'address') {
-    throw new Error(`invalid 3RN object: ${object}. Expected "address"`)
+  if (!qcomponent) {
+    throw new Error('missing 3RN qcomponent')
   }
+  const qparams = new URLSearchParams(qcomponent)
 
-  const { name, type, ens } = descriptors as URN.DESCRIPTORS
-
-  let address = name
-
-  switch (type) {
-    case CryptoAddressType.ETHEREUM:
-    case CryptoAddressType.ETH: {
-      const resolvedType = await resolveEthType(name || ens) // we may see an ens descriptor if address is unknown
-      if (!resolvedType) {
-        throw `could not resolve ethereum address type from ${urn}`
-      }
-      address = resolvedType.address
-      break
-    }
-    default:
-      throw `unsupported address type ${type}`
+  if (!fragment) {
+    throw new Error(
+      `missing 3RN fragment. Expected "<core type>:<address type>"`
+    )
   }
+  const [coreType, addressType] = fragment.split(':')
 
-  return { service, domain, object, descriptors, address, type }
+  return {
+    coreType: coreType as CoreType,
+    addressType: addressType as AddressCoreType,
+    params: qparams,
+  }
 }
 
 export const resolveEthType = async (
