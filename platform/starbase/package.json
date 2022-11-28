@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node build.js",
+    "check": "run-s format:check lint:check types:check",
     "deploy": "wrangler publish",
     "deploy:dev": "wrangler publish --env dev",
     "dev": "run-s dev:local",
@@ -18,6 +19,7 @@
     "lint": "eslint --fix src",
     "lint:check": "run-s 'lint:check:*'",
     "lint:check:src": "eslint src",
+    "test": "run-s check",
     "types:check": "tsc --project tsconfig.json --noEmit",
     "wrangler:local": "wrangler dev --local --persist",
     "wrangler:remote": "wrangler dev --env dev"
