@@ -35,7 +35,7 @@ const threeIDResolvers: Resolvers = {
 
       // Upgrayedd Oort -> Account
       if (isEmptyObject(accountProfile)) {
-        const oortClient = new OortClient(env.OORT, jwt)
+        const oortClient = new OortClient(env.Oort, jwt)
         const oortResponse = await oortClient.getProfile()
         accountProfile = await upgrayeddOortToAccount(
           coreId,
@@ -61,7 +61,7 @@ const threeIDResolvers: Resolvers = {
 
       // Upgrayedd Oort -> Account
       if (isEmptyObject(accountProfile)) {
-        const oortClient = new OortClient(env.OORT)
+        const oortClient = new OortClient(env.Oort)
         const oortResponse = await oortClient.getProfileFromAddress(address)
         accountProfile = await upgrayeddOortToAccount(
           coreId,
@@ -87,7 +87,7 @@ const threeIDResolvers: Resolvers = {
       let currentProfile = await accountClient.kb_getProfile(coreId)
 
       if (isEmptyObject(currentProfile)) {
-        const oortClient = new OortClient(env.OORT, jwt)
+        const oortClient = new OortClient(env.Oort, jwt)
         const oortResponse = await oortClient.getProfile()
         currentProfile = await checkHTTPStatus(oortResponse)
           .then(() => getRPCResult(oortResponse))

@@ -106,3 +106,13 @@ export async function upgrayeddOortToAccount(coreId: string, accountClient, oort
   console.log(`Migrating core ${coreId} to Account service... complete`)
   return result
 }
+
+export function buildGQLError(code: number, msg: string) {
+  return new GraphQLYogaError(msg, {
+    extensions: {
+      http: {
+        status: code,
+      },
+    },
+  })
+}
