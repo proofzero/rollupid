@@ -36,15 +36,12 @@ export const resolve3RN = async (
     throw new Error('missing X-Resource-3RN header')
   }
 
-  const { rcomponent, qcomponent, fragment: addressType } = parseURN(urn)
+  const { rcomponent, qcomponent } = parseURN(urn)
 
   const name = space.decode(urn)
 
   if (!rcomponent) {
     throw new Error('missing r component in 3RN')
-  }
-  if (!qcomponent) {
-    throw new Error('missing 3RN qcomponent')
   }
 
   const rparams = new URLSearchParams(rcomponent)
@@ -58,7 +55,7 @@ export const resolve3RN = async (
     )
   }
 
-  const addrType = rparams.get('addr_type') as CoreType
+  const addrType = rparams.get('addr_type') as AddressType
   if (!addrType) {
     throw new Error(
       `missing 3RN type q component parameter. Expected one of ${Object.values(
@@ -67,12 +64,12 @@ export const resolve3RN = async (
     )
   }
 
-  const qparams = new URLSearchParams(qcomponent)
+  const qparams = new URLSearchParams(qcomponent as string)
 
   return {
     nodeType,
     name,
-    addressType: addressType as AddressType,
+    addressType: addrType as AddressType,
     params: qparams,
   }
 }

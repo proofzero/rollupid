@@ -45,6 +45,8 @@ export default class CryptoCore extends Core {
     address: string,
     addressType: AddressType
   ): Promise<string> {
+    console.log('addressType', addressType)
+    console.log('address', address)
     switch (addressType) {
       case CryptoAddressType.ETHEREUM:
       case CryptoAddressType.ETH: {

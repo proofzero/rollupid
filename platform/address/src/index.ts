@@ -4,6 +4,7 @@ import { handleOptions } from '@kubelt/platform.commons/src/routers/cors'
 import { discoveryHandler } from '@kubelt/platform.commons/src/routers/openrpc'
 
 import Core from './core'
+import CryptoCore from './crypto-core'
 import jsonRpcHandler from './jsonrpc'
 import serviceDescription from './openrpc.json'
 
@@ -12,5 +13,5 @@ const index = Router()
   .options('/jsonrpc', handleOptions({ headers: ['Content-Type'] }))
   .post('/jsonrpc', jsonRpcHandler)
 
-export { Core }
+export { Core, CryptoCore }
 export default { fetch: index.handle }
