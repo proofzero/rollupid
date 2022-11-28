@@ -76,6 +76,7 @@ export class AlchemyClient {
 
     params.pageKey && url.searchParams.set('pageKey', params.pageKey)
 
+    // Default and maximum page size is 100.
     params.pageSize &&
       url.searchParams.set('pageSize', params.pageSize.toString())
 
