@@ -3,6 +3,7 @@
 // NFTMetadata probably needs a 'properties' field. Limited Alchemy docs on this.
 export default /* GraphQL */ `
     enum TokenType {
+        UNKNOWN
         ERC721
         ERC1155
     }
@@ -72,7 +73,7 @@ export default /* GraphQL */ `
         description: String
         tokenUri: TokenURI
         media: [NFTMedia!]!
-        error: String!
+        error: String
         metadata: NFTMetadata
         contractMetadata: ContractMetadata
     }
