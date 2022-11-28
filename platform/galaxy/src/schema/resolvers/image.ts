@@ -4,16 +4,16 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { setupContext } from './utils'
 import { Resolvers } from './typedefs'
 
+import CFImageUploadClient from './clients/cf-image-upload'
+
 type ResolverContext = {
   env: Env
 }
 
 const imageResolver: Resolvers = {
   Query: {
-    imageUploadUrl: async (_parent: any, {}, { env }: ResolverContext) => {
-      console.log(env)
-      return 'Foo'
-    },
+    imageUploadUrl: (_parent, {}, { env }: ResolverContext) =>
+      new CFImageUploadClient(env.Icons).getImageUploadUrl(),
   },
 }
 
