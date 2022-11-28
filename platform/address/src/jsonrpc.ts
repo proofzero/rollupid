@@ -41,13 +41,12 @@ export default async (
   // TODO: JWT validation
 
   // validate 3RN
-  const { coreType, addressType, params } = await resolve3RN(request)
+  const { coreType, addressType, name, params } = await resolve3RN(request)
 
   // route to correct DO
   let core = null
   let client: JsonRpcClient<AddressCoreApi | CryptoCoreApi>
   let address: string
-  const name = params.get('name')
 
   if (!name) {
     throw new Error('missing 3RN name query parameter')
@@ -133,12 +132,7 @@ export default async (
       const { clientId, redirectUri, scope, state } = challenge
       const accessClient = createFetcherJsonRpcClient<AccessApi>(Access)
 
-      const accountUrn = URN.generateUrn(
-        'account',
-        URN.DEFAULT_DOMAIN,
-        'account',
-        { [URN.DESCRIPTOR.NAME]: account, [URN.DESCRIPTOR.TYPE]: 'account' }
-      )
+      const accountUrn = `urn:threeid:account?=name=${account}&type=account`
 
       return accessClient.kb_authorize(
         accountUrn,

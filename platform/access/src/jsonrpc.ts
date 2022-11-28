@@ -7,6 +7,8 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
+import { parseURN } from 'urns'
+
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -19,7 +21,6 @@ import {
   Scope,
   WorkerApi,
 } from './types'
-import { URN } from '@kubelt/security'
 
 export default async (
   request: Request,
@@ -71,18 +72,23 @@ export default async (
         throw 'missing scope'
       }
 
-      const { descriptors } = await URN.parseUrn(accountUrn)
-      const { name: account } = descriptors as URN.DESCRIPTORS
+      const { nid, nss, qcomponent } = await parseURN(accountUrn)
+      if (nid != 'threeid') {
+        throw `invalid domain identifier in 3RN. Expected "threeid", got ${nid}`
+      }
+      if (nss != 'account') {
+        throw `invalid service identifier in urn. Expected "account", got "${nss}"`
+      }
+      if (!qcomponent) {
+        throw 'missing q component in 3RN'
+      }
+      const params = new URLSearchParams(qcomponent)
+      const account = params.get('name') as string
       if (!account) {
-        throw `missing account name in URN: ${accountUrn}`
+        throw `missing account name in URN q component: ${accountUrn}`
       }
 
-      const authorizationUrn = URN.generateUrn(
-        'access',
-        'threeid.xyz',
-        'authorization',
-        { account, clientId }
-      )
+      const authorizationUrn = `urn:threeid:access?=type=authoirzation&name=${account}&clientId=${clientId}`
 
       const client = getAuthorizationClient(authorizationUrn)
       return client.authorize(account, clientId, redirectUri, scope, state)
@@ -118,12 +124,7 @@ export default async (
 
       switch (grantType) {
         case GrantType.AuthenticationCode: {
-          const authorizationUrn = URN.generateUrn(
-            'access',
-            'threeid.xyz',
-            'authorization',
-            { account: clientSecret, clientId }
-          )
+          const authorizationUrn = `urn:threeid:access?=type=authoirzation&name=${clientSecret}&clientId=${clientId}`
           const authorizationClient = getAuthorizationClient(authorizationUrn)
           return authorizationClient.exchangeCode(code, redirectUri, clientId)
         }

@@ -26,7 +26,7 @@ export function getAddressClient(
   coreType: string,
   addressType: string
 ) {
-  const addressUrn = `urn:threeid:address?=name${address}#${coreType}:${addressType}`
+  const addressUrn = `urn:threeid:address?=name${address}&type=${coreType}#${addressType}`
   const requestInit: RequestInit = {
     headers: {
       'X-Resource-3RN': addressUrn,

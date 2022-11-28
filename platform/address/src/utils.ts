@@ -2,7 +2,12 @@ import { isAddress } from '@ethersproject/address'
 import type { JsonRpcResponse } from 'typed-json-rpc'
 import { parseURN } from 'urns'
 
-import { AddressURN, CoreType } from './types'
+import {
+  AddressURN,
+  CoreType,
+  CryptoAddressType,
+  CryptoCoreType,
+} from './types'
 
 import { AddressType } from './types'
 
@@ -11,6 +16,7 @@ export const resolve3RN = async (
 ): Promise<{
   coreType: CoreType
   addressType: AddressType
+  name: string
   params: URLSearchParams
 }> => {
   const urn = request.headers.get('X-Resource-3RN') as AddressURN
@@ -20,8 +26,12 @@ export const resolve3RN = async (
     throw new Error('missing X-Resource-3RN header')
   }
 
-  const { nid: domain, nss: service, qcomponent, fragment } = parseURN(urn)
-  // const { service, domain, object, descriptors } = parseUrn(urn)
+  const {
+    nid: domain,
+    nss: service,
+    qcomponent,
+    fragment: addressType,
+  } = parseURN(urn)
 
   if (domain != 'threeid.xyz') {
     throw new Error(`invalid 3RN domain: ${domain}. Expected "threeid.xyz"`)
@@ -32,18 +42,34 @@ export const resolve3RN = async (
   if (!qcomponent) {
     throw new Error('missing 3RN qcomponent')
   }
+
   const qparams = new URLSearchParams(qcomponent)
 
-  if (!fragment) {
+  const coreType = qparams.get('type') as CoreType
+  if (!coreType) {
     throw new Error(
-      `missing 3RN fragment. Expected "<core type>:<address type>"`
+      `missing 3RN type q component parameter. Expected one of ${Object.values(
+        CryptoCoreType
+      )}`
     )
   }
-  const [coreType, addressType] = fragment.split(':')
 
+  const name = qparams.get('name') as string
+  if (!name) {
+    throw new Error('missing 3RN name q component parameter')
+  }
+
+  if (!addressType) {
+    throw new Error(
+      `missing 3RN fragment. Expected one of ${Object.values(
+        CryptoAddressType
+      ).join(',')}`
+    )
+  }
   return {
-    coreType: coreType as CoreType,
+    coreType,
     addressType: addressType as AddressType,
+    name,
     params: qparams,
   }
 }

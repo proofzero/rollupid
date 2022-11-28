@@ -1,7 +1,6 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { DurableObject } from '@kubelt/platform.commons'
-import { URN } from '@kubelt/security'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
