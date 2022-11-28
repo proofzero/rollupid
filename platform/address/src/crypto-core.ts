@@ -15,6 +15,7 @@ import {
   AddressType,
 } from './types'
 import { getNftarVoucher, resolveEthType } from './utils'
+
 export default class CryptoCore extends Core {
   profile: AddressProfile | undefined
 

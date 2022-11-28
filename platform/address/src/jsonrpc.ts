@@ -27,14 +27,14 @@ import {
   AddressProfile,
   CryptoCoreType,
 } from './types'
-import { resolve3RN, resolveEthType } from './utils'
-import CryptoCore from './crypto-core'
+import { resolve3RN } from './utils'
+import { default as CryptoCoreStatic } from './crypto-core'
 
 export default async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
-  const { Access, Core, Oort } = env
+  const { Access, Core, CryptoCore, Oort } = env
 
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
@@ -58,8 +58,11 @@ export default async (
     case CryptoCoreType.Crypto:
       {
         const ens = params.get('ens') as string
-        address = await CryptoCore.validateAddress(name || ens, addressType)
-        core = Core.get(Core.idFromName(address)) // TODO: change to crypto core DO
+        address = await CryptoCoreStatic.validateAddress(
+          name || ens,
+          addressType
+        )
+        core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }
       break

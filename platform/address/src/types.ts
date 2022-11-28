@@ -10,6 +10,7 @@ export type AddressURN = BaseURN<'threeid', 'address'>
 export interface Environment {
   Access: Fetcher
   Core: DurableObjectNamespace
+  CryptoCore: DurableObjectNamespace
   Oort: Fetcher
 
   AUTH_JWT_ALG: string
