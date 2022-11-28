@@ -4,13 +4,13 @@ import { parseURN } from 'urns'
 
 import { AddressURN, CoreType } from './types'
 
-import { AddressCoreType } from './types'
+import { AddressType } from './types'
 
 export const resolve3RN = async (
   request: Request
 ): Promise<{
   coreType: CoreType
-  addressType: AddressCoreType
+  addressType: AddressType
   params: URLSearchParams
 }> => {
   const urn = request.headers.get('X-Resource-3RN') as AddressURN
@@ -43,7 +43,7 @@ export const resolve3RN = async (
 
   return {
     coreType: coreType as CoreType,
-    addressType: addressType as AddressCoreType,
+    addressType: addressType as AddressType,
     params: qparams,
   }
 }

@@ -50,8 +50,6 @@ export interface CryptoCoreApi extends AddressCoreApi {
   getPfpVoucher(): object | undefined
 }
 
-export type CoreAPIs = AddressCoreApi | CryptoCoreApi
-
 export interface WorkerApi extends BaseApi {
   kb_setAccount(accountUrn: string): Promise<void>
   kb_unsetAccount(): Promise<void>
@@ -90,7 +88,7 @@ export enum SocialAddressType {
   APPLE = 'apple',
 }
 export type EmailAddressType = 'email'
-export type AddressCoreType =
+export type AddressType =
   | CryptoAddressType
   | SocialAddressType
   | EmailAddressType

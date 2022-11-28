@@ -1,6 +1,7 @@
 import { error } from 'itty-router-extras'
 import {
   createRequestHandler,
+  JsonRpcClient,
   JsonRpcRequest,
   JsonRpcResponse,
 } from 'typed-json-rpc'
@@ -22,12 +23,10 @@ import {
   AddressCoreApi,
   CryptoCoreApi,
   WorkerApi,
-  CoreType,
   CryptoWorkerApi,
   CryptoAddressType,
   AddressProfile,
   CryptoCoreType,
-  CoreAPIs,
 } from './types'
 import { resolve3RN, resolveEthType } from './utils'
 
