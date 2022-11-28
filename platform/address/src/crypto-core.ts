@@ -27,7 +27,7 @@ export default class CryptoCore extends Core {
     })
   }
 
-  methods(): AddressCoreApi | CryptoCoreApi {
+  methods(): AddressCoreApi & CryptoCoreApi {
     const cryptoCoreApi: CryptoCoreApi = {
       ...this.coreApi,
       getNonce: this.getNonce.bind(this),
