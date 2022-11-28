@@ -14,10 +14,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "eslint-plugin-tsdoc"
-  ],
+  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
   "rules": {
     "@typescript-eslint/no-var-requires": "off",
     "tsdoc/syntax": "warn"
