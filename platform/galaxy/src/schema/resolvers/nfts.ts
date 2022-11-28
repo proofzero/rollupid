@@ -44,25 +44,20 @@ const nftsResolvers: Resolvers = {
         network: env.ALCHEMY_NETWORK,
       } as AlchemyClientConfig)
 
-      let nfts = await alchemyClient.getNFTs({
+      // let nfts = await
+      
+      return alchemyClient.getNFTs({
         owner: address,
       } as GetNFTsParams)
 
-      const response = 
+      // return nfts
 
-      console.log(nfts.ownedNfts[0])
-
-      return {
-        test: 'test',
-        ownedNfts: [{
-          contract: {
-            address: nfts.ownedNfts[0].contract.address,
-          }
-        }],
-        totalCount: nfts.totalCount,
-        pageKey: nfts.pageKey,
-        blockHash: nfts.blockHash,
-      }
+      // return {
+      //   ownedNfts: nfts.ownedNfts,
+      //   totalCount: nfts.totalCount,
+      //   pageKey: nfts.pageKey,
+      //   blockHash: nfts.blockHash,
+      // }
     }
   },
   Mutation: {},
