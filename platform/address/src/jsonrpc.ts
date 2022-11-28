@@ -24,11 +24,11 @@ import {
   CryptoCoreApi,
   WorkerApi,
   CryptoWorkerApi,
-  CryptoAddressType,
   AddressProfile,
   CryptoCoreType,
 } from './types'
 import { resolve3RN, resolveEthType } from './utils'
+import CryptoCore from './crypto-core'
 
 export default async (
   request: Request,
@@ -57,25 +57,8 @@ export default async (
   switch (coreType) {
     case CryptoCoreType.Crypto:
       {
-        // TODO: move address validation to core rpc call
         const ens = params.get('ens') as string
-        address = name || ens
-        switch (addressType) {
-          case CryptoAddressType.ETHEREUM:
-          case CryptoAddressType.ETH: {
-            const resolvedType = await resolveEthType(name || ens) // we may see an ens descriptor if address is unknown
-            if (!resolvedType) {
-              throw `could not resolve ethereum address type from ${
-                name || ens
-              }`
-            }
-            address = resolvedType.address
-            break
-          }
-          default:
-            throw `unsupported address type ${addressType}`
-        }
-        // create client
+        address = await CryptoCore.validateAddress(name || ens, addressType)
         core = Core.get(Core.idFromName(address)) // TODO: change to crypto core DO
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }
