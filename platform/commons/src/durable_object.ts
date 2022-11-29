@@ -66,8 +66,8 @@ export default class DurableObject<
     throw new Error('not implemented')
   }
 
-  getType(): string | undefined {
-    return this.coreType
+  async getType(): Promise<string | undefined> {
+    return this.coreType || (await this.storage.get('core-name'))
   }
 
   setType(type: string): Promise<void> {
@@ -75,8 +75,8 @@ export default class DurableObject<
     return this.storage.put('core-type', type)
   }
 
-  getName(): string | undefined {
-    return this.coreName
+  async getName(): Promise<string | undefined> {
+    return this.coreName || (await this.storage.get('core-name'))
   }
 
   setName(name: string): Promise<void> {

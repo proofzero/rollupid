@@ -50,13 +50,14 @@ export default /* GraphQL */ `
 
   type Query {
     profile: Profile
-    profileFromAddress(address: String!): Profile
+    profileFromAddress(
+      address: String!
+      nodeType: String!
+      addrType: String!
+    ): Profile
   }
 
   type Mutation {
-    updateThreeIDProfile(
-      profile: ThreeIDProfileInput
-      visibility: Visibility!
-    ): Boolean
+    updateThreeIDProfile(profile: ThreeIDProfileInput): Boolean
   }
 `

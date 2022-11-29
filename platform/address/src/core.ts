@@ -27,8 +27,8 @@ export default class Core extends DurableObject<
     return this.coreApi
   }
 
-  getAddress(): string | undefined {
-    return this.address || this.coreName
+  async getAddress(): Promise<string | undefined> {
+    return this.address || this.getName() || (await this.storage.get('address'))
   }
 
   async setAddress(address: string): Promise<void> {

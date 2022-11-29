@@ -32,13 +32,13 @@ const storage = createCookieSessionStorage({
 export async function createUserSession(
   jwt: string,
   redirectTo: string,
-  address?: string // NOTE: storing this temporarily in the session util RPC url remove address
+  defaultProfileUrn?: string // NOTE: storing this temporarily in the session util RPC url remove address
 ) {
   const parsedJWT = parseJwt(jwt)
   const session = await storage.getSession()
   session.set('core', parsedJWT.iss)
   session.set('jwt', jwt)
-  session.set('address', address)
+  session.set('defaultProfileUrn', defaultProfileUrn)
   return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await storage.commitSession(session),

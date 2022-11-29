@@ -20,8 +20,16 @@ query getProfile {
   }
 }
 
-query getProfileFromAddress($address: String!) {
-  profileFromAddress(address: $address) {
+query getProfileFromAddress(
+  $address: String!
+  $nodeType: String!
+  $addrType: String!
+) {
+  profileFromAddress(
+    address: $address
+    nodeType: $nodeType
+    addrType: $addrType
+  ) {
     displayName
     pfp {
       ... on StandardPFP {
@@ -42,9 +50,6 @@ query getProfileFromAddress($address: String!) {
   }
 }
 
-mutation updateProfile(
-  $profile: ThreeIDProfileInput
-  $visibility: Visibility!
-) {
-  updateThreeIDProfile(profile: $profile, visibility: $visibility)
+mutation updateProfile($profile: ThreeIDProfileInput) {
+  updateThreeIDProfile(profile: $profile)
 }

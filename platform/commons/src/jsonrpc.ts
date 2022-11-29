@@ -11,9 +11,9 @@ export interface BaseApi {
 }
 
 export interface DurableObjectApi extends BaseApi {
-  getType(): string | undefined
+  getType(): Promise<string | undefined>
   setType(type: string): Promise<void>
-  getName(): string | undefined
+  getName(): Promise<string | undefined>
   setName(name: string): Promise<void>
 }
 
@@ -38,6 +38,11 @@ export const createFetcherJsonRpcClient = <
       body,
       ...requestInit,
     })
+
+    // if (!response.ok) {
+    //   console.log({ response })
+    //   throw await response.text()
+    // }
 
     const jsonRpcResponse: JsonRpcResponse = await response.json()
     if ('error' in jsonRpcResponse) {

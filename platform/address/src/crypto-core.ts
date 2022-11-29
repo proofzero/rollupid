@@ -43,14 +43,13 @@ export default class CryptoCore extends Core {
 
   static async validateAddress(
     address: string,
-    addressType: AddressType
+    addressType: AddressType,
+    env: Environment
   ): Promise<string> {
-    console.log('addressType', addressType)
-    console.log('address', address)
     switch (addressType) {
       case CryptoAddressType.ETHEREUM:
       case CryptoAddressType.ETH: {
-        const resolvedType = await resolveEthType(address) // we may see an ens descriptor if address is unknown
+        const resolvedType = await resolveEthType(address, env) // we may see an ens descriptor if address is unknown
         if (!resolvedType) {
           throw `could not resolve ethereum address type from ${address}`
         }
@@ -69,9 +68,12 @@ export default class CryptoCore extends Core {
   }
 
   async getProfile(): Promise<AddressProfile | undefined> {
-    if (!this.profile && this.address) {
+    const address = await this.getAddress()
+    if (!this.profile && address) {
+      console.log('setting default profile')
+
       const ensRes = await fetch(
-        `https://api.ensideas.com/ens/resolve/${this.address}`
+        `https://api.ensideas.com/ens/resolve/${address}`
       )
       const {
         avatar,
@@ -82,22 +84,26 @@ export default class CryptoCore extends Core {
       } = await ensRes.json()
 
       const defaultProfile: AddressProfile = {
-        displayName: displayName || this.address,
+        displayName: displayName || address,
         pfp: {
-          url: avatar,
+          image: avatar || '',
           isToken: !!avatar,
         },
         cover: undefined,
       }
 
+      const addressType = await this.getType()
+
       // because this is a new address we don't have to check if one already exists
-      const voucher = await getNftarVoucher(this.address)
+      const voucher = await getNftarVoucher(address, addressType, this.env)
       // convert and prime the gateway
       const pfp = gatewayFromIpfs(voucher.metadata.image)
       const cover = gatewayFromIpfs(voucher.metadata.cover)
 
-      defaultProfile.pfp.url ||= pfp
+      defaultProfile.pfp.image ||= pfp as string
       defaultProfile.cover = cover
+
+      console.log('setting default profile to: ', defaultProfile)
 
       await this.setPfpVoucher(voucher) // set mint pfp voucher for this address
       await this.setProfile(defaultProfile) // overload address profile
