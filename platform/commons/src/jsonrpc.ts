@@ -41,7 +41,6 @@ export const createFetcherJsonRpcClient = <
 
     const jsonRpcResponse: JsonRpcResponse = await response.json()
     if ('error' in jsonRpcResponse) {
-      console.error(jsonRpcResponse.error)
       throw jsonRpcResponse.error
     } else {
       return jsonRpcResponse.result
