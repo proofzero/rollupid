@@ -56,8 +56,7 @@ export default async (
   switch (nodeType) {
     case CryptoCoreType.Crypto:
       {
-        console.log('crypto core', CryptoCore)
-        address = await CryptoCoreStatic.validateAddress(name, addressType)
+        address = await CryptoCoreStatic.validateAddress(name, addressType, env)
         core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }
@@ -66,8 +65,12 @@ export default async (
       throw 'invalid core type'
   }
 
+  const coreAddress = await client.getAddress()
+  const coreType = await client.getType()
+
+  console.log({ coreAddress, coreType })
   // first time setup
-  if (!(await client.getAddress()) || !(await client.getType())) {
+  if (!coreAddress || !coreType) {
     console.log('first time setup')
     const namePromise = client.setAddress(address)
     const typePromise = client.setType(addressType)

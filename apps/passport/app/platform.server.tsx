@@ -34,6 +34,14 @@ export function getAddressClient(
   }
   return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)
 }
+export function getAddressClientFromURN(addressUrn: string) {
+  const requestInit: RequestInit = {
+    headers: {
+      'X-Resource-3RN': addressUrn,
+    },
+  }
+  return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)
+}
 
 export async function getGalaxyClient() {
   const gqlClient = new GraphQLClient('http://127.0.0.1', {

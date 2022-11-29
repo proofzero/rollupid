@@ -17,6 +17,14 @@ export interface Environment {
   AUTH_JWT_TTL: string
   AUTH_NONCE_LENGTH: string
   AUTH_NONCE_TTL: string
+
+  NFTAR_URL: string
+  NFTAR_AUTHORIZATION: string
+  MINTPFP_CONTRACT_ADDRESS: string
+  NFTAR_CHAIN_ID: string
+  NFTAR_TOKEN: string
+
+  ENS_RESOLVER_URL: string
 }
 
 export interface Challenge {
@@ -29,7 +37,7 @@ export interface Challenge {
 }
 
 export interface AddressCoreApi extends DurableObjectApi {
-  getAddress(): string | undefined
+  getAddress(): Promise<string | undefined>
   setAddress(address: string): Promise<void>
   setAccount(accountUrn: string): void
   unsetAccount(): void
@@ -97,7 +105,7 @@ export type AddressType =
 export type AddressProfile = {
   displayName: string
   pfp: {
-    url: string | null | undefined
+    image: string
     isToken: boolean
   }
   cover?: string | undefined

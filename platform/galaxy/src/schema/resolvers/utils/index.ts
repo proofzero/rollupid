@@ -1,4 +1,5 @@
 import { GraphQLYogaError } from '@graphql-yoga/common'
+import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 
 import { OortJwt } from '../clients/oort'
 
@@ -83,26 +84,32 @@ export async function getRPCResult(response: Response) {
   return json.result?.value
 }
 
-// https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
-export function isEmptyObject(obj: any) {
-  // console.log('obj', obj)
-  // console.log('Object.keys(obj).length', Object.keys(obj).length)
-  // console.log('Object.getPrototypeOf(obj)', Object.getPrototypeOf(obj))
-  // console.log('Object.prototype', Object.prototype)
-  // console.log('Object.getPrototypeOf(obj) == Object.prototype', Object.getPrototypeOf(obj) == Object.prototype)
-  return (obj && Object.keys(obj).length == 0) // This doesn't apply to TS: && Object.getPrototypeOf(obj) == Object.prototype)
-}
-
-export async function upgrayeddOortToAccount(coreId: string, accountClient, oortResponse) {
+export async function upgrayeddOortToAccount(
+  coreId: string,
+  accountClient: AccountApi,
+  oortResponse
+) {
   if (!(coreId && accountClient && oortResponse)) return {}
 
   console.log(`Migrating core ${coreId} to Account service... starting`)
 
-  const [result, _] = await checkHTTPStatus(oortResponse)
-    .then(() => getRPCResult(oortResponse))
-    .then(async r => [r, await accountClient.kb_setProfile(coreId, r)])
-    .catch(e => console.log(`Migrating core ${coreId} to Account service... failed`, e))
+  await checkHTTPStatus(oortResponse)
+
+  const oortProfile = await getRPCResult(oortResponse)
+
+  console.log({ oortProfile })
+
+  if (!oortProfile) {
+    console.log(`Migrating core ${coreId} to Account service... no profile`)
+    return {}
+  }
+
+  const profileRes = await accountClient.kb_setProfile(coreId, oortProfile)
+
+  if (!profileRes) {
+    throw `Migrating core ${coreId} to Account service... failed`
+  }
 
   console.log(`Migrating core ${coreId} to Account service... complete`)
-  return result
+  return oortProfile
 }

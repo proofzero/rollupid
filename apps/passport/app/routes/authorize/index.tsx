@@ -1,9 +1,10 @@
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { redirect } from '@remix-run/cloudflare'
 import { useLoaderData } from '@remix-run/react'
 
 import {
+  getAddressClient,
+  getAddressClientFromURN,
   getGalaxyClient,
   getStabaseClient as getStarbaseClient,
 } from '~/platform.server'
@@ -28,6 +29,33 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     'KBT-Access-JWT-Assertion': session.get('jwt'),
   })
 
+  let profile
+  if (!profileRes.profile) {
+    console.log('no profile found, creating one')
+    const defaultProfileURN = session.get('defaultProfileUrn')
+    console.log({ defaultProfileURN })
+    const addressClient = getAddressClientFromURN(defaultProfileURN)
+    profile = await addressClient.kb_getAddressProfile()
+    if (!profile) {
+      throw json("Couldn't find profile", 400)
+    }
+    const updated = await galaxyClient.updateProfile(
+      { profile },
+      {
+        'KBT-Access-JWT-Assertion': session.get('jwt'),
+      }
+    )
+    if (!updated) {
+      throw json("Couldn't update profile", 400)
+    }
+  } else {
+    profile = profileRes.profile
+  }
+
+  if (!profile) {
+    throw json({ message: 'No profile found', isAuthenticated: true }, 400)
+  }
+
   // if profile is null we need to provisio a default profile
   // we can do that by getting the address profile and then setting the account profile
   // TODO: create a get address profile galaxy operation
@@ -36,14 +64,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const sbClient = getStarbaseClient()
     const scopeMeta = await sbClient.kb_appScopes()
-    console.log('scopeMeta', scopeMeta)
-    console.log('client_id', client_id)
     const appProfile = await sbClient.kb_appProfile(client_id)
-    console.log('appProfile', appProfile)
 
     return json({
       appProfile,
-      userProfile: profileRes.profile || {},
+      userProfile: profile,
       scopeMeta,
     })
   } catch (e) {

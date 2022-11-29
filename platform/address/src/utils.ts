@@ -7,6 +7,7 @@ import {
   CoreType,
   CryptoAddressType,
   CryptoCoreType,
+  Environment,
 } from './types'
 
 import { AddressType } from './types'
@@ -75,7 +76,8 @@ export const resolve3RN = async (
 }
 
 export const resolveEthType = async (
-  address: string
+  address: string,
+  env: Environment
 ): Promise<{
   type: string
   address: string
@@ -89,7 +91,7 @@ export const resolveEthType = async (
     }
   }
   if (address.endsWith('.eth')) {
-    const ens = await resolveEns(address)
+    const ens = await resolveEns(address, env)
     return {
       type: 'eth',
       ...ens,
@@ -99,10 +101,10 @@ export const resolveEthType = async (
   return null
 }
 
-export const resolveEns = async (address: string) => {
+export const resolveEns = async (address: string, env: Environment) => {
   // NOTE: this only works for mainnet
   // possibly use alchemy or other provider to resolve?
-  const ensRes = await fetch(`${ENS_RESOLVER_URL}/${address}`)
+  const ensRes = await fetch(`${env.ENS_RESOLVER_URL}/${address}`)
   const ens: {
     address: string
     avatar: string | null
@@ -114,13 +116,15 @@ export const resolveEns = async (address: string) => {
 export const getNftarVoucher = async (
   address: string,
   chain = 'ethereum',
-  chainId = NFTAR_CHAIN_ID
+  env: Environment
 ) => {
+  chain = chain === 'eth' ? 'ethereum' : chain
+
   const nftarFetch = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${NFTAR_TOKEN}`,
+      Authorization: `Bearer ${env.NFTAR_TOKEN}`,
     },
     body: JSON.stringify({
       id: 1,
@@ -130,12 +134,12 @@ export const getNftarVoucher = async (
         account: address,
         blockchain: {
           name: chain,
-          chainId,
+          chainId: env.NFTAR_CHAIN_ID,
         },
       },
     }),
   }
-  const nftarRes = await fetch(`${NFTAR_URL}`, nftarFetch)
+  const nftarRes = await fetch(`${env.NFTAR_URL}`, nftarFetch)
   const jsonRes: JsonRpcResponse = await nftarRes.json()
 
   if ('error' in jsonRes) {

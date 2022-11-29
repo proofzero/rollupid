@@ -6,7 +6,7 @@ import mwOnlyLocal from '@kubelt/openrpc/middleware/local'
 
 import { KEY_OBJECT_CORE, KEY_SERVICE_OORT } from './constants'
 import { worker as schema } from './schema'
-import { Environment, OortApi } from './types'
+import { Environment } from './types'
 
 const scopes = openrpc.scopes([])
 
@@ -23,23 +23,7 @@ const getProfile = openrpc.method(schema, {
       const Core: DurableObjectNamespace = context.get(KEY_OBJECT_CORE)
       const core = await openrpc.discover(Core, { name: id })
       const profile = await core.getProfile()
-      if (profile) {
-        return openrpc.response(request, profile)
-      } else {
-        const Oort = context.get(KEY_SERVICE_OORT)
-        const headers = { 'KBT-Core-Id': id }
-        const oortClient = createFetcherJsonRpcClient<OortApi>(Oort, {
-          headers,
-        })
-        const { value: profile } = await oortClient.kb_getObject(
-          '3id.profile',
-          ''
-        )
-        if (profile) {
-          await core.setProfile({ profile })
-        }
-        return openrpc.response(request, profile)
-      }
+      return openrpc.response(request, profile)
     }
   ),
 })
