@@ -17,7 +17,7 @@ export const fetchVoucher = async ({ address }: FetchVoucherParams) => {
 
   // check if the user has already minted
   const galaxy = await getGalaxyClient()
-  const nfts = galaxy.getNftsForAddress({
+  const { nftsForAddress: nfts } = await galaxy.getNftsForAddress({
     owner: address,
     contractAddresses: [contractAddress],
   })

@@ -13,7 +13,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const pageKey = srcUrl.searchParams.get('pageKey')
 
   const galaxyClient = await getGalaxyClient()
-  const res = await galaxyClient.getNftsForAddress({
+  const { nftsForAddress: res } = await galaxyClient.getNftsForAddress({
     owner,
     pageKey,
   })

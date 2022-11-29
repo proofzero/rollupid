@@ -60,6 +60,7 @@ const threeIDResolvers: Resolvers = {
       }: { address: string; nodeType: string; addrType: string },
       { env }: ResolverContext
     ) => {
+<<<<<<< HEAD
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
         env.Address,
         {
@@ -72,6 +73,10 @@ const threeIDResolvers: Resolvers = {
       if (!coreId) {
         throw 'galaxy:profileFromAddress: no coreId found'
       }
+=======
+      const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
+      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+>>>>>>> 9c710e0b... Galaxy NFT hookup
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
