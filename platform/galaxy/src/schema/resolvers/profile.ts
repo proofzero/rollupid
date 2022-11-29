@@ -34,20 +34,6 @@ const threeIDResolvers: Resolvers = {
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
 
-<<<<<<< HEAD
-=======
-      // Upgrayedd Oort -> Account
-      if (isEmptyObject(accountProfile)) {
-        const oortClient = new OortClient(env.Oort, jwt)
-        const oortResponse = await oortClient.getProfile()
-        accountProfile = await upgrayeddOortToAccount(
-          coreId,
-          accountClient,
-          oortResponse
-        )
-      }
-
->>>>>>> 51002224... wip
       // console.log(accountProfile)
       return accountProfile
     },
@@ -60,7 +46,6 @@ const threeIDResolvers: Resolvers = {
       }: { address: string; nodeType: string; addrType: string },
       { env }: ResolverContext
     ) => {
-<<<<<<< HEAD
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
         env.Address,
         {
@@ -73,10 +58,6 @@ const threeIDResolvers: Resolvers = {
       if (!coreId) {
         throw 'galaxy:profileFromAddress: no coreId found'
       }
-=======
-      const addressClient = createFetcherJsonRpcClient<AddressApi>(env.Address)
-      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
->>>>>>> 9c710e0b... Galaxy NFT hookup
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
