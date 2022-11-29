@@ -1,16 +1,11 @@
-import { composeResolvers } from "@graphql-tools/resolvers-composition";
-import { GraphQLYogaError } from "@graphql-yoga/common";
+import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import { Resolvers } from "./typedefs";
-
-import OortClient from "./clients/oort";
+import { Resolvers } from './typedefs'
 
 import {
   setupContext,
   isAuthorized,
-  checkHTTPStatus,
-  getRPCResult,
-} from "./utils";
+} from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -21,7 +16,7 @@ const addressResolvers: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
-      return null;
+      return null
     },
     addresses: (
       _parent,
@@ -30,14 +25,35 @@ const addressResolvers: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
-      return [];
+      return []
+    },
+    ensAddress: async (_parent, { address }, {}) => {
+      const ensRes = await fetch(
+        `https://api.ensideas.com/ens/resolve/${address}`
+      )
+
+      const res: {
+        displayName: string | null
+        error?: string
+      } = await ensRes.json()
+
+      if (res.error) {
+        console.error(`Error requesting ens from address: ${res.error}`)
+
+        throw new Error(res.error)
+      }
+
+      // This is either the ENS address or 
+      // actual address if no ENS found
+      return res.displayName
     },
   },
   Mutation: {},
-};
+}
 
 const AddressResolverComposition = {
-  "Mutation.updateThreeIDAddress": [isAuthorized()],
-};
+  'Query.ensAddress': [setupContext()],
+  'Mutation.updateThreeIDAddress': [isAuthorized()],
+}
 
-export default composeResolvers(addressResolvers, AddressResolverComposition);
+export default composeResolvers(addressResolvers, AddressResolverComposition)

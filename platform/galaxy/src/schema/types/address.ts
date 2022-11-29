@@ -22,6 +22,8 @@ export default /* GraphQL */ `
   type Query {
     address(address: String!): ThreeIDAddress
     addresses: [ThreeIDAddress]
+
+    ensAddress(address: String!): String
   }
 
   type Mutation {
@@ -30,4 +32,4 @@ export default /* GraphQL */ `
       visible: Boolean
     ): ThreeIDAddress
   }
-`;
+`
