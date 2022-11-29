@@ -6,10 +6,10 @@
   "scripts": {
     "format": "run-s format:src",
     "format:src": "prettier --write .",
-    "format:check": "run-s format:check:*",
+    "format:check": "run-s 'format:check:*'",
     "format:check:src": "prettier --check .",
     "lint": "eslint --fix .",
-    "lint:check": "run-s lint:check:*",
+    "lint:check": "run-s 'lint:check:*'",
     "lint:check:src": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 0"
   },

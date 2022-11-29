@@ -34,7 +34,7 @@
     "lint:check:test": "eslint test",
     "types:check": "tsc --project tsconfig.json --noEmit",
     "dev:wrangler": "wrangler dev --local --persist",
-    "dev": "run-p \"dev:*\"",
+    "dev": "run-p 'dev:*'",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts",
     "test:ci": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts --reporter classic",
     "test:dev": "cross-env NODE_OPTIONS=--experimental-vm-modules tap --ts --coverage --watch",

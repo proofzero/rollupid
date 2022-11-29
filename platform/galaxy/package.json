@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "wrangler publish --dry-run --outdir=dist",
     "dev:wrangler": "wrangler dev --local --persist",
-    "dev": "run-p \"dev:*\"",
+    "dev": "run-p 'dev:*'",
     "start": "echo \"No start for galaxy. Please use dev.\""
   },
   "dependencies": {

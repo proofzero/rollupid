@@ -6,14 +6,14 @@
   "private": true,
   "scripts": {
     "build:dev": "tsc",
-    "docs": "run-s build:* docs:*",
+    "docs": "run-s 'build:*' 'docs:*'",
     "docs:build": "api-extractor run --local",
     "format": "run-s format:src",
     "format:src": "prettier --write *.ts",
-    "format:check": "run-s format:check:*",
+    "format:check": "run-s 'format:check:*'",
     "format:check:src": "prettier --check *.ts",
     "lint": "eslint --fix .",
-    "lint:check": "run-s lint:check:*",
+    "lint:check": "run-s 'lint:check:*'",
     "lint:check:src": "eslint *.ts"
   },
   "devDependencies": {

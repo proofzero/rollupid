@@ -16,10 +16,10 @@
     "eject": "react-scripts eject",
     "start:package": "microbundle stories/index.ts --inline-css --jsx React.createElement -w",
     "start:storybook": "start-storybook -p 6006 -s public",
-    "start": "run-p \"start:*\"",
+    "start": "run-p 'start:*'",
     "build:storybook": "build-storybook -s public",
     "build:package": "microbundle src/index.ts --inline-css --jsx React.createElement",
-    "build": "run-p \"build:*\""
+    "build": "run-p 'build:*'"
   },
   "eslintConfig": {
     "extends": [
