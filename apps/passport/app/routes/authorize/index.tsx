@@ -33,7 +33,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (!profileRes.profile) {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
-    console.log({ defaultProfileURN })
     const addressClient = getAddressClientFromURN(defaultProfileURN)
     profile = await addressClient.kb_getAddressProfile()
     if (!profile) {
@@ -66,6 +65,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     const scopeMeta = await sbClient.kb_appScopes()
     const appProfile = await sbClient.kb_appProfile(client_id)
 
+    console.log({ scopes: scopeMeta.scopes })
+
     return json({
       appProfile,
       userProfile: profile,
@@ -83,7 +84,7 @@ export default function Authorize() {
     <Authorization
       appProfile={appProfile}
       userProfile={userProfile}
-      scopeMeta={scopeMeta}
+      scopeMeta={scopeMeta.scopes}
     />
   )
 }

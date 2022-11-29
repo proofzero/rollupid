@@ -70,7 +70,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body style={{ backgroundColor: '#F9FAFB' }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
@@ -80,6 +80,10 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <script
+          async
+          src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
+        ></script>
       </body>
     </html>
   )
@@ -106,10 +110,6 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script
-          async
-          src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
-        ></script>
       </body>
     </html>
   )

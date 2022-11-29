@@ -1,4 +1,5 @@
-import { Avatar, Button } from '@kubelt/design-system'
+import { Button } from '@kubelt/design-system/src/atoms/button/Button'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -14,14 +15,14 @@ export type ScopeMeta = {
 
 export type AppProfile = {
   name: string
-  logo: string
+  icon: string
   scopes: string[]
 }
 
 export type UserProfile = {
   displayName: string
   pfp: {
-    url: string
+    image: string
     isToken: boolean
   }
 }
@@ -43,16 +44,25 @@ export function Authorization({
   scopeMeta,
 }: AuthorizationProps) {
   return (
-    <div className={'flex flex-col gap-4 basis-96'}>
+    <div
+      className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
+      style={{
+        width: 418,
+        height: 598,
+        border: '1px solid #D1D5DB',
+        boxSizing: 'border-box',
+        borderRadius: 8,
+      }}
+    >
       <div className={'flex flex-row items-center justify-center'}>
         <Avatar
-          src={userProfile.pfp.url}
+          src={userProfile.pfp.image}
           hex={userProfile.pfp.isToken}
           size={'sm'}
-          alt="User Profile"
+          // alt="User Profile"
         />
         <img src={authorizeCheck} alt="Authorize Check" />
-        <img className={''} src={appProfile.logo} alt="App Logo" />
+        <Avatar src={appProfile.icon} size={'sm'} />
       </div>
       <div className={'flex flex-col items-center justify-center gap-2'}>
         <h1 className={'font-semibold text-xl'}>{appProfile.name}</h1>
@@ -111,15 +121,11 @@ export function Authorization({
           </ul>
         </div>
       </div>
-      <div className={'flex flex-row items-center justify-center gap-4'}>
+      <div
+        className={'flex flex-row items-center justify-center gap-4 mt-auto'}
+      >
         <Button btnType="secondary-alt">Cancel</Button>
         <Button btnType="primary-alt">Continue</Button>
-      </div>
-      <div className={'flex flex-row items-center justify-center gap-2 mt-8'}>
-        <img className={'w-4'} src={subtractLogo} alt="powered by logo" />
-        <p style={{ color: '#6B7280' }} className={'font-light text-sm'}>
-          Powered by Kubelt
-        </p>
       </div>
     </div>
   )
