@@ -14,6 +14,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const node_type = searchParams.get('node_type') as string
   const addr_type = searchParams.get('addr_type') as string
+  const state = searchParams.get('state') as string
   const code = searchParams.get('code') as string
 
   if (!address || !node_type || !addr_type || !code) {
@@ -48,7 +49,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   console.log('accessToken', accessToken)
   const redirectURL = searchParams.get('client_id')
-    ? `/authorize?client_id=${searchParams.get('client_id')}`
+    ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
     : THREEID_APP_URL
 
   const defaultProfileURN = `urn:threeid:address/${params.address}?+node_type=${node_type}&addr_type=${addr_type}`

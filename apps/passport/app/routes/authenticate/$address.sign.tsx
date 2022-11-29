@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   console.log('loader', { nonce })
   // TODO: handle the error case
 
-  return json({ nonce, address })
+  return json({ nonce, address, state })
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
@@ -50,7 +50,9 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   searchParams.set('node_type', 'crypto')
   searchParams.set('addr_type', 'eth')
   return redirect(
-    `/authenticate/${params.address}/token?${searchParams}&code=${code}`
+    `/authenticate/${
+      params.address
+    }/token?${searchParams}&code=${code}state=${formData.get('state')}`
   )
 }
 
@@ -70,7 +72,7 @@ export default function Sign() {
   const { data, error, signMessage } = useSignMessage({
     onSuccess(data, variables) {
       submit(
-        { signature: data, nonce },
+        { signature: data, nonce, state },
         {
           method: 'post',
           action: `/authenticate/${address}/sign/${window.location.search}`,

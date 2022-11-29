@@ -1,6 +1,6 @@
 import { json } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import {
   getAddressClient,
@@ -14,6 +14,7 @@ import { getUserSession } from '~/session.server'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
   const client_id = url.searchParams.get('client_id')
+  const state = url.searchParams.get('state')
 
   if (!client_id) {
     throw json(
@@ -71,6 +72,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       appProfile,
       userProfile: profile,
       scopeMeta,
+      state,
     })
   } catch (e) {
     console.error(e)
@@ -79,12 +81,27 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
-  const { appProfile, userProfile, scopeMeta } = useLoaderData()
+  const { appProfile, userProfile, scopeMeta, state } = useLoaderData()
+  const submit = useSubmit()
+
+  const cancelCallback = () => {
+    window.location.href = `${appProfile.redirectURI}?=error=access_denied&state=${state}`
+  }
+
+  const authorizeCallback = async (scopes: string[]) => {
+    const form = new FormData()
+    form.append('scopes', scopes.join(','))
+    form.append('state', state)
+    submit(form)
+  }
+
   return (
     <Authorization
       appProfile={appProfile}
       userProfile={userProfile}
       scopeMeta={scopeMeta.scopes}
+      cancelCallback={cancelCallback}
+      authorizeCallback={authorizeCallback}
     />
   )
 }

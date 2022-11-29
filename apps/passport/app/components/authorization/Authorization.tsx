@@ -31,6 +31,8 @@ export type AuthorizationProps = {
   userProfile: UserProfile
   appProfile: AppProfile
   scopeMeta: Record<string, ScopeMeta>
+  cancelCallback: () => void
+  authorizeCallback: (scopes: string[]) => void
 }
 
 const scopeIcons = {
@@ -42,6 +44,8 @@ export function Authorization({
   appProfile,
   userProfile,
   scopeMeta,
+  cancelCallback,
+  authorizeCallback,
 }: AuthorizationProps) {
   return (
     <div
@@ -121,11 +125,18 @@ export function Authorization({
           </ul>
         </div>
       </div>
-      <div
-        className={'flex flex-row items-center justify-center gap-4 mt-auto'}
-      >
-        <Button btnType="secondary-alt">Cancel</Button>
-        <Button btnType="primary-alt">Continue</Button>
+      <div className={'flex flex-row items-end justify-center gap-4 mt-auto'}>
+        <Button btnType="secondary-alt" onClick={cancelCallback}>
+          Cancel
+        </Button>
+        <Button
+          btnType="primary-alt"
+          onClick={() => {
+            authorizeCallback(appProfile.scopes)
+          }}
+        >
+          Continue
+        </Button>
       </div>
     </div>
   )
