@@ -108,16 +108,12 @@ export default class DurableObject<
       const jsonRpcRequest: JsonRpcRequest = await request.json()
       const jsonRpcResponse: JsonRpcResponse =
         await requestHandler.handleRequest(jsonRpcRequest)
-      if ('error' in jsonRpcResponse) {
-        console.error(jsonRpcResponse.error)
-      }
       return new Response(JSON.stringify(jsonRpcResponse), {
         headers: {
           'Content-Type': 'application/json',
         },
       })
     } catch (err) {
-      console.error(err)
       return error(500, JSON.stringify(err))
     }
   }
