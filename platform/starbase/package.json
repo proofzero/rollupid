@@ -28,8 +28,11 @@
     "@types/itty-router-extras": "0.4.0",
     "@types/lodash": "4.14.189",
     "esbuild": "0.15.15",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-tsdoc": "0.2.17",
     "npm-run-all": "4.1.5",
+    "prettier": "2.8.0",
     "typescript": "4.8.4",
     "wrangler": "2.4.4"
   },
