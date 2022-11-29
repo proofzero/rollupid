@@ -16,10 +16,10 @@
     "eject": "react-scripts eject",
     "start:package": "microbundle stories/index.ts --inline-css --jsx React.createElement -w",
     "start:storybook": "start-storybook -p 6006 -s public",
-    "start": "run-p \"start:*\"",
+    "start": "run-p 'start:*'",
     "build:storybook": "build-storybook -s public",
     "build:package": "microbundle src/index.ts --inline-css --jsx React.createElement",
-    "build": "run-p \"build:*\""
+    "build": "run-p 'build:*'"
   },
   "eslintConfig": {
     "extends": [
@@ -84,6 +84,7 @@
     "eslint-plugin-react": "7.31.10",
     "eslint-plugin-standard": "5.0.0",
     "microbundle": "0.15.1",
+    "npm-run-all": "4.1.5",
     "postcss": "latest",
     "prettier": "2.7.1",
     "prop-types": "15.8.1",
@@ -92,7 +93,6 @@
     "storybook-css-modules-preset": "1.1.1",
     "style-loader": "3.3.1",
     "tailwindcss": "latest",
-    "webpack": "5.75.0",
-    "yarn-run-all": "3.1.1"
+    "webpack": "5.75.0"
   }
 }

@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "gql:apps": "graphql-codegen --config graphql.config.js --project apps --aggregate-output -n -l",
-    "gql": "run-p \"gql:*\"",
-    "dev:gql": "run-p \"gql:* -- --watch\"",
+    "gql": "run-p 'gql:*'",
+    "dev:gql": "run-p 'gql:* -- --watch'",
     "storybook": "yarn workspaces foreach -i -v -p -t run storybook",
     "start": "yarn workspaces foreach -i -v -p -t run start",
     "build": "yarn workspaces foreach -p -v -i -t run build",
@@ -22,8 +22,8 @@
     "@graphql-codegen/typescript-resolvers": "2.7.5",
     "@playwright/test": "^1.27.1",
     "graphql": "16.6.0",
-    "typescript": "4.8.4",
-    "yarn-run-all": "3.1.1"
+    "npm-run-all": "4.1.5",
+    "typescript": "4.8.4"
   },
   "packageManager": "yarn@3.2.4"
 }
