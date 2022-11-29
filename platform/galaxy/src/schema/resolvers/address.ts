@@ -1,11 +1,9 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
+import ENSIdeasUtils from './clients/ens-utils'
 
 import { Resolvers } from './typedefs'
 
-import {
-  setupContext,
-  isAuthorized,
-} from './utils'
+import { setupContext, isAuthorized } from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -27,26 +25,8 @@ const addressResolvers: Resolvers = {
     ) => {
       return []
     },
-    ensAddress: async (_parent, { address }, {}) => {
-      const ensRes = await fetch(
-        `https://api.ensideas.com/ens/resolve/${address}`
-      )
-
-      const res: {
-        displayName: string | null
-        error?: string
-      } = await ensRes.json()
-
-      if (res.error) {
-        console.error(`Error requesting ens from address: ${res.error}`)
-
-        throw new Error(res.error)
-      }
-
-      // This is either the ENS address or 
-      // actual address if no ENS found
-      return res.displayName
-    },
+    ensAddress: async (_parent, { address }, {}) =>
+      new ENSIdeasUtils().getENSAddress(address),
   },
   Mutation: {},
 }
