@@ -56,6 +56,7 @@ export default async (
   switch (nodeType) {
     case CryptoCoreType.Crypto:
       {
+        console.log('crypto core', CryptoCore)
         address = await CryptoCoreStatic.validateAddress(name, addressType)
         core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)

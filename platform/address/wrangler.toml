@@ -5,7 +5,9 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Core", class_name = "Core" },
+  { name = "CryptoCore", class_name = "CryptoCore" }
+
 ]
 
 services = [

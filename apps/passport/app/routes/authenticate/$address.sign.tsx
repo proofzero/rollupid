@@ -20,12 +20,12 @@ This will not trigger a blockchain transaction or cost any gas fees.
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const state = Math.random().toString(36).substring(7)
-  const addressClient = getAddressClient(address as string, 'cyrpto', 'eth')
+  const addressClient = getAddressClient(address as string, 'crypto', 'eth')
   const nonce = await addressClient.kb_getNonce(
     signMessageTemplate,
     params.address as string, // as client_id
     PASSPORT_REDIRECT_URL,
-    ['admin'],
+    ['admin'], // todo: change scope
     state
   )
   console.log('loader', { nonce })
@@ -47,8 +47,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
 
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
-  searchParams.set('coreType', 'crypto')
-  searchParams.set('addressType', 'eth')
+  searchParams.set('node_type', 'crypto')
+  searchParams.set('addr_type', 'eth')
   return redirect(
     `/authenticate/${params.address}/token?${searchParams}&code=${code}`
   )
