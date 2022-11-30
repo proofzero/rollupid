@@ -1,12 +1,12 @@
 import { redirect, json } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit, NavLink } from '@remix-run/react'
+import { useLoaderData, NavLink } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
 import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
 import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
 
-import { getUserSession, requireJWT } from '~/utils/session.server'
+import { getUserSession, parseJwt, requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
@@ -19,7 +19,6 @@ import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system'
-import validateProof from '~/helpers/validate-proof'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
@@ -34,26 +33,15 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, '/auth')
-
-  const session = await getUserSession(request)
-  const address = session.get('address')
-  const core = session.get('core')
-
-  if (!(await validateProof(address))) {
-    return redirect(`/auth/gate/${address}`)
-  }
-
-  // @ts-ignore
-  const onboardData = await ONBOARD_STATE.get(core)
-  if (!onboardData) {
-    return redirect(`/onboard/name`)
-  }
+  const jwt = await requireJWT(request)
+  const parsedJWT = parseJwt(jwt)
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
+
+  console.log({ profileRes })
 
   // @ts-ignore
   const [avatarUrl, isToken] = [

@@ -1,14 +1,7 @@
 import type { Session } from '@remix-run/cloudflare'
 import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
-
-type OortJwt = {
-  aud: string[]
-  iss: string
-  sub: string
-  exp: number
-  iat: number
-  capabilities: object
-}
+import * as jose from 'jose'
+import type { JWTPayload } from 'jose'
 
 // @ts-ignore
 const sessionSecret = SESSION_SECRET
@@ -68,17 +61,10 @@ export async function requireJWT(
   return jwt
 }
 
-export function parseJwt(token: string): OortJwt {
-  var base64Url = token.split('.')[1]
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  var jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-      })
-      .join('')
-  )
-
-  return JSON.parse(jsonPayload)
+export function parseJwt(token: string): JWTPayload {
+  const payload = jose.decodeJwt(token)
+  if (!payload) {
+    throw new Error('Invalid JWT')
+  }
+  return payload
 }

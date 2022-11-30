@@ -1,18 +1,16 @@
-import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
+import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import {
   getAccessClient,
-  getAddressClient,
   getAddressClientFromURN,
   getGalaxyClient,
   getStabaseClient as getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
-import { AccountURN } from '@kubelt/platform.account/src/types'
-import { ResponseType } from '@kubelt/platform.access/src/types'
+import type { ResponseType } from '@kubelt/platform.access/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
