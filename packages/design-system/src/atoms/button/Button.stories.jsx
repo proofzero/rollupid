@@ -41,7 +41,7 @@ export const SmallButton = Template.bind({})
 SmallButton.args = { btnSize: 'sm' }
 
 export const LargeButton = Template.bind({})
-LargeButton.args = { btnSize: 'lg' }
+LargeButton.args = { btnSize: 'l' }
 
 export const ExtraLargeButton = Template.bind({})
 ExtraLargeButton.args = { btnSize: 'xl' }
