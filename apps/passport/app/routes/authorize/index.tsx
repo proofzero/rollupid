@@ -101,7 +101,7 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const accessClient = getAccessClient()
   const authorizeRes = await accessClient.kb_authorize(
-    `urn:threeid:account/${parsedJWT.sub}?+node_type=account` as AccountURN,
+    `urn:threeid:account/${parsedJWT.sub}?+node_type=account`,
     client_id,
     redirect_uri,
     scopes,

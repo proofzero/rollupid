@@ -5,7 +5,7 @@ import type {
 import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
 import type { BaseURN } from 'urns'
 
-export type AddressURN = BaseURN<'threeid', 'address'>
+export type AddressURN = BaseURN<'threeid', `address${string}`>
 
 export interface Environment {
   Access: Fetcher
