@@ -11,14 +11,7 @@ import {
 } from '../../../../../packages/alchemy-client'
 
 import {
-  buildGQLError,
-} from './utils'
-
-import {
   setupContext,
-//   isAuthorized,
-//   checkHTTPStatus,
-//   getRPCResult,
 } from "./utils";
 
 type ResolverContext = {

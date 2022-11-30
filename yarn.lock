@@ -5263,6 +5263,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kubelt/nftar-client@workspace:packages/nftar-client":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/nftar-client@workspace:packages/nftar-client"
+  dependencies:
+    eslint: 8.28.0
+    eslint-plugin-tsdoc: 0.2.17
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "@kubelt/openrpc@workspace:*, @kubelt/openrpc@workspace:packages/openrpc":
   version: 0.0.0-use.local
   resolution: "@kubelt/openrpc@workspace:packages/openrpc"
