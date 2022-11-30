@@ -30,6 +30,8 @@ services = [
 
 [vars]
 ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+PASSPORT_URL = "http://localhost:9696"
+COOKIE_DOMAIN = "localhost"
 
 [site]
   bucket = "./public"
@@ -58,6 +60,9 @@ services = [
   { binding = "GALAXY", service = "galaxy-dev"},
   { binding = "ICONS", service = "icons-dev"},
 ]
+[env.dev.vars]
+  PASSPORT_URL = "https://passport-dev.threeid.xyz"
+  COOKIE_DOMAIN = "dev.threeid.xyz"
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -78,6 +83,10 @@ services = [
 ]
 [env.next.build]
   command = "yarn build"
+[env.next.vars]
+  PASSPORT_URL = "https://passport-next.threeid.xyz"
+  COOKIE_DOMAIN = "next.threeid.xyz"
+
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -98,3 +107,6 @@ services = [
 ]
 [env.current.build]
   command = "yarn build"
+[env.current.vars]
+  PASSPORT_URL = "https://passport.threeid.xyz"
+  COOKIE_DOMAIN = "threeid.xyz"

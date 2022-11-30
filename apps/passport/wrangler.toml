@@ -26,7 +26,7 @@ local_protocol = "http"
 [vars]
 THREEID_APP_URL = "http://localhost:9797"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
-
+COOKIE_DOMAIN = "localhost"
 
 [env.dev]
 routes = [
@@ -43,7 +43,7 @@ services = [
 [env.dev.vars]
 THREEID_APP_URL = "https://3id-dev.kubelt.com"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
-
+COOKIE_DOMAIN = "dev.threeid.xyz"
 
 [env.next]
 routes = [
@@ -61,6 +61,7 @@ services = [
 [env.next.vars]
 THREEID_APP_URL = "https://3id-next.kubelt.com"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
+COOKIE_DOMAIN = "next.threeid.xyz"
 
 [env.next.build]
   command = "yarn build"
@@ -81,6 +82,7 @@ services = [
 [env.current.vars]
 THREEID_APP_URL = "https://3id.kubelt.com"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
+COOKIE_DOMAIN = "threeid.xyz"
 
 [env.current.build]
   command = "yarn build"

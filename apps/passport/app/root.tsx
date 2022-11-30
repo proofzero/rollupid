@@ -1,9 +1,9 @@
-import {
+import type {
   MetaFunction,
   LinksFunction,
   LoaderFunction,
-  json,
 } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { useLoaderData } from '@remix-run/react'
 import {
   Links,
@@ -32,8 +32,7 @@ export const meta: MetaFunction = () => ({
   title: '3ID - Passport',
   viewport: 'width=device-width,initial-scale=1',
   'og:url': 'https://passport.kubelt.com',
-  'og:description':
-    '3ID turns your blockchain accounts into multi-chain decentralized identities with improved auth, secure messaging and more.',
+  'og:description': 'User identity in your control.',
   'og:image': social,
   'twitter:card': 'summary_large_image',
   'twitter:site': '@threeid_xyz',

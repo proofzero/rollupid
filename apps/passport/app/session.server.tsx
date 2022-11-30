@@ -8,7 +8,6 @@ import type { Session } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-// @ts-ignore
 const sessionSecret = SESSION_SECRET
 if (!sessionSecret) {
   throw new Error('SESSION_SECRET must be set')
@@ -17,6 +16,7 @@ if (!sessionSecret) {
 const storage = createCookieSessionStorage({
   cookie: {
     name: '3ID_SESSION',
+    domain: COOKIE_DOMAIN,
     // normally you want this to be `secure: true`
     // but that doesn't work on localhost for Safari
     // https://web.dev/when-to-use-local-https/
@@ -61,20 +61,6 @@ export async function destroyUserSession(
     },
   })
 }
-
-// export async function isValidJWT(request: Request): Promise<boolean> {
-//   const session = await getUserSession(request)
-//   const jwt = session.get('jwt')
-//   if (!jwt) {
-//     return false
-//   }
-//   const parsedJWT = parseJwt(jwt)
-//   const { exp } = parsedJWT
-//   if (exp < Date.now() / 1000) {
-//     throw await destroyUserSession(session)
-//   }
-//   return true
-// }
 
 export async function requireJWT(
   request: Request,
