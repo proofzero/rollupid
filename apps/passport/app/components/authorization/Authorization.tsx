@@ -112,8 +112,8 @@ export function Authorization({
         </div>
       </div>
       <div className={'flex flex-row items-center justify-center gap-4'}>
-        <Button btnType="secondary">Cancel</Button>
-        <Button btnType="primary">Continue</Button>
+        <Button btnType="secondary-alt">Cancel</Button>
+        <Button btnType="primary-alt">Continue</Button>
       </div>
       <div className={'flex flex-row items-center justify-center gap-2 mt-8'}>
         <img className={'w-4'} src={subtractLogo} alt="powered by logo" />

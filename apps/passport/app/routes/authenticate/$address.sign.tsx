@@ -123,7 +123,7 @@ export default function Sign() {
       {error && signing && (
         <div className="flex gap-4">
           <Button
-            btnType="secondary"
+            btnType="secondary-alt"
             onClick={() => {
               disconnect()
               // navigate(`/authenticate${window.location.search}`)

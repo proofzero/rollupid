@@ -55,7 +55,7 @@ export function ConnectButton({
         {({ isConnected, isConnecting, show, hide, address, ensName }) => {
           return (
             <Button
-              btnType="secondary"
+              btnType="secondary-alt"
               className={classNames('button', className)}
               disabled={isConnecting}
               onClick={show}
