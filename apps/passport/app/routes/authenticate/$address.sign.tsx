@@ -1,6 +1,11 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { useNavigate, useLoaderData, useSubmit } from '@remix-run/react'
+import {
+  useNavigate,
+  useLoaderData,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 import { useAccount, useSignMessage, useDisconnect, useConnect } from 'wagmi'
 
 import { Button } from '@kubelt/design-system'
@@ -59,6 +64,7 @@ export default function Sign() {
   const [signing, setSigning] = useState(false)
   const navigate = useNavigate()
   const submit = useSubmit()
+  const transition = useTransition()
   const { nonce, address, state } = useLoaderData()
   const nonceMessage = signMessageTemplate.replace('{{nonce}}', nonce)
 
@@ -98,7 +104,10 @@ export default function Sign() {
   return (
     <div className={'flex flex-col gap-4 h-screen justify-center items-center'}>
       <h1 className={''}>
-        {(!signing || !error) && 'Please sign the verification message...'}
+        {(!signing || !error) &&
+          transition.state == 'idle' &&
+          'Please sign the verification message...'}
+        {transition.state != 'idle' && 'Loading profile...'}
         {error && signing && `${error}`}
       </h1>
       {(!signing || !error) && (

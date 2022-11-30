@@ -19,6 +19,7 @@ import {
   Environment,
   ExchangeAuthorizationCodeResult,
   GrantType,
+  ResponseType,
   Scope,
   WorkerApi,
 } from './types'
@@ -55,7 +56,8 @@ export default async (
       clientId: string,
       redirectUri: string,
       scope: Scope,
-      state: string
+      state: string,
+      responseType: ResponseType
     ): Promise<AuthorizeResult> {
       if (!accountUrn) {
         throw 'missing core identifier'

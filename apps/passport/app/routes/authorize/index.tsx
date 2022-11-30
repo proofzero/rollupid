@@ -1,15 +1,18 @@
-import { json } from '@remix-run/cloudflare'
+import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import {
+  getAccessClient,
   getAddressClient,
   getAddressClientFromURN,
   getGalaxyClient,
   getStabaseClient as getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
-import { getUserSession } from '~/session.server'
+import { getUserSession, parseJwt, requireJWT } from '~/session.server'
+import { AccountURN } from '@kubelt/platform.account/src/types'
+import { ResponseType } from '@kubelt/platform.access/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -69,6 +72,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     console.log({ scopes: scopeMeta.scopes })
 
     return json({
+      clientId: client_id,
       appProfile,
       userProfile: profile,
       scopeMeta,
@@ -80,19 +84,65 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   }
 }
 
+export const action: ActionFunction = async ({ request, context }) => {
+  const form = await request.formData()
+  const cancel = form.get('cancel') as string
+
+  if (cancel) {
+    console.log({ cancel })
+    return redirect(cancel)
+  }
+
+  const jwt = await requireJWT(request)
+
+  const redirect_uri = form.get('redirect_uri') as string
+  const scopes = (form.get('scopes') as string).split(',')
+  const state = form.get('state') as string
+  const client_id = form.get('client_id') as string
+
+  const parsedJWT = parseJwt(jwt)
+
+  const accessClient = getAccessClient()
+  const authorizeRes = await accessClient.kb_authorize(
+    `urn:threeid:account/${parsedJWT.sub}?+node_type=account` as AccountURN,
+    client_id,
+    redirect_uri,
+    scopes,
+    state,
+    'code' as ResponseType
+  )
+
+  if (!authorizeRes) {
+    throw json({ message: 'Failed to authorize' }, 400)
+  }
+
+  return redirect(
+    `${redirect_uri}?code=${authorizeRes.code}&state=${authorizeRes.state}`
+  )
+}
+
 export default function Authorize() {
-  const { appProfile, userProfile, scopeMeta, state } = useLoaderData()
+  const { clientId, appProfile, userProfile, scopeMeta, state } =
+    useLoaderData()
   const submit = useSubmit()
 
   const cancelCallback = () => {
-    window.location.href = `${appProfile.redirectURI}?=error=access_denied&state=${state}`
+    submit(
+      {
+        cancel: `${appProfile.redirectURI}?=error=access_denied&state=${state}`,
+      },
+      { method: 'post' }
+    )
   }
 
   const authorizeCallback = async (scopes: string[]) => {
     const form = new FormData()
     form.append('scopes', scopes.join(','))
     form.append('state', state)
-    submit(form)
+    form.append('client_id', clientId)
+    form.append('redirect_uri', appProfile.redirectURI)
+    console.log({ form })
+    submit(form, { method: 'post' })
   }
 
   return (

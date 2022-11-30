@@ -1,5 +1,8 @@
+import { useTransition } from '@remix-run/react'
+
 import { Button } from '@kubelt/design-system/src/atoms/button/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
 import subtractLogo from '../../assets/subtract-logo.svg'
@@ -47,6 +50,8 @@ export function Authorization({
   cancelCallback,
   authorizeCallback,
 }: AuthorizationProps) {
+  const transition = useTransition()
+
   console.log('scopeMeta', scopeMeta)
   return (
     <div
@@ -127,17 +132,27 @@ export function Authorization({
         </div>
       </div>
       <div className={'flex flex-row items-end justify-center gap-4 mt-auto'}>
-        <Button btnType="secondary-alt" onClick={cancelCallback}>
-          Cancel
-        </Button>
-        <Button
-          btnType="primary-alt"
-          onClick={() => {
-            authorizeCallback(appProfile.scopes)
-          }}
-        >
-          Continue
-        </Button>
+        {transition.state == 'idle' && (
+          <>
+            <Button
+              btnType="secondary-alt"
+              onClick={() => {
+                cancelCallback()
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              btnType="primary-alt"
+              onClick={() => {
+                authorizeCallback(appProfile.scopes)
+              }}
+            >
+              Continue
+            </Button>
+          </>
+        )}
+        {transition.state != 'idle' && <Spinner />}
       </div>
     </div>
   )
