@@ -69,8 +69,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     const scopeMeta = await sbClient.kb_appScopes()
     const appProfile = await sbClient.kb_appProfile(client_id)
 
-    console.log({ scopes: scopeMeta.scopes })
-
     return json({
       clientId: client_id,
       appProfile,
@@ -89,7 +87,6 @@ export const action: ActionFunction = async ({ request, context }) => {
   const cancel = form.get('cancel') as string
 
   if (cancel) {
-    console.log({ cancel })
     return redirect(cancel)
   }
 
@@ -141,7 +138,6 @@ export default function Authorize() {
     form.append('state', state)
     form.append('client_id', clientId)
     form.append('redirect_uri', appProfile.redirectURI)
-    console.log({ form })
     submit(form, { method: 'post' })
   }
 

@@ -30,7 +30,7 @@ export default class Authorization extends DurableObject<Environment, Api> {
   }
 
   async alarm() {
-    console.log('cleaning up the codes')
+    console.log(`cleaning up the codes for ${this.id}`)
     this.storage.list({ prefix: 'codes/' }).then((keys) => {
       console.log('keys', keys)
       keys.forEach((_, key) => {
