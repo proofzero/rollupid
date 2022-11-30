@@ -57,6 +57,8 @@ jobs:
             DATADOG_APPLICATION_ID
             DATADOG_ENV
             DATADOG_SERVICE_NAME
+            THREEID_APP_URL
+            ALCHEMY_KEY
         env:
           TEST_ENV: true
           SESSION_SECRET: 'secret'
@@ -65,3 +67,5 @@ jobs:
           DATADOG_ENV: development
           DATADOG_SERVICE_NAME: 3id-passport
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          THREEID_APP_URL: https://dev.threeid.xyz
+          ALCHEMY_KEY: ALCHEMY_PUBLIC_API_KEY
