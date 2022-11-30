@@ -29,6 +29,16 @@ export default class Authorization extends DurableObject<Environment, Api> {
     }
   }
 
+  async alarm() {
+    console.log('cleaning up the codes')
+    this.storage.list({ prefix: 'codes/' }).then((keys) => {
+      console.log('keys', keys)
+      keys.forEach((_, key) => {
+        this.storage.delete(key)
+      })
+    })
+  }
+
   async authorize(
     account: string,
     clientId: string,
@@ -36,14 +46,14 @@ export default class Authorization extends DurableObject<Environment, Api> {
     scope: Scope,
     state: string
   ): Promise<AuthorizeResult> {
-    console.log({ account, clientId, redirectUri, scope, state })
-
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     await this.storage.put({
       account,
       clientId,
-      [`codes/${code}`]: { redirectUri, scope, state },
+      [`codes/${code}`]: { redirectUri, scope, state }, // TODO: can we set a retention policy or alarm?
     })
+
+    this.storage.setAlarm(Date.now() + 120000) // in two minutes
 
     return { code, state }
   }
@@ -57,7 +67,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
 
     const account = await this.storage.get<string>('account')
 
-    console.log('account', account)
     if (!account) {
       throw 'missing account name'
     }
@@ -65,11 +74,16 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const request = await this.storage.get<AuthorizationRequest>(
       `codes/${code}`
     )
+    console.log('here', JSON.stringify(request))
     if (!request) {
+      console.error("authorization: auth code ${code} doesn't exist")
       throw 'missing authorization request'
     }
 
     if (redirectUri != request.redirectUri) {
+      console.error(
+        `authorization: invalid redirect URI, expected ${request.redirectUri}, got ${redirectUri}`
+      )
       throw 'invalid redirect URI'
     }
 

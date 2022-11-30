@@ -47,7 +47,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   // TODO: store refresh token in DO and set alarm to refresh
 
-  console.log('accessToken', accessToken)
   const redirectURL = searchParams.get('client_id')
     ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
     : THREEID_APP_URL

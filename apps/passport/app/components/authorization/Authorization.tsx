@@ -47,6 +47,7 @@ export function Authorization({
   cancelCallback,
   authorizeCallback,
 }: AuthorizationProps) {
+  console.log('scopeMeta', scopeMeta)
   return (
     <div
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}

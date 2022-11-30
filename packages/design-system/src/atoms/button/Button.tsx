@@ -4,7 +4,7 @@ import { Text } from '../text/Text'
 
 // Strings used so no other
 // constructs need to be exported
-type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl'
+type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl' | 'xxl'
 type ButtonType = 'primary' | 'primary-alt' | 'secondary' | 'secondary-alt'
 
 // Dictionary pattern used
@@ -15,6 +15,7 @@ const sizeToSizesDict = {
   base: 'min-w-[6rem] py-[9px] px-[17px] font-medium text-sm rounded-md',
   l: 'min-w-[7rem] py-[9px] px-[17px] font-medium text-base rounded-md',
   xl: 'min-w-[8rem] py-[13px] px-[25px] font-medium text-base rounded-md',
+  xxl: 'min-w-[20rem] py-[13px] px-[25px] font-medium text-base rounded-md',
 }
 
 const typeToColorsDict = {

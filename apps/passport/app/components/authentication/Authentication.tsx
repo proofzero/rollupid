@@ -1,3 +1,4 @@
+import { Button } from '@kubelt/design-system/src/atoms/button/Button'
 import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
 import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
@@ -43,6 +44,16 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
+      {/* <Button
+        className={'button'}
+        btnType={'secondary-alt'}
+        btnSize={'xxl'}
+        disabled
+      >
+        @ Connect with Email
+        <br />
+        (coming soon)
+      </Button> */}
     </div>
   )
 }

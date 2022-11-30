@@ -92,8 +92,6 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
-  console.log('here', error)
-
   return (
     <html lang="en">
       <head>

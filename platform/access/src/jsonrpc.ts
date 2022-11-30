@@ -90,7 +90,6 @@ export default async (
       clientId: string,
       clientSecret: string
     ): Promise<ExchangeAuthorizationCodeResult> {
-      console.log({ clientId, clientSecret })
       if (!grantType) {
         throw 'missing grant type'
       }

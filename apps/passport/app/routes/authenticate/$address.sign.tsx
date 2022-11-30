@@ -28,7 +28,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     ['admin'], // todo: change scope
     state
   )
-  console.log('loader', { nonce })
   // TODO: handle the error case
 
   return json({ nonce, address, state })
@@ -52,7 +51,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   return redirect(
     `/authenticate/${
       params.address
-    }/token?${searchParams}&code=${code}state=${formData.get('state')}`
+    }/token?${searchParams}&code=${code}&state=${formData.get('state')}`
   )
 }
 
@@ -62,8 +61,6 @@ export default function Sign() {
   const submit = useSubmit()
   const { nonce, address, state } = useLoaderData()
   const nonceMessage = signMessageTemplate.replace('{{nonce}}', nonce)
-
-  console.log('client', { nonce })
 
   // const { connect, connectors, error, isLoading, pendingConnector } =
   //   useConnect()
