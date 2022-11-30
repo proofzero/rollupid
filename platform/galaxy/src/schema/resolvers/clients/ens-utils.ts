@@ -16,9 +16,7 @@ class ENSIdeasUtils implements IENSUtils {
     )
 
     const res: ENSIdeasRes = await ensRes.json()
-
-    console.log(res)
-
+    
     if (res.error) {
       console.error(`Error requesting ens from address: ${res.error}`)
 
