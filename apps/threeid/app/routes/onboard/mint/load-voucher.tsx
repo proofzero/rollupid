@@ -50,7 +50,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   if (!prof?.pfp) {
-    const { ensAddressAvatar } = await galaxyClient.getEnsAddressAvatar(address)
+    const { ensAddressAvatar } = await galaxyClient.getEnsAddressAvatar({address})
 
     await galaxyClient.updateProfile(
       {

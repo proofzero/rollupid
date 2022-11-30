@@ -36,7 +36,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   let profile = profileRes.profile || { displayName: '' }
 
   if (!profileRes.profile?.displayName) {
-    const { ensAddress } = await galaxyClient.getEnsAddress(address)
+    const { ensAddress } = await galaxyClient.getEnsAddress({address})
 
     if (ensAddress?.endsWith('.eth')) {
       profile.displayName = ensAddress
