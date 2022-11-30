@@ -18,17 +18,17 @@ const sizeToSizesDict = {
 }
 
 const typeToColorsDict = {
-  primary:
-    'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+  'primary':
+    'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:bg-[#1f2937] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'primary-alt':
-    'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
-  secondary:
-    'bg-white text-[#5d4aec] shadow-sm border border-solid border-gray-300 hover:bg-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+    'bg-[#3e29df] text-white shadow-sm hover:bg-[#6366f1] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+  'secondary':
+    'bg-[#f3f4f6] text-[#5d4aec] shadow-sm border border-solid border-[#dfdcff] hover:bg-[#e5e7eb] focus:bg-[#f3f4f6] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'secondary-alt':
-    'bg-white text-[#1f2937] shadow-sm border border-solid border-gray-300 hover:bg-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+    'bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-[#d1d5db] focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
 }
 
-const disabledColorClasses = 'bg-gray-100 text-gray-300'
+const disabledColorClasses = 'bg-[#f3f4f6] text-[#d1d5db]'
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   btnSize?: ButtonSize
