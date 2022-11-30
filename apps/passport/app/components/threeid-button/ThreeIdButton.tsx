@@ -1,4 +1,3 @@
-import React, { ReactNode } from 'react'
 import { Button, ButtonProps } from '@kubelt/design-system'
 
 import threeIdLogo from './3id.svg'
@@ -17,12 +16,11 @@ export function ThreeIdButton({
       onClick={() => {
         window.location.href = href
       }}
-      className={'flex flex-row gap-4'}
-      size={'lg'}
+      className="flex flex-row gap-4 items-center"
+      btnSize="l"
     >
-      <span className={''}>
-        <img src={threeIdLogo} />
-      </span>
+      <img src={threeIdLogo} />
+
       {text}
     </Button>
   )
