@@ -50,7 +50,7 @@ const threeIDResolvers: Resolvers = {
         env.Address,
         {
           headers: {
-            'X-3RN': AddressURNSpace.fullUrn(`address/${address}`, { q: { node_type, addr_type }}),
+            'X-3RN': `urn:threeid:address/${address}?+node_type=${nodeType}&addr_type=${addrType}`,
           },
         }
       )
