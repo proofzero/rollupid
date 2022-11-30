@@ -30,11 +30,11 @@ export const resolve3RN = async (
   addressType: AddressType
   params: URLSearchParams
 }> => {
-  const urn = request.headers.get('X-Resource-3RN') as AddressURN
+  const urn = request.headers.get('X-3RN') as AddressURN
   // 'urn:threeid:address/0x123?+node_type=crypto&addr_type=eth'
 
   if (!urn) {
-    throw new Error('missing X-Resource-3RN header')
+    throw new Error('missing X-3RN header')
   }
 
   const { rcomponent, qcomponent } = parseURN(urn)

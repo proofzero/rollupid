@@ -1,7 +1,7 @@
 import { BaseURN } from 'urns'
 import { BaseApi } from '@kubelt/platform.commons/src/jsonrpc'
 
-export type AccountURN = BaseURN<'threeid', 'account'>
+export type AccountURN = BaseURN<'threeid', `account/${string}`>
 
 export interface Environment {
   Core: DurableObjectNamespace

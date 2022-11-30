@@ -29,7 +29,7 @@ export function getAddressClient(
   const addressUrn = `urn:threeid:address/${address}?+node_type=${nodeType}&addr_type=${addressType}`
   const requestInit: RequestInit = {
     headers: {
-      'X-Resource-3RN': addressUrn,
+      'X-3RN': addressUrn,
     },
   }
   return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)
@@ -37,7 +37,7 @@ export function getAddressClient(
 export function getAddressClientFromURN(addressUrn: string) {
   const requestInit: RequestInit = {
     headers: {
-      'X-Resource-3RN': addressUrn,
+      'X-3RN': addressUrn,
     },
   }
   return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)

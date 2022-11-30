@@ -1,10 +1,10 @@
 import React from 'react'
 
 export type SpinnerProps = {
-  color: string
+  color?: string
 }
 
-export const Spinner = ({ color }: SpinnerProps) => (
+export const Spinner = ({ color = '#000000' }: SpinnerProps) => (
   <div
     className="sp sp-circle animate-spin"
     style={{

@@ -4,7 +4,7 @@ import { Text } from '../text/Text'
 
 // Strings used so no other
 // constructs need to be exported
-type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl'
+type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl' | 'xxl'
 type ButtonType = 'primary' | 'primary-alt' | 'secondary' | 'secondary-alt'
 
 // Dictionary pattern used
@@ -15,14 +15,15 @@ const sizeToSizesDict = {
   base: 'min-w-[6rem] py-[9px] px-[17px] font-medium text-sm rounded-md',
   l: 'min-w-[7rem] py-[9px] px-[17px] font-medium text-base rounded-md',
   xl: 'min-w-[8rem] py-[13px] px-[25px] font-medium text-base rounded-md',
+  xxl: 'min-w-[20rem] py-[13px] px-[25px] font-medium text-base rounded-md',
 }
 
 const typeToColorsDict = {
-  'primary':
+  primary:
     'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:bg-[#1f2937] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'primary-alt':
     'bg-[#3e29df] text-white shadow-sm hover:bg-[#6366f1] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
-  'secondary':
+  secondary:
     'bg-[#f3f4f6] text-[#5d4aec] shadow-sm border border-solid border-[#dfdcff] hover:bg-[#e5e7eb] focus:bg-[#f3f4f6] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   'secondary-alt':
     'bg-white text-[#1f2937] shadow-sm border border-solid border-[#d1d5db] hover:bg-[#d1d5db] focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',

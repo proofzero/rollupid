@@ -1,3 +1,4 @@
+import { Button } from '@kubelt/design-system/src/atoms/button/Button'
 import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
 import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
@@ -17,7 +18,18 @@ export function Authentication({
 }: AuthenticationProps) {
   const logo = logoURL || circleLogo
   return (
-    <div className={'flex flex-col items-center justify-center gap-4'}>
+    <div
+      className={
+        'flex flex-col items-center justify-center gap-4 basis-96 m-auto bg-white p-6'
+      }
+      style={{
+        width: 418,
+        height: 598,
+        border: '1px solid #D1D5DB',
+        boxSizing: 'border-box',
+        borderRadius: 8,
+      }}
+    >
       <div className={''}>
         <img className={''} src={logo} alt="3ID Logo" />
       </div>
@@ -32,12 +44,16 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
-      <div className={'flex flex-row items-center justify-center gap-2 mt-8'}>
-        <img className={'w-4'} src={subtractLogo} alt="powered by logo" />
-        <p style={{ color: '#6B7280' }} className={'font-light text-sm'}>
-          Powered by Kubelt
-        </p>
-      </div>
+      {/* <Button
+        className={'button'}
+        btnType={'secondary-alt'}
+        btnSize={'xxl'}
+        disabled
+      >
+        @ Connect with Email
+        <br />
+        (coming soon)
+      </Button> */}
     </div>
   )
 }

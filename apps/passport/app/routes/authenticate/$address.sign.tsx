@@ -1,6 +1,11 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { useNavigate, useLoaderData, useSubmit } from '@remix-run/react'
+import {
+  useNavigate,
+  useLoaderData,
+  useSubmit,
+  useTransition,
+} from '@remix-run/react'
 import { useAccount, useSignMessage, useDisconnect, useConnect } from 'wagmi'
 
 import { Button } from '@kubelt/design-system'
@@ -28,10 +33,9 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     ['admin'], // todo: change scope
     state
   )
-  console.log('loader', { nonce })
   // TODO: handle the error case
 
-  return json({ nonce, address })
+  return json({ nonce, address, state })
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
@@ -50,7 +54,9 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   searchParams.set('node_type', 'crypto')
   searchParams.set('addr_type', 'eth')
   return redirect(
-    `/authenticate/${params.address}/token?${searchParams}&code=${code}`
+    `/authenticate/${
+      params.address
+    }/token?${searchParams}&code=${code}&state=${formData.get('state')}`
   )
 }
 
@@ -58,10 +64,9 @@ export default function Sign() {
   const [signing, setSigning] = useState(false)
   const navigate = useNavigate()
   const submit = useSubmit()
+  const transition = useTransition()
   const { nonce, address, state } = useLoaderData()
   const nonceMessage = signMessageTemplate.replace('{{nonce}}', nonce)
-
-  console.log('client', { nonce })
 
   // const { connect, connectors, error, isLoading, pendingConnector } =
   //   useConnect()
@@ -70,7 +75,7 @@ export default function Sign() {
   const { data, error, signMessage } = useSignMessage({
     onSuccess(data, variables) {
       submit(
-        { signature: data, nonce },
+        { signature: data, nonce, state },
         {
           method: 'post',
           action: `/authenticate/${address}/sign/${window.location.search}`,
@@ -99,7 +104,10 @@ export default function Sign() {
   return (
     <div className={'flex flex-col gap-4 h-screen justify-center items-center'}>
       <h1 className={''}>
-        {(!signing || !error) && 'Please sign the verification message...'}
+        {(!signing || !error) &&
+          transition.state == 'idle' &&
+          'Please sign the verification message...'}
+        {transition.state != 'idle' && 'Loading profile...'}
         {error && signing && `${error}`}
       </h1>
       {(!signing || !error) && (

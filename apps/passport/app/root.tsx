@@ -70,7 +70,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body style={{ backgroundColor: '#F9FAFB' }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
@@ -80,6 +80,10 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <script
+          async
+          src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
+        ></script>
       </body>
     </html>
   )
@@ -88,8 +92,6 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
-  console.log('here', error)
-
   return (
     <html lang="en">
       <head>
@@ -106,10 +108,6 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script
-          async
-          src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
-        ></script>
       </body>
     </html>
   )
