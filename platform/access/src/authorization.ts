@@ -50,7 +50,7 @@ export default class Authorization extends DurableObject<Environment, Api> {
     await this.storage.put({
       account,
       clientId,
-      [`codes/${code}`]: { redirectUri, scope, state }, // TODO: can we set a retention policy or alarm?
+      [`codes/${code}`]: { redirectUri, scope, state },
     })
 
     this.storage.setAlarm(Date.now() + 120000) // in two minutes
@@ -74,7 +74,6 @@ export default class Authorization extends DurableObject<Environment, Api> {
     const request = await this.storage.get<AuthorizationRequest>(
       `codes/${code}`
     )
-    console.log('here', JSON.stringify(request))
     if (!request) {
       console.error("authorization: auth code ${code} doesn't exist")
       throw 'missing authorization request'
