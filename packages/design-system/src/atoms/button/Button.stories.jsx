@@ -23,25 +23,25 @@ const Template = (args) => (
 export const PrimaryButton = Template.bind({})
 
 export const AltPrimaryButton = Template.bind({})
-AltPrimaryButton.args = { alt: true }
+AltPrimaryButton.args = { btnType: 'primary-alt' }
 
 export const SecondaryButton = Template.bind({})
-SecondaryButton.args = { secondary: true }
+SecondaryButton.args = { btnType: 'secondary' }
 
 export const TertiaryButton = Template.bind({})
-TertiaryButton.args = { tertiary: true }
+TertiaryButton.args = { btnType: 'secondary-alt' }
 
 export const DisabledButton = Template.bind({})
 DisabledButton.args = { disabled: true }
 
 export const ExtraSmallButton = Template.bind({})
-ExtraSmallButton.args = { size: 'xs' }
+ExtraSmallButton.args = { btnSize: 'xs' }
 
 export const SmallButton = Template.bind({})
-SmallButton.args = { size: 'sm' }
+SmallButton.args = { btnSize: 'sm' }
 
 export const LargeButton = Template.bind({})
-LargeButton.args = { size: 'lg' }
+LargeButton.args = { btnSize: 'l' }
 
 export const ExtraLargeButton = Template.bind({})
-ExtraLargeButton.args = { size: 'xl' }
+ExtraLargeButton.args = { btnSize: 'xl' }
