@@ -61,14 +61,14 @@ export const loader: LoaderFunction = async (args) => {
       claimed: true,
     }
 
-    if (params.address?.endsWith('.eth')) {
-      const { ensAddress } = await galaxyClient.getEnsAddress(address)
+    if (params.profile?.endsWith('.eth')) {
+      const { ensAddress } = await galaxyClient.getEnsAddress({address})
 
       // the ens name is the same as the logged in user
-      if (ensAddress == params.address) {
+      if (ensAddress == params.profile) {
         targetAddress = address
       }
-    } else if (address == params.address) {
+    } else if (address == params.profile) {
       targetAddress = address
     }
   }
