@@ -24,6 +24,7 @@ export default /* GraphQL */ `
     addresses: [ThreeIDAddress]
 
     ensAddress(address: String!): String
+    ensAddressAvatar(address: String!): String
   }
 
   type Mutation {

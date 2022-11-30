@@ -50,28 +50,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   if (!prof?.pfp) {
-    const addressLookup = await oortSend('ens_lookupAddress', [address], {
-      jwt,
-    })
-
-    let ensAvatar = null
-    if (addressLookup?.result?.endsWith('.eth')) {
-      const ensRes = await fetch(
-        `https://api.ensideas.com/ens/resolve/${addressLookup?.result}`
-      )
-      const res: {
-        avatar: string | null
-      } = await ensRes.json()
-
-      ensAvatar = res.avatar
-    }
+    const { ensAddressAvatar } = await galaxyClient.getEnsAddressAvatar(address)
 
     await galaxyClient.updateProfile(
       {
         profile: {
           pfp: {
             image:
-              ensAvatar ||
+              ensAddressAvatar ||
               gatewayFromIpfs(voucher?.metadata?.image) ||
               deafaultPfp,
           },

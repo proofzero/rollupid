@@ -62,13 +62,10 @@ export const loader: LoaderFunction = async (args) => {
     }
 
     if (params.address?.endsWith('.eth')) {
-      // get the 0x address for the eth name
-      const addressLookup = await oortSend('ens_lookupAddress', [address], {
-        jwt,
-      })
+      const { ensAddress } = await galaxyClient.getEnsAddress(address)
 
       // the ens name is the same as the logged in user
-      if (addressLookup?.result == params.address) {
+      if (ensAddress == params.address) {
         targetAddress = address
       }
     } else if (address == params.address) {

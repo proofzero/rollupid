@@ -27,12 +27,15 @@ const addressResolvers: Resolvers = {
     },
     ensAddress: async (_parent, { address }, {}) =>
       new ENSIdeasUtils().getENSAddress(address),
+    ensAddressAvatar: async (_parent, { address }, {}) =>
+      new ENSIdeasUtils().getENSAddressAvatar(address),
   },
   Mutation: {},
 }
 
 const AddressResolverComposition = {
   'Query.ensAddress': [setupContext()],
+  'Query.ensAddressAvatar': [setupContext()],
   'Mutation.updateThreeIDAddress': [isAuthorized()],
 }
 
