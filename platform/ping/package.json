@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "all:check": "run-s format:check lint:check types:check",
+    "check": "run-s format:check lint:check types:check",
     "format": "run-s format:src",
     "format:src": "prettier --write src",
     "format:check": "run-s format:check:src",
