@@ -5,7 +5,7 @@ import { Text } from '../text/Text'
 // Strings used so no other
 // constructs need to be exported
 type ButtonSize = 'xs' | 'sm' | 'base' | 'l' | 'xl'
-type ButtonType = 'primary' | 'secondary'
+type ButtonType = 'primary' | 'primary-alt' | 'secondary' | 'secondary-alt'
 
 // Dictionary pattern used
 // so Tailwind can find the needed classes
@@ -19,9 +19,13 @@ const sizeToSizesDict = {
 
 const typeToColorsDict = {
   primary:
+    'bg-[#1f2937] text-white shadow-sm hover:bg-[#374151] focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+  'primary-alt':
     'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
   secondary:
-    'bg-white text-gray-700 shadow-sm border border-solid border-gray-300 hover:bg-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+    'bg-white text-[#5d4aec] shadow-sm border border-solid border-gray-300 hover:bg-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
+  'secondary-alt':
+    'bg-white text-[#1f2937] shadow-sm border border-solid border-gray-300 hover:bg-gray-300 focus:bg-white focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500',
 }
 
 const disabledColorClasses = 'bg-gray-100 text-gray-300'
