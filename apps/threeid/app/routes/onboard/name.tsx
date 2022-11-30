@@ -36,19 +36,10 @@ export const loader: LoaderFunction = async ({ request }) => {
   let profile = profileRes.profile || { displayName: '' }
 
   if (!profileRes.profile?.displayName) {
-    const addressLookup = await oortSend('ens_lookupAddress', [address], {
-      jwt,
-    })
+    const { ensAddress } = await galaxyClient.getEnsAddress({address})
 
-    if (addressLookup?.result?.endsWith('.eth')) {
-      const ensRes = await fetch(
-        `https://api.ensideas.com/ens/resolve/${addressLookup?.result}`
-      )
-      const res: {
-        displayName: string | null
-      } = await ensRes.json()
-
-      profile.displayName = res.displayName || addressLookup?.result
+    if (ensAddress?.endsWith('.eth')) {
+      profile.displayName = ensAddress
     }
   }
 
@@ -152,20 +143,12 @@ const OnboardDisplayname = () => {
           className="flex-1 justify-center items-center items-stretch self-center"
         >
           <Label htmlFor="display-name">
-            <Text
-              className="mb-1.5 text-gray-700"
-              size="sm"
-              weight="medium"
-            >
+            <Text className="mb-1.5 text-gray-700" size="sm" weight="medium">
               *Display Name
             </Text>
 
             {actionErrors?.displayname && (
-              <Text
-                className="mb-1.5 text-gray-400"
-                size="xs"
-                weight="normal"
-              >
+              <Text className="mb-1.5 text-gray-400" size="xs" weight="normal">
                 {actionErrors.displayname}
               </Text>
             )}
