@@ -44,6 +44,7 @@ export const loader = async ({ request }) => {
     parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
   ]
 
+  console.log({ profileRes, address })
   return json({
     address,
     avatarUrl,
@@ -78,11 +79,7 @@ export default function AccountLayout() {
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav
-            avatarUrl={avatarUrl}
-            isToken={isToken}
-            loggedIn={{ address }}
-          />
+          <HeadNav avatarUrl={avatarUrl} isToken={isToken} loggedIn={address} />
         </div>
 
         <main className="-mt-72 pb-12">

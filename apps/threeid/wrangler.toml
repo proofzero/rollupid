@@ -36,7 +36,7 @@ COOKIE_DOMAIN = "localhost"
   command = "yarn build -- --sourcemap"
 
 [dev]
-port = 31337
+port = 9797
 local_protocol = "http"
 
 # dev (development)

@@ -17,6 +17,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     owner,
     pageKey,
   })
+
   const ownedNfts = res.ownedNfts.map((nft) => {
     let properties: {
       name: string

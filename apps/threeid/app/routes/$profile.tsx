@@ -48,6 +48,7 @@ export const loader: LoaderFunction = async (args) => {
 
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
+  let isOwner = false
   if (jwt) {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
@@ -56,9 +57,9 @@ export const loader: LoaderFunction = async (args) => {
       ...profileRes.profile,
       claimed: true,
     }
+    isOwner = profileRes.profile.defaultAddress == targetAddress
   }
 
-  const isOwner = profileRes.profile.defaultAddress == targetAddress
   const profileJson = await (await profileLoader(args)).json()
 
   // Setup og tag data
@@ -87,7 +88,8 @@ export const loader: LoaderFunction = async (args) => {
 
   return json({
     ...profileJson,
-    originalCoverUrl: profileJson?.cover,
+    // originalCoverUrl: profileJson?.cover, // TODO: get voucher from address
+    cover: profileJson?.cover,
     loggedInUserProfile,
     isOwner,
     targetAddress: targetAddress,
@@ -251,7 +253,7 @@ const ProfileRoute = () => {
       </div>
 
       <Cover
-        loaded={coverUrl && !handlingCover}
+        // loaded={coverUrl && !handlingCover}
         src={gatewayFromIpfs(coverUrl)}
         className={`max-w-7xl mx-auto flex justify-center ${
           !handlingCover ? 'hover-child-visible' : ''

@@ -44,7 +44,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         'KBT-Access-JWT-Assertion': session.get('jwt'),
       }
     )
-    console.log({ parsedJwt, updated })
     if (!updated) {
       throw json("Couldn't update profile", 400)
     }

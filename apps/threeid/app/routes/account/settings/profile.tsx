@@ -23,29 +23,24 @@ import { getGalaxyClient } from '~/helpers/galaxyClient'
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
 import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { getCachedVoucher } from '~/helpers/voucher'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const session = await getUserSession(request)
-  const address = await session.get('address')
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  let voucher
-  try {
-    voucher = await getCachedVoucher(address)
-  } catch (ex) {
-    console.error(ex)
-  }
+  // const {nftsForAddress} = await galaxyClient.getNfts({
+  //   owner: profileRes.profile?.defaultAddress,
+  //   contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
+  // })
 
   return json({
-    address,
-    generatedPfp: voucher?.metadata?.image,
-    generatedPfpMinted: voucher?.minted,
+    // address,
+    // generatedPfp: voucher?.metadata?.image,
+    // generatedPfpMinted: nftsForAddress.ownedNfts.length,
     ...profileRes.profile,
   })
 }
@@ -136,9 +131,9 @@ export default function AccountSettingsProfile() {
     bio,
     website,
     pfp,
-    address,
-    generatedPfp,
-    generatedPfpMinted,
+    // address,
+    // generatedPfp,
+    // generatedPfpMinted,
   } = useLoaderData()
 
   const [pfpUrl, setPfpUrl] = useState(pfp?.image)
@@ -207,12 +202,12 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
-      <PfpNftModal
+      {/* <PfpNftModal
         account={address}
         isOpen={nftPfpModalOpen}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
-      />
+      /> */}
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
@@ -263,7 +258,7 @@ export default function AccountSettingsProfile() {
               </Button>
             </div>
 
-            {generatedPfp && (
+            {/* {generatedPfp && (
               <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text className="text-gray-400" size="sm" weight="medium">
                   Or use your 1/1 gradient
@@ -282,7 +277,7 @@ export default function AccountSettingsProfile() {
                   }}
                 />
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
