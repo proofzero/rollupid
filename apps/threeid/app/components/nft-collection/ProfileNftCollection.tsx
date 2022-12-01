@@ -10,7 +10,7 @@ import book from '~/assets/book.svg'
 
 import noNfts from '~/assets/No_NFT_Found.svg'
 
-import { ButtonAnchor } from '../buttons'
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import Masonry from 'react-masonry-css'
 

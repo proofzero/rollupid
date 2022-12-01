@@ -7,7 +7,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
-import { Button } from '@kubelt/design-system/src/atoms/button/Button'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
@@ -233,8 +233,8 @@ export default function AccountSettingsProfile() {
           <div className="flex flex-col justify-between space-y-3.5">
             <div className="flex flex-row space-x-3.5">
               <Button
-                type={ButtonType.Secondary}
-                size={ButtonSize.SM}
+                btnType={'secondary'}
+                btnSize={'sm'}
                 onClick={() => {
                   if (!nftPfpModalOpen) setNftPfpModalOpen(true)
                 }}
@@ -253,8 +253,8 @@ export default function AccountSettingsProfile() {
               />
 
               <Button
-                type={ButtonType.Secondary}
-                size={ButtonSize.SM}
+                btnType={'secondary'}
+                btnSize={'sm'}
                 onClick={() => {
                   pfpUploadRef.current?.click()
                 }}
@@ -383,7 +383,7 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex lg:justify-end">
-            <Button isSubmit type={ButtonType.Primary}>
+            <Button isSubmit btnType={'secondary'} btnSize={'sm'}>
               Save
             </Button>
           </div>

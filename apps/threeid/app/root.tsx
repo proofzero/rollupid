@@ -17,6 +17,8 @@ import { useLoaderData, useCatch } from '@remix-run/react'
 
 import { startSession } from '~/utils/datadog.client'
 
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
+
 import designStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
@@ -139,11 +141,12 @@ export function ErrorBoundary({ error }) {
                 If this problem persists please join Discord for help
               </p>
 
-              <BaseButtonAnchor
-                text={'Go to Discord'}
-                color={'dark'}
+              <ButtonAnchor
+                btnType={'primary'}
                 href={'https://discord.gg/threeid'}
-              />
+              >
+                Go to Discord
+              </ButtonAnchor>
             </div>
           </article>
           <article className="content col-span-3 m-12">

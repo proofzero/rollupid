@@ -9,8 +9,8 @@ import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Cover } from '../components/profile/cover/Cover'
 
-import { Button } from '@kubelt/design-system/src/atoms/button/Button'
-import ButtonLink from '~/components/buttons/ButtonLink'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import HeadNav from '~/components/head-nav'
 
@@ -332,25 +332,29 @@ const ProfileRoute = () => {
               <div className="flex flex-row space-x-4 items-center">
                 {originalCoverUrl && coverUrl !== originalCoverUrl && (
                   <Button
-                    type={ButtonType.Contrast}
-                    size={ButtonSize.SM}
-                    Icon={FaTrash}
+                    btnType={'primary'}
+                    btnSize={'sm'}
                     onClick={async () => {
                       await handleCoverReset()
                     }}
                   >
+                    <span>
+                      <FaTrash />
+                    </span>
                     Delete
                   </Button>
                 )}
 
                 <Button
-                  type={ButtonType.Contrast}
-                  size={ButtonSize.SM}
-                  Icon={FaCamera}
+                  btnType={'primary'}
+                  btnSize={'sm'}
                   onClick={() => {
                     coverUploadRef.current?.click()
                   }}
                 >
+                  <span>
+                    <FaCamera />
+                  </span>
                   Upload
                 </Button>
               </div>
@@ -368,13 +372,12 @@ const ProfileRoute = () => {
         />
 
         {isOwner && (
-          <ButtonLink
-            size={ButtonSize.SM}
-            to="/account/settings/profile"
-            Icon={FaEdit}
-          >
+          <ButtonAnchor btnSize={'sm'} href="/account/settings/profile">
+            <span>
+              <FaEdit />
+            </span>
             Edit Profile
-          </ButtonLink>
+          </ButtonAnchor>
         )}
       </div>
 

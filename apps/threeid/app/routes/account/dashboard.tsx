@@ -8,11 +8,11 @@ import FAQ from '~/components/FAQ'
 import stepComplete from '~/assets/step_complete.png'
 import stepSoon from '~/assets/step_soon.png'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
 import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
-import { ButtonAnchor } from '~/components/buttons'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { requireJWT } from '~/utils/session.server'
 
@@ -120,19 +120,17 @@ export default function Welcome() {
         </Text>
 
         <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
-          <ButtonAnchor
-            href="https://twitter.com/threeid_xyz"
-            Icon={FaTwitter}
-            iconColor="#1D9BF0"
-          >
+          <ButtonAnchor href="https://twitter.com/threeid_xyz">
+            <span style={{ color: '#1D9BF0' }}>
+              <FaTwitter />
+            </span>
             Twitter
           </ButtonAnchor>
 
-          <ButtonAnchor
-            href="https://discord.gg/threeid"
-            Icon={FaDiscord}
-            iconColor="#5865F2"
-          >
+          <ButtonAnchor href="https://discord.gg/threeid">
+            <span style={{ color: '#1D9BF0' }}>
+              <FaDiscord />
+            </span>
             Discord
           </ButtonAnchor>
         </div>
