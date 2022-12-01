@@ -1,7 +1,0 @@
-query getEnsAddress($address: String!) {
-  ensAddress(address: $address)
-}
-
-query getEnsAddressAvatar($address: String!) {
-  ensAddressAvatar(address: $address)
-}
