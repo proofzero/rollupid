@@ -107,6 +107,7 @@ export const action: ActionFunction = async ({ request }) => {
     {
       profile: {
         displayName: displayName,
+        // TODO: support for default address
         job: job,
         location: location,
         bio: bio,
@@ -116,7 +117,6 @@ export const action: ActionFunction = async ({ request }) => {
           isToken: computedIsToken,
         },
       },
-      visibility: Visibility.Public,
     },
     {
       'KBT-Access-JWT-Assertion': jwt,

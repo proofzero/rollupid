@@ -4,6 +4,7 @@ import { parseURN } from 'urns'
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 import {
   AddressURN,
+  CryptoWorkerApi,
   WorkerApi as AddressApi,
 } from '@kubelt/platform.address/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
@@ -39,7 +40,9 @@ const threeIDResolvers: Resolvers = {
       // console.log('query', coreId)
       // TODO: get coreId from URN
 
-      console.log('getting...', { coreId })
+      console.log(
+        `galaxy:profileFromAddress: getting profilef for account: ${coreId}`
+      )
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
@@ -62,7 +65,21 @@ const threeIDResolvers: Resolvers = {
       )
       const coreId = await addressClient.kb_resolveAccount()
       if (!coreId) {
-        throw 'galaxy:profileFromAddress: no coreId found'
+        console.log(
+          'galaxy:profileFromAddress: attempt to resolve profile from address w/o account'
+        )
+        const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
+        try {
+          const addressProfile = await (addressClient as CryptoWorkerApi) // TODO: should there be generic addres profile interface?
+            .kb_getAddressProfile()
+          if (!addressProfile) {
+            throw errorMessage
+          }
+          return addressProfile
+        } catch (e) {
+          console.error(errorMessage)
+          throw errorMessage
+        }
       }
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
@@ -70,6 +87,9 @@ const threeIDResolvers: Resolvers = {
 
       // Upgrayedd Oort -> Account
       if (!accountProfile) {
+        console.log(
+          `galaxy:profileFromAddress: upgrayedd Oort -> Account for ${addressURN}`
+        )
         const oortClient = new OortClient(env.OORT)
         const parsedURN = parseURN(addressURN) // TODO: need utils lik AddressURN.parse(addressURN)
         const name = parsedURN.nss.split('/')[1]
@@ -79,7 +99,6 @@ const threeIDResolvers: Resolvers = {
           accountClient,
           oortResponse
         )
-        // TODO: also add address profile?
       }
 
       // console.log(accountProfile)
@@ -92,8 +111,9 @@ const threeIDResolvers: Resolvers = {
       { profile },
       { env, jwt, coreId }: ResolverContext
     ) => {
-      console.log('updating..')
-      console.log({ coreId, profile })
+      console.log(
+        `galaxy:profileFromAddress: updating profilef for account: ${coreId}`
+      )
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let currentProfile = await accountClient.kb_getProfile(coreId)
