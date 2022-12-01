@@ -1,11 +1,12 @@
-import { BytesLike } from '@ethersproject/bytes'
-import { keccak256 } from '@ethersproject/keccak256'
-import { recoverPublicKey } from '@ethersproject/signing-key'
-import { computeAddress } from '@ethersproject/transactions'
+import { hexlify } from '@ethersproject/bytes'
+import { randomBytes } from '@ethersproject/random'
 
 import { DurableObject } from '@kubelt/platform.commons'
+import { AccountURN, AccountURNSpace } from '@kubelt/platform.account/src/urns'
 
+import { ADDRESS_OPTIONS } from './constants'
 import { AddressCoreApi, Environment, CryptoCoreApi } from './types'
+
 export default class Core extends DurableObject<
   Environment,
   AddressCoreApi | CryptoCoreApi
@@ -37,7 +38,11 @@ export default class Core extends DurableObject<
     await this.storage.put({ address })
   }
 
-  async setAccount(account: string): Promise<void> {
+  async getAccount(): Promise<string | undefined> {
+    return this.storage.get<string>('account')
+  }
+
+  async setAccount(account: AccountURN): Promise<void> {
     await this.storage.put({ account })
   }
 
@@ -45,19 +50,19 @@ export default class Core extends DurableObject<
     await this.storage.deleteAll()
   }
 
-  async resolveAccount(): Promise<string | undefined> {
-    return this.storage.get<string>('account')
-  }
-
-  recoverPublicKey(message: string, signature: string): string {
-    const prefix = `\u0019Ethereum Signed Message:\n${message.length}`
-    const encoder = new TextEncoder()
-    const bytes = encoder.encode(`${prefix}${message}`)
-    const digest = keccak256(bytes)
-    return recoverPublicKey(digest, signature)
-  }
-
-  computeAddress(publicKey: BytesLike): string {
-    return computeAddress(publicKey)
+  async resolveAccount(): Promise<AccountURN> {
+    const urn = await this.getAccount()
+    if (urn) {
+      if (AccountURNSpace.is(urn)) {
+        return urn
+      } else {
+        throw `invalid account: ${urn}`
+      }
+    } else {
+      const id = hexlify(randomBytes(ADDRESS_OPTIONS.length))
+      const urn = AccountURNSpace.urn(id)
+      await this.setAccount(urn)
+      return urn
+    }
   }
 }

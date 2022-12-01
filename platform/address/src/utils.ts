@@ -1,26 +1,9 @@
 import { isAddress as isEthAddress } from '@ethersproject/address'
 import type { JsonRpcResponse } from 'typed-json-rpc'
-import { parseURN, URNSpace } from 'urns'
 
-import {
-  AddressURN,
-  CoreType,
-  CryptoAddressType,
-  CryptoCoreType,
-  Environment,
-} from './types'
+import { AddressType, CoreType, CryptoCoreType, Environment } from './types'
 
-import { AddressType } from './types'
-
-const space = new URNSpace('threeid', {
-  decode: (nss) => {
-    const [service, name] = nss.split('/')
-    if (service != 'address') {
-      throw `Invalid 3RN service name. Got ${service}, expected "address".`
-    }
-    return name
-  },
-})
+import { AddressURN, AddressURNSpace } from './urns'
 
 export const resolveAddress3RN = async (
   request: Request
@@ -37,11 +20,10 @@ export const resolveAddress3RN = async (
     throw new Error('missing X-3RN header')
   }
 
-  const { rcomponent, qcomponent } = parseURN(urn)
+  const name = AddressURNSpace.decode(urn)
+  const { rcomponent, qcomponent } = AddressURNSpace.parse(urn)
 
-  const name = space.decode(urn)
-
-  const rparams = new URLSearchParams(rcomponent || undefined)
+  const rparams = new URLSearchParams(rcomponent || '')
 
   let nodeType = rparams.get('node_type') as CoreType
   if (!nodeType) {

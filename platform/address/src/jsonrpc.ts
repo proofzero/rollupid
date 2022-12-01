@@ -6,17 +6,16 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
+import { AccountURN } from '@kubelt/platform.account/src/urns'
 
 import {
   AuthorizeResult,
   ResponseType,
   WorkerApi as AccessApi,
 } from '@kubelt/platform.access/src/types'
+
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
-import { ADDRESS_OPTIONS } from './constants'
 import {
   Environment,
   AddressCoreApi,
@@ -28,7 +27,6 @@ import {
 } from './types'
 import { resolveAddress3RN } from './utils'
 import { default as CryptoCoreStatic } from './crypto-core'
-import { AccountURN } from '../../account/src/types'
 
 const checkEnvVars = (env: Environment) => {
   if (!env.NFTAR_CHAIN_ID) {
@@ -56,7 +54,7 @@ export default async (
   request: Request,
   env: Environment
 ): Promise<Response> => {
-  const { Access, CryptoCore, Oort } = env
+  const { Access, CryptoCore } = env
 
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
@@ -117,32 +115,16 @@ export default async (
     async kb_unsetAccount(): Promise<void> {
       return client.kb_unsetAddress()
     },
-    async kb_resolveAccount(): Promise<string | undefined> {
-      return await client.resolveAccount()
+    async kb_resolveAccount(): Promise<AccountURN> {
+      return client.resolveAccount()
     },
   }
 
   const cryptoApiHandlers: CryptoWorkerApi = {
     ...baseApiHandlers,
     // TODO: function to be deprecated pass support period for oort migration
-    async kb_resolveAccount(): Promise<string> {
-      let account = await client.resolveAccount()
-      if (account) {
-        return account
-      } else {
-        const response = await Oort.fetch(`http://localhost/address/${address}`)
-        if (response.ok) {
-          // if oort has an account we can also assume it has a profile
-          const { coreId: accountId }: { coreId: string } =
-            await response.json()
-          account = accountId
-        } else {
-          account = hexlify(randomBytes(ADDRESS_OPTIONS.length))
-        }
-
-        await client.setAccount(account)
-        return account
-      }
+    async kb_resolveAccount(): Promise<AccountURN> {
+      return client.resolveAccount()
     },
     async kb_getNonce(
       template: string,
@@ -157,24 +139,19 @@ export default async (
       nonce: string,
       signature: string
     ): Promise<AuthorizeResult> {
-      const account = await this.kb_resolveAccount()
-      if (!account) {
-        throw 'missing account'
-      }
+      const account = await client.resolveAccount()
+      const responseType = ResponseType.Code
       const challenge = await client.verifyNonce(nonce, signature)
       const { clientId, redirectUri, scope, state } = challenge
       const accessClient = createFetcherJsonRpcClient<AccessApi>(Access)
-
-      const accountUrn = `urn:threeid:account/${account}?+node_type=account`
-
-      return accessClient.kb_authorize(
-        accountUrn as AccountURN,
+      return accessClient.kb_authorize({
+        account,
+        responseType,
         clientId,
         redirectUri,
         scope,
         state,
-        ResponseType.Code
-      )
+      })
     },
     async kb_setAddressProfile(profile: AddressProfile): Promise<void> {
       return client.setProfile(profile)

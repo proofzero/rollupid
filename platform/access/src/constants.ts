@@ -1,3 +1,5 @@
+export const URN_NODE_TYPE_AUTHORIZATION = 'node_type:authorization'
+
 export const CODE_OPTIONS = {
   length: 24,
 }

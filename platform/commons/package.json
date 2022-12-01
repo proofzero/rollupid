@@ -37,6 +37,7 @@
     "itty-router-extras": "*"
   },
   "dependencies": {
-    "typed-json-rpc": "1.1.0"
+    "typed-json-rpc": "1.1.0",
+    "urns": "0.6.0"
   }
 }

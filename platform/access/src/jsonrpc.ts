@@ -7,22 +7,29 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { accountURNSpace } from '@kubelt/platform.account/src/utils'
-import { AccountURN } from '@kubelt/platform.account/src/types'
+import { AccountURNSpace } from '@kubelt/platform.account/src/urns'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+
+import { URN_NODE_TYPE_AUTHORIZATION } from './constants'
 
 import {
   AccessApi,
   AuthorizationApi,
+  AuthorizeOptions,
   AuthorizeResult,
   Environment,
-  ExchangeAuthorizationCodeResult,
+  ExchangeAuthenticationCodeOptions,
+  ExchangeAuthorizationCodeOptions,
+  ExchangeRefreshTokenOptions,
+  ExchangeTokenOptions,
+  ExchangeTokenResult,
   GrantType,
-  ResponseType,
-  Scope,
+  StarbaseApi,
   WorkerApi,
 } from './types'
+
+import { AccessURN, AccessURNSpace } from './urns'
 
 export default async (
   request: Request,
@@ -30,7 +37,7 @@ export default async (
 ): Promise<Response> => {
   const { Access, Authorization } = env
   const getAuthorizationClient = (
-    name: string
+    name: AccessURN
   ): JsonRpcClient<AuthorizationApi> => {
     const fetcher = Authorization.get(Authorization.idFromName(name))
     return createFetcherJsonRpcClient<AuthorizationApi>(fetcher)
@@ -50,88 +57,163 @@ export default async (
     return createFetcherJsonRpcClient<AccessApi>(fetcher)
   }
 
+  const kb_authorize = ({
+    account,
+    responseType,
+    clientId,
+    redirectUri,
+    scope,
+    state,
+  }: AuthorizeOptions): Promise<AuthorizeResult> => {
+    if (!account) {
+      throw 'missing core identifier'
+    }
+
+    if (!responseType) {
+      throw 'missing response type'
+    }
+
+    if (!clientId) {
+      throw 'missing client identifier'
+    }
+
+    if (!redirectUri) {
+      throw 'missing redirect URI'
+    }
+
+    if (!scope || !scope.length) {
+      throw 'missing scope'
+    }
+
+    const accountId = AccountURNSpace.decode(account)
+    const urn = AccessURNSpace.fullUrn(accountId, {
+      r: URN_NODE_TYPE_AUTHORIZATION,
+      q: { clientId },
+    })
+
+    const client = getAuthorizationClient(urn)
+    return client.authorize(
+      account,
+      responseType,
+      clientId,
+      redirectUri,
+      scope,
+      state
+    )
+  }
+
+  const exchangeAuthenticationCode = ({
+    account,
+    code,
+    redirectUri,
+    clientId,
+  }: ExchangeAuthenticationCodeOptions): Promise<ExchangeTokenResult> => {
+    if (!account) {
+      throw 'missing account'
+    }
+
+    if (!code) {
+      throw 'missing authorization code'
+    }
+
+    if (!redirectUri) {
+      throw 'missing redirect uri'
+    }
+
+    if (!clientId) {
+      throw 'missing client identifier'
+    }
+
+    const accountId = AccountURNSpace.decode(account)
+    const urn = AccessURNSpace.fullUrn(accountId, {
+      r: URN_NODE_TYPE_AUTHORIZATION,
+      q: { clientId },
+    })
+    const client = getAuthorizationClient(urn)
+    return client.exchangeToken(code, redirectUri, clientId)
+  }
+
+  const exchangeAuthorizationCode = async ({
+    account,
+    code,
+    redirectUri,
+    clientId,
+    clientSecret,
+  }: ExchangeAuthorizationCodeOptions): Promise<ExchangeTokenResult> => {
+    if (!account) {
+      throw 'missing account'
+    }
+
+    if (!code) {
+      throw 'missing authorization code'
+    }
+
+    if (!redirectUri) {
+      throw 'missing redirect uri'
+    }
+
+    if (!clientId) {
+      throw 'missing client identifier'
+    }
+
+    const urn = AccessURNSpace.fullUrn(account, {
+      r: URN_NODE_TYPE_AUTHORIZATION,
+      q: { clientId },
+    })
+    const authorizationClient = getAuthorizationClient(urn)
+
+    const { scope } = await authorizationClient.params(code)
+    const { Starbase } = env
+    const starbaseClient = createFetcherJsonRpcClient<StarbaseApi>(Starbase)
+    const validated = await starbaseClient.kb_checkClientAuthorization(
+      redirectUri,
+      scope,
+      clientId,
+      clientSecret
+    )
+    if (validated) {
+      return authorizationClient.exchangeCode(code, redirectUri, clientId)
+    } else {
+      throw 'failed authorization attempt'
+    }
+  }
+
+  const exchangeRefreshToken = ({
+    refreshToken,
+  }: ExchangeRefreshTokenOptions): Promise<ExchangeTokenResult> => {
+    return getAccessClient(refreshToken).refresh(refreshToken)
+  }
+
+  const kb_exchangeToken = (
+    options: ExchangeTokenOptions
+  ): Promise<ExchangeTokenResult> => {
+    const { grantType } = options
+    if (!grantType) {
+      throw 'missing grant type'
+    }
+
+    switch (grantType) {
+      case GrantType.AuthenticationCode:
+        return exchangeAuthenticationCode(options)
+      case GrantType.AuthorizationCode:
+        return exchangeAuthorizationCode(options)
+      case GrantType.RefreshToken:
+        return exchangeRefreshToken(options)
+      default:
+        throw 'invalid grant type'
+    }
+  }
+
+  const kb_verifyAuthorization = (
+    token: string
+  ): Promise<jose.JWTVerifyResult> => {
+    return getAccessClient(token).verify(token)
+  }
+
   const api = createRequestHandler<WorkerApi>({
-    async kb_authorize(
-      accountUrn: AccountURN,
-      clientId: string,
-      redirectUri: string,
-      scope: Scope,
-      state: string,
-      responseType: ResponseType
-    ): Promise<AuthorizeResult> {
-      if (!accountUrn) {
-        throw 'missing core identifier'
-      }
-
-      if (!clientId) {
-        throw 'missing client identifier'
-      }
-
-      if (!redirectUri) {
-        throw 'missing redirect URI'
-      }
-
-      if (!scope || !scope.length) {
-        throw 'missing scope'
-      }
-
-      // TODO: utility?
-
-      const account = accountURNSpace.decode(accountUrn)
-
-      const authorizationUrn = `urn:threeid:access/${account}?+node_type=authoirzation?=clientId=${clientId}`
-
-      const client = getAuthorizationClient(authorizationUrn)
-      return client.authorize(account, clientId, redirectUri, scope, state)
-    },
-    async kb_exchangeToken(
-      // todo: should overload this with diff params
-      grantType: GrantType,
-      code: string,
-      redirectUri: string,
-      clientId: string,
-      clientSecret: string
-    ): Promise<ExchangeAuthorizationCodeResult> {
-      if (!grantType) {
-        throw 'missing grant type'
-      }
-
-      if (!code) {
-        throw 'missing authorization code'
-      }
-
-      if (!redirectUri) {
-        throw 'missing redirect uri'
-      }
-
-      if (!clientId) {
-        throw 'missing client identifier'
-      }
-
-      if (!clientSecret) {
-        throw 'missing client secret'
-      }
-
-      switch (grantType) {
-        case GrantType.AuthenticationCode: {
-          const authorizationUrn = `urn:threeid:access/${clientSecret}?+node_type=authoirzation?=clientId=${clientId}`
-          const authorizationClient = getAuthorizationClient(authorizationUrn)
-          return authorizationClient.exchangeCode(code, redirectUri, clientId)
-        }
-      }
-
-      throw 'invalid grant type'
-    },
-    async kb_verifyAuthorization(token: string): Promise<boolean> {
-      const client = getAccessClient(token)
-      try {
-        await client.verify(token)
-        return true
-      } catch (err) {
-        console.error(err)
-        return false
-      }
-    },
+    kb_authorize,
+    kb_exchangeToken,
+    kb_verifyAuthorization,
   })
 
   try {
@@ -139,6 +221,10 @@ export default async (
     const jsonRpcResponse: JsonRpcResponse = await api.handleRequest(
       jsonRpcRequest
     )
+    if ('error' in jsonRpcResponse) {
+      console.error(jsonRpcResponse.error)
+      jsonRpcResponse.error = jsonRpcResponse.error.message || error
+    }
     return new Response(JSON.stringify(jsonRpcResponse), {
       headers: {
         'Content-Type': 'application/json',

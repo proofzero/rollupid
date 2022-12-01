@@ -1,5 +1,8 @@
-import { hexlify } from '@ethersproject/bytes'
+import { hexlify, BytesLike } from '@ethersproject/bytes'
+import { keccak256 } from '@ethersproject/keccak256'
 import { randomBytes } from '@ethersproject/random'
+import { recoverPublicKey } from '@ethersproject/signing-key'
+import { computeAddress } from '@ethersproject/transactions'
 
 import { gatewayFromIpfs } from '@kubelt/platform.commons/src/utils'
 
@@ -14,6 +17,7 @@ import {
   CryptoAddressType,
   AddressType,
 } from './types'
+import { AddressURNSpace } from './urns'
 import { getNftarVoucher, resolveEthType } from './utils'
 
 export default class CryptoCore extends Core {
@@ -178,9 +182,9 @@ export default class CryptoCore extends Core {
 
     const message = challenge.template.slice().replace(/{{nonce}}/, nonce)
     const publicKey = this.recoverPublicKey(message, signature)
-    const subject = this.computeAddress(publicKey)
+    const address = this.computeAddress(publicKey)
 
-    if (subject != challenge.clientId) {
+    if (address != challenge.clientId) {
       throw 'not matching address'
     }
 
@@ -189,5 +193,17 @@ export default class CryptoCore extends Core {
     }
 
     return challenge
+  }
+
+  recoverPublicKey(message: string, signature: string): string {
+    const prefix = `\u0019Ethereum Signed Message:\n${message.length}`
+    const encoder = new TextEncoder()
+    const bytes = encoder.encode(`${prefix}${message}`)
+    const digest = keccak256(bytes)
+    return recoverPublicKey(digest, signature)
+  }
+
+  computeAddress(publicKey: BytesLike): string {
+    return computeAddress(publicKey)
   }
 }

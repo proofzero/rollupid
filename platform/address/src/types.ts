@@ -2,10 +2,9 @@ import type {
   BaseApi,
   DurableObjectApi,
 } from '@kubelt/platform.commons/src/jsonrpc'
-import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
-import type { BaseURN } from 'urns'
 
-export type AddressURN = BaseURN<'threeid', `address/${string}`>
+import type { AccountURN } from '@kubelt/platform.account/src/urns'
+import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
 
 export interface Environment {
   Access: Fetcher
@@ -41,7 +40,7 @@ export interface AddressCoreApi extends DurableObjectApi {
   setAddress(address: string): Promise<void>
   setAccount(accountUrn: string): void
   unsetAccount(): void
-  resolveAccount(): Promise<string | undefined>
+  resolveAccount(): Promise<AccountURN>
 }
 
 export interface CryptoCoreApi extends AddressCoreApi {
@@ -62,7 +61,7 @@ export interface CryptoCoreApi extends AddressCoreApi {
 export interface WorkerApi extends BaseApi {
   kb_setAccount(accountUrn: string): Promise<void>
   kb_unsetAccount(): Promise<void>
-  kb_resolveAccount(): Promise<string | undefined>
+  kb_resolveAccount(): Promise<AccountURN>
 }
 
 export interface CryptoWorkerApi extends WorkerApi {
