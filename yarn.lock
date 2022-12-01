@@ -4929,6 +4929,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kubelt/alchemy-client@workspace:packages/alchemy-client":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/alchemy-client@workspace:packages/alchemy-client"
+  dependencies:
+    eslint: 8.28.0
+    eslint-plugin-tsdoc: 0.2.17
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
 "@kubelt/apps.console@workspace:apps/console":
   version: 0.0.0-use.local
   resolution: "@kubelt/apps.console@workspace:apps/console"
@@ -5132,6 +5142,7 @@ __metadata:
     tailwindcss: 3.2.4
     tw-elements: 1.0.0-alpha12
     typescript: 4.9.3
+    urns: 0.6.0
     wagmi: 0.8.6
     webpack: 5.75.0
     wrangler: 2.4.4
@@ -5249,6 +5260,16 @@ __metadata:
     eslint: 8.28.0
     eslint-plugin-tsdoc: 0.2.17
     npm-run-all: 4.1.5
+    prettier: 2.7.1
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/nftar-client@workspace:packages/nftar-client":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/nftar-client@workspace:packages/nftar-client"
+  dependencies:
+    eslint: 8.28.0
+    eslint-plugin-tsdoc: 0.2.17
     prettier: 2.7.1
   languageName: unknown
   linkType: soft
@@ -5429,6 +5450,7 @@ __metadata:
     graphql: 16.6.0
     npm-run-all: 4.1.5
     typescript: 4.8.4
+    urn: 1.1.0
     wrangler: 2.4.4
   languageName: unknown
   linkType: soft
@@ -30305,6 +30327,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mkdirp@npm:0.3.5":
+  version: 0.3.5
+  resolution: "mkdirp@npm:0.3.5"
+  checksum: 5b7db0f7db199b87f5b0e563b919ad214d1a2c55c3896db332ef1e66c2192b2077112a4733b2c6ff99c833a6f85ba5686f05a768c411fe461b667a17421d37a8
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:0.5.5":
   version: 0.5.5
   resolution: "mkdirp@npm:0.5.5"
@@ -36478,6 +36507,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"semver@npm:2.1.0":
+  version: 2.1.0
+  resolution: "semver@npm:2.1.0"
+  bin:
+    semver: ./bin/semver
+  checksum: 9923d06bdc7ec2042efa2db819b8341f6207fe77505872262469de89c06cb18cd4960c873a4925266b2d6d7f7872cb7f8e154d1ea982bd361e3e530197764bf9
+  languageName: node
+  linkType: hard
+
 "semver@npm:^6.0.0, semver@npm:^6.1.0, semver@npm:^6.1.1, semver@npm:^6.1.2, semver@npm:^6.3.0":
   version: 6.3.0
   resolution: "semver@npm:6.3.0"
@@ -36738,6 +36776,15 @@ __metadata:
   version: 1.7.4
   resolution: "shell-quote@npm:1.7.4"
   checksum: 2874ea9c1a7c3ebfc9ec5734a897e16533d0d06f2e4cddc22ba3d1cab5cdc07d0f825364c1b1e39abe61236f44d8e60e933c7ad7349ce44de4f5dddc7b4354e9
+  languageName: node
+  linkType: hard
+
+"shelljs@npm:0.3.0":
+  version: 0.3.0
+  resolution: "shelljs@npm:0.3.0"
+  bin:
+    shjs: ./bin/shjs
+  checksum: 6e57d6bff3bb101525f251fd80358b983fb9c8175dc31593496bfcdf66701b78dba33b9319e38026ac31b2c80875794fc71bd2fdd9cdb86fbeb81fcbfce28d7b
   languageName: node
   linkType: hard
 
@@ -40259,6 +40306,19 @@ __metadata:
   version: 4.0.3
   resolution: "urlpattern-polyfill@npm:4.0.3"
   checksum: 96ac2aea49a7b17a9ff41b2ccccdaf5e58a18c33c494cf663bea853c1ac2e70fd26a147b33b83ff7c6b77f9e34ee48409d21dbc1f2a2ad5cd9509cf3d5cb148e
+  languageName: node
+  linkType: hard
+
+"urn@npm:1.1.0":
+  version: 1.1.0
+  resolution: "urn@npm:1.1.0"
+  dependencies:
+    mkdirp: 0.3.5
+    semver: 2.1.0
+    shelljs: 0.3.0
+  bin:
+    urn: ./urn.js
+  checksum: ad16d754a82dd31ec37e871b8ed10ec727e659833613803b1a9b33e09aec24909b6f3d4f6d1bb8196677176f6f2a529e3e6940a7d753dd66f3c7ea836d627e18
   languageName: node
   linkType: hard
 

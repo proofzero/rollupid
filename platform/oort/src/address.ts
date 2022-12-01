@@ -41,7 +41,7 @@ export default class Address extends DurableObject {
         return error(400, 'bad ens name')
       }
     } else {
-      return error(400, 'unsupported address type')
+      return error(400, `oort: unsupported address type for ${address}`)
     }
 
     if (type == 'eth') {

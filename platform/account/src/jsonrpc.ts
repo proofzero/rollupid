@@ -20,6 +20,7 @@ const getProfile = openrpc.method(schema, {
       context: Readonly<RpcContext>
     ) => {
       const [id] = request.params as [string]
+      console.log('get profile', id)
       const Core: DurableObjectNamespace = context.get(KEY_OBJECT_CORE)
       const core = await openrpc.discover(Core, { name: id })
       const profile = await core.getProfile()
@@ -38,6 +39,7 @@ const setProfile = openrpc.method(schema, {
       context: Readonly<RpcContext>
     ) => {
       const [id, profile] = request.params as [string, object]
+      console.log('set profile', { id, profile })
       const Core: DurableObjectNamespace = context.get(KEY_OBJECT_CORE)
       const core = await openrpc.discover(Core, { name: id })
       return openrpc.response(request, await core.setProfile({ profile }))

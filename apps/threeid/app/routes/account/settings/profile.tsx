@@ -7,13 +7,15 @@ import {
   useTransition,
 } from '@remix-run/react'
 import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
-import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'
-import { Avatar, Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
@@ -21,36 +23,24 @@ import { getGalaxyClient } from '~/helpers/galaxyClient'
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
 import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { getCachedVoucher } from '~/helpers/voucher'
-
-import { links as spinnerLinks } from '~/components/spinner'
-import Spinner from '~/components/spinner'
-
-export function links() {
-  return [...spinnerLinks()]
-}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const session = await getUserSession(request)
-  const address = await session.get('address')
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  let voucher
-  try {
-    voucher = await getCachedVoucher(address)
-  } catch (ex) {
-    console.error(ex)
-  }
+  // const {nftsForAddress} = await galaxyClient.getNfts({
+  //   owner: profileRes.profile?.defaultAddress,
+  //   contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
+  // })
 
   return json({
-    address,
-    generatedPfp: voucher?.metadata?.image,
-    generatedPfpMinted: voucher?.minted,
+    // address,
+    // generatedPfp: voucher?.metadata?.image,
+    // generatedPfpMinted: nftsForAddress.ownedNfts.length,
     ...profileRes.profile,
   })
 }
@@ -112,6 +102,7 @@ export const action: ActionFunction = async ({ request }) => {
     {
       profile: {
         displayName: displayName,
+        // TODO: support for default address
         job: job,
         location: location,
         bio: bio,
@@ -121,7 +112,6 @@ export const action: ActionFunction = async ({ request }) => {
           isToken: computedIsToken,
         },
       },
-      visibility: Visibility.Public,
     },
     {
       'KBT-Access-JWT-Assertion': jwt,
@@ -141,9 +131,9 @@ export default function AccountSettingsProfile() {
     bio,
     website,
     pfp,
-    address,
-    generatedPfp,
-    generatedPfpMinted,
+    // address,
+    // generatedPfp,
+    // generatedPfpMinted,
   } = useLoaderData()
 
   const [pfpUrl, setPfpUrl] = useState(pfp?.image)
@@ -212,12 +202,12 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
-      <PfpNftModal
+      {/* <PfpNftModal
         account={address}
         isOpen={nftPfpModalOpen}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
-      />
+      /> */}
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
@@ -238,8 +228,8 @@ export default function AccountSettingsProfile() {
           <div className="flex flex-col justify-between space-y-3.5">
             <div className="flex flex-row space-x-3.5">
               <Button
-                type={ButtonType.Secondary}
-                size={ButtonSize.SM}
+                btnType={'secondary'}
+                btnSize={'sm'}
                 onClick={() => {
                   if (!nftPfpModalOpen) setNftPfpModalOpen(true)
                 }}
@@ -258,8 +248,8 @@ export default function AccountSettingsProfile() {
               />
 
               <Button
-                type={ButtonType.Secondary}
-                size={ButtonSize.SM}
+                btnType={'secondary'}
+                btnSize={'sm'}
                 onClick={() => {
                   pfpUploadRef.current?.click()
                 }}
@@ -268,7 +258,7 @@ export default function AccountSettingsProfile() {
               </Button>
             </div>
 
-            {generatedPfp && (
+            {/* {generatedPfp && (
               <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text className="text-gray-400" size="sm" weight="medium">
                   Or use your 1/1 gradient
@@ -287,7 +277,7 @@ export default function AccountSettingsProfile() {
                   }}
                 />
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -388,7 +378,7 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex lg:justify-end">
-            <Button isSubmit type={ButtonType.Primary}>
+            <Button isSubmit btnType={'secondary'} btnSize={'sm'}>
               Save
             </Button>
           </div>

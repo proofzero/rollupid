@@ -1,27 +1,12 @@
-import Text, { TextColor, TextSize, TextWeight } from "./Text";
+import type { TextProps } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-type SmallRegularBlockProps = {
-  children: any;
-  className?: string;
-  type?: "div" | "span" | "paragraph";
-};
-
-const SmallRegularBlock = ({
-  children,
-  className,
-  type = "paragraph",
-}: SmallRegularBlockProps) => {
+const SmallRegularBlock = ({ children, className, type = 'p' }: TextProps) => {
   return (
-    <Text
-      className={className}
-      weight="normal"
-      size="sm"
-      color={TextColor.Gray500}
-      type={type}
-    >
+    <Text className={className} weight="normal" size="sm" type={type}>
       {children}
     </Text>
-  );
-};
+  )
+}
 
-export default SmallRegularBlock;
+export default SmallRegularBlock

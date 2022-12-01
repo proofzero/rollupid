@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import Modal from '~/components/modal/Modal'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
@@ -33,11 +33,7 @@ const NftModal = ({
         </div>
 
         <div className="p-0 lg:p-4 max-w-full lg:max-w-md mt-3">
-          <Text
-            className="mb-2 text-gray-900"
-            size="lg"
-            weight="medium"
-          >
+          <Text className="mb-2 text-gray-900" size="lg" weight="medium">
             {nft?.collectionTitle}
           </Text>
 
@@ -68,11 +64,7 @@ const NftModal = ({
                       key={p.name ?? `${new Date().getTime()}`}
                       className="m-1 py-2 px-4 border rounded-md"
                     >
-                      <Text
-                        size="xs"
-                        weight="medium"
-                        className="text-gray-400"
-                      >
+                      <Text size="xs" weight="medium" className="text-gray-400">
                         {p.name?.toUpperCase()}
                       </Text>
                       <Text

@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons/lib'
-import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
+import type { TextProps } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type InputTextValType = string | number
 type InputIconPosType = 'leading' | 'trailing'
@@ -42,11 +43,7 @@ const InputText = ({
   return (
     <div>
       <label htmlFor={id}>
-        <Text
-          size="sm"
-          weight="medium"
-          color={error ? TextColor.Red500 : TextColor.Gray700}
-        >
+        <Text size="sm" weight="medium" color={error ? '#EF4444' : '#374151'}>
           {heading}
         </Text>
       </label>
@@ -69,7 +66,7 @@ const InputText = ({
             <Text
               size="sm"
               weight="medium"
-              color={error ? TextColor.Red500 : TextColor.Gray700}
+              color={error ? '#EF4444' : '#374151'}
             >
               {addon}
             </Text>

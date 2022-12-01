@@ -1,40 +1,36 @@
-import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json, redirect } from '@remix-run/cloudflare'
+import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
 import {
   getAccessClient,
-  getAddressClient,
   getAddressClientFromURN,
   getGalaxyClient,
   getStabaseClient as getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
-import { AccountURN } from '@kubelt/platform.account/src/types'
-import { ResponseType } from '@kubelt/platform.access/src/types'
+import type { ResponseType } from '@kubelt/platform.access/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
   const client_id = url.searchParams.get('client_id')
   const state = url.searchParams.get('state')
 
-  if (!client_id) {
-    throw json(
-      { message: 'No app to authorize provided', isAuthenticated: true },
-      400
-    )
-  }
-
+  // this will redirect unauthenticated users to the auth page but maintain query params
+  const jwt = await requireJWT(request)
   const session = await getUserSession(request)
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    'KBT-Access-JWT-Assertion': session.get('jwt'),
+    'KBT-Access-JWT-Assertion': jwt,
   })
 
+  const parsedJwt = parseJwt(jwt)
+
   let profile
-  if (!profileRes.profile) {
+  // if (!profileRes.profile) {
+  if (true) {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
     const addressClient = getAddressClientFromURN(defaultProfileURN)
@@ -43,7 +39,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       throw json("Couldn't find profile", 400)
     }
     const updated = await galaxyClient.updateProfile(
-      { profile },
+      { profile: { ...profile, defaultAddress: defaultProfileURN } },
       {
         'KBT-Access-JWT-Assertion': session.get('jwt'),
       }
@@ -59,6 +55,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw json({ message: 'No profile found', isAuthenticated: true }, 400)
   }
 
+  if (!client_id) {
+    return redirect(THREEID_APP_URL)
+  }
+
   // if profile is null we need to provisio a default profile
   // we can do that by getting the address profile and then setting the account profile
   // TODO: create a get address profile galaxy operation
@@ -66,6 +66,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   try {
     const sbClient = getStarbaseClient()
+
+    // ======================= TEMPOARY =======================
+    const ids = await sbClient.kb_initPlatform() // TODO: temporary until console is complete
+    console.log('ids', ids)
+    // ======================= TEMPOARY =======================
+
     const scopeMeta = await sbClient.kb_appScopes()
     const appProfile = await sbClient.kb_appProfile(client_id)
 

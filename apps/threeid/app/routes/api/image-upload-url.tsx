@@ -1,14 +1,12 @@
 import { ActionFunction, json } from '@remix-run/cloudflare'
+import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { requireJWT } from '~/utils/session.server'
 
 export const action: ActionFunction = async ({ request }) => {
   await requireJWT(request)
 
-  const cfUploadUrlRes: {
-    id: string
-    uploadURL: string
-    // @ts-ignore
-  } = await ICONS.fetch('http://127.0.0.1/').then((res) => res.json())
+  const galaxyClient = await getGalaxyClient()
+  const { imageUploadUrl } = await galaxyClient.getImageUploadUrl()
 
-  return json(cfUploadUrlRes.uploadURL)
+  return json(imageUploadUrl)
 }

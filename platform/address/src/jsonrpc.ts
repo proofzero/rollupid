@@ -26,7 +26,7 @@ import {
   AddressProfile,
   CryptoCoreType,
 } from './types'
-import { resolve3RN } from './utils'
+import { resolveAddress3RN } from './utils'
 import { default as CryptoCoreStatic } from './crypto-core'
 import { AccountURN } from '../../account/src/types'
 
@@ -42,12 +42,14 @@ export default async (
   // TODO: JWT validation
 
   // validate 3RN
-  const { nodeType, name, addressType } = await resolve3RN(request)
+  const resolved3RN = await resolveAddress3RN(request)
+  const { name, nodeType } = resolved3RN
+  let { addressType } = resolved3RN
 
   // route to correct DO
   let core = null
   let client: JsonRpcClient<AddressCoreApi | CryptoCoreApi>
-  let address: string
+  let address = name
 
   if (!name) {
     throw new Error('missing 3RN name query parameter')
@@ -55,20 +57,26 @@ export default async (
 
   switch (nodeType) {
     case CryptoCoreType.Crypto:
+    case undefined:
+    case null: {
       {
-        address = await CryptoCoreStatic.validateAddress(name, addressType, env)
-        core = CryptoCore.get(CryptoCore.idFromName(address)) // TODO: change to crypto core DO
+        ;({ address, addressType } = await CryptoCoreStatic.validateAddress(
+          name,
+          addressType
+        ))
+        core = CryptoCore.get(CryptoCore.idFromName(address))
         client = createFetcherJsonRpcClient<CryptoCoreApi>(core)
       }
       break
-    default: // TODO: change to crypto core DO
-      throw 'invalid core type'
+    }
+    default: {
+      throw `invalid 3RN nodeType ${nodeType}`
+    }
   }
 
   const coreAddress = await client.getAddress()
   const coreType = await client.getType()
 
-  console.log({ coreAddress, coreType })
   // first time setup
   if (!coreAddress || !coreType) {
     console.log('first time setup')
@@ -77,6 +85,7 @@ export default async (
     await Promise.all([namePromise, typePromise])
   }
   //--------------------------------------------------------------------------------
+  // end proto middleware
 
   const baseApiHandlers: WorkerApi = {
     async kb_setAccount(accountUrn: string): Promise<void> {

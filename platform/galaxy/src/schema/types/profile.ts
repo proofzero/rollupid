@@ -20,6 +20,7 @@ export default /* GraphQL */ `
   type DefaultProfile implements Profile {
     displayName: String
     pfp: PFP
+    defaultAddress: URN
   }
 
   type ThreeIDProfile implements Profile {
@@ -30,7 +31,8 @@ export default /* GraphQL */ `
     job: String
     location: String
     website: String
-    addresses: [ThreeIDAddress!]
+    defaultAddress: URN
+    addresses: [URN!]
   }
 
   input PFPInput {
@@ -46,15 +48,12 @@ export default /* GraphQL */ `
     job: String
     location: String
     website: String
+    defaultAddress: URN
   }
 
   type Query {
     profile: Profile
-    profileFromAddress(
-      address: String!
-      nodeType: String!
-      addrType: String!
-    ): Profile
+    profileFromAddress(addressURN: URN!): Profile
   }
 
   type Mutation {

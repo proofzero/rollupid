@@ -11,6 +11,7 @@ query getProfile {
       }
     }
     ... on ThreeIDProfile {
+      defaultAddress
       cover
       location
       job
@@ -18,4 +19,8 @@ query getProfile {
       website
     }
   }
+}
+
+mutation updateProfile($profile: ThreeIDProfileInput) {
+  updateThreeIDProfile(profile: $profile)
 }

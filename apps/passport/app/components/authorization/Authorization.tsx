@@ -1,6 +1,6 @@
 import { useTransition } from '@remix-run/react'
 
-import { Button } from '@kubelt/design-system/src/atoms/button/Button'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 

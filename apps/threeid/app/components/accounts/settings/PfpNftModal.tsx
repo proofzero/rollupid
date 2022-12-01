@@ -2,7 +2,7 @@ import Modal from '~/components/modal/Modal'
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
 import SelectableNft from '~/components/nft-collection/SelectableNft'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type PfpNftModalProps = {
   account: string

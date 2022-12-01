@@ -1,25 +1,5 @@
 @import './variables.scss';
 
-@font-face {
-  font-family: Inter_400Regular;
-  src: url('/fonts/Inter-Regular.ttf');
-}
-
-@font-face {
-  font-family: Inter_500Medium;
-  src: url('/fonts/Inter-Medium.ttf');
-}
-
-@font-face {
-  font-family: Inter_600SemiBold;
-  src: url('/fonts/Inter-SemiBold.ttf');
-}
-
-@font-face {
-  font-family: Inter_700Bold;
-  src: url('/fonts/Inter-Bold.ttf');
-}
-
 html {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   height: calc(100% + env(safe-area-inset-top));

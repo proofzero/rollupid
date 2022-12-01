@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 export type InputTextareaProps = {
   id?: string
@@ -44,20 +44,12 @@ const InputTextarea = ({
   return (
     <div>
       <label htmlFor={id} className="flex flex-row justify-between">
-        <Text
-          size="sm"
-          weight="medium"
-          color={computedError ? TextColor.Red500 : TextColor.Gray700}
-        >
+        <Text size="sm" weight="medium" color={error ? '#EF4444' : '#374151'}>
           {heading}
         </Text>
 
         {charLimit && (
-          <Text
-            size="sm"
-            weight="medium"
-            color={TextColor.Gray400}
-          >
+          <Text size="sm" weight="medium" color={'#9CA3AF'}>
             {val?.length || 0}/{charLimit}
           </Text>
         )}

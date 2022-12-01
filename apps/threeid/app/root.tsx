@@ -13,12 +13,14 @@ import {
 } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
-import { useLoaderData, useCatch, useNavigate } from '@remix-run/react'
+import { useLoaderData, useCatch } from '@remix-run/react'
 
 import { startSession } from '~/utils/datadog.client'
 
-import styles from './styles/tailwind.css'
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
+
 import designStyles from '@kubelt/design-system/src/styles/global.css'
+import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
 
 import social from './assets/social.png'
@@ -30,12 +32,7 @@ import maskIcon from './assets/safari-pinned-tab.svg'
 import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
-import { links as buttonLinks } from '~/components/buttons'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
-import {
-  links as baseButtonLinks,
-  BaseButtonAnchor,
-} from '~/components/base-button'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -56,16 +53,14 @@ export const meta: MetaFunction = () => ({
 })
 
 export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: designStyles },
   { rel: 'stylesheet', href: styles },
   { rel: 'stylesheet', href: baseStyles },
-  { rel: 'stylesheet', href: designStyles },
   { rel: 'apple-touch-icon', href: appleIcon, sizes: '180x180' },
   { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
   { rel: 'mask-icon', href: maskIcon, color: '#5bbad5' },
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
-  ...baseButtonLinks(),
-  ...buttonLinks(),
   ...headNavLink(),
 ]
 
@@ -146,11 +141,12 @@ export function ErrorBoundary({ error }) {
                 If this problem persists please join Discord for help
               </p>
 
-              <BaseButtonAnchor
-                text={'Go to Discord'}
-                color={'dark'}
+              <ButtonAnchor
+                btnType={'primary'}
                 href={'https://discord.gg/threeid'}
-              />
+              >
+                Go to Discord
+              </ButtonAnchor>
             </div>
           </article>
           <article className="content col-span-3 m-12">

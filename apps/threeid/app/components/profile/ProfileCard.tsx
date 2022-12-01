@@ -1,7 +1,7 @@
 import { Tooltip } from 'flowbite-react'
 import { FaCopy, FaDiscord, FaGlobe, FaTwitter } from 'react-icons/fa'
-import { Text } from '@kubelt/design-system'
-import Spinner from '../spinner'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 export type ProfileCardProps = {
   account: string
@@ -55,11 +55,7 @@ const ProfileCard = ({
         )}
       </div>
 
-      <Text
-        className="mt-5 mb-2.5 text-gray-600"
-        weight="bold"
-        size="2xl"
-      >
+      <Text className="mt-5 mb-2.5 text-gray-600" weight="bold" size="2xl">
         {displayName ?? shortenedAccount}
       </Text>
 
@@ -70,11 +66,7 @@ const ProfileCard = ({
         }}
       >
         <Tooltip content="Copied!" trigger="click" animation="duration-1000">
-          <Text
-            weight="semibold"
-            className="text-gray-400"
-            size="xs"
-          >
+          <Text weight="semibold" className="text-gray-400" size="xs">
             <span className="flex flex-row items-center">
               <FaCopy className="mr-3" />
 
@@ -113,11 +105,7 @@ const ProfileCard = ({
         </a>
       </div>
 
-      <Text
-        weight="medium"
-        size="xs"
-        className="text-gray-300"
-      >
+      <Text weight="medium" size="xs" className="text-gray-300">
         &nbsp;
         {/* {`${
           claimed

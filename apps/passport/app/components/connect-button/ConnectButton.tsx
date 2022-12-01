@@ -1,7 +1,7 @@
 import React, { ReactNode, useState, useEffect } from 'react'
 import classNames from 'classnames'
-import { Button } from '@kubelt/design-system/src/atoms/button/Button'
-import type { ButtonProps } from '@kubelt/design-system/src/atoms/button/Button'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import type { LinksFunction } from '@remix-run/cloudflare'
 import {

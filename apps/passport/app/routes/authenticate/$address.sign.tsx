@@ -25,7 +25,8 @@ This will not trigger a blockchain transaction or cost any gas fees.
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const state = Math.random().toString(36).substring(7)
-  const addressClient = getAddressClient(address as string, 'crypto', 'eth')
+  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=eth`
+  const addressClient = getAddressClient(addressURN)
   const nonce = await addressClient.kb_getNonce(
     signMessageTemplate,
     params.address as string, // as client_id
@@ -40,7 +41,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { address } = params
-  const addressClient = getAddressClient(address as string, 'crypto', 'eth')
+  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=eth`
+  const addressClient = getAddressClient(addressURN)
   const formData = await request.formData()
 
   // TODO: validate from data
@@ -70,7 +72,13 @@ export default function Sign() {
 
   // const { connect, connectors, error, isLoading, pendingConnector } =
   //   useConnect()
-  const { address: connectedAddress, connector, isConnected } = useAccount()
+  const {
+    address: connectedAddress,
+    connector,
+    isConnected,
+    isConnecting,
+    isDisconnected,
+  } = useAccount()
   const { disconnect } = useDisconnect()
   const { data, error, signMessage } = useSignMessage({
     onSuccess(data, variables) {
@@ -96,7 +104,9 @@ export default function Sign() {
   }, [connector])
 
   useEffect(() => {
-    if (!isConnected && signing) {
+    console.log({ signing, isConnected, isConnecting, isDisconnected, status })
+
+    if ((!isConnected && signing) || isDisconnected || isConnecting) {
       navigate(`/authenticate${window.location.search}`)
     }
   }, [isConnected])

@@ -1,31 +1,28 @@
 import { redirect, json } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit, NavLink } from '@remix-run/react'
+import { useLoaderData, NavLink } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
 import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
 import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
 
-import { getUserSession, requireJWT } from '~/utils/session.server'
+import { parseURN } from 'urns'
+
+import { requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
-import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
-import { links as invCodeStyles } from '~/components/invite-code'
 import { links as profileNftCollectionLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
-import { Text } from '@kubelt/design-system'
-import validateProof from '~/helpers/validate-proof'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
   return [
-    ...invCodeStyles(),
-    ...buttonStyles(),
     ...faqStyles(),
     ...profileNftCollectionLinks(),
     { rel: 'stylesheet', href: styles },
@@ -34,33 +31,20 @@ export function links() {
 
 // @ts-ignore
 export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, '/auth')
-
-  const session = await getUserSession(request)
-  const address = session.get('address')
-  const core = session.get('core')
-
-  if (!(await validateProof(address))) {
-    return redirect(`/auth/gate/${address}`)
-  }
-
-  // @ts-ignore
-  const onboardData = await ONBOARD_STATE.get(core)
-  if (!onboardData) {
-    return redirect(`/onboard/name`)
-  }
+  const jwt = await requireJWT(request)
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  // @ts-ignore
-  const [avatarUrl, isToken] = [
+  const [avatarUrl, isToken, address] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,
+    parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
   ]
 
+  console.log({ profileRes, address })
   return json({
     address,
     avatarUrl,
@@ -95,11 +79,7 @@ export default function AccountLayout() {
     <>
       <div className="min-h-full">
         <div className="header lg:px-4">
-          <HeadNav
-            avatarUrl={avatarUrl}
-            isToken={isToken}
-            loggedIn={{ address }}
-          />
+          <HeadNav avatarUrl={avatarUrl} isToken={isToken} loggedIn={address} />
         </div>
 
         <main className="-mt-72 pb-12">

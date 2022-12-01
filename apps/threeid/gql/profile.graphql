@@ -11,6 +11,7 @@ query getProfile {
       }
     }
     ... on ThreeIDProfile {
+      defaultAddress
       cover
       location
       job
@@ -20,16 +21,8 @@ query getProfile {
   }
 }
 
-query getProfileFromAddress(
-  $address: String!
-  $nodeType: String!
-  $addrType: String!
-) {
-  profileFromAddress(
-    address: $address
-    nodeType: $nodeType
-    addrType: $addrType
-  ) {
+query getProfileFromAddress($addressURN: URN!) {
+  profileFromAddress(addressURN: $addressURN) {
     displayName
     pfp {
       ... on StandardPFP {
@@ -41,6 +34,7 @@ query getProfileFromAddress(
       }
     }
     ... on ThreeIDProfile {
+      defaultAddress
       cover
       location
       job
@@ -52,4 +46,8 @@ query getProfileFromAddress(
 
 mutation updateProfile($profile: ThreeIDProfileInput) {
   updateThreeIDProfile(profile: $profile)
+}
+
+query getImageUploadUrl {
+  imageUploadUrl
 }

@@ -19,6 +19,7 @@ const getRelativeModulePath = (moduleName) => {
 module.exports = {
   content: [
     './app/**/*.{ts,tsx,jsx,js}',
+    '../../packages/design-system/src/**/*.{ts,tsx,jsx,js}',
     path.join(
       getRelativeModulePath('flowbite-react'),
       '**',

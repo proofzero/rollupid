@@ -1,28 +1,25 @@
 import { GraphQLYogaError } from '@graphql-yoga/common'
+import * as jose from 'jose'
+import type { JWTPayload } from 'jose'
+
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 
 import { OortJwt } from '../clients/oort'
 
 // 404: 'USER_NOT_FOUND' as string,
-export function parseJwt(token: string): OortJwt {
-  var base64Url = token.split('.')[1]
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  var jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map(function (c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-      })
-      .join('')
-  )
-
-  return JSON.parse(jsonPayload)
+export function parseJwt(token: string): JWTPayload {
+  const payload = jose.decodeJwt(token)
+  if (!payload) {
+    throw new Error('Invalid JWT')
+  }
+  return payload
 }
 
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
   const parsedJwt = jwt && parseJwt(jwt)
-  const coreId = parsedJwt && parsedJwt.iss
+  const coreId = parsedJwt && parsedJwt.sub
+
   return next(root, args, { ...context, jwt, coreId }, info)
 }
 
@@ -86,6 +83,7 @@ export async function getRPCResult(response: Response) {
 
 export async function upgrayeddOortToAccount(
   coreId: string,
+  name: string,
   accountClient: AccountApi,
   oortResponse
 ) {
@@ -104,7 +102,10 @@ export async function upgrayeddOortToAccount(
     return {}
   }
 
-  const profileRes = await accountClient.kb_setProfile(coreId, oortProfile)
+  const profileRes = await accountClient.kb_setProfile(coreId, {
+    ...oortProfile,
+    defaultAddress: name,
+  })
 
   if (!profileRes) {
     throw `Migrating core ${coreId} to Account service... failed`

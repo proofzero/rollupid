@@ -56,7 +56,7 @@ const withCore = async (
     address = res?.address
     type = 'eth'
   } else {
-    return error(400, 'unsupported address type')
+    return error(400, `oort: unsupported address type for ${address}`)
   }
 
   const client = Address.get(Address.idFromName(address))

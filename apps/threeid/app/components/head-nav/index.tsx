@@ -2,7 +2,8 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Link, NavLink } from '@remix-run/react'
 
-import { Avatar, Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -33,9 +34,7 @@ const user = {
 type HeadNavProps = {
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
-  loggedIn?: {
-    address: string
-  }
+  loggedIn?: string | undefined
 }
 
 export default function HeadNav({
@@ -49,7 +48,7 @@ export default function HeadNav({
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
   const navigation = [
-    { name: 'My Profile', to: `/${loggedIn?.address}` },
+    { name: 'My Profile', to: `/${loggedIn}` },
     { name: 'Account', to: '/account' },
   ]
 
@@ -132,7 +131,7 @@ export default function HeadNav({
                           <Avatar
                             src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                             hex={isToken}
-                            size="sm"
+                            size="xs"
                             style={
                               isToken
                                 ? {
@@ -229,7 +228,7 @@ export default function HeadNav({
                     <Avatar
                       src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                       hex={isToken}
-                      size="sm"
+                      size="xs"
                       style={
                         isToken
                           ? {

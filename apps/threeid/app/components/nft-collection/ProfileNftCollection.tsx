@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import SectionTitle from '../typography/SectionTitle'
 
@@ -10,7 +10,7 @@ import book from '~/assets/book.svg'
 
 import noNfts from '~/assets/No_NFT_Found.svg'
 
-import { ButtonAnchor } from '../buttons'
+import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import Masonry from 'react-masonry-css'
 
@@ -19,7 +19,7 @@ import { LinksFunction } from '@remix-run/cloudflare'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useState } from 'react'
-import Spinner from '../spinner'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import InputText from '../inputs/InputText'
 
 import { FaSearch } from 'react-icons/fa'
@@ -77,11 +77,7 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
             {title}
           </Text>
           {description && (
-            <Text
-              size="sm"
-              weight="medium"
-              className="text-gray-500"
-            >
+            <Text size="sm" weight="medium" className="text-gray-500">
               {description}
             </Text>
           )}
@@ -141,11 +137,7 @@ const ProfileNftCollection = ({
   return (
     <>
       {!loading && !isOwner && loadedNfts.length === 0 && (
-        <Text
-          className="text-center text-gray-300"
-          size="2xl"
-          weight="medium"
-        >
+        <Text className="text-center text-gray-300" size="2xl" weight="medium">
           Looks like {displayname ?? account} doesn't own any NFTs
         </Text>
       )}
@@ -155,18 +147,10 @@ const ProfileNftCollection = ({
             <img src={noNfts} className="w-[119px] h-[127px]" />
 
             <div>
-              <Text
-                size="3xl"
-                weight="bold"
-                className="text-gray-400"
-              >
+              <Text size="3xl" weight="bold" className="text-gray-400">
                 Oh no!
               </Text>
-              <Text
-                size="2xl"
-                weight="medium"
-                className="text-gray-400"
-              >
+              <Text size="2xl" weight="medium" className="text-gray-400">
                 Looks like you don't own any NFTs
               </Text>
             </div>
