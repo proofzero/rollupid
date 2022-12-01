@@ -2,7 +2,8 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Link, NavLink } from '@remix-run/react'
 
-import { Avatar, Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
@@ -132,7 +133,7 @@ export default function HeadNav({
                           <Avatar
                             src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                             hex={isToken}
-                            size="sm"
+                            size="xs"
                             style={
                               isToken
                                 ? {
@@ -229,7 +230,7 @@ export default function HeadNav({
                     <Avatar
                       src={gatewayFromIpfs(avatarUrl) || user.imageUrl}
                       hex={isToken}
-                      size="sm"
+                      size="xs"
                       style={
                         isToken
                           ? {

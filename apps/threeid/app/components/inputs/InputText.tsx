@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons/lib'
-import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
+import type { TextProps } from '@kubelt/design-system/src/atoms/text/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type InputTextValType = string | number
 type InputIconPosType = 'leading' | 'trailing'

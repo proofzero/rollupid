@@ -2,8 +2,7 @@ import { Link } from '@remix-run/react'
 import { IconType } from 'react-icons/lib'
 
 import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from '.'
-
-import Text from '../typography/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type ButtonLinkProps = {
   children: string

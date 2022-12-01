@@ -2,7 +2,7 @@ import { Outlet } from '@remix-run/react'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 const tabs = [
   { name: 'Profile', to: 'profile' },
@@ -35,11 +35,7 @@ export default function AccountSetting() {
         className="mb-4 flex flex-row justify-between
       "
       >
-        <Text
-          size="xl"
-          weight="bold"
-          className="my-4 text-gray-900"
-        >
+        <Text size="xl" weight="bold" className="my-4 text-gray-900">
           Settings
         </Text>
 

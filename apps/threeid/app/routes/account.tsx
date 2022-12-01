@@ -6,24 +6,24 @@ import { Outlet } from '@remix-run/react'
 import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
 import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
 
-import { getUserSession, parseJwt, requireJWT } from '~/utils/session.server'
+import { parseURN } from 'urns'
+
+import { requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
 import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
-import { links as invCodeStyles } from '~/components/invite-code'
 import { links as profileNftCollectionLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
   return [
-    ...invCodeStyles(),
     ...buttonStyles(),
     ...faqStyles(),
     ...profileNftCollectionLinks(),
@@ -34,19 +34,16 @@ export function links() {
 // @ts-ignore
 export const loader = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const parsedJWT = parseJwt(jwt)
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  console.log({ profileRes })
-
-  // @ts-ignore
-  const [avatarUrl, isToken] = [
+  const [avatarUrl, isToken, address] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,
+    parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
   ]
 
   return json({

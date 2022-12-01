@@ -72,7 +72,13 @@ export default function Sign() {
 
   // const { connect, connectors, error, isLoading, pendingConnector } =
   //   useConnect()
-  const { address: connectedAddress, connector, isConnected } = useAccount()
+  const {
+    address: connectedAddress,
+    connector,
+    isConnected,
+    isConnecting,
+    isDisconnected,
+  } = useAccount()
   const { disconnect } = useDisconnect()
   const { data, error, signMessage } = useSignMessage({
     onSuccess(data, variables) {
@@ -98,7 +104,9 @@ export default function Sign() {
   }, [connector])
 
   useEffect(() => {
-    if (!isConnected && signing) {
+    console.log({ signing, isConnected, isConnecting, isDisconnected, status })
+
+    if ((!isConnected && signing) || isDisconnected || isConnecting) {
       navigate(`/authenticate${window.location.search}`)
     }
   }, [isConnected])

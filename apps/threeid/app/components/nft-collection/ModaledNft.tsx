@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import NftModal from './NftModal'
 
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
@@ -30,18 +30,10 @@ const ModaledNft = ({ nft }: any) => {
           }}
           className="absolute left-0 right-0 top-0 bottom-0 p-0 lg:p-4 flex flex-col justify-end transition-all duration-300 rounded-lg"
         >
-          <Text
-            size="sm"
-            weight="semibold"
-            className="text-white"
-          >
+          <Text size="sm" weight="semibold" className="text-white">
             {nft.collectionTitle}
           </Text>
-          <Text
-            size="sm"
-            weight="semibold"
-            className="text-white"
-          >
+          <Text size="sm" weight="semibold" className="text-white">
             {nft.title}
           </Text>
         </div>

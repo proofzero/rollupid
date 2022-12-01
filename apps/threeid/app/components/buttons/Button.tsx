@@ -1,7 +1,6 @@
 import { IconType } from 'react-icons'
 import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from '.'
-
-import Text from '../typography/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 export type ButtonProps = {
   children: string

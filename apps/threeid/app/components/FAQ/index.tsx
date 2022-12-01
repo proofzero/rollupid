@@ -1,14 +1,14 @@
-import SectionTitle from "~/components/typography/SectionTitle";
-import SectionHeading from "~/components/typography/SectionHeading";
-import SmallRegularBlock from "~/components/typography/SmallRegularBlock";
+import SectionTitle from '~/components/typography/SectionTitle'
+import SectionHeading from '~/components/typography/SectionHeading'
+import SmallRegularBlock from '~/components/typography/SmallRegularBlock'
 
-import styles from "./FAQ.css";
+import styles from './FAQ.css'
 
-export const links = () => [{ rel: "stylesheet", href: styles }];
+export const links = () => [{ rel: 'stylesheet', href: styles }]
 
 const contents = [
   {
-    question: "How do I use 3ID?",
+    question: 'How do I use 3ID?',
     answer: (
       <>
         <SmallRegularBlock className="mb-4">
@@ -26,7 +26,7 @@ const contents = [
     ),
   },
   {
-    question: "Can I sell my invite card?",
+    question: 'Can I sell my invite card?',
     answer: (
       <div className="mb-4">
         <SmallRegularBlock type="span">
@@ -34,8 +34,8 @@ const contents = [
         </SmallRegularBlock>
 
         <a
-          target={"_blank"}
-          rel={"noopener noopener noreferrer"}
+          target={'_blank'}
+          rel={'noopener noopener noreferrer'}
           href={`https://opensea.io/collection/3id-invite`}
           className="mx-1"
         >
@@ -49,7 +49,7 @@ const contents = [
     ),
   },
   {
-    question: "What is my 3ID PFP?",
+    question: 'What is my 3ID PFP?',
     answer: (
       <div className="mb-4">
         <SmallRegularBlock>
@@ -60,10 +60,10 @@ const contents = [
 
         <ol
           style={{
-            listStyle: "auto",
-            marginTop: "1rem",
-            marginBottom: "1rem",
-            marginLeft: "1.25rem",
+            listStyle: 'auto',
+            marginTop: '1rem',
+            marginBottom: '1rem',
+            marginLeft: '1.25rem',
           }}
         >
           <li>
@@ -91,8 +91,8 @@ const contents = [
           <SmallRegularBlock type="span">Click</SmallRegularBlock>
 
           <a
-            target={"_blank"}
-            rel={"noopener noopener noreferrer"}
+            target={'_blank'}
+            rel={'noopener noopener noreferrer'}
             href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
             className="mx-1"
           >
@@ -109,19 +109,19 @@ const contents = [
     ),
   },
   {
-    question: "Who is behind this project?",
+    question: 'Who is behind this project?',
     answer: (
       <div className="mb-4">
         <SmallRegularBlock type="span">3ID is created by</SmallRegularBlock>
         <a
-          target={"_blank"}
-          rel={"noopener noopener noreferrer"}
+          target={'_blank'}
+          rel={'noopener noopener noreferrer'}
           href={`https://kubelt.com`}
           className="mx-1"
         >
           Kubelt
         </a>
-        
+
         <SmallRegularBlock type="span">
           , a decentralized application platform, and is inspired by Web3 and
           the digital identity specification. Instead of applications
@@ -138,7 +138,7 @@ const contents = [
       </div>
     ),
   },
-];
+]
 
 const FAQ = () => {
   return (
@@ -146,8 +146,7 @@ const FAQ = () => {
       <SectionTitle className="mb-1 mt-6" title="FAQ" />
       <div className="accordion" id="accordionFaq">
         {contents.map((content, index) => {
-          const borderStyle =
-            index === contents.length - 1 ? "" : "border-down";
+          const borderStyle = index === contents.length - 1 ? '' : 'border-down'
 
           return (
             <div
@@ -161,14 +160,14 @@ const FAQ = () => {
                 <button
                   className={
                     index === 0
-                      ? "accordion-button relative flex\
+                      ? 'accordion-button relative flex\
                        items-center w-full py-4\
                       text-left bg-white border-0 rounded-none\
-                       transition focus:outline-none"
-                      : "accordion-button collapsed relative flex\
+                       transition focus:outline-none'
+                      : 'accordion-button collapsed relative flex\
                        items-center w-full py-4\
                         text-left bg-white border-none rounded-none\
-                         transition focus:outline-none"
+                         transition focus:outline-none'
                   }
                   type="button"
                   data-bs-toggle="collapse"
@@ -183,8 +182,8 @@ const FAQ = () => {
                 id={`collapse-${index}`}
                 className={
                   index === 0
-                    ? "accordion-collapse collapse show"
-                    : "accordion-collapse collapse"
+                    ? 'accordion-collapse collapse show'
+                    : 'accordion-collapse collapse'
                 }
                 aria-labelledby={`heading-${index}`}
                 data-bs-parent="#accordionFaq"
@@ -192,11 +191,11 @@ const FAQ = () => {
                 <div className="accordion-body">{content.answer}</div>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FAQ;
+export default FAQ

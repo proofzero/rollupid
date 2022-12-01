@@ -6,13 +6,13 @@ import { getUserSession } from '~/utils/session.server'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Cover } from '../components/profile/cover/Cover'
 
 import { Button, ButtonSize, ButtonType } from '~/components/buttons'
 
 import HeadNav from '~/components/head-nav'
 
-import Spinner, { links as spinnerLinks } from '~/components/spinner'
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
@@ -37,7 +37,7 @@ import { getGalaxyClient } from '~/helpers/galaxyClient'
 import { getCachedVoucher } from '~/helpers/voucher'
 
 export function links() {
-  return [...spinnerLinks(), ...nftCollLinks()]
+  return [...nftCollLinks()]
 }
 
 export const loader: LoaderFunction = async (args) => {

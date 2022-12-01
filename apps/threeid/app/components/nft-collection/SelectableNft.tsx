@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Text, { TextColor, TextSize, TextWeight } from '../typography/Text'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 export type InputTextareaProps = {
   id?: string
@@ -53,11 +53,7 @@ const InputTextarea = ({
         </Text>
 
         {charLimit && (
-          <Text
-            size="sm"
-            weight="medium"
-            color={TextColor.Gray400}
-          >
+          <Text size="sm" weight="medium" color={TextColor.Gray400}>
             {val?.length || 0}/{charLimit}
           </Text>
         )}

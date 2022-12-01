@@ -18,8 +18,8 @@ import {
 
 import { links as componentLinks, ThreeIdButton } from '~/components'
 
-import styles from './styles/tailwind.css'
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
+import styles from './styles/tailwind.css'
 
 import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'

@@ -13,7 +13,9 @@ import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'
-import { Avatar, Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
@@ -22,13 +24,6 @@ import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
 import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { getCachedVoucher } from '~/helpers/voucher'
-
-import { links as spinnerLinks } from '~/components/spinner'
-import Spinner from '~/components/spinner'
-
-export function links() {
-  return [...spinnerLinks()]
-}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)

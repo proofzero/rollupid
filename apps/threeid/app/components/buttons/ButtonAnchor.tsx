@@ -1,23 +1,23 @@
-import { FaTwitter } from "react-icons/fa";
-import { IconType } from "react-icons/lib";
+import { FaTwitter } from 'react-icons/fa'
+import { IconType } from 'react-icons/lib'
 
-import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from ".";
+import { ButtonSize, buttonSizeDict, ButtonType, buttonTypeDict } from '.'
 
-import Text from "../typography/Text";
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type ButtonAnchorProps = {
-  children: string;
+  children: string
 
-  type?: ButtonType;
-  size?: ButtonSize;
+  type?: ButtonType
+  size?: ButtonSize
 
-  Icon?: IconType;
-  iconColor?: string;
+  Icon?: IconType
+  iconColor?: string
 
-  href: string;
+  href: string
 
-  disabled?: boolean;
-};
+  disabled?: boolean
+}
 
 const ButtonAnchor = ({
   href,
@@ -46,7 +46,7 @@ const ButtonAnchor = ({
                 width: 19.82,
                 height: 15.11,
                 marginRight: 13.09,
-                color: iconColor ? iconColor : "default",
+                color: iconColor ? iconColor : 'default',
               }}
             />
           )}
@@ -55,7 +55,7 @@ const ButtonAnchor = ({
         </span>
       </Text>
     </a>
-  );
-};
+  )
+}
 
-export default ButtonAnchor;
+export default ButtonAnchor
