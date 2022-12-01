@@ -1,0 +1,22 @@
+{
+  "name": "@kubelt/nftar-client",
+  "version": "0.1.0",
+  "description": "A client for NFTar calls.",
+  "main": "index.ts",
+  "scripts": {
+    "format": "run-s format:src",
+    "format:src": "prettier --write .",
+    "format:check": "run-s format:check:*",
+    "format:check:src": "prettier --check .",
+    "lint": "eslint --fix .",
+    "lint:check": "run-s lint:check:*",
+    "lint:check:src": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "eslint": "8.28.0",
+    "eslint-plugin-tsdoc": "0.2.17",
+    "prettier": "2.7.1"
+  }
+}

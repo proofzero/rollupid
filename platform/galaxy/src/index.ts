@@ -18,7 +18,7 @@ export default {
     ctx: ExecutionContext
   ): Promise<Response> {
     if (!env.Oort) {
-      throw Error('OORT service bind not set')
+      throw Error('Oort service bind not set')
     }
     if (!env.Account) {
       throw Error('Account service bind not set')
