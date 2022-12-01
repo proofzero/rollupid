@@ -31,7 +31,6 @@ import { useEffect, useRef, useState } from 'react'
 import social from '~/assets/social.png'
 import pepe from '~/assets/pepe.svg'
 
-import { oortSend } from '~/utils/rpc.server'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 import { getCachedVoucher } from '~/helpers/voucher'
@@ -61,19 +60,19 @@ export const loader: LoaderFunction = async (args) => {
       claimed: true,
     }
 
-    if (params.address?.endsWith('.eth')) {
-      // get the 0x address for the eth name
-      const addressLookup = await oortSend('ens_lookupAddress', [address], {
-        jwt,
-      })
+    // if (params.address?.endsWith('.eth')) {
+    //   // get the 0x address for the eth name
+    //   const addressLookup = await oortSend('ens_lookupAddress', [address], {
+    //     jwt,
+    //   })
 
-      // the ens name is the same as the logged in user
-      if (addressLookup?.result == params.address) {
-        targetAddress = address
-      }
-    } else if (address == params.address) {
-      targetAddress = address
-    }
+    //   // the ens name is the same as the logged in user
+    //   if (addressLookup?.result == params.address) {
+    //     targetAddress = address
+    //   }
+    // } else if (address == params.address) {
+    // }
+    targetAddress = address
   }
 
   let profileJson = {}
