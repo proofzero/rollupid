@@ -1,6 +1,5 @@
 import { ActionFunction, json } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
-import { Visibility } from '~/utils/galaxy.server'
 import { requireJWT } from '~/utils/session.server'
 
 export const action: ActionFunction = async ({ request }) => {
@@ -15,7 +14,6 @@ export const action: ActionFunction = async ({ request }) => {
       profile: {
         cover: coverUrl,
       },
-      visibility: Visibility.Public,
     },
     {
       'KBT-Access-JWT-Assertion': jwt,
