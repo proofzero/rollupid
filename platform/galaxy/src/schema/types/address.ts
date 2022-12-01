@@ -1,10 +1,9 @@
 export default /* GraphQL */ `
   type Query {
-    address(address: URN!): URN
-    addresses: [URN]
+    ensAddress(address: String!): String
+    ensAddressAvatar(address: String!): String
   }
 
   type Mutation {
-    updateThreeIDAddress(address: URN!): URN
   }
 `

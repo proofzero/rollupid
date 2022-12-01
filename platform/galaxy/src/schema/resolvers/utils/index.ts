@@ -83,6 +83,7 @@ export async function getRPCResult(response: Response) {
 
 export async function upgrayeddOortToAccount(
   coreId: string,
+  name: string,
   accountClient: AccountApi,
   oortResponse
 ) {
@@ -101,7 +102,10 @@ export async function upgrayeddOortToAccount(
     return {}
   }
 
-  const profileRes = await accountClient.kb_setProfile(coreId, oortProfile)
+  const profileRes = await accountClient.kb_setProfile(coreId, {
+    ...oortProfile,
+    defaultAddress: name,
+  })
 
   if (!profileRes) {
     throw `Migrating core ${coreId} to Account service... failed`

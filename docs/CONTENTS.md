@@ -1,11 +1,8 @@
 # Table of contents
 
-* [🆔 3ID Public Profiles](next/3id/3id-public-profiles.md)
+- [🆔 3ID Public Profiles](3id/3id-public-profiles.md)
 
 <!--
-* [v8.x](v8.x/3id/)
-  * [🆔 3ID Public Profiles](v8.x/3id/3id-public-profiles.md)
-
 ## Use headings to create page groups like this one​
 
 * [First page's title](use-headings-to-create-page-groups-like-this-one/first-pages-title/README.md)

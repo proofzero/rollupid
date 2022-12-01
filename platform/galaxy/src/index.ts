@@ -17,7 +17,7 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
-    if (!env.OORT) {
+    if (!env.Oort) {
       throw Error('OORT service bind not set')
     }
     if (!env.Account) {
@@ -26,12 +26,18 @@ export default {
     if (!env.Address) {
       throw Error('Address service bind not set')
     }
-    // if (!env.ALCHEMY_API_KEY) {
-    //   throw Error('ALCHEMY_API_URL not set')
-    // }
-    // if (!env.ALCHEMY_NETWORK) {
-    //   throw Error('ALCHEMY_NETWORK not set')
-    // }
+    if (!env.Icons) {
+      throw Error('Icons service bind not set')
+    }
+    if (!env.ALCHEMY_KEY) {
+      throw Error('ALCHEMY_KEY not set')
+    }
+    if (!env.ALCHEMY_CHAIN) {
+      throw Error('ALCHEMY_CHAIN not set')
+    }
+    if (!env.ALCHEMY_NETWORK) {
+      throw Error('ALCHEMY_NETWORK not set')
+    }
     return yoga.handleRequest(request, { env, ctx })
   },
 }

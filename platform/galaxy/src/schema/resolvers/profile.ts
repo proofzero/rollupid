@@ -90,12 +90,13 @@ const threeIDResolvers: Resolvers = {
         console.log(
           `galaxy:profileFromAddress: upgrayedd Oort -> Account for ${addressURN}`
         )
-        const oortClient = new OortClient(env.OORT)
+        const oortClient = new OortClient(env.Oort)
         const parsedURN = parseURN(addressURN) // TODO: need utils lik AddressURN.parse(addressURN)
         const name = parsedURN.nss.split('/')[1]
         const oortResponse = await oortClient.getProfileFromAddress(name)
         accountProfile = await upgrayeddOortToAccount(
           coreId,
+          name,
           accountClient,
           oortResponse
         )

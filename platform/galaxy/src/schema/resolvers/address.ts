@@ -1,44 +1,22 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { GraphQLYogaError } from '@graphql-yoga/common'
-
+import ENSUtils from './clients/ens-utils'
 import { Resolvers } from './typedefs'
 
-import OortClient from './clients/oort'
-
-import {
-  setupContext,
-  isAuthorized,
-  checkHTTPStatus,
-  getRPCResult,
-} from './utils'
+import { setupContext, isAuthorized } from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
-    address: (
-      _parent,
-      { address },
-      {
-        /* oort send, jwt */
-      }
-    ) => {
-      return null
-    },
-    addresses: (
-      _parent,
-      _args,
-      {
-        /* oort send, jwt */
-      }
-    ) => {
-      return []
-    },
+    ensAddress: async (_parent, { address }, {}) =>
+      new ENSUtils().getENSAddress(address),
+    ensAddressAvatar: async (_parent, { address }, {}) =>
+      new ENSUtils().getENSAddressAvatar(address),
   },
   Mutation: {},
 }
 
 const AddressResolverComposition = {
-  'Query.address': [setupContext()],
-  'Query.addresses': [setupContext()],
+  'Query.ensAddress': [setupContext()],
+  'Query.ensAddressAvatar': [setupContext()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

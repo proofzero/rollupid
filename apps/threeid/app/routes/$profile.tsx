@@ -33,8 +33,6 @@ import pepe from '~/assets/pepe.svg'
 
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 
-import { getCachedVoucher } from '~/helpers/voucher'
-
 export function links() {
   return [...nftCollLinks()]
 }
@@ -42,16 +40,15 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
 
+  const galaxyClient = await getGalaxyClient()
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
-  const address = session.get('address')
 
   let targetAddress = params.profile
 
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
   if (jwt) {
-    const galaxyClient = await getGalaxyClient()
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
@@ -59,48 +56,12 @@ export const loader: LoaderFunction = async (args) => {
       ...profileRes.profile,
       claimed: true,
     }
-
-    // if (params.address?.endsWith('.eth')) {
-    //   // get the 0x address for the eth name
-    //   const addressLookup = await oortSend('ens_lookupAddress', [address], {
-    //     jwt,
-    //   })
-
-    //   // the ens name is the same as the logged in user
-    //   if (addressLookup?.result == params.address) {
-    //     targetAddress = address
-    //   }
-    // } else if (address == params.address) {
-    // }
-    targetAddress = address
   }
 
-  let profileJson = {}
-  let isOwner = false
-  if (address !== targetAddress) {
-    const profileJsonRes = await profileLoader(args)
-    if (profileJsonRes.status !== 200) {
-      const resData = {
-        error: await profileJsonRes.text(),
-        targetAddress: params.profile,
-        displayName: null,
-        bio: null,
-        loggedInUserProfile,
-        ogImageUrl: social,
-        loggedIn: jwt ? { address } : false,
-      }
-      throw json(resData, { status: profileJsonRes.status as number })
-    }
-    profileJson = await profileJsonRes.json()
-  } else {
-    profileJson = loggedInUserProfile
-    isOwner = true
-  }
+  const isOwner = profileRes.profile.defaultAddress == targetAddress
+  const profileJson = await (await profileLoader(args)).json()
 
   // Setup og tag data
-  let hex = gatewayFromIpfs(profileJson?.pfp?.image)
-  let bkg = gatewayFromIpfs(profileJson?.cover)
-
   // check generate and return og image
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
@@ -109,8 +70,8 @@ export const loader: LoaderFunction = async (args) => {
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      bkg,
-      hex,
+      bkg: profileJson?.cover,
+      hex: profileJson?.pfp?.image,
     }),
   })
 
@@ -124,28 +85,12 @@ export const loader: LoaderFunction = async (args) => {
     url = social
   }
 
-  let originalCoverUrl
-  try {
-    if (!targetAddress) {
-      throw new Error(
-        'Target address expected to recover original cover gradient'
-      )
-    }
-
-    const voucher = await getCachedVoucher(targetAddress)
-    originalCoverUrl = voucher?.metadata?.cover
-  } catch (ex) {
-    console.debug('Error trying to retrieve cached voucher')
-    console.error(ex)
-  }
-
   return json({
     ...profileJson,
-    originalCoverUrl,
+    originalCoverUrl: profileJson?.cover,
     loggedInUserProfile,
     isOwner,
     targetAddress: targetAddress,
-    loggedIn: jwt ? { address } : false,
     ogImageURL: url,
   })
 }
@@ -192,7 +137,6 @@ const ProfileRoute = () => {
     job,
     location,
     isOwner,
-    loggedIn,
     pfp,
     cover,
     website,
@@ -300,7 +244,7 @@ const ProfileRoute = () => {
         }}
       >
         <HeadNav
-          loggedIn={loggedIn}
+          loggedIn={loggedInUserProfile?.defaultAddress}
           avatarUrl={loggedInUserProfile?.pfp?.image}
           isToken={loggedInUserProfile?.pfp?.isToken}
         />

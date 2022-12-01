@@ -34,9 +34,7 @@ const user = {
 type HeadNavProps = {
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
-  loggedIn?: {
-    address: string
-  }
+  loggedIn?: string | undefined
 }
 
 export default function HeadNav({
@@ -50,7 +48,7 @@ export default function HeadNav({
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
   const navigation = [
-    { name: 'My Profile', to: `/${loggedIn?.address}` },
+    { name: 'My Profile', to: `/${loggedIn}` },
     { name: 'Account', to: '/account' },
   ]
 
