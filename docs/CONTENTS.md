@@ -1,5 +1,6 @@
 # Table of contents
 
+- [🗺️ Implementation Guides](3id/implementation-guides.md)
 - [🆔 3ID Public Profiles](3id/3id-public-profiles.md)
 
 <!--
