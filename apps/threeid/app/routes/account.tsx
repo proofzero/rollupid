@@ -12,7 +12,6 @@ import { requireJWT } from '~/utils/session.server'
 
 import styles from '~/styles/account.css'
 
-import { links as buttonStyles } from '~/components/base-button'
 import { links as faqStyles } from '~/components/FAQ'
 import { links as profileNftCollectionLinks } from '~/components/nft-collection/ProfileNftCollection'
 
@@ -24,7 +23,6 @@ import { getGalaxyClient } from '~/helpers/galaxyClient'
 
 export function links() {
   return [
-    ...buttonStyles(),
     ...faqStyles(),
     ...profileNftCollectionLinks(),
     { rel: 'stylesheet', href: styles },

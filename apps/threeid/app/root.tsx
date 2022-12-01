@@ -30,12 +30,7 @@ import maskIcon from './assets/safari-pinned-tab.svg'
 import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
-import { links as buttonLinks } from '~/components/buttons'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
-import {
-  links as baseButtonLinks,
-  BaseButtonAnchor,
-} from '~/components/base-button'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -64,8 +59,6 @@ export const links: LinksFunction = () => [
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
   { rel: 'mask-icon', href: maskIcon, color: '#5bbad5' },
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
-  ...baseButtonLinks(),
-  ...buttonLinks(),
   ...headNavLink(),
 ]
 

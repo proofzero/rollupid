@@ -9,7 +9,8 @@ import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Cover } from '../components/profile/cover/Cover'
 
-import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import { Button } from '@kubelt/design-system/src/atoms/button/Button'
+import ButtonLink from '~/components/buttons/ButtonLink'
 
 import HeadNav from '~/components/head-nav'
 
@@ -25,7 +26,6 @@ import {
   FaTrash,
 } from 'react-icons/fa'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
-import ButtonLink from '~/components/buttons/ButtonLink'
 import { useEffect, useRef, useState } from 'react'
 
 import social from '~/assets/social.png'

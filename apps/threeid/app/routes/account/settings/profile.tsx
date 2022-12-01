@@ -7,7 +7,7 @@ import {
   useTransition,
 } from '@remix-run/react'
 import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
-import { Button, ButtonSize, ButtonType } from '~/components/buttons'
+import { Button } from '@kubelt/design-system/src/atoms/button/Button'
 import InputText from '~/components/inputs/InputText'
 import { getUserSession, requireJWT } from '~/utils/session.server'
 import { Visibility } from '~/utils/galaxy.server'
