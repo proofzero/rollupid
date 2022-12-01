@@ -1,8 +1,11 @@
 import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-
+import { parseURN } from 'urns'
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
-import { WorkerApi as AddressApi } from '@kubelt/platform.address/src/types'
+import {
+  AddressURN,
+  WorkerApi as AddressApi,
+} from '@kubelt/platform.address/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -17,19 +20,26 @@ import Env from '../../env'
 import OortClient from './clients/oort'
 import { Resolvers } from './typedefs'
 import { isCompositeType } from 'graphql'
+import { GraphQLError } from 'graphql'
 
 type ResolverContext = {
   env: Env
   jwt?: string
   coreId?: string
+  urn?: { service: string; name: string }
 }
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (_parent: any, {}, { env, jwt }: ResolverContext) => {
+    profile: async (
+      _parent: any,
+      {},
+      { env, jwt, coreId }: ResolverContext
+    ) => {
       // console.log('query', coreId)
       // TODO: get coreId from URN
-      const coreId = jose.decodeJwt(jwt).sub
+
+      console.log('getting...', { coreId })
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let accountProfile = await accountClient.kb_getProfile(coreId)
@@ -39,18 +49,14 @@ const threeIDResolvers: Resolvers = {
     },
     profileFromAddress: async (
       _parent: any,
-      {
-        address,
-        nodeType,
-        addrType,
-      }: { address: string; nodeType: string; addrType: string },
+      { addressURN }: { addressURN: string },
       { env }: ResolverContext
     ) => {
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
         env.Address,
         {
           headers: {
-            'X-3RN': `urn:threeid:address/${address}?+node_type=${nodeType}&addr_type=${addrType}`,
+            'X-3RN': addressURN,
           },
         }
       )
@@ -65,7 +71,9 @@ const threeIDResolvers: Resolvers = {
       // Upgrayedd Oort -> Account
       if (!accountProfile) {
         const oortClient = new OortClient(env.OORT)
-        const oortResponse = await oortClient.getProfileFromAddress(address)
+        const parsedURN = parseURN(addressURN) // TODO: need utils lik AddressURN.parse(addressURN)
+        const name = parsedURN.nss.split('/')[1]
+        const oortResponse = await oortClient.getProfileFromAddress(name)
         accountProfile = await upgrayeddOortToAccount(
           coreId,
           accountClient,
@@ -84,10 +92,8 @@ const threeIDResolvers: Resolvers = {
       { profile },
       { env, jwt, coreId }: ResolverContext
     ) => {
-      // Rectify coreId in case it's undefined. Middleware should make sure JWT is valid here:
-      coreId = (coreId || jose.decodeJwt(jwt).sub) as string
-
-      console.log({ coreId })
+      console.log('updating..')
+      console.log({ coreId, profile })
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
       let currentProfile = await accountClient.kb_getProfile(coreId)
@@ -128,8 +134,6 @@ const threeIDResolvers: Resolvers = {
 }
 
 const ThreeIDResolverComposition = {
-  'Query.address': [setupContext()],
-  'Query.addresses': [setupContext()],
   'Query.profile': [setupContext()],
   'Query.profileFromAddress': [setupContext()],
   'Mutation.updateThreeIDProfile': [setupContext(), isAuthorized()],

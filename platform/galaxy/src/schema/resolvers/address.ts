@@ -1,16 +1,16 @@
-import { composeResolvers } from "@graphql-tools/resolvers-composition";
-import { GraphQLYogaError } from "@graphql-yoga/common";
+import { composeResolvers } from '@graphql-tools/resolvers-composition'
+import { GraphQLYogaError } from '@graphql-yoga/common'
 
-import { Resolvers } from "./typedefs";
+import { Resolvers } from './typedefs'
 
-import OortClient from "./clients/oort";
+import OortClient from './clients/oort'
 
 import {
   setupContext,
   isAuthorized,
   checkHTTPStatus,
   getRPCResult,
-} from "./utils";
+} from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -21,7 +21,7 @@ const addressResolvers: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
-      return null;
+      return null
     },
     addresses: (
       _parent,
@@ -30,14 +30,15 @@ const addressResolvers: Resolvers = {
         /* oort send, jwt */
       }
     ) => {
-      return [];
+      return []
     },
   },
   Mutation: {},
-};
+}
 
 const AddressResolverComposition = {
-  "Mutation.updateThreeIDAddress": [isAuthorized()],
-};
+  'Query.address': [setupContext()],
+  'Query.addresses': [setupContext()],
+}
 
-export default composeResolvers(addressResolvers, AddressResolverComposition);
+export default composeResolvers(addressResolvers, AddressResolverComposition)

@@ -4,4 +4,6 @@ export default /* GraphQL */ `
     PRIVATE
     PROTECTED
   }
-`;
+
+  scalar URN
+`

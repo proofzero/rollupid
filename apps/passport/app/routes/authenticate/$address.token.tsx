@@ -20,15 +20,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   if (!address || !node_type || !addr_type || !code) {
     throw json({ message: 'Invalid params' }, 400)
   }
+  const addressURN = `urn:threeid:address/${address}?+node_type=${node_type}&addr_type=${addr_type}`
 
   // TODO exchange token for access token
-  const addressClient = getAddressClient(
-    address as string,
-    node_type,
-    addr_type
-  )
+  const addressClient = getAddressClient(addressURN)
   const account = await addressClient.kb_resolveAccount()
   const accessClient = getAccessClient()
+  // TODO: handle refresh token
   const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(
     GrantType.AuthenticationCode,
     code,
@@ -40,17 +38,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const galaxyClient = await getGalaxyClient()
   console.log('get profile from address')
   await galaxyClient.getProfileFromAddress({
-    address,
-    nodeType: node_type,
-    addrType: addr_type,
+    addressURN,
   }) // lazy try to upgrade to profile in new account
 
   // TODO: store refresh token in DO and set alarm to refresh
 
   const redirectURL = searchParams.get('client_id')
     ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
-    : THREEID_APP_URL
-
-  const defaultProfileURN = `urn:threeid:address/${params.address}?+node_type=${node_type}&addr_type=${addr_type}`
-  return createUserSession(accessToken, redirectURL, defaultProfileURN)
+    : `/authorize`
+  return createUserSession(accessToken, redirectURL, addressURN)
 }

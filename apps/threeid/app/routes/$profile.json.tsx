@@ -1,4 +1,5 @@
-import { LoaderFunction, json } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/galaxyClient'
 import {
   fetchVoucher,
@@ -11,22 +12,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error('Profile address required')
   }
 
+  // address should be reachable if already created
+  // TODO: if not we have to do some checking downstream
+  const addressURN = `urn:threeid:address/${params.profile}`
+
   // TODO: double check that this still throws an exception
   // TODO: remove claimed from response?
   try {
     const galaxyClient = await getGalaxyClient()
     const profileRes = await galaxyClient.getProfileFromAddress({
-      address: params.profile,
+      addressURN,
     })
 
-    return json({
-      ...profileRes.profileFromAddress,
-      claimed: true,
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
+    return json(
+      {
+        ...profileRes.profileFromAddress,
+        claimed: true,
+      },
+      {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    })
+    )
   } catch (e) {
     console.error("Couldn't find profile", e)
     if (e?.response?.errors) {
@@ -88,12 +96,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     profile.pfp.image ||= voucher.metadata.image
     profile.cover ||= voucher.metadata.cover
 
-    return json({
-      ...profile,
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
+    return json(
+      {
+        ...profile,
+      },
+      {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
       }
-    })
+    )
   }
 }

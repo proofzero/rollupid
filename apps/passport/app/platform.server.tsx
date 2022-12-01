@@ -21,12 +21,7 @@ export function getAccessClient() {
   return createFetcherJsonRpcClient<AccessApi>(Access)
 }
 
-export function getAddressClient(
-  address: string,
-  nodeType: string,
-  addressType: string
-) {
-  const addressUrn = `urn:threeid:address/${address}?+node_type=${nodeType}&addr_type=${addressType}`
+export function getAddressClient(addressUrn: string) {
   const requestInit: RequestInit = {
     headers: {
       'X-3RN': addressUrn,

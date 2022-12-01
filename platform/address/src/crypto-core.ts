@@ -43,23 +43,25 @@ export default class CryptoCore extends Core {
 
   static async validateAddress(
     address: string,
-    addressType: AddressType,
-    env: Environment
-  ): Promise<string> {
+    addressType: AddressType | undefined
+  ): Promise<{ address: string; addressType: AddressType }> {
     switch (addressType) {
       case CryptoAddressType.ETHEREUM:
-      case CryptoAddressType.ETH: {
-        const resolvedType = await resolveEthType(address, env) // we may see an ens descriptor if address is unknown
+      case CryptoAddressType.ETH:
+      case undefined:
+      case null: {
+        const resolvedType = await resolveEthType(address) // we may see an ens descriptor if address is unknown
         if (!resolvedType) {
           throw `could not resolve ethereum address type from ${address}`
         }
         address = resolvedType.address
+        addressType = CryptoAddressType.ETH
         break
       }
       default:
         throw `unsupported address type ${addressType}`
     }
-    return address
+    return { address, addressType }
   }
 
   async setProfile(profile: AddressProfile): Promise<void> {
