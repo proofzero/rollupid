@@ -19,7 +19,7 @@ import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getGalaxyClient } from '~/helpers/clients'
 
 export function links() {
   return [
@@ -44,7 +44,6 @@ export const loader = async ({ request }) => {
     parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
   ]
 
-  console.log({ profileRes, address })
   return json({
     address,
     avatarUrl,

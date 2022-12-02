@@ -6,9 +6,9 @@ import {
   useSubmit,
   useTransition,
 } from '@remix-run/react'
-import { useAccount, useSignMessage, useDisconnect, useConnect } from 'wagmi'
+import { useAccount, useSignMessage, useDisconnect } from 'wagmi'
 
-import { Button } from '@kubelt/design-system'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import { useEffect, useState } from 'react'
 import { getAddressClient } from '~/platform.server'
@@ -70,10 +70,8 @@ export default function Sign() {
   const { nonce, address, state } = useLoaderData()
   const nonceMessage = signMessageTemplate.replace('{{nonce}}', nonce)
 
-  // const { connect, connectors, error, isLoading, pendingConnector } =
-  //   useConnect()
   const {
-    address: connectedAddress,
+    // address: connectedAddress,
     connector,
     isConnected,
     isConnecting,

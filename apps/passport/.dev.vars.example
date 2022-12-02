@@ -1,2 +1,3 @@
+THREEID_APP_URL="http://localhost:9797"
+ALCHEMY_KEY=""
 SESSION_SECRET="foobar"
-ALCHEMY_KEY="foobar"

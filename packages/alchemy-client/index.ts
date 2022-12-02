@@ -87,9 +87,22 @@ export class AlchemyClient {
     }
 
     return fetch(url.toString())
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (r.status !== 200) {
+          const errorText = await r.text()
+          console.error(errorText)
+          throw buildError(
+            r.status,
+            `Error calling Alchemy getNFTs: ${errorText}`
+          )
+        }
+        return r.json()
+      })
       .catch((e) => {
-        throw buildError(500, `Error calling Alchemy getNFTs: ${e.message}`)
+        throw buildError(
+          e.status,
+          `Error calling Alchemy getNFTs: ${e.message}`
+        )
       })
   }
 
@@ -106,7 +119,17 @@ export class AlchemyClient {
     // const body: GetOwnersForTokenResult = await response.json()
     // return body
     return fetch(`${url}?${urlSearchParams}`)
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (r.status !== 200) {
+          const errorText = await r.text()
+          console.error(errorText)
+          throw buildError(
+            r.status,
+            `Error calling Alchemy getOwnersForToken: ${errorText}`
+          )
+        }
+        return r.json()
+      })
       .catch((e) => {
         throw buildError(
           500,

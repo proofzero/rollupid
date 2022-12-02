@@ -37,12 +37,11 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      if (!owner) buildGQLError(400, `Error: missing required argument 'owner'`)
+      if (!owner) throw `Error: missing required argument 'owner'`
 
       // console.log('owner', owner)
       // console.log('pageKey', pageKey)
       // console.log('pageSize', pageSize)
-      // console.log('contractAddresses', contractAddresses)
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_KEY,
