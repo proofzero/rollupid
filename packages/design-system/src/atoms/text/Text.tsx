@@ -12,7 +12,26 @@ type TextSize =
   | '3xl'
   | '4xl'
   | '5xl'
+const textSizeDict: { [key in TextSize]: string } = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  base: 'text-base',
+  lg: 'text-lg',
+  xl: 'text-xl',
+  '2xl': 'text-2xl',
+  '3xl': 'text-3xl',
+  '4xl': 'text-4xl',
+  '5xl': 'text-5xl',
+}
+
 type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold'
+const textWeightDict: { [key in TextWeight]: string } = {
+  normal: 'font-normal',
+  medium: 'font-medium',
+  semibold: 'font-semibold',
+  bold: 'font-bold',
+}
+
 type TextType = 'p' | 'span'
 
 export type TextProps = HTMLAttributes<
@@ -34,7 +53,11 @@ export const Text = ({
   return React.createElement(
     type,
     {
-      className: classNames(`font-${weight}`, `text-${size}`, className),
+      className: classNames(
+        textWeightDict[weight],
+        textSizeDict[size],
+        className
+      ),
       ...rest,
     },
     children
