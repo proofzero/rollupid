@@ -36,10 +36,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       params.address as string, // as client_id
       account as string // as client_secret
     )
-    console.log({ accessToken })
 
     const galaxyClient = await getGalaxyClient()
-    console.log('get profile from address')
     await galaxyClient.getProfileFromAddress({
       addressURN,
     }) // lazy try to upgrade to profile in new account

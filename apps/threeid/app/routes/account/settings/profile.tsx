@@ -49,8 +49,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
   const voucher = await addressClient.kb_getPfpVoucher()
 
-  console.log({ voucher })
-
   return json({
     address,
     generatedPfp: voucher?.metadata?.image,
