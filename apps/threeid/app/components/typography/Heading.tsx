@@ -2,12 +2,12 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 export type HeadingProps = {
   className?: string
-  children: string
+  children: any
 }
 
 const Heading = ({ children, className }: HeadingProps) => {
   return (
-    <Text className={`${className} text-gray-800`} weight="medium" size="4xl">
+    <Text className={`${className} text-gray-800`} weight="semibold" size="4xl">
       {children}
     </Text>
   )
