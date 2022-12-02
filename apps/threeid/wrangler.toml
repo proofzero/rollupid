@@ -47,7 +47,7 @@ routes = [
   { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "GALAXY", service = "galaxy-dev"},
+  { binding = "Galaxy", service = "galaxy-dev"},
   { binding = "Address", service = "address-dev"},
 
 ]
@@ -64,7 +64,7 @@ routes = [
 kv_namespaces = [
 ]
 services = [
-  { binding = "GALAXY", service = "galaxy-next"},
+  { binding = "Galaxy", service = "galaxy-next"},
   { binding = "Address", service = "address-next"},
 ]
 [env.next.build]
@@ -83,7 +83,7 @@ routes = [
 kv_namespaces = [
 ]
 services = [
-  { binding = "GALAXY", service = "galaxy-current"},
+  { binding = "Galaxy", service = "galaxy-current"},
   { binding = "Address", service = "address-current"},
 
 ]
