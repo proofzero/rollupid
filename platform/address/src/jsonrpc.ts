@@ -30,6 +30,28 @@ import { resolveAddress3RN } from './utils'
 import { default as CryptoCoreStatic } from './crypto-core'
 import { AccountURN } from '../../account/src/types'
 
+const checkEnvVars = (env: Environment) => {
+  if (!env.NFTAR_CHAIN_ID) {
+    throw new Error('Missing env variable: NFTAR_CHAIN_ID')
+  }
+
+  if (!env.NFTAR_TOKEN) {
+    throw new Error('Missing env variable: NFTAR_TOKEN')
+  }
+
+  if (!env.NFTAR_URL) {
+    throw new Error('Missing env variable: NFTAR_URL')
+  }
+
+  if (!env.MINTPFP_CONTRACT_ADDRESS) {
+    throw new Error('Missing env variable: MINTPFP_CONTRACT_ADDRESS')
+  }
+
+  if (!env.ENS_RESOLVER_URL) {
+    throw new Error('Missing env variable: ENS_RESOLVER_URL')
+  }
+}
+
 export default async (
   request: Request,
   env: Environment
@@ -38,6 +60,7 @@ export default async (
 
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
+  checkEnvVars(env)
 
   // TODO: JWT validation
 
