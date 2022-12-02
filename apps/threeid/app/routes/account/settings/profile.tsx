@@ -1,7 +1,6 @@
 import {
   Form,
   useActionData,
-  useFetcher,
   useLoaderData,
   useOutletContext,
   useTransition,
@@ -9,8 +8,7 @@ import {
 import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
-import { getUserSession, requireJWT } from '~/utils/session.server'
-import { Visibility } from '~/utils/galaxy.server'
+import { requireJWT } from '~/utils/session.server'
 
 import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -18,11 +16,13 @@ import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
 
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
-import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from 'react'
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import { useEffect, useRef, useState } from 'react'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import { parseURN } from 'urns'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -32,15 +32,29 @@ export const loader: LoaderFunction = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  // const {nftsForAddress} = await galaxyClient.getNfts({
-  //   owner: profileRes.profile?.defaultAddress,
-  //   contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
-  // })
+  const parsedURN = parseURN(profileRes.profile?.defaultAddress)
+
+  const address = parsedURN.nss.split('/')[1]
+
+  const { nftsForAddress } = await galaxyClient.getNftsForAddress({
+    owner: address,
+    pageSize: 1,
+    contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
+  })
+
+  const addressClient = getCryptoAddressClient({
+    headers: {
+      'X-3RN': `urn:threeid:address/${address}`,
+    },
+  })
+  const voucher = await addressClient.kb_getPfpVoucher()
+
+  console.log({ voucher })
 
   return json({
-    // address,
-    // generatedPfp: voucher?.metadata?.image,
-    // generatedPfpMinted: nftsForAddress.ownedNfts.length,
+    address,
+    generatedPfp: voucher?.metadata?.image,
+    generatedPfpMinted: nftsForAddress.ownedNfts.length,
     ...profileRes.profile,
   })
 }
@@ -131,9 +145,9 @@ export default function AccountSettingsProfile() {
     bio,
     website,
     pfp,
-    // address,
-    // generatedPfp,
-    // generatedPfpMinted,
+    address,
+    generatedPfp,
+    generatedPfpMinted,
   } = useLoaderData()
 
   const [pfpUrl, setPfpUrl] = useState(pfp?.image)
@@ -202,12 +216,12 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
-      {/* <PfpNftModal
+      <PfpNftModal
         account={address}
         isOpen={nftPfpModalOpen}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
-      /> */}
+      />
 
       <div className="flex flex-col space-y-9 mt-12">
         <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-10 space-y-9 lg:space-y-0">
@@ -258,7 +272,7 @@ export default function AccountSettingsProfile() {
               </Button>
             </div>
 
-            {/* {generatedPfp && (
+            {generatedPfp && (
               <div className="flex flex-col space-y-2.5 items-center lg:items-start">
                 <Text className="text-gray-400" size="sm" weight="medium">
                   Or use your 1/1 gradient
@@ -277,7 +291,7 @@ export default function AccountSettingsProfile() {
                   }}
                 />
               </div>
-            )} */}
+            )}
           </div>
         </div>
 

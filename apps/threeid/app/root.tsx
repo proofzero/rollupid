@@ -67,17 +67,10 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = () => {
   return json({
     ENV: {
-      // @ts-ignore
       DATADOG_APPLICATION_ID: DATADOG_APPLICATION_ID,
-      // @ts-ignore
       DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN,
-      // @ts-ignore
       DATADOG_SERVICE_NAME: DATADOG_SERVICE_NAME,
-      // @ts-ignore
       DATADOG_ENV: DATADOG_ENV,
-      // @ts-ignore
-      NFTAR_CHAIN_ID: NFTAR_CHAIN_ID,
-      // @ts-ignore
       VALID_CHAIN_ID_NAME: VALID_CHAIN_ID_NAME,
     },
   })

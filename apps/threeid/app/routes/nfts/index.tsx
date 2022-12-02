@@ -1,6 +1,6 @@
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getGalaxyClient } from '~/helpers/clients'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)

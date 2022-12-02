@@ -1,4 +1,6 @@
 SESSION_SECRET="foobar"
+PASSPORT_URL="http://localhost:9696"
+COOKIE_DOMAIN="localhost"
 
 TWITTER_URL=https://twitter.com/threeid_xyz
 DISCORD_URL=https://discord.gg/threeid
@@ -9,17 +11,11 @@ DATADOG_SERVICE_NAME=3id-application
 DATADOG_ENV=local
 DATA_API_TOKEN=
 
-# for `act --secret-file threeid/.env -W .github/workflows/next.yaml -j ThreeID` 
-ADMIN_ACCOUNT_ID=
-CLOUDFLARE_API_TOKEN=
-CF_ZONE_ID=
-
 ETH_GOERLI_PK=
 
-NFTAR_URL=
-NFTAR_AUTHORIZATION=
 MINTPFP_CONTRACT_ADDRESS=
-NFTAR_CHAIN_ID=5
+NFTAR_AUTHORIZATION = ""
+NFTAR_URL = ""
 VALID_CHAIN_ID_NAME=goerli
 
 TEST_ENV=false

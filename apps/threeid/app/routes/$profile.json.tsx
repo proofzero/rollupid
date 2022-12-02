@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getGalaxyClient } from '~/helpers/clients'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.profile) {
@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
   }
 
-  // Tempory solution: check profile defaultAddress is the same as pramrs profile
+  // Tempory solution: check profile defaultAddress is the same as params profile
   const claimed = !!profileRes.profileFromAddress?.defaultAddress
 
   return json(

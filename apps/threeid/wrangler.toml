@@ -19,9 +19,8 @@ kv_namespaces = [
 
 # Services binding for local development
 services = [
-  { binding = "OORT", service = "oort"},
-  { binding = "GALAXY", service = "galaxy"},
-  { binding = "ICONS", service = "icons-dev"},
+  { binding = "Galaxy", service = "galaxy"},
+  { binding = "Address", service = "address"},
 ]
 
 [vars]
@@ -48,9 +47,9 @@ routes = [
   { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "OORT", service = "oort-devnet"},
   { binding = "GALAXY", service = "galaxy-dev"},
-  { binding = "ICONS", service = "icons-dev"},
+  { binding = "Address", service = "address-dev"},
+
 ]
 [env.dev.vars]
   PASSPORT_URL = "https://passport-dev.threeid.xyz"
@@ -65,9 +64,8 @@ routes = [
 kv_namespaces = [
 ]
 services = [
-  { binding = "OORT", service = "oort-testnet"},
   { binding = "GALAXY", service = "galaxy-next"},
-  { binding = "ICONS", service = "icons-next"},
+  { binding = "Address", service = "address-next"},
 ]
 [env.next.build]
   command = "yarn build"
@@ -85,9 +83,9 @@ routes = [
 kv_namespaces = [
 ]
 services = [
-  { binding = "OORT", service = "oort-mainnet"},
   { binding = "GALAXY", service = "galaxy-current"},
-  { binding = "ICONS", service = "icons-current"},
+  { binding = "Address", service = "address-current"},
+
 ]
 [env.current.build]
   command = "yarn build"

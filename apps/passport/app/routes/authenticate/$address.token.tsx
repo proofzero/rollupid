@@ -26,25 +26,31 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const addressClient = getAddressClient(addressURN)
   const account = await addressClient.kb_resolveAccount()
   const accessClient = getAccessClient()
+
   // TODO: handle refresh token
-  const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(
-    GrantType.AuthenticationCode,
-    code,
-    PASSPORT_REDIRECT_URL,
-    params.address as string, // as client_id
-    account as string // as client_secret
-  )
+  try {
+    const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(
+      GrantType.AuthenticationCode,
+      code,
+      PASSPORT_REDIRECT_URL,
+      params.address as string, // as client_id
+      account as string // as client_secret
+    )
+    console.log({ accessToken })
 
-  const galaxyClient = await getGalaxyClient()
-  console.log('get profile from address')
-  await galaxyClient.getProfileFromAddress({
-    addressURN,
-  }) // lazy try to upgrade to profile in new account
+    const galaxyClient = await getGalaxyClient()
+    console.log('get profile from address')
+    await galaxyClient.getProfileFromAddress({
+      addressURN,
+    }) // lazy try to upgrade to profile in new account
 
-  // TODO: store refresh token in DO and set alarm to refresh
+    // TODO: store refresh token in DO and set alarm to refresh
 
-  const redirectURL = searchParams.get('client_id')
-    ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
-    : `/authorize`
-  return createUserSession(accessToken, redirectURL, addressURN)
+    const redirectURL = searchParams.get('client_id')
+      ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
+      : `/authorize`
+    return createUserSession(accessToken, redirectURL, addressURN)
+  } catch (error) {
+    throw json({ message: 'invalid code' }, 400)
+  }
 }

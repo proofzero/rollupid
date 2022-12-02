@@ -31,7 +31,7 @@ import { useEffect, useRef, useState } from 'react'
 import social from '~/assets/social.png'
 import pepe from '~/assets/pepe.svg'
 
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getCryptoAddressClient, getGalaxyClient } from '~/helpers/clients'
 
 export function links() {
   return [...nftCollLinks()]
@@ -86,13 +86,20 @@ export const loader: LoaderFunction = async (args) => {
     url = social
   }
 
+  const addressClient = getCryptoAddressClient({
+    headers: {
+      'X-3RN': `urn:threeid:address/${targetAddress}`,
+    },
+  })
+  const voucher = await addressClient.kb_getPfpVoucher()
+
   return json({
     ...profileJson,
-    // originalCoverUrl: profileJson?.cover, // TODO: get voucher from address
+    originalCoverUrl: voucher?.metadata?.cover,
     cover: profileJson?.cover,
     loggedInUserProfile,
     isOwner,
-    targetAddress: targetAddress,
+    targetAddress,
     ogImageURL: url,
   })
 }

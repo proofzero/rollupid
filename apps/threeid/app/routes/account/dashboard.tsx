@@ -13,7 +13,7 @@ import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
 import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
-import { getGalaxyClient } from '~/helpers/galaxyClient'
+import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
 // @ts-ignore
