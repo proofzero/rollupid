@@ -2,8 +2,6 @@
 description: 3ID Public Profiles are the easiest way for developers to personalize their apps for users.
 ---
 
-## Introduction
-
 3ID Public Profiles help you customize your application for your users with one API call.
 
 Simply look up a unique account resolver (see below) and onboard your users into a personalized experience, with their familiar display name, profile picture, cover photo, bio, and more.

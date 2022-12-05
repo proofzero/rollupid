@@ -2,8 +2,6 @@
 description: An introduction to 3ID concepts.
 ---
 
-## Introduction
-
 3ID is a way to organize distributed networking resources. There are a couple of 
 "core" ([heheh -- inside joke](#cores)) concepts that will be useful to
 understand our offerings.
