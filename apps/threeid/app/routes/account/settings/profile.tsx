@@ -392,7 +392,7 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex lg:justify-end">
-            <Button isSubmit btnType={'secondary'} btnSize={'sm'}>
+            <Button isSubmit btnType={'primary'} btnSize={'xl'}>
               Save
             </Button>
           </div>
