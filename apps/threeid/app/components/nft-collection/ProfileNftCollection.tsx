@@ -73,11 +73,11 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
         )}
 
         <div className="flex-1 flex flex-col">
-          <Text size="sm" weight="medium">
+          <Text size="sm" weight="medium" className="text-gray-900">
             {title}
           </Text>
           {description && (
-            <Text size="sm" weight="medium" className="text-gray-500">
+            <Text size="sm" weight="normal" className="text-gray-500">
               {description}
             </Text>
           )}
@@ -85,7 +85,9 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
       </div>
 
       <span className="mx-5 my-4">
-        <ButtonAnchor href={url}>Visit website</ButtonAnchor>
+        <ButtonAnchor href={url} className="bg-gray-100 border-none">
+          Visit website
+        </ButtonAnchor>
       </span>
     </div>
   )
@@ -166,19 +168,19 @@ const ProfileNftCollection = ({
               imgSrc={opensea}
               title="OpenSea"
               description="The world’s largest digital marketplace for crypto collectibles and non-fungible tokens (NFTs), including ERC721 and ERC1155 assets."
-              url="#"
+              url="https://opensea.io"
             />
             <PartnerUrl
               imgSrc={rarible}
               title="Rarible"
               description="Rarible is a community-owned NFT marketplace, it awards the RARI token to active users on the platform, who buy or sell on the NFT marketplace. "
-              url="#"
+              url="https://rarible.com"
             />
             <PartnerUrl
               imgSrc={superrare}
               title="SuperRare"
               description="SuperRare has a strong focus on being a marketplace for people to buy and sell unique, single-edition digital artworks."
-              url="#"
+              url="https://superrare.com"
             />
           </div>
 
@@ -186,13 +188,21 @@ const ProfileNftCollection = ({
             <div className="flex-1">
               <SectionTitle title="Mint your own NFT on Polygon" />
 
-              <PartnerUrl imgSrc={polygon} title="Mintnft.Today" url="#" />
+              <PartnerUrl
+                imgSrc={polygon}
+                title="Mintnft.Today"
+                url="https://mintnft.today"
+              />
             </div>
 
             <div className="flex-1">
               <SectionTitle title="What's an NFT?" />
 
-              <PartnerUrl imgSrc={book} title="Learn About NFTs" url="#" />
+              <PartnerUrl
+                imgSrc={book}
+                title="Learn About NFTs"
+                url="https://opensea.io/learn/what-are-nfts"
+              />
             </div>
           </div>
         </>
