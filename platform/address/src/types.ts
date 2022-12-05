@@ -3,7 +3,7 @@ import type {
   DurableObjectApi,
 } from '@kubelt/platform.commons/src/jsonrpc'
 
-import type { AccountURN } from '@kubelt/platform.account/src/urns'
+import type { AccountURN } from '@kubelt/urns/account'
 import type { AuthorizeResult } from '@kubelt/platform.access/src/types'
 
 export interface Environment {

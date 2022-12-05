@@ -7,7 +7,7 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { AccountURNSpace } from '@kubelt/platform.account/src/urns'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
@@ -29,7 +29,7 @@ import {
   WorkerApi,
 } from './types'
 
-import { AccessURN, AccessURNSpace } from './urns'
+import { AccessURN, AccessURNSpace } from '@kubelt/urns/access'
 
 export default async (
   request: Request,

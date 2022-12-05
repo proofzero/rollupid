@@ -2,7 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { DurableObject } from '@kubelt/platform.commons'
-import { AccountURN, AccountURNSpace } from '@kubelt/platform.account/src/urns'
+import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
 import { ADDRESS_OPTIONS } from './constants'
 import { AddressCoreApi, Environment, CryptoCoreApi } from './types'

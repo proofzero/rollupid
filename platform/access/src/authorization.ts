@@ -2,7 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 import { DurableObject } from '@kubelt/platform.commons'
 
-import type { AccountURN } from '@kubelt/platform.account/src/urns'
+import type { AccountURN } from '@kubelt/urns/account'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import { CODE_OPTIONS } from './constants'

@@ -1,7 +1,4 @@
-import {
-  createThreeIdURNSpace,
-  ThreeIdURN,
-} from '@kubelt/platform.commons/src/urns'
+import { createThreeIdURNSpace, ThreeIdURN } from './index'
 
 export type AccountURN = ThreeIdURN<`account/${string}`>
 export const AccountURNSpace = createThreeIdURNSpace<'account'>('account')
