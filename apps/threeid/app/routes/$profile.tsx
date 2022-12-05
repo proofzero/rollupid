@@ -33,9 +33,7 @@ import pepe from '~/assets/pepe.svg'
 
 import { getCryptoAddressClient, getGalaxyClient } from '~/helpers/clients'
 
-import {
-  AddressURNSpace
-} from '@kubelt/platform.address/src/urns'
+import { AddressURNSpace } from '@kubelt/platform.address/src/urns'
 
 export function links() {
   return [...nftCollLinks()]
@@ -61,10 +59,9 @@ export const loader: LoaderFunction = async (args) => {
       ...profileRes.profile,
       claimed: true,
     }
-    
-    
+
     const urnAddress = AddressURNSpace.decode(profileRes.profile.defaultAddress)
-    
+
     isOwner = urnAddress == targetAddress
   }
 
