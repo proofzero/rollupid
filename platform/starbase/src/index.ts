@@ -15,6 +15,8 @@ import * as openrpc from '@kubelt/openrpc'
 
 import invariant from 'tiny-invariant'
 
+import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+
 import type {
   RpcAuthHandler,
   RpcContext,
@@ -33,6 +35,7 @@ import { StarbaseApplication } from '@kubelt/do.starbase-application'
 import { StarbaseContract } from '@kubelt/do.starbase-contract'
 import { StarbaseUser } from '@kubelt/do.starbase-user'
 
+import { required as requiredEnv } from './env'
 import * as oauth from './oauth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
@@ -798,6 +801,8 @@ export default {
     // third-party extensions to avoid setting conflicting keys.
     //
     // NBB: secrets are set via the dashboard or using the wrangler CLI tool.
+
+    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
 
     // TODO allow context to be initialized in this function.
     const context = openrpc.context(request, env, ctx)

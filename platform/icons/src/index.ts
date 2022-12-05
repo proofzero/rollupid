@@ -15,6 +15,9 @@
 import { add as dateAdd, formatRFC3339 as dateFormat } from "date-fns";
 
 import invariant from "tiny-invariant";
+import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+
+import { required as requiredEnv } from './env'
 
 // Environment
 // -----------------------------------------------------------------------------
@@ -49,6 +52,7 @@ export default {
     env: Env,
     ctx: ExecutionContext
   ): Promise<Response> {
+    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
 
     const { headers } = request;
     const contentType = headers.get("content-type") || "";
