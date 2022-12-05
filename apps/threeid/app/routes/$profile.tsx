@@ -289,11 +289,16 @@ const ProfileRoute = () => {
                     onClick={async () => {
                       await handleCoverReset()
                     }}
+                    className="flex flex-row space-x-3 justify-center items-center"
+                    style={{
+                      opacity: 0.8,
+                    }}
                   >
-                    <span>
-                      <FaTrash />
-                    </span>
-                    Delete
+                    <FaTrash className="text-sm" />
+
+                    <Text type="span" size="sm">
+                      Delete
+                    </Text>
                   </Button>
                 )}
 
@@ -303,11 +308,16 @@ const ProfileRoute = () => {
                   onClick={() => {
                     coverUploadRef.current?.click()
                   }}
+                  className="flex flex-row space-x-3 justify-center items-center"
+                  style={{
+                    opacity: 0.8,
+                  }}
                 >
-                  <span>
-                    <FaCamera />
-                  </span>
-                  Upload
+                  <FaCamera className="text-sm" />
+
+                  <Text type="span" size="sm">
+                    Upload
+                  </Text>
                 </Button>
               </div>
             )}
@@ -324,11 +334,16 @@ const ProfileRoute = () => {
         />
 
         {isOwner && (
-          <ButtonAnchor btnSize={'sm'} href="/account/settings/profile">
+          <ButtonAnchor
+            btnSize={'sm'}
+            href="/account/settings/profile"
+            className="bg-gray-100"
+          >
             <span>
               <FaEdit />
             </span>
-            Edit Profile
+
+            <span>Edit Profile</span>
           </ButtonAnchor>
         )}
       </div>
