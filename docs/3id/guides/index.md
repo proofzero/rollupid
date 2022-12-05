@@ -1,8 +1,9 @@
 ---
-description: Frequently Asked Questions for the 3ID project.
+description: Implementation guides for 3ID services.
 ---
 
-You can email me personally at [alex@kubelt.com](mailto:alex@kubelt.com) or see below for a Discord link to chat with the team.
+* [🔒 3ID Auth](3id/guides/3id-auth.md)
+* [💼 3ID Public Profiles](3id/guides/3id-public-profiles.md)
 
 ## FAQ
 
