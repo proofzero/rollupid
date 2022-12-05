@@ -1,4 +1,4 @@
-import type { GrantType } from '@kubelt/platform.access/src/types'
+import { GrantType } from '@kubelt/platform.access/src/types'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
