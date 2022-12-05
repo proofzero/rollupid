@@ -16,3 +16,13 @@ export default interface Env {
   ALCHEMY_CHAIN: string
   ALCHEMY_NETWORK: string
 }
+
+export const required = [
+  'Oort',
+  'Account',
+  'Address',
+  'Icons',
+  'ALCHEMY_KEY',
+  'ALCHEMY_CHAIN',
+  'ALCHEMY_NETWORK',
+]

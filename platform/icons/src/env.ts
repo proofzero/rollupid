@@ -1,0 +1,5 @@
+export const required = [
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_IMAGES_KEY',
+  'UPLOAD_WINDOW_SECONDS',
+]
