@@ -4984,6 +4984,7 @@ __metadata:
     "@kubelt-ui/threeid.ui.button": 0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455
     "@kubelt-ui/threeid.ui.heading": 0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda
     "@kubelt/design-system": "*"
+    "@kubelt/platform.access": "workspace:*"
     "@kubelt/platform.account": "workspace:*"
     "@kubelt/platform.commons": "workspace:*"
     "@mdx-js/react": ^1.6.22

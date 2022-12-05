@@ -2,6 +2,8 @@ import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
+import type { ResponseType } from '@kubelt/platform.access/src/types'
+
 import {
   getAccessClient,
   getAddressClientFromURN,
@@ -10,7 +12,6 @@ import {
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
-import type { ResponseType } from '@kubelt/platform.access/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -97,23 +98,23 @@ export const action: ActionFunction = async ({ request, context }) => {
   }
 
   const jwt = await requireJWT(request)
-
-  const redirect_uri = form.get('redirect_uri') as string
-  const scopes = (form.get('scopes') as string).split(',')
-  const state = form.get('state') as string
-  const client_id = form.get('client_id') as string
-
   const parsedJWT = parseJwt(jwt)
+  const account = parsedJWT.sub
+  const responseType = ResponseType.Code
+  const redirectUri = form.get('redirect_uri') as string
+  const scope = (form.get('scopes') as string).split(',')
+  const state = form.get('state') as string
+  const clientId = form.get('client_id') as string
 
   const accessClient = getAccessClient()
-  const authorizeRes = await accessClient.kb_authorize(
-    `urn:threeid:account/${parsedJWT.sub}?+node_type=account`,
-    client_id,
-    redirect_uri,
-    scopes,
+  const authorizeRes = await accessClient.kb_authorize({
+    account: parsedJWT.sub,
+    responseType,
+    clientId,
+    redirectUri,
+    scope,
     state,
-    'code' as ResponseType
-  )
+  })
 
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
