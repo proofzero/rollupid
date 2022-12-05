@@ -12,7 +12,7 @@ export default interface Env {
   Account: Fetcher
   Address: Fetcher
   Icons: Fetcher
-  ALCHEMY_KEY: string
-  ALCHEMY_CHAIN: string
-  ALCHEMY_NETWORK: string
+  ALCHEMY_KEYS: string
+  ALCHEMY_CHAINS: string
+  ALCHEMY_NETWORKS: string
 }

@@ -8,6 +8,7 @@ import {
   AlchemyClient,
   AlchemyClientConfig,
   GetNFTsParams,
+  GetContractsForOwnerParams,
 } from '../../../../../packages/alchemy-client'
 
 import { setupContext } from './utils'
@@ -28,11 +29,13 @@ const nftsResolvers: Resolvers = {
         owner,
         pageKey,
         pageSize,
+        network = 'goerli',
         contractAddresses,
       }: {
         owner: string
         pageKey: string
         pageSize: number
+        network: string
         contractAddresses: string[]
       },
       { env }: ResolverContext
@@ -42,11 +45,13 @@ const nftsResolvers: Resolvers = {
       // console.log('owner', owner)
       // console.log('pageKey', pageKey)
       // console.log('pageSize', pageSize)
-
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_KEY,
-        chain: env.ALCHEMY_CHAIN,
-        network: env.ALCHEMY_NETWORK,
+        key: JSON.parse(env.ALCHEMY_KEYS)[`${network}`],
+        chain:
+          network == 'mumbai'
+            ? JSON.parse(env.ALCHEMY_CHAINS).polygon
+            : JSON.parse(env.ALCHEMY_CHAINS).ethereum,
+        network: env.ALCHEMY_NETWORKS[`${network}`],
       } as AlchemyClientConfig)
 
       // const response = await alchemyClient.getNFTs({
@@ -62,6 +67,43 @@ const nftsResolvers: Resolvers = {
         })
       // console.log(response)
       // return response
+    },
+
+    contractsForAddress: async (
+      _parent: any,
+      {
+        owner,
+        pageKey,
+        pageSize,
+        network = 'goerli',
+      }: {
+        owner: string
+        pageKey: string
+        pageSize: number
+        network: string
+      },
+      { env }: ResolverContext
+    ) => {
+      if (!owner) throw `Error: missing required argument 'owner'`
+
+      const alchemyClient: AlchemyClient = new AlchemyClient({
+        key: JSON.parse(env.ALCHEMY_KEYS)[`${network}`],
+        chain:
+          network == 'mumbai'
+            ? JSON.parse(env.ALCHEMY_CHAINS).polygon
+            : JSON.parse(env.ALCHEMY_CHAINS).ethereum,
+        network: env.ALCHEMY_NETWORKS[`${network}`],
+      } as AlchemyClientConfig)
+
+      return alchemyClient
+        .getContractsForOwner({
+          owner,
+          pageKey,
+          pageSize,
+        } as GetNFTsParams)
+        .catch((e) => {
+          throw new GraphQLYogaError(e)
+        })
     },
   },
   Mutation: {},

@@ -29,14 +29,14 @@ export default {
     if (!env.Icons) {
       throw Error('Icons service bind not set')
     }
-    if (!env.ALCHEMY_KEY) {
-      throw Error('ALCHEMY_KEY not set')
+    if (!env.ALCHEMY_KEYS) {
+      throw Error('ALCHEMY_KEYS not set')
     }
-    if (!env.ALCHEMY_CHAIN) {
-      throw Error('ALCHEMY_CHAIN not set')
+    if (!env.ALCHEMY_CHAINS) {
+      throw Error('ALCHEMY_CHAINS not set')
     }
-    if (!env.ALCHEMY_NETWORK) {
-      throw Error('ALCHEMY_NETWORK not set')
+    if (!env.ALCHEMY_NETWORKS) {
+      throw Error('ALCHEMY_NETWORKS not set')
     }
     return yoga.handleRequest(request, { env, ctx })
   },
