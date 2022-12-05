@@ -1,9 +1,9 @@
 import { isAddress as isEthAddress } from '@ethersproject/address'
 import type { JsonRpcResponse } from 'typed-json-rpc'
 
-import { AddressType, CoreType, CryptoCoreType, Environment } from './types'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
-import { AddressURN, AddressURNSpace } from './urns'
+import { AddressType, CoreType, CryptoCoreType, Environment } from './types'
 
 export const resolveAddress3RN = async (
   request: Request

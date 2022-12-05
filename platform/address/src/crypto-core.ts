@@ -17,7 +17,6 @@ import {
   CryptoAddressType,
   AddressType,
 } from './types'
-import { AddressURNSpace } from './urns'
 import { getNftarVoucher, resolveEthType } from './utils'
 
 export default class CryptoCore extends Core {

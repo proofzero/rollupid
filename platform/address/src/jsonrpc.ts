@@ -6,7 +6,7 @@ import {
   JsonRpcResponse,
 } from 'typed-json-rpc'
 
-import { AccountURN } from '@kubelt/platform.account/src/urns'
+import { AccountURN } from '@kubelt/urns/account'
 
 import {
   AuthorizeResult,

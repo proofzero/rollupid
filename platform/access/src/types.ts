@@ -1,7 +1,7 @@
 import jose from 'jose'
 
 import type { BaseApi } from '@kubelt/platform.commons/src/jsonrpc'
-import type { AccountURN } from '@kubelt/platform.account/src/urns'
+import type { AccountURN } from '@kubelt/urns/account'
 
 export interface KeyPair {
   publicKey: jose.KeyLike | Uint8Array

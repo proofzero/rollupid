@@ -1,6 +1,8 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 
+import { AddressURNSpace } from '@kubelt/urns/address'
+
 import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 
@@ -32,8 +34,6 @@ import social from '~/assets/social.png'
 import pepe from '~/assets/pepe.svg'
 
 import { getCryptoAddressClient, getGalaxyClient } from '~/helpers/clients'
-
-import { AddressURNSpace } from '@kubelt/platform.address/src/urns'
 
 export function links() {
   return [...nftCollLinks()]
