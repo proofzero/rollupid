@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "3.18.0",
+    "@kubelt/platform.account": "workspace:*",
     "@types/itty-router-extras": "0.4.0",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
@@ -30,11 +31,9 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
-    "@kubelt/platform.commons": "*",
-    "@kubelt/security": "workspace:*",
+    "@kubelt/platform.commons": "workspace:*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
-    "typed-json-rpc": "1.1.0",
-    "urns": "0.6.0"
+    "typed-json-rpc": "1.1.0"
   }
 }

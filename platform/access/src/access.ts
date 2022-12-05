@@ -13,7 +13,6 @@ import {
   GenerateResult,
   KeyPair,
   KeyPairSerialized,
-  RefreshAuthorizationResult,
   Scope,
 } from './types'
 
@@ -72,8 +71,8 @@ export default class Access extends DurableObject<Environment, Api> {
     return jose.jwtVerify(token, key, options)
   }
 
-  async refresh(token: string): Promise<RefreshAuthorizationResult> {
-    await this.verify(token) // @sonmez: does this throw an exception?
+  async refresh(token: string): Promise<GenerateResult> {
+    await this.verify(token)
     const params = await this.storage.get<AccessParameters>('params')
     if (!params) {
       throw 'missing access parameters'

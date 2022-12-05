@@ -32,11 +32,11 @@
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
+    "@kubelt/platform.account": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "jose": "4.11.0",
-    "typed-json-rpc": "1.1.0",
-    "urns": "0.6.0"
+    "typed-json-rpc": "1.1.0"
   }
 }

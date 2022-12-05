@@ -1,4 +1,4 @@
-import { GrantType } from '@kubelt/platform.access/src/types'
+import type { GrantType } from '@kubelt/platform.access/src/types'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
@@ -25,17 +25,22 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   // TODO exchange token for access token
   const addressClient = getAddressClient(addressURN)
   const account = await addressClient.kb_resolveAccount()
+
+  const grantType = GrantType.AuthenticationCode
+  const redirectUri = PASSPORT_REDIRECT_URL
+  const clientId = params.address as string
+
   const accessClient = getAccessClient()
 
   // TODO: handle refresh token
   try {
-    const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(
-      GrantType.AuthenticationCode,
+    const { accessToken, refreshToken } = await accessClient.kb_exchangeToken({
+      account,
+      grantType,
       code,
-      PASSPORT_REDIRECT_URL,
-      params.address as string, // as client_id
-      account as string // as client_secret
-    )
+      redirectUri,
+      clientId,
+    })
 
     const galaxyClient = await getGalaxyClient()
     await galaxyClient.getProfileFromAddress({
