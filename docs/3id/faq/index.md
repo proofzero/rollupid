@@ -2,9 +2,7 @@
 description: Frequently Asked Questions for the 3ID project.
 ---
 
-# 🔍 3ID FAQ
-
-You can email me personally at [alex@kubelt.com](mailto:alex@kubelt.com) -- ask away! Or see below for Discord link to get the whole team on it.
+You can email me personally at [alex@kubelt.com](mailto:alex@kubelt.com) or see below for a Discord link to chat with the team.
 
 ## FAQ
 
