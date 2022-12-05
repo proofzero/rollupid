@@ -29,7 +29,7 @@ export function ButtonAnchor({
       className={classNames(
         sizeClasses,
         colorClasses,
-        'flex flex-row space-x-3 items-center justify-center',
+        'flex flex-row space-x-3 items-center justify-center text-gray-600',
         className
       )}
       {...rest}
