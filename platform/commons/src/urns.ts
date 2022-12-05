@@ -1,7 +1,11 @@
 import { BaseURN, URNSpace } from 'urns'
 
 export type ThreeIdURN<NSS extends string> = BaseURN<'threeid', NSS>
-export type ThreeIdURNSpace<NSS extends string> = URNSpace<'threeid', NSS, string>
+export type ThreeIdURNSpace<NSS extends string> = URNSpace<
+  'threeid',
+  NSS,
+  string
+>
 
 export const createThreeIdURNSpace = <NSSPrefix extends string>(
   prefix: string
