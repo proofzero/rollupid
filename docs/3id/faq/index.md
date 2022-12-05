@@ -10,7 +10,3 @@ Email me questions personally at [alex@kubelt.com](mailto:alex@kubelt.com) or se
 are graph nodes that represent people or applications. They are used to organize
 decentralized services. Cores are an important internal technical abstraction so
 you may see chat messages, code, or documentation that referrs to them.
-
-## FAQ
-
-Joining our [Discord →](https://discord.gg/UgwAsJf6C5) is the fastest way to get your question answered.

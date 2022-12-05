@@ -82,7 +82,3 @@ If you feed the above `curl` through a tool like `jq`, for example with `curl ht
 Using 3ID means you don't have to worry about storing user data -- your users can store it themselves!
 
 In order to store your own custom application data within a user's 3ID profile you will need to use a custom application namespace as well as our new encrypted storage RPC methods. [Join our Discord](https://discord.gg/UgwAsJf6C5) to talk to us about your use case and get beta access.
-
-## FAQ
-
-Joining our [Discord →](https://discord.gg/UgwAsJf6C5) is the fastest way to get your question answered.

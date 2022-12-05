@@ -10,7 +10,3 @@ understand our offerings.
 
 "Cores" are nodes in our graph. They represent people and applications, and developers
 can use them to organize decentralized software services around their users.
-
-## FAQ
-
-Joining our [Discord →](https://discord.gg/UgwAsJf6C5) is the fastest way to get your question answered.
