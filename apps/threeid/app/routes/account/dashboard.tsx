@@ -120,18 +120,22 @@ export default function Welcome() {
         </Text>
 
         <div className="flex flex-row gap-4 justify-center align-center lg:justify-start">
-          <ButtonAnchor href="https://twitter.com/threeid_xyz">
-            <span style={{ color: '#1D9BF0' }}>
-              <FaTwitter />
-            </span>
-            Twitter
+          <ButtonAnchor
+            href="https://twitter.com/threeid_xyz"
+            className="bg-gray-100 border-none min-w-[170px]"
+          >
+            <FaTwitter style={{ color: '#1D9BF0' }} />
+
+            <span>Twitter</span>
           </ButtonAnchor>
 
-          <ButtonAnchor href="https://discord.gg/threeid">
-            <span style={{ color: '#1D9BF0' }}>
-              <FaDiscord />
-            </span>
-            Discord
+          <ButtonAnchor
+            href="https://discord.gg/threeid"
+            className="bg-gray-100 border-none min-w-[170px]"
+          >
+            <FaDiscord style={{ color: '#1D9BF0' }} />
+
+            <span>Discord</span>
           </ButtonAnchor>
         </div>
       </div>
