@@ -93,13 +93,18 @@ const threeIDResolvers: Resolvers = {
         const oortClient = new OortClient(env.Oort)
         const parsedURN = parseURN(addressURN) // TODO: need utils lik AddressURN.parse(addressURN)
         const name = parsedURN.nss.split('/')[1]
-        const oortResponse = await oortClient.getProfileFromAddress(name)
-        accountProfile = await upgrayeddOortToAccount(
-          coreId,
-          name,
-          accountClient,
-          oortResponse
-        )
+        try {
+          const oortResponse = await oortClient.getProfileFromAddress(name)
+          accountProfile = await upgrayeddOortToAccount(
+            coreId,
+            name,
+            accountClient,
+            oortResponse
+          )
+        } catch (err) {
+          console.error(err)
+          accountProfile = {}
+        }
       }
 
       // console.log(accountProfile)
