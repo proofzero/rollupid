@@ -15,7 +15,7 @@ export type ButtonAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 export function ButtonAnchor({
   href,
   btnSize = 'base',
-  btnType = 'primary',
+  btnType = 'secondary-alt',
   className,
   children,
   ...rest
@@ -26,7 +26,12 @@ export function ButtonAnchor({
   return (
     <a
       href={href}
-      className={classNames(sizeClasses, colorClasses, className)}
+      className={classNames(
+        sizeClasses,
+        colorClasses,
+        'flex flex-row space-x-3 items-center justify-center text-gray-600',
+        className
+      )}
       {...rest}
     >
       {children}

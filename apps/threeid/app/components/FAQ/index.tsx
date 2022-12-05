@@ -4,6 +4,8 @@ import SmallRegularBlock from '~/components/typography/SmallRegularBlock'
 
 import styles from './FAQ.css'
 
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+
 export const links = () => [{ rel: 'stylesheet', href: styles }]
 
 const contents = [
@@ -39,7 +41,7 @@ const contents = [
           href={`https://opensea.io/collection/3id-invite`}
           className="mx-1"
         >
-          OpenSea
+          <Text type="span" size="sm" className="text-indigo-500">OpenSea</Text>
         </a>
 
         <SmallRegularBlock type="span">
@@ -96,7 +98,7 @@ const contents = [
             href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
             className="mx-1"
           >
-            here
+            <Text type="span" size="sm" className="text-indigo-500">here</Text>
           </a>
 
           <SmallRegularBlock type="span">
@@ -119,7 +121,7 @@ const contents = [
           href={`https://kubelt.com`}
           className="mx-1"
         >
-          Kubelt
+          <Text type="span" size="sm" className="text-indigo-500">Kubelt</Text>
         </a>
 
         <SmallRegularBlock type="span">
@@ -143,7 +145,7 @@ const contents = [
 const FAQ = () => {
   return (
     <div className="mb-3">
-      <SectionTitle className="mb-1 mt-6" title="FAQ" />
+      <SectionTitle className="mb-1 mt-6 lg:mt-0" title="FAQ" />
       <div className="accordion" id="accordionFaq">
         {contents.map((content, index) => {
           const borderStyle = index === contents.length - 1 ? '' : 'border-down'

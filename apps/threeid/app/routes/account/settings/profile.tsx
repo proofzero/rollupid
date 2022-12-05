@@ -245,6 +245,7 @@ export default function AccountSettingsProfile() {
                 onClick={() => {
                   if (!nftPfpModalOpen) setNftPfpModalOpen(true)
                 }}
+                className="text-gray-600 border-none"
               >
                 Change NFT Avatar
               </Button>
@@ -265,6 +266,7 @@ export default function AccountSettingsProfile() {
                 onClick={() => {
                   pfpUploadRef.current?.click()
                 }}
+                className="text-gray-600 border-none"
               >
                 Upload an Image
               </Button>
@@ -390,7 +392,7 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex lg:justify-end">
-            <Button isSubmit btnType={'secondary'} btnSize={'sm'}>
+            <Button isSubmit btnType={'primary'} btnSize={'xl'}>
               Save
             </Button>
           </div>

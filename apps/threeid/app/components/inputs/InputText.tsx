@@ -122,10 +122,6 @@ const InputText = ({
             }-400 ${
               Icon ? `p${iconPosition === 'trailing' ? 'r' : 'l'}-10` : ''
             } w-full`}
-            style={{
-              fontWeight: 400,
-              fontFamily: 'Inter_400Regular',
-            }}
             maxLength={maxChars}
             placeholder={placeholder}
           />

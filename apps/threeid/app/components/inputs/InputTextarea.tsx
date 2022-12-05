@@ -49,7 +49,7 @@ const InputTextarea = ({
         </Text>
 
         {charLimit && (
-          <Text size="sm" weight="medium" color={'#9CA3AF'}>
+          <Text size="sm" weight="medium" className="text-gray-400">
             {val?.length || 0}/{charLimit}
           </Text>
         )}
@@ -85,10 +85,6 @@ const InputTextarea = ({
             }-50 placeholder-${
               computedError ? 'red' : 'gray'
             }-400 w-full rounded-md`}
-            style={{
-              fontWeight: 400,
-              fontFamily: 'Inter_400Regular',
-            }}
             placeholder={placeholder}
             required={required}
           />
