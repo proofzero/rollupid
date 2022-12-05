@@ -2,10 +2,6 @@
 description: Implementation Guides for 3ID
 ---
 
-# 🗺️ Implementation Guides
-
-`TODO`
-
 1. Create an application in [Developer Console](https://console.threeid.xyz).
 1. Configure your OAuth settings including secrets, requested scopes, and redirect URL.
 1. Drop our [3ID Passport]() private login button on your page. Users can now onboard easily.

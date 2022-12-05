@@ -2,8 +2,6 @@
 description: An introduction to 3ID concepts.
 ---
 
-# 🆔 3ID Public Profiles
-
 ## Introduction
 
 3ID is a way to organize distributed networking resources. There are a couple of 
