@@ -27,11 +27,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const parsedJwt = parseJwt(jwt)
-
   let profile
-  // if (!profileRes.profile) {
-  if (true) {
+  if (!profileRes.profile) {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
     const addressClient = getAddressClientFromURN(defaultProfileURN)
@@ -56,11 +53,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     throw json({ message: 'No profile found', isAuthenticated: true }, 400)
   }
 
+  // if no client id let's redirect to the first party app select page
   if (!client_id) {
-    return redirect(THREEID_APP_URL)
+    return redirect('/apps')
   }
 
-  // if profile is null we need to provisio a default profile
+  // if profile is null we need to provision a default profile
   // we can do that by getting the address profile and then setting the account profile
   // TODO: create a get address profile galaxy operation
   // TODO: call set profile mutation from galaxy

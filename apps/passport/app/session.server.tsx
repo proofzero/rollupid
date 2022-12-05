@@ -39,6 +39,7 @@ export async function createUserSession(
   session.set('core', parsedJWT.iss)
   session.set('jwt', jwt)
   session.set('defaultProfileUrn', defaultProfileUrn)
+
   return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await storage.commitSession(session),
