@@ -10,7 +10,8 @@ understand our offerings.
 
 ## Cores
 
-This is a test.
+"Cores" are nodes in our graph. They represent people and applications, and developers
+can use them to organize decentralized software services around their users.
 
 ## FAQ
 
