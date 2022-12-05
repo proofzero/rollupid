@@ -91,26 +91,30 @@ export async function upgrayeddOortToAccount(
 
   console.log(`Migrating core ${coreId} to Account service... starting`)
 
-  await checkHTTPStatus(oortResponse)
+  try {
+    await checkHTTPStatus(oortResponse)
 
-  const oortProfile = await getRPCResult(oortResponse)
+    const oortProfile = await getRPCResult(oortResponse)
 
-  console.log({ oortProfile })
+    console.log({ oortProfile })
 
-  if (!oortProfile) {
-    console.log(`Migrating core ${coreId} to Account service... no profile`)
-    return {}
+    if (!oortProfile) {
+      console.log(`Migrating core ${coreId} to Account service... no profile`)
+      return {}
+    }
+
+    const profileRes = await accountClient.kb_setProfile(coreId, {
+      ...oortProfile,
+      defaultAddress: name,
+    })
+
+    if (!profileRes) {
+      throw `Migrating core ${coreId} to Account service... failed`
+    }
+
+    console.log(`Migrating core ${coreId} to Account service... complete`)
+    return oortProfile
+  } catch (err) {
+    console.error(err)
   }
-
-  const profileRes = await accountClient.kb_setProfile(coreId, {
-    ...oortProfile,
-    defaultAddress: name,
-  })
-
-  if (!profileRes) {
-    throw `Migrating core ${coreId} to Account service... failed`
-  }
-
-  console.log(`Migrating core ${coreId} to Account service... complete`)
-  return oortProfile
 }
