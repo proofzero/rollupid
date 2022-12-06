@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request'
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import createAddressClient from '@kubelt/platform-clients/address'
 import { getSdk } from '~/utils/galaxy.server'
 
 export async function getGalaxyClient() {
@@ -11,5 +11,5 @@ export async function getGalaxyClient() {
 }
 
 export function getCryptoAddressClient(options: RequestInit) {
-  return createFetcherJsonRpcClient(Address, options)
+  return createAddressClient(Address, options)
 }

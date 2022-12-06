@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (!clientName) throw 'App name is required'
 
   const starbaseClient = getStarbaseClient()
-  const app = await starbaseClient.createApplication(clientName as string)
+  const app = await starbaseClient.kb_appCreate(clientName as string)
 }
 
 // Component

@@ -45,4 +45,13 @@ export type GetNonceParams = [
 
 export type VerifyNonceParams = [nonce: string, signature: string]
 
-export type SetAddressProfileParams = [profile: object]
+export type AddressProfile = {
+  cover: string
+  displayName: string
+  pfp: {
+    image: string
+    isToken: string
+  }
+}
+
+export type SetAddressProfileParams = [profile: Partial<AddressProfile>]

@@ -29,7 +29,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const addressClient = getAddressClient(addressURN)
   try {
     const nonce = await addressClient.kb_getNonce(
-      params.address, // as client_id
+      params.address as string, // as client_id
       signMessageTemplate,
       PASSPORT_REDIRECT_URL,
       ['admin'], // todo: change scope

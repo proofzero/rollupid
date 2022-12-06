@@ -1,14 +1,22 @@
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import createAccessClient from '@kubelt/platform-clients/access'
+import createAccountClient from '@kubelt/platform-clients/account'
+import createAddressClient from '@kubelt/platform-clients/address'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
+
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
 import { getSdk } from '~/galaxy.server'
 
 export function getStarbaseClient() {
-  return createFetcherJsonRpcClient(Starbase)
+  return createStarbaseClient(Starbase)
 }
 
 export function getAccessClient() {
-  return createFetcherJsonRpcClient(Access)
+  return createAccessClient(Access)
+}
+
+export function getAccountClient() {
+  return createAccountClient(Account)
 }
 
 export function getAddressClient(addressUrn: string) {
@@ -17,15 +25,7 @@ export function getAddressClient(addressUrn: string) {
       'X-3RN': addressUrn,
     },
   }
-  return createFetcherJsonRpcClient(Address, requestInit)
-}
-export function getAddressClientFromURN(addressUrn: string) {
-  const requestInit: RequestInit = {
-    headers: {
-      'X-3RN': addressUrn,
-    },
-  }
-  return createFetcherJsonRpcClient(Address, requestInit)
+  return createAddressClient(Address, requestInit)
 }
 
 export async function getGalaxyClient() {

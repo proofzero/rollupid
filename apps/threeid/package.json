@@ -24,6 +24,7 @@
     "@headlessui/react": "1.7.4",
     "@heroicons/react": "2.0.13",
     "@kubelt/design-system": "*",
+    "@kubelt/platform-clients": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@remix-run/cloudflare": "1.7.6",
