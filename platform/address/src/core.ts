@@ -61,6 +61,7 @@ export default class Core extends DurableObject<
   async resolveAccount(): Promise<AccountURN> {
     const urn = await this.getAccount()
     if (urn) {
+      console.log({ urn })
       if (AccountURNSpace.is(urn)) {
         return urn
       } else {
