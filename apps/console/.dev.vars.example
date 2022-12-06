@@ -1,2 +1,1 @@
-DEPLOY_ENV = ""
-STORAGE_NAMESPACE = "starbase"
+SESSION_SECRET="foobar"
