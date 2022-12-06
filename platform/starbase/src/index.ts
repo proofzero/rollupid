@@ -331,29 +331,29 @@ const kb_appList = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
 
-      // Get a reference to the StarbaseApplication Durable Object.
-      const sbUser: DurableObjectNamespace = context.get(KEY_USER)
-      // TODO better typing
-      const userName = _.get(request, ['params', 'ownerId'])
+      // // Get a reference to the StarbaseApplication Durable Object.
+      // const sbUser: DurableObjectNamespace = context.get(KEY_USER)
+      // // TODO better typing
+      // const userName = _.get(request, ['params', 'ownerId'])
 
-      const user = await openrpc.discover(sbUser, {
-        // Derive the name of the object from user ID.
-        name: userName,
-        // TODO This auth token is sent with every RPC call.
-        token,
-        // This tag is used when logging requests.
-        tag: 'starbase-user',
-      })
+      // const user = await openrpc.discover(sbUser, {
+      //   // Derive the name of the object from user ID.
+      //   name: userName,
+      //   // TODO This auth token is sent with every RPC call.
+      //   token,
+      //   // This tag is used when logging requests.
+      //   tag: 'starbase-user',
+      // })
 
-      // TODO implement graph linking
-      // TODO filter the edges to only include those linking to apps.
-      //const result = await user._.graph.edges()
+      // // TODO implement graph linking
+      // // TODO filter the edges to only include those linking to apps.
+      // //const result = await user._.graph.edges()
 
-      const result = await user.listApplications()
+      // const result = await user.listApplications()
 
       return openrpc.response(request, {
         invoked: 'kb_appList',
-        result,
+        result: {},
       })
     }
   ),

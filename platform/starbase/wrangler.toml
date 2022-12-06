@@ -25,8 +25,6 @@ services = [
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
-  { name = "StarbaesContract", class_name = "StarbaseContract" },
-  { name = "StarbaseUser", class_name = "StarbaseUser" },
 ]
 
 # KV
@@ -60,8 +58,6 @@ local_protocol = "http"
 tag = "v1"
 new_classes = [
   "StarbaseApplication",
-  "StarbaseContract",
-  "StarbaseUser",
 ]
 # renamed_classes = [
 #   { from = "OldName", to = "NewName" }
@@ -118,6 +114,7 @@ services = [
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
 
 kv_namespaces = [
   { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
