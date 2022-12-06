@@ -102,6 +102,7 @@ export default /* GraphQL */ `
       owner: String!
       pageKey: String
       pageSize: Int
+      excludeFilters: [String]
     ): NFTContracts
   }
 `
