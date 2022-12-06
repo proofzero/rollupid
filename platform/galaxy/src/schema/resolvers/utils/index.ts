@@ -5,6 +5,7 @@ import type { JWTPayload } from 'jose'
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 
 import { AccountURN } from '@kubelt/urns/account'
+import { AddressURNSpace } from '@kubelt/urns/address'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -107,7 +108,7 @@ export async function upgrayeddOortToAccount(
 
     const profileRes = await accountClient.kb_setProfile(accountURN, {
       ...oortProfile,
-      defaultAddress: name,
+      defaultAddress: AddressURNSpace.urn(name),
     })
 
     if (!profileRes) {

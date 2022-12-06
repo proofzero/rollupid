@@ -14,11 +14,14 @@ import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
 import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
 import { getGalaxyClient } from '~/helpers/clients'
-import { requireJWT } from '~/utils/session.server'
+import { requireJWT, parseJwt, getUserSession } from '~/utils/session.server'
 
 // @ts-ignore
 export const loader = async ({ request }) => {
   const jwt = await requireJWT(request, '/auth')
+
+  const session = getUserSession(request)
+  console.log({ session })
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
@@ -26,11 +29,9 @@ export const loader = async ({ request }) => {
   })
 
   const [isToken, displayname] = [
-    profileRes.profile?.pfp?.isToken,
+    profileRes.profile?.pfp?.isToken || false,
     profileRes.profile?.displayName,
   ]
-  console.log('here')
-  console.log({ isToken, displayname, profile: profileRes.profile })
 
   return json({
     isToken,
