@@ -196,9 +196,11 @@ const nftsResolvers: Resolvers = {
             excludeFilters,
           } as GetContractsForOwnerParams) as any,
         ])
-      } catch (err) {}
 
-      return alchemyRes
+        return alchemyRes
+      } catch (ex) {
+        throw new GraphQLYogaError(ex as string)
+      }
     },
   },
 
