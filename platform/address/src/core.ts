@@ -42,6 +42,9 @@ export default class Core extends DurableObject<
     const account = await this.storage.get<string>('account')
     if (account && !AccountURNSpace.is(account)) {
       const urn = AccountURNSpace.urn(account)
+      if (!AccountURNSpace.is(urn)) {
+        throw 'address.getAccount: invalid account'
+      }
       await this.setAccount(urn)
       return urn
     } else {

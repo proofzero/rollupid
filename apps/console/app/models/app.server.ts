@@ -10,9 +10,6 @@ import invariant from 'tiny-invariant'
 
 import * as _ from 'lodash'
 
-import { oortSend } from '~/shared/utilities/rpc.server'
-import { getUserSession } from '~/shared/utilities/session.server'
-
 // Invariants
 // -----------------------------------------------------------------------------
 
@@ -163,19 +160,19 @@ const app = {
  */
 export async function getApplication(
   jwt: string,
-  appId: string,
-  cookie?
+  appId: string
 ): Promise<Application | null> {
   return new Promise(async (resolve, reject) => {
     const namespace = STORAGE_NAMESPACE
     const path = `/application/${appId}`
     const params = [namespace, path /*{ visibility: "private" }*/]
 
-    const getObject = await oortSend('kb_getObject', params, {
-      jwt,
-      cookie,
-    })
+    // const getObject = await oortSend('kb_getObject', params, {
+    //   jwt,
+    //   cookie,
+    // })
 
+    const getObject = { result: { value: {} }, error: undefined }
     console.log(JSON.stringify(getObject, null, 2))
 
     // TODO handle these errors.

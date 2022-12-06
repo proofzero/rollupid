@@ -10,7 +10,7 @@ import { requireJWT } from '~/shared/utilities/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireJWT(request)
-  return redirect('/account')
+  return redirect('/dashboard')
 }
 
 // Component
