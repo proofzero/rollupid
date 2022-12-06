@@ -27,7 +27,7 @@ export type AuthorizationParameters = {
 }
 
 export type AccessParameters = {
-  account: string
+  account: AccountURN
   clientId: string
   scope: Scope
 }

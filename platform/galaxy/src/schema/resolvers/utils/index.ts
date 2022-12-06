@@ -4,8 +4,7 @@ import type { JWTPayload } from 'jose'
 
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 
-import { OortJwt } from '../clients/oort'
-import { ThreeIdURN } from '@kubelt/urns'
+import { AccountURN } from '@kubelt/urns/account'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -19,7 +18,7 @@ export function parseJwt(token: string): JWTPayload {
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
   const parsedJwt = jwt && parseJwt(jwt)
-  const accountURN: ThreeIdURN<'account/${name}'> = parsedJwt && parsedJwt.sub
+  const accountURN: AccountURN = parsedJwt && parsedJwt.sub
 
   return next(root, args, { ...context, jwt, accountURN }, info)
 }
@@ -83,14 +82,14 @@ export async function getRPCResult(response: Response) {
 }
 
 export async function upgrayeddOortToAccount(
-  coreId: string,
+  accountURN: AccountURN,
   name: string,
   accountClient: AccountApi,
   oortResponse
 ) {
-  if (!(coreId && accountClient && oortResponse)) return {}
+  if (!(accountURN && accountClient && oortResponse)) return {}
 
-  console.log(`Migrating core ${coreId} to Account service... starting`)
+  console.log(`Migrating core ${accountURN} to Account service... starting`)
 
   try {
     await checkHTTPStatus(oortResponse)
@@ -100,20 +99,22 @@ export async function upgrayeddOortToAccount(
     console.log({ oortProfile })
 
     if (!oortProfile) {
-      console.log(`Migrating core ${coreId} to Account service... no profile`)
+      console.log(
+        `Migrating core ${accountURN} to Account service... no profile`
+      )
       return {}
     }
 
-    const profileRes = await accountClient.kb_setProfile(coreId, {
+    const profileRes = await accountClient.kb_setProfile(accountURN, {
       ...oortProfile,
       defaultAddress: name,
     })
 
     if (!profileRes) {
-      throw `Migrating core ${coreId} to Account service... failed`
+      throw `Migrating core ${accountURN} to Account service... failed`
     }
 
-    console.log(`Migrating core ${coreId} to Account service... complete`)
+    console.log(`Migrating core ${accountURN} to Account service... complete`)
     return oortProfile
   } catch (err) {
     console.error(err)

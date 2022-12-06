@@ -15,6 +15,7 @@ import {
   KeyPairSerialized,
   Scope,
 } from './types'
+import { AccountURN } from '@kubelt/urns/account'
 
 export default class Access extends DurableObject<Environment, Api> {
   methods(): Api {
@@ -26,7 +27,7 @@ export default class Access extends DurableObject<Environment, Api> {
   }
 
   async generate(
-    account: string,
+    account: AccountURN,
     clientId: string,
     scope: Scope
   ): Promise<GenerateResult> {

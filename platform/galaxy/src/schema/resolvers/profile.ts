@@ -25,23 +25,18 @@ import OortClient from './clients/oort'
 import { Resolvers } from './typedefs'
 import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
+import { AccountURN } from '@kubelt/urns/account'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 type ResolverContext = {
   env: Env
-  jwt?: string
-  accountURN?: string
+  jwt: string
+  accountURN: AccountURN
 }
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (
-      _parent: any,
-      {},
-      { env, jwt, accountURN }: ResolverContext
-    ) => {
-      // console.log('query', coreId)
-      // TODO: get coreId from URN
-
+    profile: async (_parent: any, {}, { env, accountURN }: ResolverContext) => {
       console.log(
         `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
@@ -54,7 +49,7 @@ const threeIDResolvers: Resolvers = {
     },
     profileFromAddress: async (
       _parent: any,
-      { addressURN }: { addressURN: string },
+      { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
@@ -97,10 +92,7 @@ const threeIDResolvers: Resolvers = {
           `galaxy:profileFromAddress: upgrayedd Oort -> Account for ${addressURN}`
         )
         const oortClient = new OortClient(env.Oort)
-        const AddressURN = createThreeIdURNSpace('address')
-        const name = AddressURN.decode(
-          addressURN as ThreeIdURN<'address/${name}'>
-        )
+        const name = AddressURNSpace.decode(addressURN)
 
         try {
           const oortResponse = await oortClient.getProfileFromAddress(name)
