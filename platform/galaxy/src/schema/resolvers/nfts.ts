@@ -45,15 +45,15 @@ const nftsResolvers: Resolvers = {
       // console.log('pageSize', pageSize)
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_KEY,
-        chain: env.ALCHEMY_CHAIN,
-        network: env.ALCHEMY_NETWORK,
+        key: env.ALCHEMY_GOERLI_KEY,
+        chain: env.ALCHEMY_ETH_CHAIN,
+        network: env.ALCHEMY_GOERLI_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_MUMBAI_KEY,
+        key: env.ALCHEMY_POLYGON_TESTNET_KEY,
         chain: env.ALCHEMY_POLYGON_CHAIN,
-        network: env.ALCHEMY_MUMBAI_NETWORK,
+        network: env.ALCHEMY_POLYGON_TEST_NETWORK,
       } as AlchemyClientConfig)
 
       try {
@@ -142,7 +142,7 @@ const nftsResolvers: Resolvers = {
           return nft
         })
 
-        alchemyRes.ownedNfts = ownedNfts
+        alchemyRes.ownedNfts = ownedNfts.concat(ownedPolygonNfts)
         alchemyPolygonRes.ownedNfts = ownedPolygonNfts
 
         return alchemyRes
@@ -150,7 +150,7 @@ const nftsResolvers: Resolvers = {
         throw new GraphQLYogaError(ex as string)
       }
     },
-
+    //@ts-ignore
     contractsForAddress: async (
       _parent: any,
       {
@@ -169,15 +169,15 @@ const nftsResolvers: Resolvers = {
       if (!owner) throw `Error: missing required argument 'owner'`
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_KEY,
-        chain: env.ALCHEMY_CHAIN,
-        network: env.ALCHEMY_NETWORK,
+        key: env.ALCHEMY_GOERLI_KEY,
+        chain: env.ALCHEMY_ETH_CHAIN,
+        network: env.ALCHEMY_GOERLI_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_MUMBAI_KEY,
+        key: env.ALCHEMY_POLYGON_TESTNET_KEY,
         chain: env.ALCHEMY_POLYGON_CHAIN,
-        network: env.ALCHEMY_MUMBAI_NETWORK,
+        network: env.ALCHEMY_POLYGON_TEST_NETWORK,
       } as AlchemyClientConfig)
 
       let alchemyRes, alchemyPolygonRes
@@ -196,7 +196,6 @@ const nftsResolvers: Resolvers = {
             excludeFilters,
           } as GetContractsForOwnerParams) as any,
         ])
-
         return alchemyRes
       } catch (ex) {
         throw new GraphQLYogaError(ex as string)
