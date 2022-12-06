@@ -60,9 +60,12 @@ export const loader: LoaderFunction = async (args) => {
       claimed: true,
     }
 
-    const urnAddress = AddressURNSpace.decode(profileRes.profile.defaultAddress)
-
-    isOwner = urnAddress == targetAddress
+    if (profileRes?.profile?.defaultAddress) {
+      const urnAddress = AddressURNSpace.decode(
+        profileRes.profile.defaultAddress
+      )
+      isOwner = urnAddress == targetAddress
+    }
   }
 
   const profileJson = await (await profileLoader(args)).json()
@@ -258,7 +261,11 @@ const ProfileRoute = () => {
         }}
       >
         <HeadNav
-          loggedIn={AddressURNSpace.decode(loggedInUserProfile?.defaultAddress)}
+          loggedIn={
+            loggedInUserProfile?.defaultAddress
+              ? AddressURNSpace.decode(loggedInUserProfile?.defaultAddress)
+              : undefined
+          }
           avatarUrl={loggedInUserProfile?.pfp?.image}
           isToken={loggedInUserProfile?.pfp?.isToken}
         />
