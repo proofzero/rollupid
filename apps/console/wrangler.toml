@@ -7,7 +7,7 @@ main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
 services = [
-  { binding = "STARBASE", service = "starbase", environment = "production" }
+  { binding = "Starbase", service = "starbase"}
 ]
 
 # development
@@ -31,6 +31,8 @@ local_protocol = "http"
 # independently for each environment.
 
 [vars]
+PASSPORT_URL = "http://localhost:9696"
+COOKIE_DOMAIN = "localhost"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -50,7 +52,7 @@ local_protocol = "http"
 [env.dev]
 
 services = [
-  { binding = "STARBASE", service = "starbase-dev", environment = "production" }
+  { binding = "Starbase", service = "starbase-dev"}
 ]
 
 # kv_namespaces = [
@@ -58,14 +60,13 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "console-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.dev.vars]
 DEPLOY_ENV = "dev"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport-dev.threeid.xyz"
+COOKIE_DOMAIN = "dev.threeid.xyz"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -73,7 +74,7 @@ STORAGE_NAMESPACE = "starbase"
 [env.next]
 
 services = [
-  { binding = "STARBASE", service = "starbase-next", environment = "production" }
+  { binding = "Starbase", service = "starbase-next"}
 ]
 
 # kv_namespaces = [
@@ -81,7 +82,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { binding = "Starbase", service = "starbase-current"}
 ]
 
 [env.next.build]
@@ -89,9 +90,8 @@ routes = [
 
 [env.next.vars]
 DEPLOY_ENV = "next"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport-next.threeid.xyz"
+COOKIE_DOMAIN = "next.threeid.xyz"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "console.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.current.build]
@@ -116,6 +116,5 @@ routes = [
 
 [env.current.vars]
 DEPLOY_ENV = "current"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
