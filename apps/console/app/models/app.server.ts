@@ -2,36 +2,36 @@
  * @file app/models/app.server.ts
  */
 
-import invariant from "tiny-invariant";
+import invariant from 'tiny-invariant'
 
 //import cuid from "cuid";
 
 //import type { User } from "./user.server";
 
-import * as _ from "lodash";
+import * as _ from 'lodash'
 
-import { oortSend } from "~/shared/utilities/rpc.server";
-import { getSession } from "~/shared/utilities/session.server";
+import { oortSend } from '~/shared/utilities/rpc.server'
+import { getUserSession } from '~/shared/utilities/session.server'
 
 // Invariants
 // -----------------------------------------------------------------------------
 
 // Ensure that STORAGE_NAMESPACE is defined.
-invariant(STORAGE_NAMESPACE !== undefined, "STORAGE_NAMESPACE must be defined");
+invariant(STORAGE_NAMESPACE !== undefined, 'STORAGE_NAMESPACE must be defined')
 
 // Definitions
 // -----------------------------------------------------------------------------
 
-export const APP_NAME_MAX_LENGTH = 100;
+export const APP_NAME_MAX_LENGTH = 100
 
 // Scope
 // -----------------------------------------------------------------------------
 
 export type Scope = {
-  name: string;
-  category: string;
-  permission: string;
-};
+  name: string
+  category: string
+  permission: string
+}
 
 // Application
 // -----------------------------------------------------------------------------
@@ -39,44 +39,44 @@ export type Scope = {
 
 // Nominal types.
 
-export type AppID = string;
+export type AppID = string
 
-export type DateString = string;
+export type DateString = string
 
-export type URLString = string;
+export type URLString = string
 
 export type Application = {
   // Unique application identifier.
-  id: AppID;
+  id: AppID
   // Creation date.
-  createdDate: DateString;
+  createdDate: DateString
   // Published?
-  published: boolean;
+  published: boolean
   // Human-readable name.
-  name: string;
+  name: string
   // URL of the application icon.
-  icon: string;
+  icon: string
   // Secret
-  secret: string;
+  secret: string
   // oAuth redirect URL.
-  redirectURL: URLString;
+  redirectURL: URLString
   // oAuth ToS URL.
-  termsURL: URLString;
+  termsURL: URLString
   // oAuth domains
-  domains: Array<string>;
+  domains: Array<string>
   // oAuth scopes
-  scopes: Array<Scope>;
+  scopes: Array<Scope>
   // URL of application website
-  websiteURL: URLString;
+  websiteURL: URLString
   // URL of mirror website
-  mirrorURL: URLString;
+  mirrorURL: URLString
   // Discord username
-  discordUser: string;
+  discordUser: string
   // Medium username
-  mediumUser: string;
+  mediumUser: string
   // Twitter username
-  twitterUser: string;
-};
+  twitterUser: string
+}
 
 // ApplicationItem
 // -----------------------------------------------------------------------------
@@ -102,14 +102,34 @@ export async function getScopes(): Promise<Array<Scope> | null> {
   return new Promise((resolve, reject) => {
     // TEMP
     const scopes = [
-      { id: 1, name: "profile.all_data", category: "Profile", permission: "All Data", },
-      { id: 2, name: "profile.some_data", category: "Profile", permission: "Some Data", },
-      { id: 3, name: "contract.read_only", category: "Contracts", permission: "Read Only", },
-      { id: 4, name: "contract.write_only", category: "Contracts", permission: "Write Only", },
-    ];
-    resolve(scopes);
-  });
-};
+      {
+        id: 1,
+        name: 'profile.all_data',
+        category: 'Profile',
+        permission: 'All Data',
+      },
+      {
+        id: 2,
+        name: 'profile.some_data',
+        category: 'Profile',
+        permission: 'Some Data',
+      },
+      {
+        id: 3,
+        name: 'contract.read_only',
+        category: 'Contracts',
+        permission: 'Read Only',
+      },
+      {
+        id: 4,
+        name: 'contract.write_only',
+        category: 'Contracts',
+        permission: 'Write Only',
+      },
+    ]
+    resolve(scopes)
+  })
+}
 
 // getApplication
 // -----------------------------------------------------------------------------
@@ -141,26 +161,30 @@ const app = {
 /**
  * Return the details of a single application.
  */
-export async function getApplication(jwt: string, appId: string, cookie?): Promise<Application | null> {
+export async function getApplication(
+  jwt: string,
+  appId: string,
+  cookie?
+): Promise<Application | null> {
   return new Promise(async (resolve, reject) => {
-    const namespace = STORAGE_NAMESPACE;
-    const path = `/application/${appId}`;
-    const params = [namespace, path, /*{ visibility: "private" }*/];
+    const namespace = STORAGE_NAMESPACE
+    const path = `/application/${appId}`
+    const params = [namespace, path /*{ visibility: "private" }*/]
 
-    const getObject = await oortSend("kb_getObject", params, {
+    const getObject = await oortSend('kb_getObject', params, {
       jwt,
       cookie,
-    });
+    })
 
-    console.log(JSON.stringify(getObject, null, 2));
+    console.log(JSON.stringify(getObject, null, 2))
 
     // TODO handle these errors.
     if (getObject.error !== undefined) {
-      reject(getObject);
+      reject(getObject)
     }
 
-    resolve(getObject?.result?.value);
-  });
+    resolve(getObject?.result?.value)
+  })
 }
 
 // getApplicationListItems
@@ -169,25 +193,27 @@ export async function getApplication(jwt: string, appId: string, cookie?): Promi
 /**
  * Return a list of the user's application.
  */
-export async function getApplicationListItems(jwt: string): Promise<Array<Application>> {
+export async function getApplicationListItems(
+  jwt: string
+): Promise<Array<Application>> {
   return new Promise(async (resolve, reject) => {
     // Fetch the list of the user's application IDs.
-    const appList = await fetchAppList(jwt);
+    const appList = await fetchAppList(jwt)
     if (appList.errors !== undefined) {
-      reject(appList);
+      reject(appList)
     }
 
     // For each application ID, fetch the application data object.
     const requests = appList.map((appId) => {
-      return getApplication(jwt, appId);
-    });
+      return getApplication(jwt, appId)
+    })
 
     return Promise.all(requests).then((results) => {
       return results.map((getApp) => {
-        return getApp?.result?.value;
-      });
-    });
-  });
+        return getApp?.result?.value
+      })
+    })
+  })
 }
 
 // makeApplicationId
@@ -197,7 +223,7 @@ export async function getApplicationListItems(jwt: string): Promise<Array<Applic
  *
  */
 export function makeApplicationId(): string {
-  return crypto.randomUUID();
+  return crypto.randomUUID()
 }
 
 // makeApplicationKey
@@ -207,8 +233,8 @@ export function makeApplicationId(): string {
  *
  */
 function makeApplicationKey(appId: string): string {
-  const id = appId.trim().toLowerCase();
-  return `app/${id}`;
+  const id = appId.trim().toLowerCase()
+  return `app/${id}`
 }
 
 // initApplication
@@ -219,30 +245,30 @@ function makeApplicationKey(appId: string): string {
  */
 export async function initApplication(session, appId: string) {
   return new Promise((resolve, reject) => {
-    const appKey = makeApplicationKey(appId);
-    const createdDate = (new Date()).toUTCString();
+    const appKey = makeApplicationKey(appId)
+    const createdDate = new Date().toUTCString()
 
     const appDefaults = {
-       published: false,
-       secret: "",
-       redirectURL: "",
-       termsURL: "",
-       websiteURL: "",
-       mirrorURL: "",
-       discordUser: "",
-       mediumUser: "",
-       twitterUser: "",
-    };
+      published: false,
+      secret: '',
+      redirectURL: '',
+      termsURL: '',
+      websiteURL: '',
+      mirrorURL: '',
+      discordUser: '',
+      mediumUser: '',
+      twitterUser: '',
+    }
 
     const appData = _.merge(appDefaults, {
       id: appId,
       createdDate,
-    });
+    })
 
-    session.set(appKey, appData);
+    session.set(appKey, appData)
 
-    resolve(appData);
-  });
+    resolve(appData)
+  })
 }
 
 // updateApplication
@@ -254,26 +280,22 @@ export async function initApplication(session, appId: string) {
  * with ID of appId is loaded from the session and the given fields
  * merged into before saving it back to the session.
  */
-export async function updateApplication(
-  session,
-  appId: string,
-  fields
-) {
+export async function updateApplication(session, appId: string, fields) {
   return new Promise(async (resolve, reject) => {
-    const appKey = makeApplicationKey(appId);
+    const appKey = makeApplicationKey(appId)
 
     if (!session.has(appKey)) {
-      const message = `missing app from session: ${appKey}`;
-      reject({ error: message });
+      const message = `missing app from session: ${appKey}`
+      reject({ error: message })
     }
-    const app = await session.get(appKey) || {};
+    const app = (await session.get(appKey)) || {}
 
-    const updated = _.merge(app, fields);
-    session.set(appKey, updated);
+    const updated = _.merge(app, fields)
+    session.set(appKey, updated)
 
-    resolve(updated);
-  });
-};
+    resolve(updated)
+  })
+}
 
 // cleanApplication
 // -----------------------------------------------------------------------------
@@ -281,15 +303,12 @@ export async function updateApplication(
 /**
  * Remove the application definition from session state.
  */
-export async function cleanApplication(
-  session,
-  appId: string
-) {
-  const appKey = makeApplicationKey(appId);
+export async function cleanApplication(session, appId: string) {
+  const appKey = makeApplicationKey(appId)
   if (session.has(appKey)) {
-    session.unset(appKey);
+    session.unset(appKey)
   }
-};
+}
 
 // fetchAppList
 // -----------------------------------------------------------------------------
@@ -300,53 +319,56 @@ export async function cleanApplication(
 export async function fetchAppList(jwt: string): Promise<Array<string>> {
   return new Promise(async (resolve, reject) => {
     // The path to the list of the user's applications.
-    const path = `/apps`;
+    const path = `/apps`
     // Storage write parameters: namespace, path, value.
-    const params = [STORAGE_NAMESPACE, path];
+    const params = [STORAGE_NAMESPACE, path]
     // Use the supplied JWT to authenticate to the service.
-    const options = { jwt, };
+    const options = { jwt }
 
     // Write application data to storage service.
-    const getObject = await oortSend("kb_getObject", params, options);
+    const getObject = await oortSend('kb_getObject', params, options)
     if (getObject.error !== undefined) {
-      reject(getObject);
+      reject(getObject)
     }
 
-    resolve(getObject?.result?.value);
-  });
+    resolve(getObject?.result?.value)
+  })
 }
 
 // storeAppList
 // -----------------------------------------------------------------------------
 
 // TODO define application ID type.
-type ApplicationList = Array<string>;
+type ApplicationList = Array<string>
 
-export async function storeAppList(jwt: string, appList: ApplicationList): Promise {
+export async function storeAppList(
+  jwt: string,
+  appList: ApplicationList
+): Promise {
   return new Promise(async (resolve, reject) => {
     // The path to the list of the user's applications.
-    const path = `/apps`;
+    const path = `/apps`
     // Options for the RPC call.
     const rpcOptions = {
       // Data storage object visibility.
-      visibility: "private",
-    };
+      visibility: 'private',
+    }
     // Storage write parameters: namespace, path, value.
-    const params = [STORAGE_NAMESPACE, path, appList, rpcOptions];
+    const params = [STORAGE_NAMESPACE, path, appList, rpcOptions]
 
     // Use the supplied JWT to authenticate to the service.
     const options = {
       jwt,
-    };
-
-    // Write application data to storage service.
-    const putObject = await oortSend("kb_putObject", params, options);
-    if (putObject.error !== undefined) {
-      reject(putObject);
     }
 
-    resolve(putObject);
-  });
+    // Write application data to storage service.
+    const putObject = await oortSend('kb_putObject', params, options)
+    if (putObject.error !== undefined) {
+      reject(putObject)
+    }
+
+    resolve(putObject)
+  })
 }
 
 // createApplication
@@ -355,44 +377,47 @@ export async function storeAppList(jwt: string, appList: ApplicationList): Promi
 /**
  * Create an application.
  */
-export async function createApplication(jwt: string, app: Pick<Application>): Promise<Application> {
+export async function createApplication(
+  jwt: string,
+  app: Pick<Application>
+): Promise<Application> {
   return new Promise(async (resolve, reject) => {
     // This stored path uniquely identifies an application.
-    const path = `/application/${app.id}`;
+    const path = `/application/${app.id}`
     // Options for the RPC call.
     const rpcOptions = {
       // Data storage object visibility.
-      visibility: "private",
-    };
+      visibility: 'private',
+    }
     // Storage write parameters: namespace, path, value.
-    const params = [STORAGE_NAMESPACE, path, app, rpcOptions];
+    const params = [STORAGE_NAMESPACE, path, app, rpcOptions]
 
     // Use the supplied JWT to authenticate to the service.
     const options = {
       jwt,
-    };
+    }
 
     // Write application data to storage service.
-    const result = await oortSend("kb_putObject", params, options);
+    const result = await oortSend('kb_putObject', params, options)
     if (result.error !== undefined) {
-      reject(result);
+      reject(result)
     }
 
     // Application write succeeded, fetch list of applications and add
     // this app ID to the list.
-    let appList = await fetchAppList(jwt) || [];
+    let appList = (await fetchAppList(jwt)) || []
     // TODO handle rejected promise
     appList = _.filter(_.uniq(_.concat(appList, app.id)), (x) => {
-      return !_.isUndefined(x) && !_.isNull(x);
-    });
-    console.log(appList);
+      return !_.isUndefined(x) && !_.isNull(x)
+    })
+    console.log(appList)
 
     // Update the list of the user's applications.
-    const storeResult = await storeAppList(jwt, appList);
-    console.log(storeResult);
+    const storeResult = await storeAppList(jwt, appList)
+    console.log(storeResult)
 
-    resolve(storeResult);
-  });
+    resolve(storeResult)
+  })
 }
 
 // deleteApplication
@@ -404,9 +429,9 @@ export async function createApplication(jwt: string, app: Pick<Application>): Pr
 export async function deleteApplication({
   jwt,
   appId,
-}: Pick<Application, "id" | "appId">) {
+}: Pick<Application, 'id' | 'appId'>) {
   return new Promise((resolve, reject) => {
     // TODO delete application.
-    resolve(undefined);
-  });
+    resolve(undefined)
+  })
 }

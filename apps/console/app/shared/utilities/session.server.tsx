@@ -2,30 +2,32 @@
  * @file app/shared/utilities/session.server.tsx
  */
 
-import invariant from "tiny-invariant";
-
+import invariant from 'tiny-invariant'
+import * as jose from 'jose'
+import type { JWTPayload } from 'jose'
+import type { Session } from '@remix-run/cloudflare'
 import {
   createCookieSessionStorage,
   // createCloudflareKVSessionStorage,
   redirect,
-} from "@remix-run/cloudflare";
+} from '@remix-run/cloudflare'
 
 // import eventSubmit from "~/utils/datadog.server";
 
 // @ts-ignore
-invariant(DEPLOY_ENV, "DEPLOY_ENV must be set");
+invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 
 // NB: This secret is set using: wrangler secret put.
 // @ts-ignore
-invariant(SESSION_SECRET, "SESSION_SECRET must be set");
+invariant(SESSION_SECRET, 'SESSION_SECRET must be set')
 
 // @ts-ignore
-invariant(SESSION_NAME, "SESSION_NAME must be set");
+invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
 
 // Definitions
 // -----------------------------------------------------------------------------
 
-const MAX_AGE = 60 * 60 * 4;
+const MAX_AGE = 60 * 60 * 4
 
 // createCookieSessionStorage
 // -----------------------------------------------------------------------------
@@ -39,84 +41,43 @@ const MAX_AGE = 60 * 60 * 4;
  */
 const storage = createCookieSessionStorage({
   cookie: {
-    name: SESSION_NAME,
+    name: '3ID_SESSION',
+    domain: COOKIE_DOMAIN,
     // normally you want this to be `secure: true`
     // but that doesn't work on localhost for Safari
     // https://web.dev/when-to-use-local-https/
-    secure: DEPLOY_ENV === "current" || "production",
+    secure: true,
     secrets: [SESSION_SECRET],
     sameSite: true,
-    path: "/",
+    path: '/',
     maxAge: MAX_AGE,
     // httpOnly: true,
   },
-});
+})
 
-// redirectTo
-// -----------------------------------------------------------------------------
-
-/**
- *
- */
-export async function redirectTo(
-  target: string,
-  session,
-  remember?: boolean = true,
-) {
-  return redirect(target, {
-    headers: {
-      "Set-Cookie": await storage.commitSession(session, {
-        maxAge: remember ? MAX_AGE : undefined,
-      }),
-    },
-  });
-}
-
-// createSession
-// -----------------------------------------------------------------------------
-
-/**
- *
- */
-export async function createSession(
-    jwt: string,
-    target: string,
-    // NOTE: storing this temporarily in the session util RPC url remove address
-    address?: string,
-    remember?: boolean = true,
-) {
-  const parsedJWT = parseJWT(jwt);
-  const session = await storage.getSession();
-  session.set("core", parsedJWT.iss);
-  session.set("jwt", jwt);
-  session.set("address", address);
-
-  return redirectTo(target, session, remember);
-}
-
-// getSession
+// getUserSession
 // -----------------------------------------------------------------------------
 
 /**
  * @todo reset cookie maxAge if valid
  */
-export function getSession(request: Request, renew: boolean = true) {
+export function getUserSession(request: Request, renew: boolean = true) {
   // TODO can headers be optional here?
-  return storage.getSession(request?.headers.get("Cookie"));
+  return storage.getSession(request?.headers.get('Cookie'))
 }
 
-// destroySession
+// destroyUserSession
 // -----------------------------------------------------------------------------
 
 /**
  *
  */
-export async function destroySession(session: Session) {
-  return redirect("/auth", {
+export async function destroyUserSession(session: Session) {
+  return redirect('/auth', {
     headers: {
-      "Set-Cookie": await storage.destroySession(session),
+      'Set-Cookie': await storage.destroySession(session),
     },
-  });
+  })
 }
 
 // logout
@@ -126,8 +87,8 @@ export async function destroySession(session: Session) {
  *
  */
 export async function logout(request: Request) {
-  const session = getSession(request);
-  return destroySession(session);
+  const session = await getUserSession(request)
+  return destroyUserSession(session)
 }
 
 // requireJWT
@@ -140,17 +101,15 @@ export async function requireJWT(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
 ) {
-  const session = await getSession(request);
-  const jwt = session.get("jwt");
-  const searchParams = new URLSearchParams([
-    ["redirectTo", redirectTo],
-  ]);
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
+  // const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
 
-  if (!jwt || typeof jwt !== "string") {
-    throw redirect(`/auth?${searchParams}`);
+  if (!jwt || typeof jwt !== 'string') {
+    throw redirect(PASSPORT_URL)
   }
   if (jwt) {
-    const parsedJWT = parseJWT(jwt);
+    const parsedJWT = parseJwt(jwt)
     if (parsedJWT.exp < Date.now() / 1000) {
       throw await destroyUserSession(session)
     }
@@ -158,30 +117,16 @@ export async function requireJWT(
 
   // eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
 
-  return jwt;
-}
-
-// parseJwt
-// -----------------------------------------------------------------------------
-
-type OortJWT = {
-  aud: string[];
-  iss: string;
-  sub: string;
-  exp: number;
-  iat: number;
-  capabilities: object;
+  return jwt
 }
 
 /**
  *
  */
-export function parseJWT (token: string): OortJWT {
-  var base64Url = token.split('.')[1];
-  var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
-
-  return JSON.parse(jsonPayload);
-};
+export function parseJwt(token: string): JWTPayload {
+  const payload = jose.decodeJwt(token)
+  if (!payload) {
+    throw new Error('Invalid JWT')
+  }
+  return payload
+}
