@@ -13,8 +13,11 @@ export default interface Env {
   Address: Fetcher
   Icons: Fetcher
   ALCHEMY_KEY: string
+  ALCHEMY_MUMBAI_KEY: string
   ALCHEMY_CHAIN: string
+  ALCHEMY_POLYGON_CHAIN: string
   ALCHEMY_NETWORK: string
+  ALCHEMY_MUMBAI_NETWORK: string
 }
 
 export const required = [
@@ -23,6 +26,9 @@ export const required = [
   'Address',
   'Icons',
   'ALCHEMY_KEY',
+  'ALCHEMY_MUMBAI_KEY',
   'ALCHEMY_CHAIN',
+  'ALCHEMY_POLYGON_CHAIN',
   'ALCHEMY_NETWORK',
+  'ALCHEMY_MUMBAI_NETWORK',
 ]
