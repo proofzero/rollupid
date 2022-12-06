@@ -37,6 +37,11 @@ query getNftsForAddress(
         name
         description
         timeLastUpdated
+        properties {
+          name
+          value
+          display
+        }
       }
       error
       contractMetadata {
