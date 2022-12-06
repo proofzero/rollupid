@@ -31,8 +31,10 @@ local_protocol = "http"
 # independently for each environment.
 
 [vars]
+DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:9696"
 COOKIE_DOMAIN = "localhost"
+STORAGE_NAMESPACE="console"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -67,6 +69,8 @@ routes = [
 DEPLOY_ENV = "dev"
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
 COOKIE_DOMAIN = "dev.threeid.xyz"
+STORAGE_NAMESPACE="console"
+
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -92,6 +96,8 @@ routes = [
 DEPLOY_ENV = "next"
 PASSPORT_URL = "https://passport-next.threeid.xyz"
 COOKIE_DOMAIN = "next.threeid.xyz"
+STORAGE_NAMESPACE="console"
+
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -118,3 +124,5 @@ routes = [
 DEPLOY_ENV = "current"
 PASSPORT_URL = "https://passport.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
+STORAGE_NAMESPACE="console"
+
