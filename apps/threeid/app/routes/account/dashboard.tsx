@@ -43,18 +43,6 @@ const completeSteps = [
     isCompleted: true,
   },
   {
-    title: 'Claim your PFP',
-    isCompleted: false,
-    description: (
-      <>
-        <Text className="mb-1 text-gray-400" size="sm" weight="normal">
-          Mint your very own 3ID 1/1 PFP.
-        </Text>
-        <a href="/onboard/mint">Click here to complete.</a>
-      </>
-    ),
-  },
-  {
     title: 'Configure Profile',
     description: (
       <>
@@ -83,8 +71,8 @@ const comingNext = [
 export default function Welcome() {
   const { isToken, displayname, profile } = useLoaderData()
 
-  completeSteps[1].isCompleted = isToken
-  completeSteps[2].isCompleted = Object.keys(profile || {}).length > 1
+  completeSteps[0].isCompleted = isToken
+  completeSteps[1].isCompleted = Object.keys(profile || {}).length > 1
 
   const percentage =
     (completeSteps.filter((step) => step.isCompleted).length /

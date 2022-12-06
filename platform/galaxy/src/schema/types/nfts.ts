@@ -44,9 +44,10 @@ export default /* GraphQL */ `
     raw: String
     gateway: String
   }
-  type NFTAttribute {
+  type NFTProperty {
+    name: String
     value: String
-    trait_type: String
+    display: String
   }
   type NFTMetadata {
     image: String
@@ -54,7 +55,7 @@ export default /* GraphQL */ `
     background_color: String
     name: String
     description: String
-    attributes: [NFTAttribute!]
+    properties: [NFTProperty]
     media: [NFTMedia!]!
     timeLastUpdated: String
   }

@@ -208,7 +208,7 @@ const ProfileNftCollection = ({
         </>
       )}
 
-      {!loading && !pageKey && loadedNfts.length > 0 && filters && (
+      {filters && (
         <div className="flex flex-col lg:flex-row justify-between items-center my-5">
           <select
             id="collection"
