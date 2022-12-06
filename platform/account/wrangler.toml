@@ -2,7 +2,7 @@ name = "account"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
-workers_dev = false
+workers_dev = true
 
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
@@ -20,7 +20,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Oort", service = "oort-dev" },
+  { binding = "Oort", service = "oort-devnet" },
 ]
 
 [env.next]
@@ -28,7 +28,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Oort", service = "oort-next" },
+  { binding = "Oort", service = "oort-testnet" },
 ]
 
 [env.current]
@@ -36,7 +36,7 @@ durable_objects.bindings = [
   { name = "Core", class_name = "Core" }
 ]
 services = [
-  { binding = "Oort", service = "oort-current" },
+  { binding = "Oort", service = "oort-mainnet" },
 ]
 
 [[migrations]]

@@ -5,6 +5,7 @@ import type { JWTPayload } from 'jose'
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 
 import { OortJwt } from '../clients/oort'
+import { ThreeIdURN } from '@kubelt/urns'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -18,9 +19,9 @@ export function parseJwt(token: string): JWTPayload {
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
   const parsedJwt = jwt && parseJwt(jwt)
-  const coreId = parsedJwt && parsedJwt.sub
+  const accountURN: ThreeIdURN<'account/${name}'> = parsedJwt && parsedJwt.sub
 
-  return next(root, args, { ...context, jwt, coreId }, info)
+  return next(root, args, { ...context, jwt, accountURN }, info)
 }
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {

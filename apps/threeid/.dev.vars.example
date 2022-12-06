@@ -1,9 +1,4 @@
 SESSION_SECRET="foobar"
-PASSPORT_URL="http://localhost:9696"
-COOKIE_DOMAIN="localhost"
-
-TWITTER_URL=https://twitter.com/threeid_xyz
-DISCORD_URL=https://discord.gg/threeid
 
 DATADOG_CLIENT_TOKEN=
 DATADOG_APPLICATION_ID=
@@ -11,11 +6,4 @@ DATADOG_SERVICE_NAME=3id-application
 DATADOG_ENV=local
 DATA_API_TOKEN=
 
-ETH_GOERLI_PK=
-
-MINTPFP_CONTRACT_ADDRESS=
 NFTAR_AUTHORIZATION = ""
-NFTAR_URL = ""
-VALID_CHAIN_ID_NAME=goerli
-
-TEST_ENV=false

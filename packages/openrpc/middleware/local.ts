@@ -49,7 +49,7 @@ export default openrpc.middleware(
 
     const allowedOrigin = '127.0.0.1'
 
-    if (connectingIP === allowedOrigin) {
+    if (!connectingIP || connectingIP === allowedOrigin) {
       // Allow middleware chain to continue.
       return context
     }

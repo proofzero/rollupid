@@ -27,6 +27,12 @@ services = [
 ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 PASSPORT_URL = "http://localhost:9696"
 COOKIE_DOMAIN = "localhost"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
+
 
 [site]
   bucket = "./public"
@@ -52,8 +58,13 @@ services = [
 
 ]
 [env.dev.vars]
-  PASSPORT_URL = "https://passport-dev.threeid.xyz"
-  COOKIE_DOMAIN = "dev.threeid.xyz"
+PASSPORT_URL = "https://passport-dev.threeid.xyz"
+COOKIE_DOMAIN = "dev.threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -70,8 +81,13 @@ services = [
 [env.next.build]
   command = "yarn build"
 [env.next.vars]
-  PASSPORT_URL = "https://passport-next.threeid.xyz"
-  COOKIE_DOMAIN = "next.threeid.xyz"
+PASSPORT_URL = "https://passport-next.threeid.xyz"
+COOKIE_DOMAIN = "next.threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
 
 
 # current (production)
@@ -90,5 +106,10 @@ services = [
 [env.current.build]
   command = "yarn build"
 [env.current.vars]
-  PASSPORT_URL = "https://passport.threeid.xyz"
-  COOKIE_DOMAIN = "threeid.xyz"
+PASSPORT_URL = "https://passport.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+NFTAR_URL="https://nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=1

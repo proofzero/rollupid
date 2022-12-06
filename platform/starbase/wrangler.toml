@@ -11,7 +11,7 @@ node_compat = true
 
 # Don't automatically expose this service at:
 # <worker-name>.<account-name>.workers.dev.
-workers_dev = false
+workers_dev = true
 
 # Services
 # -----------------------------------------------------------------------------

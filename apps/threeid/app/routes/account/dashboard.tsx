@@ -26,9 +26,11 @@ export const loader = async ({ request }) => {
   })
 
   const [isToken, displayname] = [
-    profileRes.profile?.pfp.isToken,
+    profileRes.profile?.pfp?.isToken,
     profileRes.profile?.displayName,
   ]
+  console.log('here')
+  console.log({ isToken, displayname, profile: profileRes.profile })
 
   return json({
     isToken,

@@ -2,6 +2,7 @@ name = "galaxy"
 main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
+wrangler_dev = true
 
 # Services binding for local development
 services = [
@@ -15,31 +16,47 @@ services = [
 port = 8787
 local_protocol = "http"
 
+[vars]
+ALCHEMY_CHAIN="eth"
+ALCHEMY_NETWORK="goerli"
+
 [env.dev]
 route = { pattern = "galaxy-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
   { binding = "Oort", service = "oort-devnet"},
-  { binding = "Account", service = "account" },
-  { binding = "Address", service = "address" },
-  { binding = "Icons", service = "icons" },
+  { binding = "Account", service = "account-dev" },
+  { binding = "Address", service = "address-dev" },
+  { binding = "Icons", service = "icons-dev" },
 ]
+
+[env.dev.vars]
+ALCHEMY_CHAIN="eth"
+ALCHEMY_NETWORK="goerli"
 
 [env.next]
 route = { pattern = "galaxy-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
   { binding = "Oort", service = "oort-testnet"},
-  { binding = "Account", service = "account" },
-  { binding = "Address", service = "address" },
-  { binding = "Icons", service = "icons" },
+  { binding = "Account", service = "account-next" },
+  { binding = "Address", service = "address-next" },
+  { binding = "Icons", service = "icons-next" },
 ]
+
+[env.next.vars]
+ALCHEMY_CHAIN="eth"
+ALCHEMY_NETWORK="goerli"
 
 [env.current]
 route = { pattern = "galaxy.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
 services = [
   { binding = "Oort", service = "oort-mainnet"},
-  { binding = "Account", service = "account" },
-  { binding = "Address", service = "address" },
-  { binding = "Icons", service = "icons" },
+  { binding = "Account", service = "account-current" },
+  { binding = "Address", service = "address-current" },
+  { binding = "Icons", service = "icons-current" },
 ]
+
+[env.current.vars]
+ALCHEMY_CHAIN="eth"
+ALCHEMY_NETWORK="mainnet"
 
 

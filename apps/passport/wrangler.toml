@@ -1,5 +1,7 @@
 name = "passport"
 
+workers_dev = true
+
 main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2022-04-05"
@@ -45,7 +47,7 @@ services = [
 THREEID_APP_URL = "https://app-dev.threeid.xyz"
 CONSOLE_APP_URL = "https://console-dev.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
-COOKIE_DOMAIN = "dev.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
 
 [env.next]
 routes = [
@@ -64,7 +66,7 @@ services = [
 THREEID_APP_URL = "https://app-next.threeid.xyz"
 CONSOLE_APP_URL = "https://console-next.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
-COOKIE_DOMAIN = "next.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
 
 [env.next.build]
   command = "yarn build"

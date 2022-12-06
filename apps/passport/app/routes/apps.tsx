@@ -1,8 +1,10 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { requireJWT } from '~/session.server'
 import gradientBG from '~/assets/gradient.jpg'
 import threeidIcon from '~/assets/3id-icon.svg'
 import consoleIcon from '~/assets/console-icon.svg'
+import { useLoaderData } from '@remix-run/react'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -10,10 +12,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
   await requireJWT(request)
 
-  return null
+  return json({
+    THREEID_APP_URL,
+    CONSOLE_APP_URL,
+  })
 }
 
 export default function Apps() {
+  const { THREEID_APP_URL, CONSOLE_APP_URL } = useLoaderData()
   const apps = [
     {
       name: 'My 3ID',
