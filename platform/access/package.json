@@ -32,6 +32,7 @@
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
+    "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "itty-router": "2.6.6",

@@ -1,4 +1,4 @@
-export const ADDRESS_OPTIONS = {
+export const ACCOUNT_OPTIONS = {
   length: 24,
 }
 
