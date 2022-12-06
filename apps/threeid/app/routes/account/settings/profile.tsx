@@ -318,7 +318,7 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex flex-col lg:flex-row lg:space-x-9">
-            <div className="flex-1">
+            <div className="flex-1 mb-4 lg:mb-0">
               <InputText
                 id="job"
                 heading="Job"
@@ -392,7 +392,12 @@ export default function AccountSettingsProfile() {
           )}
 
           <div className="flex lg:justify-end">
-            <Button isSubmit btnType={'primary'} btnSize={'xl'}>
+            <Button
+              isSubmit
+              btnType={'primary'}
+              btnSize={'xl'}
+              className="mb-4 lg:mb-0"
+            >
               Save
             </Button>
           </div>
