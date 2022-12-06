@@ -11,6 +11,15 @@ export type GetNFTsParams = {
 
 export type GetNFTsResult = unknown
 
+export type GetContractsForOwnerParams = {
+  owner: string
+  pageKey?: string
+  pageSize?: number
+  excludeFilters?: string[]
+}
+
+export type GetContractsForOwnerResult = unknown
+
 export type GetOwnersForTokenParams = {
   contractAddress: string
   tokenId: string
@@ -23,10 +32,12 @@ export type GetOwnersForTokenResult = {
 enum AlchemyNetwork {
   mainnet = 'mainnet',
   goerli = 'goerli',
+  mumbai = 'mumbai',
 }
 
 enum AlchemyChain {
   ethereum = 'eth',
+  polygon = 'polygon',
 }
 
 export type AlchemyClientConfig = {
@@ -102,6 +113,45 @@ export class AlchemyClient {
         throw buildError(
           e.status,
           `Error calling Alchemy getNFTs: ${e.message}`
+        )
+      })
+  }
+
+  async getContractsForOwner(
+    params: GetContractsForOwnerParams
+  ): Promise<GetContractsForOwnerResult> {
+    const url = this.getAPIURL('getContractsForOwner/')
+
+    url.searchParams.set('owner', params.owner)
+
+    params.pageKey && url.searchParams.set('pageKey', params.pageKey)
+
+    // Default and maximum page size is 100.
+    params.pageSize &&
+      url.searchParams.set('pageSize', params.pageSize.toString())
+
+    // To exclude spam or airdrop
+    params.excludeFilters &&
+      params.excludeFilters.forEach((filter) =>
+        url.searchParams.set('excludeFilters', filter)
+      )
+
+    return fetch(url.toString())
+      .then(async (r) => {
+        if (r.status !== 200) {
+          const errorText = await r.text()
+          console.error(errorText)
+          throw buildError(
+            r.status,
+            `Error calling Alchemy getContractsForOwner: ${errorText}`
+          )
+        }
+        return r.json()
+      })
+      .catch((e) => {
+        throw buildError(
+          e.status,
+          `Error calling Alchemy getContractsForOwner: ${e.message}`
         )
       })
   }
