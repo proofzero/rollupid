@@ -1,6 +1,6 @@
 # projects/console/wrangler.toml
 
-name = "starbase"
+name = "console"
 
 workers_dev = true
 main = "./build/index.js"
@@ -99,7 +99,7 @@ COOKIE_DOMAIN = "next.threeid.xyz"
 [env.current]
 
 services = [
-  { binding = "STARBASE", service = "starbase", environment = "production" }
+  { binding = "Starbaes", service = "starbase", environment = "production" }
 ]
 
 # kv_namespaces = [

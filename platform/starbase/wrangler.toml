@@ -24,9 +24,9 @@ services = [
 # -----------------------------------------------------------------------------
 
 durable_objects.bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
-  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
-  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
+  { name = "StarbaesContract", class_name = "StarbaseContract" },
+  { name = "StarbaseUser", class_name = "StarbaseUser" },
 ]
 
 # KV
@@ -97,9 +97,7 @@ services = [
 ]
 
 durable_objects.bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
-  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
-  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
 ]
 
 kv_namespaces = [
@@ -119,10 +117,7 @@ services = [
 ]
 
 durable_objects.bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
-  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
-  { name = "STARBASE_USER", class_name = "StarbaseUser" },
-]
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
 
 kv_namespaces = [
   { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
@@ -139,9 +134,7 @@ PLATFORM_OWNER = "@kubelt"
 [env.current]
 
 durable_objects.bindings = [
-  { name = "STARBASE_APP", class_name = "StarbaseApplication" },
-  { name = "STARBASE_CONTRACT", class_name = "StarbaseContract" },
-  { name = "STARBASE_USER", class_name = "StarbaseUser" },
+  { name = "StarbaseApp", class_name = "StarbaseApplication" },
 ]
 
 kv_namespaces = [
