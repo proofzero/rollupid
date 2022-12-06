@@ -31,12 +31,9 @@ import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 import { default as mwOort } from '@kubelt/openrpc/middleware/oort'
 
-import { StarbaseApplication } from '@kubelt/do.starbase-application'
-import { StarbaseContract } from '@kubelt/do.starbase-contract'
-import { StarbaseUser } from '@kubelt/do.starbase-user'
-
 import { required as requiredEnv } from './env'
-import * as oauth from './oauth'
+import { StarbaseApplication } from './nodes/application'
+import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
 
@@ -57,33 +54,29 @@ import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 // -----------------------------------------------------------------------------
 // We need to export any Durable Objects we use.
 
-export { StarbaseApplication, StarbaseContract, StarbaseUser }
+export { StarbaseApplication }
 
 // Definitions
 // -----------------------------------------------------------------------------
 
 // Context key for a KV store binding containing fixture data.
-const KEY_FIXTURES = 'com.kubelt.kv/fixtures'
+const KEY_FIXTURES = 'xyz.threeid.kv/fixtures'
 // Context key for a KV store binding containing a client ID => app ID mapping.
-const KEY_LOOKUP = 'com.kubelt.kv/lookup'
+const KEY_LOOKUP = 'xyz.threeid.kv/lookup'
 
 // Context key for the KV value containing the Datadog API token.
 const KEY_DATADOG = 'com.datadog/token'
 
 // Context key for the JWT associated with the incoming request.
-const KEY_TOKEN = 'com.kubelt.security/jwt'
+const KEY_TOKEN = 'xyz.threeid.security/jwt'
 // Context key for the user ID associated with the request (if any).
-const KEY_USER_ID = 'com.kubelt.security/user.id'
+const KEY_USER_ID = 'xyz.threeid.security/user.id'
 
 // Context key for a KV value containing name of current environment.
-const KEY_ENVIRONMENT = 'com.kubelt.value/environment'
+const KEY_ENVIRONMENT = 'xyz.threeid.value/environment'
 
 // Context key for looking up StarbaseApplication durable object.
-const KEY_APPLICATION = 'com.kubelt.object/application'
-// Context key for looking up StarbaseContract durable object.
-const KEY_CONTRACT = 'com.kubelt.object/contract'
-// Context key for looking up StarbaseUser durable object.
-const KEY_USER = 'com.kubelt.object/user'
+const KEY_APPLICATION = 'xyz.threeid.object/application'
 
 // Scopes
 // -----------------------------------------------------------------------------
@@ -723,15 +716,7 @@ export interface Env {
 
   // A component representing a single Starbase application. This includes an OAuth
   // configuration profile and other metadata about the application.
-  STARBASE_APP: StarbaseApplication
-
-  // A component representing a proxied smart contract. Can be configured to proxy requests
-  // to the remote contract, providing value-added capabilities along the way.
-  STARBASE_CONTRACT: StarbaseContract
-
-  // A component representing a Starbase user. Manages the references to other components
-  // That the user owns.
-  STARBASE_USER: StarbaseUser
+  StarbaseApp: StarbaseApplication
 
   // Buckets
   // ---------------------------------------------------------------------------
@@ -826,11 +811,7 @@ export default {
     context.set(KEY_LOOKUP, env.LOOKUP)
 
     // A durable object containing Starbase App state.
-    context.set(KEY_APPLICATION, env.STARBASE_APP)
-    // A durable object containing Starbase App state.
-    context.set(KEY_CONTRACT, env.STARBASE_CONTRACT)
-    // A durable object containing Starbase App state.
-    context.set(KEY_USER, env.STARBASE_USER)
+    context.set(KEY_APPLICATION, env.StarbaseApp)
 
     // NB: the handler clones the request; we don't need to do it here.
     return rpcHandler(request, context)
