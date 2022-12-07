@@ -78,8 +78,10 @@ const nftsResolvers: Resolvers = {
       let ownedNfts: any[] = []
 
       try {
-        const ethNfts = await getAllNfts(ethClient, owner, contractAddresses)
-        const polyNfts = await getAllNfts(polyClient, owner, contractAddresses)
+        const [ethNfts, polyNfts] = await Promise.all([
+          getAllNfts(ethClient, owner, contractAddresses),
+          getAllNfts(polyClient, owner, contractAddresses),
+        ])
 
         ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
       } catch (ex) {
@@ -202,6 +204,9 @@ const nftsResolvers: Resolvers = {
 
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
+
+        console.log(EthOwnedNfts[0])
+
         EthOwnedNfts.forEach((NFT: any) => {
           NFT.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
           if (
