@@ -71,9 +71,6 @@ export default /* GraphQL */ `
   }
   type NFTs {
     ownedNfts: [NFT!]!
-    pageKey: String
-    totalCount: String
-    blockHash: String
   }
   type NFTContract {
     address: String
