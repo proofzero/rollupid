@@ -1,6 +1,6 @@
 name = "passport"
 
-workers_dev = true
+workers_dev = false
 
 main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
