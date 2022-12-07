@@ -1,28 +1,22 @@
 // @kubelt/platform.edges:db/data-source.ts
 
-import "reflect-metadata"
+import 'reflect-metadata'
 
-import { DataSource } from "typeorm"
+import { DataSource } from 'typeorm'
 
-import { Edge } from "./entity/Edge"
-import { Node } from "./entity/Node"
-import { Permission } from "./entity/Permission"
-import { URNQComponent } from "./entity/URNQComponent"
-import { URNRComponent } from "./entity/URNRComponent"
+import { Edge } from './entity/Edge'
+import { Node } from './entity/Node'
+import { Permission } from './entity/Permission'
+import { URNQComponent } from './entity/URNQComponent'
+import { URNRComponent } from './entity/URNRComponent'
 
 // The list of entities in the database.
-export const ENTITIES = [
-  Edge,
-  Node,
-  Permission,
-  URNQComponent,
-  URNRComponent,
-]
+export const ENTITIES = [Edge, Node, Permission, URNQComponent, URNRComponent]
 
 // In-memory database for testing.
 export const MemDataSource = new DataSource({
-  type: "better-sqlite3",
-  database: ":memory:",
+  type: 'better-sqlite3',
+  database: ':memory:',
   synchronize: true,
   logging: false,
   entities: ENTITIES,
@@ -32,8 +26,8 @@ export const MemDataSource = new DataSource({
 
 // Local SQLite3 database file.
 export const FileDataSource = new DataSource({
-  type: "better-sqlite3",
-  database: ".wrangler/state/d1/EDGES.sqlite3",
+  type: 'better-sqlite3',
+  database: '.wrangler/state/d1/EDGES.sqlite3',
   synchronize: true,
   logging: false,
   entities: ENTITIES,

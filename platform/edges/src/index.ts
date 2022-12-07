@@ -13,11 +13,7 @@ import * as openrpc from '@kubelt/openrpc'
 
 import * as urns from 'urns'
 
-import type {
-  RpcContext,
-  RpcRequest,
-  RpcService,
-} from '@kubelt/openrpc'
+import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
@@ -297,7 +293,7 @@ const kb_findNode = openrpc.method(schema, {
     async (
       service: Readonly<RpcService>,
       request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>,
+      context: Readonly<RpcContext>
     ) => {
       const g: Graph = context.get(KEY_GRAPH)
 

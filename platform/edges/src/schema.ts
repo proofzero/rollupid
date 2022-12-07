@@ -40,14 +40,14 @@ const rpcSchema: RpcSchema = {
           schema: {
             // TODO define a NodeID type
             type: 'string',
-          }
+          },
         },
         {
           name: 'direction',
           schema: {
             type: 'string',
             enum: ['incoming', 'outgoing'],
-          }
+          },
         },
       ],
       result: {
@@ -143,9 +143,7 @@ const rpcSchema: RpcSchema = {
       result: {
         name: 'nodes',
         description: 'A list of any nodes matching the search parameters',
-        schema: {
-
-        },
+        schema: {},
       },
       errors: [],
     },
