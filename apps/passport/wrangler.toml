@@ -30,6 +30,7 @@ THREEID_APP_URL = "http://localhost:9797"
 CONSOLE_APP_URL = "http://localhost:9898"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 
 [env.dev]
 routes = [
@@ -48,6 +49,8 @@ THREEID_APP_URL = "https://app-dev.threeid.xyz"
 CONSOLE_APP_URL = "https://console-dev.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+
 
 [env.next]
 routes = [
@@ -67,6 +70,8 @@ THREEID_APP_URL = "https://app-next.threeid.xyz"
 CONSOLE_APP_URL = "https://console-next.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+
 
 [env.next.build]
   command = "yarn build"
@@ -89,6 +94,8 @@ THREEID_APP_URL = "https://app.threeid.xyz"
 CONSOLE_APP_URL = "https://console.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+
 
 [env.current.build]
   command = "yarn build"
