@@ -188,3 +188,39 @@ export class AlchemyClient {
       })
   }
 }
+
+export const NFTPropertyMapper = (nfts: any[]) =>
+  nfts.map((nft: any) => {
+    let properties: {
+      name: string
+      value: any
+      display: string
+    }[] = []
+
+    // TODO: is this here b/c pfp does not conform to standard?
+    if (nft.metadata?.properties) {
+      const validProps = Object.keys(nft.metadata.properties)
+        .filter((k) => typeof nft.metadata.properties[k] !== 'object')
+        .map((k) => ({
+          name: k,
+          value: nft.metadata.properties[k],
+          display: typeof nft.metadata.properties[k],
+        }))
+
+      properties = properties.concat(validProps)
+    }
+
+    if (nft.metadata.attributes?.length) {
+      const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
+        name: a.trait_type,
+        value: a.value,
+        display: a.display_type || 'string',
+      }))
+
+      properties = properties.concat(mappedAttributes)
+    }
+
+    nft.metadata.properties = properties
+
+    return nft
+  })
