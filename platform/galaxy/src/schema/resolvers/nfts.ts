@@ -96,15 +96,17 @@ const nftsResolvers: Resolvers = {
       {
         owner,
         excludeFilters,
+        pageSize = 1,
       }: {
         owner: string
         excludeFilters: string[]
+        pageSize: number
       },
       { env }: ResolverContext
     ) => {
       if (!owner) throw `Error: missing required argument 'owner'`
 
-      let ownedNfts: any[] = []
+      let contracts: any[] = []
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
@@ -115,7 +117,7 @@ const nftsResolvers: Resolvers = {
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_POLYGON_KEY,
         chain: 'polygon',
-        network: env.ALCHEMY_POLYGON_NETWORK,
+        network: 'mainnet', //env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
       try {
@@ -139,26 +141,60 @@ const nftsResolvers: Resolvers = {
           alchemyClient.getNFTs({
             owner,
             contractAddresses: ethContractsAddresses,
-            pageSize: 1,
+            pageSize,
           }),
           alchemyPolygonClient.getNFTs({
             owner,
             contractAddresses: polygonContractsAddresses,
-            pageSize: 1,
+            pageSize,
           }),
         ])
+
+        const ethCollectionsHashMap: any = {}
+        const polyCollectionsHashMap: any = {}
 
         ethNFTs.ownedNfts = NFTPropertyMapper(ethNFTs.ownedNfts)
         polygonNFTs.ownedNfts = NFTPropertyMapper(polygonNFTs.ownedNfts)
 
-        ownedNfts = ownedNfts.concat(ethNFTs.ownedNfts, polygonNFTs.ownedNfts)
-        console.log(ownedNfts)
+        ethNFTs.ownedNfts.forEach((NFT: any) => {
+          if (
+            ethCollectionsHashMap[`${NFT.contract.address}`] &&
+            ethCollectionsHashMap[`${NFT.contract.address}`].length
+          ) {
+            ethCollectionsHashMap[`${NFT.contract.address}`].push(NFT)
+          } else {
+            ethCollectionsHashMap[`${NFT.contract.address}`] = [NFT]
+          }
+        })
+
+        polygonNFTs.ownedNfts.forEach((NFT: any) => {
+          if (
+            polyCollectionsHashMap[`${NFT.contract.address}`] &&
+            polyCollectionsHashMap[`${NFT.contract.address}`].length
+          ) {
+            polyCollectionsHashMap[`${NFT.contract.address}`].push(NFT)
+          } else {
+            polyCollectionsHashMap[`${NFT.contract.address}`] = [NFT]
+          }
+        })
+
+        ethContracts.contracts.forEach((contract: any) => {
+          contract.ownedNfts = ethCollectionsHashMap[`${contract.address}`]
+          contract.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
+        })
+        polygonContracts.contracts.forEach((contract: any) => {
+          contract.ownedNfts = polyCollectionsHashMap[`${contract.address}`]
+          contract.chain = {
+            chain: 'polygon',
+            network: env.ALCHEMY_POLYGON_NETWORK,
+          }
+        })
+        contracts = ethContracts.contracts.concat(polygonContracts.contracts)
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
-
       return {
-        ownedNfts,
+        contracts,
       }
     },
     //@ts-ignore

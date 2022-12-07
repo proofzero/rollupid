@@ -72,6 +72,10 @@ export default /* GraphQL */ `
   type NFTs {
     ownedNfts: [NFT!]!
   }
+  type Chain {
+    chain: String
+    network: String
+  }
   type NFTContract {
     address: String
     totalBalance: Int
@@ -82,15 +86,19 @@ export default /* GraphQL */ `
     tokenType: String
     media: NFTMedia
     opensea: OpenSeaMetadata
+    ownedNfts: [NFT!]
+    chain: Chain
   }
   type NFTContracts {
     contracts: [NFTContract!]!
-    pageKey: String
-    totalCount: String
   }
   type Query {
     nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
-    nftsForAddressContracts(owner: String!, excludeFilters: [String]): NFTs
+    nftsForAddressContracts(
+      owner: String!
+      excludeFilters: [String]
+      pageSize: Int
+    ): NFTContracts
     contractsForAddress(
       owner: String!
       pageKey: String
