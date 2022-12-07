@@ -40,9 +40,6 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
-    "@kubelt/do.starbase-application": "workspace:*",
-    "@kubelt/do.starbase-contract": "workspace:*",
-    "@kubelt/do.starbase-user": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "@kubelt/security": "workspace:*",
