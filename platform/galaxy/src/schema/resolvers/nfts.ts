@@ -126,13 +126,15 @@ const nftsResolvers: Resolvers = {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters: ['SPAM'],
           }),
           alchemyPolygonClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters: ['SPAM'],
           }),
         ])
+
+        console.log('EVEN HERE', ethContracts)
 
         const ethContractsAddresses = ethContracts.contracts.map(
           (contract: any) => contract.address
