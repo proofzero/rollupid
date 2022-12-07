@@ -43,7 +43,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: platform/address
-          command: publish
+          command: publish --env next
           environment: next
           secrets: |
             ENVIRONMENT
