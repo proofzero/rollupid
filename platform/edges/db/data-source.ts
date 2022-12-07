@@ -21,7 +21,7 @@ export const ENTITIES = [
 
 // In-memory database for testing.
 export const MemDataSource = new DataSource({
-  type: "sqlite",
+  type: "better-sqlite3",
   database: ":memory:",
   synchronize: true,
   logging: false,
@@ -32,7 +32,7 @@ export const MemDataSource = new DataSource({
 
 // Local SQLite3 database file.
 export const FileDataSource = new DataSource({
-  type: "sqlite",
+  type: "better-sqlite3",
   database: ".wrangler/state/d1/EDGES.sqlite3",
   synchronize: true,
   logging: false,
@@ -78,7 +78,7 @@ export const LocalDataSource = new DataSource({
 })
 */
 
-// Remove wrangler D1
+// Remote wrangler D1
 /*
 export const RemoteDataSource = new DataSource({
   type: "d1",

@@ -7,11 +7,9 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
 } from "typeorm"
 
 import { Edge } from './Edge'
-import { Permission } from './Permission'
 import { URNQComponent } from './URNQComponent'
 import { URNRComponent } from './URNRComponent'
 

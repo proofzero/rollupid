@@ -96,8 +96,7 @@ FileDataSource.initialize().then(async () => {
   })
   console.log("Loaded edges: ", JSON.stringify(edges, null, 2))
 
-
-}).catch((error: any) => {
+}).catch((error: unknown) => {
   console.log(error)
 })
 

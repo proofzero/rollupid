@@ -7,8 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
-import { Node } from './Node'
-
 // Definitions
 // -----------------------------------------------------------------------------
 

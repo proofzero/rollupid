@@ -13,10 +13,7 @@ import * as openrpc from '@kubelt/openrpc'
 
 import * as urns from 'urns'
 
-import invariant from 'tiny-invariant'
-
 import type {
-  RpcAuthHandler,
   RpcContext,
   RpcRequest,
   RpcService,
@@ -24,11 +21,9 @@ import type {
 
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
-import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
-
 import type { EdgeTag, Graph } from '@kubelt/graph'
 
-import { EdgeDirection, EdgeSpace } from '@kubelt/graph'
+import { EdgeDirection } from '@kubelt/graph'
 
 import * as graph from '@kubelt/graph'
 
@@ -184,9 +179,8 @@ const kb_getEdges = openrpc.method(schema, {
           message: 'missing node URN',
         })
       }
-      let urn: urns.ParsedURN
       try {
-        urn = urns.parseURN(nodeId)
+        urns.parseURN(nodeId)
       } catch (e) {
         return openrpc.error(request, {
           code: 2,
@@ -249,9 +243,8 @@ const kb_rmEdge = openrpc.method(schema, {
           message: 'missing source node URN',
         })
       }
-      let srcURN: urns.ParsedURN
       try {
-        srcURN = urns.parseURN(srcId)
+        urns.parseURN(srcId)
       } catch (e) {
         return openrpc.error(request, {
           code: 2,
@@ -268,9 +261,8 @@ const kb_rmEdge = openrpc.method(schema, {
           message: 'missing destination node URN',
         })
       }
-      let dstURN: urns.ParsedURN
       try {
-        dstURN = urns.parseURN(dstId)
+        urns.parseURN(dstId)
       } catch (e) {
         return openrpc.error(request, {
           code: 4,

@@ -18,6 +18,9 @@
     "@typescript-eslint",
     "eslint-plugin-tsdoc"
   ],
+  "ignorePatterns": [
+    "dist/**/*"
+  ],
   "rules": {
     "@typescript-eslint/no-var-requires": "off",
     "tsdoc/syntax": "warn"
