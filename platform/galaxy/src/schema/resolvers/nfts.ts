@@ -91,6 +91,76 @@ const nftsResolvers: Resolvers = {
       }
     },
     //@ts-ignore
+    nftsForContractsForAddress: async (
+      _parent: any,
+      {
+        owner,
+        excludeFilters,
+      }: {
+        owner: string
+        excludeFilters: string[]
+      },
+      { env }: ResolverContext
+    ) => {
+      if (!owner) throw `Error: missing required argument 'owner'`
+
+      let ownedNfts: any[] = []
+
+      const alchemyClient: AlchemyClient = new AlchemyClient({
+        key: env.ALCHEMY_ETH_KEY,
+        chain: 'eth',
+        network: env.ALCHEMY_ETH_NETWORK,
+      } as AlchemyClientConfig)
+
+      const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
+        key: env.ALCHEMY_POLYGON_KEY,
+        chain: 'polygon',
+        network: env.ALCHEMY_POLYGON_NETWORK,
+      } as AlchemyClientConfig)
+
+      try {
+        const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
+          alchemyClient.getContractsForOwner({ owner }),
+          alchemyClient.getContractsForOwner({ owner }),
+        ])
+
+        const ethContractsAddresses = ethContracts.map(
+          (contract: any) => contract.address
+        )
+
+        const polygonContractsAddresses = polygonContracts.map(
+          (contract: any) => contract.address
+        )
+
+        // TODO: Max limit on Alchemy is 45 contract addresses per request.
+        // Gotta go over the limit
+        const [ethNFTs, polygonNFTs]: [any, any] = await Promise.all([
+          // 1 NFT per contract
+          alchemyClient.getNFTs({
+            owner,
+            contractAddresses: ethContractsAddresses,
+            pageSize: 1,
+          }),
+          alchemyPolygonClient.getNFTs({
+            owner,
+            contractAddresses: polygonContractsAddresses,
+            pageSize: 1,
+          }),
+        ])
+
+        ethNFTs.ownedNfts = NFTPropertyMapper(ethNFTs.ownedNfts)
+        polygonNFTs.ownedNfts = NFTPropertyMapper(polygonNFTs.ownedNfts)
+
+        ownedNfts = ownedNfts.concat(ethNFTs, polygonNFTs)
+      } catch (ex) {
+        console.error(new GraphQLYogaError(ex as string))
+      }
+
+      return {
+        ownedNfts,
+      }
+    },
+    //@ts-ignore
     contractsForAddress: async (
       _parent: any,
       {
