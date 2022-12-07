@@ -113,7 +113,7 @@ const nftsResolvers: Resolvers = {
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
         chain: 'eth',
-        network: 'mainnet', //env.ALCHEMY_ETH_NETWORK,
+        network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
@@ -200,6 +200,8 @@ const nftsResolvers: Resolvers = {
         const ethCollectionsHashMap: any = {}
         const polyCollectionsHashMap: any = {}
 
+        // Mapper doesn't work on some vitaliks' nfts for
+        // various reasons "Cannot create property 'properties' on string" - e.g.
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
 
