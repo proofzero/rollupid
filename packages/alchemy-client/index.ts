@@ -5,8 +5,6 @@ function buildError(code: number, message: string) {
 export type GetNFTsParams = {
   owner: string
   contractAddresses: string[]
-  pageKey?: string
-  pageSize?: number
 }
 
 export type GetNFTsResult = unknown
@@ -81,15 +79,10 @@ export class AlchemyClient {
   }
 
   async getNFTs(params: GetNFTsParams): Promise<GetNFTsResult> {
+    // Setup initial call URL
     const url = this.getAPIURL('getNFTs/')
 
     url.searchParams.set('owner', params.owner)
-
-    params.pageKey && url.searchParams.set('pageKey', params.pageKey)
-
-    // Default and maximum page size is 100.
-    params.pageSize &&
-      url.searchParams.set('pageSize', params.pageSize.toString())
 
     if (params.contractAddresses) {
       params.contractAddresses.forEach((address) => {
@@ -97,24 +90,51 @@ export class AlchemyClient {
       })
     }
 
-    return fetch(url.toString())
-      .then(async (r) => {
-        if (r.status !== 200) {
-          const errorText = await r.text()
+    let nfts: GetNFTsResult[] = []
+
+    // We want to be able
+    // to recover from failed
+    // requests and just return
+    // empty array; maybe.
+    try {
+      // TODO:
+      // Maybe pagination should be done in Galaxy resolver
+      let pageKey
+      do {
+        // First call will be bare
+        // if pageKey is detected
+        // subsequent calls will include that
+        pageKey && url.searchParams.set('pageKey', pageKey)
+
+        const res = await fetch(url.toString())
+        if (res.status !== 200) {
+          const errorText = await res.text()
           console.error(errorText)
           throw buildError(
-            r.status,
+            res.status,
             `Error calling Alchemy getNFTs: ${errorText}`
           )
         }
-        return r.json()
-      })
-      .catch((e) => {
-        throw buildError(
-          e.status,
-          `Error calling Alchemy getNFTs: ${e.message}`
-        )
-      })
+
+        // Mapping result to needed properties
+        const { ownedNfts, pageKey: resPageKey } = (await res.json()) as {
+          ownedNfts: unknown[]
+          pageKey: string | null
+        }
+
+        nfts.push(ownedNfts)
+
+        pageKey = resPageKey
+      } while (pageKey)
+    } catch (ex) {
+      // Should make error
+      // inspectable
+      // without fully
+      // breaking frontend
+      console.error(ex)
+    }
+
+    return nfts
   }
 
   async getContractsForOwner(

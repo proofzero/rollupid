@@ -28,13 +28,9 @@ const nftsResolvers: Resolvers = {
       _parent: any,
       {
         owner,
-        pageKey,
-        pageSize,
         contractAddresses,
       }: {
         owner: string
-        pageKey: string
-        pageSize: number
         contractAddresses: string[]
       },
       { env }: ResolverContext
@@ -61,14 +57,10 @@ const nftsResolvers: Resolvers = {
         let [alchemyRes, alchemyPolygonRes] = await Promise.all([
           alchemyClient.getNFTs({
             owner,
-            pageKey,
-            pageSize,
             contractAddresses,
           } as GetNFTsParams) as any,
           alchemyPolygonClient.getNFTs({
             owner,
-            pageKey,
-            pageSize,
             contractAddresses,
           } as GetNFTsParams) as any,
         ])
