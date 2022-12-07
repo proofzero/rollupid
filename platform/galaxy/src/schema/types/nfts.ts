@@ -71,9 +71,6 @@ export default /* GraphQL */ `
   }
   type NFTs {
     ownedNfts: [NFT!]!
-    pageKey: String
-    totalCount: String
-    blockHash: String
   }
   type NFTContract {
     address: String
@@ -92,12 +89,7 @@ export default /* GraphQL */ `
     totalCount: String
   }
   type Query {
-    nftsForAddress(
-      owner: String!
-      pageKey: String
-      pageSize: Int
-      contractAddresses: [String]
-    ): NFTs
+    nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
     contractsForAddress(
       owner: String!
       pageKey: String
