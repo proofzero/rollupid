@@ -1,8 +1,5 @@
 query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
   nftsForAddress(owner: $owner, contractAddresses: $contractAddresses) {
-    pageKey
-    totalCount
-    blockHash
     ownedNfts {
       contract {
         address
