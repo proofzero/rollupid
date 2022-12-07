@@ -10,19 +10,33 @@ import { Permission } from "./entity/Permission"
 import { URNQComponent } from "./entity/URNQComponent"
 import { URNRComponent } from "./entity/URNRComponent"
 
+// The list of entities in the database.
+export const ENTITIES = [
+  Edge,
+  Node,
+  Permission,
+  URNQComponent,
+  URNRComponent,
+]
+
+// In-memory database for testing.
+export const MemDataSource = new DataSource({
+  type: "sqlite",
+  database: ":memory:",
+  synchronize: true,
+  logging: false,
+  entities: ENTITIES,
+  migrations: [],
+  subscribers: [],
+})
+
 // Local SQLite3 database file.
 export const FileDataSource = new DataSource({
   type: "sqlite",
   database: ".wrangler/state/d1/EDGES.sqlite3",
   synchronize: true,
   logging: false,
-  entities: [
-    Edge,
-    Node,
-    Permission,
-    URNQComponent,
-    URNRComponent,
-  ],
+  entities: ENTITIES,
   migrations: [],
   subscribers: [],
 })

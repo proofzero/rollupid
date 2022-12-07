@@ -29,6 +29,8 @@ export interface Graph {
 }
 
 export interface Edge {
+  // The edge identifier
+  id: number
   // The URN of the source node, where the edge originates.
   srcUrn: AnyURN
   // The URN of the sink node, where the edge terminates.

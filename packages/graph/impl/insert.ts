@@ -96,7 +96,7 @@ export async function node(g: Graph, urn: AnyURN) {
       const qcResult = await g.db.batch(selects)
       // Collect an array of row IDs for the table rows containing q-components.
       const rowIds = _.map(qcResult[0].results, (o) => {
-        return o.id
+        return _.get(o, 'id', -1)
       })
       // Add an entry to the join table for each q-component row that is
       // used in the node URN.
@@ -127,8 +127,8 @@ export async function node(g: Graph, urn: AnyURN) {
       }
       const rcResult = await g.db.batch(selects)
       // Collect an array of row IDs fro the table rows containing r-components.
-      const rowIds = _.map(rcResult[0].results, (o) => {
-        return o.id
+      const rowIds = _.map(rcResult[0].results, (o: Object) => {
+        return _.get(o, 'id', -1)
       })
       // Add an entry to the join table for each r-component row that is
       // used in the node URN.
@@ -179,7 +179,7 @@ export async function edge(
       .then(async (result) => {
         // TODO check for error; there is a .success property in the
         // result but referring to it causes a type error.
-        if (result.success === false) {
+        if (_.get(result, 'success', false) === false) {
           reject()
         }
 
@@ -189,7 +189,7 @@ export async function edge(
         .bind(srcParam, dstParam, tagParam)
         .first()
 
-        resolve(edge)
+        resolve(_.get(edge, 'id', -1))
       })
       .catch((e: any) => {
         reject(e)

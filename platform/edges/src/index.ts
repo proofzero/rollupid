@@ -309,13 +309,25 @@ const kb_findNode = openrpc.method(schema, {
     ) => {
       const g: Graph = context.get(KEY_GRAPH)
 
-      // TODO find node by:
-      // - nid
-      // - nss
+      // TODO find node(s) by:
+      // - nid: direct match
+      // - nss: direct match
       // - f
       // - qc
       // - rc
-      //const edges = graph.node.find(nid, nss)
+      // TODO support pagination
+
+      /*
+      const edges = graph.find('node', {
+        equals: {
+          nid,
+          nss,
+        },
+        contains: {
+          rcomp: 'foo',
+        }
+      })
+      */
 
       return openrpc.response(request, {
         warn: 'not yet implemented',

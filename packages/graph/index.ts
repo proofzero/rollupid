@@ -62,7 +62,7 @@ export function node(nid: string, nss: string): AnyURN {
 // -----------------------------------------------------------------------------
 
 /**
- * Return an edge tag constructred from the given tag string.
+ * Return an edge tag constructed from the given tag string.
  */
 export function edge(tag: string): EdgeTag {
   return impl.edge(tag)
