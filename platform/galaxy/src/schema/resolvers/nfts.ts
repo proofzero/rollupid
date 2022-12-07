@@ -113,7 +113,7 @@ const nftsResolvers: Resolvers = {
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
         chain: 'eth',
-        network: env.ALCHEMY_ETH_NETWORK,
+        network: 'mainnet', //env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
@@ -154,7 +154,7 @@ const nftsResolvers: Resolvers = {
           const ethBatches = sliceIntoChunks(ethContractsAddresses, 45)
           const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 45)
 
-          const [ethNFTs, polygonNFTs]: [any, any] = await Promise.all([
+          const ethNFTs: any = await Promise.all(
             ethBatches.map(async (batch) => {
               const res = await alchemyClient.getNFTs({
                 owner,
@@ -162,21 +162,23 @@ const nftsResolvers: Resolvers = {
                 pageSize,
               })
               return res
-            }),
+            })
+          )
+          const polygonNFTs: any = await Promise.all(
             polygonBatches.map(async (batch) => {
               return await alchemyPolygonClient.getNFTs({
                 owner,
                 contractAddresses: batch,
                 pageSize,
               })
-            }),
-          ])
+            })
+          )
 
           ethNFTs.forEach((batch: any) => {
-            EthOwnedNfts.push(batch.ownedNfts[0])
+            EthOwnedNfts.push(...batch.ownedNfts)
           })
           polygonNFTs.forEach((batch: any) => {
-            PolygonOwnedNfts.push(batch.ownedNfts[0])
+            PolygonOwnedNfts.push(...batch.ownedNfts)
           })
         } // In case we have <= 45 nfts
         else {
