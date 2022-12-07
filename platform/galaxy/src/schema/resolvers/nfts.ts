@@ -93,7 +93,7 @@ const nftsResolvers: Resolvers = {
       }
     },
     //@ts-ignore
-    nftsForAddressContracts: async (
+    contractsForAddress: async (
       _parent: any,
       {
         owner,
@@ -126,11 +126,11 @@ const nftsResolvers: Resolvers = {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM'],
+            excludeFilters: ['SPAM', 'AIRDROPS'],
           }),
           alchemyPolygonClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM'],
+            excludeFilters: ['SPAM', 'AIRDROPS'],
           }),
         ])
 
@@ -205,8 +205,6 @@ const nftsResolvers: Resolvers = {
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
 
-        console.log(EthOwnedNfts[0])
-
         EthOwnedNfts.forEach((NFT: any) => {
           NFT.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
           if (
@@ -248,59 +246,6 @@ const nftsResolvers: Resolvers = {
       }
       return {
         contracts,
-      }
-    },
-    //@ts-ignore
-    contractsForAddress: async (
-      _parent: any,
-      {
-        owner,
-        pageKey,
-        pageSize,
-        excludeFilters,
-      }: {
-        owner: string
-        pageKey: string
-        pageSize: number
-        excludeFilters: string[]
-      },
-      { env }: ResolverContext
-    ) => {
-      if (!owner) throw `Error: missing required argument 'owner'`
-
-      const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_ETH_KEY,
-        chain: 'eth',
-        network: env.ALCHEMY_ETH_NETWORK,
-      } as AlchemyClientConfig)
-
-      const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_POLYGON_KEY,
-        chain: 'polygon',
-        network: env.ALCHEMY_POLYGON_NETWORK,
-      } as AlchemyClientConfig)
-
-      // TODO: We need to reconsider pagination
-      // here also
-      let alchemyRes, alchemyPolygonRes
-      try {
-        ;[alchemyRes, alchemyPolygonRes] = await Promise.all([
-          alchemyClient.getContractsForOwner({
-            owner,
-            pageKey,
-            pageSize,
-            excludeFilters,
-          } as GetContractsForOwnerParams) as any,
-          alchemyPolygonClient.getContractsForOwner({
-            owner,
-            pageKey,
-            pageSize,
-            excludeFilters,
-          } as GetContractsForOwnerParams) as any,
-        ])
-        return alchemyRes
-      } catch (ex) {
-        throw new GraphQLYogaError(ex as string)
       }
     },
   },
