@@ -21,7 +21,7 @@ ALCHEMY_CHAIN="eth"
 ALCHEMY_NETWORK="goerli"
 
 [env.dev]
-route = { pattern = "galaxy-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
   { binding = "Oort", service = "oort-devnet"},
   { binding = "Account", service = "account-dev" },
@@ -34,7 +34,7 @@ ALCHEMY_CHAIN="eth"
 ALCHEMY_NETWORK="goerli"
 
 [env.next]
-route = { pattern = "galaxy-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
   { binding = "Oort", service = "oort-testnet"},
   { binding = "Account", service = "account-next" },
@@ -47,7 +47,7 @@ ALCHEMY_CHAIN="eth"
 ALCHEMY_NETWORK="goerli"
 
 [env.current]
-route = { pattern = "galaxy.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
   { binding = "Oort", service = "oort-mainnet"},
   { binding = "Account", service = "account-current" },
