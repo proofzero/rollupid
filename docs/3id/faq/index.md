@@ -2,11 +2,15 @@
 description: Frequently Asked Questions for the 3ID project.
 ---
 
-Email me questions personally at [alex@kubelt.com](mailto:alex@kubelt.com) or see below for a Discord link to chat with the team.
+If your question isn't answered here get in touch to ask for help directly:
 
-## What is a "core"?
+* [Join Discord](https://discord.gg/threeid) to chat with the team.
+* Post questions to our [Github Discussions](https://github.com/kubelt/kubelt/discussions).
 
-"Cores" are a [fundamental concept](../overview/index.md#cores) in 3ID. Cores
-are graph nodes that represent people or applications. They are used to organize
-decentralized services. Cores are an important internal technical abstraction so
-you may see chat messages, code, or documentation that referrs to them.
+## What is a "node"?
+
+"Nodes" are a [fundamental concept](../overview/index.md#nodes) in 3ID.
+
+3ID is implemented using a global, decentralized graph. Nodes in the graph
+represent people and applications and are used to organize decentralized
+services.
