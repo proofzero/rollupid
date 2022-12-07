@@ -8,7 +8,7 @@ export default function SignOut({ className }: { className: string }) {
     <a
       className={className}
       style={{ cursor: 'pointer' }}
-      onClick={() => submit(null, { method: 'post', action: `/auth/signout/` })}
+      onClick={() => submit(null, { method: 'post', action: `/signout/` })}
     >
       <Text className="truncate text-gray-800" size="sm" weight="medium">
         Sign Out

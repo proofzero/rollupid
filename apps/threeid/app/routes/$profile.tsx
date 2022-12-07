@@ -360,7 +360,7 @@ const ProfileRoute = () => {
         )}
       </div>
 
-      <div className="mt-3 max-w-7xl w-full mx-auto p-3 lg:p-0">
+      <div className="px-4 mt-3 max-w-7xl w-full mx-auto p-3 lg:p-0">
         {!claimed && (
           <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
