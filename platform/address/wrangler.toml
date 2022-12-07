@@ -7,7 +7,6 @@ workers_dev = false
 durable_objects.bindings = [
   { name = "Core", class_name = "Core" },
   { name = "CryptoCore", class_name = "CryptoCore" }
-
 ]
 
 services = [
@@ -17,10 +16,22 @@ services = [
 
 [vars]
 ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
 
 [dev]
 port = 9191
 local_protocol = "http"
+
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["CryptoCore"]
+
 
 [env.dev]
 durable_objects.bindings = [
@@ -30,8 +41,14 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-dev" },
-  { binding = "Oort", service = "oort-dev" },
+  { binding = "Oort", service = "oort-devnet" },
 ]
+
+[env.dev.vars]
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
@@ -40,8 +57,14 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-next" },
-  { binding = "Oort", service = "oort-next" },
+  { binding = "Oort", service = "oort-testnet" },
 ]
+
+[env.next.vars]
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
@@ -50,9 +73,11 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-current" },
-  { binding = "Oort", service = "oort-current" },
+  { binding = "Oort", service = "oort-mainnet" },
 ]
 
-[[migrations]]
-tag = "v0"
-new_classes = ["Core"]
+[env.current.vars]
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
+MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+NFTAR_URL="https://nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=1

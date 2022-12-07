@@ -45,25 +45,9 @@ jobs:
           command: publish --env current
           environment: 'current'
           secrets: |
-            DATADOG_CLIENT_TOKEN
-            DATADOG_APPLICATION_ID
-            DATADOG_ENV
-            DATADOG_SERVICE_NAME
-            NFTAR_URL
-            NFTAR_AUTHORIZATION
-            ALCHEMY_API_KEY
-            ALCHEMY_NETWORK
+            ALCHEMY_KEY
         env:
-          SESSION_SECRET: 'secret'
           ADMIN_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: current
-          DATADOG_SERVICE_NAME: 3id-application
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          NFTAR_URL: ${{ secrets.NFTAR_TEST_URL }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_TEST_AUTHORIZATION }}
-          MINTPFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
-          ALCHEMY_API_KEY: ${{ secrets.GALAXY_ALCHEMY_API_KEY}}
-          ALCHEMY_NETWORK: 'homestead'
+          ALCHEMY_KEY: ${{ secrets.GALAXY_ALCHEMY_API_KEY}}

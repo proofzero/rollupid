@@ -13,9 +13,11 @@
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-icons.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-starbase.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-access.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-address.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-account.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-threeid.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-chromatic.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-redeem.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-nftar.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-smartcontracts.yaml/badge.svg)
 

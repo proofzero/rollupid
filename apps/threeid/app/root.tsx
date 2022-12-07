@@ -71,7 +71,6 @@ export const loader: LoaderFunction = () => {
       DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN,
       DATADOG_SERVICE_NAME: DATADOG_SERVICE_NAME,
       DATADOG_ENV: DATADOG_ENV,
-      VALID_CHAIN_ID_NAME: VALID_CHAIN_ID_NAME,
     },
   })
 }

@@ -25,7 +25,7 @@ import appleIcon from '~/assets/apple-touch-icon.png'
 import icon32 from '~/assets/favicon-32x32.png'
 import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/three-id-logo.svg'
-import social from '~/assets/social.png'
+import social from '~/assets/passport-social.png'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',

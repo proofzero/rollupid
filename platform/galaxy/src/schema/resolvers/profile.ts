@@ -1,9 +1,12 @@
 import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { parseURN } from 'urns'
 import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 import {
-  AddressURN,
+  createThreeIdURNSpace,
+  ThreeIdURN,
+  ThreeIdURNSpace,
+} from '@kubelt/urns'
+import {
   CryptoWorkerApi,
   WorkerApi as AddressApi,
 } from '@kubelt/platform.address/src/types'
@@ -22,37 +25,31 @@ import OortClient from './clients/oort'
 import { Resolvers } from './typedefs'
 import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
+import { AccountURN } from '@kubelt/urns/account'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 type ResolverContext = {
   env: Env
-  jwt?: string
-  coreId?: string
-  urn?: { service: string; name: string }
+  jwt: string
+  accountURN: AccountURN
 }
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (
-      _parent: any,
-      {},
-      { env, jwt, coreId }: ResolverContext
-    ) => {
-      // console.log('query', coreId)
-      // TODO: get coreId from URN
-
+    profile: async (_parent: any, {}, { env, accountURN }: ResolverContext) => {
       console.log(
-        `galaxy:profileFromAddress: getting profilef for account: ${coreId}`
+        `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      let accountProfile = await accountClient.kb_getProfile(coreId)
+      let accountProfile = await accountClient.kb_getProfile(accountURN)
 
       // console.log(accountProfile)
       return accountProfile
     },
     profileFromAddress: async (
       _parent: any,
-      { addressURN }: { addressURN: string },
+      { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
       const addressClient = createFetcherJsonRpcClient<AddressApi>(
@@ -63,10 +60,10 @@ const threeIDResolvers: Resolvers = {
           },
         }
       )
-      const coreId = await addressClient.kb_resolveAccount()
-      if (!coreId) {
+      const accountURN = await addressClient.kb_resolveAccount()
+      if (!accountURN) {
         console.log(
-          'galaxy:profileFromAddress: attempt to resolve profile from address w/o account'
+          'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
         )
         const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
         try {
@@ -77,32 +74,39 @@ const threeIDResolvers: Resolvers = {
           }
           return addressProfile
         } catch (e) {
-          console.error(errorMessage)
+          console.error(
+            'galaxy.profileFromAddress: failed to upgrayed from oort:',
+            { errorMessage }
+          )
           throw errorMessage
         }
       }
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      let accountProfile = await accountClient.kb_getProfile(coreId)
+      let accountProfile = await accountClient.kb_getProfile(accountURN)
 
+      console.log({ accountProfile })
       // Upgrayedd Oort -> Account
       if (!accountProfile) {
         console.log(
           `galaxy:profileFromAddress: upgrayedd Oort -> Account for ${addressURN}`
         )
         const oortClient = new OortClient(env.Oort)
-        const parsedURN = parseURN(addressURN) // TODO: need utils lik AddressURN.parse(addressURN)
-        const name = parsedURN.nss.split('/')[1]
+        const name = AddressURNSpace.decode(addressURN)
+
         try {
           const oortResponse = await oortClient.getProfileFromAddress(name)
           accountProfile = await upgrayeddOortToAccount(
-            coreId,
+            accountURN,
             name,
             accountClient,
             oortResponse
           )
         } catch (err) {
-          console.error(err)
+          console.error(
+            'galaxy.profileFromAddress: failed to upgrayed from oort:',
+            { err }
+          )
           accountProfile = {}
         }
       }
@@ -115,14 +119,14 @@ const threeIDResolvers: Resolvers = {
     updateThreeIDProfile: async (
       _parent: any,
       { profile },
-      { env, jwt, coreId }: ResolverContext
+      { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy:profileFromAddress: updating profilef for account: ${coreId}`
+        `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
       )
 
       const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
-      let currentProfile = await accountClient.kb_getProfile(coreId)
+      let currentProfile = await accountClient.kb_getProfile(accountURN)
 
       // Make sure nulls are empty objects.
       currentProfile ||= {}
@@ -135,7 +139,7 @@ const threeIDResolvers: Resolvers = {
       // TODO: Return the profile we've created. Need to enforce
       // the GraphQL types when setting data otherwise we're able
       // to set a value that can't be returned.
-      await accountClient.kb_setProfile(coreId, newProfile)
+      await accountClient.kb_setProfile(accountURN, newProfile)
 
       return true
     },

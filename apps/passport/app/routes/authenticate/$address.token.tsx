@@ -54,6 +54,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       : `/authorize`
     return createUserSession(accessToken, redirectURL, addressURN)
   } catch (error) {
+    console.error({ addressURN, error: JSON.stringify(error) })
     throw json({ message: 'invalid code' }, 400)
   }
 }
