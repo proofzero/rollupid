@@ -76,6 +76,20 @@ export default /* GraphQL */ `
     chain: String
     network: String
   }
+  type NFTWithChain {
+    contract: Contract
+    title: String
+    description: String
+    tokenUri: TokenURI
+    media: [NFTMedia!]!
+    error: String
+    metadata: NFTMetadata
+    contractMetadata: ContractMetadata
+    chain: Chain
+  }
+  type NFTsWithChain {
+    ownedNfts: [NFTWithChain!]!
+  }
   type NFTContract {
     address: String
     totalBalance: Int
@@ -86,7 +100,7 @@ export default /* GraphQL */ `
     tokenType: String
     media: NFTMedia
     opensea: OpenSeaMetadata
-    ownedNfts: [NFT!]
+    ownedNfts: [NFTWithChain!]
     chain: Chain
   }
   type NFTContracts {

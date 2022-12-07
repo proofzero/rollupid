@@ -12,7 +12,7 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
-import { setupContext } from './utils'
+import { setupContext, sliceIntoChunks } from './utils'
 
 type ResolverContext = {
   env: Env
@@ -111,7 +111,7 @@ const nftsResolvers: Resolvers = {
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
         chain: 'eth',
-        network: env.ALCHEMY_ETH_NETWORK,
+        network: 'mainnet', //env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
@@ -122,8 +122,14 @@ const nftsResolvers: Resolvers = {
 
       try {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
-          alchemyClient.getContractsForOwner({ owner }),
-          alchemyPolygonClient.getContractsForOwner({ owner }),
+          alchemyClient.getContractsForOwner({
+            owner,
+            excludeFilters: ['SPAM'],
+          }),
+          alchemyPolygonClient.getContractsForOwner({
+            owner,
+            excludeFilters: ['SPAM'],
+          }),
         ])
 
         const ethContractsAddresses = ethContracts.contracts.map(
@@ -134,29 +140,71 @@ const nftsResolvers: Resolvers = {
           (contract: any) => contract.address
         )
 
-        // TODO: Max limit on Alchemy is 45 contract addresses per request.
-        // Gotta go over the limit
-        const [ethNFTs, polygonNFTs]: [any, any] = await Promise.all([
-          // 1 NFT per contract
-          alchemyClient.getNFTs({
-            owner,
-            contractAddresses: ethContractsAddresses,
-            pageSize,
-          }),
-          alchemyPolygonClient.getNFTs({
-            owner,
-            contractAddresses: polygonContractsAddresses,
-            pageSize,
-          }),
-        ])
+        let EthOwnedNfts: any[] = []
+        let PolygonOwnedNfts: any[] = []
 
+        // Max limit on Alchemy is 45 contract addresses per request.
+        // We need batches with 45 contracts in each
+        // DOESN'T WORK with vitalik.eth address
+        // TODO: this case needs additional work
+        if (
+          ethContractsAddresses.length > 44 ||
+          polygonContractsAddresses > 44
+        ) {
+          const ethBatches = sliceIntoChunks(ethContractsAddresses, 44)
+          const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 44)
+
+          const ethNFTs: any = await Promise.all(
+            ethBatches.map(async (batch) => {
+              const res = await alchemyClient.getNFTs({
+                owner,
+                contractAddresses: batch,
+                pageSize,
+              })
+              return res
+            })
+          )
+
+          const polygonNFTs: any = await Promise.all(
+            polygonBatches.map(async (batch) => {
+              return await alchemyPolygonClient.getNFTs({
+                owner,
+                contractAddresses: batch,
+                pageSize,
+              })
+            })
+          )
+
+          ethNFTs.forEach((batch: any) => {
+            EthOwnedNfts.push(batch.ownedNfts)
+          })
+          polygonNFTs.forEach((batch: any) => {
+            PolygonOwnedNfts.push(batch.ownedNfts)
+          })
+        } else {
+          const [ethNFTs, polygonNFTs]: any = await Promise.all([
+            alchemyClient.getNFTs({
+              owner,
+              contractAddresses: ethContractsAddresses,
+              pageSize,
+            }),
+            alchemyPolygonClient.getNFTs({
+              owner,
+              contractAddresses: polygonContractsAddresses,
+              pageSize,
+            }),
+          ])
+          EthOwnedNfts = ethNFTs.ownedNfts
+          PolygonOwnedNfts = polygonNFTs.ownedNfts
+        }
         const ethCollectionsHashMap: any = {}
         const polyCollectionsHashMap: any = {}
 
-        ethNFTs.ownedNfts = NFTPropertyMapper(ethNFTs.ownedNfts)
-        polygonNFTs.ownedNfts = NFTPropertyMapper(polygonNFTs.ownedNfts)
+        EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
+        PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
 
-        ethNFTs.ownedNfts.forEach((NFT: any) => {
+        EthOwnedNfts.forEach((NFT: any) => {
+          NFT.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
           if (
             ethCollectionsHashMap[`${NFT.contract.address}`] &&
             ethCollectionsHashMap[`${NFT.contract.address}`].length
@@ -167,7 +215,8 @@ const nftsResolvers: Resolvers = {
           }
         })
 
-        polygonNFTs.ownedNfts.forEach((NFT: any) => {
+        PolygonOwnedNfts.forEach((NFT: any) => {
+          NFT.chain = { chain: 'polygon', network: env.ALCHEMY_ETH_NETWORK }
           if (
             polyCollectionsHashMap[`${NFT.contract.address}`] &&
             polyCollectionsHashMap[`${NFT.contract.address}`].length
@@ -189,6 +238,7 @@ const nftsResolvers: Resolvers = {
             network: env.ALCHEMY_POLYGON_NETWORK,
           }
         })
+        console.log(PolygonOwnedNfts)
         contracts = ethContracts.contracts.concat(polygonContracts.contracts)
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
