@@ -108,16 +108,10 @@ export default /* GraphQL */ `
   }
   type Query {
     nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
-    nftsForAddressContracts(
-      owner: String!
-      excludeFilters: [String]
-      pageSize: Int
-    ): NFTContracts
     contractsForAddress(
       owner: String!
-      pageKey: String
-      pageSize: Int
       excludeFilters: [String]
+      pageSize: Int
     ): NFTContracts
   }
 `
