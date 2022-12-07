@@ -1,0 +1,55 @@
+name: Next Account
+
+on:
+  push:
+    tags:
+      - '*'
+
+defaults:
+  run:
+    working-directory: platform/account
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build platform.nix
+
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Test
+        run: yarn run test
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: platform/account
+          command: publish
+          environment: next
+          secrets: |
+            ENVIRONMENT
+            CLOUDFLARE_API_TOKEN
+            CLOUDFLARE_ACCOUNT_ID
+        env:
+          ENVIRONMENT: production
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
