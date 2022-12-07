@@ -27,12 +27,12 @@ export default function Apps() {
       icon: threeidIcon,
       url: THREEID_APP_URL,
     },
-    {
-      name: 'Console',
-      description: 'Manage your 3ID applications',
-      icon: consoleIcon,
-      url: CONSOLE_APP_URL,
-    },
+    // {
+    //   name: 'Console',
+    //   description: 'Manage your 3ID applications',
+    //   icon: consoleIcon,
+    //   url: CONSOLE_APP_URL,
+    // },
   ]
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
