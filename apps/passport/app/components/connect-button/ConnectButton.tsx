@@ -3,10 +3,7 @@ import classNames from 'classnames'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import {
-  ConnectKitProvider,
-  ConnectKitButton,
-} from 'connectkit'
+import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import walletsSvg from './wallets.svg'
 
@@ -62,16 +59,18 @@ export function ConnectButton({
                 lineHeight: 24,
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
               }}
             >
-              <span style={{
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: '100%',
-                height: 20,
-                width: 20,
-                margin: '0 7px'
-              }}>
+              <span
+                style={{
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: '100%',
+                  height: 20,
+                  width: 20,
+                  margin: '0 7px',
+                }}
+              >
                 <img src={walletsSvg} />
               </span>
               {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
@@ -79,6 +78,6 @@ export function ConnectButton({
           )
         }}
       </ConnectKitButton.Custom>
-    </ConnectKitProvider >
+    </ConnectKitProvider>
   )
 }
