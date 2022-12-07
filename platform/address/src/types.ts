@@ -41,6 +41,7 @@ export interface AddressCoreApi extends DurableObjectApi {
   setAccount(accountUrn: string): void
   unsetAccount(): void
   resolveAccount(): Promise<AccountURN>
+  getAccount(): Promise<AccountURN | undefined>
 }
 
 export interface CryptoCoreApi extends AddressCoreApi {

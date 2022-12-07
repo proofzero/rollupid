@@ -22,6 +22,7 @@ export default class Core extends DurableObject<
     setAccount: this.setAccount.bind(this),
     unsetAccount: this.unsetAccount.bind(this),
     resolveAccount: this.resolveAccount.bind(this),
+    getAccount: this.getAccount.bind(this),
   }
 
   methods(): AddressCoreApi | CryptoCoreApi {
@@ -38,8 +39,8 @@ export default class Core extends DurableObject<
     await this.storage.put({ address })
   }
 
-  async getAccount(): Promise<string | undefined> {
-    const account = await this.storage.get<string>('account')
+  async getAccount(): Promise<AccountURN | undefined> {
+    const account = await this.storage.get<AccountURN>('account')
     if (account && !AccountURNSpace.is(account)) {
       const urn = AccountURNSpace.urn(account)
       await this.setAccount(urn)
