@@ -20,6 +20,32 @@ type ResolverContext = {
   coreId?: string
 }
 
+const getAllNfts = async (
+  alchemyClient: AlchemyClient,
+  owner: string,
+  contractAddresses: string[]
+) => {
+  let nfts: any[] = []
+
+  let pageKey
+  do {
+    const res = (await alchemyClient.getNFTs({
+      owner,
+      contractAddresses,
+      pageKey,
+    })) as {
+      ownedNfts: any[]
+      pageKey: string | undefined
+    }
+
+    nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
+
+    pageKey = res.pageKey
+  } while (pageKey)
+
+  return nfts
+}
+
 const nftsResolvers: Resolvers = {
   Query: {
     // TODO: apply typing to the resolver:
@@ -37,49 +63,31 @@ const nftsResolvers: Resolvers = {
     ) => {
       if (!owner) throw `Error: missing required argument 'owner'`
 
-      // console.log('owner', owner)
-      // console.log('pageKey', pageKey)
-      // console.log('pageSize', pageSize)
-
-      const alchemyClient: AlchemyClient = new AlchemyClient({
+      const ethClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
         chain: 'eth',
         network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
-      const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
+      const polyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_POLYGON_KEY,
         chain: 'polygon',
         network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
+      let ownedNfts: any[] = []
+
       try {
-        let [alchemyRes, alchemyPolygonRes] = await Promise.all([
-          alchemyClient.getNFTs({
-            owner,
-            contractAddresses,
-          } as GetNFTsParams) as any,
-          alchemyPolygonClient.getNFTs({
-            owner,
-            contractAddresses,
-          } as GetNFTsParams) as any,
-        ])
+        const ethNfts = await getAllNfts(ethClient, owner, contractAddresses)
+        const polyNfts = await getAllNfts(polyClient, owner, contractAddresses)
 
-        let ownedNfts: any[] = []
-        ownedNfts = ownedNfts.concat(NFTPropertyMapper(alchemyRes.ownedNfts))
-        ownedNfts = ownedNfts.concat(
-          NFTPropertyMapper(alchemyPolygonRes.ownedNfts)
-        )
-
-        // TOOD:
-        // This is going to cause bugs
-        // we need to reconsider pagination
-        return {
-          ...alchemyRes,
-          ownedNfts,
-        }
+        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
       } catch (ex) {
-        throw new GraphQLYogaError(ex as string)
+        console.error(new GraphQLYogaError(ex as string))
+      }
+
+      return {
+        ownedNfts,
       }
     },
     //@ts-ignore
