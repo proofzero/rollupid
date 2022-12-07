@@ -120,7 +120,7 @@ export class AlchemyClient {
   async getContractsForOwner(
     params: GetContractsForOwnerParams
   ): Promise<GetContractsForOwnerResult> {
-    const url = this.getAPIURL('getContractsForOwner/')
+    const url = this.getNFTAPIURL('getContractsForOwner/')
 
     url.searchParams.set('owner', params.owner)
 
