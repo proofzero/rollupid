@@ -40,7 +40,7 @@ export default class Core extends DurableObject<
   }
 
   async getAccount(): Promise<AccountURN | undefined> {
-    const account = await this.storage.get<AccountURN>('account')
+    const account = await this.storage.get<AccountURN | undefined>('account')
     if (account && !AccountURNSpace.is(account)) {
       const urn = AccountURNSpace.urn(account)
       await this.setAccount(urn)

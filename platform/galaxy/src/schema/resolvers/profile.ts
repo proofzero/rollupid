@@ -107,9 +107,16 @@ const threeIDResolvers: Resolvers = {
             'galaxy.profileFromAddress: failed to upgrayed from oort:',
             { err }
           )
-          accountProfile = {}
         }
       }
+
+      if (!accountProfile) {
+        accountProfile = (await (addressClient as CryptoWorkerApi) // TODO: should there be generic addres profile interface?
+          .kb_getAddressProfile()) as object
+      }
+
+      console.log('final')
+      console.log({ accountProfile })
 
       // console.log(accountProfile)
       return accountProfile
