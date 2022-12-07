@@ -1,19 +1,14 @@
-import React, { ReactNode, useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import classNames from 'classnames'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import type { LinksFunction } from '@remix-run/cloudflare'
 import {
   ConnectKitProvider,
   ConnectKitButton,
-  getDefaultClient,
 } from 'connectkit'
 
 import walletsSvg from './wallets.svg'
-import styles from './ConnectButton.css'
-
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: styles }]
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -59,8 +54,24 @@ export function ConnectButton({
               className={classNames('button', className)}
               disabled={isConnecting}
               onClick={show}
+              style={{
+                width: 328,
+                height: 50,
+                fontSize: 16,
+                fontWeight: 500,
+                lineHeight: 24,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
             >
-              <span className={classNames('icon')}>
+              <span style={{
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '100%',
+                height: 20,
+                width: 20,
+                margin: '0 7px'
+              }}>
                 <img src={walletsSvg} />
               </span>
               {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
@@ -68,6 +79,6 @@ export function ConnectButton({
           )
         }}
       </ConnectKitButton.Custom>
-    </ConnectKitProvider>
+    </ConnectKitProvider >
   )
 }
