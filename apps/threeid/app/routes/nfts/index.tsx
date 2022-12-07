@@ -10,12 +10,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error('Owner required')
   }
 
-  const pageKey = srcUrl.searchParams.get('pageKey')
-
   const galaxyClient = await getGalaxyClient()
   const { nftsForAddress: res } = await galaxyClient.getNftsForAddress({
     owner,
-    pageKey,
   })
 
   const ownedNfts = res?.ownedNfts.map((nft) => {
@@ -39,6 +36,5 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return json({
     ownedNfts: filteredNfts,
-    pageKey: res?.pageKey,
   })
 }
