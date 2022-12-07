@@ -58,7 +58,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "console-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.dev.vars]
@@ -81,7 +81,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "console-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.next.build]
@@ -107,7 +107,7 @@ services = [
 # ]
 
 routes = [
-  { pattern = "console.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "console.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.current.build]
