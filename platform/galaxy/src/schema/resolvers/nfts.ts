@@ -134,8 +134,6 @@ const nftsResolvers: Resolvers = {
           }),
         ])
 
-        console.log('EVEN HERE', ethContracts)
-
         const ethContractsAddresses = ethContracts.contracts.map(
           (contract: any) => contract.address
         )
@@ -158,7 +156,7 @@ const nftsResolvers: Resolvers = {
           const ethBatches = sliceIntoChunks(ethContractsAddresses, 44)
           const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 44)
 
-          const ethNFTs: any = await Promise.all(
+          const [ethNFTs, polygonNFTs]: [any, any] = await Promise.all([
             ethBatches.map(async (batch) => {
               const res = await alchemyClient.getNFTs({
                 owner,
@@ -166,18 +164,15 @@ const nftsResolvers: Resolvers = {
                 pageSize,
               })
               return res
-            })
-          )
-
-          const polygonNFTs: any = await Promise.all(
+            }),
             polygonBatches.map(async (batch) => {
               return await alchemyPolygonClient.getNFTs({
                 owner,
                 contractAddresses: batch,
                 pageSize,
               })
-            })
-          )
+            }),
+          ])
 
           ethNFTs.forEach((batch: any) => {
             EthOwnedNfts.push(batch.ownedNfts[0])
