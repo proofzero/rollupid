@@ -51,17 +51,17 @@ const InputText = ({
       <div className="mt-1 text-base flex">
         {addon && (
           <span
-            className={`inline-flex items-center rounded-l-md border border-r-0 border-${
-              error ? 'red-500' : 'gray-300'
-            } shadow-sm focus:border-${
-              error ? 'red' : 'indigo'
-            }-500 focus:ring-${
-              error ? 'red' : 'indigo'
-            }-500 disabled:cursor-not-allowed disabled:border-${
-              error ? 'red' : 'gray'
-            }-200 disabled:bg-${error ? 'red' : 'gray'}-50 placeholder-${
-              error ? 'red' : 'gray'
-            }-400 bg-gray-50 px-3`}
+            className={`inline-flex items-center rounded-l-md border border-r-0 ${
+              error ? 'border-red-500' : 'border-gray-300'
+            } shadow-sm ${
+              error ? 'focus:border-red-500' : 'focus:border-indigo-500'
+            } ${
+              error ? 'focus:ring-red-500' : 'focus:ring-indigo-500'
+            } disabled:cursor-not-allowed ${
+              error ? 'disabled:border-red-200' : 'disabled:border-gray-200'
+            } ${error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'} ${
+              error ? 'placeholder-red-400' : 'placeholder-gray-400'
+            } bg-gray-50 px-3`}
           >
             <Text
               size="sm"
@@ -73,7 +73,9 @@ const InputText = ({
           </span>
         )}
         <div
-          className={`relative text-${error ? 'red' : 'gray'}-900 flex flex-1`}
+          className={`relative ${
+            error ? 'text-red-900' : 'text-gray-900'
+          } flex flex-1`}
         >
           {Icon && (
             <div
@@ -81,13 +83,13 @@ const InputText = ({
                 // Seems to be a problem with the `pr-3` class not adding padding
                 paddingRight: iconPosition === 'trailing' ? '0.75rem' : 0,
               }}
-              className={`text-${
-                error ? 'red' : 'gray'
-              }-400 pointer-events-none absolute inset-y-0 ${
+              className={`${
+                error ? 'text-red-400' : 'text-gray-400'
+              } pointer-events-none absolute inset-y-0 ${
                 iconPosition === 'trailing' ? 'right-0' : 'left-0'
-              } flex items-center p${
-                iconPosition === 'trailing' ? 'r' : 'l'
-              }-3`}
+              } flex items-center ${
+                iconPosition === 'trailing' ? 'pr-3' : 'pl-3'
+              }`}
             >
               <Icon
                 style={{
@@ -109,18 +111,18 @@ const InputText = ({
             }}
             defaultValue={defaultValue}
             disabled={disabled ?? false}
-            className={`${
-              addon ? 'rounded-none rounded-r-md' : 'rounded-md'
-            } border-${error ? 'red-500' : 'gray-300'} shadow-sm focus:border-${
-              error ? 'red' : 'indigo'
-            }-500 focus:ring-${
-              error ? 'red' : 'indigo'
-            }-500 disabled:cursor-not-allowed disabled:border-${
-              error ? 'red' : 'gray'
-            }-200 disabled:bg-${error ? 'red' : 'gray'}-50 placeholder-${
-              error ? 'red' : 'gray'
-            }-400 ${
-              Icon ? `p${iconPosition === 'trailing' ? 'r' : 'l'}-10` : ''
+            className={`${addon ? 'rounded-none rounded-r-md' : 'rounded-md'} ${
+              error ? 'border-red-500' : 'border-gray-300'
+            } shadow-sm ${
+              error ? 'focus:border-red-500' : 'focus:border-indigo-500'
+            } ${
+              error ? 'focus:ring-red-500' : 'focus:ring-indigo-500'
+            } disabled:cursor-not-allowed ${
+              error ? 'disabled:border-red-200' : 'disabled:border-gray-200'
+            } ${error ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'} ${
+              error ? 'placeholder-red-400' : 'placeholder-gray-400'
+            } ${
+              Icon ? `${iconPosition === 'trailing' ? 'pr-10' : 'pl-10'}` : ''
             } w-full`}
             maxLength={maxChars}
             placeholder={placeholder}
