@@ -9,6 +9,7 @@ import {
   AlchemyClientConfig,
   GetNFTsParams,
   GetContractsForOwnerParams,
+  NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
 import { setupContext } from './utils'
@@ -45,15 +46,15 @@ const nftsResolvers: Resolvers = {
       // console.log('pageSize', pageSize)
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_GOERLI_KEY,
-        chain: env.ALCHEMY_ETH_CHAIN,
-        network: env.ALCHEMY_GOERLI_NETWORK,
+        key: env.ALCHEMY_ETH_KEY,
+        chain: 'eth',
+        network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_POLYGON_TESTNET_KEY,
-        chain: env.ALCHEMY_POLYGON_CHAIN,
-        network: env.ALCHEMY_POLYGON_TEST_NETWORK,
+        key: env.ALCHEMY_POLYGON_KEY,
+        chain: 'polygon',
+        network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
       try {
@@ -72,80 +73,19 @@ const nftsResolvers: Resolvers = {
           } as GetNFTsParams) as any,
         ])
 
-        const ownedNfts = alchemyRes.ownedNfts.map((nft: any) => {
-          let properties: {
-            name: string
-            value: any
-            display: string
-          }[] = []
+        let ownedNfts: any[] = []
+        ownedNfts = ownedNfts.concat(NFTPropertyMapper(alchemyRes.ownedNfts))
+        ownedNfts = ownedNfts.concat(
+          NFTPropertyMapper(alchemyPolygonRes.ownedNfts)
+        )
 
-          // TODO: is this here b/c pfp does not conform to standard?
-          if (nft.metadata?.properties) {
-            const validProps = Object.keys(nft.metadata.properties)
-              .filter((k) => typeof nft.metadata.properties[k] !== 'object')
-              .map((k) => ({
-                name: k,
-                value: nft.metadata.properties[k],
-                display: typeof nft.metadata.properties[k],
-              }))
-
-            properties = properties.concat(validProps)
-          }
-
-          if (nft.metadata.attributes?.length) {
-            const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
-              name: a.trait_type,
-              value: a.value,
-              display: a.display_type || 'string', // TODO: @Cosmin this field is not in the alchemy schema. Is it needed at all?
-            }))
-
-            properties = properties.concat(mappedAttributes)
-          }
-
-          nft.metadata.properties = properties
-
-          return nft
-        })
-
-        const ownedPolygonNfts = alchemyPolygonRes.ownedNfts.map((nft: any) => {
-          let properties: {
-            name: string
-            value: any
-            display: string
-          }[] = []
-
-          // TODO: is this here b/c pfp does not conform to standard?
-          if (nft.metadata?.properties) {
-            const validProps = Object.keys(nft.metadata.properties)
-              .filter((k) => typeof nft.metadata.properties[k] !== 'object')
-              .map((k) => ({
-                name: k,
-                value: nft.metadata.properties[k],
-                display: typeof nft.metadata.properties[k],
-              }))
-
-            properties = properties.concat(validProps)
-          }
-
-          if (nft.metadata.attributes?.length) {
-            const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
-              name: a.trait_type,
-              value: a.value,
-              display: a.display_type || 'string',
-            }))
-
-            properties = properties.concat(mappedAttributes)
-          }
-
-          nft.metadata.properties = properties
-
-          return nft
-        })
-
-        alchemyRes.ownedNfts = ownedNfts.concat(ownedPolygonNfts)
-        alchemyPolygonRes.ownedNfts = ownedPolygonNfts
-
-        return alchemyRes
+        // TOOD:
+        // This is going to cause bugs
+        // we need to reconsider pagination
+        return {
+          ...alchemyRes,
+          ownedNfts,
+        }
       } catch (ex) {
         throw new GraphQLYogaError(ex as string)
       }
@@ -169,17 +109,19 @@ const nftsResolvers: Resolvers = {
       if (!owner) throw `Error: missing required argument 'owner'`
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_GOERLI_KEY,
-        chain: env.ALCHEMY_ETH_CHAIN,
-        network: env.ALCHEMY_GOERLI_NETWORK,
+        key: env.ALCHEMY_ETH_KEY,
+        chain: 'eth',
+        network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_POLYGON_TESTNET_KEY,
-        chain: env.ALCHEMY_POLYGON_CHAIN,
-        network: env.ALCHEMY_POLYGON_TEST_NETWORK,
+        key: env.ALCHEMY_POLYGON_KEY,
+        chain: 'polygon',
+        network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
+      // TODO: We need to reconsider pagination
+      // here also
       let alchemyRes, alchemyPolygonRes
       try {
         ;[alchemyRes, alchemyPolygonRes] = await Promise.all([
