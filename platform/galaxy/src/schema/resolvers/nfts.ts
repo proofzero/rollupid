@@ -147,14 +147,12 @@ const nftsResolvers: Resolvers = {
 
         // Max limit on Alchemy is 45 contract addresses per request.
         // We need batches with 45 contracts in each
-        // DOESN'T WORK with vitalik.eth address
-        // TODO: this case needs additional work
         if (
-          ethContractsAddresses.length > 44 ||
-          polygonContractsAddresses > 44
+          ethContractsAddresses.length > 45 ||
+          polygonContractsAddresses > 45
         ) {
-          const ethBatches = sliceIntoChunks(ethContractsAddresses, 44)
-          const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 44)
+          const ethBatches = sliceIntoChunks(ethContractsAddresses, 45)
+          const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 45)
 
           const [ethNFTs, polygonNFTs]: [any, any] = await Promise.all([
             ethBatches.map(async (batch) => {
@@ -180,7 +178,8 @@ const nftsResolvers: Resolvers = {
           polygonNFTs.forEach((batch: any) => {
             PolygonOwnedNfts.push(batch.ownedNfts[0])
           })
-        } else {
+        } // In case we have <= 45 nfts
+        else {
           const [ethNFTs, polygonNFTs]: any = await Promise.all([
             alchemyClient.getNFTs({
               owner,
@@ -202,6 +201,8 @@ const nftsResolvers: Resolvers = {
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
 
+        // Creating hashmap with contract addresses as keys
+        // And nft arrays as values
         EthOwnedNfts.forEach((NFT: any) => {
           NFT.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
           if (
@@ -226,6 +227,9 @@ const nftsResolvers: Resolvers = {
           }
         })
 
+        // Attach NFT array to a contract object
+        // With hash map key it is easy to find a needed array to specific
+        // collection
         ethContracts.contracts.forEach((contract: any) => {
           contract.ownedNfts = ethCollectionsHashMap[`${contract.address}`]
           contract.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
