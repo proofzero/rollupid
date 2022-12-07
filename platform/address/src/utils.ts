@@ -29,6 +29,10 @@ export const resolveAddress3RN = async (
   if (!nodeType) {
     // TODO: expand to support other node types
     if (name.startsWith('0x')) nodeType = CryptoCoreType.Crypto // next step will validate if this is correct
+
+    if (name.endsWith('.eth')) nodeType = CryptoCoreType.Crypto // next step will validate if this is correct
+
+    // TODO: broader validation
   }
 
   const addrType = rparams.get('addr_type') as AddressType

@@ -59,7 +59,7 @@ export default async (
   // proto middleware for all requests
   //--------------------------------------------------------------------------------
   checkEnvVars(env)
-
+  Object.assign(globalThis, env)
   // TODO: JWT validation
 
   // validate 3RN
