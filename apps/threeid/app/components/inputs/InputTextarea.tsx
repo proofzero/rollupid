@@ -57,9 +57,9 @@ const InputTextarea = ({
 
       <div className="mt-1 text-base flex">
         <div
-          className={`relative text-${
-            computedError ? 'red' : 'gray'
-          }-900 flex flex-1`}
+          className={`relative ${
+            computedError ? 'text-red-900' : 'text-gray-900'
+          } flex flex-1`}
         >
           <textarea
             name={computedName}
@@ -72,19 +72,19 @@ const InputTextarea = ({
             rows={rows}
             defaultValue={defaultValue}
             disabled={disabled ?? false}
-            className={`border-${
-              computedError ? 'red-500' : 'gray-300'
-            } shadow-sm focus:border-${
-              computedError ? 'red' : 'indigo'
-            }-500 focus:ring-${
-              computedError ? 'red' : 'indigo'
-            }-500 disabled:cursor-not-allowed disabled:border-${
-              computedError ? 'red' : 'gray'
-            }-200 disabled:bg-${
-              computedError ? 'red' : 'gray'
-            }-50 placeholder-${
-              computedError ? 'red' : 'gray'
-            }-400 w-full rounded-md`}
+            className={`${
+              computedError ? 'border-red-500' : 'border-gray-300'
+            } shadow-sm ${
+              computedError ? 'focus:border-red-500' : 'focus:border-indigo-500'
+            } ${
+              computedError ? 'focus:ring-red-500' : 'focus:ring-indigo-500'
+            } disabled:cursor-not-allowed ${
+              computedError
+                ? 'disabled:border-red-200'
+                : 'disabled:border-gray-200'
+            } ${computedError ? 'disabled:bg-red-50' : 'disabled:bg-gray-50'} ${
+              computedError ? 'placeholder-red-400' : 'placeholder-gray-400'
+            } w-full rounded-md`}
             placeholder={placeholder}
             required={required}
           />
