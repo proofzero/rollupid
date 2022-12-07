@@ -115,10 +115,6 @@ const threeIDResolvers: Resolvers = {
           .kb_getAddressProfile()) as object
       }
 
-      console.log('final')
-      console.log({ accountProfile })
-
-      // console.log(accountProfile)
       return accountProfile
     },
   },
