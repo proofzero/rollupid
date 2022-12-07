@@ -113,13 +113,13 @@ const nftsResolvers: Resolvers = {
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
         chain: 'eth',
-        network: 'mainnet', //env.ALCHEMY_ETH_NETWORK,
+        network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_POLYGON_KEY,
         chain: 'polygon',
-        network: 'mainnet', //env.ALCHEMY_POLYGON_NETWORK,
+        network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
       try {
