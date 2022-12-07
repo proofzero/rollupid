@@ -109,6 +109,9 @@ export default async (
   // end proto middleware
 
   const baseApiHandlers: WorkerApi = {
+    async kb_getAccount(): Promise<AccountURN | undefined> {
+      return client.getAccount()
+    },
     async kb_setAccount(accountUrn: string): Promise<void> {
       return client.setAccount(accountUrn)
     },

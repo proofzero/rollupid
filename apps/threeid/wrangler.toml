@@ -65,6 +65,7 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -80,6 +81,7 @@ services = [
 ]
 [env.next.build]
   command = "yarn build"
+
 [env.next.vars]
 PASSPORT_URL = "https://passport-next.threeid.xyz"
 COOKIE_DOMAIN = "next.threeid.xyz"
@@ -88,7 +90,7 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -105,6 +107,7 @@ services = [
 ]
 [env.current.build]
   command = "yarn build"
+
 [env.current.vars]
 PASSPORT_URL = "https://passport.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
@@ -113,3 +116,4 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
+ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"

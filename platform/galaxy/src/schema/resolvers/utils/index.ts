@@ -90,7 +90,9 @@ export async function upgrayeddOortToAccount(
 ) {
   if (!(accountURN && accountClient && oortResponse)) return {}
 
-  console.log(`Migrating core ${accountURN} to Account service... starting`)
+  console.log(
+    `Migrating oort from address ${name} to ${accountURN}... starting`
+  )
 
   try {
     await checkHTTPStatus(oortResponse)
@@ -103,7 +105,7 @@ export async function upgrayeddOortToAccount(
       console.log(
         `Migrating core ${accountURN} to Account service... no profile`
       )
-      return {}
+      return null
     }
 
     const profileRes = await accountClient.kb_setProfile(accountURN, {

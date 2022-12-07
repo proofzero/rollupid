@@ -89,7 +89,7 @@ export const loader: LoaderFunction = async (args) => {
     url = (await ogImage.json()).url
   } catch {
     console.error(
-      'JSON converstion failed for og:image generator. Using default social image.'
+      'threeid.profile: JSON converstion failed for og:image generator. Using default social image.'
     )
     url = social
   }

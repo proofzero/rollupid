@@ -12,4 +12,5 @@ declare global {
   const CONSOLE_APP_URL: string
   const PASSPORT_REDIRECT_URL: string
   const ALCHEMY_KEY: string
+  const ENS_RESOLVER_URL: string
 }
