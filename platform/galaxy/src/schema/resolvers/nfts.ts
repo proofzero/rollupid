@@ -91,7 +91,7 @@ const nftsResolvers: Resolvers = {
       }
     },
     //@ts-ignore
-    nftsForContractsForAddress: async (
+    nftsForAddressContracts: async (
       _parent: any,
       {
         owner,
