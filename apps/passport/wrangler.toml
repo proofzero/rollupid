@@ -73,7 +73,7 @@ COOKIE_DOMAIN = "threeid.xyz"
 
 [env.current]
 routes = [
-  { pattern = "passport-current.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "passport.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
   { binding = "Account", service = "account-current"},
