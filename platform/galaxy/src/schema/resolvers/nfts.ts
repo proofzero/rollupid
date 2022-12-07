@@ -176,10 +176,10 @@ const nftsResolvers: Resolvers = {
           )
 
           ethNFTs.forEach((batch: any) => {
-            EthOwnedNfts.push(batch.ownedNfts)
+            EthOwnedNfts.push(batch.ownedNfts[0])
           })
           polygonNFTs.forEach((batch: any) => {
-            PolygonOwnedNfts.push(batch.ownedNfts)
+            PolygonOwnedNfts.push(batch.ownedNfts[0])
           })
         } else {
           const [ethNFTs, polygonNFTs]: any = await Promise.all([
@@ -202,7 +202,6 @@ const nftsResolvers: Resolvers = {
 
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts)
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts)
-
         EthOwnedNfts.forEach((NFT: any) => {
           NFT.chain = { chain: 'eth', network: env.ALCHEMY_ETH_NETWORK }
           if (
@@ -238,7 +237,6 @@ const nftsResolvers: Resolvers = {
             network: env.ALCHEMY_POLYGON_NETWORK,
           }
         })
-        console.log(PolygonOwnedNfts)
         contracts = ethContracts.contracts.concat(polygonContracts.contracts)
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
