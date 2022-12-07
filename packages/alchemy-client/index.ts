@@ -131,10 +131,11 @@ export class AlchemyClient {
       url.searchParams.set('pageSize', params.pageSize.toString())
 
     // To exclude spam or airdrop
-    params.excludeFilters &&
-      params.excludeFilters.forEach((filter) =>
-        url.searchParams.set('excludeFilters', filter)
-      )
+    if (params.excludeFilters) {
+      params.excludeFilters.forEach((filter) => {
+        url.searchParams.append('excludeFilters[]', filter)
+      })
+    }
 
     return fetch(url.toString())
       .then(async (r) => {
