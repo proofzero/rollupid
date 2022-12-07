@@ -36,7 +36,7 @@ export const ThreeIdSpace = new URNSpace('threeid')
 
 export const createThreeIdURNSpace = <NSSPrefix extends string>(
   prefix?: string // optional if we want to validate prefix
-): ThreeIdURNSpace<`${NSSPrefix}/${string}` | string> => {
+): ThreeIdURNSpace<`${NSSPrefix}/${string}`> => {
   return new URNSpace<'threeid', `${NSSPrefix}/${string}`, string>('threeid', {
     encode: (val: string): string => {
       if (!prefix) throw 'cannot encode without prefix'
