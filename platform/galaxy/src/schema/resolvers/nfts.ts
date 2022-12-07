@@ -121,14 +121,14 @@ const nftsResolvers: Resolvers = {
       try {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({ owner }),
-          alchemyClient.getContractsForOwner({ owner }),
+          alchemyPolygonClient.getContractsForOwner({ owner }),
         ])
 
-        const ethContractsAddresses = ethContracts.map(
+        const ethContractsAddresses = ethContracts.contracts.map(
           (contract: any) => contract.address
         )
 
-        const polygonContractsAddresses = polygonContracts.map(
+        const polygonContractsAddresses = polygonContracts.contracts.map(
           (contract: any) => contract.address
         )
 
@@ -151,7 +151,8 @@ const nftsResolvers: Resolvers = {
         ethNFTs.ownedNfts = NFTPropertyMapper(ethNFTs.ownedNfts)
         polygonNFTs.ownedNfts = NFTPropertyMapper(polygonNFTs.ownedNfts)
 
-        ownedNfts = ownedNfts.concat(ethNFTs, polygonNFTs)
+        ownedNfts = ownedNfts.concat(ethNFTs.ownedNfts, polygonNFTs.ownedNfts)
+        console.log(ownedNfts)
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
