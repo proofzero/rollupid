@@ -104,36 +104,40 @@ const ProfileNftCollection = ({
   nftRenderer = (nft) => <ModaledNft nft={nft} />,
 }: ProfileNftCollectionProps) => {
   const [loadedNfts, setLoadedNfts] = useState(nfts)
-
-  const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
+
+  const [visibleNfts, setVisibleNfts] = useState<any[]>([])
 
   const [textFilter, setTextFilter] = useState('')
   const [colFilter, setColFilter] = useState('All Collections')
 
   const [selectedNft, setSelectedNft] = useState('')
 
-  const getMoreNfts = async () => {
-    const nftReq = await fetch(
-      `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ''}`
-    )
-    const nftRes = await nftReq.json()
+  const getNfts = async () => {
+    const nftReq = await fetch(`/nfts?owner=${account}`)
+    const nftRes = (await nftReq.json()) as { ownedNfts: any[] }
 
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
-    setPageLink(nftRes.pageKey ?? null)
+    setLoading(false)
+  }
+
+  const showMoreNfts = async (diff: number = 10) => {
+    const visibleSlice = loadedNfts.slice(
+      0,
+      Math.min(visibleNfts.length + diff, loadedNfts.length)
+    )
+
+    setVisibleNfts(visibleSlice)
   }
 
   useEffect(() => {
-    if (pageKey) {
-      setLoading(true)
-      getMoreNfts()
-    } else if (pageKey === null) {
-      setLoading(false)
+    if (loadedNfts.length > 0 && visibleNfts.length === 0) {
+      showMoreNfts(preload ? loadedNfts.length : 5)
     }
-  }, [pageKey])
+  }, [loadedNfts])
 
   useEffect(() => {
-    getMoreNfts()
+    getNfts()
   }, [])
 
   return (
@@ -239,61 +243,65 @@ const ProfileNftCollection = ({
       )}
 
       {loadedNfts.length > 0 && (
-        <InfiniteScroll
-          dataLength={loadedNfts.length} //This is important field to render the next data
-          next={preload ? () => {} : getMoreNfts}
-          hasMore={preload ? false : pageKey != null}
-          loader={<Spinner />}
-        >
-          <Masonry
-            breakpointCols={{
-              default: 5,
-              1024: 3,
-              768: 2,
-              640: 1,
-            }}
-            className="my-masonry-grid space-x-10"
-            columnClassName="my-masonry-grid_column"
+        <>
+          <InfiniteScroll
+            dataLength={visibleNfts.length} //This is important field to render the next data
+            next={showMoreNfts}
+            hasMore={visibleNfts.length < loadedNfts.length}
+            loader={<Spinner />}
           >
-            {loadedNfts
-              .filter(
-                (nft) =>
-                  colFilter === 'All Collections' ||
-                  nft.collectionTitle === colFilter
-              )
-              .filter(
-                (nft) =>
-                  nft.title?.toLowerCase().includes(textFilter.toLowerCase()) ||
-                  nft.collectionTitle
-                    ?.toLowerCase()
-                    .includes(textFilter.toLowerCase())
-              )
-              .map((nft, i) => (
-                // Filtering collection by
-                // unique values
-                // breaks the infinite scroll
-                // plugin I resorted to this
-                <div
-                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                >
-                  {nftRenderer(
-                    nft,
-                    selectedNft ===
-                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
-                    (selectedNft: any) => {
-                      setSelectedNft(
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
-                      )
+            <Masonry
+              breakpointCols={{
+                default: 5,
+                1024: 3,
+                768: 2,
+                640: 1,
+              }}
+              className="my-masonry-grid space-x-10"
+              columnClassName="my-masonry-grid_column"
+            >
+              {visibleNfts
+                .filter(
+                  (nft) =>
+                    colFilter === 'All Collections' ||
+                    nft.collectionTitle === colFilter
+                )
+                .filter(
+                  (nft) =>
+                    nft.title
+                      ?.toLowerCase()
+                      .includes(textFilter.toLowerCase()) ||
+                    nft.collectionTitle
+                      ?.toLowerCase()
+                      .includes(textFilter.toLowerCase())
+                )
+                .map((nft, i) => (
+                  // Filtering collection by
+                  // unique values
+                  // breaks the infinite scroll
+                  // plugin I resorted to this
+                  <div
+                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                  >
+                    {nftRenderer(
+                      nft,
+                      selectedNft ===
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                      (selectedNft: any) => {
+                        setSelectedNft(
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                        )
 
-                      if (handleSelectedNft) {
-                        handleSelectedNft(selectedNft)
+                        if (handleSelectedNft) {
+                          handleSelectedNft(selectedNft)
+                        }
                       }
-                    }
-                  )}
-                </div>
-              ))}
-          </Masonry>
-        </InfiniteScroll>
+                    )}
+                  </div>
+                ))}
+            </Masonry>
+          </InfiniteScroll>
+        </>
       )}
 
       {loading && (
