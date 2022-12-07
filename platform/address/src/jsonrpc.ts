@@ -76,7 +76,6 @@ export default async (
     throw new Error('missing 3RN name query parameter')
   }
 
-  console.log({ nodeType, addressType, name })
   switch (nodeType) {
     case CryptoCoreType.Crypto:
     case undefined:
@@ -179,7 +178,6 @@ export default async (
 
   try {
     const jsonRpcRequest: JsonRpcRequest = await request.json()
-    console.log({ jsonRpcRequest })
     const jsonRpcResponse: JsonRpcResponse = await genApi().handleRequest(
       jsonRpcRequest
     )
