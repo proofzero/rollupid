@@ -90,7 +90,9 @@ export async function upgrayeddOortToAccount(
 ) {
   if (!(accountURN && accountClient && oortResponse)) return {}
 
-  console.log(`Migrating core ${accountURN} to Account service... starting`)
+  console.log(
+    `Migrating oort from address ${name} to ${accountURN}... starting`
+  )
 
   try {
     await checkHTTPStatus(oortResponse)

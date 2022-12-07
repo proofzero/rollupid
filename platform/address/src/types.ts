@@ -59,7 +59,8 @@ export interface CryptoCoreApi extends AddressCoreApi {
 }
 
 export interface WorkerApi extends BaseApi {
-  kb_setAccount(accountUrn: string): Promise<void>
+  kb_getAccount(): Promise<AccountURN | undefined>
+  kb_setAccount(accountUrn: AccountURN): Promise<void>
   kb_unsetAccount(): Promise<void>
   kb_resolveAccount(): Promise<AccountURN>
 }

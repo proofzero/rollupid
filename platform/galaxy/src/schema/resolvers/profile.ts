@@ -60,7 +60,7 @@ const threeIDResolvers: Resolvers = {
           },
         }
       )
-      const accountURN = await addressClient.kb_resolveAccount()
+      const accountURN = await addressClient.kb_getAccount()
       if (!accountURN) {
         console.log(
           'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
