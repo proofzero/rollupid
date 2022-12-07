@@ -9,7 +9,7 @@ defaults:
     working-directory: ./apps
 
 jobs:
-  build-publish-threeid-current:
+  build-publish-passport-current:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

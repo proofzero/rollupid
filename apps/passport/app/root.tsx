@@ -16,7 +16,7 @@ import {
   useParams,
 } from '@remix-run/react'
 
-import { links as componentLinks, ThreeIdButton } from '~/components'
+import { ThreeIdButton } from '~/components'
 
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
@@ -49,7 +49,6 @@ export const links: LinksFunction = () => [
   { rel: 'icon', type: 'image/png', href: icon32, sizes: '32x32' },
   { rel: 'icon', type: 'image/png', href: icon16, sizes: '16x16' },
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
-  ...componentLinks(),
 ]
 
 export const loader: LoaderFunction = () => {

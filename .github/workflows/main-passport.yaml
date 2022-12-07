@@ -11,7 +11,7 @@ defaults:
     working-directory: ./apps
 
 jobs:
-  build-publish-test-threeid-dev:
+  build-publish-test-passport-dev:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

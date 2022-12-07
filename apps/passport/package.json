@@ -17,7 +17,7 @@
     "dev": "echo \"No dev for passport. Please use start.\"",
     "start": "run-p 'dev:*'",
     "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
-    "storybook:start": "start-storybook -p 6006",
+    "storybook:start": "start-storybook -p 6009",
     "storybook": "run-p 'storybook:*'",
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },

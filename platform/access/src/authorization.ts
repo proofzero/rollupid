@@ -78,7 +78,7 @@ export default class Authorization extends DurableObject<Environment, Api> {
   ): Promise<ExchangeTokenResult> {
     const { Access } = this.env
 
-    const account = (await this.storage.get<string>('account')) as AccountURN
+    const account = await this.storage.get<AccountURN>('account')
 
     if (!account) {
       throw 'missing account name'
