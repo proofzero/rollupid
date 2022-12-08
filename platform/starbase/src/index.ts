@@ -160,6 +160,9 @@ const kb_appCreate = openrpc.method(schema, {
         tag: 'starbase-app',
       })
 
+      // TODO: we need to create an edge between the logged in user node (aka account)
+      // and the new app
+
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
@@ -350,6 +353,11 @@ const kb_appList = openrpc.method(schema, {
       // //const result = await user._.graph.edges()
 
       // const result = await user.listApplications()
+
+      // TODO: use the edges service to look up all the app edges
+      // for the logged in user (account node <==> starbase node)
+      // account urn: <urn:threeid:account/0x123...> available from the JWT sub prop
+      // starbase urn: <urn:starbase:app/0x123...>
 
       return openrpc.response(request, {
         invoked: 'kb_appList',

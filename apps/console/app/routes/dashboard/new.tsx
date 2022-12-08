@@ -7,7 +7,6 @@ import * as React from 'react'
 import { Form } from '@remix-run/react'
 import { ActionFunction, redirect } from '@remix-run/cloudflare'
 
-import { requireJWT } from '~/shared/utilities/session.server'
 import { makeApplicationId } from '~/models/app.server'
 
 // Action
@@ -18,6 +17,7 @@ export const action: ActionFunction = async ({ request }) => {
   const appId = makeApplicationId()
 
   // TODO: create empty app DO
+
   // const app = await initApplication(session, appId)
 
   // TODO make the redirect URL a parameter
