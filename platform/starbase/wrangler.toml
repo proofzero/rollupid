@@ -18,6 +18,7 @@ workers_dev = false
 # A list of other Clouflare services bound to this service.
 
 services = [
+  { binding = "EDGES", service = "edges" }
 ]
 
 # Durable Objects
@@ -33,13 +34,6 @@ durable_objects.bindings = [
 kv_namespaces = [
   { binding = "FIXTURES", id = "29bcce9f29d9499688da216bcc3dbb49", preview_id = "afbd7707df58426c9926a483c979b9a5" },
   { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
-]
-
-# D1 Databases
-# -----------------------------------------------------------------------------
-
-d1_databases = [
-  { binding = "EDGES", database_name = "edges", database_id = "0f35adf4-7b94-49bf-93c1-e675f3db3533" }
 ]
 
 # Secrets
@@ -62,16 +56,17 @@ port = 9090
 local_protocol = "http"
 
 [[migrations]]
-tag = "v1"
-new_classes = [
-  "StarbaseApplication",
-]
+tag = "v2"
+# new_classes = [
+#   "StarbaseApplication",
+# ]
 # renamed_classes = [
 #   { from = "OldName", to = "NewName" }
 # ]
-# deleted_classes = [
-#   "DeprecatedClass"
-# ]
+deleted_classes = [
+  "StarbaseContract",
+  "StarbaseUser",
+]
 
 # KV
 # -----------------------------------------------------------------------------
@@ -97,6 +92,7 @@ new_classes = [
 [env.dev]
 
 services = [
+  { binding = "EDGES", service = "edges-dev" }
 ]
 
 durable_objects.bindings = [
@@ -117,6 +113,7 @@ ENVIRONMENT = "dev"
 [env.next]
 
 services = [
+  { binding = "EDGES", service = "edges" }
 ]
 
 durable_objects.bindings = [
@@ -136,6 +133,10 @@ PLATFORM_OWNER = "@kubelt"
 # -----------------------------------------------------------------------------
 
 [env.current]
+
+services = [
+  { binding = "EDGES", service = "edges" }
+]
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
