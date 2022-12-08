@@ -28,6 +28,10 @@ export const loader: LoaderFunction = async ({ request }) => {
       title: nft.title,
       collectionTitle: nft.contractMetadata?.name,
       properties: nft.metadata?.properties,
+      details: {
+        contractAddress: nft.contract?.address,
+        nftStandard: nft.contractMetadata?.tokenType,
+      },
     }
   })
 
