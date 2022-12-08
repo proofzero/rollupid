@@ -55,8 +55,8 @@ export function Modal({
                 <div
                   className={`flex flex-col ${
                     fixed
-                      ? `w-[96vw] lg:w-[50vw] h-[96vh] lg:h-[76vh]`
-                      : `max-w-[96vw] lg:max-w-[50vw] max-h-[89vh] lg:max-h-76vh`
+                      ? `w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
+                      : `max-w-[96vw] lg:max-w-[62vw] max-h-[89vh] lg:max-h-80vh`
                   }`}
                 >
                   <div className="flex flex-row justify-end p-3">
