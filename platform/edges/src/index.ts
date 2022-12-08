@@ -68,6 +68,16 @@ const ErrorInvalidDestinationNode = {
   message: 'invalid destination node URN',
 }
 
+const ErrorMissingEdgeTag = {
+  code: 5,
+  message: 'missing edge tag',
+}
+
+const ErrorInvalidEdgeTag = {
+  code: 6,
+  message: 'invalid edge tag URN',
+}
+
 // Methods
 // -----------------------------------------------------------------------------
 // These are the method handler implementations for the RPC methods
@@ -94,60 +104,54 @@ const kb_makeEdge = openrpc.method(schema, {
       const g: Graph = context.get(KEY_GRAPH)
 
       // TODO schema enforcement required
+      // TODO support permissions associated with edge
 
       // SRC
 
-      const srcId = _.get(request, ['params', 'src'])
-      if (_.isUndefined(srcId)) {
+      const srcURN = _.get(request, ['params', 'src'])
+      if (_.isUndefined(srcURN)) {
         return openrpc.error(request, ErrorMissingSourceNode)
       }
-      let parsedSrcUrn: urns.ParsedURN
-      let srcURN: string
       try {
-        parsedSrcUrn = urns.parseURN(srcId)
-        srcURN = `urn:${parsedSrcUrn.nid}:${parsedSrcUrn.nss}`
+        urns.parseURN(srcURN)
       } catch (e) {
         return openrpc.error(request, ErrorInvalidSourceNode)
       }
 
       // DST
 
-      const dstId = _.get(request, ['params', 'dst'])
-      if (_.isUndefined(dstId)) {
+      const dstURN = _.get(request, ['params', 'dst'])
+      if (_.isUndefined(dstURN)) {
         return openrpc.error(request, ErrorMissingDestinationNode)
       }
-      let dstURN: urns.ParsedURN
       try {
-        dstURN = urns.parseURN(dstId)
+        urns.parseURN(dstURN)
       } catch (e) {
         return openrpc.error(request, ErrorInvalidDestinationNode)
       }
 
       // TAG
 
-      const edgeTag = _.get(request, ['params', 'tag'])
-      if (edgeTag === undefined) {
-        return openrpc.error(request, { code: 4, message: 'missing edge tag' })
+      const tag = _.get(request, ['params', 'tag'])
+      if (_.isUndefined(tag)) {
+        return openrpc.error(request, ErrorMissingEdgeTag)
       }
 
-      // TODO add urn: option to client:
-      // - urn:durable-object:<xxx>
-      // - urn:threeid:...
+      // Constructs a URN for the edge "type" given a string tag.
+      const edgeTag: EdgeTag = graph.edge(tag)
 
-      const tag: EdgeTag = graph.edge(edgeTag)
-
-      const edgeId = await graph.link(g, srcId, dstId, tag)
+      const edgeId = await graph.link(g, srcURN, dstURN, edgeTag)
 
       // TODO permissions
 
-      console.log(`created edge ${edgeId}: ${srcURN} =[${tag}]=> ${dstURN}`)
+      console.log(`created edge ${edgeId}: ${srcURN} =[${edgeTag}]=> ${dstURN}`)
 
       return openrpc.response(request, {
         edge: {
           id: edgeId,
           src: srcURN,
           dst: dstURN,
-          tag,
+          tag: edgeTag,
         },
       })
     }
