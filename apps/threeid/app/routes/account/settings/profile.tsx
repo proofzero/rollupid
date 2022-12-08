@@ -38,7 +38,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const { nftsForAddress } = await galaxyClient.getNftsForAddress({
     owner: address,
-    pageSize: 1,
     contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
   })
 

@@ -5,10 +5,9 @@ import { Resolvers } from './typedefs'
 import Env from '../../env'
 
 import {
+  AlchemyChain,
   AlchemyClient,
   AlchemyClientConfig,
-  GetNFTsParams,
-  GetContractsForOwnerParams,
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
@@ -23,10 +22,12 @@ type ResolverContext = {
 const getAllNfts = async (
   alchemyClient: AlchemyClient,
   owner: string,
-  contractAddresses: string[]
+  contractAddresses: string[],
+  maxRuns: number = 3
 ) => {
   let nfts: any[] = []
 
+  let runs = 0
   let pageKey
   do {
     const res = (await alchemyClient.getNFTs({
@@ -41,7 +42,7 @@ const getAllNfts = async (
     nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
 
     pageKey = res.pageKey
-  } while (pageKey)
+  } while (pageKey && ++runs <= maxRuns)
 
   return nfts
 }
@@ -65,13 +66,13 @@ const nftsResolvers: Resolvers = {
 
       const ethClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_ETH_KEY,
-        chain: 'eth',
+        chain: AlchemyChain.ethereum,
         network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const polyClient: AlchemyClient = new AlchemyClient({
         key: env.ALCHEMY_POLYGON_KEY,
-        chain: 'polygon',
+        chain: AlchemyChain.polygon,
         network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
 
@@ -87,6 +88,12 @@ const nftsResolvers: Resolvers = {
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
+
+      ownedNfts = ownedNfts.sort((a, b) =>
+        (a.contractMetadata?.name ?? '').localeCompare(
+          b.contractMetadata?.name ?? ''
+        )
+      )
 
       return {
         ownedNfts,
