@@ -57,7 +57,7 @@ export function ErrorPage({ code, message, trace }: ErrorPageProps) {
             <Text weight="semibold" className="text-gray-800">
               Error message
             </Text>
-            <Text size="sm" className="break-all">
+            <Text size="sm" className="break-all leading-loose">
               {trace}
             </Text>
           </div>
