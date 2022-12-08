@@ -28,6 +28,8 @@ import type {
 
 import type { ParamsObject } from '../impl/jsonrpc'
 
+import { RpcAlarm } from './alarm'
+
 import * as openrpc from '../index'
 
 // Definitions
@@ -47,6 +49,10 @@ const _SCOPES_REQUIRED = '_requiredScopes'
 
 const _FIELDS_REQUIRED = '_requiredFields'
 
+// The key used to store the name of the alarm handler method on the
+// constructor.
+const _ALARM_HANDLER = '_alarmHandler'
+
 // Types
 // -----------------------------------------------------------------------------
 
@@ -57,16 +63,22 @@ type MethodMap = Map<string, string>
 type RequiredScopes = Map<symbol, ScopeSet>
 
 // The parameters from the JSON-RPC request converted into a Map.
-export type RpcParams = Map<string, any>
+type RpcParams = Map<string, any>
 
 // The map of input data passed to an RpcCallable.
-export type RpcInput = Map<string, any>
+type RpcInput = Map<string, any>
 
 // The map of output data passed from an RpcCallable.
-export type RpcOutput = Map<string, any>
+type RpcOutput = Map<string, any>
 
 // The value returned by the RpcCallable and injected into the RpcResponse.
-export type RpcResult = any
+type RpcResult = any
+
+type RpcAlarmCallable = (
+  input: Readonly<RpcInput>,
+  output: RpcOutput,
+  alarm: RpcAlarm,
+) => void
 
 // Defines the signature for an OpenRPC handler method defined on a Durable
 // Object and which is marked as an @method.
@@ -78,10 +90,11 @@ type RpcCallable = (
   input: Readonly<RpcInput>,
   // A map that is used to set writable state for fields configured
   // by @requiredField decorations on the called method.
-  output: RpcOutput
-
-  // TODO context values: envvar, secrets, buckets, etc.
-  // TODO clients for remote objects/workers
+  output: RpcOutput,
+  // A utility class for scheduling alarms on the component. The method
+  // decorated with the @alarm decorator is invoked when the alarm
+  // fires.
+  alarm: RpcAlarm,
 
   //context: Map<string, any>,
   //remote: Map<string, any>,
@@ -105,7 +118,7 @@ type FieldSpec = {
   validator?: ValidatorFn;
 }
 
-export enum FieldAccess {
+enum FieldAccess {
   Read = 'read',
   Write = 'write',
 }
@@ -128,6 +141,21 @@ type FieldMap = Map<FieldName, RequiredField>
 type RequiredFields = Map<FieldName, FieldSet>
 
 type Env = unknown
+
+// Exports
+// -----------------------------------------------------------------------------
+
+export type {
+  RpcAlarm,
+  RpcInput,
+  RpcOutput,
+  RpcParams,
+  RpcResult,
+}
+
+export {
+  FieldAccess,
+}
 
 // Middleware
 // -----------------------------------------------------------------------------
@@ -220,6 +248,9 @@ export function component(schema: Readonly<RpcSchema>) {
     //console.log("rpc method map:");
     //console.log(rpcMethodMap);
 
+    // The name of the method marked with @alarm, if any.
+    const alarmMethod: string = Reflect.get(constructor, _ALARM_HANDLER)
+
     // TODO seal the generated object so that all fields, etc. must be
     // defined declaratively using decorators. Stay out of trouble,
     // friends!
@@ -252,6 +283,9 @@ export function component(schema: Readonly<RpcSchema>) {
       // It returns a Response containing a JSON-RPC format response body.
       private readonly _rpcHandler: OpenRpcHandler
 
+      // A reference to the method marked as the @alarm handler.
+      private readonly _alarmFn: RpcAlarmCallable
+
       constructor(...args: any[]) {
         super()
 
@@ -271,6 +305,11 @@ export function component(schema: Readonly<RpcSchema>) {
         this._allScopes = allScopes
         this._state = <DurableObjectState>args[0]
         this._env = <Env>args[1]
+
+        // Get the method that should be invoked when an alarm is
+        // triggered. This is indicated by the addition of an @alarm
+        // decorator on a method (instead of @method).
+        this._alarmFn = Reflect.get(this, alarmMethod)
 
         // Ensure that the default values for all fields are stored.
         this._setFieldDefaults()
@@ -311,10 +350,12 @@ export function component(schema: Readonly<RpcSchema>) {
           const fieldSet: FieldSet = fieldsRequired?.get(classSym) || new Set()
           //console.log(fields);
 
-          const fieldMap: FieldMap = new Map()
-          for (const field of fieldSet) {
-            fieldMap.set(field.name, field)
-          }
+          // Convert set of configured fields for the method into a Map:
+          // Symbol(<fieldName>) => {
+          //   name: Symbol(<fieldName>),
+          //   perms: Set(2) { 'read', 'write' }
+          // }
+          const fieldMap: FieldMap = this._makeFieldMap(fieldSet)
 
           // The RPC method implementation on the class. This is what we'll
           // invoke, pass the requested state, context, etc. configured using
@@ -342,11 +383,14 @@ export function component(schema: Readonly<RpcSchema>) {
             // output values to save.
             const fieldOutput: RpcOutput = new Map()
 
+            const alarm: RpcAlarm = new RpcAlarm()
+
             // Invoke the RpcCallable method.
             const requestResult = await methodFn(
               requestParams,
               fieldInput,
-              fieldOutput
+              fieldOutput,
+              alarm,
             )
 
             // TODO validate that the returned result conforms to the OpenRPC schema.
@@ -361,6 +405,9 @@ export function component(schema: Readonly<RpcSchema>) {
             // Gets all state stored in the object.
             //console.log(await this._state.storage.list());
 
+            // If any alarm was set, make sure it's scheduled.
+            this._scheduleAlarm(alarm)
+
             return openrpc.response(request, requestResult)
           }
           // Construct a handler for the RPC method.
@@ -374,6 +421,39 @@ export function component(schema: Readonly<RpcSchema>) {
         }
 
         return methods
+      }
+
+      /**
+       * Convert a set of configured fields for a method into a Map of the form:
+       * Symbol(<fieldName>) => {
+       *   name: Symbol(<fieldName>),
+       *   perms: Set(2) { 'read', 'write' }
+       * }
+       *
+       * @param fieldSet - a Set of fields configured for a method
+       * @returns the set of fields converted into a map
+       */
+      private _makeFieldMap(
+        fieldSet: Readonly<FieldSet>,
+      ) {
+        const fieldMap: FieldMap = new Map()
+        for (const field of fieldSet) {
+          fieldMap.set(field.name, field)
+        }
+
+        return fieldMap
+      }
+
+      /**
+       * Schedule an invocation of the @alarm handler method.
+       */
+      private _scheduleAlarm(
+        alarm: RpcAlarm,
+      ) {
+        if (alarm.timestamp) {
+          this._state.storage.setAlarm(alarm.timestamp)
+          console.log(`scheduled alarm for ${alarm.timestamp}`)
+        }
       }
 
       /**
@@ -833,6 +913,10 @@ export function component(schema: Readonly<RpcSchema>) {
         return openrpc.build(service, basePath, rootPath, chain)
       }
 
+      //
+      // FETCH
+      //
+
       // Workers communicate with a Durable Object via the Fetch API. Like a
       // Worker, a Durable Object listens for incoming Fetch events by
       // registering this event handler.
@@ -854,6 +938,54 @@ export function component(schema: Readonly<RpcSchema>) {
 
         return await this._rpcHandler(request, context)
       }
+
+      //
+      // ALARM
+      //
+
+      // This is the method that's invoked when durable object alarms
+      // are triggered.  If the user has decorated a method with @alarm,
+      // we will invoke that method passing in any fields that have been
+      // declared as inputs, and updating the values of any outputs that
+      // have been set.
+      async alarm() {
+        if (this._alarmFn) {
+          // The set of fields configured on the alarm method, e.g.
+          // Set(1): {
+          //   { name: Symbol(someField), perms: Set(2) { 'read', 'write' } }
+          // }
+          const fieldSet: FieldSet = fieldsRequired?.get(Symbol.for(alarmMethod)) || new Set()
+          // TODO this should be a utility method that is shared.
+          const fieldMap: FieldMap = this._makeFieldMap(fieldSet)
+          // Load any configured field values.
+          const fieldInput = await this._prepareInput(fieldSet)
+          // The map we inject into the RpcCallable to allow the developer to provide
+          // output values to save.
+          const fieldOutput: RpcOutput = new Map()
+          // Allow new alarms to be scheduled from alarm handler.
+          const alarm = new RpcAlarm()
+
+          const alarmOutput = await this._alarmFn(
+            fieldInput,
+            fieldOutput,
+            alarm,
+          )
+
+          // Keep outputs for which there is write permission and
+          // which are valid (conform to their associated schemas).
+          const checkedOutput = this._checkOutput(fieldMap, fieldOutput)
+
+          // Write the output values to durable storage.
+          await this._storeOutput(fieldSet, checkedOutput)
+
+          // Schedule the next alarm if requested.
+          this._scheduleAlarm(alarm)
+
+        } else {
+          console.error(`alarm fired but no handler configured using @alarm`)
+        }
+      }
+
     }
   }
 }
@@ -1033,6 +1165,17 @@ export function requiredScope(scope: string | symbol) {
 // @requiredField
 // -----------------------------------------------------------------------------
 
+/**
+ * This decorator is applied to a class method to indicate which
+ * component fields it requires access to, and with what
+ * permissions. The field must be declared at the class level using
+ * the @field decorator. When FieldAccess.Read permission is indicated,
+ * the value of the field is injected into the method handler as a
+ * key/value pair in the "input" map. When FieldAccess.Write permission
+ * is indicated, any value written to the "output" map for the key
+ * having the name of the field will be written back to durable object
+ * storage.
+ */
 export function requiredField(name: string, perms: Readonly<FieldPerms>) {
   const fieldName = Symbol.for(name.trim())
 
@@ -1075,6 +1218,42 @@ export function requiredField(name: string, perms: Readonly<FieldPerms>) {
   }
 }
 
+// @alarm
+// -----------------------------------------------------------------------------
+
+/**
+ * Use this decorator to mark a method as being the component alarm
+ * handler. When a scheduled durable object alarm is fired the marked
+ * method will be invoked. Any input and output fields, configured on
+ * the method using decorators, are treated as if the alarm invocation
+ * was a normal RPC method, only lacking RPC method parameters. This
+ * means that inputs will be injected as part of the "input" map
+ * parameter, and updates collected from the "output" map.
+ */
+export function alarm() {
+
+  // TODO check if alarm already set; throw if so, there can only be one
+  // alarm handler.
+  function getAlarmHandler(target: any) {
+    return Reflect.get(target.constructor, _ALARM_HANDLER)
+  }
+
+  function setAlarmHandler(target: any, propertyKey: string) {
+    Reflect.set(target.constructor, _ALARM_HANDLER, propertyKey)
+  }
+
+  return function (
+    target: unknown,
+    propertyKey: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    if (getAlarmHandler(target) !== undefined) {
+      throw new Error('there can be only one; alarm handler already configured')
+    }
+    setAlarmHandler(target, propertyKey)
+  }
+}
+
 // requiredEnvironment
 // -----------------------------------------------------------------------------
 
@@ -1089,6 +1268,7 @@ function requiredEnvironment(name: string) {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
+    // TODO
     console.log('requiredEnvironment')
   }
 }
@@ -1107,6 +1287,7 @@ function requiredSecret(name: string) {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
+    // TODO
     console.log('requiredSecret')
   }
 }
@@ -1128,6 +1309,7 @@ function requiredRemote() {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
+    // TODO
     console.log('requiredRemote')
   }
 }

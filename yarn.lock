@@ -5207,7 +5207,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/openrpc@workspace:*, @kubelt/openrpc@workspace:packages/openrpc":
+"@kubelt/openrpc@*, @kubelt/openrpc@workspace:*, @kubelt/openrpc@workspace:packages/openrpc":
   version: 0.0.0-use.local
   resolution: "@kubelt/openrpc@workspace:packages/openrpc"
   dependencies:
@@ -5221,6 +5221,7 @@ __metadata:
     "@types/node": 18.11.9
     "@types/tap": 15.0.7
     cross-env: 7.0.3
+    date-fns: 2.29.3
     esbuild: 0.15.15
     eslint: 8.28.0
     eslint-plugin-tsdoc: 0.2.17
@@ -5509,6 +5510,7 @@ __metadata:
   resolution: "@kubelt/platform.ping@workspace:platform/ping"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
+    "@kubelt/openrpc": "*"
     "@kubelt/platform.commons": "*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
