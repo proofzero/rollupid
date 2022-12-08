@@ -32,6 +32,8 @@ import maskIcon from './assets/safari-pinned-tab.svg'
 import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 export const meta: MetaFunction = () => ({
@@ -115,39 +117,16 @@ export function ErrorBoundary({ error }) {
           <nav className="col-span-3">
             <img src={logo} alt="threeid" />
           </nav>
-          <article className="content col-span-3">
-            <div className="error justify-center items-center">
-              <p className="error-message text-center">500</p>
-              <p className="error-secondary-message text-center">
-                {' '}
-                Something went terribly wrong!
-              </p>
-            </div>
-            <div className="relative -mr-20">
-              <img alt="pepe" className="m-auto pb-12" src={pepe} />
-            </div>
-          </article>
-          <article className="content col-span-3 m-12">
-            <div className="error justify-center items-center grid grid-rows-1 text-center">
-              <p className="error-secondary-message">
-                If this problem persists please join Discord for help
-              </p>
 
-              <ButtonAnchor
-                btnType={'primary'}
-                href={'https://discord.gg/threeid'}
-              >
-                Go to Discord
-              </ButtonAnchor>
-            </div>
-          </article>
-          <article className="content col-span-3 m-12">
-            <div className="error justify-center items-center">
-              <p>The stack trace is:</p>
-              <pre>{error.stack}</pre>
-            </div>
-          </article>
+          <div className="col-span-3">
+            <ErrorPage
+              code="500"
+              message="Something went terribly wrong!"
+              trace={error?.stack}
+            />
+          </div>
         </div>
+
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />

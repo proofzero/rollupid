@@ -27,6 +27,8 @@ import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/three-id-logo.svg'
 import social from '~/assets/passport-social.png'
 
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: '3ID - Passport',
@@ -98,11 +100,12 @@ export function ErrorBoundary({ error }) {
       </head>
 
       <body>
-        <div className={'flex flex-col h-screen justify-center items-center'}>
-          <h1 className="tgitext-4xl font-bold">Error</h1>
-          <p className="text-xl">{error}</p>
-        </div>
-        <pre>{error.stack}</pre>
+        <ErrorPage
+          code="Error"
+          message="Something went terribly wrong!"
+          trace={error?.stack}
+        />
+
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
