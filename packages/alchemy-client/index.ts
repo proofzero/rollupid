@@ -35,7 +35,7 @@ enum AlchemyNetwork {
   mumbai = 'mumbai',
 }
 
-enum AlchemyChain {
+export enum AlchemyChain {
   ethereum = 'eth',
   polygon = 'polygon',
 }
@@ -96,6 +96,10 @@ export class AlchemyClient {
         url.searchParams.append('contractAddresses[]', address)
       })
     }
+
+    ;['SPAM'].forEach((filter) => {
+      url.searchParams.append('excludeFilters[]', filter)
+    })
 
     return fetch(url.toString())
       .then(async (r) => {
@@ -191,37 +195,44 @@ export class AlchemyClient {
 }
 
 export const NFTPropertyMapper = (nfts: any[]) =>
-  nfts.map((nft: any) => {
-    let properties: {
-      name: string
-      value: any
-      display: string
-    }[] = []
+  nfts
+    .filter((nft: any) => nft.contractMetadata?.tokenType !== 'UNKNOWN')
+    .map((nft: any) => {
+      let properties: {
+        name: string
+        value: any
+        display: string
+      }[] = []
 
-    // TODO: is this here b/c pfp does not conform to standard?
-    if (nft.metadata?.properties) {
-      const validProps = Object.keys(nft.metadata.properties)
-        .filter((k) => typeof nft.metadata.properties[k] !== 'object')
-        .map((k) => ({
-          name: k,
-          value: nft.metadata.properties[k],
-          display: typeof nft.metadata.properties[k],
+      // TODO: is this here b/c pfp does not conform to standard?
+      if (nft.metadata?.properties) {
+        const validProps = Object.keys(nft.metadata.properties)
+          .filter((k) => typeof nft.metadata.properties[k] !== 'object')
+          .map((k) => ({
+            name: k,
+            value: nft.metadata.properties[k],
+            display: typeof nft.metadata.properties[k],
+          }))
+
+        properties = properties.concat(validProps)
+      }
+
+      if (nft.metadata.attributes?.length) {
+        const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
+          name: a.trait_type,
+          value: a.value,
+          display: a.display_type || 'string',
         }))
 
-      properties = properties.concat(validProps)
-    }
+        properties = properties.concat(mappedAttributes)
+      }
 
-    if (nft.metadata.attributes?.length) {
-      const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
-        name: a.trait_type,
-        value: a.value,
-        display: a.display_type || 'string',
-      }))
+      nft.metadata.properties = properties.filter(
+        (p) => typeof p.value !== 'object'
+      )
+      if (nft.metadata.attributes) {
+        delete nft.metadata.attributes
+      }
 
-      properties = properties.concat(mappedAttributes)
-    }
-
-    nft.metadata.properties = properties
-
-    return nft
-  })
+      return nft
+    })
