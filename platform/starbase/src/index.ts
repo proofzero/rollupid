@@ -128,13 +128,13 @@ const authCheck: RpcAuthHandler = async (
       token,
     },
   }
-  const request = new Request('http://access.dev/jsonrpc', {
+  const verifyReq = new Request('http://access.dev/jsonrpc', {
     method: 'POST',
     body: JSON.stringify(reqBody),
   })
   try {
-    const result = await access.fetch()
-    if (!_.isUndefined(result, 'error')) {
+    const result = await access.fetch(verifyReq)
+    if (!_.isUndefined(result.error)) {
       return new Response('Unauthorized', { status: 401 })
     }
   } catch (e: unknown) {
