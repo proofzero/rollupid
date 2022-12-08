@@ -75,8 +75,6 @@ const MenuLink = (props: MenuLinkProps) => {
 // -----------------------------------------------------------------------------
 
 type KubeltMenuProps = {
-  // The current path being visited.
-  path: string
   // An array of application objects.
   // TODO tighten this up
   apps: Array<Object>

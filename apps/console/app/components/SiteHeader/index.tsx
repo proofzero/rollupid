@@ -10,12 +10,9 @@ import avatar from '~/images/avatar.png'
 // KubeltHeader
 // -----------------------------------------------------------------------------
 
-type KubeltHeaderProps = {
-  // The wallet address of the logged-in user.
-  wallet: string
-}
+type KubeltHeaderProps = {}
 
-export default function KubeltHeader({ wallet }: KubeltHeaderProps) {
+export default function KubeltHeader({}: KubeltHeaderProps) {
   return (
     <header className="flex flex-row-reverse shadow-xl p-4 bg-white text-slate-500">
       <Form action="/logout" method="post">
