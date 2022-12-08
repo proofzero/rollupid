@@ -12,6 +12,8 @@ type TextSize =
   | '3xl'
   | '4xl'
   | '5xl'
+  | '6xl'
+
 const textSizeDict: { [key in TextSize]: string } = {
   xs: 'text-xs',
   sm: 'text-sm',
@@ -22,14 +24,16 @@ const textSizeDict: { [key in TextSize]: string } = {
   '3xl': 'text-3xl',
   '4xl': 'text-4xl',
   '5xl': 'text-5xl',
+  '6xl': 'text-6xl',
 }
 
-type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold'
+type TextWeight = 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
 const textWeightDict: { [key in TextWeight]: string } = {
   normal: 'font-normal',
   medium: 'font-medium',
   semibold: 'font-semibold',
   bold: 'font-bold',
+  extrabold: 'font-extrabold',
 }
 
 type TextType = 'p' | 'span'
