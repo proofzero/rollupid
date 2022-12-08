@@ -17,7 +17,7 @@ import * as openrpc from '@kubelt/openrpc'
 
 import invariant from 'tiny-invariant'
 
-import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+//import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
 
 import type {
   RpcAuthHandler,
@@ -108,18 +108,23 @@ const authCheck: RpcAuthHandler = async (
   request: Readonly<Request>,
   context: Readonly<RpcContext>
 ): Promise<void | Response> => {
-  // We need to supply a service binding for the Account service to
-  // perform the auth check.
-  const env = context.get(KEY_REQUEST_ENV)
-  if (undefined === env || '' === env) {
-    throw new Error("missing environment; can't perform auth check")
-  }
-
   // Perform a request to the Access service, passing it the token
   // provided with the current request. If the response is a payload,
   // the auth check succeeded. An error is returned otherwise.
   const access = context.get(KEY_ACCESS)
+  if (_.isUndefined(access)) {
+    // We need to supply a service binding for the Access service to
+    // perform the auth check.
+    throw new Error("missing access service binding; can't perform auth check")
+  }
+
   const token = context.get(KEY_TOKEN)
+  if (_.isUndefined(token)) {
+    // No token was supplied with the request. That's a "no access
+    // allowed" from me dawg.
+    return new Response('Unauthorized', { status: 401 })
+  }
+
   const reqBody = {
     jsonrpc: '2.0',
     id: 1,
@@ -842,7 +847,8 @@ export default {
     //
     // NBB: secrets are set via the dashboard or using the wrangler CLI tool.
 
-    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
+    // NB: this throws if there is no Account binding in the environment.
+    //checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
 
     // TODO allow context to be initialized in this function.
     const context = openrpc.context(request, env, ctx)
