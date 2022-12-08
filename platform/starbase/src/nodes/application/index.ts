@@ -114,8 +114,8 @@ export class StarbaseApplication {
   // update
   // ---------------------------------------------------------------------------
 
-  // Mark this method as being the implementation of the app_store
-  // method from the OpenRPC schema.
+  // Mark this method as being the implementation of the update method
+  // from the OpenRPC schema.
   @method("update")
   // The write scope is required to invoke this method. If the caller
   // lacks the scope they receive an error method indicating that they

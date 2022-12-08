@@ -217,7 +217,7 @@ const kb_appCreate = openrpc.method(schema, {
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
-      const result = app.appStore({
+      const result = app.update({
         clientId,
         clientSecret: hashedSecret,
       })
