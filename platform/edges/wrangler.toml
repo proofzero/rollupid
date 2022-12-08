@@ -13,32 +13,13 @@ node_compat = true
 # <worker-name>.<account-name>.workers.dev.
 workers_dev = false
 
-# Services
-# -----------------------------------------------------------------------------
-# A list of other Clouflare services bound to this service.
-
-services = [
-]
-
-# Durable Objects
-# -----------------------------------------------------------------------------
-
-durable_objects.bindings = [
-]
-
-# KV
-# -----------------------------------------------------------------------------
-
-kv_namespaces = [
-]
-
 # D1 Databases
 # -----------------------------------------------------------------------------
 
 [[d1_databases]]
 binding = "EDGES"
-database_name = "edges"
-database_id = "0f35adf4-7b94-49bf-93c1-e675f3db3533"
+database_name = "edges-dev"
+database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d"
 
 # Secrets
 # -----------------------------------------------------------------------------
@@ -66,17 +47,8 @@ local_protocol = "http"
 # -----------------------------------------------------------------------------
 
 [env.dev]
-
-services = [
-]
-
-durable_objects.bindings = [
-]
-
-kv_namespaces = [
-]
-
 d1_databases = [
+  { binding = "EDGES", database_name = "edges-dev", database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d" }
 ]
 
 [env.dev.vars]
@@ -87,16 +59,8 @@ ENVIRONMENT = "dev"
 
 [env.next]
 
-services = [
-]
-
-durable_objects.bindings = [
-]
-
-kv_namespaces = [
-]
-
 d1_databases = [
+  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98" }
 ]
 
 [env.next.vars]
@@ -107,16 +71,8 @@ ENVIRONMENT = "next"
 
 [env.current]
 
-services = [
-]
-
-durable_objects.bindings = [
-]
-
-kv_namespaces = [
-]
-
 d1_databases = [
+  { binding = "EDGES", database_name = "edges-next", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd" }
 ]
 
 [env.current.vars]
