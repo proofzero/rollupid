@@ -17,6 +17,7 @@ import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnch
 import HeadNav from '~/components/head-nav'
 
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
+import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
 
 import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
 import {
@@ -36,7 +37,7 @@ import pepe from '~/assets/pepe.svg'
 import { getCryptoAddressClient, getGalaxyClient } from '~/helpers/clients'
 
 export function links() {
-  return [...nftCollLinks()]
+  return [...nftCollLinks(), ...nftModalLinks()]
 }
 
 export const loader: LoaderFunction = async (args) => {
