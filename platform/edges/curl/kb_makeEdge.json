@@ -1,0 +1,10 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "kb_makeEdge",
+  "params": {
+    "src": "urn:threeid:example/foo?+foo=bar#alpha",
+    "dst": "urn:threeid:example/bar?=xxx=yyy#beta",
+    "tag": "links"
+  }
+}

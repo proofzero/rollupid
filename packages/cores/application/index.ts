@@ -191,7 +191,7 @@ export class StarbaseApplication {
   @method("profile")
   @requiredScope("starbase.read")
   @requiredField("app", [FieldAccess.Read])
-  publicProfile(
+  profile(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput,

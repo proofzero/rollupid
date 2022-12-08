@@ -1,0 +1,74 @@
+# .github/workflows/next-edges.yaml
+---
+name: Next Edges
+
+on:
+  push:
+    tags:
+      - '*'
+
+defaults:
+  run:
+    working-directory: ./platform
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v18
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - run: nix-build platform.nix
+
+      - name: Cache Dependencies
+        id: cache-modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            .yarn
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install Dependencies
+        run: yarn install
+
+        # NB: we do *not* drop and recreate the database. If applying
+        # the SQL fails we'll need to migrate the database manually using:
+        # $ wrangler d1 migrations
+
+      - name: Deploy edges D1 Database
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: 'platform/edges'
+          command: d1 execute --env next edges-next --file=./edges.sql
+          environment: 'next'
+          # This causes secrets to be set as if by: $ wrangler secret put.
+          # Each supplied name must be defined in the env: config stanza.
+          secrets: |
+            CLOUDFLARE_ACCOUNT_ID
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Deploy edges next Worker
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: 'platform/edges'
+          command: publish --env next
+          environment: 'next'
+          # This causes secrets to be set as if by: $ wrangler secret put.
+          # Each supplied name must be defined in the env: config stanza.
+          secrets: |
+            CLOUDFLARE_ACCOUNT_ID
+            CLOUDFLARE_IMAGES_KEY
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_IMAGES_KEY: ${{ secrets.CLOUDFLARE_IMAGES_KEY }}

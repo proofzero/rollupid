@@ -1,0 +1,38 @@
+{
+  "name": "@kubelt/graph",
+  "version": "0.1.0",
+  "author": "ProofZero Inc.",
+  "description": "Graph utilities and definitions",
+  "private": true,
+  "scripts": {
+    "build:dev": "tsc",
+    "docs": "run-s build:* docs:*",
+    "docs:build": "api-extractor run --local",
+    "format": "run-s format:src",
+    "format:src": "prettier --write *.ts",
+    "format:check": "run-s format:check:*",
+    "format:check:src": "prettier --check *.ts",
+    "lint": "eslint --fix .",
+    "lint:check": "run-s lint:check:*",
+    "lint:check:src": "eslint *.ts"
+  },
+  "devDependencies": {
+    "@microsoft/api-extractor": "7.33.6",
+    "@types/node": "18.11.9",
+    "eslint": "8.28.0",
+    "prettier": "2.7.1",
+    "typescript": "4.9.3",
+    "yarn-run-all": "3.1.1"
+  },
+  "dependencies": {
+    "@kubelt/security": "workspace:*",
+    "@kubelt/urns": "workspace:*",
+    "cross-env": "7.0.3",
+    "reflect-metadata": "0.1.13",
+    "sqlite3": "5.1.2",
+    "typeorm": "0.3.10",
+    "urns": "0.6.0"
+  },
+  "packageManager": "yarn@3.2.4",
+  "license": "UNLICENSED"
+}

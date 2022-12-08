@@ -23,11 +23,20 @@ import { toCamelCase } from 'js-convert-case'
 
 import type { MethodObject, MethodOrReference } from '@open-rpc/meta-schema'
 
+import type { ParsedURN } from 'urns'
+
 import type { RpcResponse, RpcSchema } from './index'
 
 import type { RequestParams } from './jsonrpc'
 
 import type { RpcResult } from '../component/index'
+
+import {
+  AnyURN,
+  createAnyURNSpace,
+  createObjectURNSpace,
+  ObjectURN,
+} from '@kubelt/urns'
 
 // Types
 // -----------------------------------------------------------------------------
@@ -47,8 +56,19 @@ interface RpcDispatch {
 
 // A map of data properties we expose with the .$ accessor.
 type RpcProperties = {
-  // TODO tighter type for stringified DurableObjectId
+  // A string serialized DurableObjectId.
+  // TODO use a tighter type for stringified DurableObjectId.
   id: string
+  // An arbitrary string name for the durable object (if provided)
+  name?: string
+  // The URN representation of a Durable Object ID.
+  urn?: string
+  // These are the components of the parsed URN.
+  nid?: string,
+  nss?: string,
+  rc?: string,
+  qc?: string,
+  fc?: string,
 }
 
 // RpcRequestOptions
@@ -73,14 +93,20 @@ export interface RpcExpandedSchema extends Omit<RpcSchema, 'methods'> {
 // A JWT token.
 export type AuthToken = string
 
+// NB: if none of id, name, or urn are supplied, a random durable object
+// ID (and consequently a new durable object instance) is created.
 interface ClientOptions {
   // An object ID that is converted into an object ID using
   // OBJECT_NAMESPACE.isFromString(). If you have a DurableObjectId and
   // convert it to a string using toString(), supplying that ID string
   // as the ID parameter will generate original DurableObjectId.
+  //
+  // Exclusions: name, urn.
   id: string
   // An object name that is converted/hashed into an object ID using
   // OBJECT_NAMESPACE.idFromName().
+  //
+  // Exclusions: id, urn.
   name: string
   // A token that, if provided, is sent with all requests sent by the
   // client.
@@ -88,6 +114,11 @@ interface ClientOptions {
   // A string description of the component; used as host component of
   // URL when logging.
   tag: string
+  // A URN used to uniquely identify a node. The URN is converted into a
+  // DurableObjectId using OBJECT_NAMESPACE.idFromName().
+  //
+  // Exclusions: id, name.
+  urn: AnyURN | ParsedURN<string, string>
 }
 
 export type RpcClientOptions = Readonly<Partial<ClientOptions>>
@@ -100,6 +131,11 @@ export class RpcClient {
   private readonly _durableObject: DurableObjectNamespace
   // The name of the durable object.
   private readonly _id: DurableObjectId
+  // A URN representation of the internal durable object ID.
+  private readonly _urn?: AnyURN | ParsedURN
+  // The name of the object, if provided. Converted into an internal ID.
+  // TODO type should be our platform URN.
+  private readonly _name?: string
   // The OpenRPC schema with method references resolved.
   private readonly _schema: RpcExpandedSchema
   // The options configuration map.
@@ -115,10 +151,10 @@ export class RpcClient {
   private readonly _properties: RpcProperties
   // RPC calling stub; use its .fetch() method to reach DO.
   // TODO needs a type
-  private readonly _stub;
+  private readonly _stub
   // Keep track of the JSON-RPC request ID so we can assign incrementing
   // values to subsequent requests.
-  private _requestId: number
+  private _requestId: number;
 
   // Allow for the methods added to the client to correspond to the
   // methods described in the schema that was used to initialize it.
@@ -144,6 +180,8 @@ export class RpcClient {
 
     this._durableObject = durableObject
     this._id = id
+    this._urn = options?.urn || createObjectURNSpace().urn(id.toString())
+    this._name = options?.name || undefined
     this._schema = expandedSchema
     this._options = options
     // TODO better to try and derive a tag name from durableObject, if possible.
@@ -157,10 +195,8 @@ export class RpcClient {
 
     // Filter schema methods into internal / external lists.
     // TODO pass in regex from options that is used to split on method name.
-    const [internal, external]: [
-      MethodObject[],
-      MethodObject[]
-    ] = this._splitMethods(expandedSchema.methods)
+    const [internal, external]: [MethodObject[], MethodObject[]] =
+      this._splitMethods(expandedSchema.methods)
     //console.log(internal);
     //console.log(external);
 
@@ -170,7 +206,7 @@ export class RpcClient {
     // Add a method to the client stub for each "external" RPC method.
     this._externalMethods(this, external)
     // Define a collection of properties to expose with the $ accessor.
-    this._properties = this._initProperties(id)
+    this._properties = this._initProperties(this._id, this._urn, this._name)
 
     // Freeze the collection of properties that we expose as <stub.$>.
     Object.freeze(this._properties)
@@ -189,15 +225,12 @@ export class RpcClient {
     // TODO for now, we drop any references in the methods (a method
     // with $ref property); later we need to properly expand those
     // references to include them inline!
-    _.remove(
-      schema.methods,
-      (method: MethodOrReference): boolean => {
-        if (method['$ref']) {
-          return true
-        }
-        return false
+    _.remove(schema.methods, (method: MethodOrReference): boolean => {
+      if (method['$ref']) {
+        return true
       }
-    )
+      return false
+    })
 
     return schema as RpcExpandedSchema
   }
@@ -207,10 +240,9 @@ export class RpcClient {
    * of elements that returned true for the supplied predicate, and the
    * second group of elements that returned false.
    */
-  private _splitMethods(methods: MethodObject[]): [
-    MethodObject[],
-    MethodObject[],
-  ] {
+  private _splitMethods(
+    methods: MethodObject[]
+  ): [MethodObject[], MethodObject[]] {
     return _.partition(methods, (method) => {
       // TODO make this regex a client option
       return /\./.test(method.name)
@@ -218,9 +250,13 @@ export class RpcClient {
   }
 
   /**
-   *
+   * Obtain a nested hierarchy of "internal" methods. These are exposed
+   * on the client stub under the "_" namespace.
    */
-  private _internalMethods(target: RpcDispatch, methods: MethodObject[]): RpcDispatch {
+  private _internalMethods(
+    target: RpcDispatch,
+    methods: MethodObject[]
+  ): RpcDispatch {
     return _.reduce(
       methods,
       (ns, method) => {
@@ -240,7 +276,7 @@ export class RpcClient {
   }
 
   /**
-   *
+   * Add a method to the client stub for each "external" RPC method.
    */
   private _externalMethods(target: RpcDispatch, methods: MethodObject[]) {
     // Define a function on the target object for each RPC method
@@ -262,11 +298,35 @@ export class RpcClient {
   /**
    * Define the collection of properties we expose to describe the client.
    */
-  private _initProperties(id: DurableObjectId): RpcProperties {
-    return {
-      // The ID of the durable object this client is for.
-      id: id.toString(),
+  private _initProperties(
+    doId: Readonly<DurableObjectId>,
+    urn?: Readonly<AnyURN | ParsedURN>,
+    // TODO proper type for platform URN?
+    name?: string
+  ): RpcProperties {
+    const idStr = doId.toString()
+    const urnStr = urn?.toString()
+
+    let parts = {}
+    if (typeof(urn) === 'object') {
+      // The various components of the URN (if present).
+      parts = {
+        nid: urn?.nid,
+        nss: urn?.nss,
+        rc: urn?.rcomponent,
+        qc: urn?.qcomponent,
+        fc: urn?.fragment,
+      }
     }
+
+    return _.merge({
+      // The ID of the durable object as a string.
+      id: idStr,
+      // The platform namespace ('threeid') URN of the object, if provided.
+      name,
+      // A URN representation of the internal durable object ID.
+      urn: urnStr,
+    }, parts)
   }
 
   // Access the "internal" method table.
@@ -290,7 +350,7 @@ export class RpcClient {
     target: RpcDispatch,
     path: string[],
     name: string,
-    method: Readonly<MethodObject>,
+    method: Readonly<MethodObject>
   ): RpcDispatch {
     // Create a fn for the RPC call.
     // TODO tighten up params type
@@ -318,11 +378,17 @@ export class RpcClient {
   /**
    *
    */
-  private _makeRpcFn(method: MethodObject, clientOpt: RpcClientOptions): RpcClientFn {
+  private _makeRpcFn(
+    method: MethodObject,
+    clientOpt: RpcClientOptions
+  ): RpcClientFn {
     const execute = _.bind(this._execute, this)
 
     // TODO tighten up the types on params, etc.
-    return async function (params: RequestParams, requestOpt: RpcRequestOptions = {}) {
+    return async function (
+      params: RequestParams,
+      requestOpt: RpcRequestOptions = {}
+    ) {
       // Merge any per-request options on top of the options supplied
       // when constructing the client.
       const options: RpcClientOptions = _.merge({}, clientOpt, requestOpt)
@@ -400,7 +466,9 @@ export class RpcClient {
     // in the request.
     if (Object.hasOwn(rpcJSON, 'id')) {
       if (rpcJSON.id !== this._requestId) {
-        console.warn(`mismatch in request and response ID: ${this._requestId} <> ${rpcJSON.id}`)
+        console.warn(
+          `mismatch in request and response ID: ${this._requestId} <> ${rpcJSON.id}`
+        )
       }
     }
 

@@ -7,10 +7,6 @@
 // Scopes
 // -----------------------------------------------------------------------------
 
-import type { Scope } from './scopes'
-
-export type { Scope }
-
 import {
   ALL_SCOPES,
   SCOPES,
@@ -18,4 +14,15 @@ import {
   SCOPE_ACCOUNT_WRITE,
   SCOPE_PROFILE_READ,
   SCOPE_PROFILE_WRITE,
+  Scope,
+  scope,
 } from './scopes'
+
+// API
+// -----------------------------------------------------------------------------
+
+export type { Scope }
+
+export {
+  scope,
+}

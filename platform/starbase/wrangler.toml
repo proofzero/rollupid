@@ -37,6 +37,13 @@ kv_namespaces = [
   { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
+# D1 Databases
+# -----------------------------------------------------------------------------
+
+d1_databases = [
+  { binding = "EDGES", database_name = "edges", database_id = "0f35adf4-7b94-49bf-93c1-e675f3db3533" }
+]
+
 # Secrets
 # -----------------------------------------------------------------------------
 
