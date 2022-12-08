@@ -9,7 +9,7 @@ import { json } from '@remix-run/cloudflare'
 
 import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
-import { requireJWT } from '~/shared/utilities/session.server'
+import { requireJWT } from '~/utilities/session.server'
 
 //import { useUser } from "~/utils";
 

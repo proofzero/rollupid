@@ -6,7 +6,7 @@ import { Link } from '@remix-run/react'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 
-import { requireJWT } from '~/shared/utilities/session.server'
+import { requireJWT } from '~/utilities/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   await requireJWT(request)
