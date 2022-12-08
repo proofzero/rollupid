@@ -43,7 +43,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: 'platform/edges'
-          command: d1 delete edges-dev
+          command: d1 delete --env dev edges-dev
           environment: 'dev'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
@@ -58,7 +58,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: 'platform/edges'
-          command: d1 execute edges-dev --file=./edges.sql
+          command: d1 execute --env dev edges-dev --file=./edges.sql
           environment: 'dev'
           # This causes secrets to be set as if by: $ wrangler secret put.
           # Each supplied name must be defined in the env: config stanza.
