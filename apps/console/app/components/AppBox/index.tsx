@@ -2,18 +2,22 @@
  * @file app/shared/components/AppList/index.tsx
  */
 
-import { Fragment } from "react"
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { Menu, Transition } from "@headlessui/react";
+import { Fragment } from 'react'
+import { Link, Outlet, useLoaderData } from '@remix-run/react'
+import { Menu, Transition } from '@headlessui/react'
 
-import type { Application } from "~/models/app.server";
+import type { Application } from '~/models/app.server'
 
-import EmptyPrompt from "~/components/EmptyPrompt";
+import EmptyPrompt from '~/components/EmptyPrompt'
 
-import { EllipsisVerticalIcon, TrashIcon, Cog8ToothIcon } from "@heroicons/react/20/solid";
+import {
+  EllipsisVerticalIcon,
+  TrashIcon,
+  Cog8ToothIcon,
+} from '@heroicons/react/20/solid'
 // TODO migrate to FolderPlusIcon and remove bespoke version
-import { FolderPlusIcon } from "@heroicons/react/24/outline";
-import folderPlus from "~/images/folderPlus.svg";
+import { FolderPlusIcon } from '@heroicons/react/24/outline'
+import folderPlus from '~/images/folderPlus.svg'
 
 // CompactMenu
 // -----------------------------------------------------------------------------
@@ -70,7 +74,10 @@ export function CompactMenu() {
                       'group flex items-center px-4 py-2 text-sm'
                     )}
                   >
-                    <TrashIcon className="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500" aria-hidden="true" />
+                    <TrashIcon
+                      className="mr-3 h-5 w-5 text-red-400 group-hover:text-red-500"
+                      aria-hidden="true"
+                    />
                     Delete Application
                   </a>
                 )}
@@ -87,15 +94,19 @@ export function CompactMenu() {
 // -----------------------------------------------------------------------------
 
 type AppSummaryProps = {
-  icon: string,
-  name: string,
-};
+  icon: string
+  name: string
+}
 
 const AppSummary = (props: AppSummaryProps) => {
   const dateCreated = `Date created?`
   return (
     <div className="flex flex-auto bg-white rounded-md">
-      <img className="inline-block mr-2 rounded-l-md" src={props.icon} alt={`Icon for ${props.name}`} />
+      <img
+        className="inline-block mr-2 rounded-l-md"
+        src={props.icon}
+        alt={`Icon for ${props.name}`}
+      />
       <div className="inline-block flex-grow text-sm pt-1">
         <div className="font-bold">{props.name}</div>
         <div className="text-slate-500">{dateCreated}</div>
@@ -104,28 +115,32 @@ const AppSummary = (props: AppSummaryProps) => {
         <CompactMenu />
       </div>
     </div>
-  );
-};
+  )
+}
 
 // AppList
 // -----------------------------------------------------------------------------
 
 type AppListProps = {
-  apps: Array<Application>,
-};
+  apps: Array<Application>
+}
 
 function AppList(props: AppListProps) {
   if (!props.apps) {
-    return (
-      <p>No applications to display!</p>
-    );
+    return <p>No applications to display!</p>
   }
 
-  const appSummaries = props.apps.map(app => {
+  const appSummaries = props.apps.map((app) => {
     return (
-      <AppSummary key={`app-${app.id}`} id={app.id} icon={app.icon} name={app.name} coreCount={app.coreCount} />
-    );
-  });
+      <AppSummary
+        key={`app-${app.id}`}
+        id={app.id}
+        icon={app.icon}
+        name={app.name}
+        coreCount={app.coreCount}
+      />
+    )
+  })
 
   if (props.apps.length <= 0) {
     return (
@@ -136,24 +151,20 @@ function AppList(props: AppListProps) {
         description="Get started by creating an Application."
         prompt="Create Application"
         link="/dashboard/apps/new"
-        />
-    );
+      />
+    )
   } else {
-    return (
-      <div className="flex flex-col gap-2">
-        {appSummaries}
-      </div>
-    );
+    return <div className="flex flex-col gap-2">{appSummaries}</div>
   }
-};
+}
 
 // LegendItem
 // -----------------------------------------------------------------------------
 
 type LegendItemProps = {
-  label: string,
-  color: string,
-};
+  label: string
+  color: string
+}
 
 function LegendItem(props: LegendItemProps) {
   return (
@@ -163,20 +174,7 @@ function LegendItem(props: LegendItemProps) {
       </svg>
       {props.label}
     </span>
-  );
-}
-
-
-// PublishLegend
-// -----------------------------------------------------------------------------
-
-function PublishLegend() {
-  return (
-    <div className="flex flex-row">
-      <LegendItem label="Published" color="fill-green-400" />
-      <LegendItem label="Unpublished" color="fill-gray-300" />
-    </div>
-  );
+  )
 }
 
 // AppBox
@@ -184,22 +182,21 @@ function PublishLegend() {
 
 type AppBoxProps = {
   // Application model instances
-  apps: Array<Application>,
+  apps: Array<Application>
   // Link target for creating a new application.
-  createLink: string,
-};
+  createLink: string
+}
 
 export default function AppBox(props: AppBoxProps) {
   return (
     <div className="mt-8">
-      <Link to={props.createLink} className="flex flow-col md:flex-row items-center md:items-end justify-center md:justify-end md:-mb-8 mb-2 md:items-right">
-        <button className="text-white bg-indigo-500 px-4 py-2 text-sm font-bold outline-none rounded-sm focus:outline-none">Create Application</button>
-      </Link>
+      <Link
+        to={props.createLink}
+        className="flex flow-col md:flex-row items-center md:items-end justify-center md:justify-end md:-mb-8 mb-2 md:items-right"
+      ></Link>
       <h3 className="text-xl font-bold mb-6">Your Applications</h3>
-      <div className="mb-2 mt-4">
-        <PublishLegend />
-      </div>
+      <div className="mb-2 mt-4"></div>
       <AppList apps={props.apps} />
     </div>
-  );
+  )
 }
