@@ -113,7 +113,7 @@ ENVIRONMENT = "dev"
 [env.next]
 
 services = [
-  { binding = "EDGES", service = "edges" }
+  { binding = "EDGES", service = "edges-next" }
 ]
 
 durable_objects.bindings = [
@@ -135,7 +135,7 @@ PLATFORM_OWNER = "@kubelt"
 [env.current]
 
 services = [
-  { binding = "EDGES", service = "edges" }
+  { binding = "EDGES", service = "edges-current" }
 ]
 
 durable_objects.bindings = [
