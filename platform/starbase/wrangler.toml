@@ -18,6 +18,7 @@ workers_dev = false
 # A list of other Clouflare services bound to this service.
 
 services = [
+  { binding = "Account", service = "account" },
   { binding = "EDGES", service = "edges" }
 ]
 
@@ -92,6 +93,7 @@ deleted_classes = [
 [env.dev]
 
 services = [
+  { binding = "ACCESS", service = "access-dev" },
   { binding = "EDGES", service = "edges-dev" }
 ]
 
@@ -113,6 +115,7 @@ ENVIRONMENT = "dev"
 [env.next]
 
 services = [
+  { binding = "ACCESS", service = "access-next" },
   { binding = "EDGES", service = "edges-next" }
 ]
 
@@ -127,7 +130,6 @@ kv_namespaces = [
 
 [env.next.vars]
 ENVIRONMENT = "next"
-PLATFORM_OWNER = "@kubelt"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -135,6 +137,7 @@ PLATFORM_OWNER = "@kubelt"
 [env.current]
 
 services = [
+  { binding = "ACCESS", service = "access-current" },
   { binding = "EDGES", service = "edges-current" }
 ]
 

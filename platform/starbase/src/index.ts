@@ -11,6 +11,8 @@ import * as _ from 'lodash'
 
 import * as set from 'ts-set-utils'
 
+import * as graph from '@kubelt/graph'
+
 import * as openrpc from '@kubelt/openrpc'
 
 import invariant from 'tiny-invariant'
@@ -78,6 +80,11 @@ const KEY_ENVIRONMENT = 'xyz.threeid.value/environment'
 // Context key for looking up StarbaseApplication durable object.
 const KEY_APPLICATION = 'xyz.threeid.object/application'
 
+// Context key for looking up the Account service stub.
+const KEY_ACCESS = 'xyz.threeid.service/access'
+// Context key for looking up the EDGES service stub.
+const KEY_EDGES = 'xyz.threeid.service/edges'
+
 // Scopes
 // -----------------------------------------------------------------------------
 // This service doesn't use scopes, we can use this everywhere a set of scopes
@@ -108,16 +115,31 @@ const authCheck: RpcAuthHandler = async (
     throw new Error("missing environment; can't perform auth check")
   }
 
-  // Create a version of isAuthenticated() that doesn't require entire
-  // Env, just the specific service binding proxy for Account?
-  /*
-  try {
-    // NB: request must be cloned as it may only be read once.
-    await isAuthenticated(request, env)
-  } catch (err) {
-    return new Response('Unauthorized', { status: 401 })
+  // Perform a request to the Access service, passing it the token
+  // provided with the current request. If the response is a payload,
+  // the auth check succeeded. An error is returned otherwise.
+  const access = context.get(KEY_ACCESS)
+  const token = context.get(KEY_TOKEN)
+  const reqBody = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'kb_verifyAuthorization',
+    params: {
+      token,
+    },
   }
-  */
+  const request = new Request('http://access.dev/jsonrpc', {
+    method: 'POST',
+    body: JSON.stringify(reqBody),
+  })
+  try {
+    const result = await access.fetch()
+    if (!_.isUndefined(result, 'error')) {
+      return new Response('Unauthorized', { status: 401 })
+    }
+  } catch (e: unknown) {
+    return new Response('Internal Server Error', { status: 500 })
+  }
 }
 
 // Methods
@@ -146,6 +168,7 @@ const kb_appCreate = openrpc.method(schema, {
     ) => {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better type for JWT?
       const token: string = context.get(KEY_TOKEN)
 
@@ -160,8 +183,31 @@ const kb_appCreate = openrpc.method(schema, {
         tag: 'starbase-app',
       })
 
+      // TODO: extend @kubelt/openrpc client to support remote workers
+      // that implement an OpenRPC service.
+
       // TODO: we need to create an edge between the logged in user node (aka account)
       // and the new app
+      const src = graph.node('threeid', 'fixme-src')
+      const dst = graph.node('threeid', 'fixme-dst')
+      const tag = graph.edge('owns')
+
+      const kb_makeEdge = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'kb_makeEdge',
+        params: {
+          src,
+          dst,
+          tag,
+        }
+      }
+      const edgeReq = new Request('http://edges.dev/jsonrpc', {
+        method: 'POST',
+        body: JSON.stringify(kb_makeEdge),
+      })
+      const edgeRes = await edges.fetch(edgeReq)
+      console.log(JSON.stringify(edgeRes))
 
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
@@ -736,17 +782,18 @@ export interface Env {
   // Service bindings
   // ---------------------------------------------------------------------------
 
-  // A binding to the authentication service.
-  Account: Fetcher
+  // A binding for the access service to enable auth checks.
+  ACCESS: Fetcher
+
+  // A binding to the edges service; this service is used for storing
+  // and querying links between nodes.
+  EDGES: Fetcher
 
   // Environment variables
   // ---------------------------------------------------------------------------
 
   // The name of the current deployment environment.
   ENVIRONMENT: string
-
-  // The name of the owner of platform app cores.
-  PLATFORM_OWNER: string
 
   // Secrets
   // ---------------------------------------------------------------------------
@@ -820,6 +867,11 @@ export default {
 
     // A durable object containing Starbase App state.
     context.set(KEY_APPLICATION, env.StarbaseApp)
+
+    // A stub for invoking the account service.
+    context.set(KEY_ACCESS, env.ACCESS)
+    // A stub for invoking the edges service.
+    context.set(KEY_EDGES, env.EDGES)
 
     // NB: the handler clones the request; we don't need to do it here.
     return rpcHandler(request, context)
