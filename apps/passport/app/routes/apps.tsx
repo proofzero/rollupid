@@ -26,13 +26,15 @@ export default function Apps() {
       description: 'Manage your 3ID',
       icon: threeidIcon,
       url: THREEID_APP_URL,
+      disabled: false,
     },
-    // {
-    //   name: 'Console',
-    //   description: 'Manage your 3ID applications',
-    //   icon: consoleIcon,
-    //   url: CONSOLE_APP_URL,
-    // },
+    {
+      name: 'Console',
+      description: 'Manage your 3ID applications',
+      icon: consoleIcon,
+      url: CONSOLE_APP_URL,
+      disabled: true,
+    },
   ]
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
@@ -45,6 +47,15 @@ export default function Apps() {
         className={'basis-2/5 h-screen w-full hidden lg:block'}
       ></div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
+        <div className={'flex flex-col mb-2'}>
+          <h1
+            className={
+              'flex flex-row justify-center items-center text-lg font-semibold'
+            }
+          >
+            Continue to
+          </h1>
+        </div>
         {apps.map(
           (
             app: {
@@ -52,14 +63,19 @@ export default function Apps() {
               description: string
               icon: string
               url: string
+              disabled: boolean
             },
             key: number
           ) => {
             return (
-              <div key={key} className={'flex flex-col gap-8'}>
+              <div
+                key={key}
+                className={`flex flex-col gap-8`}
+                style={app.disabled ? { opacity: 0.5 } : {}}
+              >
                 <div className={'flex flex-row justify-center items-center'}>
                   <a
-                    href={app.url}
+                    href={!app.disabled ? app.url : '#'}
                     className={
                       'flex flex-col-2 basis-1/3 justify-start items-start gap-4 my-2 p-2 bg-white'
                     }
