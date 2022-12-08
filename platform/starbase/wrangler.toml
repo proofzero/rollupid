@@ -18,7 +18,7 @@ workers_dev = false
 # A list of other Clouflare services bound to this service.
 
 services = [
-  { binding = "Account", service = "account" },
+  { binding = "ACCESS", service = "access" },
   { binding = "EDGES", service = "edges" }
 ]
 
