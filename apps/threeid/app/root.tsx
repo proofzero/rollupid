@@ -97,6 +97,11 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
+        </script>
       </body>
     </html>
   )
@@ -130,6 +135,11 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
+        </script>
       </body>
     </html>
   )
@@ -185,6 +195,11 @@ export function CatchBoundary() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <script
+          defer
+          src='https://static.cloudflareinsights.com/beacon.min.js'
+          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
+        </script>
       </body>
     </html>
   )
