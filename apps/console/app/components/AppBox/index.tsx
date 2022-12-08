@@ -8,8 +8,6 @@ import { Menu, Transition } from '@headlessui/react'
 
 import type { Application } from '~/models/app.server'
 
-import EmptyPrompt from '~/components/EmptyPrompt'
-
 import {
   EllipsisVerticalIcon,
   TrashIcon,
@@ -143,16 +141,16 @@ function AppList(props: AppListProps) {
   })
 
   if (props.apps.length <= 0) {
-    return (
-      <EmptyPrompt
-        icon={folderPlus}
-        alt="Create App icon"
-        title="No Applications"
-        description="Get started by creating an Application."
-        prompt="Create Application"
-        link="/dashboard/apps/new"
-      />
-    )
+    // return (
+    //   <EmptyPrompt
+    //     icon={folderPlus}
+    //     alt="Create App icon"
+    //     title="No Applications"
+    //     description="Get started by creating an Application."
+    //     prompt="Create Application"
+    //     link="/dashboard/apps/new"
+    //   />
+    // )
   } else {
     return <div className="flex flex-col gap-2">{appSummaries}</div>
   }
