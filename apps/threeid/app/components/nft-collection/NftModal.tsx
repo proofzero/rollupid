@@ -1,6 +1,5 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import Modal from '~/components/modal/Modal'
+import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { useState } from 'react'
 
