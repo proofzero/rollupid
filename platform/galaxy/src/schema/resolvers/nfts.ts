@@ -130,11 +130,11 @@ const nftsResolvers: Resolvers = {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM'],
+            excludeFilters: ['SPAM', 'AIRDROPS'],
           }),
           alchemyPolygonClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM'],
+            excludeFilters: ['SPAM', 'AIRDROPS'],
           }),
         ])
 
@@ -169,7 +169,7 @@ const nftsResolvers: Resolvers = {
               while (localBatch.length > 0) {
                 let nfts: any = await alchemyClient.getNFTs({
                   owner,
-                  contractAddresses: batch,
+                  contractAddresses: localBatch,
                   pageSize: localBatch.length * 3,
                 })
                 nfts.ownedNfts.forEach((nft: any) => {
@@ -192,7 +192,7 @@ const nftsResolvers: Resolvers = {
               while (localBatch.length > 0) {
                 let nfts: any = await alchemyPolygonClient.getNFTs({
                   owner,
-                  contractAddresses: batch,
+                  contractAddresses: localBatch,
                   pageSize: localBatch.length * 3,
                 })
                 nfts.ownedNfts.forEach((nft: any) => {
@@ -217,9 +217,9 @@ const nftsResolvers: Resolvers = {
         const polyCollectionsHashMap: any = {}
         // Mapper doesn't work on some vitaliks' nfts for
         // various reasons "Cannot create property 'properties' on string" - e.g.
+        
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts.flat())
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts.flat())
-
         // Creating hashmap with contract addresses as keys
         // And nft arrays as values
         EthOwnedNfts.forEach((NFT: any) => {
@@ -245,7 +245,6 @@ const nftsResolvers: Resolvers = {
             polyCollectionsHashMap[`${NFT.contract.address}`] = [NFT]
           }
         })
-
         // Attach NFT array to a contract object
         // With hash map key it is easy to find a needed array to specific
         // collection

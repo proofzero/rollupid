@@ -218,18 +218,22 @@ export const NFTPropertyMapper = (nfts: any[]) =>
       }
 
       if (nft.metadata.attributes?.length) {
-        const mappedAttributes = nft.metadata.attributes.map((a: any) => ({
-          name: a.trait_type,
-          value: a.value,
-          display: a.display_type || 'string',
-        }))
+        const mappedAttributes = nft.metadata.attributes
+          .filter((a: any) => a != null)
+          .map((a: any) => ({
+            name: a.trait_type,
+            value: a.value,
+            display: a.display_type || 'string',
+          }))
 
         properties = properties.concat(mappedAttributes)
       }
 
-      nft.metadata.properties = properties.filter(
-        (p) => typeof p.value !== 'object'
-      )
+      if (typeof nft.metadata === 'object') {
+        nft.metadata.properties = properties.filter(
+          (p) => typeof p.value !== 'object'
+        )
+      }
       if (nft.metadata.attributes) {
         delete nft.metadata.attributes
       }
