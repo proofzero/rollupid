@@ -1,11 +1,14 @@
-import { LoaderFunction, json } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient } from '~/helpers/clients'
+import { ActionFunction } from 'react-router-dom'
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const srcUrl = new URL(request.url)
+export const action: ActionFunction = async ({ request }) => {
+  const { owner, pageKeys } = (await request.json()) as {
+    owner: string
+    pageKeys: any | undefined
+  }
 
-  const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
     throw new Error('Owner required')
   }
@@ -49,8 +52,10 @@ export const loader: LoaderFunction = async ({ request }) => {
       error = true
     }
     return {
-      url: gatewayFromIpfs(media?.raw),
-      thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
+      url: gatewayFromIpfs(media?.raw ?? undefined),
+      thumbnailUrl: gatewayFromIpfs(
+        media?.thumbnail ?? media?.raw ?? undefined
+      ),
       error: error,
       title: nft.title,
       collectionTitle: nft.contractMetadata?.name,
@@ -70,5 +75,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return json({
     ownedNfts: filteredNfts,
+    pageKeys: res?.pageKeys,
   })
 }
