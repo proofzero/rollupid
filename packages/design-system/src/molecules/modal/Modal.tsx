@@ -23,7 +23,7 @@ export function Modal({
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="relative z-[100]"
+        className="relative z-[100] h-max"
         onClose={(val: boolean) => {
           if (handleClose) handleClose(val)
         }}
@@ -39,7 +39,6 @@ export function Modal({
         >
           <div className="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity" />
         </Transition.Child>
-
         <div className="fixed inset-0 z-[101] overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-2 text-center sm:p-0">
             <Transition.Child
@@ -69,11 +68,8 @@ export function Modal({
                       <HiOutlineX />
                     </div>
                   </div>
-
-                  <div className="flex-1 relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto">
-                    {children}
-                  </div>
                 </div>
+                {children}
               </Dialog.Panel>
             </Transition.Child>
           </div>
