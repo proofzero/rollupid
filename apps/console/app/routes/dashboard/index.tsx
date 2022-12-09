@@ -10,6 +10,7 @@ import { json } from '@remix-run/cloudflare'
 import folderPlus from '~/images/folderPlus.svg'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
 import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
@@ -20,6 +21,7 @@ import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
 import AppBox from '~/components/AppBox'
+import { useState } from 'react'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
@@ -43,6 +45,7 @@ export type ContextType = {
 
 export default function DashboardIndexPage() {
   const { apps, appId } = useLoaderData<ContextType>()
+  const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">
@@ -57,9 +60,17 @@ export default function DashboardIndexPage() {
             <p className="text-slate-500">
               Get started by creating an Application.
             </p>
-            <Button btnSize="l">Create Application"</Button>
+            <Button
+              btnSize="l"
+              onClick={() => {
+                setNewAppModalOpen(true)
+              }}
+            >
+              Create Application"
+            </Button>
           </div>
         </div>
+        <Modal isOpen={newAppModalOpen} fixed />
       </main>
     </div>
   )
