@@ -1,5 +1,18 @@
-query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
-  nftsForAddress(owner: $owner, contractAddresses: $contractAddresses) {
+input NFTPageKeysInput {
+  eth: String
+  polygon: String
+}
+
+query getNftsForAddress(
+  $owner: String!
+  $pageKeys: NFTPageKeysInput
+  $contractAddresses: [String]
+) {
+  nftsForAddress(
+    owner: $owner
+    pageKeys: $pageKeys
+    contractAddresses: $contractAddresses
+  ) {
     ownedNfts {
       contract {
         address
@@ -74,6 +87,10 @@ query getNftsPerCollection(
           network
         }
       }
+    }
+    pageKeys {
+      eth
+      polygon
     }
   }
 }

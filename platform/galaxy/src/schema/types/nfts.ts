@@ -72,6 +72,18 @@ export default /* GraphQL */ `
   type NFTs {
     ownedNfts: [NFT!]!
   }
+  type NFTPageKeys {
+    eth: String
+    polygon: String
+  }
+  input NFTPageKeysInput {
+    eth: String
+    polygon: String
+  }
+  type PagedNFTs {
+    ownedNfts: [NFT!]!
+    pageKeys: NFTPageKeys
+  }
   type Chain {
     chain: String
     network: String
@@ -107,7 +119,11 @@ export default /* GraphQL */ `
     contracts: [NFTContract!]!
   }
   type Query {
-    nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
+    nftsForAddress(
+      owner: String!
+      pageKeys: NFTPageKeysInput
+      contractAddresses: [String]
+    ): PagedNFTs
     contractsForAddress(
       owner: String!
       excludeFilters: [String]

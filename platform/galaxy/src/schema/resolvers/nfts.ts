@@ -20,32 +20,27 @@ type ResolverContext = {
   coreId?: string
 }
 
-const getAllNfts = async (
+const getNfts = async (
   alchemyClient: AlchemyClient,
   owner: string,
-  contractAddresses: string[],
-  maxRuns: number = 3
+  pageKey: string | undefined,
+  contractAddresses: string[]
 ) => {
-  let nfts: any[] = []
+  const res = (await alchemyClient.getNFTs({
+    owner,
+    contractAddresses,
+    pageKey,
+  })) as {
+    ownedNfts: any[]
+    pageKey: string | undefined
+  }
 
-  let runs = 0
-  let pageKey
-  do {
-    const res = (await alchemyClient.getNFTs({
-      owner,
-      contractAddresses,
-      pageKey,
-    })) as {
-      ownedNfts: any[]
-      pageKey: string | undefined
-    }
+  const mappedNfts = NFTPropertyMapper(res.ownedNfts)
 
-    nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
-
-    pageKey = res.pageKey
-  } while (pageKey && ++runs <= maxRuns)
-
-  return nfts
+  return {
+    nfts: mappedNfts,
+    pageKey: res.pageKey,
+  }
 }
 
 const nftsResolvers: Resolvers = {
@@ -56,9 +51,11 @@ const nftsResolvers: Resolvers = {
       _parent: any,
       {
         owner,
+        pageKeys,
         contractAddresses,
       }: {
         owner: string
+        pageKeys: { [key: string]: string }
         contractAddresses: string[]
       },
       { env }: ResolverContext
@@ -77,25 +74,29 @@ const nftsResolvers: Resolvers = {
 
       let ownedNfts: any[] = []
 
+      let ethPageKey = pageKeys ? pageKeys[AlchemyChain.ethereum] : undefined
+      let polyPageKey = pageKeys ? pageKeys[AlchemyChain.polygon] : undefined
+
       try {
         const [ethNfts, polyNfts] = await Promise.all([
-          getAllNfts(ethClient, owner, contractAddresses),
-          getAllNfts(polyClient, owner, contractAddresses),
+          getNfts(ethClient, owner, ethPageKey, contractAddresses),
+          getNfts(polyClient, owner, polyPageKey, contractAddresses),
         ])
 
-        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
+        ownedNfts = ownedNfts.concat(ethNfts.nfts, polyNfts.nfts)
+
+        ethPageKey = ethNfts.pageKey
+        polyPageKey = polyNfts.pageKey
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
 
-      ownedNfts = ownedNfts.sort((a, b) =>
-        (a.contractMetadata?.name ?? '').localeCompare(
-          b.contractMetadata?.name ?? ''
-        )
-      )
-
       return {
         ownedNfts,
+        pageKeys: {
+          [AlchemyChain.ethereum]: ethPageKey,
+          [AlchemyChain.polygon]: polyPageKey,
+        },
       }
     },
     //@ts-ignore
