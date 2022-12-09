@@ -18,8 +18,7 @@ workers_dev = false
 # A list of other Clouflare services bound to this service.
 
 services = [
-  { binding = "ACCESS", service = "access" },
-  { binding = "EDGES", service = "edges" }
+  { binding = "Edges", service = "edges" }
 ]
 
 # Durable Objects
@@ -93,8 +92,7 @@ deleted_classes = [
 [env.dev]
 
 services = [
-  { binding = "ACCESS", service = "access-dev" },
-  { binding = "EDGES", service = "edges-dev" }
+  { binding = "Edges", service = "edges-dev" }
 ]
 
 durable_objects.bindings = [
@@ -115,8 +113,7 @@ ENVIRONMENT = "dev"
 [env.next]
 
 services = [
-  { binding = "ACCESS", service = "access-next" },
-  { binding = "EDGES", service = "edges-next" }
+  { binding = "Edges", service = "edges-next" }
 ]
 
 durable_objects.bindings = [
@@ -137,8 +134,7 @@ ENVIRONMENT = "next"
 [env.current]
 
 services = [
-  { binding = "ACCESS", service = "access-current" },
-  { binding = "EDGES", service = "edges-current" }
+  { binding = "Edges", service = "edges-current" }
 ]
 
 durable_objects.bindings = [
