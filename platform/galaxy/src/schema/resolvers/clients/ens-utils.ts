@@ -25,10 +25,6 @@ class ENSUtils implements IENSUtils {
       throw new Error(res.error)
     }
 
-    console.log({
-      res,
-    })
-
     return res
   }
 
