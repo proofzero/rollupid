@@ -18,14 +18,13 @@ import ProfileNftCollectionStyles from './ProfileNftCollection.css'
 import { LinksFunction } from '@remix-run/cloudflare'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import InputText from '../inputs/InputText'
 
 import { FaSearch } from 'react-icons/fa'
 
 import ModaledNft from './ModaledNft'
-import SelectableNft from './SelectableNft'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: ProfileNftCollectionStyles },
@@ -103,6 +102,8 @@ const ProfileNftCollection = ({
   handleSelectedNft,
   nftRenderer = (nft) => <ModaledNft nft={nft} />,
 }: ProfileNftCollectionProps) => {
+  const [refresh, setRefresh] = useState(true)
+
   const [loadedNfts, setLoadedNfts] = useState(nfts)
 
   const [pageKey, setPageLink] = useState<string | undefined>()
@@ -121,6 +122,10 @@ const ProfileNftCollection = ({
 
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
     setPageLink(nftRes.pageKey ?? null)
+
+    if (refresh) {
+      setRefresh(false)
+    }
   }
 
   useEffect(() => {
@@ -132,18 +137,31 @@ const ProfileNftCollection = ({
     }
   }, [pageKey])
 
+  useMemo(() => {
+    setRefresh(true)
+
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [account])
+
   useEffect(() => {
-    getMoreNfts()
-  }, [])
+    const asyncFn = async () => {
+      await getMoreNfts()
+    }
+
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
 
   return (
     <>
-      {!loading && !isOwner && loadedNfts.length === 0 && (
+      {!loading && !refresh && !isOwner && loadedNfts.length === 0 && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
           Looks like {displayname ?? account} doesn't own any NFTs
         </Text>
       )}
-      {!loading && isOwner && loadedNfts.length === 0 && (
+      {!loading && !refresh && isOwner && loadedNfts.length === 0 && (
         <>
           <div className="my-9 flex flex-row justify-center items-center">
             <img src={noNfts} className="w-[119px] h-[127px]" />
@@ -296,7 +314,7 @@ const ProfileNftCollection = ({
         </InfiniteScroll>
       )}
 
-      {loading && (
+      {(refresh || loading) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
           <div className="w-full h-[550px] sm:h-80 md:h-72 lg:h-56 bg-gray-200 animate-pulse rounded-lg"></div>
           <div className="w-full h-[550px] sm:h-80 md:h-72 lg:h-56 bg-gray-200 animate-pulse rounded-lg"></div>
