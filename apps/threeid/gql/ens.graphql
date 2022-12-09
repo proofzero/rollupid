@@ -1,3 +1,7 @@
-query getEnsAddress($address: String!) {
-  ensAddress(address: $address)
+query getEnsAddress($addressOrEns: String!) {
+  ensAddress(addressOrEns: $addressOrEns)
+}
+
+query getEnsDisplayName($addressOrEns: String!) {
+  ensDisplayName(addressOrEns: $addressOrEns)
 }

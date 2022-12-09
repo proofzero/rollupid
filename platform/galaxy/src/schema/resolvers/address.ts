@@ -2,19 +2,22 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import ENSUtils from './clients/ens-utils'
 import { Resolvers } from './typedefs'
 
-import { setupContext, isAuthorized } from './utils'
+import { setupContext } from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
-    ensAddress: async (_parent, { address }, {}) =>
-      new ENSUtils().getENSAddress(address),
-    ensAddressAvatar: async (_parent, { address }, {}) =>
-      new ENSUtils().getENSAddressAvatar(address),
+    ensDisplayName: async (_parent, { addressOrEns }, { }) =>
+      new ENSUtils().getENSDisplayName(addressOrEns),
+    ensAddress: async (_parent, { addressOrEns }, { }) =>
+      new ENSUtils().getENSAddress(addressOrEns),
+    ensAddressAvatar: async (_parent, { addressOrEns }, { }) =>
+      new ENSUtils().getENSAddressAvatar(addressOrEns),
   },
   Mutation: {},
 }
 
 const AddressResolverComposition = {
+  'Query.ensDisplayName': [setupContext()],
   'Query.ensAddress': [setupContext()],
   'Query.ensAddressAvatar': [setupContext()],
 }

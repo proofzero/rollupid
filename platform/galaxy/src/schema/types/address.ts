@@ -1,6 +1,7 @@
 export default /* GraphQL */ `
   type Query {
-    ensAddress(address: String!): String
-    ensAddressAvatar(address: String!): String
+    ensDisplayName(addressOrEns: String!): String
+    ensAddress(addressOrEns: String!): String!
+    ensAddressAvatar(addressOrEns: String!): String
   }
 `
