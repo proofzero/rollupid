@@ -1,42 +1,13 @@
-query getNftsForAddress(
-  $owner: String!
-  $pageKey: String
-  $pageSize: Int
-  $contractAddresses: [String]
-) {
-  nftsForAddress(
-    owner: $owner
-    pageKey: $pageKey
-    pageSize: $pageSize
-    contractAddresses: $contractAddresses
-  ) {
-    pageKey
-    totalCount
-    blockHash
+query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
+  nftsForAddress(owner: $owner, contractAddresses: $contractAddresses) {
     ownedNfts {
-      contract {
-        address
-      }
       title
       description
-      tokenUri {
-        raw
-        gateway
-      }
       media {
         raw
-        gateway
         thumbnail
-        format
-        bytes
       }
       metadata {
-        image
-        external_url
-        background_color
-        name
-        description
-        timeLastUpdated
         properties {
           name
           value
@@ -46,9 +17,6 @@ query getNftsForAddress(
       error
       contractMetadata {
         name
-        symbol
-        totalSupply
-        tokenType
       }
     }
   }

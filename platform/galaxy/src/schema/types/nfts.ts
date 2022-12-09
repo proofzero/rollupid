@@ -71,16 +71,47 @@ export default /* GraphQL */ `
   }
   type NFTs {
     ownedNfts: [NFT!]!
-    pageKey: String
-    totalCount: String
-    blockHash: String
+  }
+  type Chain {
+    chain: String
+    network: String
+  }
+  type NFTWithChain {
+    contract: Contract
+    title: String
+    description: String
+    tokenUri: TokenURI
+    media: [NFTMedia!]!
+    error: String
+    metadata: NFTMetadata
+    contractMetadata: ContractMetadata
+    chain: Chain
+  }
+  type NFTsWithChain {
+    ownedNfts: [NFTWithChain!]!
+  }
+  type NFTContract {
+    address: String
+    totalBalance: Int
+    numDistinctTokensOwned: Int
+    tokenId: String
+    name: String
+    symbol: String
+    tokenType: String
+    media: NFTMedia
+    opensea: OpenSeaMetadata
+    ownedNfts: [NFTWithChain!]
+    chain: Chain
+  }
+  type NFTContracts {
+    contracts: [NFTContract!]!
   }
   type Query {
-    nftsForAddress(
+    nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
+    contractsForAddress(
       owner: String!
-      pageKey: String
+      excludeFilters: [String]
       pageSize: Int
-      contractAddresses: [String]
-    ): NFTs
+    ): NFTContracts
   }
 `
