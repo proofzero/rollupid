@@ -109,17 +109,19 @@ const ProfileNftCollection = ({
   pfp,
   nftRenderer = (nft) => <ModaledNft nft={nft} isModal={false} />,
 }: ProfileNftCollectionProps) => {
-  const [refresh, setRefresh] = useState(true)
+  const [loadedNfts, setLoadedNfts] = useState<any[]>(nfts)
+  const [canLoadMoreNfts, setCanLoadMoreNfts] = useState(false)
 
-  const [loadedNfts, setLoadedNfts] = useState(nfts)
+  const [visibleNfts, setVisibleNfts] = useState<any[]>([])
 
   const [pageKeys, setPageKeys] = useState<
     | {
+        // State with pagination
         eth: string | undefined
         polygon: string | undefined
       }
-    | undefined
-    | null
+    | undefined // Initial state
+    | null // State when pagination is finished
   >()
 
   const [loading, setLoading] = useState(true)
@@ -136,7 +138,22 @@ const ProfileNftCollection = ({
 
   const [selectedNft, setSelectedNft] = useState('')
 
-  const getMoreNfts = async () => {
+  const showMoreNfts = async () => {
+    const delta = 20
+    const sliceRange = Math.min(loadedNfts.length, visibleNfts.length + delta)
+
+    const visibleSlice = loadedNfts.slice(0, sliceRange)
+
+    if (visibleSlice.length === loadedNfts.length && canLoadMoreNfts) {
+      await loadMoreNfts()
+    }
+
+    setVisibleNfts(visibleSlice)
+  }
+
+  const loadMoreNfts = async () => {
+    setLoading(true)
+
     const nftReq = await fetch(`/nfts`, {
       method: 'POST',
       headers: {
@@ -162,22 +179,22 @@ const ProfileNftCollection = ({
 
     if (nftRes.pageKeys?.eth || nftRes.pageKeys?.polygon) {
       setPageKeys(nftRes.pageKeys)
+      setCanLoadMoreNfts(true)
     } else {
       setPageKeys(null)
+      setCanLoadMoreNfts(false)
     }
+
+    setLoading(false)
   }
 
   useEffect(() => {
-    if (pageKeys && (pageKeys.eth || pageKeys.polygon)) {
-      setLoading(true)
-      getMoreNfts()
-    } else if (pageKeys === null) {
-      setLoading(false)
+    const asyncFn = async () => {
+      await loadMoreNfts()
+      await showMoreNfts()
     }
-  }, [pageKeys])
 
-  useEffect(() => {
-    getMoreNfts()
+    asyncFn()
   }, [])
 
   return (
@@ -394,9 +411,9 @@ const ProfileNftCollection = ({
 
       {loadedNfts.length > 0 && (
         <InfiniteScroll
-          dataLength={loadedNfts.length} //This is important field to render the next data
-          next={preload ? () => {} : getMoreNfts}
-          hasMore={preload ? false : pageKeys != null}
+          dataLength={visibleNfts.length} //This is important field to render the next data
+          next={showMoreNfts}
+          hasMore={visibleNfts.length < loadedNfts.length}
           loader={<Spinner />}
         >
           <Masonry
@@ -409,7 +426,7 @@ const ProfileNftCollection = ({
             className="my-masonry-grid space-x-10"
             columnClassName="my-masonry-grid_column"
           >
-            {loadedNfts
+            {visibleNfts
               .filter(
                 (nft) =>
                   curFilter === 'All Collections' ||
