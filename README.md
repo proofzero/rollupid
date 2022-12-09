@@ -4,7 +4,6 @@
 
 ![License](https://img.shields.io/github/license/kubelt/kubelt)
 [![Discord](https://img.shields.io/discord/790660849471062046?label=Discord)](https://discord.gg/UgwAsJf6C5)
-![Version badge](https://img.shields.io/badge/Version-pre%20alpha-orange.svg)
 
 #### Build Status
 

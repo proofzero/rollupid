@@ -4,8 +4,12 @@
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
+
+import folderPlus from '~/images/folderPlus.svg'
+
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
@@ -47,7 +51,14 @@ export default function DashboardIndexPage() {
         <SiteHeader />
         <div className="bg-gray-200 p-6 h-full">
           <AppBox createLink="/dashboard/new" apps={apps} />
-          {/* <Outlet context={{ apps, appId }} /> */}
+          <div className="text-center mt-24 m-auto">
+            <img className="inline-block" src={folderPlus} alt="Wallet icon" />
+            <div className="text-black mt-4">No Applications</div>
+            <p className="text-slate-500">
+              Get started by creating an Application.
+            </p>
+            <Button btnSize="l">Create Application"</Button>
+          </div>
         </div>
       </main>
     </div>

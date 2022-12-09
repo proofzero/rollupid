@@ -4887,6 +4887,7 @@ __metadata:
     "@cloudflare/workers-types": 3.18.0
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
+    "@kubelt/design-system": "workspace:*"
     "@remix-run/cloudflare": 1.7.5
     "@remix-run/cloudflare-workers": 1.7.5
     "@remix-run/dev": 1.7.5
@@ -5107,7 +5108,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/design-system@*, @kubelt/design-system@workspace:packages/design-system":
+"@kubelt/design-system@*, @kubelt/design-system@workspace:*, @kubelt/design-system@workspace:packages/design-system":
   version: 0.0.0-use.local
   resolution: "@kubelt/design-system@workspace:packages/design-system"
   dependencies:
