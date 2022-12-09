@@ -27,18 +27,18 @@ const NftModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
-        className={`flex-1 relative h-[${size}]
+        className={`flex-1 relative h-[80vh] w-[66vw]
          transform rounded-lg  bg-white px-4 pt-5 pb-4 
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
       >
-        <div className="flex flex-row lg:flex-row max-w-full">
-          <div className="max-w-full lg:max-w-sm flex justify-center items-center">
+        <div className="flex flex-row justify-between lg:flex-row max-w-full">
+          <div className="lg:max-w-sm flex justify-center items-center">
             {!imgLoaded && (
               <div className="w-[24rem] h-[24rem] bg-gray-100 rounded-lg animate-pulse"></div>
             )}
 
             <img
-              className={`object-cover rounded-lg ${
+              className={`object-cover rounded-lg shrink-0 ${
                 imgLoaded ? 'visible' : 'invisible absolute w-2.5 h-2.5'
               }`}
               src={gatewayFromIpfs(nft?.url)}
@@ -47,7 +47,7 @@ const NftModal = ({
             />
           </div>
 
-          <div className="p-0 lg:p-4 max-w-full lg:max-w-md mt-3">
+          <div className="p-0 lg:p-4 w-[100vw] h-[60vh] max-w-full lg:max-w-md mt-3">
             <Text className="mb-2 text-gray-900" size="lg" weight="medium">
               {nft?.collectionTitle}
             </Text>
@@ -58,136 +58,132 @@ const NftModal = ({
             >
               {nft?.title}
             </Text>
-            <div className="accordion accordion-flush" id="accordionDetails">
-              {nft?.details?.length > 0 && (
-                <div
-                  className="accordion-item 
+            {nft?.details?.length > 0 && (
+              <div
+                className="accordion-item 
                 border-t-0 border-l-0 border-r-0 
                 rounded-none bg-white mt-4 lg:mt-8 mb-4 lg:mb-8"
+              >
+                <Text
+                  className="accordion-header ml-1 mb-4 text-gray-900"
+                  size="lg"
+                  weight="semibold"
+                  id="flush-headingOne"
                 >
-                  <Text
-                    className="accordion-header ml-1 mb-4 text-gray-900"
-                    size="lg"
-                    weight="semibold"
-                    id="flush-headingOne"
-                  >
-                    <button
-                      className={
-                        'accordion-button relative flex\
+                  <button
+                    className={
+                      'accordion-button relative flex\
                        items-center w-full py-4\
                       text-left bg-white border-0 rounded-none\
                        transition focus:outline-none'
-                      }
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#flush-collapseOne"
-                      aria-expanded="true"
-                      aria-controls="flush-collapseOne"
-                    >
-                      <Text className="text-gray-600">Details</Text>
-                    </button>
-                  </Text>
-
-                  <div
-                    id="flush-collapseOne"
-                    className="accordion-collapse border-0 collapse show
-                     flex flex-row max-w-md  overflow-hidden"
-                    aria-labelledby="flush-headingOne"
-                    data-bs-parent="#accordionDetails"
+                    }
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#flush-collapseOne"
+                    aria-expanded="true"
+                    aria-controls="flush-collapseOne"
                   >
-                    <div className="accordion-body">
-                      {nft.details.map((d: { name: string; value: any }) => {
-                        return (
-                          <div
-                            key={d.name}
-                            className="flex flex-row justify-between"
+                    <Text className="text-gray-600">Details</Text>
+                  </button>
+                </Text>
+
+                <div
+                  id="flush-collapseOne"
+                  className="accordion-collapse border-0 collapse show
+                     flex flex-row max-w-md  overflow-hidden"
+                  aria-labelledby="flush-headingOne"
+                >
+                  <div className="accordion-body w-[100vw]">
+                    {nft.details.map((d: { name: string; value: any }) => {
+                      return (
+                        <div
+                          key={d.name}
+                          className="flex flex-row justify-between"
+                        >
+                          <Text
+                            size="xs"
+                            weight="medium"
+                            className="text-gray-400 pb-2"
                           >
-                            <Text
-                              size="xs"
-                              weight="medium"
-                              className="text-gray-400 pb-2"
-                            >
-                              {d.name}
-                            </Text>
-                            <Text
-                              size="xs"
-                              weight="semibold"
-                              className="text-gray-700 pt-2"
-                            >
-                              {d.value}
-                            </Text>
-                          </div>
-                        )
-                      })}
-                    </div>
+                            {d.name}
+                          </Text>
+                          <Text
+                            size="xs"
+                            weight="semibold"
+                            className="text-gray-700 pt-2"
+                          >
+                            {d.value}
+                          </Text>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
-              )}
-              <hr />
-              {nft?.properties?.length > 0 && (
-                <div
-                  className="accordion-item 
+              </div>
+            )}
+            <hr />
+            {nft?.properties?.length > 0 && (
+              <div
+                className="accordion-item 
               border-t-0 border-l-0 border-r-0
               rounded-none bg-white mt-4 lg:mt-8"
-                >
-                  <Text
-                    className="accordion-header 
+              >
+                <Text
+                  className="accordion-header 
                   ml-1 mb-4 text-gray-900"
-                    size="lg"
-                    weight="semibold"
-                  >
-                    <button
-                      className={
-                        'accordion-button relative collapsed flex\
+                  size="lg"
+                  weight="semibold"
+                >
+                  <button
+                    className={
+                      'accordion-button relative collapsed flex\
                        items-center w-full py-4\
                       text-left bg-white border-0 rounded-none\
                        transition focus:outline-none'
-                      }
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#flush-collapseTwo"
-                      aria-expanded="false"
-                      aria-controls="flush-collapseTwo"
-                    >
-                      <Text className="text-gray-600">Properties</Text>
-                    </button>
-                  </Text>
-
-                  <div
-                    id="flush-collapseTwo"
-                    className="accordion-collapse border-0 collapse flex flex-row max-w-md  overflow-hidden"
-                    aria-labelledby="flush-headingTwo"
-                    data-bs-parent="#accordionDetails"
+                    }
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#flush-collapseTwo"
+                    aria-expanded="false"
+                    aria-controls="flush-collapseTwo"
                   >
-                    <div className="accordion-body flex flex-row">
-                      {nft?.properties.map(
-                        (p: { name: string; value: any; display: string }) => (
-                          <div
-                            key={p.name ?? `${new Date().getTime()}`}
-                            className="m-1 py-2 px-4 border rounded-md"
+                    <Text className="text-gray-600">Properties</Text>
+                  </button>
+                </Text>
+
+                <div
+                  id="flush-collapseTwo"
+                  className="accordion-collapse border-0 collapse flex flex-row max-w-md  overflow-hidden"
+                  aria-labelledby="flush-headingTwo"
+                >
+                  <div className="accordion-body flex flex-row">
+                    {nft?.properties.map(
+                      (p: { name: string; value: any; display: string }) => (
+                        <div
+                          key={p.name ?? `${new Date().getTime()}`}
+                          className="m-1 py-2 px-4 border rounded-md"
+                        >
+                          <Text
+                            size="xs"
+                            weight="medium"
+                            className="text-gray-400"
                           >
-                            <Text
-                              size="xs"
-                              weight="medium"
-                              className="text-gray-400"
-                            >
-                              {p.name?.toUpperCase()}
-                            </Text>
-                            <Text
-                              size="sm"
-                              weight="semibold"
-                              className="text-gray-700"
-                            >
-                              {p.value}
-                            </Text>
-                          </div>
-                        )
-                      )}
-                    </div>
+                            {p.name?.toUpperCase()}
+                          </Text>
+                          <Text
+                            size="sm"
+                            weight="semibold"
+                            className="text-gray-700"
+                          >
+                            {p.value}
+                          </Text>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
