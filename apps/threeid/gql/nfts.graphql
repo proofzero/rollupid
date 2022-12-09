@@ -1,6 +1,9 @@
 query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
   nftsForAddress(owner: $owner, contractAddresses: $contractAddresses) {
     ownedNfts {
+      contract {
+        address
+      }
       title
       description
       media {
@@ -17,6 +20,7 @@ query getNftsForAddress($owner: String!, $contractAddresses: [String]) {
       error
       contractMetadata {
         name
+        tokenType
       }
     }
   }

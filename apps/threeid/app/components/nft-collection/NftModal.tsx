@@ -23,7 +23,6 @@ const NftModal = ({
   handleClose: (evt: any) => void
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false)
-  console.log(nft)
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
@@ -72,7 +71,7 @@ const NftModal = ({
                 >
                   <button
                     className={
-                      'accordion-button relative flex\
+                      'accordion-button relative collapsed flex\
                        items-center w-full py-4\
                       text-left bg-white border-0 rounded-none\
                        transition focus:outline-none'
@@ -89,7 +88,7 @@ const NftModal = ({
 
                 <div
                   id="flush-collapseOne"
-                  className="accordion-collapse border-0 collapse show
+                  className="accordion-collapse border-0 collapse
                      flex flex-row max-w-md  overflow-hidden"
                   aria-labelledby="flush-headingOne"
                 >
@@ -136,7 +135,7 @@ const NftModal = ({
                 >
                   <button
                     className={
-                      'accordion-button relative collapsed flex\
+                      'accordion-button relative flex\
                        items-center w-full py-4\
                       text-left bg-white border-0 rounded-none\
                        transition focus:outline-none'
@@ -153,7 +152,7 @@ const NftModal = ({
 
                 <div
                   id="flush-collapseTwo"
-                  className="accordion-collapse border-0 collapse flex flex-row max-w-md  overflow-hidden"
+                  className="accordion-collapse border-0 collapse show flex flex-row max-w-md  overflow-hidden"
                   aria-labelledby="flush-headingTwo"
                 >
                   <div className="accordion-body flex flex-row">
