@@ -1,0 +1,3 @@
+query getEnsAddress($address: String!) {
+  ensAddress(address: $address)
+}

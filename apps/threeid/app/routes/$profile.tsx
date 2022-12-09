@@ -64,7 +64,12 @@ export const loader: LoaderFunction = async (args) => {
       const urnAddress = AddressURNSpace.decode(
         profileRes.profile.defaultAddress
       )
-      isOwner = urnAddress == targetAddress
+
+      const { ensAddress } = await galaxyClient.getEnsAddress({
+        address: urnAddress,
+      })
+
+      isOwner = urnAddress == targetAddress || ensAddress === targetAddress
     }
   }
 
