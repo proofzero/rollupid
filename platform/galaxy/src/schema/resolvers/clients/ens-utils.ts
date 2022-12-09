@@ -1,9 +1,11 @@
 export interface IENSUtils {
-  getENSAddress(address: string): Promise<string | null>
-  getENSAddressAvatar(address: string): Promise<string | null>
+  getENSDisplayName(addressOrEns: string): Promise<string | null>
+  getENSAddress(addressOrEns: string): Promise<string>
+  getENSAddressAvatar(addressOrEns: string): Promise<string | null>
 }
 
 type ENSRes = {
+  address: string
   avatar: string | null
   displayName: string | null
   error?: string
@@ -26,14 +28,20 @@ class ENSUtils implements IENSUtils {
     return res
   }
 
-  async getENSAddress(address: string): Promise<string | null> {
-    const { displayName } = await this.getEnsEntry(address)
+  async getENSDisplayName(addressOrEns: string): Promise<string | null> {
+    const { displayName } = await this.getEnsEntry(addressOrEns)
 
     return displayName
   }
 
-  async getENSAddressAvatar(address: string): Promise<string | null> {
-    const { avatar } = await this.getEnsEntry(address)
+  async getENSAddress(addressOrEns: string): Promise<string> {
+    const { address } = await this.getEnsEntry(addressOrEns)
+
+    return address
+  }
+
+  async getENSAddressAvatar(addressOrEns: string): Promise<string | null> {
+    const { avatar } = await this.getEnsEntry(addressOrEns)
 
     return avatar
   }

@@ -46,7 +46,11 @@ export const loader: LoaderFunction = async (args) => {
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
 
-  let targetAddress = params.profile
+  if (!params.profile) throw new Error('Profile is required')
+
+  const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
+    addressOrEns: params.profile,
+  })
 
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
@@ -64,6 +68,7 @@ export const loader: LoaderFunction = async (args) => {
       const urnAddress = AddressURNSpace.decode(
         profileRes.profile.defaultAddress
       )
+
       isOwner = urnAddress == targetAddress
     }
   }
