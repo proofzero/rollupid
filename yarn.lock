@@ -4068,6 +4068,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@headlessui/react@npm:1.7.5":
+  version: 1.7.5
+  resolution: "@headlessui/react@npm:1.7.5"
+  dependencies:
+    client-only: ^0.0.1
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+    react-dom: ^16 || ^17 || ^18
+  checksum: 0658251a38a23cb6e41bc4edb15184fa8a5470f57f8c9d948a1aa5ce4da5b1d6ec24ac488ce5d5dbf0ed49c0ad1f147a03db4d6661262eb60a1eed299527a0f0
+  languageName: node
+  linkType: hard
+
 "@heroicons/react@npm:2.0.10":
   version: 2.0.10
   resolution: "@heroicons/react@npm:2.0.10"
@@ -5113,6 +5125,7 @@ __metadata:
   resolution: "@kubelt/design-system@workspace:packages/design-system"
   dependencies:
     "@babel/cli": 7.19.3
+    "@headlessui/react": 1.7.5
     "@mdx-js/react": 1.6.22
     "@storybook/addon-actions": 6.5.13
     "@storybook/addon-docs": 6.5.13
@@ -5153,7 +5166,7 @@ __metadata:
     prop-types: 15.8.1
     react: 18.2.0
     react-dom: 18.2.0
-    react-icons: 4.6.0
+    react-icons: 4.7.1
     react-scripts: 5.0.1
     sass-loader: 13.2.0
     storybook-addon-sass-postcss: 0.1.3
@@ -35926,7 +35939,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-icons@npm:^4.6.0":
+"react-icons@npm:4.7.1, react-icons@npm:^4.6.0":
   version: 4.7.1
   resolution: "react-icons@npm:4.7.1"
   peerDependencies:
