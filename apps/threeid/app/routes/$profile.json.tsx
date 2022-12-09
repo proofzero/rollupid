@@ -6,16 +6,19 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.profile) {
     throw new Error('Profile address required')
   }
+  const galaxyClient = await getGalaxyClient()
+
+  const { ensAddress } = await galaxyClient.getEnsAddress({
+    addressOrEns: params.profile,
+  })
 
   // address should be reachable if already created
   // TODO: if not we have to do some checking downstream
-  const addressURN = `urn:threeid:address/${params.profile}`
+  const addressURN = `urn:threeid:address/${ensAddress}`
 
-  const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfileFromAddress({
     addressURN,
   })
-  console.log({ profileRes })
 
   if (!profileRes) {
     return json(`Could not resolve profile with name: ${params.profile}`, {
