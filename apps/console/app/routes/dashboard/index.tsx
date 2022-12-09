@@ -63,6 +63,7 @@ export default function DashboardIndexPage() {
             <Button
               btnSize="l"
               onClick={() => {
+                console.log('opening')
                 setNewAppModalOpen(true)
               }}
             >
