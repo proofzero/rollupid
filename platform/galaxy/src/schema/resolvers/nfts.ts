@@ -78,15 +78,41 @@ const nftsResolvers: Resolvers = {
       let polyPageKey = pageKeys ? pageKeys[AlchemyChain.polygon] : undefined
 
       try {
-        const [ethNfts, polyNfts] = await Promise.all([
-          getNfts(ethClient, owner, ethPageKey, contractAddresses),
-          getNfts(polyClient, owner, polyPageKey, contractAddresses),
-        ])
+        let promiseChain = []
 
-        ownedNfts = ownedNfts.concat(ethNfts.nfts, polyNfts.nfts)
+        // If we have no page keys
+        // we consider it the first request
+        // so we want both networks
+        if (!pageKeys) {
+          promiseChain = [
+            getNfts(ethClient, owner, ethPageKey, contractAddresses),
+            getNfts(polyClient, owner, polyPageKey, contractAddresses),
+          ]
 
-        ethPageKey = ethNfts.pageKey
-        polyPageKey = polyNfts.pageKey
+          // If keys are nulled it means we reached
+          // the end of nfts for the particular
+          // network
+        } else {
+          if (ethPageKey) {
+            promiseChain.push(
+              getNfts(ethClient, owner, ethPageKey, contractAddresses)
+            )
+          }
+
+          if (polyPageKey) {
+            promiseChain.push(
+              getNfts(polyClient, owner, polyPageKey, contractAddresses)
+            )
+          }
+        }
+
+        // Ordering is important in the promise chain
+        const [ethRes, polyRes] = await Promise.all(promiseChain)
+
+        ownedNfts = ownedNfts.concat(ethRes?.nfts ?? [], polyRes?.nfts ?? [])
+
+        ethPageKey = ethRes?.pageKey
+        polyPageKey = polyRes?.pageKey
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
