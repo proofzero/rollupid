@@ -113,7 +113,15 @@ const ProfileNftCollection = ({
 
   const [loadedNfts, setLoadedNfts] = useState(nfts)
 
-  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [pageKeys, setPageKeys] = useState<
+    | {
+        eth: string | undefined
+        polygon: string | undefined
+      }
+    | undefined
+    | null
+  >()
+
   const [loading, setLoading] = useState(true)
 
   const [openedFilters, setOpenedFilters] = useState(false)
@@ -129,68 +137,48 @@ const ProfileNftCollection = ({
   const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
-    const nftReq = await fetch(
-      `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ''}`
-    )
-    const nftRes: any = await nftReq.json()
+    const nftReq = await fetch(`/nfts`, {
+      method: 'POST',
+      headers: {
+        ['Content-Type']: 'application/json',
+      },
+      body: JSON.stringify({
+        owner: account,
+        pageKeys,
+      }),
+    })
 
-    /* We already have only 1 NFT per collection
-     ** No need to put it in additional Set data structure
-     */
-    setColFilters([
-      ...colFilters,
-      ...nftRes.ownedNfts.reduce((acc: any, nft: any) => {
-        if (
-          nft.collectionTitle &&
-          nft.collectionTitle !== 'All Collections' &&
-          nft.collectionTitle !== 'Untitled Collections'
-        ) {
-          return [
-            ...acc,
-            {
-              title: nft.collectionTitle,
-              img: nft.thumbnailUrl ? nft.thumbnailUrl : undefined,
-            },
-          ]
-        } else {
-          return acc
-        }
-      }, []),
-    ])
+    const nftRes = (await nftReq.json()) as {
+      ownedNfts: any[]
+      pageKeys:
+        | {
+            eth: string | undefined
+            polygon: string | undefined
+          }
+        | undefined
+    }
 
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
-    setPageLink(nftRes.pageKey ?? null)
 
-    if (refresh) {
-      setRefresh(false)
+    if (nftRes.pageKeys?.eth || nftRes.pageKeys?.polygon) {
+      setPageKeys(nftRes.pageKeys)
+    } else {
+      setPageKeys(null)
     }
   }
 
   useEffect(() => {
-    if (pageKey) {
+    if (pageKeys && (pageKeys.eth || pageKeys.polygon)) {
       setLoading(true)
       getMoreNfts()
-    } else if (pageKey === null) {
+    } else if (pageKeys === null) {
       setLoading(false)
     }
-  }, [pageKey])
-
-  useMemo(() => {
-    setRefresh(true)
-
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [account])
+  }, [pageKeys])
 
   useEffect(() => {
-    const asyncFn = async () => {
-      await getMoreNfts()
-    }
-
-    if (refresh) {
-      asyncFn()
-    }
-  }, [refresh])
+    getMoreNfts()
+  }, [])
 
   return (
     <>
@@ -408,7 +396,7 @@ const ProfileNftCollection = ({
         <InfiniteScroll
           dataLength={loadedNfts.length} //This is important field to render the next data
           next={preload ? () => {} : getMoreNfts}
-          hasMore={preload ? false : pageKey != null}
+          hasMore={preload ? false : pageKeys != null}
           loader={<Spinner />}
         >
           <Masonry
