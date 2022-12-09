@@ -6,11 +6,11 @@ import { setupContext } from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
-    ensDisplayName: async (_parent, { addressOrEns }, { }) =>
+    ensDisplayName: async (_parent, { addressOrEns }, {}) =>
       new ENSUtils().getENSDisplayName(addressOrEns),
-    ensAddress: async (_parent, { addressOrEns }, { }) =>
+    ensAddress: async (_parent, { addressOrEns }, {}) =>
       new ENSUtils().getENSAddress(addressOrEns),
-    ensAddressAvatar: async (_parent, { addressOrEns }, { }) =>
+    ensAddressAvatar: async (_parent, { addressOrEns }, {}) =>
       new ENSUtils().getENSAddressAvatar(addressOrEns),
   },
   Mutation: {},

@@ -26,7 +26,7 @@ class ENSUtils implements IENSUtils {
     }
 
     console.log({
-      res
+      res,
     })
 
     return res
@@ -37,7 +37,6 @@ class ENSUtils implements IENSUtils {
 
     return displayName
   }
-
 
   async getENSAddress(addressOrEns: string): Promise<string> {
     const { address } = await this.getEnsEntry(addressOrEns)
