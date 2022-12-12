@@ -111,6 +111,7 @@ const authCheck: RpcAuthHandler = async (
   // Perform a request to the Access service, passing it the token
   // provided with the current request. If the response is a payload,
   // the auth check succeeded. An error is returned otherwise.
+  /*
   const access = context.get(KEY_ACCESS)
   if (_.isUndefined(access)) {
     // We need to supply a service binding for the Access service to
@@ -145,6 +146,7 @@ const authCheck: RpcAuthHandler = async (
   } catch (e: unknown) {
     return new Response('Internal Server Error', { status: 500 })
   }
+  */
 }
 
 // Methods
@@ -191,8 +193,9 @@ const kb_appCreate = openrpc.method(schema, {
       // TODO: extend @kubelt/openrpc client to support remote workers
       // that implement an OpenRPC service.
 
-      // TODO: we need to create an edge between the logged in user node (aka account)
-      // and the new app
+      // TODO: we need to create an edge between the logged in user node
+      // (aka account) and the new app
+      // TODO accept src and dst nodes as RPC parameters.
       const src = graph.node('threeid', 'fixme-src')
       const dst = graph.node('threeid', 'fixme-dst')
       const tag = graph.edge('owns')
@@ -875,9 +878,13 @@ export default {
     context.set(KEY_APPLICATION, env.StarbaseApp)
 
     // A stub for invoking the account service.
-    context.set(KEY_ACCESS, env.ACCESS)
+    //
+    // NB: we can't use the access service this way, results in a cyclic
+    // service binding dependency.
+    //context.set(KEY_ACCESS, env.ACCESS)
+
     // A stub for invoking the edges service.
-    context.set(KEY_EDGES, env.EDGES)
+    context.set(KEY_EDGES, env.Edges)
 
     // NB: the handler clones the request; we don't need to do it here.
     return rpcHandler(request, context)
