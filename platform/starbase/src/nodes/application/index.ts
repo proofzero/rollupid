@@ -3,16 +3,16 @@
  * @file src/index.ts
  */
 
-import * as _ from "lodash";
+import * as _ from 'lodash'
 
-import * as openrpc from "@kubelt/openrpc";
+import * as openrpc from '@kubelt/openrpc'
 
 import type {
   RpcInput,
   RpcOutput,
   RpcParams,
   RpcResult,
-} from "@kubelt/openrpc/component";
+} from '@kubelt/openrpc/component'
 
 import {
   FieldAccess,
@@ -22,10 +22,10 @@ import {
   requiredField,
   requiredScope,
   scopes,
-} from "@kubelt/openrpc/component";
+} from '@kubelt/openrpc/component'
 
 // The OpenRPC schema that defines the RPC API provided by the Durable Object.
-import schema from "./schema";
+import schema from './schema'
 
 // StarbaseApplication
 // -----------------------------------------------------------------------------
@@ -55,14 +55,10 @@ import schema from "./schema";
 // Should this version be an argument to @component(schema, "v1")?
 //@version("v1")
 @component(schema)
-@scopes([
-  "owner",
-  "starbase.read",
-  "starbase.write",
-])
+@scopes(['owner', 'starbase.read', 'starbase.write'])
 @field({
-  name: "app",
-  doc: "An application object",
+  name: 'app',
+  doc: 'An application object',
   defaultValue: {},
   /*
   scopes: {
@@ -85,30 +81,29 @@ import schema from "./schema";
   */
 })
 export class StarbaseApplication {
-
   // init
   // -----------------------------------------------------------------------------
   // Store the initial copy of the application record.
 
-  @method("init")
-  @requiredScope("starbase.write")
-  @requiredField("app", [FieldAccess.Read, FieldAccess.Write])
+  @method('init')
+  @requiredScope('starbase.write')
+  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
   init(
     params: RpcParams,
     input: RpcInput,
-    output: RpcOutput,
+    output: RpcOutput
   ): Promise<RpcResult> {
-    const app = params.get("app");
+    const app = params.get('app')
 
     if (Object.keys(app).length > 0) {
-      output.set("app", app)
+      output.set('app', app)
     } else {
       return Promise.resolve({
         error: `cannot initialize app more than once`,
       })
     }
 
-    return Promise.resolve(app);
+    return Promise.resolve(app)
   }
 
   // update
@@ -116,23 +111,22 @@ export class StarbaseApplication {
 
   // Mark this method as being the implementation of the update method
   // from the OpenRPC schema.
-  @method("update")
+  @method('update')
   // The write scope is required to invoke this method. If the caller
   // lacks the scope they receive an error method indicating that they
   // lack permission, and this method handler is not invoked.
-  @requiredScope("starbase.write")
+  @requiredScope('starbase.write')
   // Allow this method to update the value of the "app" field of the
   // component.
-  @requiredField("app", [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
   // The RPC method implementation.
   async update(
     params: RpcParams,
     input: RpcInput,
-    output: RpcOutput,
+    output: RpcOutput
   ): Promise<RpcResult> {
-
-    if (!params.has("profile")) {
-      const message = `missing parameter "profile" from request`;
+    if (!params.has('profile')) {
+      const message = `missing parameter "profile" from request`
       // TODO need a better way to return errors:
       // - additional RpcCallable parameter that is an error map; errors
       //   set on that map trigger the return of a JSON-RPC error
@@ -140,14 +134,14 @@ export class StarbaseApplication {
       // - exceptions
       return Promise.resolve({
         error: message,
-      });
+      })
     }
 
-    const app = input.get("app")
+    const app = input.get('app')
 
     // Read the supplied "app" request parameter and write it to the
     // output "app" field.
-    const profile = params.get("profile");
+    const profile = params.get('profile')
 
     // Make sure there's nothing sensitive in the parameters being
     // updated.
@@ -155,46 +149,45 @@ export class StarbaseApplication {
     // NB: that no extraneous fields are set should eventually be
     // validated by application of the schema.
     // TODO: add separate fields for secure / sensitive data
-    const updated = _.merge(app, _.omit(profile, [
-      'clientId',
-      'clientSecret',
-      'published',
-    ]))
+    const updated = _.merge(
+      app,
+      _.omit(profile, ['clientId', 'clientSecret', 'published'])
+    )
 
-    output.set("app", updated);
+    output.set('app', updated)
     console.log(updated)
 
     return Promise.resolve({
       profile,
-    });
+    })
   }
 
   // fetch
   // -----------------------------------------------------------------------------
 
-  @method("fetch")
-  @requiredScope("starbase.read")
-  @requiredField("app", [FieldAccess.Read])
+  @method('fetch')
+  @requiredScope('starbase.read')
+  @requiredField('app', [FieldAccess.Read])
   appFetch(
     params: RpcParams,
     input: RpcInput,
-    output: RpcOutput,
+    output: RpcOutput
   ): Promise<RpcResult> {
-    const app = input.get("app");
+    const app = input.get('app')
 
-    return Promise.resolve(app);
+    return Promise.resolve(app)
   }
 
   // profile
   // -----------------------------------------------------------------------------
 
-  @method("profile")
-  @requiredScope("starbase.read")
-  @requiredField("app", [FieldAccess.Read])
+  @method('profile')
+  @requiredScope('starbase.read')
+  @requiredField('app', [FieldAccess.Read])
   profile(
     params: RpcParams,
     input: RpcInput,
-    output: RpcOutput,
+    output: RpcOutput
   ): Promise<RpcResult> {
     const app = input.get('app')
 
@@ -202,10 +195,7 @@ export class StarbaseApplication {
     // information.
     let profile = {}
     if (app?.published == true) {
-      profile = _.omit(app, [
-        'clientSecret',
-        'published',
-      ])
+      profile = _.omit(app, ['clientSecret', 'published'])
     }
 
     return Promise.resolve(profile)
@@ -230,5 +220,4 @@ export class StarbaseApplication {
   // cmp.scopes
   // -----------------------------------------------------------------------------
   // Returns a list of the scopes declared by the component.
-
 } // END StarbaseApp

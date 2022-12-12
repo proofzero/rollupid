@@ -208,7 +208,7 @@ const kb_appCreate = openrpc.method(schema, {
           src,
           dst,
           tag,
-        }
+        },
       }
       const edgeReq = new Request('http://edges.dev/jsonrpc', {
         method: 'POST',

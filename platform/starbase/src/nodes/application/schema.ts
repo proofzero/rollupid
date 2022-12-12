@@ -1,91 +1,91 @@
 // schema.ts
 
-import type { RpcSchema } from "@kubelt/openrpc";
+import type { RpcSchema } from '@kubelt/openrpc'
 
 const rpcSchema: RpcSchema = {
-  openrpc: "1.0.0-rc1",
+  openrpc: '1.0.0-rc1',
   info: {
-    title: "StarbaseApplication",
-    version: "0.1.0",
+    title: 'StarbaseApplication',
+    version: '0.1.0',
     license: {
-      name: "UNLICENSED"
-    }
+      name: 'UNLICENSED',
+    },
   },
   methods: [
     {
-      name: "init",
-      summary: "Store the initial copy of the application record",
+      name: 'init',
+      summary: 'Store the initial copy of the application record',
       params: [
         // TODO
       ],
       result: {
-        name: "app",
-        description: "An application record",
+        name: 'app',
+        description: 'An application record',
         schema: {
-          "$ref": "#/components/contentDescriptors/Application"
-        }
+          $ref: '#/components/contentDescriptors/Application',
+        },
       },
       errors: [],
     },
     {
-      name: "update",
-      summary: "Update the public application profile",
+      name: 'update',
+      summary: 'Update the public application profile',
       params: [
         // TODO
       ],
       result: {
-        name: "app",
-        description: "An application record",
+        name: 'app',
+        description: 'An application record',
         schema: {
-          "$ref": "#/components/contentDescriptors/Application"
-        }
+          $ref: '#/components/contentDescriptors/Application',
+        },
       },
       errors: [],
     },
     {
-      name: "fetch",
-      summary: "Fetch the complete application record",
+      name: 'fetch',
+      summary: 'Fetch the complete application record',
       params: [],
       result: {
-        name: "app",
-        description: "An application record",
+        name: 'app',
+        description: 'An application record',
         schema: {
-          "$ref": "#/components/contentDescriptors/Application"
-        }
+          $ref: '#/components/contentDescriptors/Application',
+        },
       },
       errors: [],
     },
     {
-      name: "profile",
-      summary: "Return public view of application data",
+      name: 'profile',
+      summary: 'Return public view of application data',
       params: [],
       result: {
-        name: "profile",
-        description: "Public application data",
+        name: 'profile',
+        description: 'Public application data',
         schema: {
-          type: "object"
-        }
+          type: 'object',
+        },
       },
       errors: [],
     },
   ],
   components: {
     contentDescriptors: {
-      "Application": {
-        name: "app",
+      Application: {
+        name: 'app',
         required: true,
-        description: "An application record",
+        description: 'An application record',
         schema: {
-          "$ref": "#/components/schemas/Application"
+          $ref: '#/components/schemas/Application',
         },
       },
     },
     schemas: {
-      "Application": {
-        type: "object",
+      Application: {
+        type: 'object',
       },
-    }
+    },
   },
-};
+}
 
-export default rpcSchema;
+export default rpcSchema
