@@ -17,8 +17,8 @@ port = 8787
 local_protocol = "http"
 
 [vars]
-ALCHEMY_CHAIN="eth"
-ALCHEMY_NETWORK="goerli"
+ALCHEMY_ETH_NETWORK="goerli"
+ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.dev]
 route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
