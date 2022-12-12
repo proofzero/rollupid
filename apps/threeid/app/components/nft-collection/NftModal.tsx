@@ -1,5 +1,5 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import Modal from '@kubelt/design-system/src/molecules/modal/Modal'
+import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
 import { HiChevronDown } from 'react-icons/hi'
 

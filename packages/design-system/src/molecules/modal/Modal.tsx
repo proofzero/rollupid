@@ -12,7 +12,7 @@ export type ModalProps = {
   fixed?: boolean
 }
 
-const Modal = ({
+export const Modal = ({
   isOpen = false,
   fixed = false,
   handleClose,
@@ -84,5 +84,3 @@ const Modal = ({
     </Transition.Root>
   )
 }
-
-export default Modal
