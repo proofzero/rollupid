@@ -4,8 +4,6 @@ description: Implementation Guides for 3ID
 
 ## Login to [3ID Passport](https://passport.threeid.xyz).
 
-<img src="./img/passport.png" alt="Passport post-login dashboard showing 3ID Profile and Console applications." />
-
 ## Open [Console](https://console.threeid.xyz).
 
 ## Configure your OAuth settings including secrets, requested scopes, and redirect URL.
