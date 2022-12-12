@@ -52,20 +52,11 @@ jobs:
           environment: 'dev'
           secrets: |
             SESSION_SECRET
-            DATADOG_CLIENT_TOKEN
-            DATADOG_APPLICATION_ID
-            DATADOG_ENV
-            DATADOG_SERVICE_NAME
             NFTAR_AUTHORIZATION
         env:
           SESSION_SECRET: 'foobar'
           # CF_ROUTE: https://3id-dev.kubelt.com/*
           # These values are injected into the generated wrangler.toml.
-          # The Datadog client token.
-          DATADOG_CLIENT_TOKEN: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_APPLICATION_ID: ${{ secrets.DATADOG_APPLICATION_ID }}
-          DATADOG_ENV: development
-          DATADOG_SERVICE_NAME: 3id-application
           # The Cloudflare API token used by wrangler.
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
           NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_DEV_AUTHORIZATION }}

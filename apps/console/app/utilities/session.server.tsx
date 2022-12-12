@@ -12,8 +12,6 @@ import {
   redirect,
 } from '@remix-run/cloudflare'
 
-// import eventSubmit from "~/utils/datadog.server";
-
 // @ts-ignore
 invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 

@@ -6,10 +6,6 @@ declare global {
   const SESSON_SECRET: string
   const PASSPORT_URL: String
   const MINTPFP_CONTRACT_ADDRESS: string
-  const DATADOG_APPLICATION_ID: string
-  const DATADOG_CLIENT_TOKEN: string
-  const DATADOG_SERVICE_NAME: string
-  const DATADOG_ENV: string
   const VALID_CHAIN_ID_NAME: string
   const NFTAR_AUTHORIZATION: string
   const NFTAR_URL: string

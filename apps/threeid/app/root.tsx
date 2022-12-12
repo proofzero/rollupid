@@ -15,10 +15,6 @@ import { json } from '@remix-run/cloudflare'
 
 import { useLoaderData, useCatch } from '@remix-run/react'
 
-import { startSession } from '~/utils/datadog.client'
-
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
-
 import designStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
@@ -35,6 +31,13 @@ import logo from './assets/three-id-logo.svg'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
+
+function Analytics () {
+  return <script defer
+    src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'>
+  </script>
+}
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -69,17 +72,12 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = () => {
   return json({
     ENV: {
-      DATADOG_APPLICATION_ID: DATADOG_APPLICATION_ID,
-      DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN,
-      DATADOG_SERVICE_NAME: DATADOG_SERVICE_NAME,
-      DATADOG_ENV: DATADOG_ENV,
     },
   })
 }
 
 export default function App() {
   const browserEnv = useLoaderData()
-  typeof window !== 'undefined' && startSession()
 
   return (
     <html lang="en">
@@ -97,6 +95,7 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <Analytics />
       </body>
     </html>
   )
@@ -130,6 +129,7 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <Analytics />
       </body>
     </html>
   )
@@ -185,6 +185,7 @@ export function CatchBoundary() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <Analytics />
       </body>
     </html>
   )
