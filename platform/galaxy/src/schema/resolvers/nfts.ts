@@ -103,7 +103,7 @@ const nftsResolvers: Resolvers = {
       _parent: any,
       {
         owner,
-        excludeFilters,
+        excludeFilters = ['SPAM', 'AIRDROPS'],
         pageSize = 1,
       }: {
         owner: string
@@ -130,11 +130,11 @@ const nftsResolvers: Resolvers = {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters,
           }),
           alchemyPolygonClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters,
           }),
         ])
 
@@ -217,7 +217,7 @@ const nftsResolvers: Resolvers = {
         const polyCollectionsHashMap: any = {}
         // Mapper doesn't work on some vitaliks' nfts for
         // various reasons "Cannot create property 'properties' on string" - e.g.
-        
+
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts.flat())
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts.flat())
         // Creating hashmap with contract addresses as keys
