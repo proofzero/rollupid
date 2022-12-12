@@ -56,6 +56,5 @@ jobs:
 
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          ALCHEMY_KEY: ${{ secrets.GALAXY_ALCHEMY_GOERLI_API_KEY}}
           APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_GOERLI }}
           APIKEY_ALCHEMY_POLYGON: ${{ secrets.APIKEY_ALCHEMY_POLYGON_MUMBAI }}
