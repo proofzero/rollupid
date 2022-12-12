@@ -13,10 +13,11 @@ export type ModalProps = {
 }
 
 const Modal = ({
-  children,
-  isOpen,
-  handleClose,
+  isOpen = false,
   fixed = false,
+  handleClose,
+  children,
+  ...rest
 }: ModalProps) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
