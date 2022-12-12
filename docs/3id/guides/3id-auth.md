@@ -4,7 +4,7 @@ description: Implementation Guides for 3ID
 
 ## Login to [3ID Passport](https://passport.threeid.xyz).
 
-![Passport post-login dashboard showing 3ID Profile and Console applications.](./img/passport.png)
+<img src="./img/passport.png" alt="Passport post-login dashboard showing 3ID Profile and Console applications." />
 
 ## Open [Console](https://console.threeid.xyz).
 
