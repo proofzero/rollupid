@@ -45,6 +45,7 @@
     "@microsoft/api-extractor": "7.33.6",
     "@open-rpc/meta-schema": "1.14.2",
     "cross-env": "7.0.3",
+    "date-fns": "2.29.3",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "jose": "4.11.0",

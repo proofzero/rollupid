@@ -8,6 +8,7 @@ import * as _ from 'lodash'
 import * as openrpc from '@kubelt/openrpc'
 
 import type {
+  RpcAlarm,
   RpcInput,
   RpcOutput,
   RpcParams,
@@ -16,6 +17,7 @@ import type {
 
 import {
   FieldAccess,
+  alarm,
   component,
   field,
   method,

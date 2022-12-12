@@ -1,4 +1,4 @@
-// platform/starbase/src/index.ts
+// @kubelt/platform.starbase:/src/index.ts
 
 /**
  * This Cloudflare worker provides an OpenRPC backend for the Kubelt
@@ -28,10 +28,8 @@ import type {
 
 import { default as mwAnalytics } from '@kubelt/openrpc/middleware/analytics'
 import { default as mwAuthenticate } from '@kubelt/openrpc/middleware/authenticate'
-import { default as mwDatadog } from '@kubelt/openrpc/middleware/datadog'
 import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation'
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
-import { default as mwOort } from '@kubelt/openrpc/middleware/oort'
 
 import { required as requiredEnv } from './env'
 import { StarbaseApplication } from './nodes/application'
@@ -746,10 +744,6 @@ const chain = openrpc.chain([
   mwGeolocation,
   // Cloudflare Worker analytics.
   mwAnalytics,
-  // Construct a Datadog client for sending metrics.
-  mwDatadog,
-  // Construct an Oort client for talking to the Kubelt backend.
-  mwOort,
 ])
 
 // The returned handler validates the incoming request, routes it to the

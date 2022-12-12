@@ -4,10 +4,9 @@ compatibility_date = "2022-10-26"
 node_compat = true
 
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "REPLY_MESSAGE", class_name = "ReplyMessage" }
 ]
 services = [
-  { binding = "Address", service = "address" }
 ]
 
 [dev]
@@ -16,28 +15,25 @@ local_protocol = "http"
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "REPLY_MESSAGE", class_name = "ReplyMessage" }
 ]
 services = [
-  { binding = "Address", service = "address-dev" }
 ]
 
 [env.next]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "REPLY_MESSAGE", class_name = "ReplyMessage" }
 ]
 services = [
-  { binding = "Address", service = "address-next" }
 ]
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "REPLY_MESSAGE", class_name = "ReplyMessage" }
 ]
 services = [
-  { binding = "Address", service = "address-current" }
 ]
 
 [[migrations]]
 tag = "v0"
-new_classes = ["Core"]
+new_classes = ["ReplyMessage"]

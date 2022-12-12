@@ -28,6 +28,7 @@
     "wrangler": "2.4.4"
   },
   "dependencies": {
+    "@kubelt/openrpc": "*",
     "@kubelt/platform.commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
