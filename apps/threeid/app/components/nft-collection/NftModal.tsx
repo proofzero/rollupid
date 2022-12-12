@@ -1,5 +1,4 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
 import {  HiChevronDown } from 'react-icons/hi'
 
@@ -7,6 +6,7 @@ import nftModalStyles from './NftModal.css'
 
 import type { LinksFunction } from '@remix-run/cloudflare'
 
+import Modal from '~/components/modal/Modal'
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 
 import { useState } from 'react'

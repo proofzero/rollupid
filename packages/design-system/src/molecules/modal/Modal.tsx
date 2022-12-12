@@ -1,24 +1,23 @@
-import React, { Fragment, HTMLAttributes } from 'react'
-import classNames from 'classnames'
 import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from 'react'
 
 import { HiOutlineX } from 'react-icons/hi'
 
-export type ModalProps = HTMLAttributes<HTMLDivElement> & {
-  fixed?: boolean
+export type ModalProps = {
+  children: any
+
   isOpen: boolean
   handleClose?: (value: boolean) => void
+
+  fixed?: boolean
 }
 
-export function Modal({
-  isOpen = false,
-  fixed = false,
-  handleClose,
+const Modal = ({
   children,
-  ...rest
-}: ModalProps) {
-  console.log({ isOpen })
-
+  isOpen,
+  handleClose,
+  fixed = false,
+}: ModalProps) => {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -84,3 +83,5 @@ export function Modal({
     </Transition.Root>
   )
 }
+
+export default Modal
