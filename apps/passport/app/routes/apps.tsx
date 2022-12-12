@@ -70,7 +70,7 @@ export default function Apps() {
             return (
               <div
                 key={key}
-                className={`flex flex-col`}
+                className={`flex flex-col gap-8`}
                 style={app.disabled ? { opacity: 0.5 } : {}}
               >
                 <div className={'flex flex-row justify-center items-center'}>
