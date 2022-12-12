@@ -791,11 +791,11 @@ export interface Env {
   // ---------------------------------------------------------------------------
 
   // A binding for the access service to enable auth checks.
-  ACCESS: Fetcher
+  //ACCESS: Fetcher
 
   // A binding to the edges service; this service is used for storing
   // and querying links between nodes.
-  EDGES: Fetcher
+  Edges: Fetcher
 
   // Environment variables
   // ---------------------------------------------------------------------------
