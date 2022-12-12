@@ -70,14 +70,16 @@ export default function DashboardIndexPage() {
               Create Application"
             </Button>
           </div>
+          <Modal
+            isOpen={newAppModalOpen}
+            fixed
+            handleClose={() => setNewAppModalOpen(false)}
+          >
+            <>
+              <div>foo</div>
+            </>
+          </Modal>
         </div>
-        <Modal
-          isOpen={newAppModalOpen}
-          fixed={true}
-          handleClose={() => setNewAppModalOpen(false)}
-        >
-          foo
-        </Modal>
       </main>
     </div>
   )

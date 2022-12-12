@@ -21,7 +21,7 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint ."
   },
   "dependencies": {
-    "@headlessui/react": "1.7.4",
+    "@headlessui/react": "1.7.5",
     "@heroicons/react": "2.0.13",
     "@kubelt/design-system": "workspace:*",
     "@remix-run/cloudflare": "1.7.5",

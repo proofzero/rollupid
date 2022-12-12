@@ -23,6 +23,7 @@ export const Modal = ({
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
+        open={isOpen}
         as="div"
         className="relative z-[100]"
         onClose={(val: boolean) => {

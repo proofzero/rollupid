@@ -4816,7 +4816,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.20.2
     "@cloudflare/workers-types": 3.18.0
-    "@headlessui/react": 1.7.4
+    "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@kubelt/design-system": "workspace:*"
     "@mdx-js/react": 2.1.5
