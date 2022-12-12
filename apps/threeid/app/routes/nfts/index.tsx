@@ -9,17 +9,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!owner) {
     throw new Error('Owner required')
   }
-
   const galaxyClient = await getGalaxyClient()
-  const { nftsForAddress: res } = await galaxyClient.getNftsForAddress({
-    owner,
-  })
+  // const { nftsForAddress: res } = await galaxyClient.getNftsForAddress({
+  //   owner,
+  // })
   const { contractsForAddress: resColl } =
     await galaxyClient.getNftsPerCollection({
       owner,
-      excludeFilters: ['SPAM', 'AIRDROPS'],
+      excludeFilters: ['SPAM'],
     })
-
   // const ownedNfts = res?.ownedNfts.map((nft) => {
   //   const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
   //   let error = false
@@ -66,8 +64,6 @@ export const loader: LoaderFunction = async ({ request }) => {
       ],
     }
   })
-
-  console.log('YOyYPOYOYOYOY')
 
   const filteredNfts =
     ownedNfts?.filter((n) => !n.error && n.thumbnailUrl) || []
