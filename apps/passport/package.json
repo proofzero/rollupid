@@ -45,8 +45,8 @@
     "graphql-request": "5.0.0",
     "graphql-tag": "2.12.6",
     "jose": "4.11.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "typed-json-rpc": "1.1.0",
     "wagmi": "0.8.5"
   },

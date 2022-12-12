@@ -11,11 +11,13 @@ import * as _ from 'lodash'
 
 import * as set from 'ts-set-utils'
 
+import * as graph from '@kubelt/graph'
+
 import * as openrpc from '@kubelt/openrpc'
 
 import invariant from 'tiny-invariant'
 
-import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+//import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
 
 import type {
   RpcAuthHandler,
@@ -31,12 +33,9 @@ import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 import { default as mwOort } from '@kubelt/openrpc/middleware/oort'
 
-import { StarbaseApplication } from '@kubelt/do.starbase-application'
-import { StarbaseContract } from '@kubelt/do.starbase-contract'
-import { StarbaseUser } from '@kubelt/do.starbase-user'
-
 import { required as requiredEnv } from './env'
-import * as oauth from './oauth'
+import { StarbaseApplication } from './nodes/application'
+import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
 
@@ -57,33 +56,34 @@ import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 // -----------------------------------------------------------------------------
 // We need to export any Durable Objects we use.
 
-export { StarbaseApplication, StarbaseContract, StarbaseUser }
+export { StarbaseApplication }
 
 // Definitions
 // -----------------------------------------------------------------------------
 
 // Context key for a KV store binding containing fixture data.
-const KEY_FIXTURES = 'com.kubelt.kv/fixtures'
+const KEY_FIXTURES = 'xyz.threeid.kv/fixtures'
 // Context key for a KV store binding containing a client ID => app ID mapping.
-const KEY_LOOKUP = 'com.kubelt.kv/lookup'
+const KEY_LOOKUP = 'xyz.threeid.kv/lookup'
 
 // Context key for the KV value containing the Datadog API token.
 const KEY_DATADOG = 'com.datadog/token'
 
 // Context key for the JWT associated with the incoming request.
-const KEY_TOKEN = 'com.kubelt.security/jwt'
+const KEY_TOKEN = 'xyz.threeid.security/jwt'
 // Context key for the user ID associated with the request (if any).
-const KEY_USER_ID = 'com.kubelt.security/user.id'
+const KEY_USER_ID = 'xyz.threeid.security/user.id'
 
 // Context key for a KV value containing name of current environment.
-const KEY_ENVIRONMENT = 'com.kubelt.value/environment'
+const KEY_ENVIRONMENT = 'xyz.threeid.value/environment'
 
 // Context key for looking up StarbaseApplication durable object.
-const KEY_APPLICATION = 'com.kubelt.object/application'
-// Context key for looking up StarbaseContract durable object.
-const KEY_CONTRACT = 'com.kubelt.object/contract'
-// Context key for looking up StarbaseUser durable object.
-const KEY_USER = 'com.kubelt.object/user'
+const KEY_APPLICATION = 'xyz.threeid.object/application'
+
+// Context key for looking up the Account service stub.
+const KEY_ACCESS = 'xyz.threeid.service/access'
+// Context key for looking up the EDGES service stub.
+const KEY_EDGES = 'xyz.threeid.service/edges'
 
 // Scopes
 // -----------------------------------------------------------------------------
@@ -108,21 +108,43 @@ const authCheck: RpcAuthHandler = async (
   request: Readonly<Request>,
   context: Readonly<RpcContext>
 ): Promise<void | Response> => {
-  // We need to supply a service binding for the Account service to
-  // perform the auth check.
-  const env = context.get(KEY_REQUEST_ENV)
-  if (undefined === env || '' === env) {
-    throw new Error("missing environment; can't perform auth check")
+  // Perform a request to the Access service, passing it the token
+  // provided with the current request. If the response is a payload,
+  // the auth check succeeded. An error is returned otherwise.
+  /*
+  const access = context.get(KEY_ACCESS)
+  if (_.isUndefined(access)) {
+    // We need to supply a service binding for the Access service to
+    // perform the auth check.
+    throw new Error("missing access service binding; can't perform auth check")
   }
 
-  // Create a version of isAuthenticated() that doesn't require entire
-  // Env, just the specific service binding proxy for Account?
-  /*
-  try {
-    // NB: request must be cloned as it may only be read once.
-    await isAuthenticated(request, env)
-  } catch (err) {
+  const token = context.get(KEY_TOKEN)
+  if (_.isUndefined(token)) {
+    // No token was supplied with the request. That's a "no access
+    // allowed" from me dawg.
     return new Response('Unauthorized', { status: 401 })
+  }
+
+  const reqBody = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'kb_verifyAuthorization',
+    params: {
+      token,
+    },
+  }
+  const verifyReq = new Request('http://access.dev/jsonrpc', {
+    method: 'POST',
+    body: JSON.stringify(reqBody),
+  })
+  try {
+    const result = await access.fetch(verifyReq)
+    if (!_.isUndefined(result.error)) {
+      return new Response('Unauthorized', { status: 401 })
+    }
+  } catch (e: unknown) {
+    return new Response('Internal Server Error', { status: 500 })
   }
   */
 }
@@ -153,6 +175,7 @@ const kb_appCreate = openrpc.method(schema, {
     ) => {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better type for JWT?
       const token: string = context.get(KEY_TOKEN)
 
@@ -167,10 +190,37 @@ const kb_appCreate = openrpc.method(schema, {
         tag: 'starbase-app',
       })
 
+      // TODO: extend @kubelt/openrpc client to support remote workers
+      // that implement an OpenRPC service.
+
+      // TODO: we need to create an edge between the logged in user node
+      // (aka account) and the new app
+      // TODO accept src and dst nodes as RPC parameters.
+      const src = graph.node('threeid', 'fixme-src')
+      const dst = graph.node('threeid', 'fixme-dst')
+      const tag = graph.edge('owns')
+
+      const kb_makeEdge = {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'kb_makeEdge',
+        params: {
+          src,
+          dst,
+          tag,
+        },
+      }
+      const edgeReq = new Request('http://edges.dev/jsonrpc', {
+        method: 'POST',
+        body: JSON.stringify(kb_makeEdge),
+      })
+      const edgeRes = await edges.fetch(edgeReq)
+      console.log(JSON.stringify(edgeRes))
+
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
-      const result = app.appStore({
+      const result = app.update({
         clientId,
         clientSecret: hashedSecret,
       })
@@ -338,29 +388,34 @@ const kb_appList = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
 
-      // Get a reference to the StarbaseApplication Durable Object.
-      const sbUser: DurableObjectNamespace = context.get(KEY_USER)
-      // TODO better typing
-      const userName = _.get(request, ['params', 'ownerId'])
+      // // Get a reference to the StarbaseApplication Durable Object.
+      // const sbUser: DurableObjectNamespace = context.get(KEY_USER)
+      // // TODO better typing
+      // const userName = _.get(request, ['params', 'ownerId'])
 
-      const user = await openrpc.discover(sbUser, {
-        // Derive the name of the object from user ID.
-        name: userName,
-        // TODO This auth token is sent with every RPC call.
-        token,
-        // This tag is used when logging requests.
-        tag: 'starbase-user',
-      })
+      // const user = await openrpc.discover(sbUser, {
+      //   // Derive the name of the object from user ID.
+      //   name: userName,
+      //   // TODO This auth token is sent with every RPC call.
+      //   token,
+      //   // This tag is used when logging requests.
+      //   tag: 'starbase-user',
+      // })
 
-      // TODO implement graph linking
-      // TODO filter the edges to only include those linking to apps.
-      //const result = await user._.graph.edges()
+      // // TODO implement graph linking
+      // // TODO filter the edges to only include those linking to apps.
+      // //const result = await user._.graph.edges()
 
-      const result = await user.listApplications()
+      // const result = await user.listApplications()
+
+      // TODO: use the edges service to look up all the app edges
+      // for the logged in user (account node <==> starbase node)
+      // account urn: <urn:threeid:account/0x123...> available from the JWT sub prop
+      // starbase urn: <urn:starbase:app/0x123...>
 
       return openrpc.response(request, {
         invoked: 'kb_appList',
-        result,
+        result: {},
       })
     }
   ),
@@ -723,15 +778,7 @@ export interface Env {
 
   // A component representing a single Starbase application. This includes an OAuth
   // configuration profile and other metadata about the application.
-  STARBASE_APP: StarbaseApplication
-
-  // A component representing a proxied smart contract. Can be configured to proxy requests
-  // to the remote contract, providing value-added capabilities along the way.
-  STARBASE_CONTRACT: StarbaseContract
-
-  // A component representing a Starbase user. Manages the references to other components
-  // That the user owns.
-  STARBASE_USER: StarbaseUser
+  StarbaseApp: StarbaseApplication
 
   // Buckets
   // ---------------------------------------------------------------------------
@@ -743,17 +790,18 @@ export interface Env {
   // Service bindings
   // ---------------------------------------------------------------------------
 
-  // A binding to the authentication service.
-  Account: Fetcher
+  // A binding for the access service to enable auth checks.
+  //ACCESS: Fetcher
+
+  // A binding to the edges service; this service is used for storing
+  // and querying links between nodes.
+  Edges: Fetcher
 
   // Environment variables
   // ---------------------------------------------------------------------------
 
   // The name of the current deployment environment.
   ENVIRONMENT: string
-
-  // The name of the owner of platform app cores.
-  PLATFORM_OWNER: string
 
   // Secrets
   // ---------------------------------------------------------------------------
@@ -802,7 +850,8 @@ export default {
     //
     // NBB: secrets are set via the dashboard or using the wrangler CLI tool.
 
-    checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
+    // NB: this throws if there is no Account binding in the environment.
+    //checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
 
     // TODO allow context to be initialized in this function.
     const context = openrpc.context(request, env, ctx)
@@ -826,11 +875,16 @@ export default {
     context.set(KEY_LOOKUP, env.LOOKUP)
 
     // A durable object containing Starbase App state.
-    context.set(KEY_APPLICATION, env.STARBASE_APP)
-    // A durable object containing Starbase App state.
-    context.set(KEY_CONTRACT, env.STARBASE_CONTRACT)
-    // A durable object containing Starbase App state.
-    context.set(KEY_USER, env.STARBASE_USER)
+    context.set(KEY_APPLICATION, env.StarbaseApp)
+
+    // A stub for invoking the account service.
+    //
+    // NB: we can't use the access service this way, results in a cyclic
+    // service binding dependency.
+    //context.set(KEY_ACCESS, env.ACCESS)
+
+    // A stub for invoking the edges service.
+    context.set(KEY_EDGES, env.Edges)
 
     // NB: the handler clones the request; we don't need to do it here.
     return rpcHandler(request, context)

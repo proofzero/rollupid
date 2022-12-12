@@ -1,4 +1,4 @@
-// @kubelt/platform.starbase:src/token.ts
+// @threeid/platform.starbase:src/token.ts
 
 import * as jose from 'jose'
 

@@ -1,13 +1,13 @@
 # projects/console/wrangler.toml
 
-name = "starbase"
+name = "console"
 
 workers_dev = true
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
 services = [
-  { binding = "STARBASE", service = "starbase", environment = "production" }
+  { binding = "Starbase", service = "starbase"}
 ]
 
 # development
@@ -31,6 +31,10 @@ local_protocol = "http"
 # independently for each environment.
 
 [vars]
+DEPLOY_ENV = "local"
+PASSPORT_URL = "http://localhost:9696"
+COOKIE_DOMAIN = "localhost"
+STORAGE_NAMESPACE="console"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -50,7 +54,7 @@ local_protocol = "http"
 [env.dev]
 
 services = [
-  { binding = "STARBASE", service = "starbase-dev", environment = "production" }
+  { binding = "Starbase", service = "starbase-dev"}
 ]
 
 # kv_namespaces = [
@@ -63,9 +67,10 @@ routes = [
 
 [env.dev.vars]
 DEPLOY_ENV = "dev"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport-dev.threeid.xyz"
+COOKIE_DOMAIN = "dev.threeid.xyz"
+STORAGE_NAMESPACE="console"
+
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -73,7 +78,7 @@ STORAGE_NAMESPACE = "starbase"
 [env.next]
 
 services = [
-  { binding = "STARBASE", service = "starbase-next", environment = "production" }
+  { binding = "Starbase", service = "starbase-next"}
 ]
 
 # kv_namespaces = [
@@ -89,9 +94,10 @@ routes = [
 
 [env.next.vars]
 DEPLOY_ENV = "next"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport-next.threeid.xyz"
+COOKIE_DOMAIN = "next.threeid.xyz"
+STORAGE_NAMESPACE="console"
+
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -99,7 +105,7 @@ STORAGE_NAMESPACE = "starbase"
 [env.current]
 
 services = [
-  { binding = "STARBASE", service = "starbase", environment = "production" }
+  { binding = "Starbaes", service = "starbase", environment = "production" }
 ]
 
 # kv_namespaces = [
@@ -116,6 +122,7 @@ routes = [
 
 [env.current.vars]
 DEPLOY_ENV = "current"
-SESSION_NAME = "starbase"
-# NB: can go away once support for storage API is removed
-STORAGE_NAMESPACE = "starbase"
+PASSPORT_URL = "https://passport.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
+STORAGE_NAMESPACE="console"
+

@@ -18,7 +18,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect(`/authorize?client_id=${searchParams.get('client_id')}`)
   }
   if (session.get('jwt')) {
-    return redirect(THREEID_APP_URL)
+    return redirect('/apps')
   }
   return null
 }

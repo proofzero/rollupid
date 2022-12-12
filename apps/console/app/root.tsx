@@ -2,10 +2,7 @@
  * @file app/root.tsx
  */
 
-import type {
-  LinksFunction,
-  MetaFunction,
-} from "@remix-run/cloudflare";
+import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare'
 
 import {
   Links,
@@ -14,22 +11,25 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
+} from '@remix-run/react'
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
+import globalStyles from '@kubelt/design-system/src/styles/global.css'
+import tailwindStylesheetUrl from './styles/tailwind.css'
 
 export const links: LinksFunction = () => {
   return [
-    { rel: "stylesheet", href: tailwindStylesheetUrl },
-    { rel: "icon", href: "/favicon.ico" },
-  ];
-};
+    { rel: 'stylesheet', href: tailwindStylesheetUrl },
+    { rel: 'stylesheet', href: globalStyles },
+
+    { rel: 'icon', href: '/favicon.ico' },
+  ]
+}
 
 export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Starbase",
-  viewport: "width=device-width,initial-scale=1",
-});
+  charset: 'utf-8',
+  title: 'Starbase',
+  viewport: 'width=device-width,initial-scale=1',
+})
 
 export default function App() {
   return (
@@ -45,5 +45,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  );
+  )
 }
