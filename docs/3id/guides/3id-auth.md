@@ -2,8 +2,13 @@
 description: Implementation Guides for 3ID
 ---
 
-1. Create an application in [Developer Console](https://console.threeid.xyz).
-1. Configure your OAuth settings including secrets, requested scopes, and redirect URL.
-1. Drop our [3ID Passport]() private login button on your page. Users can now onboard easily.
-1. In your application, check the JWT for the required scopes and use it to call 3ID first-party services.
-1. User analytics are now available via the [Developer Console](https://console.threeid.xyz).
+## Login to [3ID Passport](https://passport.threeid.xyz).
+
+![Passport post-login dashboard showing 3ID Profile and Console applications.](./img/passport.png)
+
+## Open [Console](https://console.threeid.xyz).
+
+## Configure your OAuth settings including secrets, requested scopes, and redirect URL.
+## Drop our [3ID Passport]() private login button on your page. Users can now onboard easily.
+## In your application, check the JWT for the required scopes and use it to call 3ID first-party services.
+## User analytics are now available via the [Developer Console](https://console.threeid.xyz).
