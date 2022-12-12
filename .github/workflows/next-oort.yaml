@@ -50,8 +50,6 @@ jobs:
             ENVIRONMENT
             CLOUDFLARE_API_TOKEN
             CLOUDFLARE_ACCOUNT_ID
-            DATADOG_API_KEY
-            DATADOG_APP_KEY
             ENS_CONTRACT_ADDRESS
             ALCHEMY_API_URL
             ALCHEMY_NFT_API_URL
@@ -60,8 +58,6 @@ jobs:
           ENVIRONMENT: production
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          DATADOG_API_KEY: ${{ secrets.DATADOG_CLIENT_TOKEN }}
-          DATADOG_APP_KEY: ${{ secrets.DATADOG_APPLICATION_ID }}
           ENS_CONTRACT_ADDRESS: ${{ secrets.ENS_CONTRACT_ADDRESS }}
           ALCHEMY_API_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
           ALCHEMY_NFT_API_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}

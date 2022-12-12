@@ -21,8 +21,6 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
-    "@datadog/browser-rum": "4.25.0",
-    "@datadog/datadog-api-client": "1.6.0",
     "@headlessui/react": "1.7.4",
     "@heroicons/react": "2.0.13",
     "@kubelt/design-system": "*",

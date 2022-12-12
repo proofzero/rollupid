@@ -15,10 +15,6 @@ import { json } from '@remix-run/cloudflare'
 
 import { useLoaderData, useCatch } from '@remix-run/react'
 
-import { startSession } from '~/utils/datadog.client'
-
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
-
 import designStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
 import baseStyles from './styles/base.css'
@@ -69,17 +65,12 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = () => {
   return json({
     ENV: {
-      DATADOG_APPLICATION_ID: DATADOG_APPLICATION_ID,
-      DATADOG_CLIENT_TOKEN: DATADOG_CLIENT_TOKEN,
-      DATADOG_SERVICE_NAME: DATADOG_SERVICE_NAME,
-      DATADOG_ENV: DATADOG_ENV,
     },
   })
 }
 
 export default function App() {
   const browserEnv = useLoaderData()
-  typeof window !== 'undefined' && startSession()
 
   return (
     <html lang="en">
