@@ -46,7 +46,7 @@ export default function Apps() {
         }}
         className={'basis-2/5 h-screen w-full hidden lg:block'}
       ></div>
-      <div className={'basis-full basis-full lg:basis-3/5'}>
+      <div className={'basis-full lg:basis-3/5'}>
         <div className={'flex flex-col mb-2'}>
           <h1
             className={
@@ -77,7 +77,7 @@ export default function Apps() {
                   <a
                     href={!app.disabled ? app.url : '#'}
                     className={
-                      'flex flex-col-2 basis-1/3 justify-start items-start gap-4 my-2 p-2 bg-white'
+                      'flex flex-col-2 basis-full md:basis-1/3  md:justify-start md:items-start justify-center items-center gap-4 my-2 p-2 bg-white'
                     }
                     style={{
                       border: '1px solid #D1D5DB',

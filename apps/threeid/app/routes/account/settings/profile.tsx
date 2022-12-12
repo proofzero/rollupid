@@ -155,6 +155,7 @@ export default function AccountSettingsProfile() {
   const transition = useTransition()
   useEffect(() => {
     if (transition.type === 'actionReload') {
+      setFormChanged(false)
       notificationHandler(!!!actionData?.errors)
     }
   }, [transition])
@@ -173,6 +174,7 @@ export default function AccountSettingsProfile() {
 
   const pfpUploadRef = useRef<HTMLInputElement>(null)
   const [pfpUploading, setPfpUploading] = useState(false)
+  const [isFormChanged, setFormChanged] = useState(false)
 
   const handlePfpUpload = async (e: any) => {
     const pfpFile = (e.target as HTMLInputElement & EventTarget).files?.item(0)
@@ -294,7 +296,16 @@ export default function AccountSettingsProfile() {
           </div>
         </div>
 
-        <Form className="flex flex-col space-y-9 mt-12" method="post">
+        <Form
+          className="flex flex-col space-y-9 mt-12"
+          method="post"
+          onChange={() => {
+            setFormChanged(true)
+          }}
+          onReset={() => {
+            setFormChanged(false)
+          }}
+        >
           <input name="pfp_url" type="hidden" value={pfpUrl} />
           <input name="pfp_isToken" type="hidden" value={isToken ? 1 : 0} />
 
@@ -389,17 +400,40 @@ export default function AccountSettingsProfile() {
               {actionData?.errors.bio}
             </Text>
           )}
-
-          <div className="flex lg:justify-end">
-            <Button
-              isSubmit
-              btnType={'primary'}
-              btnSize={'xl'}
-              className="mb-4 lg:mb-0"
-            >
-              Save
-            </Button>
-          </div>
+          {isFormChanged ? (
+            <div className="flex lg:justify-end">
+              <div className="pr-2">
+                <Button
+                  type="reset"
+                  btnType={'secondary'}
+                  btnSize={'xl'}
+                  className="!text-gray-600 border-none mb-4 lg:mb-0"
+                >
+                  Discard
+                </Button>
+              </div>
+              <Button
+                isSubmit
+                btnType={'primary'}
+                btnSize={'xl'}
+                className="mb-4 lg:mb-0"
+              >
+                Save
+              </Button>
+            </div>
+          ) : (
+            <div className="flex lg:justify-end">
+              <Button
+                isSubmit
+                btnType={'primary'}
+                btnSize={'xl'}
+                className="mb-4 lg:mb-0"
+                disabled
+              >
+                Save
+              </Button>
+            </div>
+          )}
         </Form>
       </div>
     </>

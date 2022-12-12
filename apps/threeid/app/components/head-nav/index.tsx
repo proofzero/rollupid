@@ -101,7 +101,7 @@ export default function HeadNav({
                       </Link>
 
                       <a
-                        href="https://get.threeid.xyz"
+                        href="https://passport.threeid.xyz/"
                         className="button-base w-full lg:w-fit bg-white py-3 px-8 rounded-md"
                       >
                         <Text weight="semibold" size="sm">
@@ -186,7 +186,7 @@ export default function HeadNav({
                 {!loggedIn && (
                   <div className="flex flex-row items-center space-x-8">
                     <a
-                      href="https://get.threeid.xyz"
+                      href="https://passport.threeid.xyz/"
                       className="button-base w-full lg:w-fit bg-white py-3 px-8"
                     >
                       <Text weight="bold" size="sm">
