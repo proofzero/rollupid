@@ -2,7 +2,7 @@
  * @file app/routes/dashboard/index.tsx
  */
 
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { Link, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
@@ -31,6 +31,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   //const apps = await getApplicationListItems(jwt);
   const apps = []
   return json<LoaderData>({ apps })
+}
+
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData()
+  const clientName = formData.get('client_name')
+
+  if (!clientName) throw 'App name is required'
 }
 
 // Component
@@ -76,7 +83,16 @@ export default function DashboardIndexPage() {
             handleClose={() => setNewAppModalOpen(false)}
           >
             <>
-              <div>foo</div>
+              <h3 className="text-xl font-bold mb-6">New Application</h3>
+
+              <form method="post">
+                <p>Application Name</p>
+                <input placeholder="My Application" name="client_name"></input>
+                <button onClick={() => setNewAppModalOpen(false)}>
+                  Cancel
+                </button>
+                <button type="submit">Create Application</button>
+              </form>
             </>
           </Modal>
         </div>
