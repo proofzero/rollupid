@@ -12,9 +12,9 @@ export default interface Env {
   Account: Fetcher
   Address: Fetcher
   Icons: Fetcher
-  ALCHEMY_ETH_KEY: string
+  APIKEY_ALCHEMY_ETH: string
   ALCHEMY_ETH_NETWORK: string
-  ALCHEMY_POLYGON_KEY: string
+  APIKEY_ALCHEMY_POLYGON: string
   ALCHEMY_POLYGON_NETWORK: string
 }
 
@@ -23,8 +23,8 @@ export const required = [
   'Account',
   'Address',
   'Icons',
-  'ALCHEMY_ETH_KEY',
+  'APIKEY_ALCHEMY_ETH',
   'ALCHEMY_ETH_NETWORK',
-  'ALCHEMY_POLYGON_KEY',
+  'APIKEY_ALCHEMY_POLYGON',
   'ALCHEMY_POLYGON_NETWORK',
 ]

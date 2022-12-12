@@ -30,8 +30,8 @@ services = [
 ]
 
 [env.dev.vars]
-ALCHEMY_CHAIN="eth"
-ALCHEMY_NETWORK="goerli"
+ALCHEMY_ETH_NETWORK="goerli"
+ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.next]
 route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
@@ -43,8 +43,8 @@ services = [
 ]
 
 [env.next.vars]
-ALCHEMY_CHAIN="eth"
-ALCHEMY_NETWORK="goerli"
+ALCHEMY_ETH_NETWORK="goerli"
+ALCHEMY_POLYGON_NETWORK="mumbai"
 
 [env.current]
 route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
@@ -56,7 +56,7 @@ services = [
 ]
 
 [env.current.vars]
-ALCHEMY_CHAIN="eth"
-ALCHEMY_NETWORK="mainnet"
+ALCHEMY_ETH_NETWORK="mainnet"
+ALCHEMY_POLYGON_NETWORK="mumbai"
 
 
