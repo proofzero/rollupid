@@ -400,7 +400,7 @@ export default function AccountSettingsProfile() {
               {actionData?.errors.bio}
             </Text>
           )}
-          {isFormChanged && (
+          {isFormChanged ? (
             <div className="flex lg:justify-end">
               <div className="pr-2">
                 <Button
@@ -417,6 +417,29 @@ export default function AccountSettingsProfile() {
                 btnType={'primary'}
                 btnSize={'xl'}
                 className="mb-4 lg:mb-0"
+              >
+                Save
+              </Button>
+            </div>
+          ) : (
+            <div className="flex lg:justify-end">
+              <div className="pr-2">
+                <Button
+                  type="reset"
+                  btnType={'secondary'}
+                  btnSize={'xl'}
+                  className="text-gray-600 border-none mb-4 lg:mb-0"
+                  disabled
+                >
+                  Discard
+                </Button>
+              </div>
+              <Button
+                isSubmit
+                btnType={'primary'}
+                btnSize={'xl'}
+                className="mb-4 lg:mb-0"
+                disabled
               >
                 Save
               </Button>
