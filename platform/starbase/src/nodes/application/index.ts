@@ -222,5 +222,4 @@ export class StarbaseApplication {
   // cmp.scopes
   // -----------------------------------------------------------------------------
   // Returns a list of the scopes declared by the component.
-
 } // END StarbaseApp
