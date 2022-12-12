@@ -12,6 +12,7 @@ import folderPlus from '~/images/folderPlus.svg'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
+import { getStarbaseClient } from '~/utilities/platform.server'
 import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
 
@@ -38,6 +39,9 @@ export const action: ActionFunction = async ({ request }) => {
   const clientName = formData.get('client_name')
 
   if (!clientName) throw 'App name is required'
+
+  const starbaseClient = getStarbaseClient()
+  const app = await starbaseClient.createApplication(clientName as string)
 }
 
 // Component
