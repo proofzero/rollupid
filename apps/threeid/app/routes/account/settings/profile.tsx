@@ -423,17 +423,6 @@ export default function AccountSettingsProfile() {
             </div>
           ) : (
             <div className="flex lg:justify-end">
-              <div className="pr-2">
-                <Button
-                  type="reset"
-                  btnType={'secondary'}
-                  btnSize={'xl'}
-                  className="text-gray-600 border-none mb-4 lg:mb-0"
-                  disabled
-                >
-                  Discard
-                </Button>
-              </div>
               <Button
                 isSubmit
                 btnType={'primary'}
