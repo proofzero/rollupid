@@ -1,5 +1,5 @@
+import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment } from 'react'
 
 import { HiOutlineX } from 'react-icons/hi'
 
