@@ -5551,6 +5551,7 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.commons": "workspace:*"
     "@kubelt/security": "workspace:*"
+    "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.189
     cross-env: 7.0.3

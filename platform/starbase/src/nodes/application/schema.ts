@@ -68,6 +68,25 @@ const rpcSchema: RpcSchema = {
       },
       errors: [],
     },
+    {
+      name: 'rotateSecret',
+      summary: 'Set a new (hashed) application OAuth secret',
+      params: [
+        {
+          name: 'secret',
+          description: 'A hashed application OAuth secret',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'success',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
   ],
   components: {
     contentDescriptors: {

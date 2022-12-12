@@ -180,7 +180,7 @@ export type OpenRpcHandler = (
  */
 const authPass: RpcAuthHandler = (
   request: Readonly<Request>,
-  context: Readonly<RpcContext>,
+  context: Readonly<RpcContext>
 ): MiddlewareResult => {
   // Resolves to nothing which indicates successful check.
   return Promise.resolve()

@@ -3,6 +3,6 @@
   "id": 1,
   "method": "kb_appCreate",
   "params": {
-    "ownerId": "robert"
+    "clientName": "foobar App"
   }
 }

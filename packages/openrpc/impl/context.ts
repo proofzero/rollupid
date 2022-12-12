@@ -34,13 +34,13 @@ import * as _ from 'lodash'
  */
 export class RpcContext extends Map<string | symbol, any> {
   get(k: string | symbol): any {
-    if (typeof(k) === 'symbol') {
+    if (typeof k === 'symbol') {
       k = k.toString()
     }
     return _.get(this, k)
   }
   set(k: string | symbol, v: any): this {
-    if (typeof(k) === 'symbol') {
+    if (typeof k === 'symbol') {
       k = k.toString()
     }
     _.set(this, k, v)

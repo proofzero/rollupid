@@ -82,6 +82,11 @@ import schema from './schema'
   }
   */
 })
+@field({
+  name: 'secret',
+  doc: 'The OAuth client secret for the application',
+  defaultValue: '',
+})
 export class StarbaseApplication {
   // init
   // -----------------------------------------------------------------------------
@@ -201,6 +206,24 @@ export class StarbaseApplication {
     }
 
     return Promise.resolve(profile)
+  }
+
+  // updateSecret
+  // -----------------------------------------------------------------------------
+
+  @method('rotateSecret')
+  //@requiredScope()
+  @requiredField('secret', [FieldAccess.Write])
+  rotateSecret(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    // The new hashed secret is provided in the request.
+    const secret = params.get('secret')
+    output.set('secret', secret)
+
+    return Promise.resolve(true)
   }
 
   // ---------------------------------------------------------------------------

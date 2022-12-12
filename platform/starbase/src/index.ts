@@ -9,6 +9,8 @@
 
 import * as _ from 'lodash'
 
+import * as jose from 'jose'
+
 import * as set from 'ts-set-utils'
 
 import * as graph from '@kubelt/graph'
@@ -36,12 +38,21 @@ import { StarbaseApplication } from './nodes/application'
 import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
+import * as edgeUtil from './edge'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
 import type { Scope } from '@kubelt/security/scopes'
 
 import { SCOPES_JSON } from '@kubelt/security/scopes'
+
+import type { ApplicationURN } from '@kubelt/urns/application'
+
+import { ApplicationURNSpace } from '@kubelt/urns/application'
+
+import type { AccountURN } from '@kubelt/urns/account'
+
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -58,6 +69,10 @@ export { StarbaseApplication }
 
 // Definitions
 // -----------------------------------------------------------------------------
+
+// The name of the edge tag used to link an account node and an
+// application node.
+const EDGE_TAG = 'owns/app'
 
 // Context key for a KV store binding containing fixture data.
 const KEY_FIXTURES = 'xyz.threeid.kv/fixtures'
@@ -163,6 +178,7 @@ const authCheck: RpcAuthHandler = async (
  */
 const kb_appCreate = openrpc.method(schema, {
   name: 'kb_appCreate',
+  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -177,73 +193,66 @@ const kb_appCreate = openrpc.method(schema, {
       // TODO better type for JWT?
       const token: string = context.get(KEY_TOKEN)
 
-      const clientId = oauth.makeClientId()
-      const clientSecret = oauth.makeClientSecret()
-      const hashedSecret = await secret.hash(clientSecret)
+      // NB: decoding a signed JWT payload does not validate the JWT
+      // Claims Set or values. This will be managed by authCheck, once
+      // implemented (probably by forwarding to auth service).
+      //
+      // NB: this throws if no token was provided, or if the supplied
+      // account URN isn't valid.
+      const accountURN = tokenUtil.getAccountId(token)
 
-      // When the component ID is undefined (neither .id or .name is set
-      // as an option) a randomly assigned ID is used.
+      const clientName = _.get(request, ['params', 'clientName'])
+      if (_.isUndefined(clientName)) {
+        throw new Error('missing OAuth application name')
+      }
+
+      // Create initial OAuth configuration for the application. There
+      // is no secret associated with the app after creation. The
+      // kbt_rotateSecret method must be called to generate the initial
+      // OAuth secret and return it to the caller.
+      const clientId = oauth.makeClientId()
+
+      // When the component ID is undefined (none of 'id', 'name', or
+      // 'urn' is set as an option) a randomly assigned ID is used. The
+      // object ID can be retrieved from the client as: stub.$.id.
       const app = await openrpc.discover(sbApplication, {
+        // Forward the token sent with the request to the DO.
         token,
         tag: 'starbase-app',
       })
-
-      // TODO: extend @kubelt/openrpc client to support remote workers
-      // that implement an OpenRPC service.
-
-      // TODO: we need to create an edge between the logged in user node
-      // (aka account) and the new app
-      // TODO accept src and dst nodes as RPC parameters.
-      const src = graph.node('threeid', 'fixme-src')
-      const dst = graph.node('threeid', 'fixme-dst')
-      const tag = graph.edge('owns')
-
-      const kb_makeEdge = {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'kb_makeEdge',
-        params: {
-          src,
-          dst,
-          tag,
-        },
-      }
-      const edgeReq = new Request('http://edges.dev/jsonrpc', {
-        method: 'POST',
-        body: JSON.stringify(kb_makeEdge),
-      })
-      const edgeRes = await edges.fetch(edgeReq)
-      console.log(JSON.stringify(edgeRes))
-
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
       const result = app.update({
         clientId,
-        clientSecret: hashedSecret,
+        clientName,
       })
 
       // Get the ID of the created durable object and store it in the
       // mapping table.
       const appId: string = <string>app.$.id
+      // Create a platform URN that uniquely represents the just-created
+      // application.
+      const appURN = ApplicationURNSpace.urn(appId)
 
+      // We need to create an edge between the logged in user node (aka
+      // account) and the new app.
+      const src = accountURN
+      const dst = appURN
+      const tag = graph.edge(EDGE_TAG)
+      const edgeRes = await edgeUtil.link(edges, src, dst, tag)
+
+      // Store an entry in the lookup KV that maps from application
+      // client ID to internal application object ID.
       await lookup.put(clientId, appId)
-
-      //console.log(`stored clientId:${clientId} => appId:${appId}`)
-
-      // -----------------------------------------------------------------------
-      // TODO record the fact that this app is owned by ownerId by
-      // creating an edge (once that capability is online).
-      // -----------------------------------------------------------------------
-
-      const ownerId: string = _.get(request, ['params', 'ownerId']) || ''
+      console.log(`stored clientId:${clientId} => appId:${appId}`)
 
       // Return clientId to caller to allow for later interaction with
       // app record.
       return openrpc.response(request, {
-        ownerId,
+        account: accountURN,
         clientId,
-        clientSecret,
+        clientName,
       })
     }
   ),
@@ -254,6 +263,7 @@ const kb_appCreate = openrpc.method(schema, {
 
 const kb_appUpdate = openrpc.method(schema, {
   name: 'kb_appUpdate',
+  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -270,11 +280,7 @@ const kb_appUpdate = openrpc.method(schema, {
       const token = context.get(KEY_TOKEN)
 
       // The user that owns the app is determined by the supplied token.
-      const userId = tokenUtil.getUserId(token)
-      if (undefined === userId) {
-        throw new Error('missing user ID in JWT')
-      }
-      console.log(`storing app for user ${userId}`)
+      const accountURN = tokenUtil.getAccountId(token)
 
       const clientId = _.get(request, ['params', 'clientId'])
       if (clientId === undefined) {
@@ -310,7 +316,7 @@ const kb_appUpdate = openrpc.method(schema, {
       })
 
       return openrpc.response(request, {
-        userId,
+        account: accountURN,
         clientId,
         profile,
       })
@@ -323,6 +329,7 @@ const kb_appUpdate = openrpc.method(schema, {
 
 const kb_appDelete = openrpc.method(schema, {
   name: 'kb_appDelete',
+  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -333,8 +340,14 @@ const kb_appDelete = openrpc.method(schema, {
     ) => {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const starbase: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better token type
       const token: string = context.get(KEY_TOKEN)
+
+      // NB: decoding a signed JWT payload does not validate the JWT
+      // Claims Set or values. This will be managed by authCheck, once
+      // implemented (probably by forwarding to auth service).
+      const accountURN = tokenUtil.getAccountId(token)
 
       // TODO better typing
       // TODO once we conformance check the request against the schema, we
@@ -352,18 +365,33 @@ const kb_appDelete = openrpc.method(schema, {
       if (null === appId) {
         throw new Error('missing appId mapping')
       }
+      // Create a platform URN that uniquely represents the just-created
+      // application.
+      const appURN = ApplicationURNSpace.urn(appId)
 
       // Construct an RPC client for the named component (a durable
       // object) by calling its OpenRPC rpc.discover method and using the
       // returned schema to define an RPC proxy stub.
       const app = await openrpc.discover(starbase, {
         id: appId,
-        // TODO This auth token is sent with every RPC call.
+        // This auth token is sent with every RPC call.
         token,
         // This tag is used when logging requests.
         tag: 'starbase-app',
       })
 
+      // Make a call to the remote edges service to remove the link
+      // between the owning account node and the application node.
+      const src = accountURN
+      const dst = appURN
+      const tag = graph.edge(EDGE_TAG)
+      const edgeRes = await edgeUtil.unlink(edges, src, dst, tag)
+
+      // Remove the entry from the client ID => object ID lookup table.
+      await lookup.delete(clientId)
+
+      // Tell the application Durable Object to delete any stored
+      // state. This should lead to it being GC'ed.
       const result = await app._.cmp.delete()
 
       return openrpc.response(request, result)
@@ -385,35 +413,20 @@ const kb_appList = openrpc.method(schema, {
       context: Readonly<RpcContext>
     ) => {
       const token = context.get(KEY_TOKEN)
+      const edges: Fetcher = context.get(KEY_EDGES)
 
-      // // Get a reference to the StarbaseApplication Durable Object.
-      // const sbUser: DurableObjectNamespace = context.get(KEY_USER)
-      // // TODO better typing
-      // const userName = _.get(request, ['params', 'ownerId'])
+      // NB: decoding a signed JWT payload does not validate the JWT
+      // Claims Set or values. This will be managed by authCheck, once
+      // implemented (probably by forwarding to auth service).
+      const accountURN = tokenUtil.getAccountId(token)
 
-      // const user = await openrpc.discover(sbUser, {
-      //   // Derive the name of the object from user ID.
-      //   name: userName,
-      //   // TODO This auth token is sent with every RPC call.
-      //   token,
-      //   // This tag is used when logging requests.
-      //   tag: 'starbase-user',
-      // })
+      const edgeTag = graph.edge(EDGE_TAG)
 
-      // // TODO implement graph linking
-      // // TODO filter the edges to only include those linking to apps.
-      // //const result = await user._.graph.edges()
-
-      // const result = await user.listApplications()
-
-      // TODO: use the edges service to look up all the app edges
-      // for the logged in user (account node <==> starbase node)
-      // account urn: <urn:threeid:account/0x123...> available from the JWT sub prop
-      // starbase urn: <urn:starbase:app/0x123...>
+      const edgeList = await edgeUtil.edges(edges, accountURN, edgeTag)
 
       return openrpc.response(request, {
         invoked: 'kb_appList',
-        result: {},
+        result: edgeList,
       })
     }
   ),
@@ -597,6 +610,7 @@ const kb_initPlatform = openrpc.extension(schema, {
 
 const kb_appRotateSecret = openrpc.method(schema, {
   name: 'kb_appRotateSecret',
+  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -605,13 +619,50 @@ const kb_appRotateSecret = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const token = context.get(KEY_TOKEN)
-      const userId = context.get(KEY_USER_ID)
 
-      // TODO Generate new client secret
-      // TODO trigger invalidation of access tokens?
+      // Get the ID of the app that we are rotating the secret for.
+      const clientId = _.get(request, ['params', 'clientId'])
+      // TODO once we conformance check the request against the schema,
+      // we can be sure that the required parameter(s) are present.
+      if (undefined === clientId) {
+        throw new Error('missing clientId param')
+      }
+      // The mapping table stores the durable object ID for the
+      // application core.
+      const appId = await lookup.get(clientId)
+      if (null === appId) {
+        throw new Error('missing appId mapping')
+      }
+      // Create a platform URN that uniquely represents the just-created
+      // application.
+      const appURN = ApplicationURNSpace.urn(appId)
+      console.log(`rotating secret for ${appURN}`)
 
-      return openrpc.response(request, 'not yet implemented')
+      // Create an OAuth configuration for the application. The hashed
+      // secret is stored in the application object; the plaintext
+      // secret is returned from the call and is never seen in the
+      // system as plaintext again.
+      const clientSecret = oauth.makeClientSecret()
+      const hashedSecret = await secret.hash(clientSecret)
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        // Forward the token sent with the request to the DO.
+        token,
+        // Use this string when logging DO requests.
+        tag: 'starbase-app',
+      })
+
+      // Store the new secret for the application. This is
+      // *destructive*.
+      await app.rotateSecret({ secret: hashedSecret })
+
+      return openrpc.response(request, {
+        secret: clientSecret,
+      })
     }
   ),
 })
@@ -622,6 +673,7 @@ const kb_appRotateSecret = openrpc.method(schema, {
 
 const kb_appPublish = openrpc.method(schema, {
   name: 'kb_appPublish',
+  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -632,6 +684,9 @@ const kb_appPublish = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
       const userId = context.get(KEY_USER_ID)
+
+      // TODO validate that the required configuration for the app has
+      // been provided before allowing the user to publish it.
 
       return openrpc.response(request, 'not yet implemented')
     }
@@ -844,7 +899,7 @@ export default {
     //
     // NBB: secrets are set via the dashboard or using the wrangler CLI tool.
 
-    // NB: this throws if there is no Account binding in the environment.
+    // TODO update this to check for newly required environments.
     //checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
 
     // TODO allow context to be initialized in this function.
@@ -853,10 +908,6 @@ export default {
     // Store the JWT associated with the request (if any).
     const token = tokenUtil.fromRequest(request)
     context.set(KEY_TOKEN, token)
-
-    // Store the user ID associated with the request (if any).
-    const userId = tokenUtil.getUserId(token)
-    context.set(KEY_USER_ID, userId)
 
     // A secret value; the API token for Datadog metrics collection.
     context.set(KEY_DATADOG, env.DATADOG_TOKEN)
@@ -870,12 +921,6 @@ export default {
 
     // A durable object containing Starbase App state.
     context.set(KEY_APPLICATION, env.StarbaseApp)
-
-    // A stub for invoking the account service.
-    //
-    // NB: we can't use the access service this way, results in a cyclic
-    // service binding dependency.
-    //context.set(KEY_ACCESS, env.ACCESS)
 
     // A stub for invoking the edges service.
     context.set(KEY_EDGES, env.Edges)

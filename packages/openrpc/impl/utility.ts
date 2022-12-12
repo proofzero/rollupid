@@ -49,7 +49,7 @@ export function idFromOptions(
   } else if (Object.hasOwn(options, 'urn')) {
     const urn: AnyURN | ParsedURN<string, string> = options.urn!
     let parsedURN
-    if (typeof(urn) === 'string') {
+    if (typeof urn === 'string') {
       parsedURN = urns.parseURN(urn)
     } else {
       parsedURN = urn

@@ -77,7 +77,7 @@ type RpcResult = any
 type RpcAlarmCallable = (
   input: Readonly<RpcInput>,
   output: RpcOutput,
-  alarm: RpcAlarm,
+  alarm: RpcAlarm
 ) => void
 
 // Defines the signature for an OpenRPC handler method defined on a Durable
@@ -94,7 +94,7 @@ type RpcCallable = (
   // A utility class for scheduling alarms on the component. The method
   // decorated with the @alarm decorator is invoked when the alarm
   // fires.
-  alarm: RpcAlarm,
+  alarm: RpcAlarm
 
   //context: Map<string, any>,
   //remote: Map<string, any>,
@@ -115,7 +115,7 @@ type FieldSpec = {
   // The default value of the field.
   defaultValue: any
   // The validation function to apply before updating the field.
-  validator?: ValidatorFn;
+  validator?: ValidatorFn
 }
 
 enum FieldAccess {
@@ -145,17 +145,9 @@ type Env = unknown
 // Exports
 // -----------------------------------------------------------------------------
 
-export type {
-  RpcAlarm,
-  RpcInput,
-  RpcOutput,
-  RpcParams,
-  RpcResult,
-}
+export type { RpcAlarm, RpcInput, RpcOutput, RpcParams, RpcResult }
 
-export {
-  FieldAccess,
-}
+export { FieldAccess }
 
 // Middleware
 // -----------------------------------------------------------------------------
@@ -390,7 +382,7 @@ export function component(schema: Readonly<RpcSchema>) {
               requestParams,
               fieldInput,
               fieldOutput,
-              alarm,
+              alarm
             )
 
             // TODO validate that the returned result conforms to the OpenRPC schema.
@@ -433,9 +425,7 @@ export function component(schema: Readonly<RpcSchema>) {
        * @param fieldSet - a Set of fields configured for a method
        * @returns the set of fields converted into a map
        */
-      private _makeFieldMap(
-        fieldSet: Readonly<FieldSet>,
-      ) {
+      private _makeFieldMap(fieldSet: Readonly<FieldSet>) {
         const fieldMap: FieldMap = new Map()
         for (const field of fieldSet) {
           fieldMap.set(field.name, field)
@@ -447,9 +437,7 @@ export function component(schema: Readonly<RpcSchema>) {
       /**
        * Schedule an invocation of the @alarm handler method.
        */
-      private _scheduleAlarm(
-        alarm: RpcAlarm,
-      ) {
+      private _scheduleAlarm(alarm: RpcAlarm) {
         if (alarm.timestamp) {
           this._state.storage.setAlarm(alarm.timestamp)
           console.log(`scheduled alarm for ${alarm.timestamp}`)
@@ -558,7 +546,7 @@ export function component(schema: Readonly<RpcSchema>) {
         const fieldKeys = new Set(fields.keys())
         const updateKeys = set.intersection(outputKeys, fieldKeys)
 
-        for (const [fieldName,] of output.entries()) {
+        for (const [fieldName] of output.entries()) {
           if (!updateKeys.has(Symbol.for(fieldName))) {
             console.warn(
               `tried storing output "${fieldName}" without declaration; ignored`
@@ -954,7 +942,8 @@ export function component(schema: Readonly<RpcSchema>) {
           // Set(1): {
           //   { name: Symbol(someField), perms: Set(2) { 'read', 'write' } }
           // }
-          const fieldSet: FieldSet = fieldsRequired?.get(Symbol.for(alarmMethod)) || new Set()
+          const fieldSet: FieldSet =
+            fieldsRequired?.get(Symbol.for(alarmMethod)) || new Set()
           // TODO this should be a utility method that is shared.
           const fieldMap: FieldMap = this._makeFieldMap(fieldSet)
           // Load any configured field values.
@@ -968,7 +957,7 @@ export function component(schema: Readonly<RpcSchema>) {
           const alarmOutput = await this._alarmFn(
             fieldInput,
             fieldOutput,
-            alarm,
+            alarm
           )
 
           // Keep outputs for which there is write permission and
@@ -980,12 +969,10 @@ export function component(schema: Readonly<RpcSchema>) {
 
           // Schedule the next alarm if requested.
           this._scheduleAlarm(alarm)
-
         } else {
           console.error(`alarm fired but no handler configured using @alarm`)
         }
       }
-
     }
   }
 }
@@ -1231,7 +1218,6 @@ export function requiredField(name: string, perms: Readonly<FieldPerms>) {
  * parameter, and updates collected from the "output" map.
  */
 export function alarm() {
-
   // TODO check if alarm already set; throw if so, there can only be one
   // alarm handler.
   function getAlarmHandler(target: any) {
@@ -1245,7 +1231,7 @@ export function alarm() {
   return function (
     target: unknown,
     propertyKey: string,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ) {
     if (getAlarmHandler(target) !== undefined) {
       throw new Error('there can be only one; alarm handler already configured')

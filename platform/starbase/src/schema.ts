@@ -20,7 +20,15 @@ const rpcSchema: RpcSchema = {
     {
       name: 'kb_appCreate',
       summary: 'Create a new application record',
-      params: [],
+      params: [
+        {
+          name: 'clientName',
+          description: 'A human-readable name for the application',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
       result: {
         name: 'appId',
         description: 'The ID of the newly created application',
