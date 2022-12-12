@@ -19,6 +19,7 @@ export const Modal = ({
   children,
   ...rest
 }: ModalProps) => {
+  console.log('rendering', { isOpen }, { fixed }, { children })
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
