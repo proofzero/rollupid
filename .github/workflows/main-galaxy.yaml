@@ -51,7 +51,10 @@ jobs:
           command: publish --env dev
           environment: 'dev'
           secrets: |
-            ALCHEMY_KEY
+            APIKEY_ALCHEMY_ETH
+            APIKEY_ALCHEMY_POLYGON
+
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          ALCHEMY_KEY: ${{ secrets.GALAXY_ALCHEMY_GOERLI_API_KEY}}
+          APIKEY_ALCHEMY_ETH: ${{ secrets.APIKEY_ALCHEMY_GALAXY_GOERLI }}
+          APIKEY_ALCHEMY_POLYGON: ${{ secrets.APIKEY_ALCHEMY_POLYGON_MUMBAI }}

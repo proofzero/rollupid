@@ -64,13 +64,13 @@ const nftsResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const ethClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_ETH_KEY,
+        key: env.APIKEY_ALCHEMY_ETH,
         chain: AlchemyChain.ethereum,
         network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const polyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_POLYGON_KEY,
+        key: env.APIKEY_ALCHEMY_POLYGON,
         chain: AlchemyChain.polygon,
         network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
@@ -115,13 +115,13 @@ const nftsResolvers: Resolvers = {
       let contracts: any[] = []
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_ETH_KEY,
+        key: env.APIKEY_ALCHEMY_ETH,
         chain: 'eth',
         network: env.ALCHEMY_ETH_NETWORK,
       } as AlchemyClientConfig)
 
       const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
-        key: env.ALCHEMY_POLYGON_KEY,
+        key: env.APIKEY_ALCHEMY_POLYGON,
         chain: 'polygon',
         network: env.ALCHEMY_POLYGON_NETWORK,
       } as AlchemyClientConfig)
