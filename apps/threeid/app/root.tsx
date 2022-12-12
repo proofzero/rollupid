@@ -32,6 +32,13 @@ import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
+function Analytics () {
+  return <script defer
+    src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'>
+  </script>
+}
+
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: '3ID',
@@ -88,11 +95,7 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
-        <script
-          defer
-          src='https://static.cloudflareinsights.com/beacon.min.js'
-          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
-        </script>
+        <Analytics />
       </body>
     </html>
   )
@@ -126,11 +129,7 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script
-          defer
-          src='https://static.cloudflareinsights.com/beacon.min.js'
-          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
-        </script>
+        <Analytics />
       </body>
     </html>
   )
@@ -186,11 +185,7 @@ export function CatchBoundary() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script
-          defer
-          src='https://static.cloudflareinsights.com/beacon.min.js'
-          data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}'>
-        </script>
+        <Analytics />
       </body>
     </html>
   )
