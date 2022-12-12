@@ -51,6 +51,7 @@ kv_namespaces = [
 ]
 routes = [
   { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-dev"},
@@ -72,6 +73,7 @@ ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 [env.next]
 routes = [
   { pattern = "app-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 kv_namespaces = [
 ]
@@ -97,6 +99,7 @@ ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 [env.current]
 routes = [
   { pattern = "app.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 kv_namespaces = [
 ]
