@@ -197,7 +197,7 @@ export default class CryptoAddress {
   @method('getPfpVoucher')
   @requiredField('pfpVoucher', [FieldAccess.Read])
   getPfpVoucher(params: RpcParams, input: RpcInput): RpcResult {
-    return input.get('voucher')
+    return input.get('pfpVoucher')
   }
 
   @method('setPfpVoucher')

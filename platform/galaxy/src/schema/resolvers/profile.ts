@@ -27,7 +27,7 @@ const threeIDResolvers: Resolvers = {
 
       const accountClient = createFetcherJsonRpcClient(env.Account)
       let accountProfile = await accountClient.kb_getProfile(accountURN)
-
+      console.log({ accountProfile })
       // console.log(accountProfile)
       return accountProfile
     },

@@ -32,6 +32,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
+  console.log({ profileRes })
+
   const parsedURN = parseURN(profileRes.profile?.defaultAddress)
 
   const address = parsedURN.nss.split('/')[1]
