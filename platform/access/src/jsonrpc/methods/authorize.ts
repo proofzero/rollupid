@@ -13,14 +13,8 @@ export default async (
   request: Readonly<RpcRequest>,
   context: Readonly<RpcContext>
 ) => {
-  const {
-    account,
-    responseType,
-    clientId,
-    redirectUri,
-    scope,
-    state,
-  }: AuthorizeParams = (request.params as ParamsArray)[0]
+  const [account, responseType, clientId, redirectUri, scope, state] =
+    request.params as AuthorizeParams
 
   if (!account) {
     return openrpc.error(request, {

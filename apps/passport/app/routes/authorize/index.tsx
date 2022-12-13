@@ -2,7 +2,7 @@ import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 import { useLoaderData, useSubmit } from '@remix-run/react'
 
-import type { ResponseType } from '@kubelt/platform.access/src/types'
+import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import {
   getAccessClient,
@@ -105,14 +105,14 @@ export const action: ActionFunction = async ({ request, context }) => {
   const clientId = form.get('client_id') as string
 
   const accessClient = getAccessClient()
-  const authorizeRes = await accessClient.kb_authorize({
-    account: parsedJWT.sub,
+  const authorizeRes = await accessClient.kb_authorize(
+    parsedJWT.sub,
     responseType,
     clientId,
     redirectUri,
     scope,
     state,
-  })
+  )
 
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)

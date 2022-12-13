@@ -22,7 +22,7 @@ export default async (
       })
   }
 
-  const { nonce, signature } = request.params as VerifyNonceParams
+  const [nonce, signature] = request.params as VerifyNonceParams
   if (!nonce) {
     return openrpc.error(request, {
       code: -32500,
@@ -42,7 +42,7 @@ export default async (
     redirectUri,
     scope,
     state,
-  }: Challenge = await nodeClient.verifyNonce(request.params)
+  }: Challenge = await nodeClient.verifyNonce({ nonce, signature })
 
   const account = await nodeClient.resolveAccount()
   const responseType = ResponseType.Code
@@ -50,14 +50,14 @@ export default async (
   const accessClient = createFetcherJsonRpcClient(context.get('Access'))
 
   try {
-    const result = await accessClient.kb_authorize({
+    const result = await accessClient.kb_authorize(
       account,
       responseType,
       clientId,
       redirectUri,
       scope,
-      state,
-    })
+      state
+    )
 
     return openrpc.response(request, result)
   } catch (error) {

@@ -2,7 +2,6 @@ import { decodeJwt } from 'jose'
 
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
@@ -24,8 +23,7 @@ export default async (
   request: Readonly<RpcRequest>,
   context: Readonly<RpcContext>
 ) => {
-  const params: ExchangeTokenParams = (request.params as ParamsArray)[0]
-  const { grantType } = params
+  const [grantType] = (request.params as ExchangeTokenParams).splice(0, 1)
   if (!grantType) {
     return openrpc.error(request, {
       code: -32500,
@@ -33,12 +31,12 @@ export default async (
     })
   }
 
-  const exchangeAuthenticationCode = async ({
-    account,
-    code,
-    redirectUri,
-    clientId,
-  }: ExchangeAuthenticationCodeParams) => {
+  const exchangeAuthenticationCode = async (
+    params: ExchangeAuthenticationCodeParams
+  ) => {
+    const [account, code, redirectUri, clientId] = params
+    console.log({ params })
+    console.log({ account, code, redirectUri, clientId })
     if (!account) {
       throw 'missing account'
     }
@@ -66,6 +64,7 @@ export default async (
       name,
     })
     const { scope } = await authorizationClient.exchangeToken({
+      account,
       code,
       redirectUri,
       clientId,
@@ -82,13 +81,10 @@ export default async (
     return openrpc.response(request, result)
   }
 
-  const exchangeAuthorizationCode = async ({
-    account,
-    code,
-    redirectUri,
-    clientId,
-    clientSecret,
-  }: ExchangeAuthorizationCodeParams) => {
+  const exchangeAuthorizationCode = async (
+    params: ExchangeAuthorizationCodeParams
+  ) => {
+    const [account, code, redirectUri, clientId, clientSecret] = params
     if (!account) {
       throw 'missing account'
     }
@@ -143,9 +139,8 @@ export default async (
     }
   }
 
-  const exchangeRefreshToken = async ({
-    token,
-  }: ExchangeRefreshTokenParams) => {
+  const exchangeRefreshToken = async (params: ExchangeRefreshTokenParams) => {
+    const [token] = params
     const payload = decodeJwt(token)
     if (!payload) {
       return openrpc.error(request, {
@@ -174,17 +169,17 @@ export default async (
 
   if (grantType == GrantType.AuthenticationCode) {
     const result = await exchangeAuthenticationCode(
-      params as ExchangeAuthenticationCodeParams
+      request.params as ExchangeAuthenticationCodeParams
     )
     return openrpc.response(request, result)
   } else if (grantType == GrantType.AuthorizationCode) {
     const result = await exchangeAuthorizationCode(
-      params as ExchangeAuthorizationCodeParams
+      request.params as ExchangeAuthorizationCodeParams
     )
     return openrpc.response(request, result)
   } else if (grantType == GrantType.RefreshToken) {
     const result = await exchangeRefreshToken(
-      params as ExchangeRefreshTokenParams
+      request.params as ExchangeRefreshTokenParams
     )
     return openrpc.response(request, result)
   } else {

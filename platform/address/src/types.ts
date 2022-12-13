@@ -32,19 +32,16 @@ export interface Challenge {
   state: string
 }
 
-export type SetAccountParams = {
-  account: string
-}
+export type SetAccountParams = [account: string]
 
-export type GetNonceParams = {
-  address: string
-  template: string
-  redirectUri: string
-  scope: string[]
+export type GetNonceParams = [
+  address: string,
+  template: string,
+  redirectUri: string,
+  scope: string[],
   state: string
-}
+]
 
-export type VerifyNonceParams = {
-  nonce: string
-  signature: string
-}
+export type VerifyNonceParams = [nonce: string, signature: string]
+
+export type SetAddressProfileParams = [profile: object]

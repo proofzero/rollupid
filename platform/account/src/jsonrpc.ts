@@ -1,5 +1,3 @@
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-
 import * as openrpc from '@kubelt/openrpc'
 import { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 import mwOnlyLocal from '@kubelt/openrpc/middleware/local'
