@@ -1,5 +1,5 @@
+import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment } from 'react'
 
 import { HiOutlineX } from 'react-icons/hi'
 
@@ -19,9 +19,11 @@ export const Modal = ({
   children,
   ...rest
 }: ModalProps) => {
+  console.log('rendering', { isOpen }, { fixed }, { children })
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
+        open={isOpen}
         as="div"
         className="relative z-[100]"
         onClose={(val: boolean) => {

@@ -30,9 +30,13 @@ export default async (
   }
 
   try {
-    const voucher = await getNftarVoucher(address, type, context)
+    const chainType = type === 'eth' ? 'ethereum' : type
+    const voucher = await getNftarVoucher(address, chainType, context)
     if (!voucher) {
-      return openrpc.response(request, null)
+      return openrpc.error(request, {
+        code: -32500,
+        message: 'Unable to get voucher from Nftar',
+      })
     }
     const pfp = gatewayFromIpfs(voucher.metadata.image)
     const cover = gatewayFromIpfs(voucher.metadata.cover)
@@ -40,8 +44,8 @@ export default async (
     newProfile.pfp.image ||= pfp
     newProfile.cover = cover
 
-    await nodeClient.setPfpVoucher(voucher)
-    await nodeClient.setProfile(newProfile)
+    await nodeClient.setPfpVoucher({ voucher })
+    await nodeClient.setProfile({ profile: newProfile })
 
     return openrpc.response(request, newProfile)
   } catch (error) {

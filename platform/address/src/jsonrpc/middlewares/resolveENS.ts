@@ -3,7 +3,10 @@ import type { RpcContext } from '@kubelt/openrpc'
 import { CryptoAddressType, EthereumAddressDescription } from '../../types'
 
 export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (context.get('addr_type') != CryptoAddressType.Ethereum) {
+  if (
+    context.get('addr_type') != CryptoAddressType.Ethereum ||
+    context.get('addr_type') != CryptoAddressType.ETH
+  ) {
     return
   }
 

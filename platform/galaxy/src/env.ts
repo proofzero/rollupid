@@ -8,7 +8,6 @@ export default interface Env {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   // MY_BUCKET: R2Bucket;
 
-  Oort: Fetcher
   Account: Fetcher
   Address: Fetcher
   Icons: Fetcher
@@ -19,7 +18,6 @@ export default interface Env {
 }
 
 export const required = [
-  'Oort',
   'Account',
   'Address',
   'Icons',

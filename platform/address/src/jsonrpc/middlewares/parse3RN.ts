@@ -1,3 +1,5 @@
+import { isAddress as isEthAddress } from '@ethersproject/address'
+
 import type { RpcContext } from '@kubelt/openrpc'
 
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
@@ -20,8 +22,17 @@ export default (request: Readonly<Request>, context: RpcContext) => {
   const { rcomponent, qcomponent } = AddressURNSpace.parse(urn)
   const rparams = new URLSearchParams(rcomponent || '')
 
+  let type = rparams.get('addr_type')
+  if (!type) {
+    if (isEthAddress(name)) {
+      type = 'ethereum'
+    } else if (name.endsWith('.eth')) {
+      type = 'ethereum'
+    }
+  }
+
   context.set('name', name)
-  context.set('addr_type', rparams.get('addr_type'))
+  context.set('addr_type', type)
   context.set('params', new URLSearchParams(qcomponent as string))
 
   const nodeType = rparams.get('node_type') || ''

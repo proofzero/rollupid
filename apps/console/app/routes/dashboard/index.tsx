@@ -2,7 +2,7 @@
  * @file app/routes/dashboard/index.tsx
  */
 
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 
 import { Link, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
@@ -12,6 +12,7 @@ import folderPlus from '~/images/folderPlus.svg'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
+import { getStarbaseClient } from '~/utilities/platform.server'
 import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
 
@@ -31,6 +32,16 @@ export const loader: LoaderFunction = async ({ request }) => {
   //const apps = await getApplicationListItems(jwt);
   const apps = []
   return json<LoaderData>({ apps })
+}
+
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData()
+  const clientName = formData.get('client_name')
+
+  if (!clientName) throw 'App name is required'
+
+  const starbaseClient = getStarbaseClient()
+  const app = await starbaseClient.createApplication(clientName as string)
 }
 
 // Component
@@ -63,15 +74,32 @@ export default function DashboardIndexPage() {
             <Button
               btnSize="l"
               onClick={() => {
-                console.log('opening')
+                console.log('opening', newAppModalOpen)
                 setNewAppModalOpen(true)
               }}
             >
               Create Application"
             </Button>
           </div>
+          <Modal
+            isOpen={newAppModalOpen}
+            fixed
+            handleClose={() => setNewAppModalOpen(false)}
+          >
+            <>
+              <h3 className="text-xl font-bold mb-6">New Application</h3>
+
+              <form method="post">
+                <p>Application Name</p>
+                <input placeholder="My Application" name="client_name"></input>
+                <button onClick={() => setNewAppModalOpen(false)}>
+                  Cancel
+                </button>
+                <button type="submit">Create Application</button>
+              </form>
+            </>
+          </Modal>
         </div>
-        <Modal isOpen={newAppModalOpen} fixed />
       </main>
     </div>
   )

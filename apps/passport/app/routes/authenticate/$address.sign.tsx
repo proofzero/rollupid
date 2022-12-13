@@ -27,16 +27,19 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const state = Math.random().toString(36).substring(7)
   const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
   const addressClient = getAddressClient(addressURN)
-  const nonce = await addressClient.kb_getNonce(
-    params.address,
-    signMessageTemplate,
-    PASSPORT_REDIRECT_URL,
-    ['admin'], // todo: change scope
-    state
-  )
-  // TODO: handle the error case
-
-  return json({ nonce, address, state })
+  try {
+    const nonce = await addressClient.kb_getNonce(
+      params.address, // as client_id
+      signMessageTemplate,
+      PASSPORT_REDIRECT_URL,
+      ['admin'], // todo: change scope
+      state
+    )
+    return json({ nonce, address, state })
+  } catch (e) {
+    console.error(e)
+    throw json(`Error getting nonce: ${e}`, { status: 500 })
+  }
 }
 
 export const action: ActionFunction = async ({ request, context, params }) => {
@@ -54,7 +57,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
-  searchParams.set('addr_type', 'eth')
+  searchParams.set('addr_type', 'ethereum')
   return redirect(
     `/authenticate/${
       params.address
@@ -102,8 +105,6 @@ export default function Sign() {
   }, [connector])
 
   useEffect(() => {
-    console.log({ signing, isConnected, isConnecting, isDisconnected, status })
-
     if ((!isConnected && signing) || isDisconnected || isConnecting) {
       navigate(`/authenticate${window.location.search}`)
     }
@@ -142,7 +143,6 @@ export default function Sign() {
             btnType="secondary-alt"
             onClick={() => {
               disconnect()
-              // navigate(`/authenticate${window.location.search}`)
             }}
           >
             Go Back

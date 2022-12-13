@@ -6,7 +6,6 @@ wrangler_dev = true
 
 # Services binding for local development
 services = [
-  { binding = "Oort", service = "oort"},
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
   { binding = "Icons", service = "icons" },
@@ -23,7 +22,6 @@ ALCHEMY_POLYGON_NETWORK="mumbai"
 [env.dev]
 route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
-  { binding = "Oort", service = "oort-devnet"},
   { binding = "Account", service = "account-dev" },
   { binding = "Address", service = "address-dev" },
   { binding = "Icons", service = "icons-dev" },
@@ -36,7 +34,6 @@ ALCHEMY_POLYGON_NETWORK="mumbai"
 [env.next]
 route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
-  { binding = "Oort", service = "oort-testnet"},
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
   { binding = "Icons", service = "icons-next" },
@@ -49,7 +46,6 @@ ALCHEMY_POLYGON_NETWORK="mumbai"
 [env.current]
 route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
-  { binding = "Oort", service = "oort-mainnet"},
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
   { binding = "Icons", service = "icons-current" },

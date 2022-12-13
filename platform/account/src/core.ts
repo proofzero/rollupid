@@ -41,7 +41,6 @@ export default class Core {
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
-    output.set('profile', params.get('profile'))
-    return true
+    return output.set('profile', params.get('profile'))
   }
 }
