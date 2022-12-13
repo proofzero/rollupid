@@ -68,6 +68,7 @@
     "@storybook/preset-typescript": "3.0.0",
     "@storybook/react": "6.5.13",
     "@storybook/testing-library": "0.0.13",
+    "@tailwindcss/forms": "0.5.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "autoprefixer": "latest",

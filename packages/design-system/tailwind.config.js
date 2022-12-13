@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
   safelist: [
     'font-normal',
     'font-medium',
@@ -21,6 +21,6 @@ module.exports = {
     'text-5xl',
     'text-gray-500',
     'mt-8',
-    'mt-2'
-  ]
+    'mt-2',
+  ],
 }
