@@ -1,4 +1,4 @@
-// @kubelt/graph:impl/select.ts
+// @kubelt/platform.edges:src/db/impl/select.ts
 
 /**
  * Utilities for selecting data from the database.
@@ -6,7 +6,7 @@
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeId, EdgeTag, Graph } from '../types'
+import type { Edge, Graph } from '../types'
 
 // edges()
 // -----------------------------------------------------------------------------
@@ -23,8 +23,8 @@ export async function edges(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
       .then((result) => {
         resolve(<Edge[]>result.results)
       })
-      .catch((e: any) => {
-        reject(e.cause.message)
+      .catch((e: unknown) => {
+        reject(e)
       })
   })
 }
@@ -32,6 +32,9 @@ export async function edges(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 // incoming()
 // -----------------------------------------------------------------------------
 
+/**
+ *
+ */
 export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
@@ -41,8 +44,8 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
       .then((result) => {
         resolve(<Edge[]>result.results)
       })
-      .catch((e: any) => {
-        reject(e.cause.message)
+      .catch((e: unknown) => {
+        reject(e)
       })
   })
 }
@@ -50,6 +53,9 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 // outgoing()
 // -----------------------------------------------------------------------------
 
+/**
+ *
+ */
 export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
@@ -59,8 +65,8 @@ export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
       .then((result) => {
         resolve(<Edge[]>result.results)
       })
-      .catch((e: any) => {
-        reject(e.cause.message)
+      .catch((e: unknown) => {
+        reject(e)
       })
   })
 }

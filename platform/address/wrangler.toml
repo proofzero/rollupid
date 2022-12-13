@@ -10,6 +10,7 @@ durable_objects.bindings = [
 
 services = [
   { binding = "Access", service = "access" },
+  { binding = "Edges", service = "edges" }
 ]
 
 [vars]
@@ -40,6 +41,7 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-dev" },
+  { binding = "Edges", service = "edges-dev" }
 ]
 
 [env.dev.vars]
@@ -53,6 +55,7 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-next" },
+  { binding = "Edges", service = "edges-next" }
 ]
 
 [env.next.vars]
@@ -66,6 +69,7 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-current" },
+  { binding = "Edges", service = "edges-current" }
 ]
 
 [env.current.vars]

@@ -23,6 +23,8 @@ import { URNQComponent } from '../../db/entity/URNQComponent'
 import { URNRComponent } from '../../db/entity/URNRComponent'
 
 import * as graph from '@kubelt/graph'
+import * as db from '../../src/db'
+
 import * as security from '@kubelt/security'
 import * as scopes from '@kubelt/security/scopes'
 
@@ -144,8 +146,8 @@ tap.teardown(async () => {
 // -----------------------------------------------------------------------------
 
 tap.test('link', async (t) => {
-  const g = graph.init(d1)
-  const result = await graph.link(g, srcURN, dstURN, edgeTag)
+  const g = db.init(d1)
+  const result = await db.link(g, srcURN, dstURN, edgeTag)
   tap.equal(1, result, 'the first edge should have an ID of 1')
 
   t.end()
@@ -155,8 +157,8 @@ tap.test('link', async (t) => {
 // -----------------------------------------------------------------------------
 
 tap.test('unlink', async (t) => {
-  const g = graph.init(d1)
-  const result = await graph.unlink(g, srcURN, dstURN, edgeTag)
+  const g = db.init(d1)
+  const result = await db.unlink(g, srcURN, dstURN, edgeTag)
   tap.equal(1, result, 'only one edge should have been removed')
 
   t.end()
@@ -164,12 +166,15 @@ tap.test('unlink', async (t) => {
 
 // graph.edges()
 // -----------------------------------------------------------------------------
+// TODO test filtering by edge type
+// TODO test filtering by edge direction
+// TODO test filtering by f-comp, r-comp, q-comp
 
 tap.test('edges', async (t) => {
-  const g = graph.init(d1)
+  const g = db.init(d1)
 
-  await graph.link(g, srcURN, dstURN, edgeTag)
-  const edges = await graph.edges(g, srcURN)
+  await db.link(g, srcURN, dstURN, edgeTag)
+  const edges = await db.edges(g, srcURN)
   tap.equal(1, edges.length, 'there should only be a single edge')
 
   const edge: graph.Edge = edges[0]
@@ -178,22 +183,6 @@ tap.test('edges', async (t) => {
   tap.equal(srcURN, edge.srcUrn)
   tap.equal(dstURN, edge.dstUrn)
 
-  t.end()
-})
-
-// graph.incoming()
-// -----------------------------------------------------------------------------
-
-tap.test('incoming', async (t) => {
-  // TODO
-  t.end()
-})
-
-// graph.outgoing()
-// -----------------------------------------------------------------------------
-
-tap.test('outgoing', async (t) => {
-  // TODO
   t.end()
 })
 

@@ -56,6 +56,8 @@ export type RpcRequest = jsonrpc.JsonRpcRequest
 
 export type RpcResponse = jsonrpc.JsonRpcResponse
 
+export type RpcResult = jsonrpc.JsonRpcResultResponse
+
 export type RpcError = jsonrpc.JsonRpcErrorResponse
 
 // The standard JSON-RPC object that describes the error that occurred.

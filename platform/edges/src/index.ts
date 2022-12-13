@@ -9,19 +9,19 @@
 
 import * as _ from 'lodash'
 
-import * as openrpc from '@kubelt/openrpc'
-
 import * as urns from 'urns'
+
+import * as openrpc from '@kubelt/openrpc'
 
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
-import type { EdgeTag, Graph } from '@kubelt/graph'
+import type { Graph } from './db/types'
 
-import { EdgeDirection } from '@kubelt/graph'
+import { EdgeDirection } from './db/types'
 
-import * as graph from '@kubelt/graph'
+import * as db from './db'
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ const kb_makeEdge = openrpc.method(schema, {
         return openrpc.error(request, ErrorInvalidEdgeTag)
       }
 
-      const edgeId = await graph.link(g, srcURN, dstURN, edgeTag)
+      const edgeId = await db.link(g, srcURN, dstURN, edgeTag)
 
       // TODO permissions
 
@@ -198,11 +198,11 @@ const kb_getEdges = openrpc.method(schema, {
       if (edgeDir !== undefined) {
         switch (edgeDir) {
           case EdgeDirection.Incoming:
-            edges = await graph.incoming(g, nodeId)
+            edges = await db.incoming(g, nodeId)
             console.log(edges)
             break
           case EdgeDirection.Outgoing:
-            edges = await graph.outgoing(g, nodeId)
+            edges = await db.outgoing(g, nodeId)
             console.log(edges)
             break
           default:
@@ -211,7 +211,7 @@ const kb_getEdges = openrpc.method(schema, {
       } else {
         // Get the list of all edges impinging on a node (either incoming
         // or outgoing).
-        edges = await graph.edges(g, nodeId)
+        edges = await db.edges(g, nodeId)
       }
 
       return openrpc.response(request, {
@@ -280,7 +280,7 @@ const kb_rmEdge = openrpc.method(schema, {
       }
 
       // Unlink the edge (if it exists).
-      const edgeId = await graph.unlink(g, srcId, dstId, edgeTag)
+      const edgeId = await db.unlink(g, srcId, dstId, edgeTag)
 
       console.log(`deleted edge ${edgeId}: ${srcId} =[${edgeTag}]=> ${dstId}`)
 
@@ -314,7 +314,7 @@ const kb_findNode = openrpc.method(schema, {
       // TODO support pagination
 
       /*
-      const edges = graph.find('node', {
+      const edges = db.find('node', {
         equals: {
           nid,
           nss,
@@ -451,7 +451,7 @@ export default {
     // Store the current environment name, e.g. local, dev.
     context.set(KEY_ENVIRONMENT, env.ENVIRONMENT)
     // Construct and store our graph handle.
-    const g = graph.init(env.EDGES)
+    const g = db.init(env.EDGES)
     context.set(KEY_GRAPH, g)
 
     // NB: the handler clones the request; we don't need to do it here.
