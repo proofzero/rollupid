@@ -2,10 +2,7 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
-
 import { AccountURN } from '@kubelt/urns/account'
-import { AddressURNSpace } from '@kubelt/urns/address'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -80,48 +77,6 @@ export async function getRPCResult(response: Response) {
     )
   }
   return json.result?.value
-}
-
-export async function upgrayeddOortToAccount(
-  accountURN: AccountURN,
-  name: string,
-  accountClient: AccountApi,
-  oortResponse
-) {
-  if (!(accountURN && accountClient && oortResponse)) return {}
-
-  console.log(
-    `Migrating oort from address ${name} to ${accountURN}... starting`
-  )
-
-  try {
-    await checkHTTPStatus(oortResponse)
-
-    const oortProfile = await getRPCResult(oortResponse)
-
-    console.log({ oortProfile })
-
-    if (!oortProfile) {
-      console.log(
-        `Migrating core ${accountURN} to Account service... no profile`
-      )
-      return null
-    }
-
-    const profileRes = await accountClient.kb_setProfile(accountURN, {
-      ...oortProfile,
-      defaultAddress: AddressURNSpace.urn(name),
-    })
-
-    if (!profileRes) {
-      throw `Migrating core ${accountURN} to Account service... failed`
-    }
-
-    console.log(`Migrating core ${accountURN} to Account service... complete`)
-    return oortProfile
-  } catch (err) {
-    console.error(err)
-  }
 }
 
 export function sliceIntoChunks(arr: any, chunkSize: number) {

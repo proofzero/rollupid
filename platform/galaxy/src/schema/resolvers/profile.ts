@@ -1,19 +1,8 @@
 import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import {
-  createThreeIdURNSpace,
-  ThreeIdURN,
-  ThreeIdURNSpace,
-} from '@kubelt/urns'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
-import {
-  setupContext,
-  isAuthorized,
-  checkHTTPStatus,
-  getRPCResult,
-  upgrayeddOortToAccount,
-} from './utils'
+import { setupContext, isAuthorized } from './utils'
 
 import Env from '../../env'
 import OortClient from './clients/oort'
@@ -61,52 +50,32 @@ const threeIDResolvers: Resolvers = {
         try {
           const addressProfile = await addressClient.kb_getAddressProfile()
           if (!addressProfile) {
-            throw errorMessage
+            throw new GraphQLError(errorMessage)
           }
           return addressProfile
         } catch (e) {
-          console.error(
-            'galaxy.profileFromAddress: failed to upgrayed from oort:',
-            { errorMessage }
-          )
-          throw errorMessage
+          console.error(errorMessage)
+          throw new GraphQLError(errorMessage)
         }
       }
 
-      const accountClient = createFetcherJsonRpcClient(env.Account)
-      let accountProfile = await accountClient.kb_getProfile(accountURN)
+      try {
+        const accountClient = createFetcherJsonRpcClient(env.Account)
+        let accountProfile = await accountClient.kb_getProfile(accountURN)
 
-      console.log({ accountProfile })
-      // Upgrayedd Oort -> Account
-      if (!accountProfile) {
-        console.log(
-          `galaxy:profileFromAddress: upgrayedd Oort -> Account for ${addressURN}`
-        )
-        const oortClient = new OortClient(env.Oort)
-        const name = AddressURNSpace.decode(addressURN)
+        console.log({ accountProfile })
 
-        try {
-          const oortResponse = await oortClient.getProfileFromAddress(name)
-          accountProfile = await upgrayeddOortToAccount(
-            accountURN,
-            name,
-            accountClient,
-            oortResponse
-          )
-        } catch (err) {
-          console.error(
-            'galaxy.profileFromAddress: failed to upgrayed from oort:',
-            { err }
-          )
+        if (!accountProfile) {
+          accountProfile =
+            (await addressClient.kb_getAddressProfile()) as object
         }
-      }
 
-      if (!accountProfile) {
-        accountProfile = (await (addressClient as CryptoWorkerApi) // TODO: should there be generic addres profile interface?
-          .kb_getAddressProfile()) as object
+        return accountProfile
+      } catch (e) {
+        const errorMessage = `galaxy.profileFromAddress: failed to create profile for address ${addressURN}`
+        console.error(errorMessage, e)
+        throw new GraphQLError(errorMessage)
       }
-
-      return accountProfile
     },
   },
   Mutation: {

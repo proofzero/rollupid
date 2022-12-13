@@ -19,7 +19,7 @@ export default async (
     default:
       return openrpc.error(request, {
         code: -32500,
-        message: `kb_verifyNonce: not supported adress type: ${addressType}`,
+        message: `kb_verifyNonce: not supported address type: ${addressType}`,
       })
   }
 

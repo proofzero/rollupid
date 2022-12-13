@@ -8,7 +8,7 @@ import {
   getAccessClient,
   getAddressClientFromURN,
   getGalaxyClient,
-  getStabaseClient as getStarbaseClient,
+  getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
@@ -111,7 +111,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     clientId,
     redirectUri,
     scope,
-    state,
+    state
   )
 
   if (!authorizeRes) {
