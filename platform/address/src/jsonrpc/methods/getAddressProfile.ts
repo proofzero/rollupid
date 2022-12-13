@@ -79,7 +79,7 @@ const getNftarVoucher = async (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${context.get('NFTAR_TOKEN')}`,
+      Authorization: `Bearer ${context.get('TOKEN_NFTAR')}`,
     },
     body: JSON.stringify({
       id: 1,

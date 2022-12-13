@@ -28,7 +28,7 @@ export default function Index() {
   const client = createClient(
     getDefaultClient({
       appName: '3ID',
-      alchemyId: typeof window !== 'undefined' && window.ENV.ALCHEMY_KEY,
+      alchemyId: typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_THREEID,
     })
   )
   return (

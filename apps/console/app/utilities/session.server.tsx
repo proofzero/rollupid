@@ -17,7 +17,7 @@ invariant(DEPLOY_ENV, 'DEPLOY_ENV must be set')
 
 // NB: This secret is set using: wrangler secret put.
 // @ts-ignore
-invariant(SESSION_SECRET, 'SESSION_SECRET must be set')
+invariant(SECRET_SESSION_SALT, 'SECRET_SESSION_SALT must be set')
 
 // @ts-ignore
 invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
@@ -29,7 +29,7 @@ const MAX_AGE = 60 * 60 * 4
 
 // createCookieSessionStorage
 // -----------------------------------------------------------------------------
-// TODO load the SESSION_SECRET from context injected into Loader and
+// TODO load the SECRET_SESSION_SALT from context injected into Loader and
 // use that to construct a Singleton for the session storage.
 //
 // TODO switch to using a CloudflareKVSessionStorage.
@@ -45,7 +45,7 @@ const storage = createCookieSessionStorage({
     // but that doesn't work on localhost for Safari
     // https://web.dev/when-to-use-local-https/
     secure: true,
-    secrets: [SESSION_SECRET],
+    secrets: [SECRET_SESSION_SALT],
     sameSite: true,
     path: '/',
     maxAge: MAX_AGE,
