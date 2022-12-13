@@ -2,7 +2,7 @@ import * as openrpc from '@kubelt/openrpc'
 import { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 import mwOnlyLocal from '@kubelt/openrpc/middleware/local'
 
-import { KEY_OBJECT_CORE, KEY_SERVICE_OORT } from './constants'
+import { KEY_OBJECT_CORE } from './constants'
 import { worker as schema } from './schema'
 import { Environment } from './types'
 
@@ -62,6 +62,5 @@ export default async (
 ): Promise<Response> => {
   const context = openrpc.context(request, env, ctx)
   context.set(KEY_OBJECT_CORE, env.Core)
-  context.set(KEY_SERVICE_OORT, env.Oort)
   return rpcHandler(request, context)
 }

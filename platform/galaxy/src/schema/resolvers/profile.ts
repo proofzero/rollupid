@@ -5,7 +5,6 @@ import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc
 import { setupContext, isAuthorized } from './utils'
 
 import Env from '../../env'
-import OortClient from './clients/oort'
 import { Resolvers } from './typedefs'
 import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
