@@ -11,6 +11,6 @@ declare global {
   const THREEID_APP_URL: string
   const CONSOLE_APP_URL: string
   const PASSPORT_REDIRECT_URL: string
-  const APIKEY_ALCHEMY_THREEID: string
+  const APIKEY_ALCHEMY_PUBLIC: string
   const ENS_RESOLVER_URL: string
 }
