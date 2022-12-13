@@ -454,6 +454,7 @@ const ProfileRoute = () => {
             account={targetAddress}
             displayname={displayName}
             isOwner={isOwner}
+            filters={true}
             detailsModal
           />
         </div>

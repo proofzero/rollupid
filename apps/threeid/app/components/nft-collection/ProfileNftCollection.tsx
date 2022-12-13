@@ -68,6 +68,7 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
           <img
             className="w-[4.5rem] h-[4.5rem] mb-5 lg:mb-0 lg:mr-5 bg-gray-50 mt-4 lg:mt-0"
             src={imgSrc}
+            alt="here you was supposed to see something"
           />
         )}
 
@@ -112,13 +113,42 @@ const ProfileNftCollection = ({
   const [textFilter, setTextFilter] = useState('')
   const [colFilter, setColFilter] = useState('All Collections')
 
+  const [colFilters, setColFilters] = useState([
+    { title: 'All Collections', img: undefined },
+    { title: 'Without Collection', img: undefined },
+  ])
+
   const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
     const nftReq = await fetch(
       `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ''}`
     )
-    const nftRes = await nftReq.json()
+    const nftRes: any = await nftReq.json()
+
+    /* We already have only 1 NFT per collection
+     ** No need to put it in additional Set data structure
+     */
+    setColFilters([
+      ...colFilters,
+      ...nftRes.ownedNfts.reduce((acc: any, nft: any) => {
+        if (
+          nft.collectionTitle &&
+          nft.collectionTitle !== 'All Collections' &&
+          nft.collectionTitle !== 'Without Collection'
+        ) {
+          return [
+            ...acc,
+            {
+              title: nft.collectionTitle,
+              img: nft.thumbnailUrl ? nft.thumbnailUrl : undefined,
+            },
+          ]
+        } else {
+          return acc
+        }
+      }, []),
+    ])
 
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
     setPageLink(nftRes.pageKey ?? null)
@@ -237,13 +267,9 @@ const ProfileNftCollection = ({
               setColFilter(evt.target.value)
             }}
           >
-            <option>All Collections</option>
-            {loadedNfts
-              .map((n) => n.collectionTitle)
-              .filter((val, ind, arr) => arr.indexOf(val) === ind)
-              .map((colName, i) => (
-                <option key={`${colName}_${i}`}>{colName}</option>
-              ))}
+            {colFilters.map((colName, i) => (
+              <option key={`${colName.title}_${i}`}>{colName.title}</option>
+            ))}
           </select>
 
           <InputText
@@ -277,15 +303,17 @@ const ProfileNftCollection = ({
               .filter(
                 (nft) =>
                   colFilter === 'All Collections' ||
-                  nft.collectionTitle === colFilter
+                  nft.collectionTitle === colFilter ||
+                  (!nft.collectionTitle && colFilter == 'Without Collection')
               )
-              .filter(
-                (nft) =>
+              .filter((nft) => {
+                return (
                   nft.title?.toLowerCase().includes(textFilter.toLowerCase()) ||
                   nft.collectionTitle
                     ?.toLowerCase()
                     .includes(textFilter.toLowerCase())
-              )
+                )
+              })
               .map((nft, i) => (
                 // Filtering collection by
                 // unique values
