@@ -23,7 +23,7 @@ local_protocol = "http"
 # $ echo <VALUE> | wrangler secret put <NAME>
 
 # Required secrets:
-# - SESSION_SECRET
+# - SECRET_SESSION_SALT
 
 # Environment Variables
 # -----------------------------------------------------------------------------

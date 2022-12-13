@@ -1,1 +1,1 @@
-SESSION_SECRET="foobar"
+SECRET_SESSION_SALT="foobar"
