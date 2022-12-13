@@ -189,15 +189,15 @@ export default class CryptoAddress {
   @method('setProfile')
   @requiredField('profile', [FieldAccess.Read, FieldAccess.Write])
   setProfile(params: RpcParams, input: RpcInput, output: RpcOutput): RpcResult {
-    const profile = input.get('profile')
-    Object.assign(profile, params)
-    output.set('profile', profile)
+    const profile = input.get('profile') || {}
+    Object.assign(profile, params.get('profile'))
+    return output.set('profile', profile)
   }
 
   @method('getPfpVoucher')
   @requiredField('pfpVoucher', [FieldAccess.Read])
   getPfpVoucher(params: RpcParams, input: RpcInput): RpcResult {
-    return input.get('pfpVoucher')
+    return input.get('voucher')
   }
 
   @method('setPfpVoucher')
@@ -207,6 +207,6 @@ export default class CryptoAddress {
     input: RpcInput,
     output: RpcOutput
   ): RpcResult {
-    output.set('pfpVoucher', params.get('pfpVoucher'))
+    return output.set('pfpVoucher', params.get('voucher'))
   }
 }

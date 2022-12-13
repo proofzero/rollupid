@@ -188,7 +188,7 @@ export const schema: RpcSchema = {
         },
       },
       AddressProfile: {
-        name: 'address profile',
+        name: 'profile',
         schema: {
           $ref: '#/components/schemas/AddressProfile',
         },
@@ -206,7 +206,7 @@ export const schema: RpcSchema = {
         },
       },
       PfpVoucher: {
-        name: 'pfp voucher',
+        name: 'voucher',
         schema: {
           $ref: '#/components/schemas/PfpVoucher',
         },

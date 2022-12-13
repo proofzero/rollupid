@@ -171,17 +171,17 @@ export default async (
     const result = await exchangeAuthenticationCode(
       request.params as ExchangeAuthenticationCodeParams
     )
-    return openrpc.response(request, result)
+    return result
   } else if (grantType == GrantType.AuthorizationCode) {
     const result = await exchangeAuthorizationCode(
       request.params as ExchangeAuthorizationCodeParams
     )
-    return openrpc.response(request, result)
+    return result
   } else if (grantType == GrantType.RefreshToken) {
     const result = await exchangeRefreshToken(
       request.params as ExchangeRefreshTokenParams
     )
-    return openrpc.response(request, result)
+    return result
   } else {
     return openrpc.error(request, {
       code: -32500,

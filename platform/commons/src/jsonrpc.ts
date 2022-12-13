@@ -1,3 +1,4 @@
+import { json } from 'itty-router-extras'
 import {
   createJsonRpcClient,
   Func,
@@ -43,6 +44,7 @@ export const createFetcherJsonRpcClient = <
     if ('error' in jsonRpcResponse) {
       throw jsonRpcResponse.error
     } else {
+      console.log({ jsonRpcResponse: JSON.stringify(jsonRpcResponse) })
       return jsonRpcResponse.result
     }
   }

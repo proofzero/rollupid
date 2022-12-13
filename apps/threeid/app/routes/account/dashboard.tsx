@@ -20,9 +20,6 @@ import { requireJWT, parseJwt, getUserSession } from '~/utils/session.server'
 export const loader = async ({ request }) => {
   const jwt = await requireJWT(request, '/auth')
 
-  const session = getUserSession(request)
-  console.log({ session })
-
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,

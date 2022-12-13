@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
-  searchParams.set('addr_type', 'eth')
+  searchParams.set('addr_type', 'ethereum')
   return redirect(
     `/authenticate/${
       params.address
@@ -105,8 +105,6 @@ export default function Sign() {
   }, [connector])
 
   useEffect(() => {
-    console.log({ signing, isConnected, isConnecting, isDisconnected, status })
-
     if ((!isConnected && signing) || isDisconnected || isConnecting) {
       navigate(`/authenticate${window.location.search}`)
     }

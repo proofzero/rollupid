@@ -32,7 +32,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
     const addressClient = getAddressClientFromURN(defaultProfileURN)
-    profile = await addressClient.kb_getAddressProfile()
+    profile = await addressClient.kb_getAddressProfile() // this will detect the kind of address
     if (!profile) {
       throw json("Couldn't find profile", 400)
     }
