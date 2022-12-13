@@ -63,8 +63,6 @@ const threeIDResolvers: Resolvers = {
         const accountClient = createFetcherJsonRpcClient(env.Account)
         let accountProfile = await accountClient.kb_getProfile(accountURN)
 
-        console.log({ accountProfile })
-
         if (!accountProfile) {
           accountProfile =
             (await addressClient.kb_getAddressProfile()) as object
