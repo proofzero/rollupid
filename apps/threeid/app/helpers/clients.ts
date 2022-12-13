@@ -1,6 +1,5 @@
 import { GraphQLClient } from 'graphql-request'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import type { CryptoWorkerApi } from '@kubelt/platform.address/src/types'
 import { getSdk } from '~/utils/galaxy.server'
 
 export async function getGalaxyClient() {
@@ -12,5 +11,5 @@ export async function getGalaxyClient() {
 }
 
 export function getCryptoAddressClient(options: RequestInit) {
-  return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, options)
+  return createFetcherJsonRpcClient(Address, options)
 }

@@ -1,24 +1,15 @@
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import type { CryptoWorkerApi } from '@kubelt/platform.address/src/types'
-import type { WorkerApi as AccessApi } from '@kubelt/platform.access/src/types'
 import type { Func } from 'typed-json-rpc'
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
 import { getSdk } from '~/galaxy.server'
 
-interface StarbaseApi {
-  [key: string]: Func
-  kb_initPlatform(): Promise<string[]>
-  kb_appScopes(): Promise<Record<string, ScopeMeta>>
-  kbt_appProfile(): Promise<Record<string, any>>
-}
-
 export function getStabaseClient() {
-  return createFetcherJsonRpcClient<StarbaseApi>(Starbase)
+  return createFetcherJsonRpcClient(Starbase)
 }
 
 export function getAccessClient() {
-  return createFetcherJsonRpcClient<AccessApi>(Access)
+  return createFetcherJsonRpcClient(Access)
 }
 
 export function getAddressClient(addressUrn: string) {
@@ -27,7 +18,7 @@ export function getAddressClient(addressUrn: string) {
       'X-3RN': addressUrn,
     },
   }
-  return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)
+  return createFetcherJsonRpcClient(Address, requestInit)
 }
 export function getAddressClientFromURN(addressUrn: string) {
   const requestInit: RequestInit = {
@@ -35,7 +26,7 @@ export function getAddressClientFromURN(addressUrn: string) {
       'X-3RN': addressUrn,
     },
   }
-  return createFetcherJsonRpcClient<CryptoWorkerApi>(Address, requestInit)
+  return createFetcherJsonRpcClient(Address, requestInit)
 }
 
 export async function getGalaxyClient() {

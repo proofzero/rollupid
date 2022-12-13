@@ -2,7 +2,6 @@ import { decodeJwt } from 'jose'
 
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 
 import { VerifyAuthorizationParams } from '../../types'
 
@@ -11,9 +10,7 @@ export default async (
   request: Readonly<RpcRequest>,
   context: Readonly<RpcContext>
 ) => {
-  const { token }: VerifyAuthorizationParams = (
-    request.params as ParamsArray
-  )[0]
+  const [token] = request.params as VerifyAuthorizationParams
   const payload = decodeJwt(token)
   if (!payload) {
     return openrpc.error(request, {

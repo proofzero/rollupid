@@ -28,8 +28,8 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=eth`
   const addressClient = getAddressClient(addressURN)
   const nonce = await addressClient.kb_getNonce(
+    params.address,
     signMessageTemplate,
-    params.address as string, // as client_id
     PASSPORT_REDIRECT_URL,
     ['admin'], // todo: change scope
     state

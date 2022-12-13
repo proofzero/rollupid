@@ -34,13 +34,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   // TODO: handle refresh token
   try {
-    const { accessToken, refreshToken } = await accessClient.kb_exchangeToken({
-      account,
+    const { accessToken, refreshToken } = await accessClient.kb_exchangeToken(
       grantType,
+      account,
       code,
       redirectUri,
       clientId,
-    })
+    )
 
     const galaxyClient = await getGalaxyClient()
     await galaxyClient.getProfileFromAddress({

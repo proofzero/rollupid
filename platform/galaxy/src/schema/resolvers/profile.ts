@@ -1,15 +1,10 @@
 import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { WorkerApi as AccountApi } from '@kubelt/platform.account/src/types'
 import {
   createThreeIdURNSpace,
   ThreeIdURN,
   ThreeIdURNSpace,
 } from '@kubelt/urns'
-import {
-  CryptoWorkerApi,
-  WorkerApi as AddressApi,
-} from '@kubelt/platform.address/src/types'
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
 
 import {
@@ -41,7 +36,7 @@ const threeIDResolvers: Resolvers = {
         `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
 
-      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      const accountClient = createFetcherJsonRpcClient(env.Account)
       let accountProfile = await accountClient.kb_getProfile(accountURN)
 
       // console.log(accountProfile)
@@ -52,14 +47,11 @@ const threeIDResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
-      const addressClient = createFetcherJsonRpcClient<AddressApi>(
-        env.Address,
-        {
-          headers: {
-            'X-3RN': addressURN,
-          },
-        }
-      )
+      const addressClient = createFetcherJsonRpcClient(env.Address, {
+        headers: {
+          'X-3RN': addressURN,
+        },
+      })
       const accountURN = await addressClient.kb_getAccount()
       if (!accountURN) {
         console.log(
@@ -67,8 +59,7 @@ const threeIDResolvers: Resolvers = {
         )
         const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
         try {
-          const addressProfile = await (addressClient as CryptoWorkerApi) // TODO: should there be generic addres profile interface?
-            .kb_getAddressProfile()
+          const addressProfile = await addressClient.kb_getAddressProfile()
           if (!addressProfile) {
             throw errorMessage
           }
@@ -82,7 +73,7 @@ const threeIDResolvers: Resolvers = {
         }
       }
 
-      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      const accountClient = createFetcherJsonRpcClient(env.Account)
       let accountProfile = await accountClient.kb_getProfile(accountURN)
 
       console.log({ accountProfile })
@@ -128,7 +119,7 @@ const threeIDResolvers: Resolvers = {
         `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createFetcherJsonRpcClient<AccountApi>(env.Account)
+      const accountClient = createFetcherJsonRpcClient(env.Account)
       let currentProfile = await accountClient.kb_getProfile(accountURN)
 
       // Make sure nulls are empty objects.

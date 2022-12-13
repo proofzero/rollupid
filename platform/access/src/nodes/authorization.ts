@@ -88,6 +88,7 @@ export default class Authorization {
     input: RpcInput,
     output: RpcOutput
   ): RpcResult {
+    console.log({ input })
     const account = input.get('account')
     if (!account) {
       throw new Error('missing account name')
