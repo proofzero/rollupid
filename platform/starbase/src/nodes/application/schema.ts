@@ -61,7 +61,7 @@ const rpcSchema: RpcSchema = {
       params: [],
       result: {
         name: 'profile',
-        description: 'Public application data',
+        description: 'Public (published) application data',
         schema: {
           type: 'object',
         },
@@ -82,6 +82,29 @@ const rpcSchema: RpcSchema = {
       ],
       result: {
         name: 'success',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
+    {
+      name: 'hasSecret',
+      summary: 'Returns whether or not the application OAuth secret is set',
+      params: [],
+      result: {
+        name: 'exists',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
+    {
+      name: 'publish',
+      summary: 'Set the publication flag status',
+      params: [],
+      result: {
+        name: 'published',
+        description: 'The new publication status',
         schema: {
           type: 'boolean',
         },

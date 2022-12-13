@@ -3,7 +3,7 @@
   "id": 1,
   "method": "kb_appUpdate",
   "params": {
-    "clientId": "f5f43b2354c644360f6ba49c9e7b5e5a",
+    "clientId": "53ab56010b446e62746309dba44c35c2",
     "profile": {
       "redirectURI": "https://example.com/auth/successful",
       "domains": [],

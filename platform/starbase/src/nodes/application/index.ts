@@ -57,7 +57,7 @@ import schema from './schema'
 // Should this version be an argument to @component(schema, "v1")?
 //@version("v1")
 @component(schema)
-@scopes(['owner', 'starbase.read', 'starbase.write'])
+@scopes(['owner' /* 'starbase.read', 'starbase.write'*/])
 @field({
   name: 'app',
   doc: 'An application object',
@@ -83,18 +83,27 @@ import schema from './schema'
   */
 })
 @field({
+  name: 'published',
+  doc: 'Application publication flag',
+  defaultValue: false,
+})
+@field({
   name: 'secret',
   doc: 'The OAuth client secret for the application',
   defaultValue: '',
 })
 export class StarbaseApplication {
   // init
-  // -----------------------------------------------------------------------------
-  // Store the initial copy of the application record.
+  // ---------------------------------------------------------------------------
+  // Store the initial copy of the application record. Used to set up
+  // fixture nodes for internal platform apps, which is why it updates
+  // the secret. Once we no longer need to initialize the platform in
+  // this way we can remove this method.
 
   @method('init')
-  @requiredScope('starbase.write')
+  //@requiredScope('starbase.write')
   @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('secret', [FieldAccess.Write])
   init(
     params: RpcParams,
     input: RpcInput,
@@ -102,8 +111,13 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const app = params.get('app')
 
+    // Normally the secret is set using rotateSecret(), but when
+    // initializing from fixture data we use a supplied secret (hashed).
+    const secret = _.get(app, 'clientSecret', '')
+    output.set('secret', secret)
+
     if (Object.keys(app).length > 0) {
-      output.set('app', app)
+      output.set('app', _.omit(app, ['clientSecret', 'published']))
     } else {
       return Promise.resolve({
         error: `cannot initialize app more than once`,
@@ -122,7 +136,7 @@ export class StarbaseApplication {
   // The write scope is required to invoke this method. If the caller
   // lacks the scope they receive an error method indicating that they
   // lack permission, and this method handler is not invoked.
-  @requiredScope('starbase.write')
+  //@requiredScope('starbase.write')
   // Allow this method to update the value of the "app" field of the
   // component.
   @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
@@ -144,10 +158,9 @@ export class StarbaseApplication {
       })
     }
 
+    // Read the supplied "profile" request parameter and write it to the
+    // output "app" field, merging with the existing app data.
     const app = input.get('app')
-
-    // Read the supplied "app" request parameter and write it to the
-    // output "app" field.
     const profile = params.get('profile')
 
     // Make sure there's nothing sensitive in the parameters being
@@ -160,9 +173,7 @@ export class StarbaseApplication {
       app,
       _.omit(profile, ['clientId', 'clientSecret', 'published'])
     )
-
     output.set('app', updated)
-    console.log(updated)
 
     return Promise.resolve({
       profile,
@@ -170,10 +181,10 @@ export class StarbaseApplication {
   }
 
   // fetch
-  // -----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   @method('fetch')
-  @requiredScope('starbase.read')
+  //@requiredScope('starbase.read')
   @requiredField('app', [FieldAccess.Read])
   appFetch(
     params: RpcParams,
@@ -186,30 +197,51 @@ export class StarbaseApplication {
   }
 
   // profile
-  // -----------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   @method('profile')
-  @requiredScope('starbase.read')
+  //@requiredScope('starbase.read')
   @requiredField('app', [FieldAccess.Read])
+  @requiredField('published', [FieldAccess.Read])
   profile(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
     const app = input.get('app')
+    const published = input.get('published')
 
     // If the application is not published we shouldn't return any
     // information.
     let profile = {}
-    if (app?.published == true) {
+    if (published == true) {
+      // These fields are stored separately, but out of an abundance of
+      // caution we make sure they're not present in the returned profile.
       profile = _.omit(app, ['clientSecret', 'published'])
     }
 
     return Promise.resolve(profile)
   }
 
-  // updateSecret
+  // hasSecret
   // -----------------------------------------------------------------------------
+
+  @method('hasSecret')
+  //@requiredScope()
+  @requiredField('secret', [FieldAccess.Read])
+  hasSecret(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    const secret = input.get('secret')
+    const exists = _.isString(secret) && _.trim(secret) !== ''
+
+    return Promise.resolve(exists)
+  }
+
+  // rotateSecret
+  // ---------------------------------------------------------------------------
 
   @method('rotateSecret')
   //@requiredScope()
@@ -224,6 +256,27 @@ export class StarbaseApplication {
     output.set('secret', secret)
 
     return Promise.resolve(true)
+  }
+
+  // publish
+  // ---------------------------------------------------------------------------
+  // Note that this method simply sets the publication flag as
+  // requested. Any validation of the application data that needs to
+  // happen before the app is published is expected to happen in the
+  // worker.
+
+  @method('publish')
+  //@requiredScope()
+  @requiredField('published', [FieldAccess.Write])
+  publish(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    const published = params.get('published')
+    output.set('published', published)
+
+    return Promise.resolve({ published })
   }
 
   // ---------------------------------------------------------------------------
