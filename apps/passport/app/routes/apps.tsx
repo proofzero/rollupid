@@ -77,7 +77,7 @@ export default function Apps() {
                   <a
                     href={!app.disabled ? app.url : '#'}
                     className={
-                      'flex flex-col-2 basis-full min-w-max sm:basis-6/12 md:basis-6/12 md:justify-start md:items-start justify-start items-start gap-4 my-2 p-2 bg-white'
+                      'flex flex-col-2 w-[25vw] min-w-[18rem] justify-start items-start gap-4 my-2 p-2 bg-white'
                     }
                     style={{
                       border: '1px solid #D1D5DB',
