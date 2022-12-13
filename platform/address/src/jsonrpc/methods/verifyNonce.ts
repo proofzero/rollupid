@@ -14,6 +14,7 @@ export default async (
   const addressType = context.get('addr_type')
   switch (addressType) {
     case CryptoAddressType.Ethereum:
+    case CryptoAddressType.ETH:
       break
     default:
       return openrpc.error(request, {
