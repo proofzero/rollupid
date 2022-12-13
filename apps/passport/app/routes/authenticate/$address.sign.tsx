@@ -25,7 +25,7 @@ This will not trigger a blockchain transaction or cost any gas fees.
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const state = Math.random().toString(36).substring(7)
-  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=eth`
+  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
   const addressClient = getAddressClient(addressURN)
   const nonce = await addressClient.kb_getNonce(
     params.address,
@@ -41,7 +41,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { address } = params
-  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=eth`
+  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
   const addressClient = getAddressClient(addressURN)
   const formData = await request.formData()
 
