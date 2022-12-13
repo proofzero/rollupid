@@ -6,11 +6,11 @@ declare global {
   const Access: Fetcher
   const Starbase: Fetcher
 
-  const SESSION_SECRET: string
+  const SECRET_SESSION_SALT: string
   const COOKIE_DOMAIN: string
   const THREEID_APP_URL: string
   const CONSOLE_APP_URL: string
   const PASSPORT_REDIRECT_URL: string
-  const ALCHEMY_KEY: string
+  const APIKEY_ALCHEMY_THREEID: string
   const ENS_RESOLVER_URL: string
 }

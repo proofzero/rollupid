@@ -57,7 +57,7 @@ export const loader: LoaderFunction = () => {
   return json({
     ENV: {
       THREEID_APP_URL,
-      ALCHEMY_KEY,
+      APIKEY_ALCHEMY_THREEID: APIKEY_ALCHEMY_THREEID,
     },
   })
 }

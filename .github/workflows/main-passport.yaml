@@ -46,14 +46,14 @@ jobs:
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/passport'
           command: publish --env dev
           environment: 'dev'
           secrets: |
-            SESSION_SECRET
-            ALCHEMY_KEY
+            SECRET_SESSION_SALT
+            APIKEY_ALCHEMY_THREEID
         env:
-          SESSION_SECRET: 'foobar'
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          ALCHEMY_KEY: ${{ secrets.ALCHEMY_PUBLIC_API_KEY }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          APIKEY_ALCHEMY_THREEID: ${{ secrets.APIKEY_ALCHEMY_THREEID_GOERLI }}

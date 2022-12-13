@@ -8,9 +8,9 @@ import type { Session } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
-const sessionSecret = SESSION_SECRET
+const sessionSecret = SECRET_SESSION_SALT
 if (!sessionSecret) {
-  throw new Error('SESSION_SECRET must be set')
+  throw new Error('SECRET_SESSION_SALT must be set')
 }
 
 const storage = createCookieSessionStorage({
