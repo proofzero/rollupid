@@ -268,16 +268,23 @@ const ProfileNftOneCollection = ({
       {loadedNfts.length > 0 && (
         <>
           <Link to={`/${account}`}>
-            <div className="mb-16">
+            <Text className="mb-12 text-gray-600" size="base" weight="semibold">
               {collectionTitle?.length ? (
                 <div>
-                  <HiArrowNarrowLeft className='inline mr-4'></HiArrowNarrowLeft>
+                  <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
                   {collectionTitle}
                 </div>
               ) : (
-                <div>go back</div>
+                <Text
+                  className="mb-12 text-gray-600"
+                  size="base"
+                  weight="semibold"
+                >
+                  <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                  Back to collections
+                </Text>
               )}
-            </div>
+            </Text>
           </Link>
           <InfiniteScroll
             dataLength={loadedNfts.length} //This is important field to render the next data

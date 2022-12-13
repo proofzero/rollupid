@@ -443,7 +443,7 @@ const ProfileRoute = () => {
 
         <div className="mt-12 lg:mt-24">
           <Text
-            className="mb-8 lg:mb-16 text-gray-600"
+            className="mb-8 lg:mb-12 text-gray-600"
             size="sm"
             weight="semibold"
           >
