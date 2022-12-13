@@ -30,10 +30,15 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
+    "@ethersproject/bytes": "5.7.0",
+    "@ethersproject/keccak256": "5.7.0",
+    "@ethersproject/random": "5.7.0",
+    "@ethersproject/signing-key": "5.7.0",
+    "@ethersproject/transactions": "5.7.0",
+    "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "itty-router": "2.6.6",
-    "itty-router-extras": "0.4.2",
-    "typed-json-rpc": "1.1.0"
+    "itty-router-extras": "0.4.2"
   }
 }

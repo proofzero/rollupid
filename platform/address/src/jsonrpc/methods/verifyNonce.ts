@@ -1,0 +1,70 @@
+import * as openrpc from '@kubelt/openrpc'
+import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+
+import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import { ResponseType } from '@kubelt/platform.access/src/types'
+
+import { Challenge, CryptoAddressType, VerifyNonceParams } from '../../types'
+
+export default async (
+  service: Readonly<RpcService>,
+  request: Readonly<RpcRequest>,
+  context: Readonly<RpcContext>
+) => {
+  const addressType = context.get('addr_type')
+  switch (addressType) {
+    case CryptoAddressType.Ethereum:
+      break
+    default:
+      return openrpc.error(request, {
+        code: -32500,
+        message: `kb_verifyNonce: not supported adress type: ${addressType}`,
+      })
+  }
+
+  const { nonce, signature } = request.params as VerifyNonceParams
+  if (!nonce) {
+    return openrpc.error(request, {
+      code: -32500,
+      message: 'missing nonce',
+    })
+  }
+  if (!signature) {
+    return openrpc.error(request, {
+      code: -32500,
+      message: 'missing signature',
+    })
+  }
+
+  const nodeClient = context.get('node_client')
+  const {
+    address: clientId,
+    redirectUri,
+    scope,
+    state,
+  }: Challenge = await nodeClient.verifyNonce(request.params)
+
+  const account = await nodeClient.resolveAccount()
+  const responseType = ResponseType.Code
+
+  const accessClient = createFetcherJsonRpcClient(context.get('Access'))
+
+  try {
+    const result = await accessClient.kb_authorize({
+      account,
+      responseType,
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    })
+
+    return openrpc.response(request, result)
+  } catch (error) {
+    console.error(error)
+    return openrpc.error(request, {
+      code: -32500,
+      message: (error as Error).message,
+    })
+  }
+}

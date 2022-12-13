@@ -1,22 +1,13 @@
 import { Router } from 'itty-router'
+import { error } from 'itty-router-extras'
 
-import { handleOptions } from '@kubelt/platform.commons/src/routers/cors'
-import { discoveryHandler } from '@kubelt/platform.commons/src/routers/openrpc'
-
-import Access from './access'
-import Authorization from './authorization'
-import jsonRpcHandler from './jsonrpc'
-import serviceDescription from './openrpc.json'
+import Access from './nodes/access'
+import Authorization from './nodes/authorization'
+import jsonRpc from './jsonrpc'
 
 const index = Router()
-  .get('/openrpc.json', discoveryHandler(serviceDescription))
-  .options(
-    '/jsonrpc',
-    handleOptions({
-      headers: ['Content-Type', 'KBT-Access-JWT-Assertion'],
-    })
-  )
-  .post('/jsonrpc', jsonRpcHandler)
+  .post('/jsonrpc', jsonRpc)
+  .all('*', () => error(404, 'not found'))
 
 export { Access, Authorization }
 export default { fetch: index.handle }

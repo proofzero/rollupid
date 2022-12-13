@@ -5,13 +5,11 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" },
-  { name = "CryptoCore", class_name = "CryptoCore" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" }
 ]
 
 services = [
   { binding = "Access", service = "access" },
-  { binding = "Oort", service = "oort" },
 ]
 
 [vars]
@@ -32,16 +30,16 @@ new_classes = ["Core"]
 tag = "v1"
 new_classes = ["CryptoCore"]
 
+[[migrations]]
+tag = "v2"
+renamed_classes = [{ from = "CryptoCore", to = "CryptoAddress" }]
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" },
-  { name = "CryptoCore", class_name = "CryptoCore" }
-
+  { name = "CryptoAddress", class_name = "CryptoAddress" }
 ]
 services = [
   { binding = "Access", service = "access-dev" },
-  { binding = "Oort", service = "oort-devnet" },
 ]
 
 [env.dev.vars]
@@ -52,12 +50,10 @@ NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" },
-  { name = "CryptoCore", class_name = "CryptoCore" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" }
 ]
 services = [
   { binding = "Access", service = "access-next" },
-  { binding = "Oort", service = "oort-testnet" },
 ]
 
 [env.next.vars]
@@ -68,12 +64,10 @@ NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" },
-  { name = "CryptoCore", class_name = "CryptoCore" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" }
 ]
 services = [
   { binding = "Access", service = "access-current" },
-  { binding = "Oort", service = "oort-mainnet" },
 ]
 
 [env.current.vars]

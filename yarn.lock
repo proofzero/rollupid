@@ -5175,31 +5175,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/platform.access-gateway@workspace:platform/access-gateway":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.access-gateway@workspace:platform/access-gateway"
-  dependencies:
-    "@cloudflare/workers-types": 3.18.0
-    "@ethersproject/address": 5.7.0
-    "@kubelt/openrpc": "workspace:*"
-    "@kubelt/platform.access": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
-    "@types/itty-router-extras": 0.4.0
-    "@types/node": 18.11.9
-    "@typescript-eslint/eslint-plugin": 5.42.1
-    "@typescript-eslint/parser": 5.42.1
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typed-json-rpc: 1.1.0
-    typescript: 4.8.4
-    wrangler: 2.4.4
-  languageName: unknown
-  linkType: soft
-
 "@kubelt/platform.access@workspace:*, @kubelt/platform.access@workspace:platform/access":
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.access@workspace:platform/access"
@@ -5207,6 +5182,7 @@ __metadata:
     "@cloudflare/workers-types": 3.18.0
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/random": 5.7.0
+    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.commons": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
@@ -5258,6 +5234,12 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@ethersproject/address": 5.7.0
+    "@ethersproject/bytes": 5.7.0
+    "@ethersproject/keccak256": 5.7.0
+    "@ethersproject/random": 5.7.0
+    "@ethersproject/signing-key": 5.7.0
+    "@ethersproject/transactions": 5.7.0
+    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.commons": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
@@ -5269,7 +5251,6 @@ __metadata:
     itty-router-extras: 0.4.2
     npm-run-all: 4.1.5
     prettier: 2.7.1
-    typed-json-rpc: 1.1.0
     typescript: 4.8.4
     wrangler: 2.4.4
   languageName: unknown
