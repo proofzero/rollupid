@@ -1,5 +1,6 @@
 import React from 'react'
 import { InputHTMLAttributes } from 'react'
+import { HiEyeOff } from 'react-icons/hi'
 import { Text } from '../text/Text'
 
 export type ReadOnlyInputProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -10,7 +11,7 @@ export type ReadOnlyInputProps = InputHTMLAttributes<HTMLInputElement> & {
 }
 
 export const ReadOnlyInput = ({
-  hidden = false,
+  hidden,
   label,
   id,
   name,
@@ -30,15 +31,23 @@ export const ReadOnlyInput = ({
       </label>
 
       {/* Would `disabled` also work instead of overwriting focus properties ?*/}
-      <input
-        type={hidden ? 'password' : 'text'}
-        className={`form-input rounded border border-gray-300 shadow-sm bg-gray-100 text-sm text-gray-500 font-normal py-2 px-3 focus:outline-none focus:border-gray-300 focus:ring-0 ${className}`}
-        id={id}
-        name={computedName}
-        readOnly
-        {...rest}
-        value={value}
-      />
+      <div className="relative">
+        <input
+          type={hidden ? 'password' : 'text'}
+          className={`w-full form-input rounded border border-gray-300 shadow-sm bg-gray-100 text-sm text-gray-500 font-normal py-2 px-3 focus:outline-none focus:border-gray-300 focus:ring-0 ${
+            hidden ? 'pr-10' : ''
+          } ${className}`}
+          id={id}
+          name={computedName}
+          readOnly
+          {...rest}
+          value={value}
+        />
+
+        <span className="absolute right-0 top-0 bottom-0 flex justify-center items-center pr-3">
+          {hidden && <HiEyeOff className="w-5 h-5 text-gray-400" />}
+        </span>
+      </div>
     </div>
   )
 }
