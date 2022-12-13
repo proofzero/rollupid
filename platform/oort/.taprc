@@ -1,3 +1,0 @@
-coverage: false
-files: test/index.ts
-reporter: list
