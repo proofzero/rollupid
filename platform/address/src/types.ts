@@ -5,7 +5,7 @@ export interface Environment {
   ENS_RESOLVER_URL: string
   MINTPFP_CONTRACT_ADDRESS: string
   NFTAR_CHAIN_ID: string
-  NFTAR_TOKEN: string
+  TOKEN_NFTAR: string
   NFTAR_URL: string
 }
 
