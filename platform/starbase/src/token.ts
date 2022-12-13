@@ -1,8 +1,14 @@
 // @threeid/platform.starbase:src/token.ts
 
+import * as _ from 'lodash'
+
 import * as jose from 'jose'
 
 import { HEADER_ACCESS_TOKEN } from '@kubelt/platform.commons/src/constants'
+
+import type { AccountURN } from '@kubelt/urns/account'
+
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 // fromRequest()
 // -----------------------------------------------------------------------------
@@ -26,12 +32,27 @@ export function fromRequest(request: Request): string {
  *
  * @param token - A JWT token string
  */
-export function getUserId(token: string): string {
+export function getAccountId(token: string): AccountURN {
   if (token === '') {
-    return ''
+    throw new Error('invalid empty token provided')
   }
 
   const decoded = jose.decodeJwt(token)
   // The unique user ID can be found in the JWT 'sub' field.
-  return decoded?.sub ? decoded.sub : ''
+  const userId = decoded?.sub ? decoded.sub : ''
+
+  // The user URN is provided as the 'subject' JWT claim.
+  if (_.isUndefined(userId) || userId === '') {
+    throw new Error('missing account ID in JWT')
+  }
+
+  // Validate user ID as an AccountURN.
+  let accountURN: AccountURN
+  if (!AccountURNSpace.is(userId)) {
+    throw new Error('invalid account ID in JWT')
+  } else {
+    accountURN = userId
+  }
+
+  return accountURN
 }

@@ -64,11 +64,11 @@ type RpcProperties = {
   // The URN representation of a Durable Object ID.
   urn?: string
   // These are the components of the parsed URN.
-  nid?: string,
-  nss?: string,
-  rc?: string,
-  qc?: string,
-  fc?: string,
+  nid?: string
+  nss?: string
+  rc?: string
+  qc?: string
+  fc?: string
 }
 
 // RpcRequestOptions
@@ -308,7 +308,7 @@ export class RpcClient {
     const urnStr = urn?.toString()
 
     let parts = {}
-    if (typeof(urn) === 'object') {
+    if (typeof urn === 'object') {
       // The various components of the URN (if present).
       parts = {
         nid: urn?.nid,
@@ -319,14 +319,17 @@ export class RpcClient {
       }
     }
 
-    return _.merge({
-      // The ID of the durable object as a string.
-      id: idStr,
-      // The platform namespace ('threeid') URN of the object, if provided.
-      name,
-      // A URN representation of the internal durable object ID.
-      urn: urnStr,
-    }, parts)
+    return _.merge(
+      {
+        // The ID of the durable object as a string.
+        id: idStr,
+        // The platform namespace ('threeid') URN of the object, if provided.
+        name,
+        // A URN representation of the internal durable object ID.
+        urn: urnStr,
+      },
+      parts
+    )
   }
 
   // Access the "internal" method table.

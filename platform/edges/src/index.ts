@@ -132,13 +132,15 @@ const kb_makeEdge = openrpc.method(schema, {
 
       // TAG
 
-      const tag = _.get(request, ['params', 'tag'])
-      if (_.isUndefined(tag)) {
+      const edgeTag = _.get(request, ['params', 'tag'])
+      if (_.isUndefined(edgeTag)) {
         return openrpc.error(request, ErrorMissingEdgeTag)
       }
-
-      // Constructs a URN for the edge "type" given a string tag.
-      const edgeTag: EdgeTag = graph.edge(tag)
+      try {
+        urns.parseURN(edgeTag)
+      } catch (e) {
+        return openrpc.error(request, ErrorInvalidEdgeTag)
+      }
 
       const edgeId = await graph.link(g, srcURN, dstURN, edgeTag)
 
@@ -279,6 +281,8 @@ const kb_rmEdge = openrpc.method(schema, {
 
       // Unlink the edge (if it exists).
       const edgeId = await graph.unlink(g, srcId, dstId, edgeTag)
+
+      console.log(`deleted edge ${edgeId}: ${srcId} =[${edgeTag}]=> ${dstId}`)
 
       return openrpc.response(request, {
         removed: edgeId,

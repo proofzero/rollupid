@@ -3,6 +3,5 @@
   "id": 1,
   "method": "kb_appList",
   "params": {
-    "ownerId": "@kubelt"
   }
 }

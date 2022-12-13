@@ -11,7 +11,6 @@ import { add } from 'date-fns'
  * A utility class for setting an alarm time in a durable object.
  */
 export class RpcAlarm {
-
   private _timestamp: Date | undefined
 
   /**
@@ -55,5 +54,4 @@ export class RpcAlarm {
     this._timestamp = add(Date.now(), duration)
     return this._timestamp
   }
-
 }
