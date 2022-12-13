@@ -28,7 +28,7 @@ export const ApplicationListItemIcon = ({
   </div>
 )
 
-type ApplicationListItemProps = {
+export type ApplicationListItemProps = {
   title: string
   created: Date
   iconUrl?: string
