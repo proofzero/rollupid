@@ -31,7 +31,7 @@ Deploying NFTar touches three things: this project, the smart contract secrets, 
 First, in this project run:
 
 ```bash
-gcloud builds submit
+gcloud builds submit --project threeid-nftar
 ```
 
 This will yield a Docker image tag.
