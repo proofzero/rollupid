@@ -9,7 +9,7 @@ import { getUserSession } from '~/utils/session.server'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Cover } from '../components/profile/cover/Cover'
+import { Cover } from '../../components/profile/cover/Cover'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
@@ -447,7 +447,7 @@ const ProfileRoute = () => {
             size="sm"
             weight="semibold"
           >
-            NFT Collection
+            NFT Collections
           </Text>
 
           <ProfileNftCollection
