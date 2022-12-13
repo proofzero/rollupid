@@ -9,7 +9,7 @@ import { getUserSession } from '~/utils/session.server'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Cover } from '../components/profile/cover/Cover'
+import { Cover } from '../../../components/profile/cover/Cover'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
@@ -19,7 +19,7 @@ import HeadNav from '~/components/head-nav'
 import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
 import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
 
-import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
+import ProfileNftOneCollection from '~/components/nft-collection/ProfileNftOneCollection'
 import {
   FaBriefcase,
   FaCamera,
@@ -48,6 +48,7 @@ export const loader: LoaderFunction = async (args) => {
   const jwt = session.get('jwt')
 
   if (!params.profile) throw new Error('Profile is required')
+  if (!params.collection) throw new Error('Collection is required')
 
   const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
     addressOrEns: params.profile,
@@ -115,6 +116,7 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress,
     ogImageURL: url,
+    collection: params.collection,
   })
 }
 
@@ -149,7 +151,7 @@ export const meta: MetaFunction = ({
   }
 }
 
-const ProfileRoute = () => {
+const CollectionForProfileRoute = () => {
   const {
     loggedInUserProfile,
     originalCoverUrl,
@@ -163,6 +165,7 @@ const ProfileRoute = () => {
     pfp,
     cover,
     website,
+    collection,
   } = useLoaderData()
 
   const [coverUrl, setCoverUrl] = useState(cover)
@@ -443,18 +446,19 @@ const ProfileRoute = () => {
 
         <div className="mt-12 lg:mt-24">
           <Text
-            className="mb-8 lg:mb-16 text-gray-600"
+            className="mb-8 lg:mb-12 text-gray-600"
             size="sm"
             weight="semibold"
           >
-            NFT Collection
+            NFT Collections
           </Text>
 
-          <ProfileNftCollection
+          <ProfileNftOneCollection
             account={targetAddress}
             displayname={displayName}
             isOwner={isOwner}
             detailsModal
+            collection={collection}
           />
         </div>
       </div>
@@ -462,7 +466,7 @@ const ProfileRoute = () => {
   )
 }
 
-export default ProfileRoute
+export default CollectionForProfileRoute
 
 export function CatchBoundary() {
   const caught = useCatch()

@@ -103,7 +103,7 @@ const nftsResolvers: Resolvers = {
       _parent: any,
       {
         owner,
-        excludeFilters,
+        excludeFilters = ['SPAM', 'AIRDROPS'],
         pageSize = 1,
       }: {
         owner: string
@@ -130,11 +130,11 @@ const nftsResolvers: Resolvers = {
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           alchemyClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters,
           }),
           alchemyPolygonClient.getContractsForOwner({
             owner,
-            excludeFilters: ['SPAM', 'AIRDROPS'],
+            excludeFilters,
           }),
         ])
 
@@ -167,16 +167,20 @@ const nftsResolvers: Resolvers = {
               const res: any = []
               let localBatch = Object.keys(visitedMap)
               while (localBatch.length > 0) {
-                let nfts: any = await alchemyClient.getNFTs({
-                  owner,
-                  contractAddresses: localBatch,
-                  pageSize: localBatch.length * 3,
-                })
-                nfts.ownedNfts.forEach((nft: any) => {
-                  delete visitedMap[`${nft.contract.address}`]
-                })
-                localBatch = Object.keys(visitedMap)
-                res.push(nfts.ownedNfts)
+                try {
+                  let nfts: any = await alchemyClient.getNFTs({
+                    owner,
+                    contractAddresses: localBatch,
+                    pageSize: localBatch.length * 3,
+                  })
+                  nfts.ownedNfts.forEach((nft: any) => {
+                    delete visitedMap[`${nft.contract.address}`]
+                  })
+                  localBatch = Object.keys(visitedMap)
+                  res.push(nfts.ownedNfts)
+                } catch (ex) {
+                  console.error(new GraphQLYogaError(ex as string))
+                }
               }
               return res
             })
@@ -190,16 +194,20 @@ const nftsResolvers: Resolvers = {
               const res: any = []
               let localBatch = Object.keys(visitedMap)
               while (localBatch.length > 0) {
-                let nfts: any = await alchemyPolygonClient.getNFTs({
-                  owner,
-                  contractAddresses: localBatch,
-                  pageSize: localBatch.length * 3,
-                })
-                nfts.ownedNfts.forEach((nft: any) => {
-                  delete visitedMap[`${nft.contract.address}`]
-                })
-                localBatch = Object.keys(visitedMap)
-                res.push(nfts.ownedNfts)
+                try {
+                  let nfts: any = await alchemyPolygonClient.getNFTs({
+                    owner,
+                    contractAddresses: localBatch,
+                    pageSize: localBatch.length * 3,
+                  })
+                  nfts.ownedNfts.forEach((nft: any) => {
+                    delete visitedMap[`${nft.contract.address}`]
+                  })
+                  localBatch = Object.keys(visitedMap)
+                  res.push(nfts.ownedNfts)
+                } catch (ex) {
+                  console.error(new GraphQLYogaError(ex as string))
+                }
               }
               return res
             })
@@ -217,7 +225,7 @@ const nftsResolvers: Resolvers = {
         const polyCollectionsHashMap: any = {}
         // Mapper doesn't work on some vitaliks' nfts for
         // various reasons "Cannot create property 'properties' on string" - e.g.
-        
+
         EthOwnedNfts = NFTPropertyMapper(EthOwnedNfts.flat())
         PolygonOwnedNfts = NFTPropertyMapper(PolygonOwnedNfts.flat())
         // Creating hashmap with contract addresses as keys
