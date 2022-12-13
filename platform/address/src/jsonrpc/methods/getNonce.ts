@@ -1,5 +1,6 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 
 import { CryptoAddressType, GetNonceParams } from '../../types'
 
@@ -8,8 +9,9 @@ export default async (
   request: Readonly<RpcRequest>,
   context: Readonly<RpcContext>
 ) => {
-  const { address, template, redirectUri, scope, state } =
-    request.params as GetNonceParams
+  const { address, template, redirectUri, scope, state }: GetNonceParams = (
+    request.params as ParamsArray
+  )[0]
 
   const addressType = context.get('addr_type')
   switch (addressType) {
@@ -73,7 +75,13 @@ export default async (
 
   const nodeClient = context.get('node_client')
   try {
-    const result = await nodeClient.getNonce(request.params)
+    const result = await nodeClient.getNonce({
+      address,
+      template,
+      redirectUri,
+      scope,
+      state,
+    })
     return openrpc.response(request, result)
   } catch (error) {
     return openrpc.error(request, {
