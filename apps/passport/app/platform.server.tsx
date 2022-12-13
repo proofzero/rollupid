@@ -1,10 +1,9 @@
 import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
-import type { Func } from 'typed-json-rpc'
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
 import { getSdk } from '~/galaxy.server'
 
-export function getStabaseClient() {
+export function getStarbaseClient() {
   return createFetcherJsonRpcClient(Starbase)
 }
 

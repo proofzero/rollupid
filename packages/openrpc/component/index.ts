@@ -596,9 +596,6 @@ export function component(schema: Readonly<RpcSchema>) {
         }
         const entries: StorageObject = {}
         for (const [outName, outValue] of fieldOutput) {
-          console.log(
-            `setting field "${outName}" => ${JSON.stringify(outValue, null, 2)}`
-          )
           entries[outName] = outValue
         }
 
@@ -633,18 +630,11 @@ export function component(schema: Readonly<RpcSchema>) {
             // value isn't already defined.
             const value = await this._state.storage.get(fieldSpec.name)
             if (value === undefined) {
-              const valueStr = JSON.stringify(fieldSpec.defaultValue)
-              console.log(
-                `setting field "${fieldSpec.name}" default to: ${valueStr}`
-              )
               const put: Promise<any> = this._state.storage.put(
                 fieldSpec.name,
                 fieldSpec.defaultValue
               )
               wait.push(put)
-            } else {
-              const valueStr = JSON.stringify(value, null, 2)
-              console.log(`found field "${fieldSpec.name}" value: ${valueStr}`)
             }
           })
 

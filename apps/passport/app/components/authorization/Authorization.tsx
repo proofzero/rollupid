@@ -52,7 +52,6 @@ export function Authorization({
 }: AuthorizationProps) {
   const transition = useTransition()
 
-  console.log('scopeMeta', scopeMeta)
   return (
     <div
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}

@@ -39,7 +39,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
       account,
       code,
       redirectUri,
-      clientId,
+      clientId
     )
 
     const galaxyClient = await getGalaxyClient()

@@ -18,6 +18,7 @@ export const isCryptoAddressType = (
 ): type is CryptoAddressType => {
   switch (type) {
     case CryptoAddressType.Ethereum:
+    case CryptoAddressType.ETH:
       return true
     default:
       return false
