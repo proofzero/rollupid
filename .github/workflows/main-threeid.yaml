@@ -46,20 +46,17 @@ jobs:
       - name: Deploy to Dev Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'apps/threeid'
           command: publish --env dev
           environment: 'dev'
           secrets: |
-            SESSION_SECRET
-            NFTAR_AUTHORIZATION
+            SECRET_SESSION_SALT
+            TOKEN_NFTAR
         env:
-          SESSION_SECRET: 'foobar'
-          # CF_ROUTE: https://3id-dev.kubelt.com/*
-          # These values are injected into the generated wrangler.toml.
-          # The Cloudflare API token used by wrangler.
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ADMIN_ACCOUNT_ID }}
-          NFTAR_AUTHORIZATION: ${{ secrets.NFTAR_DEV_AUTHORIZATION }}
+          SECRET_SESSION_SALT: 'foobar'
+          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_DEV }}
       # - name: Cache playwright binaries
       #   id: playwright-cache
       #   uses: actions/cache@v3

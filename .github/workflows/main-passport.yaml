@@ -53,7 +53,7 @@ jobs:
           environment: 'dev'
           secrets: |
             SECRET_SESSION_SALT
-            APIKEY_ALCHEMY_THREEID
+            APIKEY_ALCHEMY_PUBLIC
         env:
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
-          APIKEY_ALCHEMY_THREEID: ${{ secrets.APIKEY_ALCHEMY_THREEID_GOERLI }}
+          APIKEY_ALCHEMY_PUBLIC: ${{ secrets.APIKEY_ALCHEMY_PUBLIC_GOERLI }}
