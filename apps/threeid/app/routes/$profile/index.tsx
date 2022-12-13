@@ -81,7 +81,7 @@ export const loader: LoaderFunction = async (args) => {
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     method: 'POST',
     headers: {
-      authorization: `Bearer ${NFTAR_AUTHORIZATION}`,
+      authorization: `Bearer ${TOKEN_NFTAR}`,
       'content-type': 'application/json',
     },
     body: JSON.stringify({

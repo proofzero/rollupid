@@ -7,7 +7,7 @@ declare global {
   const PASSPORT_URL: String
   const MINTPFP_CONTRACT_ADDRESS: string
   const VALID_CHAIN_ID_NAME: string
-  const NFTAR_AUTHORIZATION: string
+  const TOKEN_NFTAR: string
   const NFTAR_URL: string
 
   const Galaxy: Fetcher
