@@ -5565,6 +5565,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kubelt/utils@workspace:packages/utils":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/utils@workspace:packages/utils"
+  dependencies:
+    "@cloudflare/workers-types": 3.18.0
+    "@kubelt/platform.account": "workspace:*"
+    "@kubelt/platform.address": "workspace:*"
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"

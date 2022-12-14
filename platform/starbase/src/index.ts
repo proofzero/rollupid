@@ -19,7 +19,7 @@ import * as openrpc from '@kubelt/openrpc'
 
 import invariant from 'tiny-invariant'
 
-//import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+//import { checkEnv } from '@kubelt/utils'
 
 import type {
   RpcAuthHandler,
