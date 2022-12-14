@@ -188,10 +188,6 @@ type AppBoxProps = {
 export default function AppBox(props: AppBoxProps) {
   return (
     <div className="mt-8">
-      <Link
-        to={props.createLink}
-        className="flex flow-col md:flex-row items-center md:items-end justify-center md:justify-end md:-mb-8 mb-2 md:items-right"
-      ></Link>
       <h3 className="text-xl font-bold mb-6">Your Applications</h3>
       <div className="mb-2 mt-4"></div>
       <AppList apps={props.apps} />

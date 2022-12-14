@@ -23,6 +23,7 @@ import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
 import { getStarbaseClient } from '~/utilities/platform.server'
+import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
@@ -55,6 +56,10 @@ export default function DashboardIndexPage() {
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader />
         <div className="bg-gray-200 p-6 h-full">
+          <div className="mb-11">
+            <InfoPanelDashboard />
+          </div>
+
           <AppBox createLink="/dashboard/new" apps={apps} />
           <div className="text-center mt-24 m-auto">
             <img className="inline-block" src={folderPlus} alt="Wallet icon" />
