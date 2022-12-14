@@ -23,17 +23,24 @@ import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
+import { getStarbaseClient } from '~/utilities/platform.server'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  requireJWT(request)
+  const jwt = await requireJWT(request)
+  const starbaseClient = getStarbaseClient(jwt)
 
-  //const apps = await getApplicationListItems(jwt);
-  const apps = []
-  return json<LoaderData>({ apps })
+  try {
+    const apps = await starbaseClient.kb_appList()
+    console.log({ apps })
+    return json<LoaderData>({ apps })
+  } catch (error) {
+    console.error({ error })
+    return json({ error }, { status: 500 })
+  }
 }
 
 // Component
