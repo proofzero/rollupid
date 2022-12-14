@@ -22,12 +22,15 @@ import SiteHeader from '~/components/SiteHeader'
 import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
+import { requireJWT } from '~/utilities/session.server'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
+  requireJWT(request)
+
   //const apps = await getApplicationListItems(jwt);
   const apps = []
   return json<LoaderData>({ apps })

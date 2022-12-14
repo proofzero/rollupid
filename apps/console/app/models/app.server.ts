@@ -173,7 +173,7 @@ export async function getApplication(
     // })
 
     const getObject = { result: { value: {} }, error: undefined }
-    console.log(JSON.stringify(getObject, null, 2))
+    console.log('getApplication', JSON.stringify(getObject, null, 2))
 
     // TODO handle these errors.
     if (getObject.error !== undefined) {
@@ -407,11 +407,11 @@ export async function createApplication(
     appList = _.filter(_.uniq(_.concat(appList, app.id)), (x) => {
       return !_.isUndefined(x) && !_.isNull(x)
     })
-    console.log(appList)
+    console.log({ appList })
 
     // Update the list of the user's applications.
     const storeResult = await storeAppList(jwt, appList)
-    console.log(storeResult)
+    console.log({ storeResult })
 
     resolve(storeResult)
   })
