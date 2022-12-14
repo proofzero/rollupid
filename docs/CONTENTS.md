@@ -1,6 +1,14 @@
 # Table of contents
 
-- [🆔 3ID Public Profiles](3id/3id-public-profiles.md)
+## 🆔 3ID
+
+* [⏱️ Quickstart](3id/quickstart/index.md)
+* [🔮 Overview](3id/overview/index.md)
+* [🗺️ Implementation Guides](3id/guides/index.md)
+  * [🔒 3ID Auth](3id/guides/3id-auth.md)
+  * [💼 3ID Public Profiles](3id/guides/3id-public-profiles.md)
+* [📖 References](3id/references/index.md)
+* [🔍 FAQ](3id/faq/index.md)
 
 <!--
 ## Use headings to create page groups like this one​
@@ -16,3 +24,11 @@
 
 * [Yet another page](a-second-page-group/yet-another-page.md)
 -->
+.
+├── 3id
+│   ├── faq
+│   ├── guides
+│   │   ├── 3id-auth.md
+│   │   └── 3id-public-profiles.md
+│   ├── overview
+│   └── quickstart
