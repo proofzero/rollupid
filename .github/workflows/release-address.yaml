@@ -46,6 +46,6 @@ jobs:
           command: publish --env current
           environment: current
           secrets: |
-            NFTAR_TOKEN
+            TOKEN_NFTAR
         env:
           TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_PROD }}
