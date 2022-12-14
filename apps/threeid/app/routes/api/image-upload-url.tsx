@@ -9,6 +9,5 @@ export const action: ActionFunction = async ({ request }) => {
 
   const imageClient = new CFImageUploadClient(Icons)
   const imageUploadUrl = await imageClient.getImageUploadUrl()
-
   return json(imageUploadUrl)
 }
