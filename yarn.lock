@@ -5244,6 +5244,7 @@ __metadata:
     "@ethersproject/random": 5.7.0
     "@ethersproject/signing-key": 5.7.0
     "@ethersproject/transactions": 5.7.0
+    "@kubelt/graph": "workspace:*"
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
