@@ -245,6 +245,7 @@ export default function AccountSettingsProfile() {
                 btnSize={'sm'}
                 onClick={() => {
                   if (!nftPfpModalOpen) setNftPfpModalOpen(true)
+                  setFormChanged(true)
                 }}
                 className="!text-gray-600 border-none"
               >
@@ -266,6 +267,7 @@ export default function AccountSettingsProfile() {
                 btnSize={'sm'}
                 onClick={() => {
                   pfpUploadRef.current?.click()
+                  setFormChanged(true)
                 }}
                 className="!text-gray-600 border-none"
               >
@@ -408,6 +410,9 @@ export default function AccountSettingsProfile() {
                   btnType={'secondary'}
                   btnSize={'xl'}
                   className="!text-gray-600 border-none mb-4 lg:mb-0"
+                  onClick={() => {
+                    setPfpUrl(pfp?.image)
+                  }}
                 >
                   Discard
                 </Button>
