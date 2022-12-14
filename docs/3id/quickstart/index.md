@@ -1,3 +1,7 @@
+---
+description: This guide will get you up and running with 3ID so that your users can onboard into your application quickly and efficiently.
+---
+
 # Getting Started With 3ID
 
 This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://app.threeid.xyz)
