@@ -1,4 +1,5 @@
 import * as openrpc from '@kubelt/openrpc'
+import getAccessClient from '@kubelt/platform-clients/access'
 
 import schema from '../schemas/worker'
 import { Environment } from '../types'
@@ -86,7 +87,7 @@ const rpcHandler = openrpc.build(
 
 export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   const context = openrpc.context(request, env, ctx)
-  context.set('Access', env.Access)
+  context.set('Access', getAccessClient(env.Access))
   context.set('CryptoAddress', env.CryptoAddress)
   context.set('ENS_RESOLVER_URL', env.ENS_RESOLVER_URL)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)

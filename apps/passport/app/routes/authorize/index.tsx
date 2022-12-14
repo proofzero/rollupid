@@ -6,7 +6,7 @@ import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import {
   getAccessClient,
-  getAddressClientFromURN,
+  getAddressClient,
   getGalaxyClient,
   getStarbaseClient,
 } from '~/platform.server'
@@ -31,7 +31,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (!profileRes.profile) {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
-    const addressClient = getAddressClientFromURN(defaultProfileURN)
+    const addressClient = getAddressClient(defaultProfileURN)
     profile = await addressClient.kb_getAddressProfile() // this will detect the kind of address
     if (!profile) {
       throw json("Couldn't find profile", 400)

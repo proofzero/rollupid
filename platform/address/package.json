@@ -36,7 +36,7 @@
     "@ethersproject/signing-key": "5.7.0",
     "@ethersproject/transactions": "5.7.0",
     "@kubelt/openrpc": "workspace:*",
-    "@kubelt/platform.commons": "workspace:*",
+    "@kubelt/platform-clients": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2"

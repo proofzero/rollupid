@@ -28,6 +28,7 @@
     "@kubelt-ui/threeid.ui.button": "0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455",
     "@kubelt-ui/threeid.ui.heading": "0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda",
     "@kubelt/design-system": "*",
+    "@kubelt/platform-clients": "workspace:*",
     "@kubelt/platform.access": "workspace:*",
     "@kubelt/platform.commons": "workspace:*",
     "@remix-run/cloudflare": "1.7.0",

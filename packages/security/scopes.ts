@@ -9,7 +9,7 @@
 
 type Scope = symbol
 
-interface ScopeDescriptor {
+export interface ScopeDescriptor {
   name: string
   description: string
   class: string

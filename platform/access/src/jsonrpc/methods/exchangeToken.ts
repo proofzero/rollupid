@@ -3,7 +3,7 @@ import { decodeJwt } from 'jose'
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import type { StarbaseApi } from '@kubelt/platform-clients/starbase'
 
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'
@@ -110,13 +110,13 @@ export default async (
       name,
     })
     const { scope } = await authorizationClient.params(code)
-    const starbaseClient = createFetcherJsonRpcClient(context.get('Starbase'))
-    const validated = await starbaseClient.kb_checkClientAuthorization(
-      redirectUri,
-      scope,
+    const starbaseClient: StarbaseApi = context.get('Starbase')
+    const validated = await starbaseClient.kb_appAuthCheck({
+      redirectURI: redirectUri,
+      scopes: scope,
       clientId,
-      clientSecret
-    )
+      clientSecret,
+    })
     if (validated) {
       const { scope } = await authorizationClient.exchangeCode(
         code,

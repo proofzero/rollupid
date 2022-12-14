@@ -1,7 +1,7 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+import { AccessApi } from '@kubelt/platform-clients/access'
 import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import { Challenge, CryptoAddressType, VerifyNonceParams } from '../../types'
@@ -48,8 +48,7 @@ export default async (
   const account = await nodeClient.resolveAccount()
   const responseType = ResponseType.Code
 
-  const accessClient = createFetcherJsonRpcClient(context.get('Access'))
-
+  const accessClient: AccessApi = context.get('Access')
   try {
     const result = await accessClient.kb_authorize(
       account,

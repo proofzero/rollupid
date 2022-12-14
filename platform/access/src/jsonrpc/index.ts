@@ -1,5 +1,7 @@
 import * as openrpc from '@kubelt/openrpc'
 
+import getStarbaseClient from '@kubelt/platform-clients/starbase'
+
 import schema from '../schemas/worker'
 import { Environment } from '../types'
 
@@ -40,6 +42,6 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   const context = openrpc.context(request, env, ctx)
   context.set('Authorization', env.Authorization)
   context.set('Access', env.Access)
-  context.set('Starbase', env.Starbase)
+  context.set('Starbase', getStarbaseClient(env.Starbase))
   return rpcHandler(request, context)
 }

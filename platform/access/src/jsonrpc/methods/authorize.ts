@@ -1,6 +1,5 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'

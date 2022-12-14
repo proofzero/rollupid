@@ -1,6 +1,8 @@
 import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import { createFetcherJsonRpcClient } from '@kubelt/platform.commons/src/jsonrpc'
+
+import createAccountClient from '@kubelt/platform-clients/account'
+import createAddressClient from '@kubelt/platform-clients/address'
 
 import { setupContext, isAuthorized } from './utils'
 
@@ -24,7 +26,7 @@ const threeIDResolvers: Resolvers = {
         `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
 
-      const accountClient = createFetcherJsonRpcClient(env.Account)
+      const accountClient = createAccountClient(env.Account)
       let accountProfile = await accountClient.kb_getProfile(accountURN)
       console.log({ accountProfile })
       // console.log(accountProfile)
@@ -35,7 +37,7 @@ const threeIDResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
-      const addressClient = createFetcherJsonRpcClient(env.Address, {
+      const addressClient = createAddressClient(env.Address, {
         headers: {
           'X-3RN': addressURN,
         },
@@ -59,7 +61,7 @@ const threeIDResolvers: Resolvers = {
       }
 
       try {
-        const accountClient = createFetcherJsonRpcClient(env.Account)
+        const accountClient = createAccountClient(env.Account)
         let accountProfile = await accountClient.kb_getProfile(accountURN)
 
         if (!accountProfile) {
@@ -85,7 +87,7 @@ const threeIDResolvers: Resolvers = {
         `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createFetcherJsonRpcClient(env.Account)
+      const accountClient = createAccountClient(env.Account)
       let currentProfile = await accountClient.kb_getProfile(accountURN)
 
       // Make sure nulls are empty objects.
