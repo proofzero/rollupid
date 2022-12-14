@@ -19,7 +19,7 @@ local_protocol = "http"
 
 [env.dev]
 routes = [
-  { pattern = "icons-dev.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "icons-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.dev.vars]
@@ -30,7 +30,7 @@ UPLOAD_WINDOW_SECONDS = 200
 
 [env.next]
 routes = [
-  { pattern = "icons-next.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "icons-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.next.vars]
@@ -41,7 +41,7 @@ UPLOAD_WINDOW_SECONDS = 200
 
 [env.current]
 routes = [
-  { pattern = "icons.kubelt.com", custom_domain = true, zone_name = "kubelt.com" }
+  { pattern = "icons.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 ]
 
 [env.current.vars]
