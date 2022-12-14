@@ -1,8 +1,6 @@
----
-description: This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://app.threeid.xyz)
----
-
 # Getting Started With 3ID
+
+This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://app.threeid.xyz)
 
 ## Connect with 3ID Passport
 
