@@ -49,6 +49,6 @@ services = [
 
 [env.current.vars]
 ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mumbai"
+ALCHEMY_POLYGON_NETWORK="mainnet"
 
 
