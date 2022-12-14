@@ -5,7 +5,7 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Account", class_name = "Account" }
 ]
 services = [
 ]
@@ -16,25 +16,25 @@ local_protocol = "http"
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Account", class_name = "Account" }
 ]
 services = [
 ]
 
 [env.next]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Account", class_name = "Account" }
 ]
 services = [
 ]
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Account", class_name = "Account" }
 ]
 services = [
 ]
 
 [[migrations]]
 tag = "v0"
-new_classes = ["Core"]
+new_classes = ["Account"]
