@@ -99,12 +99,14 @@ export function ErrorBoundary({ error }) {
         <Links />
       </head>
 
-      <body>
-        <ErrorPage
-          code="Error"
-          message="Something went terribly wrong!"
-          trace={error?.stack}
-        />
+      <body className="min-h-[100dvh] flex justify-center items-center">
+        <div className="w-full">
+          <ErrorPage
+            code="Error"
+            message="Something went terribly wrong!"
+            trace={error?.stack}
+          />
+        </div>
 
         <ScrollRestoration />
         <Scripts />
