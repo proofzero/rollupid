@@ -2,13 +2,6 @@
 description: This guide will get you up and running with 3ID so that your users can onboard into your application quickly and efficiently.
 ---
 
-<<<<<<< Updated upstream
-1. Create an application in [Developer Console](https://console.threeid.xyz).
-1. Configure your OAuth settings including secrets, requested scopes, and redirect URL.
-1. Drop our [3ID Passport]() private login button on your page. Users can now onboard easily.
-1. In your application, check the JWT for the required scopes and use it to call 3ID first-party services.
-1. User analytics are now available via your [Developer Console](https://console.threeid.xyz).
-=======
 # Getting Started With 3ID
 
 This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://app.threeid.xyz)
@@ -46,4 +39,3 @@ TODO: More here.
 - Custom domains and white-labelling configuration
 - Post-login redirect URL
 - Publish and Save
->>>>>>> Stashed changes
