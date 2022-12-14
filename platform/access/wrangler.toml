@@ -2,7 +2,7 @@ name = "access"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
-workers_dev = true
+workers_dev = false
 
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
