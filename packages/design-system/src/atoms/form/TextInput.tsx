@@ -20,7 +20,7 @@ export const TextInput = ({
     <div className="flex flex-col">
       <label htmlFor={id}>
         <Text size="sm" weight="medium" className="text-gray-700 mb-2">
-          {label}
+          {label}{rest.required ? '*' : ''}
         </Text>
       </label>
 
