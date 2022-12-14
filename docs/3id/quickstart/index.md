@@ -1,6 +1,5 @@
 ---
-description: This guide will get you up and running with 3ID so that your users
-can onboard into your application quickly and efficiently.
+description: This guide will get you up and running with 3ID so that your users can onboard into your application quickly and efficiently.
 ---
 
 1. Create an application in [Developer Console](https://console.threeid.xyz).
