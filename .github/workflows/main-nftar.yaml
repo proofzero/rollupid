@@ -42,12 +42,12 @@ jobs:
           CHAIN: 'ethereum'
           CHAIN_ID: 5
           OORT_URL: oort-devnet.kubelt.com
-          STORAGE_KEY: ${{ secrets.NFT_STORAGE_DEV }}
-          WALLET_PRIVATE_KEY: ${{ secrets.MINT_PFP_TEST_OPERATOR_PRIVATE_KEY }} # TODO: this is a bad env name
-          ALCHEMY_URL: ${{ secrets.ALCHEMY_GOERLI_API_URL }}
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_GOERLI_API_KEY }}
+          TOKEN_NFT_STORAGE: ${{ secrets.TOKEN_NFT_STORAGE_TESTNET }}
+          KEY_MINT_PFP: ${{ secrets.KEY_MINT_PFP_OPERATOR_GOERLI }}
+          INTERNAL_ALCHEMY_PUBLIC_API_URL: ${{ secrets.INTERNAL_ALCHEMY_PUBLIC_API_URL_GOERLI }}
+          APIKEY_ALCHEMY_PUBLIC: ${{ secrets.APIKEY_ALCHEMY_PUBLIC_GOERLI }}
           ALCHEMY_NETWORK: 'ETH_MAINNET'
-          INVITE_CONTRACT_ADDRESS: ${{ secrets.INVITE_TEST_CONTRACT_ADDRESS }}
-          PFP_CONTRACT_ADDRESS: ${{ secrets.MINT_PFP_TEST_CONTRACT_ADDRESS }}
+          INTERNAL_INVITE_OPERATOR_ADDRESS: ${{ secrets.INTERNAL_INVITE_OPERATOR_ADDRESS_GOERLI }}
+          INTERNAL_MINT_PFP_OPERATOR_ADDRESS: ${{ secrets.INTERNAL_MINT_PFP_OPERATOR_ADDRESS_GOERLI }}
           NFTAR_API_KEY: 'test'
       # TODO: deploy
