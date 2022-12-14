@@ -1,6 +1,6 @@
 import { createServer } from '@graphql-yoga/common'
 
-import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+import { checkEnv } from '@kubelt/utils'
 
 import Env, { required as requiredEnv } from './env'
 import schema from './schema'
