@@ -16,7 +16,6 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "@kubelt/platform.commons": "workspace:*",
     "date-fns": "2.29.3",
     "tiny-invariant": "1.3.1"
   }

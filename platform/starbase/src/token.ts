@@ -4,7 +4,7 @@ import * as _ from 'lodash'
 
 import * as jose from 'jose'
 
-import { HEADER_ACCESS_TOKEN } from '@kubelt/platform.commons/src/constants'
+import { HEADER_ACCESS_TOKEN } from './constants'
 
 import type { AccountURN } from '@kubelt/urns/account'
 

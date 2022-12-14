@@ -4,8 +4,6 @@ import * as _ from 'lodash'
 
 import * as jose from 'jose'
 
-import { HEADER_ACCESS_TOKEN } from '@kubelt/platform.commons/src/constants'
-
 import type { AccountURN } from '@kubelt/urns/account'
 
 import { AccountURNSpace } from '@kubelt/urns/account'
