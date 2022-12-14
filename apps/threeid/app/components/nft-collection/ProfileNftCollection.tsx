@@ -9,10 +9,14 @@ import polygon from '~/assets/partners/polygon.svg'
 import book from '~/assets/book.svg'
 
 import noNfts from '~/assets/No_NFT_Found.svg'
+import noImage from '~/assets/noImage.png'
 
+import { Button } from '@kubelt/design-system'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import Masonry from 'react-masonry-css'
+
+import { HiChevronUp, HiOutlineCheck } from 'react-icons/hi'
 
 import ProfileNftCollectionStyles from './ProfileNftCollection.css'
 import { LinksFunction } from '@remix-run/cloudflare'
@@ -38,6 +42,7 @@ export type ProfileNftCollectionProps = {
     title: string
     collectionTitle: string
   }[]
+  pfp: string
   isOwner?: boolean
   preload?: boolean
   detailsModal?: boolean
@@ -101,6 +106,7 @@ const ProfileNftCollection = ({
   preload = false,
   filters = false,
   handleSelectedNft,
+  pfp,
   nftRenderer = (nft) => <ModaledNft nft={nft} isModal={false} />,
 }: ProfileNftCollectionProps) => {
   const [refresh, setRefresh] = useState(true)
@@ -110,12 +116,14 @@ const ProfileNftCollection = ({
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
 
+  const [openedFilters, setOpenedFilters] = useState(false)
+
   const [textFilter, setTextFilter] = useState('')
-  const [colFilter, setColFilter] = useState('All Collections')
+  const [curFilter, setCurFilter] = useState('All Collections')
 
   const [colFilters, setColFilters] = useState([
     { title: 'All Collections', img: undefined },
-    { title: 'Without Collection', img: undefined },
+    { title: 'Untitled Collections', img: undefined },
   ])
 
   const [selectedNft, setSelectedNft] = useState('')
@@ -135,7 +143,7 @@ const ProfileNftCollection = ({
         if (
           nft.collectionTitle &&
           nft.collectionTitle !== 'All Collections' &&
-          nft.collectionTitle !== 'Without Collection'
+          nft.collectionTitle !== 'Untitled Collections'
         ) {
           return [
             ...acc,
@@ -257,28 +265,135 @@ const ProfileNftCollection = ({
       )}
 
       {filters && (
-        <div className="flex flex-col lg:flex-row justify-between items-center my-5">
-          <select
-            id="collection"
-            name="collection"
-            className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            defaultValue="All Collections"
-            onChange={(evt) => {
-              setColFilter(evt.target.value)
-            }}
-          >
-            {colFilters.map((colName, i) => (
-              <option key={`${colName.title}_${i}`}>{colName.title}</option>
-            ))}
-          </select>
+        <div className="flex items-center justify-start sm:justify-center lg:justify-end my-5">
+          <div className="w-[10vw] lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base">
+            <div>
+              <div className="dropdown relative">
+                <button
+                  className="
+          dropdown-toggle
+          ease-in-out
+          flex
+          flex-row
+          justify-between
+          items-center
+          bg-white
+          text-[#1f2937]
+          shadow-sm
+          border
+          border-solid
+          border-[#d1d5db]
+          hover:bg-[#d1d5db]
+          min-w-[17.2rem]
+          py-[10px]
+          px-[25px]
+          font-medium
+          text-base
+          rounded-md
+          "
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  onClick={() => {
+                    setOpenedFilters(!openedFilters)
+                  }}
+                >
+                  Filters
+                  <HiChevronUp
+                    className={
+                      openedFilters ? 'rotate-180 transition' : 'transition'
+                    }
+                  />
+                </button>
+                <ul
+                  className="
+          dropdown-menu
+          min-w-max
+          list-none
+          absolute
+          hidden
+          bg-white
+          text-base
+          z-50
+          float-left
+          py-2
+          rounded-lg
+          shadow-xl
+          mt-1
+          hidden
+          m-0
+          bg-clip-padding
+          border-none
+          px-1
+          items-center
+        "
+                  aria-labelledby="dropdownMenuButton1"
+                >
+                  <li>
+                    <InputText
+                      heading=""
+                      placeholder={'Search'}
+                      Icon={FaSearch}
+                      onChange={(val) => {
+                        setTextFilter(val)
+                      }}
+                    />
+                  </li>
+                  {colFilters
+                    .filter((filter) =>
+                      filter.title
+                        .toLowerCase()
+                        .includes(textFilter.toLowerCase())
+                    )
+                    .map((colName, i) => (
+                      <li key={`${colName.title}_${i}`}>
+                        <div
+                          className="
+                      dropdown-item
+                      flex 
+                      select-none
+                      flex-row
+                      bg-transparent
+                      w-full
+                      hover:bg-gray-100
+                      py-2
+                      pl-1
+                      block"
+                          onClick={(event: any) => {
+                            setCurFilter(colName.title || 'Untitled Collection')
+                          }}
+                        >
+                          <img
+                            className="w-[1.5em] h-[1.5em] rounded-full"
+                            src={
+                              colName.title === 'All Collections'
+                                ? pfp
+                                : colName.img
+                                ? colName.img
+                                : noImage
+                            }
+                            alt="+"
+                          />
 
-          <InputText
-            heading=""
-            Icon={FaSearch}
-            onChange={(val) => {
-              setTextFilter(val)
-            }}
-          />
+                          {curFilter === colName.title ||
+                          curFilter === 'Untitled Collection' ? (
+                            <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
+                              <div>{colName.title}</div>
+                              <HiOutlineCheck />
+                            </Text>
+                          ) : (
+                            <Text className="focus:outline-none pl-3">
+                              {colName.title}
+                            </Text>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -302,18 +417,10 @@ const ProfileNftCollection = ({
             {loadedNfts
               .filter(
                 (nft) =>
-                  colFilter === 'All Collections' ||
-                  nft.collectionTitle === colFilter ||
-                  (!nft.collectionTitle && colFilter == 'Without Collection')
+                  curFilter === 'All Collections' ||
+                  curFilter === nft.collectionTitle ||
+                  (!nft.collectionTitle && curFilter === 'Untitled Collections')
               )
-              .filter((nft) => {
-                return (
-                  nft.title?.toLowerCase().includes(textFilter.toLowerCase()) ||
-                  nft.collectionTitle
-                    ?.toLowerCase()
-                    .includes(textFilter.toLowerCase())
-                )
-              })
               .map((nft, i) => (
                 // Filtering collection by
                 // unique values

@@ -452,6 +452,7 @@ const ProfileRoute = () => {
 
           <ProfileNftCollection
             account={targetAddress}
+            pfp={pfp.image}
             displayname={displayName}
             isOwner={isOwner}
             filters={true}
