@@ -15,7 +15,7 @@ export const NewAppModal = ({
       <>
         <h3 className="text-xl font-bold mb-6">New Application</h3>
 
-        <form method="post" action="/app/new">
+        <form method="post" action="/apps/new">
           <p>Application Name</p>
           <input placeholder="My Application" name="client_name"></input>
           <button onClick={() => newAppCreateCallback(null)}>Cancel</button>

@@ -215,8 +215,8 @@ const kb_appCreate = openrpc.method(schema, {
       // Let's make sure this name is unique
       const linkedEdges = await edgeUtil.edges(edges, accountURN, tag)
       console.log({ linkedEdges })
-
-      // if (linkedEdges?.filter(e => e.rComp.client))
+      // TODO: check if the link already exists
+      // if (linkedEdges?.filter(e => e.rComp.clientName))
 
       // Create initial OAuth configuration for the application. There
       // is no secret associated with the app after creation. The
@@ -235,10 +235,16 @@ const kb_appCreate = openrpc.method(schema, {
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
-      const result = app.update({
+      // TODO: return a JsonRpcResponse or JsonRpcError
+      const result = await app.init({
         clientId,
         clientName,
       })
+
+      if (result.error) {
+        console.error({ result })
+        throw 'starbase.kb_appCreate: failed to create application'
+      }
 
       // Get the ID of the created durable object and store it in the
       // mapping table.
@@ -252,7 +258,14 @@ const kb_appCreate = openrpc.method(schema, {
       // account) and the new app.
       const src = accountURN
       const dst = appURN
+
+      // TODO: return a JsonRpcResponse or JsonRpcError
       const edgeRes = await edgeUtil.link(edges, src, dst, tag)
+      if (!edgeRes.ok) {
+        console.error({ edgeRes })
+        await await app._.cmp.delete()
+        throw `starbase.kb_appCreate: failed to create edge`
+      }
 
       // Store an entry in the lookup KV that maps from application
       // client ID to internal application object ID.

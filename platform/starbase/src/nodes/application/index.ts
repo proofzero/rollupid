@@ -139,7 +139,7 @@ export class StarbaseApplication {
   //@requiredScope('starbase.write')
   // Allow this method to update the value of the "app" field of the
   // component.
-  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('profile', [FieldAccess.Read, FieldAccess.Write])
   // The RPC method implementation.
   async update(
     params: RpcParams,
