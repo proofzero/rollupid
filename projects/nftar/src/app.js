@@ -53,8 +53,7 @@ const jsonrpc = new Jsonrpc({
 });
 
 const CHAINS = {
-    ETHEREUM: 'ethereum',
-    ETH: 'eth',
+    ETH: 'ethereum',
 };
 
 // TODO: is there a better way to do this? e.g., open API yaml?
