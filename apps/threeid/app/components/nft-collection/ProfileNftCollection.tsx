@@ -9,10 +9,14 @@ import polygon from '~/assets/partners/polygon.svg'
 import book from '~/assets/book.svg'
 
 import noNfts from '~/assets/No_NFT_Found.svg'
+import noImage from '~/assets/noImage.png'
 
+import { Button } from '@kubelt/design-system'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import Masonry from 'react-masonry-css'
+
+import { HiChevronUp, HiOutlineCheck } from 'react-icons/hi'
 
 import ProfileNftCollectionStyles from './ProfileNftCollection.css'
 import { LinksFunction } from '@remix-run/cloudflare'
@@ -38,6 +42,7 @@ export type ProfileNftCollectionProps = {
     title: string
     collectionTitle: string
   }[]
+  pfp: string
   isOwner?: boolean
   preload?: boolean
   detailsModal?: boolean
@@ -68,6 +73,7 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
           <img
             className="w-[4.5rem] h-[4.5rem] mb-5 lg:mb-0 lg:mr-5 bg-gray-50 mt-4 lg:mt-0"
             src={imgSrc}
+            alt="here you was supposed to see something"
           />
         )}
 
@@ -100,6 +106,7 @@ const ProfileNftCollection = ({
   preload = false,
   filters = false,
   handleSelectedNft,
+  pfp,
   nftRenderer = (nft) => <ModaledNft nft={nft} isModal={false} />,
 }: ProfileNftCollectionProps) => {
   const [refresh, setRefresh] = useState(true)
@@ -109,8 +116,15 @@ const ProfileNftCollection = ({
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
 
+  const [openedFilters, setOpenedFilters] = useState(false)
+
   const [textFilter, setTextFilter] = useState('')
-  const [colFilter, setColFilter] = useState('All Collections')
+  const [curFilter, setCurFilter] = useState('All Collections')
+
+  const [colFilters, setColFilters] = useState([
+    { title: 'All Collections', img: undefined },
+    { title: 'Untitled Collections', img: undefined },
+  ])
 
   const [selectedNft, setSelectedNft] = useState('')
 
@@ -118,7 +132,31 @@ const ProfileNftCollection = ({
     const nftReq = await fetch(
       `/nfts?owner=${account}${pageKey ? `&pageKey=${pageKey}` : ''}`
     )
-    const nftRes = await nftReq.json()
+    const nftRes: any = await nftReq.json()
+
+    /* We already have only 1 NFT per collection
+     ** No need to put it in additional Set data structure
+     */
+    setColFilters([
+      ...colFilters,
+      ...nftRes.ownedNfts.reduce((acc: any, nft: any) => {
+        if (
+          nft.collectionTitle &&
+          nft.collectionTitle !== 'All Collections' &&
+          nft.collectionTitle !== 'Untitled Collections'
+        ) {
+          return [
+            ...acc,
+            {
+              title: nft.collectionTitle,
+              img: nft.thumbnailUrl ? nft.thumbnailUrl : undefined,
+            },
+          ]
+        } else {
+          return acc
+        }
+      }, []),
+    ])
 
     setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
     setPageLink(nftRes.pageKey ?? null)
@@ -227,32 +265,142 @@ const ProfileNftCollection = ({
       )}
 
       {filters && (
-        <div className="flex flex-col lg:flex-row justify-between items-center my-5">
-          <select
-            id="collection"
-            name="collection"
-            className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            defaultValue="All Collections"
-            onChange={(evt) => {
-              setColFilter(evt.target.value)
-            }}
-          >
-            <option>All Collections</option>
-            {loadedNfts
-              .map((n) => n.collectionTitle)
-              .filter((val, ind, arr) => arr.indexOf(val) === ind)
-              .map((colName, i) => (
-                <option key={`${colName}_${i}`}>{colName}</option>
-              ))}
-          </select>
+        <div className="flex items-center justify-start sm:justify-center lg:justify-end my-5">
+          <div className="w-[10vw] lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base">
+            <div>
+              <div className="dropdown relative">
+                <button
+                  className="
+          dropdown-toggle
+          ease-in-out
+          flex
+          flex-row
+          justify-between
+          items-center
+          bg-white
+          text-[#1f2937]
+          shadow-sm
+          border
+          border-solid
+          border-[#d1d5db]
+          hover:bg-[#d1d5db]
+          min-w-[17.2rem]
+          py-[10px]
+          px-[25px]
+          font-medium
+          text-base
+          rounded-md
+          "
+                  type="button"
+                  id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  onClick={() => {
+                    setOpenedFilters(!openedFilters)
+                  }}
+                >
+                  Filters
+                  <HiChevronUp
+                    className={
+                      openedFilters ? 'rotate-180 transition' : 'transition'
+                    }
+                  />
+                </button>
+                <ul
+                  className="
+          dropdown-menu
+          min-w-max
+          list-none
+          absolute
+          hidden
+          bg-white
+          text-base
+          z-50
+          float-left
+          py-2
+          rounded-lg
+          shadow-xl
+          mt-1
+          max-h-[25rem]
+          overflow-auto
+          hidden
+          m-0
+          bg-clip-padding
+          border-none
+          px-1
+          items-center
+        "
+                  aria-labelledby="dropdownMenuButton1"
+                >
+                  <li>
+                    <InputText
+                      heading=""
+                      placeholder={'Search'}
+                      Icon={FaSearch}
+                      onChange={(val) => {
+                        setTextFilter(val)
+                      }}
+                    />
+                  </li>
+                  {colFilters
+                    .filter((filter) =>
+                      filter.title
+                        .toLowerCase()
+                        .includes(textFilter.toLowerCase())
+                    )
+                    .map((colName, i) => (
+                      <li key={`${colName.title}_${i}`}>
+                        <div
+                          className="
+                      dropdown-item
+                      flex 
+                      select-none
+                      flex-row
+                      max-w-[17rem]
+                      overflow-auto
+                      bg-transparent
+                      w-full
+                      hover:bg-gray-100
+                      py-2
+                      pl-1
+                      block"
+                          onClick={(event: any) => {
+                            setCurFilter(colName.title || 'Untitled Collection')
+                          }}
+                        >
+                          {colName.title === 'All Collections' ||
+                          colName.img ? (
+                            <img
+                              className="w-[1.5em] h-[1.5em] rounded-full"
+                              src={
+                                colName.title === 'All Collections'
+                                  ? pfp
+                                  : colName.img
+                              }
+                              alt="+"
+                            />
+                          ) : (
+                            <div className="w-[1.5em] h-[1.5em] bg-[#E8E8E8] rounded-full"></div>
+                          )}
 
-          <InputText
-            heading=""
-            Icon={FaSearch}
-            onChange={(val) => {
-              setTextFilter(val)
-            }}
-          />
+                          {curFilter === colName.title ||
+                          curFilter === 'Untitled Collection' ? (
+                            <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
+                              <div>{colName.title}</div>
+                              <HiOutlineCheck />
+                            </Text>
+                          ) : (
+                            <Text className="focus:outline-none pl-3">
+                              {colName.title}
+                            </Text>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -276,15 +424,9 @@ const ProfileNftCollection = ({
             {loadedNfts
               .filter(
                 (nft) =>
-                  colFilter === 'All Collections' ||
-                  nft.collectionTitle === colFilter
-              )
-              .filter(
-                (nft) =>
-                  nft.title?.toLowerCase().includes(textFilter.toLowerCase()) ||
-                  nft.collectionTitle
-                    ?.toLowerCase()
-                    .includes(textFilter.toLowerCase())
+                  curFilter === 'All Collections' ||
+                  curFilter === nft.collectionTitle ||
+                  (!nft.collectionTitle && curFilter === 'Untitled Collections')
               )
               .map((nft, i) => (
                 // Filtering collection by
