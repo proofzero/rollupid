@@ -1,9 +1,12 @@
 import { Router } from 'itty-router'
+import { error } from 'itty-router-extras'
 
-import Core from './core'
-import jsonRpcHandler from './jsonrpc'
+import Account from './nodes/account'
+import jsonRpc from './jsonrpc'
 
-const index = Router().post('/jsonrpc', jsonRpcHandler)
+const index = Router()
+  .post('/jsonrpc', jsonRpc)
+  .all('*', () => error(404, 'not found'))
 
-export { Core }
+export { Account }
 export default { fetch: index.handle }
