@@ -20,27 +20,27 @@ const main = async (api) => {
     // NB: app.context is the prototype from which the request ctx is
     // created.
     api.context.storage = new storage.NFTStorage({
-        token: process.env.STORAGE_KEY,
+        token: process.env.TOKEN_NFT_STORAGE,
     });
 
     // Import the wallet as a mnemonic. Assumes the default Ethereum
     // path and standard English wordlist.
     // const mnemonic = process.env.WALLET_MNEMONIC;
     // api.context.wallet = await ethers.Wallet.fromMnemonic(mnemonic);
-    const web3 = new createAlchemyWeb3(process.env.ALCHEMY_URL);
+    const web3 = new createAlchemyWeb3(process.env.INTERNAL_ALCHEMY_PUBLIC_API_URL);
     api.context.web3 = web3;
-    api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.WALLET_PRIVATE_KEY);
+    api.context.wallet = web3.eth.accounts.privateKeyToAccount(process.env.KEY_MINT_PFP);
 
     // An Alchemy API client.
     api.context.alchemy = new Alchemy({
-        apiKey: process.env.ALCHEMY_API_KEY,
+        apiKey: process.env.APIKEY_ALCHEMY_PUBLIC,
         network: Network[process.env.ALCHEMY_NETWORK],
         maxRetries: 10,
     });
 
     // The Ethereum minting contract address.
-    api.context.pfp_contract = process.env.PFP_CONTRACT_ADDRESS;
-    api.context.invite_contract = process.env.INVITE_CONTRACT_ADDRESS;
+    api.context.pfp_contract = process.env.INTERNAL_MINT_PFP_OPERATOR_ADDRESS;
+    api.context.invite_contract = process.env.INTERNAL_INVITE_OPERATOR_ADDRESS;
 
     // set the app api key
     api.context.apiKey = process.env.NFTAR_API_KEY;

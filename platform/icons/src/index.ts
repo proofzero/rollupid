@@ -29,10 +29,10 @@ export interface Env {
 
   // The Cloudflare account identifier that uploaded images will be
   // associated with.
-  CLOUDFLARE_ACCOUNT_ID: string;
+  INTERNAL_CLOUDFLARE_ACCOUNT_ID: string;
 
   // An API token with write permissions for the Images service.
-  CLOUDFLARE_IMAGES_KEY: string;
+  TOKEN_CLOUDFLARE_API: string;
 
   // Environment variables
   // ---------------------------------------------------------------------------
@@ -97,7 +97,7 @@ export default {
     const uploadRequest = new Request(url, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${env.CLOUDFLARE_IMAGES_KEY}`,
+        "Authorization": `Bearer ${env.TOKEN_CLOUDFLARE_API}`,
       },
       // NB: do *not* explicitly set the Content-Type header to
       // "multipart/form-data"; this prevents the header from being set
