@@ -12,7 +12,7 @@ type ENSRes = {
 }
 
 class ENSUtils implements IENSUtils {
-  private async getEnsEntry(address: string): Promise<ENSRes> {
+  async getEnsEntry(address: string): Promise<ENSRes> {
     const ensRes = await fetch(
       `https://api.ensideas.com/ens/resolve/${address}`
     )

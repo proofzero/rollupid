@@ -2,7 +2,6 @@ export interface Environment {
   Access: Fetcher
   CryptoAddress: DurableObjectNamespace
 
-  ENS_RESOLVER_URL: string
   MINTPFP_CONTRACT_ADDRESS: string
   NFTAR_CHAIN_ID: string
   TOKEN_NFTAR: string
@@ -16,13 +15,6 @@ export enum NodeType {
 export enum CryptoAddressType {
   Ethereum = 'ethereum',
   ETH = 'eth',
-}
-
-export type EthereumAddressDescription = {
-  address: string
-  name: string
-  avatar: string
-  displayName: string
 }
 
 export interface Challenge {

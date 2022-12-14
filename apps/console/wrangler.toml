@@ -7,7 +7,8 @@ main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
 services = [
-  { binding = "Starbase", service = "starbase"}
+  { binding = "Starbase", service = "starbase"},
+  { binding = "Icons", service = "icons" },
 ]
 
 # development
@@ -54,7 +55,8 @@ STORAGE_NAMESPACE="console"
 [env.dev]
 
 services = [
-  { binding = "Starbase", service = "starbase-dev"}
+  { binding = "Starbase", service = "starbase-dev"},
+  { binding = "Icons", service = "icons-dev" },
 ]
 
 # kv_namespaces = [
@@ -78,7 +80,8 @@ STORAGE_NAMESPACE="console"
 [env.next]
 
 services = [
-  { binding = "Starbase", service = "starbase-next"}
+  { binding = "Starbase", service = "starbase-next"},
+  { binding = "Icons", service = "icons-next" },
 ]
 
 # kv_namespaces = [
@@ -105,7 +108,8 @@ STORAGE_NAMESPACE="console"
 [env.current]
 
 services = [
-  { binding = "Starbaes", service = "starbase", environment = "production" }
+  { binding = "Starbaes", service = "starbase", environment = "production" },
+  { binding = "Icons", service = "icons-current" },
 ]
 
 # kv_namespaces = [

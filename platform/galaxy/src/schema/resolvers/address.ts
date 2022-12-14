@@ -1,5 +1,5 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
-import ENSUtils from './clients/ens-utils'
+import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { Resolvers } from './typedefs'
 
 import { setupContext } from './utils'

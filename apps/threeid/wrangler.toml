@@ -21,10 +21,10 @@ kv_namespaces = [
 services = [
   { binding = "Galaxy", service = "galaxy"},
   { binding = "Address", service = "address"},
+  { binding = "Icons", service = "icons" },
 ]
 
 [vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 PASSPORT_URL = "http://localhost:9696"
 COOKIE_DOMAIN = "localhost"
 TWITTER_URL="https://twitter.com/threeid_xyz"
@@ -56,7 +56,7 @@ routes = [
 services = [
   { binding = "Galaxy", service = "galaxy-dev"},
   { binding = "Address", service = "address-dev"},
-
+  { binding = "Icons", service = "icons-dev" },
 ]
 [env.dev.vars]
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
@@ -66,7 +66,6 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -80,6 +79,7 @@ kv_namespaces = [
 services = [
   { binding = "Galaxy", service = "galaxy-next"},
   { binding = "Address", service = "address-next"},
+  { binding = "Icons", service = "icons-next" },
 ]
 [env.next.build]
   command = "yarn build"
@@ -92,7 +92,6 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -106,7 +105,7 @@ kv_namespaces = [
 services = [
   { binding = "Galaxy", service = "galaxy-current"},
   { binding = "Address", service = "address-current"},
-
+  { binding = "Icons", service = "icons-current" },
 ]
 [env.current.build]
   command = "yarn build"
@@ -119,4 +118,3 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"

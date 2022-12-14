@@ -1,6 +1,6 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-import { EthereumAddressDescription } from '../../types'
+import ENSUtils from '@kubelt/platform-clients/ens-utils'
 
 export default async (
   service: Readonly<RpcService>,
@@ -16,9 +16,8 @@ export default async (
   const address = await nodeClient.getAddress()
   const type = await nodeClient.getType()
 
-  const ensRes = await fetch(`${context.get('ENS_RESOLVER_URL')}/${address}`)
-  const { avatar, displayName }: EthereumAddressDescription =
-    await ensRes.json()
+  const ensClient = new ENSUtils()
+  const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
   const newProfile = {
     cover: '',

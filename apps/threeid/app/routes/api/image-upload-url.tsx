@@ -1,12 +1,13 @@
 import { ActionFunction, json } from '@remix-run/cloudflare'
-import { getGalaxyClient } from '~/helpers/clients'
+
+import CFImageUploadClient from '@kubelt/platform-clients/cf-image-upload'
+
 import { requireJWT } from '~/utils/session.server'
 
 export const action: ActionFunction = async ({ request }) => {
   await requireJWT(request)
 
-  const galaxyClient = await getGalaxyClient()
-  const { imageUploadUrl } = await galaxyClient.getImageUploadUrl()
-
+  const imageClient = new CFImageUploadClient(Icons)
+  const imageUploadUrl = await imageClient.getImageUploadUrl()
   return json(imageUploadUrl)
 }

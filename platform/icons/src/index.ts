@@ -84,7 +84,7 @@ export default {
     formData.append('expiry', expiry)
 
     // URL for "Create authenticated direct upload URL V2" endpoint.
-    const url = `https://api.cloudflare.com/client/v4/accounts/${env.TOKEN_CLOUDFLARE_API}/images/v2/direct_upload`
+    const url = `https://api.cloudflare.com/client/v4/accounts/${env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`
 
     // Direct uploads allow users to upload images without API keys. A
     // common use case are web apps, client-side applications, or mobile
