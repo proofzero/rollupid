@@ -111,7 +111,6 @@ export default {
 
     // Check the HTTP status.
     if (!response.ok) {
-      console.log(JSON.stringify(response))
       return response
     }
 
