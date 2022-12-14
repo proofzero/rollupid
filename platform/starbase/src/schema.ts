@@ -125,7 +125,7 @@ const rpcSchema: RpcSchema = {
       summary: 'Delete an application',
       params: [
         {
-          $ref: '#/components/contentDescriptors/AppSelect',
+          $ref: '#/components/contentDescriptors/ClientId',
         },
       ],
       result: {
@@ -164,7 +164,7 @@ const rpcSchema: RpcSchema = {
         {
           name: 'clientId',
           schema: {
-            type: 'string',
+            $ref: '#/components/contentDescriptors/ClientId',
           },
         },
         {
@@ -208,6 +208,9 @@ const rpcSchema: RpcSchema = {
       summary: 'Set the publication status of an application',
       params: [
         {
+          $ref: '#/components/contentDescriptors/ClientId',
+        },
+        {
           name: 'published',
           required: true,
           schema: {
@@ -229,17 +232,12 @@ const rpcSchema: RpcSchema = {
       summary: 'Return the public application profile',
       params: [
         {
-          name: 'clientId',
-          required: true,
-          schema: {
-            // TODO app core ID, needs better type here
-            type: 'string',
-          },
+          $ref: '#/components/contentDescriptors/ClientId',
         },
       ],
       result: {
         name: 'status',
-        summary: 'The new publication status',
+        summary: 'The public (published) application data',
         schema: {
           $ref: '#/components/schema/AppProfile',
         },
@@ -256,6 +254,14 @@ const rpcSchema: RpcSchema = {
           'The information required to uniquely identify an application',
         schema: {
           $ref: '#/components/schemas/AppSelect',
+        },
+      },
+      ClientId: {
+        name: 'clientId',
+        required: true,
+        description: 'An OAuth client ID, used to identify an application',
+        schema: {
+          $ref: '#/components/schemas/ClientId',
         },
       },
       Profile: {

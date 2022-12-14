@@ -54,6 +54,11 @@ import type { AccountURN } from '@kubelt/urns/account'
 
 import { AccountURNSpace } from '@kubelt/urns/account'
 
+// Errors
+// -----------------------------------------------------------------------------
+
+import { ErrorMissingClientName, ErrorMissingClientSecret } from './error'
+
 // Schema
 // -----------------------------------------------------------------------------
 
@@ -557,11 +562,12 @@ const kb_initPlatform = openrpc.extension(schema, {
       const acmeName = 'acmecorp'
       const acmeKey = `${env}-${acmeName}`
       const acmeData = await fixtures.get(acmeKey, { type: 'json' })
-      const acmeSecret = _.get(acmeData, 'clientSecret')
+      const acmeSecret: string = _.get(acmeData, 'clientSecret', '')
 
-      if (acmeSecret === undefined) {
+      if (acmeSecret === '') {
         console.error(`console fixture missing "clientSecret" property`)
       }
+      const hashedSecret = await secret.hash(acmeSecret)
 
       // If the key was not present we get a null response.
       if (acmeData) {
@@ -571,7 +577,7 @@ const kb_initPlatform = openrpc.extension(schema, {
           tag: 'acmecorp-app',
         })
         const conResult = await con.init({
-          app: _.set(acmeData, 'clientSecret', acmeSecret),
+          app: _.set(acmeData, 'clientSecret', hashedSecret),
         })
         if (conResult.error) {
           throw new Error(conResult.error)
@@ -682,13 +688,66 @@ const kb_appPublish = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const token = context.get(KEY_TOKEN)
-      const userId = context.get(KEY_USER_ID)
 
-      // TODO validate that the required configuration for the app has
-      // been provided before allowing the user to publish it.
+      // Get the ID of the app that we are rotating the secret for.
+      const clientId = _.get(request, ['params', 'clientId'])
+      // TODO once we conformance check the request against the schema,
+      // we can be sure that the required parameter(s) are present.
+      if (undefined === clientId) {
+        throw new Error('missing clientId param')
+      }
+      // The mapping table stores the durable object ID for the
+      // application core.
+      const appId = await lookup.get(clientId)
+      if (null === appId) {
+        throw new Error('missing appId mapping')
+      }
 
-      return openrpc.response(request, 'not yet implemented')
+      // This is the requested publication state of the application.
+      const published = _.get(request, ['params', 'published'])
+      if (typeof published !== 'boolean') {
+        throw new Error(`invalid "published" value: ${published}`)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        // Forward the token sent with the request to the DO.
+        token,
+        // Use this string when logging DO requests.
+        tag: 'starbase-app',
+      })
+      invariant(appId === app.$.id, 'object IDs must match')
+
+      // If we're *unpublishing* the app, we don't need to validate the
+      // app data.
+      if (published === false) {
+        app.publish({ published })
+      } else {
+        // Validate that the required configuration for the app has
+        // been provided before allowing the user to publish it.
+        const record = await app.fetch()
+        const hasSecret = await app.hasSecret()
+        // clientSecret
+        if (!hasSecret) {
+          return openrpc.error(request, ErrorMissingClientSecret)
+        }
+        // clientName
+        const clientName = _.get(record, 'clientName')
+        if (_.isUndefined(clientName) || clientName === '') {
+          return openrpc.error(request, ErrorMissingClientName)
+        }
+
+        console.log(JSON.stringify(record, null, 2))
+        app.publish({ published: true })
+      }
+
+      return openrpc.response(request, {
+        clientId,
+        published,
+      })
     }
   ),
 })
@@ -725,11 +784,10 @@ const kb_appProfile = openrpc.method(schema, {
         id: appId,
         tag: 'starbase-app',
       })
-      //console.log("clientId:", clientId)
-      //console.log("   appId:", appId)
-      //console.log("app.$.id:", app.$.id)
       invariant(appId === app.$.id, 'object IDs must match')
 
+      // NB: this returns an empty object if the application is not
+      // published.
       const appProfile = await app.profile()
 
       return openrpc.response(request, appProfile)
