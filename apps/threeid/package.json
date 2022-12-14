@@ -78,7 +78,7 @@
     "autoprefixer": "10.4.13",
     "babel-loader": "9.1.0",
     "babel-plugin-named-exports-order": "0.0.2",
-    "chromatic": "6.11.4",
+    "chromatic": "6.13.1",
     "concurrently": "7.6.0",
     "css-loader": "6.7.2",
     "eslint": "8.28.0",

@@ -4822,6 +4822,7 @@ __metadata:
     "@types/react-dom": 18.0.8
     babel-loader: 9.1.0
     bcryptjs: 2.4.3
+    chromatic: 6.13.1
     cross-env: 7.0.3
     eslint: 8.28.0
     ethers: 5.7.2
@@ -4967,7 +4968,7 @@ __metadata:
     autoprefixer: 10.4.13
     babel-loader: 9.1.0
     babel-plugin-named-exports-order: 0.0.2
-    chromatic: 6.11.4
+    chromatic: 6.13.1
     concurrently: 7.6.0
     cross-env: 7.0.3
     css-loader: 6.7.2
@@ -17114,6 +17115,20 @@ __metadata:
     chromatic: bin/main.cjs
     chromatic-cli: bin/main.cjs
   checksum: 7af3302b410a42d7e4833be0c94830a4848ccd877920bbb32082554da7fd1bbf46af800bb9f66ee14fb24a124df2229102ddc5e5dc91237f6339dc7b1394fbe3
+  languageName: node
+  linkType: hard
+
+"chromatic@npm:6.13.1":
+  version: 6.13.1
+  resolution: "chromatic@npm:6.13.1"
+  dependencies:
+    "@discoveryjs/json-ext": ^0.5.7
+    "@types/webpack-env": ^1.17.0
+  bin:
+    chroma: bin/main.cjs
+    chromatic: bin/main.cjs
+    chromatic-cli: bin/main.cjs
+  checksum: 78d7eacf317641a2c98beb334b8506772e21815daf971b8f8a86655379ba4ced17caa160e1b02e1ff35a429abc858295168f8b1a24887c2fe19f3f8264402974
   languageName: node
   linkType: hard
 

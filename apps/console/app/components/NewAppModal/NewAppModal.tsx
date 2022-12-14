@@ -19,7 +19,7 @@ export const NewAppModal = ({
           <p>Application Name</p>
           <input placeholder="My Application" name="client_name"></input>
           <button onClick={() => newAppCreateCallback(null)}>Cancel</button>
-          <button type="submit">Create Application</button>
+          <button type="submit">Create</button>
         </form>
       </>
     </Modal>
