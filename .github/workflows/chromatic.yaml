@@ -59,7 +59,7 @@ jobs:
         # Chromatic GitHub Action options
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
-          projectToken: ${{ secrets.CHROMATIC_THREEID_PROJECT_TOKEN }}
+          projectToken: ${{ secrets.TOKEN_CHROMATIC_THREEID_PROJECT }}
           onlyChanged: true
           workingDir: apps/threeid
   chromatic-deployment-console:
@@ -76,6 +76,6 @@ jobs:
         # Chromatic GitHub Action options
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
-          projectToken: ${{ secrets.CHROMATIC_CONSOLE_PROJECT_TOKEN }}
+          projectToken: ${{ secrets.TOKEN_CHROMATIC_CONSOLE_PROJECT }}
           onlyChanged: true
           workingDir: apps/console
