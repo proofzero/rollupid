@@ -13,7 +13,6 @@ import { mergeSortedNfts } from '~/helpers/nfts'
 import noNfts from '~/assets/No_NFT_Found.svg'
 import noFilter from '~/assets/no-filter.svg'
 
-import { Button } from '@kubelt/design-system'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 
 import Masonry from 'react-masonry-css'

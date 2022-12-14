@@ -60,8 +60,9 @@ const subNavigation = [
   },
   {
     name: 'NFT Gallery',
-    href: '#',
+    href: '/account/gallery',
     icon: HiOutlineViewGridAdd,
+    exists: true,
   },
   { name: 'KYC', href: '#', icon: BiIdCard },
   { name: 'Apps', href: '#', icon: BiLink },
