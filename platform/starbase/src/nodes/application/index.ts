@@ -88,6 +88,11 @@ import schema from './schema'
   defaultValue: false,
 })
 @field({
+  name: 'clientId',
+  doc: 'The OAuth client id for the application',
+  defaultValue: '',
+})
+@field({
   name: 'secret',
   doc: 'The OAuth client secret for the application',
   defaultValue: '',
@@ -102,29 +107,32 @@ export class StarbaseApplication {
 
   @method('init')
   //@requiredScope('starbase.write')
-  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('secret', [FieldAccess.Write])
+  @requiredField('clientName', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('clientId', [FieldAccess.Read, FieldAccess.Write])
   init(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
-    const app = params.get('app')
-
-    // Normally the secret is set using rotateSecret(), but when
-    // initializing from fixture data we use a supplied secret (hashed).
-    const secret = _.get(app, 'clientSecret', '')
-    output.set('secret', secret)
-
-    if (Object.keys(app).length > 0) {
-      output.set('app', _.omit(app, ['clientSecret', 'published']))
-    } else {
+    if (!params.has('clientId') || !params.has('clientName')) {
+      const message = `missing parameter "clientId" or "clientName" from request`
+      // TODO need a better way to return errors:
+      // - additional RpcCallable parameter that is an error map; errors
+      //   set on that map trigger the return of a JSON-RPC error
+      //   response.
+      // - exceptions
       return Promise.resolve({
-        error: `cannot initialize app more than once`,
+        error: message,
       })
     }
 
-    return Promise.resolve(app)
+    const clientId = params.get('clientId')
+    const clientName = params.get('clientName')
+
+    output.set('clientId', clientId)
+    output.set('clientName', clientName)
+
+    return Promise.resolve(true)
   }
 
   // update
