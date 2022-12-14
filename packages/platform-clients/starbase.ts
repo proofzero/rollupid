@@ -9,6 +9,7 @@ import { BaseApi } from './base'
 import createClient from './fetcher'
 
 export interface StarbaseApi extends BaseApi {
+  kb_appList(): Promise<AppProfileResult[]>
   kb_appCreate(clientName: string): Promise<AppCreateResult>
   kb_appAuthCheck(params: AppAuthCheckParams): Promise<boolean>
   kb_appProfile(clientId: string): Promise<AppProfileResult>

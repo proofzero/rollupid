@@ -449,6 +449,8 @@ const kb_appList = openrpc.method(schema, {
 
       const edgeList = await edgeUtil.edges(edges, accountURN, edgeTag)
 
+      console.log({ edgeList })
+
       return openrpc.response(request, {
         invoked: 'kb_appList',
         result: edgeList,
