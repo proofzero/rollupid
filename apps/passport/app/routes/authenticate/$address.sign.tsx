@@ -37,7 +37,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     )
     return json({ nonce, address, state })
   } catch (e) {
-    console.error(e)
+    console.error('Error getting nonce', e)
     throw json(`Error getting nonce: ${e}`, { status: 500 })
   }
 }

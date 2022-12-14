@@ -33,6 +33,7 @@ new_classes = ["CryptoCore"]
 [[migrations]]
 tag = "v2"
 renamed_classes = [{ from = "CryptoCore", to = "CryptoAddress" }]
+deleted_classes = ["Core"]
 
 [env.dev]
 durable_objects.bindings = [
