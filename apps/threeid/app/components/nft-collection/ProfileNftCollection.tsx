@@ -321,6 +321,8 @@ const ProfileNftCollection = ({
           rounded-lg
           shadow-xl
           mt-1
+          max-h-[25rem]
+          overflow-auto
           hidden
           m-0
           bg-clip-padding
@@ -354,6 +356,8 @@ const ProfileNftCollection = ({
                       flex 
                       select-none
                       flex-row
+                      max-w-[17rem]
+                      overflow-auto
                       bg-transparent
                       w-full
                       hover:bg-gray-100
