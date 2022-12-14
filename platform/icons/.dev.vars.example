@@ -3,10 +3,10 @@
 # Rename this file to .dev.vars and set the owning Cloudflare account ID.
 
 # The account ID that owns uploaded images.
-CLOUDFLARE_ACCOUNT_ID = "<replace-me>"
+INTERNAL_CLOUDFLARE_ACCOUNT_ID = "<replace-me>"
 
 # A bearer token providing access to the Cloudflare Images API.
-CLOUDFLARE_IMAGES_KEY = "<replace-me>"
+TOKEN_CLOUDFLARE_API = "<replace-me>"
 
 # The duration in seconds that returned upload URL is good for.
 # - minimum: 2 minutes (120)
