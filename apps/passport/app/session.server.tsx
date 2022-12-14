@@ -70,6 +70,8 @@ export async function requireJWT(
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
 
+  console.log({ sessionSecret })
+
   if (!jwt || typeof jwt !== 'string') {
     throw redirect(`/authenticate?${searchParams}`)
   }

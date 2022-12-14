@@ -46,6 +46,7 @@ export async function requireJWT(
   const jwt = session.get('jwt')
   // const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
 
+  console.log({ sessionSecret })
   if (!jwt || typeof jwt !== 'string') {
     throw redirect(PASSPORT_URL)
   }
