@@ -13,7 +13,6 @@ services = [
 ]
 
 [vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -44,7 +43,6 @@ services = [
 ]
 
 [env.dev.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -58,7 +56,6 @@ services = [
 ]
 
 [env.next.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -72,7 +69,6 @@ services = [
 ]
 
 [env.current.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
