@@ -111,3 +111,28 @@ export async function edges(edges: Fetcher, id: string, tag: string) {
     return _.get(edge, 'srcUrn') === id && _.get(edge, 'tag') === tag
   })
 }
+
+// // assertUniqueLink()
+// TODO: @ROB can we make this query shape work diredclty in SQL?
+// export async function assertUniqueLink(
+//   accountURN: string,
+//   rComponents?: Record<string, string>
+// ): Promise<boolean> {
+//   const kb_getEdges = {
+//     jsonrpc: '2.0',
+//     id: 1,
+//     method: 'kb_getEdges',
+//     params: {
+//       dst: {
+//         id: accountURN,
+//       },
+//       src:{
+//         nid: 'threeid',
+//         nss: 'app',
+//         rComponents
+//       }
+
+//     },
+//   }
+//   // Search for unique links with the components joined
+// }

@@ -74,7 +74,7 @@ export default function AppDetailsPage() {
 // -----------------------------------------------------------------------------
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
+  console.error({ error })
 
   return <div>An unexpected error occurred: {error.message}</div>
 }

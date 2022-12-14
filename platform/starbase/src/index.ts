@@ -205,11 +205,18 @@ const kb_appCreate = openrpc.method(schema, {
       // NB: this throws if no token was provided, or if the supplied
       // account URN isn't valid.
       const accountURN = tokenUtil.getAccountId(token)
+      const tag = graph.edge(EDGE_TAG)
 
-      const clientName = _.get(request, ['params', 'clientName'])
+      const [clientName] = request.params as ParamsArray
       if (_.isUndefined(clientName)) {
         throw new Error('missing OAuth application name')
       }
+
+      // Let's make sure this name is unique
+      const linkedEdges = await edgeUtil.edges(edges, accountURN, tag)
+      console.log({ linkedEdges })
+
+      // if (linkedEdges?.filter(e => e.rComp.client))
 
       // Create initial OAuth configuration for the application. There
       // is no secret associated with the app after creation. The
@@ -238,13 +245,13 @@ const kb_appCreate = openrpc.method(schema, {
       const appId: string = <string>app.$.id
       // Create a platform URN that uniquely represents the just-created
       // application.
-      const appURN = ApplicationURNSpace.urn(appId)
+      const appURN =
+        ApplicationURNSpace.urn(appId) + `?+clientName=${clientName}`
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
       const src = accountURN
       const dst = appURN
-      const tag = graph.edge(EDGE_TAG)
       const edgeRes = await edgeUtil.link(edges, src, dst, tag)
 
       // Store an entry in the lookup KV that maps from application
