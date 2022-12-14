@@ -364,17 +364,20 @@ const ProfileNftCollection = ({
                             setCurFilter(colName.title || 'Untitled Collection')
                           }}
                         >
-                          <img
-                            className="w-[1.5em] h-[1.5em] rounded-full"
-                            src={
-                              colName.title === 'All Collections'
-                                ? pfp
-                                : colName.img
-                                ? colName.img
-                                : noImage
-                            }
-                            alt="+"
-                          />
+                          {colName.title === 'All Collections' ||
+                          colName.img ? (
+                            <img
+                              className="w-[1.5em] h-[1.5em] rounded-full"
+                              src={
+                                colName.title === 'All Collections'
+                                  ? pfp
+                                  : colName.img
+                              }
+                              alt="+"
+                            />
+                          ) : (
+                            <div className="w-[1.5em] h-[1.5em] bg-[#E8E8E8] rounded-full"></div>
+                          )}
 
                           {curFilter === colName.title ||
                           curFilter === 'Untitled Collection' ? (
