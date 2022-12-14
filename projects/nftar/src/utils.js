@@ -166,7 +166,7 @@ const generateTraits = function(weightInc) {
 // image-data-uri because it uses a legacy HTTP library that Cryptopunks 403
 // blocks when called from GCP (for some reason). We need more control so we
 // use the fetch API and pass the bytes retrieved into the library's encoder.
-const encodeDataURI = async (url) => {
+const encodeDataURI = async (ctx, url) => {
     return fetch(url)
     // Get the content type and unfortunately await the body. I would prefer
     // that retrieving the body here was thennable, but need the header.
