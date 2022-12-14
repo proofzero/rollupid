@@ -10,11 +10,13 @@ const Template = () => (
     galaxyGql={{
       apiKey: 'API_KEY',
       createdAt: new Date(),
+      onKeyRoll: () => {},
     }}
     oAuth={{
       appId: 'APP_ID',
       appSecret: 'APP_SECRET',
       createdAt: new Date(),
+      onKeyRoll: () => {},
     }}
   />
 )

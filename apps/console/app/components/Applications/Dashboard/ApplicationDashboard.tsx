@@ -8,11 +8,13 @@ type ApplicationDashboardProps = {
   galaxyGql: {
     apiKey: string
     createdAt: Date
+    onKeyRoll: () => void
   }
   oAuth: {
     appId: string
     appSecret: string
     createdAt: Date
+    onKeyRoll: () => void
   }
   logins?: any[]
 }
@@ -28,7 +30,27 @@ export const ApplicationDashboard = ({
 
     <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
       <div className="flex-1 flex flex-col space-y-5">
-        <Panel title="Galaxy GraphQL API Key">
+        <Panel
+          title="Galaxy GraphQL API Key"
+          titleCompanion={
+            <div>
+              <Text size="xs" weight="medium" className="text-gray-400">
+                Created: {galaxyGql.createdAt.toDateString()}
+              </Text>
+              <div className="text-right">
+                <Text
+                  type="span"
+                  size="xs"
+                  weight="medium"
+                  className="text-indigo-500 cursor-pointer"
+                  onClick={galaxyGql.onKeyRoll}
+                >
+                  Roll keys
+                </Text>
+              </div>
+            </div>
+          }
+        >
           <ReadOnlyInput
             id="gqlApiKey"
             label="API Key"
@@ -37,7 +59,27 @@ export const ApplicationDashboard = ({
           />
         </Panel>
 
-        <Panel title="0xAuth">
+        <Panel
+          title="0xAuth"
+          titleCompanion={
+            <div>
+              <Text size="xs" weight="medium" className="text-gray-400">
+                Created: {oAuth.createdAt.toDateString()}
+              </Text>
+              <div className="text-right">
+                <Text
+                  type="span"
+                  size="xs"
+                  weight="medium"
+                  className="text-indigo-500 cursor-pointer"
+                  onClick={oAuth.onKeyRoll}
+                >
+                  Roll keys
+                </Text>
+              </div>
+            </div>
+          }
+        >
           <div className="flex flex-col space-y-4">
             <ReadOnlyInput
               id="oAuthAppId"
