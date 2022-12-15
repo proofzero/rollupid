@@ -2,6 +2,6 @@
 description: Technical references for 3ID products and services.
 ---
 
-TODO:
-
-Default JWT Scopes
+* [Profile Reference Guide](./profile.md)
+* [Passport Reference Guide](./passport.md)
+* [Console Reference Guide](./console.md)

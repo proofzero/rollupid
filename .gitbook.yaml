@@ -1,9 +1,5 @@
 root: ./docs/
 
 structure:
-  readme: next/3id/3id-public-profiles.md
+  readme: 3id/quickstart/index.md
   summary: CONTENTS.md
-
-#redirects:
-#  /: next/3id/3id-public-profiles.md
-#  next/3id/README.md: next/3id/3id-public-profiles.md

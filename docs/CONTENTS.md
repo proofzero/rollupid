@@ -1,14 +1,16 @@
 # Table of contents
 
-## 3ID
+## 3ID Documentation
 
 * [Quickstart](3id/quickstart/index.md)
 * [Overview](3id/overview/index.md)
 * [Implementation Guides](3id/guides/index.md)
-  * [3ID Auth](3id/guides/3id-auth.md)
-  * [3ID Public Profiles](3id/guides/3id-public-profiles.md)
-* [References](3id/references/index.md)
-* [FAQ](3id/faq/index.md)
+  * [3ID Passport](3id/guides/3id-passport.md)
+* [Technical References](3id/reference/index.md)
+  * [Profile Reference Guide](3id/reference/profile.md)
+  * [Passport Reference Guide](3id/reference/passport.md)
+  * [Console Reference Guide](3id/reference/console.md)
+* [FAQs](3id/faq/index.md)
 
 <!--
 ## Use headings to create page groups like this one​
