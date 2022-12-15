@@ -1,6 +1,8 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { appRouter } from '../jsonrpc/router'
 import { createContext } from '../context'
+import { Environment } from '..'
 
 type Message = {
   method: string
@@ -8,7 +10,8 @@ type Message = {
 }
 export default async (
   batch: MessageBatch<Message>,
-  ctx: ExecutionContext
+  ctx: ExecutionContext,
+  env: Environment
 ): Promise<void> => {
   console.log({ batch })
 
@@ -22,7 +25,8 @@ export default async (
       endpoint: '/trpc',
       req,
       router: appRouter,
-      createContext,
+      createContext: (opts) =>
+        createContext(opts as CreateNextContextOptions, env),
     })
   })
 }

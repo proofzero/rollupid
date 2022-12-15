@@ -42,7 +42,6 @@ query getNftsPerCollection(
       address
       totalBalance
       numDistinctTokensOwned
-      tokenId
       name
       symbol
       tokenType
@@ -82,4 +81,60 @@ query getNftsPerCollection(
       }
     }
   }
+}
+
+query getNFTMetadata($input: [NFTMetadataInput]) {
+  getNFTMetadataBatch(input: $input) {
+    ownedNfts {
+      contract {
+        address
+      }
+      title
+      description
+      id {
+        tokenId
+      }
+      media {
+        raw
+        thumbnail
+      }
+      error
+      contractMetadata {
+        name
+        tokenType
+      }
+    }
+  }
+}
+
+query getGallery($addressURN: URN!) {
+  getCuratedGallery(addressURN: $addressURN) {
+    ownedNfts {
+      contract {
+        address
+      }
+      title
+      description
+      media {
+        raw
+        thumbnail
+      }
+      metadata {
+        properties {
+          name
+          value
+          display
+        }
+      }
+      error
+      contractMetadata {
+        name
+        tokenType
+      }
+    }
+  }
+}
+
+mutation updateGallery($gallery: [NFTInput]) {
+  updateCuratedGallery(gallery: $gallery)
 }

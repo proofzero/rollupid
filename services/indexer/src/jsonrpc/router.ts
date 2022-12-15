@@ -28,6 +28,7 @@ export const logUsage = t.middleware(async ({ path, type, next }) => {
   return result
 })
 
+// TODO: add output types
 export const appRouter = t.router({
   getGallery: t.procedure
     .use(scopes)
@@ -61,4 +62,5 @@ export const appRouter = t.router({
     .mutation(indexTokenMethod),
 })
 
-export type AppRouter = typeof appRouter
+// TODO: move to package and export .d.ts file for deps
+export type IndexerRouter = typeof appRouter

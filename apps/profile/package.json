@@ -21,6 +21,8 @@
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },
   "dependencies": {
+    "@dnd-kit/core": "6.0.6",
+    "@dnd-kit/sortable": "7.0.1",
     "@headlessui/react": "1.7.4",
     "@heroicons/react": "2.0.13",
     "@kubelt/design-system": "*",
@@ -33,6 +35,7 @@
     "@storybook/manager-webpack5": "6.5.13",
     "@tailwindcss/forms": "0.5.3",
     "@tanstack/react-query": "4.16.1",
+    "@trpc/client": "10.7.0",
     "cross-env": "7.0.3",
     "ethers": "5.7.2",
     "flowbite": "1.5.4",

@@ -3,17 +3,9 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
 import { HiChevronDown } from 'react-icons/hi'
 
-import nftModalStyles from './NftModal.css'
-
-import type { LinksFunction } from '@remix-run/cloudflare'
-
 import { gatewayFromIpfs } from '~/helpers'
 
 import { useState } from 'react'
-
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: nftModalStyles },
-]
 
 const NftModal = ({
   isOpen,
@@ -39,9 +31,18 @@ const NftModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
+        style={{
+          /**
+           * This works only in Firefox for now
+           * https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color
+           * MDN convincingly written not to use ::-webkit-scrollbar
+           * https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar
+           **/
+          scrollbarColor: '#D1D5DB white',
+        }}
         className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
           transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto scrollable-element`}
+         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
       >
         <div className="flex flex-col justify-between lg:flex-row max-w-full ">
           <div>
@@ -69,7 +70,6 @@ const NftModal = ({
           h-[27rem]
           max-h-full max-w-full
           lg:max-w-md
-          lg:max-h-md
           mt-3"
           >
             <Text className="mb-2 text-gray-900" size="lg" weight="medium">
@@ -83,210 +83,195 @@ const NftModal = ({
               {nft?.title}
             </Text>
 
-            <div
-              className="accordion-item 
+            <div>
+              <div
+                className="
                 border-t-0 border-l-0 border-r-0 
                 rounded-none bg-white mt-2 lg:mt-8 lg:mb-4"
-            >
-              <Text
-                className="accordion-header text-gray-900"
-                size="lg"
-                weight="semibold"
-                id="flush-headingOne"
               >
-                <button
-                  className={
-                    'relative collapsed flex justify-between\
+                <Text className=" text-gray-900" size="lg" weight="semibold">
+                  <button
+                    className={
+                      'relative flex justify-between\
                      items-center w-full py-4\
                     text-left bg-white border-0 rounded-none\
                      transition focus:outline-none'
-                  }
-                  onClick={() => {
-                    setOpenedDetails(!openedDetails)
-                  }}
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#flush-collapseOne"
-                  aria-expanded="true"
-                  aria-controls="flush-collapseOne"
-                >
-                  <Text className="text-gray-900" weight="semibold">
-                    Details
-                  </Text>
-
-                  <HiChevronDown
-                    className={
-                      openedDetails ? 'rotate-180 transition' : 'transition'
                     }
-                  ></HiChevronDown>
-                </button>
-              </Text>
+                    onClick={() => {
+                      setOpenedDetails(!openedDetails)
+                    }}
+                    type="button"
+                  >
+                    <Text className="text-gray-900" weight="semibold">
+                      Details
+                    </Text>
+
+                    <HiChevronDown
+                      className={
+                        openedDetails ? 'rotate-180 transition' : 'transition'
+                      }
+                    ></HiChevronDown>
+                  </button>
+                </Text>
+
+                <div
+                  className={
+                    openedDetails
+                      ? `border-0 visible flex flex-wrap flex-row max-w-full ${noDetails}`
+                      : `border-0 collapse  flex flex-wrap flex-row max-w-full ${noDetails}`
+                  }
+                >
+                  <div className=" w-screen flex-wrap truncate">
+                    {nft?.details?.length ? (
+                      nft.details.map(
+                        (d: {
+                          name: string
+                          value: any
+                          isCopyable: boolean
+                        }) => {
+                          return (
+                            <div
+                              key={d.name}
+                              className="flex flex-row justify-between"
+                            >
+                              <Text
+                                size="xs"
+                                weight="medium"
+                                className="text-gray-400 pb-2"
+                              >
+                                {d.name}
+                              </Text>
+                              {(d.isCopyable && (
+                                <div className="flex items-center">
+                                  {hover === d.name && (
+                                    <Text
+                                      size="xs"
+                                      weight="semibold"
+                                      className="
+                                  pb-2 mr-2
+                                  max-w-[12rem]
+                                  overflow-hidden"
+                                    >
+                                      {copied ? 'Copied!' : 'Copy'}
+                                    </Text>
+                                  )}
+                                  <button>
+                                    <Text
+                                      size="xs"
+                                      weight="semibold"
+                                      className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
+                            truncate"
+                                      onClick={async () => {
+                                        navigator.clipboard.writeText(d.value)
+                                        setCopied(true)
+                                        await setTimeout(() => {
+                                          setCopied(false)
+                                        }, 1500)
+                                      }}
+                                      onMouseEnter={() => setHover(d.name)}
+                                      onMouseLeave={() => setHover('')}
+                                    >
+                                      {d.value}
+                                    </Text>
+                                  </button>
+                                </div>
+                              )) || (
+                                <Text
+                                  size="xs"
+                                  weight="semibold"
+                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                            truncate"
+                                >
+                                  {d.value}
+                                </Text>
+                              )}
+                            </div>
+                          )
+                        }
+                      )
+                    ) : (
+                      <div className="text-gray-400 items-center justify-center text-center">
+                        No details
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <hr />
 
               <div
-                id="flush-collapseOne"
-                className={
-                  openedDetails
-                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-full overflow-hidden ${noDetails}`
-                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-full overflow-hidden ${noDetails}`
-                }
-                aria-labelledby="flush-headingOne"
+                className="
+              border-t-0 border-l-0 border-r-0
+              rounded-none bg-white mt-2 lg:mt-4"
               >
-                <div className="accordion-body w-screen flex-wrap truncate">
-                  {nft?.details?.length ? (
-                    nft.details.map(
-                      (d: {
-                        name: string
-                        value: any
-                        isCopyable: boolean
-                      }) => {
-                        return (
+                <Text
+                  className="
+                  ml-1 mb-2 text-gray-900"
+                  size="lg"
+                  weight="semibold"
+                >
+                  <button
+                    className={
+                      'relative flex justify-between\
+                       items-center w-full py-4\
+                      text-left bg-white border-0 rounded-none\
+                       transition focus:outline-none'
+                    }
+                    type="button"
+                    onClick={() => {
+                      setOpenedProps(!openedProps)
+                    }}
+                  >
+                    <Text className="text-gray-900" weight="semibold">
+                      Properties
+                    </Text>
+                    <HiChevronDown
+                      className={
+                        openedProps ? 'rotate-180 transition' : 'transition'
+                      }
+                    ></HiChevronDown>
+                  </button>
+                </Text>
+
+                <div
+                  className={
+                    openedProps
+                      ? `border-0 visible flex flex-wrap flex-row max-w-md  ${noProps}`
+                      : `border-0 collapse flex flex-wrap flex-row max-w-md  ${noProps}`
+                  }
+                >
+                  <div className="flex flex-row  flex-wrap ">
+                    {nft?.properties?.length ? (
+                      nft?.properties.map(
+                        (p: { name: string; value: any; display: string }) => (
                           <div
-                            key={d.name}
-                            className="flex flex-row justify-between"
+                            key={p.name ?? `${new Date().getTime()}`}
+                            className="m-1 py-2 px-4 border rounded-md"
                           >
                             <Text
                               size="xs"
                               weight="medium"
-                              className="text-gray-400 pb-2"
+                              className="text-gray-400"
                             >
-                              {d.name}
+                              {p.name?.toUpperCase()}
                             </Text>
-                            {(d.isCopyable && (
-                              <div className="flex items-center">
-                                {hover === d.name && (
-                                  <Text
-                                    size="xs"
-                                    weight="semibold"
-                                    className="
-                                  pb-2 mr-2
-                                  max-w-[12rem]
-                                  overflow-hidden"
-                                  >
-                                    {copied ? 'Copied!' : 'Copy'}
-                                  </Text>
-                                )}
-                                <button>
-                                  <Text
-                                    size="xs"
-                                    weight="semibold"
-                                    className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
-                            truncate"
-                                    onClick={async () => {
-                                      navigator.clipboard.writeText(d.value)
-                                      setCopied(true)
-                                      await setTimeout(() => {
-                                        setCopied(false)
-                                      }, 1500)
-                                    }}
-                                    onMouseEnter={() => setHover(d.name)}
-                                    onMouseLeave={() => setHover('')}
-                                  >
-                                    {d.value}
-                                  </Text>
-                                </button>
-                              </div>
-                            )) || (
-                              <Text
-                                size="xs"
-                                weight="semibold"
-                                className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
-                            truncate"
-                              >
-                                {d.value}
-                              </Text>
-                            )}
+                            <Text
+                              size="sm"
+                              weight="semibold"
+                              className="text-gray-700"
+                            >
+                              {p.value}
+                            </Text>
                           </div>
                         )
-                      }
-                    )
-                  ) : (
-                    <div className="accordion-body text-gray-400 items-center justify-center text-center">
-                      No details
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <hr />
-
-            <div
-              className="accordion-item 
-              border-t-0 border-l-0 border-r-0
-              rounded-none bg-white mt-2 lg:mt-4"
-            >
-              <Text
-                className="accordion-header 
-                  ml-1 mb-2 text-gray-900"
-                size="lg"
-                weight="semibold"
-              >
-                <button
-                  className={
-                    'relative flex justify-between\
-                       items-center w-full py-4\
-                      text-left bg-white border-0 rounded-none\
-                       transition focus:outline-none'
-                  }
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#flush-collapseTwo"
-                  aria-expanded="false"
-                  aria-controls="flush-collapseTwo"
-                  onClick={() => {
-                    setOpenedProps(!openedProps)
-                  }}
-                >
-                  <Text className="text-gray-900" weight="semibold">
-                    Properties
-                  </Text>
-                  <HiChevronDown
-                    className={
-                      openedProps ? 'rotate-180 transition' : 'transition'
-                    }
-                  ></HiChevronDown>
-                </button>
-              </Text>
-
-              <div
-                id="flush-collapseTwo"
-                className={
-                  openedProps
-                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-md  overflow-hidden ${noProps}`
-                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-md  overflow-hidden ${noProps}`
-                }
-                aria-labelledby="flush-headingTwo"
-              >
-                <div className="accordion-body flex flex-row  flex-wrap ">
-                  {nft?.properties?.length ? (
-                    nft?.properties.map(
-                      (p: { name: string; value: any; display: string }) => (
-                        <div
-                          key={p.name ?? `${new Date().getTime()}`}
-                          className="m-1 py-2 px-4 border rounded-md"
-                        >
-                          <Text
-                            size="xs"
-                            weight="medium"
-                            className="text-gray-400"
-                          >
-                            {p.name?.toUpperCase()}
-                          </Text>
-                          <Text
-                            size="sm"
-                            weight="semibold"
-                            className="text-gray-700"
-                          >
-                            {p.value}
-                          </Text>
-                        </div>
                       )
-                    )
-                  ) : (
-                    <div className="accordion-body text-gray-400 items-center justify-center text-center">
-                      No properties
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-gray-400 items-center justify-center text-center">
+                        No properties
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

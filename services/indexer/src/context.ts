@@ -1,21 +1,14 @@
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import { Environment } from '.'
 
 /**
  * Defines your inner context shape.
  * Add fields here that the inner context brings.
  */
-interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
-  Access: Fetcher
-  Edges: Fetcher
-
-  COLLECTIONS: D1Database
-
-  APIKEY_MORALIS: string
-  MORALIS_STREAM_ID: string
-  URL_MORALIS_WEBHOOK: string
-
-  BLOCKCHAIN_ACTIVITY: Queue
+interface CreateInnerContextOptions
+  extends Partial<CreateNextContextOptions & Environment> {
+  placeholder?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -27,7 +20,6 @@ interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts?: CreateInnerContextOptions) {
-  console.log({ opts })
   return {
     ...opts,
   }
@@ -37,8 +29,11 @@ export async function createContextInner(opts?: CreateInnerContextOptions) {
  *
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
-export async function createContext(opts: CreateNextContextOptions) {
-  const contextInner = await createContextInner()
+export async function createContext(
+  opts: CreateNextContextOptions,
+  env: Environment
+) {
+  const contextInner = await createContextInner(env)
   return {
     req: opts.req,
     res: opts.res,

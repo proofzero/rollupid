@@ -1,10 +1,12 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
+import createAddressClient from '@kubelt/platform-clients/address'
+import createIndexerClient from '@kubelt/platform-clients/indexer'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+
 import { Resolvers } from './typedefs'
 import Env from '../../env'
-
-import createIndexerClient from '@kubelt/platform-clients/indexer'
 
 import {
   AlchemyChain,
@@ -15,11 +17,13 @@ import {
 
 import { hasApiKey, setupContext, sliceIntoChunks } from './utils'
 import { print } from 'graphql'
+import account from '@kubelt/platform-clients/account'
 
 type ResolverContext = {
   env: Env
   jwt?: string
   coreId?: string
+  addressURN: AddressURN
 }
 
 const getAllNfts = async (
@@ -277,9 +281,105 @@ const nftsResolvers: Resolvers = {
         contracts,
       }
     },
+
+    //@ts-ignore
+    getNFTMetadataBatch: async (
+      _parent: any,
+      {
+        input,
+      }: {
+        input: {
+          contractAddress: string
+          tokenId: string
+          tokenType: string
+        }[]
+      },
+      { env }: ResolverContext
+    ) => {
+      let ownedNfts: any[] = []
+      const alchemyClient: AlchemyClient = new AlchemyClient({
+        key: env.APIKEY_ALCHEMY_ETH,
+        chain: 'eth',
+        network: env.ALCHEMY_ETH_NETWORK,
+      } as AlchemyClientConfig)
+
+      const alchemyPolygonClient: AlchemyClient = new AlchemyClient({
+        key: env.APIKEY_ALCHEMY_POLYGON,
+        chain: 'polygon',
+        network: env.ALCHEMY_POLYGON_NETWORK,
+      } as AlchemyClientConfig)
+
+      try {
+        const [ethNfts, polyNfts] = await Promise.all([
+          alchemyClient.getNFTMetadataBatch(input),
+          alchemyPolygonClient.getNFTMetadataBatch(input),
+        ])
+
+        ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
+      } catch (ex) {
+        console.error(new GraphQLYogaError(ex as string))
+      }
+
+      console.log(ownedNfts.filter((nft) => !nft.error))
+      console.log(
+        ownedNfts.filter((nft) => !nft.error).map((nft) => nft.metadata)
+      )
+
+      return {
+        ownedNfts: ownedNfts.filter((nft) => !nft.error),
+      }
+    },
+
+    //@ts-ignore
+    getCuratedGallery: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { env }: ResolverContext
+    ) => {
+      const indexerClient = createIndexerClient(env.Indexer)
+
+      let gallery: any = []
+
+      try {
+        gallery = await indexerClient.kb_getGallery([
+          `urn:threeid:address/${AddressURNSpace.parse(addressURN).decoded}`,
+        ])
+      } catch (ex) {
+        console.error(ex)
+      }
+
+      return {
+        gallery,
+      }
+    },
   },
 
-  Mutation: {},
+  Mutation: {
+    //@ts-ignore
+    updateCuratedGallery: async (
+      _parent: any,
+      { gallery }: { gallery: any[] },
+      { env, jwt, addressURN }: ResolverContext
+    ) => {
+      console.log("YOOO IT'S BEEN HIT", addressURN)
+
+      const indexerClient = createIndexerClient(env.Indexer)
+
+      // TODO: Return the gallery we've created. Need to enforce
+      // the GraphQL types when setting data otherwise we're able
+      // to set a value that can't be returned.
+      try {
+        await indexerClient.kb_setGallery(
+          gallery.map((nft) => ({ ...nft, addressURN: '1' }))
+        )
+        console.log('SUCCESS')
+      } catch (ex) {
+        console.error(ex)
+      }
+
+      return true
+    },
+  },
 }
 
 const NFTsResolverComposition = {

@@ -13,4 +13,5 @@ declare global {
   const Galaxy: Fetcher
   const Address: Fetcher
   const Images: Fetcher
+  const Indexer: Fetcher
 }

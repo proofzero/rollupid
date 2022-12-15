@@ -4,12 +4,11 @@ import { useLoaderData } from '@remix-run/react'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { useRouteData } from '~/hooks'
-import ProfileNftOneCollection from '~/components/nft-collection/ProfileNftOneCollection'
+import ProfileNftSingleCollection from '~/components/nft-collection/ProfileNftSingleCollection'
 
 import type { ProfileData } from './collection'
 
 export const loader: LoaderFunction = async (args) => {
-  console.log('here')
   const { params } = args
 
   return json({
@@ -28,7 +27,7 @@ const CollectionForProfileRoute = () => {
         NFT Collections
       </Text>
 
-      <ProfileNftOneCollection
+      <ProfileNftSingleCollection
         account={targetAddress}
         displayname={displayName}
         isOwner={isOwner}
