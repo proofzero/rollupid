@@ -310,20 +310,21 @@ const ProfileNftCollection = ({
                 <ul
                   className="
           dropdown-menu
-          min-w-max
           list-none
+          w-full
           absolute
           hidden
           bg-white
           text-base
           z-50
           float-left
+          sm:max-h-[20rem]
+          min-[480px]:max-h-[20rem]
+          max-h-[23rem]
           py-2
           rounded-lg
           shadow-xl
           mt-1
-          max-h-[23rem]
-          min-w-full
           overflow-auto
           hidden
           m-0
@@ -359,7 +360,6 @@ const ProfileNftCollection = ({
                       select-none
                       flex-row
                       sm:max-w-[17rem]
-                      min-w-[100%]
                       overflow-auto
                       bg-transparent
                       w-full
@@ -417,7 +417,7 @@ const ProfileNftCollection = ({
           <Masonry
             breakpointCols={{
               default: 5,
-              1280:4,
+              1280: 4,
               1024: 3,
               768: 2,
               640: 1,
