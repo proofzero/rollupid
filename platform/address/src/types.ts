@@ -1,5 +1,6 @@
 export interface Environment {
   Access: Fetcher
+  Edges: Fetcher
   CryptoAddress: DurableObjectNamespace
 
   MINTPFP_CONTRACT_ADDRESS: string

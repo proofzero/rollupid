@@ -88,6 +88,7 @@ const rpcHandler = openrpc.build(
 export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   const context = openrpc.context(request, env, ctx)
   context.set('Access', getAccessClient(env.Access))
+  context.set('Edges', env.Edges)
   context.set('CryptoAddress', env.CryptoAddress)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)

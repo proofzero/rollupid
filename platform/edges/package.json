@@ -24,6 +24,9 @@
     "types:check": "tsc --project tsconfig.json --noEmit",
     "wrangler:local": "wrangler dev --local --persist"
   },
+  "tap": {
+    "check-coverage": false
+  },
   "devDependencies": {
     "@databases/split-sql-query": "1.0.3",
     "@databases/sql": "3.2.0",
@@ -39,7 +42,6 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
-    "@kubelt/graph": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/security": "workspace:*",
     "@kubelt/urns": "workspace:*",

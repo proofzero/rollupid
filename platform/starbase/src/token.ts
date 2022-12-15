@@ -32,9 +32,9 @@ export function fromRequest(request: Request): string {
  *
  * @param token - A JWT token string
  */
-export function getAccountId(token: string): AccountURN {
+export function getAccountId(token: string): AccountURN | undefined {
   if (token === '') {
-    throw new Error('invalid empty token provided')
+    return undefined
   }
 
   const decoded = jose.decodeJwt(token)

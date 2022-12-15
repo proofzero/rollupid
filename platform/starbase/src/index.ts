@@ -38,7 +38,6 @@ import { StarbaseApplication } from './nodes/application'
 import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
-import * as edgeUtil from './edge'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
@@ -57,7 +56,14 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 // Errors
 // -----------------------------------------------------------------------------
 
-import { ErrorMissingClientName, ErrorMissingClientSecret } from './error'
+import {
+  ErrorInvalidPublishFlag,
+  ErrorMappingClientId,
+  ErrorMissingClientId,
+  ErrorMissingClientName,
+  ErrorMissingClientSecret,
+  ErrorMissingProfile,
+} from './error'
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -90,7 +96,7 @@ const KEY_DATADOG = 'com.datadog/token'
 // Context key for the JWT associated with the incoming request.
 const KEY_TOKEN = 'xyz.threeid.security/jwt'
 // Context key for the user ID associated with the request (if any).
-const KEY_USER_ID = 'xyz.threeid.security/user.id'
+const KEY_ACCOUNT_ID = 'xyz.threeid.security/account.id'
 
 // Context key for a KV value containing name of current environment.
 const KEY_ENVIRONMENT = 'xyz.threeid.value/environment'
@@ -115,10 +121,17 @@ const noScope = openrpc.scopes([])
 // A check applied on RPC methods that require authorization.
 
 /**
- * Forward request to authorization service. This throws if the
- * authentication doesn't succeed. It relies on service bindings to
- * communicate with the "account" authorization service available as
- * env.Account.
+ * Check that a JWT was included with the request, and that it includes
+ * a valid account identifier if so. If the account ID is present it is
+ * set on the context as the value of KEY_ACCOUNT_ID, making it
+ * available in the RPC method handlers that use this auth handler.
+ *
+ * If the JWT is missing, if the account ID claim ("sub") is missing, or
+ * if the account ID is not of the expected format, short-circuit to
+ * return a 401 error.
+ *
+ * Note that we do not *yet* validate the signature of the token. This
+ * will be handled by forwarding to an authentication service.
  *
  * @returns nothing if auth succeeds, an error response otherwise
  */
@@ -126,17 +139,6 @@ const authCheck: RpcAuthHandler = async (
   request: Readonly<Request>,
   context: Readonly<RpcContext>
 ): Promise<void | Response> => {
-  // Perform a request to the Access service, passing it the token
-  // provided with the current request. If the response is a payload,
-  // the auth check succeeded. An error is returned otherwise.
-  /*
-  const access = context.get(KEY_ACCESS)
-  if (_.isUndefined(access)) {
-    // We need to supply a service binding for the Access service to
-    // perform the auth check.
-    throw new Error("missing access service binding; can't perform auth check")
-  }
-
   const token = context.get(KEY_TOKEN)
   if (_.isUndefined(token)) {
     // No token was supplied with the request. That's a "no access
@@ -144,27 +146,27 @@ const authCheck: RpcAuthHandler = async (
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const reqBody = {
-    jsonrpc: '2.0',
-    id: 1,
-    method: 'kb_verifyAuthorization',
-    params: {
-      token,
-    },
-  }
-  const verifyReq = new Request('http://access.dev/jsonrpc', {
-    method: 'POST',
-    body: JSON.stringify(reqBody),
-  })
+  let accountId
   try {
-    const result = await access.fetch(verifyReq)
-    if (!_.isUndefined(result.error)) {
-      return new Response('Unauthorized', { status: 401 })
-    }
+    // NB: decoding a signed JWT payload does not validate the JWT
+    // Claims Set or values. This will be managed by authCheck, once
+    // implemented (probably by forwarding to auth service).
+    //
+    // NB: this throws if no token was provided, or if the supplied
+    // account URN isn't valid.
+    accountId = tokenUtil.getAccountId(token)
   } catch (e: unknown) {
-    return new Response('Internal Server Error', { status: 500 })
+    const message = e instanceof Error ? e.message : String(e)
+    return new Response(message, { status: 401 })
   }
-  */
+
+  if (_.isUndefined(accountId)) {
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  // Store the extracted account ID on the context for use in the method
+  // handler.
+  context.set(KEY_ACCOUNT_ID, accountId)
 }
 
 // Methods
@@ -183,7 +185,6 @@ const authCheck: RpcAuthHandler = async (
  */
 const kb_appCreate = openrpc.method(schema, {
   name: 'kb_appCreate',
-  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -197,18 +198,12 @@ const kb_appCreate = openrpc.method(schema, {
       const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better type for JWT?
       const token: string = context.get(KEY_TOKEN)
-
-      // NB: decoding a signed JWT payload does not validate the JWT
-      // Claims Set or values. This will be managed by authCheck, once
-      // implemented (probably by forwarding to auth service).
-      //
-      // NB: this throws if no token was provided, or if the supplied
-      // account URN isn't valid.
-      const accountURN = tokenUtil.getAccountId(token)
+      // This value is extracted by authCheck.
+      const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
       const clientName = _.get(request, ['params', 'clientName'])
       if (_.isUndefined(clientName)) {
-        throw new Error('missing OAuth application name')
+        return openrpc.error(request, ErrorMissingClientName)
       }
 
       // Create initial OAuth configuration for the application. There
@@ -245,7 +240,7 @@ const kb_appCreate = openrpc.method(schema, {
       const src = accountURN
       const dst = appURN
       const tag = graph.edge(EDGE_TAG)
-      const edgeRes = await edgeUtil.link(edges, src, dst, tag)
+      const edgeRes = await graph.link(edges, src, dst, tag)
 
       // Store an entry in the lookup KV that maps from application
       // client ID to internal application object ID.
@@ -268,7 +263,6 @@ const kb_appCreate = openrpc.method(schema, {
 
 const kb_appUpdate = openrpc.method(schema, {
   name: 'kb_appUpdate',
-  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -283,18 +277,21 @@ const kb_appUpdate = openrpc.method(schema, {
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
       // The JWT provided with the current request.
       const token = context.get(KEY_TOKEN)
-
-      // The user that owns the app is determined by the supplied token.
-      const accountURN = tokenUtil.getAccountId(token)
+      // This value is extracted by authCheck.
+      const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
       const clientId = _.get(request, ['params', 'clientId'])
       if (clientId === undefined) {
-        throw new Error(`missing clientId parameter`)
+        return openrpc.error(request, ErrorMissingClientId)
       }
 
       const appId = await lookup.get(clientId)
       if (appId === null) {
-        throw new Error(`missing app ID mapping for ${clientId}`)
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
 
       // TODO better typing, impl/jsonrpc utility?
@@ -303,7 +300,7 @@ const kb_appUpdate = openrpc.method(schema, {
       // NB: we should always have data here after JSON-RPC checking in place
       const profile = _.get(request, ['params', 'profile'])
       if (profile === null) {
-        throw new Error(`missing profile data`)
+        return openrpc.error(request, ErrorMissingProfile)
       }
 
       const app = await openrpc.discover(sbApplication, {
@@ -314,6 +311,7 @@ const kb_appUpdate = openrpc.method(schema, {
         // This tag is used when logging requests.
         tag: 'starbase-app',
       })
+      invariant(appId === app.$.id, 'object IDs must match')
 
       // Store application profile data in the app component.
       const appResult = await app.update({
@@ -334,7 +332,6 @@ const kb_appUpdate = openrpc.method(schema, {
 
 const kb_appDelete = openrpc.method(schema, {
   name: 'kb_appDelete',
-  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -348,11 +345,8 @@ const kb_appDelete = openrpc.method(schema, {
       const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better token type
       const token: string = context.get(KEY_TOKEN)
-
-      // NB: decoding a signed JWT payload does not validate the JWT
-      // Claims Set or values. This will be managed by authCheck, once
-      // implemented (probably by forwarding to auth service).
-      const accountURN = tokenUtil.getAccountId(token)
+      // This value is extracted by authCheck.
+      const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
       // TODO better typing
       // TODO once we conformance check the request against the schema, we
@@ -361,14 +355,18 @@ const kb_appDelete = openrpc.method(schema, {
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
-        throw new Error('missing clientId param')
+        return openrpc.error(request, ErrorMissingClientId)
       }
 
       // The mapping table stores the durable object ID for the
       // application core.
       const appId = await lookup.get(clientId)
       if (null === appId) {
-        throw new Error('missing appId mapping')
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
       // Create a platform URN that uniquely represents the just-created
       // application.
@@ -384,13 +382,14 @@ const kb_appDelete = openrpc.method(schema, {
         // This tag is used when logging requests.
         tag: 'starbase-app',
       })
+      invariant(appId === app.$.id, 'object IDs must match')
 
       // Make a call to the remote edges service to remove the link
       // between the owning account node and the application node.
       const src = accountURN
       const dst = appURN
       const tag = graph.edge(EDGE_TAG)
-      const edgeRes = await edgeUtil.unlink(edges, src, dst, tag)
+      const edgeRes = await graph.unlink(edges, src, dst, tag)
 
       // Remove the entry from the client ID => object ID lookup table.
       await lookup.delete(clientId)
@@ -419,20 +418,14 @@ const kb_appList = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
       const edges: Fetcher = context.get(KEY_EDGES)
-
-      // NB: decoding a signed JWT payload does not validate the JWT
-      // Claims Set or values. This will be managed by authCheck, once
-      // implemented (probably by forwarding to auth service).
-      const accountURN = tokenUtil.getAccountId(token)
+      // This value is extracted by authCheck.
+      const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
       const edgeTag = graph.edge(EDGE_TAG)
 
-      const edgeList = await edgeUtil.edges(edges, accountURN, edgeTag)
+      const edgeList = await graph.edges(edges, accountURN, edgeTag)
 
-      return openrpc.response(request, {
-        invoked: 'kb_appList',
-        result: edgeList,
-      })
+      return openrpc.response(request, edgeList)
     }
   ),
 })
@@ -457,18 +450,23 @@ const kb_appAuthCheck = openrpc.method(schema, {
 
       const clientId = _.get(request, ['params', 'clientId'])
       if (clientId == undefined || clientId === null || clientId === '') {
-        throw new Error(`client ID was not supplied`)
+        return openrpc.error(request, ErrorMissingClientId)
       }
 
       const appId = await lookup.get(clientId)
       if (appId === null) {
-        throw new Error(`missing app ID mapping for ${clientId}`)
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
 
       const app = await openrpc.discover(sbApplication, {
         id: appId,
         tag: 'starbase-app',
       })
+      invariant(appId === app.$.id, 'object IDs must match')
 
       // The stored application data.
       const stored = await app.fetch()
@@ -634,13 +632,17 @@ const kb_appRotateSecret = openrpc.method(schema, {
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
-        throw new Error('missing clientId param')
+        return openrpc.error(request, ErrorMissingClientId)
       }
       // The mapping table stores the durable object ID for the
       // application core.
       const appId = await lookup.get(clientId)
       if (null === appId) {
-        throw new Error('missing appId mapping')
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
       // Create a platform URN that uniquely represents the just-created
       // application.
@@ -661,6 +663,7 @@ const kb_appRotateSecret = openrpc.method(schema, {
         // Use this string when logging DO requests.
         tag: 'starbase-app',
       })
+      invariant(appId === app.$.id, 'object IDs must match')
 
       // Store the new secret for the application. This is
       // *destructive*.
@@ -697,19 +700,27 @@ const kb_appPublish = openrpc.method(schema, {
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
-        throw new Error('missing clientId param')
+        return openrpc.error(request, ErrorMissingClientId)
       }
       // The mapping table stores the durable object ID for the
       // application core.
       const appId = await lookup.get(clientId)
       if (null === appId) {
-        throw new Error('missing appId mapping')
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
 
       // This is the requested publication state of the application.
       const published = _.get(request, ['params', 'published'])
       if (typeof published !== 'boolean') {
-        throw new Error(`invalid "published" value: ${published}`)
+        const detail = Object.assign(
+          { data: { published } },
+          ErrorInvalidPublishFlag
+        )
+        return openrpc.error(request, detail)
       }
 
       const app = await openrpc.discover(sbApplication, {
@@ -768,16 +779,21 @@ const kb_appProfile = openrpc.method(schema, {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
-      const [clientId] = request.params as ParamsArray
-      // const clientId = _.get(request, ['params', 'clientId'])
+      // This throws with a TypeError at runtime.
+      // const [clientId] = request.params as ParamsArray
+      const clientId = _.get(request, ['params', 'clientId'])
       if (!clientId) {
-        throw new Error(`missing client ID`)
+        return openrpc.error(request, ErrorMissingClientId)
       }
 
       // Map the client ID into an application ID.
       const appId = await lookup.get(clientId)
       if (appId === null) {
-        throw new Error(`missing app ID`)
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
       }
 
       const app = await openrpc.discover(sbApplication, {
