@@ -1,6 +1,6 @@
 # Table of contents
 
-## 3ID
+## Three ID
 
 * [Quickstart](3id/quickstart/index.md)
 * [Overview](3id/overview/index.md)
