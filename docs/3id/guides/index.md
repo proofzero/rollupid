@@ -2,4 +2,4 @@
 description: Implementation guides for 3ID services.
 ---
 
-* [3ID Passport](./3id-passport.md)
+* [Setting up your first app](./app-setup.md)
