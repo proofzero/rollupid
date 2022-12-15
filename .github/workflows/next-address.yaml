@@ -49,4 +49,4 @@ jobs:
           secrets: |
             TOKEN_NFTAR
         env:
-          TOKEN_NFTAR: ${{ secrets.INTERNAL_NFTAR_TEST }}
+          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_TEST }}
