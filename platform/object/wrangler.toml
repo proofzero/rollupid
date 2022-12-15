@@ -4,13 +4,10 @@ compatibility_date = "2022-10-26"
 node_compat = true
 
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
-]
-services = [
-  { binding = "Address", service = "address" }
+  { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
 ]
 
 [dev]
@@ -19,37 +16,28 @@ local_protocol = "http"
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
-]
-services = [
-  { binding = "Address", service = "address-dev" }
+  { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
 ]
 
 [env.next]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
-]
-services = [
-  { binding = "Address", service = "address-next" }
+  { binding = "Bucket", bucket_name = "threeid-next", preview_bucket_name = "threeid-next" },
 ]
 
 [env.current]
 durable_objects.bindings = [
-  { name = "Core", class_name = "Core" }
+  { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
-  { binding = "Objects", bucket_name = "oort-objects", preview_bucket_name = "oort-objects" },
-]
-services = [
-  { binding = "Address", service = "address-current" }
+  { binding = "Bucket", bucket_name = "threeid-current", preview_bucket_name = "threeid-current" },
 ]
 
 [[migrations]]
 tag = "v0"
-new_classes = ["Core"]
+new_classes = ["Meta"]

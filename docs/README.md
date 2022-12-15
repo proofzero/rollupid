@@ -66,3 +66,9 @@ settings. [See the GitBook Custom Domains docs](https://docs.gitbook.com/advance
 
 Because of these overrides and the above configuration, currently 3ID is the
 default space and all docs are redirected to `https://docs.threeid.xyz`.
+
+### Workflow
+
+`main` is rendered to the `3ID Next` space, which is not published publically. This lets you preview documentation changes through Github Actions on your PRs that land to `main`.
+
+Merging/rebasing/forcing `main` into `docs/main` will publish live to `https://docs.threeid.xyz`.

@@ -1,6 +1,7 @@
 import type { RpcContext } from '@kubelt/openrpc'
+import ENSUtils from '@kubelt/platform-clients/ens-utils'
 
-import { CryptoAddressType, EthereumAddressDescription } from '../../types'
+import { CryptoAddressType } from '../../types'
 
 export default async (request: Readonly<Request>, context: RpcContext) => {
   if (
@@ -10,12 +11,8 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
     return
   }
 
-  const response = await fetch(
-    `${context.get('ENS_RESOLVER_URL')}/${context.get('name')}`
-  )
+  const ensClient = new ENSUtils()
+  const response = await ensClient.getEnsEntry(context.get('name'))
 
-  context.set(
-    'address_description',
-    await response.json<EthereumAddressDescription>()
-  )
+  context.set('address_description', response)
 }

@@ -291,6 +291,7 @@ export default function AccountSettingsProfile() {
                   onClick={() => {
                     setPfpUrl(generatedPfp)
                     setIsToken(generatedPfpMinted)
+                    setFormChanged(true)
                   }}
                 />
               </div>

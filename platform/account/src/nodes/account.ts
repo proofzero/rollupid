@@ -14,7 +14,7 @@ import {
   scopes,
 } from '@kubelt/openrpc/component'
 
-import { core as schema } from './schema'
+import schema from '../schemas/account'
 
 @component(schema)
 @scopes(['owner'])
@@ -26,11 +26,7 @@ import { core as schema } from './schema'
 export default class Core {
   @method('getProfile')
   @requiredField('profile', [FieldAccess.Read])
-  async getProfile(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
+  async getProfile(params: RpcParams, input: RpcInput): Promise<RpcResult> {
     return input.get('profile')
   }
 

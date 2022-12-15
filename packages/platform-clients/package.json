@@ -22,6 +22,7 @@
   "devDependencies": {
     "@kubelt/platform.access": "workspace:*",
     "@kubelt/platform.address": "workspace:*",
+    "@kubelt/platform.object": "workspace:*",
     "@kubelt/platform.starbase": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.45.0",

@@ -47,7 +47,3 @@ query getProfileFromAddress($addressURN: URN!) {
 mutation updateProfile($profile: ThreeIDProfileInput) {
   updateThreeIDProfile(profile: $profile)
 }
-
-query getImageUploadUrl {
-  imageUploadUrl
-}

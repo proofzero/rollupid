@@ -1,4 +1,4 @@
-// @kubelt/graph:impl/remove.ts
+// @kubelt/platform.edges:src/db/impl/remove.ts
 
 /**
  * Utilities for removing data from the database.
@@ -7,8 +7,6 @@
 import type { AnyURN } from '@kubelt/urns'
 
 import type {
-  Edge,
-  EdgeId,
   EdgeTag,
   Graph,
 } from '../types'
@@ -35,8 +33,17 @@ export async function edge(
       const { changes } = result
       resolve(changes)
     })
-    .catch((e: any) => {
-      reject(e.cause.message)
+    .catch((e: unknown) => {
+      // NB: using instanceof to narrow the type of e doesn't appear to
+      // work.
+      /*
+      if (e instanceof Error) {
+        reject(e.cause.message)
+      } else {
+        reject(String(e))
+      }
+      */
+      reject(e)
     })
   })
 }

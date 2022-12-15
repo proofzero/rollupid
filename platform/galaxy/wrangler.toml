@@ -8,7 +8,6 @@ wrangler_dev = true
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Icons", service = "icons" },
 ]
 
 [dev]
@@ -24,7 +23,6 @@ route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = 
 services = [
   { binding = "Account", service = "account-dev" },
   { binding = "Address", service = "address-dev" },
-  { binding = "Icons", service = "icons-dev" },
 ]
 
 [env.dev.vars]
@@ -36,7 +34,6 @@ route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name =
 services = [
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
-  { binding = "Icons", service = "icons-next" },
 ]
 
 [env.next.vars]
@@ -48,11 +45,10 @@ route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "thr
 services = [
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
-  { binding = "Icons", service = "icons-current" },
 ]
 
 [env.current.vars]
 ALCHEMY_ETH_NETWORK="mainnet"
-ALCHEMY_POLYGON_NETWORK="mumbai"
+ALCHEMY_POLYGON_NETWORK="mainnet"
 
 

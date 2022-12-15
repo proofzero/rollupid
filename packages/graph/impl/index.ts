@@ -6,26 +6,17 @@
 
 import * as _ from 'lodash'
 
-import * as insert from './insert'
-import * as remove from './remove'
-import * as select from './select'
-
 import { EdgeSpace } from '../space'
 
-import type { Edge, EdgeId, EdgeTag, Graph, Token } from '../types'
+import type { RpcResponse, RpcErrorDetail } from '@kubelt/openrpc'
+
+import type { Edge, EdgeId, EdgeTag, Token } from '../types'
 
 import type { AnyURN } from '@kubelt/urns'
 
 import { createAnyURNSpace } from '@kubelt/urns'
 
-// init()
-// -----------------------------------------------------------------------------
-
-export function init(db: D1Database): Graph {
-  return {
-    db,
-  }
-}
+import * as rpc from './rpc'
 
 // node
 // -----------------------------------------------------------------------------
@@ -43,62 +34,102 @@ export function edge(tag: string): EdgeTag {
 
 // link()
 // -----------------------------------------------------------------------------
-// TODO migrate to typeorm once d1 driver finished
 // TODO support permissions / scopes
 
 export async function link(
-  g: Graph,
+  edges: Fetcher,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeId> {
-  const srcNode = await insert.node(g, src)
-  // TODO check for error
+): Promise<Edge|RpcErrorDetail> {
+  const kb_makeEdge = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'kb_makeEdge',
+    params: {
+      src,
+      dst,
+      tag,
+    },
+  }
+  const response: RpcResponse = await rpc.request(edges, kb_makeEdge)
 
-  const dstNode = await insert.node(g, dst)
-  // TODO check for error
-
-  // Return existing edge ID (if found) or new edge ID (if created).
-  return insert.edge(g, src, dst, tag)
+  if (Object.hasOwn(response, 'result')) {
+    const result = _.get(response, 'result') as unknown
+    return result as Edge
+  } else {
+    const error = response as unknown
+    return error as RpcErrorDetail
+  }
 }
 
 // unlink()
 // -----------------------------------------------------------------------------
 
 export async function unlink(
-  g: Graph,
+  edges: Fetcher,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
-  return remove.edge(g, src, dst, tag)
-}
+): Promise<number|RpcErrorDetail> {
+  const kb_rmEdge = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'kb_rmEdge',
+    params: {
+      src,
+      dst,
+      tag,
+    },
+  }
+  const response: RpcResponse = await rpc.request(edges, kb_rmEdge)
 
-// traversable()
-// -----------------------------------------------------------------------------
-
-export function traversable(g: Graph, id: EdgeId, token: Token): boolean {
-  // TODO
-  return false
+  if (Object.hasOwn(response, 'result')) {
+    const result = _.get(response, 'result') as unknown
+    return result as number
+  } else {
+    const error = response as unknown
+    return error as RpcErrorDetail
+  }
 }
 
 // edges()
 // -----------------------------------------------------------------------------
 
-export async function edges(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.edges(g, nodeId)
+export async function edges(
+  edges: Fetcher,
+  id: AnyURN,
+  tag: EdgeTag,
+): Promise<Edge[]|RpcErrorDetail> {
+  const kb_getEdges = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'kb_getEdges',
+    params: {
+      id,
+    },
+  }
+  const response: RpcResponse = await rpc.request(edges, kb_getEdges)
+
+  if (Object.hasOwn(response, 'edges')) {
+    const edgeList = (_.get(response, 'edges') as unknown) as Edge[]
+    // Filter on edge type.
+    // TODO move into edges service! It should accept additional parameters:
+    // - direction
+    // - tag
+    return _.filter(edgeList, (edge) => {
+      return _.get(edge, 'srcUrn') === id && _.get(edge, 'tag') === tag
+    })
+  } else {
+    const error = response as unknown
+    return error as RpcErrorDetail
+  }
 }
 
-// incoming()
+// traversable()
 // -----------------------------------------------------------------------------
 
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.incoming(g, nodeId)
-}
-
-// outgoing()
-// -----------------------------------------------------------------------------
-
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.outgoing(g, nodeId)
+export async function traversable(edges: Fetcher, id: EdgeId, token: Token): Promise<boolean|RpcErrorDetail> {
+  // TODO
+  throw new Error('not yet implemented')
 }

@@ -4,27 +4,19 @@
  * Platform graph definitions and utilities.
  */
 
-import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
+import { EdgeSpace } from '@kubelt/urns/edge'
 
 import * as impl from './impl/index'
 
-import { EdgeSpace } from './space'
-
+// FIXME
 import { EdgeDirection } from './types'
-
-// Definitions
-// -----------------------------------------------------------------------------
-
-//const NS_DO = 'durable-object'
-
-// The URN namespace identifier for node IDs.
-//const NS_NODE = 'node'
-
-// The URN namespace identifier for
-//const NS_EDGE = 'edge'
 
 // Imported Types
 // -----------------------------------------------------------------------------
+
+import type { RpcErrorDetail } from '@kubelt/openrpc'
+
+import type { AnyURN } from '@kubelt/urns'
 
 import type { Edge, EdgeId, EdgeTag, Graph, Token } from './types'
 
@@ -37,16 +29,6 @@ export type { Edge, EdgeTag, Graph }
 // -----------------------------------------------------------------------------
 
 export { EdgeDirection, EdgeSpace }
-
-// init()
-// -----------------------------------------------------------------------------
-
-/**
- * Create a handle for the graph database.
- */
-export function init(db: D1Database): Graph {
-  return impl.init(db)
-}
 
 // node()
 // -----------------------------------------------------------------------------
@@ -75,36 +57,11 @@ export function edge(tag: string): EdgeTag {
  * Return the set of edges that either originate or terminate at a node.
  */
 export async function edges(
-  g: Graph,
-  nodeId: AnyURN,
-): Promise<Edge[]> {
-  return impl.edges(g, nodeId)
-}
-
-// incoming()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that terminate at a node.
- */
-export async function incoming(
-  g: Graph,
-  nodeId: AnyURN,
-): Promise<Edge[]> {
-  return impl.incoming(g, nodeId)
-}
-
-// outgoing()
-// -----------------------------------------------------------------------------
-
-/**
- * Return the set of edges that originate at a node.
- */
-export async function outgoing(
-  g: Graph,
-  nodeId: AnyURN,
-): Promise<Edge[]> {
-  return impl.outgoing(g, nodeId)
+  edges: Fetcher,
+  id: AnyURN,
+  tag: EdgeTag
+): Promise<Edge[] | RpcErrorDetail> {
+  return impl.edges(edges, id, tag)
 }
 
 // link()
@@ -113,7 +70,7 @@ export async function outgoing(
 /**
  * Create a link between two nodes.
  *
- * @param g - the graph handle returned from init()
+ * @param edges - the edges service binding
  * @param src - the ID of the source node
  * @param dst - the ID of the destination node
  * @param tag - a tag representing the edge type
@@ -121,12 +78,12 @@ export async function outgoing(
  * @returns the ID of the created edge, or -1 on error
  */
 export async function link(
-  g: Graph,
+  edges: Fetcher,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeId> {
-  return impl.link(g, src, dst, tag)
+): Promise<Edge | RpcErrorDetail> {
+  return impl.link(edges, src, dst, tag)
 }
 
 // unlink()
@@ -135,15 +92,19 @@ export async function link(
 /**
  * Remove the link between two nodes.
  *
+ * @param edges - the edges service binding
+ * @param src - the ID of the source node
+ * @param dst - the ID of the destination node
+ * @param tag - a tag representing the edge type
  * @returns the number of edges removed.
  */
 export async function unlink(
-  g: Graph,
+  edges: Fetcher,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
-  return impl.unlink(g, src, dst, tag)
+): Promise<number | RpcErrorDetail> {
+  return impl.unlink(edges, src, dst, tag)
 }
 
 // traversable()
@@ -151,7 +112,16 @@ export async function unlink(
 
 /**
  * Check if a token grants permission to traverse an edge.
+ *
+ * @param edges - the edges service binding
+ * @param id - an edge identifier
+ * @param token - a JWT providing authorization claims
+ * @returns a flag indicating whether claims are sufficient to traverse the edge
  */
-export function traversable(graph: Graph, id: EdgeId, token: Token): boolean {
-  return impl.traversable(graph, id, token)
+export function traversable(
+  edges: Fetcher,
+  id: EdgeId,
+  token: Token
+): Promise<boolean | RpcErrorDetail> {
+  return impl.traversable(edges, id, token)
 }

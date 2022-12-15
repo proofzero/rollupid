@@ -10,10 +10,10 @@ durable_objects.bindings = [
 
 services = [
   { binding = "Access", service = "access" },
+  { binding = "Edges", service = "edges" }
 ]
 
 [vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -41,10 +41,10 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-dev" },
+  { binding = "Edges", service = "edges-dev" }
 ]
 
 [env.dev.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -55,10 +55,10 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-next" },
+  { binding = "Edges", service = "edges-next" }
 ]
 
 [env.next.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
@@ -69,10 +69,10 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-current" },
+  { binding = "Edges", service = "edges-current" }
 ]
 
 [env.current.vars]
-ENS_RESOLVER_URL = "https://api.ensideas.com/ens/resolve/"
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
