@@ -11,7 +11,6 @@ import folderPlus from '~/images/folderPlus.svg'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
 
 //import { useUser } from "~/utils";
@@ -34,9 +33,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const starbaseClient = getStarbaseClient(jwt)
 
   try {
-    const apps = await starbaseClient.kb_appList()
-    console.log({ apps })
-    return json<LoaderData>({ apps })
+    const apps = await starbaseClient.kb_appList() // TODO: update result type
+    console.log({ appsRes: apps.result })
+    return json<LoaderData>({ apps: apps.result })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -46,15 +45,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 // Component
 // -----------------------------------------------------------------------------
 
-export type ContextType = {
-  // The list of a user's applications.
-  apps: Array<Application>
-  // ID of the currently selected application.
-  appId: string
-}
-
 export default function DashboardIndexPage() {
-  const { apps, appId } = useLoaderData<ContextType>()
+  const { apps, appId } = useLoaderData()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   return (
