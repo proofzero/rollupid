@@ -20,5 +20,9 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
   if (!address || !type) {
     await nodeClient.setAddress({ address: context.get('name') })
     await nodeClient.setType({ type: context.get('addr_type') })
+
+    // let's tell the node to register a webhook for this address
+
+    // and let's set a short alarm to bootstrap itself
   }
 }
