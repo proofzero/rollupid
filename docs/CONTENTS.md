@@ -7,7 +7,7 @@
 * [Implementation Guides](3id/guides/index.md)
   * [3ID Auth](3id/guides/3id-auth.md)
   * [3ID Public Profiles](3id/guides/3id-public-profiles.md)
-* [References](3id/references/index.md)
+* [Technical Reference](3id/reference/index.md)
 * [FAQ](3id/faq/index.md)
 
 <!--
