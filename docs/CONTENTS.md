@@ -4,8 +4,8 @@
 
 * [Quickstart](3id/quickstart/index.md)
 * [Overview](3id/overview/index.md)
-* [Implementation Guides](3id/guides/index.md)
-  * [3ID Passport](3id/guides/3id-passport.md)
+* [Guides](3id/guides/index.md)
+  * [Setting up your first app](3id/guides/app-setup.md)
 * [Technical References](3id/reference/index.md)
   * [Profile Reference Guide](3id/reference/profile.md)
   * [Passport Reference Guide](3id/reference/passport.md)

@@ -69,6 +69,6 @@ default space and all docs are redirected to `https://docs.threeid.xyz`.
 
 ### Workflow
 
-`main` is rendered to the `3ID Next` space, which is not published publically. This lets you preview documentation changes through Github Actions on your PRs that land to `main`.
+`main` is rendered to the `3ID Next` space. This lets you preview documentation changes through Github Actions on your PRs that land to `main`. It might also be shared with our partners through private `https://docs-next.threeid.xyz` links.
 
-Merging/rebasing/forcing `main` into `docs/main` will publish live to `https://docs.threeid.xyz`.
+Merging a PR from `main` to `docs/main` will publish live to `https://docs.threeid.xyz`.

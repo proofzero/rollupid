@@ -1,5 +1,5 @@
 root: ./docs/
 
 structure:
-  readme: 3id/quickstart/index.md
+  readme: 3id/overview/index.md
   summary: CONTENTS.md
