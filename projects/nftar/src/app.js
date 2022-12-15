@@ -477,8 +477,8 @@ router.post('/api/v0/og-image', async (ctx, next) => {
 
         // Images that are remote need to be converted to Data URIs so that we can
         // render the SVG without triggering a cross-origin security violation.
-        const hexURI = await encodeDataURI(hexURL.href)
-        const bkgURI = await encodeDataURI(bkgURL.href)
+        const hexURI = await encodeDataURI(ctx, hexURL.href)
+        const bkgURI = await encodeDataURI(ctx, bkgURL.href)
 
         // Constants for populating the SVG (optional).
         const OG_WIDTH = 1200;
