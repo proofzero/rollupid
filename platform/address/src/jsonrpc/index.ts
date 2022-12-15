@@ -94,5 +94,12 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)
   context.set('NFTAR_URL', env.NFTAR_URL)
+  context.set('APIKEY_ALCHEMY_ETH', env.APIKEY_ALCHEMY_ETH)
+  context.set('ALCHEMY_ETH_NETWORK', env.ALCHEMY_ETH_NETWORK)
+  context.set('APIKEY_ALCHEMY_POLYGON', env.APIKEY_ALCHEMY_POLYGON)
+  context.set('ALCHEMY_POLYGON_NETWORK', env.ALCHEMY_POLYGON_NETWORK)
+  context.set('TOKEN_ALCHEMY_NOTIFY', env.TOKEN_ALCHEMY_NOTIFY)
+  context.set('URL_ALCHEMY_WEBHOOK', env.URL_ALCHEMY_WEBHOOK)
+
   return rpcHandler(request, context)
 }

@@ -8,6 +8,16 @@ export interface Environment {
   NFTAR_CHAIN_ID: string
   TOKEN_NFTAR: string
   NFTAR_URL: string
+
+  APIKEY_ALCHEMY_ETH: string
+  ALCHEMY_ETH_NETWORK: string
+
+  APIKEY_ALCHEMY_POLYGON: string
+  ALCHEMY_POLYGON_NETWORK: string
+
+  TOKEN_ALCHEMY_NOTIFY: string
+
+  URL_ALCHEMY_WEBHOOK: string
 }
 
 export enum NodeType {

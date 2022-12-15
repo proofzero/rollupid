@@ -29,6 +29,37 @@ export type GetOwnersForTokenResult = {
   owners: string[]
 }
 
+export enum WebhookType {
+  MINED_TRANSACTION = 'MINED_TRANSACTION',
+  DROPPED_TRANSACTION = 'DROPPED_TRANSACTION',
+  ADDRESS_ACTIVIY = 'ADDRESS_ACTIVIY',
+  NFT_ACTIVIY = 'NFT_ACTIVIY',
+  NFT_METADATA_UPDATE = 'NFT_METADATA_UPDATE',
+}
+export type CreateWebhookParams = {
+  network: string
+  webhookType: WebhookType
+  webhookUrl: string
+  app_id?: string
+  addresses?: string[]
+  nft_filters?: { contract_address: string; token_id: string }[]
+  nft_metadata_filters?: { contract_address: string; token_id: string }[]
+}
+
+export type CreateWebhookResult = {
+  data: {
+    id: string
+    network: AlchemyNetwork
+    webhook_type: WebhookType
+    webhook_url: string
+    is_active: boolean
+    time_created: number
+    addresses: string[]
+    version: string
+    signing_key: string
+  }
+}
+
 enum AlchemyNetwork {
   mainnet = 'mainnet',
   goerli = 'goerli',
@@ -42,9 +73,10 @@ export enum AlchemyChain {
 
 export type AlchemyClientConfig = {
   key: string
-  chain: AlchemyChain
   network: AlchemyNetwork
+  chain?: AlchemyChain
   url?: string
+  token?: string
 }
 
 export class AlchemyClient {
@@ -71,7 +103,7 @@ export class AlchemyClient {
   }
 
   constructor(config: AlchemyClientConfig) {
-    if (!config || !config.key || !config.chain || !config.network) {
+    if (!config || (!config.key && !config.token) || !config.network) {
       throw buildError(
         500,
         `Missing or malformed Alchemy config: ${JSON.stringify(config)}`
@@ -191,6 +223,26 @@ export class AlchemyClient {
           `Error calling Alchemy getOwnersForToken: ${e.message}`
         )
       })
+  }
+
+  async createWebhook(
+    params: CreateWebhookParams
+  ): Promise<CreateWebhookResult> {
+    const response = await fetch(
+      'https://dashboard.alchemy.com/api/create-webhook',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'X-Alchemy-Token': this.#config.token as string,
+        },
+        body: JSON.stringify(params),
+      }
+    )
+
+    const body: CreateWebhookResult = await response.json()
+    return body
   }
 }
 

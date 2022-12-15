@@ -172,6 +172,32 @@ export const schema: RpcSchema = {
         schema: {},
       },
     },
+    {
+      name: 'getWebHook',
+      params: [
+        {
+          name: 'webhook_id',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        $ref: '#/components/contentDescriptors/Webhook',
+      },
+    },
+    {
+      name: 'setWebhook',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/Webhook',
+        },
+      ],
+      result: {
+        name: 'set webhook result',
+        schema: {},
+      },
+    },
   ],
   components: {
     contentDescriptors: {
@@ -221,6 +247,12 @@ export const schema: RpcSchema = {
         name: 'type',
         schema: {
           $ref: '#/components/schemas/Type',
+        },
+      },
+      Webhook: {
+        name: 'webhook',
+        schema: {
+          $ref: '#/components/schemas/Webhook',
         },
       },
     },
@@ -301,6 +333,17 @@ export const schema: RpcSchema = {
       },
       Type: {
         type: 'string',
+      },
+      Webhook: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+          },
+          signingKey: {
+            type: 'string',
+          },
+        },
       },
     },
   },

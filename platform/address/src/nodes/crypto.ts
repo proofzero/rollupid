@@ -59,6 +59,11 @@ import { recoverEthereumAddress } from '../utils'
   doc: 'PFP Voucher',
   defaultValue: null,
 })
+@field({
+  name: 'webhook',
+  doc: 'Registered Webhooks',
+  defaultValue: {},
+})
 export default class CryptoAddress {
   @method('getAddress')
   @requiredField('address', [FieldAccess.Read])
