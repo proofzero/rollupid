@@ -5,9 +5,12 @@
 * [Quickstart](3id/quickstart/index.md)
 * [Overview](3id/overview/index.md)
 * [Implementation Guides](3id/guides/index.md)
-  * [3ID Passport](3id/guides/3id-passport.md)
   * [3ID Profile](3id/guides/3id-profile.md)
+  * [3ID Passport](3id/guides/3id-passport.md)
 * [Technical Reference](3id/reference/index.md)
+  * [3ID Profile](3id/reference/profile.md)
+  * [3ID Passport](3id/reference/passport.md)
+  * [Console](3id/reference/console.md)
 * [FAQ](3id/faq/index.md)
 
 <!--
