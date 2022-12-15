@@ -50,36 +50,48 @@ const ModaledNft = ({ nft, isModal }: any) => {
                   : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
               }
               onError={(e) => setLoadFail(true)}
+              alt="collection-item"
             />
           </div>
         </>
       ) : (
-        <Link to={`./collection/${nft.details[0].value}`}>
-          <div
-            className="rounded-lg
+        <div
+          className="rounded-lg
           shadow 
           text-sm 
           font-semibold
           hover:shadow-xl 
-          hover:text-base"
-          >
+          hover:text-base
+          flex
+          flex-col
+          align-center justify-center
+         "
+        >
+          <Link to={`./collection/${nft.details[0].value}`}>
             <img
-              className="w-full rounded-t-lg"
+              className="rounded-t-lg block 
+              mx-auto 
+              lg:min-h-[13rem] 
+              md:h-[14rem]
+              sm:h-[15rem]
+              align-center 
+              justify-center"
               src={
                 loadFail
                   ? missingNftSvg
                   : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
               }
               onError={(e) => setLoadFail(true)}
+              alt="collection-representation"
             />
-            <div className="flex flex-row justify-between items-center px-4 py-3">
-              <div className="text-gray-600">
+            <div className="flex flex-row whitespace-nowrap max-w-[13rem] justify-between items-center px-4 py-3">
+              <div className="text-gray-600 overflow-hidden">
                 {nft.collectionTitle ? nft.collectionTitle : 'Check collection'}
               </div>
               <HiArrowNarrowRight />
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       )}
     </>
   )
