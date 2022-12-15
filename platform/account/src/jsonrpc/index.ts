@@ -4,7 +4,7 @@ import schema from '../schemas/worker'
 import { Environment } from '../types'
 
 import getProfile from './methods/getProfile'
-import setProfile from './methods/getProfile'
+import setProfile from './methods/setProfile'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
