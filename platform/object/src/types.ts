@@ -1,9 +1,6 @@
-import { BaseApi } from '@kubelt/platform.commons/src/jsonrpc'
-
 export interface Environment {
-  Address: Fetcher
-  Core: DurableObjectNamespace
-  Objects: R2Bucket
+  Bucket: R2Bucket
+  Meta: DurableObjectNamespace
 }
 
 export interface IndexRecord {
@@ -13,36 +10,30 @@ export interface IndexRecord {
 
 export type ObjectValue = boolean | string | object | number | null | undefined
 
-export type VisibilityType = {
-  [key: string]: string
+export enum Visibility {
+  PRIVATE = 'private',
+  PUBLIC = 'public',
 }
 
-export type GetObjectOptions = Record<string, unknown>
+export type GetObjectParams = [namespace: string, path: string]
 
 export type GetObjectResult = {
   value: ObjectValue
   version: number
 }
 
-export type PutObjectOptions = {
-  visibility: string
-}
+export type PutObjectOptions = Partial<{
+  visibility: Visibility
+}>
+
+export type PutObjectParams = [
+  namespace: string,
+  path: string,
+  value: ObjectValue,
+  options?: PutObjectOptions
+]
 
 export type PutObjectResult = {
   size: number
   version: number
-}
-
-export interface Api extends BaseApi {
-  kb_getObject(
-    namespace: string,
-    path: string,
-    options: GetObjectOptions
-  ): Promise<GetObjectResult>
-  kb_putObject(
-    namespace: string,
-    path: string,
-    value: ObjectValue,
-    options: PutObjectOptions
-  ): Promise<PutObjectResult>
 }

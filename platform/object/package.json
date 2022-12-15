@@ -28,9 +28,7 @@
     "wrangler": "2.4.4"
   },
   "dependencies": {
-    "@kubelt/platform.commons": "workspace:*",
     "itty-router": "2.6.6",
-    "itty-router-extras": "0.4.2",
-    "typed-json-rpc": "1.1.0"
+    "itty-router-extras": "0.4.2"
   }
 }
