@@ -52,7 +52,9 @@ export default function AppDetailIndexPage() {
       <main className="flex flex-col flex-initial min-h-full w-full bg-gray-300">
         <SiteHeader />
 
-        <Outlet />
+        <section className="mx-11 my-9">
+          <Outlet />
+        </section>
       </main>
     </div>
   )

@@ -164,9 +164,10 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
 
     <Panel title="Danger Zone">
       <Text
+        type="span"
         weight="medium"
         size="sm"
-        className="text-red-500 cursor:pointer"
+        className="text-red-500 cursor-pointer"
         onClick={onDelete}
       >
         Delete the App

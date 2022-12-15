@@ -4,6 +4,7 @@
 
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { useLoaderData } from '@remix-run/react'
+import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import { getStarbaseClient } from '~/utilities/platform.server'
 import { requireJWT } from '~/utilities/session.server'
@@ -40,18 +41,14 @@ export default function AppDetailIndexPage() {
   const { app } = useLoaderData()
 
   return (
-    <ApplicationDashboard
-      galaxyGql={{
-        apiKey: 'Fubar',
-        createdAt: new Date(),
-        onKeyRoll: () => {},
-      }}
+    <ApplicationAuth
       oAuth={{
         appId: app.id,
         appSecret: 'SECRET',
         createdAt: new Date(),
         onKeyRoll: () => {},
       }}
+      onDelete={() => {}}
     />
   )
 }
