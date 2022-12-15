@@ -23,7 +23,7 @@ import schema from '../schemas/account'
   doc: 'Account profile object',
   defaultValue: null,
 })
-export default class Core {
+export default class Account {
   @method('getProfile')
   @requiredField('profile', [FieldAccess.Read])
   async getProfile(params: RpcParams, input: RpcInput): Promise<RpcResult> {
