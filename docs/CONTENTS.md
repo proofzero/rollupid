@@ -1,9 +1,9 @@
 # Table of contents
 
-## ThreeID
+## 3ID Documentation
 
-* [Quickstarts](3id/quickstart/index.md)
-* [Overviews](3id/overview/index.md)
+* [Quickstart](3id/quickstart/index.md)
+* [Overview](3id/overview/index.md)
 * [Implementation Guides](3id/guides/index.md)
   * [3ID Passport](3id/guides/3id-passport.md)
 * [Technical References](3id/reference/index.md)
