@@ -10,6 +10,14 @@ durable_objects.bindings = [
 services = [
 ]
 
+[[migrations]]
+tag = "v0"
+new_classes = ["Core"]
+
+[[migrations]]
+tag = "v1"
+renamed_classes = [{ from = "Core", to = "Account" }]
+
 [dev]
 port = 9494
 local_protocol = "http"
@@ -34,7 +42,3 @@ durable_objects.bindings = [
 ]
 services = [
 ]
-
-[[migrations]]
-tag = "v0"
-new_classes = ["Account"]
