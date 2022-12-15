@@ -34,7 +34,7 @@ const NftModal = ({
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
-        className={`flex-1 relative max-h-[35rem] max-w-[58rem] h-[86vh] w-[62vw]
+        className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
           transform rounded-lg  bg-white px-4 pt-5 pb-4 
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
       >
