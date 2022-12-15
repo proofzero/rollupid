@@ -8,9 +8,11 @@ import * as _ from 'lodash'
 
 import { EdgeSpace } from '../space'
 
+import { EdgeDirection } from '../types'
+
 import type { RpcResponse, RpcErrorDetail } from '@kubelt/openrpc'
 
-import type { Edge, EdgeId, EdgeTag, Token } from '../types'
+import type { Edge, EdgeTag, Token } from '../types'
 
 import type { AnyURN } from '@kubelt/urns'
 
@@ -99,7 +101,8 @@ export async function unlink(
 export async function edges(
   edges: Fetcher,
   id: AnyURN,
-  tag: EdgeTag,
+  tag?: EdgeTag,
+  dir?: EdgeDirection,
 ): Promise<Edge[]|RpcErrorDetail> {
   const kb_getEdges = {
     jsonrpc: '2.0',
@@ -107,29 +110,16 @@ export async function edges(
     method: 'kb_getEdges',
     params: {
       id,
+      tag,
+      dir,
     },
   }
   const response: RpcResponse = await rpc.request(edges, kb_getEdges)
 
   if (Object.hasOwn(response, 'edges')) {
-    const edgeList = (_.get(response, 'edges') as unknown) as Edge[]
-    // Filter on edge type.
-    // TODO move into edges service! It should accept additional parameters:
-    // - direction
-    // - tag
-    return _.filter(edgeList, (edge) => {
-      return _.get(edge, 'srcUrn') === id && _.get(edge, 'tag') === tag
-    })
+    return (_.get(response, 'edges') as unknown) as Edge[]
   } else {
     const error = response as unknown
     return error as RpcErrorDetail
   }
-}
-
-// traversable()
-// -----------------------------------------------------------------------------
-
-export async function traversable(edges: Fetcher, id: EdgeId, token: Token): Promise<boolean|RpcErrorDetail> {
-  // TODO
-  throw new Error('not yet implemented')
 }

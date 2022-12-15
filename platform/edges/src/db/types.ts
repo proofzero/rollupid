@@ -4,8 +4,9 @@
  * Edge-related types.
  */
 
+import type { EdgeTag } from '@kubelt/graph'
+
 import type { AnyURN } from '@kubelt/urns'
-import type { EdgeURN } from '@kubelt/urns/edge'
 
 // Types
 // -----------------------------------------------------------------------------
@@ -15,19 +16,12 @@ export type Token = string
 
 export type EdgeId = number
 
-export type EdgeTag = EdgeURN
-
-export enum EdgeDirection {
-  Incoming = 'incoming',
-  Outgoing = 'outgoing',
-}
-
 export interface Graph {
   // The binding for the D1 edges database.
   db: D1Database
 }
 
-export interface Node {
+export interface NodeRecord {
   // The full node URN
   urn: AnyURN
   // The URN namespace ID
@@ -38,7 +32,7 @@ export interface Node {
   fragment?: string
 }
 
-export interface Edge {
+export interface EdgeRecord {
   // The edge identifier
   id: number
   // The URN of the source node, where the edge originates.
@@ -48,3 +42,17 @@ export interface Edge {
   // The "type" of the edge.
   tag: EdgeTag
 }
+
+export interface QComponent {
+  key: string
+  value: string
+}
+
+export type QComponents = Record<string, string>
+
+export interface RComponent {
+  key: string
+  value: string
+}
+
+export type RComponents = Record<string, string>

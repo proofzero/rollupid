@@ -5,6 +5,6 @@
   "params": {
     "src": "urn:threeid:example/foo?+foo=bar#alpha",
     "dst": "urn:threeid:example/bar?=xxx=yyy#beta",
-    "tag": "links"
+    "tag": "urn:edge-tag:links"
   }
 }

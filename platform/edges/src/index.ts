@@ -11,6 +11,10 @@ import * as _ from 'lodash'
 
 import * as urns from 'urns'
 
+import type { EdgeTag } from '@kubelt/graph'
+
+import { EdgeDirection } from '@kubelt/graph'
+
 import * as openrpc from '@kubelt/openrpc'
 
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
@@ -19,9 +23,9 @@ import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
 import type { Graph } from './db/types'
 
-import { EdgeDirection } from './db/types'
-
 import * as db from './db'
+
+import { withErrorData } from './error'
 
 // Schema
 // -----------------------------------------------------------------------------
@@ -48,35 +52,17 @@ const noScope = openrpc.scopes([])
 // Error Codes
 // -----------------------------------------------------------------------------
 
-const ErrorMissingSourceNode = {
-  code: 1,
-  message: 'missing source node URN',
-}
-
-const ErrorInvalidSourceNode = {
-  code: 2,
-  message: 'invalid source node URN',
-}
-
-const ErrorMissingDestinationNode = {
-  code: 3,
-  message: 'missing destination node URN',
-}
-
-const ErrorInvalidDestinationNode = {
-  code: 4,
-  message: 'invalid destination node URN',
-}
-
-const ErrorMissingEdgeTag = {
-  code: 5,
-  message: 'missing edge tag',
-}
-
-const ErrorInvalidEdgeTag = {
-  code: 6,
-  message: 'invalid edge tag URN',
-}
+import {
+  ErrorInvalidDestinationNode,
+  ErrorInvalidEdgeDirection,
+  ErrorInvalidEdgeTag,
+  ErrorInvalidNodeId,
+  ErrorInvalidSourceNode,
+  ErrorMissingDestinationNode,
+  ErrorMissingEdgeTag,
+  ErrorMissingNodeId,
+  ErrorMissingSourceNode,
+} from './error'
 
 // Methods
 // -----------------------------------------------------------------------------
@@ -142,9 +128,9 @@ const kb_makeEdge = openrpc.method(schema, {
         return openrpc.error(request, ErrorInvalidEdgeTag)
       }
 
-      const edgeId = await db.link(g, srcURN, dstURN, edgeTag)
+      // TODO store permissions if supplied
 
-      // TODO permissions
+      const edgeId = await db.link(g, srcURN, dstURN, edgeTag)
 
       console.log(`created edge ${edgeId}: ${srcURN} =[${edgeTag}]=> ${dstURN}`)
 
@@ -176,43 +162,59 @@ const kb_getEdges = openrpc.method(schema, {
 
       const nodeId = _.get(request, ['params', 'id'])
       if (_.isUndefined(nodeId)) {
-        return openrpc.error(request, {
-          code: 1,
-          message: 'missing node URN',
-        })
+        return openrpc.error(request, ErrorMissingNodeId)
       }
       try {
         urns.parseURN(nodeId)
       } catch (e) {
-        return openrpc.error(request, {
-          code: 2,
-          message: 'invalid node URN',
-        })
+        return openrpc.error(
+          request,
+          withErrorData(ErrorInvalidNodeId, {
+            id: nodeId,
+          })
+        )
+      }
+
+      // Get edge tag. This may be undefined, but if present will be
+      // used to filter the set of edges that is returned to just those
+      // having this tag (an edge "type").
+      const edgeTag: EdgeTag = _.get(request, ['params', 'tag'])
+      if (!_.isUndefined(edgeTag)) {
+        try {
+          urns.parseURN(edgeTag)
+        } catch (e: unknown) {
+          return openrpc.error(
+            request,
+            withErrorData(ErrorInvalidEdgeTag, {
+              tag: edgeTag,
+            })
+          )
+        }
       }
 
       // Check for optional restriction to either 'incoming' or 'outgoing' edges.
-      const edgeDir: EdgeDirection = _.get(request, ['params', 'direction'])
-
-      let edges
-
-      if (edgeDir !== undefined) {
+      // This may be undefined.
+      const edgeDir: EdgeDirection = _.get(request, ['params', 'dir'])
+      if (!_.isUndefined(edgeDir)) {
         switch (edgeDir) {
           case EdgeDirection.Incoming:
-            edges = await db.incoming(g, nodeId)
-            console.log(edges)
-            break
           case EdgeDirection.Outgoing:
-            edges = await db.outgoing(g, nodeId)
-            console.log(edges)
+            // I sleep
             break
           default:
-            throw new Error(`invalid edge direction: ${edgeDir}`)
+            // I wake
+            return openrpc.error(
+              request,
+              withErrorData(ErrorInvalidEdgeDirection, {
+                dir: edgeDir,
+              })
+            )
         }
-      } else {
-        // Get the list of all edges impinging on a node (either incoming
-        // or outgoing).
-        edges = await db.edges(g, nodeId)
       }
+
+      // Get the list of all edges impinging on a node (either incoming
+      // or outgoing).
+      const edges = await db.edges(g, nodeId, edgeTag, edgeDir)
 
       return openrpc.response(request, {
         id: nodeId,

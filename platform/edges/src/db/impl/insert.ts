@@ -10,7 +10,9 @@ import * as urns from 'urns'
 
 import { AnyURN } from '@kubelt/urns'
 
-import type { EdgeId, EdgeTag, Graph, Node } from '../types'
+import type { Edge, EdgeTag, Node } from '@kubelt/graph'
+
+import type { EdgeId, EdgeRecord, Graph, NodeRecord } from '../types'
 
 // node()
 // -----------------------------------------------------------------------------
@@ -20,7 +22,7 @@ import type { EdgeId, EdgeTag, Graph, Node } from '../types'
  *
  * @returns the inserted node
  */
-export async function node(g: Graph, urn: AnyURN): Promise<Node> {
+export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   const parsedURN = urns.parseURN(urn)
 
   // Collect all the INSERT statements for q- and r-component records
@@ -148,7 +150,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<Node> {
   .bind(urn)
   .first() as unknown
 
-  return node as Node
+  return node as NodeRecord
 }
 
 // edge()
@@ -162,16 +164,27 @@ export async function edge(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeId> {
+): Promise<EdgeRecord> {
   return new Promise((resolve, reject) => {
     const srcParam = src.toString()
     const dstParam = dst.toString()
     const tagParam = tag.toString()
 
-    g.db
-      .prepare(
-        'INSERT INTO edge (srcUrn, dstUrn, tag) VALUES (?1, ?2, ?3) ON CONFLICT DO NOTHING'
+    const insertEdge = `
+      INSERT INTO edge (
+        srcUrn,
+        dstUrn,
+        tag
       )
+      VALUES (
+        ?1,
+        ?2,
+        ?3
+      )
+      ON CONFLICT DO NOTHING
+    `
+    g.db
+      .prepare(insertEdge)
       .bind(srcParam, dstParam, tagParam)
       .run()
       .then(async (result) => {
@@ -187,7 +200,7 @@ export async function edge(
         .bind(srcParam, dstParam, tagParam)
         .first()
 
-        resolve(_.get(edge, 'id', -1))
+        resolve(edge as EdgeRecord)
       })
       .catch((e: Error) => {
         reject(e)

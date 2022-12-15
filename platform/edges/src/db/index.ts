@@ -1,42 +1,31 @@
-// @kubelt/graph:packages/graph/index.ts
+// @kubelt/platform.edges:src/db/index.ts
 
 /**
- * Platform graph definitions and utilities.
+ * Platform edges database interface.
  */
 
-import type { AnyURN } from '@kubelt/urns'
-
-import { EdgeSpace } from '@kubelt/urns/edge'
-
-import { EdgeDirection } from './types'
+import { EdgeDirection } from '@kubelt/graph'
 
 import * as impl from './impl/index'
-
-// Definitions
-// -----------------------------------------------------------------------------
-
-//const NS_DO = 'durable-object'
-
-// The URN namespace identifier for node IDs.
-//const NS_NODE = 'node'
-
-// The URN namespace identifier for
-//const NS_EDGE = 'edge'
 
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import type { Edge, EdgeId, EdgeTag, Graph, Token } from './types'
+import type { AnyURN } from '@kubelt/urns'
+
+import type { Edge, EdgeTag, Node } from '@kubelt/graph'
+
+import type { EdgeRecord, EdgeId, Graph, NodeRecord, Token } from './types'
 
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type { Edge, EdgeTag, Graph }
+export type { EdgeTag, Graph }
 
 // Exports
 // -----------------------------------------------------------------------------
 
-export { EdgeDirection, EdgeSpace }
+export { EdgeDirection }
 
 // init()
 // -----------------------------------------------------------------------------
@@ -48,6 +37,19 @@ export function init(db: D1Database): Graph {
   return impl.init(db)
 }
 
+// node()
+// -----------------------------------------------------------------------------
+
+/**
+ * Lookup a single node in the database and return it as an object.
+ */
+export async function node(
+  g: Graph,
+  nodeId: AnyURN|undefined
+): Promise<Node|undefined> {
+  return impl.node(g, nodeId)
+}
+
 // edges()
 // -----------------------------------------------------------------------------
 
@@ -56,9 +58,11 @@ export function init(db: D1Database): Graph {
  */
 export async function edges(
   g: Graph,
-  nodeId: AnyURN,
+  id: AnyURN,
+  tag?: EdgeTag,
+  dir?: EdgeDirection,
 ): Promise<Edge[]> {
-  return impl.edges(g, nodeId)
+  return impl.edges(g, id, tag, dir)
 }
 
 // incoming()
@@ -105,7 +109,7 @@ export async function link(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeId> {
+): Promise<EdgeRecord> {
   return impl.link(g, src, dst, tag)
 }
 
@@ -124,14 +128,4 @@ export async function unlink(
   tag: EdgeTag
 ): Promise<number> {
   return impl.unlink(g, src, dst, tag)
-}
-
-// traversable()
-// -----------------------------------------------------------------------------
-
-/**
- * Check if a token grants permission to traverse an edge.
- */
-export function traversable(graph: Graph, id: EdgeId, token: Token): boolean {
-  return impl.traversable(graph, id, token)
 }
