@@ -4,7 +4,7 @@
 
 When you create a PR intended to land to `main` it will render the documentation in `/docs`. This allows you and PR reviewers to check that your code changes are properly captured in the documentation portal.
 
-Documentation landed to `main` will not immediately be visible to the public, but might be shared with our partners. Merging documentation in `main` to `docs/main` will publish documentation to the open web.
+Documentation landed to `main` will not immediately be visible to the public, but might be shared with our partners through private `https://docs-next.threeid.xyz` links. Merging documentation in `main` to `docs/main` will publish documentation to `https://docs.threeid.xyz`.
 
 ## Environment variables and secrets naming conventions
 
