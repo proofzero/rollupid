@@ -2,6 +2,7 @@ export interface Environment {
   Access: Fetcher
   Edges: Fetcher
   CryptoAddress: DurableObjectNamespace
+  ContractAddress: DurableObjectNamespace
 
   MINTPFP_CONTRACT_ADDRESS: string
   NFTAR_CHAIN_ID: string
@@ -11,6 +12,7 @@ export interface Environment {
 
 export enum NodeType {
   Crypto = 'crypto',
+  Contract = 'contract',
 }
 
 export enum CryptoAddressType {

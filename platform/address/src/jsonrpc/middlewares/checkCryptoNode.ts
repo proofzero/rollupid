@@ -5,7 +5,7 @@ import { isCryptoAddressType } from '../../utils'
 
 export default (request: Readonly<Request>, context: RpcContext) => {
   const nodeType = context.get('node_type')
-  if (nodeType != NodeType.Crypto) {
+  if (nodeType != NodeType.Crypto && nodeType != NodeType.Contract) {
     return
   }
 

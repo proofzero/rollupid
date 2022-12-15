@@ -2,7 +2,10 @@ import type { RpcContext } from '@kubelt/openrpc'
 import { NodeType } from '../../types'
 
 export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (context.get('node_type') != NodeType.Crypto) {
+  if (
+    context.get('node_type') != NodeType.Crypto &&
+    context.get('node_type') != NodeType.Contract
+  ) {
     return
   }
 

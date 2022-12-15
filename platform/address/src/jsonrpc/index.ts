@@ -90,6 +90,7 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('Access', getAccessClient(env.Access))
   context.set('Edges', env.Edges)
   context.set('CryptoAddress', env.CryptoAddress)
+  context.set('ContractAddress', env.ContractAddress)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)
   context.set('NFTAR_URL', env.NFTAR_URL)
