@@ -265,8 +265,8 @@ const ProfileNftCollection = ({
       )}
 
       {filters && (
-        <div className="flex items-center justify-start sm:justify-center lg:justify-end my-5">
-          <div className="w-[10vw] lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base">
+        <div className="w-full flex items-center justify-start sm:justify-end lg:justify-end my-5">
+          <div className="w-full sm:w-auto mt-1 block rounded-md border-gray-300 py-2 text-base">
             <div>
               <div className="dropdown relative">
                 <button
@@ -284,9 +284,10 @@ const ProfileNftCollection = ({
           border-solid
           border-[#d1d5db]
           hover:bg-[#d1d5db]
-          min-w-[17.2rem]
+          sm:min-w-[17.2rem]
+          min-w-full
           py-[10px]
-          px-[25px]
+          px-[30px]
           font-medium
           text-base
           rounded-md
@@ -309,19 +310,21 @@ const ProfileNftCollection = ({
                 <ul
                   className="
           dropdown-menu
-          min-w-max
           list-none
+          w-full
           absolute
           hidden
           bg-white
           text-base
           z-50
           float-left
+          sm:max-h-[20rem]
+          min-[480px]:max-h-[20rem]
+          max-h-[23rem]
           py-2
           rounded-lg
           shadow-xl
           mt-1
-          max-h-[25rem]
           overflow-auto
           hidden
           m-0
@@ -356,7 +359,7 @@ const ProfileNftCollection = ({
                       flex 
                       select-none
                       flex-row
-                      max-w-[17rem]
+                      sm:max-w-[17rem]
                       overflow-auto
                       bg-transparent
                       w-full
@@ -414,6 +417,7 @@ const ProfileNftCollection = ({
           <Masonry
             breakpointCols={{
               default: 5,
+              1280: 4,
               1024: 3,
               768: 2,
               640: 1,

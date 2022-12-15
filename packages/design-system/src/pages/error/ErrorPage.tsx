@@ -16,7 +16,7 @@ export function ErrorPage({ code, message, trace }: ErrorPageProps) {
   return (
     <article className="relative m-4">
       <section
-        className="absolute top-0 lg:top-1/3 right-0 xl:right-[15%]"
+        className="absolute top-0 hidden lg:block lg:top-1/3 right-0 xl:right-[10%] 2xl:right-[15%]"
         style={{
           zIndex: -1,
         }}
