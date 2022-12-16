@@ -15,7 +15,7 @@
 import { add as dateAdd, formatRFC3339 as dateFormat } from 'date-fns'
 
 import invariant from 'tiny-invariant'
-import checkEnv from '@kubelt/platform.commons/src/utils/checkEnv'
+import { checkEnv } from '@kubelt/utils'
 
 import { required as requiredEnv } from './env'
 

@@ -42,7 +42,6 @@
     "@ethersproject/bytes": "5.7.0",
     "@kubelt/graph": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
-    "@kubelt/platform.commons": "workspace:*",
     "@kubelt/security": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "cross-env": "7.0.3",

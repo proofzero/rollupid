@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@kubelt/openrpc": "*",
-    "@kubelt/platform.commons": "*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "typed-json-rpc": "1.1.0"
