@@ -29,8 +29,6 @@ const NftModal = ({
     nft?.properties?.length == 0
   )
   const [openedProps, setOpenedProps] = useState(nft?.properties?.length > 0)
-  console.log('PROPS', openedProps)
-  console.log('DETAILS', openedDetails)
   const noProps =
     nft?.properties?.length > 0 ? '' : 'items-center justify-center text-center'
   const noDetails =
