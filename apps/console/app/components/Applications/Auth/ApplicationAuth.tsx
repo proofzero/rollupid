@@ -2,6 +2,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
+import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
 
 type ApplicationAuthProps = {
@@ -62,6 +63,14 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
                 </Text>
               </div>
             </div>
+          </div>
+        </Panel>
+      </div>
+
+      <div>
+        <Panel title="Application Status">
+          <div className="flex flex-col h-full justify-center">
+            <InputToggle id="published" label='Published' />
           </div>
         </Panel>
       </div>

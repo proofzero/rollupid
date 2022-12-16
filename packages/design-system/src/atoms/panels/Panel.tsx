@@ -17,6 +17,8 @@ export const Panel = ({ title, titleCompanion, children }: PanelProps) => (
       {titleCompanion}
     </section>
 
-    <section className="h-full">{children}</section>
+    <section className="h-full flex">
+      <div className="w-full">{children}</div>
+    </section>
   </div>
 )
