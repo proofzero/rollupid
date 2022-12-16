@@ -3,7 +3,7 @@
 ## 3ID Documentation
 
 * [Overview](3id/overview/index.md)
-* [Quickstart](3id/quickstart/index.md)
+* [Getting Started](3id/quickstart/index.md)
 * [Guides](3id/guides/index.md)
   * [Setting up your first app](3id/guides/app-setup.md)
 * [Technical References](3id/reference/index.md)
