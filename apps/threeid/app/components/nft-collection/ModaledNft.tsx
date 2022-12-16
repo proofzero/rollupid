@@ -59,7 +59,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
           className="rounded-lg
           truncate
           shadow 
-          ease-linear
+          transition-shadow
           text-sm 
           font-semibold
           hover:shadow-xl 
@@ -73,9 +73,12 @@ const ModaledNft = ({ nft, isModal }: any) => {
             <img
               className="rounded-t-lg block 
               mx-auto 
-              lg:min-h-[13rem] 
+              lg:h-[13rem] 
+              lg:max-w-[13rem]
               md:h-[14rem]
+              md:max-w-[14rem]
               sm:h-[15rem]
+              sm:max-w-[15rem]
               align-center 
               justify-center"
               src={
@@ -88,10 +91,14 @@ const ModaledNft = ({ nft, isModal }: any) => {
             />
             <div
               className="flex text-gray-600
-            flex-row whitespace-nowrap max-w-[13rem] justify-between items-center px-2 py-3"
+            flex-row whitespace-nowrap 
+            max-w-full
+            lg:max-w-[13rem] 
+            md:max-w-[14rem] 
+            sm:max-w-[15rem] justify-between items-center px-2 py-3"
             >
-              <div className="truncate">
-                {nft.collectionTitle ? nft.collectionTitle : 'Check collection'}
+              <div className="truncate leading-none">
+                {nft.collectionTitle ? nft.collectionTitle : ' '}
               </div>
               <HiArrowNarrowRight />
             </div>
