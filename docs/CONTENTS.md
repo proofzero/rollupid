@@ -3,14 +3,13 @@
 ## 3ID Documentation
 
 * [Overview](3id/overview/index.md)
-* [Getting Started](3id/quickstart/index.md)
+* [Getting Started](3id/start/index.md)
 * [Guides](3id/guides/index.md)
   * [Setting up your first app](3id/guides/app-setup.md)
-* [Reference Guides](3id/reference/index.md)
-  * [Profile Reference Guide](3id/reference/profile.md)
-  * [Passport Reference Guide](3id/reference/passport.md)
-  * [Console Reference Guide](3id/reference/console.md)
-  * [Galaxy Reference Guide](3id/reference/galaxy.md)
+* [Profile Reference](3id/profile/index.md)
+* [Passport Reference](3id/passport/index.md)
+* [Console Reference](3id/console/index.md)
+* [Galaxy Reference](3id/galaxy/index.md)
 * [FAQs](3id/faq/index.md)
 
 <!--
