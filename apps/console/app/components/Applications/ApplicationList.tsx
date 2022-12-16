@@ -1,5 +1,6 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+
 import {
   ApplicationListItem,
   ApplicationListItemProps,
@@ -8,10 +9,18 @@ import {
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
+  onCreateApplication?: () => void
 }
 
-export const ApplicationList = ({ applications }: ApplicationListProps) => {
-  const handleCreateApplication = () => {}
+export const ApplicationList = ({
+  applications,
+  onCreateApplication,
+}: ApplicationListProps) => {
+  const handleCreateApplication = () => {
+    if (onCreateApplication) {
+      onCreateApplication()
+    }
+  }
 
   return (
     <div>
