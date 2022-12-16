@@ -259,7 +259,7 @@ const ProfileRoute = () => {
   }, [coverUrl])
 
   return (
-    <div className="bg-white h-full min-h-screen">
+    <div className="bg-white h-full min-h-screen overflow-visible">
       <div
         className="header lg:px-4"
         style={{
@@ -366,7 +366,7 @@ const ProfileRoute = () => {
         )}
       </div>
 
-      <div className="mt-3 max-w-7xl w-full mx-auto p-3 lg:py-0 lg:px-4">
+      <div className="mt-3 max-w-7xl overflow-visible w-full mx-auto p-3 lg:py-0 lg:px-4">
         {!claimed && (
           <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
@@ -399,7 +399,7 @@ const ProfileRoute = () => {
             </Text>
 
             <Text
-              className="break-all text-gray-500"
+              className="break-normal text-gray-500"
               size="base"
               weight="medium"
             >

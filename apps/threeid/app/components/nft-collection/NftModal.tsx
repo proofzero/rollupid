@@ -25,12 +25,15 @@ const NftModal = ({
   handleClose: (evt: any) => void
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false)
-  const [openedDetails, setOpenedDetails] = useState(false)
-  const [openedProps, setOpenedProps] = useState(true)
+  const [openedDetails, setOpenedDetails] = useState(
+    nft?.properties?.length == 0
+  )
+  const [openedProps, setOpenedProps] = useState(nft?.properties?.length > 0)
   const noProps =
     nft?.properties?.length > 0 ? '' : 'items-center justify-center text-center'
   const noDetails =
     nft?.details?.length > 0 ? '' : 'items-center justify-center text-center'
+
   return (
     <Modal isOpen={isOpen} handleClose={handleClose}>
       <div
@@ -119,7 +122,11 @@ const NftModal = ({
 
               <div
                 id="flush-collapseOne"
-                className={`accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-md  overflow-hidden ${noDetails}`}
+                className={
+                  openedDetails
+                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-md  overflow-hidden ${noDetails}`
+                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-md  overflow-hidden ${noDetails}`
+                }
                 aria-labelledby="flush-headingOne"
               >
                 <div className="accordion-body w-[100vw] flex-wrap">
@@ -198,7 +205,11 @@ const NftModal = ({
 
               <div
                 id="flush-collapseTwo"
-                className={`accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-md  overflow-hidden ${noProps}`}
+                className={
+                  openedProps
+                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-md  overflow-hidden ${noProps}`
+                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-md  overflow-hidden ${noProps}`
+                }
                 aria-labelledby="flush-headingTwo"
               >
                 <div className="accordion-body flex flex-row  flex-wrap ">
