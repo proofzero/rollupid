@@ -2,7 +2,7 @@ import React from 'react'
 import { NewAppModal } from './NewAppModal'
 
 export default {
-  title: 'Molecules/New App Modal/',
+  title: 'Molecules/New App Modal',
   component: NewAppModal,
   argTypes: {
     isOpen: {

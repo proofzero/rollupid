@@ -1,5 +1,7 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 
 export type NewAppModalProps = {
   isOpen: boolean
@@ -13,13 +15,30 @@ export const NewAppModal = ({
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => newAppCreateCallback(null)}>
       <>
-        <h3 className="text-xl font-bold mb-6">New Application</h3>
+        <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
+          Create Application
+        </Text>
 
         <form method="post" action="/apps/new">
-          <p>Application Name</p>
-          <input placeholder="My Application" name="client_name"></input>
-          <button onClick={() => newAppCreateCallback(null)}>Cancel</button>
-          <button type="submit">Create</button>
+          <Input
+            id="client_name"
+            label="Application Name"
+            placeholder="My application"
+            required
+            className="mb-12"
+          />
+
+          <div className="flex justify-end items-center space-x-3">
+            <Button
+              btnType="secondary-alt"
+              onClick={() => newAppCreateCallback(null)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" btnType="primary-alt">
+              Create
+            </Button>
+          </div>
         </form>
       </>
     </Modal>
