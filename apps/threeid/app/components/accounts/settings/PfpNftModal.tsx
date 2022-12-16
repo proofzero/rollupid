@@ -19,7 +19,7 @@ const PfpNftModal = ({
 }: PfpNftModalProps) => {
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
-      <>
+      <div className="flex-1 relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto">
         <Text className="pb-1 text-gray-800" size="2xl" weight="bold">
           Select NFT Avatar
         </Text>
@@ -37,7 +37,7 @@ const PfpNftModal = ({
             />
           )}
         />
-      </>
+      </div>
     </Modal>
   )
 }
