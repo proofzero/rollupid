@@ -57,11 +57,13 @@ const ModaledNft = ({ nft, isModal }: any) => {
       ) : (
         <div
           className="rounded-lg
+          truncate
           shadow 
+          ease-linear
           text-sm 
           font-semibold
           hover:shadow-xl 
-          hover:text-base
+          hover:font-bold
           flex
           flex-col
           align-center justify-center
@@ -84,8 +86,11 @@ const ModaledNft = ({ nft, isModal }: any) => {
               onError={(e) => setLoadFail(true)}
               alt="collection-representation"
             />
-            <div className="flex flex-row whitespace-nowrap max-w-[13rem] justify-between items-center px-4 py-3">
-              <div className="text-gray-600 overflow-hidden">
+            <div
+              className="flex text-gray-600
+            flex-row whitespace-nowrap max-w-[13rem] justify-between items-center px-2 py-3"
+            >
+              <div className="truncate">
                 {nft.collectionTitle ? nft.collectionTitle : 'Check collection'}
               </div>
               <HiArrowNarrowRight />
