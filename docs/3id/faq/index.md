@@ -36,13 +36,13 @@ Users authenticate to the identity graph and grant developer applications author
 
 ## How do I configure my OAuth settings?
 
-Developers use [Console](https://passport.threeid.xyz) to configure their application settings. Our standards-compliant version of OAuth with extensions to support the decentralized identity graph is called ************0xAuth************. 
+Developers use [Console](https://passport.threeid.xyz) to configure their application settings. Our standards-compliant version of OAuth with extensions to support the decentralized identity graph is called **0xAuth**. 
 
 ![console.png](../img/console-app-0xauth.png)
 
 ## How does the user authenticate? Is it a standard web3 sign-in process or can they just sign up for an account and login?
 
-Users’ choice! They can use social logins (Google, Twitter, etc.), their own wallet (SIWE), or an emaill address. No wallet needed, developers just request an authorization scope and a single-purpose account (a ******************************dedicated vault******************************) will be created automatically!
+Users’ choice! They can use social logins (Google, Twitter, etc.), their own wallet (SIWE), or an emaill address. No wallet needed, developers just request an authorization scope and a single-purpose account (a **dedicated vault**) will be created automatically!
 
 ## How do applications know about and connect to the account?
 

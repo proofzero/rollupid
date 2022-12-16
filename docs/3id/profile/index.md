@@ -1,5 +1,5 @@
 ---
-description: 3ID Profile Technical Reference
+description: 3ID Profile Reference
 ---
 
 3ID Public Profiles help you customize your application for your users with one API call.
