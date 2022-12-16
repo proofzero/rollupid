@@ -11,12 +11,9 @@
   * [Passport Reference](3id/passport/index.md)
 * [Console](3id/console/index.md)
   * [Console Reference](3id/console/index.md)
-* [FAQs](3id/faq/index.md)
-
-## Galaxy
-
 * [Galaxy](3id/galaxy/index.md)
   * [Galaxy Reference](3id/galaxy/index.md)
+* [FAQ](3id/faq/index.md)
 
 <!--
 ## Use headings to create page groups like this one​
