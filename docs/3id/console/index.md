@@ -1,7 +1,5 @@
 ---
-description: Console Reference
+description: Console Technical Reference
 ---
 
 # Console
-
-[Console](https://passport.threeid.xyz) is where you can create an **0xAuth** application.

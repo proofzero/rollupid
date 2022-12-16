@@ -1,7 +1,5 @@
 ---
-description: Passport Reference
+description: 3ID Passport Technical Reference
 ---
 
-# Passport
-
-[Passport](https://passport.threeid.xyz) is 3ID's authentication and authorization system.
+# 3ID Passport
