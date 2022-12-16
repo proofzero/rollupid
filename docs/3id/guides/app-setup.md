@@ -28,4 +28,4 @@ Click the second item in the sidebar on the left, **0xAuth**. This will open the
 
 ## Configure Your Application Data
 
-Now you can configure your application data. [See the Console Technical Reference](../reference/console.md) for more information.
+Now you can configure your application data. [See the Console Reference](../console/index.md) for more information.
