@@ -41,7 +41,7 @@ export const ApplicationList = ({ applications }: ApplicationListProps) => {
 
       <section className="flex flex-col space-y-2">
         {applications.map((ali) => (
-          <ApplicationListItem {...ali} />
+          <ApplicationListItem key={ali.title} {...ali} />
         ))}
       </section>
     </div>

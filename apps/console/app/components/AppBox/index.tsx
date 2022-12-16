@@ -3,7 +3,6 @@
  */
 
 import { Fragment } from 'react'
-import { Link, Outlet, useLoaderData } from '@remix-run/react'
 import { Menu, Transition } from '@headlessui/react'
 
 import type { Application } from '~/models/app.server'
@@ -14,8 +13,7 @@ import {
   Cog8ToothIcon,
 } from '@heroicons/react/20/solid'
 // TODO migrate to FolderPlusIcon and remove bespoke version
-import { FolderPlusIcon } from '@heroicons/react/24/outline'
-import folderPlus from '~/images/folderPlus.svg'
+import { ApplicationList } from '../Applications/ApplicationList'
 
 // CompactMenu
 // -----------------------------------------------------------------------------
@@ -186,11 +184,15 @@ type AppBoxProps = {
 }
 
 export default function AppBox(props: AppBoxProps) {
+  const mappedApps = props.apps.map((a) => ({
+    created: new Date(),
+    title: a.dstUrn.split('clientName=')[1],
+    published: false,
+  }))
+
   return (
     <div className="mt-8">
-      <h3 className="text-xl font-bold mb-6">Your Applications</h3>
-      <div className="mb-2 mt-4"></div>
-      <AppList apps={props.apps} />
+      <ApplicationList applications={mappedApps} />
     </div>
   )
 }

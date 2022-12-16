@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const apps = await starbaseClient.kb_appList()
     console.log({ apps })
-    return json<LoaderData>({ apps, appId })
+    return json<LoaderData>({ apps: (apps as any).result, appId })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -49,7 +49,7 @@ export default function AppDetailIndexPage() {
     <div className="flex flex-col md:flex-row min-h-full">
       <SiteMenu apps={apps} selected={appId} />
 
-      <main className="flex flex-col flex-initial min-h-full w-full bg-gray-300">
+      <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
         <SiteHeader />
 
         <section className="mx-11 my-9">

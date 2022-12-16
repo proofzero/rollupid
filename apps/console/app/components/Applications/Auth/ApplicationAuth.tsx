@@ -70,7 +70,7 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
       <div>
         <Panel title="Application Status">
           <div className="flex flex-col h-full justify-center">
-            <InputToggle id="published" label='Published' />
+            <InputToggle id="published" label="Published" />
           </div>
         </Panel>
       </div>
