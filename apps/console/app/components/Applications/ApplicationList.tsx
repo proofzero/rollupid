@@ -25,7 +25,9 @@ export const ApplicationList = ({
   return (
     <div>
       <section className="flex justify-between items-start">
-        <Text>Your Applications</Text>
+        <Text size="base" weight="semibold" className="text-gray-900">
+          Your Applications
+        </Text>
 
         <Button btnType="primary-alt" onClick={handleCreateApplication}>
           Create Application
