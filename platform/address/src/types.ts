@@ -24,6 +24,7 @@ export interface Challenge {
   redirectUri: string
   scope: string[]
   state: string
+  timestamp: number
 }
 
 export type SetAccountParams = [account: string]
