@@ -263,17 +263,17 @@ const ProfileNftCollection = ({
           </div>
         </>
       )}
-
-      {filters && (
-        <div
-          className="w-full flex items-center justify-start 
+      {filters && loadedNfts.length > 0 && (
+        <>
+          <div
+            className="w-full flex items-center justify-start 
         sm:justify-end lg:justify-end my-5"
-        >
-          <div className="w-full sm:w-auto mt-1 block rounded-md border-gray-300 py-2 text-base">
-            <div>
-              <div className="dropdown relative">
-                <button
-                  className="
+          >
+            <div className="w-full sm:w-auto mt-1 block rounded-md border-gray-300 py-2 text-base">
+              <div>
+                <div className="dropdown relative">
+                  <button
+                    className="
           dropdown-toggle
           ease-in-out
           flex
@@ -295,23 +295,23 @@ const ProfileNftCollection = ({
           text-base
           rounded-md
           "
-                  type="button"
-                  id="dropdownMenuButton1"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  onClick={() => {
-                    setOpenedFilters(!openedFilters)
-                  }}
-                >
-                  Filters
-                  <HiChevronUp
-                    className={
-                      openedFilters ? 'rotate-180 transition' : 'transition'
-                    }
-                  />
-                </button>
-                <ul
-                  className="
+                    type="button"
+                    id="dropdownMenuButton1"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    onClick={() => {
+                      setOpenedFilters(!openedFilters)
+                    }}
+                  >
+                    Filters
+                    <HiChevronUp
+                      className={
+                        openedFilters ? 'rotate-180 transition' : 'transition'
+                      }
+                    />
+                  </button>
+                  <ul
+                    className="
           dropdown-menu
           list-none
           w-full
@@ -336,28 +336,28 @@ const ProfileNftCollection = ({
           px-1
           items-center
         "
-                  aria-labelledby="dropdownMenuButton1"
-                >
-                  <li>
-                    <InputText
-                      heading=""
-                      placeholder={'Search'}
-                      Icon={FaSearch}
-                      onChange={(val) => {
-                        setTextFilter(val)
-                      }}
-                    />
-                  </li>
-                  {colFilters
-                    .filter((filter) =>
-                      filter.title
-                        .toLowerCase()
-                        .includes(textFilter.toLowerCase())
-                    )
-                    .map((colName, i) => (
-                      <li key={`${colName.title}_${i}`}>
-                        <div
-                          className="
+                    aria-labelledby="dropdownMenuButton1"
+                  >
+                    <li>
+                      <InputText
+                        heading=""
+                        placeholder={'Search'}
+                        Icon={FaSearch}
+                        onChange={(val) => {
+                          setTextFilter(val)
+                        }}
+                      />
+                    </li>
+                    {colFilters
+                      .filter((filter) =>
+                        filter.title
+                          .toLowerCase()
+                          .includes(textFilter.toLowerCase())
+                      )
+                      .map((colName, i) => (
+                        <li key={`${colName.title}_${i}`}>
+                          <div
+                            className="
                       dropdown-item
                       flex 
                       select-none
@@ -370,98 +370,100 @@ const ProfileNftCollection = ({
                       py-2
                       pl-1
                       block"
-                          onClick={(event: any) => {
-                            setCurFilter(colName.title || 'Untitled Collection')
-                          }}
-                        >
-                          {colName.title === 'All Collections' ||
-                          colName.img ? (
-                            <img
-                              className="w-[1.5em] h-[1.5em] rounded-full"
-                              src={
-                                colName.title === 'All Collections'
-                                  ? pfp
-                                  : colName.img
-                              }
-                              alt="+"
-                            />
-                          ) : (
-                            <div className="w-[1.5em] h-[1.5em] bg-[#E8E8E8] rounded-full"></div>
-                          )}
+                            onClick={(event: any) => {
+                              setCurFilter(
+                                colName.title || 'Untitled Collection'
+                              )
+                            }}
+                          >
+                            {colName.title === 'All Collections' ||
+                            colName.img ? (
+                              <img
+                                className="w-[1.5em] h-[1.5em] rounded-full"
+                                src={
+                                  colName.title === 'All Collections'
+                                    ? pfp
+                                    : colName.img
+                                }
+                                alt="+"
+                              />
+                            ) : (
+                              <div className="w-[1.5em] h-[1.5em] bg-[#E8E8E8] rounded-full"></div>
+                            )}
 
-                          {curFilter === colName.title ||
-                          curFilter === 'Untitled Collection' ? (
-                            <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
-                              <div>{colName.title}</div>
-                              <HiOutlineCheck />
-                            </Text>
-                          ) : (
-                            <Text className="focus:outline-none pl-3">
-                              {colName.title}
-                            </Text>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                </ul>
+                            {curFilter === colName.title ||
+                            curFilter === 'Untitled Collection' ? (
+                              <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
+                                <div>{colName.title}</div>
+                                <HiOutlineCheck />
+                              </Text>
+                            ) : (
+                              <Text className="focus:outline-none pl-3">
+                                {colName.title}
+                              </Text>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {loadedNfts.length > 0 && (
-        <InfiniteScroll
-          dataLength={loadedNfts.length} //This is important field to render the next data
-          next={preload ? () => {} : getMoreNfts}
-          hasMore={preload ? false : pageKey != null}
-          loader={<Spinner />}
-          className="overflow-visible flex items-center justify-center"
-        >
-          <Masonry
-            breakpointCols={{
-              default: 5,
-              1280: 4,
-              1024: 3,
-              768: 2,
-              640: 1,
-            }}
-            className="my-masonry-grid space-x-10"
-            columnClassName="my-masonry-grid_column"
+          <InfiniteScroll
+            dataLength={loadedNfts.length} //This is important field to render the next data
+            next={preload ? () => {} : getMoreNfts}
+            hasMore={preload ? false : pageKey != null}
+            loader={<Spinner />}
+            className="overflow-visible flex items-center justify-center"
           >
-            {loadedNfts
-              .filter(
-                (nft) =>
-                  curFilter === 'All Collections' ||
-                  curFilter === nft.collectionTitle ||
-                  (!nft.collectionTitle && curFilter === 'Untitled Collections')
-              )
-              .map((nft, i) => (
-                // Filtering collection by
-                // unique values
-                // breaks the infinite scroll
-                // plugin I resorted to this
-                <div
-                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                >
-                  {nftRenderer(
-                    nft,
-                    selectedNft ===
-                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
-                    (selectedNft: any) => {
-                      setSelectedNft(
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
-                      )
+            <Masonry
+              breakpointCols={{
+                default: 5,
+                1280: 4,
+                1024: 3,
+                768: 2,
+                640: 1,
+              }}
+              className="my-masonry-grid space-x-10"
+              columnClassName="my-masonry-grid_column"
+            >
+              {loadedNfts
+                .filter(
+                  (nft) =>
+                    curFilter === 'All Collections' ||
+                    curFilter === nft.collectionTitle ||
+                    (!nft.collectionTitle &&
+                      curFilter === 'Untitled Collections')
+                )
+                .map((nft, i) => (
+                  // Filtering collection by
+                  // unique values
+                  // breaks the infinite scroll
+                  // plugin I resorted to this
+                  <div
+                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                  >
+                    {nftRenderer(
+                      nft,
+                      selectedNft ===
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                      (selectedNft: any) => {
+                        setSelectedNft(
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                        )
 
-                      if (handleSelectedNft) {
-                        handleSelectedNft(selectedNft)
+                        if (handleSelectedNft) {
+                          handleSelectedNft(selectedNft)
+                        }
                       }
-                    }
-                  )}
-                </div>
-              ))}
-          </Masonry>
-        </InfiniteScroll>
+                    )}
+                  </div>
+                ))}
+            </Masonry>
+          </InfiniteScroll>
+        </>
       )}
 
       {(refresh || loading) && (
