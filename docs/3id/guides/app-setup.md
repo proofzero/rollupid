@@ -28,10 +28,4 @@ Click the second item in the sidebar on the left, **0xAuth**. This will open the
 
 ## Configure Your Application Data
 
-TODO: More here.
-
-- Name
-- Requested authorization scopes
-- Custom domains and white-labelling configuration
-- Post-login redirect URL
-- Publish and Save
+Now you can configure your application data. [See the Console Reference](../console/index.md) for more information.

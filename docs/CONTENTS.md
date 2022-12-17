@@ -2,15 +2,18 @@
 
 ## 3ID Documentation
 
-* [Quickstart](3id/quickstart/index.md)
 * [Overview](3id/overview/index.md)
 * [Guides](3id/guides/index.md)
   * [Setting up your first app](3id/guides/app-setup.md)
-* [Technical References](3id/reference/index.md)
-  * [Profile Reference Guide](3id/reference/profile.md)
-  * [Passport Reference Guide](3id/reference/passport.md)
-  * [Console Reference Guide](3id/reference/console.md)
-* [FAQs](3id/faq/index.md)
+* [Profile](3id/profile/index.md)
+  * [Profile Reference](3id/profile/index.md)
+* [Passport](3id/passport/index.md)
+  * [Passport Reference](3id/passport/index.md)
+* [Console](3id/console/index.md)
+  * [Console Reference](3id/console/index.md)
+* [Galaxy](3id/galaxy/index.md)
+  * [Galaxy Reference](3id/galaxy/index.md)
+* [FAQ](3id/faq/index.md)
 
 <!--
 ## Use headings to create page groups like this one​
