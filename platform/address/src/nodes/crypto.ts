@@ -174,7 +174,7 @@ export default class CryptoAddress {
       throw new Error('not matching address')
     }
 
-    // challenges.delete(nonce)
+    challenges.delete(nonce)
     output.set('challenges', challenges)
 
     return challenge
