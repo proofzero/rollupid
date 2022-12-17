@@ -21,6 +21,7 @@ export interface Environment {
 export type AuthorizationParameters = {
   redirectUri: string
   scope: Scope
+  timestamp: number
 }
 
 export enum GrantType {

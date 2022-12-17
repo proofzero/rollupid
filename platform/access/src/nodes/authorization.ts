@@ -2,6 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import type {
+  RpcAlarm,
   RpcInput,
   RpcOutput,
   RpcParams,
@@ -9,6 +10,7 @@ import type {
 } from '@kubelt/openrpc/component'
 
 import {
+  alarm,
   component,
   field,
   method,
@@ -52,7 +54,8 @@ export default class Authorization {
   async authorize(
     params: RpcParams,
     input: RpcInput,
-    output: RpcOutput
+    output: RpcOutput,
+    alarm: RpcAlarm
   ): Promise<AuthorizeResult> {
     const account = params.get('account')
     const responseType = params.get('responseType')
@@ -60,6 +63,7 @@ export default class Authorization {
     const redirectUri = params.get('redirectUri')
     const scope = params.get('scope')
     const state = params.get('state')
+    const timestamp = Date.now()
 
     if (responseType != ResponseType.Code) {
       throw `unsupported response type: ${responseType}`
@@ -68,13 +72,13 @@ export default class Authorization {
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     const codes: Map<string, AuthorizationParameters> =
       input.get('codes') || new Map()
-    codes.set(code, { redirectUri, scope })
+    codes.set(code, { redirectUri, scope, timestamp })
 
     output.set('account', account)
     output.set('clientId', clientId)
     output.set('codes', codes)
 
-    // this.storage.setAlarm(Date.now() + 2 * 60 * 1000)
+    alarm.after({ seconds: CODE_OPTIONS.ttl })
 
     return { code, state }
   }
@@ -118,5 +122,17 @@ export default class Authorization {
     output.set('codes', codes)
 
     return code
+  }
+
+  @alarm()
+  @requiredField('codes', [FieldAccess.Read, FieldAccess.Write])
+  expireCodes(input: RpcInput, output: RpcOutput) {
+    const codes: Map<string, AuthorizationParameters> = input.get('codes')
+    for (const [code, params] of codes) {
+      if (params.timestamp + CODE_OPTIONS.ttl * 1000 <= Date.now()) {
+        codes.delete(code)
+      }
+    }
+    output.set('codes', codes)
   }
 }
