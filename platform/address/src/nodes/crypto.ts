@@ -2,6 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import type {
+  RpcAlarm,
   RpcInput,
   RpcOutput,
   RpcParams,
@@ -9,6 +10,7 @@ import type {
 } from '@kubelt/openrpc/component'
 
 import {
+  alarm,
   component,
   field,
   method,
@@ -130,13 +132,19 @@ export default class CryptoAddress {
 
   @method('getNonce')
   @requiredField('challenges', [FieldAccess.Read, FieldAccess.Write])
-  getNonce(params: RpcParams, input: RpcInput, output: RpcOutput): RpcResult {
+  getNonce(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput,
+    alarm: RpcAlarm
+  ): RpcResult {
     const nonce = hexlify(randomBytes(NONCE_OPTIONS.length))
     const address = params.get('address')
     const template = params.get('template')
     const redirectUri = params.get('redirectUri')
     const scope = params.get('scope')
     const state = params.get('state')
+    const timestamp = Date.now()
 
     const challenges: Map<string, Challenge> = input.get('challenges')
     challenges.set(nonce, {
@@ -145,8 +153,11 @@ export default class CryptoAddress {
       redirectUri,
       scope,
       state,
+      timestamp,
     })
     output.set('challenges', challenges)
+
+    alarm.after({ seconds: NONCE_OPTIONS.ttl })
 
     return nonce
   }
@@ -174,7 +185,7 @@ export default class CryptoAddress {
       throw new Error('not matching address')
     }
 
-    // challenges.delete(nonce)
+    challenges.delete(nonce)
     output.set('challenges', challenges)
 
     return challenge
@@ -208,5 +219,17 @@ export default class CryptoAddress {
     output: RpcOutput
   ): RpcResult {
     return output.set('pfpVoucher', params.get('voucher'))
+  }
+
+  @alarm()
+  @requiredField('challenges', [FieldAccess.Read, FieldAccess.Write])
+  expireNonces(input: RpcInput, output: RpcOutput) {
+    const challenges: Map<string, Challenge> = input.get('challenges')
+    for (const [nonce, challenge] of challenges) {
+      if (challenge.timestamp + NONCE_OPTIONS.ttl * 1000 <= Date.now()) {
+        challenges.delete(nonce)
+      }
+    }
+    output.set('challenges', challenges)
   }
 }
