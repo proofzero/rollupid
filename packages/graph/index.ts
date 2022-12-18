@@ -8,7 +8,6 @@ import { EdgeSpace } from '@kubelt/urns/edge'
 
 import * as impl from './impl/index'
 
-// FIXME
 import { EdgeDirection } from './types'
 
 // Imported Types
@@ -18,12 +17,12 @@ import type { RpcErrorDetail } from '@kubelt/openrpc'
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeId, EdgeTag, Graph, Token } from './types'
+import type { Edge, EdgeTag, Node, Permission, Token } from './types'
 
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type { Edge, EdgeTag, Graph }
+export type { Edge, EdgeTag, Node, Permission, Token }
 
 // Exports
 // -----------------------------------------------------------------------------
@@ -59,9 +58,10 @@ export function edge(tag: string): EdgeTag {
 export async function edges(
   edges: Fetcher,
   id: AnyURN,
-  tag: EdgeTag
+  tag?: EdgeTag,
+  dir?: EdgeDirection,
 ): Promise<Edge[] | RpcErrorDetail> {
-  return impl.edges(edges, id, tag)
+  return impl.edges(edges, id, tag, dir)
 }
 
 // link()
@@ -105,23 +105,4 @@ export async function unlink(
   tag: EdgeTag
 ): Promise<number | RpcErrorDetail> {
   return impl.unlink(edges, src, dst, tag)
-}
-
-// traversable()
-// -----------------------------------------------------------------------------
-
-/**
- * Check if a token grants permission to traverse an edge.
- *
- * @param edges - the edges service binding
- * @param id - an edge identifier
- * @param token - a JWT providing authorization claims
- * @returns a flag indicating whether claims are sufficient to traverse the edge
- */
-export function traversable(
-  edges: Fetcher,
-  id: EdgeId,
-  token: Token
-): Promise<boolean | RpcErrorDetail> {
-  return impl.traversable(edges, id, token)
 }

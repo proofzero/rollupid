@@ -6,7 +6,11 @@
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeId, EdgeTag, Graph, Token } from '../types'
+import type { Edge, EdgeTag, Node } from '@kubelt/graph'
+
+import type { EdgeRecord, EdgeId, Graph, NodeRecord, Token } from '../types'
+
+import { EdgeDirection } from '@kubelt/graph'
 
 import * as insert from './insert'
 import * as remove from './remove'
@@ -31,7 +35,7 @@ export async function link(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeId> {
+): Promise<EdgeRecord> {
   const srcNode = await insert.node(g, src)
   // TODO check for error
 
@@ -54,19 +58,23 @@ export async function unlink(
   return remove.edge(g, src, dst, tag)
 }
 
-// traversable()
+// node()
 // -----------------------------------------------------------------------------
 
-export function traversable(g: Graph, id: EdgeId, token: Token): boolean {
-  // TODO
-  throw new Error('not yet implemented')
+export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|undefined> {
+  return select.node(g, nodeId)
 }
 
 // edges()
 // -----------------------------------------------------------------------------
 
-export async function edges(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.edges(g, nodeId)
+export async function edges(
+  g: Graph,
+  id: AnyURN,
+  tag?: EdgeTag,
+  dir?: EdgeDirection,
+): Promise<Edge[]> {
+  return select.edges(g, id, tag, dir)
 }
 
 // incoming()

@@ -21,6 +21,8 @@ import invariant from 'tiny-invariant'
 
 //import { checkEnv } from '@kubelt/utils'
 
+import { EdgeDirection } from '@kubelt/graph'
+
 import type {
   RpcAuthHandler,
   RpcContext,
@@ -423,9 +425,26 @@ const kb_appList = openrpc.method(schema, {
 
       const edgeTag = graph.edge(EDGE_TAG)
 
-      const edgeList = await graph.edges(edges, accountURN, edgeTag)
+      // When an account owns an application, there is an edge *from*
+      // the account node *to* the app node (direction = outgoing), with
+      // edge type tag defined by EDGE_TAG.
+      const edgeList = await graph.edges(
+        edges,
+        accountURN,
+        edgeTag,
+        EdgeDirection.Outgoing
+      )
 
-      return openrpc.response(request, edgeList)
+      // The app nodes are the "destination" node of each returned edge,
+      // an object provided as the .dst property. The node "id" property
+      // has the shape: `urn:nid:nss`. More details about the node are
+      // available on node object, if required. E.g. r-, q-,
+      // f-component, or the full URN.
+      const appList = _.map(edgeList, (edge) => {
+        return _.get(edge, ['dst', 'id'])
+      })
+
+      return openrpc.response(request, appList)
     }
   ),
 })
