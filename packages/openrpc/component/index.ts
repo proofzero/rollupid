@@ -242,6 +242,7 @@ export function component(schema: Readonly<RpcSchema>) {
 
     // The name of the method marked with @alarm, if any.
     const alarmMethod: string = Reflect.get(constructor, _ALARM_HANDLER)
+    Reflect.deleteProperty(constructor, _ALARM_HANDLER)
 
     // TODO seal the generated object so that all fields, etc. must be
     // defined declaratively using decorators. Stay out of trouble,
@@ -255,7 +256,8 @@ export function component(schema: Readonly<RpcSchema>) {
       // The schema that this OpenRPC service conforms to.
       private readonly _schema: RpcSchema
 
-      // A map from method to the set of scopes that it requires to be invoke.
+      // A map from method to the set of scopes that are required for it
+      // to be invoked.
       private readonly _scopes: RequiredScopes
 
       // A map from field name (a symbol) to a field descriptor.
