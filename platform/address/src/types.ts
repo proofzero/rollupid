@@ -1,8 +1,13 @@
+import { RpcContext } from '@kubelt/openrpc'
+import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+
 export interface Environment {
   Access: Fetcher
   Edges: Fetcher
   CryptoAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
+
+  COLLECTIONS: D1Database
 
   MINTPFP_CONTRACT_ADDRESS: string
   NFTAR_CHAIN_ID: string
@@ -18,6 +23,10 @@ export interface Environment {
   TOKEN_ALCHEMY_NOTIFY: string
 
   URL_ALCHEMY_WEBHOOK: string
+}
+
+export interface AddressRpcContext extends RpcContext {
+  db: DrizzleD1Database
 }
 
 export enum NodeType {
@@ -61,3 +70,9 @@ export type AddressProfile = {
 }
 
 export type SetAddressProfileParams = [profile: Partial<AddressProfile>]
+
+export type AddressTokensTable = {
+  addressURN: string
+  tokenId: string
+  order?: number
+}

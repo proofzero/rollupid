@@ -19,6 +19,7 @@ import checkCryptoNode from './middlewares/checkCryptoNode'
 import resolveENS from './middlewares/resolveENS'
 import setCryptoNodeClient from './middlewares/setCryptoNodeClient'
 import initCryptoNode from './middlewares/initCryptoNode'
+import injectDB from './middlewares/injectDB'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -82,6 +83,7 @@ const rpcHandler = openrpc.build(
     openrpc.middleware(resolveENS),
     openrpc.middleware(setCryptoNodeClient),
     openrpc.middleware(initCryptoNode),
+    openrpc.middleware(injectDB),
   ])
 )
 
@@ -91,6 +93,7 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('Edges', env.Edges)
   context.set('CryptoAddress', env.CryptoAddress)
   context.set('ContractAddress', env.ContractAddress)
+  context.set('COLLECTIONS', env.COLLECTIONS)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)
   context.set('NFTAR_URL', env.NFTAR_URL)

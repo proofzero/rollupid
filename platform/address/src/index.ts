@@ -9,5 +9,6 @@ const index = Router()
   .post('/jsonrpc', jsonrpc)
   .all('*', () => error(404, 'not found'))
 
+// TODO: export ContractAddress when ready
 export { CryptoAddress }
 export default { fetch: index.handle }
