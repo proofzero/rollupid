@@ -14,7 +14,6 @@ import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
 import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
@@ -216,7 +215,6 @@ export default function AccountSettingsProfile() {
 
   return (
     <>
-      {transition.state === 'loading' && <Loader />}
       <PfpNftModal
         account={address}
         isOpen={nftPfpModalOpen}

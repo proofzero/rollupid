@@ -10,6 +10,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useTransition,
 } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
@@ -29,14 +30,18 @@ import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
-function Analytics () {
-  return <script defer
-    src='https://static.cloudflareinsights.com/beacon.min.js'
-    data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'>
-  </script>
+function Analytics() {
+  return (
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'
+    ></script>
+  )
 }
 
 export const meta: MetaFunction = () => ({
@@ -71,14 +76,15 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = () => {
   return json({
-    ENV: {
-    },
+    ENV: {},
   })
 }
 
 export default function App() {
   const browserEnv = useLoaderData()
+  const transition = useTransition()
 
+  console.log(transition.state)
   return (
     <html lang="en">
       <head>
@@ -86,6 +92,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        {transition.state === 'loading' && <Loader />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
