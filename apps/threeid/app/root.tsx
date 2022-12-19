@@ -84,7 +84,6 @@ export default function App() {
   const browserEnv = useLoaderData()
   const transition = useTransition()
 
-  console.log(transition.state)
   return (
     <html lang="en">
       <head>
