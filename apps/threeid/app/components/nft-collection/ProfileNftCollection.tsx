@@ -442,11 +442,7 @@ const ProfileNftCollection = ({
                 768: 2,
                 640: 1,
               }}
-              className={`my-masonry-grid space-x-10 ${
-                filteredLoadedNfts.length <= 4
-                  ? 'flex justify-center px-14'
-                  : ''
-              }`}
+              className="my-masonry-grid space-x-10"
               columnClassName="my-masonry-grid_column"
             >
               {filteredLoadedNfts.map((nft, i) => (
