@@ -1,10 +1,10 @@
 import { Router } from 'itty-router'
 
-import AlchemyHandler from './handlers/alchemy'
+import moarlis from './handlers/moralis'
 
 const router = Router()
 router
-  .get('/webhooks/alchemy', AlchemyHandler)
+  .post('/webhooks/moralis', moarlis)
   .get('*', () => new Response('Not found', { status: 404 }))
 
 export const handleRequest = (request: Request) => router.handle(request)

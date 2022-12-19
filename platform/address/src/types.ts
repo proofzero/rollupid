@@ -20,9 +20,9 @@ export interface Environment {
   APIKEY_ALCHEMY_POLYGON: string
   ALCHEMY_POLYGON_NETWORK: string
 
-  TOKEN_ALCHEMY_NOTIFY: string
-
-  URL_ALCHEMY_WEBHOOK: string
+  APIKEY_MORALIS: string
+  MORALIS_STREAM_ID: string
+  URL_MORALIS_WEBHOOK: string
 }
 
 export interface AddressRpcContext extends RpcContext {

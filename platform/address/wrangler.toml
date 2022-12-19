@@ -22,7 +22,7 @@ database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-URL_ALCHEMY_WEBHOOK = "https://localhost:9292/webhooks/alchemy"
+URL_MORALIS_WEBHOOK = "https://localhost:9292/webhooks/moralis"
 
 [dev]
 port = 9191
@@ -57,6 +57,7 @@ d1_databases = [
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
+URL_MORALIS_WEBHOOK = "https://beacon-dev/webhooks/moralis"
 
 [env.next]
 durable_objects.bindings = [
@@ -74,6 +75,8 @@ d1_databases = [
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
+URL_MORALIS_WEBHOOK = "https://beacon-next/webhooks/moralis"
+
 
 [env.current]
 durable_objects.bindings = [
@@ -91,3 +94,5 @@ d1_databases = [
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
+URL_MORALIS_WEBHOOK = "https://beacon/webhooks/moralis"
+

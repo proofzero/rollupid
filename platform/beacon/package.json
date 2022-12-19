@@ -17,6 +17,9 @@
     "start": "echo \"No start for galaxy. Please use dev.\""
   },
   "dependencies": {
-    "itty-router": "2.6.6"
+    "@moralisweb3/evm-utils": "2.10.0",
+    "itty-router": "2.6.6",
+    "moralis": "2.10.0",
+    "web3": "1.8.1"
   }
 }

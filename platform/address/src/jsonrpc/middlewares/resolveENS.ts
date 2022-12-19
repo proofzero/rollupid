@@ -14,5 +14,6 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
   const ensClient = new ENSUtils()
   const response = await ensClient.getEnsEntry(context.get('name'))
 
+  context.set('name', response.address)
   context.set('address_description', response)
 }

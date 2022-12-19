@@ -5,3 +5,6 @@ compatibility_date = "2022-12-15"
 [dev]
 port = 9292
 local_protocol = "http"
+
+[env.dev]
+route = { pattern = "beacon-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
