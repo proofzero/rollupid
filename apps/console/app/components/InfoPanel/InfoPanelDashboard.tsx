@@ -4,12 +4,12 @@ import { HiAcademicCap, HiUsers } from 'react-icons/hi2'
 import { InfoPanel } from './InfoPanel'
 
 const communityLinks = [
-  <ButtonAnchor href="https://twitter.com/threeid_xyz">
+  <ButtonAnchor key="twitter" href="https://twitter.com/threeid_xyz">
     <FaTwitter style={{ color: '#1D9BF0' }} />
 
     <span>Twitter</span>
   </ButtonAnchor>,
-  <ButtonAnchor href="https://discord.gg/threeid">
+  <ButtonAnchor key="discord" href="https://discord.gg/threeid">
     <FaDiscord style={{ color: '#1D9BF0' }} />
 
     <span>Discord</span>
@@ -17,12 +17,12 @@ const communityLinks = [
 ]
 
 const practiceLinks = [
-  <ButtonAnchor href="https://github.com/kubelt">
+  <ButtonAnchor key="github" href="https://github.com/kubelt">
     <FaGithub className="text-gray-400" />
 
     <span>GitHub</span>
   </ButtonAnchor>,
-  <ButtonAnchor href="https://docs.threeid.xyz">
+  <ButtonAnchor key="docs" href="https://docs.threeid.xyz">
     <FaBook className="text-gray-400" />
 
     <span>Docs</span>

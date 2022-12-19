@@ -10,6 +10,7 @@ import { json } from '@remix-run/cloudflare'
 import folderPlus from '~/images/folderPlus.svg'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { getApplicationListItems } from '~/models/app.server'
 
@@ -23,6 +24,7 @@ import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
 import { getStarbaseClient } from '~/utilities/platform.server'
+import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
@@ -54,30 +56,58 @@ export default function DashboardIndexPage() {
       <SiteMenu apps={apps} selected={appId} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader />
-        <div className="bg-gray-200 p-6 h-full">
-          <AppBox createLink="/dashboard/new" apps={apps} />
-          <div className="text-center mt-24 m-auto">
-            <img className="inline-block" src={folderPlus} alt="Wallet icon" />
-            <div className="text-black mt-4">No Applications</div>
-            <p className="text-slate-500">
-              Get started by creating an Application.
-            </p>
-            <Button
-              btnSize="l"
-              onClick={() => {
-                console.log('opening', newAppModalOpen)
-                setNewAppModalOpen(true)
-              }}
-            >
-              Create Application"
-            </Button>
+        <div className="bg-gray-50 p-6 h-full">
+          <div className="mb-11">
+            <InfoPanelDashboard />
           </div>
-          <NewAppModal
-            isOpen={newAppModalOpen}
-            newAppCreateCallback={(app) => {
-              setNewAppModalOpen(false)
-            }}
-          />
+
+          {apps?.length > 0 && (
+            <AppBox createLink="/dashboard/new" apps={apps} />
+          )}
+
+          {apps?.length === 0 && (
+            <>
+              <Text
+                size="base"
+                weight="semibold"
+                className="text-gray-900 mb-6"
+              >
+                Your Applications
+              </Text>
+
+              <div className="text-center m-auto">
+                <img
+                  className="inline-block mb-2"
+                  src={folderPlus}
+                  alt="Wallet icon"
+                />
+
+                <Text weight="semibold" className="text-gray-900">
+                  No Applications
+                </Text>
+                <Text weight="medium" className="text-gray-500 mb-6">
+                  Get started by creating an Application.
+                </Text>
+
+                <Button
+                  btnType="primary-alt"
+                  btnSize="l"
+                  onClick={() => {
+                    console.log('opening', newAppModalOpen)
+                    setNewAppModalOpen(true)
+                  }}
+                >
+                  Create Application
+                </Button>
+              </div>
+              <NewAppModal
+                isOpen={newAppModalOpen}
+                newAppCreateCallback={(app) => {
+                  setNewAppModalOpen(false)
+                }}
+              />
+            </>
+          )}
         </div>
       </main>
     </div>
