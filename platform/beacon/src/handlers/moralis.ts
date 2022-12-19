@@ -1,6 +1,6 @@
 import web3 from 'web3'
-
-import { AddressURNSpace } from '@kubelt/urns'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { Environment } from '../types'
 
 // https://docs.moralis.io/docs/response-body
 type MoralisWebhookBody = {
@@ -17,12 +17,12 @@ type MoralisWebhookBody = {
   }[]
 }
 
-const MoralisHandler = async (request: Request) => {
+const MoralisHandler = async (request: Request, env: Environment) => {
   const providedSignature = request.headers.get('x-signature')
   if (!providedSignature) throw new Error('moralis: no signature provided')
 
   const bodyText = await request.text()
-  const generatedSignature = web3.utils.sha3(bodyText + APIKEY_MORALIS)
+  const generatedSignature = web3.utils.sha3(bodyText + env.APIKEY_MORALIS)
   if (generatedSignature !== providedSignature)
     throw new Error('moralis: Invalid Signature')
 
@@ -35,23 +35,23 @@ const MoralisHandler = async (request: Request) => {
 
   // batch the changes to address worker
   const setTokensBody = body.nftTransfers.map((nft) => {
-    const addressUrn = AddressURNSpace.fromAddress(nft.to)
+    const addressUrn = AddressURNSpace.urn(nft.to)
     return {
       tokenId: nft.tokenId,
       contract: nft.contract,
       addressUrn: `${addressUrn}+?type=ethereum`,
     }
   })
-  BLOCKCHAIN_ACTIVITY.send({
+  env.BLOCKCHAIN_ACTIVITY.send({
     method: 'kb_setToken',
     setTokensBody,
   })
 
   const setTokenMetaBody = body.nftTransfers.flatMap((nft) => nft.tokenId)
-  BLOCKCHAIN_ACTIVITY.send({ method: 'kb_setTokenMeta', setTokenMetaBody })
+  env.BLOCKCHAIN_ACTIVITY.send({ method: 'kb_setTokenMeta', setTokenMetaBody })
 
   const setContractMetaBody = body.nftTransfers.flatMap((nft) => nft.contract)
-  BLOCKCHAIN_ACTIVITY.send({
+  env.BLOCKCHAIN_ACTIVITY.send({
     method: 'kb_setContractMeta',
     setContractMetaBody,
   })
