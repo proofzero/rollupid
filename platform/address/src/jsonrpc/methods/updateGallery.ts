@@ -1,5 +1,5 @@
 import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
 import { AddressRpcContext, AddressTokensTable } from '../../types'
 import { address_tokens } from '../../db/schema'
@@ -13,7 +13,7 @@ export default async (
   context: Readonly<AddressRpcContext>
 ) => {
   const values = request.params as SetGalleryParams
-  const db = context.db
+  const db = context.collectionDB
   const upsertGallery = await db
     .insert(address_tokens)
     .values(...values)

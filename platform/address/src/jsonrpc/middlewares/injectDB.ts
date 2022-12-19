@@ -1,5 +1,4 @@
 import { drizzle } from 'drizzle-orm-sqlite/d1'
-import type { RpcContext } from '@kubelt/openrpc'
 import { AddressRpcContext } from '../../types'
 
 export default async (
@@ -7,5 +6,5 @@ export default async (
   context: AddressRpcContext
 ) => {
   const db = drizzle(context.get('COLLECTIONS'))
-  context.db = db
+  context.collectionDB = db
 }

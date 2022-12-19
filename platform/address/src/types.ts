@@ -26,7 +26,7 @@ export interface Environment {
 }
 
 export interface AddressRpcContext extends RpcContext {
-  db: DrizzleD1Database
+  collectionDB: DrizzleD1Database
 }
 
 export enum NodeType {

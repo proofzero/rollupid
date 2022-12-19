@@ -1,0 +1,103 @@
+{
+  "version": "3",
+  "dialect": "sqlite",
+  "id": "92c48177-628f-403a-9e5c-36929f25061d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "address_tokens": {
+      "name": "address_tokens",
+      "columns": {
+        "addressURN": {
+          "name": "addressURN",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokenId": {
+          "name": "tokenId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gallery_order": {
+          "name": "gallery_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "IDX_address_tokens__addressURN__tokenId": {
+          "name": "IDX_address_tokens__addressURN__tokenId",
+          "columns": [
+            "addressURN",
+            "tokenId"
+          ],
+          "isUnique": true
+        },
+        "IDX_address_tokens__addressURN": {
+          "name": "IDX_address_tokens__addressURN",
+          "columns": [
+            "addressURN"
+          ],
+          "isUnique": false
+        },
+        "IDX_address_tokens__tokenId": {
+          "name": "IDX_address_tokens__tokenId",
+          "columns": [
+            "tokenId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    },
+    "collections": {
+      "name": "collections",
+      "columns": {
+        "contract": {
+          "name": "contract",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "tokens": {
+      "name": "tokens",
+      "columns": {
+        "tokenId": {
+          "name": "tokenId",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": false
+        },
+        "contract": {
+          "name": "contract",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_tokens__contract": {
+          "name": "IDX_tokens__contract",
+          "columns": [
+            "contract"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {}
+    }
+  },
+  "enums": {}
+}
