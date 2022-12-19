@@ -204,6 +204,19 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
+      name: 'kb_appRotateApiKey',
+      summary: 'Invalidate an old API key and replace it with a new value',
+      params: [],
+      result: {
+        name: 'success',
+        schema: {
+          type: 'boolean',
+        },
+      },
+      errors: [],
+    },
+
+    {
       name: 'kb_appPublish',
       summary: 'Set the publication status of an application',
       params: [

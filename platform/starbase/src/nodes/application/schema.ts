@@ -99,6 +99,26 @@ const rpcSchema: RpcSchema = {
       },
     },
     {
+      name: 'rotateApiKey',
+      summary: 'Set a new API key',
+      params: [
+        {
+          name: 'apiKey',
+          description: 'An API key',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'success',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
+
+    {
       name: 'publish',
       summary: 'Set the publication flag status',
       params: [],
