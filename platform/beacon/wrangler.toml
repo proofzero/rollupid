@@ -2,6 +2,10 @@ name = "beacon"
 main = "src/index.ts"
 compatibility_date = "2022-12-15"
 
+[[queues.producers]]
+ queue = "blockchain-activity"
+ binding = "BLOCKCHAIN_ACTIVITY"
+
 [dev]
 port = 9292
 local_protocol = "http"
