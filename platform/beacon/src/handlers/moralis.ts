@@ -39,7 +39,7 @@ const MoralisHandler = async (request: Request, env: Environment) => {
     return {
       tokenId: nft.tokenId,
       contract: nft.contract,
-      addressUrn: `${addressUrn}+?type=ethereum`,
+      addressUrn: `${addressUrn}?+node_type=crypto&addr_type=ethereum`,
     }
   })
   env.BLOCKCHAIN_ACTIVITY.send({

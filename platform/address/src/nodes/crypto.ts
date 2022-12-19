@@ -60,9 +60,9 @@ import { recoverEthereumAddress } from '../utils'
   defaultValue: null,
 })
 @field({
-  name: 'webhook',
-  doc: 'Registered Webhooks',
-  defaultValue: {},
+  name: 'boostrapped',
+  doc: 'Bootstrapped flagged',
+  defaultValue: false,
 })
 export default class CryptoAddress {
   @method('getAddress')
