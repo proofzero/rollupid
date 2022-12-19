@@ -6,24 +6,6 @@ import {
   uniqueIndex,
 } from 'drizzle-orm-sqlite'
 
-export const address_tokens = sqliteTable(
-  'address_tokens',
-  {
-    addressURN: text('addressURN'),
-    tokenId: text('tokenId').notNull(),
-    // .references(() => tokens.tokenId),
-    order: integer('order'), // NOTE: when upserting address_token we should set order to null
-  },
-  (table) => ({
-    uniquePK: uniqueIndex('IDX_address_tokens__addressURN__tokenId').on(
-      table.addressURN,
-      table.tokenId
-    ),
-    addressIdx: index('IDX_address_tokens__addressURN').on(table.addressURN),
-    tokenIdx: index('IDX_address_tokens__tokenId').on(table.tokenId),
-  })
-)
-
 export const tokens = sqliteTable(
   'tokens',
   {
@@ -35,6 +17,23 @@ export const tokens = sqliteTable(
   })
 )
 
+export const address_tokens = sqliteTable(
+  'address_tokens',
+  {
+    addressURN: text('addressURN').notNull(),
+    tokenId: text('tokenId').notNull(),
+    // .references(() => tokens.tokenId),
+    gallery_order: integer('gallery_order'), // NOTE: when upserting address_token we should set order to null
+  },
+  (table) => ({
+    uniquePK: uniqueIndex('IDX_address_tokens__addressURN__tokenId').on(
+      table.addressURN,
+      table.tokenId
+    ),
+    addressIdx: index('IDX_address_tokens__addressURN').on(table.addressURN),
+    tokenIdx: index('IDX_address_tokens__tokenId').on(table.tokenId),
+  })
+)
 export const collections = sqliteTable(
   'collections',
   {

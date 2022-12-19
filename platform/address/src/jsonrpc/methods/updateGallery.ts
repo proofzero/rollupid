@@ -19,7 +19,7 @@ export default async (
     .values(...values)
     .onConflictDoUpdate({
       set: {
-        order: sql`excluded.order`,
+        gallery_order: sql`excluded.gallery_order`,
       },
     })
     .run()
