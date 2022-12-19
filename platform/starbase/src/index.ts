@@ -40,6 +40,7 @@ import { StarbaseApplication } from './nodes/application'
 import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
+import * as edgeUtil from './edge'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
@@ -208,6 +209,10 @@ const kb_appCreate = openrpc.method(schema, {
       // NB: this throws if no token was provided, or if the supplied
       // account URN isn't valid.
       const accountURN = tokenUtil.getAccountId(token)
+      if(!accountURN) {
+        throw new Error("Account URN must be retrievable")
+      }
+      
       const tag = graph.edge(EDGE_TAG)
 
       const [clientName] = request.params as ParamsArray
