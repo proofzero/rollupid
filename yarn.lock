@@ -4853,7 +4853,6 @@ __metadata:
     "@kubelt/design-system": "*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
     "@mdx-js/react": ^1.6.22
     "@playwright/test": 1.25.2
     "@remix-run/cloudflare": 1.7.0
@@ -4938,7 +4937,6 @@ __metadata:
     "@heroicons/react": 2.0.13
     "@kubelt/design-system": "*"
     "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@mdx-js/react": 2.1.5
     "@playwright/test": 1.28.1
@@ -5191,7 +5189,6 @@ __metadata:
     "@ethersproject/random": 5.7.0
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
@@ -5218,7 +5215,6 @@ __metadata:
     "@ethersproject/address": 5.7.0
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
@@ -5278,29 +5274,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/platform.commons@*, @kubelt/platform.commons@workspace:*, @kubelt/platform.commons@workspace:platform/commons":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/platform.commons@workspace:platform/commons"
-  dependencies:
-    "@cloudflare/workers-types": 3.18.0
-    "@kubelt/platform.account": "workspace:*"
-    "@kubelt/platform.address": "workspace:*"
-    "@types/itty-router-extras": 0.4.0
-    "@typescript-eslint/eslint-plugin": 5.41.0
-    "@typescript-eslint/parser": 5.41.0
-    eslint: 8.28.0
-    eslint-config-prettier: 8.5.0
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    typed-json-rpc: 1.1.0
-    typescript: 4.8.4
-    urns: 0.6.0
-  peerDependencies:
-    itty-router: "*"
-    itty-router-extras: "*"
-  languageName: unknown
-  linkType: soft
-
 "@kubelt/platform.edges@workspace:platform/edges":
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.edges@workspace:platform/edges"
@@ -5339,7 +5312,6 @@ __metadata:
     "@graphql-tools/schema": 9.0.4
     "@graphql-tools/stitch": 8.7.13
     "@graphql-yoga/common": 2.12.12
-    "@kubelt/platform.commons": "workspace:*"
     concurrently: 7.5.0
     graphql: 16.6.0
     npm-run-all: 4.1.5
@@ -5354,7 +5326,6 @@ __metadata:
   resolution: "@kubelt/platform.icons@workspace:platform/icons"
   dependencies:
     "@cloudflare/workers-types": 3.18.0
-    "@kubelt/platform.commons": "workspace:*"
     date-fns: 2.29.3
     npm-run-all: 4.1.5
     tiny-invariant: 1.3.1
@@ -5388,7 +5359,6 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 3.18.0
     "@kubelt/openrpc": "*"
-    "@kubelt/platform.commons": "*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -5412,7 +5382,6 @@ __metadata:
     "@ethersproject/bytes": 5.7.0
     "@kubelt/graph": "workspace:*"
     "@kubelt/openrpc": "workspace:*"
-    "@kubelt/platform.commons": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
@@ -5576,6 +5545,24 @@ __metadata:
     prettier: 2.8.0
     typescript: 4.9.3
     urns: 0.6.0
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/utils@workspace:packages/utils":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/utils@workspace:packages/utils"
+  dependencies:
+    "@cloudflare/workers-types": 3.18.0
+    "@kubelt/platform.account": "workspace:*"
+    "@kubelt/platform.address": "workspace:*"
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.41.0
+    "@typescript-eslint/parser": 5.41.0
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    typescript: 4.8.4
   languageName: unknown
   linkType: soft
 
