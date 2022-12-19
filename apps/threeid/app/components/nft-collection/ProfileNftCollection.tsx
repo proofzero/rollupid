@@ -9,7 +9,7 @@ import polygon from '~/assets/partners/polygon.svg'
 import book from '~/assets/book.svg'
 
 import noNfts from '~/assets/No_NFT_Found.svg'
-import noImage from '~/assets/noImage.png'
+import noFilter from '~/assets/no-filter.svg'
 
 import { Button } from '@kubelt/design-system'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
@@ -192,6 +192,13 @@ const ProfileNftCollection = ({
     }
   }, [refresh])
 
+  const filteredLoadedNfts = loadedNfts.filter(
+    (nft) =>
+      curFilter === 'All Collections' ||
+      curFilter === nft.collectionTitle ||
+      (!nft.collectionTitle && curFilter === 'Untitled Collections')
+  )
+
   return (
     <>
       {!loading && !refresh && !isOwner && loadedNfts.length === 0 && (
@@ -290,7 +297,7 @@ const ProfileNftCollection = ({
           sm:min-w-[17.2rem]
           min-w-full
           py-[10px]
-          px-[30px]
+          px-[12px]
           font-medium
           text-base
           rounded-md
@@ -303,8 +310,9 @@ const ProfileNftCollection = ({
                       setOpenedFilters(!openedFilters)
                     }}
                   >
-                    Filters
+                    {curFilter}
                     <HiChevronUp
+                      size={20}
                       className={
                         openedFilters ? 'rotate-180 transition' : 'transition'
                       }
@@ -385,6 +393,10 @@ const ProfileNftCollection = ({
                                     ? pfp
                                     : colName.img
                                 }
+                                onError={({ currentTarget }) => {
+                                  currentTarget.onerror = null
+                                  currentTarget.src = noFilter
+                                }}
                                 alt="+"
                               />
                             ) : (
@@ -395,7 +407,7 @@ const ProfileNftCollection = ({
                             curFilter === 'Untitled Collection' ? (
                               <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
                                 <div>{colName.title}</div>
-                                <HiOutlineCheck />
+                                <HiOutlineCheck size={20} />
                               </Text>
                             ) : (
                               <Text className="focus:outline-none pl-3">
@@ -416,7 +428,11 @@ const ProfileNftCollection = ({
             next={preload ? () => {} : getMoreNfts}
             hasMore={preload ? false : pageKey != null}
             loader={<Spinner />}
-            className="overflow-visible flex items-center justify-center"
+            className={`${
+              filteredLoadedNfts.length > 4
+                ? 'flex items-center justify-center'
+                : ''
+            }`}
           >
             <Masonry
               breakpointCols={{
@@ -426,41 +442,39 @@ const ProfileNftCollection = ({
                 768: 2,
                 640: 1,
               }}
-              className="my-masonry-grid space-x-10"
+              className={`my-masonry-grid space-x-10 ${
+                filteredLoadedNfts.length <= 4
+                  ? 'flex justify-center px-14'
+                  : ''
+              }`}
               columnClassName="my-masonry-grid_column"
             >
-              {loadedNfts
-                .filter(
-                  (nft) =>
-                    curFilter === 'All Collections' ||
-                    curFilter === nft.collectionTitle ||
-                    (!nft.collectionTitle &&
-                      curFilter === 'Untitled Collections')
-                )
-                .map((nft, i) => (
-                  // Filtering collection by
-                  // unique values
-                  // breaks the infinite scroll
-                  // plugin I resorted to this
-                  <div
-                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                  >
-                    {nftRenderer(
-                      nft,
-                      selectedNft ===
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
-                      (selectedNft: any) => {
-                        setSelectedNft(
-                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
-                        )
+              {filteredLoadedNfts.map((nft, i) => (
+                // Filtering collection by
+                // unique values
+                // breaks the infinite scroll
+                // plugin I resorted to this
 
-                        if (handleSelectedNft) {
-                          handleSelectedNft(selectedNft)
-                        }
+                <div
+                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                  className="flex justify-center"
+                >
+                  {nftRenderer(
+                    nft,
+                    selectedNft ===
+                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                    (selectedNft: any) => {
+                      setSelectedNft(
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                      )
+
+                      if (handleSelectedNft) {
+                        handleSelectedNft(selectedNft)
                       }
-                    )}
-                  </div>
-                ))}
+                    }
+                  )}
+                </div>
+              ))}
             </Masonry>
           </InfiniteScroll>
         </>

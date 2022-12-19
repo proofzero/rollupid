@@ -64,6 +64,11 @@ const ModaledNft = ({ nft, isModal }: any) => {
           font-semibold
           hover:shadow-xl 
           hover:font-bold
+          lg:w-[13rem]
+          md:w-[14rem]
+          sm:w-[15rem]
+          min-[410px]:w-[22rem]
+          w-[18rem]
           flex
           flex-col
           align-center justify-center
@@ -79,8 +84,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
               md:max-w-[14rem]
               sm:h-[15rem]
               sm:max-w-[15rem]
-              align-center 
-              justify-center"
+              "
               src={
                 loadFail
                   ? missingNftSvg
@@ -92,10 +96,8 @@ const ModaledNft = ({ nft, isModal }: any) => {
             <div
               className="flex text-gray-600
             flex-row whitespace-nowrap 
-            max-w-full
-            lg:max-w-[13rem] 
-            md:max-w-[14rem] 
-            sm:max-w-[15rem] justify-between items-center px-2 py-3"
+            w-full
+            justify-between items-center px-4 py-3"
             >
               <div className="truncate leading-none">
                 {nft.collectionTitle ? nft.collectionTitle : ' '}
