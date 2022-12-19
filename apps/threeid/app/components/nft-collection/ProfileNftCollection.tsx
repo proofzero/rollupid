@@ -297,7 +297,7 @@ const ProfileNftCollection = ({
           sm:min-w-[17.2rem]
           min-w-full
           py-[10px]
-          px-[30px]
+          px-[12px]
           font-medium
           text-base
           rounded-md
@@ -310,8 +310,9 @@ const ProfileNftCollection = ({
                       setOpenedFilters(!openedFilters)
                     }}
                   >
-                    Filters
+                    {curFilter}
                     <HiChevronUp
+                      size={20}
                       className={
                         openedFilters ? 'rotate-180 transition' : 'transition'
                       }
@@ -406,7 +407,7 @@ const ProfileNftCollection = ({
                             curFilter === 'Untitled Collection' ? (
                               <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
                                 <div>{colName.title}</div>
-                                <HiOutlineCheck />
+                                <HiOutlineCheck size={20} />
                               </Text>
                             ) : (
                               <Text className="focus:outline-none pl-3">
