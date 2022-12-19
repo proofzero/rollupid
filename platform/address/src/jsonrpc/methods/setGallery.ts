@@ -1,11 +1,11 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { AddressRpcContext, AddressTokensTable } from '../../types'
-import { address_tokens } from '../../db/schema'
+import { AddressRpcContext } from '../../types'
+import { TokensTable, tokens } from '../../db/schema'
 import { sql } from 'drizzle-orm'
 
-export type SetGalleryParams = AddressTokensTable[]
+export type SetGalleryParams = TokensTable[]
 
 export default async (
   service: Readonly<RpcService>,
@@ -15,9 +15,10 @@ export default async (
   const values = request.params as SetGalleryParams
   const db = context.collectionDB
   const upsertGallery = await db
-    .insert(address_tokens)
+    .insert(tokens)
     .values(...values)
     .onConflictDoUpdate({
+      where: sql`addressURN = excluded.addressURN`,
       set: {
         gallery_order: sql`excluded.gallery_order`,
       },
@@ -27,5 +28,6 @@ export default async (
   if (upsertGallery.error) {
     throw `Error upserting gallery: ${upsertGallery.error}`
   }
+
   return openrpc.response(request, null)
 }

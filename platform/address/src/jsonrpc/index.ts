@@ -20,7 +20,10 @@ import resolveENS from './middlewares/resolveENS'
 import setCryptoNodeClient from './middlewares/setCryptoNodeClient'
 import initCryptoNode from './middlewares/initCryptoNode'
 import injectDB from './middlewares/injectDB'
-import updateGallery from './methods/updateGallery'
+import setGallery from './methods/setGallery'
+import getGallery from './methods/getGallery'
+import getTokens from './methods/getTokens'
+import setTokens from './methods/setTokens'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -73,9 +76,24 @@ const rpcHandler = openrpc.build(
         handler: openrpc.handler(getPfpVoucher),
       }),
       openrpc.method(schema, {
-        name: 'kb_updateGallery',
+        name: 'kb_getTokens',
         scopes: openrpc.scopes([]),
-        handler: openrpc.handler(updateGallery),
+        handler: openrpc.handler(getTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setTokens',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_getGallery',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getGallery),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setGallery',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setGallery),
       }),
     ]),
     openrpc.extensions(schema, []),

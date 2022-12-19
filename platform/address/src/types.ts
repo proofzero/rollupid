@@ -70,9 +70,3 @@ export type AddressProfile = {
 }
 
 export type SetAddressProfileParams = [profile: Partial<AddressProfile>]
-
-export type AddressTokensTable = {
-  addressURN: string
-  tokenId: string
-  order?: number
-}
