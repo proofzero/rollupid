@@ -1,6 +1,6 @@
 import { json } from '@remix-run/cloudflare'
 
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useTransition } from '@remix-run/react'
 import { FaDiscord, FaTwitter } from 'react-icons/fa'
 
 import FAQ from '~/components/FAQ'
@@ -8,6 +8,7 @@ import FAQ from '~/components/FAQ'
 import stepComplete from '~/assets/step_complete.png'
 import stepSoon from '~/assets/step_soon.png'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
@@ -70,6 +71,7 @@ const comingNext = [
 
 export default function Welcome() {
   const { isToken, displayname, profile } = useLoaderData()
+  const transition = useTransition()
 
   completeSteps[0].isCompleted = isToken
   completeSteps[1].isCompleted = Object.keys(profile || {}).length > 1
@@ -81,6 +83,7 @@ export default function Welcome() {
 
   return (
     <div className="dashboard flex flex-col gap-4">
+      {transition.state === 'loading' && <Loader />}
       <div
         className="welcome-banner basis-full"
         style={{

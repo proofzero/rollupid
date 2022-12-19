@@ -1,5 +1,10 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
+import {
+  useCatch,
+  useFetcher,
+  useLoaderData,
+  useTransition,
+} from '@remix-run/react'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 
@@ -10,6 +15,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Cover } from '../../components/profile/cover/Cover'
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
@@ -168,6 +174,8 @@ const ProfileRoute = () => {
   const [coverUrl, setCoverUrl] = useState(cover)
   const [handlingCover, setHandlingCover] = useState<boolean>(false)
 
+  const transition = useTransition()
+
   const fetcher = useFetcher()
   useEffect(() => {
     if (fetcher.type === 'done') {
@@ -260,6 +268,7 @@ const ProfileRoute = () => {
 
   return (
     <div className="bg-white h-full min-h-screen overflow-visible">
+      {transition.state === 'loading' && <Loader />}
       <div
         className="header lg:px-4"
         style={{
