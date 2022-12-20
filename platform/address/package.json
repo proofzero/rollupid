@@ -2,6 +2,7 @@
   "name": "@kubelt/platform.address",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "wrangler publish --dry-run --outdir=dist",
     "db:generate": "drizzle-kit generate --dialect=sqlite --schema=src/db/schema.ts",
@@ -25,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "drizzle-kit": "0.14.0",
+    "esbuild": "0.16.10",
     "eslint": "8.28.0",
     "eslint-config-prettier": "8.5.0",
     "npm-run-all": "4.1.5",
@@ -49,6 +51,7 @@
     "drizzle-orm": "0.14.2",
     "drizzle-orm-sqlite": "0.14.2",
     "itty-router": "2.6.6",
-    "itty-router-extras": "0.4.2"
+    "itty-router-extras": "0.4.2",
+    "stream": "0.0.2"
   }
 }

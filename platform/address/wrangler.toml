@@ -1,8 +1,12 @@
 name = "address"
-main = "src/index.ts"
+main = "dist/index.mjs"
+# type = "javascript"
 compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
+
+[build]
+command = "node build.js"
 
 durable_objects.bindings = [
   { name = "CryptoAddress", class_name = "CryptoAddress" }

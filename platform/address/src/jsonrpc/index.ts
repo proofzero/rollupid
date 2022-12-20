@@ -22,10 +22,10 @@ import initCryptoNode from './middlewares/initCryptoNode'
 import injectDB from './middlewares/injectDB'
 import setGallery from './methods/setGallery'
 import getGallery from './methods/getGallery'
-import getTokens from './methods/getTokens'
-import setTokens from './methods/setTokens'
-import setTokenMetadata from './methods/setTokenMetadata'
-import indexTokens from './methods/indexTokens'
+// import getTokens from './methods/getTokens'
+// import setTokens from './methods/setTokens'
+// import setTokenMetadata from './methods/setTokenMetadata'
+// import indexTokens from './methods/indexTokens'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -77,26 +77,26 @@ const rpcHandler = openrpc.build(
         scopes: openrpc.scopes([]),
         handler: openrpc.handler(getPfpVoucher),
       }),
-      openrpc.method(schema, {
-        name: 'kb_indexTokens',
-        scopes: openrpc.scopes([]),
-        handler: openrpc.handler(indexTokens),
-      }),
-      openrpc.method(schema, {
-        name: 'kb_setTokenMetadata',
-        scopes: openrpc.scopes([]),
-        handler: openrpc.handler(setTokenMetadata),
-      }),
-      openrpc.method(schema, {
-        name: 'kb_getTokens',
-        scopes: openrpc.scopes([]),
-        handler: openrpc.handler(getTokens),
-      }),
-      openrpc.method(schema, {
-        name: 'kb_setTokens',
-        scopes: openrpc.scopes([]),
-        handler: openrpc.handler(setTokens),
-      }),
+      // openrpc.method(schema, {
+      //   name: 'kb_indexTokens',
+      //   scopes: openrpc.scopes([]),
+      //   handler: openrpc.handler(indexTokens),
+      // }),
+      // openrpc.method(schema, {
+      //   name: 'kb_setTokenMetadata',
+      //   scopes: openrpc.scopes([]),
+      //   handler: openrpc.handler(setTokenMetadata),
+      // }),
+      // openrpc.method(schema, {
+      //   name: 'kb_getTokens',
+      //   scopes: openrpc.scopes([]),
+      //   handler: openrpc.handler(getTokens),
+      // }),
+      // openrpc.method(schema, {
+      //   name: 'kb_setTokens',
+      //   scopes: openrpc.scopes([]),
+      //   handler: openrpc.handler(setTokens),
+      // }),
       openrpc.method(schema, {
         name: 'kb_getGallery',
         scopes: openrpc.scopes([]),

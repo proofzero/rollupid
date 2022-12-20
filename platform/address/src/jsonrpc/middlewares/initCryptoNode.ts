@@ -1,5 +1,5 @@
-import Core from '@moralisweb3/common-core'
-import Streams from '@moralisweb3/streams'
+// import Core from '@moralisweb3/common-core'
+// import Streams from '@moralisweb3/streams'
 
 import type { RpcContext } from '@kubelt/openrpc'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -26,26 +26,26 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
     await nodeClient.setType({ type: context.get('addr_type') })
 
     // TODO: when contracts are supported we can monitor contracts too
-    if (context.get('node_type') == NodeType.Crypto) {
-      const core = Core.create()
-      await core.start({ apiKey: context.get('APIKEY_MORALIS') })
-      core.registerModules([Streams])
+    // if (context.get('node_type') == NodeType.Crypto) {
+    //   const core = Core.create()
+    //   await core.start({ apiKey: context.get('APIKEY_MORALIS') })
+    //   core.registerModules([Streams])
 
-      const streamsApi = core.getModule<Streams>(Streams.moduleName)
-      streamsApi.addAddress({
-        address: context.get('name'),
-        id: context.get('MORALIS_STREAM_ID'),
-      })
+    //   const streamsApi = core.getModule<Streams>(Streams.moduleName)
+    //   streamsApi.addAddress({
+    //     address: context.get('name'),
+    //     id: context.get('MORALIS_STREAM_ID'),
+    //   })
 
-      // and let's send a message to bootstrap the address collection
-      context.get('BLOCKCHAIN_ACTIVITY').send({
-        method: 'kb_indexTokens',
-        body: [AddressURNSpace.urn(context.get('name')), 'eth', null],
-      })
-      context.get('BLOCKCHAIN_ACTIVITY').send({
-        method: 'kb_indexTokens',
-        body: [AddressURNSpace.urn(context.get('name')), 'polygon', null],
-      })
-    }
+    //   // and let's send a message to bootstrap the address collection
+    //   context.get('BLOCKCHAIN_ACTIVITY').send({
+    //     method: 'kb_indexTokens',
+    //     body: [AddressURNSpace.urn(context.get('name')), 'eth', null],
+    //   })
+    //   context.get('BLOCKCHAIN_ACTIVITY').send({
+    //     method: 'kb_indexTokens',
+    //     body: [AddressURNSpace.urn(context.get('name')), 'polygon', null],
+    //   })
+    // }
   }
 }
