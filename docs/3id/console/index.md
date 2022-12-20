@@ -30,5 +30,4 @@ OAuth, these are effectively your application's username and password for the
 
 Connect smart contracts to your 3ID application to import the account addresses
 of token holders. Owners of these accounts who connect to your 3ID application
-will be shown under "Logins", along with contact information they have shared
-with your application.
+will be shown under "Logins".
