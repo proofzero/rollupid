@@ -8,11 +8,9 @@
 * [Profile](3id/profile/index.md)
   * [Profile Reference](3id/profile/reference.md)
 * [Passport](3id/passport/index.md)
-  * [Passport Reference](3id/passport/reference.md)
 * [Console](3id/console/index.md)
   * [Console Reference](3id/console/reference.md)
 * [Galaxy](3id/galaxy/index.md)
-  * [Galaxy Reference](3id/galaxy/reference.md)
 * [FAQ](3id/faq/index.md)
 
 <!--

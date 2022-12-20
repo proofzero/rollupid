@@ -4,11 +4,11 @@ description: 3ID Profile Reference
 
 3ID Public Profiles help you customize your application for your users with one API call.
 
-Simply look up a unique account resolver (see below) and onboard your users into a personalized experience, with their familiar display name, profile picture, cover photo, bio, and more.
+Simply look up a unique account resolver ([see below](#resolvers)) and onboard your users into a personalized experience, with their familiar display name, profile picture, cover photo, bio, and more.
 
 ## Getting Started
 
-To get a user's public profile make an HTTP API call to https://my.threeid.xyz/<resolver>/json, where <resolver> is a unique account identifier (e.g. an Ethereum address).
+To get a user's public profile make an HTTP API call to `https://my.threeid.xyz/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
 
 ### Resolvers
 
