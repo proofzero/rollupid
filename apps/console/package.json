@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.20.2",
-    "@cloudflare/workers-types": "3.18.0",
+    "@cloudflare/workers-types": "4.20221111.1",
     "@mdx-js/react": "2.1.5",
     "@remix-run/dev": "1.7.5",
     "@remix-run/eslint-config": "1.7.5",

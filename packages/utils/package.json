@@ -20,7 +20,7 @@
     "test": "run-s check"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "3.18.0",
+    "@cloudflare/workers-types": "4.20221111.1",
     "@kubelt/platform.account": "workspace:*",
     "@kubelt/platform.address": "workspace:*",
     "@types/itty-router-extras": "0.4.0",

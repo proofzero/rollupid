@@ -17,7 +17,7 @@
     "test": "run-s check"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "3.18.0",
+    "@cloudflare/workers-types": "4.20221111.1",
     "@types/itty-router-extras": "0.4.0",
     "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.42.1",

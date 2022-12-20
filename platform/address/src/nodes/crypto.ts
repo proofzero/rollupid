@@ -60,7 +60,7 @@ import { recoverEthereumAddress } from '../utils'
   defaultValue: null,
 })
 @field({
-  name: 'webook_registered',
+  name: 'webhook_registered',
   doc: 'Webhook registered flag',
   defaultValue: false,
 })

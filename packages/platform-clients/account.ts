@@ -8,5 +8,7 @@ export interface AccountApi extends BaseApi {
   kb_setProfile(account: AccountURN, profile: object): void
 }
 
-export default (fetcher: Fetcher, requestInit: RequestInit | Request = {}) =>
-  createClient<AccountApi>(fetcher, requestInit)
+export default (
+  fetcher: Fetcher,
+  requestInit: RequestInit<RequestInitCfProperties> | undefined
+) => createClient<AccountApi>(fetcher, requestInit)

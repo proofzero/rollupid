@@ -1952,13 +1952,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:3.18.0":
-  version: 3.18.0
-  resolution: "@cloudflare/workers-types@npm:3.18.0"
-  checksum: 9a54a4fbd12eed19495cf6774cd48b0e97aaee093d40d2ae8e7a11c58937b8ad5173588efca5e138c373c6d6730faf96f2385eee203dab3fdb91565885efb0cd
-  languageName: node
-  linkType: hard
-
 "@cloudflare/workers-types@npm:4.20221111.1":
   version: 4.20221111.1
   resolution: "@cloudflare/workers-types@npm:4.20221111.1"
@@ -4809,7 +4802,7 @@ __metadata:
   resolution: "@kubelt/apps.console@workspace:apps/console"
   dependencies:
     "@babel/core": 7.20.2
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@headlessui/react": 1.7.5
     "@heroicons/react": 2.0.13
     "@kubelt/design-system": "workspace:*"
@@ -4858,7 +4851,7 @@ __metadata:
   resolution: "@kubelt/apps.passport@workspace:apps/passport"
   dependencies:
     "@babel/core": ^7.20.2
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@headlessui/react": 1.6.6
     "@heroicons/react": 2.0.10
     "@kubelt-ui/threeid.themes.base-theme": 0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1
@@ -5139,7 +5132,7 @@ __metadata:
   resolution: "@kubelt/openrpc@workspace:packages/openrpc"
   dependencies:
     "@cfworker/json-schema": 1.12.5
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/graph": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
     "@open-rpc/meta-schema": 1.14.2
@@ -5198,7 +5191,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.access@workspace:platform/access"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/random": 5.7.0
     "@kubelt/openrpc": "workspace:*"
@@ -5225,7 +5218,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.account@workspace:platform/account"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
@@ -5250,7 +5243,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.address@workspace:platform/address"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/keccak256": 5.7.0
@@ -5327,7 +5320,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.galaxy@workspace:platform/galaxy"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/providers": 5.7.2
     "@graphql-tools/merge": 8.3.6
     "@graphql-tools/resolvers-composition": 6.5.6
@@ -5347,7 +5340,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.icons@workspace:platform/icons"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     date-fns: 2.29.3
     npm-run-all: 4.1.5
     tiny-invariant: 1.3.1
@@ -5360,7 +5353,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.object@workspace:platform/object"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -5379,7 +5372,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.ping@workspace:platform/ping"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/openrpc": "*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
@@ -5400,7 +5393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.starbase@workspace:platform/starbase"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
     "@kubelt/graph": "workspace:*"
     "@kubelt/openrpc": "workspace:*"
@@ -5574,7 +5567,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/utils@workspace:packages/utils"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/platform.account": "workspace:*"
     "@kubelt/platform.address": "workspace:*"
     "@types/itty-router-extras": 0.4.0

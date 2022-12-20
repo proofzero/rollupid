@@ -25,7 +25,7 @@
     "wrangler:remote": "wrangler dev --env dev"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "3.18.0",
+    "@cloudflare/workers-types": "4.20221111.1",
     "@types/itty-router-extras": "0.4.0",
     "@types/lodash": "4.14.189",
     "esbuild": "0.15.15",

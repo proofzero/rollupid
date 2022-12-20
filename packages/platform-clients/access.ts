@@ -54,5 +54,7 @@ export interface AccessApi extends BaseApi {
   kb_verifyAuthorization: VerifyAuthorization
 }
 
-export default (fetcher: Fetcher, requestInit: RequestInit | Request = {}) =>
-  createClient(fetcher, requestInit) as AccessApi
+export default (
+  fetcher: Fetcher,
+  requestInit: RequestInit<RequestInitCfProperties> | undefined
+) => createClient(fetcher, requestInit) as AccessApi

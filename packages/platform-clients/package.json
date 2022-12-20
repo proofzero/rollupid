@@ -1,7 +1,7 @@
 {
   "name": "@kubelt/platform-clients",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "description": "Kubelt Platform Clients",
   "keywords": [],
   "license": "ISC",
@@ -16,7 +16,7 @@
     "lint": "eslint --fix *.ts",
     "lint:check": "run-s lint:check:src",
     "lint:check:src": "eslint *.ts",
-    "types:check": "tsc",
+    "types:check": "tsc --project ./tsconfig.json --noEmit",
     "test": "run-s check"
   },
   "devDependencies": {

@@ -15,7 +15,7 @@ import type { BaseApi } from './base'
  */
 export default <Api extends BaseApi>(
   fetcher: Fetcher,
-  requestInit: RequestInit | Request = {}
+  requestInit: RequestInit<RequestInitCfProperties> | undefined
 ): JsonRpcClient<Api> => {
   const sendRequest = async (
     request: JsonRpcRequest
