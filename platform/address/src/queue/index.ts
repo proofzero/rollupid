@@ -3,7 +3,7 @@ import { Environment } from '../types'
 
 type Message = {
   method: string
-  body: any
+  body: string
 }
 export default async (
   batch: MessageBatch<Message>,
@@ -12,10 +12,10 @@ export default async (
 ): Promise<void> => {
   console.log({ batch })
 
-  batch.map(async (message: Message) => {
+  batch.messages.map(async (message) => {
     const req = new Request('', {
-      method: message.method,
-      body: message.body,
+      method: message.body.method,
+      body: message.body.body,
     })
 
     await jsonrpc(req, env, ctx)

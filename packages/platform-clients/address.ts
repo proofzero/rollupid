@@ -26,5 +26,5 @@ export interface AddressApi extends BaseApi {
 
 export default (
   fetcher: Fetcher,
-  requestInit: RequestInit<RequestInitCfProperties> | undefined
+  requestInit?: RequestInit<RequestInitCfProperties> | undefined
 ) => createClient<AddressApi>(fetcher, requestInit)

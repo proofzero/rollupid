@@ -30,6 +30,7 @@
     "check-coverage": false
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "3.18.0",
     "@databases/split-sql-query": "1.0.3",
     "@databases/sql": "3.2.0",
     "@microsoft/api-extractor": "7.33.6",

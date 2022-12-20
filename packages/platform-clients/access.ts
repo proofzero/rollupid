@@ -56,5 +56,5 @@ export interface AccessApi extends BaseApi {
 
 export default (
   fetcher: Fetcher,
-  requestInit: RequestInit<RequestInitCfProperties> | undefined
+  requestInit?: RequestInit<RequestInitCfProperties> | undefined
 ) => createClient(fetcher, requestInit) as AccessApi
