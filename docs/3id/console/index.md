@@ -1,7 +1,7 @@
 # Console
 
 [Console](https://passport.threeid.xyz) is where you create and manage 3ID applications.
-The details page for applications is described below. For more information see the [Console Reference](reference.md)
+The "Dashboard" page for applications is described below. For more information see the [Console Reference](reference.md).
 
 ![Console Application Details](../img/console-app-details.png)
 
@@ -9,7 +9,7 @@ The details page for applications is described below. For more information see t
 
 This key gives you access to [Galaxy](../galaxy/index.md)
 where you can query all of your configured scopes (see the [Console Reference](reference.md)
-for more information.
+for more information).
 
 ### Roll Keys
 
