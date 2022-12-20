@@ -330,6 +330,18 @@ export class StarbaseApplication {
     return apiKey
   }
 
+  @method('validateApiKey')
+  //@requiredScope()
+  @requiredField('apiKeySigningKeyPair', [FieldAccess.Read])
+  async validateApiKey(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    const validResult = await apiKeyUtils.verify(params, input, output)
+    return validResult
+  }
+
   // publish
   // ---------------------------------------------------------------------------
   // Note that this method simply sets the publication flag as

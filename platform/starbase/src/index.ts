@@ -50,7 +50,7 @@ import { ApplicationURNSpace } from '@kubelt/urns/application'
 
 import type { AccountURN } from '@kubelt/urns/account'
 
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { decodeJwt } from 'jose'
 
 // Errors
 // -----------------------------------------------------------------------------
@@ -564,6 +564,48 @@ const kb_appAuthCheck = openrpc.method(schema, {
   ),
 })
 
+const kb_appApiKeyCheck = openrpc.method(schema, {
+  name: 'kb_appApiKeyCheck',
+  scopes: noScope,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      //TODO: add error checking for buffer overflows: overall body payload and the decoded JWT sizes
+      const apiKey = _.get(request, ['params', 'apiKey'])
+      const jwtSub = decodeJwt(apiKey).sub as ApplicationURN
+      const clientId = ApplicationURNSpace.parse(jwtSub).decoded
+
+      // Our mapping from application OAuth client ID to internal app ID.
+      const lookup = context.get(KEY_LOOKUP)
+      // Get a reference to the StarbaseApplication Durable Object.
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+
+      const appId = await lookup.get(clientId)
+      if (appId === null) {
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        tag: 'starbase-app',
+      })
+
+      const validResult = await app.validateApiKey({ apiKey: apiKey })
+
+      return openrpc.response(request, {
+        valid: validResult,
+      })
+    }
+  ),
+})
+
 // kb_appScopes
 // -----------------------------------------------------------------------------
 // Return a list of scopes with their metadata.
@@ -834,7 +876,7 @@ const kb_appRotateApiKey = openrpc.method(schema, {
       }
       // Create a platform URN that uniquely represents the just-created
       // application.
-      const appURN = ApplicationURNSpace.urn(appId)
+      const appURN = ApplicationURNSpace.urn(clientId)
       console.log(`rotating API key for ${appURN}`)
 
       const app = await openrpc.discover(sbApplication, {
@@ -844,7 +886,6 @@ const kb_appRotateApiKey = openrpc.method(schema, {
         // Use this string when logging DO requests.
         tag: 'starbase-app',
       })
-      invariant(appId === app.$.id, 'object IDs must match')
 
       const apiKey = await app.rotateApiKey({ appId: appId, urn: appURN })
 
@@ -1050,6 +1091,7 @@ const scopes = noScope
 // These are the implementations of the RPC methods described in the schema.
 const methods = openrpc.methods(schema, [
   kb_appAuthCheck,
+  kb_appApiKeyCheck,
   kb_appCreate,
   kb_appDelete,
   kb_appList,

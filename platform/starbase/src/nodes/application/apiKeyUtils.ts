@@ -10,7 +10,7 @@ import {
 } from 'jose'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { RpcResult } from '@kubelt/openrpc'
+import { STARBASE_API_KEY_ISSUER } from '../../constants'
 
 const JWT_OPTIONS = {
   alg: 'ES256',
@@ -34,7 +34,6 @@ export async function generateAndStore(
   input: RpcInput,
   output: RpcOutput
 ): Promise<string> {
-  const appId = params.get('appId')
   const appURN = params.get('urn')
 
   const { privateKey: key } = await getJWTSigningKeyPair(input, output)
@@ -42,7 +41,7 @@ export async function generateAndStore(
   const apiKey = await new SignJWT({})
     .setProtectedHeader(JWT_OPTIONS)
     .setIssuedAt()
-    .setIssuer(appId)
+    .setIssuer(STARBASE_API_KEY_ISSUER)
     .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
     .setSubject(appURN)
     .sign(key)
@@ -50,16 +49,22 @@ export async function generateAndStore(
   return apiKey
 }
 
-const verify = async (
+export async function verify (
   params: RpcParams,
   input: RpcInput,
   output: RpcOutput
-) => {
+): Promise<boolean> {
   const { alg } = JWT_OPTIONS
   const { publicKey: key } = await getJWTSigningKeyPair(input, output)
   const options = { algorithms: [alg] }
   const token = params.get('apiKey')
-  return jwtVerify(token, key, options)
+  try {
+    await jwtVerify(token, key, options)
+    return true
+  } catch (e) {
+    console.error("Error verifying API key validity.", e)
+    return false
+  }
 }
 
 export async function getJWTSigningKeyPair(
