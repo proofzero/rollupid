@@ -83,7 +83,7 @@ export const loader: LoaderFunction = async (args) => {
     cf: {
       cacheEverything: true,
       cacheTtl: 3600,
-      cacheKey: `og-image-${targetAddress}`,
+      cacheKey: `og-image-${targetAddress}-${profileJson?.cover}-${profileJson?.pfp?.image}`,
     },
     method: 'POST',
     headers: {
