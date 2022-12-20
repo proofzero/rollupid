@@ -933,8 +933,6 @@ const kb_appDetails = openrpc.method(schema, {
       })
       invariant(appId === app.$.id, 'object IDs must match')
 
-      // NB: this returns an empty object if the application is not
-      // published.
       const appDetails = await app.fetch()
       const hasSecret = (await app.hasSecret()) as boolean
 
