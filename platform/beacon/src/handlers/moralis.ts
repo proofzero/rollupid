@@ -36,10 +36,11 @@ const MoralisHandler = async (request: Request, env: Environment) => {
   // batch the changes to address worker
   const setTokensBody = body.nftTransfers.map((nft) => {
     const addressUrn = AddressURNSpace.urn(nft.to)
+    console.log({ addressUrn })
     return {
       tokenId: nft.tokenId,
       contract: nft.contract,
-      addressUrn: `${addressUrn}?+node_type=crypto&addr_type=ethereum`,
+      addressUrn: addressUrn,
     }
   })
   env.BLOCKCHAIN_ACTIVITY.send({

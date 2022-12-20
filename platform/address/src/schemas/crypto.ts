@@ -46,6 +46,42 @@ export const schema: RpcSchema = {
       },
     },
     {
+      name: 'isWebhookRegistered',
+      params: [],
+      result: {
+        name: 'is webhook registered result',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
+    {
+      name: 'registerWebhook',
+      params: [],
+      result: {
+        name: 'register webhook result',
+        schema: {},
+      },
+    },
+    {
+      name: 'isTokensIndexed',
+      params: [],
+      result: {
+        name: 'is tokens indexed result',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
+    {
+      name: 'indexedTokens',
+      params: [],
+      result: {
+        name: 'indexed token result',
+        schema: {},
+      },
+    },
+    {
       name: 'resolveAccount',
       params: [],
       result: {

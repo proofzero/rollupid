@@ -60,8 +60,13 @@ import { recoverEthereumAddress } from '../utils'
   defaultValue: null,
 })
 @field({
-  name: 'boostrapped',
-  doc: 'Bootstrapped flagged',
+  name: 'webook_registered',
+  doc: 'Webhook registered flag',
+  defaultValue: false,
+})
+@field({
+  name: 'indexed_tokens',
+  doc: 'Indexed tokens flag',
   defaultValue: false,
 })
 export default class CryptoAddress {
@@ -87,6 +92,30 @@ export default class CryptoAddress {
   @requiredField('type', [FieldAccess.Write])
   setType(params: RpcParams, input: RpcInput, output: RpcOutput): RpcResult {
     return output.set('type', params.get('type'))
+  }
+
+  @method('registerWebhook')
+  @requiredField('webhook_registered', [FieldAccess.Write])
+  registerWebhook(params: RpcParams, output: RpcOutput): RpcResult {
+    return output.set('webhook_registered', true)
+  }
+
+  @method('isWebhookRegistered')
+  @requiredField('webhook_registered', [FieldAccess.Read])
+  isWebhookRegistered(params: RpcParams, input: RpcInput): RpcResult {
+    return input.get('webhook_registered')
+  }
+
+  @method('indexedTokens')
+  @requiredField('indexed_tokens', [FieldAccess.Write])
+  indexedTokens(params: RpcParams, output: RpcOutput): RpcResult {
+    return output.set('indexed_tokens', true)
+  }
+
+  @method('isTokensIndexed')
+  @requiredField('indexed_tokens', [FieldAccess.Read])
+  isTokensIndexed(params: RpcParams, input: RpcInput): RpcResult {
+    return input.get('indexed_tokens')
   }
 
   @method('resolveAccount')

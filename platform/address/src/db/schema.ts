@@ -1,3 +1,4 @@
+import { AddressURN } from '@kubelt/urns/address'
 import {
   integer,
   sqliteTable,
@@ -9,7 +10,7 @@ import {
 export type TokensTable = {
   tokenId: string
   contract: string
-  addressURN: string
+  addressURN: AddressURN
   gallery_order?: number
 }
 

@@ -23,6 +23,8 @@ export interface Environment {
   APIKEY_MORALIS: string
   MORALIS_STREAM_ID: string
   URL_MORALIS_WEBHOOK: string
+
+  BLOCKCHAIN_ACTIVITY: Queue
 }
 
 export interface AddressRpcContext extends RpcContext {

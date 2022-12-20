@@ -76,6 +76,16 @@ const rpcHandler = openrpc.build(
         handler: openrpc.handler(getPfpVoucher),
       }),
       openrpc.method(schema, {
+        name: 'kb_indexTokens',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setTokenMetadata',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getTokens),
+      }),
+      openrpc.method(schema, {
         name: 'kb_getTokens',
         scopes: openrpc.scopes([]),
         handler: openrpc.handler(getTokens),
@@ -128,6 +138,7 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('URL_MORALIS_WEBHOOK', env.URL_MORALIS_WEBHOOK)
   context.set('APIKEY_MORALIS', env.APIKEY_MORALIS)
   context.set('MORALIS_STREAM_ID', env.MORALIS_STREAM_ID)
+  context.set('BLOCKCHAIN_ACTIVITY', env.BLOCKCHAIN_ACTIVITY)
 
   return rpcHandler(request, context)
 }

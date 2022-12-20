@@ -18,6 +18,10 @@ binding = "COLLECTIONS" # i.e. available in your Worker on env.DB
 database_name = "collections-dev"
 database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
 
+[[queues.producers]]
+ queue = "blockchain-activity"
+ binding = "BLOCKCHAIN_ACTIVITY"
+ 
 [[queues.consumers]]
 queue = "blockchain-activity"
 max_batch_size = 1 # optional: defaults to 10

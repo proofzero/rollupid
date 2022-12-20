@@ -125,6 +125,30 @@ export const schema: RpcSchema = {
       },
     },
     {
+      name: 'kb_indexTokens',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/TokenPage',
+        },
+      ],
+      result: {
+        name: 'index tokens result',
+        schema: {},
+      },
+    },
+    {
+      name: 'kb_setTokenMetadata',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/TokenMetadata',
+        },
+      ],
+      result: {
+        name: 'index tokens result',
+        schema: {},
+      },
+    },
+    {
       name: 'kb_getTokens',
       params: [],
       result: {
