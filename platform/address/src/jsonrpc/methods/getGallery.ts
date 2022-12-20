@@ -4,8 +4,9 @@ import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 import { AddressRpcContext } from '../../types'
 import { tokens } from '../../db/schema'
 import { sql } from 'drizzle-orm'
+import { AddressURN } from '@kubelt/urns/address'
 
-export type GetGalleryParams = string[] // addresses
+export type GetGalleryParams = AddressURN[] // addresses
 
 export default async (
   service: Readonly<RpcService>,
