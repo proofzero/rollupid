@@ -2,8 +2,8 @@ name: Address
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
 
 defaults:
   run:
