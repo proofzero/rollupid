@@ -110,12 +110,12 @@ const rpcSchema: RpcSchema = {
           },
         },
         {
-          name: "appURN",
-          description: "URN of the application",
+          name: 'appURN',
+          description: 'URN of the application',
           schema: {
-            type: 'string'
-          }
-        }
+            type: 'string',
+          },
+        },
       ],
       result: {
         name: 'apiKey',

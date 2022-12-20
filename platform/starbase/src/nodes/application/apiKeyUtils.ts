@@ -1,36 +1,42 @@
-import { RpcInput, RpcOutput, RpcParams } from "@kubelt/openrpc/component"
-import { exportJWK, generateKeyPair, importJWK, JWK, jwtVerify, KeyLike, SignJWT } from "jose"
+import { RpcInput, RpcOutput, RpcParams } from '@kubelt/openrpc/component'
+import {
+  exportJWK,
+  generateKeyPair,
+  importJWK,
+  JWK,
+  jwtVerify,
+  KeyLike,
+  SignJWT,
+} from 'jose'
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { RpcResult } from "@kubelt/openrpc"
-
+import { RpcResult } from '@kubelt/openrpc'
 
 const JWT_OPTIONS = {
-    alg: 'ES256',
-    jti: {
-        length: 24
-    }
+  alg: 'ES256',
+  jti: {
+    length: 24,
+  },
 }
 
 interface KeyPair {
-    publicKey: KeyLike | Uint8Array
-    privateKey: KeyLike | Uint8Array
-  }
-  
-interface KeyPairSerialized {
-    publicKey: JWK
-    privateKey: JWK
-  }
-  
+  publicKey: KeyLike | Uint8Array
+  privateKey: KeyLike | Uint8Array
+}
 
-export async function generateAndStore (
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<string> {
-    const appId = params.get('appId')
-    const appURN = params.get('urn')
-  
+interface KeyPairSerialized {
+  publicKey: JWK
+  privateKey: JWK
+}
+
+export async function generateAndStore(
+  params: RpcParams,
+  input: RpcInput,
+  output: RpcOutput
+): Promise<string> {
+  const appId = params.get('appId')
+  const appURN = params.get('urn')
+
   const { privateKey: key } = await getJWTSigningKeyPair(input, output)
 
   const apiKey = await new SignJWT({})
@@ -56,7 +62,7 @@ const verify = async (
   return jwtVerify(token, key, options)
 }
 
-export async function getJWTSigningKeyPair  (
+export async function getJWTSigningKeyPair(
   input: RpcInput,
   output: RpcOutput
 ): Promise<KeyPair> {

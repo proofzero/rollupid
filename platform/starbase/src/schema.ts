@@ -210,11 +210,10 @@ const rpcSchema: RpcSchema = {
         {
           name: 'clientId',
           required: true,
-          schema:
-          {
+          schema: {
             $ref: '#/components/contentDescriptors/ClientId',
-          }
-        }
+          },
+        },
       ],
       result: {
         name: 'apiKey',

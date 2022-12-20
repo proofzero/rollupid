@@ -101,12 +101,12 @@ import * as apiKeyUtils from './apiKeyUtils'
 @field({
   name: 'apiKey',
   doc: 'The API key for the application',
-  defaultValue: null
+  defaultValue: null,
 })
 @field({
   name: 'apiKeySigningKeyPair',
   doc: 'The signing keypair for signing the API key for app',
-  defaultValue: null
+  defaultValue: null,
 })
 export class StarbaseApplication {
   // init
@@ -303,11 +303,10 @@ export class StarbaseApplication {
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
-    const apiKey = await apiKeyUtils.generateAndStore(params, input, output);
-    output.set('apiKey', apiKey);
-    return apiKey;
+    const apiKey = await apiKeyUtils.generateAndStore(params, input, output)
+    output.set('apiKey', apiKey)
+    return apiKey
   }
-
 
   // publish
   // ---------------------------------------------------------------------------
@@ -326,7 +325,6 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const published = params.get('published')
     output.set('published', published)
- console.log()
     return Promise.resolve({ published })
   }
 
