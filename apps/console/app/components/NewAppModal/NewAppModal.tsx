@@ -14,7 +14,10 @@ export const NewAppModal = ({
 }: NewAppModalProps) => {
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => newAppCreateCallback(null)}>
-      <>
+      <div
+        className={`relative w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
+         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+      >
         <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
           Create Application
         </Text>
@@ -40,7 +43,7 @@ export const NewAppModal = ({
             </Button>
           </div>
         </form>
-      </>
+      </div>
     </Modal>
   )
 }
