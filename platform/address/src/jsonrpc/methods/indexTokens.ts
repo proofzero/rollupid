@@ -57,7 +57,7 @@ export default async (
     if (metadata) {
       context.get('BLOCKCHAIN_ACTIVITY').send({
         method: 'kb_setTokenMetadata',
-        body: [tokenId, nft.metadata?.toString()],
+        body: [tokenId, contract, nft.metadata?.toString()],
       })
     }
   }

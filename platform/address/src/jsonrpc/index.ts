@@ -24,6 +24,8 @@ import setGallery from './methods/setGallery'
 import getGallery from './methods/getGallery'
 import getTokens from './methods/getTokens'
 import setTokens from './methods/setTokens'
+import setTokenMetadata from './methods/setTokenMetadata'
+import indexTokens from './methods/indexTokens'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -78,12 +80,12 @@ const rpcHandler = openrpc.build(
       openrpc.method(schema, {
         name: 'kb_indexTokens',
         scopes: openrpc.scopes([]),
-        handler: openrpc.handler(getTokens),
+        handler: openrpc.handler(indexTokens),
       }),
       openrpc.method(schema, {
         name: 'kb_setTokenMetadata',
         scopes: openrpc.scopes([]),
-        handler: openrpc.handler(getTokens),
+        handler: openrpc.handler(setTokenMetadata),
       }),
       openrpc.method(schema, {
         name: 'kb_getTokens',
