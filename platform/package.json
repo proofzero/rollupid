@@ -10,7 +10,7 @@
     "gql:galaxy": "graphql-codegen --config graphql.config.js --project galaxy --aggregate-output -n -l",
     "gql": "run-p 'gql:*'",
     "dev:gql": "run-p 'gql:* -- --watch'",
-    "dev": "yarn workspaces foreach -i -v -p run dev",
+    "dev": "yarn workspaces foreach -i -v -p -j unlimited run dev",
     "build": "yarn workspaces foreach -p -v -i run build",
     "test": "yarn workspaces foreach -p -v -i run test"
   },
