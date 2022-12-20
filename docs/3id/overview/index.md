@@ -29,7 +29,8 @@ Passport experience yours, and get analytics on your users.
 
 ## Galaxy
 
-[Galaxy](../galaxy/index.md) is 3ID's GraphQL system.
+[Galaxy](../galaxy/index.md) is your portal for accessing data through 3ID. It
+exposes
 
 ## The Authorization Graph
 
