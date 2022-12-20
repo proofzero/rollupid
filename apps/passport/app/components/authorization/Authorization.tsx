@@ -1,5 +1,3 @@
-import { useTransition } from '@remix-run/react'
-
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
@@ -34,6 +32,7 @@ export type AuthorizationProps = {
   userProfile: UserProfile
   appProfile: AppProfile
   scopeMeta: Record<string, ScopeMeta>
+  transition: 'idle' | 'loading'
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
 }
@@ -47,11 +46,10 @@ export function Authorization({
   appProfile,
   userProfile,
   scopeMeta,
+  transition,
   cancelCallback,
   authorizeCallback,
 }: AuthorizationProps) {
-  const transition = useTransition()
-
   return (
     <div
       className={'flex flex-col gap-4 basis-96 m-auto bg-white p-6'}
@@ -131,7 +129,7 @@ export function Authorization({
         </div>
       </div>
       <div className={'flex flex-row items-end justify-center gap-4 mt-auto'}>
-        {transition.state == 'idle' && (
+        {transition == 'idle' && (
           <>
             <Button
               btnType="secondary-alt"
@@ -151,7 +149,7 @@ export function Authorization({
             </Button>
           </>
         )}
-        {transition.state != 'idle' && <Spinner />}
+        {transition != 'idle' && <Spinner />}
       </div>
     </div>
   )

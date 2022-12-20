@@ -18,7 +18,7 @@
     "start": "run-p 'dev:*'",
     "e2e": "cross-env NODE_ENV=test npx playwright test",
     "storybook": "start-storybook -p 6007",
-    "build-storybook": "build-storybook"
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },
   "dependencies": {
     "@headlessui/react": "1.7.4",
