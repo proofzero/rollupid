@@ -8,7 +8,7 @@ Simply look up a unique account resolver (see below) and onboard your users into
 
 ## Getting Started
 
-To get a user's public profile make an HTTP API call to https://3id.kubelt.com/<resolver>/json, where <resolver> is a unique account identifier (e.g. an Ethereum address).
+To get a user's public profile make an HTTP API call to https://my.threeid.xyz/<resolver>/json, where <resolver> is a unique account identifier (e.g. an Ethereum address).
 
 ### Resolvers
 
@@ -24,16 +24,16 @@ Here is the current list of resolvers. [Join our Discord](https://discord.gg/Ugw
 
 ## Making a Request
 
-If you visit a profile link in a browser (e.g., [https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722)](https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722) you can see our own rendering of profile data. If you append `/json` to that URL you can query the same API directly:
+If you visit a profile link in a browser (e.g., [https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722)](https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722) you can see our own rendering of profile data. If you append `/json` to that URL you can query the same API directly:
 
 ```bash
-curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
+curl https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
 ```
 
 Or, for example, with Javascript `fetch`:
 
 ```javascript
-fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
+fetch('https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
   .then(p => p.json())
   .then(profile => {
     console.log('User-set display name:', profile.displayName)
@@ -49,7 +49,7 @@ fetch('https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
 
 ## 3ID Profile Response
 
-If you feed the above `curl` through a tool like `jq`, for example with `curl https://3id.kubelt.com/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
+If you feed the above `curl` through a tool like `jq`, for example with `curl https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
 
 ```json
 {
