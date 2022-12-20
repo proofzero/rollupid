@@ -1,6 +1,6 @@
 # Getting Started With 3ID
 
-This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://app.threeid.xyz)
+This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://my.threeid.xyz)
 
 ## Connect with 3ID Passport
 
@@ -28,4 +28,4 @@ Click the second item in the sidebar on the left, **0xAuth**. This will open the
 
 ## Configure Your Application Data
 
-Now you can configure your application data. [See the Console Reference](../console/index.md) for more information.
+Now you can configure your application data. [See the Console Reference](../console/reference.md) for more information.

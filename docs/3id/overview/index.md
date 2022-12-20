@@ -1,38 +1,55 @@
 ---
-description: An introduction to 3ID concepts.
+description: A conceptual introduction to 3ID.
 ---
 
-3ID is a way to organize distributed networking resources. There are a couple of
-key concepts that will be useful to understand our technology.
+3ID helps developers onboard users quickly and effectively. It's organized
+around several components. First we'll discuss those components ([Profile](#profile),
+[Passport](#passport), [Console](#console), and [Galaxy](#galaxy)) and then we'll
+briefly discuss the underlying technical architecture.
 
 ## Profile
 
-[Profile](/3id/profile/index.md) is a decentralized user profile that developers use to personalize their UX.
+Users expect personalized experiences. [Profile](../profile/index.md) gives your
+users a profile picture, cover photo, display name of their choice, and a lot
+more, all with one simple API call.
 
 ## Passport
 
-[Passport](/3id/passport/index.md) is 3ID's authentication and authorization system.
+[Passport](../passport/index.md) makes it easy to get users into your
+application safely and securely with the traditional, social, and crypto logins
+that make them most comfortable. No matter how those users connect you get
+one, unified view of their data: social logins can provision social wallets,
+crypto users can share their emails, and everyone can get an updated KYC profile.
 
 ## Console
 
-[Console](/3id/console/index.md) is where developers create **0xAuth** apps.
+Create your 3ID applications in [Console](../console/index.md), where you can
+define standard OAuth application settings, set up white labelling to make the
+Passport experience yours, and get analytics on your users.
 
 ## Galaxy
 
-[Galaxy](/3id/galaxy/index.md) is 3ID's GraphQL system.
+[Galaxy](../galaxy/index.md) is your portal for accessing data through 3ID.
+Galaxy exposes a GraphQL interface that allows your application permissioned
+access to user data via the scopes defined in [Console](../console/reference.md#scopes).
 
-## Glossary
+## The Authorization Graph
 
-### 0xAuth
+All 3ID components are different configurations of, or views on, the same
+underlying structure: an immensely power graph of decentralized edge computing
+resources.
 
-**0xAuth** is 3ID's OAuth-standard authorization system with extensions to handle authorizations in decentralized systems, including blockchain.
+For example, a user is able to connect multiple social and blockchain accounts
+to their 3ID Profile because, under the hood, these are represented as different
+[nodes](glossary.md#nodes) in the underlying graph.
 
-### Nodes
+Authorizations are baked into the fundamental structures of this graph, which
+means traversals and data accesses are always **secure**. The structure of the
+graph is tightly controlled, which means that accesses are always **fast**.
 
-3ID is organized around a decentralized graph. Nodes in that graph represent
-people and applications, and developers can use them to organize decentralized
-software services around users.
-
-### URNs
-
-Uniform Resource Names, **URNs**, are how resources within the 3ID graph are identified.
+It might be useful to understand that you are working on top of a decentralized
+graph, however, interactions with the graph are through well-defined interfaces
+represented by the components of the system. You will be defining scopes
+in [Console](../console/reference.md#scopes), making GraphQL calls through
+[Galaxy](../galaxy/index.md), and personalizing your UX with
+[Profile](../profile/reference.md), not wrangling complex graph operations.
