@@ -23,7 +23,9 @@ crypto users can share their emails, and everyone can get an updated KYC profile
 
 ## Console
 
-[Console](../console/index.md) is where developers create **0xAuth** apps.
+Create your 3ID applications in [Console](../console/index.md), where you can
+define standard OAuth application settings, set up white labelling to make the
+Passport experience yours, and get analytics on your users.
 
 ## Galaxy
 
