@@ -1,5 +1,5 @@
 import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { useCatch, useFetcher, useLoaderData } from '@remix-run/react'
+import { Link, useCatch, useFetcher, useLoaderData } from '@remix-run/react'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 
@@ -352,17 +352,19 @@ const ProfileRoute = () => {
         />
 
         {isOwner && (
-          <ButtonAnchor
-            btnSize={'sm'}
-            href="/account/settings/profile"
-            className="bg-gray-100"
-          >
-            <span>
-              <FaEdit />
-            </span>
+          <Link to="/account/settings/profile">
+            <Button
+              btnSize="sm"
+              className="bg-gray-100 flex flex-row space-x-3 items-center justify-center"
+              btnType="secondary-alt"
+            >
+              <span>
+                <FaEdit />
+              </span>
 
-            <span>Edit Profile</span>
-          </ButtonAnchor>
+              <span>Edit Profile</span>
+            </Button>
+          </Link>
         )}
       </div>
 
