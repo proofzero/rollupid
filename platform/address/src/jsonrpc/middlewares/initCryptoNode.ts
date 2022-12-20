@@ -1,5 +1,4 @@
 import type { RpcContext } from '@kubelt/openrpc'
-import { AddressURNSpace } from '@kubelt/urns/address'
 import { NodeType } from '../../types'
 
 export default async (request: Readonly<Request>, context: RpcContext) => {
