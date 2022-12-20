@@ -27,7 +27,7 @@ OAuth, these are effectively your application's username and password for the
 
 ### Roll Keys
 
-"Roll Keys" allows you to generate a new secret and expire an existing one.
+"Roll Keys" allows you to generate a new secret and expire the existing one.
 
 ## Smart Contracts and Logins
 
