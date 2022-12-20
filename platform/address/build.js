@@ -9,7 +9,7 @@ try {
   await build({
     bundle: true,
     sourcemap: true,
-    minify: true,
+    minify: false,
     format: 'esm',
     target: 'esnext',
     external: ['__STATIC_CONTENT_MANIFEST'],

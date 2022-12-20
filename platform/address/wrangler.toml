@@ -66,6 +66,9 @@ d1_databases = [
   { binding = "COLLECTIONS", database_name = "collections-dev", database_id = "13213d87-dc22-442a-ad81-afb8139edbf4" }
 ]
 
+[env.dev.build]
+command = "node build.js"
+
 [env.dev.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
@@ -83,6 +86,9 @@ services = [
 d1_databases = [
   { binding = "COLLECTIONS", database_name = "collections-next", database_id = "9f4437bc-1a3f-4e4d-8c7f-19cf964d28d1" }
 ]
+
+[env.next.build]
+command = "node buildProd.js"
 
 [env.next.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
@@ -102,6 +108,9 @@ services = [
 d1_databases = [
   { binding = "COLLECTIONS", database_name = "collections-current", database_id = "e20e21e5-f1c1-4679-ad3c-65a3854bcb30" }
 ]
+
+[env.current.build]
+command = "node buildProd.js"
 
 [env.current.vars]
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
