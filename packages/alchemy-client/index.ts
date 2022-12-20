@@ -140,7 +140,10 @@ export class AlchemyClient {
       },
       new TextEncoder().encode(urlStr)
     )
-    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
+    const cacheKey = cacheKeyArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
     return fetch(urlStr, {
       cf: {
         cacheTtl: 1500,
@@ -194,7 +197,10 @@ export class AlchemyClient {
       },
       new TextEncoder().encode(urlStr)
     )
-    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
+    const cacheKey = cacheKeyArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
     return fetch(urlStr, {
       cf: {
         cacheTtl: 1500,
@@ -242,7 +248,10 @@ export class AlchemyClient {
       },
       new TextEncoder().encode(urlStr)
     )
-    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
+    const cacheKey = cacheKeyArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
     return fetch(urlStr, {
       cf: {
         cacheTtl: 1500,

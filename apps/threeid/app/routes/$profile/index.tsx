@@ -78,11 +78,19 @@ export const loader: LoaderFunction = async (args) => {
 
   // Setup og tag data
   // check generate and return og image
+  const cacheKeyEnc = new TextEncoder().encode(
+    `og-image-${targetAddress}-${profileJson?.cover}-${profileJson?.pfp?.image}`
+  )
+  const cacheKeyDigest = await crypto.subtle.digest('SHA-256', cacheKeyEnc)
+  const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
+  const cacheKey = cacheKeyArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
     cf: {
       cacheEverything: true,
       cacheTtl: 3600,
-      cacheKey: `og-image-${targetAddress}`,
+      cacheKey,
     },
     method: 'POST',
     headers: {
