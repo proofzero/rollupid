@@ -3,7 +3,7 @@ description: A conceptual introduction to 3ID.
 ---
 
 3ID helps developers onboard users quickly and effectively. It's organized
-around several component. Before discussing those components ([Profile](#profile),
+around several components. Before discussing those components ([Profile](#profile),
 [Passport](#passport), [Console](#console), and [Galaxy](#galaxy)) we'll briefly
 discuss the underlying technical architecture.
 
@@ -26,6 +26,9 @@ graph, however, interactions with the graph are through well-defined interfaces:
 your team will be defining scopes in [Console](../console/reference.md#scopes)
 and making GraphQL calls through [Galaxy](../galaxy/index.md), not doing edge
 and node operations.
+
+We'll now move on to discussing the system compoents built on top of the
+Authorization Graph and what they do for you.
 
 ## Profile
 
