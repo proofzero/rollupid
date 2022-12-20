@@ -43,10 +43,12 @@
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/urns": "workspace:*",
+    "@moralisweb3/common-core": "2.10.1",
+    "@moralisweb3/evm-api": "2.10.1",
+    "@moralisweb3/streams": "2.10.1",
     "drizzle-orm": "0.14.2",
     "drizzle-orm-sqlite": "0.14.2",
     "itty-router": "2.6.6",
-    "itty-router-extras": "0.4.2",
-    "moralis": "2.10.0"
+    "itty-router-extras": "0.4.2"
   }
 }

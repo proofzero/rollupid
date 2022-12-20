@@ -1,4 +1,5 @@
-import Moralis from 'moralis'
+import Core from '@moralisweb3/common-core'
+import Streams from '@moralisweb3/streams'
 
 import type { RpcContext } from '@kubelt/openrpc'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -26,8 +27,12 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
 
     // TODO: when contracts are supported we can monitor contracts too
     if (context.get('node_type') == NodeType.Crypto) {
-      await Moralis.start({ apiKey: context.get('APIKEY_MORALIS') })
-      Moralis.Streams.addAddress({
+      const core = Core.create()
+      await core.start({ apiKey: context.get('APIKEY_MORALIS') })
+      core.registerModules([Streams])
+
+      const streamsApi = core.getModule<Streams>(Streams.moduleName)
+      streamsApi.addAddress({
         address: context.get('name'),
         id: context.get('MORALIS_STREAM_ID'),
       })

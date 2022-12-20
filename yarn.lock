@@ -5263,6 +5263,9 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@moralisweb3/common-core": 2.10.1
+    "@moralisweb3/evm-api": 2.10.1
+    "@moralisweb3/streams": 2.10.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -5273,7 +5276,6 @@ __metadata:
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
-    moralis: 2.10.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
@@ -6336,6 +6338,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@moralisweb3/api-utils@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/api-utils@npm:2.10.1"
+  dependencies:
+    "@moralisweb3/common-core": ^2.10.1
+    "@moralisweb3/common-evm-utils": ^2.10.1
+    axios: ^1.2.1
+  checksum: 3b971b3ac7d69b46375ade99cdba6b5422b8747957b73c8754fce98c9795e49db0dd24734435f6a50ae81e78a4e1ac03ec4c10f5a6d6378451f1a7acb973fbb5
+  languageName: node
+  linkType: hard
+
 "@moralisweb3/auth@npm:^2.10.0":
   version: 2.10.0
   resolution: "@moralisweb3/auth@npm:2.10.0"
@@ -6362,6 +6375,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@moralisweb3/common-core@npm:2.10.1, @moralisweb3/common-core@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/common-core@npm:2.10.1"
+  dependencies:
+    axios: ^1.2.1
+    eventemitter3: ^4.0.7
+    typed-emitter: ^2.1.0
+  checksum: 28d43ec4565ecd30d008a7f102cbdfdcd0b48721a97483d9429a219027f1b2409ff7f53335df0ceb4b81b29bb699ee180f2a8a95bd05e9db1bab6a20a0b6a16f
+  languageName: node
+  linkType: hard
+
 "@moralisweb3/common-core@npm:^2.10.0":
   version: 2.10.0
   resolution: "@moralisweb3/common-core@npm:2.10.0"
@@ -6385,6 +6409,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@moralisweb3/common-evm-utils@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/common-evm-utils@npm:2.10.1"
+  dependencies:
+    "@ethersproject/address": ^5.7.0
+    "@ethersproject/bytes": ^5.6.0
+    "@ethersproject/transactions": ^5.6.0
+    "@moralisweb3/common-core": ^2.10.1
+  checksum: 2d6c28e1b2b36c361650a0b06d52086c2f96870c69a84b325dfbec0aafb5cd5c9abbcf0baefddbbefc3d01175374aa4fbdfcca77bd50cbaf1cb684c8f56d0a37
+  languageName: node
+  linkType: hard
+
 "@moralisweb3/common-sol-utils@npm:^2.10.0":
   version: 2.10.0
   resolution: "@moralisweb3/common-sol-utils@npm:2.10.0"
@@ -6404,6 +6440,29 @@ __metadata:
     "@moralisweb3/common-evm-utils": ^2.10.0
     "@moralisweb3/streams-typings": ^1.0.5
   checksum: 89e35bf5247acba60ac326476011d44962044c88a49caac7c7492f9be42aeacbe52cfbd9338881372c36f3e31bcdd0fb45483a3f6b9f581ebcbb18a33f3778d4
+  languageName: node
+  linkType: hard
+
+"@moralisweb3/common-streams-utils@npm:^2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/common-streams-utils@npm:2.10.1"
+  dependencies:
+    "@ethersproject/abi": ^5.7.0
+    "@moralisweb3/common-core": ^2.10.1
+    "@moralisweb3/common-evm-utils": ^2.10.1
+    "@moralisweb3/streams-typings": ^1.0.5
+  checksum: 58472162c265426499f58971d296f4763fcc0409ad68dce642709cbb827fa83926a6b846519ab4190eb19f812d878312afce8d074b7ddf4e9ed0bd6df612109e
+  languageName: node
+  linkType: hard
+
+"@moralisweb3/evm-api@npm:2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/evm-api@npm:2.10.1"
+  dependencies:
+    "@moralisweb3/api-utils": ^2.10.1
+    "@moralisweb3/common-core": ^2.10.1
+    "@moralisweb3/common-evm-utils": ^2.10.1
+  checksum: 683e90c85057644ac4cd1c4ffc5b49eac11b8cfeec0586a50b0f8ca838527cdb867a2f645c633f0cb3b17168f73e4778df1b50c031923f2efdbd25c024056d86
   languageName: node
   linkType: hard
 
@@ -6442,6 +6501,23 @@ __metadata:
   version: 1.0.5
   resolution: "@moralisweb3/streams-typings@npm:1.0.5"
   checksum: 119c67bac5a71c6f7645b1bc01da9fd18a1bad218fd2623eb88d9f87f6d48ca7a6210c9b42b873256847fd337c0f16966dde8c2f4a6c5ab8d26b48a9e121fd92
+  languageName: node
+  linkType: hard
+
+"@moralisweb3/streams@npm:2.10.1":
+  version: 2.10.1
+  resolution: "@moralisweb3/streams@npm:2.10.1"
+  dependencies:
+    "@ethersproject/abi": ^5.7.0
+    "@moralisweb3/api-utils": ^2.10.1
+    "@moralisweb3/common-core": ^2.10.1
+    "@moralisweb3/common-evm-utils": ^2.10.1
+    "@moralisweb3/common-streams-utils": ^2.10.1
+    "@moralisweb3/streams-typings": ^1.0.5
+    ethereumjs-util: ^7.1.0
+    ethers: ^5.7.1
+    web3-eth-abi: ^1.8.0
+  checksum: fb41655c5ec9a5bfa79bf6af77548b8566f9674f0743ddb395dc743b1f4340d906c86ca8e033a5e56432b1f0d9f5e040252255ea14bab44939c0c361bfd3a472
   languageName: node
   linkType: hard
 
