@@ -71,7 +71,7 @@ export function getUserSession(request: Request, renew: boolean = true) {
  *
  */
 export async function destroyUserSession(session: Session) {
-  return redirect('/auth', {
+  return redirect('/', {
     headers: {
       'Set-Cookie': await storage.destroySession(session),
     },

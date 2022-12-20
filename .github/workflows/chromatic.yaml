@@ -45,4 +45,37 @@ jobs:
           projectToken: ${{ secrets.TOKEN_CHROMATIC_PASSPORT_PROJECT }}
           onlyChanged: true
           workingDir: apps/passport
-# TODO: add a workflow for threeid and console
+  chromatic-deployment-threeid:
+    # Operating System
+    runs-on: ubuntu-latest
+    # Job steps
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: yarn
+        # 👇 Adds Chromatic as a step in the workflow
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        # Chromatic GitHub Action options
+        with:
+          # 👇 Chromatic projectToken, refer to the manage page to obtain it.
+          projectToken: ${{ secrets.TOKEN_CHROMATIC_THREEID_PROJECT }}
+          onlyChanged: true
+          workingDir: apps/threeid
+  chromatic-deployment-console:
+    # Operating System
+    runs-on: ubuntu-latest
+    # Job steps
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: yarn
+        # 👇 Adds Chromatic as a step in the workflow
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        # Chromatic GitHub Action options
+        with:
+          # 👇 Chromatic projectToken, refer to the manage page to obtain it.
+          projectToken: ${{ secrets.TOKEN_CHROMATIC_CONSOLE_PROJECT }}
+          onlyChanged: true
+          workingDir: apps/console

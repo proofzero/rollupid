@@ -4,17 +4,12 @@
 
 import * as React from 'react'
 
-import { Link, NavLink } from '@remix-run/react'
+import { Link } from '@remix-run/react'
 
-import AppSelect from './appSelect.tsx'
+import AppSelect from './appSelect'
 
 // Images
 import kubeltLogo from '~/images/kubelt.svg'
-
-import { Cog8ToothIcon as SettingsIcon } from '@heroicons/react/24/outline'
-import { DocumentIcon as SmartContractsIcon } from '@heroicons/react/24/outline'
-import { UserIcon as UsersIcon } from '@heroicons/react/24/outline'
-import { UsersIcon as TeamIcon } from '@heroicons/react/24/outline'
 
 // KubeltLogo
 // -----------------------------------------------------------------------------
@@ -24,7 +19,7 @@ type KubeltLogoProps = {}
 const KubeltLogo = (props: KubeltLogoProps) => {
   return (
     <h1 className="text-3xl font-bold text-white my-8 mx-4">
-      <Link to=".">
+      <Link to="/">
         <img className="inline-block" src={kubeltLogo} />{' '}
         <span className="align-bottom">kubelt</span>
       </Link>
@@ -77,18 +72,21 @@ const MenuLink = (props: MenuLinkProps) => {
 type KubeltMenuProps = {
   // An array of application objects.
   // TODO tighten this up
-  apps: Array<Object>
+  apps: {
+    clientId: string
+    app: {
+      title: string
+    }
+  }[]
   // Current selected application ID.
   selected: string
 }
 
 export default function SiteMenu(props: KubeltMenuProps) {
-  const prefix = `/dashboard/apps/${props.selected}`
-
   return (
     <div className="text-center bg-slate-800 pb-4 md:min-h-screen md:w-1/4 md:border-r md:text-left">
       <KubeltLogo />
-      <AppSelect apps={props.apps} selected="" />
+      <AppSelect apps={props.apps} selected={props.selected} />
     </div>
   )
 }

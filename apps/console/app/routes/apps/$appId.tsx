@@ -1,91 +1,73 @@
-/**
- * @file app/routes/dapps/$appId.tsx
- */
+import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { Outlet, useLoaderData } from '@remix-run/react'
+import { json } from '@remix-run/cloudflare'
 
-import invariant from 'tiny-invariant'
+import SiteMenu from '~/components/SiteMenu'
+import SiteHeader from '~/components/SiteHeader'
 
-import { json, redirect } from '@remix-run/cloudflare'
-import {
-  Outlet,
-  useCatch,
-  useLoaderData,
-  useLocation,
-  useParams,
-} from '@remix-run/react'
-
-import type { Application } from '~/models/app.server'
-import { deleteApplication, getApplication } from '~/models/app.server'
 import { requireJWT } from '~/utilities/session.server'
-
-// Loader
-// -----------------------------------------------------------------------------
+import { getStarbaseClient } from '~/utilities/platform.server'
 
 type LoaderData = {
-  app: NonNullable<Awaited<ReturnType<typeof getApplication>>>
+  apps: {
+    clientId: string
+    app: {
+      title: string
+    }
+  }[]
+  appId: string | undefined
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  invariant(params.appId, 'appId not found')
-
-  const jwt = await requireJWT(request /*, "/auth"*/)
-  const cookie = request.headers.get('Cookie')
-
-  const app = await getApplication(jwt, params.appId, cookie)
-  if (!app) {
-    throw new Response('Not Found', { status: 404 })
-  }
-  return json<LoaderData>({ app })
-}
-
-// Action
-// -----------------------------------------------------------------------------
-
-export const action: ActionFunction = async ({ request, params }) => {
-  invariant(params.appId, 'appId not found')
-
   const jwt = await requireJWT(request)
+  const starbaseClient = getStarbaseClient(jwt)
 
-  await deleteApplication({ jwt, appId: params.appId })
+  const appId = params?.appId
 
-  return redirect('/dashboard/apps')
+  try {
+    const apps = (await starbaseClient.kb_appList()) as {
+      clientId: string
+      app: {
+        title: string
+      }
+    }[]
+
+    return json<LoaderData>({ apps, appId })
+  } catch (error) {
+    console.error({ error })
+    return json({ error }, { status: 500 })
+  }
 }
 
 // Component
 // -----------------------------------------------------------------------------
 
-export type ContextType = {
-  app: Application
+type ContextType = {
+  // The list of a user's applications.
+  apps: {
+    clientId: string
+    app: {
+      title: string
+    }
+  }[]
+  appId: string
 }
 
-export default function AppDetailsPage() {
-  const data = useLoaderData() as LoaderData
-  const app = data?.app !== undefined ? data.app : {}
+export default function AppDetailIndexPage() {
+  const { apps, appId } = useLoaderData<ContextType>()
 
   return (
-    <div className="h-full">
-      <Outlet context={{ app }} />
+    <div className="flex flex-col md:flex-row min-h-full">
+      <SiteMenu apps={apps} selected={appId} />
+
+      <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
+        <SiteHeader />
+
+        <section className="mx-11 my-9">
+          <Outlet />
+        </section>
+      </main>
     </div>
   )
-}
-
-// Errors
-// -----------------------------------------------------------------------------
-
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
-
-  return <div>An unexpected error occurred: {error.message}</div>
-}
-
-export function CatchBoundary() {
-  const { appId } = useParams()
-  const caught = useCatch()
-
-  if (caught.status === 404) {
-    return <div>Application "{appId}" not found</div>
-  }
-
-  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }

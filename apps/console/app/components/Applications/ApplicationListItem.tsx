@@ -33,6 +33,7 @@ export const ApplicationListItemIcon = ({
 )
 
 export type ApplicationListItemProps = {
+  id: string
   title: string
   created: Date
   iconUrl?: string
@@ -40,6 +41,7 @@ export type ApplicationListItemProps = {
   panel?: React.ReactNode
 }
 export const ApplicationListItem = ({
+  id,
   title,
   created,
   iconUrl,
@@ -86,15 +88,14 @@ export const ApplicationListItem = ({
               <Menu.Item
                 as="div"
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
-                onClick={() => {
-                  /* Need to handle */
-                }}
               >
                 <HiCog className="text-xl font-normal text-gray-400" />
 
-                <Text size="sm" weight="normal" className="text-gray-700">
-                  Settings
-                </Text>
+                <a href={`/apps/${id}`}>
+                  <Text size="sm" weight="normal" className="text-gray-700">
+                    Settings
+                  </Text>
+                </a>
               </Menu.Item>
             </div>
 

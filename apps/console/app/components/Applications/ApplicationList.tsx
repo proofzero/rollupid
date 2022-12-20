@@ -1,5 +1,6 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+
 import {
   ApplicationListItem,
   ApplicationListItemProps,
@@ -8,15 +9,25 @@ import {
 
 type ApplicationListProps = {
   applications: ApplicationListItemProps[]
+  onCreateApplication?: () => void
 }
 
-export const ApplicationList = ({ applications }: ApplicationListProps) => {
-  const handleCreateApplication = () => {}
+export const ApplicationList = ({
+  applications,
+  onCreateApplication,
+}: ApplicationListProps) => {
+  const handleCreateApplication = () => {
+    if (onCreateApplication) {
+      onCreateApplication()
+    }
+  }
 
   return (
     <div>
       <section className="flex justify-between items-start">
-        <Text>Your Applications</Text>
+        <Text size="base" weight="semibold" className="text-gray-900">
+          Your Applications
+        </Text>
 
         <Button btnType="primary-alt" onClick={handleCreateApplication}>
           Create Application
@@ -41,7 +52,7 @@ export const ApplicationList = ({ applications }: ApplicationListProps) => {
 
       <section className="flex flex-col space-y-2">
         {applications.map((ali) => (
-          <ApplicationListItem {...ali} />
+          <ApplicationListItem key={ali.id} {...ali} />
         ))}
       </section>
     </div>

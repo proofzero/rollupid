@@ -2,7 +2,7 @@
  * @file app/routes/dashboard/index.tsx
  */
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 
 import { Link, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
@@ -10,10 +10,8 @@ import { json } from '@remix-run/cloudflare'
 import folderPlus from '~/images/folderPlus.svg'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { getStarbaseClient } from '~/utilities/platform.server'
-import type { Application } from '~/models/app.server'
 import { getApplicationListItems } from '~/models/app.server'
 
 //import { useUser } from "~/utils";
@@ -23,39 +21,33 @@ import SiteHeader from '~/components/SiteHeader'
 
 import AppBox from '~/components/AppBox'
 import { useState } from 'react'
+import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
+import { requireJWT } from '~/utilities/session.server'
+import { getStarbaseClient } from '~/utilities/platform.server'
+import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  //const apps = await getApplicationListItems(jwt);
-  const apps = []
-  return json<LoaderData>({ apps })
-}
+  const jwt = await requireJWT(request)
+  const starbaseClient = getStarbaseClient(jwt)
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData()
-  const clientName = formData.get('client_name')
-
-  if (!clientName) throw 'App name is required'
-
-  const starbaseClient = getStarbaseClient()
-  const app = await starbaseClient.kb_appCreate(clientName as string)
+  try {
+    const apps = await starbaseClient.kb_appList() // TODO: update result type
+    return json<LoaderData>({ apps })
+  } catch (error) {
+    console.error({ error })
+    return json({ error }, { status: 500 })
+  }
 }
 
 // Component
 // -----------------------------------------------------------------------------
 
-export type ContextType = {
-  // The list of a user's applications.
-  apps: Array<Application>
-  // ID of the currently selected application.
-  appId: string
-}
-
 export default function DashboardIndexPage() {
-  const { apps, appId } = useLoaderData<ContextType>()
+  const { apps, appId } = useLoaderData()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   return (
@@ -63,42 +55,57 @@ export default function DashboardIndexPage() {
       <SiteMenu apps={apps} selected={appId} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader />
-        <div className="bg-gray-200 p-6 h-full">
-          <AppBox createLink="/dashboard/new" apps={apps} />
-          <div className="text-center mt-24 m-auto">
-            <img className="inline-block" src={folderPlus} alt="Wallet icon" />
-            <div className="text-black mt-4">No Applications</div>
-            <p className="text-slate-500">
-              Get started by creating an Application.
-            </p>
-            <Button
-              btnSize="l"
-              onClick={() => {
-                console.log('opening', newAppModalOpen)
-                setNewAppModalOpen(true)
-              }}
-            >
-              Create Application"
-            </Button>
+        <div className="bg-gray-50 p-6 h-full">
+          <div className="mb-11">
+            <InfoPanelDashboard />
           </div>
-          <Modal
-            isOpen={newAppModalOpen}
-            fixed
-            handleClose={() => setNewAppModalOpen(false)}
-          >
-            <>
-              <h3 className="text-xl font-bold mb-6">New Application</h3>
 
-              <form method="post">
-                <p>Application Name</p>
-                <input placeholder="My Application" name="client_name"></input>
-                <button onClick={() => setNewAppModalOpen(false)}>
-                  Cancel
-                </button>
-                <button type="submit">Create Application</button>
-              </form>
+          {apps?.length > 0 && (
+            <AppBox createLink="/dashboard/new" apps={apps} />
+          )}
+
+          {apps?.length === 0 && (
+            <>
+              <Text
+                size="base"
+                weight="semibold"
+                className="text-gray-900 mb-6"
+              >
+                Your Applications
+              </Text>
+
+              <div className="text-center m-auto">
+                <img
+                  className="inline-block mb-2"
+                  src={folderPlus}
+                  alt="Wallet icon"
+                />
+
+                <Text weight="semibold" className="text-gray-900">
+                  No Applications
+                </Text>
+                <Text weight="medium" className="text-gray-500 mb-6">
+                  Get started by creating an Application.
+                </Text>
+
+                <Button
+                  btnType="primary-alt"
+                  btnSize="l"
+                  onClick={() => {
+                    setNewAppModalOpen(true)
+                  }}
+                >
+                  Create Application
+                </Button>
+              </div>
+              <NewAppModal
+                isOpen={newAppModalOpen}
+                newAppCreateCallback={(app) => {
+                  setNewAppModalOpen(false)
+                }}
+              />
             </>
-          </Modal>
+          )}
         </div>
       </main>
     </div>

@@ -9,8 +9,6 @@
 
 import * as _ from 'lodash'
 
-import * as jose from 'jose'
-
 import * as set from 'ts-set-utils'
 
 import * as graph from '@kubelt/graph'
@@ -21,7 +19,7 @@ import invariant from 'tiny-invariant'
 
 //import { checkEnv } from '@kubelt/utils'
 
-import { EdgeDirection } from '@kubelt/graph'
+import { Edge, EdgeDirection } from '@kubelt/graph'
 
 import type {
   RpcAuthHandler,
@@ -35,7 +33,6 @@ import { default as mwAuthenticate } from '@kubelt/openrpc/middleware/authentica
 import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation'
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
-import { required as requiredEnv } from './env'
 import { StarbaseApplication } from './nodes/application'
 import * as oauth from './0xAuth'
 import * as secret from './secret'
@@ -200,13 +197,30 @@ const kb_appCreate = openrpc.method(schema, {
       const edges: Fetcher = context.get(KEY_EDGES)
       // TODO better type for JWT?
       const token: string = context.get(KEY_TOKEN)
-      // This value is extracted by authCheck.
-      const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      const clientName = _.get(request, ['params', 'clientName'])
+      // NB: decoding a signed JWT payload does not validate the JWT
+      // Claims Set or values. This will be managed by authCheck, once
+      // implemented (probably by forwarding to auth service).
+      //
+      // NB: this throws if no token was provided, or if the supplied
+      // account URN isn't valid.
+      const accountURN = tokenUtil.getAccountId(token)
+      if (!accountURN) {
+        throw new Error('Account URN must be retrievable')
+      }
+
+      const tag = graph.edge(EDGE_TAG)
+
+      const [clientName] = request.params as ParamsArray
       if (_.isUndefined(clientName)) {
         return openrpc.error(request, ErrorMissingClientName)
       }
+
+      // Let's make sure this name is unique
+      const linkedEdges = await graph.edges(edges, accountURN, tag)
+      console.log({ linkedEdges })
+      // TODO: check if the link already exists
+      // if (linkedEdges?.filter(e => e.rComp.clientName))
 
       // Create initial OAuth configuration for the application. There
       // is no secret associated with the app after creation. The
@@ -225,24 +239,38 @@ const kb_appCreate = openrpc.method(schema, {
       // We store the hashed version of the secret; the plaintext is
       // returned for one-time display to the user and is never again
       // available in unhashed form in the system.
-      const result = app.update({
+      // TODO: return a JsonRpcResponse or JsonRpcError
+      const result = await app.init({
         clientId,
         clientName,
       })
+
+      if (result.error) {
+        console.error({ result })
+        throw 'starbase.kb_appCreate: failed to create application'
+      }
 
       // Get the ID of the created durable object and store it in the
       // mapping table.
       const appId: string = <string>app.$.id
       // Create a platform URN that uniquely represents the just-created
       // application.
-      const appURN = ApplicationURNSpace.urn(appId)
+      const appURN =
+        ApplicationURNSpace.urn(appId) +
+        `?+clientName=${encodeURIComponent(clientName)}`
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
       const src = accountURN
       const dst = appURN
-      const tag = graph.edge(EDGE_TAG)
-      const edgeRes = await graph.link(edges, src, dst, tag)
+
+      // TODO: return a JsonRpcResponse or JsonRpcError
+      const edgeRes = await graph.link(edges, src, dst as ApplicationURN, tag)
+      if (!(edgeRes as any).edge) {
+        console.error({ edgeRes })
+        await await app._.cmp.delete()
+        throw `starbase.kb_appCreate: failed to create edge`
+      }
 
       // Store an entry in the lookup KV that maps from application
       // client ID to internal application object ID.
@@ -420,6 +448,7 @@ const kb_appList = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
       const edges: Fetcher = context.get(KEY_EDGES)
+
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
@@ -435,14 +464,31 @@ const kb_appList = openrpc.method(schema, {
         EdgeDirection.Outgoing
       )
 
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+
       // The app nodes are the "destination" node of each returned edge,
       // an object provided as the .dst property. The node "id" property
       // has the shape: `urn:nid:nss`. More details about the node are
       // available on node object, if required. E.g. r-, q-,
       // f-component, or the full URN.
-      const appList = _.map(edgeList, (edge) => {
-        return _.get(edge, ['dst', 'id'])
-      })
+
+      const appList = []
+      if (edgeList) {
+        const edgeListArr = edgeList as Edge[]
+
+        for (let i = 0; i < edgeListArr.length; i++) {
+          const edge = edgeListArr[i]
+
+          const app = await openrpc.discover(sbApplication, {
+            token,
+            tag: 'starbase-app',
+            id: ApplicationURNSpace.decode(edge.dst.id as ApplicationURN),
+          })
+
+          const appListingDetails = await app.fetch()
+          appList.push(appListingDetails)
+        }
+      }
 
       return openrpc.response(request, appList)
     }

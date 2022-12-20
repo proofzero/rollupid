@@ -4,6 +4,8 @@
 
 import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare'
 
+import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+
 import {
   Links,
   LiveReload,
@@ -43,6 +45,36 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+      </body>
+    </html>
+  )
+}
+
+export const ErrorBoundary = ({
+  error,
+}: {
+  error?: {
+    stack: any
+  }
+}) => {
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+
+      <body className="min-h-[100dvh] flex justify-center items-center">
+        <div className="w-full">
+          <ErrorPage
+            code="Error"
+            message="Something went terribly wrong!"
+            trace={error?.stack}
+          />
+        </div>
+
+        <ScrollRestoration />
+        <Scripts />
       </body>
     </html>
   )
