@@ -1,6 +1,7 @@
 # Console
 
 [Console](https://passport.threeid.xyz) is where you create and manage 3ID applications.
+The details page for applications is described below. For more information see the [Console Reference](3id/console/reference.md)
 
 ![Console Application Details](../img/console-app-details.png)
 
