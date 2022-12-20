@@ -28,6 +28,7 @@ import {
 
 // The OpenRPC schema that defines the RPC API provided by the Durable Object.
 import schema from './schema'
+import * as apiKeyUtils from './apiKeyUtils'
 
 // StarbaseApplication
 // -----------------------------------------------------------------------------
@@ -96,6 +97,16 @@ import schema from './schema'
   name: 'secret',
   doc: 'The OAuth client secret for the application',
   defaultValue: '',
+})
+@field({
+  name: 'apiKey',
+  doc: 'The API key for the application',
+  defaultValue: null,
+})
+@field({
+  name: 'apiKeySigningKeyPair',
+  doc: 'The signing keypair for signing the API key for app',
+  defaultValue: null,
 })
 export class StarbaseApplication {
   // init
@@ -280,6 +291,23 @@ export class StarbaseApplication {
     return Promise.resolve(true)
   }
 
+  // rotateSecret
+  // ---------------------------------------------------------------------------
+
+  @method('rotateApiKey')
+  //@requiredScope()
+  @requiredField('apiKey', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('apiKeySigningKeyPair', [FieldAccess.Read, FieldAccess.Write])
+  async rotateApiKey(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    const apiKey = await apiKeyUtils.generateAndStore(params, input, output)
+    output.set('apiKey', apiKey)
+    return apiKey
+  }
+
   // publish
   // ---------------------------------------------------------------------------
   // Note that this method simply sets the publication flag as
@@ -297,7 +325,6 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const published = params.get('published')
     output.set('published', published)
-
     return Promise.resolve({ published })
   }
 

@@ -139,10 +139,12 @@ const authCheck: RpcAuthHandler = async (
   context: Readonly<RpcContext>
 ): Promise<void | Response> => {
   const token = context.get(KEY_TOKEN)
-  if (_.isUndefined(token)) {
+  if (_.isUndefined(token) || token === '') {
     // No token was supplied with the request. That's a "no access
     // allowed" from me dawg.
-    return new Response('Unauthorized', { status: 401 })
+    return new Response('Unauthorized. No token supplied with request.', {
+      status: 401,
+    })
   }
 
   let accountId
@@ -160,7 +162,10 @@ const authCheck: RpcAuthHandler = async (
   }
 
   if (_.isUndefined(accountId)) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response(
+      'Unauthorized. No account id was found encoded in token.',
+      { status: 401 }
+    )
   }
 
   // Store the extracted account ID on the context for use in the method
@@ -741,6 +746,66 @@ const kb_appRotateSecret = openrpc.method(schema, {
   ),
 })
 
+// kb_appRotateSecret
+// -----------------------------------------------------------------------------
+// Generate a new secret and store in the application (keeping old
+// secrets around).
+
+const kb_appRotateApiKey = openrpc.method(schema, {
+  name: 'kb_appRotateApiKey',
+  // TODO authCheck is currently a no-op
+  auth: authCheck,
+  scopes: noScope,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+
+      // Get the ID of the app that we are rotating the secret for.
+      const clientId = _.get(request, ['params', 'clientId'])
+
+      // TODO once we conformance check the request against the schema,
+      // we can be sure that the required parameter(s) are present.
+      if (undefined === clientId) {
+        return openrpc.error(request, ErrorMissingClientId)
+      }
+      // The mapping table stores the durable object ID for the
+      // application core.
+      const appId = await lookup.get(clientId)
+      if (null === appId) {
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
+      }
+      // Create a platform URN that uniquely represents the just-created
+      // application.
+      const appURN = ApplicationURNSpace.urn(appId)
+      console.log(`rotating API key for ${appURN}`)
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        // Forward the token sent with the request to the DO.
+        urn: appURN,
+        // Use this string when logging DO requests.
+        tag: 'starbase-app',
+      })
+      invariant(appId === app.$.id, 'object IDs must match')
+
+      const apiKey = await app.rotateApiKey({ appId: appId, urn: appURN })
+
+      return openrpc.response(request, {
+        apiKey: apiKey,
+      })
+    }
+  ),
+})
+
 // kb_appPublish
 // -----------------------------------------------------------------------------
 // Toggle the publication state of the application.
@@ -892,6 +957,7 @@ const methods = openrpc.methods(schema, [
   kb_appProfile,
   kb_appPublish,
   kb_appRotateSecret,
+  kb_appRotateApiKey,
   kb_appScopes,
   kb_appUpdate,
 ])
