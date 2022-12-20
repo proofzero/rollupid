@@ -9,8 +9,6 @@
 
 import * as _ from 'lodash'
 
-import * as jose from 'jose'
-
 import * as set from 'ts-set-utils'
 
 import * as graph from '@kubelt/graph'
@@ -35,12 +33,10 @@ import { default as mwAuthenticate } from '@kubelt/openrpc/middleware/authentica
 import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation'
 import { default as mwOnlyLocal } from '@kubelt/openrpc/middleware/local'
 
-import { required as requiredEnv } from './env'
 import { StarbaseApplication } from './nodes/application'
 import * as oauth from './0xAuth'
 import * as secret from './secret'
 import * as tokenUtil from './token'
-import * as edgeUtil from './edge'
 
 import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
 
@@ -221,7 +217,7 @@ const kb_appCreate = openrpc.method(schema, {
       }
 
       // Let's make sure this name is unique
-      const linkedEdges = await edgeUtil.edges(edges, accountURN, tag)
+      const linkedEdges = await graph.edges(edges, accountURN, tag)
       console.log({ linkedEdges })
       // TODO: check if the link already exists
       // if (linkedEdges?.filter(e => e.rComp.clientName))
@@ -269,8 +265,8 @@ const kb_appCreate = openrpc.method(schema, {
       const dst = appURN
 
       // TODO: return a JsonRpcResponse or JsonRpcError
-      const edgeRes = await edgeUtil.link(edges, src, dst, tag)
-      if (!edgeRes.ok) {
+      const edgeRes = await graph.link(edges, src, dst as ApplicationURN, tag)
+      if (!(edgeRes as any).edge) {
         console.error({ edgeRes })
         await await app._.cmp.delete()
         throw `starbase.kb_appCreate: failed to create edge`
