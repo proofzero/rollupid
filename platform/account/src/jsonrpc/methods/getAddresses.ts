@@ -6,7 +6,6 @@ import { Context } from '../../context'
 
 import type { Edge } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
-import type { AddressURN } from '@kubelt/urns/address'
 
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -14,11 +13,6 @@ export const GetAddressesInput = z.object({
 })
 
 export type GetAddressesParams = z.infer<typeof GetAddressesInput>
-
-export const AddressList = z.array(inputValidators.AddressURNInput)
-
-// TODO move to types package
-export type AddressList = z.infer<typeof AddressList>
 
 export const getAddressesMethod = async ({
   input,

@@ -1,17 +1,19 @@
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
+import { proxyDurable } from 'itty-durable'
 
 import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
-import { ProfileSchema } from './middlewares/profile'
-
 import {
   getAddressesMethod,
   GetAddressesInput,
   AddressList,
 } from './methods/getAddresses'
+import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
+
+import { ProfileSchema } from './middlewares/profile'
 
 import {
   ValidateJWT,
@@ -19,7 +21,11 @@ import {
 } from '@kubelt/platform-middleware/jwt'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
+
 import { initAccountNodeByName } from '../nodes'
+
+import Account from '../nodes/account'
+//import { AddressList } from './middlewares/addressList'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -54,7 +60,7 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 export const appRouter = t.router({
   getProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
-    // .use(Scopes)
+    .use(Scopes)
     .use(LogUsage)
     .input(GetProfileInput)
     .output(ProfileSchema.nullable())
@@ -62,7 +68,7 @@ export const appRouter = t.router({
   setProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
-    // .use(Scopes)
+    .use(Scopes)
     .use(injectAccountNode)
     .use(LogUsage)
     .input(SetProfileInput)
@@ -70,10 +76,15 @@ export const appRouter = t.router({
   getAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
-    // .use(Scopes)
+    .use(Scopes)
     .use(LogUsage)
     .input(GetAddressesInput)
     // TODO this causes a type checking error
     //.output(AddressList)
     .mutation(getAddressesMethod),
+  hasAddresses: t.procedure
+    .use(Scopes)
+    .use(LogUsage)
+    .input(HasAddressesInput)
+    .mutation(hasAddressesMethod),
 })
