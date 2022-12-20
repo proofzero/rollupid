@@ -8,9 +8,9 @@
   * [Setting up your first app](3id/guides/app-setup.md)
 * [Profile](3id/profile/index.md)
   * [Profile Reference](3id/profile/reference.md)
-* [Passport](3id/passport/index.md)
 * [Console](3id/console/index.md)
   * [Console Reference](3id/console/reference.md)
+* [Passport](3id/passport/index.md)
 * [Galaxy](3id/galaxy/index.md)
 * [FAQ](3id/faq/index.md)
 
