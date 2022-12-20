@@ -22,13 +22,11 @@ means traversals and data accesses are always **secure**. The structure of the
 graph is tightly controlled, which means that accesses are always **fast**.
 
 It might be useful to understand that you are working on top of a decentralized
-graph, however, interactions with the graph are through well-defined interfaces:
-your team will be defining scopes in [Console](../console/reference.md#scopes)
-and making GraphQL calls through [Galaxy](../galaxy/index.md), not doing edge
-and node operations.
-
-We'll now move on to discussing the system compoents built on top of the
-Authorization Graph and what they do for you.
+graph, however, interactions with the graph are through well-defined interfaces
+represented by the components of the system. Your team will be defining scopes
+in [Console](../console/reference.md#scopes), making GraphQL calls through
+[Galaxy](../galaxy/index.md), and personalizing your UX with
+[Profile](../profile/reference.md), not learning new graph operations.
 
 ## Profile
 
