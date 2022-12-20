@@ -472,7 +472,7 @@ const kb_appList = openrpc.method(schema, {
       // available on node object, if required. E.g. r-, q-,
       // f-component, or the full URN.
 
-      let appList = []
+      const appList = []
       if (edgeList) {
         const edgeListArr = edgeList as Edge[]
 
