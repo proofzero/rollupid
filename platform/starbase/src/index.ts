@@ -698,12 +698,14 @@ const kb_appRotateSecret = openrpc.method(schema, {
       const token = context.get(KEY_TOKEN)
 
       // Get the ID of the app that we are rotating the secret for.
-      const clientId = _.get(request, ['params', 'clientId'])
+      const [clientId] = request.params as ParamsArray
+
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
         return openrpc.error(request, ErrorMissingClientId)
       }
+
       // The mapping table stores the durable object ID for the
       // application core.
       const appId = await lookup.get(clientId)
@@ -935,6 +937,11 @@ const kb_appProfile = openrpc.method(schema, {
       // NB: this returns an empty object if the application is not
       // published.
       const appProfile = await app.profile()
+
+      // Check if regen secret requested
+      // Actually regen secret
+      // Add to appProfile
+      // ~= calling kb_regenerateKeys
 
       return openrpc.response(request, appProfile)
     }

@@ -187,18 +187,18 @@ const rpcSchema: RpcSchema = {
       summary: 'Invalidate an old secret and replace it with a new value',
       params: [
         {
-          // TODO refer to a secret content descriptor
-          name: 'secret',
+          name: 'clientId',
+          description: 'The application OAuth client ID',
           required: true,
           schema: {
-            type: 'string',
+            $ref: '#/components/contentDescriptors/ClientId',
           },
         },
       ],
       result: {
-        name: 'success',
+        name: 'secret',
         schema: {
-          type: 'boolean',
+          type: 'string',
         },
       },
       errors: [],
