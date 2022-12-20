@@ -25,7 +25,9 @@ key concepts that will be useful to understand our technology.
 
 ### 0xAuth
 
-**0xAuth** is 3ID's OAuth-standard authorization system with extensions to handle authorizations in decentralized systems, including blockchain.
+**0xAuth** is 3ID's OAuth-standard authorization system with extensions to handle
+authorizations in decentralized systems, including blockchain. Configure 0xAuth
+using [Console](../console/reference.md).
 
 ### Nodes
 
