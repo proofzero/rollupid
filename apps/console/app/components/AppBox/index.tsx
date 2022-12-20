@@ -42,10 +42,11 @@ type AppBoxProps = {
 export default function AppBox(props: AppBoxProps) {
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
-  const mappedApps = props.apps.map((a) => ({
-    id: a.srcUrn.split('/')[1],
+  // TODO: Get more app details here...
+  const mappedApps = props.apps.map((appURN) => ({
+    id: appURN.split('/')[1],
     created: new Date(),
-    title: a.dstUrn.split('clientName=')[1],
+    title: "Foo",
     published: false,
   }))
 
