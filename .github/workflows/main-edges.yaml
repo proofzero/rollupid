@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - fix/gha-edges
 
 defaults:
   run:
@@ -42,6 +43,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
           command: d1 delete --env dev edges-dev
           environment: 'dev'
@@ -51,6 +53,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
           command: d1 execute --env dev edges-dev --file=./edges.sql
           environment: 'dev'
@@ -60,6 +63,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
           command: publish --env dev
           environment: 'dev'
