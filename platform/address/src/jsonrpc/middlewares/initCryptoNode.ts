@@ -1,6 +1,3 @@
-// import Core from '@moralisweb3/common-core'
-// import Streams from '@moralisweb3/streams'
-
 import type { RpcContext } from '@kubelt/openrpc'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { NodeType } from '../../types'
