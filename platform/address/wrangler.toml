@@ -1,6 +1,6 @@
 name = "address"
 main = "dist/index.mjs"
-# type = "javascript"
+# main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
 workers_dev = false
