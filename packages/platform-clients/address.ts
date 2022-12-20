@@ -24,5 +24,7 @@ export interface AddressApi extends BaseApi {
   kb_getPfpVoucher(): object | undefined
 }
 
-export default (fetcher: Fetcher, requestInit: RequestInit | Request = {}) =>
-  createClient<AddressApi>(fetcher, requestInit)
+export default (
+  fetcher: Fetcher,
+  requestInit?: RequestInit<RequestInitCfProperties> | undefined
+) => createClient<AddressApi>(fetcher, requestInit)

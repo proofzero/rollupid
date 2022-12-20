@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node build.js",
+    "build": "wrangler publish --dry-run --outdir=dist",
     "check": "run-s format:check lint:check types:check",
     "deploy": "wrangler publish",
     "deploy:dev": "wrangler publish --env dev",
     "dev": "run-s dev:local",
-    "dev:local": "run-s types:check build wrangler:local",
-    "dev:remote": "run-s types:check build wrangler:remote",
+    "dev:local": "run-s types:check wrangler:local",
+    "dev:remote": "run-s types:check wrangler:remote",
     "dev:wrangler": "wrangler dev --local --persist",
     "format": "run-s format:src",
     "format:src": "prettier --write src/",
@@ -25,7 +25,7 @@
     "wrangler:remote": "wrangler dev --env dev"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "3.18.0",
+    "@cloudflare/workers-types": "4.20221111.1",
     "@types/itty-router-extras": "0.4.0",
     "@types/lodash": "4.14.189",
     "esbuild": "0.15.15",

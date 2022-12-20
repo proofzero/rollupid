@@ -17,5 +17,7 @@ export interface StarbaseApi extends BaseApi {
   kb_initPlatform(): Promise<string[]>
 }
 
-export default (fetcher: Fetcher, requestInit: RequestInit | Request = {}) =>
-  createClient<StarbaseApi>(fetcher, requestInit)
+export default (
+  fetcher: Fetcher,
+  requestInit?: RequestInit<RequestInitCfProperties> | undefined
+) => createClient<StarbaseApi>(fetcher, requestInit)

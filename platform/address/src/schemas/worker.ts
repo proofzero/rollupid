@@ -124,6 +124,68 @@ export const schema: RpcSchema = {
         $ref: '#/components/contentDescriptors/PfpVoucher',
       },
     },
+    {
+      name: 'kb_indexTokens',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/TokenPage',
+        },
+      ],
+      result: {
+        name: 'index tokens result',
+        schema: {},
+      },
+    },
+    {
+      name: 'kb_setTokenMetadata',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/TokenMetadata',
+        },
+      ],
+      result: {
+        name: 'index tokens result',
+        schema: {},
+      },
+    },
+    {
+      name: 'kb_getTokens',
+      params: [],
+      result: {
+        $ref: '#/components/contentDescriptors/TokenItems',
+      },
+    },
+    {
+      name: 'kb_setTokens',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/TokenItems',
+        },
+      ],
+      result: {
+        name: 'set gallery result',
+        schema: {},
+      },
+    },
+    {
+      name: 'kb_getGallery',
+      params: [],
+      result: {
+        $ref: '#/components/contentDescriptors/GalleryItems',
+      },
+    },
+    {
+      name: 'kb_setGallery',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/GalleryItems',
+        },
+      ],
+      result: {
+        name: 'set gallery result',
+        schema: {},
+      },
+    },
   ],
   components: Node.components,
 }

@@ -5,6 +5,7 @@
   "description": "Graph edge storage and retrieval",
   "private": true,
   "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
     "build:dev": "tsc",
     "db:local": "ts-node db/index.ts",
     "db:start": "run-s build:dev db:local",
@@ -29,6 +30,7 @@
     "check-coverage": false
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "3.18.0",
     "@databases/split-sql-query": "1.0.3",
     "@databases/sql": "3.2.0",
     "@microsoft/api-extractor": "7.33.6",

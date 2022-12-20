@@ -1,8 +1,14 @@
+import Moralis from 'moralis'
+
 import type { RpcContext } from '@kubelt/openrpc'
+import { AddressURNSpace } from '@kubelt/urns/address'
 import { NodeType } from '../../types'
 
 export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (context.get('node_type') != NodeType.Crypto) {
+  if (
+    context.get('node_type') != NodeType.Crypto &&
+    context.get('node_type') != NodeType.Contract
+  ) {
     return
   }
 
@@ -17,5 +23,24 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
   if (!address || !type) {
     await nodeClient.setAddress({ address: context.get('name') })
     await nodeClient.setType({ type: context.get('addr_type') })
+
+    // TODO: when contracts are supported we can monitor contracts too
+    if (context.get('node_type') == NodeType.Crypto) {
+      await Moralis.start({ apiKey: context.get('APIKEY_MORALIS') })
+      Moralis.Streams.addAddress({
+        address: context.get('name'),
+        id: context.get('MORALIS_STREAM_ID'),
+      })
+
+      // and let's send a message to bootstrap the address collection
+      context.get('BLOCKCHAIN_ACTIVITY').send({
+        method: 'kb_indexTokens',
+        body: [AddressURNSpace.urn(context.get('name')), 'eth', null],
+      })
+      context.get('BLOCKCHAIN_ACTIVITY').send({
+        method: 'kb_indexTokens',
+        body: [AddressURNSpace.urn(context.get('name')), 'polygon', null],
+      })
+    }
   }
 }

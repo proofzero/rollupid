@@ -7,6 +7,7 @@ import { CryptoAddressType, NodeType } from './types'
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {
     case NodeType.Crypto:
+    case NodeType.Contract:
       return true
     default:
       return false

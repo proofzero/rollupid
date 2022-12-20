@@ -19,6 +19,13 @@ import checkCryptoNode from './middlewares/checkCryptoNode'
 import resolveENS from './middlewares/resolveENS'
 import setCryptoNodeClient from './middlewares/setCryptoNodeClient'
 import initCryptoNode from './middlewares/initCryptoNode'
+import injectDB from './middlewares/injectDB'
+import setGallery from './methods/setGallery'
+import getGallery from './methods/getGallery'
+import getTokens from './methods/getTokens'
+import setTokens from './methods/setTokens'
+import setTokenMetadata from './methods/setTokenMetadata'
+import indexTokens from './methods/indexTokens'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -70,6 +77,36 @@ const rpcHandler = openrpc.build(
         scopes: openrpc.scopes([]),
         handler: openrpc.handler(getPfpVoucher),
       }),
+      openrpc.method(schema, {
+        name: 'kb_indexTokens',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(indexTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setTokenMetadata',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setTokenMetadata),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_getTokens',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setTokens',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setTokens),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_getGallery',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getGallery),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setGallery',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setGallery),
+      }),
     ]),
     openrpc.extensions(schema, []),
     openrpc.options({ rpcDiscover: true })
@@ -82,6 +119,7 @@ const rpcHandler = openrpc.build(
     openrpc.middleware(resolveENS),
     openrpc.middleware(setCryptoNodeClient),
     openrpc.middleware(initCryptoNode),
+    openrpc.middleware(injectDB),
   ])
 )
 
@@ -90,8 +128,19 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('Access', getAccessClient(env.Access))
   context.set('Edges', env.Edges)
   context.set('CryptoAddress', env.CryptoAddress)
+  context.set('ContractAddress', env.ContractAddress)
+  context.set('COLLECTIONS', env.COLLECTIONS)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)
   context.set('NFTAR_URL', env.NFTAR_URL)
+  context.set('APIKEY_ALCHEMY_ETH', env.APIKEY_ALCHEMY_ETH)
+  context.set('ALCHEMY_ETH_NETWORK', env.ALCHEMY_ETH_NETWORK)
+  context.set('APIKEY_ALCHEMY_POLYGON', env.APIKEY_ALCHEMY_POLYGON)
+  context.set('ALCHEMY_POLYGON_NETWORK', env.ALCHEMY_POLYGON_NETWORK)
+  context.set('URL_MORALIS_WEBHOOK', env.URL_MORALIS_WEBHOOK)
+  context.set('APIKEY_MORALIS', env.APIKEY_MORALIS)
+  context.set('MORALIS_STREAM_ID', env.MORALIS_STREAM_ID)
+  context.set('BLOCKCHAIN_ACTIVITY', env.BLOCKCHAIN_ACTIVITY)
+
   return rpcHandler(request, context)
 }

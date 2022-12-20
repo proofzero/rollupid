@@ -18,5 +18,7 @@ export interface ObjectApi extends BaseApi {
   ): Promise<PutObjectResult>
 }
 
-export default (fetcher: Fetcher, requestInit: RequestInit | Request = {}) =>
-  createClient<ObjectApi>(fetcher, requestInit)
+export default (
+  fetcher: Fetcher,
+  requestInit?: RequestInit<RequestInitCfProperties> | undefined
+) => createClient<ObjectApi>(fetcher, requestInit)

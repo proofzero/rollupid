@@ -31,7 +31,7 @@ export default (request: Readonly<Request>, context: RpcContext) => {
     }
   }
 
-  context.set('name', name)
+  context.set('name', name) // if it's an ENS name, it will be resolved later to an address in resolveENS middleware
   context.set('addr_type', type)
   context.set('params', new URLSearchParams(qcomponent as string))
 
