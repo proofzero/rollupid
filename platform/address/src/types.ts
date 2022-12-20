@@ -43,6 +43,8 @@ export interface Challenge {
 
 export type SetAccountParams = [account: string]
 
+export type UnsetAccountParams = [account: string]
+
 export type GetNonceParams = [
   address: string,
   template: string,

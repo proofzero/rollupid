@@ -11,7 +11,14 @@ import * as _ from 'lodash'
 
 import * as urns from 'urns'
 
-import type { EdgeTag } from '@kubelt/graph'
+import type { AnyURN } from '@kubelt/urns'
+
+import type {
+  EdgeTag,
+  EdgesOptions,
+  EdgeQuery,
+  NodeFilter,
+} from '@kubelt/graph'
 
 import { EdgeDirection } from '@kubelt/graph'
 
@@ -92,9 +99,15 @@ const kb_makeEdge = openrpc.method(schema, {
       // TODO schema enforcement required
       // TODO support permissions associated with edge
 
+      const params = request.params as {
+        src?: AnyURN
+        dst?: AnyURN
+        tag?: EdgeTag
+      }
+
       // SRC
 
-      const srcURN = _.get(request, ['params', 'src'])
+      const srcURN = params?.src
       if (_.isUndefined(srcURN)) {
         return openrpc.error(request, ErrorMissingSourceNode)
       }
@@ -106,7 +119,7 @@ const kb_makeEdge = openrpc.method(schema, {
 
       // DST
 
-      const dstURN = _.get(request, ['params', 'dst'])
+      const dstURN = params?.dst
       if (_.isUndefined(dstURN)) {
         return openrpc.error(request, ErrorMissingDestinationNode)
       }
@@ -118,7 +131,7 @@ const kb_makeEdge = openrpc.method(schema, {
 
       // TAG
 
-      const edgeTag = _.get(request, ['params', 'tag'])
+      const edgeTag = params?.tag
       if (_.isUndefined(edgeTag)) {
         return openrpc.error(request, ErrorMissingEdgeTag)
       }
@@ -130,16 +143,17 @@ const kb_makeEdge = openrpc.method(schema, {
 
       // TODO store permissions if supplied
 
-      const edgeId = await db.link(g, srcURN, dstURN, edgeTag)
+      const edge = await db.link(g, srcURN, dstURN, edgeTag)
 
-      console.log(`created edge ${edgeId}: ${srcURN} =[${edgeTag}]=> ${dstURN}`)
+      console.log(
+        `created edge ${edge.id}: ${edge.srcUrn} =[${edge.tag}]=> ${edge.dstUrn}`
+      )
 
       return openrpc.response(request, {
         edge: {
-          id: edgeId,
-          src: srcURN,
-          dst: dstURN,
-          tag: edgeTag,
+          src: edge.srcUrn,
+          dst: edge.dstUrn,
+          tag: edge.tag,
         },
       })
     }
@@ -160,7 +174,12 @@ const kb_getEdges = openrpc.method(schema, {
     ) => {
       const g: Graph = context.get(KEY_GRAPH)
 
-      const nodeId = _.get(request, ['params', 'id'])
+      const params = request.params as {
+        query: EdgeQuery
+        opt?: EdgesOptions
+      }
+
+      const nodeId: AnyURN | undefined = params?.query?.id
       if (_.isUndefined(nodeId)) {
         return openrpc.error(request, ErrorMissingNodeId)
       }
@@ -178,7 +197,7 @@ const kb_getEdges = openrpc.method(schema, {
       // Get edge tag. This may be undefined, but if present will be
       // used to filter the set of edges that is returned to just those
       // having this tag (an edge "type").
-      const edgeTag: EdgeTag = _.get(request, ['params', 'tag'])
+      const edgeTag: EdgeTag | undefined = params?.query?.tag
       if (!_.isUndefined(edgeTag)) {
         try {
           urns.parseURN(edgeTag)
@@ -194,7 +213,7 @@ const kb_getEdges = openrpc.method(schema, {
 
       // Check for optional restriction to either 'incoming' or 'outgoing' edges.
       // This may be undefined.
-      const edgeDir: EdgeDirection = _.get(request, ['params', 'dir'])
+      const edgeDir: EdgeDirection | undefined = params?.query?.dir
       if (!_.isUndefined(edgeDir)) {
         switch (edgeDir) {
           case EdgeDirection.Incoming:
@@ -212,9 +231,28 @@ const kb_getEdges = openrpc.method(schema, {
         }
       }
 
-      // Get the list of all edges impinging on a node (either incoming
-      // or outgoing).
-      const edges = await db.edges(g, nodeId, edgeTag, edgeDir)
+      const src: NodeFilter | undefined = params?.query?.src
+      if (src !== undefined) {
+        // TODO validate the src node filter.
+        console.warn(`todo: validate the src node filter`)
+      }
+
+      const dst: NodeFilter | undefined = params?.query?.dst
+      if (dst !== undefined) {
+        // TODO validate the dst node filter.
+        console.warn(`todo: validate the dst node filter`)
+      }
+
+      // TODO support pagination, cache control, access control, etc.
+      const opt: EdgesOptions | undefined = params?.opt
+      if (opt !== undefined) {
+        // TODO validate supplied options.
+        console.warn(`todo: validate the options`)
+      }
+
+      // Get the list of the edges selected by the query, modifying the
+      // result as per any options.
+      const edges = await db.edges(g, params.query, params.opt)
 
       return openrpc.response(request, {
         id: nodeId,

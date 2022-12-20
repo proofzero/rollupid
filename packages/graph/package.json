@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@kubelt/security": "workspace:*",
+    "@kubelt/types": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "cross-env": "7.0.3",
     "reflect-metadata": "0.1.13",

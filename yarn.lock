@@ -6263,6 +6263,7 @@ __metadata:
   resolution: "@kubelt/graph@workspace:packages/graph"
   dependencies:
     "@kubelt/security": "workspace:*"
+    "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
     "@types/node": 18.11.9
@@ -6355,6 +6356,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform-middleware@workspace:packages/platform-middleware"
   dependencies:
+    "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@trpc/server": 10.7.0
     "@typescript-eslint/eslint-plugin": 5.45.0
@@ -6403,8 +6405,10 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
+    "@kubelt/graph": "workspace:*"
     "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
+    "@kubelt/types": "workspace:*"
     "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
@@ -6769,6 +6773,20 @@ __metadata:
 "@kubelt/smartcontracts@workspace:smartcontracts":
   version: 0.0.0-use.local
   resolution: "@kubelt/smartcontracts@workspace:smartcontracts"
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/types@workspace:*, @kubelt/types@workspace:packages/types":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/types@workspace:packages/types"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
+    eslint: 8.29.0
+    eslint-config-prettier: 8.5.0
+    npm-run-all: 4.1.5
+    prettier: 2.8.0
+    typescript: 4.9.3
   languageName: unknown
   linkType: soft
 

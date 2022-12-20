@@ -12,6 +12,8 @@
   * [Console Reference](3id/console/reference.md)
 * [Passport](3id/passport/index.md)
 * [Galaxy](3id/galaxy/index.md)
+* [Graph](3id/graph/index.md)
+  * [Graph Reference](3id/graph/reference.md)
 * [FAQ](3id/faq/index.md)
 
 <!--

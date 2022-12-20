@@ -19,7 +19,13 @@ import invariant from 'tiny-invariant'
 
 //import { checkEnv } from '@kubelt/utils'
 
-import { Edge, EdgeDirection } from '@kubelt/graph'
+import { Edge, EdgeDirection, EdgeQuery } from '@kubelt/graph'
+
+import {
+  listApplications,
+  linkAccountApp,
+  unlinkAccountApp,
+} from '@kubelt/graph/util'
 
 import type {
   RpcAuthHandler,
@@ -80,10 +86,6 @@ export { StarbaseApplication }
 
 // Definitions
 // -----------------------------------------------------------------------------
-
-// The name of the edge tag used to link an account node and an
-// application node.
-const EDGE_TAG = 'owns/app'
 
 // Context key for a KV store binding containing fixture data.
 const KEY_FIXTURES = 'xyz.threeid.kv/fixtures'
@@ -215,16 +217,14 @@ const kb_appCreate = openrpc.method(schema, {
         throw new Error('Account URN must be retrievable')
       }
 
-      const tag = graph.edge(EDGE_TAG)
-
       const [clientName] = request.params as ParamsArray
       if (_.isUndefined(clientName)) {
         return openrpc.error(request, ErrorMissingClientName)
       }
 
-      // Let's make sure this name is unique
-      const linkedEdges = await graph.edges(edges, accountURN, tag)
-      console.log({ linkedEdges })
+      // Let's make sure this name is unique.
+      //const linkedEdges = await listApplications(edges, accountURN)
+      //console.log({ linkedEdges })
       // TODO: check if the link already exists
       // if (linkedEdges?.filter(e => e.rComp.clientName))
 
@@ -267,14 +267,14 @@ const kb_appCreate = openrpc.method(schema, {
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
-      const src = accountURN
-      const dst = appURN
-
-      // TODO: return a JsonRpcResponse or JsonRpcError
-      const edgeRes = await graph.link(edges, src, dst as ApplicationURN, tag)
+      const edgeRes = await linkAccountApp(
+        edges,
+        accountURN,
+        ApplicationURNSpace.urn(appId)
+      )
       if (!(edgeRes as any).edge) {
         console.error({ edgeRes })
-        await await app._.cmp.delete()
+        await app._.cmp.delete()
         throw `starbase.kb_appCreate: failed to create edge`
       }
 
@@ -422,10 +422,7 @@ const kb_appDelete = openrpc.method(schema, {
 
       // Make a call to the remote edges service to remove the link
       // between the owning account node and the application node.
-      const src = accountURN
-      const dst = appURN
-      const tag = graph.edge(EDGE_TAG)
-      const edgeRes = await graph.unlink(edges, src, dst, tag)
+      const edgeRes = await unlinkAccountApp(edges, accountURN, appURN)
 
       // Remove the entry from the client ID => object ID lookup table.
       await lookup.delete(clientId)
@@ -458,17 +455,9 @@ const kb_appList = openrpc.method(schema, {
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      const edgeTag = graph.edge(EDGE_TAG)
-
-      // When an account owns an application, there is an edge *from*
-      // the account node *to* the app node (direction = outgoing), with
-      // edge type tag defined by EDGE_TAG.
-      const edgeList = await graph.edges(
-        edges,
-        accountURN,
-        edgeTag,
-        EdgeDirection.Outgoing
-      )
+      // Get the list of edges linking an account node (identified by
+      // URN to its applications).
+      const edgeList = await listApplications(edges, accountURN)
 
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 

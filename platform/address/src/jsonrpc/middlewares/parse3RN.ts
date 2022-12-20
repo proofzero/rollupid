@@ -21,6 +21,7 @@ export default (request: Readonly<Request>, context: RpcContext) => {
 
   const { rcomponent, qcomponent } = AddressURNSpace.parse(urn)
   const rparams = new URLSearchParams(rcomponent || '')
+  context.set('rparams', rparams)
 
   let type = rparams.get('addr_type')
   if (!type) {

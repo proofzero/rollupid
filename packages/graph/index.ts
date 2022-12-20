@@ -17,12 +17,30 @@ import type { RpcErrorDetail } from '@kubelt/openrpc'
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeTag, Node, Permission, Token } from './types'
+import type {
+  Edge,
+  EdgeTag,
+  EdgesOptions,
+  EdgeQuery,
+  Node,
+  NodeFilter,
+  Permission,
+  Token,
+} from './types'
 
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type { Edge, EdgeTag, Node, Permission, Token }
+export type {
+  Edge,
+  EdgeTag,
+  EdgesOptions,
+  EdgeQuery,
+  Node,
+  NodeFilter,
+  Permission,
+  Token,
+}
 
 // Exports
 // -----------------------------------------------------------------------------
@@ -57,11 +75,10 @@ export function edge(tag: string): EdgeTag {
  */
 export async function edges(
   edges: Fetcher,
-  id: AnyURN,
-  tag?: EdgeTag,
-  dir?: EdgeDirection,
+  query: EdgeQuery,
+  opt?: EdgesOptions
 ): Promise<Edge[] | RpcErrorDetail> {
-  return impl.edges(edges, id, tag, dir)
+  return impl.edges(edges, query, opt)
 }
 
 // link()
@@ -88,6 +105,7 @@ export async function link(
 
 // unlink()
 // -----------------------------------------------------------------------------
+// TODO this should return the edge that was removed
 
 /**
  * Remove the link between two nodes.
@@ -96,7 +114,7 @@ export async function link(
  * @param src - the ID of the source node
  * @param dst - the ID of the destination node
  * @param tag - a tag representing the edge type
- * @returns the number of edges removed.
+ * @returns the removed edge
  */
 export async function unlink(
   edges: Fetcher,

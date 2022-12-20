@@ -3,6 +3,8 @@
   "id": 1,
   "method": "kb_getEdges",
   "params": {
-    "id": "urn:threeid:example/foo?+foo=bar#alpha"
+    "query": {
+      "id": "urn:threeid:account/0x123412341234"
+    }
   }
 }

@@ -14,7 +14,7 @@ import type { Graph } from '../types'
 // -----------------------------------------------------------------------------
 
 /**
- *
+ * Removes an edge from the database.
  */
 export async function edge(
   g: Graph,

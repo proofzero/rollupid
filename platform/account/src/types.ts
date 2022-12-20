@@ -2,6 +2,7 @@ import type { Router } from 'itty-router'
 
 export interface Environment {
   Account: DurableObjectNamespace
+  Edges: Fetcher
 }
 
 export interface IttyDurableObjectState extends DurableObjectState {

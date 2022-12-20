@@ -13,7 +13,7 @@ import * as impl from './impl/index'
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeTag, Node } from '@kubelt/graph'
+import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Node } from '@kubelt/graph'
 
 import type { EdgeRecord, EdgeId, Graph, NodeRecord, Token } from './types'
 
@@ -58,11 +58,10 @@ export async function node(
  */
 export async function edges(
   g: Graph,
-  id: AnyURN,
-  tag?: EdgeTag,
-  dir?: EdgeDirection,
+  query: EdgeQuery,
+  opt?: EdgesOptions,
 ): Promise<Edge[]> {
-  return impl.edges(g, id, tag, dir)
+  return impl.edges(g, query, opt)
 }
 
 // incoming()
