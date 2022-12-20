@@ -19,9 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: cachix/install-nix-action@v18
-        with:
-          nix_path: nixpkgs=channel:nixos-unstable
+      # - uses: cachix/install-nix-action@v18
+      #   with:
+      #     nix_path: nixpkgs=channel:nixos-unstable
 
       # - run: nix-build ../platform.nix
 
@@ -48,7 +48,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/address'
-          command: d1 migrations apply COLLECTIONS
+          command: d1 migrations apply COLLECTIONS --env dev
           environment: 'dev'
 
       - name: Deploy
