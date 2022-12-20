@@ -249,6 +249,23 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
+      name: 'kb_appDetails',
+      summary: 'Return the application details',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/ClientId',
+        },
+      ],
+      result: {
+        name: 'details',
+        summary: 'The application details',
+        schema: {
+          $ref: '#/components/schema/AppDetails',
+        },
+      },
+      errors: [],
+    },
+    {
       name: 'kb_appProfile',
       summary: 'Return the public application profile',
       params: [

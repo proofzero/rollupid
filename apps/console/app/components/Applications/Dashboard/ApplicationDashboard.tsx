@@ -13,6 +13,7 @@ type ApplicationDashboardProps = {
   oAuth: {
     appId: string
     appSecret: string
+    appSecretVisible?: boolean
     createdAt: Date
     onKeyRoll: () => void
   }
@@ -90,7 +91,7 @@ export const ApplicationDashboard = ({
               id="oAuthAppSecret"
               label="Application Secret"
               value={oAuth.appSecret}
-              hidden
+              hidden={oAuth.appSecretVisible ? false : true}
             />
           </div>
         </Panel>

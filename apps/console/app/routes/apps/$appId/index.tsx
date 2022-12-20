@@ -22,14 +22,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
 
-  // Figure out how to get app details
-  // const appDetails = await starbaseClient.
-  const appDetails = {
-    id: params.appId,
+  const appDetails = (await starbaseClient.kb_appDetails(params.appId)) as {
+    clientId: string
+    hasSecret: boolean
+    app: {
+      timestamp: number
+      title: string
+    }
+  }
+
+  let rotatedSecret
+  if (!appDetails.hasSecret) {
+    rotatedSecret = await starbaseClient.kb_appRotateSecret(params.appId)
+
+    // For some reason secret is
+    // secret:{actualSecret}
+    // so to not break anything
+    // taking care of this client server side
+    rotatedSecret = rotatedSecret.secret.split(':')[1]
   }
 
   return json({
     app: appDetails,
+    rotatedSecret: rotatedSecret,
   })
 }
 
@@ -37,7 +52,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
-  const { app } = useLoaderData()
+  const { app, rotatedSecret } = useLoaderData()
 
   return (
     <ApplicationDashboard
@@ -47,8 +62,9 @@ export default function AppDetailIndexPage() {
         onKeyRoll: () => {},
       }}
       oAuth={{
-        appId: app.id,
-        appSecret: 'SECRET',
+        appId: app.clientId,
+        appSecret: rotatedSecret,
+        appSecretVisible: rotatedSecret ? true : false,
         createdAt: new Date(),
         onKeyRoll: () => {},
       }}

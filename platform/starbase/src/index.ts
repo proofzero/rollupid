@@ -895,6 +895,59 @@ const kb_appPublish = openrpc.method(schema, {
   ),
 })
 
+// kb_appDetails
+// -----------------------------------------------------------------------------
+// Return the app details.
+
+const kb_appDetails = openrpc.method(schema, {
+  name: 'kb_appDetails',
+  scopes: noScope,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+
+      // This throws with a TypeError at runtime.
+      const [clientId] = request.params as ParamsArray
+      if (!clientId) {
+        return openrpc.error(request, ErrorMissingClientId)
+      }
+
+      // Map the client ID into an application ID.
+      const appId = await lookup.get(clientId)
+      if (appId === null) {
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        tag: 'starbase-app',
+      })
+      invariant(appId === app.$.id, 'object IDs must match')
+
+      // NB: this returns an empty object if the application is not
+      // published.
+      const appDetails = await app.fetch()
+      const hasSecret = (await app.hasSecret()) as boolean
+
+      return openrpc.response(
+        request,
+        _.merge(appDetails, {
+          hasSecret,
+        })
+      )
+    }
+  ),
+})
+
 // kb_appProfile
 // -----------------------------------------------------------------------------
 // Return the public app profile.
@@ -938,11 +991,6 @@ const kb_appProfile = openrpc.method(schema, {
       // published.
       const appProfile = await app.profile()
 
-      // Check if regen secret requested
-      // Actually regen secret
-      // Add to appProfile
-      // ~= calling kb_regenerateKeys
-
       return openrpc.response(request, appProfile)
     }
   ),
@@ -961,6 +1009,7 @@ const methods = openrpc.methods(schema, [
   kb_appCreate,
   kb_appDelete,
   kb_appList,
+  kb_appDetails,
   kb_appProfile,
   kb_appPublish,
   kb_appRotateSecret,
