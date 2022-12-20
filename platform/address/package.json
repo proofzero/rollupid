@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "db:generate": "drizzle-kit generate --dialect=sqlite --schema=src/db/schema.ts",
+    "db:execute": "npx wrangler d1 execute COLLECTIONS",
     "check": "run-s format:check lint:check types:check",
     "format": "run-s format:src",
     "format:src": "prettier --write src",

@@ -1,7 +1,7 @@
 {
   "version": "3",
   "dialect": "sqlite",
-  "id": "e52a0078-05fb-4dde-b87f-bfd0eb65435c",
+  "id": "49512a3e-8a3c-45fb-9028-895e885ace35",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "collections": {
@@ -29,7 +29,7 @@
         "tokenId": {
           "name": "tokenId",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": false
         },
         "contract": {

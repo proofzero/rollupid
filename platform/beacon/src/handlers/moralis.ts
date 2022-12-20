@@ -43,6 +43,7 @@ const MoralisHandler = async (request: Request, env: Environment) => {
       addressUrn: addressUrn,
     }
   })
+
   env.BLOCKCHAIN_ACTIVITY.send({
     method: 'kb_setToken',
     setTokensBody,

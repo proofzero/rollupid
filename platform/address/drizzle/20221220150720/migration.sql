@@ -4,7 +4,7 @@ CREATE TABLE collections (
 );
 
 CREATE TABLE tokens (
-	`tokenId` text PRIMARY KEY,
+	`tokenId` text,
 	`contract` text NOT NULL,
 	`addressURN` text NOT NULL,
 	`gallery_order` integer

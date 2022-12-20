@@ -33,7 +33,7 @@ import schema from '../schemas/contract'
   doc: 'Address Profile',
   defaultValue: null,
 })
-export default class CryptoAddress {
+export default class ContractAddress {
   @method('getAddress')
   @requiredField('address', [FieldAccess.Read])
   getAddress(params: RpcParams, input: RpcInput): RpcResult {

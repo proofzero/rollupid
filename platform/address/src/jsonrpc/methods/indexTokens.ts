@@ -4,6 +4,7 @@ import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
 import { AddressRpcContext } from '../../types'
+import { SetTokenMetadataParams } from './setTokenMetadata'
 import { tokens, collections, TokensTable } from '../../db/schema'
 import { sql } from 'drizzle-orm'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
@@ -41,6 +42,7 @@ export default async (
 
   const tokenValues: TokensTable[] = []
   const contractMap: Record<string, string> = {}
+  const messages: { method: string; body: SetTokenMetadataParams }[] = []
   for (const nft of res.result) {
     const contract = nft.tokenAddress.lowercase
     const tokenId = nft.result.tokenId.toString()
@@ -55,12 +57,14 @@ export default async (
     const metadata = nft.metadata?.toString()
     console.log({ token, metadata })
     if (metadata) {
-      context.get('BLOCKCHAIN_ACTIVITY').send({
+      messages.push({
         method: 'kb_setTokenMetadata',
-        body: [tokenId, contract, nft.metadata?.toString()],
+        body: [tokenId, contract, metadata],
       })
     }
   }
+
+  context.get('BLOCKCHAIN_ACTIVITY').sendBatch(messages)
 
   const db = context.collectionDB
   const upsertGallery = await db

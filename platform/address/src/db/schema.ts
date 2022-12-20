@@ -17,7 +17,7 @@ export type TokensTable = {
 export const tokens = sqliteTable(
   'tokens',
   {
-    tokenId: text('tokenId').primaryKey(),
+    tokenId: text('tokenId'),
     contract: text('contract').notNull(),
     addressURN: text('addressURN').notNull(), // current holder
     gallery_order: integer('gallery_order'), // NOTE: when upserting address_token we should set order to null
