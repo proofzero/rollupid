@@ -1,7 +1,3 @@
----
-description: Console Reference
----
-
 The Console 0xAuth page allows you to configure your 0xAuth and white labelling
 settings. Use the **Save** button in the top-right corner of the page to commit
 any changes you make.
