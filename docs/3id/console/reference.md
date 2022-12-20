@@ -39,17 +39,19 @@ This will not delete your application (see [Danger Zone](#danger-zone), below).
 
 ### App Icon
 
+Customize the [Passport](../passport/index.md) authorization flow for your users
+by uploading your app's icon.
+
 ## Links
 
-### Website
+**Links** are a white labelling feature allowing you to display links to your
+social accounts and marketing sites alongside your application in various contexts:
 
-### Medium
-
-### Discord
-
-### Twitter
-
-### Mirror
+* Website
+* Medium
+* Discord
+* Twitter
+* Mirror
 
 ## Danger Zone
 
