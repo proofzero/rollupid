@@ -296,7 +296,8 @@ export class StarbaseApplication {
 
   @method('rotateApiKey')
   //@requiredScope()
-  @requiredField('apiKey', [FieldAccess.Write])
+  @requiredField('apiKey', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('apiKeySigningKeyPair', [FieldAccess.Read, FieldAccess.Write])
   async rotateApiKey(
     params: RpcParams,
     input: RpcInput,
@@ -304,7 +305,7 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const apiKey = await apiKeyUtils.generateAndStore(params, input, output);
     output.set('apiKey', apiKey);
-    return { apiKey: apiKey };
+    return apiKey;
   }
 
 

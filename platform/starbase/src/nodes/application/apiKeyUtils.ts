@@ -28,7 +28,7 @@ export async function generateAndStore (
     input: RpcInput,
     output: RpcOutput
   ): Promise<string> {
-    const objectId = params.get('objectId')
+    const appId = params.get('appId')
     const appURN = params.get('urn')
   
   const { privateKey: key } = await getJWTSigningKeyPair(input, output)
@@ -36,7 +36,7 @@ export async function generateAndStore (
   const apiKey = await new SignJWT({})
     .setProtectedHeader(JWT_OPTIONS)
     .setIssuedAt()
-    .setIssuer(objectId)
+    .setIssuer(appId)
     .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
     .setSubject(appURN)
     .sign(key)

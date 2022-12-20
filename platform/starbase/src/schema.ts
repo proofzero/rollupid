@@ -206,11 +206,20 @@ const rpcSchema: RpcSchema = {
     {
       name: 'kb_appRotateApiKey',
       summary: 'Invalidate an old API key and replace it with a new value',
-      params: [],
+      params: [
+        {
+          name: 'clientId',
+          required: true,
+          schema:
+          {
+            $ref: '#/components/contentDescriptors/ClientId',
+          }
+        }
+      ],
       result: {
-        name: 'success',
+        name: 'apiKey',
         schema: {
-          type: 'boolean',
+          type: 'string',
         },
       },
       errors: [],

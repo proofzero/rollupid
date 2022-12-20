@@ -103,17 +103,25 @@ const rpcSchema: RpcSchema = {
       summary: 'Set a new API key',
       params: [
         {
-          name: 'apiKey',
-          description: 'An API key',
+          name: 'appId',
+          description: 'Application ID for which the key should be rotated',
           schema: {
             type: 'string',
           },
         },
+        {
+          name: "appURN",
+          description: "URN of the application",
+          schema: {
+            type: 'string'
+          }
+        }
       ],
       result: {
-        name: 'success',
+        name: 'apiKey',
+        description: 'New API key',
         schema: {
-          type: 'boolean',
+          type: 'string',
         },
       },
     },
