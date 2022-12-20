@@ -241,7 +241,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         description: `3ID PFP for ${account}`,
         image: png,
         cover: cvr,
-        external_url: `https://3id.kubelt.com/${account}`,
+        external_url: `https://my.threeid.xyz/${account}`,
         //animation_url: ani,
         properties: {
             metadata: blockchain,
