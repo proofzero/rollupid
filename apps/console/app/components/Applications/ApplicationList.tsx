@@ -52,7 +52,7 @@ export const ApplicationList = ({
 
       <section className="flex flex-col space-y-2">
         {applications.map((ali) => (
-          <ApplicationListItem key={ali.title} {...ali} />
+          <ApplicationListItem key={ali.id} {...ali} />
         ))}
       </section>
     </div>

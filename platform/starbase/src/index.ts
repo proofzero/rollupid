@@ -21,7 +21,7 @@ import invariant from 'tiny-invariant'
 
 //import { checkEnv } from '@kubelt/utils'
 
-import { EdgeDirection } from '@kubelt/graph'
+import { Edge, EdgeDirection } from '@kubelt/graph'
 
 import type {
   RpcAuthHandler,
@@ -209,10 +209,10 @@ const kb_appCreate = openrpc.method(schema, {
       // NB: this throws if no token was provided, or if the supplied
       // account URN isn't valid.
       const accountURN = tokenUtil.getAccountId(token)
-      if(!accountURN) {
-        throw new Error("Account URN must be retrievable")
+      if (!accountURN) {
+        throw new Error('Account URN must be retrievable')
       }
-      
+
       const tag = graph.edge(EDGE_TAG)
 
       const [clientName] = request.params as ParamsArray
@@ -260,7 +260,8 @@ const kb_appCreate = openrpc.method(schema, {
       // Create a platform URN that uniquely represents the just-created
       // application.
       const appURN =
-        ApplicationURNSpace.urn(appId) + `?+clientName=${clientName}`
+        ApplicationURNSpace.urn(appId) +
+        `?+clientName=${encodeURIComponent(clientName)}`
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
@@ -451,6 +452,7 @@ const kb_appList = openrpc.method(schema, {
     ) => {
       const token = context.get(KEY_TOKEN)
       const edges: Fetcher = context.get(KEY_EDGES)
+
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
@@ -466,14 +468,31 @@ const kb_appList = openrpc.method(schema, {
         EdgeDirection.Outgoing
       )
 
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+
       // The app nodes are the "destination" node of each returned edge,
       // an object provided as the .dst property. The node "id" property
       // has the shape: `urn:nid:nss`. More details about the node are
       // available on node object, if required. E.g. r-, q-,
       // f-component, or the full URN.
-      const appList = _.map(edgeList, (edge) => {
-        return _.get(edge, ['dst', 'id'])
-      })
+
+      let appList = []
+      if (edgeList) {
+        const edgeListArr = edgeList as Edge[]
+
+        for (let i = 0; i < edgeListArr.length; i++) {
+          const edge = edgeListArr[i]
+
+          const app = await openrpc.discover(sbApplication, {
+            token,
+            tag: 'starbase-app',
+            id: ApplicationURNSpace.decode(edge.dst.id as ApplicationURN),
+          })
+
+          const appListingDetails = await app.fetch()
+          appList.push(appListingDetails)
+        }
+      }
 
       return openrpc.response(request, appList)
     }

@@ -109,6 +109,8 @@ export class StarbaseApplication {
   //@requiredScope('starbase.write')
   @requiredField('clientName', [FieldAccess.Read, FieldAccess.Write])
   @requiredField('clientId', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('timestamp', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
   init(
     params: RpcParams,
     input: RpcInput,
@@ -129,8 +131,15 @@ export class StarbaseApplication {
     const clientId = params.get('clientId')
     const clientName = params.get('clientName')
 
+    const timestamp = Date.now()
+
     output.set('clientId', clientId)
     output.set('clientName', clientName)
+
+    output.set('app', {
+      timestamp,
+      title: clientName,
+    })
 
     return Promise.resolve(true)
   }
@@ -194,14 +203,19 @@ export class StarbaseApplication {
   @method('fetch')
   //@requiredScope('starbase.read')
   @requiredField('app', [FieldAccess.Read])
+  @requiredField('clientId', [FieldAccess.Read])
   appFetch(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
+    const clientId = input.get('clientId')
     const app = input.get('app')
 
-    return Promise.resolve(app)
+    return Promise.resolve({
+      clientId,
+      app,
+    })
   }
 
   // profile
