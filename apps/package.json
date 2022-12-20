@@ -11,7 +11,7 @@
     "gql": "run-p 'gql:*'",
     "dev:gql": "run-p 'gql:* -- --watch'",
     "storybook": "yarn workspaces foreach -i -v -p -t run storybook",
-    "start": "yarn workspaces foreach -i -v -p -t run start",
+    "start": "yarn workspaces foreach -i -v -p -t -j unlimited run start",
     "build": "yarn workspaces foreach -p -v -i -t run build",
     "test": "yarn workspaces foreach -p -v -i -t run test"
   },
