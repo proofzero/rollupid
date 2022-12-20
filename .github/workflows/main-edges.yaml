@@ -42,8 +42,9 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
-          command: d1 delete --env dev edges-dev
+          command: d1 --env dev delete edges-dev
           environment: 'dev'
 
       - name: Deploy edges D1 Database
@@ -51,8 +52,9 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
-          command: d1 execute --env dev edges-dev --file=./edges.sql
+          command: d1 --env dev execute edges-dev --file=./edges.sql
           environment: 'dev'
 
       - name: Deploy edges dev Worker
@@ -60,6 +62,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
           command: publish --env dev
           environment: 'dev'
