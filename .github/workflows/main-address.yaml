@@ -9,10 +9,6 @@ defaults:
   run:
     working-directory: platform/address
 
-env:
-  CLOUDFLARE_API_TOKEN: ${{ secrets.TOKEN_CLOUDFLARE_API }}
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
