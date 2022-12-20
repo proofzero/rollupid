@@ -3,9 +3,6 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
-import type { Application } from '~/models/app.server'
-import { getApplicationListItems } from '~/models/app.server'
-
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
@@ -13,7 +10,12 @@ import { requireJWT } from '~/utilities/session.server'
 import { getStarbaseClient } from '~/utilities/platform.server'
 
 type LoaderData = {
-  apps: Awaited<ReturnType<typeof getApplicationListItems>>
+  apps: {
+    clientId: string
+    app: {
+      title: string
+    }
+  }[]
   appId: string | undefined
 }
 
@@ -24,7 +26,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const appId = params?.appId
 
   try {
-    const apps = await starbaseClient.kb_appList()
+    const apps = (await starbaseClient.kb_appList()) as {
+      clientId: string
+      app: {
+        title: string
+      }
+    }[]
+
+    console.log({ apps })
+
     return json<LoaderData>({ apps, appId })
   } catch (error) {
     console.error({ error })
@@ -37,7 +47,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 type ContextType = {
   // The list of a user's applications.
-  apps: Array<Application>
+  apps: {
+    clientId: string
+    app: {
+      title: string
+    }
+  }[]
   appId: string
 }
 
