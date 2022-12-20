@@ -133,7 +133,21 @@ export class AlchemyClient {
       url.searchParams.append('excludeFilters[]', filter)
     })
 
-    return fetch(url.toString())
+    const urlStr = url.toString()
+    const cacheKeyDigest = await crypto.subtle.digest(
+      {
+        name: 'SHA-256',
+      },
+      new TextEncoder().encode(urlStr)
+    )
+    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    return fetch(urlStr, {
+      cf: {
+        cacheTtl: 1500,
+        cacheEverything: true,
+        cacheKey,
+      },
+    })
       .then(async (r) => {
         if (r.status !== 200) {
           const errorText = await r.text()
@@ -173,7 +187,21 @@ export class AlchemyClient {
       })
     }
 
-    return fetch(url.toString())
+    const urlStr = url.toString()
+    const cacheKeyDigest = await crypto.subtle.digest(
+      {
+        name: 'SHA-256',
+      },
+      new TextEncoder().encode(urlStr)
+    )
+    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    return fetch(urlStr, {
+      cf: {
+        cacheTtl: 1500,
+        cacheEverything: true,
+        cacheKey,
+      },
+    })
       .then(async (r) => {
         if (r.status !== 200) {
           const errorText = await r.text()
@@ -199,13 +227,29 @@ export class AlchemyClient {
     const url = this.getAPIURL('getOwnersForToken/')
 
     const { contractAddress, tokenId } = params
-    const urlSearchParams = new URLSearchParams({ contractAddress, tokenId })
+
+    url.searchParams.set('contractAddress', contractAddress)
+    url.searchParams.set('tokenId', tokenId.toString())
 
     // Not currently tested. Was:
     // const response = await fetch(`${url}?${urlSearchParams}`)
     // const body: GetOwnersForTokenResult = await response.json()
     // return body
-    return fetch(`${url}?${urlSearchParams}`)
+    const urlStr = url.toString()
+    const cacheKeyDigest = await crypto.subtle.digest(
+      {
+        name: 'SHA-256',
+      },
+      new TextEncoder().encode(urlStr)
+    )
+    const cacheKey = new Uint8Array(cacheKeyDigest).toString()
+    return fetch(urlStr, {
+      cf: {
+        cacheTtl: 1500,
+        cacheEverything: true,
+        cacheKey,
+      },
+    })
       .then(async (r) => {
         if (r.status !== 200) {
           const errorText = await r.text()
@@ -223,26 +267,6 @@ export class AlchemyClient {
           `Error calling Alchemy getOwnersForToken: ${e.message}`
         )
       })
-  }
-
-  async createWebhook(
-    params: CreateWebhookParams
-  ): Promise<CreateWebhookResult> {
-    const response = await fetch(
-      'https://dashboard.alchemy.com/api/create-webhook',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'X-Alchemy-Token': this.#config.token as string,
-        },
-        body: JSON.stringify(params),
-      }
-    )
-
-    const body: CreateWebhookResult = await response.json()
-    return body
   }
 }
 
