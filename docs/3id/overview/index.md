@@ -7,19 +7,19 @@ key concepts that will be useful to understand our technology.
 
 ## Profile
 
-[Profile](/3id/profile/index.md) is a decentralized user profile that developers use to personalize their UX.
+[Profile](../profile/index.md) is a decentralized user profile that developers use to personalize their UX.
 
 ## Passport
 
-[Passport](/3id/passport/index.md) is 3ID's authentication and authorization system.
+[Passport](../passport/index.md) is 3ID's authentication and authorization system.
 
 ## Console
 
-[Console](/3id/console/index.md) is where developers create **0xAuth** apps.
+[Console](../console/index.md) is where developers create **0xAuth** apps.
 
 ## Galaxy
 
-[Galaxy](/3id/galaxy/index.md) is 3ID's GraphQL system.
+[Galaxy](../galaxy/index.md) is 3ID's GraphQL system.
 
 ## Glossary
 
