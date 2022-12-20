@@ -7,7 +7,7 @@
 ## Galaxy GraphQL API Key
 
 This key gives you access to [Galaxy](/3id/galaxy/index.md)
-where you can query all of your configured scopes (see the [Console Reference](/3id/console/reference.md)
+where you can query all of your configured scopes (see the [Console Reference](3id/console/reference.md)
 for more information.
 
 ### Roll Keys
@@ -21,6 +21,8 @@ for more information.
 This section shows your 0xAuth Application ID and Secret. Like in standard
 OAuth, these are effectively your application's username and password for the
 0xAuth authorization scheme.
+
+0xAuth configuration is covered in the [Console Reference](3id/console/reference.md).
 
 ### Roll Keys
 
