@@ -92,7 +92,6 @@ export default function DashboardIndexPage() {
                   btnType="primary-alt"
                   btnSize="l"
                   onClick={() => {
-                    console.log('opening', newAppModalOpen)
                     setNewAppModalOpen(true)
                   }}
                 >

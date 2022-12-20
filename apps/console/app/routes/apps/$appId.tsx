@@ -33,8 +33,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       }
     }[]
 
-    console.log({ apps })
-
     return json<LoaderData>({ apps, appId })
   } catch (error) {
     console.error({ error })
