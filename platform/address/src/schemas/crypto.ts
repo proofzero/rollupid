@@ -208,32 +208,32 @@ export const schema: RpcSchema = {
         schema: {},
       },
     },
-    {
-      name: 'getWebHook',
-      params: [
-        {
-          name: 'webhook_id',
-          schema: {
-            type: 'string',
-          },
-        },
-      ],
-      result: {
-        $ref: '#/components/contentDescriptors/Webhook',
-      },
-    },
-    {
-      name: 'setWebhook',
-      params: [
-        {
-          $ref: '#/components/contentDescriptors/Webhook',
-        },
-      ],
-      result: {
-        name: 'set webhook result',
-        schema: {},
-      },
-    },
+    // {
+    //   name: 'getWebHook',
+    //   params: [
+    //     {
+    //       name: 'webhook_id',
+    //       schema: {
+    //         type: 'string',
+    //       },
+    //     },
+    //   ],
+    //   result: {
+    //     $ref: '#/components/contentDescriptors/Webhook',
+    //   },
+    // },
+    // {
+    //   name: 'setWebhook',
+    //   params: [
+    //     {
+    //       $ref: '#/components/contentDescriptors/Webhook',
+    //     },
+    //   ],
+    //   result: {
+    //     name: 'set webhook result',
+    //     schema: {},
+    //   },
+    // },
   ],
   components: {
     contentDescriptors: {

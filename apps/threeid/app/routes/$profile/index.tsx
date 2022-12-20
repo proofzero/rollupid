@@ -79,6 +79,11 @@ export const loader: LoaderFunction = async (args) => {
   // Setup og tag data
   // check generate and return og image
   const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
+    cf: {
+      cacheEverything: true,
+      cacheTtl: 3600,
+      cacheKey: `og-image-${targetAddress}`,
+    },
     method: 'POST',
     headers: {
       authorization: `Bearer ${TOKEN_NFTAR}`,
