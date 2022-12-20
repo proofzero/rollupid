@@ -2,7 +2,7 @@ name = "galaxy"
 main = "src/index.ts"
 compatibility_date = "2022-10-19"
 node_compat = true
-wrangler_dev = true
+wrangler_dev = false
 
 # Services binding for local development
 services = [

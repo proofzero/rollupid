@@ -9,6 +9,7 @@
   },
   "private": true,
   "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 0",
     "dev:wrangler": "wrangler dev --local --persist",
     "dev": "run-p 'dev:*'",

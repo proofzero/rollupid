@@ -5,6 +5,7 @@
   "description": "Graph edge storage and retrieval",
   "private": true,
   "scripts": {
+    "build": "wrangler publish --dry-run --outdir=dist",
     "build:dev": "tsc",
     "db:local": "ts-node db/index.ts",
     "db:start": "run-s build:dev db:local",

@@ -59,7 +59,7 @@ jobs:
       - name: Build
         run: yarn build
         env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.TOKEN_CLOUDFLARE_API }}
-
       - name: Test
         run: yarn test
