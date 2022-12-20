@@ -7,7 +7,7 @@
     "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "storybook:start": "start-storybook -p 6008",
     "storybook": "run-p 'storybook:*'",
-    "build-storybook": "build-storybook",
+    "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook",
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s 'build:*'",
     "build:css": "yarn run generate:css -- --minify",

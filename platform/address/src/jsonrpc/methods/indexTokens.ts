@@ -1,4 +1,5 @@
-import Moralis from 'moralis'
+import Core from '@moralisweb3/common-core'
+import EvmApi from '@moralisweb3/evm-api'
 
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
@@ -23,8 +24,12 @@ export default async (
   const [addressURN, chain, cursor] = request.params as IndexTokenParams
   const address = AddressURNSpace.decode(addressURN)
 
-  await Moralis.start({ apiKey: context.get('APIKEY_MORALIS') })
-  const res = await Moralis.EvmApi.nft.getWalletNFTs({
+  const core = Core.create()
+  await core.start({ apiKey: context.get('APIKEY_MORALIS') })
+  core.registerModules([EvmApi])
+
+  const evmApi = core.getModule<EvmApi>(EvmApi.moduleName)
+  const res = await evmApi.nft.getWalletNFTs({
     address,
     chain,
     cursor,
