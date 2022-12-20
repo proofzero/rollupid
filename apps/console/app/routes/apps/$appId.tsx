@@ -25,8 +25,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   try {
     const apps = await starbaseClient.kb_appList()
-    console.log({ apps })
-    return json<LoaderData>({ apps: (apps as any).result, appId })
+    return json<LoaderData>({ apps, appId })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
