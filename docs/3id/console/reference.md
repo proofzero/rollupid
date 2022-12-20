@@ -2,6 +2,6 @@
 description: Console Reference
 ---
 
-# Console
+# Console Refs
 
-[Console](https://passport.threeid.xyz) is where you can create an **0xAuth** application.
+![0xAuth Config](../img/console-app-0xauth.png)
