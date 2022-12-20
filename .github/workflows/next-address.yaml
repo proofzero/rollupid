@@ -38,6 +38,15 @@ jobs:
       - name: Test
         run: yarn run test
 
+      - name: Deploy collections D1 Database
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
+          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: 'platform/address'
+          command: d1 migrations apply COLLECTIONS
+          environment: 'next'
+
       - name: Deploy
         uses: cloudflare/wrangler-action@2.0.0
         with:
