@@ -5140,6 +5140,8 @@ __metadata:
     "@types/lodash": 4.14.189
     "@types/node": 18.11.9
     "@types/tap": 15.0.7
+    "@typescript-eslint/eslint-plugin": 5.45.0
+    "@typescript-eslint/parser": 5.45.0
     cross-env: 7.0.3
     date-fns: 2.29.3
     esbuild: 0.15.15
@@ -5183,7 +5185,7 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.8.0
     typed-json-rpc: 1.1.0
-    typescript: 4.9.3
+    typescript: 4.8.4
   languageName: unknown
   linkType: soft
 
