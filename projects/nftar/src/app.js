@@ -254,11 +254,21 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const imageFilepath = `${metadata.ipnft}/image`
     const coverFilepath = `${metadata.ipnft}/cover`
 
-    uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat)
-    uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
-    
     const imageURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`;
     const coverURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`;
+
+    Promise.all([
+        uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat),
+        uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
+    ]).then(() => fetch('/api/v0/og-image', {
+        method: 'POST',
+        body: JSON.stringify({
+            hex: `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`,
+            bkg: `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`
+        })
+    }))
+    .catch(e => console.log(JSON.stringify(e)))
+    .finally(() => console.log('Cloudflare Image uploads and OG generation complete.'))
 
     t1 = performance.now();
     console.log(`Cloudflare Image uploads took ${t1 - t0} milliseconds.`);    
@@ -304,6 +314,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         signature,
     };
 
+    // The voucher stores the IPFS URIs, these are the faster Cloudflare URLs
+    // that should be passed back to the OG:Image generator and other services.
     body.metadata.image = imageURL;
     body.metadata.cover = coverURL;
 
