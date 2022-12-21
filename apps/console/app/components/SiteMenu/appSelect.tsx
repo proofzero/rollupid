@@ -7,6 +7,8 @@
 import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { HiGlobeAlt } from 'react-icons/hi'
 
 // Utility
 // -----------------------------------------------------------------------------
@@ -43,14 +45,23 @@ type AppListboxProps = {
   selectedAppIndex: number
 }
 
-function AppListbox(props: AppListboxProps) {
-  const [selected] = useState(props.apps[props.selectedAppIndex])
+function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
+  const [selected] = useState(
+    selectedAppIndex < 0
+      ? {
+          clientId: 'none',
+          app: {
+            title: 'All Applications',
+          },
+        }
+      : apps[selectedAppIndex]
+  )
 
   const setSelected = (selected: { clientId: string }) => {
     // Using useNavigation hook
     // doesn't refresh the
     // details component
-    if (window) {
+    if (window && selected.clientId !== 'none') {
       window.location.href = `/apps/${selected.clientId}`
     }
   }
@@ -60,12 +71,15 @@ function AppListbox(props: AppListboxProps) {
       {({ open }) => (
         <>
           <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-500 bg-transparent text-white py-4 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
+            <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-500 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
               <span className="flex items-center">
                 {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
-                <span className="ml-3 block truncate">
+                {selected.clientId === 'none' && (
+                  <HiGlobeAlt className="h-6 w-6 text-gray-300 mr-2.5" />
+                )}
+                <Text weight="medium" className="text-white">
                   {selected.app.title}
-                </span>
+                </Text>
               </span>
               <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
                 <ChevronUpDownIcon
@@ -83,7 +97,7 @@ function AppListbox(props: AppListboxProps) {
               leaveTo="opacity-0"
             >
               <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                {props.apps.map((app) => (
+                {apps.map((app) => (
                   <Listbox.Option
                     key={app.clientId}
                     className={({ active }) =>
@@ -157,17 +171,16 @@ type AppSelectProps = {
     }
   }[]
   // The currently selected application ID.
-  selected: string
+  selected?: string
 }
 
 export default function AppSelect(props: AppSelectProps) {
   // Get the array index of the application with the given id.
-  const appIndex = indexFor(props.apps, props.selected)
-  const selectedAppIndex = appIndex >= 0 ? appIndex : 0
+  const appIndex = props.selected ? indexFor(props.apps, props.selected) : -1
 
   const control =
     props.apps.length > 0 ? (
-      <AppListbox apps={props.apps} selectedAppIndex={selectedAppIndex} />
+      <AppListbox apps={props.apps} selectedAppIndex={appIndex} />
     ) : (
       <NoApps />
     )
