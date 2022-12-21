@@ -25,7 +25,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const appDetails = (await starbaseClient.kb_appDetails(params.clientId)) as {
     appId: string
     clientId: string
-    hasSecret: boolean
     secretTimestamp?: number
     app: {
       timestamp: number

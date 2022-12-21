@@ -981,13 +981,11 @@ const kb_appDetails = openrpc.method(schema, {
       invariant(appId === app.$.id, 'object IDs must match')
 
       const appDetails = await app.fetch()
-      const hasSecret = (await app.hasSecret()) as boolean
 
       return openrpc.response(
         request,
         _.merge(appDetails, {
           appId,
-          hasSecret,
         })
       )
     }
