@@ -2,7 +2,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { Resolvers } from './typedefs'
 
-import { setupContext } from './utils'
+import { hasApiKey, setupContext } from './utils'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -17,9 +17,9 @@ const addressResolvers: Resolvers = {
 }
 
 const AddressResolverComposition = {
-  'Query.ensDisplayName': [setupContext()],
-  'Query.ensAddress': [setupContext()],
-  'Query.ensAddressAvatar': [setupContext()],
+  'Query.ensDisplayName': [setupContext(), hasApiKey()],
+  'Query.ensAddress': [setupContext(), hasApiKey()],
+  'Query.ensAddressAvatar': [setupContext(), hasApiKey()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

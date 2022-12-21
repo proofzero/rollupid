@@ -136,6 +136,26 @@ const rpcSchema: RpcSchema = {
         },
       },
     },
+    {
+      name: 'validateApiKey',
+      summary: 'Validate API key',
+      params: [
+        {
+          name: 'apiKey',
+          description: 'API key',
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'valid',
+        description: 'Validity result',
+        schema: {
+          type: 'boolean',
+        },
+      },
+    },
 
     {
       name: 'publish',

@@ -11,7 +11,7 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
-import { setupContext, sliceIntoChunks } from './utils'
+import { hasApiKey, setupContext, sliceIntoChunks } from './utils'
 import { print } from 'graphql'
 
 type ResolverContext = {
@@ -281,8 +281,8 @@ const nftsResolvers: Resolvers = {
 }
 
 const NFTsResolverComposition = {
-  'Query.nftsForAddress': [setupContext()],
-  'Query.contractsForAddress': [setupContext()],
+  'Query.nftsForAddress': [setupContext(), hasApiKey()],
+  'Query.contractsForAddress': [setupContext(), hasApiKey()],
 }
 
 export default composeResolvers(nftsResolvers, NFTsResolverComposition)

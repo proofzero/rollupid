@@ -244,6 +244,26 @@ const rpcSchema: RpcSchema = {
       },
       errors: [],
     },
+    {
+      name: 'kb_appApiKeyCheck',
+      summary: 'Validates given API key',
+      params: [
+        {
+          name: 'apiKey',
+          required: true,
+          schema: {
+            type: 'string',
+          },
+        },
+      ],
+      result: {
+        name: 'valid',
+        schema: {
+          type: 'boolean',
+        },
+      },
+      errors: [],
+    },
 
     {
       name: 'kb_appPublish',
