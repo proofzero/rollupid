@@ -11,6 +11,7 @@ export default interface Env {
   Account: Fetcher
   Address: Fetcher
   Starbase: Fetcher
+  Indexer: Fetcher
   APIKEY_ALCHEMY_ETH: string
   ALCHEMY_ETH_NETWORK: string
   APIKEY_ALCHEMY_POLYGON: string
@@ -21,6 +22,7 @@ export const required = [
   'Account',
   'Address',
   'Starbase',
+  'Indexer',
   'APIKEY_ALCHEMY_ETH',
   'ALCHEMY_ETH_NETWORK',
   'APIKEY_ALCHEMY_POLYGON',
