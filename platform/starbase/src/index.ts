@@ -677,6 +677,53 @@ const kb_initPlatform = openrpc.extension(schema, {
   ),
 })
 
+// kb_clearSecret
+const kb_appClearSecret = openrpc.method(schema, {
+  name: 'kb_appClearSecret',
+  auth: authCheck,
+  scopes: noScope,
+  handler: openrpc.handler(
+    async (
+      service: Readonly<RpcService>,
+      request: Readonly<RpcRequest>,
+      context: Readonly<RpcContext>
+    ) => {
+      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
+      const lookup: KVNamespace = context.get(KEY_LOOKUP)
+      const token = context.get(KEY_TOKEN)
+
+      const [clientId] = request.params as ParamsArray
+
+      if (undefined === clientId) {
+        return openrpc.error(request, ErrorMissingClientId)
+      }
+
+      const appId = await lookup.get(clientId)
+      if (null === appId) {
+        const detail = Object.assign(
+          { data: { clientId } },
+          ErrorMappingClientId
+        )
+        return openrpc.error(request, detail)
+      }
+
+      const app = await openrpc.discover(sbApplication, {
+        id: appId,
+        token,
+        tag: 'starbase-app',
+      })
+
+      invariant(appId === app.$.id, 'object IDs must match')
+
+      const success = await app.clearSecret()
+
+      return openrpc.response(request, {
+        success,
+      })
+    }
+  ),
+})
+
 // kb_appRotateSecret
 // -----------------------------------------------------------------------------
 // Generate a new secret and store in the application (keeping old
@@ -1011,6 +1058,7 @@ const methods = openrpc.methods(schema, [
   kb_appDetails,
   kb_appProfile,
   kb_appPublish,
+  kb_appClearSecret,
   kb_appRotateSecret,
   kb_appRotateApiKey,
   kb_appScopes,

@@ -273,6 +273,21 @@ export class StarbaseApplication {
     return Promise.resolve(exists)
   }
 
+  // clearSecret
+  // ---------------------------------------------------------------------------
+  @method('clearSecret')
+  //@requiredScope()
+  @requiredField('secret', [FieldAccess.Read, FieldAccess.Write])
+  clearSecret(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    output.set('secret', null)
+
+    return Promise.resolve(true)
+  }
+
   // rotateSecret
   // ---------------------------------------------------------------------------
 
