@@ -32,12 +32,8 @@ export const tokens = sqliteTable(
   })
 )
 
-export const collections = sqliteTable(
-  'collections',
-  {
-    contract: text('contract').primaryKey(),
-    // .references(() => tokens.contract),
-    name: text('name').notNull(),
-  },
-  (table) => ({})
-)
+export const collections = sqliteTable('collections', {
+  contract: text('contract').primaryKey(),
+  // .references(() => tokens.contract),
+  name: text('name').notNull(),
+})

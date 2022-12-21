@@ -1,7 +1,7 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { AddressRpcContext } from '../../types'
+import { IndexRpcContext } from '../../types'
 import { tokens } from '../../db/schema'
 import { sql } from 'drizzle-orm'
 import { AddressURN } from '@kubelt/urns/address'
@@ -11,7 +11,7 @@ export type GetTokensParams = AddressURN[] // addresses
 export default async (
   service: Readonly<RpcService>,
   request: Readonly<RpcRequest>,
-  context: Readonly<AddressRpcContext>
+  context: Readonly<IndexRpcContext>
 ) => {
   const addressUrns = request.params as GetTokensParams
   const db = context.collectionDB

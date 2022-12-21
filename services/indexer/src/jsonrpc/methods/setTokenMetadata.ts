@@ -1,7 +1,7 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { AddressRpcContext } from '../../types'
+import { IndexRpcContext } from '../../types'
 
 export type SetTokenMetadataParams = [
   tokenId: string,
@@ -12,7 +12,7 @@ export type SetTokenMetadataParams = [
 export default async (
   service: Readonly<RpcService>,
   request: Readonly<RpcRequest>,
-  context: Readonly<AddressRpcContext>
+  context: Readonly<IndexRpcContext>
 ) => {
   const [tokenId, contract, metadata] = request.params as SetTokenMetadataParams
 

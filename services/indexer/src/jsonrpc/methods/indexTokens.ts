@@ -4,7 +4,7 @@ import EvmApi from '@moralisweb3/evm-api'
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { AddressRpcContext } from '../../types'
+import { IndexRpcContext } from '../../types'
 import { SetTokenMetadataParams } from './setTokenMetadata'
 import { tokens, collections, TokensTable } from '../../db/schema'
 import { sql } from 'drizzle-orm'
@@ -19,7 +19,7 @@ export type IndexTokenParams = [
 export default async (
   service: Readonly<RpcService>,
   request: Readonly<RpcRequest>,
-  context: Readonly<AddressRpcContext>
+  context: Readonly<IndexRpcContext>
 ) => {
   const [addressURN, chain, cursor] = request.params as IndexTokenParams
   const address = AddressURNSpace.decode(addressURN)
