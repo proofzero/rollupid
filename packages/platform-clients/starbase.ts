@@ -6,7 +6,7 @@ import type {
   AppRotateSecretResult,
   AppClearSecretResult,
   AppAPIKeyValidityRequest,
-  AppAPIKeyValidityResult
+  AppAPIKeyValidityResult,
 } from '@kubelt/platform.starbase/src/types'
 
 import { BaseApi } from './base'
