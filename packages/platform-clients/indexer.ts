@@ -4,15 +4,12 @@ import type { BaseApi } from './base'
 import createClient from './fetcher'
 
 export interface IndexerApi extends BaseApi {
-  kb_setGallery(
-    account: AccountURN,
-    gallery: {
-      tokenId: string
-      contract: string
-      addressURN: string
-      gallery_order: number
-    }
-  ): void
+  kb_setGallery(gallery: {
+    tokenId: string
+    contract: string
+    addressURN: string
+    gallery_order: number
+  }): void
   kb_getGallery(account: AccountURN[]): object | undefined
 }
 
