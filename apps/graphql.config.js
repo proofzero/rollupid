@@ -7,7 +7,7 @@ module.exports = {
       extensions: {
         codegen: {
           generates: {
-            'threeid/app/utils/galaxy.server.ts': {
+            'profile/app/utils/galaxy.server.ts': {
               plugins: [
                 'typescript',
                 'typescript-operations',
