@@ -94,30 +94,6 @@ export default class CryptoAddress {
     return output.set('type', params.get('type'))
   }
 
-  @method('registerWebhook')
-  @requiredField('webhook_registered', [FieldAccess.Write])
-  registerWebhook(params: RpcParams, output: RpcOutput): RpcResult {
-    return output.set('webhook_registered', true)
-  }
-
-  @method('isWebhookRegistered')
-  @requiredField('webhook_registered', [FieldAccess.Read])
-  isWebhookRegistered(params: RpcParams, input: RpcInput): RpcResult {
-    return input.get('webhook_registered')
-  }
-
-  @method('indexedTokens')
-  @requiredField('indexed_tokens', [FieldAccess.Write])
-  indexedTokens(params: RpcParams, output: RpcOutput): RpcResult {
-    return output.set('indexed_tokens', true)
-  }
-
-  @method('isTokensIndexed')
-  @requiredField('indexed_tokens', [FieldAccess.Read])
-  isTokensIndexed(params: RpcParams, input: RpcInput): RpcResult {
-    return input.get('indexed_tokens')
-  }
-
   @method('resolveAccount')
   @requiredField('account', [FieldAccess.Read, FieldAccess.Write])
   resolveAccount(
