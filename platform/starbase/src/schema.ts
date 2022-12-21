@@ -183,15 +183,15 @@ const rpcSchema: RpcSchema = {
       },
     },
     {
-      name: 'kb_appRotateSecret',
-      summary: 'Invalidate an old secret and replace it with a new value',
+      name: 'kb_appClearSecret',
+      summary: 'Clear current secret',
       params: [
         {
-          // TODO refer to a secret content descriptor
-          name: 'secret',
+          name: 'clientId',
+          description: 'The application OAuth client ID',
           required: true,
           schema: {
-            type: 'string',
+            $ref: '#/components/contentDescriptors/ClientId',
           },
         },
       ],
@@ -199,6 +199,27 @@ const rpcSchema: RpcSchema = {
         name: 'success',
         schema: {
           type: 'boolean',
+        },
+      },
+      errors: [],
+    },
+    {
+      name: 'kb_appRotateSecret',
+      summary: 'Invalidate an old secret and replace it with a new value',
+      params: [
+        {
+          name: 'clientId',
+          description: 'The application OAuth client ID',
+          required: true,
+          schema: {
+            $ref: '#/components/contentDescriptors/ClientId',
+          },
+        },
+      ],
+      result: {
+        name: 'secret',
+        schema: {
+          type: 'string',
         },
       },
       errors: [],
@@ -244,6 +265,23 @@ const rpcSchema: RpcSchema = {
         summary: 'The new publication status',
         schema: {
           type: 'boolean',
+        },
+      },
+      errors: [],
+    },
+    {
+      name: 'kb_appDetails',
+      summary: 'Return the application details',
+      params: [
+        {
+          $ref: '#/components/contentDescriptors/ClientId',
+        },
+      ],
+      result: {
+        name: 'details',
+        summary: 'The application details',
+        schema: {
+          $ref: '#/components/schema/AppDetails',
         },
       },
       errors: [],

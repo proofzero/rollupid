@@ -215,6 +215,7 @@ export class StarbaseApplication {
   //@requiredScope('starbase.read')
   @requiredField('app', [FieldAccess.Read])
   @requiredField('clientId', [FieldAccess.Read])
+  @requiredField('secretTimestamp', [FieldAccess.Read])
   appFetch(
     params: RpcParams,
     input: RpcInput,
@@ -222,10 +223,12 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const clientId = input.get('clientId')
     const app = input.get('app')
+    const secretTimestamp = input.get('secretTimestamp')
 
     return Promise.resolve({
       clientId,
       app,
+      secretTimestamp,
     })
   }
 
@@ -273,12 +276,30 @@ export class StarbaseApplication {
     return Promise.resolve(exists)
   }
 
+  // clearSecret
+  // ---------------------------------------------------------------------------
+  @method('clearSecret')
+  //@requiredScope()
+  @requiredField('secret', [FieldAccess.Write])
+  @requiredField('secretTimestamp', [FieldAccess.Write])
+  clearSecret(
+    params: RpcParams,
+    input: RpcInput,
+    output: RpcOutput
+  ): Promise<RpcResult> {
+    output.set('secret', null)
+    output.set('secretTimestamp', null)
+
+    return Promise.resolve(true)
+  }
+
   // rotateSecret
   // ---------------------------------------------------------------------------
 
   @method('rotateSecret')
   //@requiredScope()
   @requiredField('secret', [FieldAccess.Write])
+  @requiredField('secretTimestamp', [FieldAccess.Write])
   rotateSecret(
     params: RpcParams,
     input: RpcInput,
@@ -287,6 +308,7 @@ export class StarbaseApplication {
     // The new hashed secret is provided in the request.
     const secret = params.get('secret')
     output.set('secret', secret)
+    output.set('secretTimestamp', Date.now())
 
     return Promise.resolve(true)
   }

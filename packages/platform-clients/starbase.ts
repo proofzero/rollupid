@@ -3,6 +3,8 @@ import type {
   AppProfileResult,
   AppScopesResult,
   AppAuthCheckParams,
+  AppRotateSecretResult,
+  AppClearSecretResult,
 } from '@kubelt/platform.starbase/src/types'
 
 import { BaseApi } from './base'
@@ -15,6 +17,8 @@ export interface StarbaseApi extends BaseApi {
   kb_appProfile(clientId: string): Promise<AppProfileResult>
   kb_appScopes(): Promise<AppScopesResult>
   kb_initPlatform(): Promise<string[]>
+  kb_appClearSecret(clientId: string): Promise<AppClearSecretResult>
+  kb_appRotateSecret(clientId: string): Promise<AppRotateSecretResult>
 }
 
 export default (

@@ -19,3 +19,11 @@ export type AppAuthCheckParams = {
   clientId: string
   clientSecret?: string
 }
+
+export type AppClearSecretResult = {
+  success: boolean
+}
+
+export type AppRotateSecretResult = {
+  secret: string
+}
