@@ -17,14 +17,14 @@ const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
 const Web3 = require('web3');
 const { convert } = require('convert-svg-to-png');
-const FormData = require('form-data');
 
 const {
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits,
-    encodeDataURI
+    encodeDataURI,
+    uploadImage
 } = require('./utils.js');
 
 const {
@@ -77,24 +77,6 @@ const METHOD_PARAMS = {
                     description: 'chain id of the blockchain'
                 }
             }
-        },
-    },
-    '3id_genInvite': {
-        'recipient': {
-            type: 'string',
-            description: 'blockchain account to award the invite'
-        },
-        'inviteId': {
-            type: 'string',
-            description: 'Invite serial number'
-        },
-        'inviteTier': {
-            type: 'string',
-            description: 'Invite tier'
-        },
-        'issueDate': {
-            type: 'string',
-            description: 'Date the invite was issued'
         },
     },
     'describe': {},
@@ -259,12 +241,22 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const metadata = token
     const opts = {}
 
+    const imageFilepath = `${metadata.ipnft}/image`
+    const coverFilepath = `${metadata.ipnft}/cover`
+
+    // Fire-and-forget uploads to Cloudflare Images.
+    uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat)
+    uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
+
+    const imageURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`;
+    const coverURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`;
+
     // Fire-and-forget uploads.
     let u0, u1, u2, cid
     u0 = performance.now();
     ctx.storage.storeCar(car, opts)
         .then(_cid => { cid = _cid; u1 = performance.now(); console.log(`NFT.storage took ${u1 - u0} milliseconds for ${cid}.`); })
-        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
+        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.ipnft}/metadata.json`))
         .then(() => { u2 = performance.now(); console.log(`Warming fires took ${u2 - u1} milliseconds for ${cid}`); })
         .catch(e => { u2 = performance.now(); console.log(`Fire-and-forget store-and-warm failed in ${u2 -u1} milliseconds for ${cid} with:`, JSON.stringify(e)) })
         .finally(() => console.log(`NFT.storage store-and-warm took ${u2 - u0} milliseconds for ${cid} end-to-end.`))
@@ -306,115 +298,21 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     console.log(`Crypto took ${t1 - t0} milliseconds.`);
 
     // Generate the response to send to the client.
-    ctx.body = {
-      metadata: metadata.data,
-      voucher,
-      signature,
+    const body = {
+        metadata: metadata.data,
+        voucher,
+        signature,
     };
+
+    body.metadata.image = imageURL;
+    body.metadata.cover = coverURL;
+
+    console.log('response body', JSON.stringify(body));
+
+    ctx.body = body;
     const s1 = performance.now();
     console.log(`Total took ${s1 - s0} milliseconds.`);
 });
-
-const genInvite = async (ctx, next) => {
-    const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
-    
-    if (ctx.apiKey && !key) {
-        ctx.throw(403, 'Missing NFTAR API key');
-    }
-
-    if (key !== ctx.apiKey && key !== ctx.devKey) {
-        ctx.throw(401, 'Invalid NFTAR API key');
-    }
-    
-    let inviteId = ctx.jsonrpc.params['inviteId'];
-    const inviteTier = ctx.jsonrpc.params['inviteTier'];
-    const issueDate = Intl.DateTimeFormat('en-GB-u-ca-iso8601').format(Date.now());
-    const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
-    const OUTPUT_DIR = path.resolve("outputs");
-    
-    const recipient = ctx.jsonrpc.params['recipient'];
-    
-    console.log('genInvite:', JSON.stringify({
-        recipient,
-        inviteId,
-        inviteTier,
-        issueDate,
-    }), 'with API key:', key === ctx.apiKey, 'with DEV key:', key === ctx.devKey);
-    
-    await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
-    const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
-    const baseName = path.basename(outputFile);
-
-    inviteId = inviteId.toString().padStart(4, "0");
-
-    const newCard = await fs.promises.readFile(assetFile, 'utf8')
-      .then(data => {
-        // Parse the SVG XML data and return a query context.
-        return cheerio.load(data, {
-          xml: {},
-        });
-      })
-      .then(($) => {
-        /*
-        <svg>
-          ...
-          <text id="ISSUED">04/20/2022</text>
-          <text id="NUMBER">#6969</text>
-        </svg>
-        */
-        // Set the issue date.
-        $('#ISSUED').text(issueDate);
-        // Set the invite identifier.
-        $('#NUMBER').text(`#${inviteId}`);
-
-        const svgText = $.root().html();
-        if (null === svgText) {
-          throw "empty SVG document generated";
-        }
-        return svgText.trim();
-      })
-      .then(svgText => {
-        return fs.promises.writeFile(outputFile, svgText);
-      })
-
-     // Utility to title-case a string.
-    const titleCase = (s) => {
-        return s.charAt(0).toUpperCase() + s.slice(1);
-    };
-
-    // Upload to NFT.storage.
-    const metadata = {
-        name: `3ID Invite #${inviteId}`,
-        description: `${titleCase(inviteTier)} 3ID Invite`,
-        image: new storage.File(
-            [await fs.promises.readFile(outputFile)],
-            baseName,
-            { type: 'image/svg+xml' },
-        ),
-        properties: {
-            inviteId,
-            inviteTier,
-            issueDate,
-        }
-    };
-
-    t0 = performance.now();
-    const result = await ctx.storage.store(metadata);
-    t1 = performance.now();
-    console.log(`genInvite: ctx.storage.store took ${t1 - t0} milliseconds.`);
-    
-    ctx.body = {
-        // IPFS URL of the metadata
-        url: result.url,
-        // The metadata.json contents
-        metadata: result.data,
-        // metadata.json contents with IPFS gateway URLs
-        embed: result.embed(),
-      };
-};
-
-jsonrpc.method('3id_genInvite', genInvite);
-jsonrpc.method('3iD_genInvite', genInvite);
 
 jsonrpc.method('describe', (ctx, next) => {
     ctx.body = jsonrpc.methods.map(method => {
@@ -467,12 +365,13 @@ router.post('/api/v0/og-image', async (ctx, next) => {
     const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
     console.log('Checking cache:', url);
     const cacheCheck = await fetch(url);
+    console.log('Cache check status:', cacheCheck.status);
     
-    if (cacheCheck.status === 200) {
-        console.log('Returning cached image url for ', filename);
-        ctx.set('Content-Type', 'application/json');
-        ctx.body = { url };
-    } else if (cacheCheck.status === 404) {
+    // if (cacheCheck.status === 200) {
+    //     console.log('Returning cached image url for ', filename);
+    //     ctx.set('Content-Type', 'application/json');
+    //     ctx.body = { url };
+    // } else if (cacheCheck.status === 404) {
         console.log(`Cache miss for ${filename}. Generating new image.`);
 
         // Images that are remote need to be converted to Data URIs so that we can
@@ -513,39 +412,20 @@ router.post('/api/v0/og-image', async (ctx, next) => {
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             }
         });
-        
-        // Cloudflare Image service requires we submit by POSTing FormData in order
-        // to set our own filename (cache key).
-        const form = new FormData();
 
-         // Name file after cache key with the correct content-type.
-        form.append('file', pngBuffer, { filename, contentType: 'image/png' });
-
-        // Set the cache key as the Cloudflare "Custom ID".
-        form.append('id', filename);
-        
-        // Get the headers from the FormData object so that we can pick up
-        // the dynamically generated multipart boundary.
-        const headers = form.getHeaders();
-        headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
-        
         // This fire-and-forget call could fail because the image service has a race condition on uploads.
         // It might cache miss above, get here, and then try to upload something that already exists,
         // which will cause this to return "ERROR 5409: Resource already exists".
-        fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
-            method: 'POST',
-            body: form,
-            headers
-        });
+        uploadImage(ctx, filename, pngBuffer)
 
         ctx.set('Content-Type', 'application/json');
         ctx.body = { url };
-    } else {
-        ctx.set('Content-Type', 'application/json');
-        ctx.status = 500;
-        ctx.body = `{ "err": "Application Error: Image Service returned bad non-200, non-404 response '${cacheCheck.status}' for ${filename} (search for this in logs)." }`;
-        console.log(filename, JSON.stringify(cacheCheck));
-    }
+    // } else {
+    //     ctx.set('Content-Type', 'application/json');
+    //     ctx.status = 500;
+    //     ctx.body = `{ "err": "Application Error: Image Service returned bad non-200, non-404 response '${cacheCheck.status}' for ${filename} (search for this in logs)." }`;
+    //     console.log(filename, JSON.stringify(cacheCheck));
+    // }
 
     return next();
 });

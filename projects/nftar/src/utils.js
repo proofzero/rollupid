@@ -2,6 +2,7 @@
 
 const Probability = require('./probability.js')
 const imageDataURI = require('image-data-uri')
+const FormData = require('form-data')
 
 const {
     TRAIT_CATEGORIES,
@@ -183,10 +184,31 @@ const encodeDataURI = async (ctx, url) => {
     })
 }
 
+// Uploads an image stream to the Cloudflare Image service with a custom ID.
+const uploadImage = async (ctx, customId, stream, contentType = 'image/png') => {
+    // Cloudflare Image service requires we submit by POSTing FormData in order
+    // to set our own filename (cache key).
+    const form = new FormData();
+    form.append('file', stream, { filename: customId, contentType });
+    form.append('id', customId);
+    
+    // Get the headers from the FormData object so that we can pick up
+    // the dynamically generated multipart boundary.
+    const headers = form.getHeaders();
+    headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
+    
+    return fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
+        method: 'POST',
+        body: form,
+        headers
+    });
+}
+
 module.exports = {
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits,
-    encodeDataURI
+    encodeDataURI,
+    uploadImage
 }
