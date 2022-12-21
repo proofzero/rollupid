@@ -939,6 +939,7 @@ const kb_appDetails = openrpc.method(schema, {
       return openrpc.response(
         request,
         _.merge(appDetails, {
+          appId,
           hasSecret,
         })
       )

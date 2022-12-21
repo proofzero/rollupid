@@ -15,14 +15,15 @@ import { requireJWT } from '~/utilities/session.server'
  */
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  if (!params.appId) {
-    throw new Error('Application id is required for the requested route')
+  if (!params.clientId) {
+    throw new Error('Application client id is required for the requested route')
   }
 
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
 
-  const appDetails = (await starbaseClient.kb_appDetails(params.appId)) as {
+  const appDetails = (await starbaseClient.kb_appDetails(params.clientId)) as {
+    appId: string
     clientId: string
     hasSecret: boolean
     app: {
@@ -33,7 +34,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   let rotatedSecret
   if (!appDetails.hasSecret) {
-    rotatedSecret = await starbaseClient.kb_appRotateSecret(params.appId)
+    rotatedSecret = await starbaseClient.kb_appRotateSecret(appDetails.clientId)
 
     // For some reason secret is
     // secret:{actualSecret}
@@ -57,14 +58,12 @@ export default function AppDetailIndexPage() {
   return (
     <ApplicationDashboard
       galaxyGql={{
-        apiKey: 'Fubar',
         createdAt: new Date(),
         onKeyRoll: () => {},
       }}
       oAuth={{
-        appId: app.clientId,
+        appId: app.appId,
         appSecret: rotatedSecret,
-        appSecretVisible: rotatedSecret ? true : false,
         createdAt: new Date(),
         onKeyRoll: () => {},
       }}

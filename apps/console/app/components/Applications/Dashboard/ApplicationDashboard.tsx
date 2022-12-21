@@ -6,14 +6,13 @@ import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
-    apiKey: string
+    apiKey?: string
     createdAt: Date
     onKeyRoll: () => void
   }
   oAuth: {
     appId: string
-    appSecret: string
-    appSecretVisible?: boolean
+    appSecret?: string
     createdAt: Date
     onKeyRoll: () => void
   }
@@ -55,8 +54,8 @@ export const ApplicationDashboard = ({
           <ReadOnlyInput
             id="gqlApiKey"
             label="API Key"
-            value={galaxyGql.apiKey}
-            hidden
+            value={galaxyGql.apiKey ?? 's3cr3t-l337-h4x0r5'}
+            hidden={galaxyGql.apiKey ? false : true}
           />
         </Panel>
 
@@ -90,15 +89,15 @@ export const ApplicationDashboard = ({
             <ReadOnlyInput
               id="oAuthAppSecret"
               label="Application Secret"
-              value={oAuth.appSecret}
-              hidden={oAuth.appSecretVisible ? false : true}
+              value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
+              hidden={oAuth.appSecret ? false : true}
             />
           </div>
         </Panel>
 
         <Panel title="Smart Contracts">
           <div className="flex justify-center p-8">
-            <Button btnType="secondary-alt" btnSize="xxl">
+            <Button btnType="secondary-alt" btnSize="xxl" disabled>
               Connect Smart Contract
             </Button>
           </div>

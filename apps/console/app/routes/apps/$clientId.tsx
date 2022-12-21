@@ -16,14 +16,14 @@ type LoaderData = {
       title: string
     }
   }[]
-  appId: string | undefined
+  clientId: string | undefined
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
 
-  const appId = params?.appId
+  const clientId = params?.clientId
 
   try {
     const apps = (await starbaseClient.kb_appList()) as {
@@ -33,7 +33,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       }
     }[]
 
-    return json<LoaderData>({ apps, appId })
+    return json<LoaderData>({ apps, clientId })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -51,15 +51,15 @@ type ContextType = {
       title: string
     }
   }[]
-  appId: string
+  clientId: string
 }
 
 export default function AppDetailIndexPage() {
-  const { apps, appId } = useLoaderData<ContextType>()
+  const { apps, clientId } = useLoaderData<ContextType>()
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">
-      <SiteMenu apps={apps} selected={appId} />
+      <SiteMenu apps={apps} selected={clientId} />
 
       <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
         <SiteHeader />
