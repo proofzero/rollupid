@@ -74,7 +74,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
           align-center justify-center
          "
         >
-          <Link to={`./collection/${nft.details[0].value}`}>
+          <Link to={`./${nft.details[0].value}`}>
             <img
               className="rounded-t-lg block 
               mx-auto 

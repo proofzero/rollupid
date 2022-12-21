@@ -27,7 +27,7 @@ import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
 import { Cover } from '~/components/profile/cover/Cover'
 import HeadNav from '~/components/head-nav'
 
-import { loader as profileLoader } from '~/routes/__profile/$profile.json'
+import { loader as profileLoader } from '~/routes/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
 import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
@@ -38,6 +38,7 @@ export function links() {
 }
 
 export const loader: LoaderFunction = async (args) => {
+  console.log('here')
   const { request, params } = args
 
   const galaxyClient = await clients.getGalaxyClient()
