@@ -1,13 +1,14 @@
-name: Next Address
+# .github/workflows/release-images.yaml
+---
+name: Release Images
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 defaults:
   run:
-    working-directory: platform/address
+    working-directory: ./services
 
 jobs:
   deploy:
@@ -19,7 +20,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build ../platform.nix
+      - run: nix-build services.nix
 
       - name: Cache Dependencies
         id: cache-modules
@@ -35,18 +36,19 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Test
-        run: yarn run test
-
-      - name: Deploy
+      - name: Deploy Oort to Test Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: platform/address
-          command: publish --env next
-          environment: next
+          workingDirectory: 'services/images'
+          command: publish --env current
+          environment: 'current'
+          # This causes secrets to be set as if by: $ wrangler secret put.
+          # Each supplied name must be defined in the env: config stanza.
           secrets: |
-            TOKEN_NFTAR
+            INTERNAL_CLOUDFLARE_ACCOUNT_ID
+            TOKEN_CLOUDFLARE_API
         env:
-          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_TEST }}
+          INTERNAL_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
+          TOKEN_CLOUDFLARE_API: ${{ secrets.TOKEN_CLOUDFLARE_API }}

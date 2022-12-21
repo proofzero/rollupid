@@ -8,14 +8,14 @@ type CfImageUploadUrlRes = {
 }
 
 class CFImageUploadClient implements IImageUploadClient {
-  #iconsFetcher
+  #imagesFetcher
 
-  constructor(iconsFetcher: Fetcher) {
-    this.#iconsFetcher = iconsFetcher
+  constructor(imagesFetcher: Fetcher) {
+    this.#imagesFetcher = imagesFetcher
   }
 
   async getImageUploadUrl(): Promise<string> {
-    const res = await this.#iconsFetcher.fetch('http://127.0.0.1/')
+    const res = await this.#imagesFetcher.fetch('http://127.0.0.1/upload')
 
     try {
       const { uploadURL } = (await res.clone().json()) as CfImageUploadUrlRes

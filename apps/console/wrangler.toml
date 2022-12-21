@@ -8,7 +8,7 @@ compatibility_date = "2022-04-05"
 
 services = [
   { binding = "Starbase", service = "starbase"},
-  { binding = "Icons", service = "icons" },
+  { binding = "Images", service = "images" },
 ]
 
 # development
@@ -56,7 +56,7 @@ STORAGE_NAMESPACE="console"
 
 services = [
   { binding = "Starbase", service = "starbase-dev"},
-  { binding = "Icons", service = "icons-dev" },
+  { binding = "Images", service = "images-dev" },
 ]
 
 # kv_namespaces = [
@@ -81,7 +81,7 @@ STORAGE_NAMESPACE="console"
 
 services = [
   { binding = "Starbase", service = "starbase-next"},
-  { binding = "Icons", service = "icons-next" },
+  { binding = "Images", service = "images-next" },
 ]
 
 # kv_namespaces = [
@@ -109,7 +109,7 @@ STORAGE_NAMESPACE="console"
 
 services = [
   { binding = "Starbaes", service = "starbase", environment = "production" },
-  { binding = "Icons", service = "icons-current" },
+  { binding = "Images", service = "images-current" },
 ]
 
 # kv_namespaces = [

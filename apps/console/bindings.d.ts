@@ -1,6 +1,7 @@
 export const seviceBindings = true
 declare global {
   const Starbase: Fetcher
+  const Images: Fetcher
 
   const SECRET_SESSION_SALT: string
   const COOKIE_DOMAIN: string

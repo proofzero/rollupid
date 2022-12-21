@@ -13,11 +13,6 @@ services = [
   { binding = "Edges", service = "edges" }
 ]
 
-[[ d1_databases ]]
-binding = "COLLECTIONS" # i.e. available in your Worker on env.DB
-database_name = "collections-dev"
-database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
-
 [[queues.producers]]
  queue = "blockchain-activity"
  binding = "BLOCKCHAIN_ACTIVITY"
@@ -31,7 +26,6 @@ max_batch_timeout = 5 # optional: defaults to 5 seconds
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-URL_MORALIS_WEBHOOK = "https://localhost:9292/webhooks/moralis"
 
 [dev]
 port = 9191
@@ -58,15 +52,11 @@ services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" }
 ]
-d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-dev", database_id = "13213d87-dc22-442a-ad81-afb8139edbf4" }
-]
 
 [env.dev.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-URL_MORALIS_WEBHOOK = "https://beacon-dev/webhooks/moralis"
 
 [env.next]
 durable_objects.bindings = [
@@ -76,16 +66,11 @@ services = [
   { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" }
 ]
-d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-next", database_id = "9f4437bc-1a3f-4e4d-8c7f-19cf964d28d1" }
-]
 
 [env.next.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-URL_MORALIS_WEBHOOK = "https://beacon-next/webhooks/moralis"
-
 
 [env.current]
 durable_objects.bindings = [
@@ -95,13 +80,8 @@ services = [
   { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" }
 ]
-d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-current", database_id = "e20e21e5-f1c1-4679-ad3c-65a3854bcb30" }
-]
 
 [env.current.vars]
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
-URL_MORALIS_WEBHOOK = "https://beacon/webhooks/moralis"
-

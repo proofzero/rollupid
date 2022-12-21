@@ -14,21 +14,12 @@ export interface Environment {
   TOKEN_NFTAR: string
   NFTAR_URL: string
 
-  APIKEY_ALCHEMY_ETH: string
-  ALCHEMY_ETH_NETWORK: string
-
-  APIKEY_ALCHEMY_POLYGON: string
-  ALCHEMY_POLYGON_NETWORK: string
-
-  APIKEY_MORALIS: string
-  MORALIS_STREAM_ID: string
-  URL_MORALIS_WEBHOOK: string
-
   BLOCKCHAIN_ACTIVITY: Queue
 }
 
 export interface AddressRpcContext extends RpcContext {
-  collectionDB: DrizzleD1Database
+  NFTAR_URL: string
+  BLOCKCHAIN_ACTIVITY: Queue
 }
 
 export enum NodeType {
