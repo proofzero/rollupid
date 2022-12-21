@@ -2,7 +2,7 @@
 
 name = "console"
 
-workers_dev = true
+workers_dev = false
 main = "./build/index.js"
 compatibility_date = "2022-04-05"
 
