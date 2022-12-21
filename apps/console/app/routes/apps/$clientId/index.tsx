@@ -26,6 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     appId: string
     clientId: string
     hasSecret: boolean
+    secretTimestamp?: number
     app: {
       timestamp: number
       title: string
@@ -33,7 +34,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   let rotatedSecret
-  if (!appDetails.hasSecret) {
+  if (!appDetails.secretTimestamp) {
     rotatedSecret = await starbaseClient.kb_appRotateSecret(appDetails.clientId)
 
     // For some reason secret is
@@ -41,6 +42,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     // so to not break anything
     // taking care of this client server side
     rotatedSecret = rotatedSecret.secret.split(':')[1]
+
+    // This is a client 'hack' as the date
+    // is populated from the graph
+    // on subsequent requests
+    appDetails.secretTimestamp = Date.now()
   }
 
   return json({
@@ -66,10 +72,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   // populating the values if empty
   switch (op) {
     case 'roll_api_key':
-      break;
+      break
     case 'roll_app_secret':
       await starbaseClient.kb_appClearSecret(params.clientId)
-      break;
+      break
   }
 
   return null
@@ -92,13 +98,16 @@ export default function AppDetailIndexPage() {
       oAuth={{
         appId: app.appId,
         appSecret: rotatedSecret,
-        createdAt: new Date(),
+        createdAt: new Date(app.secretTimestamp),
         onKeyRoll: () => {
-          submit({
-            op: 'roll_app_secret'
-          }, {
-            method: 'post'
-          })
+          submit(
+            {
+              op: 'roll_app_secret',
+            },
+            {
+              method: 'post',
+            }
+          )
         },
       }}
     />
