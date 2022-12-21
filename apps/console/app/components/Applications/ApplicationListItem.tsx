@@ -1,9 +1,8 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Link } from '@remix-run/react'
 import { Fragment } from 'react'
-import { HiDotsVertical } from 'react-icons/hi'
-import { HiCog, HiTrash } from 'react-icons/hi2'
+import { HiDotsVertical, HiOutlineCog } from 'react-icons/hi'
+import { HiOutlineTrash } from 'react-icons/hi2'
 
 type ApplicationListItemPublishedStateProps = {
   published?: boolean
@@ -83,13 +82,13 @@ export const ApplicationListItem = ({
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
+          <Menu.Items className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
             <div className="p-1">
               <Menu.Item
                 as="div"
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
               >
-                <HiCog className="text-xl font-normal text-gray-400" />
+                <HiOutlineCog className="text-xl font-normal text-gray-400" />
 
                 <a href={`/apps/${id}`}>
                   <Text size="sm" weight="normal" className="text-gray-700">
@@ -107,7 +106,7 @@ export const ApplicationListItem = ({
                   /* Need to handle */
                 }}
               >
-                <HiTrash className="text-xl font-normal text-red-500" />
+                <HiOutlineTrash className="text-xl font-normal text-red-500" />
 
                 <Text size="sm" weight="normal" className="text-red-500">
                   Delete Application
