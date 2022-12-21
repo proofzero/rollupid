@@ -36,10 +36,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!appDetails.secretTimestamp) {
     rotatedSecret = await starbaseClient.kb_appRotateSecret(appDetails.clientId)
 
-    // For some reason secret is
-    // secret:{actualSecret}
-    // so to not break anything
-    // taking care of this client server side
+    // The prefix is there just as an aide to users;
+    // when they're moving these values
+    // (client ID, client secret),
+    // the prefix should help distinguish between them,
+    // rather then the user having to
+    // distinguish between them by e.g. length.
+    // The prefix is part of the secret and is included in the stored hash.
     rotatedSecret = rotatedSecret.secret.split(':')[1]
 
     // This is a client 'hack' as the date
