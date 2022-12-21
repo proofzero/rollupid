@@ -1,0 +1,5 @@
+export const required = [
+  'INTERNAL_CLOUDFLARE_ACCOUNT_ID',
+  'TOKEN_CLOUDFLARE_API',
+  'UPLOAD_WINDOW_SECONDS',
+]

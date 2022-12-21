@@ -18,13 +18,6 @@ services = [
 port = 9898
 local_protocol = "http"
 
-# Secrets
-# -----------------------------------------------------------------------------
-# Set these secrets using the wrangler CLI:
-# $ echo <VALUE> | wrangler secret put <NAME>
-
-# Required secrets:
-# - SECRET_SESSION_SALT
 
 # Environment Variables
 # -----------------------------------------------------------------------------
@@ -70,7 +63,7 @@ routes = [
 [env.dev.vars]
 DEPLOY_ENV = "dev"
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
-COOKIE_DOMAIN = "dev.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 
 
@@ -98,7 +91,7 @@ routes = [
 [env.next.vars]
 DEPLOY_ENV = "next"
 PASSPORT_URL = "https://passport-next.threeid.xyz"
-COOKIE_DOMAIN = "next.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 
 
