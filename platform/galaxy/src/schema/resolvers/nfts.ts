@@ -4,6 +4,8 @@ import { GraphQLYogaError } from '@graphql-yoga/common'
 import { Resolvers } from './typedefs'
 import Env from '../../env'
 
+import createIndexerClient from '@kubelt/platform-clients/indexer'
+
 import {
   AlchemyChain,
   AlchemyClient,

@@ -8,7 +8,7 @@ wrangler_dev = false
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
-  { binding = "Starbase", service = "starbase"}
+  { binding = "Starbase", service = "starbase"},
 ]
 
 [dev]
@@ -25,6 +25,7 @@ services = [
   { binding = "Account", service = "account-dev" },
   { binding = "Address", service = "address-dev" },
   { binding = "Starbase", service = "starbase-dev" },
+  { binding = "Indexer, service = "indexer-dev" },
 ]
 
 [env.dev.vars]
@@ -37,6 +38,7 @@ services = [
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
   { binding = "Starbase", service = "starbase-next" },
+  { binding = "Indexer, service = "indexer-next" },
 ]
 
 [env.next.vars]
@@ -49,6 +51,7 @@ services = [
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
   { binding = "Starbase", service = "starbase-current" },
+  { binding = "Indexer, service = "indexer-current" },
 ]
 
 [env.current.vars]
