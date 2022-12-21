@@ -8,6 +8,7 @@ import { Fragment, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { HiGlobeAlt } from 'react-icons/hi'
 
 // Utility
 // -----------------------------------------------------------------------------
@@ -50,7 +51,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
       ? {
           clientId: 'none',
           app: {
-            title: 'No app selected',
+            title: 'All Applications',
           },
         }
       : apps[selectedAppIndex]
@@ -73,6 +74,9 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
             <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-500 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
               <span className="flex items-center">
                 {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
+                {selected.clientId === 'none' && (
+                  <HiGlobeAlt className="h-6 w-6 text-gray-300 mr-2.5" />
+                )}
                 <Text weight="medium" className="text-white">
                   {selected.app.title}
                 </Text>
