@@ -21,7 +21,9 @@ export interface StarbaseApi extends BaseApi {
   kb_initPlatform(): Promise<string[]>
   kb_appClearSecret(clientId: string): Promise<AppClearSecretResult>
   kb_appRotateSecret(clientId: string): Promise<AppRotateSecretResult>
-  kb_appApiKeyCheck(keyObj: AppAPIKeyValidityRequest): Promise<AppAPIKeyValidityResult>
+  kb_appApiKeyCheck(
+    keyObj: AppAPIKeyValidityRequest
+  ): Promise<AppAPIKeyValidityResult>
 }
 
 export default (
