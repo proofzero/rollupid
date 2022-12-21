@@ -4,8 +4,7 @@ import type { BaseApi } from './base'
 import createClient from './fetcher'
 
 export interface IndexerApi extends BaseApi {
-  kb_setGallery(account: AccountURN): void
-  kb_getGallery(
+  kb_setGallery(
     account: AccountURN,
     gallery: {
       tokenId: string
@@ -13,7 +12,8 @@ export interface IndexerApi extends BaseApi {
       addressURN: string
       gallery_order: number
     }
-  ): object | undefined
+  ): void
+  kb_getGallery(account: AccountURN[]): object | undefined
 }
 
 export default (

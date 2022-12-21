@@ -9,6 +9,7 @@ services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
   { binding = "Starbase", service = "starbase"},
+  { binding = "Indexer, service = "indexer" },
 ]
 
 [dev]
