@@ -3,6 +3,10 @@ import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
 
 import { AccountURN } from '@kubelt/urns/account'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
+
+import Env from '../../../env'
+import { isFromCFBinding } from '@kubelt/utils'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -15,10 +19,11 @@ export function parseJwt(token: string): JWTPayload {
 
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
+  const apiKey = context.request.headers.get('X-GALAXY-KEY')
   const parsedJwt = jwt && parseJwt(jwt)
   const accountURN: AccountURN = parsedJwt && parsedJwt.sub
 
-  return next(root, args, { ...context, jwt, accountURN }, info)
+  return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
 }
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {
@@ -35,6 +40,45 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
 
   return next(root, args, context, info)
 }
+
+export const hasApiKey = () => (next) => async (root, args, context, info) => {
+
+  //If request isn't coming from a service binding then we check for API key validity;
+  //otherwise we passthrough to next middleware
+  if (!isFromCFBinding(context.request)) {
+
+    const apiKey = context.apiKey
+    if (!apiKey) {
+      throw new GraphQLYogaError('No API Key provided.', {
+        extensions: {
+          http: {
+            status: 400,
+          },
+        },
+      })
+    }
+
+    const env = context.env as Env
+    const keyObj = {
+      apiKey: apiKey
+    }
+    const starbaseClient = createStarbaseClient(env.Starbase)
+    const apiKeyValidity = await starbaseClient.kb_appApiKeyCheck(keyObj)
+
+    if (!apiKeyValidity.valid) {
+      throw new GraphQLYogaError('Invalid API key provided.', {
+        extensions: {
+          http: {
+            status: 401,
+          },
+        },
+      })
+    }
+  }
+
+  return next(root, args, context, info)
+}
+
 
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {

@@ -8,6 +8,7 @@ wrangler_dev = false
 services = [
   { binding = "Account", service = "account" },
   { binding = "Address", service = "address" },
+  { binding = "Starbase", service = "starbase"}
 ]
 
 [dev]
@@ -23,6 +24,7 @@ route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = 
 services = [
   { binding = "Account", service = "account-dev" },
   { binding = "Address", service = "address-dev" },
+  { binding = "Starbase", service = "starbase-dev" },
 ]
 
 [env.dev.vars]
@@ -34,6 +36,7 @@ route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name =
 services = [
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
+  { binding = "Starbase", service = "starbase-next" },
 ]
 
 [env.next.vars]
@@ -45,6 +48,7 @@ route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "thr
 services = [
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
+  { binding = "Starbase", service = "starbase-current" },
 ]
 
 [env.current.vars]

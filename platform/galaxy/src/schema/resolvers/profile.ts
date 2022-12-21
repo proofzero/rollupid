@@ -4,7 +4,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 
-import { setupContext, isAuthorized } from './utils'
+import { setupContext, isAuthorized, hasApiKey } from './utils'
 
 import Env from '../../env'
 import { Resolvers } from './typedefs'
@@ -16,6 +16,7 @@ import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 type ResolverContext = {
   env: Env
   jwt: string
+  apiKey: string
   accountURN: AccountURN
 }
 
@@ -127,7 +128,7 @@ const threeIDResolvers: Resolvers = {
 
 const ThreeIDResolverComposition = {
   'Query.profile': [setupContext()],
-  'Query.profileFromAddress': [setupContext()],
+  'Query.profileFromAddress': [setupContext(), hasApiKey()],
   'Mutation.updateThreeIDProfile': [setupContext(), isAuthorized()],
 }
 

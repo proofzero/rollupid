@@ -16,6 +16,8 @@ import type { RpcContext } from '@kubelt/openrpc'
 
 import * as openrpc from '@kubelt/openrpc'
 
+import { isFromCFBinding } from '@kubelt/utils'
+
 // local
 // -----------------------------------------------------------------------------
 
@@ -43,17 +45,11 @@ export default openrpc.middleware(
     //const realIP = request.headers.get("x-real-ip");
 
     // E.g. "127.0.0.1"
-    const connectingIP = request.headers.get('cf-connecting-ip')
-
-    //console.log(forwardedProto, hostIP, realIP, connectingIP);
-
-    const allowedOrigin = '127.0.0.1'
-
-    if (!connectingIP || connectingIP === allowedOrigin) {
+    if (isFromCFBinding(request))
       // Allow middleware chain to continue.
       return context
-    }
-
+      
+    const connectingIP = request.headers.get('cf-connecting-ip')
     const message = `rejecting request from non-local address: ${connectingIP}`
     console.warn(message)
 

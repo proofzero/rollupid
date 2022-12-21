@@ -70,6 +70,7 @@ import {
 // Import the OpenRPC schema for this API.
 import schema from './schema'
 import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
+import { AppApiKeyCheckParams } from './types'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -573,8 +574,7 @@ const kb_appApiKeyCheck = openrpc.method(schema, {
       request: Readonly<RpcRequest>,
       context: Readonly<RpcContext>
     ) => {
-      //TODO: add error checking for buffer overflows: overall body payload and the decoded JWT sizes
-      const apiKey = _.get(request, ['params', 'apiKey'])
+      const [{ apiKey }] = request.params as AppApiKeyCheckParams
       const jwtSub = decodeJwt(apiKey).sub as ApplicationURN
       const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 

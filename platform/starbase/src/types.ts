@@ -27,3 +27,13 @@ export type AppClearSecretResult = {
 export type AppRotateSecretResult = {
   secret: string
 }
+
+export type AppApiKeyCheckParams = [key: AppAPIKeyValidityRequest]
+
+export type AppAPIKeyValidityResult = {
+  valid: boolean
+}
+
+export type AppAPIKeyValidityRequest = {
+  apiKey: string
+}

@@ -49,7 +49,7 @@ export async function generateAndStore(
   return apiKey
 }
 
-export async function verify (
+export async function verify(
   params: RpcParams,
   input: RpcInput,
   output: RpcOutput
@@ -62,7 +62,7 @@ export async function verify (
     await jwtVerify(token, key, options)
     return true
   } catch (e) {
-    console.error("Error verifying API key validity.", e)
+    console.error('Error verifying API key validity.', e)
     return false
   }
 }
