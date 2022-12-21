@@ -127,9 +127,9 @@ const threeIDResolvers: Resolvers = {
 }
 
 const ThreeIDResolverComposition = {
-  'Query.profile': [setupContext()],
+  'Query.profile': [setupContext(), hasApiKey()],
   'Query.profileFromAddress': [setupContext(), hasApiKey()],
-  'Mutation.updateThreeIDProfile': [setupContext(), isAuthorized()],
+  'Mutation.updateThreeIDProfile': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
 export default composeResolvers(threeIDResolvers, ThreeIDResolverComposition)
