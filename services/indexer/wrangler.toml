@@ -1,4 +1,4 @@
-name = "index"
+name = "indexer"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true

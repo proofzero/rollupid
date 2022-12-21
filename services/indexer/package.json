@@ -1,5 +1,5 @@
 {
-  "name": "@kubelt/services.index",
+  "name": "@kubelt/services.indexer",
   "version": "0.0.0",
   "private": true,
   "type": "module",

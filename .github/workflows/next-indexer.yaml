@@ -1,4 +1,4 @@
-name: Next Index
+name: Next Indexer
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 defaults:
   run:
-    working-directory: services/index
+    working-directory: services/indexer
 
 jobs:
   deploy:
@@ -43,7 +43,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: 'services/index'
+          workingDirectory: 'services/indexer'
           command: d1 migrations apply COLLECTIONS
           environment: 'next'
 
@@ -52,7 +52,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: services/index
+          workingDirectory: services/indexer
           command: publish --env next
           environment: next
           secrets: |
