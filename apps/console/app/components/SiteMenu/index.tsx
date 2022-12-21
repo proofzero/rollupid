@@ -9,21 +9,15 @@ import { Link } from '@remix-run/react'
 import AppSelect from './appSelect'
 
 // Images
-import kubeltLogo from '~/images/kubelt.svg'
+import consoleLogo from '~/images/3id_console_logo.svg'
 
 // KubeltLogo
 // -----------------------------------------------------------------------------
-
-type KubeltLogoProps = {}
-
-const KubeltLogo = (props: KubeltLogoProps) => {
+const KubeltLogo = () => {
   return (
-    <h1 className="text-3xl font-bold text-white my-8 mx-4">
-      <Link to="/">
-        <img className="inline-block" src={kubeltLogo} />{' '}
-        <span className="align-bottom">kubelt</span>
-      </Link>
-    </h1>
+    <Link to="/">
+      <img className="mx-4 my-5" src={consoleLogo} />
+    </Link>
   )
 }
 
@@ -79,7 +73,7 @@ type KubeltMenuProps = {
     }
   }[]
   // Current selected application ID.
-  selected: string
+  selected?: string
 }
 
 export default function SiteMenu(props: KubeltMenuProps) {

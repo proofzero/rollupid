@@ -47,12 +47,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
-  const { apps, appId } = useLoaderData()
+  const { apps } = useLoaderData()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">
-      <SiteMenu apps={apps} selected={appId} />
+      <SiteMenu apps={apps} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
         <SiteHeader />
         <div className="bg-gray-50 p-6 h-full">
