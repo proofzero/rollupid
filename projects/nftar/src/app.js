@@ -124,12 +124,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // cf. https://docs.alchemy.com/reference/sdk-getnfts
     const MAX_ALCHEMY_CONTRACT_ARRAY_SIZE = 20;
     const contractAddresses = getContractAddresses().slice(0, MAX_ALCHEMY_CONTRACT_ARRAY_SIZE);
-    console.log('contractAddresses list:', JSON.stringify(contractAddresses));
 
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account, {
         contractAddresses
     });
-    console.log('nftsForOwner:', JSON.stringify(nftsForOwner));
 
     t1 = performance.now();
     console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
@@ -236,20 +234,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     };
 
     t0 = performance.now();
-
     const { token, car } = await storage.NFTStorage.encodeNFT(nft)
     const metadata = token
     const opts = {}
-
-    const imageFilepath = `${metadata.ipnft}/image`
-    const coverFilepath = `${metadata.ipnft}/cover`
-
-    // Fire-and-forget uploads to Cloudflare Images.
-    uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat)
-    uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
-
-    const imageURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`;
-    const coverURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`;
 
     // Fire-and-forget uploads.
     let u0, u1, u2, cid
@@ -262,7 +249,20 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         .finally(() => console.log(`NFT.storage store-and-warm took ${u2 - u0} milliseconds for ${cid} end-to-end.`))
     t1 = performance.now();
     console.log(`NFT.storage metadata generation and upload scheduling took ${t1 - t0} milliseconds.`);
+
+    t0 = performance.now();
+    const imageFilepath = `${metadata.ipnft}/image`
+    const coverFilepath = `${metadata.ipnft}/cover`
+
+    uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat)
+    uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
     
+    const imageURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`;
+    const coverURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`;
+
+    t1 = performance.now();
+    console.log(`Cloudflare Image uploads took ${t1 - t0} milliseconds.`);    
+
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
     
@@ -306,8 +306,6 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     body.metadata.image = imageURL;
     body.metadata.cover = coverURL;
-
-    console.log('response body', JSON.stringify(body));
 
     ctx.body = body;
     const s1 = performance.now();
@@ -365,7 +363,6 @@ router.post('/api/v0/og-image', async (ctx, next) => {
     const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
     console.log('Checking cache:', url);
     const cacheCheck = await fetch(url);
-    console.log('Cache check status:', cacheCheck.status);
     
     // if (cacheCheck.status === 200) {
     //     console.log('Returning cached image url for ', filename);
