@@ -4941,9 +4941,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/apps.threeid@workspace:apps/threeid":
+"@kubelt/apps.threeid@workspace:apps/profile":
   version: 0.0.0-use.local
-  resolution: "@kubelt/apps.threeid@workspace:apps/threeid"
+  resolution: "@kubelt/apps.threeid@workspace:apps/profile"
   dependencies:
     "@babel/core": 7.20.2
     "@cloudflare/workers-types": 4.20221111.1
@@ -5475,9 +5475,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/services.index@workspace:services/index":
+"@kubelt/services.indexer@workspace:services/indexer":
   version: 0.0.0-use.local
-  resolution: "@kubelt/services.index@workspace:services/index"
+  resolution: "@kubelt/services.indexer@workspace:services/indexer"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/openrpc": "workspace:*"
