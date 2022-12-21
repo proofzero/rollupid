@@ -91,7 +91,7 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
 
 export default function SiteMenu(props: KubeltMenuProps) {
   return (
-    <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:w-1/4 md:border-r md:text-left">
+    <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:min-w-[256px] md:max-w-sm md:border-r md:text-left">
       <KubeltLogo />
       <AppSelect apps={props.apps} selected={props.selected} />
 
