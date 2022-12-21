@@ -4,12 +4,20 @@
 
 import * as React from 'react'
 
-import { Link } from '@remix-run/react'
+import { Link, NavLink } from '@remix-run/react'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import AppSelect from './appSelect'
 
 // Images
 import consoleLogo from '~/images/3id_console_logo.svg'
+import {
+  HiOutlineChartSquareBar,
+  HiOutlineCog,
+  HiOutlineDocument,
+  HiOutlineHome,
+  HiOutlineUsers,
+} from 'react-icons/hi'
 
 // KubeltLogo
 // -----------------------------------------------------------------------------
@@ -76,11 +84,79 @@ type KubeltMenuProps = {
   selected?: string
 }
 
+const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
+  `flex flex-row space-x-3 items-center p-2 rounded-md hover:bg-gray-800 hover:text-white ${
+    isActive ? 'bg-gray-800 text-white' : 'text-gray-400'
+  } ${disabled ? 'hover:cursor-not-allowed' : ''}`
+
 export default function SiteMenu(props: KubeltMenuProps) {
   return (
-    <div className="text-center bg-slate-800 pb-4 md:min-h-screen md:w-1/4 md:border-r md:text-left">
+    <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:w-1/4 md:border-r md:text-left">
       <KubeltLogo />
       <AppSelect apps={props.apps} selected={props.selected} />
+
+      {props.selected && (
+        <section className="pt-5 px-2 hidden md:flex md:flex-col">
+          <NavLink
+            to={`/apps/${props.selected}`}
+            end
+            className={({ isActive }) => menuItemClass(isActive)}
+          >
+            <HiOutlineHome className="w-6 h-6" />{' '}
+            <Text size="sm" weight="medium">
+              Dashboard
+            </Text>
+          </NavLink>
+
+          <NavLink
+            to={`/apps/${props.selected}/soon`}
+            end
+            className={({ isActive }) => menuItemClass(isActive, true)}
+            onClick={(e) => e.preventDefault()}
+          >
+            <HiOutlineCog className="w-6 h-6" />{' '}
+            <Text size="sm" weight="medium">
+              0xAuth
+            </Text>
+          </NavLink>
+
+          <NavLink
+            to={`/apps/${props.selected}/soon`}
+            end
+            className={({ isActive }) => menuItemClass(isActive, true)}
+            onClick={(e) => e.preventDefault()}
+          >
+            <HiOutlineDocument className="w-6 h-6" />{' '}
+            <Text size="sm" weight="medium">
+              Smart Contracts
+            </Text>
+          </NavLink>
+
+          <NavLink
+            to={`/apps/${props.selected}/soon`}
+            end
+            className={({ isActive }) => menuItemClass(isActive, true)}
+            onClick={(e) => e.preventDefault()}
+          >
+            <HiOutlineChartSquareBar className="w-6 h-6" />{' '}
+            <Text size="sm" weight="medium">
+              Users
+            </Text>
+          </NavLink>
+
+          <NavLink
+            to={`/apps/${props.selected}/soon`}
+            end
+            className={({ isActive }) => menuItemClass(isActive, true)}
+            onClick={(e) => e.preventDefault()}
+          >
+            <HiOutlineUsers className="w-6 h-6" />{' '}
+            <Text size="sm" weight="medium">
+              Team
+            </Text>
+          </NavLink>
+        </section>
+      )}
     </div>
   )
 }
