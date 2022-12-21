@@ -5461,9 +5461,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/services.images@workspace:services/icons":
+"@kubelt/services.images@workspace:services/images":
   version: 0.0.0-use.local
-  resolution: "@kubelt/services.images@workspace:services/icons"
+  resolution: "@kubelt/services.images@workspace:services/images"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     date-fns: 2.29.3

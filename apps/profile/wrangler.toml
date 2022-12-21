@@ -5,6 +5,8 @@ main = "./build/index.js"
 
 name = "profile"
 
+workers_dev = false
+
 # The default environment
 # ------------------------------------------------------------------------------
 # name = "three-id-dev"
@@ -14,8 +16,6 @@ name = "profile"
 # routes = [
 #   "3id-dev.kubelt.com/*",
 # ]
-kv_namespaces = [
-]
 
 # Services binding for local development
 services = [
@@ -47,8 +47,6 @@ local_protocol = "http"
 # dev (development)
 # ------------------------------------------------------------------------------
 [env.dev]
-kv_namespaces = [
-]
 routes = [
   { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
@@ -74,8 +72,6 @@ routes = [
   { pattern = "app-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
-kv_namespaces = [
-]
 services = [
   { binding = "Galaxy", service = "galaxy-next"},
   { binding = "Address", service = "address-next"},
@@ -99,8 +95,6 @@ NFTAR_CHAIN_ID=5
 routes = [
   { pattern = "app.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
   { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
-]
-kv_namespaces = [
 ]
 services = [
   { binding = "Galaxy", service = "galaxy-current"},
