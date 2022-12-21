@@ -124,25 +124,6 @@ export const schema: RpcSchema = {
         $ref: '#/components/contentDescriptors/PfpVoucher',
       },
     },
-    {
-      name: 'kb_getGallery',
-      params: [],
-      result: {
-        $ref: '#/components/contentDescriptors/GalleryItems',
-      },
-    },
-    {
-      name: 'kb_setGallery',
-      params: [
-        {
-          $ref: '#/components/contentDescriptors/GalleryItems',
-        },
-      ],
-      result: {
-        name: 'set gallery result',
-        schema: {},
-      },
-    },
   ],
   components: Node.components,
 }

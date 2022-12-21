@@ -7,19 +7,30 @@
 
 #### Build Status
 
+##### Platform
+
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-galaxy.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-edges.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-icons.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-starbase.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-access.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-address.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-account.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-threeid.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-chromatic.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-nftar.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-smartcontracts.yaml/badge.svg)
+
+##### Apps
+
+![](https://github.com/kubelt/kubelt/actions/workflows/main-profile.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
+
+##### Services
+
+![](https://github.com/kubelt/kubelt/actions/workflows/main-images.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-indexer.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-webhooks.yaml/badge.svg)
+
+##### Packages
+
+TODO
 
 ## What is Kubelt?
 
@@ -38,6 +49,10 @@ Let's take a look around at the Kubelt Monorepo layout...
 ## Platform
 
 The [platform/](platform) directory is where all the core identity services. The Kubelt platformed is organized by "local-first" (or logically local) nodes (accounts, address, acccount, and more) organized in a graph by the Galaxy service.
+
+## Services
+
+The [services/](services) directory is supporting services for the platform are developed.
 
 ## Apps
 

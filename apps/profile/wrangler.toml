@@ -1,0 +1,120 @@
+# https://developers.cloudflare.com/workers/platform/compatibility-dates
+compatibility_date = "2022-04-05"
+
+main = "./build/index.js"
+
+name = "profile"
+
+# The default environment
+# ------------------------------------------------------------------------------
+# name = "three-id-dev"
+# # Whether or not the worker should be deployed to *.workers.dev. Can use
+# # either route or workers_dev, but not both.
+# workers_dev = true
+# routes = [
+#   "3id-dev.kubelt.com/*",
+# ]
+kv_namespaces = [
+]
+
+# Services binding for local development
+services = [
+  { binding = "Galaxy", service = "galaxy"},
+  { binding = "Address", service = "address"},
+  { binding = "Images", service = "images" },
+]
+
+[vars]
+PASSPORT_URL = "http://localhost:9696"
+COOKIE_DOMAIN = "localhost"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
+
+
+[site]
+  bucket = "./public"
+
+[build]
+  command = "yarn build -- --sourcemap"
+
+[dev]
+port = 9797
+local_protocol = "http"
+
+# dev (development)
+# ------------------------------------------------------------------------------
+[env.dev]
+kv_namespaces = [
+]
+routes = [
+  { pattern = "app-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+]
+services = [
+  { binding = "Galaxy", service = "galaxy-dev"},
+  { binding = "Address", service = "address-dev"},
+  { binding = "Images", service = "images-dev" },
+]
+[env.dev.vars]
+PASSPORT_URL = "https://passport-dev.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
+
+# next (staging)
+# ------------------------------------------------------------------------------
+[env.next]
+routes = [
+  { pattern = "app-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+]
+kv_namespaces = [
+]
+services = [
+  { binding = "Galaxy", service = "galaxy-next"},
+  { binding = "Address", service = "address-next"},
+  { binding = "Images", service = "images-next" },
+]
+[env.next.build]
+  command = "yarn build"
+
+[env.next.vars]
+PASSPORT_URL = "https://passport-next.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL="https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=5
+
+# current (production)
+# ------------------------------------------------------------------------------
+[env.current]
+routes = [
+  { pattern = "app.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+  { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
+]
+kv_namespaces = [
+]
+services = [
+  { binding = "Galaxy", service = "galaxy-current"},
+  { binding = "Address", service = "address-current"},
+  { binding = "Images", service = "images-current" },
+]
+[env.current.build]
+  command = "yarn build"
+
+[env.current.vars]
+PASSPORT_URL = "https://passport.threeid.xyz"
+COOKIE_DOMAIN = "threeid.xyz"
+TWITTER_URL="https://twitter.com/threeid_xyz"
+DISCORD_URL="https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+NFTAR_URL="https://nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID=1

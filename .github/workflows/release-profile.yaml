@@ -1,25 +1,24 @@
-name: Next Address
-
+---
+name: Release Profile
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 defaults:
   run:
-    working-directory: platform/address
+    working-directory: ./apps
 
 jobs:
-  deploy:
+  build-publish-profile-current:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - uses: cachix/install-nix-action@v18
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build ../platform.nix
+      - run: nix-build apps.nix
 
       - name: Cache Dependencies
         id: cache-modules
@@ -35,18 +34,20 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Test
-        run: yarn run test
+      - name: Code Generation
+        run: yarn gql
 
-      - name: Deploy
+      - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: platform/address
-          command: publish --env next
-          environment: next
+          workingDirectory: 'apps/profile'
+          command: publish --env current
+          environment: 'current'
           secrets: |
+            SECRET_SESSION_SALT
             TOKEN_NFTAR
         env:
-          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_TEST }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_PROD }}

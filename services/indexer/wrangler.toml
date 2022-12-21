@@ -1,0 +1,63 @@
+name = "indexer"
+main = "src/index.ts"
+compatibility_date = "2022-10-26"
+node_compat = true
+workers_dev = false
+
+services = [
+  { binding = "Access", service = "access" },
+  { binding = "Edges", service = "edges" }
+]
+
+[[ d1_databases ]]
+binding = "COLLECTIONS" # i.e. available in your Worker on env.DB
+database_name = "collections-dev"
+database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
+
+[[queues.producers]]
+ queue = "blockchain-activity"
+ binding = "BLOCKCHAIN_ACTIVITY"
+ 
+[[queues.consumers]]
+queue = "blockchain-activity"
+max_batch_size = 1 # optional: defaults to 10
+max_batch_timeout = 5 # optional: defaults to 5 seconds
+
+[vars]
+
+[dev]
+port = 8989
+local_protocol = "http"
+
+[env.dev]
+services = [
+  { binding = "Access", service = "access-dev" },
+  { binding = "Edges", service = "edges-dev" }
+]
+d1_databases = [
+  { binding = "COLLECTIONS", database_name = "collections-dev", database_id = "13213d87-dc22-442a-ad81-afb8139edbf4" }
+]
+
+[env.dev.vars]
+
+[env.next]
+services = [
+  { binding = "Access", service = "access-next" },
+  { binding = "Edges", service = "edges-next" }
+]
+d1_databases = [
+  { binding = "COLLECTIONS", database_name = "collections-next", database_id = "9f4437bc-1a3f-4e4d-8c7f-19cf964d28d1" }
+]
+
+[env.next.vars]
+
+[env.current]
+services = [
+  { binding = "Access", service = "access-current" },
+  { binding = "Edges", service = "edges-current" }
+]
+d1_databases = [
+  { binding = "COLLECTIONS", database_name = "collections-current", database_id = "e20e21e5-f1c1-4679-ad3c-65a3854bcb30" }
+]
+
+[env.current.vars]
