@@ -4,11 +4,12 @@
  * Derived from TailwindUI > Select Menus > Custom with avatar.
  */
 
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { HiGlobeAlt } from 'react-icons/hi'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 // Utility
 // -----------------------------------------------------------------------------
@@ -68,9 +69,12 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
     // Using useNavigation hook
     // doesn't refresh the
     // details component
-    if (window && selected.clientId !== 'none') {
-      window.location.href = `/apps/${selected.clientId}`
-    }
+    if (window)
+      if (selected.clientId === 'all') {
+        window.location.href = `/`
+      } else if (selected.clientId !== 'none') {
+        window.location.href = `/apps/${selected.clientId}`
+      }
   }
 
   return (
@@ -88,6 +92,15 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                     } mr-2.5`}
                   />
                 )}
+
+                {selected.clientId !== 'none' && (
+                  <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
+                    <Text className="text-gray-500">
+                      {selected.app.title.substring(0, 1)}
+                    </Text>
+                  </div>
+                )}
+
                 <Text
                   weight="medium"
                   className={`${
@@ -106,71 +119,58 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
             </Listbox.Button>
 
             <Transition
-              show={open && selected.clientId !== 'none'}
-              as={Fragment}
+              show={open && (apps.length > 0 || selected.clientId !== 'none')}
+              as="div"
               leave="transition ease-in duration-100"
               leaveFrom="opacity-100"
               leaveTo="opacity-0"
+              className="bg-gray-800"
             >
-              <Listbox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Listbox.Options className="w-full text-gray-300">
+                <Listbox.Option
+                  className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-500 cursor-pointer"
+                  value={{
+                    clientId: 'all',
+                  }}
+                >
+                  <HiGlobeAlt className={`h-6 w-6 mr-2.5`} />
+
+                  <Text size="sm" weight="medium">
+                    All Applications
+                  </Text>
+                </Listbox.Option>
+
                 {apps.map((app) => (
-                  <Listbox.Option
-                    key={app.clientId}
-                    className={({ active }) =>
-                      classNames(
-                        active ? 'text-white bg-indigo-600' : 'text-gray-900',
-                        'relative cursor-default select-none py-2 pl-3 pr-9'
-                      )
-                    }
-                    value={app}
-                  >
+                  <Listbox.Option key={app.clientId} value={app}>
                     {({ selected, active }) => (
                       <>
-                        <div className="flex items-center">
-                          {/* <img src={person.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
-                          <span
-                            className={classNames(
-                              selected ? 'font-semibold' : 'font-normal',
-                              'ml-3 block truncate'
-                            )}
-                          >
-                            {app.app.title}
-                          </span>
-                        </div>
+                        <div className="flex items-center py-2 px-4 cursor-pointer">
+                          <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
+                            <Text className="text-gray-500">
+                              {app.app.title.substring(0, 1)}
+                            </Text>
+                          </div>
 
-                        {selected ? (
-                          <span
-                            className={classNames(
-                              active ? 'text-white' : 'text-indigo-600',
-                              'absolute inset-y-0 right-0 flex items-center pr-4'
-                            )}
-                          >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                          </span>
-                        ) : null}
+                          <Text size="sm" weight="medium">
+                            {app.app.title}
+                          </Text>
+                        </div>
                       </>
                     )}
                   </Listbox.Option>
                 ))}
               </Listbox.Options>
+
+              <div className="w-full justify-center border border-l-0 border-r-0 border-gray-500 px-4 py-3">
+                <Button className="w-full" btnType="primary-alt">
+                  Create Application
+                </Button>
+              </div>
             </Transition>
           </div>
         </>
       )}
     </Listbox>
-  )
-}
-
-// NoApps
-// -----------------------------------------------------------------------------
-
-function NoApps() {
-  return (
-    <div className="relative mt-1">
-      <p className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-500 bg-transparent text-white py-4 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
-        No Applications
-      </p>
-    </div>
   )
 }
 
