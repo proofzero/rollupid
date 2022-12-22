@@ -3,9 +3,10 @@
  */
 
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useActionData, useLoaderData, useSubmit } from '@remix-run/react'
+import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
-import { getStarbaseClient } from '~/utilities/platform.server'
+import { getStarbaseClient, StarbaseClient } from '~/utilities/platform.server'
 import { requireJWT } from '~/utilities/session.server'
 
 // Component
@@ -21,41 +22,31 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
-
   const appDetails = (await starbaseClient.kb_appDetails(params.clientId)) as {
     appId: string
     clientId: string
     secretTimestamp?: number
+    apiKeyTimestamp?: number
     app: {
       timestamp: number
       title: string
     }
   }
-
-  let rotatedSecret
-  if (!appDetails.secretTimestamp) {
-    rotatedSecret = await starbaseClient.kb_appRotateSecret(appDetails.clientId)
-
-    // The prefix is there just as an aide to users;
-    // when they're moving these values
-    // (client ID, client secret),
-    // the prefix should help distinguish between them,
-    // rather then the user having to
-    // distinguish between them by e.g. length.
-    // The prefix is part of the secret and is included in the stored hash.
-    rotatedSecret = rotatedSecret.secret.split(':')[1]
-
-    // This is a client 'hack' as the date
-    // is populated from the graph
-    // on subsequent requests
-    appDetails.secretTimestamp = Date.now()
+  
+  let rotationResult
+  //If there's no timestamps, then the secrets have never been set, signifying the app
+  //has just been created; we rotate both secrets and set the timestamps
+  if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
+    rotationResult = await rotateSecrets(starbaseClient, params.clientId, RollType.RollBothSecrets);
+    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
   }
 
   return json({
     app: appDetails,
-    rotatedSecret: rotatedSecret,
+    rotatedSecrets: rotationResult
   })
 }
+
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -67,44 +58,74 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const formData = await request.formData()
   const op = formData.get('op')
+  invariant(op && typeof op === 'string', "Operation should be a string")
 
-  // As part of the rolling operation
-  // we only need to remove the keys
-  // because the loader gets called again
-  // populating the values if empty
-  switch (op) {
-    case 'roll_api_key':
-      break
-    case 'roll_app_secret':
-      await starbaseClient.kb_appClearSecret(params.clientId)
-      break
+  const rotationResult = await rotateSecrets(starbaseClient, params.clientId, op)
+  return json({ 
+    rotatedSecrets: rotationResult
+  })
+}
+
+const RollType = {
+  RollAPIKey: 'roll_api_key',
+  RollClientSecret: 'roll_app_secret',
+  RollBothSecrets: 'roll_both'
+} as const
+
+type RotatedSecrets = {
+  rotatedApiKey: string | null,
+  rotatedClientSecret: string | null
+}
+
+async function rotateSecrets(starbaseClient: StarbaseClient, clientId: string, op: string): Promise<RotatedSecrets> {
+  let result: RotatedSecrets = {
+    rotatedApiKey: null,
+    rotatedClientSecret: null
   }
 
-  return null
+  if (op === RollType.RollAPIKey || op === RollType.RollBothSecrets)
+    result.rotatedApiKey = (await starbaseClient.kb_appRotateApiKey({ clientId: clientId})).apiKey
+
+  if (op === RollType.RollClientSecret || op === RollType.RollBothSecrets)
+    result.rotatedClientSecret = (await starbaseClient.kb_appRotateSecret(clientId)).secret.split(":")[1]
+
+  return result
+
 }
 
 // Component
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
+  const { app } = useLoaderData()
   const submit = useSubmit()
-
-  const { app, rotatedSecret } = useLoaderData()
-
-  return (
+  const { rotatedClientSecret, rotatedApiKey } = 
+    useLoaderData()?.rotatedSecrets || useActionData()?.rotatedSecrets || { rotatedClientSecret: null, rotatedApiKey: null}
+  
+    return (
     <ApplicationDashboard
       galaxyGql={{
-        createdAt: new Date(),
-        onKeyRoll: () => {},
+        createdAt: new Date(app.apiKeyTimestamp),
+        apiKey: rotatedApiKey,
+        onKeyRoll: () => {
+          submit(
+            {
+              op: RollType.RollAPIKey
+            },
+            {
+              method: 'post'
+            }
+          )
+        },
       }}
       oAuth={{
         appId: app.appId,
-        appSecret: rotatedSecret,
+        appSecret: rotatedClientSecret,
         createdAt: new Date(app.secretTimestamp),
         onKeyRoll: () => {
           submit(
             {
-              op: 'roll_app_secret',
+              op: RollType.RollClientSecret
             },
             {
               method: 'post',

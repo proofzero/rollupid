@@ -69,17 +69,6 @@ const rpcSchema: RpcSchema = {
       errors: [],
     },
     {
-      name: 'clearSecret',
-      summary: 'Clear currently stored secret',
-      params: [],
-      result: {
-        name: 'success',
-        schema: {
-          type: 'boolean',
-        },
-      },
-    },
-    {
       name: 'rotateSecret',
       summary: 'Set a new (hashed) application OAuth secret',
       params: [

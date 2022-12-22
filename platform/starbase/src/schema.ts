@@ -183,27 +183,6 @@ const rpcSchema: RpcSchema = {
       },
     },
     {
-      name: 'kb_appClearSecret',
-      summary: 'Clear current secret',
-      params: [
-        {
-          name: 'clientId',
-          description: 'The application OAuth client ID',
-          required: true,
-          schema: {
-            $ref: '#/components/contentDescriptors/ClientId',
-          },
-        },
-      ],
-      result: {
-        name: 'success',
-        schema: {
-          type: 'boolean',
-        },
-      },
-      errors: [],
-    },
-    {
       name: 'kb_appRotateSecret',
       summary: 'Invalidate an old secret and replace it with a new value',
       params: [

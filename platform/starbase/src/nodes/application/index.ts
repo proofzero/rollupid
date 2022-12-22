@@ -216,6 +216,7 @@ export class StarbaseApplication {
   @requiredField('app', [FieldAccess.Read])
   @requiredField('clientId', [FieldAccess.Read])
   @requiredField('secretTimestamp', [FieldAccess.Read])
+  @requiredField('apiKeyTimestamp', [FieldAccess.Read])
   appFetch(
     params: RpcParams,
     input: RpcInput,
@@ -224,11 +225,13 @@ export class StarbaseApplication {
     const clientId = input.get('clientId')
     const app = input.get('app')
     const secretTimestamp = input.get('secretTimestamp')
+    const apiKeyTimestamp = input.get('apiKeyTimestamp')
 
     return Promise.resolve({
       clientId,
       app,
       secretTimestamp,
+      apiKeyTimestamp,
     })
   }
 
@@ -276,23 +279,6 @@ export class StarbaseApplication {
     return Promise.resolve(exists)
   }
 
-  // clearSecret
-  // ---------------------------------------------------------------------------
-  @method('clearSecret')
-  //@requiredScope()
-  @requiredField('secret', [FieldAccess.Write])
-  @requiredField('secretTimestamp', [FieldAccess.Write])
-  clearSecret(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    output.set('secret', null)
-    output.set('secretTimestamp', null)
-
-    return Promise.resolve(true)
-  }
-
   // rotateSecret
   // ---------------------------------------------------------------------------
 
@@ -320,6 +306,7 @@ export class StarbaseApplication {
   //@requiredScope()
   @requiredField('apiKey', [FieldAccess.Read, FieldAccess.Write])
   @requiredField('apiKeySigningKeyPair', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('apiKeyTimestamp', [FieldAccess.Write])
   async rotateApiKey(
     params: RpcParams,
     input: RpcInput,
@@ -327,6 +314,7 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const apiKey = await apiKeyUtils.generateAndStore(params, input, output)
     output.set('apiKey', apiKey)
+    output.set('apiKeyTimestamp', Date.now())
     return apiKey
   }
 
