@@ -126,9 +126,6 @@ const ProfileNftCollection = ({
     { title: 'Untitled Collections', img: undefined },
   ])
 
-  // array used to sort NFTs alphabetically
-  const sorted: any[] = []
-
   const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
