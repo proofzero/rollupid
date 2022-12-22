@@ -40,6 +40,7 @@ export const loader: LoaderFunction = async ({ request }) => {
           value: nft.contract?.address,
         },
         { name: 'NFT Standard', value: nft.contractMetadata?.tokenType },
+        { name: 'Token ID', value: BigInt(nft.id?.tokenId).toString(10) },
       ],
     }
   })

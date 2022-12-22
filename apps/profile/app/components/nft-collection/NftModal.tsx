@@ -25,9 +25,11 @@ const NftModal = ({
   handleClose: (evt: any) => void
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false)
+  const [hover, setHover] = useState(false)
   const [openedDetails, setOpenedDetails] = useState(
     nft?.properties?.length == 0
   )
+  const [copied, setCopied] = useState(false)
   const [openedProps, setOpenedProps] = useState(nft?.properties?.length > 0)
   const noProps =
     nft?.properties?.length > 0 ? '' : 'items-center justify-center text-center'
@@ -124,12 +126,12 @@ const NftModal = ({
                 id="flush-collapseOne"
                 className={
                   openedDetails
-                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-md  overflow-hidden ${noDetails}`
-                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-md  overflow-hidden ${noDetails}`
+                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-lg overflow-hidden ${noDetails}`
+                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-lg overflow-hidden ${noDetails}`
                 }
                 aria-labelledby="flush-headingOne"
               >
-                <div className="accordion-body w-[100vw] flex-wrap">
+                <div className="accordion-body w-screen flex-wrap truncate">
                   {nft?.details?.length ? (
                     nft.details.map((d: { name: string; value: any }) => {
                       return (
@@ -144,13 +146,54 @@ const NftModal = ({
                           >
                             {d.name}
                           </Text>
-                          <Text
-                            size="xs"
-                            weight="semibold"
-                            className="text-gray-700 pb-2"
-                          >
-                            {d.value}
-                          </Text>
+                          {(d.name === 'Token ID' && (
+                            <div className="flex items-center">
+                              {hover && (
+                                <Text
+                                  size="xs"
+                                  weight="semibold"
+                                  className="
+                                  pb-2 mr-2
+                                  max-w-[12rem]
+                                  md:max-w-[16rem]
+                                  lg:max-w-[18rem]
+                                  overflow-hidden"
+                                >
+                                  {copied ? 'Copied!' : 'Copy'}
+                                </Text>
+                              )}
+                              <button>
+                                <Text
+                                  size="xs"
+                                  weight="semibold"
+                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                            truncate"
+                                  onClick={async () => {
+                                    if (d.name === 'Token ID') {
+                                      navigator.clipboard.writeText(d.value)
+                                      setCopied(true)
+                                      await setTimeout(() => {
+                                        setCopied(false)
+                                      }, 1500)
+                                    }
+                                  }}
+                                  onMouseEnter={() => setHover(true)}
+                                  onMouseLeave={() => setHover(false)}
+                                >
+                                  {d.value}
+                                </Text>
+                              </button>
+                            </div>
+                          )) || (
+                            <Text
+                              size="xs"
+                              weight="semibold"
+                              className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                            truncate"
+                            >
+                              {d.value}
+                            </Text>
+                          )}
                         </div>
                       )
                     })
