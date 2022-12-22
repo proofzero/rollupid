@@ -63,7 +63,6 @@ const ModaledNft = ({ nft, isModal }: any) => {
           text-sm 
           font-semibold
           hover:shadow-xl 
-          hover:font-bold
           lg:w-[13rem]
           md:w-[14rem]
           sm:w-[15rem]
@@ -102,7 +101,9 @@ const ModaledNft = ({ nft, isModal }: any) => {
               <div className="truncate leading-none">
                 {nft.collectionTitle ? nft.collectionTitle : ' '}
               </div>
-              <HiArrowNarrowRight />
+              <div className="text-xl">
+                <HiArrowNarrowRight />
+              </div>
             </div>
           </Link>
         </div>

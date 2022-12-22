@@ -405,8 +405,15 @@ const ProfileNftCollection = ({
 
                             {curFilter === colName.title ||
                             curFilter === 'Untitled Collection' ? (
-                              <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
-                                <div>{colName.title}</div>
+                              <Text
+                                className="
+                               focus:outline-none w-full
+                                px-3 flex flex-row items-center
+                                justify-between"
+                              >
+                                <div className="truncate sm:max-w-[12rem] max-w-[17rem]">
+                                  {colName.title}
+                                </div>
                                 <HiOutlineCheck size={20} />
                               </Text>
                             ) : (
