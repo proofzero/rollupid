@@ -38,7 +38,6 @@ export function links() {
 }
 
 export const loader: LoaderFunction = async (args) => {
-  console.log('here')
   const { request, params } = args
 
   const galaxyClient = await clients.getGalaxyClient()

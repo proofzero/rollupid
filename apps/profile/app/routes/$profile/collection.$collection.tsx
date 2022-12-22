@@ -19,7 +19,6 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  console.log({ collection })
   const { targetAddress, displayName, isOwner } =
     useRouteData<ProfileData>('routes/$profile')
 
