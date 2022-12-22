@@ -126,6 +126,9 @@ const ProfileNftCollection = ({
     { title: 'Untitled Collections', img: undefined },
   ])
 
+  // array used to sort NFTs alphabetically
+  const sorted: any[] = []
+
   const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
@@ -445,29 +448,38 @@ const ProfileNftCollection = ({
               className="my-masonry-grid space-x-10"
               columnClassName="my-masonry-grid_column"
             >
-              {filteredLoadedNfts
-                .sort((a, b) => {
-                  return (
-                    a.collectionTitle?.localeCompare(b.collectionTitle) || 1
+              {filteredLoadedNfts.reduce((rendered, nft) => {
+                let index = 0
+                while (
+                  (index < sorted.length && !nft.collectionTitle) ||
+                  (index < sorted.length &&
+                    nft.collectionTitle?.localeCompare(
+                      sorted[index].collectionTitle
+                    ) > 0)
+                ) {
+                  console.log(
+                    index,
+                    nft.collectionTitle || '',
+                    sorted[index].collectionTitle || ''
                   )
-                })
-                .map((nft, i) => (
-                  // Filtering collection by
-                  // unique values
-                  // breaks the infinite scroll
-                  // plugin I resorted to this
+                  index++
+                }
 
+                sorted.splice(index, 0, nft)
+                rendered.splice(
+                  index,
+                  0,
                   <div
-                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
                     className="flex justify-center"
                   >
                     {nftRenderer(
                       nft,
                       selectedNft ===
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
                       (selectedNft: any) => {
                         setSelectedNft(
-                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
                         )
 
                         if (handleSelectedNft) {
@@ -476,7 +488,9 @@ const ProfileNftCollection = ({
                       }
                     )}
                   </div>
-                ))}
+                )
+                return rendered
+              }, [])}
             </Masonry>
           </InfiniteScroll>
         </>
