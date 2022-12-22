@@ -22,9 +22,9 @@ const {
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits,
-    encodeDataURI,
     uploadImage,
-    generateOGImage
+    generateOGImage,
+    generateOGImageFromBuffers
 } = require('./utils.js');
 
 const {
@@ -32,11 +32,6 @@ const {
 } = require('./traits.js');
 
 const canvas = require('./canvas/canvas.js');
-const { encode } = require('node:punycode');
-
-// const {
-//     animationViewer
-// } = require('./views/nftar.js');
 
 const app     = new Koa();
 app.use(bodyParser());
@@ -114,6 +109,14 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     if (blockchain.name == CHAINS.ETH && !Web3.utils.isAddress(account)) {
         ctx.throw(401, 'account is not a valid address');
     }
+
+    // Validate Cloudflare config.
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+        ctx.throw(500, 'Missing storage service configuration');
+    }
+
+    // Clone the R2 config so we can access it when ctx is no longer available in fire-and-forget requests.
+    const r2Config = JSON.parse(JSON.stringify(ctx.cloudflare.r2));
     
     // derive weight inc for each trait
     let t0, t1;
@@ -167,7 +170,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     const isNode = () => typeof window === 'undefined';
 
-    const PFP_SQUARE_DIMENSION = 1000;
+    const PFP_SQUARE_DIMENSION = 500;
     const PFP_WIDTH = PFP_SQUARE_DIMENSION;
     const PFP_HEIGHT = PFP_SQUARE_DIMENSION;
 
@@ -205,9 +208,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     t1 = performance.now();
     console.log(`Generating image took ${t1 - t0} milliseconds.`);
 
-    // nft.storage File objects are automatically uploaded.
+    // nft.storage File objects are automatically uploaded with the carfile below.
     t0 = performance.now();
-    const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
+    const png = new storage.File([pfp_blob], "image.png", {type: imageFormat});
     const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
     //const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
     t1 = performance.now();
@@ -251,31 +254,27 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     console.log(`NFT.storage metadata generation and upload scheduling took ${t1 - t0} milliseconds.`);
 
     t0 = performance.now();
-    const imageFilepath = `${metadata.ipnft}/image`
-    const coverFilepath = `${metadata.ipnft}/cover`
+    let v0 = t0;
 
-    const imageURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${imageFilepath}/public`;
-    const coverURL = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${coverFilepath}/public`;
+    const imageFilepath = `${metadata.ipnft}/image.png`
+    const coverFilepath = `${metadata.ipnft}/cover.png`
 
-    const cloudflareConfig = {
-        accountId: ctx.cloudflare.accountId,
-        imageToken: ctx.cloudflare.imageToken,
-    }
+    const imageURL = `${r2Config.publicURL}${imageFilepath}`;
+    const coverURL = `${r2Config.publicURL}${coverFilepath}`;
 
-    await uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat)
-    await uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
-    await generateOGImage(cloudflareConfig, new URL(coverURL), new URL(imageURL))
+    const imageBuffer = Buffer.from(await pfp_blob.arrayBuffer());
+    const coverBuffer = Buffer.from(await pfp_blob.arrayBuffer());
 
-    // await Promise.allSettled([
-    //     uploadImage(ctx, imageFilepath, Buffer.from(await pfp_blob.arrayBuffer()), imageFormat),
-    //     uploadImage(ctx, coverFilepath, Buffer.from(await cvr_blob.arrayBuffer()), imageFormat)
-    // ])
-    // .then(() => generateOGImage(cloudflareConfig, new URL(coverURL), new URL(imageURL)))
-    // .catch(e => console.log(`Promises error: ${e}`))
-    // .finally(() => console.log('Cloudflare Image uploads and OG generation complete.'))
+    // Fire-and-forget uploads to R2. Once this chain resolves we have a valid OG image.
+    Promise.all([
+        uploadImage(r2Config, imageFilepath, imageBuffer, imageFormat),
+        uploadImage(r2Config, coverFilepath, coverBuffer, imageFormat)
+    ])
+    .then(() => generateOGImageFromBuffers(r2Config, new URL(coverURL), new URL(imageURL), coverBuffer, imageBuffer))
+    .then(() => console.log(`Completing Cloudflare R2 uploads actually took ${performance.now() - v0} milliseconds.`))
 
     t1 = performance.now();
-    console.log(`Cloudflare Image uploads took ${t1 - t0} milliseconds.`);    
+    console.log(`Scheduling Cloudflare R2 uploads took ${t1 - t0} milliseconds.`);
 
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
@@ -324,8 +323,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     body.metadata.cover = coverURL;
 
     ctx.body = body;
-    const s1 = performance.now();
-    console.log(`Total took ${s1 - s0} milliseconds.`);
+    console.log(`Total took ${performance.now() - s0} milliseconds.`);
 });
 
 jsonrpc.method('describe', (ctx, next) => {
@@ -351,9 +349,12 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
 
-    if (!ctx.cloudflare || !ctx.cloudflare.accountId || !ctx.cloudflare.accountHash || !ctx.cloudflare.imageToken) {
-        ctx.throw(500, 'Missing image service configuration');
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+        ctx.throw(500, 'Missing storage service configuration');
     }
+
+    // Clone the R2 config so we can access it when ctx is no longer available in fire-and-forget requests.
+    const r2Config = JSON.parse(JSON.stringify(ctx.cloudflare.r2));
 
     const bkg = ctx.request.body.bkg;
     const hex = ctx.request.body.hex;
@@ -373,10 +374,10 @@ router.post('/api/v0/og-image', async (ctx, next) => {
     }
 
     // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
-    const filename = Web3.utils.keccak256(bkgURL.href + hexURL.href);
+    const filename = `${Web3.utils.keccak256(bkgURL.href + hexURL.href)}/og.png`;
 
     // Check the image service to see if the cache key already exists.
-    const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
+    const url = `${r2Config.publicURL}${filename}`;
     console.log('Checking cache:', url);
     const cacheCheck = await fetch(url);
     
@@ -387,12 +388,7 @@ router.post('/api/v0/og-image', async (ctx, next) => {
     } else if (cacheCheck.status === 404) {
         console.log(`Cache miss for ${filename}. Generating new image.`);
 
-        const cloudflareConfig = {
-            accountId: ctx.cloudflare.accountId,
-            imageToken: ctx.cloudflare.imageToken,
-        }
-
-        await generateOGImage(cloudflareConfig, bkgURL, hexURL, filename)
+        await generateOGImage(r2Config, bkgURL, hexURL, filename)
 
         ctx.set('Content-Type', 'application/json');
         ctx.body = { url };

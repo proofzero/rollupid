@@ -6,6 +6,8 @@ const FormData = require('form-data')
 const { convert } = require('convert-svg-to-png');
 const Web3 = require('web3');
 
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+
 const {
     TRAIT_CATEGORIES,
     V0_COLORS,
@@ -186,38 +188,29 @@ const encodeDataURI = async (url) => {
     })
 }
 
-// Uploads an image stream to the Cloudflare Image service with a custom ID.
-const uploadImage = async (cloudflareConfig, customId, stream, contentType = 'image/png') => {
-    // Cloudflare Image service requires we submit by POSTing FormData in order
-    // to set our own filename (cache key).
-    const form = new FormData();
-    form.append('file', stream, { filename: customId, contentType });
-    form.append('id', customId);
-    
-    // Get the headers from the FormData object so that we can pick up
-    // the dynamically generated multipart boundary.
-    const headers = form.getHeaders();
-    headers['authorization'] = `bearer ${cloudflareConfig.imageToken}`;
-    
-    return fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareConfig.accountId}/images/v1`, {
-        method: 'POST',
-        body: form,
-        headers
+// Uploads an image stream to R2 with a custom ID.
+const uploadImage = async (r2Config, customId, stream, contentType = 'image/png') => {
+
+    const client = new S3Client({
+        region: 'auto',
+        endpoint: 'https://2906425795180ede5ac707178f96406d.r2.cloudflarestorage.com/', //nftar bucket
+        credentials: {
+            accessKeyId: 'c8cbeb7c75cfc0e72a175e28fd504101',
+            secretAccessKey: '9d2c40342fa1bdeb66f34f6ec9673e0ec1e0741504e6a72c8efca233ad7a8692'
+        }
+    })
+
+    const putCommand = new PutObjectCommand({
+        Key: customId,
+        Body: stream,
+        Bucket: 'nftar',
+        ContentType: contentType,
     });
+
+    return client.send(putCommand);
 }
 
-const generateOGImage = async (cloudflareConfig, bkgURL, hexURL, filename) => {
-
-    if (!filename) {
-        // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
-        filename = Web3.utils.keccak256(bkgURL.href + hexURL.href);
-    }
-
-    // Images that are remote need to be converted to Data URIs so that we can
-    // render the SVG without triggering a cross-origin security violation.
-    const hexURI = await encodeDataURI(hexURL.href)
-    const bkgURI = await encodeDataURI(bkgURL.href)
-
+const renderAndUploadOGImage = async (r2Config, bkgURI, hexURI, filename) => {
     // Constants for populating the SVG (optional).
     const OG_WIDTH = 1200;
     const OG_HEIGHT = 630;
@@ -252,10 +245,36 @@ const generateOGImage = async (cloudflareConfig, bkgURL, hexURL, filename) => {
         }
     });
 
-    // This fire-and-forget call could fail because the image service has a race condition on uploads.
-    // It might cache miss above, get here, and then try to upload something that already exists,
-    // which will cause this to return "ERROR 5409: Resource already exists".
-    await uploadImage(cloudflareConfig, filename, pngBuffer).then(() => console.log(`Uploaded ${filename}`))
+    // We await here because we want to make sure the og:image exists.
+    await uploadImage(r2Config, filename, pngBuffer).then(() => console.log(`Uploaded ${r2Config.publicURL}${filename}`))
+}
+
+const generateOGImageFromBuffers = async (r2Config, coverURL, imageURL, coverBuffer, imageBuffer, filename) => {
+    if (!filename) {
+        // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
+        filename = `${Web3.utils.keccak256(coverURL.href + imageURL.href)}/og.png`;
+    }
+
+    // We know these are PNG streams because we generated them.
+    const hexURI = imageDataURI.encode(imageBuffer, 'image/png')
+    const bkgURI = imageDataURI.encode(coverBuffer, 'image/png')
+
+    return renderAndUploadOGImage(r2Config, bkgURI, hexURI, filename);
+}
+
+const generateOGImage = async (r2Config, bkgURL, hexURL, filename) => {
+
+    if (!filename) {
+        // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
+        filename = `${Web3.utils.keccak256(bkgURL.href + hexURL.href)}/og.png`;
+    }
+
+    // Images that are remote need to be converted to Data URIs so that we can
+    // render the SVG without triggering a cross-origin security violation.
+    const hexURI = await encodeDataURI(hexURL.href)
+    const bkgURI = await encodeDataURI(bkgURL.href)
+
+    return renderAndUploadOGImage(r2Config, bkgURI, hexURI, filename);
 }
 
 module.exports = {
@@ -265,5 +284,6 @@ module.exports = {
     generateTraits,
     encodeDataURI,
     uploadImage,
-    generateOGImage
+    generateOGImage,
+    generateOGImageFromBuffers,
 }

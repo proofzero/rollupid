@@ -19,6 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "@alch/alchemy-web3": "1.4.7",
+    "@aws-sdk/client-s3": "3.236.0",
     "@koalex/koa-json-rpc": "1.0.3",
     "alchemy-sdk": "2.0.2",
     "cheerio": "^1.0.0-rc.12",
