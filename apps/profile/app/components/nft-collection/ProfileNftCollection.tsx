@@ -457,14 +457,8 @@ const ProfileNftCollection = ({
                       sorted[index].collectionTitle
                     ) > 0)
                 ) {
-                  console.log(
-                    index,
-                    nft.collectionTitle || '',
-                    sorted[index].collectionTitle || ''
-                  )
                   index++
                 }
-
                 sorted.splice(index, 0, nft)
                 rendered.splice(
                   index,
