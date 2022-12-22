@@ -47,14 +47,21 @@ type AppListboxProps = {
 
 function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
   const [selected] = useState(
-    selectedAppIndex < 0
-      ? {
+    apps.length !== 0
+      ? selectedAppIndex < 0
+        ? {
+            clientId: 'none',
+            app: {
+              title: 'All Applications',
+            },
+          }
+        : apps[selectedAppIndex]
+      : {
           clientId: 'none',
           app: {
-            title: 'All Applications',
+            title: 'No Applications',
           },
         }
-      : apps[selectedAppIndex]
   )
 
   const setSelected = (selected: { clientId: string }) => {
@@ -75,9 +82,18 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
               <span className="flex items-center">
                 {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                 {selected.clientId === 'none' && (
-                  <HiGlobeAlt className="h-6 w-6 text-gray-300 mr-2.5" />
+                  <HiGlobeAlt
+                    className={`h-6 w-6 ${
+                      apps.length === 0 ? 'text-gray-600' : 'text-gray-300'
+                    } mr-2.5`}
+                  />
                 )}
-                <Text weight="medium" className="text-white">
+                <Text
+                  weight="medium"
+                  className={`${
+                    apps.length === 0 ? 'text-gray-600' : 'text-white'
+                  }`}
+                >
                   {selected.app.title}
                 </Text>
               </span>
@@ -90,7 +106,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
             </Listbox.Button>
 
             <Transition
-              show={open}
+              show={open && selected.clientId !== 'none'}
               as={Fragment}
               leave="transition ease-in duration-100"
               leaveFrom="opacity-100"
@@ -178,12 +194,5 @@ export default function AppSelect(props: AppSelectProps) {
   // Get the array index of the application with the given id.
   const appIndex = props.selected ? indexFor(props.apps, props.selected) : -1
 
-  const control =
-    props.apps.length > 0 ? (
-      <AppListbox apps={props.apps} selectedAppIndex={appIndex} />
-    ) : (
-      <NoApps />
-    )
-
-  return control
+  return <AppListbox apps={props.apps} selectedAppIndex={appIndex} />
 }
