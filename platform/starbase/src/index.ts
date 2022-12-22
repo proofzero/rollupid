@@ -719,53 +719,6 @@ const kb_initPlatform = openrpc.extension(schema, {
   ),
 })
 
-// kb_clearSecret
-const kb_appClearSecret = openrpc.method(schema, {
-  name: 'kb_appClearSecret',
-  auth: authCheck,
-  scopes: noScope,
-  handler: openrpc.handler(
-    async (
-      service: Readonly<RpcService>,
-      request: Readonly<RpcRequest>,
-      context: Readonly<RpcContext>
-    ) => {
-      const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
-      const lookup: KVNamespace = context.get(KEY_LOOKUP)
-      const token = context.get(KEY_TOKEN)
-
-      const [clientId] = request.params as ParamsArray
-
-      if (undefined === clientId) {
-        return openrpc.error(request, ErrorMissingClientId)
-      }
-
-      const appId = await lookup.get(clientId)
-      if (null === appId) {
-        const detail = Object.assign(
-          { data: { clientId } },
-          ErrorMappingClientId
-        )
-        return openrpc.error(request, detail)
-      }
-
-      const app = await openrpc.discover(sbApplication, {
-        id: appId,
-        token,
-        tag: 'starbase-app',
-      })
-
-      invariant(appId === app.$.id, 'object IDs must match')
-
-      const success = await app.clearSecret()
-
-      return openrpc.response(request, {
-        success,
-      })
-    }
-  ),
-})
-
 // kb_appRotateSecret
 // -----------------------------------------------------------------------------
 // Generate a new secret and store in the application (keeping old
@@ -844,7 +797,6 @@ const kb_appRotateSecret = openrpc.method(schema, {
 
 const kb_appRotateApiKey = openrpc.method(schema, {
   name: 'kb_appRotateApiKey',
-  // TODO authCheck is currently a no-op
   auth: authCheck,
   scopes: noScope,
   handler: openrpc.handler(
@@ -857,7 +809,7 @@ const kb_appRotateApiKey = openrpc.method(schema, {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
 
       // Get the ID of the app that we are rotating the secret for.
-      const clientId = _.get(request, ['params', 'clientId'])
+      const [{ clientId }] = request.params as [{ clientId: string }]
 
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
@@ -1098,7 +1050,6 @@ const methods = openrpc.methods(schema, [
   kb_appDetails,
   kb_appProfile,
   kb_appPublish,
-  kb_appClearSecret,
   kb_appRotateSecret,
   kb_appRotateApiKey,
   kb_appScopes,

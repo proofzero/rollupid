@@ -20,10 +20,6 @@ export type AppAuthCheckParams = {
   clientSecret?: string
 }
 
-export type AppClearSecretResult = {
-  success: boolean
-}
-
 export type AppRotateSecretResult = {
   secret: string
 }
@@ -35,5 +31,9 @@ export type AppAPIKeyValidityResult = {
 }
 
 export type AppAPIKeyValidityRequest = {
+  apiKey: string
+}
+
+export type AppAPIKeyResult = {
   apiKey: string
 }
