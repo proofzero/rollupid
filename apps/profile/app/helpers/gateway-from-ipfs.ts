@@ -1,6 +1,4 @@
-export const gatewayFromIpfs = (
-  ipfsUrl: string | undefined
-): string | undefined => {
+export default (ipfsUrl: string | undefined): string | undefined => {
   const regex =
     /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
   const match = ipfsUrl?.match(regex)

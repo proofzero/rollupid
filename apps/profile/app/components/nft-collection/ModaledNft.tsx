@@ -8,7 +8,7 @@ import { Link } from '@remix-run/react'
 
 import { HiArrowNarrowRight } from 'react-icons/hi'
 
-import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { gatewayFromIpfs } from '~/helpers'
 
 import missingNftSvg from '~/assets/missing-nft.svg'
 

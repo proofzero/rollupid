@@ -10,6 +10,8 @@ export async function getGalaxyClient() {
   return getSdk(gqlClient)
 }
 
-export function getCryptoAddressClient(options: RequestInit) {
+export function getCryptoAddressClient(
+  options: RequestInit<RequestInitCfProperties>
+) {
   return createAddressClient(Address, options)
 }
