@@ -87,6 +87,13 @@ export const action: ActionFunction = async ({ request, params }) => {
         updates: {
           name: formData.get('name') as string,
           published: formData.get('published') === '1' ? true : false,
+          redirectURI: formData.get('redirectURI') as string | undefined,
+          termsURL: formData.get('termsURL') as string | undefined,
+          websiteURL: formData.get('websiteURL') as string | undefined,
+          twitterUser: formData.get('twitterUser') as string | undefined,
+          mediumUser: formData.get('mediumUser') as string | undefined,
+          mirrorURL: formData.get('mirrorURL') as string | undefined,
+          discordUser: formData.get('discordUser') as string | undefined,
         },
       })
 
