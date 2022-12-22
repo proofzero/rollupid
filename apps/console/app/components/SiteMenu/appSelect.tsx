@@ -82,7 +82,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
       {({ open }) => (
         <>
           <div className="relative mt-1">
-            <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-500 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
+            <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
               <span className="flex items-center">
                 {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                 {selected.clientId === 'none' && (
@@ -128,7 +128,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
             >
               <Listbox.Options className="w-full text-gray-300">
                 <Listbox.Option
-                  className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-500 cursor-pointer"
+                  className="flex items-center px-4 py-4 border border-l-0 border-r-0 border-t-0 border-gray-700 cursor-pointer hover:bg-gray-700"
                   value={{
                     clientId: 'all',
                   }}
@@ -144,7 +144,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   <Listbox.Option key={app.clientId} value={app}>
                     {({ selected, active }) => (
                       <>
-                        <div className="flex items-center py-2 px-4 cursor-pointer">
+                        <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
                           <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
                             <Text className="text-gray-500">
                               {app.app.title.substring(0, 1)}
@@ -161,7 +161,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                 ))}
               </Listbox.Options>
 
-              <div className="w-full justify-center border border-l-0 border-r-0 border-gray-500 px-4 py-3">
+              <div className="w-full justify-center border border-l-0 border-r-0 border-gray-700 px-4 py-3">
                 <Button className="w-full" btnType="primary-alt">
                   Create Application
                 </Button>
