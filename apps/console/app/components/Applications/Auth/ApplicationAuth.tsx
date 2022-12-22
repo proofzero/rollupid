@@ -4,8 +4,19 @@ import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInpu
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 type ApplicationAuthProps = {
+  app: {
+    name: string
+    redirectURI?: string
+    termsURL?: string
+    websiteURL?: string
+    twitterUser?: string
+    mediumUser?: string
+    mirrorURL?: string
+    discordUser?: string
+  }
   oAuth: {
     appId: string
     appSecret: string
@@ -15,11 +26,21 @@ type ApplicationAuthProps = {
   onDelete: () => void
 }
 
-export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
+export const ApplicationAuth = ({
+  app,
+  oAuth,
+  onDelete,
+}: ApplicationAuthProps) => (
   <section className="flex flex-col space-y-5">
-    <Text size="2xl" weight="semibold" className="text-gray-900">
-      0xAuth
-    </Text>
+    <div className="flex flex-row justify-between space-x-5">
+      <Text size="2xl" weight="semibold" className="text-gray-900">
+        0xAuth
+      </Text>
+
+      <Button type="submit" btnType="primary-alt">
+        Save
+      </Button>
+    </div>
 
     <div className="flex space-x-5">
       <div className="flex-1">
@@ -30,6 +51,7 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
                 id="oAuthAppId"
                 label="Application ID"
                 value={oAuth.appId}
+                disabled
               />
             </div>
 
@@ -39,6 +61,7 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
                 label="Application Secret"
                 value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
                 hidden={oAuth.appSecret ? false : true}
+                disabled
               />
             </div>
 
@@ -80,41 +103,49 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
       <div className="flex flex-col md:space-y-5">
         <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
-            <Input id="appName" label="Application Name" required />
+            <Input
+              id="name"
+              label="Application Name"
+              defaultValue={app.name}
+              required
+            />
           </div>
 
           <div className="flex-1">
-            <Input id="appScopes" label="Scopes" />
+            <Input disabled id="appScopes" label="Scopes" />
           </div>
         </div>
 
         <div className="my-8 md:my-0">
-          <Input id="appDomains" label="Domain(s)" required />
+          <Input disabled id="appDomains" label="Domain(s)" required />
         </div>
 
         <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
-              id="appRedirectUrl"
+              id="redirectURI"
               label="Redirect URL"
               preLabel="http://"
               placeholder="www.example.com"
+              defaultValue={app.redirectURI}
             />
           </div>
           <div className="flex-1">
             <PreLabeledInput
-              id="appTOSUrl"
+              id="termsURL"
               label="Terms of Service URL"
               preLabel="http://"
               placeholder="www.example.com"
+              defaultValue={app.termsURL}
             />
           </div>
           <div className="flex-1">
             <PreLabeledInput
-              id="appWebsite"
+              id="websiteURL"
               label="Website"
               preLabel="http://"
               placeholder="www.example.com"
+              defaultValue={app.websiteURL}
             />
           </div>
         </div>
@@ -126,16 +157,18 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
         <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
-              id="appWebsiteLink"
+              id="websiteURL"
               label="Website"
               preLabel="https://"
+              defaultValue={app.websiteURL}
             />
           </div>
           <div className="flex-1">
             <PreLabeledInput
-              id="appTwitterLink"
+              id="twitterUser"
               label="Twitter"
               preLabel="https://twitter.com/"
+              defaultValue={app.twitterUser}
             />
           </div>
         </div>
@@ -143,16 +176,18 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
         <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
-              id="appMediumLink"
+              id="mediumUser"
               label="Medium"
               preLabel="https://medium.com/@"
+              defaultValue={app.mediumUser}
             />
           </div>
           <div className="flex-1">
             <PreLabeledInput
-              id="appMirrorLink"
+              id="mirrorURL"
               label="Mirror"
               preLabel="https://mirror.xyz/"
+              defaultValue={app.mirrorURL}
             />
           </div>
         </div>
@@ -160,9 +195,10 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
         <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
-              id="appDiscordLink"
+              id="discordUser"
               label="Discord"
               preLabel="http://discord.com/"
+              defaultValue={app.discordUser}
             />
           </div>
 

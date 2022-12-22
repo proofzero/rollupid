@@ -12,9 +12,7 @@ import { getStarbaseClient } from '~/utilities/platform.server'
 type LoaderData = {
   apps: {
     clientId: string
-    app: {
-      title: string
-    }
+    name: string
   }[]
   clientId: string | undefined
 }
@@ -28,9 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const apps = (await starbaseClient.kb_appList()) as {
       clientId: string
-      app: {
-        title: string
-      }
+      name: string
     }[]
 
     return json<LoaderData>({ apps, clientId })
@@ -47,9 +43,7 @@ type ContextType = {
   // The list of a user's applications.
   apps: {
     clientId: string
-    app: {
-      title: string
-    }
+    name: string
   }[]
   clientId: string
 }

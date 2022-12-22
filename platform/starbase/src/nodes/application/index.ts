@@ -149,7 +149,7 @@ export class StarbaseApplication {
 
     output.set('app', {
       timestamp,
-      title: clientName,
+      name: clientName,
     })
 
     return Promise.resolve(true)
@@ -167,45 +167,24 @@ export class StarbaseApplication {
   //@requiredScope('starbase.write')
   // Allow this method to update the value of the "app" field of the
   // component.
-  @requiredField('profile', [FieldAccess.Read, FieldAccess.Write])
+  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
   // The RPC method implementation.
   async update(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
-    if (!params.has('profile')) {
-      const message = `missing parameter "profile" from request`
-      // TODO need a better way to return errors:
-      // - additional RpcCallable parameter that is an error map; errors
-      //   set on that map trigger the return of a JSON-RPC error
-      //   response.
-      // - exceptions
-      return Promise.resolve({
-        error: message,
-      })
-    }
-
     // Read the supplied "profile" request parameter and write it to the
     // output "app" field, merging with the existing app data.
     const app = input.get('app')
-    const profile = params.get('profile')
+    const { updates } = Object.fromEntries(params)
 
-    // Make sure there's nothing sensitive in the parameters being
-    // updated.
-    //
-    // NB: that no extraneous fields are set should eventually be
-    // validated by application of the schema.
-    // TODO: add separate fields for secure / sensitive data
-    const updated = _.merge(
-      app,
-      _.omit(profile, ['clientId', 'clientSecret', 'published'])
-    )
-    output.set('app', updated)
+    // TODO: Need to handle published differently
+    let merged = _.merge(app, _.omit(updates, ['published']))
 
-    return Promise.resolve({
-      profile,
-    })
+    output.set('app', merged)
+
+    return Promise.resolve(merged)
   }
 
   // fetch
@@ -215,6 +194,7 @@ export class StarbaseApplication {
   //@requiredScope('starbase.read')
   @requiredField('app', [FieldAccess.Read])
   @requiredField('clientId', [FieldAccess.Read])
+  @requiredField('published', [FieldAccess.Read])
   @requiredField('secretTimestamp', [FieldAccess.Read])
   @requiredField('apiKeyTimestamp', [FieldAccess.Read])
   appFetch(
@@ -223,16 +203,23 @@ export class StarbaseApplication {
     output: RpcOutput
   ): Promise<RpcResult> {
     const clientId = input.get('clientId')
-    const app = input.get('app')
+    const published = input.get('published')
     const secretTimestamp = input.get('secretTimestamp')
     const apiKeyTimestamp = input.get('apiKeyTimestamp')
 
-    return Promise.resolve({
-      clientId,
-      app,
-      secretTimestamp,
-      apiKeyTimestamp,
-    })
+    const app = input.get('app')
+
+    return Promise.resolve(
+      _.merge(
+        {
+          clientId,
+          published,
+          secretTimestamp,
+          apiKeyTimestamp,
+        },
+        app
+      )
+    )
   }
 
   // profile

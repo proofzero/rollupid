@@ -3,9 +3,8 @@
  */
 
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { Form, useLoaderData, useSubmit } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
-import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import { getStarbaseClient } from '~/utilities/platform.server'
 import { requireJWT } from '~/utilities/session.server'
 
@@ -28,16 +27,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     clientId: string
     published: boolean
     secretTimestamp?: number
-    app: {
-      title?: string
-      redirectUrl?: string
-      tosUrl?: string
-      websiteUrl?: string
-      twitterUrl?: string
-      mediumUrl?: string
-      mirrorUrl?: string
-      discordUrl?: string
-    }
+    name: string
+    redirectURI?: string
+    termsURL?: string
+    websiteURL?: string
+    twitterUser?: string
+    mediumUser?: string
+    mirrorURL?: string
+    discordUser?: string
   }
 
   let rotatedSecret
@@ -84,6 +81,16 @@ export const action: ActionFunction = async ({ request, params }) => {
     case 'roll_app_secret':
       await starbaseClient.kb_appClearSecret(params.clientId)
       break
+    case 'update_app':
+      await starbaseClient.kb_appUpdate({
+        clientId: params.clientId,
+        updates: {
+          name: formData.get('name') as string,
+          published: formData.get('published') === '1' ? true : false,
+        },
+      })
+
+      break
   }
 
   return null
@@ -98,23 +105,27 @@ export default function AppDetailIndexPage() {
   const { app, rotatedSecret } = useLoaderData()
 
   return (
-    <ApplicationAuth
-      oAuth={{
-        appId: app.appId,
-        appSecret: rotatedSecret,
-        createdAt: new Date(app.secretTimestamp),
-        onKeyRoll: () => {
-          submit(
-            {
-              op: 'roll_app_secret',
-            },
-            {
-              method: 'post',
-            }
-          )
-        },
-      }}
-      onDelete={() => {}}
-    />
+    <Form method="post">
+      <input type="hidden" name="op" value="update_app" />
+      <ApplicationAuth
+        app={app}
+        oAuth={{
+          appId: app.appId,
+          appSecret: rotatedSecret,
+          createdAt: new Date(app.secretTimestamp),
+          onKeyRoll: () => {
+            submit(
+              {
+                op: 'roll_app_secret',
+              },
+              {
+                method: 'post',
+              }
+            )
+          },
+        }}
+        onDelete={() => {}}
+      />
+    </Form>
   )
 }

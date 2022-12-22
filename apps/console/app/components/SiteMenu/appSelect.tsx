@@ -39,9 +39,7 @@ type AppListboxProps = {
   // TODO tighten up this definition
   apps: {
     clientId: string
-    app: {
-      title: string
-    }
+    name: string
   }[]
   //
   selectedAppIndex: number
@@ -55,16 +53,12 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
       ? selectedAppIndex < 0
         ? {
             clientId: 'none',
-            app: {
-              title: 'All Applications',
-            },
+            name: 'All Applications',
           }
         : apps[selectedAppIndex]
       : {
           clientId: 'none',
-          app: {
-            title: 'No Applications',
-          },
+          name: 'No Applications',
         }
   )
 
@@ -106,7 +100,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   {selected.clientId !== 'none' && (
                     <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
                       <Text className="text-gray-500">
-                        {selected.app.title.substring(0, 1)}
+                        {selected.name.substring(0, 1)}
                       </Text>
                     </div>
                   )}
@@ -117,7 +111,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                       apps.length === 0 ? 'text-gray-600' : 'text-white'
                     }`}
                   >
-                    {selected.app.title}
+                    {selected.name}
                   </Text>
                 </span>
                 <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
@@ -157,12 +151,12 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                           <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
                             <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
                               <Text className="text-gray-500">
-                                {app.app.title.substring(0, 1)}
+                                {app.name.substring(0, 1)}
                               </Text>
                             </div>
 
                             <Text size="sm" weight="medium">
-                              {app.app.title}
+                              {app.name}
                             </Text>
                           </div>
                         </>
@@ -197,9 +191,7 @@ type AppSelectProps = {
   // TODO tighten up this definition
   apps: {
     clientId: string
-    app: {
-      title: string
-    }
+    name: string
   }[]
   // The currently selected application ID.
   selected?: string

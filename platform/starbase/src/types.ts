@@ -7,6 +7,22 @@ export type AppCreateResult = {
   clientName: string
 }
 
+export type AppUpdateRequestParams = {
+  clientId: string
+  updates: {
+    name: string
+    published: boolean
+    icon?: string
+    redirectURI?: string
+    termsURL?: string
+    websiteURL?: string
+    mirrorURL?: string
+    discordUser?: string
+    mediumUser?: string
+    twitterUser?: string
+  }
+}
+
 export type AppProfileResult = object
 
 export type AppScopesResult = {

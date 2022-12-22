@@ -69,6 +69,7 @@ import {
   ErrorMissingClientName,
   ErrorMissingClientSecret,
   ErrorMissingProfile,
+  ErrorMissingUpdates,
 } from './error'
 
 // Schema
@@ -77,9 +78,8 @@ import {
 // Import the OpenRPC schema for this API.
 import schema from './schema'
 import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
-import { AppApiKeyCheckParams } from './types'
 import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { create } from 'lodash'
+import { AppApiKeyCheckParams, AppUpdateRequestParams } from './types'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -327,7 +327,16 @@ const kb_appUpdate = openrpc.method(schema, {
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      const clientId = _.get(request, ['params', 'clientId'])
+      if (!request.params) {
+        throw new Error('Expected request params')
+      }
+
+      const reqParams = (request.params as any)[0] as AppUpdateRequestParams
+      if (!reqParams) {
+        throw new Error('Expected request params to have param object')
+      }
+
+      const { clientId, updates } = reqParams
       if (clientId === undefined) {
         return openrpc.error(request, ErrorMissingClientId)
       }
@@ -345,9 +354,8 @@ const kb_appUpdate = openrpc.method(schema, {
       // TODO guarantee that only public fields are being stored; apply
       // schema to incoming profile data.
       // NB: we should always have data here after JSON-RPC checking in place
-      const profile = _.get(request, ['params', 'profile'])
-      if (profile === null) {
-        return openrpc.error(request, ErrorMissingProfile)
+      if (updates === null) {
+        return openrpc.error(request, ErrorMissingUpdates)
       }
 
       const app = await openrpc.discover(sbApplication, {
@@ -361,14 +369,12 @@ const kb_appUpdate = openrpc.method(schema, {
       invariant(appId === app.$.id, 'object IDs must match')
 
       // Store application profile data in the app component.
-      const appResult = await app.update({
-        profile,
-      })
+      const appResult = await app.update({ updates })
 
       return openrpc.response(request, {
         account: accountURN,
         clientId,
-        profile,
+        appResult,
       })
     }
   ),
@@ -499,15 +505,18 @@ const kb_appList = openrpc.method(schema, {
 
         for (let i = 0; i < edgeListArr.length; i++) {
           const edge = edgeListArr[i]
+          const appId = ApplicationURNSpace.decode(
+            edge.dst.id as ApplicationURN
+          )
 
           const app = await openrpc.discover(sbApplication, {
             token,
             tag: 'starbase-app',
-            id: ApplicationURNSpace.decode(edge.dst.id as ApplicationURN),
+            id: appId,
           })
 
           const appListingDetails = await app.fetch()
-          appList.push(appListingDetails)
+          appList.push(_.merge(appListingDetails, appId))
         }
       }
 
