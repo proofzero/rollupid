@@ -262,6 +262,8 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const imageURL = `${r2Config.publicURL}${imageFilepath}`;
     const coverURL = `${r2Config.publicURL}${coverFilepath}`;
 
+    const ogFilename = `${Web3.utils.keccak256(coverURL + imageURL)}/og.png`
+
     const imageBuffer = Buffer.from(await pfp_blob.arrayBuffer());
     const coverBuffer = Buffer.from(await pfp_blob.arrayBuffer());
 
@@ -270,7 +272,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         uploadImage(r2Config, imageFilepath, imageBuffer, imageFormat),
         uploadImage(r2Config, coverFilepath, coverBuffer, imageFormat)
     ])
-    .then(() => generateOGImageFromBuffers(r2Config, new URL(coverURL), new URL(imageURL), coverBuffer, imageBuffer))
+    .then(() => generateOGImageFromBuffers(r2Config, coverBuffer, imageBuffer, ogFilename))
     .then(() => console.log(`Completing Cloudflare R2 uploads actually took ${performance.now() - v0} milliseconds.`))
 
     t1 = performance.now();
@@ -321,6 +323,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // that should be passed back to the OG:Image generator and other services.
     body.metadata.image = imageURL;
     body.metadata.cover = coverURL;
+    body.metadata.ogImage = `${r2Config.publicURL}${ogFilename}`;
 
     ctx.body = body;
     console.log(`Total took ${performance.now() - s0} milliseconds.`);

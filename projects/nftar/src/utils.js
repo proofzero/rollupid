@@ -249,11 +249,7 @@ const renderAndUploadOGImage = async (r2Config, bkgURI, hexURI, filename) => {
     await uploadImage(r2Config, filename, pngBuffer).then(() => console.log(`Uploaded ${r2Config.publicURL}${filename}`))
 }
 
-const generateOGImageFromBuffers = async (r2Config, coverURL, imageURL, coverBuffer, imageBuffer, filename) => {
-    if (!filename) {
-        // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
-        filename = `${Web3.utils.keccak256(coverURL.href + imageURL.href)}/og.png`;
-    }
+const generateOGImageFromBuffers = async (r2Config, coverBuffer, imageBuffer, filename) => {
 
     // We know these are PNG streams because we generated them.
     const hexURI = imageDataURI.encode(imageBuffer, 'image/png')
