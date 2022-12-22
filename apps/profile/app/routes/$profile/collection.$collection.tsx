@@ -6,9 +6,10 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { useRouteData } from '~/hooks'
 import ProfileNftOneCollection from '~/components/nft-collection/ProfileNftOneCollection'
 
-import type { ProfileData } from '../$profile'
+import type { ProfileData } from './collection'
 
 export const loader: LoaderFunction = async (args) => {
+  console.log('here')
   const { params } = args
 
   return json({
@@ -18,9 +19,8 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  console.log({ collection })
   const { targetAddress, displayName, isOwner } =
-    useRouteData<ProfileData>('routes/__profile')
+    useRouteData<ProfileData>('routes/$profile')
 
   return (
     <>

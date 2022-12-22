@@ -14,7 +14,7 @@ export type ProfileData = {
 }
 const ProfileRoute = () => {
   const { targetAddress, displayName, isOwner, pfp } =
-    useRouteData<ProfileData>('routes/__profile')
+    useRouteData<ProfileData>('routes/$profile')
 
   return (
     <>
