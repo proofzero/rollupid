@@ -109,10 +109,9 @@ export default function SiteMenu(props: KubeltMenuProps) {
           </NavLink>
 
           <NavLink
-            to={`/apps/${props.selected}/soon`}
+            to={`/apps/${props.selected}/auth`}
             end
-            className={({ isActive }) => menuItemClass(isActive, true)}
-            onClick={(e) => e.preventDefault()}
+            className={({ isActive }) => menuItemClass(isActive)}
           >
             <HiOutlineCog className="w-6 h-6" />{' '}
             <Text size="sm" weight="medium">

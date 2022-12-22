@@ -23,7 +23,7 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
 
     <div className="flex space-x-5">
       <div className="flex-1">
-        <Panel title="API Keys">
+        <Panel title="0xAuth Settings">
           <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
               <ReadOnlyInput
@@ -37,8 +37,8 @@ export const ApplicationAuth = ({ oAuth, onDelete }: ApplicationAuthProps) => (
               <ReadOnlyInput
                 id="oAuthAppSecret"
                 label="Application Secret"
-                value={oAuth.appSecret}
-                hidden
+                value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
+                hidden={oAuth.appSecret ? false : true}
               />
             </div>
 
