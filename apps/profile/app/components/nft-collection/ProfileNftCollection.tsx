@@ -448,43 +448,39 @@ const ProfileNftCollection = ({
               className="my-masonry-grid space-x-10"
               columnClassName="my-masonry-grid_column"
             >
-              {filteredLoadedNfts.reduce((rendered, nft) => {
-                let index = 0
-                while (
-                  (index < sorted.length && !nft.collectionTitle) ||
-                  (index < sorted.length &&
-                    nft.collectionTitle?.localeCompare(
-                      sorted[index].collectionTitle
-                    ) > 0)
-                ) {
-                  index++
-                }
-                sorted.splice(index, 0, nft)
-                rendered.splice(
-                  index,
-                  0,
-                  <div
-                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
-                    className="flex justify-center"
-                  >
-                    {nftRenderer(
-                      nft,
-                      selectedNft ===
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
-                      (selectedNft: any) => {
-                        setSelectedNft(
-                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
-                        )
+              {filteredLoadedNfts
+                .sort((a, b) => {
+                  if (b.collectionTitle === null) {
+                    return -1
+                  } else {
+                    return (
+                      a.collectionTitle?.localeCompare(b.collectionTitle) || 1
+                    )
+                  }
+                })
+                .map((nft, index) => {
+                  return (
+                    <div
+                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
+                      className="flex justify-center"
+                    >
+                      {nftRenderer(
+                        nft,
+                        selectedNft ===
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
+                        (selectedNft: any) => {
+                          setSelectedNft(
+                            `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
+                          )
 
-                        if (handleSelectedNft) {
-                          handleSelectedNft(selectedNft)
+                          if (handleSelectedNft) {
+                            handleSelectedNft(selectedNft)
+                          }
                         }
-                      }
-                    )}
-                  </div>
-                )
-                return rendered
-              }, [])}
+                      )}
+                    </div>
+                  )
+                })}
             </Masonry>
           </InfiniteScroll>
         </>
