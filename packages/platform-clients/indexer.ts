@@ -1,4 +1,4 @@
-import type { AccountURN } from '@kubelt/urns/account'
+import type { AddressURN } from '@kubelt/urns/address'
 
 import type { BaseApi } from './base'
 import createClient from './fetcher'
@@ -12,7 +12,7 @@ type TokenRecord = {
 
 export interface IndexerApi extends BaseApi {
   kb_setGallery(gallery: TokenRecord[]): void
-  kb_getGallery(account: AccountURN[]): object | undefined
+  kb_getGallery(addresses: AddressURN[]): object | undefined
 }
 
 export default (
