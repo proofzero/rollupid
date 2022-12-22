@@ -1,6 +1,6 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { gatewayFromIpfs } from '~/helpers'
 
 import missingNftSvg from '~/assets/missing-nft.svg'
 import { useState } from 'react'

@@ -1,25 +1,4 @@
-import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
-import { Link, useCatch, useFetcher, useLoaderData } from '@remix-run/react'
-
-import { AddressURNSpace } from '@kubelt/urns/address'
-
-import { loader as profileLoader } from '~/routes/$profile.json'
-import { getUserSession } from '~/utils/session.server'
-
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
-import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import { Cover } from '../../components/profile/cover/Cover'
-
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
-
-import HeadNav from '~/components/head-nav'
-
-import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
-import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
-
-import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
+import { useEffect, useRef, useState } from 'react'
 import {
   FaBriefcase,
   FaCamera,
@@ -28,13 +7,31 @@ import {
   FaMapMarkerAlt,
   FaTrash,
 } from 'react-icons/fa'
-import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
-import { useEffect, useRef, useState } from 'react'
 
-import social from '~/assets/social.png'
-import pepe from '~/assets/pepe.svg'
+import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import {
+  Link,
+  Outlet,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 
-import { getCryptoAddressClient, getGalaxyClient } from '~/helpers/clients'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
+import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
+import { Cover } from '~/components/profile/cover/Cover'
+import HeadNav from '~/components/head-nav'
+
+import { loader as profileLoader } from '~/routes/__profile/$profile.json'
+
+import { getUserSession } from '~/utils/session.server'
+import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
+import type { ThreeIdProfile } from '~/utils/galaxy.server'
 
 export function links() {
   return [...nftCollLinks(), ...nftModalLinks()]
@@ -43,7 +40,7 @@ export function links() {
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
 
-  const galaxyClient = await getGalaxyClient()
+  const galaxyClient = await clients.getGalaxyClient()
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
 
@@ -56,78 +53,42 @@ export const loader: LoaderFunction = async (args) => {
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
   let isOwner = false
+  let profile = null
   if (jwt) {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
+    profile = profileRes.profile as ThreeIdProfile
     loggedInUserProfile = {
-      ...profileRes.profile,
+      ...profile,
       claimed: true,
     }
 
-    if (profileRes?.profile?.defaultAddress) {
-      const urnAddress = AddressURNSpace.decode(
-        profileRes.profile.defaultAddress
-      )
+    if (profile.defaultAddress) {
+      const urnAddress = AddressURNSpace.decode(profile.defaultAddress)
 
       isOwner = urnAddress == targetAddress
     }
   }
 
-  const profileJson = await (await profileLoader(args)).json()
+  // get profile from address if not assigned from logged in user
+  if (!isOwner) {
+    profile = await (await profileLoader(args)).json()
+  }
 
   // Setup og tag data
   // check generate and return og image
-  const cacheKeyEnc = new TextEncoder().encode(
-    `og-image-${targetAddress}-${profileJson?.cover}-${profileJson?.pfp?.image}`
+  const cacheKey = await strings.cacheKey(
+    `og-image-${targetAddress}-${profile.cover}-${profile.pfp.image}`
   )
-  const cacheKeyDigest = await crypto.subtle.digest('SHA-256', cacheKeyEnc)
-  const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
-  const cacheKey = cacheKeyArray
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-  const ogImage = await fetch(`${NFTAR_URL}/v0/og-image`, {
-    cf: {
-      cacheEverything: true,
-      cacheTtl: 3600,
-      cacheKey,
-    },
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${TOKEN_NFTAR}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      bkg: profileJson?.cover,
-      hex: profileJson?.pfp?.image,
-    }),
-  })
-
-  let url
-  try {
-    url = (await ogImage.json()).url
-  } catch {
-    console.error(
-      'threeid.profile: JSON converstion failed for og:image generator. Using default social image.'
-    )
-    url = social
-  }
-
-  const addressClient = getCryptoAddressClient({
-    headers: {
-      'X-3RN': `urn:threeid:address/${targetAddress}`,
-    },
-  })
-  const voucher = await addressClient.kb_getPfpVoucher()
+  const ogImageURL = await ogImage(profile.cover, profile.pfp.image, cacheKey)
 
   return json({
-    ...profileJson,
-    originalCoverUrl: voucher?.metadata?.cover,
-    cover: profileJson?.cover,
+    ...profile,
     loggedInUserProfile,
     isOwner,
     targetAddress,
-    ogImageURL: url,
+    ogImageURL,
   })
 }
 
@@ -162,10 +123,9 @@ export const meta: MetaFunction = ({
   }
 }
 
-const ProfileRoute = () => {
+const ProfileLayout = () => {
   const {
     loggedInUserProfile,
-    originalCoverUrl,
     targetAddress,
     claimed,
     displayName,
@@ -177,11 +137,12 @@ const ProfileRoute = () => {
     cover,
     website,
   } = useLoaderData()
-
   const [coverUrl, setCoverUrl] = useState(cover)
   const [handlingCover, setHandlingCover] = useState<boolean>(false)
 
   const fetcher = useFetcher()
+
+  // watch for cover load
   useEffect(() => {
     if (fetcher.type === 'done') {
       if (fetcher.data) {
@@ -192,12 +153,14 @@ const ProfileRoute = () => {
     }
   }, [fetcher])
 
-  const handleCoverReset = async () => {
+  // reset cover to original gradient
+  // TODO: I think we can dro this
+  const deleteCoverImage = async () => {
     setHandlingCover(true)
 
     fetcher.submit(
       {
-        url: originalCoverUrl,
+        url: '',
       },
       {
         method: 'post',
@@ -206,6 +169,7 @@ const ProfileRoute = () => {
     )
   }
 
+  // handle cover upload
   const coverUploadRef = useRef<HTMLInputElement>(null)
   const handleCoverUpload = async (e: any) => {
     setHandlingCover(true)
@@ -250,11 +214,6 @@ const ProfileRoute = () => {
       )
     }
   }
-
-  const shortenedAccount = `${targetAddress.substring(
-    0,
-    4
-  )} ... ${targetAddress.substring(targetAddress.length - 4)}`
 
   useEffect(() => {
     if (!coverUrl) {
@@ -313,25 +272,23 @@ const ProfileRoute = () => {
 
             {!handlingCover && (
               <div className="flex flex-row space-x-4 items-center">
-                {originalCoverUrl && coverUrl !== originalCoverUrl && (
-                  <Button
-                    btnType={'primary'}
-                    btnSize={'sm'}
-                    onClick={async () => {
-                      await handleCoverReset()
-                    }}
-                    className="flex flex-row space-x-3 justify-center items-center"
-                    style={{
-                      opacity: 0.8,
-                    }}
-                  >
-                    <FaTrash className="text-sm" />
+                <Button
+                  btnType={'primary'}
+                  btnSize={'sm'}
+                  onClick={async () => {
+                    await deleteCoverImage()
+                  }}
+                  className="flex flex-row space-x-3 justify-center items-center"
+                  style={{
+                    opacity: 0.8,
+                  }}
+                >
+                  <FaTrash className="text-sm" />
 
-                    <Text type="span" size="sm">
-                      Delete
-                    </Text>
-                  </Button>
-                )}
+                  <Text type="span" size="sm">
+                    Delete
+                  </Text>
+                </Button>
 
                 <Button
                   btnType={'primary'}
@@ -410,7 +367,7 @@ const ProfileRoute = () => {
               weight="bold"
               size="4xl"
             >
-              {displayName ?? shortenedAccount}
+              {displayName ?? strings.shortenedAccount(targetAddress)}
             </Text>
 
             <Text
@@ -457,72 +414,11 @@ const ProfileRoute = () => {
         )}
 
         <div className="mt-12 lg:mt-24">
-          <Text
-            className="mb-8 lg:mb-12 text-gray-600"
-            size="sm"
-            weight="semibold"
-          >
-            NFT Collections
-          </Text>
-
-          <ProfileNftCollection
-            account={targetAddress}
-            pfp={pfp.image}
-            displayname={displayName}
-            isOwner={isOwner}
-            filters={true}
-            detailsModal
-          />
+          <Outlet />
         </div>
       </div>
     </div>
   )
 }
 
-export default ProfileRoute
-
-export function CatchBoundary() {
-  const caught = useCatch()
-
-  let secondary = 'Something went wrong'
-  switch (caught.status) {
-    case 404:
-      secondary = 'Page not found'
-      break
-    case 400:
-      secondary = 'Invalid address'
-      break
-    case 500:
-      secondary = 'Internal Server Error'
-      break
-  }
-  return (
-    <div className="error-screen bg-white h-full min-h-screen">
-      <div
-        style={{
-          backgroundColor: '#192030',
-        }}
-      >
-        <HeadNav
-          loggedIn={caught.data.loggedIn}
-          avatarUrl={caught.data.loggedInUserProfile?.pfp?.image}
-          isToken={caught.data.loggedInUserProfile?.pfp?.isToken}
-        />
-      </div>
-      <div
-        className="wrapper grid grid-row-3 gap-4"
-        style={{ marginTop: '-128px' }}
-      >
-        <article className="content col-span-3">
-          <div className="error justify-center items-center">
-            <p className="error-message text-center">{caught.status}</p>
-            <p className="error-secondary-message text-center">{secondary}</p>
-          </div>
-          <div className="relative -mr-20">
-            <img alt="pepe" className="m-auto pb-12" src={pepe} />
-          </div>
-        </article>
-      </div>
-    </div>
-  )
-}
+export default ProfileLayout

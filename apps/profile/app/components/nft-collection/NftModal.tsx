@@ -7,7 +7,7 @@ import nftModalStyles from './NftModal.css'
 
 import type { LinksFunction } from '@remix-run/cloudflare'
 
-import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { gatewayFromIpfs } from '~/helpers'
 
 import { useState } from 'react'
 

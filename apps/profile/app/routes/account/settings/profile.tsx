@@ -15,7 +15,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
-import { gatewayFromIpfs } from '~/helpers/gateway-from-ipfs'
+import { gatewayFromIpfs } from '~/helpers'
 import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
 
 import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { parseURN } from 'urns'
+import { ThreeIdProfile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -32,7 +33,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const parsedURN = parseURN(profileRes.profile?.defaultAddress)
+  const profile = profileRes.profile as ThreeIdProfile
+
+  const parsedURN = parseURN(profile.defaultAddress)
 
   const address = parsedURN.nss.split('/')[1]
 
