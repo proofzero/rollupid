@@ -27,13 +27,11 @@ import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
 import { Cover } from '~/components/profile/cover/Cover'
 import HeadNav from '~/components/head-nav'
 
-import { loader as profileLoader } from '~/routes/$profile.json'
+import { loader as profileLoader } from '~/routes/__profile/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
 import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
 import type { ThreeIdProfile } from '~/utils/galaxy.server'
-
-import pepe from './assets/pepe.svg'
 
 export function links() {
   return [...nftCollLinks(), ...nftModalLinks()]
