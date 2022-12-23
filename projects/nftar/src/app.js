@@ -267,12 +267,13 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     const imageBuffer = Buffer.from(await pfp_blob.arrayBuffer());
     const coverBuffer = Buffer.from(await pfp_blob.arrayBuffer());
 
-    // Fire-and-forget uploads to R2. Once this chain resolves we have a valid OG image.
+    // Fire-and-forget uploads to R2.
     Promise.all([
         uploadImage(r2Config, imageFilepath, imageBuffer, imageFormat),
         uploadImage(r2Config, coverFilepath, coverBuffer, imageFormat)
     ])
-    .then(() => generateOGImageFromBuffers(r2Config, coverBuffer, imageBuffer, ogFilename))
+    // Actually can't fire-and-forget OG generation because Cloud Run won't let Puppeteer run in the background.
+    // .then(() => generateOGImageFromBuffers(r2Config, coverBuffer, imageBuffer, ogFilename))
     .then(() => console.log(`Completing Cloudflare R2 uploads actually took ${performance.now() - v0} milliseconds.`))
 
     t1 = performance.now();
