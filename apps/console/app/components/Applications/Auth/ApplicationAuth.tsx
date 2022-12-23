@@ -10,6 +10,7 @@ import IconPicker from '~/components/IconPicker'
 type ApplicationAuthProps = {
   app: {
     name: string
+    published: boolean
     icon?: string
     redirectURI?: string
     termsURL?: string
@@ -95,7 +96,11 @@ export const ApplicationAuth = ({
       <div>
         <Panel title="Application Status">
           <div className="flex flex-col h-full justify-center">
-            <InputToggle id="published" label="Published" />
+            <InputToggle
+              id="published"
+              label="Published"
+              checked={app.published}
+            />
           </div>
         </Panel>
       </div>

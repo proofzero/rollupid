@@ -35,8 +35,8 @@ export const InputToggle = ({
         id={id}
         name={computedName}
         type="hidden"
-        checked={enabled}
-        value={enabled ? 1 : 0}
+        defaultChecked={enabled}
+        defaultValue={enabled ? 1 : 0}
       />
 
       <Switch

@@ -79,7 +79,11 @@ import {
 import schema from './schema'
 import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { AppApiKeyCheckParams, AppUpdateRequestParams } from './types'
+import {
+  AppApiKeyCheckParams,
+  AppPublishRequestParams,
+  AppUpdateRequestParams,
+} from './types'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -891,8 +895,17 @@ const kb_appPublish = openrpc.method(schema, {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const token = context.get(KEY_TOKEN)
 
-      // Get the ID of the app that we are rotating the secret for.
-      const clientId = _.get(request, ['params', 'clientId'])
+      if (!request.params) {
+        throw new Error('Expected request params')
+      }
+
+      const reqParams = (request.params as any)[0] as AppPublishRequestParams
+      if (!reqParams) {
+        throw new Error('Expected request params to have param object')
+      }
+
+      const { clientId, published } = reqParams
+
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
@@ -909,8 +922,6 @@ const kb_appPublish = openrpc.method(schema, {
         return openrpc.error(request, detail)
       }
 
-      // This is the requested publication state of the application.
-      const published = _.get(request, ['params', 'published'])
       if (typeof published !== 'boolean') {
         const detail = Object.assign(
           { data: { published } },
@@ -942,7 +953,7 @@ const kb_appPublish = openrpc.method(schema, {
           return openrpc.error(request, ErrorMissingClientSecret)
         }
         // clientName
-        const clientName = _.get(record, 'clientName')
+        const clientName = _.get(record, 'name')
         if (_.isUndefined(clientName) || clientName === '') {
           return openrpc.error(request, ErrorMissingClientName)
         }

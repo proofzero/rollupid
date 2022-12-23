@@ -8,6 +8,7 @@ import type {
   AppAPIKeyValidityResult,
   AppAPIKeyResult,
   AppUpdateRequestParams,
+  AppPublishRequestParams,
 } from '@kubelt/platform.starbase/src/types'
 
 import { BaseApi } from './base'
@@ -17,6 +18,7 @@ export interface StarbaseApi extends BaseApi {
   kb_appList(): Promise<AppProfileResult[]>
   kb_appCreate(clientName: string): Promise<AppCreateResult>
   kb_appUpdate(appUpdateParams: AppUpdateRequestParams): Promise<object>
+  kb_appPublish(params: AppPublishRequestParams): Promise<boolean>
   kb_appAuthCheck(params: AppAuthCheckParams): Promise<boolean>
   kb_appProfile(clientId: string): Promise<AppProfileResult>
   kb_appScopes(): Promise<AppScopesResult>

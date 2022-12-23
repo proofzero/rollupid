@@ -102,6 +102,13 @@ export const action: ActionFunction = async ({ request, params }) => {
         },
       })
 
+      const published = formData.get('published') === '1' ? true : false
+
+      await starbaseClient.kb_appPublish({
+        clientId: params.clientId,
+        published: published,
+      })
+
       break
   }
 

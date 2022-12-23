@@ -180,7 +180,7 @@ export class StarbaseApplication {
     const { updates } = Object.fromEntries(params)
 
     // TODO: Need to handle published differently
-    let merged = _.merge(app, _.omit(updates, ['published']))
+    const merged = _.merge(app, _.omit(updates, ['published']))
 
     output.set('app', merged)
 

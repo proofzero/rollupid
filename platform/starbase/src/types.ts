@@ -11,7 +11,6 @@ export type AppUpdateRequestParams = {
   clientId: string
   updates: {
     name: string
-    published: boolean
     icon?: string
     redirectURI?: string
     termsURL?: string
@@ -21,6 +20,11 @@ export type AppUpdateRequestParams = {
     mediumUser?: string
     twitterUser?: string
   }
+}
+
+export type AppPublishRequestParams = {
+  clientId: string
+  published: boolean
 }
 
 export type AppProfileResult = object
