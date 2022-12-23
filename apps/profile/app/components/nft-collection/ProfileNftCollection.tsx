@@ -405,8 +405,15 @@ const ProfileNftCollection = ({
 
                             {curFilter === colName.title ||
                             curFilter === 'Untitled Collection' ? (
-                              <Text className="focus:outline-none w-full px-3 flex flex-row items-center justify-between">
-                                <div>{colName.title}</div>
+                              <Text
+                                className="
+                               focus:outline-none w-full
+                                px-3 flex flex-row items-center
+                                justify-between"
+                              >
+                                <div className="truncate sm:max-w-[12rem] max-w-[17rem]">
+                                  {colName.title}
+                                </div>
                                 <HiOutlineCheck size={20} />
                               </Text>
                             ) : (
@@ -428,11 +435,6 @@ const ProfileNftCollection = ({
             next={preload ? () => {} : getMoreNfts}
             hasMore={preload ? false : pageKey != null}
             loader={<Spinner />}
-            className={`${
-              filteredLoadedNfts.length > 4
-                ? 'flex items-center justify-center'
-                : ''
-            }`}
           >
             <Masonry
               breakpointCols={{
@@ -442,7 +444,7 @@ const ProfileNftCollection = ({
                 768: 2,
                 640: 1,
               }}
-              className="my-masonry-grid space-x-10"
+              className="my-masonry-grid"
               columnClassName="my-masonry-grid_column"
             >
               {filteredLoadedNfts
@@ -459,7 +461,11 @@ const ProfileNftCollection = ({
                   return (
                     <div
                       key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
-                      className="flex justify-center"
+                      className="flex
+                      justify-center
+                      pl-[10%]
+                      w-[90%]
+                      "
                     >
                       {nftRenderer(
                         nft,

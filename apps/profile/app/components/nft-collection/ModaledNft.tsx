@@ -55,6 +55,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
           </div>
         </>
       ) : (
+        
         <div
           className="rounded-lg
           truncate
@@ -62,13 +63,8 @@ const ModaledNft = ({ nft, isModal }: any) => {
           transition-shadow
           text-sm 
           font-semibold
+          w-full
           hover:shadow-xl 
-          hover:font-bold
-          lg:w-[13rem]
-          md:w-[14rem]
-          sm:w-[15rem]
-          min-[410px]:w-[22rem]
-          w-[18rem]
           flex
           flex-col
           align-center justify-center
@@ -78,12 +74,10 @@ const ModaledNft = ({ nft, isModal }: any) => {
             <img
               className="rounded-t-lg block 
               mx-auto 
-              lg:h-[13rem] 
-              lg:max-w-[13rem]
+              lg:h-[13rem]
               md:h-[14rem]
-              md:max-w-[14rem]
               sm:h-[15rem]
-              sm:max-w-[15rem]
+              h-[20rem]
               "
               src={
                 loadFail
@@ -102,7 +96,9 @@ const ModaledNft = ({ nft, isModal }: any) => {
               <div className="truncate leading-none">
                 {nft.collectionTitle ? nft.collectionTitle : ' '}
               </div>
-              <HiArrowNarrowRight />
+              <div className="text-xl">
+                <HiArrowNarrowRight />
+              </div>
             </div>
           </Link>
         </div>

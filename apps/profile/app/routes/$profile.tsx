@@ -338,7 +338,7 @@ const ProfileLayout = () => {
         )}
       </div>
 
-      <div className="mt-3 max-w-7xl overflow-visible w-full mx-auto p-3 lg:py-0 lg:px-4">
+      <div className="mt-3 max-w-[82rem] overflow-visible w-full mx-auto p-3 lg:py-0 lg:px-4">
         {!claimed && (
           <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
             <div>
