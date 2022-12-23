@@ -53,10 +53,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
-      - name: Build Dependencies
-        run: yarn build
-        working-directory: ./packages
-
       - name: Code Generation
         run: yarn gql
 
