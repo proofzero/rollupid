@@ -5,6 +5,7 @@ import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import IconPicker from '~/components/IconPicker'
 
 type ApplicationAuthProps = {
   app: {
@@ -42,10 +43,10 @@ export const ApplicationAuth = ({
       </Button>
     </div>
 
-    <div className="flex space-x-5">
+    <div className="flex flex-col md:flex-row space-y-5 lg:space-y-0 lg:space-x-5">
       <div className="flex-1">
         <Panel title="0xAuth Settings">
-          <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+          <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
               <ReadOnlyInput
                 id="oAuthAppId"
@@ -101,7 +102,7 @@ export const ApplicationAuth = ({
 
     <Panel title="Details">
       <div className="flex flex-col md:space-y-5">
-        <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <Input
               id="name"
@@ -120,7 +121,7 @@ export const ApplicationAuth = ({
           <Input disabled id="appDomains" label="Domain(s)" required />
         </div>
 
-        <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
               id="redirectURI"
@@ -149,12 +150,16 @@ export const ApplicationAuth = ({
             />
           </div>
         </div>
+
+        <div>
+          <IconPicker id="iconURL" />
+        </div>
       </div>
     </Panel>
 
     <Panel title="Links">
       <div className="flex flex-col space-y-8 md:space-y-5">
-        <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
               id="websiteURL"
@@ -173,7 +178,7 @@ export const ApplicationAuth = ({
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
               id="mediumUser"
@@ -192,7 +197,7 @@ export const ApplicationAuth = ({
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
           <div className="flex-1">
             <PreLabeledInput
               id="discordUser"
