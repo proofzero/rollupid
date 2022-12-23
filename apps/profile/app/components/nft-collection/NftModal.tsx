@@ -25,7 +25,7 @@ const NftModal = ({
   handleClose: (evt: any) => void
 }) => {
   const [imgLoaded, setImgLoaded] = useState(false)
-  const [hover, setHover] = useState(false)
+  const [hover, setHover] = useState('')
   const [openedDetails, setOpenedDetails] = useState(
     nft?.properties?.length == 0
   )
@@ -41,7 +41,7 @@ const NftModal = ({
       <div
         className={`flex-1 relative h-max w-full sm:min-w-[37rem] sm:max-h-[35rem] sm:max-w-[58rem] h-[86vh] sm:w-[62vw]
           transform rounded-lg  bg-white px-4 pt-5 pb-4 
-         text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+         text-left shadow-xl transition-all sm:p-6 overflow-y-auto scrollable-element`}
       >
         <div className="flex flex-col justify-between lg:flex-row max-w-full ">
           <div>
@@ -89,7 +89,7 @@ const NftModal = ({
                 rounded-none bg-white mt-2 lg:mt-8 lg:mb-4"
             >
               <Text
-                className="accordion-header ml-1 text-gray-900"
+                className="accordion-header text-gray-900"
                 size="lg"
                 weight="semibold"
                 id="flush-headingOne"
@@ -126,8 +126,8 @@ const NftModal = ({
                 id="flush-collapseOne"
                 className={
                   openedDetails
-                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-lg overflow-hidden ${noDetails}`
-                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-lg overflow-hidden ${noDetails}`
+                    ? `accordion-collapse border-0 collapse show flex flex-wrap flex-row max-w-full overflow-hidden ${noDetails}`
+                    : `accordion-collapse border-0 collapse flex flex-wrap flex-row max-w-full overflow-hidden ${noDetails}`
                 }
                 aria-labelledby="flush-headingOne"
               >
@@ -146,17 +146,16 @@ const NftModal = ({
                           >
                             {d.name}
                           </Text>
-                          {(d.name === 'Token ID' && (
+                          {((d.name === 'Token ID' ||
+                            d.name === 'NFT Contract') && (
                             <div className="flex items-center">
-                              {hover && (
+                              {hover === d.name && (
                                 <Text
                                   size="xs"
                                   weight="semibold"
                                   className="
                                   pb-2 mr-2
                                   max-w-[12rem]
-                                  md:max-w-[16rem]
-                                  lg:max-w-[18rem]
                                   overflow-hidden"
                                 >
                                   {copied ? 'Copied!' : 'Copy'}
@@ -166,19 +165,17 @@ const NftModal = ({
                                 <Text
                                   size="xs"
                                   weight="semibold"
-                                  className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                                  className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
                             truncate"
                                   onClick={async () => {
-                                    if (d.name === 'Token ID') {
-                                      navigator.clipboard.writeText(d.value)
-                                      setCopied(true)
-                                      await setTimeout(() => {
-                                        setCopied(false)
-                                      }, 1500)
-                                    }
+                                    navigator.clipboard.writeText(d.value)
+                                    setCopied(true)
+                                    await setTimeout(() => {
+                                      setCopied(false)
+                                    }, 1500)
                                   }}
-                                  onMouseEnter={() => setHover(true)}
-                                  onMouseLeave={() => setHover(false)}
+                                  onMouseEnter={() => setHover(d.name)}
+                                  onMouseLeave={() => setHover('')}
                                 >
                                   {d.value}
                                 </Text>
