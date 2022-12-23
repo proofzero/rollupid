@@ -55,6 +55,7 @@ const main = async (api) => {
             bucket: process.env.INTERNAL_CLOUDFLARE_R2_BUCKET,
             endpoint: process.env.INTERNAL_CLOUDFLARE_R2_API_ENDPOINT,
             publicURL: process.env.INTERNAL_CLOUDFLARE_R2_PUBLIC_URL,
+            customDomain: process.env.INTERNAL_CLOUDFLARE_R2_CUSTOM_DOMAIN,
             accessKeyId: process.env.SECRET_CLOUDFLARE_R2_ACCESS_KEY_ID,
             secretAccessKey: process.env.SECRET_CLOUDFLARE_R2_SECRET_ACCESS_KEY
         }

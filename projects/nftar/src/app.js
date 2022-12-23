@@ -111,7 +111,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     }
 
     // Validate Cloudflare config.
-    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || 
+        !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.customDomain || 
+        !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
         ctx.throw(500, 'Missing storage service configuration');
     }
 
@@ -355,7 +357,9 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
 
-    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket ||
+        !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.customDomain || 
+        !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
         ctx.throw(500, 'Missing storage service configuration');
     }
 
@@ -384,20 +388,21 @@ router.post('/api/v0/og-image', async (ctx, next) => {
 
     // Check the image service to see if the cache key already exists.
     const url = `${r2Config.publicURL}${filename}`;
-    console.log('Checking cache:', url);
+    const customDomainURL = `${r2Config.customDomain}${filename}`;
+    console.log('Checking cache:', url, 'for', customDomainURL);
     const cacheCheck = await fetch(url);
     
     if (cacheCheck.status === 200) {
         console.log('Returning cached image url for ', filename);
         ctx.set('Content-Type', 'application/json');
-        ctx.body = { url };
+        ctx.body = { url: customDomainURL };
     } else if (cacheCheck.status === 404) {
         console.log(`Cache miss for ${filename}. Generating new image.`);
 
         await generateOGImage(r2Config, bkgURL, hexURL, filename)
 
         ctx.set('Content-Type', 'application/json');
-        ctx.body = { url };
+        ctx.body = { url: customDomainURL };
     } else {
         ctx.set('Content-Type', 'application/json');
         ctx.status = 500;
