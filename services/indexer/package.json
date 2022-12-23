@@ -40,10 +40,12 @@
     "@moralisweb3/common-core": "2.10.1",
     "@moralisweb3/evm-api": "2.10.1",
     "@moralisweb3/streams": "2.10.1",
+    "@trpc/server": "10.7.0",
     "drizzle-orm": "0.14.2",
     "drizzle-orm-sqlite": "0.14.2",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
-    "stream": "0.0.2"
+    "stream": "0.0.2",
+    "zod": "3.20.2"
   }
 }

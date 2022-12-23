@@ -4,7 +4,7 @@ import type { RpcRequest, RpcService } from '@kubelt/openrpc'
 import { IndexRpcContext } from '../../types'
 import { tokens } from '../../db/schema'
 import { sql } from 'drizzle-orm'
-import { AddressURN } from '@kubelt/urns/address'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export type GetTokensParams = AddressURN[] // addresses
 
