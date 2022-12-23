@@ -10,6 +10,7 @@ import IconPicker from '~/components/IconPicker'
 type ApplicationAuthProps = {
   app: {
     name: string
+    icon?: string
     redirectURI?: string
     termsURL?: string
     websiteURL?: string
@@ -152,7 +153,7 @@ export const ApplicationAuth = ({
         </div>
 
         <div>
-          <IconPicker id="iconURL" />
+          <IconPicker id="icon" url={app.icon} />
         </div>
       </div>
     </Panel>

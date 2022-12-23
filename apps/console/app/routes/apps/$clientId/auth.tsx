@@ -26,6 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     appId: string
     clientId: string
     published: boolean
+    icon: string
     secretTimestamp?: number
     name: string
     redirectURI?: string
@@ -90,7 +91,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         clientId: params.clientId,
         updates: {
           name: formData.get('name') as string,
-          published: formData.get('published') === '1' ? true : false,
+          icon: formData.get('icon') as string | undefined,
           redirectURI: formData.get('redirectURI') as string | undefined,
           termsURL: formData.get('termsURL') as string | undefined,
           websiteURL: formData.get('websiteURL') as string | undefined,
@@ -120,7 +121,7 @@ export default function AppDetailIndexPage() {
     useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
 
   return (
-    <Form method="post">
+    <Form method="post" encType="multipart/form-data">
       <input type="hidden" name="op" value="update_app" />
       <ApplicationAuth
         app={app}
