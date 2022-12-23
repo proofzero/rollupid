@@ -323,7 +323,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // that should be passed back to the OG:Image generator and other services.
     body.metadata.image = imageURL;
     body.metadata.cover = coverURL;
-    body.metadata.ogImage = `${r2Config.publicURL}${ogFilename}`;
+
+    // TODO: Is it useful to return the OG image URL here? If so, this needs a fix.
+    //body.metadata.ogImage = `${r2Config.publicURL}${ogFilename}`;
 
     ctx.body = body;
     console.log(`Total took ${performance.now() - s0} milliseconds.`);
