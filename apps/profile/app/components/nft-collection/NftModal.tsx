@@ -133,67 +133,72 @@ const NftModal = ({
               >
                 <div className="accordion-body w-screen flex-wrap truncate">
                   {nft?.details?.length ? (
-                    nft.details.map((d: { name: string; value: any }) => {
-                      return (
-                        <div
-                          key={d.name}
-                          className="flex flex-row justify-between"
-                        >
-                          <Text
-                            size="xs"
-                            weight="medium"
-                            className="text-gray-400 pb-2"
+                    nft.details.map(
+                      (d: {
+                        name: string
+                        value: any
+                        isCopyable: boolean
+                      }) => {
+                        return (
+                          <div
+                            key={d.name}
+                            className="flex flex-row justify-between"
                           >
-                            {d.name}
-                          </Text>
-                          {((d.name === 'Token ID' ||
-                            d.name === 'NFT Contract') && (
-                            <div className="flex items-center">
-                              {hover === d.name && (
-                                <Text
-                                  size="xs"
-                                  weight="semibold"
-                                  className="
+                            <Text
+                              size="xs"
+                              weight="medium"
+                              className="text-gray-400 pb-2"
+                            >
+                              {d.name}
+                            </Text>
+                            {(d.isCopyable && (
+                              <div className="flex items-center">
+                                {hover === d.name && (
+                                  <Text
+                                    size="xs"
+                                    weight="semibold"
+                                    className="
                                   pb-2 mr-2
                                   max-w-[12rem]
                                   overflow-hidden"
-                                >
-                                  {copied ? 'Copied!' : 'Copy'}
-                                </Text>
-                              )}
-                              <button>
-                                <Text
-                                  size="xs"
-                                  weight="semibold"
-                                  className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
+                                  >
+                                    {copied ? 'Copied!' : 'Copy'}
+                                  </Text>
+                                )}
+                                <button>
+                                  <Text
+                                    size="xs"
+                                    weight="semibold"
+                                    className="text-gray-700 pb-2 max-w-[12rem] sm:max-w-[19rem] lg:max-w-[17rem] 
                             truncate"
-                                  onClick={async () => {
-                                    navigator.clipboard.writeText(d.value)
-                                    setCopied(true)
-                                    await setTimeout(() => {
-                                      setCopied(false)
-                                    }, 1500)
-                                  }}
-                                  onMouseEnter={() => setHover(d.name)}
-                                  onMouseLeave={() => setHover('')}
-                                >
-                                  {d.value}
-                                </Text>
-                              </button>
-                            </div>
-                          )) || (
-                            <Text
-                              size="xs"
-                              weight="semibold"
-                              className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
+                                    onClick={async () => {
+                                      navigator.clipboard.writeText(d.value)
+                                      setCopied(true)
+                                      await setTimeout(() => {
+                                        setCopied(false)
+                                      }, 1500)
+                                    }}
+                                    onMouseEnter={() => setHover(d.name)}
+                                    onMouseLeave={() => setHover('')}
+                                  >
+                                    {d.value}
+                                  </Text>
+                                </button>
+                              </div>
+                            )) || (
+                              <Text
+                                size="xs"
+                                weight="semibold"
+                                className="text-gray-700 pb-2 max-w-[12rem] md:max-w-[16rem] lg:max-w-[18rem] 
                             truncate"
-                            >
-                              {d.value}
-                            </Text>
-                          )}
-                        </div>
-                      )
-                    })
+                              >
+                                {d.value}
+                              </Text>
+                            )}
+                          </div>
+                        )
+                      }
+                    )
                   ) : (
                     <div className="accordion-body text-gray-400 items-center justify-center text-center">
                       No details

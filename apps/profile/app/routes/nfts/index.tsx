@@ -59,9 +59,18 @@ export const loader: LoaderFunction = async ({ request }) => {
         {
           name: 'NFT Contract',
           value: nft.contract?.address,
+          isCopyable: true,
         },
-        { name: 'NFT Standard', value: nft.contractMetadata?.tokenType },
-        { name: 'Token ID', value: BigInt(nft.id?.tokenId).toString(10) },
+        {
+          name: 'NFT Standard',
+          value: nft.contractMetadata?.tokenType,
+          isCopyable: false,
+        },
+        {
+          name: 'Token ID',
+          value: BigInt(nft.id?.tokenId).toString(10),
+          isCopyable: true,
+        },
       ],
     }
   })
