@@ -1,4 +1,4 @@
-import { BaseURN, URNSpace, parseURN } from 'urns'
+import { BaseURN, URNSpace } from 'urns'
 
 export { parseURN }
 
