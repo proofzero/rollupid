@@ -15,17 +15,14 @@ if (!sessionSecret) {
 
 const storage = createCookieSessionStorage({
   cookie: {
-    name: '3ID_SESSION',
     domain: COOKIE_DOMAIN,
-    // normally you want this to be `secure: true`
-    // but that doesn't work on localhost for Safari
-    // https://web.dev/when-to-use-local-https/
-    secure: true,
-    secrets: [sessionSecret],
-    sameSite: true,
+    name: '3ID_SESSION',
     path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV == 'production',
     maxAge: 60 * 60 * 4,
     httpOnly: true,
+    secrets: [sessionSecret],
   },
 })
 

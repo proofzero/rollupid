@@ -6,6 +6,7 @@ export interface Environment {
   Edges: Fetcher
   CryptoAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
+  OAuthAddress: DurableObjectNamespace
 
   COLLECTIONS: D1Database
 
@@ -25,11 +26,16 @@ export interface AddressRpcContext extends RpcContext {
 export enum NodeType {
   Crypto = 'crypto',
   Contract = 'contract',
+  OAuth = 'oauth',
 }
 
 export enum CryptoAddressType {
   Ethereum = 'ethereum',
   ETH = 'eth',
+}
+
+export enum OAuthAddressType {
+  Google = 'google',
 }
 
 export interface Challenge {
@@ -44,6 +50,8 @@ export interface Challenge {
 export type SetAccountParams = [account: string]
 
 export type UnsetAccountParams = [account: string]
+
+export type SetDataParams = [data: object]
 
 export type GetNonceParams = [
   address: string,

@@ -5,7 +5,8 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" },
+  { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
 
 services = [
@@ -16,7 +17,7 @@ services = [
 [[queues.producers]]
  queue = "blockchain-activity"
  binding = "BLOCKCHAIN_ACTIVITY"
- 
+
 [[queues.consumers]]
 queue = "blockchain-activity"
 max_batch_size = 1 # optional: defaults to 10
@@ -44,9 +45,14 @@ tag = "v2"
 renamed_classes = [{ from = "CryptoCore", to = "CryptoAddress" }]
 deleted_classes = ["Core"]
 
+[[migrations]]
+tag = "v3"
+new_classes = ["OAuthAddress"]
+
 [env.dev]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" },
+  { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
 services = [
   { binding = "Access", service = "access-dev" },
@@ -60,7 +66,8 @@ NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" },
+  { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
 services = [
   { binding = "Access", service = "access-next" },
@@ -74,7 +81,8 @@ NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" }
+  { name = "CryptoAddress", class_name = "CryptoAddress" },
+  { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
 services = [
   { binding = "Access", service = "access-current" },

@@ -8,6 +8,8 @@ import resolveAccount from './methods/resolveAccount'
 import getAccount from './methods/getAccount'
 import setAccount from './methods/setAccount'
 import unsetAccount from './methods/unsetAccount'
+import getData from './methods/getData'
+import setData from './methods/setData'
 import getNonce from './methods/getNonce'
 import verifyNonce from './methods/verifyNonce'
 import getAddressProfile from './methods/getAddressProfile'
@@ -18,7 +20,9 @@ import parse3RN from './middlewares/parse3RN'
 import checkCryptoNode from './middlewares/checkCryptoNode'
 import resolveENS from './middlewares/resolveENS'
 import setCryptoNodeClient from './middlewares/setCryptoNodeClient'
+import setOAuthNodeClient from './middlewares/setOAuthNodeClient'
 import initCryptoNode from './middlewares/initCryptoNode'
+import initOAuthNode from './middlewares/initOAuthNode'
 
 const rpcHandler = openrpc.build(
   openrpc.service(
@@ -44,6 +48,16 @@ const rpcHandler = openrpc.build(
         name: 'kb_unsetAccount',
         scopes: openrpc.scopes([]),
         handler: openrpc.handler(unsetAccount),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_getData',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(getData),
+      }),
+      openrpc.method(schema, {
+        name: 'kb_setData',
+        scopes: openrpc.scopes([]),
+        handler: openrpc.handler(setData),
       }),
       openrpc.method(schema, {
         name: 'kb_getNonce',
@@ -81,7 +95,9 @@ const rpcHandler = openrpc.build(
     openrpc.middleware(checkCryptoNode),
     openrpc.middleware(resolveENS),
     openrpc.middleware(setCryptoNodeClient),
+    openrpc.middleware(setOAuthNodeClient),
     openrpc.middleware(initCryptoNode),
+    openrpc.middleware(initOAuthNode),
   ])
 )
 
@@ -91,6 +107,7 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('Edges', env.Edges)
   context.set('CryptoAddress', env.CryptoAddress)
   context.set('ContractAddress', env.ContractAddress)
+  context.set('OAuthAddress', env.OAuthAddress)
   context.set('COLLECTIONS', env.COLLECTIONS)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)

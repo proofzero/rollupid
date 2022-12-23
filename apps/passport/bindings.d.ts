@@ -12,4 +12,8 @@ declare global {
   const CONSOLE_APP_URL: string
   const PASSPORT_REDIRECT_URL: string
   const APIKEY_ALCHEMY_PUBLIC: string
+
+  const INTERNAL_GOOGLE_OAUTH_CLIENT_ID: string
+  const SECRET_GOOGLE_OAUTH_CLIENT_SECRET: string
+  const INTERNAL_GOOGLE_OAUTH_CALLBACK_URL: string
 }
