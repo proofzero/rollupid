@@ -49,5 +49,5 @@ jobs:
             SECRET_SESSION_SALT
             TOKEN_NFTAR
         env:
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_PROD }}
           TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_PROD }}
