@@ -235,36 +235,6 @@ const ProfileNftOneCollection = ({
         </>
       )}
 
-      {filters && (
-        <div className="flex flex-col lg:flex-row justify-between items-center my-5">
-          <select
-            id="collection"
-            name="collection"
-            className="w-full lg:w-auto mt-1 block rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            defaultValue="All Collections"
-            onChange={(evt) => {
-              setColFilter(evt.target.value)
-            }}
-          >
-            <option>All Collections</option>
-            {loadedNfts
-              .map((n) => n.collectionTitle)
-              .filter((val, ind, arr) => arr.indexOf(val) === ind)
-              .map((colName, i) => (
-                <option key={`${colName}_${i}`}>{colName}</option>
-              ))}
-          </select>
-
-          <InputText
-            heading=""
-            Icon={FaSearch}
-            onChange={(val) => {
-              setTextFilter(val)
-            }}
-          />
-        </div>
-      )}
-
       {loadedNfts.length > 0 && (
         <>
           <Link to={`/${account}`}>
