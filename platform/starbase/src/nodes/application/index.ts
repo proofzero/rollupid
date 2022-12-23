@@ -321,13 +321,15 @@ export class StarbaseApplication {
   @method('validateApiKey')
   //@requiredScope()
   @requiredField('apiKeySigningKeyPair', [FieldAccess.Read])
+  @requiredField('apiKey', [FieldAccess.Read])
   async validateApiKey(
     params: RpcParams,
     input: RpcInput,
     output: RpcOutput
   ): Promise<RpcResult> {
-    const validResult = await apiKeyUtils.verify(params, input, output)
-    return validResult
+    const providedKey = params.get('apiKey')
+    const validJWTForClient = await apiKeyUtils.verify(params, input, output)
+    return validJWTForClient && providedKey == input.get('apiKey')
   }
 
   // publish
