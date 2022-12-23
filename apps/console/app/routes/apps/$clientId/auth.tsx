@@ -3,7 +3,7 @@
  */
 
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { Form, useLoaderData, useSubmit } from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import { getStarbaseClient } from '~/utilities/platform.server'
 import { requireJWT } from '~/utilities/session.server'
@@ -67,6 +67,8 @@ export const action: ActionFunction = async ({ request, params }) => {
     throw new Error('Application client id is required for the requested route')
   }
 
+  let rotatedSecret
+
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
 
@@ -79,7 +81,9 @@ export const action: ActionFunction = async ({ request, params }) => {
   // populating the values if empty
   switch (op) {
     case 'roll_app_secret':
-      await starbaseClient.kb_appClearSecret(params.clientId)
+      rotatedSecret = (
+        await starbaseClient.kb_appRotateSecret(params.clientId)
+      ).secret.split(':')[1]
       break
     case 'update_app':
       await starbaseClient.kb_appUpdate({
@@ -100,7 +104,9 @@ export const action: ActionFunction = async ({ request, params }) => {
       break
   }
 
-  return null
+  return {
+    rotatedSecret,
+  }
 }
 
 // Component
@@ -109,7 +115,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
 
-  const { app, rotatedSecret } = useLoaderData()
+  const { app } = useLoaderData()
+  const rotatedSecret =
+    useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
 
   return (
     <Form method="post">
