@@ -40,6 +40,9 @@ export default /* GraphQL */ `
   type Contract {
     address: String
   }
+  type Id {
+    tokenId: String
+  }
   type TokenURI {
     raw: String
     gateway: String
@@ -63,6 +66,7 @@ export default /* GraphQL */ `
     contract: Contract
     title: String
     description: String
+    id: Id
     tokenUri: TokenURI
     media: [NFTMedia!]!
     error: String
@@ -80,6 +84,7 @@ export default /* GraphQL */ `
     contract: Contract
     title: String
     description: String
+    id: Id
     tokenUri: TokenURI
     media: [NFTMedia!]!
     error: String
