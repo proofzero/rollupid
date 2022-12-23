@@ -329,7 +329,7 @@ export class StarbaseApplication {
   ): Promise<RpcResult> {
     const providedKey = params.get('apiKey')
     const validJWTForClient = await apiKeyUtils.verify(params, input, output)
-    return validJWTForClient && providedKey == input.get('apiKey')
+    return validJWTForClient && providedKey === input.get('apiKey')
   }
 
   // publish
