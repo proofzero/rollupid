@@ -56,5 +56,5 @@ jobs:
             SECRET_SESSION_SALT
         env:
           # A secret used for session encryption.
-          SECRET_SESSION_SALT: 'foobar'
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           # CF_ROUTE: https://console-dev.kubelt.com/*

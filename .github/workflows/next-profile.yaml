@@ -53,5 +53,5 @@ jobs:
             SECRET_SESSION_SALT
             TOKEN_NFTAR
         env:
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
           TOKEN_NFTAR: ${{ secrets.INTERNAL_NFTAR_TEST }}

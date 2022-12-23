@@ -49,5 +49,5 @@ jobs:
             SECRET_SESSION_SALT
             APIKEY_ALCHEMY_PUBLIC
         env:
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_PROD }}
           APIKEY_ALCHEMY_PUBLIC: ${{ secrets.APIKEY_ALCHEMY_PUBLIC_MAINNET }}

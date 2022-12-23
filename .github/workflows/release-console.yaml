@@ -48,4 +48,4 @@ jobs:
             SECRET_SESSION_SALT
         env:
           # A secret used for session encryption.
-          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT }}
+          SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_PROD }}
