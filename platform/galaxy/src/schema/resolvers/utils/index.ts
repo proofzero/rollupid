@@ -63,7 +63,19 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
       apiKey: apiKey
     }
     const starbaseClient = createStarbaseClient(env.Starbase)
-    const apiKeyValidity = await starbaseClient.kb_appApiKeyCheck(keyObj)
+
+    let apiKeyValidity
+    try {
+      apiKeyValidity = await starbaseClient.kb_appApiKeyCheck(keyObj)
+    } catch (e) {
+      throw new GraphQLYogaError('Unable to validate given API key.', {
+        extensions: {
+          http: {
+            status: 401
+          }
+        }
+      })
+    }
 
     if (!apiKeyValidity.valid) {
       throw new GraphQLYogaError('Invalid API key provided.', {
