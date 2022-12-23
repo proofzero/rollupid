@@ -445,32 +445,39 @@ const ProfileNftCollection = ({
               className="my-masonry-grid space-x-10"
               columnClassName="my-masonry-grid_column"
             >
-              {filteredLoadedNfts.map((nft, i) => (
-                // Filtering collection by
-                // unique values
-                // breaks the infinite scroll
-                // plugin I resorted to this
+              {filteredLoadedNfts
+                .sort((a, b) => {
+                  if (b.collectionTitle === null) {
+                    return -1
+                  } else {
+                    return (
+                      a.collectionTitle?.localeCompare(b.collectionTitle) || 1
+                    )
+                  }
+                })
+                .map((nft, index) => {
+                  return (
+                    <div
+                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
+                      className="flex justify-center"
+                    >
+                      {nftRenderer(
+                        nft,
+                        selectedNft ===
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
+                        (selectedNft: any) => {
+                          setSelectedNft(
+                            `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
+                          )
 
-                <div
-                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                  className="flex justify-center"
-                >
-                  {nftRenderer(
-                    nft,
-                    selectedNft ===
-                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
-                    (selectedNft: any) => {
-                      setSelectedNft(
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
-                      )
-
-                      if (handleSelectedNft) {
-                        handleSelectedNft(selectedNft)
-                      }
-                    }
-                  )}
-                </div>
-              ))}
+                          if (handleSelectedNft) {
+                            handleSelectedNft(selectedNft)
+                          }
+                        }
+                      )}
+                    </div>
+                  )
+                })}
             </Masonry>
           </InfiniteScroll>
         </>
