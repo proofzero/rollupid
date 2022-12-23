@@ -77,6 +77,7 @@ type KubeltMenuProps = {
   apps: {
     clientId: string
     name: string
+    icon: string
   }[]
   // Current selected application ID.
   selected?: string

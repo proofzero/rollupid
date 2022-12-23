@@ -7,6 +7,8 @@ import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import { getStarbaseClient } from '~/utilities/platform.server'
 import { requireJWT } from '~/utilities/session.server'
+import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
+import { useState } from 'react'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -127,28 +129,43 @@ export default function AppDetailIndexPage() {
   const rotatedSecret =
     useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
   return (
-    <Form method="post" encType="multipart/form-data">
-      <input type="hidden" name="op" value="update_app" />
-      <ApplicationAuth
-        app={app}
-        oAuth={{
-          appId: app.appId,
-          appSecret: rotatedSecret,
-          createdAt: new Date(app.secretTimestamp),
-          onKeyRoll: () => {
-            submit(
-              {
-                op: 'roll_app_secret',
-              },
-              {
-                method: 'post',
-              }
-            )
-          },
+    <>
+      <DeleteAppModal
+        clientId={app.clientId}
+        appName={app.name}
+        deleteAppCallback={() => {
+          setDeleteModalOpen(false)
         }}
-        onDelete={() => {}}
+        isOpen={deleteModalOpen}
       />
-    </Form>
+
+      <Form method="post" encType="multipart/form-data">
+        <input type="hidden" name="op" value="update_app" />
+        <ApplicationAuth
+          app={app}
+          oAuth={{
+            appId: app.appId,
+            appSecret: rotatedSecret,
+            createdAt: new Date(app.secretTimestamp),
+            onKeyRoll: () => {
+              submit(
+                {
+                  op: 'roll_app_secret',
+                },
+                {
+                  method: 'post',
+                }
+              )
+            },
+          }}
+          onDelete={() => {
+            setDeleteModalOpen(true)
+          }}
+        />
+      </Form>
+    </>
   )
 }

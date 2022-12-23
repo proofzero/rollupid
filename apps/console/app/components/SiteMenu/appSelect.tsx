@@ -40,6 +40,7 @@ type AppListboxProps = {
   apps: {
     clientId: string
     name: string
+    icon: string
   }[]
   //
   selectedAppIndex: number
@@ -54,11 +55,13 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
         ? {
             clientId: 'none',
             name: 'All Applications',
+            icon: undefined,
           }
         : apps[selectedAppIndex]
       : {
           clientId: 'none',
           name: 'No Applications',
+          icon: undefined,
         }
   )
 
@@ -99,9 +102,14 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
 
                   {selected.clientId !== 'none' && (
                     <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
-                      <Text className="text-gray-500">
-                        {selected.name.substring(0, 1)}
-                      </Text>
+                      {!selected.icon && (
+                        <Text className="text-gray-500">
+                          {selected.name.substring(0, 1)}
+                        </Text>
+                      )}
+                      {selected.icon && (
+                        <img src={selected.icon} className="object-cover" />
+                      )}
                     </div>
                   )}
 
@@ -150,9 +158,14 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                         <>
                           <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
                             <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
-                              <Text className="text-gray-500">
-                                {app.name.substring(0, 1)}
-                              </Text>
+                              {!app.icon && (
+                                <Text className="text-gray-500">
+                                  {app.name.substring(0, 1)}
+                                </Text>
+                              )}
+                              {app.icon && (
+                                <img src={app.icon} className="object-cover" />
+                              )}
                             </div>
 
                             <Text size="sm" weight="medium">
@@ -192,6 +205,7 @@ type AppSelectProps = {
   apps: {
     clientId: string
     name: string
+    icon: string
   }[]
   // The currently selected application ID.
   selected?: string

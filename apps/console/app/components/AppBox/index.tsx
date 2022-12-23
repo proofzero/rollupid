@@ -17,6 +17,7 @@ type AppBoxProps = {
     clientId: string
     name: string
     timestamp: number
+    icon: string
   }[]
   // Link target for creating a new application.
   createLink: string
@@ -31,6 +32,7 @@ export default function AppBox(props: AppBoxProps) {
     created: new Date(app.timestamp),
     name: app.name,
     published: false,
+    icon: app.icon,
   }))
 
   return (

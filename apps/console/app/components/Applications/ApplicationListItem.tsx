@@ -35,20 +35,21 @@ export type ApplicationListItemProps = {
   id: string
   name: string
   created: Date
-  iconUrl?: string
+  icon?: string
   published?: boolean
-  panel?: React.ReactNode
+  onDeleteApplication?: (clientId: string, appName: string) => void
 }
 export const ApplicationListItem = ({
   id,
   name,
   created,
-  iconUrl,
+  icon,
   published,
+  onDeleteApplication,
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
     <section>
-      <ApplicationListItemIcon title={name} iconUrl={iconUrl} />
+      <ApplicationListItemIcon title={name} iconUrl={icon} />
     </section>
 
     <section className="px-4 flex-1">
@@ -103,7 +104,9 @@ export const ApplicationListItem = ({
                 as="div"
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
                 onClick={() => {
-                  /* Need to handle */
+                  if (onDeleteApplication) {
+                    onDeleteApplication(id, name)
+                  }
                 }}
               >
                 <HiOutlineTrash className="text-xl font-normal text-red-500" />

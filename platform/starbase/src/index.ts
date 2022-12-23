@@ -405,10 +405,19 @@ const kb_appDelete = openrpc.method(schema, {
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      // TODO better typing
-      // TODO once we conformance check the request against the schema, we
-      // can be sure that the required parameter(s) are present.
-      const clientId = _.get(request, ['params', 'clientId'])
+      if (!request.params) {
+        throw new Error('Expected request params')
+      }
+
+      const reqParams = (request.params as any)[0] as {
+        clientId: string
+      }
+      if (!reqParams) {
+        throw new Error('Expected request params to have param object')
+      }
+
+      const { clientId } = reqParams
+
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === clientId) {

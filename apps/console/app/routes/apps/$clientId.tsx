@@ -44,6 +44,7 @@ type ContextType = {
   apps: {
     clientId: string
     name: string
+    icon: string
   }[]
   clientId: string
 }
