@@ -64,10 +64,6 @@ const ModaledNft = ({ nft, isModal }: any) => {
           font-semibold
           w-full
           hover:shadow-xl 
-          lg:h-[13rem]
-          md:h-[14rem]
-          sm:h-[15rem]
-          h-[20rem]
           flex
           flex-col
           align-center justify-center
@@ -75,9 +71,13 @@ const ModaledNft = ({ nft, isModal }: any) => {
         >
           <Link to={`./${nft.details[0].value}`}>
             <img
-              className="rounded-t-lg block 
-              mx-auto 
-              w-fit
+              className="rounded-t-lg block
+                lg:h-[13rem]
+                md:h-[14rem]
+                sm:h-[15rem]
+                h-[20rem]
+                object-contain 
+                mx-auto 
               "
               src={
                 loadFail
