@@ -273,8 +273,12 @@ const nftsResolvers: Resolvers = {
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
+      const filteredContracts = contracts.filter(
+        (contract) => contract.ownedNfts
+      )
+
       return {
-        contracts,
+        contracts: filteredContracts,
       }
     },
   },
