@@ -64,6 +64,10 @@ const ModaledNft = ({ nft, isModal }: any) => {
           font-semibold
           w-full
           hover:shadow-xl 
+          lg:h-[13rem]
+          md:h-[14rem]
+          sm:h-[15rem]
+          h-[20rem]
           flex
           flex-col
           align-center justify-center
