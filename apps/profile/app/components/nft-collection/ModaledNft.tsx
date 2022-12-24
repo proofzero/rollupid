@@ -55,7 +55,6 @@ const ModaledNft = ({ nft, isModal }: any) => {
           </div>
         </>
       ) : (
-        
         <div
           className="rounded-lg
           truncate
@@ -65,6 +64,10 @@ const ModaledNft = ({ nft, isModal }: any) => {
           font-semibold
           w-full
           hover:shadow-xl 
+          lg:h-[13rem]
+          md:h-[14rem]
+          sm:h-[15rem]
+          h-[20rem]
           flex
           flex-col
           align-center justify-center
@@ -74,10 +77,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
             <img
               className="rounded-t-lg block 
               mx-auto 
-              lg:h-[13rem]
-              md:h-[14rem]
-              sm:h-[15rem]
-              h-[20rem]
+              w-fit
               "
               src={
                 loadFail
