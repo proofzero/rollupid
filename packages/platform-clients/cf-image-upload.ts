@@ -15,7 +15,9 @@ class CFImageUploadClient implements IImageUploadClient {
   }
 
   async getImageUploadUrl(): Promise<string> {
-    const res = await this.#imagesFetcher.fetch('http://127.0.0.1/upload')
+    const res = await this.#imagesFetcher.fetch('http://127.0.0.1/upload', {
+      method: 'POST',
+    })
 
     try {
       const { uploadURL } = (await res.clone().json()) as CfImageUploadUrlRes
