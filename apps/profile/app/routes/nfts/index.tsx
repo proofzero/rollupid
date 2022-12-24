@@ -48,6 +48,27 @@ export const loader: LoaderFunction = async ({ request }) => {
     if (nft.error) {
       error = true
     }
+
+    const details = [
+      {
+        name: 'NFT Contract',
+        value: nft.contract?.address,
+        isCopyable: true,
+      },
+      {
+        name: 'NFT Standard',
+        value: nft.contractMetadata?.tokenType,
+        isCopyable: false,
+      },
+    ]
+    if (nft.id && nft.id.tokenId) {
+      details.push({
+        name: 'Token ID',
+        value: BigInt(nft.id?.tokenId).toString(10),
+        isCopyable: true,
+      })
+    }
+
     return {
       url: gatewayFromIpfs(media?.raw),
       thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
@@ -55,23 +76,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       title: nft.title,
       collectionTitle: nft.contractMetadata?.name,
       properties: nft.metadata?.properties,
-      details: [
-        {
-          name: 'NFT Contract',
-          value: nft.contract?.address,
-          isCopyable: true,
-        },
-        {
-          name: 'NFT Standard',
-          value: nft.contractMetadata?.tokenType,
-          isCopyable: false,
-        },
-        {
-          name: 'Token ID',
-          value: BigInt(nft.id?.tokenId).toString(10),
-          isCopyable: true,
-        },
-      ],
+      details,
     }
   })
 
