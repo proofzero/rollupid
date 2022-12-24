@@ -55,7 +55,6 @@ const ModaledNft = ({ nft, isModal }: any) => {
           </div>
         </>
       ) : (
-        
         <div
           className="rounded-lg
           truncate
@@ -72,12 +71,13 @@ const ModaledNft = ({ nft, isModal }: any) => {
         >
           <Link to={`./${nft.details[0].value}`}>
             <img
-              className="rounded-t-lg block 
-              mx-auto 
-              lg:h-[13rem]
-              md:h-[14rem]
-              sm:h-[15rem]
-              h-[20rem]
+              className="rounded-t-lg block
+                lg:h-[13rem]
+                md:h-[14rem]
+                sm:h-[15rem]
+                h-[20rem]
+                object-contain 
+                mx-auto 
               "
               src={
                 loadFail
