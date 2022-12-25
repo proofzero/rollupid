@@ -1,25 +1,27 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcRequest, RpcService } from '@kubelt/openrpc'
-
-import { IndexRpcContext } from '../../types'
-import { tokens } from '../../db/schema'
-import { sql } from 'drizzle-orm'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { z } from 'zod'
+import { Context } from '../../context'
+import { AddressURN } from '@kubelt/urns/address'
+import { AddressURNInput } from '../middlewares/inputValidators'
 
 export type GetTokensParams = AddressURN[] // addresses
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<IndexRpcContext>
-) => {
-  const addressUrns = request.params as GetTokensParams
-  const db = context.collectionDB
-  const gallery = await db
-    .select(tokens)
-    .where(sql`addressURN IN (${addressUrns})`)
-    // TODO: join with collections table to get collection meta
-    .all()
+export const GetTokensInput = z.array(AddressURNInput)
 
-  return openrpc.response(request, { gallery })
+export const getTokensMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetTokensParams
+  ctx: Context
+}) => {
+  const galleryStmt = await ctx.COLLECTIONS?.prepare(
+    `SELECT * FROM tokens WHERE addressURN IN (${input.join(
+      ','
+    )})`
+  )
+  const gallery = await galleryStmt?.all()
+
+  return {
+    gallery,
+  }
 }

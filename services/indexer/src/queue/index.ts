@@ -1,5 +1,6 @@
-import jsonrpc from '../jsonrpc'
-import { Environment } from '../types'
+import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import { appRouter } from '../jsonrpc/router'
+import { createContext } from '../context'
 
 type Message = {
   method: string
@@ -7,10 +8,11 @@ type Message = {
 }
 export default async (
   batch: MessageBatch<Message>,
-  env: Environment,
   ctx: ExecutionContext
 ): Promise<void> => {
   console.log({ batch })
+
+  
 
   batch.messages.map(async (message) => {
     const req = new Request('', {
@@ -18,6 +20,11 @@ export default async (
       body: message.body.body,
     })
 
-    await jsonrpc(req, env, ctx)
+    await fetchRequestHandler({
+      endpoint: '/trpc',
+      req,
+      router: appRouter,
+      createContext,
+    })
   })
 }

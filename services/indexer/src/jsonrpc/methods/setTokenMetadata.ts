@@ -1,23 +1,30 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcRequest, RpcService } from '@kubelt/openrpc'
+import { z } from 'zod'
+import { Context } from '../../context'
 
-import { IndexRpcContext } from '../../types'
-
-export type SetTokenMetadataParams = [
+export type SetTokenMetadataParams = {
   tokenId: string,
   contract: string,
   metadata: string
-]
+}
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<IndexRpcContext>
-) => {
-  const [tokenId, contract, metadata] = request.params as SetTokenMetadataParams
+export const SetTokenMetadataInput = z.object({
+  tokenId: z.string(),
+  contract: z.string(),
+  metadata: z.string(),
+})
 
-  const metadataObj = JSON.parse(metadata)
+export const setTokenMetadataMethod = async ({
+  input,
+  ctx,
+}: {
+  input: SetTokenMetadataParams
+  ctx: Context
+}) => {
+  
+  const metadataObj = JSON.parse(input.metadata)
   // TODO: save metadata to R2
 
-  return openrpc.response(request, null)
+  return null
 }
