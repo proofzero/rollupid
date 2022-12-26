@@ -38,12 +38,12 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(SetGalleryInput)
-    .query(setGalleryMethod),
+    .mutation(setGalleryMethod),
   setToken: t.procedure
     .use(scopes)
     .use(logUsage)
     .input(SetTokensInput)
-    .query(setTokensMethod),
+    .mutation(setTokensMethod),
   getToken: t.procedure
     .use(scopes)
     .use(logUsage)
@@ -53,12 +53,12 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(SetTokenMetadataInput)
-    .query(setTokenMetadataMethod),
+    .mutation(setTokenMetadataMethod),
   indexTokens: t.procedure
     .use(scopes)
     .use(logUsage)
     .input(IndexTokenInput)
-    .query(indexTokenMethod),
+    .mutation(indexTokenMethod),
 })
 
 export type AppRouter = typeof appRouter
