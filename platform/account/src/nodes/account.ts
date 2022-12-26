@@ -19,7 +19,6 @@ export default class Account extends createDurable({
   }
 
   async setProfile(profile: object): Promise<void> {
-    await this.state.storage.put('profile', profile)
-    return
+    return await this.state.storage.put('profile', profile)
   }
 }
