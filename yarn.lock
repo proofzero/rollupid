@@ -6581,11 +6581,13 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/openrpc": "*"
+    "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
+    itty-durable: 1.6.0
     itty-router: 2.6.6
     itty-router-extras: 0.4.2
     npm-run-all: 4.1.5
