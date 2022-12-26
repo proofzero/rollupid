@@ -12,8 +12,6 @@ export default async (
 ): Promise<void> => {
   console.log({ batch })
 
-  
-
   batch.messages.map(async (message) => {
     const req = new Request('', {
       method: message.body.method,

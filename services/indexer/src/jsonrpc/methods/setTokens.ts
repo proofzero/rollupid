@@ -1,16 +1,18 @@
-import { z }from 'zod'
+import { z } from 'zod'
 import { TokensTable } from '../../db/schema'
 import { Context } from '../../context'
 import { AddressURNInput } from '../middlewares/inputValidators'
 
 export type SetTokensParams = TokensTable[]
 
-export const SetTokensInput = z.array(z.object({
-  tokenId: z.string(),
-  contract: z.string(),
-  addressURN: AddressURNInput,
-  gallery_order: z.number().optional(),
-}))
+export const SetTokensInput = z.array(
+  z.object({
+    tokenId: z.string(),
+    contract: z.string(),
+    addressURN: AddressURNInput,
+    gallery_order: z.number().optional(),
+  })
+)
 
 // This method should get called when change event occurs on chain
 // Or when the address is first initialized

@@ -1,17 +1,19 @@
 import { z } from 'zod'
 
 import { Context } from '../../context'
-import { TokensTable, tokens } from '../../db/schema'
+import { TokensTable } from '../../db/schema'
 import { AddressURNInput } from '../middlewares/inputValidators'
 
 export type SetGalleryParams = TokensTable[]
 
-export const SetGalleryInput = z.array(z.object({
-  tokenId: z.string(),
-  contract: z.string(),
-  addressURN: AddressURNInput,
-  gallery_order: z.number().optional(),
-}))
+export const SetGalleryInput = z.array(
+  z.object({
+    tokenId: z.string(),
+    contract: z.string(),
+    addressURN: AddressURNInput,
+    gallery_order: z.number().optional(),
+  })
+)
 
 export const setGalleryMethod = async ({
   input,
@@ -42,4 +44,3 @@ export const setGalleryMethod = async ({
 
   return null
 }
-

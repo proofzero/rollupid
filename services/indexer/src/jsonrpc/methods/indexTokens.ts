@@ -9,8 +9,8 @@ import { SetTokenMetadataParams } from './setTokenMetadata'
 import { TokensTable } from '../../db/schema'
 
 export type IndexTokenParams = {
-  address: AddressURN,
-  chain: string,
+  address: AddressURN
+  chain: string
   cursor?: string
 }
 
@@ -30,7 +30,7 @@ export const indexTokenMethod = async ({
   const address = AddressURNSpace.decode(input.address)
 
   const core = Core.create()
-  await core.start({ apiKey:ctx.APIKEY_MORALIS })
+  await core.start({ apiKey: ctx.APIKEY_MORALIS })
   core.registerModules([EvmApi])
 
   const evmApi = core.getModule<EvmApi>(EvmApi.moduleName)
@@ -69,20 +69,19 @@ export const indexTokenMethod = async ({
     if (metadata) {
       messages.push({
         method: 'kb_setTokenMetadata',
-        body: [tokenId, contract, metadata],
+        body: { tokenId, contract, metadata },
       })
     }
   }
 
-  ctx.BLOCKCHAIN_ACTIVITY?.sendBatch(messages)
+  // ctx.BLOCKCHAIN_ACTIVITY?.sendBatch(messages)
 
-  const db = ctx.COLLECTIONS
   const upsertGallery = await ctx.COLLECTIONS?.prepare(
     `INSERT INTO tokens (tokenId, contract, addressURN) 
       VALUES ${tokenValues} ON CONFLICT (tokenId, contract) 
       DO UPDATE SET addressURN = excluded.addressURN, gallery_order = null`
   ).all()
-  
+
   // const upsertGallery = await db
   //   .insert(tokens)
   //   .values(...tokenValues)
@@ -107,8 +106,8 @@ export const indexTokenMethod = async ({
   const insertCollections = await ctx.COLLECTIONS?.prepare(
     `INSERT INTO collections (contract, name) 
       VALUES ${contractValues} 
-      ON CONFLICT (contract) DO NOTHING`).all()
-
+      ON CONFLICT (contract) DO NOTHING`
+  ).all()
 
   // const insertCollections = await db
   //   .insert(collections)

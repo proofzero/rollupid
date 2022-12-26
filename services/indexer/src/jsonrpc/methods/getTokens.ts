@@ -15,9 +15,7 @@ export const getTokensMethod = async ({
   ctx: Context
 }) => {
   const galleryStmt = await ctx.COLLECTIONS?.prepare(
-    `SELECT * FROM tokens WHERE addressURN IN (${input.join(
-      ','
-    )})`
+    `SELECT * FROM tokens WHERE addressURN IN (${input.join(',')})`
   )
   const gallery = await galleryStmt?.all()
 

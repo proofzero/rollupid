@@ -5,7 +5,10 @@ import { GetGalleryInput, getGalleryMethod } from './methods/getGallery'
 import { GetTokensInput, getTokensMethod } from './methods/getTokens'
 import { IndexTokenInput, indexTokenMethod } from './methods/indexTokens'
 import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
-import { SetTokenMetadataInput, setTokenMetadataMethod } from './methods/setTokenMetadata'
+import {
+  SetTokenMetadataInput,
+  setTokenMetadataMethod,
+} from './methods/setTokenMetadata'
 import { SetTokensInput, setTokensMethod } from './methods/setTokens'
 
 const t = initTRPC.context<Context>().create()

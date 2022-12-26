@@ -1,4 +1,3 @@
-
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'

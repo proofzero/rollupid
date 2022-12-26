@@ -1,6 +1,5 @@
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { drizzle } from 'drizzle-orm-sqlite/d1'
 
 /**
  * Defines your inner context shape.
@@ -41,9 +40,9 @@ export async function createContextInner(opts?: CreateInnerContextOptions) {
 export async function createContext(opts: CreateNextContextOptions) {
   const contextInner = await createContextInner()
   return {
-    ...contextInner,
     req: opts.req,
     res: opts.res,
+    ...contextInner,
   }
 }
 
