@@ -4,10 +4,9 @@ import type { Environment, IttyDurableObjectState } from '../types'
 
 export default class Account extends createDurable({
   autoReturn: true,
-  autoPersist: true,
+  autoPersist: false,
 }) {
   state: IttyDurableObjectState
-  profile: object | undefined
 
   constructor(state: IttyDurableObjectState, env: Environment) {
     super(state, env)
