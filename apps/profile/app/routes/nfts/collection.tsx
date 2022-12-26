@@ -1,6 +1,7 @@
 import { LoaderFunction, json } from '@remix-run/cloudflare'
 import { gatewayFromIpfs } from '~/helpers'
 import { getGalaxyClient } from '~/helpers/clients'
+import { sortNftsFn } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
@@ -62,7 +63,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const filteredNfts =
     ownedNfts?.filter((n: any) => !n.error && n.thumbnailUrl) || []
 
+  const sortedNfts = filteredNfts.sort(sortNftsFn)
+
   return json({
-    ownedNfts: filteredNfts,
+    ownedNfts: sortedNfts,
   })
 }
