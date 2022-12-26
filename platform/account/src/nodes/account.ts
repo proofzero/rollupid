@@ -15,16 +15,11 @@ export default class Account extends createDurable({
   }
 
   async getProfile(): Promise<object> {
-    // TODO: remove this migration code after 2023-01-30
-    if (!this.profile || Object.keys(this.profile).length === 0) {
-      const oldProfile = await this.state.storage.get('profile')
-      this.profile = oldProfile
-    }
-    return this.profile || {}
+    return (await this.state.storage.get('profile')) || {}
   }
 
-  setProfile(profile: object): void {
-    this.profile = profile
+  async setProfile(profile: object): Promise<void> {
+    await this.state.storage.put('profile', profile)
     return
   }
 }
