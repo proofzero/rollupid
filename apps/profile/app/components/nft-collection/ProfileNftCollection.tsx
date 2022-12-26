@@ -8,6 +8,8 @@ import superrare from '~/assets/partners/superrare.svg'
 import polygon from '~/assets/partners/polygon.svg'
 import book from '~/assets/book.svg'
 
+import { mergeSortedNfts } from '~/helpers/nfts'
+
 import noNfts from '~/assets/No_NFT_Found.svg'
 import noFilter from '~/assets/no-filter.svg'
 
@@ -158,7 +160,7 @@ const ProfileNftCollection = ({
       }, []),
     ])
 
-    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
+    setLoadedNfts(mergeSortedNfts(loadedNfts, nftRes.ownedNfts))
     setPageLink(nftRes.pageKey ?? null)
 
     if (refresh) {
@@ -447,43 +449,33 @@ const ProfileNftCollection = ({
               className="my-masonry-grid"
               columnClassName="my-masonry-grid_column"
             >
-              {filteredLoadedNfts
-                .sort((a, b) => {
-                  if (b.collectionTitle === null) {
-                    return -1
-                  } else {
-                    return (
-                      a.collectionTitle?.localeCompare(b.collectionTitle) || 1
-                    )
-                  }
-                })
-                .map((nft, index) => {
-                  return (
-                    <div
-                      key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
-                      className="flex
+              {filteredLoadedNfts.map((nft, index) => {
+                return (
+                  <div
+                    key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
+                    className="flex
                       justify-center
                       pl-[10%]
                       w-[90%]
                       "
-                    >
-                      {nftRenderer(
-                        nft,
-                        selectedNft ===
-                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
-                        (selectedNft: any) => {
-                          setSelectedNft(
-                            `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
-                          )
+                  >
+                    {nftRenderer(
+                      nft,
+                      selectedNft ===
+                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`,
+                      (selectedNft: any) => {
+                        setSelectedNft(
+                          `${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`
+                        )
 
-                          if (handleSelectedNft) {
-                            handleSelectedNft(selectedNft)
-                          }
+                        if (handleSelectedNft) {
+                          handleSelectedNft(selectedNft)
                         }
-                      )}
-                    </div>
-                  )
-                })}
+                      }
+                    )}
+                  </div>
+                )
+              })}
             </Masonry>
           </InfiniteScroll>
         </>
