@@ -5486,6 +5486,7 @@ __metadata:
     "@moralisweb3/common-core": 2.10.1
     "@moralisweb3/evm-api": 2.10.1
     "@moralisweb3/streams": 2.10.1
+    "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -5501,6 +5502,7 @@ __metadata:
     stream: 0.0.2
     typescript: 4.8.4
     wrangler: 2.4.4
+    zod: 3.20.2
   languageName: unknown
   linkType: soft
 
@@ -11640,6 +11642,13 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
+  languageName: node
+  linkType: hard
+
+"@trpc/server@npm:10.7.0":
+  version: 10.7.0
+  resolution: "@trpc/server@npm:10.7.0"
+  checksum: 6f63b8792b574c19e121cb90fa72b0093040fe3608512641a0ba762ac585a6eb030cdd9cdbc669387a067143d74e0c62f5fe6c3cb102ea2a447d618d561c9a8e
   languageName: node
   linkType: hard
 
@@ -45120,7 +45129,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.20.2":
+"zod@npm:3.20.2, zod@npm:^3.20.2":
   version: 3.20.2
   resolution: "zod@npm:3.20.2"
   checksum: 04172f7e9350372684ccd298d4716908edc9113751295b6c4e1b3ea84e2af8997e504b33ba36f4741417bb2a5dc90bfd40501f6b0e7389df10e42a63d6d8366c

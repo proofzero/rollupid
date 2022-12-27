@@ -1,45 +1,50 @@
+import { z } from 'zod'
 import Core from '@moralisweb3/common-core'
 import EvmApi from '@moralisweb3/evm-api'
 
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcRequest, RpcService } from '@kubelt/openrpc'
-
-import { IndexRpcContext } from '../../types'
-import { SetTokenMetadataParams } from './setTokenMetadata'
-import { tokens, collections, TokensTable } from '../../db/schema'
-import { sql } from 'drizzle-orm'
+import { Context } from '../../context'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURNInput } from '../middlewares/inputValidators'
+import { SetTokenMetadataParams } from './setTokenMetadata'
+import { TokensTable } from '../../db/schema'
 
-export type IndexTokenParams = [
-  address: AddressURN,
-  chain: string,
+export type IndexTokenParams = {
+  address: AddressURN
+  chain: string
   cursor?: string
-] // addresses
+}
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<IndexRpcContext>
-) => {
-  const [addressURN, chain, cursor] = request.params as IndexTokenParams
-  const address = AddressURNSpace.decode(addressURN)
+export const IndexTokenInput = z.object({
+  address: AddressURNInput,
+  chain: z.string(),
+  cursor: z.string().optional(),
+})
+
+export const indexTokenMethod = async ({
+  input,
+  ctx,
+}: {
+  input: IndexTokenParams
+  ctx: Context
+}) => {
+  const address = AddressURNSpace.decode(input.address)
 
   const core = Core.create()
-  await core.start({ apiKey: context.get('APIKEY_MORALIS') })
+  await core.start({ apiKey: ctx.APIKEY_MORALIS })
   core.registerModules([EvmApi])
 
   const evmApi = core.getModule<EvmApi>(EvmApi.moduleName)
   const res = await evmApi.nft.getWalletNFTs({
     address,
-    chain,
-    cursor,
+    chain: input.chain,
+    cursor: input.cursor,
     normalizeMetadata: true,
   })
 
   if (res.pagination.cursor) {
-    context.get('BLOCKCHAIN_ACTIVITY').send({
+    ctx.BLOCKCHAIN_ACTIVITY?.send({
       method: 'kb_indexTokens',
-      body: [addressURN, chain, res.pagination.cursor],
+      body: [input.address, input.chain, res.pagination.cursor],
     })
     // alternatively we could use just do a loop with
     // res.hasNext and res.next() to fetch next page
@@ -54,7 +59,7 @@ export default async (
     const token = {
       tokenId,
       contract,
-      addressURN,
+      addressURN: input.address,
     }
     tokenValues.push(token)
     contractMap[contract] = nft.name || ''
@@ -64,25 +69,30 @@ export default async (
     if (metadata) {
       messages.push({
         method: 'kb_setTokenMetadata',
-        body: [tokenId, contract, metadata],
+        body: { tokenId, contract, metadata },
       })
     }
   }
 
-  context.get('BLOCKCHAIN_ACTIVITY').sendBatch(messages)
+  // ctx.BLOCKCHAIN_ACTIVITY?.sendBatch(messages)
 
-  const db = context.collectionDB
-  const upsertGallery = await db
-    .insert(tokens)
-    .values(...tokenValues)
-    .onConflictDoUpdate({
-      where: sql`addressURN != excluded.addressURN`,
-      set: {
-        gallery_order: null,
-        addressURN: sql`excluded.addressURN`,
-      },
-    })
-    .run()
+  const upsertGallery = await ctx.COLLECTIONS?.prepare(
+    `INSERT INTO tokens (tokenId, contract, addressURN) 
+      VALUES ${tokenValues} ON CONFLICT (tokenId, contract) 
+      DO UPDATE SET addressURN = excluded.addressURN, gallery_order = null`
+  ).all()
+
+  // const upsertGallery = await db
+  //   .insert(tokens)
+  //   .values(...tokenValues)
+  //   .onConflictDoUpdate({
+  //     where: sql`addressURN != excluded.addressURN`,
+  //     set: {
+  //       gallery_order: null,
+  //       addressURN: sql`excluded.addressURN`,
+  //     },
+  //   })
+  //   .run()
 
   console.log({ upsertGallery })
 
@@ -92,12 +102,19 @@ export default async (
       name,
     })
   )
-  const insertCollections = await db
-    .insert(collections)
-    .values(...contractValues) // should ignore duplicates
-    .run()
+
+  const insertCollections = await ctx.COLLECTIONS?.prepare(
+    `INSERT INTO collections (contract, name) 
+      VALUES ${contractValues} 
+      ON CONFLICT (contract) DO NOTHING`
+  ).all()
+
+  // const insertCollections = await db
+  //   .insert(collections)
+  //   .values(...contractValues) // should ignore duplicates
+  //   .run()
 
   console.log({ insertCollections })
 
-  return openrpc.response(request, { tokens, contracts: contractMap })
+  return null
 }
