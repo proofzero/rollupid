@@ -6,10 +6,12 @@ export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (AddressURNSpace.parse(input as AddressURN) === null) {
     throw new Error('Invalid AddressURN entry')
   }
+  return input as AddressURN
 })
 
 export const AccountURNInput = z.custom<AccountURN>((input) => {
   if (AccountURNSpace.parse(input as AccountURN) === null) {
     throw new Error('Invalid AccountURN entry')
   }
+  return input as AccountURN
 })

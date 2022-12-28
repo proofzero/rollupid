@@ -18,6 +18,7 @@ export const getProfileMethod = async ({
   input: GetProfileParams
   ctx: Context
 }) => {
-  const profile = ctx.node.getProfile()
+  const profile = await ctx.node.getProfile()
+  console.log({ profile })
   return profile
 }

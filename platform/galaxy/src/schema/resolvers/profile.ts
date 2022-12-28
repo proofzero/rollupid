@@ -12,6 +12,7 @@ import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
 
 type ResolverContext = {
   env: Env
@@ -22,23 +23,29 @@ type ResolverContext = {
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (_parent: any, {}, { env, accountURN }: ResolverContext) => {
+    profile: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
       console.log(
         `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [AccountJWTHeader]: jwt,
+        },
+      })
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
-      console.log({ accountProfile })
-      // console.log(accountProfile)
       return accountProfile
     },
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env }: ResolverContext
+      { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         headers: {
@@ -64,7 +71,11 @@ const threeIDResolvers: Resolvers = {
       }
 
       try {
-        const accountClient = createAccountClient(env.Account)
+        const accountClient = createAccountClient(env.Account, {
+          headers: {
+            [AccountJWTHeader]: jwt,
+          },
+        })
         let accountProfile = await accountClient.getProfile.query({
           account: accountURN,
         })
@@ -92,7 +103,11 @@ const threeIDResolvers: Resolvers = {
         `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [AccountJWTHeader]: jwt,
+        },
+      })
       let currentProfile = await accountClient.getProfile.query({
         account: accountURN,
       })

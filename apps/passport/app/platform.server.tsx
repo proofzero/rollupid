@@ -1,5 +1,4 @@
 import createAccessClient from '@kubelt/platform-clients/access'
-import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
@@ -13,10 +12,6 @@ export function getStarbaseClient() {
 
 export function getAccessClient() {
   return createAccessClient(Access)
-}
-
-export function getAccountClient() {
-  return createAccountClient(Account)
 }
 
 export function getAddressClient(addressUrn: string) {

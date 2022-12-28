@@ -24,7 +24,7 @@ interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
 export async function createContextInner(opts: CreateInnerContextOptions) {
   // TODO: should this all be middleware steps?
   const headers = opts.req?.headers
-  const token = headers?.get(headers.AccountJWTHeader)
+  const token = headers?.get(jwt.AccountJWTHeader)
 
   if (!token) throw new Error('No JWT found in headers')
 
@@ -37,10 +37,10 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
   const proxy = await proxyDurable(opts.Account, {
     name: 'account',
     class: Account,
-    parse: false,
+    parse: true,
   })
 
-  const node = proxy.get(accountURN)
+  const node = proxy.get(accountURN) as Account
 
   return {
     token,
@@ -58,7 +58,7 @@ export async function createContext(
   opts: CreateNextContextOptions,
   env: Environment
 ) {
-  const contextInner = await createContextInner(env)
+  const contextInner = await createContextInner({ ...opts, ...env })
   return {
     req: opts.req,
     res: opts.res,

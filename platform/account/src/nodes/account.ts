@@ -1,7 +1,10 @@
 import { createDurable } from 'itty-durable'
 import { Environment } from '..'
 
-export default class Account extends createDurable({ autoReturn: true }) {
+export default class Account extends createDurable({
+  autoReturn: true,
+  autoPersist: true,
+}) {
   // state: DurableObjectState
   profile: object
 
@@ -16,5 +19,6 @@ export default class Account extends createDurable({ autoReturn: true }) {
 
   setProfile(profile: object): void {
     this.profile = profile
+    return
   }
 }
