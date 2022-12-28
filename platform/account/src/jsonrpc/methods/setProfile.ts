@@ -10,7 +10,7 @@ export type GetProfileParams = {
 
 export const SetProfileInput = z.object({
   name: inputValidators.AccountURNInput,
-  profile: z.object({}),
+  profile: z.any(),
 })
 
 export const setProfileMethod = async ({
@@ -20,6 +20,6 @@ export const setProfileMethod = async ({
   input: GetProfileParams
   ctx: Context
 }) => {
-  const res = await ctx.account?.setProfile({ profile: input.profile })
+  const res = await ctx.account?.setProfile(input.profile)
   return res
 }

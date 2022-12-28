@@ -29,6 +29,5 @@ export const getProfileMethod = async ({
   const node = proxy.get(input.account) as Account
 
   const profile = await node.getProfile()
-  console.log({ profile })
   return profile
 }
