@@ -1,4 +1,4 @@
-import { initTRPC, trpcNext } from '@trpc/server'
+import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 
 import { jwt } from '@kubelt/platform-middleware'
