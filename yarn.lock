@@ -6196,6 +6196,7 @@ __metadata:
     graphql: 16.6.0
     npm-run-all: 4.1.5
     typescript: 4.8.4
+    wrangler: 2.6.2
   languageName: unknown
   linkType: soft
 
@@ -45693,6 +45694,36 @@ __metadata:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
   checksum: 0548a4e79162057ea4f80ad85ecd904a78448ab114badd16ffbed679896607ada564dca9b66374079515129e5730134b582c29f29cfc9bf16ef3f84848fa533e
+  languageName: node
+  linkType: hard
+
+"wrangler@npm:2.6.2":
+  version: 2.6.2
+  resolution: "wrangler@npm:2.6.2"
+  dependencies:
+    "@cloudflare/kv-asset-handler": ^0.2.0
+    "@esbuild-plugins/node-globals-polyfill": ^0.1.1
+    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
+    "@miniflare/core": 2.10.0
+    "@miniflare/d1": 2.10.0
+    "@miniflare/durable-objects": 2.10.0
+    blake3-wasm: ^2.1.5
+    chokidar: ^3.5.3
+    esbuild: 0.14.51
+    fsevents: ~2.3.2
+    miniflare: 2.10.0
+    nanoid: ^3.3.3
+    path-to-regexp: ^6.2.0
+    selfsigned: ^2.0.1
+    source-map: ^0.7.4
+    xxhash-wasm: ^1.0.1
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    wrangler: bin/wrangler.js
+    wrangler2: bin/wrangler.js
+  checksum: 2df66e168a2dfc4c035f23b2bd5de0fd33c1c006689ed3ea682b01fc7c5ccc98248ce393b07a35ee27280b0b3151e6299cd16b9b187e0744e4fa0e63e543be8f
   languageName: node
   linkType: hard
 
