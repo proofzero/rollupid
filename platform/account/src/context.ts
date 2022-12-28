@@ -4,6 +4,7 @@ import { proxyDurable } from 'itty-durable'
 
 import { jwt } from '@kubelt/platform-middleware'
 import { Environment, Account } from '.'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 /**
  * Defines your inner context shape.
@@ -34,16 +35,19 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
 
   if (!accountURN) throw new Error('No accountURN found in JWT')
 
+  const accountName = AccountURNSpace.decode(accountURN)
+
   const proxy = await proxyDurable(opts.Account, {
     name: 'account',
     class: Account,
     parse: true,
   })
 
-  const node = proxy.get(accountURN) as Account
+  const node = proxy.get(accountName) as Account
 
   return {
     token,
+    accountName,
     accountURN,
     node,
     ...opts,

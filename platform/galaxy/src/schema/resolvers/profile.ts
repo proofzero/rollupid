@@ -40,6 +40,7 @@ const threeIDResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+      console.log({ accountProfile })
       return accountProfile
     },
     profileFromAddress: async (
