@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
+import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import { TokensTable } from '../../db/schema'
-import { AddressURNInput } from '../middlewares/inputValidators'
 
 export type SetGalleryParams = TokensTable[]
 
@@ -10,7 +10,7 @@ export const SetGalleryInput = z.array(
   z.object({
     tokenId: z.string(),
     contract: z.string(),
-    addressURN: AddressURNInput,
+    addressURN: inputValidators.AddressURNInput,
     gallery_order: z.number().optional(),
   })
 )

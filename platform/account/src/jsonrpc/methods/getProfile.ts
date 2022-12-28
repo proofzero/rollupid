@@ -1,16 +1,25 @@
-import * as openrpc from '@kubelt/openrpc'
-import { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { z } from 'zod'
+import { AccountURN } from '@kubelt/urns/account'
+import { inputValidators } from '@kubelt/platform-middleware'
+import { Context } from '../../context'
 
-import type { GetProfileParams } from '../../types'
+export type GetProfileParams = {
+  account: AccountURN
+}
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const [name] = request.params as GetProfileParams
-  const Account: DurableObjectNamespace = context.get('Account')
-  const nodeClient = await openrpc.discover(Account, { name })
-  const result = await nodeClient.getProfile()
-  return openrpc.response(request, result)
+export const GetProfileInput = z.object({
+  account: inputValidators.AccountURNInput,
+})
+
+export const getProfileMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetProfileParams
+  ctx: Context
+}) => {
+  const nodeId = ctx.Account.idFromName(input.account)
+  const account = await ctx.Account.get(nodeId)
+  const profile = ctx.Account.get(input.account).getProfile()
+  return profile
 }

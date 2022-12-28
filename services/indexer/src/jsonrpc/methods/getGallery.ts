@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { AddressURN } from '@kubelt/urns/address'
-import { AddressURNInput } from '../middlewares/inputValidators'
+import { inputValidators } from '@kubelt/platform-middleware'
 
 export type GetGalleryParams = AddressURN[] // addresses
 
-export const GetGalleryInput = z.array(AddressURNInput)
+export const GetGalleryInput = z.array(inputValidators.AddressURNInput)
 
 export const getGalleryMethod = async ({
   input,

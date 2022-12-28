@@ -1,0 +1,37 @@
+{
+  "name": "@kubelt/platform-middleware",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kubelt Platform Middleware",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Kubelt, Inc.",
+  "main": "index.ts",
+  "scripts": {
+    "check": "run-s format:check lint:check types:check",
+    "format": "run-s format:src",
+    "format:src": "prettier --write *.ts",
+    "format:check": "run-s format:check:src",
+    "format:check:src": "prettier --check *.ts",
+    "lint": "eslint --fix *.ts",
+    "lint:check": "run-s lint:check:src",
+    "lint:check:src": "eslint *.ts",
+    "types:check": "tsc --project ./tsconfig.json --noEmit",
+    "test": "run-s check"
+  },
+  "devDependencies": {
+    "@kubelt/urns": "workspace:*",
+    "@typescript-eslint/eslint-plugin": "5.45.0",
+    "@typescript-eslint/parser": "5.45.0",
+    "eslint": "8.29.0",
+    "eslint-config-prettier": "8.5.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.8.0",
+    "typescript": "4.8.4"
+  },
+  "dependencies": {
+    "@trpc/server": "10.7.0",
+    "typed-json-rpc": "1.1.0",
+    "zod": "3.20.2"
+  }
+}
