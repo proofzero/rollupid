@@ -6403,7 +6403,6 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
     "@trpc/server": 10.7.0
@@ -6414,7 +6413,6 @@ __metadata:
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-durable: 1.6.0
-    itty-router: 2.6.6
     itty-router-extras: 0.4.2
     npm-run-all: 4.1.5
     prettier: 2.7.1
