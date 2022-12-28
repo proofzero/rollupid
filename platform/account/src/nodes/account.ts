@@ -15,6 +15,7 @@ export default class Account extends createDurable({
   async getProfile(): Promise<object> {
     // TODO: remove this migration code after 2023-01-30
     if (!this.profile || Object.keys(this.profile).length === 0) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const oldProfile = await this.state.storage.get('profile')
       this.profile = oldProfile
