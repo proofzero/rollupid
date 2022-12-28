@@ -43,7 +43,7 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
     parse: true,
   })
 
-  const node = proxy.get(accountName) as Account
+  const node = proxy.get(accountURN) as Account
 
   return {
     token,
