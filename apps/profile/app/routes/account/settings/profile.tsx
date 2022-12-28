@@ -5,11 +5,11 @@ import {
   useOutletContext,
   useTransition,
 } from '@remix-run/react'
-import { FaAt, FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
+import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { requireJWT } from '~/utils/session.server'
-
+import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
 import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
@@ -64,63 +64,25 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  let errors: any = {}
-
   const displayName = formData.get('displayName')?.toString()
-  if (!displayName || displayName === '') {
-    errors.displayName = ['Display name is required']
-  }
-
-  if (displayName && displayName.length > 50) {
-    errors.displayName = ['Display name is maximum 50 characters']
-  }
-
   const job = formData.get('job')?.toString()
-  if (job && job.length > 30) {
-    errors.job = ['Job is maximum 30 characters']
-  }
-
   const location = formData.get('location')?.toString()
-  if (location && location.length > 30) {
-    errors.location = ['Location is maximum 30 characters']
-  }
-
   const website = formData.get('website')?.toString()
-  if (website) {
-    let url
-    try {
-      // URL throws exception
-      // if website is invalid
-      url = new URL(website)
-    } catch (ex) {
-      errors.website = ['Website must be a valid URL']
-    }
-  }
-
   const bio = formData.get('bio')?.toString()
-  if (bio && bio.length > 256) {
-    errors.bio = ['Bio must be less than 256 characters']
-  }
-
-  if (Object.keys(errors).length) {
-    return {
-      errors,
-    }
-  }
-
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
 
   const galaxyClient = await getGalaxyClient()
+  // TODO: handle and return form errors
   await galaxyClient.updateProfile(
     {
       profile: {
-        displayName: displayName,
+        displayName,
         // TODO: support for default address
-        job: job,
-        location: location,
-        bio: bio,
-        website: formData.get('website')?.toString(),
+        job,
+        location,
+        bio,
+        website,
         pfp: {
           image: formData.get('pfp_url') as string,
           isToken: computedIsToken,
@@ -128,7 +90,7 @@ export const action: ActionFunction = async ({ request }) => {
       },
     },
     {
-      'KBT-Access-JWT-Assertion': jwt,
+      [AccountJWTHeader]: jwt,
     }
   )
 

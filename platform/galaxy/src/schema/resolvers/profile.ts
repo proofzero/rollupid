@@ -13,6 +13,7 @@ import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
+import { Profile } from '@kubelt/platform.account/src/jsonrpc/middlewares/profile'
 
 type ResolverContext = {
   env: Env
@@ -82,7 +83,7 @@ const threeIDResolvers: Resolvers = {
 
         if (!accountProfile) {
           accountProfile =
-            (await addressClient.kb_getAddressProfile()) as object
+            (await addressClient.kb_getAddressProfile()) as Profile
         }
 
         return accountProfile
@@ -100,7 +101,7 @@ const threeIDResolvers: Resolvers = {
       { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
+        `galaxy.updateThreeIDProfile: updating profile for account: ${accountURN}`
       )
 
       const accountClient = createAccountClient(env.Account, {
@@ -112,17 +113,15 @@ const threeIDResolvers: Resolvers = {
         account: accountURN,
       })
 
-      // Make sure nulls are empty objects.
-      currentProfile ||= {}
-
       const newProfile = {
         ...currentProfile,
         ...profile,
-      }
+      } as Profile
 
       // TODO: Return the profile we've created. Need to enforce
       // the GraphQL types when setting data otherwise we're able
       // to set a value that can't be returned.
+      // TODO: handle and return form errors
       await accountClient.setProfile.mutate({
         name: accountURN,
         profile: newProfile,

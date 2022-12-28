@@ -4,6 +4,7 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import Account from '../../nodes/account'
 import { proxyDurable } from 'itty-durable'
+import type { Profile } from '../middlewares/profile'
 
 export type GetProfileParams = {
   account: AccountURN
@@ -28,6 +29,6 @@ export const getProfileMethod = async ({
 
   const node = proxy.get(input.account) as Account
 
-  const profile = await node.getProfile()
+  const profile = (await node.getProfile()) as Profile
   return profile
 }

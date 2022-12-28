@@ -1,4 +1,5 @@
-import { initTRPC } from '@trpc/server'
+import { initTRPC, trpcNext } from '@trpc/server'
+import { ZodError } from 'zod'
 
 import { jwt } from '@kubelt/platform-middleware'
 
@@ -8,8 +9,22 @@ import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import Account from '../nodes/account'
 import { proxyDurable } from 'itty-durable'
+import { Profile } from './middlewares/profile'
 
-const t = initTRPC.context<Context>().create()
+const t = initTRPC.context<Context>().create({
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
+            ? error.cause.flatten()
+            : null,
+      },
+    }
+  },
+})
 
 export const scopes = t.middleware(async ({ ctx, next }) => {
   // TODO: check scopes
@@ -58,6 +73,7 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(GetProfileInput)
+    .output(Profile)
     .query(getProfileMethod),
   setProfile: t.procedure
     .use(scopes)

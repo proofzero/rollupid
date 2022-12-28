@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { AccountURN } from '@kubelt/urns/account'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
+import { Profile } from '../middlewares/profile'
 
 export type GetProfileParams = {
   name: AccountURN
@@ -10,7 +11,7 @@ export type GetProfileParams = {
 
 export const SetProfileInput = z.object({
   name: inputValidators.AccountURNInput,
-  profile: z.any(),
+  profile: Profile,
 })
 
 export const setProfileMethod = async ({
@@ -20,6 +21,6 @@ export const setProfileMethod = async ({
   input: GetProfileParams
   ctx: Context
 }) => {
-  const res = await ctx.account?.setProfile(input.profile)
+  const res = await ctx.account?.setProfile(input.profile as object)
   return res
 }
