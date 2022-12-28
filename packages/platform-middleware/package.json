@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@trpc/server": "10.7.0",
+    "jose": "4.11.1",
     "typed-json-rpc": "1.1.0",
     "zod": "3.20.2"
   }

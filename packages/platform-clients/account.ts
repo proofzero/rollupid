@@ -1,14 +1,12 @@
-import type { AccountURN } from '@kubelt/urns/account'
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { AccountRouter } from '@kubelt/platform.account/src/jsonrpc/router'
 
-import type { BaseApi } from './base'
-import createClient from './fetcher'
-
-export interface AccountApi extends BaseApi {
-  kb_getProfile(account: AccountURN): object | undefined
-  kb_setProfile(account: AccountURN, profile: object): void
-}
-
-export default (
-  fetcher: Fetcher,
-  requestInit?: RequestInit<RequestInitCfProperties> | undefined
-) => createClient<AccountApi>(fetcher, requestInit)
+export default (fetcher: Fetcher) =>
+  createTRPCProxyClient<AccountRouter>({
+    links: [
+      httpBatchLink({
+        url: 'http://localhost/trpc',
+        fetch: fetcher.fetch,
+      }),
+    ],
+  })

@@ -1,4 +1,5 @@
 import { initTRPC } from '@trpc/server'
+
 import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
@@ -34,4 +35,4 @@ export const appRouter = t.router({
     .mutation(setProfileMethod),
 })
 
-export type AppRouter = typeof appRouter
+export type AccountRouter = typeof appRouter
