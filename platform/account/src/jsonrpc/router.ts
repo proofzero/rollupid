@@ -1,15 +1,46 @@
 import { initTRPC } from '@trpc/server'
 
+import { jwt } from '@kubelt/platform-middleware'
+
 import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
+import Account from '../nodes/account'
+import { proxyDurable } from 'itty-durable'
 
 const t = initTRPC.context<Context>().create()
 
 export const scopes = t.middleware(async ({ ctx, next }) => {
   // TODO: check scopes
   return next({ ctx })
+})
+
+export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
+  const token = ctx.token
+
+  if (!token) throw new Error('No JWT found in headers')
+
+  // TODO: validate token
+
+  const { accountURN } = jwt.AccountJWTFromHeader(token)
+
+  if (!accountURN) throw new Error('No accountURN found in JWT')
+
+  const proxy = await proxyDurable(ctx.Account, {
+    name: 'account',
+    class: Account,
+    parse: true,
+  })
+
+  const account = proxy.get(accountURN) as Account
+
+  return next({
+    ctx: {
+      account,
+      ...ctx,
+    },
+  })
 })
 
 export const logUsage = t.middleware(async ({ path, type, next }) => {
@@ -30,6 +61,7 @@ export const appRouter = t.router({
     .query(getProfileMethod),
   setProfile: t.procedure
     .use(scopes)
+    .use(injectAccountNode)
     .use(logUsage)
     .input(SetProfileInput)
     .mutation(setProfileMethod),

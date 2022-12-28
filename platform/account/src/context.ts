@@ -1,10 +1,8 @@
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { proxyDurable } from 'itty-durable'
 
 import { jwt } from '@kubelt/platform-middleware'
-import { Environment, Account } from '.'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { Account, Environment } from '.'
 
 /**
  * Defines your inner context shape.
@@ -12,6 +10,7 @@ import { AccountURNSpace } from '@kubelt/urns/account'
  */
 interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
   Account: DurableObjectNamespace
+  account?: Account
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -27,29 +26,8 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
   const headers = opts.req?.headers
   const token = headers?.get(jwt.AccountJWTHeader)
 
-  if (!token) throw new Error('No JWT found in headers')
-
-  // TODO: validate token
-
-  const { accountURN } = jwt.AccountJWTFromHeader(token)
-
-  if (!accountURN) throw new Error('No accountURN found in JWT')
-
-  const accountName = AccountURNSpace.decode(accountURN)
-
-  const proxy = await proxyDurable(opts.Account, {
-    name: 'account',
-    class: Account,
-    parse: true,
-  })
-
-  const node = proxy.get(accountURN) as Account
-
   return {
     token,
-    accountName,
-    accountURN,
-    node,
     ...opts,
   }
 }

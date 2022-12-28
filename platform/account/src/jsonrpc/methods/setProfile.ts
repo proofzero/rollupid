@@ -20,6 +20,6 @@ export const setProfileMethod = async ({
   input: GetProfileParams
   ctx: Context
 }) => {
-  const res = await ctx.node.setProfile({ profile: input.profile })
+  const res = await ctx.account?.setProfile({ profile: input.profile })
   return res
 }
