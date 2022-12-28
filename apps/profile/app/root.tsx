@@ -75,6 +75,11 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = () => {
+  ProfileAnalytics ? ProfileAnalytics.writeDataPoiunt({
+    blobs: ['test'],
+    doubles: [1],
+    indexes: ['abc123']
+  }) : console.log('ProfileAnalytics not bound')
   return json({
     ENV: {},
   })

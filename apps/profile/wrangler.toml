@@ -24,6 +24,10 @@ services = [
   { binding = "Images", service = "images" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "ProfileAnalytics" }
+]
+
 [vars]
 PASSPORT_URL = "http://localhost:9696"
 COOKIE_DOMAIN = "localhost"
@@ -32,7 +36,6 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-
 
 [site]
   bucket = "./public"
