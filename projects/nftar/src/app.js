@@ -16,15 +16,15 @@ const streamToBlob = require('stream-to-blob');
 const fabric = require('fabric').fabric;
 const storage = require('nft.storage');
 const Web3 = require('web3');
-const { convert } = require('convert-svg-to-png');
-const FormData = require('form-data');
 
 const {
     calculateNFTWeight,
     calculateSpecialWeight,
     calculateBalanceWeight,
     generateTraits,
-    encodeDataURI
+    uploadImage,
+    generateOGImage,
+    generateOGImageFromBuffers
 } = require('./utils.js');
 
 const {
@@ -32,11 +32,6 @@ const {
 } = require('./traits.js');
 
 const canvas = require('./canvas/canvas.js');
-const { encode } = require('node:punycode');
-
-// const {
-//     animationViewer
-// } = require('./views/nftar.js');
 
 const app     = new Koa();
 app.use(bodyParser());
@@ -79,24 +74,6 @@ const METHOD_PARAMS = {
             }
         },
     },
-    '3id_genInvite': {
-        'recipient': {
-            type: 'string',
-            description: 'blockchain account to award the invite'
-        },
-        'inviteId': {
-            type: 'string',
-            description: 'Invite serial number'
-        },
-        'inviteTier': {
-            type: 'string',
-            description: 'Invite tier'
-        },
-        'issueDate': {
-            type: 'string',
-            description: 'Date the invite was issued'
-        },
-    },
     'describe': {},
 };
 
@@ -132,6 +109,16 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     if (blockchain.name == CHAINS.ETH && !Web3.utils.isAddress(account)) {
         ctx.throw(401, 'account is not a valid address');
     }
+
+    // Validate Cloudflare config.
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket || 
+        !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.customDomain || 
+        !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+        ctx.throw(500, 'Missing storage service configuration');
+    }
+
+    // Clone the R2 config so we can access it when ctx is no longer available in fire-and-forget requests.
+    const r2Config = JSON.parse(JSON.stringify(ctx.cloudflare.r2));
     
     // derive weight inc for each trait
     let t0, t1;
@@ -142,12 +129,10 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     // cf. https://docs.alchemy.com/reference/sdk-getnfts
     const MAX_ALCHEMY_CONTRACT_ARRAY_SIZE = 20;
     const contractAddresses = getContractAddresses().slice(0, MAX_ALCHEMY_CONTRACT_ARRAY_SIZE);
-    console.log('contractAddresses list:', JSON.stringify(contractAddresses));
 
     const nftsForOwner = await ctx.alchemy.nft.getNftsForOwner(account, {
         contractAddresses
     });
-    console.log('nftsForOwner:', JSON.stringify(nftsForOwner));
 
     t1 = performance.now();
     console.log(`Call to alchemy took ${t1 - t0} milliseconds.`);
@@ -187,7 +172,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
 
     const isNode = () => typeof window === 'undefined';
 
-    const PFP_SQUARE_DIMENSION = 1000;
+    const PFP_SQUARE_DIMENSION = 500;
     const PFP_WIDTH = PFP_SQUARE_DIMENSION;
     const PFP_HEIGHT = PFP_SQUARE_DIMENSION;
 
@@ -225,9 +210,9 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     t1 = performance.now();
     console.log(`Generating image took ${t1 - t0} milliseconds.`);
 
-    // nft.storage File objects are automatically uploaded.
+    // nft.storage File objects are automatically uploaded with the carfile below.
     t0 = performance.now();
-    const png = new storage.File([pfp_blob], "threeid.png", {type: imageFormat});
+    const png = new storage.File([pfp_blob], "image.png", {type: imageFormat});
     const cvr = new storage.File([cvr_blob], "cover.png", {type: imageFormat});
     //const ani = new storage.File([ani_blob], "index.html", {type: htmlFormat});
     t1 = performance.now();
@@ -241,7 +226,7 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
         description: `3ID PFP for ${account}`,
         image: png,
         cover: cvr,
-        external_url: `https://3id.kubelt.com/${account}`,
+        external_url: `https://my.threeid.xyz/${account}`,
         //animation_url: ani,
         properties: {
             metadata: blockchain,
@@ -254,7 +239,6 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     };
 
     t0 = performance.now();
-
     const { token, car } = await storage.NFTStorage.encodeNFT(nft)
     const metadata = token
     const opts = {}
@@ -264,13 +248,39 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     u0 = performance.now();
     ctx.storage.storeCar(car, opts)
         .then(_cid => { cid = _cid; u1 = performance.now(); console.log(`NFT.storage took ${u1 - u0} milliseconds for ${cid}.`); })
-        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.data.image.host}/threeid.png`))
+        .then(() => fetch(`https://nftstorage.link/ipfs/${metadata.ipnft}/metadata.json`))
         .then(() => { u2 = performance.now(); console.log(`Warming fires took ${u2 - u1} milliseconds for ${cid}`); })
         .catch(e => { u2 = performance.now(); console.log(`Fire-and-forget store-and-warm failed in ${u2 -u1} milliseconds for ${cid} with:`, JSON.stringify(e)) })
         .finally(() => console.log(`NFT.storage store-and-warm took ${u2 - u0} milliseconds for ${cid} end-to-end.`))
     t1 = performance.now();
     console.log(`NFT.storage metadata generation and upload scheduling took ${t1 - t0} milliseconds.`);
-    
+
+    t0 = performance.now();
+    let v0 = t0;
+
+    const imageFilepath = `${metadata.ipnft}/image.png`
+    const coverFilepath = `${metadata.ipnft}/cover.png`
+
+    const imageURL = `${r2Config.publicURL}${imageFilepath}`;
+    const coverURL = `${r2Config.publicURL}${coverFilepath}`;
+
+    const ogFilename = `${Web3.utils.keccak256(coverURL + imageURL)}/og.png`
+
+    const imageBuffer = Buffer.from(await pfp_blob.arrayBuffer());
+    const coverBuffer = Buffer.from(await pfp_blob.arrayBuffer());
+
+    // Fire-and-forget uploads to R2.
+    Promise.all([
+        uploadImage(r2Config, imageFilepath, imageBuffer, imageFormat),
+        uploadImage(r2Config, coverFilepath, coverBuffer, imageFormat)
+    ])
+    // Actually can't fire-and-forget OG generation because Cloud Run won't let Puppeteer run in the background.
+    // .then(() => generateOGImageFromBuffers(r2Config, coverBuffer, imageBuffer, ogFilename))
+    .then(() => console.log(`Completing Cloudflare R2 uploads actually took ${performance.now() - v0} milliseconds.`))
+
+    t1 = performance.now();
+    console.log(`Scheduling Cloudflare R2 uploads took ${t1 - t0} milliseconds.`);
+
     // This is the URI that will be passed to the NFT minting contract.
     const tokenURI = metadata.url;
     
@@ -306,115 +316,23 @@ jsonrpc.method('3id_genPFP', async (ctx, next) => {
     console.log(`Crypto took ${t1 - t0} milliseconds.`);
 
     // Generate the response to send to the client.
-    ctx.body = {
-      metadata: metadata.data,
-      voucher,
-      signature,
+    const body = {
+        metadata: metadata.data,
+        voucher,
+        signature,
     };
-    const s1 = performance.now();
-    console.log(`Total took ${s1 - s0} milliseconds.`);
+
+    // The voucher stores the IPFS URIs, these are the faster Cloudflare URLs
+    // that should be passed back to the OG:Image generator and other services.
+    body.metadata.image = imageURL;
+    body.metadata.cover = coverURL;
+
+    // TODO: Is it useful to return the OG image URL here? If so, this needs a fix.
+    //body.metadata.ogImage = `${r2Config.publicURL}${ogFilename}`;
+
+    ctx.body = body;
+    console.log(`Total took ${performance.now() - s0} milliseconds.`);
 });
-
-const genInvite = async (ctx, next) => {
-    const key = ctx.request.headers.authorization ? ctx.request.headers.authorization.replace("Bearer ","") : null
-    
-    if (ctx.apiKey && !key) {
-        ctx.throw(403, 'Missing NFTAR API key');
-    }
-
-    if (key !== ctx.apiKey && key !== ctx.devKey) {
-        ctx.throw(401, 'Invalid NFTAR API key');
-    }
-    
-    let inviteId = ctx.jsonrpc.params['inviteId'];
-    const inviteTier = ctx.jsonrpc.params['inviteTier'];
-    const issueDate = Intl.DateTimeFormat('en-GB-u-ca-iso8601').format(Date.now());
-    const assetFile = "./assets/3ID_NFT_CARD_NO_BG.svg"
-    const OUTPUT_DIR = path.resolve("outputs");
-    
-    const recipient = ctx.jsonrpc.params['recipient'];
-    
-    console.log('genInvite:', JSON.stringify({
-        recipient,
-        inviteId,
-        inviteTier,
-        issueDate,
-    }), 'with API key:', key === ctx.apiKey, 'with DEV key:', key === ctx.devKey);
-    
-    await fs.promises.mkdir(OUTPUT_DIR, { recursive: true });
-    const outputFile = path.join("outputs", `invite-${inviteId}.svg`);
-    const baseName = path.basename(outputFile);
-
-    inviteId = inviteId.toString().padStart(4, "0");
-
-    const newCard = await fs.promises.readFile(assetFile, 'utf8')
-      .then(data => {
-        // Parse the SVG XML data and return a query context.
-        return cheerio.load(data, {
-          xml: {},
-        });
-      })
-      .then(($) => {
-        /*
-        <svg>
-          ...
-          <text id="ISSUED">04/20/2022</text>
-          <text id="NUMBER">#6969</text>
-        </svg>
-        */
-        // Set the issue date.
-        $('#ISSUED').text(issueDate);
-        // Set the invite identifier.
-        $('#NUMBER').text(`#${inviteId}`);
-
-        const svgText = $.root().html();
-        if (null === svgText) {
-          throw "empty SVG document generated";
-        }
-        return svgText.trim();
-      })
-      .then(svgText => {
-        return fs.promises.writeFile(outputFile, svgText);
-      })
-
-     // Utility to title-case a string.
-    const titleCase = (s) => {
-        return s.charAt(0).toUpperCase() + s.slice(1);
-    };
-
-    // Upload to NFT.storage.
-    const metadata = {
-        name: `3ID Invite #${inviteId}`,
-        description: `${titleCase(inviteTier)} 3ID Invite`,
-        image: new storage.File(
-            [await fs.promises.readFile(outputFile)],
-            baseName,
-            { type: 'image/svg+xml' },
-        ),
-        properties: {
-            inviteId,
-            inviteTier,
-            issueDate,
-        }
-    };
-
-    t0 = performance.now();
-    const result = await ctx.storage.store(metadata);
-    t1 = performance.now();
-    console.log(`genInvite: ctx.storage.store took ${t1 - t0} milliseconds.`);
-    
-    ctx.body = {
-        // IPFS URL of the metadata
-        url: result.url,
-        // The metadata.json contents
-        metadata: result.data,
-        // metadata.json contents with IPFS gateway URLs
-        embed: result.embed(),
-      };
-};
-
-jsonrpc.method('3id_genInvite', genInvite);
-jsonrpc.method('3iD_genInvite', genInvite);
 
 jsonrpc.method('describe', (ctx, next) => {
     ctx.body = jsonrpc.methods.map(method => {
@@ -439,9 +357,14 @@ router.post('/api/v0/og-image', async (ctx, next) => {
         ctx.throw(401, 'Invalid NFTAR API key');
     }
 
-    if (!ctx.cloudflare || !ctx.cloudflare.accountId || !ctx.cloudflare.accountHash || !ctx.cloudflare.imageToken) {
-        ctx.throw(500, 'Missing image service configuration');
+    if (!ctx.cloudflare || !ctx.cloudflare.r2 || !ctx.cloudflare.r2.bucket ||
+        !ctx.cloudflare.r2.endpoint || !ctx.cloudflare.r2.publicURL || !ctx.cloudflare.r2.customDomain || 
+        !ctx.cloudflare.r2.accessKeyId || !ctx.cloudflare.r2.secretAccessKey) {
+        ctx.throw(500, 'Missing storage service configuration');
     }
+
+    // Clone the R2 config so we can access it when ctx is no longer available in fire-and-forget requests.
+    const r2Config = JSON.parse(JSON.stringify(ctx.cloudflare.r2));
 
     const bkg = ctx.request.body.bkg;
     const hex = ctx.request.body.hex;
@@ -461,85 +384,25 @@ router.post('/api/v0/og-image', async (ctx, next) => {
     }
 
     // NOTE: Unique cache key (big assumption here that the passed image urls are, themselves, unique).
-    const filename = Web3.utils.keccak256(bkgURL.href + hexURL.href);
+    const filename = `${Web3.utils.keccak256(bkgURL.href + hexURL.href)}/og.png`;
 
     // Check the image service to see if the cache key already exists.
-    const url = `https://imagedelivery.net/${ctx.cloudflare.accountHash}/${filename}/public`;
-    console.log('Checking cache:', url);
+    const url = `${r2Config.publicURL}${filename}`;
+    const customDomainURL = `${r2Config.customDomain}${filename}`;
+    console.log('Checking cache:', url, 'for', customDomainURL);
     const cacheCheck = await fetch(url);
     
     if (cacheCheck.status === 200) {
         console.log('Returning cached image url for ', filename);
         ctx.set('Content-Type', 'application/json');
-        ctx.body = { url };
+        ctx.body = { url: customDomainURL };
     } else if (cacheCheck.status === 404) {
         console.log(`Cache miss for ${filename}. Generating new image.`);
 
-        // Images that are remote need to be converted to Data URIs so that we can
-        // render the SVG without triggering a cross-origin security violation.
-        const hexURI = await encodeDataURI(ctx, hexURL.href)
-        const bkgURI = await encodeDataURI(ctx, bkgURL.href)
-
-        // Constants for populating the SVG (optional).
-        const OG_WIDTH = 1200;
-        const OG_HEIGHT = 630;
-
-        // TODO: Load from assets folder?
-        const svg =
-        `<svg width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="url(#Backround)"/>
-            <path d="M752.632 246.89C740.674 221.745 726.731 197.594 710.932 174.666L705.837 167.342C699.563 158.24 691.341 150.65 681.768 145.124C672.194 139.597 661.508 136.273 650.489 135.392L641.543 134.671C613.787 132.443 585.899 132.443 558.145 134.671L549.199 135.392C538.179 136.273 527.494 139.597 517.921 145.124C508.347 150.65 500.124 158.24 493.851 167.342L488.755 174.732C472.958 197.66 459.014 221.811 447.056 246.956L443.206 255.05C438.462 265.033 436 275.947 436 287C436 298.053 438.462 308.967 443.206 318.95L447.056 327.044C459.014 352.19 472.958 376.341 488.755 399.268L493.851 406.658C500.124 415.759 508.347 423.35 517.921 428.877C527.494 434.403 538.179 437.728 549.199 438.608L558.145 439.329C585.899 441.557 613.787 441.557 641.543 439.329L650.489 438.608C661.516 437.716 672.207 434.377 681.781 428.833C691.356 423.288 699.573 415.679 705.837 406.559L710.932 399.17C726.731 376.243 740.674 352.092 752.632 326.946L756.482 318.852C761.225 308.869 763.688 297.955 763.688 286.902C763.688 275.849 761.225 264.935 756.482 254.951L752.632 246.89Z" fill="white"/>
-            <mask id="mask0_1_24" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="446" y="142" width="307" height="289">
-            <path d="M742.673 249.319C731.507 225.839 718.487 203.286 703.734 181.876L698.976 175.036C693.117 166.537 685.439 159.449 676.499 154.288C667.559 149.127 657.581 146.023 647.291 145.201L638.937 144.528C613.018 142.447 586.976 142.447 561.058 144.528L552.704 145.201C542.414 146.023 532.437 149.127 523.496 154.288C514.556 159.449 506.878 166.537 501.02 175.036L496.262 181.937C481.509 203.347 468.488 225.9 457.322 249.381L453.727 256.939C449.296 266.261 446.998 276.453 446.998 286.775C446.998 297.096 449.296 307.288 453.727 316.61L457.322 324.168C468.488 347.65 481.509 370.203 496.262 391.612L501.02 398.513C506.878 407.012 514.556 414.101 523.496 419.261C532.437 424.422 542.414 427.527 552.704 428.348L561.058 429.021C586.976 431.102 613.018 431.102 638.937 429.021L647.291 428.348C657.588 427.516 667.572 424.398 676.512 419.22C685.453 414.042 693.126 406.937 698.976 398.421L703.734 391.52C718.487 370.111 731.507 347.558 742.673 324.077L746.269 316.518C750.698 307.196 752.998 297.004 752.998 286.683C752.998 276.361 750.698 266.169 746.269 256.847L742.673 249.319Z" fill="white"/>
-            </mask>
-            <g mask="url(#mask0_1_24)">
-            <rect x="447" y="132.756" width="305.604" height="305.604" fill="url(#hexagon)"/>
-            </g>
-            <defs>
-            <pattern id="Backround" patternContentUnits="objectBoundingBox" width="1" height="1">
-                <use xlink:href="#backroundimage" transform="translate(0 -0.452381) scale(0.015625 0.0297619)"/>
-            </pattern>
-            <pattern id="hexagon" patternContentUnits="objectBoundingBox" width="1" height="1">
-                <use xlink:href="#hexagonimage" transform="translate(-1.98598) scale(0.00233645)"/>
-            </pattern>
-            <image id="backroundimage" width="64" height="64" xlink:href="${bkgURI}"/>
-            <image id="hexagonimage" width="2128" height="428" xlink:href="${hexURI}"/>
-            </defs>
-        </svg>`;
-
-        // Convert the populated SVG template into a PNG byte stream.
-        const pngBuffer = await convert(svg, {
-            puppeteer: {
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            }
-        });
-        
-        // Cloudflare Image service requires we submit by POSTing FormData in order
-        // to set our own filename (cache key).
-        const form = new FormData();
-
-         // Name file after cache key with the correct content-type.
-        form.append('file', pngBuffer, { filename, contentType: 'image/png' });
-
-        // Set the cache key as the Cloudflare "Custom ID".
-        form.append('id', filename);
-        
-        // Get the headers from the FormData object so that we can pick up
-        // the dynamically generated multipart boundary.
-        const headers = form.getHeaders();
-        headers['authorization'] = `bearer ${ctx.cloudflare.imageToken}`;
-        
-        // This fire-and-forget call could fail because the image service has a race condition on uploads.
-        // It might cache miss above, get here, and then try to upload something that already exists,
-        // which will cause this to return "ERROR 5409: Resource already exists".
-        fetch(`https://api.cloudflare.com/client/v4/accounts/${ctx.cloudflare.accountId}/images/v1`, {
-            method: 'POST',
-            body: form,
-            headers
-        });
+        await generateOGImage(r2Config, bkgURL, hexURL, filename)
 
         ctx.set('Content-Type', 'application/json');
-        ctx.body = { url };
+        ctx.body = { url: customDomainURL };
     } else {
         ctx.set('Content-Type', 'application/json');
         ctx.status = 500;

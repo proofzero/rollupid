@@ -106,8 +106,8 @@ export const meta: MetaFunction = ({
     'og:description': bio || 'Claim yours now!',
     'twitter:description': bio || 'Claim yours now!',
     'og:url': targetAddress
-      ? `https://3id.kubelt.com/${targetAddress}`
-      : 'https://3id.kubelt.com',
+      ? `https://my.threeid.xyz/${targetAddress}`
+      : 'https://my.threeid.xyz',
     'og:image': ogImageURL + `?${Date.now()}`,
     'og:image:alt': `${displayName || targetAddress}'s 3ID Profile`,
     'og:site_name': '3ID',
