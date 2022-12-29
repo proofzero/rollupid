@@ -3,7 +3,6 @@ import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 import { CryptoAddressType } from '@kubelt/types'
 
-
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (AddressURNSpace.parse(input as AddressURN) === null) {
     throw new Error('Invalid AddressURN entry')
@@ -27,8 +26,8 @@ export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {
     case CryptoAddressType.ETH:
       addrType = CryptoAddressType.ETH
       break
-  default:
-    throw new TypeError(`invalid crypto address type: ${input}`)
+    default:
+      throw new TypeError(`invalid crypto address type: ${input}`)
   }
 
   return addrType
