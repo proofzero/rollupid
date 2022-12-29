@@ -25,9 +25,12 @@ export default async (
   const edges: Fetcher = context.get('Edges')
   const nodeClient = context.get('node_client')
 
-  // When the X-3RN header is parsed, any r-components are parsed into a
-  // URLSearchParams, otherwise an empty string is stored.
-  const rComponents = context.get('rparams')
+  // When the X-3RN header is parsed, the r-components contain details
+  // of the type of address.
+  const addrType = context.get('addr_type')
+  const nodeType = context.get('node_type')
+  const rComponents = `addr_type=${addrType}&node_type=${nodeType}`
+
   // This is the core part of the address, e.g. an Ethereum wallet
   // address, an e-mail address, etc. It's taken from the X-3RN header
   // included in the request.
