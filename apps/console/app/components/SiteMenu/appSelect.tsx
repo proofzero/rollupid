@@ -104,7 +104,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                     <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
                       {!selected.icon && (
                         <Text className="text-gray-500">
-                          {selected.name.substring(0, 1)}
+                          {selected.name?.substring(0, 1)}
                         </Text>
                       )}
                       {selected.icon && (
@@ -160,7 +160,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                             <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
                               {!app.icon && (
                                 <Text className="text-gray-500">
-                                  {app.name.substring(0, 1)}
+                                  {app.name?.substring(0, 1)}
                                 </Text>
                               )}
                               {app.icon && (

@@ -54,7 +54,7 @@ export const ApplicationList = ({
         </div>
 
         <div className="flex space-x-2 items-center">
-          <ApplicationListItemPublishedState />
+          <ApplicationListItemPublishedState published={false} />
           <Text size="xs" weight="normal" className="text-gray-500">
             Unpublished
           </Text>
