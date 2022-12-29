@@ -2,7 +2,8 @@ import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 
 import { jwt } from '@kubelt/platform-middleware'
-import { Account, Environment } from '.'
+import { Account } from '.'
+import type { Environment } from './types'
 
 /**
  * Defines your inner context shape.
