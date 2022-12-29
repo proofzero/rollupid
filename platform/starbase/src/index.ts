@@ -268,8 +268,7 @@ const kb_appCreate = openrpc.method(schema, {
       const appId: string = <string>app.$.id
       // Create a platform URN that uniquely represents the just-created
       // application.
-      const appURN =
-        ApplicationURNSpace.urn(appId)
+      const appURN = ApplicationURNSpace.urn(appId)
 
       const edgesClient = createEdgesClient(edges)
 
