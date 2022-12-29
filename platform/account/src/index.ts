@@ -4,10 +4,7 @@ import { ZodError } from 'zod'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
 import Account from './nodes/account'
-
-export interface Environment {
-  Account: DurableObjectNamespace
-}
+import type { Environment } from './types'
 
 export default {
   async fetch(request: Request, env: Environment): Promise<Response> {

@@ -1,22 +1,22 @@
 import { createDurable } from 'itty-durable'
-import { Environment } from '..'
+
+import type { Environment, IttyDurableObjectState } from '../types'
 
 export default class Account extends createDurable({
   autoReturn: true,
   autoPersist: true,
 }) {
-  // state: DurableObjectState
+  state: IttyDurableObjectState
   profile: object | undefined
 
-  constructor(state: DurableObjectState, env: Environment) {
+  constructor(state: IttyDurableObjectState, env: Environment) {
     super(state, env)
+    this.state = state
   }
 
   async getProfile(): Promise<object> {
     // TODO: remove this migration code after 2023-01-30
     if (!this.profile || Object.keys(this.profile).length === 0) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const oldProfile = await this.state.storage.get('profile')
       this.profile = oldProfile
     }
