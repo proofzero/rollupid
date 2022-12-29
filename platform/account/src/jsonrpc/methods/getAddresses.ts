@@ -4,6 +4,7 @@ import { CryptoAddressType } from '@kubelt/types'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 
+import type { Edge } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
 import type { AddressURN } from '@kubelt/urns/address'
 
@@ -44,5 +45,5 @@ export const getAddressesMethod = async ({
   }
 
   // Should this be a TRPCError?
-  throw new Error(edgeResult.error.message)
+  throw new Error(edgeResult.message)
 }

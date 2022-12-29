@@ -11,6 +11,7 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
   Account: DurableObjectNamespace
+  Edges: Fetcher
   account?: Account
 }
 /**
