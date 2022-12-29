@@ -8,6 +8,5 @@ export interface IttyDurableObjectState extends DurableObjectState {
   defaultState: undefined
   initialized: boolean
   router: Router
-  storage: DurableObjectStorage
   env: Environment
 }
