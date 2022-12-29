@@ -58,7 +58,7 @@ export type AddressProfile = {
   displayName: string
   pfp: {
     image: string
-    isToken: string
+    isToken?: boolean
   }
 }
 

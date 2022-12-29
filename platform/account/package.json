@@ -32,9 +32,10 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
-    "@kubelt/openrpc": "workspace:*",
+    "@kubelt/platform-middleware": "workspace:*",
     "@kubelt/platform.access": "workspace:*",
-    "itty-router": "2.6.6",
+    "@trpc/server": "10.7.0",
+    "itty-durable": "1.6.0",
     "itty-router-extras": "0.4.2",
     "typed-json-rpc": "1.1.0",
     "urns": "0.6.0"

@@ -1,8 +1,13 @@
-import type { AccountURN } from '@kubelt/urns/account'
+import type { Router } from 'itty-router'
 
 export interface Environment {
   Account: DurableObjectNamespace
 }
 
-export type GetProfileParams = [account: AccountURN]
-export type SetProfileParams = [account: AccountURN, profile: object]
+export interface IttyDurableObjectState extends DurableObjectState {
+  defaultState: undefined
+  initialized: boolean
+  router: Router
+  storage: DurableObjectStorage
+  env: Environment
+}

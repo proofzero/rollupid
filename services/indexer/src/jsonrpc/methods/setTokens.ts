@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { TokensTable } from '../../db/schema'
 import { Context } from '../../context'
-import { AddressURNInput } from '../middlewares/inputValidators'
+import { inputValidators } from '@kubelt/platform-middleware'
 
 export type SetTokensParams = TokensTable[]
 
@@ -9,7 +9,7 @@ export const SetTokensInput = z.array(
   z.object({
     tokenId: z.string(),
     contract: z.string(),
-    addressURN: AddressURNInput,
+    addressURN: inputValidators.AddressURNInput,
     gallery_order: z.number().optional(),
   })
 )

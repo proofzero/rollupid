@@ -4,7 +4,7 @@ import EvmApi from '@moralisweb3/evm-api'
 
 import { Context } from '../../context'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { AddressURNInput } from '../middlewares/inputValidators'
+import { inputValidators } from '@kubelt/platform-middleware'
 import { SetTokenMetadataParams } from './setTokenMetadata'
 import { TokensTable } from '../../db/schema'
 
@@ -15,7 +15,7 @@ export type IndexTokenParams = {
 }
 
 export const IndexTokenInput = z.object({
-  address: AddressURNInput,
+  address: inputValidators.AddressURNInput,
   chain: z.string(),
   cursor: z.string().optional(),
 })

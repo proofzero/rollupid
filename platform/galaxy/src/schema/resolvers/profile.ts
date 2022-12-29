@@ -12,6 +12,8 @@ import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
+import { Profile } from '@kubelt/platform.account/src/jsonrpc/middlewares/profile'
 
 type ResolverContext = {
   env: Env
@@ -22,21 +24,29 @@ type ResolverContext = {
 
 const threeIDResolvers: Resolvers = {
   Query: {
-    profile: async (_parent: any, {}, { env, accountURN }: ResolverContext) => {
+    profile: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
       console.log(
         `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account)
-      let accountProfile = await accountClient.kb_getProfile(accountURN)
-      console.log({ accountProfile })
-      // console.log(accountProfile)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [AccountJWTHeader]: jwt,
+        },
+      })
+      let accountProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
       return accountProfile
     },
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
-      { env }: ResolverContext
+      { env, jwt }: ResolverContext
     ) => {
       const addressClient = createAddressClient(env.Address, {
         headers: {
@@ -62,12 +72,18 @@ const threeIDResolvers: Resolvers = {
       }
 
       try {
-        const accountClient = createAccountClient(env.Account)
-        let accountProfile = await accountClient.kb_getProfile(accountURN)
+        const accountClient = createAccountClient(env.Account, {
+          headers: {
+            [AccountJWTHeader]: jwt,
+          },
+        })
+        let accountProfile = await accountClient.getProfile.query({
+          account: accountURN,
+        })
 
         if (!accountProfile) {
           accountProfile =
-            (await addressClient.kb_getAddressProfile()) as object
+            (await addressClient.kb_getAddressProfile()) as Profile
         }
 
         return accountProfile
@@ -85,24 +101,31 @@ const threeIDResolvers: Resolvers = {
       { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy.profileFromAddress: updating profile for account: ${accountURN}`
+        `galaxy.updateThreeIDProfile: updating profile for account: ${accountURN}`
       )
 
-      const accountClient = createAccountClient(env.Account)
-      let currentProfile = await accountClient.kb_getProfile(accountURN)
-
-      // Make sure nulls are empty objects.
-      currentProfile ||= {}
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [AccountJWTHeader]: jwt,
+        },
+      })
+      let currentProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
 
       const newProfile = {
         ...currentProfile,
         ...profile,
-      }
+      } as Profile
 
       // TODO: Return the profile we've created. Need to enforce
       // the GraphQL types when setting data otherwise we're able
       // to set a value that can't be returned.
-      await accountClient.kb_setProfile(accountURN, newProfile)
+      // TODO: handle and return form errors
+      await accountClient.setProfile.mutate({
+        name: accountURN,
+        profile: newProfile,
+      })
 
       return true
     },
@@ -129,7 +152,11 @@ const threeIDResolvers: Resolvers = {
 const ThreeIDResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey()],
   'Query.profileFromAddress': [setupContext(), hasApiKey()],
-  'Mutation.updateThreeIDProfile': [setupContext(), hasApiKey(), isAuthorized()],
+  'Mutation.updateThreeIDProfile': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+  ],
 }
 
 export default composeResolvers(threeIDResolvers, ThreeIDResolverComposition)

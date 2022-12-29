@@ -1,42 +1,23 @@
-import type {
-  RpcInput,
-  RpcOutput,
-  RpcParams,
-  RpcResult,
-} from '@kubelt/openrpc/component'
+import { createDurable } from 'itty-durable'
 
-import {
-  FieldAccess,
-  component,
-  field,
-  method,
-  requiredField,
-  scopes,
-} from '@kubelt/openrpc/component'
+import type { Environment, IttyDurableObjectState } from '../types'
 
-import schema from '../schemas/account'
+export default class Account extends createDurable({
+  autoReturn: true,
+  autoPersist: false,
+}) {
+  state: IttyDurableObjectState
 
-@component(schema)
-@scopes(['owner'])
-@field({
-  name: 'profile',
-  doc: 'Account profile object',
-  defaultValue: null,
-})
-export default class Core {
-  @method('getProfile')
-  @requiredField('profile', [FieldAccess.Read])
-  async getProfile(params: RpcParams, input: RpcInput): Promise<RpcResult> {
-    return input.get('profile')
+  constructor(state: IttyDurableObjectState, env: Environment) {
+    super(state, env)
+    this.state = state
   }
 
-  @method('setProfile')
-  @requiredField('profile', [FieldAccess.Write])
-  async setProfile(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    return output.set('profile', params.get('profile'))
+  async getProfile(): Promise<object> {
+    return (await this.state.storage.get('profile')) || {}
+  }
+
+  async setProfile(profile: object): Promise<void> {
+    return await this.state.storage.put('profile', profile)
   }
 }

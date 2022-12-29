@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { AddressURN } from '@kubelt/urns/address'
-import { AddressURNInput } from '../middlewares/inputValidators'
+import { inputValidators } from '@kubelt/platform-middleware'
 
 export type GetTokensParams = AddressURN[] // addresses
 
-export const GetTokensInput = z.array(AddressURNInput)
+export const GetTokensInput = z.array(inputValidators.AddressURNInput)
 
 export const getTokensMethod = async ({
   input,

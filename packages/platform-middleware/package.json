@@ -1,8 +1,8 @@
 {
-  "name": "@kubelt/platform-clients",
+  "name": "@kubelt/platform-middleware",
   "version": "1.0.0",
   "private": true,
-  "description": "Kubelt Platform Clients",
+  "description": "Kubelt Platform Middleware",
   "keywords": [],
   "license": "ISC",
   "author": "Kubelt, Inc.",
@@ -20,10 +20,6 @@
     "test": "run-s check"
   },
   "devDependencies": {
-    "@kubelt/platform.access": "workspace:*",
-    "@kubelt/platform.address": "workspace:*",
-    "@kubelt/platform.object": "workspace:*",
-    "@kubelt/platform.starbase": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@typescript-eslint/eslint-plugin": "5.45.0",
     "@typescript-eslint/parser": "5.45.0",
@@ -34,7 +30,9 @@
     "typescript": "4.8.4"
   },
   "dependencies": {
-    "@trpc/client": "10.7.0",
-    "typed-json-rpc": "1.1.0"
+    "@trpc/server": "10.7.0",
+    "jose": "4.11.1",
+    "typed-json-rpc": "1.1.0",
+    "zod": "3.20.2"
   }
 }
