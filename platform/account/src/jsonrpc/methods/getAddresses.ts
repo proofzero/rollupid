@@ -34,16 +34,16 @@ export const getAddressesMethod = async ({
   // nodes, filtered by address type if provided.
   const edgeResult = await listAddresses(ctx.Edges, input.account, input?.type)
 
-  if (Array.isArray(edgeResult)) {
-    // The source nodes in the returned edges are the URNs of the
-    // account nodes.
-    const addresses = edgeResult.map((edge: Edge) => {
-      return edge.dst.urn
-    })
-
-    return addresses
+  if (!Array.isArray(edgeResult)) {
+    // Should this be a TRPCError?
+    throw new Error(edgeResult.message)
   }
 
-  // Should this be a TRPCError?
-  throw new Error(edgeResult.message)
+  // The source nodes in the returned edges are the URNs of the
+  // account nodes.
+  const addresses = edgeResult.map((edge: Edge) => {
+    return edge.dst.urn
+  })
+
+  return addresses
 }

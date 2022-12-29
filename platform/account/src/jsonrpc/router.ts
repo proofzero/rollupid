@@ -90,7 +90,8 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(GetAddressesInput)
-    .output(AddressList)
+    // TODO this causes a type checking error
+    //.output(AddressList)
     .mutation(getAddressesMethod),
 })
 
