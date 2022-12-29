@@ -17,13 +17,8 @@ export const GetAddressesInput = z.object({
   type: inputValidators.CryptoAddressTypeInput.optional(),
 })
 
-export const AddressList = z.object({
-  account: inputValidators.AccountURNInput,
-  // One of the values of CryptoAddressType enum.
-  type: z.string(),
-  // The list of addresses (as URNs) associated with the account.
-  addresses: z.array(inputValidators.AddressURNInput),
-})
+export const AddressList = z.array(inputValidators.AddressURNInput)
+
 // TODO move to types package
 export type AddressList = z.infer<typeof AddressList>
 
@@ -45,7 +40,7 @@ export const getAddressesMethod = async ({
       return edge.dst.urn
     })
 
-    return { account: input.account, type: input?.type, addresses }
+    return addresses
   }
 
   // Should this be a TRPCError?
