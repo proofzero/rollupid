@@ -7,6 +7,7 @@ export interface Environment {
   CryptoAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
   OAuthAddress: DurableObjectNamespace
+  AddressAnalytics: AnalyticsEngineDataset
 
   COLLECTIONS: D1Database
 

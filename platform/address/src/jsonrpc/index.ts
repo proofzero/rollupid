@@ -108,6 +108,7 @@ export default (request: Request, env: Environment, ctx: ExecutionContext) => {
   context.set('CryptoAddress', env.CryptoAddress)
   context.set('ContractAddress', env.ContractAddress)
   context.set('OAuthAddress', env.OAuthAddress)
+  context.set('AddressAnalytics', env.AddressAnalytics)
   context.set('COLLECTIONS', env.COLLECTIONS)
   context.set('NFTAR_CHAIN_ID', env.NFTAR_CHAIN_ID)
   context.set('TOKEN_NFTAR', env.TOKEN_NFTAR)
