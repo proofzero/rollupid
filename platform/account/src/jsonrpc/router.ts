@@ -4,13 +4,11 @@ import { proxyDurable } from 'itty-durable'
 
 import { Context } from '../context'
 
+import { AddressList } from './middlewares/addressList'
+
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
-import {
-  getAddressesMethod,
-  GetAddressesInput,
-  AddressList,
-} from './methods/getAddresses'
+import { getAddressesMethod, GetAddressesInput } from './methods/getAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
 
 import { ProfileSchema } from './middlewares/profile'
@@ -23,9 +21,6 @@ import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
 
 import { initAccountNodeByName } from '../nodes'
-
-import Account from '../nodes/account'
-//import { AddressList } from './middlewares/addressList'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -79,10 +74,11 @@ export const appRouter = t.router({
     .use(Scopes)
     .use(LogUsage)
     .input(GetAddressesInput)
-    // TODO this causes a type checking error
-    //.output(AddressList)
+    .output(AddressList)
     .mutation(getAddressesMethod),
   hasAddresses: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .input(HasAddressesInput)

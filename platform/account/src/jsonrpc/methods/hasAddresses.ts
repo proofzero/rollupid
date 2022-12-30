@@ -8,7 +8,6 @@ import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressList } from '../middlewares/addressList'
 import type { Edge } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
-import type { AddressURN } from '@kubelt/urns/address'
 
 // Should this live in @kubelt/platform-middlewares/inputValidators?
 export const AddressListInput = z.custom<AddressList>((input) => {
@@ -16,7 +15,7 @@ export const AddressListInput = z.custom<AddressList>((input) => {
     throw new Error('address list must be an array')
   }
   input.forEach((address) => {
-    if (AddressURNSpace.parse(address as AddressURN) === null) {
+    if (!AddressURNSpace.is(address)) {
       throw new Error(`invalid address provided: ${address}`)
     }
   })
