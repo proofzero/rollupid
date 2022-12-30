@@ -11,6 +11,7 @@ import type { Environment } from './types'
 interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
   ReplyMessage: DurableObjectNamespace
   reply?: ReplyMessage
+  KEY_REPLY_MESSAGE?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -22,7 +23,6 @@ interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-
   return {
     ...opts,
   }
