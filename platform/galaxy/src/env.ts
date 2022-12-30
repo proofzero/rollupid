@@ -12,6 +12,7 @@ export default interface Env {
   Address: Fetcher
   Starbase: Fetcher
   Indexer: Fetcher
+  GalaxyAnalytics: AnalyticsEngineDataset
   APIKEY_ALCHEMY_ETH: string
   ALCHEMY_ETH_NETWORK: string
   APIKEY_ALCHEMY_POLYGON: string
@@ -23,6 +24,7 @@ export const required = [
   'Address',
   'Starbase',
   'Indexer',
+  'GalaxyAnalyics',
   'APIKEY_ALCHEMY_ETH',
   'ALCHEMY_ETH_NETWORK',
   'APIKEY_ALCHEMY_POLYGON',

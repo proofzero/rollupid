@@ -13,6 +13,10 @@ services = [
   { binding = "Indexer", service = "indexer" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "GalaxyAnalytics", dataset = "GalaxyAnalytics"  },
+]
+
 [dev]
 port = 8787
 local_protocol = "http"
@@ -30,6 +34,10 @@ services = [
   { binding = "Indexer", service = "indexer-dev" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "GalaxyAnalytics", dataset = "GalaxyAnalyticsDev"  },
+]
+
 [env.dev.vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -43,6 +51,10 @@ services = [
   { binding = "Indexer", service = "indexer-next" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "GalaxyAnalytics", dataset = "GalaxyAnalyticsNext"  },
+]
+
 [env.next.vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -54,6 +66,10 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Starbase", service = "starbase-current" },
   { binding = "Indexer", service = "indexer-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "GalaxyAnalytics", dataset = "GalaxyAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

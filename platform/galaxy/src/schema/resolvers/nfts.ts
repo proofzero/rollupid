@@ -277,6 +277,14 @@ const nftsResolvers: Resolvers = {
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }
+
+      // Try getting analytics on contracts.
+      const blobs = contracts
+      const doubles = []
+      const indexes = [owner ? owner.slice(-32) : 'noOwner'] // Must cap index at 32 bytes.
+      console.log('logging contracts in galaxy:', blobs)
+      env.GalaxyAnalytics.writeDataPoint({ blobs, doubles, indexes })
+
       return {
         contracts,
       }
