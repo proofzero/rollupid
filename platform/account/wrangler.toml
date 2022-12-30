@@ -11,6 +11,10 @@ services = [
   { binding = "Edges", service = "edges" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccountAnalytics", dataset = "AccountAnalytics"  },
+]
+
 [[migrations]]
 tag = "v0"
 new_classes = ["Core"]
@@ -31,6 +35,10 @@ services = [
   { binding = "Edges", service = "edges-dev" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccountAnalytics", dataset = "AccountAnalyticsDev"  },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
@@ -39,10 +47,18 @@ services = [
   { binding = "Edges", service = "edges-next" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccountAnalytics", dataset = "AccountAnalyticsNext"  },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
   { binding = "Edges", service = "edges-current" }
+]
+
+analytics_engine_datasets = [
+  { binding = "AccountAnalytics", dataset = "AccountAnalyticsCurrent"  },
 ]
