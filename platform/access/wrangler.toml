@@ -12,6 +12,10 @@ services = [
   { binding = "Starbase", service = "starbase" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccessAnalytics" },
+]
+
 [dev]
 port = 9393
 local_protocol = "http"
@@ -25,6 +29,10 @@ services = [
   { binding = "Starbase", service = "starbase-dev" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccessAnalytics", dataset = "AccessAnalyticsDev" },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -34,6 +42,10 @@ services = [
   { binding = "Starbase", service = "starbase-next" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "AccessAnalytics", dataset = "AccessAnalyticsNext"  },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -41,6 +53,10 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Starbase", service = "starbase-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "AccessAnalytics", dataset = "AccessAnalyticsCurrent"  },
 ]
 
 [[migrations]]

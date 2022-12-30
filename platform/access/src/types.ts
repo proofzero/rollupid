@@ -16,6 +16,7 @@ export interface Environment {
   Access: DurableObjectNamespace
   Authorization: DurableObjectNamespace
   Starbase: Fetcher
+  AccessAnalytics: AnalyticsEngineDataset
 }
 
 export type AuthorizationParameters = {
