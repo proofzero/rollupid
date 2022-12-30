@@ -12,7 +12,7 @@ import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { Profile } from '@kubelt/platform.account/src/jsonrpc/middlewares/profile'
 
 type ResolverContext = {
@@ -35,7 +35,7 @@ const threeIDResolvers: Resolvers = {
 
       const accountClient = createAccountClient(env.Account, {
         headers: {
-          [AccountJWTHeader]: jwt,
+          [PlatformJWTAssertionHeader]: jwt,
         },
       })
       let accountProfile = await accountClient.getProfile.query({
@@ -74,7 +74,7 @@ const threeIDResolvers: Resolvers = {
       try {
         const accountClient = createAccountClient(env.Account, {
           headers: {
-            [AccountJWTHeader]: jwt,
+            [PlatformJWTAssertionHeader]: jwt,
           },
         })
         let accountProfile = await accountClient.getProfile.query({
@@ -106,7 +106,7 @@ const threeIDResolvers: Resolvers = {
 
       const accountClient = createAccountClient(env.Account, {
         headers: {
-          [AccountJWTHeader]: jwt,
+          [PlatformJWTAssertionHeader]: jwt,
         },
       })
       let currentProfile = await accountClient.getProfile.query({
