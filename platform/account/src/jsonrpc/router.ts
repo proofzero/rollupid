@@ -7,6 +7,8 @@ import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
+import { ProfileSchema } from './middlewares/profile'
+
 import {
   getAddressesMethod,
   GetAddressesInput,
@@ -14,7 +16,6 @@ import {
 } from './methods/getAddresses'
 import Account from '../nodes/account'
 import { proxyDurable } from 'itty-durable'
-import { Profile } from './middlewares/profile'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -78,7 +79,7 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(GetProfileInput)
-    .output(Profile)
+    .output(ProfileSchema.nullable())
     .query(getProfileMethod),
   setProfile: t.procedure
     .use(scopes)
