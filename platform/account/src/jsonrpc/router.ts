@@ -7,6 +7,11 @@ import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
+import {
+  getAddressesMethod,
+  GetAddressesInput,
+  AddressList,
+} from './methods/getAddresses'
 import Account from '../nodes/account'
 import { proxyDurable } from 'itty-durable'
 import { Profile } from './middlewares/profile'
@@ -81,6 +86,13 @@ export const appRouter = t.router({
     .use(logUsage)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
+  getAddresses: t.procedure
+    .use(scopes)
+    .use(logUsage)
+    .input(GetAddressesInput)
+    // TODO this causes a type checking error
+    //.output(AddressList)
+    .mutation(getAddressesMethod),
 })
 
 export type AccountRouter = typeof appRouter

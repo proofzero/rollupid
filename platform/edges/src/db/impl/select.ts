@@ -11,7 +11,7 @@ import { EdgeDirection } from '@kubelt/graph'
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import type { Edge, EdgeTag, Node, Permission } from '@kubelt/graph'
+import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Node, NodeFilter, Permission } from '@kubelt/graph'
 
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
@@ -20,10 +20,19 @@ import type { EdgeRecord, Graph, NodeRecord, QComponent, QComponents, RComponent
 // qc()
 // -----------------------------------------------------------------------------
 
+/**
+ * Returns the q-components for the node having the given ID. If the
+ * node doesn't exist, an empty mapping is returned.
+ *
+ * @param g - the graph database handle
+ * @param nodeId - a node URN
+ * @returns a map of q-components for the node
+ */
 export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
   const query = `
     SELECT
-      *
+      uc.key,
+      uc.value
     FROM
       node_qcomp_urnq_component nc
     JOIN
@@ -48,10 +57,19 @@ export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
 // rc()
 // -----------------------------------------------------------------------------
 
+/**
+ * Returns the r-components for the node having the given ID. If the
+ * node doesn't exist, an empty mapping is returned.
+ *
+ * @param g - the graph database handle
+ * @param nodeId - a node URN
+ * @returns a map of r-components for the node
+ */
 export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
   const query = `
     SELECT
-      *
+      uc.key,
+      uc.value
     FROM
       node_rcomp_urnr_component nc
     JOIN
@@ -145,41 +163,127 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
  */
 export async function edges(
   g: Graph,
-  nodeId: AnyURN,
-  tag?: EdgeTag,
-  dir?: EdgeDirection
+  query: EdgeQuery,
+  opt?: EdgesOptions,
 ): Promise<Edge[]> {
-  let query
+
+  let sql: string
+
+  // If a node ID is not supplied, we're returning no edges.
+  //
+  // TODO we don't want to allow for the possibility of all edges being
+  // returned until pagination is in place. Revisit this behavior if we
+  // decide to implement it.
+  if (_.isUndefined(query.id)) {
+    return []
+  }
 
   // Filter returned edges by direction; if we're asked for "outgoing"
   // edges, the node ID is for the "source" node of the edge. If we're
   // asked for "incoming" edges, the node ID is for the "destination"
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
-  switch(dir) {
+  switch(query.dir) {
   case EdgeDirection.Incoming:
-    query = `SELECT * FROM edge e WHERE (e.dstUrn = ?1)`
+    sql = `SELECT * FROM edge e WHERE (e.dstUrn = ?1)`
     break
   case EdgeDirection.Outgoing:
-    query = `SELECT * FROM edge e WHERE (e.srcUrn = ?1)`
+    sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1)`
     break
   default:
-    query = `SELECT * FROM edge e WHERE (e.srcUrn = ?1 OR e.dstUrn = ?1)`
+    sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1 OR e.dstUrn = ?1)`
   }
 
   // Filter edges by tag, if provided.
-  if (!_.isUndefined(tag)) {
-    query = _.join([query, 'e.tag = ?2'], ' AND ')
+  if (!_.isUndefined(query.tag)) {
+    sql = _.join([sql, 'e.tag = ?2'], ' AND ')
   }
 
   const result = await g.db
-    .prepare(query)
-    .bind(nodeId.toString(), tag)
+    .prepare(sql)
+    .bind(query.id.toString(), query.tag)
     .all()
 
   // TODO check result.success and handle query error
+  let edges: EdgeRecord[] = result.results as EdgeRecord[]
 
-  const edges: EdgeRecord[] = result.results as EdgeRecord[]
+  // Returns true if every key/value pair in the query components is
+  // matched exactly in the node components.
+  function hasProps(queryComp: Record<string, string>, nodeComp: Record<string, string>): boolean {
+    //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
+    //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
+    return _.reduce(queryComp, (flag: boolean, value: string, key: string): boolean => {
+      return flag && nodeComp[key] === value
+    }, true)
+  }
+
+  async function nodeFilter(edges: EdgeRecord[], query: EdgeQuery): Promise<EdgeRecord[]> {
+    // A reducing function over a set of edges that discards any edges
+    // which don't match the filter criteria supplied in the EdgeQuery.
+    async function queryFilter(resultPromise: Promise<EdgeRecord[]>, edge: EdgeRecord): Promise<EdgeRecord[]> {
+      const result = await resultPromise
+
+      // SRC
+
+      // fragment
+      if (query?.src?.fr !== undefined) {
+        const srcNode = await node(g, edge.srcUrn)
+        if (srcNode !== undefined && srcNode.fragment !== query.src.fr) {
+          return result
+        }
+      }
+      // q-components
+      if (query?.src?.qc !== undefined) {
+        const srcQc = await qc(g, edge.srcUrn)
+        if (!hasProps(query.src.qc, srcQc)) {
+          return result
+        }
+      }
+      // r-components
+      if (query?.src?.rc !== undefined) {
+        const srcRc = await rc(g, edge.srcUrn)
+        if (!hasProps(query.src.rc, srcRc)) {
+          return result
+        }
+      }
+
+      // DST
+
+      // fragment
+      if (query?.dst?.fr !== undefined) {
+        const dstNode = await node(g, edge.dstUrn)
+        if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
+          return result
+        }
+      }
+      // q-components
+      if (query?.dst?.qc !== undefined) {
+        const dstQc = await qc(g, edge.dstUrn)
+        if (!hasProps(query?.dst?.qc, dstQc)) {
+          return result
+        }
+      }
+      // r-components
+      if (query?.dst?.rc !== undefined) {
+        const dstRc = await rc(g, edge.dstUrn)
+        if (!hasProps(query.dst.rc, dstRc)) {
+          return result
+        }
+      }
+
+      // Include the current edge in the list of returned edges; it has
+      // passed filtering.
+      result.push(edge)
+
+      return result
+    }
+
+    return edges.reduce(queryFilter, Promise.resolve([]))
+  }
+
+  if (query?.src !== undefined || query?.dst !== undefined) {
+    edges = await nodeFilter(edges, query)
+  }
 
   // Enrich each edge with the details of the referenced nodes.
   return Promise.all(

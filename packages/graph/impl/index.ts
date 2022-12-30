@@ -6,13 +6,13 @@
 
 import * as _ from 'lodash'
 
-import { EdgeSpace } from '../space'
+import { EdgeSpace } from '@kubelt/urns/edge'
 
 import { EdgeDirection } from '../types'
 
 import type { RpcResponse, RpcErrorDetail } from '@kubelt/openrpc'
 
-import type { Edge, EdgeTag, Token } from '../types'
+import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Token } from '../types'
 
 import type { AnyURN } from '@kubelt/urns'
 
@@ -46,6 +46,7 @@ export async function link(
 ): Promise<Edge|RpcErrorDetail> {
   const kb_makeEdge = {
     jsonrpc: '2.0',
+    // TODO avoid fixed request ID
     id: 1,
     method: 'kb_makeEdge',
     params: {
@@ -56,8 +57,8 @@ export async function link(
   }
   const response: RpcResponse = await rpc.request(edges, kb_makeEdge)
 
-  if (Object.hasOwn(response, 'result')) {
-    const result = _.get(response, 'result') as unknown
+  if (Object.hasOwn(response, 'edge')) {
+    const result = _.get(response, 'edge') as unknown
     return result as Edge
   } else {
     const error = response as unknown
@@ -76,6 +77,7 @@ export async function unlink(
 ): Promise<number|RpcErrorDetail> {
   const kb_rmEdge = {
     jsonrpc: '2.0',
+    // TODO avoid fixed request ID
     id: 1,
     method: 'kb_rmEdge',
     params: {
@@ -100,18 +102,17 @@ export async function unlink(
 
 export async function edges(
   edges: Fetcher,
-  id: AnyURN,
-  tag?: EdgeTag,
-  dir?: EdgeDirection,
+  query: EdgeQuery,
+  opt?: EdgesOptions,
 ): Promise<Edge[]|RpcErrorDetail> {
   const kb_getEdges = {
     jsonrpc: '2.0',
+    // TODO avoid fixed request ID
     id: 1,
     method: 'kb_getEdges',
     params: {
-      id,
-      tag,
-      dir,
+      query,
+      opt,
     },
   }
   const response: RpcResponse = await rpc.request(edges, kb_getEdges)

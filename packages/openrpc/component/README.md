@@ -40,6 +40,7 @@ export default rpcSchema
 ### @method()
 
 Each RPC method declared in the schema must have a corresponding method defined in the component using the `@method()` decorator. For example, if the schema declared a method named `ex_MyMethod`:
+
 ```ts
 {
   name: 'ex_MyMethod',
@@ -55,6 +56,7 @@ Each RPC method declared in the schema must have a corresponding method defined 
 ```
 
 The component would need to declare that method to avoid an error during initialization:
+
 ```ts
 @component(schema)
 export class MyComponent {
@@ -69,6 +71,7 @@ export class MyComponent {
 Note that the method name on the class doesn't matter except as far as normal class method naming rules apply (you can't reuse a method name, for example). The mapping between schema declaration and implementation is managed using the name supplied to the `@method()` decorator, not the class method name.
 
 A method takes several parameters:
+
 - params: the RPC method parameters sent in the request to invoke the method
 - input: the values of any "fields" declared on the method
 - output: the updated values to store in any declared "fields"
@@ -93,6 +96,7 @@ export class MyComponent { ... }
 Each field that is declared has a `name` used to refer to it, a `doc` string to provide human-readable commentary, and a `defaultValue` that is used to initialize the stored value when the component is initialized.
 
 Extra configuration features planned for fields but not yet ready to go include:
+
 - `scopes`: permissions required to read or write a field
 - `validator`: a bespoke validation function applied before storing a new value
 - `schemas`: one or more versioned JSON-RPC schemas to apply before storing a new value
@@ -109,6 +113,7 @@ someMethod(params: RpcParams, input: RpcInput, RpcOutput: alarm: RpcAlarm) { ...
 ```
 
 The `@requiredField()` decorator accepts an array of field access declarations:
+
 - `FieldAccess.Read` - indicate that the field value is read by a method
 - `FieldAccess.Write` - indicate that the field value may be updated by the method
 
@@ -148,6 +153,7 @@ someMethod(input: RpcInput, output: RpcOutput, alarm: RpcAlarm) { ... }
 ```
 
 Alarms are scheduled by calling one of:
+
 - `alarm.at()`: schedule an alarm for an absolute time
 - `alarm.after()`: schedule an alarm for a relative time
 
@@ -162,7 +168,12 @@ const scheduledTime = alarm.at(new Date(Date.UTC(2023, 1, 2, 3, 4, 5)))
 To schedule an alarm for a relative time:
 
 ```ts
-const scheduledTime = alarm.after({days: 2, hours: 3, minutes: 22, seconds: 5})
+const scheduledTime = alarm.after({
+  days: 2,
+  hours: 3,
+  minutes: 22,
+  seconds: 5,
+})
 ```
 
 ### @scopes()
@@ -172,6 +183,7 @@ The `@scopes()` decorator is used to declare—at the component level—the set 
 The intent of defining scopes is that a method may require the existence of a granted permission on an incoming request to allow the method to be invoked. More concretely, as we are using JWTs to convey authentication and authorization information, a claim should exist in the JWT sent with an RPC request that corresponds to a scope. Middleware in the component request handler will (eventually) check the permissions included in the supplied token, map them into the component scopes, and if the needed permissions are absent to short-circuit the RPC request without invoking an RPC handler method.
 
 On the component:
+
 ```ts
 @component(schema)
 @scopes(['owner', 'app.update'])
@@ -179,6 +191,7 @@ export class MyComponent { ... }
 ```
 
 On the method:
+
 ```ts
 @method('ex_someMethod')
 @requiredScope('app.update')
@@ -202,6 +215,7 @@ This module depends heavily on TypeScript decorators which provide the structure
 ### @component()
 
 The `@component()` decorator defines the underlying Durable Object class. This class is anonymous and hides direct access to the Durable Object API, providing a decorator-based declarative API and lifecycle on top of Durable Objects. It makes the available data fields, scopes, and RPC methods explicit in the component declaration and aims to disallow unmediated access to state. The intended benefit is that, by adhering to the component API, users receive a guarantee that the stored data conforms with the user-supplied rules defining the shape of state:
+
 - JSON Schema
 - versioning / migration
 - validation functions
@@ -228,7 +242,8 @@ export function field(fieldSpec: Readonly<FieldSpec>) {
 
     // Get an existing map of fields (if any fields were previously
     // declared), or create a new, empty map otherwise.
-    const fields = Reflect.get(constructor, _FIELDS) || new Map<symbol, FieldSpec>()
+    const fields =
+      Reflect.get(constructor, _FIELDS) || new Map<symbol, FieldSpec>()
 
     // Store the field descriptor object in the field map.
     fields.set(fieldName, fieldSpec)
@@ -258,36 +273,48 @@ export function component(schema: Readonly<RpcSchema>) {
 This pattern also holds for:
 
 - required fields (declared using the `@requiredField()` method decorator:
+
 ```ts
-const fieldsRequired: RequiredFields = Reflect.get(constructor, _FIELDS_REQUIRED)
+const fieldsRequired: RequiredFields = Reflect.get(
+  constructor,
+  _FIELDS_REQUIRED
+)
 Reflect.deleteProperty(constructor, _FIELDS_REQUIRED)
 ```
 
 - required scopes (declared using the `@requiredScope()` method decorator):
+
 ```ts
-const scopesRequired: RequiredScopes = Reflect.get(constructor, _SCOPES_REQUIRED)
+const scopesRequired: RequiredScopes = Reflect.get(
+  constructor,
+  _SCOPES_REQUIRED
+)
 Reflect.deleteProperty(constructor, _SCOPES_REQUIRED)
 ```
 
 - the set of scopes (declared using the `@scopes()` class decorator):
+
 ```ts
 const allScopes: ScopeSet = Reflect.get(constructor, _SCOPES_ALL)
 Reflect.deleteProperty(constructor, _SCOPES_ALL)
 ```
 
 - the mapping from RPC method name to class method name (declared using the `@method()` decorator):
+
 ```ts
 const rpcMethodMap: MethodMap = Reflect.get(constructor, _METHODS)
 Reflect.deleteProperty(constructor, _METHODS)
 ```
 
 - the name of the alarm method (declared using the `@alarm()` decorator):
+
 ```ts
 const alarmMethod: string = Reflect.get(constructor, _ALARM_HANDLER)
 Reflect.deleteProperty(constructor, _ALARM_HANDLER)
 ```
 
 Once this data has been retrieved, the Durable Object class is constructed and returned:
+
 ```ts
 return class extends constructor implements DurableObject { ... }
 ```
@@ -297,41 +324,49 @@ return class extends constructor implements DurableObject { ... }
 The returned Durable Object class has a number of private properties. These include:
 
 - the schema that this OpenRPC service conforms to (supplied via the `@component()` decorator):
+
 ```ts
 private readonly _schema: RpcSchema
 ```
 
 - a map from method name (a symbol) to the set of scopes that are required for it to be invoked:
+
 ```ts
 private readonly _scopes: RequiredScopes
 ```
 
 - a map from field name (a symbol) to a field descriptor:
+
 ```ts
 private readonly _fields: Fields
 ```
 
 - the set of all scopes declared by the component:
+
 ```ts
 private readonly _allScopes: ScopeSet
 ```
 
 - access to Cloudflare transactional storage API (injected via the Durable Object constructor):
+
 ```ts
 private readonly _state: DurableObjectState
 ```
 
 - the wrangler-configured environment context (injected via the Durable Object constructor):
+
 ```ts
 private readonly _env: Env
 ```
 
 - a functional OpenRPC request handler (constructed using the `@kubelt/openrpc` package):
+
 ```ts
 private readonly _rpcHandler: OpenRpcHandler
 ```
 
 - a reference to the alarm handler (using the `@alarm()` decorator):
+
 ```ts
 private readonly _alarmFn: RpcAlarmCallable
 ```
@@ -355,9 +390,10 @@ The constructor stores data in these fields and performs some additional intiali
   - the handler is stored in the `_rpcHandler` property of the durable object
   - all request processing logic, from middleware to RPC method handling, is exposed via this single function
 
-#### _initMethods()
+#### \_initMethods()
 
 The `_initMethods()` method defines an RPC handler for each method declared in the schema and returns an array of these handlers. When constructing an RPC method handler the procedure is to:
+
 - retrieve the set of scopes required to invoke the method
 - retrieve the set of fields required by the method
 - retrieve the class method that implements the RPC method (an `RpcCallable`)
@@ -379,27 +415,33 @@ const requestResult = await methodFn(
 ```
 
 Any outputs that are set by the method are checked to ensure that write permission was requested (by setting `FieldAccess.Write` in the `@requiredField()` decorator on the method) and which are valid (conform to their associated schemas).
+
 ```ts
 const checkedOutput = this._checkOutput(fieldMap, fieldOutput)
 ```
+
 NB: schema checking is still a work-in-progress; don't rely on it just yet.
 
 Whatever outputs survive validation are written to durable object storage:
+
 ```ts
 await this._storeOutput(fieldSet, checkedOutput)
 ```
 
 If any alarm was set, it's scheduled for eventual execution:
+
 ```ts
 this._scheduleAlarm(alarm)
 ```
 
 Finally, the return value of the RPC method handler is set as the RPC method response:
+
 ```ts
 return openrpc.response(request, requestResult)
 ```
 
 The handler that does all of the above is "compiled" into an `@kubelt/openrpc` handler and added to the list of service handlers for the component:
+
 ```ts
 const rpcMethod: RpcMethod = openrpc.method(schema, {
   name: rpcName,

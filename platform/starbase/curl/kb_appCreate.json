@@ -2,7 +2,7 @@
   "jsonrpc": "2.0",
   "id": 1,
   "method": "kb_appCreate",
-  "params": {
-    "clientName": "foobar App"
-  }
+  "params": [
+    "foobar App"
+  ]
 }

@@ -8,6 +8,7 @@ durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
+  { binding = "Edges", service = "edges" }
 ]
 
 [[migrations]]
@@ -27,6 +28,7 @@ durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
+  { binding = "Edges", service = "edges-dev" }
 ]
 
 [env.next]
@@ -34,6 +36,7 @@ durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
+  { binding = "Edges", service = "edges-next" }
 ]
 
 [env.current]
@@ -41,4 +44,5 @@ durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
+  { binding = "Edges", service = "edges-current" }
 ]

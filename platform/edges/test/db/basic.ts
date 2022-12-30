@@ -153,17 +153,20 @@ tap.teardown(async () => {
 // graph.link()
 // -----------------------------------------------------------------------------
 
+/*
 tap.test('link', async (t) => {
   const g = db.init(d1)
   const edge: EdgeRecord = await db.link(g, srcURN, dstURN, edgeTag)
   tap.equal(1, edge.id, 'the first edge should have an ID of 1')
 
   t.end()
-})
+  })
+*/
 
 // graph.unlink()
 // -----------------------------------------------------------------------------
 
+/*
 tap.test('unlink', async (t) => {
   const g = db.init(d1)
   const result = await db.unlink(g, srcURN, dstURN, edgeTag)
@@ -171,6 +174,7 @@ tap.test('unlink', async (t) => {
 
   t.end()
 })
+*/
 
 // graph.edges()
 // -----------------------------------------------------------------------------
@@ -178,6 +182,7 @@ tap.test('unlink', async (t) => {
 // TODO test filtering by edge direction
 // TODO test filtering by f-comp, r-comp, q-comp
 
+/*
 tap.test('edges', async (t) => {
   const g = db.init(d1)
   const link: EdgeRecord = await db.link(g, srcURN, dstURN, edgeTag)
@@ -198,3 +203,4 @@ tap.test('edges', async (t) => {
 
   t.end()
 })
+*/
