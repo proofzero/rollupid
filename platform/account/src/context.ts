@@ -1,3 +1,4 @@
+import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 
@@ -8,11 +9,11 @@ import type { Environment } from './types'
  * Defines your inner context shape.
  * Add fields here that the inner context brings.
  */
-interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
+interface CreateInnerContextOptions
+  extends Partial<CreateNextContextOptions & BaseContext> {
   Account: DurableObjectNamespace
   Edges: Fetcher
   account?: Account
-  token?: string
   accountURN?: string
 }
 /**
