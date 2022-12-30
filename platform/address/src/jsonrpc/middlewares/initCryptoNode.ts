@@ -45,11 +45,9 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
     // }
   }
 
-  const blobs = [address, type]
+  const blobs = [await nodeClient.getAddress(), await nodeClient.getType()]
   const doubles = []
-  const indexes = [address.slice(-32)] // Must cap index at 32 bytes.
-
-  console.log('init crypto core:', blobs, doubles, indexes)
+  const indexes = [blobs[0] ? blobs[0].slice(-32) : 'newCryptoCore'] // Must cap index at 32 bytes.
 
   context.get('AddressAnalytics').writeDataPoint({ blobs, doubles, indexes })
 }
