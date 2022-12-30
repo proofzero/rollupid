@@ -8,15 +8,12 @@ import type { Edge } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
 import type { AddressURN } from '@kubelt/urns/address'
 
-export type GetAddressesParams = {
-  account: AccountURN
-  type?: Address.CryptoAddressType
-}
-
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
   type: inputValidators.CryptoAddressTypeInput.optional(),
 })
+
+export type GetAddressesParams = z.infer<typeof GetAddressesInput>
 
 export const AddressList = z.array(inputValidators.AddressURNInput)
 
