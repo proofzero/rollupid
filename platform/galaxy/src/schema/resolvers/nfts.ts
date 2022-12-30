@@ -100,6 +100,13 @@ const nftsResolvers: Resolvers = {
         )
       )
 
+      // Try getting analytics on contracts.
+      //const blobs = ownedNfts
+      //const doubles = []
+      //const indexes = [owner ? owner.slice(-32) : 'noOwner'] // Must cap index at 32 bytes.
+      //console.log('logging ownedNfts in galaxy:', blobs)
+      //env.GalaxyAnalytics.writeDataPoint({ blobs, doubles, indexes })
+
       return {
         ownedNfts,
       }
@@ -279,7 +286,7 @@ const nftsResolvers: Resolvers = {
       }
 
       // Try getting analytics on contracts.
-      const blobs = contracts
+      const blobs =  contracts.map((contract: any) => contract.address)
       const doubles = []
       const indexes = [owner ? owner.slice(-32) : 'noOwner'] // Must cap index at 32 bytes.
       console.log('logging contracts in galaxy:', blobs)
