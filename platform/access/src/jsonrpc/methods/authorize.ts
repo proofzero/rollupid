@@ -49,5 +49,12 @@ export const authorizeMethod = async ({
     state
   )
 
+  const blobs = [account, responseType, clientId, redirectUri, ...scope, state]
+  const doubles = []
+  const indexes = [accountId.slice(-32)] // Must cap index at 32 bytes.
+  console.log(blobs, doubles, indexes)
+
+  context.get('AccessAnalytics').writeDataPoint({ blobs, doubles, indexes })
+
   return { ...result }
 }
