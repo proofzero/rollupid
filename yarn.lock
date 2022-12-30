@@ -6493,6 +6493,7 @@ __metadata:
     "@kubelt/graph": "workspace:*"
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
+    "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1

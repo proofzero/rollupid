@@ -1,8 +1,6 @@
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
 
-import { jwt } from '@kubelt/platform-middleware'
-
 import { Context } from '../context'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
@@ -16,6 +14,12 @@ import {
 } from './methods/getAddresses'
 import Account from '../nodes/account'
 import { proxyDurable } from 'itty-durable'
+import {
+  ValidateJWT,
+  JWTAssertionTokenFromHeader,
+} from '@kubelt/platform-middleware/jwt'
+import { LogUsage } from '@kubelt/platform-middleware/log'
+import { Scopes } from '@kubelt/platform-middleware/scopes'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -32,21 +36,8 @@ const t = initTRPC.context<Context>().create({
   },
 })
 
-export const scopes = t.middleware(async ({ ctx, next }) => {
-  // TODO: check scopes
-  return next({ ctx })
-})
-
 export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
-  const token = ctx.token
-
-  if (!token) throw new Error('No JWT found in headers')
-
-  // TODO: validate token
-
-  const { accountURN } = jwt.AccountJWTFromHeader(token)
-
-  if (!accountURN) throw new Error('No accountURN found in JWT')
+  const accountURN = ctx.accountURN
 
   const proxy = await proxyDurable(ctx.Account, {
     name: 'account',
@@ -64,36 +55,29 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   })
 })
 
-export const logUsage = t.middleware(async ({ path, type, next }) => {
-  const start = Date.now()
-  const result = await next()
-  const durationMs = Date.now() - start
-  result.ok
-    ? console.log('OK request timing:', { path, type, durationMs })
-    : console.log('Non-OK request timing', { path, type, durationMs })
-  return result
-})
-
 export const appRouter = t.router({
   getProfile: t.procedure
-    .use(scopes)
-    .use(logUsage)
+    .use(JWTAssertionTokenFromHeader)
+    .use(Scopes)
+    .use(LogUsage)
     .input(GetProfileInput)
     .output(ProfileSchema.nullable())
     .query(getProfileMethod),
   setProfile: t.procedure
-    .use(scopes)
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(Scopes)
     .use(injectAccountNode)
-    .use(logUsage)
+    .use(LogUsage)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
   getAddresses: t.procedure
-    .use(scopes)
-    .use(logUsage)
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(Scopes)
+    .use(LogUsage)
     .input(GetAddressesInput)
     // TODO this causes a type checking error
     //.output(AddressList)
     .mutation(getAddressesMethod),
 })
-
-export type AccountRouter = typeof appRouter

@@ -5,63 +5,11 @@
  * @packageDocumentation
  */
 
-import * as _ from 'lodash'
-
-import * as openrpc from '@kubelt/openrpc'
-
-import invariant from 'tiny-invariant'
-
-import type {
-  RpcAuthHandler,
-  RpcContext,
-  RpcRequest,
-  RpcService,
-} from '@kubelt/openrpc'
-
 import { default as mwGeolocation } from '@kubelt/openrpc/middleware/geolocation'
 
-import { ReplyMessage } from './node/reply'
-
-import { KEY_REQUEST_ENV } from '@kubelt/openrpc/constants'
-
-import type { Scope } from '@kubelt/security/scopes'
-
-import { SCOPES_JSON } from '@kubelt/security/scopes'
-
-// Schema
-// -----------------------------------------------------------------------------
-
-// Import the OpenRPC schema for this API.
-import schema from './schema'
-
-// Durable Objects
-// -----------------------------------------------------------------------------
-// We need to export any Durable Objects we use.
+import ReplyMessage from './node/replyMessage'
 
 export { ReplyMessage }
-
-// Definitions
-// -----------------------------------------------------------------------------
-
-// Context key for looking up ExampleObject durable object.
-const KEY_REPLY_MESSAGE = 'com.kubelt.object/reply-message'
-
-// Scopes
-// -----------------------------------------------------------------------------
-// This service doesn't use scopes, we can use this everywhere a set of scopes
-// are required.
-
-const noScope = openrpc.scopes([])
-
-// Methods
-// -----------------------------------------------------------------------------
-// These are the method handler implementations for the RPC methods
-// defined in the OpenRPC API schema.
-
-// NB: we are not yet validating the incoming RPC request against the schema!
-
-// kb_init
-// -----------------------------------------------------------------------------
 
 /**
  * Update the message returned for PING requests.

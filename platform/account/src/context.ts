@@ -1,7 +1,6 @@
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 
-import { jwt } from '@kubelt/platform-middleware'
 import { Account } from '.'
 import type { Environment } from './types'
 
@@ -13,6 +12,8 @@ interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
   Account: DurableObjectNamespace
   Edges: Fetcher
   account?: Account
+  token?: string
+  accountURN?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -24,12 +25,7 @@ interface CreateInnerContextOptions extends Partial<CreateNextContextOptions> {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  // TODO: should this all be middleware steps?
-  const headers = opts.req?.headers
-  const token = headers?.get(jwt.AccountJWTHeader)
-
   return {
-    token,
     ...opts,
   }
 }

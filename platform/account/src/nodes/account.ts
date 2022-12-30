@@ -1,13 +1,14 @@
 import { createDurable } from 'itty-durable'
 
-import type { IttyDurableObjectState } from '../types'
 import type { Profile } from '../jsonrpc/middlewares/profile'
+import type { Node } from '@kubelt/types'
+import type { Environment } from '../types'
 
 export default class Account extends createDurable({
   autoReturn: true,
   autoPersist: false,
 }) {
-  declare state: IttyDurableObjectState
+  declare state: Node.IttyDurableObjectState<Environment>
 
   async getProfile(): Promise<Profile | null> {
     const stored = await this.state.storage.get<Profile>('profile')

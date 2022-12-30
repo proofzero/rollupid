@@ -1,25 +1,28 @@
 import { createDurable } from 'itty-durable'
-
-import type { Environment, IttyDurableObjectState } from '../types'
+import { Node } from '@kubelt/types'
+import type { Environment } from '../types'
 
 export default class ReplyMessage extends createDurable({
   autoReturn: true,
   autoPersist: false,
 }) {
-  state: IttyDurableObjectState
+  declare state: Node.IttyDurableObjectState<Environment>
 
-  constructor(state: IttyDurableObjectState, env: Environment) {
+  constructor(
+    state: Node.IttyDurableObjectState<Environment>,
+    env: Environment
+  ) {
     super(state, env)
     this.state = state
   }
 
-  async init(message: string): Promise<object> {
+  async init(message: string): Promise<void> {
     // Update the value of the 'message' field.
-    return await this.state.storage.put('message', message)
+    return this.state.storage.put('message', message)
   }
 
-  async message(): Promise<object> {
-    const message = this.state.storage.get('message')
+  async message(): Promise<string | undefined> {
+    const message = this.state.storage.get<string>('message')
     return message
   }
 
@@ -33,15 +36,15 @@ export default class ReplyMessage extends createDurable({
 
     return {
       message,
-      timestamp,  
+      timestamp,
     }
   }
 
   async alarm() {
     const pending = this.state.storage.get('pending')
 
-    this.state.storage.set('pending', '')
-    this.state.storage.set('message', pending)
+    this.state.storage.put('pending', '')
+    this.state.storage.put('message', pending)
 
     // Schedule another alarm.
     //alarm.after({"seconds": 5})

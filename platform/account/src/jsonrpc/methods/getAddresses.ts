@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { listAddresses } from '@kubelt/graph/util'
-import { CryptoAddressType } from '@kubelt/types'
+import { Address } from '@kubelt/types'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 
@@ -10,7 +10,7 @@ import type { AddressURN } from '@kubelt/urns/address'
 
 export type GetAddressesParams = {
   account: AccountURN
-  type?: CryptoAddressType
+  type?: Address.CryptoAddressType
 }
 
 export const GetAddressesInput = z.object({
