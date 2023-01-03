@@ -24,7 +24,7 @@ export const verifyAuthorizationMethod = async ({
     token: { token, iss },
   } = input
 
-  const accessNode = initAccessNodeByName(iss, ctx.Access)
+  const accessNode = await initAccessNodeByName(iss, ctx.Access)
   const result = await accessNode.verify(token)
   return result
 }

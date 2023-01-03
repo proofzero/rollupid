@@ -61,12 +61,11 @@ export const exchangeTokenMethod = async ({
       name,
       ctx.Authorization
     )
-    const { scope } = await authorizationNode.exchangeToken({
-      account,
+    const { scope } = await authorizationNode.exchangeToken(
       code,
       redirectUri,
-      clientId,
-    })
+      clientId
+    )
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
@@ -80,40 +79,41 @@ export const exchangeTokenMethod = async ({
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
-    const { account, code, redirectUri, clientId, clientSecret } = input
+    throw new Error('not implemented')
+    // const { account, code, redirectUri, clientId, clientSecret } = input
 
-    const name = AccessURNSpace.fullUrn(account, {
-      r: URN_NODE_TYPE_AUTHORIZATION,
-      q: { clientId },
-    })
+    // const name = AccessURNSpace.fullUrn(account, {
+    //   r: URN_NODE_TYPE_AUTHORIZATION,
+    //   q: { clientId },
+    // })
 
-    const authorizationNode = await initAuthorizationNodeByName(
-      name,
-      ctx.Authorization
-    )
-    const { scope } = await authorizationNode.params(code)
+    // const authorizationNode = await initAuthorizationNodeByName(
+    //   name,
+    //   ctx.Authorization
+    // )
+    // const { scope } = await authorizationNode.params(code)
 
-    const validated = await ctx.starbaseClient.kb_appAuthCheck({
-      redirectURI: redirectUri,
-      scopes: scope,
-      clientId,
-      clientSecret,
-    })
-    if (validated) {
-      const { scope } = await authorizationNode.exchangeCode(
-        code,
-        redirectUri,
-        clientId
-      )
+    // const validated = await ctx.starbaseClient.kb_appAuthCheck({
+    //   redirectURI: redirectUri,
+    //   scopes: scope,
+    //   clientId,
+    //   clientSecret,
+    // })
+    // if (validated) {
+    //   const { scope } = await authorizationNode.exchangeCode(
+    //     code,
+    //     redirectUri,
+    //     clientId
+    //   )
 
-      // create a new id but use it as the name
-      const objectId = ctx.Access.newUniqueId().toString()
-      const accessNode = await initAccessNodeByName(objectId, ctx.Access)
-      const result = await accessNode.generate({ account, clientId, scope })
-      return result
-    } else {
-      throw new Error(`failed authorization attempt`)
-    }
+    //   // create a new id but use it as the name
+    //   const objectId = ctx.Access.newUniqueId().toString()
+    //   const accessNode = await initAccessNodeByName(objectId, ctx.Access)
+    //   const result = await accessNode.generate({ account, clientId, scope })
+    //   return result
+    // } else {
+    //   throw new Error(`failed authorization attempt`)
+    // }
   } else if (grantType == GrantType.RefreshToken) {
     const {
       token: { iss, token },

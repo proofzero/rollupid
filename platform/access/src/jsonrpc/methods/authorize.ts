@@ -39,15 +39,15 @@ export const authorizeMethod = async ({
     q: { clientId },
   })
 
-  const node = initAuthorizationNodeByName(name, ctx.Authorization)
-  const result = node.authorize({
+  const node = await initAuthorizationNodeByName(name, ctx.Authorization)
+  const result = node.authorize(
     account,
     responseType,
     clientId,
     redirectUri,
     scope,
-    state,
-  })
+    state
+  )
 
   return { ...result }
 }

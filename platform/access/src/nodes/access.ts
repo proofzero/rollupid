@@ -6,6 +6,7 @@ import {
   SignJWT,
   JWTVerifyResult,
 } from 'jose'
+
 import { createDurable } from 'itty-durable'
 
 import { hexlify } from '@ethersproject/bytes'
@@ -13,7 +14,12 @@ import { randomBytes } from '@ethersproject/random'
 
 import { JWT_OPTIONS } from '../constants'
 
-import { Environment, KeyPair, KeyPairSerialized } from '../types'
+import {
+  Environment,
+  ExchangeTokenResult,
+  KeyPair,
+  KeyPairSerialized,
+} from '../types'
 import { Node } from '@kubelt/types'
 import { AccountURN } from '@kubelt/urns/account'
 
@@ -28,10 +34,7 @@ export default class Authorization extends createDurable({
     account: AccountURN
     clientId: string
     scope: any
-  }): Promise<{
-    accessToken: string
-    refreshToken: string
-  }> {
+  }): Promise<ExchangeTokenResult> {
     let [account, clientId, scope] = await Promise.all([
       this.state.storage.get<AccountURN>('account'),
       this.state.storage.get<string>('clientId'),
@@ -48,13 +51,7 @@ export default class Authorization extends createDurable({
     return verify(token, this.state.storage)
   }
 
-  async refresh(
-    iss: string,
-    token: string
-  ): Promise<{
-    accessToken: string
-    refreshToken: string
-  }> {
+  async refresh(iss: string, token: string): Promise<ExchangeTokenResult> {
     const [account, clientId, scope] = await Promise.all([
       this.state.storage.get<AccountURN>('account'),
       this.state.storage.get<string>('clientId'),
