@@ -1,7 +1,6 @@
 import * as openrpc from '@kubelt/openrpc'
 import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 
-import { AccessApi } from '@kubelt/platform-clients/access'
 import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import { Challenge, CryptoAddressType, VerifyNonceParams } from '../../types'
@@ -48,16 +47,16 @@ export default async (
   const account = await nodeClient.resolveAccount()
   const responseType = ResponseType.Code
 
-  const accessClient: AccessApi = context.get('Access')
+  const accessClient = context.get('Access')
   try {
-    const result = await accessClient.kb_authorize(
+    const result = await accessClient.authorize.mutate({
       account,
       responseType,
       clientId,
       redirectUri,
       scope,
-      state
-    )
+      state,
+    })
 
     return openrpc.response(request, result)
   } catch (error) {

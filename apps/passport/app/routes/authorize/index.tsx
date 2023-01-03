@@ -12,6 +12,7 @@ import {
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
+import { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -97,29 +98,33 @@ export const action: ActionFunction = async ({ request, context }) => {
 
   const jwt = await requireJWT(request)
   const parsedJWT = parseJwt(jwt)
-  const account = parsedJWT.sub
+  const account = parsedJWT.sub as AccountURN
   const responseType = ResponseType.Code
   const redirectUri = form.get('redirect_uri') as string
   const scope = (form.get('scopes') as string).split(',')
   const state = form.get('state') as string
   const clientId = form.get('client_id') as string
 
+  if (!account || !responseType || !redirectUri || !scope || !state) {
+    throw json({ message: 'Missing required fields' }, 400)
+  }
+
   const accessClient = getAccessClient()
-  const authorizeRes = await accessClient.kb_authorize(
-    parsedJWT.sub,
+  const authorizeRes = await accessClient.authorize.mutate({
+    account,
     responseType,
     clientId,
     redirectUri,
     scope,
-    state
-  )
+    state,
+  })
 
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }
 
   return redirect(
-    `${redirect_uri}?code=${authorizeRes.code}&state=${authorizeRes.state}`
+    `${redirectUri}?code=${authorizeRes.code}&state=${authorizeRes.state}`
   )
 }
 
