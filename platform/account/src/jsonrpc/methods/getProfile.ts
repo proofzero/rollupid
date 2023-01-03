@@ -1,8 +1,6 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import Account from '../../nodes/account'
-import { proxyDurable } from 'itty-durable'
 import type { Profile } from '../middlewares/profile'
 import { initAccountNodeByName } from '../../nodes'
 

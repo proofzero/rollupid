@@ -55,7 +55,7 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
 export const appRouter = t.router({
   getProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
-    .use(Scopes)
+    // .use(Scopes)
     .use(LogUsage)
     .input(GetProfileInput)
     .output(ProfileSchema.nullable())
@@ -63,7 +63,7 @@ export const appRouter = t.router({
   setProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
-    .use(Scopes)
+    // .use(Scopes)
     .use(injectAccountNode)
     .use(LogUsage)
     .input(SetProfileInput)
@@ -71,7 +71,7 @@ export const appRouter = t.router({
   getAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
-    .use(Scopes)
+    // .use(Scopes)
     .use(LogUsage)
     .input(GetAddressesInput)
     // TODO this causes a type checking error
