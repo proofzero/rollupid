@@ -20,6 +20,7 @@ import {
 } from '@kubelt/platform-middleware/jwt'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
+import { initAccountNodeByName } from '../nodes'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -39,13 +40,9 @@ const t = initTRPC.context<Context>().create({
 export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   const accountURN = ctx.accountURN
 
-  const proxy = await proxyDurable(ctx.Account, {
-    name: 'account',
-    class: Account,
-    parse: true,
-  })
+  if (!accountURN) throw new Error('No accountURN in context')
 
-  const account = proxy.get(accountURN) as Account
+  const account = await initAccountNodeByName(accountURN, ctx.Account)
 
   return next({
     ctx: {
