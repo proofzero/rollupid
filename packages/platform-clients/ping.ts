@@ -9,7 +9,7 @@ export default (fetcher: Fetcher, options?: ClientOptions) =>
         url: 'http://localhost/trpc',
         fetch: fetcher.fetch,
         headers() {
-          return options?.headers || { foo: 'bar' }
+          return options?.headers || {}
         },
       }),
     ],

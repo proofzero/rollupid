@@ -1,5 +1,6 @@
 // @kubelt/openrpc:middleware/geolocation.ts
 
+import { GeoContext } from '@kubelt/types/context'
 import type { BaseMiddlewareFunction } from './types'
 
 /**
@@ -9,7 +10,6 @@ import type { BaseMiddlewareFunction } from './types'
  */
 
 // TODO implement guards for middleware that assert what data they expect to be in the context
-// TODO support namespacing in middleware; set reverse-TLD namespace into which context values will be set
 
 // geolocation
 // -----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ export const cfGeoContext: BaseMiddlewareFunction<{
   return next({
     ctx: {
       ...ctx,
-      'com.kubelt.geo/location': pick.cf,
+      [GeoContext]: pick.cf,
     },
   })
 }

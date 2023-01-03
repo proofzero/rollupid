@@ -41,14 +41,14 @@ export default class ReplyMessage extends createDurable({
   }
 
   async alarm() {
-    const pending = this.state.storage.get('pending')
+    const pendingMessage = this.state.storage.get('pending')
 
     this.state.storage.put('pending', '')
-    this.state.storage.put('message', pending)
+    this.state.storage.put('message', pendingMessage)
 
     // Schedule another alarm.
     //alarm.after({"seconds": 5})
 
-    console.log(`scheduled update of message to '${pending}'`)
+    console.log(`scheduled update of message to '${pendingMessage}'`)
   }
 }
