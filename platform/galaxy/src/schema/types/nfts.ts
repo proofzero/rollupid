@@ -73,9 +73,26 @@ export default /* GraphQL */ `
     metadata: NFTMetadata
     contractMetadata: ContractMetadata
   }
+
+  type NFTNoProps {
+    contract: Contract
+    title: String
+    description: String
+    id: Id
+    tokenUri: TokenURI
+    media: [NFTMedia!]!
+    error: String
+    contractMetadata: ContractMetadata
+  }
+
   type NFTs {
     ownedNfts: [NFT!]!
   }
+
+  type NFTsNoProps {
+    ownedNfts: [NFTNoProps!]!
+  }
+
   type Chain {
     chain: String
     network: String
@@ -111,6 +128,29 @@ export default /* GraphQL */ `
   type NFTContracts {
     contracts: [NFTContract!]!
   }
+
+  input ContractInput {
+    address: String
+  }
+
+  input TokenURIInput {
+    raw: String
+    gateway: String
+  }
+
+  input NFTInput {
+    tokenId: String
+    contract: String
+    addressURN: String
+    gallery_order: Int
+  }
+
+  input NFTMetadataInput {
+    contractAddress: String
+    tokenId: String
+    tokenType: String
+  }
+
   type Query {
     nftsForAddress(owner: String!, contractAddresses: [String]): NFTs
     contractsForAddress(
@@ -118,5 +158,10 @@ export default /* GraphQL */ `
       excludeFilters: [String]
       pageSize: Int
     ): NFTContracts
+    getCuratedGallery(addressURN: URN): NFTsWithChain
+    getNFTMetadataBatch(input: [NFTMetadataInput]): NFTsNoProps
+  }
+  type Mutation {
+    updateCuratedGallery(gallery: [NFTInput]): Boolean
   }
 `

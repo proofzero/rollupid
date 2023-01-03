@@ -29,6 +29,17 @@ export type GetOwnersForTokenResult = {
   owners: string[]
 }
 
+export type GetNFTMedatadaParams = {
+  contractAddress: string
+  tokenId: string
+}
+
+export type GetNFTMedatadaResult = unknown
+
+export type GetNFTMedatadaBatchParams = GetNFTMedatadaParams[]
+
+export type GetNFTMedatadaBatchResult = unknown
+
 export enum WebhookType {
   MINED_TRANSACTION = 'MINED_TRANSACTION',
   DROPPED_TRANSACTION = 'DROPPED_TRANSACTION',
@@ -274,6 +285,54 @@ export class AlchemyClient {
         throw buildError(
           500,
           `Error calling Alchemy getOwnersForToken: ${e.message}`
+        )
+      })
+  }
+  async getNFTMetadataBatch(
+    params: GetNFTMedatadaBatchParams
+  ): Promise<GetNFTMedatadaBatchResult | unknown> {
+    const url = this.getNFTAPIURL('getNFTMetadataBatch/')
+
+    console.log({ tokens: params })
+
+    const urlStr = url.toString()
+    console.log(urlStr)
+    const cacheKeyDigest = await crypto.subtle.digest(
+      {
+        name: 'SHA-256',
+      },
+      new TextEncoder().encode(urlStr)
+    )
+    const cacheKeyArray = Array.from(new Uint8Array(cacheKeyDigest))
+    const cacheKey = cacheKeyArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+    return fetch(urlStr, {
+      method: 'POST',
+      cf: {
+        cacheTtl: 1500,
+        cacheEverything: true,
+        cacheKey,
+      },
+      body: JSON.stringify({
+        tokens: params,
+      }),
+    })
+      .then(async (r) => {
+        if (r.status !== 200) {
+          const errorText = await r.text()
+          console.error(errorText)
+          throw buildError(
+            r.status,
+            `Error calling Alchemy getNFTMetadataBatch: ${errorText}`
+          )
+        }
+        return r.json()
+      })
+      .catch((e) => {
+        throw buildError(
+          e.status,
+          `Error calling Alchemy getNFTMetadataBatch: ${e.message}`
         )
       })
   }

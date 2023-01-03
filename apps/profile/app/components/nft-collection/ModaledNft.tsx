@@ -25,19 +25,42 @@ const ModaledNft = ({ nft, isModal }: any) => {
             isOpen={showModal}
             handleClose={() => setShowModal(false)}
           />
-          <div className="relative overlay-img-wrapper cursor-pointer">
+          <div className="relative cursor-pointer group">
             <div
               onClick={() => {
                 if (!loadFail) {
                   setShowModal(true)
                 }
               }}
-              className="absolute left-0 right-0 top-0 bottom-0 p-1 lg:p-4 flex flex-col justify-end transition-all duration-300 rounded-lg"
+              className="absolute
+                left-0 right-0 top-0 bottom-0
+                p-1 lg:p-4 flex flex-col
+                justify-end transition-all
+                duration-300 rounded-lg
+                invisible
+                group-hover:visible
+                hover:bg-black/[.4]"
             >
-              <Text size="sm" weight="semibold" className="text-white">
+              <Text
+                size="sm"
+                weight="semibold"
+                className="text-white
+                invisible
+                group-hover:visible
+                hover:opacity-100
+                "
+              >
                 {nft.collectionTitle}
               </Text>
-              <Text size="sm" weight="semibold" className="text-white">
+              <Text
+                size="sm"
+                weight="semibold"
+                className="text-white
+                invisible
+                group-hover:visible
+                hover:opacity-100
+               "
+              >
                 {nft.title}
               </Text>
             </div>

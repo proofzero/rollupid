@@ -1,4 +1,4 @@
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { HiArrowNarrowRight } from 'react-icons/hi'
 
 import { gatewayFromIpfs } from '~/helpers'
 
@@ -10,28 +10,53 @@ const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
 
   return (
     <div
-      className={`relative border ${
-        loadFail ? '' : 'cursor-pointer'
-      } hover:scale-105 ${selected ? 'scale-105' : ''}`}
+      className="rounded-lg
+          truncate
+          shadow 
+          transition-shadow
+          text-sm 
+          font-semibold
+          w-full
+          hover:shadow-xl 
+          flex
+          flex-col
+          align-center justify-center
+         "
       onClick={() => {
-        if (!loadFail) {
-          handleSelectedNft(nft)
-        }
+        handleSelectedNft(nft)
       }}
     >
       <img
-        className="w-full"
-        src={loadFail ? missingNftSvg : gatewayFromIpfs(nft.url)}
+        className="rounded-t-lg block
+        // for now smaller height
+                lg:h-[8rem]
+                md:h-[11rem]
+                sm:h-[12rem]
+                h-[20rem]
+                object-contain 
+                mx-auto 
+              "
+        src={
+          loadFail
+            ? missingNftSvg
+            : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+        }
         onError={(e) => setLoadFail(true)}
+        alt="collection-representation"
       />
-
-      <Text
-        className="my-2.5 mx-2 bg-white text-gray-900"
-        size="xs"
-        weight="medium"
+      <div
+        className="flex text-gray-600
+            flex-row whitespace-nowrap 
+            w-full
+            justify-between items-center px-4 py-3"
       >
-        {nft.title ?? 'Untitled'}
-      </Text>
+        <div className="truncate leading-none">
+          {nft.collectionTitle ? nft.collectionTitle : ' '}
+        </div>
+        <div className="text-xl">
+          <HiArrowNarrowRight />
+        </div>
+      </div>
     </div>
   )
 }

@@ -22,23 +22,18 @@ export const setGalleryMethod = async ({
   input: SetGalleryParams
   ctx: Context
 }) => {
-  const upsertGallery = await ctx.COLLECTIONS?.prepare(
-    `INSERT INTO tokens (tokenId, contract, addressURN, gallery_order) VALUES ${input} 
-      ON CONFLICT (tokenId, contract)
-      DO UPDATE SET addressURN = excluded.addressURN, gallery_order = excluded.gallery_order`
-  ).all()
+  console.log({ input, ctx })
 
-  // const db = context.collectionDB
-  // const upsertGallery = await db
-  //   .insert(tokens)
-  //   .values(...values)
-  //   .onConflictDoUpdate({
-  //     where: sql`addressURN = excluded.addressURN`,
-  //     set: {
-  //       gallery_order: sql`excluded.gallery_order`,
-  //     },
-  //   })
-  //   .run()
+  const upsertSQL = `INSERT INTO tokens (tokenId, contract, addressURN, gallery_order) VALUES ${input
+    .map(
+      (val) =>
+        `('${val.tokenId}', '${val.contract}', '${val.addressURN}', '${val.gallery_order}')`
+    )
+    .join(',')}
+    ON CONFLICT (tokenId, contract)
+    DO UPDATE SET addressURN = excluded.addressURN, gallery_order = excluded.gallery_order`
+
+  const upsertGallery = await ctx.COLLECTIONS?.prepare(upsertSQL).all()
 
   console.log({ upsertGallery })
 

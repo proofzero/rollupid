@@ -39,4 +39,9 @@ module.exports = {
     require('tw-elements/dist/plugin'),
     require('@tailwindcss/forms'),
   ],
+  variants: {
+    extend: {
+      visibility: ['group-hover'],
+    },
+  },
 }

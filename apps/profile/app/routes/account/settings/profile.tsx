@@ -18,12 +18,13 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { gatewayFromIpfs } from '~/helpers'
 import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
 
-import PfpNftModal from '~/components/accounts/settings/PfpNftModal'
+import PfpNftModal from '~/components/accounts/PfpNftModal'
 import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { parseURN } from 'urns'
-import { ThreeIdProfile } from '~/utils/galaxy.server'
+import type { ThreeIdProfile } from '~/utils/galaxy.server'
+import SaveButton from '~/components/accounts/SaveButton'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -121,7 +122,7 @@ export default function AccountSettingsProfile() {
   useEffect(() => {
     if (transition.type === 'actionReload') {
       setFormChanged(false)
-      notificationHandler(!!!actionData?.errors)
+      notificationHandler(!actionData?.errors)
     }
   }, [transition])
 
@@ -182,6 +183,7 @@ export default function AccountSettingsProfile() {
     <>
       <PfpNftModal
         account={address}
+        pfp={pfpUrl}
         isOpen={nftPfpModalOpen}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
@@ -368,43 +370,10 @@ export default function AccountSettingsProfile() {
               {actionData?.errors.bio}
             </Text>
           )}
-          {isFormChanged ? (
-            <div className="flex lg:justify-end">
-              <div className="pr-2">
-                <Button
-                  type="reset"
-                  btnType={'secondary'}
-                  btnSize={'xl'}
-                  className="!text-gray-600 border-none mb-4 lg:mb-0"
-                  onClick={() => {
-                    setPfpUrl(pfp?.image)
-                  }}
-                >
-                  Discard
-                </Button>
-              </div>
-              <Button
-                isSubmit
-                btnType={'primary'}
-                btnSize={'xl'}
-                className="mb-4 lg:mb-0"
-              >
-                Save
-              </Button>
-            </div>
-          ) : (
-            <div className="flex lg:justify-end">
-              <Button
-                isSubmit
-                btnType={'primary'}
-                btnSize={'xl'}
-                className="mb-4 lg:mb-0"
-                disabled
-              >
-                Save
-              </Button>
-            </div>
-          )}
+          <SaveButton
+            isFormChanged={isFormChanged}
+            discardFn={() => setPfpUrl(pfp?.image)}
+          />
         </Form>
       </div>
     </>

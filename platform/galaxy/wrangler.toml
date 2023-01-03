@@ -1,5 +1,6 @@
 name = "galaxy"
 main = "src/index.ts"
+# NEED TO ADD ACCOUNT ID TO TEST REMOTE LOCALLY
 compatibility_date = "2022-10-19"
 node_compat = true
 wrangler_dev = false

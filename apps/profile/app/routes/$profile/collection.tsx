@@ -1,6 +1,6 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import ProfileNftCollection from '~/components/nft-collection/ProfileNftCollection'
+import ProfileNftCollections from '~/components/nft-collection/ProfileNftCollections'
 import { useRouteData } from '~/hooks'
 
 export type ProfileData = {
@@ -22,7 +22,7 @@ const ProfileRoute = () => {
         NFT Collections
       </Text>
 
-      <ProfileNftCollection
+      <ProfileNftCollections
         account={targetAddress}
         pfp={pfp.image}
         displayname={displayName}

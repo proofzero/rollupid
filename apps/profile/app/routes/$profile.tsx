@@ -22,8 +22,6 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { links as nftCollLinks } from '~/components/nft-collection/ProfileNftCollection'
-import { links as nftModalLinks } from '~/components/nft-collection/NftModal'
 import { Cover } from '~/components/profile/cover/Cover'
 import HeadNav from '~/components/head-nav'
 
@@ -32,10 +30,6 @@ import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
 import type { ThreeIdProfile } from '~/utils/galaxy.server'
-
-export function links() {
-  return [...nftCollLinks(), ...nftModalLinks()]
-}
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
@@ -354,7 +348,7 @@ const ProfileLayout = () => {
               </Text>
             </div>
 
-            <a href="https://get.threeid.xyz/">
+            <a href="https://passport.threeid.xyz/">
               <Button>Claim This Account</Button>
             </a>
           </div>

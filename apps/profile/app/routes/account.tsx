@@ -13,7 +13,6 @@ import { requireJWT } from '~/utils/session.server'
 import styles from '~/styles/account.css'
 
 import { links as faqStyles } from '~/components/FAQ'
-import { links as profileNftCollectionLinks } from '~/components/nft-collection/ProfileNftCollection'
 
 import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
@@ -22,11 +21,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { getGalaxyClient } from '~/helpers/clients'
 
 export function links() {
-  return [
-    ...faqStyles(),
-    ...profileNftCollectionLinks(),
-    { rel: 'stylesheet', href: styles },
-  ]
+  return [...faqStyles(), { rel: 'stylesheet', href: styles }]
 }
 
 // @ts-ignore
@@ -38,13 +33,20 @@ export const loader = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const [avatarUrl, isToken, address] = [
+  const [avatarUrl, isToken, address, pfp] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,
     parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
+    profileRes.profile?.pfp,
   ]
 
+  const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
+    addressOrEns: address,
+  })
+
   return json({
+    targetAddress,
+    pfp,
     address,
     avatarUrl,
     isToken,
@@ -60,8 +62,9 @@ const subNavigation = [
   },
   {
     name: 'NFT Gallery',
-    href: '#',
+    href: '/account/gallery',
     icon: HiOutlineViewGridAdd,
+    exists: true,
   },
   { name: 'KYC', href: '#', icon: BiIdCard },
   { name: 'Apps', href: '#', icon: BiLink },

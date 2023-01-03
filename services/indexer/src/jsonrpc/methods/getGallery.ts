@@ -14,14 +14,15 @@ export const getGalleryMethod = async ({
   input: GetGalleryParams
   ctx: Context
 }) => {
+  console.log({ input, ctx })
   const galleryStmt = await ctx.COLLECTIONS?.prepare(
-    `SELECT * FROM tokens WHERE addressURN IN (${input.join(
-      ','
-    )}) AND gallery_order IS NOT NULL`
+    `SELECT * FROM tokens WHERE addressURN IN (${input
+      .map((addr) => `'${addr}'`)
+      .join(',')}) AND gallery_order IS NOT NULL`
   )
   const gallery = await galleryStmt?.all()
-
+  console.log({ gallery })
   return {
-    gallery,
+    gallery: gallery?.results,
   }
 }
