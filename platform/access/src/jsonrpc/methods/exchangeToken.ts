@@ -34,8 +34,8 @@ export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
 ])
 
 export const ExchangeTokenMethodOutput = z.object({
-  code: z.string(),
-  state: z.string(),
+  accessToken: z.string(),
+  refreshToken: z.string(),
 })
 
 export type ExchangeTokenParams = z.infer<typeof ExchangeTokenMethodInput>
@@ -61,11 +61,9 @@ export const exchangeTokenMethod = async ({
       name,
       ctx.Authorization
     )
-    const { scope } = await authorizationNode.exchangeToken(
-      code,
-      redirectUri,
-      clientId
-    )
+
+    // TODO: what does this do other than validate code?
+    await authorizationNode.exchangeToken(code, redirectUri, clientId)
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
@@ -74,7 +72,7 @@ export const exchangeTokenMethod = async ({
       iss,
       account,
       clientId,
-      scope,
+      scope: [], //scope,
     })
 
     return result
