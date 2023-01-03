@@ -49,6 +49,8 @@ export const exchangeTokenMethod = async ({
 }) => {
   const { grantType } = input
 
+  console.log({ grantType })
+
   if (grantType == GrantType.AuthenticationCode) {
     const { account, code, redirectUri, clientId } = input
     const accountId = AccountURNSpace.decode(account)
@@ -67,6 +69,8 @@ export const exchangeTokenMethod = async ({
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
+    console.log({ iss })
+
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.generate({
       iss,

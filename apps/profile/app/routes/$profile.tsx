@@ -48,6 +48,7 @@ export const loader: LoaderFunction = async (args) => {
   let loggedInUserProfile = {}
   let isOwner = false
   let profile = null
+  let claimed = false
   if (jwt) {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
@@ -57,7 +58,6 @@ export const loader: LoaderFunction = async (args) => {
       ...profile,
       claimed: true,
     }
-
     if (profile.defaultAddress) {
       const urnAddress = AddressURNSpace.decode(profile.defaultAddress)
 
@@ -68,6 +68,8 @@ export const loader: LoaderFunction = async (args) => {
   // get profile from address if not assigned from logged in user
   if (!isOwner) {
     profile = await (await profileLoader(args)).json()
+  } else {
+    claimed = true
   }
 
   // Setup og tag data
@@ -78,6 +80,7 @@ export const loader: LoaderFunction = async (args) => {
   const ogImageURL = await ogImage(profile.cover, profile.pfp.image, cacheKey)
 
   return json({
+    claimed,
     ...profile,
     loggedInUserProfile,
     isOwner,

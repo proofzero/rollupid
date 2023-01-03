@@ -54,7 +54,7 @@ export default class Authorization extends createDurable({
     code: string,
     redirectUri: string,
     clientId: string
-  ): Promise<string> {
+  ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
     console.log({ account })
     if (!account) {
@@ -88,7 +88,7 @@ export default class Authorization extends createDurable({
     codes.delete(code)
     await this.state.storage.put('codes', codes)
 
-    return code
+    return { code }
   }
 
   async alarm() {
