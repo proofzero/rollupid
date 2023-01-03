@@ -1,35 +1,30 @@
-import { decodeJwt } from 'jose'
+import { z } from 'zod'
+import { Context } from '../../context'
+import { initAccessNodeByName } from '../../nodes'
+import { tokenValidator } from '../middleware/validators'
 
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+export const VerifyAuthorizationMethodInput = z.object({
+  token: tokenValidator,
+})
 
-import { VerifyAuthorizationParams } from '../../types'
+export const VerifyAuthorizationMethodOutput = z.boolean()
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const [token] = request.params as VerifyAuthorizationParams
-  const payload = decodeJwt(token)
-  if (!payload) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing JWT payload',
-    })
-  }
+export type VerifyAuthorizationParams = z.infer<
+  typeof VerifyAuthorizationMethodInput
+>
 
-  if (!payload.iss) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing JWT issuer',
-    })
-  }
+export const verifyAuthorizationMethod = async ({
+  input,
+  ctx,
+}: {
+  input: VerifyAuthorizationParams
+  ctx: Context
+}) => {
+  const {
+    token: { token, iss },
+  } = input
 
-  const { iss: id } = payload
-
-  const Access = context.get('Access')
-  const accessClient = await openrpc.discover(Access, { id })
-  const result = await accessClient.verify({ token })
-  return openrpc.response(request, result)
+  const accessNode = initAccessNodeByName(iss, ctx.Access)
+  const result = await accessNode.verify({ token })
+  return result
 }

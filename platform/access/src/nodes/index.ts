@@ -3,7 +3,7 @@ import { proxyDurable } from 'itty-durable'
 import Access from './access'
 import Authorization from './authorization'
 
-export const initAuthorizationNode = async (
+export const initAuthorizationNodeByName = async (
   name: string,
   durableObject: DurableObjectNamespace
 ) => {
@@ -17,7 +17,7 @@ export const initAuthorizationNode = async (
   return node
 }
 
-export const initAccessNode = async (
+export const initAccessNodeByName = async (
   name: string,
   durableObject: DurableObjectNamespace
 ) => {
@@ -30,3 +30,5 @@ export const initAccessNode = async (
   const node = proxy.get(name) as Access
   return node
 }
+
+export { Access, Authorization }

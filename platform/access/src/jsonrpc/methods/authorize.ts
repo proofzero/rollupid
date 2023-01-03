@@ -6,7 +6,7 @@ import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { Context } from '../../context'
 import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
-import { initAuthorizationNode } from '../../nodes'
+import { initAuthorizationNodeByName } from '../../nodes'
 
 export const AuthorizeMethodInput = z.object({
   account: AccountURNInput,
@@ -39,7 +39,7 @@ export const authorizeMethod = async ({
     q: { clientId },
   })
 
-  const node = initAuthorizationNode(name, ctx.Authorization)
+  const node = initAuthorizationNodeByName(name, ctx.Authorization)
   const result = node.authorize({
     account,
     responseType,

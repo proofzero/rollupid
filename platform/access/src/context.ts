@@ -1,3 +1,6 @@
+import createStarbaseClient, {
+  StarbaseApi,
+} from '@kubelt/platform-clients/starbase'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
@@ -15,6 +18,8 @@ interface CreateInnerContextOptions
   access?: Access
   Authorization: DurableObjectNamespace
   authorization?: Authorization
+  Starbase: Fetcher
+  starbaseClient?: StarbaseApi
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -26,7 +31,9 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
+  const starbaseClient = createStarbaseClient(opts.Starbase)
   return {
+    starbaseClient,
     ...opts,
   }
 }

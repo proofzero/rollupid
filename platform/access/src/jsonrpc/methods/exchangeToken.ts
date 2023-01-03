@@ -5,13 +5,11 @@ import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { Context } from '../../context'
-import { initAuthorizationNode, initAccessNode } from '../../nodes'
-
-import type { StarbaseApi } from '@kubelt/platform-clients/starbase'
+import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
 import { GrantType } from '../../types'
-import { decodeJwt } from 'jose'
+import { tokenValidator } from '../middleware/validators'
 
 export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   z.object({
@@ -31,20 +29,7 @@ export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   }),
   z.object({
     grantType: z.literal(GrantType.RefreshToken),
-    token: z.custom<{ iss: string; token: string }>((token) => {
-      const payload = decodeJwt(token as string)
-      if (!payload) {
-        throw 'missing JWT payload'
-      }
-
-      if (!payload.iss) {
-        throw 'missing JWT issuer'
-      }
-      return {
-        token,
-        iss: payload.iss,
-      }
-    }),
+    token: tokenValidator,
   }),
 ])
 
@@ -72,7 +57,10 @@ export const exchangeTokenMethod = async ({
       q: { clientId },
     })
 
-    const authorizationNode = initAuthorizationNode(name, ctx.Authorization)
+    const authorizationNode = initAuthorizationNodeByName(
+      name,
+      ctx.Authorization
+    )
     const { scope } = await authorizationNode.exchangeToken({
       account,
       code,
@@ -80,8 +68,9 @@ export const exchangeTokenMethod = async ({
       clientId,
     })
 
-    const accessNode = initAccessNode(ctx.Access)
-    const objectId = accessNode.$.id
+    // create a new id but use it as the name
+    const objectId = ctx.Access.newUniqueId().toString()
+    const accessNode = initAccessNodeByName(objectId, ctx.Access)
     const result = await accessNode.generate({
       objectId,
       account,
@@ -98,7 +87,10 @@ export const exchangeTokenMethod = async ({
       q: { clientId },
     })
 
-    const authorizationNode = initAuthorizationNode(name, ctx.Authorization)
+    const authorizationNode = initAuthorizationNodeByName(
+      name,
+      ctx.Authorization
+    )
     const { scope } = await authorizationNode.params(code)
 
     const validated = await ctx.starbaseClient.kb_appAuthCheck({
@@ -114,7 +106,9 @@ export const exchangeTokenMethod = async ({
         clientId
       )
 
-      const accessNode = initAccessNode(ctx.Access)
+      // create a new id but use it as the name
+      const objectId = ctx.Access.newUniqueId().toString()
+      const accessNode = initAccessNodeByName(objectId, ctx.Access)
       const result = await accessNode.generate(account, clientId, scope)
       return result
     } else {
@@ -125,7 +119,7 @@ export const exchangeTokenMethod = async ({
       token: { iss, token },
     } = input
 
-    const accessNode = initAccessNode(iss, ctx.Access)
+    const accessNode = initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.refresh({
       objectId: iss,
       token,
