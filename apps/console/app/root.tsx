@@ -18,6 +18,20 @@ import {
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 
+function Analytics() {
+  return (
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-675VJMWSRY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-675VJMWSRY');
+    </script>
+  )
+}
+
 export const links: LinksFunction = () => {
   return [
     { rel: 'stylesheet', href: tailwindStylesheetUrl },
@@ -45,6 +59,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <Analytics />
       </body>
     </html>
   )
@@ -75,6 +90,7 @@ export const ErrorBoundary = ({
 
         <ScrollRestoration />
         <Scripts />
+        <Analytics />
       </body>
     </html>
   )
