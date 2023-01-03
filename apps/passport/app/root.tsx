@@ -31,6 +31,20 @@ import social from '~/assets/passport-social.png'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
+function Analytics() {
+  return (
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-675VJMWSRY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-675VJMWSRY');
+    </script>
+  )
+}
+
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   title: '3ID - Passport',
@@ -88,6 +102,7 @@ export default function App() {
           async
           src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
         ></script>
+        <Analytics />
       </body>
     </html>
   )
@@ -115,6 +130,7 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
+        <Analytics />
       </body>
     </html>
   )
@@ -168,6 +184,7 @@ export function CatchBoundary() {
             __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
           }}
         />
+        <Analytics />
       </body>
     </html>
   )
