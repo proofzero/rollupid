@@ -10,8 +10,8 @@ import {
 import {
   exchangeTokenMethod,
   ExchangeTokenMethodInput,
-  ExchangeTokenOutput,
-} from './methods/authorize'
+  ExchangeTokenMethodOutput,
+} from './methods/exchangeToken'
 import {
   verifyAuthorizationMethod,
   VerifyAuthorizationMethodInput,
@@ -31,7 +31,7 @@ export const appRouter = t.router({
   exchangeToken: t.procedure
     .use(LogUsage)
     .input(ExchangeTokenMethodInput)
-    .output(ExchangeTokenOutput)
+    .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
   verifyAuthorization: t.procedure
     .use(LogUsage)

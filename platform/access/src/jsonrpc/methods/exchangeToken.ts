@@ -57,7 +57,7 @@ export const exchangeTokenMethod = async ({
       q: { clientId },
     })
 
-    const authorizationNode = initAuthorizationNodeByName(
+    const authorizationNode = await initAuthorizationNodeByName(
       name,
       ctx.Authorization
     )
@@ -69,10 +69,10 @@ export const exchangeTokenMethod = async ({
     })
 
     // create a new id but use it as the name
-    const objectId = ctx.Access.newUniqueId().toString()
-    const accessNode = initAccessNodeByName(objectId, ctx.Access)
+    const iss = ctx.Access.newUniqueId().toString()
+    const accessNode = await initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.generate({
-      objectId,
+      iss,
       account,
       clientId,
       scope,
@@ -87,7 +87,7 @@ export const exchangeTokenMethod = async ({
       q: { clientId },
     })
 
-    const authorizationNode = initAuthorizationNodeByName(
+    const authorizationNode = await initAuthorizationNodeByName(
       name,
       ctx.Authorization
     )
@@ -108,8 +108,8 @@ export const exchangeTokenMethod = async ({
 
       // create a new id but use it as the name
       const objectId = ctx.Access.newUniqueId().toString()
-      const accessNode = initAccessNodeByName(objectId, ctx.Access)
-      const result = await accessNode.generate(account, clientId, scope)
+      const accessNode = await initAccessNodeByName(objectId, ctx.Access)
+      const result = await accessNode.generate({ account, clientId, scope })
       return result
     } else {
       throw new Error(`failed authorization attempt`)
@@ -119,11 +119,8 @@ export const exchangeTokenMethod = async ({
       token: { iss, token },
     } = input
 
-    const accessNode = initAccessNodeByName(iss, ctx.Access)
-    const result = await accessNode.refresh({
-      objectId: iss,
-      token,
-    })
+    const accessNode = await initAccessNodeByName(iss, ctx.Access)
+    const result = await accessNode.refresh(iss, token)
     return result
   } else {
     throw new Error(`unsupported grant type: ${grantType}`)
