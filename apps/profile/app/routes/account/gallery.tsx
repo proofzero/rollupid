@@ -1,11 +1,8 @@
 import { useState, forwardRef } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
-import ProfileNftCollections from '~/components/nft-collection/ProfileNftCollections'
-import SelectableNft from '~/components/nft-collection/SelectableNft'
 import SaveButton from '~/components/accounts/SaveButton'
 
-import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -18,7 +15,6 @@ import {
 } from '@remix-run/react'
 import { useRouteData } from '~/hooks'
 
-import { parseURN } from 'urns'
 import { requireJWT } from '~/utils/session.server'
 
 import { HiOutlinePlusCircle } from 'react-icons/hi'

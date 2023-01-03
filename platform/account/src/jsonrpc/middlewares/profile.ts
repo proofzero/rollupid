@@ -14,7 +14,7 @@ export const ProfileSchema = z.object({
   bio: z.string().max(256).optional(),
   job: z.string().max(30).optional(),
   location: z.string().max(30).optional(),
-  website: z.string().url().optional(),
+  website: z.string().url().or(z.literal('')).optional(),
 })
 
 // TODO: move to types packages
