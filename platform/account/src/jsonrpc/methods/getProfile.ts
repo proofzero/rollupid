@@ -9,6 +9,8 @@ export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,
 })
 
+export type GetProfileParams = z.infer<typeof GetProfileInput>
+
 export const getProfileMethod = async ({
   input,
   ctx,

@@ -42,6 +42,7 @@
     "@kubelt/graph": "workspace:*",
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform-clients": "workspace:*",
+    "@kubelt/types": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2"

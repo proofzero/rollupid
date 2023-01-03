@@ -1,6 +1,5 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { ZodError } from 'zod'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
 import Account from './nodes/account'
