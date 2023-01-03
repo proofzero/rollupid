@@ -36,6 +36,7 @@
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/urns": "workspace:*",
+    "@trpc/server": "10.7.0",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "jose": "4.11.0",

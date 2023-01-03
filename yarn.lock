@@ -6434,6 +6434,7 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1

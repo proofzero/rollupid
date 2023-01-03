@@ -1,54 +1,37 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { z } from 'zod'
 
+import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
+import { Context } from '../../context'
 import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
-import { AuthorizeParams, AuthorizeResult } from '../../types'
+import { initAuthorizationNode } from '../../nodes'
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const [account, responseType, clientId, redirectUri, scope, state] =
-    request.params as AuthorizeParams
+export const AuthorizeMethodInput = z.object({
+  account: AccountURNInput,
+  responseType: z.string(),
+  clientId: z.string(),
+  redirectUri: z.string(),
+  scope: z.array(z.string()),
+  state: z.string(),
+})
 
-  if (!account) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing account',
-    })
-  }
+export const AuthorizeMethodOutput = z.object({
+  code: z.string(),
+  state: z.string(),
+})
 
-  if (!responseType) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing response type',
-    })
-  }
+export type AuthorizeParams = z.infer<typeof AuthorizeMethodInput>
 
-  if (!clientId) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing client identifier',
-    })
-  }
-
-  if (!redirectUri) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing redirect URI',
-    })
-  }
-
-  if (!scope || !scope.length) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing scope',
-    })
-  }
+export const authorizeMethod = async ({
+  input,
+  ctx,
+}: {
+  input: AuthorizeParams
+  ctx: Context
+}) => {
+  const { account, responseType, clientId, redirectUri, scope, state } = input
 
   const accountId = AccountURNSpace.decode(account)
   const name = AccessURNSpace.fullUrn(accountId, {
@@ -56,11 +39,8 @@ export default async (
     q: { clientId },
   })
 
-  const Authorization = context.get('Authorization')
-  const authorizationClient = await openrpc.discover(Authorization, {
-    name,
-  })
-  const result: AuthorizeResult = await authorizationClient.authorize({
+  const node = initAuthorizationNode(name, ctx.Authorization)
+  const result = node.authorize({
     account,
     responseType,
     clientId,
@@ -68,5 +48,6 @@ export default async (
     scope,
     state,
   })
-  return openrpc.response(request, result)
+
+  return { ...result }
 }

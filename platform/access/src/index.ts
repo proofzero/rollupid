@@ -1,13 +1,24 @@
-import { Router } from 'itty-router'
-import { error } from 'itty-router-extras'
-
+import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import { createContext } from './context'
+import { appRouter } from './jsonrpc/router'
+import type { Environment } from './types'
 import Access from './nodes/access'
 import Authorization from './nodes/authorization'
-import jsonRpc from './jsonrpc'
 
-const index = Router()
-  .post('/jsonrpc', jsonRpc)
-  .all('*', () => error(404, 'not found'))
-
+export default {
+  async fetch(request: Request, env: Environment): Promise<Response> {
+    return fetchRequestHandler({
+      endpoint: '/trpc',
+      req: request,
+      router: appRouter,
+      onError({ error, type, path, input, ctx, req }) {
+        console.error('Error:', error)
+        // TODO: report somehwere
+      },
+      createContext: (opts) =>
+        createContext(opts as CreateNextContextOptions, env),
+    })
+  },
+}
 export { Access, Authorization }
-export default { fetch: index.handle }
