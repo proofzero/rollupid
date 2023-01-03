@@ -36,11 +36,15 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 function Analytics() {
   return (
-    <script
-      defer
-      src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'
-    ></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-675VJMWSRY"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-675VJMWSRY');
+    </script>
   )
 }
 
