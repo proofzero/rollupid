@@ -39,7 +39,7 @@ export type ProfileNftSingleCollectionProps = {
   nftGrid: JSX.Element
 }
 
-const ProfileNftSingleCollection = ({
+const ProfileNftGallery = ({
   nfts = [],
   isModal = false,
   isOwner = true,
@@ -64,15 +64,15 @@ const ProfileNftSingleCollection = ({
   const [selectedNft, setSelectedNft] = useState('')
 
   const getMoreNfts = async () => {
-    const request = `/nfts/collection?owner=${account}${
-      pageKey ? `&pageKey=${pageKey}` : ''
-    }&collection=${collection}`
+    const request = `/nfts/gallery`
 
     const nftReq: any = await fetch(request)
     const nftRes: any = await nftReq.json()
 
+    console.log(nftRes)
+
     // Do not need to sort them alphabetically here
-    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
+    setLoadedNfts([...loadedNfts, ...nftRes.gallery])
     setPageLink(nftRes.pageKey ?? null)
 
     if (refresh) {
@@ -233,4 +233,4 @@ const ProfileNftSingleCollection = ({
   )
 }
 
-export default ProfileNftSingleCollection
+export default ProfileNftGallery

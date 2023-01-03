@@ -23,10 +23,6 @@ const CollectionForProfileRoute = () => {
 
   return (
     <>
-      <Text className="mb-8 lg:mb-12 text-gray-600" size="sm" weight="semibold">
-        NFT Collections
-      </Text>
-
       <ProfileNftSingleCollection
         account={targetAddress}
         displayname={displayName}

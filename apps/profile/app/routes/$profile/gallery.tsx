@@ -1,4 +1,4 @@
-import ProfileNftCollections from '~/components/nft-collection/ProfileNftCollections'
+import ProfileNftGallery from '~/components/nft-collection/ProfileNftGallery'
 import { useRouteData } from '~/hooks'
 
 export type ProfileData = {
@@ -10,18 +10,21 @@ export type ProfileData = {
     isToken: string
   }
 }
+
+export type GalleryData = {
+  gallery: any[]
+}
+
 const ProfileRoute = () => {
   const { targetAddress, displayName, isOwner, pfp } =
     useRouteData<ProfileData>('routes/$profile')
 
   return (
     <>
-      <ProfileNftCollections
+      <ProfileNftGallery
         account={targetAddress}
-        pfp={pfp.image}
         displayname={displayName}
         isOwner={isOwner}
-        filters={true}
         detailsModal
       />
     </>

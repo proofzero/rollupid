@@ -320,13 +320,8 @@ const nftsResolvers: Resolvers = {
         console.error(new GraphQLYogaError(ex as string))
       }
 
-      console.log(ownedNfts.filter((nft) => !nft.error))
-      console.log(
-        ownedNfts.filter((nft) => !nft.error).map((nft) => nft.metadata)
-      )
-
       return {
-        ownedNfts: ownedNfts.filter((nft) => !nft.error),
+        ownedNfts: NFTPropertyMapper(ownedNfts.filter((nft) => !nft.error)),
       }
     },
 
@@ -361,8 +356,6 @@ const nftsResolvers: Resolvers = {
       { gallery }: { gallery: any[] },
       { env, jwt, addressURN }: ResolverContext
     ) => {
-      console.log("YOOO IT'S BEEN HIT", addressURN)
-
       const indexerClient = createIndexerClient(env.Indexer)
 
       // TODO: Return the gallery we've created. Need to enforce
@@ -372,7 +365,6 @@ const nftsResolvers: Resolvers = {
         await indexerClient.kb_setGallery(
           gallery.map((nft) => ({ ...nft, addressURN: '1' }))
         )
-        console.log('SUCCESS')
       } catch (ex) {
         console.error(ex)
       }

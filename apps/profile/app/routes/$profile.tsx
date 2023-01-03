@@ -13,6 +13,7 @@ import {
   Link,
   Outlet,
   useCatch,
+  useNavigate,
   useFetcher,
   useLoaderData,
 } from '@remix-run/react'
@@ -33,6 +34,17 @@ import type { ThreeIdProfile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
+
+  const styles = request.url.includes('collection')
+    ? {
+        collection:
+          'text-gray-600 ml-10 h-12 border-b-[1.5px] border-[#6366F1]',
+        gallery: 'text-gray-600 ml-10 h-12',
+      }
+    : {
+        collection: 'text-gray-600 ml-10 h-12',
+        gallery: 'text-gray-600 ml-10 h-12 border-b-[1.5px] border-[#6366F1]',
+      }
 
   const galaxyClient = await clients.getGalaxyClient()
   const session = await getUserSession(request)
@@ -86,6 +98,7 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress,
     ogImageURL,
+    styles,
   })
 }
 
@@ -124,7 +137,6 @@ const ProfileLayout = () => {
   const {
     loggedInUserProfile,
     targetAddress,
-    claimed,
     displayName,
     bio,
     job,
@@ -133,9 +145,14 @@ const ProfileLayout = () => {
     pfp,
     cover,
     website,
+    styles,
   } = useLoaderData()
+  const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
   const [handlingCover, setHandlingCover] = useState<boolean>(false)
+  const [style, setStyle] = useState(styles)
+
+  const navigate = useNavigate()
 
   const fetcher = useFetcher()
 
@@ -367,50 +384,80 @@ const ProfileLayout = () => {
               {displayName ?? strings.shortenedAccount(targetAddress)}
             </Text>
 
-            <Text
-              className="break-normal text-gray-500"
-              size="base"
-              weight="medium"
-            >
-              {bio}
-            </Text>
+            <div className="flex flex-col space-around">
+              <Text
+                className="break-normal text-gray-500 mb-12"
+                size="base"
+                weight="medium"
+              >
+                {bio}
+              </Text>
 
-            <hr className="my-6" />
-
-            <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
-              {location && (
-                <div className="flex flex-row space-x-2 items-center wrap">
-                  <FaMapMarkerAlt />
-                  <Text weight="medium" className="text-gray-500">
-                    {location}
-                  </Text>
-                </div>
-              )}
-
-              {job && (
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaBriefcase />
-                  <Text weight="medium" className="text-gray-500">
-                    {job}
-                  </Text>
-                </div>
-              )}
-
-              {website && (
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaGlobe />
-                  <a href={website} target="_blank">
-                    <Text weight="medium" className="text-indigo-500">
-                      {website}
+              <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
+                {location && (
+                  <div className="flex flex-row space-x-2 items-center wrap">
+                    <FaMapMarkerAlt />
+                    <Text weight="medium" className="text-gray-500">
+                      {location}
                     </Text>
-                  </a>
-                </div>
-              )}
+                  </div>
+                )}
+
+                {job && (
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaBriefcase />
+                    <Text weight="medium" className="text-gray-500">
+                      {job}
+                    </Text>
+                  </div>
+                )}
+
+                {website && (
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaGlobe />
+                    <a href={website} target="_blank">
+                      <Text weight="medium" className="text-indigo-500">
+                        {website}
+                      </Text>
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         <div className="mt-12 lg:mt-24">
+          <div className="flex flex-row ">
+            <button
+              onClick={() => {
+                setStyle({
+                  collection: style.gallery,
+                  gallery: style.collection,
+                })
+                navigate('./gallery', { replace: true })
+              }}
+            >
+              <Text className={style.gallery} size="sm" weight="semibold">
+                Gallery
+              </Text>
+            </button>
+            <button
+              onClick={() => {
+                setStyle({
+                  collection: style.gallery,
+                  gallery: style.collection,
+                })
+                navigate('./collection', { replace: true })
+              }}
+            >
+              <Text className={style.collection} size="sm" weight="semibold">
+                NFT Collections
+              </Text>
+            </button>
+          </div>
+          <hr className="h-12 w-full" />
+
           <Outlet />
         </div>
       </div>
