@@ -9,8 +9,6 @@ import type { BaseMiddlewareFunction } from './types'
  * to convey context information between middleware.
  */
 
-// TODO implement guards for middleware that assert what data they expect to be in the context
-
 // geolocation
 // -----------------------------------------------------------------------------
 
