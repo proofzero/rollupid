@@ -1,6 +1,7 @@
 {
   "name": "@kubelt/openrpc",
   "version": "0.1.0",
+  "private": true,
   "description": "An OpenRPC framework for Cloudflare Workers",
   "scripts": {
     "build:dev": "tsc",
