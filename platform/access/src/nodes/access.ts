@@ -87,7 +87,7 @@ const generate = async (
     .setProtectedHeader({ alg })
     .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
     .setIssuedAt()
-    .setIssuer(objectId || '')
+    .setIssuer(objectId)
     .setSubject(account)
     .sign(key)
 
