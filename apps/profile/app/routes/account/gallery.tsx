@@ -132,7 +132,18 @@ const Nft = forwardRef(
     const inlineStyles = {
       opacity: faded ? '0.2' : isDragging ? '0' : '1',
       transformOrigin: '0 0',
-      height: 200,
+      /**
+       * It's the height of nft when it's dragged
+       * Don't know how to write it better so keep it for now
+       */
+      height:
+        window.innerWidth < 640
+          ? '30rem'
+          : window.innerWidth < 768
+          ? '20rem'
+          : window.innerWidth < 1024
+          ? '18rem'
+          : '14rem',
       gridRowStart: null,
       gridColumnStart: null,
       backgroundImage: `url("${url}")`,
@@ -309,15 +320,13 @@ const Gallery = () => {
           <div
             style={{
               display: 'grid',
-              // repeat(4, 1fr) here - means 4 columns
-              // gridTemplateColumns: `repeat(${4}, 1fr)`,
               gridGap: 10,
               padding: 10,
             }}
             className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
           >
-            <div className="w-full h-full bg-[#F9FAFB] rounded-lg">
+            <div className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  bg-[#F9FAFB] rounded-lg">
               <div className="flex flex-col justify-center items-center h-full text-gray-400">
                 <HiOutlinePlusCircle
                   size={60}
@@ -336,9 +345,11 @@ const Gallery = () => {
                   url={nft.url}
                   index={i}
                   nft={nft}
-                  className="flex justify-center items-center
-                w-full h-[60rem] sm:h-80 md:h-72 lg:h-60 bg-[#F9FAFB] rounded-lg
-                transition-transform duration-200 ease-in-out hover:scale-[1.02]"
+                  className="w-full
+                  flex justify-center items-center
+                  h-[30rem] sm:h-80 md:h-72 lg:h-56
+                  transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
+                 bg-[#F9FAFB] rounded-lg"
                 />
               )
             })}

@@ -12,7 +12,6 @@ import { AddressURNSpace } from '@kubelt/urns/address'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 
 import { gatewayFromIpfs } from '~/helpers'
-import { decorateNft, decorateNfts } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
   const { request } = args
@@ -31,10 +30,10 @@ export const loader: LoaderFunction = async (args) => {
     ],
   })
 
-  const urn = AddressURNSpace.urn(profile)
-  const { gallery } = await indexerClient.getGallery.query([urn])
+  const urn: any = AddressURNSpace.urn(profile)
+  const { gallery }: any = await indexerClient.getGallery.query([urn])
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata({
-    input: gallery.map((nft) => ({
+    input: gallery.map((nft: any) => ({
       contractAddress: nft.contract,
       tokenId: nft.tokenId,
     })),
