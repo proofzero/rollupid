@@ -53,7 +53,7 @@ export const authorizeMethod = async ({
   const doubles: any[] = []
   const indexes = [accountId.slice(-32)] // Must cap index at 32 bytes.
 
-  ctx.get('AccessAnalytics').writeDataPoint({ blobs, doubles, indexes })
+  ctx.AccessAnalytics.writeDataPoint({ blobs, doubles, indexes })
 
   return { ...result }
 }
