@@ -63,7 +63,7 @@ export default function AccountSetting() {
             {tabs.map((tab) => (
               <a
                 key={tab.name}
-                href={!tab.disabled ? tab.to : '#'}
+                href={!tab.disabled ? tab.to : '/'}
                 onClick={() => {
                   if (tab.disabled) {
                     return
