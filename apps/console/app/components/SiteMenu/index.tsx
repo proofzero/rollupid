@@ -18,6 +18,8 @@ import {
   HiOutlineHome,
   HiOutlineUsers,
 } from 'react-icons/hi'
+import { Disclosure } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 // KubeltLogo
 // -----------------------------------------------------------------------------
@@ -91,7 +93,46 @@ const menuItemClass = (isActive: boolean, disabled: boolean = false) =>
 export default function SiteMenu(props: KubeltMenuProps) {
   return (
     <div className="text-center bg-gray-900 pb-4 md:min-h-screen md:min-w-[256px] md:max-w-sm md:border-r md:text-left">
-      <KubeltLogo />
+        <div className='object-left'>
+          <KubeltLogo/>
+        </div>
+        {/* Mobile menu */}
+        <div className='md:hidden '>
+          <Disclosure>
+            {({ open }) => (
+              <>
+                <Disclosure.Button className="absolute right-0 top-0 my-5 items-right justify-right bg-gray-800 p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <span className="sr-only">Open main menu</span>
+                  {open ? (
+                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                  ) : (
+                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                  )}
+                </Disclosure.Button>
+                <Disclosure.Panel >
+                  <AppMenu props={props} />
+                </Disclosure.Panel>
+              </>
+            )}
+          </Disclosure>
+        </div>
+
+      {/* Desktop menu */}
+      <div className='hidden md:block'>
+        <AppMenu props={props} />
+      </div>
+
+    </div>
+  )
+}
+
+type AppMenuProps = {
+  props: KubeltMenuProps
+}
+
+function AppMenu({ props }: AppMenuProps) {
+  return (
+    <div>
       <AppSelect apps={props.apps} selected={props.selected} />
 
       {props.selected && (
