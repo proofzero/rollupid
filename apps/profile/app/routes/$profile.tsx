@@ -35,16 +35,8 @@ import type { ThreeIdProfile } from '~/utils/galaxy.server'
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
 
-  const styles = request.url.includes('collection')
-    ? {
-        collection:
-          'text-gray-600 ml-10 h-12 border-b-[1.5px] border-[#6366F1]',
-        gallery: 'text-gray-600 ml-10 h-12',
-      }
-    : {
-        collection: 'text-gray-600 ml-10 h-12',
-        gallery: 'text-gray-600 ml-10 h-12 border-b-[1.5px] border-[#6366F1]',
-      }
+  const splittedUrl = request.url.split('/')
+  const path = splittedUrl[splittedUrl.length - 1]
 
   const galaxyClient = await clients.getGalaxyClient()
   const session = await getUserSession(request)
@@ -98,7 +90,7 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress,
     ogImageURL,
-    styles,
+    path,
   })
 }
 
@@ -133,6 +125,15 @@ export const meta: MetaFunction = ({
   }
 }
 
+const tabs = {
+  gallery: 'Gallery',
+  collection: 'NFT Collections',
+}
+
+function classNames(...classes: any) {
+  return classes.filter(Boolean).join(' ')
+}
+
 const ProfileLayout = () => {
   const {
     loggedInUserProfile,
@@ -145,12 +146,12 @@ const ProfileLayout = () => {
     pfp,
     cover,
     website,
-    styles,
+    path,
   } = useLoaderData()
   const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
   const [handlingCover, setHandlingCover] = useState<boolean>(false)
-  const [style, setStyle] = useState(styles)
+  const [currentTab, setCurrentTab] = useState<string>(tabs[path])
 
   const navigate = useNavigate()
 
@@ -428,35 +429,30 @@ const ProfileLayout = () => {
         )}
 
         <div className="mt-12 lg:mt-24">
-          <div className="flex flex-row ">
-            <button
-              onClick={() => {
-                setStyle({
-                  collection: style.gallery,
-                  gallery: style.collection,
-                })
-                navigate('./gallery', { replace: true })
-              }}
-            >
-              <Text className={style.gallery} size="sm" weight="semibold">
-                Gallery
-              </Text>
-            </button>
-            <button
-              onClick={() => {
-                setStyle({
-                  collection: style.gallery,
-                  gallery: style.collection,
-                })
-                navigate('./collection', { replace: true })
-              }}
-            >
-              <Text className={style.collection} size="sm" weight="semibold">
-                NFT Collections
-              </Text>
-            </button>
+          <div className="hidden sm:block">
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                {Object.keys(tabs).map((tab) => (
+                  <button
+                    key={tabs[tab]}
+                    onClick={() => {
+                      setCurrentTab(tabs[tab])
+                      navigate(`./${tab}`, { replace: true })
+                    }}
+                    className={classNames(
+                      tabs[tab] === currentTab
+                        ? 'border-indigo-500 font-semibold text-gray-800'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                      '',
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                    )}
+                  >
+                    {tabs[tab]}
+                  </button>
+                ))}
+              </nav>
+            </div>
           </div>
-          <hr className="h-12 w-full" />
 
           <Outlet />
         </div>

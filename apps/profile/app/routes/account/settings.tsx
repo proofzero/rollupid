@@ -10,9 +10,9 @@ const tabs = [
   { name: 'Connected Accounts', to: 'connections', disabled: true },
 ]
 
-let firstEnabledTab = tabs.filter((t) => !!!t.disabled)[0]
+let firstEnabledTab = tabs.filter((t) => !t.disabled)[0]
 
-function classNames(...classes) {
+function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -63,7 +63,7 @@ export default function AccountSetting() {
             {tabs.map((tab) => (
               <a
                 key={tab.name}
-                href={!tab.disabled ? tab.to : '#'}
+                href={!tab.disabled ? tab.to : '/'}
                 onClick={() => {
                   if (tab.disabled) {
                     return

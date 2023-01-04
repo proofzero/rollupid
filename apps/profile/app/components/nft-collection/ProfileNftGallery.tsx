@@ -92,9 +92,13 @@ const ProfileNftGallery = ({
   }, [refresh])
 
   return (
-    <>
+    <div className="mt-9">
       {!loading && !refresh && !isOwner && !loadedNfts.length && (
-        <Text className="text-center text-gray-300 pb-5" size="2xl" weight="medium">
+        <Text
+          className="text-center text-gray-300 pb-5"
+          size="2xl"
+          weight="medium"
+        >
           Looks like {displayname ?? account} didn't set curated gallery
         </Text>
       )}
@@ -148,7 +152,7 @@ const ProfileNftGallery = ({
         </InfiniteScroll>
       )}
       {(refresh || loading) && nftGrid}
-    </>
+    </div>
   )
 }
 

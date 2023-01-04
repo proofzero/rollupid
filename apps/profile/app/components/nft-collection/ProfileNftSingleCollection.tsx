@@ -107,7 +107,7 @@ const ProfileNftSingleCollection = ({
   }, [refresh])
 
   return (
-    <>
+    <div className='mt-9'>
       {!loading && !refresh && !isOwner && !loadedNfts.length && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
           Looks like {displayname ?? account} doesn't own any NFTs
@@ -229,7 +229,7 @@ const ProfileNftSingleCollection = ({
         </>
       )}
       {(refresh || loading) && nftGrid}
-    </>
+    </div>
   )
 }
 
