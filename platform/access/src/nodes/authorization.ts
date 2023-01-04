@@ -45,7 +45,7 @@ export default class Authorization extends DOProxy {
       this.state.storage.put('codes', codes),
     ])
 
-    this.setAlarm(CODE_OPTIONS.ttl)
+    this.state.storage.setAlarm(CODE_OPTIONS.ttl)
 
     return { code, state }
   }

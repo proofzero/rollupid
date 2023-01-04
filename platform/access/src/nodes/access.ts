@@ -25,7 +25,7 @@ export default class Authorization extends DOProxy {
   }
 
   async generate(params: {
-    iss?: string
+    iss: string
     account: AccountURN
     clientId: string
     scope: any
@@ -59,7 +59,7 @@ export default class Authorization extends DOProxy {
 }
 
 const generate = async (
-  objectId: string | undefined,
+  objectId: string,
   account: AccountURN,
   clientId: string,
   scope: any,
@@ -78,7 +78,7 @@ const generate = async (
     .setProtectedHeader({ alg })
     .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
     .setIssuedAt()
-    .setIssuer(objectId || '')
+    .setIssuer(objectId)
     .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
     .setSubject(account)
     .sign(key)
