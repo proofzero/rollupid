@@ -25,7 +25,7 @@ export const Node = z.object({
 })
 
 export const Edge = z.object({
-  id: AnyURNInput,
+  id: AnyURNInput.optional(),
   src: Node,
   dst: Node,
   tag: EdgeTagInput,

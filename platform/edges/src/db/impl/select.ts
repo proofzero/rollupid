@@ -4,34 +4,27 @@
  * Utilities for selecting data from the database.
  */
 
-import * as _ from 'lodash'
-
-import { EdgeDirection } from '@kubelt/graph'
-
 // Imported Types
 // -----------------------------------------------------------------------------
-
-import type {
-  EdgeTag,
-  EdgesOptions,
-  NodeFilter,
-  Permission,
-} from '@kubelt/graph'
 
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
 import type {
+  EdgeTag,
   Edge,
   Node,
   EdgeQuery,
   EdgeRecord,
   Graph,
   NodeRecord,
+  NodeFilter,
   QComponent,
   QComponents,
   RComponent,
   RComponents,
+  Permission,
 } from '../types'
+import { EdgeDirection } from '@kubelt/graph'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -58,17 +51,14 @@ export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
     WHERE
       nc.nodeUrn = ?1
   `
-  const qcomp = await g.db.prepare(query).bind(nodeId.toString()).all()
+  const qcomp = await g.db
+    .prepare(query)
+    .bind(nodeId.toString())
+    .all<QComponent>()
   // Convert the result collection into a property bag object.
-  return _.reduce(
-    qcomp.results,
-    (acc: QComponents, result: unknown) => {
-      const { key, value } = result as QComponent
-      acc[key] = value
-      return acc
-    },
-    {}
-  )
+  if (qcomp.results)
+    return qcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
+  else return {}
 }
 
 // rc()
@@ -96,17 +86,14 @@ export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
     WHERE
       nc.nodeUrn = ?1
   `
-  const rcomp = await g.db.prepare(query).bind(nodeId.toString()).all()
+  const rcomp = await g.db
+    .prepare(query)
+    .bind(nodeId.toString())
+    .all<RComponent>()
   // Convert the result collection into an property bag object.
-  return _.reduce(
-    rcomp.results,
-    (acc: RComponents, result: unknown) => {
-      const { key, value } = result as RComponent
-      acc[key] = value
-      return acc
-    },
-    {}
-  )
+  if (rcomp.results)
+    return rcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
+  else return {}
 }
 
 // node()
@@ -116,7 +103,7 @@ export async function node(
   g: Graph,
   nodeId: AnyURN | undefined
 ): Promise<Node | undefined> {
-  if (_.isUndefined(nodeId)) {
+  if (!nodeId) {
     return undefined
   }
 
@@ -128,19 +115,19 @@ export async function node(
     WHERE
       urn = ?1
   `
-  const node = await g.db.prepare(query).bind(nodeId.toString()).first()
+  const node = await g.db.prepare(query).bind(nodeId.toString()).first<Node>()
 
-  if (_.isUndefined(node)) {
+  if (!node) {
     return undefined
   }
 
-  const nodeUrn = _.get(node, 'urn') as unknown
+  const nodeUrn = node.urn
 
   const qcMap = await qc(g, nodeUrn as AnyURN)
-  _.set(node as object, 'qc', qcMap)
+  node.qc = qcMap
 
   const rcMap = await rc(g, nodeUrn as AnyURN)
-  _.set(node as object, 'rc', rcMap)
+  node.rc = rcMap
 
   return node as Node
 }
@@ -162,10 +149,10 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
     WHERE
       e.edgeId = ?1
   `
-  const result = await g.db.prepare(query).bind(edgeId).all()
+  const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
 
   // TODO check result.success and handle query error
-  const perms = result.results as string[]
+  const perms = result.results
 
   return perms as Permission[]
 }
@@ -179,7 +166,7 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
 export async function edges(
   g: Graph,
   query: EdgeQuery,
-  opt?: EdgesOptions
+  opt?: any
 ): Promise<Edge[]> {
   let sql: string
 
@@ -188,7 +175,7 @@ export async function edges(
   // TODO we don't want to allow for the possibility of all edges being
   // returned until pagination is in place. Revisit this behavior if we
   // decide to implement it.
-  if (_.isUndefined(query.id)) {
+  if (!query.id) {
     return []
   }
 
@@ -209,8 +196,8 @@ export async function edges(
   }
 
   // Filter edges by tag, if provided.
-  if (!_.isUndefined(query.tag)) {
-    sql = _.join([sql, 'e.tag = ?2'], ' AND ')
+  if (!query.tag) {
+    sql = [sql, 'e.tag = ?2'].join(' AND ')
   }
 
   const result = await g.db
@@ -229,13 +216,9 @@ export async function edges(
   ): boolean {
     //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
     //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-    return _.reduce(
-      queryComp,
-      (flag: boolean, value: string, key: string): boolean => {
-        return flag && nodeComp[key] === value
-      },
-      true
-    )
+    const qSet = new Set(Object.entries(queryComp))
+    const nList = Object.entries(nodeComp)
+    return nList.filter((e) => qSet.has(e)).length === nList.length
   }
 
   async function nodeFilter(
@@ -314,15 +297,15 @@ export async function edges(
 
   // Enrich each edge with the details of the referenced nodes.
   return Promise.all(
-    _.map(edges, async (edgeRec: EdgeRecord): Promise<Edge> => {
+    edges.map(async (edgeRec: EdgeRecord): Promise<Edge> => {
       const srcNode: Node | undefined = await node(g, edgeRec.srcUrn)
-      if (_.isUndefined(srcNode)) {
+      if (!srcNode) {
         throw new Error(`error getting node: ${edgeRec.srcUrn}`)
       }
       const src: Node = { ...srcNode, id: `urn:${srcNode.nid}:${srcNode.nss}` }
 
       const dstNode: Node | undefined = await node(g, edgeRec.dstUrn)
-      if (_.isUndefined(dstNode)) {
+      if (!dstNode) {
         throw new Error(`error getting node: ${edgeRec.dstUrn}`)
       }
       const dst: Node = { ...dstNode, id: `urn:${dstNode.nid}:${dstNode.nss}` }

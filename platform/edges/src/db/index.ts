@@ -4,16 +4,12 @@
  * Platform edges database interface.
  */
 
-import { EdgeDirection } from '@kubelt/graph'
-
 import * as impl from './impl/index'
 
 // Imported Types
 // -----------------------------------------------------------------------------
 
 import type { AnyURN } from '@kubelt/urns'
-
-import type { EdgeTag, EdgesOptions } from '@kubelt/graph'
 
 import type {
   Edge,
@@ -24,6 +20,8 @@ import type {
   Graph,
   NodeRecord,
   Token,
+  EdgeDirection,
+  EdgeTag,
 } from './types'
 
 // Exported Types
@@ -68,7 +66,7 @@ export async function node(
 export async function edges(
   g: Graph,
   query: EdgeQuery,
-  opt?: EdgesOptions
+  opt?: any
 ): Promise<Edge[]> {
   return impl.edges(g, query, opt)
 }

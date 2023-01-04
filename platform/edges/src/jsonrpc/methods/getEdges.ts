@@ -2,6 +2,7 @@ import * as db from '../../db'
 import { z } from 'zod'
 import { Context } from '../../context'
 import { Edge, EdgeQueryInput } from '../middleware/validators'
+import { Edge as EdgeType } from '../../db/types'
 
 export const GetEdgesMethodInput = z.object({
   query: EdgeQueryInput,
@@ -21,7 +22,10 @@ export const getEdgesMethod = async ({
 }: {
   input: GetEdgesParams
   ctx: Context
-}): Promise<unknown> => {
+}): Promise<{
+  id: string
+  edges: EdgeType[]
+}> => {
   const nodeId = input.query.id
 
   // Get the list of the edges selected by the query, modifying the

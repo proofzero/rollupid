@@ -55,8 +55,8 @@ export const appRouter = t.router({
   makeEdge: t.procedure
     .use(LogUsage)
     .input(MakeEdgeMethodInput)
-    .output(MakeEdgeMethodInput)
-    .mutation(getEdgesMethod),
+    .output(MakeEdgeMethodOutput)
+    .mutation(makeEdgeMethod),
   removeEdge: t.procedure
     .use(LogUsage)
     .input(RemoveEdgeMethodInput)

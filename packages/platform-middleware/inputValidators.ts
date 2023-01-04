@@ -3,7 +3,7 @@ import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 import { Address } from '@kubelt/types'
 import { AnyURN, parseURN } from '@kubelt/urns'
-import { EdgeTag } from '@kubelt/graph'
+import { EdgeURN } from '@kubelt/urns/edge'
 
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (AddressURNSpace.parse(input as AddressURN) === null) {
@@ -37,20 +37,20 @@ export const CryptoAddressTypeInput = z.custom<Address.CryptoAddressType>(
   }
 )
 
-export const AnyURN = z.custom<AnyURN>((input) => {
+export const AnyURNInput = z.custom<AnyURN>((input) => {
   parseURN(input as string)
   return input as AnyURN
 })
 
-export const EdgeTag = z.custom<EdgeTag>((input) => {
+export const EdgeTagInput = z.custom<EdgeURN>((input) => {
   parseURN(input as string)
-  return input as EdgeTag
+  return input as EdgeURN
 })
 
 export const EdgeDirectionInput = z.enum(['incoming', 'outgoing'])
 
 export const NodeFilterInput = z.object({
-  id: AnyURN.optional(),
+  id: AnyURNInput.optional(),
   fr: z.string().optional(),
   qc: z.record(z.string(), z.string()).optional(),
   rc: z.record(z.string(), z.string()).optional(),

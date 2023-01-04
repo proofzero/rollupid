@@ -4,22 +4,20 @@
  * Utilities for inserting data into the database.
  */
 
-import * as _ from 'lodash'
-
 import * as urns from 'urns'
 
 import { AnyURN } from '@kubelt/urns'
 
-import type { EdgeTag } from '@kubelt/graph'
-
 import type {
   Edge,
+  EdgeTag,
   Node,
   EdgeId,
   EdgeRecord,
   Graph,
   NodeRecord,
 } from '../types'
+import { qc } from './select'
 
 // node()
 // -----------------------------------------------------------------------------
@@ -105,27 +103,11 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     for (const [key, value] of qcParams.entries()) {
       selects.push(qcStmt.bind(key, value))
     }
-    const qcResult = await g.db.batch(selects)
+    const qcResult = await g.db.batch<{ id: number }>(selects)
     // Collect an array of row IDs from the table rows containing q-components.
-    const allRowIds = _.reduce(
-      qcResult,
-      (acc: number[], o: Record<string, unknown>): number[] => {
-        const results = _.get(o, 'results')
-        if (results == undefined) {
-          return acc
-        }
-        return _.concat(
-          acc,
-          _.map(results, (result: unknown): number => {
-            return _.get(result, 'id') || -1
-          })
-        )
-      },
-      []
-    )
-    // Filter out any negative (error) row IDs.
-    const rowIds = _.filter(allRowIds, (n) => {
-      return n >= 0
+    const rowIds = qcResult.map((row) => {
+      const qcIds = row.results?.map((result) => result.id)
+      return qcIds
     })
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
@@ -154,28 +136,13 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     for (const [key, value] of rcParams.entries()) {
       selects.push(rcStmt.bind(key, value))
     }
-    const rcResult = await g.db.batch(selects)
-    // Collect an array of row IDs fro the table rows containing r-components.
-    const allRowIds = _.reduce(
-      rcResult,
-      (acc: number[], o: Record<string, unknown>): number[] => {
-        const results = _.get(o, 'results')
-        if (results === undefined) {
-          return acc
-        }
-        return _.concat(
-          acc,
-          _.map(results, (result: unknown): number => {
-            return _.get(result, 'id') || -1
-          })
-        )
-      },
-      []
-    )
-    // Filter out any negative (error) row IDs.
-    const rowIds = _.filter(allRowIds, (n) => {
-      return n >= 0
+    const rcResult = await g.db.batch<{ id: number }>(selects)
+
+    const rowIds = rcResult.map((row) => {
+      const qcIds = row.results?.map((result) => result.id)
+      return qcIds
     })
+
     // Add an entry to the join table for each r-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
@@ -238,7 +205,7 @@ export async function edge(
       .then(async (result) => {
         // TODO check for error; there is a .success property in the
         // result but referring to it causes a type error.
-        if (_.get(result, 'success', false) === false) {
+        if (result.error) {
           reject()
         }
 

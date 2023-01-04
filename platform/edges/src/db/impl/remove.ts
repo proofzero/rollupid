@@ -4,11 +4,9 @@
  * Utilities for removing data from the database.
  */
 
-import type { EdgeTag } from '@kubelt/graph'
-
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Graph } from '../types'
+import type { Graph, EdgeTag } from '../types'
 
 // edge()
 // -----------------------------------------------------------------------------

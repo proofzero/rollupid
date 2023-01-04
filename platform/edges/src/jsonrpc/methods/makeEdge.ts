@@ -5,6 +5,9 @@ import {
   AnyURNInput,
   EdgeTagInput,
 } from '@kubelt/platform-middleware/inputValidators'
+import { Edge } from '../../db/types'
+import { AnyURN } from '@kubelt/urns'
+import { EdgeURN } from '@kubelt/urns/edge'
 
 export const MakeEdgeMethodInput = z.object({
   src: AnyURNInput,
@@ -28,7 +31,13 @@ export const makeEdgeMethod = async ({
 }: {
   input: MakeEdgeParams
   ctx: Context
-}): Promise<unknown> => {
+}): Promise<{
+  edge: {
+    src: AnyURN
+    dst: AnyURN
+    tag: EdgeURN
+  }
+}> => {
   const edge = await db.link(ctx.graph, input.src, input.dst, input.tag)
 
   console.log(
