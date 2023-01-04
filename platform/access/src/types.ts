@@ -36,51 +36,12 @@ export enum ResponseType {
 
 export type Scope = string[]
 
-export type AuthorizeParams = [
-  account: AccountURN,
-  responseType: ResponseType,
-  clientId: string,
-  redirectUri: string,
-  scope: Scope,
-  state: string
-]
-
 export type AuthorizeResult = {
   code: string
   state: string
 }
 
-export type ExchangeAuthenticationCodeParams = [
-  account: AccountURN,
-  code: string,
-  redirectUri: string,
-  clientId: string
-]
-
-export type ExchangeAuthorizationCodeParams = [
-  account: AccountURN,
-  code: string,
-  redirectUri: string,
-  clientId: string,
-  clientSecret?: string
-]
-
-export type ExchangeRefreshTokenParams = [token: string]
-
-export type ExchangeTokenParams =
-  | [
-      grantType: GrantType.AuthenticationCode,
-      ...rest: ExchangeAuthenticationCodeParams
-    ]
-  | [
-      grantType: GrantType.AuthorizationCode,
-      ...rest: ExchangeAuthorizationCodeParams
-    ]
-  | [grantType: GrantType.RefreshToken, ...rest: ExchangeRefreshTokenParams]
-
 export type ExchangeTokenResult = {
   accessToken: string
   refreshToken: string
 }
-
-export type VerifyAuthorizationParams = [token: string]

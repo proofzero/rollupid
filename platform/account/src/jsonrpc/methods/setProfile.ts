@@ -15,6 +15,6 @@ export const setProfileMethod = async ({
   input: z.infer<typeof SetProfileInput>
   ctx: Context
 }): Promise<void> => {
-  await ctx.account?.setProfile(input.profile)
+  await ctx.account?.class.setProfile(input.profile)
   return
 }

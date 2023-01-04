@@ -1,191 +1,130 @@
-import { decodeJwt } from 'jose'
+import { z } from 'zod'
 
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-
-import type { StarbaseApi } from '@kubelt/platform-clients/starbase'
-
+import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
+import { Context } from '../../context'
+import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
+
 import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
-import {
-  ExchangeAuthenticationCodeParams,
-  ExchangeAuthorizationCodeParams,
-  ExchangeRefreshTokenParams,
-  ExchangeTokenParams,
-  ExchangeTokenResult,
-  GrantType,
-} from '../../types'
+import { GrantType } from '../../types'
+import { tokenValidator } from '../middleware/validators'
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const [grantType] = (request.params as ExchangeTokenParams).splice(0, 1)
-  if (!grantType) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing grant type',
-    })
-  }
+export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
+  z.object({
+    grantType: z.literal(GrantType.AuthenticationCode),
+    account: AccountURNInput,
+    code: z.string(),
+    redirectUri: z.string(),
+    clientId: z.string(),
+  }),
+  z.object({
+    grantType: z.literal(GrantType.AuthorizationCode),
+    account: AccountURNInput,
+    code: z.string(),
+    redirectUri: z.string(),
+    clientId: z.string(),
+    clientSecret: z.string(),
+  }),
+  z.object({
+    grantType: z.literal(GrantType.RefreshToken),
+    token: tokenValidator,
+  }),
+])
 
-  const exchangeAuthenticationCode = async (
-    params: ExchangeAuthenticationCodeParams
-  ) => {
-    const [account, code, redirectUri, clientId] = params
-    console.log({ params })
-    console.log({ account, code, redirectUri, clientId })
-    if (!account) {
-      throw 'missing account'
-    }
+export const ExchangeTokenMethodOutput = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+})
 
-    if (!code) {
-      throw 'missing authorization code'
-    }
+export type ExchangeTokenParams = z.infer<typeof ExchangeTokenMethodInput>
 
-    if (!redirectUri) {
-      throw 'missing redirect uri'
-    }
+export const exchangeTokenMethod = async ({
+  input,
+  ctx,
+}: {
+  input: ExchangeTokenParams
+  ctx: Context
+}) => {
+  const { grantType } = input
 
-    if (!clientId) {
-      throw 'missing client identifier'
-    }
+  console.log({ grantType })
 
+  if (grantType == GrantType.AuthenticationCode) {
+    const { account, code, redirectUri, clientId } = input
     const accountId = AccountURNSpace.decode(account)
     const name = AccessURNSpace.fullUrn(accountId, {
       r: URN_NODE_TYPE_AUTHORIZATION,
       q: { clientId },
     })
 
-    const Authorization = context.get('Authorization')
-    const authorizationClient = await openrpc.discover(Authorization, {
+    const authorizationNode = await initAuthorizationNodeByName(
       name,
-    })
-    const { scope } = await authorizationClient.exchangeToken({
-      account,
-      code,
-      redirectUri,
-      clientId,
-    })
-    const Access = context.get('Access')
-    const accessClient = await openrpc.discover(Access)
-    const objectId = accessClient.$.id
-    const result: ExchangeTokenResult = await accessClient.generate({
-      objectId,
-      account,
-      clientId,
-      scope,
-    })
-    return openrpc.response(request, result)
-  }
-
-  const exchangeAuthorizationCode = async (
-    params: ExchangeAuthorizationCodeParams
-  ) => {
-    const [account, code, redirectUri, clientId, clientSecret] = params
-    if (!account) {
-      throw 'missing account'
-    }
-
-    if (!code) {
-      throw 'missing authorization code'
-    }
-
-    if (!redirectUri) {
-      throw 'missing redirect uri'
-    }
-
-    if (!clientId) {
-      throw 'missing client identifier'
-    }
-
-    const name = AccessURNSpace.fullUrn(account, {
-      r: URN_NODE_TYPE_AUTHORIZATION,
-      q: { clientId },
-    })
-    const Authorization = context.get('Authorization')
-    const authorizationClient = await openrpc.discover(Authorization, {
-      name,
-    })
-    const { scope } = await authorizationClient.params(code)
-    const starbaseClient: StarbaseApi = context.get('Starbase')
-    const validated = await starbaseClient.kb_appAuthCheck({
-      redirectURI: redirectUri,
-      scopes: scope,
-      clientId,
-      clientSecret,
-    })
-    if (validated) {
-      const { scope } = await authorizationClient.exchangeCode(
-        code,
-        redirectUri,
-        clientId
-      )
-      const Access = context.get('Access')
-      const accessClient = await openrpc.discover(Access)
-      const result: ExchangeTokenResult = await accessClient.generate(
-        account,
-        clientId,
-        scope
-      )
-      return openrpc.response(request, result)
-    } else {
-      return openrpc.error(request, {
-        code: -32500,
-        message: 'failed authorization attempt',
-      })
-    }
-  }
-
-  const exchangeRefreshToken = async (params: ExchangeRefreshTokenParams) => {
-    const [token] = params
-    const payload = decodeJwt(token)
-    if (!payload) {
-      return openrpc.error(request, {
-        code: -32500,
-        message: 'missing JWT payload',
-      })
-    }
-
-    if (!payload.iss) {
-      return openrpc.error(request, {
-        code: -32500,
-        message: 'missing JWT issuer',
-      })
-    }
-
-    const { iss: id } = payload
-
-    const Access = context.get('Access')
-    const accessClient = await openrpc.discover(Access, { id })
-    const result: ExchangeTokenResult = await accessClient.refresh({
-      objectId: id,
-      token,
-    })
-    return openrpc.response(request, result)
-  }
-
-  if (grantType == GrantType.AuthenticationCode) {
-    const result = await exchangeAuthenticationCode(
-      request.params as ExchangeAuthenticationCodeParams
+      ctx.Authorization
     )
+
+    // TODO: what does this do other than validate code?
+    await authorizationNode.class.exchangeToken(code, redirectUri, clientId)
+
+    // create a new id but use it as the name
+    const iss = ctx.Access.newUniqueId().toString()
+    console.log({ iss })
+
+    const accessNode = await initAccessNodeByName(iss, ctx.Access)
+    const result = await accessNode.class.generate({
+      iss,
+      account,
+      clientId,
+      scope: [], //scope,
+    })
+
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
-    const result = await exchangeAuthorizationCode(
-      request.params as ExchangeAuthorizationCodeParams
-    )
-    return result
+    throw new Error('not implemented')
+    // const { account, code, redirectUri, clientId, clientSecret } = input
+
+    // const name = AccessURNSpace.fullUrn(account, {
+    //   r: URN_NODE_TYPE_AUTHORIZATION,
+    //   q: { clientId },
+    // })
+
+    // const authorizationNode = await initAuthorizationNodeByName(
+    //   name,
+    //   ctx.Authorization
+    // )
+    // const { scope } = await authorizationNode.params(code)
+
+    // const validated = await ctx.starbaseClient.kb_appAuthCheck({
+    //   redirectURI: redirectUri,
+    //   scopes: scope,
+    //   clientId,
+    //   clientSecret,
+    // })
+    // if (validated) {
+    //   const { scope } = await authorizationNode.exchangeCode(
+    //     code,
+    //     redirectUri,
+    //     clientId
+    //   )
+
+    //   // create a new id but use it as the name
+    //   const objectId = ctx.Access.newUniqueId().toString()
+    //   const accessNode = await initAccessNodeByName(objectId, ctx.Access)
+    //   const result = await accessNode.generate({ account, clientId, scope })
+    //   return result
+    // } else {
+    //   throw new Error(`failed authorization attempt`)
+    // }
   } else if (grantType == GrantType.RefreshToken) {
-    const result = await exchangeRefreshToken(
-      request.params as ExchangeRefreshTokenParams
-    )
+    const {
+      token: { iss, token },
+    } = input
+
+    const accessNode = await initAccessNodeByName(iss, ctx.Access)
+    const result = await accessNode.class.refresh(iss, token)
     return result
   } else {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'invalid grant type',
-    })
+    throw new Error(`unsupported grant type: ${grantType}`)
   }
 }

@@ -6434,14 +6434,14 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
     jose: 4.11.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
@@ -6466,10 +6466,9 @@ __metadata:
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
-    itty-durable: 1.6.0
-    itty-router-extras: 0.4.2
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
@@ -6586,11 +6585,9 @@ __metadata:
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
-    itty-durable: 1.6.0
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
@@ -21291,6 +21288,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"do-proxy@npm:1.3.1":
+  version: 1.3.1
+  resolution: "do-proxy@npm:1.3.1"
+  peerDependencies:
+    "@cloudflare/workers-types": ^4.20221111.1
+  checksum: 5763f397c87132980c346fa4ca1b7d70318f77f416c2fe9a540e4719f35beca978e74aac9a456e02e832e3560c1f69a5e7b9152e6776bbad0bd5e154bc2e39b9
+  languageName: node
+  linkType: hard
+
 "doctrine@npm:^2.1.0":
   version: 2.1.0
   resolution: "doctrine@npm:2.1.0"
@@ -29164,24 +29170,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"itty-durable@npm:1.6.0":
-  version: 1.6.0
-  resolution: "itty-durable@npm:1.6.0"
-  dependencies:
-    itty-router: ^2.6.1
-    itty-router-extras: ^0.4.2
-  checksum: 4d7fd4fcc17ee4a7de571c079a3be6914281a5a0c309b1b70f97372e24c0780a6fbe1287739d7b415b8e114c65c8de05ac7b2a3342fc427ee5aa39b573109a44
-  languageName: node
-  linkType: hard
-
-"itty-router-extras@npm:0.4.2, itty-router-extras@npm:^0.4.2":
+"itty-router-extras@npm:0.4.2":
   version: 0.4.2
   resolution: "itty-router-extras@npm:0.4.2"
   checksum: 3d98dac81561a9d7aab19f35c5a23af23ad5ff035c57b221c8991a6e6f79faf023e107c1c368af1c61b77e3861263967b0c7957c86ecfaed8879ae13b09bffe8
   languageName: node
   linkType: hard
 
-"itty-router@npm:2.6.6, itty-router@npm:^2.3.10, itty-router@npm:^2.6.1":
+"itty-router@npm:2.6.6, itty-router@npm:^2.3.10":
   version: 2.6.6
   resolution: "itty-router@npm:2.6.6"
   checksum: 2117cba792e7a131f12af8e4f18ed7fddf643d632a440f235e4a3478eac4e4158272a859d160969e0d76e96f5a8659bd090f714afabdb95cffb7964c29d4a89f

@@ -2,7 +2,7 @@ import { json } from '@remix-run/cloudflare'
 
 import { useLoaderData } from '@remix-run/react'
 import { FaDiscord, FaTwitter } from 'react-icons/fa'
-import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 import FAQ from '~/components/FAQ'
 
@@ -23,7 +23,7 @@ export const loader = async ({ request }) => {
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    [AccountJWTHeader]: jwt,
+    [PlatformJWTAssertionHeader]: jwt,
   })
 
   const [isToken, displayname] = [

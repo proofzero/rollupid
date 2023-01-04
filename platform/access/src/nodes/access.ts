@@ -1,98 +1,78 @@
-import { exportJWK, generateKeyPair, jwtVerify, importJWK, SignJWT } from 'jose'
+import {
+  exportJWK,
+  generateKeyPair,
+  jwtVerify,
+  importJWK,
+  SignJWT,
+  JWTVerifyResult,
+} from 'jose'
+import { DOProxy } from 'do-proxy'
+
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
-import type {
-  RpcInput,
-  RpcOutput,
-  RpcParams,
-  RpcResult,
-} from '@kubelt/openrpc/component'
-
-import {
-  component,
-  field,
-  method,
-  requiredField,
-  scopes,
-  FieldAccess,
-} from '@kubelt/openrpc/component'
-
 import { JWT_OPTIONS } from '../constants'
 
-import schema from '../schemas/access'
+import { ExchangeTokenResult, KeyPair, KeyPairSerialized } from '../types'
+import { AccountURN } from '@kubelt/urns/account'
 
-import { KeyPair, KeyPairSerialized } from '../types'
+export default class Authorization extends DOProxy {
+  declare state: DurableObjectState
 
-@component(schema)
-@field({
-  name: 'account',
-  doc: 'Account',
-  defaultValue: null,
-})
-@field({
-  name: 'clientId',
-  doc: 'Client Id',
-  defaultValue: null,
-})
-@field({
-  name: 'scope',
-  doc: 'Scope',
-  defaultValue: null,
-})
-@field({
-  name: 'signingKey',
-  doc: 'Signing Key',
-  defaultValue: null,
-})
-@scopes(['owner'])
-export default class Authorization {
-  @method('generate')
-  @requiredField('account', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('clientId', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('scope', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('signingKey', [FieldAccess.Read, FieldAccess.Write])
-  generate(params: RpcParams, input: RpcInput, output: RpcOutput): RpcResult {
-    return generate(params, input, output)
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
   }
 
-  @method('verify')
-  @requiredField('signingKey', [FieldAccess.Read, FieldAccess.Write])
-  verify(params: RpcParams, input: RpcInput, output: RpcOutput): RpcResult {
-    return verify(params, input, output)
+  async generate(params: {
+    iss: string
+    account: AccountURN
+    clientId: string
+    scope: any
+  }): Promise<ExchangeTokenResult> {
+    let [account, clientId, scope] = await Promise.all([
+      this.state.storage.get<AccountURN>('account'),
+      this.state.storage.get<string>('clientId'),
+      this.state.storage.get<any>('scope'),
+    ])
+
+    account ||= params.account
+    clientId ||= params.clientId
+    scope ||= params.scope
+    return generate(params.iss, account, clientId, scope, this.state.storage)
   }
 
-  @method('refresh')
-  @requiredField('account', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('clientId', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('scope', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('signingKey', [FieldAccess.Read, FieldAccess.Write])
-  async refresh(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    await verify(params, input, output)
-    return generate(params, input, output)
+  async verify(token: string): Promise<JWTVerifyResult> {
+    return verify(token, this.state.storage)
+  }
+
+  async refresh(iss: string, token: string): Promise<ExchangeTokenResult> {
+    const [account, clientId, scope] = await Promise.all([
+      this.state.storage.get<AccountURN>('account'),
+      this.state.storage.get<string>('clientId'),
+      this.state.storage.get<any>('scope'),
+    ])
+    if (!account || !clientId || !scope) throw new Error('Invalid token')
+    await verify(token, this.state.storage)
+    return generate(iss, account, clientId, scope, this.state.storage)
   }
 }
 
 const generate = async (
-  params: RpcParams,
-  input: RpcInput,
-  output: RpcOutput
+  objectId: string,
+  account: AccountURN,
+  clientId: string,
+  scope: any,
+  storage: DurableObjectStorage
 ) => {
-  const objectId = params.get('objectId')
-  const account = params.get('account') || input.get('account')
-  const clientId = params.get('clientId') || input.get('clientId')
-  const scope = params.get('scope') || input.get('scope')
-
-  output.set('account', account)
-  output.set('clientId', clientId)
-  output.set('scope', scope)
+  await Promise.all([
+    storage.put('account', account),
+    storage.put('clientId', clientId),
+    storage.put('scope', scope),
+  ])
 
   const { alg, ttl } = JWT_OPTIONS
-  const { privateKey: key } = await getJWTSigningKeyPair(input, output)
+  const { privateKey: key } = await getJWTSigningKeyPair(storage)
 
   const accessToken = await new SignJWT({ client_id: clientId, scope })
     .setProtectedHeader({ alg })
@@ -117,24 +97,18 @@ const generate = async (
   }
 }
 
-const verify = async (
-  params: RpcParams,
-  input: RpcInput,
-  output: RpcOutput
-) => {
+const verify = async (token: string, storage: DurableObjectStorage) => {
   const { alg } = JWT_OPTIONS
-  const { publicKey: key } = await getJWTSigningKeyPair(input, output)
+  const { publicKey: key } = await getJWTSigningKeyPair(storage)
   const options = { algorithms: [alg] }
-  const token = params.get('token')
   return jwtVerify(token, key, options)
 }
 
 const getJWTSigningKeyPair = async (
-  input: RpcInput,
-  output: RpcOutput
+  storage: DurableObjectStorage
 ): Promise<KeyPair> => {
   const { alg } = JWT_OPTIONS
-  const stored: KeyPairSerialized = input.get('signingKey')
+  const stored: KeyPairSerialized | undefined = await storage.get('signingKey')
   if (stored) {
     return {
       publicKey: await importJWK(stored.publicKey, alg),
@@ -146,7 +120,7 @@ const getJWTSigningKeyPair = async (
     extractable: true,
   })
 
-  output.set('signingKey', {
+  await storage.put('signingKey', {
     publicKey: await exportJWK(generated.publicKey),
     privateKey: await exportJWK(generated.privateKey),
   })

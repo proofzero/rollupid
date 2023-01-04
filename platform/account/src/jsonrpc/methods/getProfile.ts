@@ -1,9 +1,8 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import Account from '../../nodes/account'
-import { proxyDurable } from 'itty-durable'
 import type { Profile } from '../middlewares/profile'
+import { initAccountNodeByName } from '../../nodes'
 
 export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -18,13 +17,7 @@ export const getProfileMethod = async ({
   input: z.infer<typeof GetProfileInput>
   ctx: Context
 }): Promise<Profile | null> => {
-  const proxy = await proxyDurable(ctx.Account, {
-    name: 'account',
-    class: Account,
-    parse: true,
-  })
-
-  const node = proxy.get(input.account)
-  const result = await node.getProfile()
+  const node = await initAccountNodeByName(input.account, ctx.Account)
+  const result = await node.class.getProfile()
   return result
 }

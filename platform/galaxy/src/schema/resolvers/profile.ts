@@ -29,9 +29,7 @@ const threeIDResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      console.log(
-        `galaxy:profileFromAddress: getting profile for account: ${accountURN}`
-      )
+      console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
 
       const accountClient = createAccountClient(env.Account, {
         headers: {
@@ -54,6 +52,8 @@ const threeIDResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.kb_getAccount()
+      console.log({ accountURN })
+
       if (!accountURN) {
         console.log(
           'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'

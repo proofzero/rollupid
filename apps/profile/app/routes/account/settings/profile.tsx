@@ -9,7 +9,7 @@ import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { requireJWT } from '~/utils/session.server'
-import { AccountJWTHeader } from '@kubelt/platform-middleware/jwt'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
@@ -91,7 +91,7 @@ export const action: ActionFunction = async ({ request }) => {
       },
     },
     {
-      [AccountJWTHeader]: jwt,
+      [PlatformJWTAssertionHeader]: jwt,
     }
   )
 

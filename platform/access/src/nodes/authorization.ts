@@ -1,27 +1,9 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-
-import type {
-  RpcAlarm,
-  RpcInput,
-  RpcOutput,
-  RpcParams,
-  RpcResult,
-} from '@kubelt/openrpc/component'
-
-import {
-  alarm,
-  component,
-  field,
-  method,
-  requiredField,
-  scopes,
-  FieldAccess,
-} from '@kubelt/openrpc/component'
+import { AccountURN } from '@kubelt/urns/account'
+import { DOProxy } from 'do-proxy'
 
 import { CODE_OPTIONS } from '../constants'
-
-import schema from '../schemas/authorization'
 
 import {
   AuthorizationParameters,
@@ -29,110 +11,96 @@ import {
   ResponseType,
 } from '../types'
 
-@component(schema)
-@field({
-  name: 'account',
-  doc: 'Account',
-  defaultValue: null,
-})
-@field({
-  name: 'clientId',
-  doc: 'Client Id',
-  defaultValue: null,
-})
-@field({
-  name: 'codes',
-  doc: 'Authorization Codes',
-  defaultValue: new Map(),
-})
-@scopes(['owner'])
-export default class Authorization {
-  @method('authorize')
-  @requiredField('account', [FieldAccess.Write])
-  @requiredField('clientId', [FieldAccess.Write])
-  @requiredField('codes', [FieldAccess.Read, FieldAccess.Write])
-  async authorize(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput,
-    alarm: RpcAlarm
-  ): Promise<AuthorizeResult> {
-    const account = params.get('account')
-    const responseType = params.get('responseType')
-    const clientId = params.get('clientId')
-    const redirectUri = params.get('redirectUri')
-    const scope = params.get('scope')
-    const state = params.get('state')
-    const timestamp = Date.now()
+export default class Authorization extends DOProxy {
+  declare state: DurableObjectState
 
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
+  }
+
+  async authorize(
+    account: AccountURN,
+    responseType: string,
+    clientId: string,
+    redirectUri: string,
+    scope: any,
+    state: string
+  ): Promise<AuthorizeResult> {
     if (responseType != ResponseType.Code) {
       throw `unsupported response type: ${responseType}`
     }
 
+    const timestamp: number = Date.now()
     const code = hexlify(randomBytes(CODE_OPTIONS.length))
     const codes: Map<string, AuthorizationParameters> =
-      input.get('codes') || new Map()
+      (await this.state.storage.get<Map<string, AuthorizationParameters>>(
+        'codes'
+      )) || new Map()
     codes.set(code, { redirectUri, scope, timestamp })
 
-    output.set('account', account)
-    output.set('clientId', clientId)
-    output.set('codes', codes)
+    await Promise.all([
+      this.state.storage.put('account', account),
+      this.state.storage.put('clientId', clientId),
+      this.state.storage.put('codes', codes),
+    ])
 
-    alarm.after({ seconds: CODE_OPTIONS.ttl })
+    this.state.storage.setAlarm(CODE_OPTIONS.ttl)
 
     return { code, state }
   }
 
-  @method('exchangeToken')
-  @requiredField('account', [FieldAccess.Read])
-  @requiredField('clientId', [FieldAccess.Read])
-  @requiredField('codes', [FieldAccess.Read, FieldAccess.Write])
-  exchangeToken(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): RpcResult {
-    console.log({ input })
-    const account = input.get('account')
+  async exchangeToken(
+    code: string,
+    redirectUri: string,
+    clientId: string
+  ): Promise<{ code: string }> {
+    const account = await this.state.storage.get<AccountURN>('account')
+    console.log({ account })
     if (!account) {
       throw new Error('missing account name')
     }
 
-    const clientId = input.get('clientId')
-    if (!clientId) {
+    const storedClientId = await this.state.storage.get<string>('clientId')
+    if (!storedClientId) {
       throw new Error('missing client id')
     }
 
-    const code = params.get('code')
-    const codes: Map<string, AuthorizationParameters> = input.get('codes')
+    const codes = await this.state.storage.get<
+      Map<string, AuthorizationParameters>
+    >('codes')
+    if (!codes) {
+      throw new Error('missing codes')
+    }
     const stored = codes.get(code)
     if (!stored) {
       throw new Error('mismatch code')
     }
 
-    if (params.get('redirectUri') != stored.redirectUri) {
+    if (redirectUri != stored.redirectUri) {
       throw new Error('mismatch redirect uri')
     }
 
-    if (params.get('clientId') != input.get('clientId')) {
+    if (clientId != storedClientId) {
       throw new Error('mismatch client id')
     }
 
     codes.delete(code)
-    output.set('codes', codes)
+    await this.state.storage.put('codes', codes)
 
-    return code
+    return { code }
   }
 
-  @alarm()
-  @requiredField('codes', [FieldAccess.Read, FieldAccess.Write])
-  expireCodes(input: RpcInput, output: RpcOutput) {
-    const codes: Map<string, AuthorizationParameters> = input.get('codes')
+  async alarm() {
+    const codes = await this.state.storage.get<
+      Map<string, AuthorizationParameters>
+    >('codes')
+    if (!codes) return
     for (const [code, params] of codes) {
       if (params.timestamp + CODE_OPTIONS.ttl * 1000 <= Date.now()) {
         codes.delete(code)
       }
     }
-    output.set('codes', codes)
+    await this.state.storage.put('codes', codes)
   }
 }
