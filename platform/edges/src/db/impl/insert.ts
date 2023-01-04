@@ -140,10 +140,12 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     }
     const rcResult = await g.db.batch<{ id: number }>(selects)
 
-    const rowIds = rcResult.map((row) => {
-      const qcIds = row.results?.map((result) => result.id)
-      return qcIds
-    })
+    const rowIds = rcResult
+      .map((row) => {
+        const qcIds = row.results?.map((result) => result.id)
+        return qcIds
+      })
+      .flat()
 
     // Add an entry to the join table for each r-component row that is
     // used in the node URN.
