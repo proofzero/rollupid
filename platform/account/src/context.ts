@@ -13,6 +13,7 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 interface CreateInnerContextOptions
   extends Partial<CreateNextContextOptions & BaseContext> {
   Account: DurableObjectNamespace
+  AccountAnalytics: AnalyticsEngineDataset
   Edges: Fetcher
   account?: DurableObjectStubProxy<Account>
   accountURN?: string

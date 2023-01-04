@@ -15,6 +15,7 @@ import type { Environment } from './types'
 interface CreateInnerContextOptions
   extends Partial<CreateNextContextOptions & BaseContext> {
   Access: DurableObjectNamespace
+  AccessAnalytics: AnalyticsEngineDataset
   access?: Access
   Authorization: DurableObjectNamespace
   authorization?: Authorization
