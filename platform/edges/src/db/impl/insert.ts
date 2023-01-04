@@ -142,8 +142,8 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
 
     const rowIds = rcResult
       .map((row) => {
-        const qcIds = row.results?.map((result) => result.id)
-        return qcIds
+        const rcIds = row.results?.map((result) => result.id)
+        return rcIds
       })
       .flat()
 
