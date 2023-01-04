@@ -3,7 +3,7 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 
 import { HiChevronDown } from 'react-icons/hi'
 
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 import { useState } from 'react'
 

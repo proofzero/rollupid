@@ -1,4 +1,4 @@
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 /**
  * Nfts are being sorted server-side

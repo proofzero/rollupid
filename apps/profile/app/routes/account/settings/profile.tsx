@@ -15,7 +15,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'

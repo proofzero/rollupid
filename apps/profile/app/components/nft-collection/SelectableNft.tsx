@@ -1,7 +1,7 @@
 import { HiArrowNarrowRight } from 'react-icons/hi'
 import { Text } from '@kubelt/design-system'
 
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 import missingNftSvg from '~/assets/missing-nft.svg'
 import { useState } from 'react'

@@ -29,7 +29,8 @@ import HeadNav from '~/components/head-nav'
 import { loader as profileLoader } from '~/routes/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
-import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
+import { strings, ogImage, clients } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 import type { ThreeIdProfile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async (args) => {
