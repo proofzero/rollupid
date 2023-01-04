@@ -2,7 +2,13 @@
  * @file app/root.tsx
  */
 
-import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare'
+import type {
+  MetaFunction,
+  LinksFunction,
+  LoaderFunction,
+} from '@remix-run/cloudflare'
+
+import { useLoaderData } from '@remix-run/react'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
@@ -18,16 +24,16 @@ import {
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 
-function Analytics() {
+function Analytics(props) {
   return (
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-675VJMWSRY"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={props.tag}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-675VJMWSRY');
+      gtag('config', {props.tag});
     </script>
   )
 }
@@ -47,7 +53,16 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 })
 
+export const loader: LoaderFunction = () => {
+  return json({
+    ENV: {
+      INTERNAL_GOOGLE_ANALYTICS_TAG
+    },
+  })
+}
+
 export default function App() {
+  const browserEnv = useLoaderData()
   return (
     <html lang="en" className="h-full">
       <head>
@@ -57,9 +72,14 @@ export default function App() {
       <body className="h-full">
         <Outlet />
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
         <Scripts />
         <LiveReload />
-        <Analytics />
+        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -72,6 +92,7 @@ export const ErrorBoundary = ({
     stack: any
   }
 }) => {
+  const browserEnv = useLoaderData()
   return (
     <html lang="en">
       <head>
@@ -89,8 +110,13 @@ export const ErrorBoundary = ({
         </div>
 
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
         <Scripts />
-        <Analytics />
+        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )

@@ -30,6 +30,7 @@ DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:9696"
 COOKIE_DOMAIN = "localhost"
 STORAGE_NAMESPACE="console"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -67,7 +68,7 @@ DEPLOY_ENV = "dev"
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
-
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -96,7 +97,7 @@ DEPLOY_ENV = "next"
 PASSPORT_URL = "https://passport-next.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
-
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -126,4 +127,4 @@ DEPLOY_ENV = "current"
 PASSPORT_URL = "https://passport.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
-
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
