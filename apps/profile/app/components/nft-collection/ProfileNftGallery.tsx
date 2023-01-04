@@ -14,7 +14,7 @@ import LoadingGrid from './NftGrid'
 import ShowPartners from './ShowPartners'
 import ModaledNft from './ModaledNft'
 
-export type ProfileNftSingleCollectionProps = {
+export type ProfileNftGalleryProps = {
   account: string
   displayname?: string
   nfts?: {
@@ -22,14 +22,11 @@ export type ProfileNftSingleCollectionProps = {
     title: string
     collectionTitle: string
   }[]
-  isModal: boolean
   isOwner?: boolean
   preload?: boolean
   detailsModal?: boolean
-  collection: string
 
   handleSelectedNft?: (nft: any) => void
-  setCollection?: (collection: string) => void
 
   nftRenderer?: (
     nft: any,
@@ -41,19 +38,16 @@ export type ProfileNftSingleCollectionProps = {
 
 const ProfileNftGallery = ({
   nfts = [],
-  isModal = false,
   isOwner = true,
   account,
-  setCollection,
   displayname,
   preload = false,
   handleSelectedNft,
-  collection = '',
   nftRenderer = (nft) => (
     <ModaledNft nft={nft} isModal={true} account={account} />
   ),
   nftGrid = <LoadingGrid />,
-}: ProfileNftSingleCollectionProps) => {
+}: ProfileNftGalleryProps) => {
   const [refresh, setRefresh] = useState(true)
 
   const [loadedNfts, setLoadedNfts] = useState(nfts)
@@ -100,7 +94,7 @@ const ProfileNftGallery = ({
   return (
     <>
       {!loading && !refresh && !isOwner && !loadedNfts.length && (
-        <Text className="text-center text-gray-300" size="2xl" weight="medium">
+        <Text className="text-center text-gray-300 pb-5" size="2xl" weight="medium">
           Looks like {displayname ?? account} didn't set curated gallery
         </Text>
       )}
