@@ -1,6 +1,6 @@
 // React
 
-import { useState, forwardRef, useEffect, Suspense } from 'react'
+import { useState, forwardRef, useEffect, useLayoutEffect } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
@@ -129,6 +129,20 @@ export type GalleryData = {
 
 const Nft = forwardRef(
   ({ nft, url, index, faded, isDragging, style, ...props }: any, ref) => {
+    /**
+     * It re-renders this small component quite often
+     * every time user changes screen size
+     */
+    const [width, setWidth] = useState(0)
+    useLayoutEffect(() => {
+      function updateSize() {
+        setWidth(window.innerWidth)
+      }
+      window.addEventListener('resize', updateSize)
+      updateSize()
+      return () => window.removeEventListener('resize', updateSize)
+    }, [])
+
     const inlineStyles = {
       opacity: faded ? '0.2' : isDragging ? '0' : '1',
       transformOrigin: '0 0',
@@ -137,11 +151,11 @@ const Nft = forwardRef(
        * Don't know how to write it better so keep it for now
        */
       height:
-        window.innerWidth < 640
+        width < 640
           ? '30rem'
-          : window.innerWidth < 768
+          : width < 768
           ? '20rem'
-          : window.innerWidth < 1024
+          : width < 1024
           ? '18rem'
           : '14rem',
       gridRowStart: null,
@@ -153,7 +167,6 @@ const Nft = forwardRef(
       borderRadius: '0.5rem',
       ...style,
     }
-
     return <div ref={ref} style={inlineStyles} {...props} />
   }
 )
@@ -224,7 +237,7 @@ const Gallery = () => {
 
   useEffect(() => {
     ;(async () => {
-      const request = `/nfts/gallery`
+      const request = `/nfts/gallery?owner=${targetAddress}`
 
       const nftReq: any = await fetch(request)
       const nftRes: any = await nftReq.json()
@@ -347,9 +360,8 @@ const Gallery = () => {
                   nft={nft}
                   className="w-full
                   flex justify-center items-center
-                  h-[30rem] sm:h-80 md:h-72 lg:h-56
                   transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
-                 bg-[#F9FAFB] rounded-lg"
+                  bg-[#F9FAFB] rounded-lg"
                 />
               )
             })}

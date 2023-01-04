@@ -1,24 +1,24 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getUserSession } from '~/utils/session.server'
 import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
 
 import { getGalaxyClient } from '~/helpers/clients'
-
-import * as jose from 'jose'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 
 import { gatewayFromIpfs } from '~/helpers'
 
-export const loader: LoaderFunction = async (args) => {
-  const { request } = args
+export const loader: LoaderFunction = async ({ request }) => {
+  const srcUrl = new URL(request.url)
 
-  const session = await getUserSession(request)
-  const jwt = session.get('jwt')
-  const profile: any = jose.decodeJwt(jwt).client_id
+  const owner = srcUrl.searchParams.get('owner')
+  if (!owner) {
+    throw new Error('Owner required')
+  }
+
+  const profile: any = owner
 
   const galaxyClient = await getGalaxyClient()
   const indexerClient = createTRPCProxyClient<IndexerRouter>({

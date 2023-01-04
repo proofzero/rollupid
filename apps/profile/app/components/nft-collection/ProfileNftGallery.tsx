@@ -58,20 +58,18 @@ const ProfileNftGallery = ({
 
   const [loadedNfts, setLoadedNfts] = useState(nfts)
 
-  const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
 
   const [selectedNft, setSelectedNft] = useState('')
 
-  const getMoreNfts = async () => {
-    const request = `/nfts/gallery`
+  const getGallery = async () => {
+    const request = `/nfts/gallery?owner=${account}`
 
     const nftReq: any = await fetch(request)
     const nftRes: any = await nftReq.json()
 
     // Do not need to sort them alphabetically here
     setLoadedNfts([...loadedNfts, ...nftRes.gallery])
-    setPageLink(nftRes.pageKey ?? null)
 
     if (refresh) {
       setRefresh(false)
@@ -79,24 +77,19 @@ const ProfileNftGallery = ({
   }
 
   useEffect(() => {
-    if (pageKey) {
-      setLoading(true)
-      getMoreNfts()
-    } else if (pageKey === null) {
-      setLoading(false)
-    }
-  }, [pageKey])
+    getGallery()
+    setLoading(false)
+  }, [])
 
   useMemo(() => {
     setRefresh(true)
 
     setLoadedNfts([])
-    setPageLink(undefined)
   }, [account])
 
   useEffect(() => {
     const asyncFn = async () => {
-      await getMoreNfts()
+      await getGallery()
     }
 
     if (refresh) {
@@ -108,7 +101,7 @@ const ProfileNftGallery = ({
     <>
       {!loading && !refresh && !isOwner && !loadedNfts.length && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
-          Looks like {displayname ?? account} doesn't own any NFTs
+          Looks like {displayname ?? account} didn't set curated gallery
         </Text>
       )}
       {!loading && !refresh && isOwner && !loadedNfts.length && (
@@ -116,115 +109,49 @@ const ProfileNftGallery = ({
       )}
 
       {loadedNfts.length > 0 && (
-        <>
-          {/**
-           * This "isModal" variable is reffering to gallery
-           *  or settings/profile where this whole component is
-           *  opened in the modal. When collection sets to empty
-           *  string it switches this modal to show all collections.
-           */}
-
-          {isModal ? (
-            <button
-              onClick={() => {
-                setCollection('')
-              }}
-            >
-              <Text
-                className="mb-12 text-gray-600"
-                size="base"
-                weight="semibold"
-              >
-                {loadedNfts[0].collectionTitle?.length ? (
-                  <div>
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    {loadedNfts[0].collectionTitle}
-                  </div>
-                ) : (
-                  <Text
-                    className="mb-12 text-gray-600"
-                    size="base"
-                    weight="semibold"
-                  >
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    Back to collections
-                  </Text>
-                )}
-              </Text>
-            </button>
-          ) : (
-            <Link to={`/${account}`}>
-              <Text
-                className="mb-12 text-gray-600"
-                size="base"
-                weight="semibold"
-              >
-                {loadedNfts[0].collectionTitle?.length ? (
-                  <div>
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    {loadedNfts[0].collectionTitle}
-                  </div>
-                ) : (
-                  <Text
-                    className="mb-12 text-gray-600"
-                    size="base"
-                    weight="semibold"
-                  >
-                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                    Back to collections
-                  </Text>
-                )}
-              </Text>
-            </Link>
-          )}
-          <InfiniteScroll
-            dataLength={loadedNfts.length} //This is important field to render the next data
-            next={preload ? () => {} : getMoreNfts}
-            hasMore={preload ? false : pageKey != null}
-            loader={<Spinner />}
+        <InfiniteScroll
+          dataLength={loadedNfts.length} //This is important field to render the next data
+          next={preload ? () => {} : getGallery}
+          hasMore={preload ? false : loading}
+          loader={<Spinner />}
+        >
+          <Masonry
+            breakpointCols={{
+              default: 5,
+              1024: 3,
+              768: 2,
+              640: 1,
+            }}
+            className="flex w-auto"
+            columnClassName="bg-clip-padding"
           >
-            <Masonry
-              breakpointCols={{
-                default: 5,
-                1024: 3,
-                768: 2,
-                640: 1,
-              }}
-              className="flex w-auto"
-              columnClassName="bg-clip-padding"
-            >
-              {loadedNfts.map((nft, i) => (
-                // Filtering collection by
-                // unique values
-                // breaks the infinite scroll
-                // plugin I resorted to this
-                <div
-                  key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
-                  className="flex
+            {loadedNfts.map((nft, i) => (
+              <div
+                key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
+                className="flex
                         justify-center
                         pl-[10%]
                         w-[90%]
                         mb-10"
-                >
-                  {nftRenderer(
-                    nft,
-                    selectedNft ===
-                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
-                    (selectedNft: any) => {
-                      setSelectedNft(
-                        `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
-                      )
+              >
+                {nftRenderer(
+                  nft,
+                  selectedNft ===
+                    `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`,
+                  (selectedNft: any) => {
+                    setSelectedNft(
+                      `${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`
+                    )
 
-                      if (handleSelectedNft) {
-                        handleSelectedNft(selectedNft)
-                      }
+                    if (handleSelectedNft) {
+                      handleSelectedNft(selectedNft)
                     }
-                  )}
-                </div>
-              ))}
-            </Masonry>
-          </InfiniteScroll>
-        </>
+                  }
+                )}
+              </div>
+            ))}
+          </Masonry>
+        </InfiniteScroll>
       )}
       {(refresh || loading) && nftGrid}
     </>
