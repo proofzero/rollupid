@@ -31,6 +31,7 @@ CONSOLE_APP_URL = "http://localhost:9898"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/google/callback"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]
 routes = [
@@ -50,6 +51,7 @@ CONSOLE_APP_URL = "https://console-dev.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
 routes = [
@@ -70,6 +72,7 @@ CONSOLE_APP_URL = "https://console-next.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
   command = "yarn build"
@@ -93,6 +96,7 @@ CONSOLE_APP_URL = "https://console.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]
   command = "yarn build"
