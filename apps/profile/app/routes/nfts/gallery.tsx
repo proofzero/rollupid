@@ -39,7 +39,6 @@ export const loader: LoaderFunction = async (args) => {
       tokenId: nft.tokenId,
     })),
   })
-  console.log(metadata)
 
   const GalleryOrders: any = {}
   gallery?.forEach(
@@ -101,9 +100,7 @@ export const loader: LoaderFunction = async (args) => {
   // check generate and return og image
 
   const filteredNfts =
-  result?.filter((n: any) => !n.error && n.thumbnailUrl) || []
-
-  console.log(filteredNfts)
+    result?.filter((n: any) => !n.error && n.thumbnailUrl) || []
 
   return json({
     gallery: filteredNfts,

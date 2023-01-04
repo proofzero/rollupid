@@ -69,8 +69,6 @@ const ProfileNftGallery = ({
     const nftReq: any = await fetch(request)
     const nftRes: any = await nftReq.json()
 
-    console.log(nftRes)
-
     // Do not need to sort them alphabetically here
     setLoadedNfts([...loadedNfts, ...nftRes.gallery])
     setPageLink(nftRes.pageKey ?? null)
