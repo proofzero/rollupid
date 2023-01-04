@@ -33,7 +33,7 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [site]
   bucket = "./public"
@@ -67,6 +67,7 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 # next (staging)
 # ------------------------------------------------------------------------------
@@ -93,6 +94,7 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 # current (production)
 # ------------------------------------------------------------------------------
@@ -118,3 +120,4 @@ DISCORD_URL="https://discord.gg/threeid"
 MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
 NFTAR_URL="https://nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=1
+INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"

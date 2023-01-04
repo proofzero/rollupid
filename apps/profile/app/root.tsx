@@ -34,16 +34,16 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
-function Analytics() {
+function Analytics(props) {
   return (
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-675VJMWSRY"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={props.tag}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-675VJMWSRY');
+      gtag('config', {props.tag});
     </script>
   )
 }
@@ -80,7 +80,9 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = () => {
   return json({
-    ENV: {},
+    ENV: {
+      INTERNAL_GOOGLE_ANALYTICS_TAG
+    },
   })
 }
 
@@ -105,7 +107,7 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
-        <Analytics />
+        <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -114,6 +116,7 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  const browserEnv = useLoaderData()
   return (
     <html lang="en">
       <head>
@@ -137,9 +140,14 @@ export function ErrorBoundary({ error }) {
         </div>
 
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
         <Scripts />
         <LiveReload port={8002} />
-        <Analytics />
+        <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -147,6 +155,7 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
+  const browserEnv = useLoaderData()
 
   let secondary = 'Something went wrong'
   switch (caught.status) {
@@ -193,9 +202,14 @@ export function CatchBoundary() {
           </article>
         </div>
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
         <Scripts />
         <LiveReload port={8002} />
-        <Analytics />
+        <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
