@@ -8,11 +8,11 @@ import {
   FaTrash,
 } from 'react-icons/fa'
 
-import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import {
   Link,
   Outlet,
-  useCatch,
   useNavigate,
   useFetcher,
   useLoaderData,
@@ -417,7 +417,7 @@ const ProfileLayout = () => {
                 {website && (
                   <div className="flex flex-row space-x-2 items-center">
                     <FaGlobe />
-                    <a href={website} target="_blank">
+                    <a href={website} rel="noreferrer" target="_blank">
                       <Text weight="medium" className="text-indigo-500">
                         {website}
                       </Text>

@@ -23,6 +23,12 @@ export default /* GraphQL */ `
     defaultAddress: URN
   }
 
+  link {
+    name: String
+    url: String
+  }
+
+
   type ThreeIDProfile implements Profile {
     displayName: String
     pfp: PFP
