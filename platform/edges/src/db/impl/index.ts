@@ -15,9 +15,18 @@ import * as select from './select'
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Node } from '@kubelt/graph'
+import type { EdgeTag, EdgesOptions } from '@kubelt/graph'
 
-import type { EdgeRecord, EdgeId, Graph, NodeRecord, Token } from '../types'
+import type {
+  Node,
+  Edge,
+  EdgeQuery,
+  EdgeRecord,
+  EdgeId,
+  Graph,
+  NodeRecord,
+  Token,
+} from '../types'
 
 // init()
 // -----------------------------------------------------------------------------
@@ -64,7 +73,10 @@ export async function unlink(
 // node()
 // -----------------------------------------------------------------------------
 
-export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|undefined> {
+export async function node(
+  g: Graph,
+  nodeId: AnyURN | undefined
+): Promise<Node | undefined> {
   return select.node(g, nodeId)
 }
 
@@ -74,7 +86,7 @@ export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|und
 export async function edges(
   g: Graph,
   query: EdgeQuery,
-  opt?: EdgesOptions,
+  opt?: EdgesOptions
 ): Promise<Edge[]> {
   return select.edges(g, query, opt)
 }

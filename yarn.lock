@@ -6464,7 +6464,6 @@ __metadata:
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/types": "workspace:*"
     "@trpc/server": 10.7.0
-    "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -6524,6 +6523,7 @@ __metadata:
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
+    "@trpc/server": 10.7.0
     "@types/node": 18.11.9
     better-sqlite3: 8.0.0
     cross-env: 7.0.3
@@ -6538,6 +6538,7 @@ __metadata:
     urns: 0.6.0
     wrangler: 2.4.4
     yarn-run-all: 3.1.1
+    zod: 3.20.2
   languageName: unknown
   linkType: soft
 

@@ -14,7 +14,7 @@ export const getProfileMethod = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof GetProfileInput>
+  input: GetProfileParams
   ctx: Context
 }): Promise<Profile | null> => {
   const node = await initAccountNodeByName(input.account, ctx.Account)

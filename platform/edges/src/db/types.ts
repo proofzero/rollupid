@@ -4,12 +4,21 @@
  * Edge-related types.
  */
 
+import { z } from 'zod'
+
 import type { EdgeTag } from '@kubelt/graph'
 
 import type { AnyURN } from '@kubelt/urns'
+import { EdgeQueryInput, Edge, Node } from '../jsonrpc/middleware/validators'
 
 // Types
 // -----------------------------------------------------------------------------
+
+export type EdgeQuery = z.infer<typeof EdgeQueryInput>
+
+export type Edge = z.infer<typeof Edge>
+
+export type Node = z.infer<typeof Node>
 
 // An authorization token
 export type Token = string

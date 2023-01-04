@@ -48,11 +48,13 @@
     "@kubelt/openrpc": "workspace:*",
     "@kubelt/security": "workspace:*",
     "@kubelt/urns": "workspace:*",
+    "@trpc/server": "10.7.0",
     "cross-env": "7.0.3",
     "reflect-metadata": "0.1.13",
     "sqlite3": "5.1.2",
     "typeorm": "0.3.10",
-    "urns": "0.6.0"
+    "urns": "0.6.0",
+    "zod": "3.20.2"
   },
   "packageManager": "yarn@3.2.4",
   "license": "UNLICENSED"

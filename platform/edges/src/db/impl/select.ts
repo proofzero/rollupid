@@ -11,11 +11,27 @@ import { EdgeDirection } from '@kubelt/graph'
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Node, NodeFilter, Permission } from '@kubelt/graph'
+import type {
+  EdgeTag,
+  EdgesOptions,
+  NodeFilter,
+  Permission,
+} from '@kubelt/graph'
 
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
-import type { EdgeRecord, Graph, NodeRecord, QComponent, QComponents, RComponent, RComponents } from '../types'
+import type {
+  Edge,
+  Node,
+  EdgeQuery,
+  EdgeRecord,
+  Graph,
+  NodeRecord,
+  QComponent,
+  QComponents,
+  RComponent,
+  RComponents,
+} from '../types'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -42,16 +58,17 @@ export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
     WHERE
       nc.nodeUrn = ?1
   `
-  const qcomp = await g.db
-    .prepare(query)
-    .bind(nodeId.toString())
-    .all()
+  const qcomp = await g.db.prepare(query).bind(nodeId.toString()).all()
   // Convert the result collection into a property bag object.
-  return _.reduce(qcomp.results, (acc: QComponents, result: unknown) => {
-    const { key, value } = result as QComponent
-    acc[key] = value
-    return acc
-  }, {})
+  return _.reduce(
+    qcomp.results,
+    (acc: QComponents, result: unknown) => {
+      const { key, value } = result as QComponent
+      acc[key] = value
+      return acc
+    },
+    {}
+  )
 }
 
 // rc()
@@ -79,22 +96,26 @@ export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
     WHERE
       nc.nodeUrn = ?1
   `
-  const rcomp = await g.db
-    .prepare(query)
-    .bind(nodeId.toString())
-    .all()
+  const rcomp = await g.db.prepare(query).bind(nodeId.toString()).all()
   // Convert the result collection into an property bag object.
-  return _.reduce(rcomp.results, (acc: RComponents, result: unknown) => {
-    const { key, value } = result as RComponent
-    acc[key] = value
-    return acc
-  }, {})
+  return _.reduce(
+    rcomp.results,
+    (acc: RComponents, result: unknown) => {
+      const { key, value } = result as RComponent
+      acc[key] = value
+      return acc
+    },
+    {}
+  )
 }
 
 // node()
 // -----------------------------------------------------------------------------
 
-export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|undefined> {
+export async function node(
+  g: Graph,
+  nodeId: AnyURN | undefined
+): Promise<Node | undefined> {
   if (_.isUndefined(nodeId)) {
     return undefined
   }
@@ -107,10 +128,7 @@ export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|und
     WHERE
       urn = ?1
   `
-  const node = await g.db
-    .prepare(query)
-    .bind(nodeId.toString())
-    .first()
+  const node = await g.db.prepare(query).bind(nodeId.toString()).first()
 
   if (_.isUndefined(node)) {
     return undefined
@@ -144,10 +162,7 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
     WHERE
       e.edgeId = ?1
   `
-  const result = await g.db
-    .prepare(query)
-    .bind(edgeId)
-    .all()
+  const result = await g.db.prepare(query).bind(edgeId).all()
 
   // TODO check result.success and handle query error
   const perms = result.results as string[]
@@ -164,9 +179,8 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
 export async function edges(
   g: Graph,
   query: EdgeQuery,
-  opt?: EdgesOptions,
+  opt?: EdgesOptions
 ): Promise<Edge[]> {
-
   let sql: string
 
   // If a node ID is not supplied, we're returning no edges.
@@ -183,15 +197,15 @@ export async function edges(
   // asked for "incoming" edges, the node ID is for the "destination"
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
-  switch(query.dir) {
-  case EdgeDirection.Incoming:
-    sql = `SELECT * FROM edge e WHERE (e.dstUrn = ?1)`
-    break
-  case EdgeDirection.Outgoing:
-    sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1)`
-    break
-  default:
-    sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1 OR e.dstUrn = ?1)`
+  switch (query.dir) {
+    case EdgeDirection.Incoming:
+      sql = `SELECT * FROM edge e WHERE (e.dstUrn = ?1)`
+      break
+    case EdgeDirection.Outgoing:
+      sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1)`
+      break
+    default:
+      sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1 OR e.dstUrn = ?1)`
   }
 
   // Filter edges by tag, if provided.
@@ -209,18 +223,31 @@ export async function edges(
 
   // Returns true if every key/value pair in the query components is
   // matched exactly in the node components.
-  function hasProps(queryComp: Record<string, string>, nodeComp: Record<string, string>): boolean {
+  function hasProps(
+    queryComp: Record<string, string>,
+    nodeComp: Record<string, string>
+  ): boolean {
     //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
     //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-    return _.reduce(queryComp, (flag: boolean, value: string, key: string): boolean => {
-      return flag && nodeComp[key] === value
-    }, true)
+    return _.reduce(
+      queryComp,
+      (flag: boolean, value: string, key: string): boolean => {
+        return flag && nodeComp[key] === value
+      },
+      true
+    )
   }
 
-  async function nodeFilter(edges: EdgeRecord[], query: EdgeQuery): Promise<EdgeRecord[]> {
+  async function nodeFilter(
+    edges: EdgeRecord[],
+    query: EdgeQuery
+  ): Promise<EdgeRecord[]> {
     // A reducing function over a set of edges that discards any edges
     // which don't match the filter criteria supplied in the EdgeQuery.
-    async function queryFilter(resultPromise: Promise<EdgeRecord[]>, edge: EdgeRecord): Promise<EdgeRecord[]> {
+    async function queryFilter(
+      resultPromise: Promise<EdgeRecord[]>,
+      edge: EdgeRecord
+    ): Promise<EdgeRecord[]> {
       const result = await resultPromise
 
       // SRC
