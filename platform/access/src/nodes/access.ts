@@ -6,28 +6,23 @@ import {
   SignJWT,
   JWTVerifyResult,
 } from 'jose'
-
-import { createDurable } from 'itty-durable'
+import { DOProxy } from 'do-proxy'
 
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { JWT_OPTIONS } from '../constants'
 
-import {
-  Environment,
-  ExchangeTokenResult,
-  KeyPair,
-  KeyPairSerialized,
-} from '../types'
-import { Node } from '@kubelt/types'
+import { ExchangeTokenResult, KeyPair, KeyPairSerialized } from '../types'
 import { AccountURN } from '@kubelt/urns/account'
 
-export default class Authorization extends createDurable({
-  autoReturn: true,
-  autoPersist: false,
-}) {
-  declare state: Node.IttyDurableObjectState<Environment>
+export default class Authorization extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
+  }
 
   async generate(params: {
     iss?: string

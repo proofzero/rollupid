@@ -33,6 +33,6 @@ export const verifyAuthorizationMethod = async ({
   } = input
 
   const accessNode = await initAccessNodeByName(iss, ctx.Access)
-  const result = await accessNode.verify(token) // throws exceptin if invalid from jose
+  const result = await accessNode.class.verify(token) // throws exceptin if invalid from jose
   return result.payload
 }

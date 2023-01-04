@@ -12,8 +12,7 @@ import {
   GetAddressesInput,
   AddressList,
 } from './methods/getAddresses'
-import Account from '../nodes/account'
-import { proxyDurable } from 'itty-durable'
+
 import {
   ValidateJWT,
   JWTAssertionTokenFromHeader,

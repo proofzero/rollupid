@@ -1,16 +1,10 @@
-import { proxyDurable } from 'itty-durable'
 import Account from './account'
 
 export const initAccountNodeByName = async (
   name: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const proxy = await proxyDurable(durableObject, {
-    name: 'account',
-    class: Account,
-    parse: true,
-  })
-
-  const node = proxy.get(name) as Account
+  const MY_DO_BINDING = Account.wrap(durableObject)
+  const node = MY_DO_BINDING.getByName(name)
   return node
 }

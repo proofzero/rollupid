@@ -65,14 +65,14 @@ export const exchangeTokenMethod = async ({
     )
 
     // TODO: what does this do other than validate code?
-    await authorizationNode.exchangeToken(code, redirectUri, clientId)
+    await authorizationNode.class.exchangeToken(code, redirectUri, clientId)
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
     console.log({ iss })
 
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
-    const result = await accessNode.generate({
+    const result = await accessNode.class.generate({
       iss,
       account,
       clientId,
@@ -122,7 +122,7 @@ export const exchangeTokenMethod = async ({
     } = input
 
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
-    const result = await accessNode.refresh(iss, token)
+    const result = await accessNode.class.refresh(iss, token)
     return result
   } else {
     throw new Error(`unsupported grant type: ${grantType}`)

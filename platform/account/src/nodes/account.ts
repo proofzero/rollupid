@@ -1,14 +1,13 @@
-import { createDurable } from 'itty-durable'
-
+import { DOProxy } from 'do-proxy'
 import type { Profile } from '../jsonrpc/middlewares/profile'
-import type { Node } from '@kubelt/types'
-import type { Environment } from '../types'
 
-export default class Account extends createDurable({
-  autoReturn: true,
-  autoPersist: false,
-}) {
-  declare state: Node.IttyDurableObjectState<Environment>
+export default class Account extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
+  }
 
   async getProfile(): Promise<Profile | null> {
     const stored = await this.state.storage.get<Profile>('profile')

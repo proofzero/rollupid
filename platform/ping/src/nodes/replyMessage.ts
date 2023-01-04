@@ -1,18 +1,10 @@
-import { createDurable } from 'itty-durable'
-import { Node } from '@kubelt/types'
-import type { Environment } from '../types'
+import { DOProxy } from 'do-proxy'
 
-export default class ReplyMessage extends createDurable({
-  autoReturn: true,
-  autoPersist: false,
-}) {
-  declare state: Node.IttyDurableObjectState<Environment>
+export default class ReplyMessage extends DOProxy {
+  declare state: DurableObjectState
 
-  constructor(
-    state: Node.IttyDurableObjectState<Environment>,
-    env: Environment
-  ) {
-    super(state, env)
+  constructor(state: DurableObjectState) {
+    super(state)
     this.state = state
   }
 

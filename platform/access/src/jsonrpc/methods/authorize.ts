@@ -40,7 +40,7 @@ export const authorizeMethod = async ({
   })
 
   const node = await initAuthorizationNodeByName(name, ctx.Authorization)
-  const result = await node.authorize(
+  const result = await node.class.authorize(
     account,
     responseType,
     clientId,

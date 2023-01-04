@@ -1,7 +1,7 @@
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-
+import { DurableObjectStubProxy } from 'do-proxy'
 import { Account } from '.'
 import type { Environment } from './types'
 
@@ -13,7 +13,7 @@ interface CreateInnerContextOptions
   extends Partial<CreateNextContextOptions & BaseContext> {
   Account: DurableObjectNamespace
   Edges: Fetcher
-  account?: Account
+  account?: DurableObjectStubProxy<Account>
   accountURN?: string
 }
 /**

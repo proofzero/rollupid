@@ -1,7 +1,6 @@
-import { proxyDurable } from 'itty-durable'
 import { z } from 'zod'
 import { Context } from '../../context'
-import ReplyMessage from '../../nodes/replyMessage'
+import { initReplyMessageByName } from '../../nodes'
 
 export const DelayInitInputOutput = z.object({
   delay: z.number(),
@@ -17,14 +16,11 @@ export const delayInitMethod = async ({
   input: DelayInitParams
   ctx: Context
 }) => {
-  const proxy = await proxyDurable(ctx.ReplyMessage, {
-    name: 'reply-message',
-    class: ReplyMessage,
-    parse: true,
-  })
-
-  const node = proxy.get(ctx.KEY_REPLY_MESSAGE) as ReplyMessage
-  await node.schedule(input.message, input.delay)
+  const node = await initReplyMessageByName(
+    ctx.KEY_REPLY_MESSAGE as string,
+    ctx.ReplyMessage
+  )
+  await node.class.schedule(input.message, input.delay)
 
   return { message: input.message, delay: input.delay }
 }

@@ -1,23 +1,23 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { Node } from '@kubelt/types'
 import { AccountURN } from '@kubelt/urns/account'
-import { createDurable } from 'itty-durable'
+import { DOProxy } from 'do-proxy'
 
 import { CODE_OPTIONS } from '../constants'
 
 import {
   AuthorizationParameters,
   AuthorizeResult,
-  Environment,
   ResponseType,
 } from '../types'
 
-export default class Authorization extends createDurable({
-  autoReturn: true,
-  autoPersist: false,
-}) {
-  declare state: Node.IttyDurableObjectState<Environment>
+export default class Authorization extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
+  }
 
   async authorize(
     account: AccountURN,
