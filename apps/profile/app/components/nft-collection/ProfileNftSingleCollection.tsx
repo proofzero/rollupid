@@ -22,24 +22,29 @@ export type ProfileNftSingleCollectionProps = {
     title: string
     collectionTitle: string
   }[]
+  isModal: boolean
   isOwner?: boolean
   preload?: boolean
   detailsModal?: boolean
   collection: string
 
   handleSelectedNft?: (nft: any) => void
+  setCollection?: (collection: string) => void
 
   nftRenderer?: (
     nft: any,
     selected: boolean,
     handleSelectedNft?: any
   ) => JSX.Element
+  nftGrid: JSX.Element
 }
 
 const ProfileNftSingleCollection = ({
   nfts = [],
+  isModal = false,
   isOwner = true,
   account,
+  setCollection,
   displayname,
   preload = false,
   handleSelectedNft,
@@ -47,6 +52,7 @@ const ProfileNftSingleCollection = ({
   nftRenderer = (nft) => (
     <ModaledNft nft={nft} isModal={true} account={account} />
   ),
+  nftGrid = <LoadingGrid />,
 }: ProfileNftSingleCollectionProps) => {
   const [refresh, setRefresh] = useState(true)
 
@@ -101,7 +107,7 @@ const ProfileNftSingleCollection = ({
   }, [refresh])
 
   return (
-    <>
+    <div className='mt-9'>
       {!loading && !refresh && !isOwner && !loadedNfts.length && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
           Looks like {displayname ?? account} doesn't own any NFTs
@@ -113,25 +119,66 @@ const ProfileNftSingleCollection = ({
 
       {loadedNfts.length > 0 && (
         <>
-          <Link to={`/${account}`}>
-            <Text className="mb-12 text-gray-600" size="base" weight="semibold">
-              {loadedNfts[0].collectionTitle?.length ? (
-                <div>
-                  <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                  {loadedNfts[0].collectionTitle}
-                </div>
-              ) : (
-                <Text
-                  className="mb-12 text-gray-600"
-                  size="base"
-                  weight="semibold"
-                >
-                  <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
-                  Back to collections
-                </Text>
-              )}
-            </Text>
-          </Link>
+          {/**
+           * This "isModal" variable is reffering to gallery
+           *  or settings/profile where this whole component is
+           *  opened in the modal. When collection sets to empty
+           *  string it switches this modal to show all collections.
+           */}
+
+          {isModal ? (
+            <button
+              onClick={() => {
+                setCollection('')
+              }}
+            >
+              <Text
+                className="mb-12 text-gray-600"
+                size="base"
+                weight="semibold"
+              >
+                {loadedNfts[0].collectionTitle?.length ? (
+                  <div>
+                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                    {loadedNfts[0].collectionTitle}
+                  </div>
+                ) : (
+                  <Text
+                    className="mb-12 text-gray-600"
+                    size="base"
+                    weight="semibold"
+                  >
+                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                    Back to collections
+                  </Text>
+                )}
+              </Text>
+            </button>
+          ) : (
+            <Link to={`/${account}`}>
+              <Text
+                className="mb-12 text-gray-600"
+                size="base"
+                weight="semibold"
+              >
+                {loadedNfts[0].collectionTitle?.length ? (
+                  <div>
+                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                    {loadedNfts[0].collectionTitle}
+                  </div>
+                ) : (
+                  <Text
+                    className="mb-12 text-gray-600"
+                    size="base"
+                    weight="semibold"
+                  >
+                    <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                    Back to collections
+                  </Text>
+                )}
+              </Text>
+            </Link>
+          )}
           <InfiniteScroll
             dataLength={loadedNfts.length} //This is important field to render the next data
             next={preload ? () => {} : getMoreNfts}
@@ -181,8 +228,8 @@ const ProfileNftSingleCollection = ({
           </InfiniteScroll>
         </>
       )}
-      {(refresh || loading) && <LoadingGrid />}
-    </>
+      {(refresh || loading) && nftGrid}
+    </div>
   )
 }
 

@@ -98,6 +98,13 @@ query getNFTMetadata($input: [NFTMetadataInput]) {
         raw
         thumbnail
       }
+      metadata {
+        properties {
+          name
+          value
+          display
+        }
+      }
       error
       contractMetadata {
         name

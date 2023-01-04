@@ -182,6 +182,7 @@ export default function AccountSettingsProfile() {
   return (
     <>
       <PfpNftModal
+        text={'Select NFT Avatar'}
         account={address}
         pfp={pfpUrl}
         isOpen={nftPfpModalOpen}

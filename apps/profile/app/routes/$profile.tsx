@@ -13,6 +13,7 @@ import {
   Link,
   Outlet,
   useCatch,
+  useNavigate,
   useFetcher,
   useLoaderData,
 } from '@remix-run/react'
@@ -33,6 +34,9 @@ import type { ThreeIdProfile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
+
+  const splittedUrl = request.url.split('/')
+  const path = splittedUrl[splittedUrl.length - 1]
 
   const galaxyClient = await clients.getGalaxyClient()
   const session = await getUserSession(request)
@@ -86,6 +90,7 @@ export const loader: LoaderFunction = async (args) => {
     isOwner,
     targetAddress,
     ogImageURL,
+    path,
   })
 }
 
@@ -120,11 +125,19 @@ export const meta: MetaFunction = ({
   }
 }
 
+const tabs = {
+  gallery: 'Gallery',
+  collection: 'NFT Collections',
+}
+
+function classNames(...classes: any) {
+  return classes.filter(Boolean).join(' ')
+}
+
 const ProfileLayout = () => {
   const {
     loggedInUserProfile,
     targetAddress,
-    claimed,
     displayName,
     bio,
     job,
@@ -133,9 +146,14 @@ const ProfileLayout = () => {
     pfp,
     cover,
     website,
+    path,
   } = useLoaderData()
+  const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
   const [handlingCover, setHandlingCover] = useState<boolean>(false)
+  const [currentTab, setCurrentTab] = useState<string>(tabs[path])
+
+  const navigate = useNavigate()
 
   const fetcher = useFetcher()
 
@@ -367,50 +385,75 @@ const ProfileLayout = () => {
               {displayName ?? strings.shortenedAccount(targetAddress)}
             </Text>
 
-            <Text
-              className="break-normal text-gray-500"
-              size="base"
-              weight="medium"
-            >
-              {bio}
-            </Text>
+            <div className="flex flex-col space-around">
+              <Text
+                className="break-normal text-gray-500 mb-12"
+                size="base"
+                weight="medium"
+              >
+                {bio}
+              </Text>
 
-            <hr className="my-6" />
-
-            <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
-              {location && (
-                <div className="flex flex-row space-x-2 items-center wrap">
-                  <FaMapMarkerAlt />
-                  <Text weight="medium" className="text-gray-500">
-                    {location}
-                  </Text>
-                </div>
-              )}
-
-              {job && (
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaBriefcase />
-                  <Text weight="medium" className="text-gray-500">
-                    {job}
-                  </Text>
-                </div>
-              )}
-
-              {website && (
-                <div className="flex flex-row space-x-2 items-center">
-                  <FaGlobe />
-                  <a href={website} target="_blank">
-                    <Text weight="medium" className="text-indigo-500">
-                      {website}
+              <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
+                {location && (
+                  <div className="flex flex-row space-x-2 items-center wrap">
+                    <FaMapMarkerAlt />
+                    <Text weight="medium" className="text-gray-500">
+                      {location}
                     </Text>
-                  </a>
-                </div>
-              )}
+                  </div>
+                )}
+
+                {job && (
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaBriefcase />
+                    <Text weight="medium" className="text-gray-500">
+                      {job}
+                    </Text>
+                  </div>
+                )}
+
+                {website && (
+                  <div className="flex flex-row space-x-2 items-center">
+                    <FaGlobe />
+                    <a href={website} target="_blank">
+                      <Text weight="medium" className="text-indigo-500">
+                        {website}
+                      </Text>
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
 
         <div className="mt-12 lg:mt-24">
+          <div className="hidden sm:block">
+            <div className="border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                {Object.keys(tabs).map((tab) => (
+                  <button
+                    key={tabs[tab]}
+                    onClick={() => {
+                      setCurrentTab(tabs[tab])
+                      navigate(`./${tab}`, { replace: true })
+                    }}
+                    className={classNames(
+                      tabs[tab] === currentTab
+                        ? 'border-indigo-500 font-semibold text-gray-800'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                      '',
+                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                    )}
+                  >
+                    {tabs[tab]}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+
           <Outlet />
         </div>
       </div>

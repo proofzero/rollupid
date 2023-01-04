@@ -159,7 +159,7 @@ export default /* GraphQL */ `
       pageSize: Int
     ): NFTContracts
     getCuratedGallery(addressURN: URN): NFTsWithChain
-    getNFTMetadataBatch(input: [NFTMetadataInput]): NFTsNoProps
+    getNFTMetadataBatch(input: [NFTMetadataInput]): NFTs
   }
   type Mutation {
     updateCuratedGallery(gallery: [NFTInput]): Boolean

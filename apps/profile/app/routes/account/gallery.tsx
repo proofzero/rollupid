@@ -1,11 +1,10 @@
-import { useState, forwardRef } from 'react'
+// React
+
+import { useState, forwardRef, useEffect, useLayoutEffect } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
-import SaveButton from '~/components/accounts/SaveButton'
+// Remix
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import { AddressURNSpace } from '@kubelt/urns/address'
 import {
   useLoaderData,
   useSubmit,
@@ -13,12 +12,11 @@ import {
   useActionData,
   useTransition,
 } from '@remix-run/react'
-import { useRouteData } from '~/hooks'
+import type { ActionFunction } from '@remix-run/cloudflare'
 
-import { requireJWT } from '~/utils/session.server'
+// Styles
 
 import { HiOutlinePlusCircle } from 'react-icons/hi'
-
 import {
   DndContext,
   closestCenter,
@@ -34,113 +32,21 @@ import {
   rectSortingStrategy,
   useSortable,
 } from '@dnd-kit/sortable'
-
 import { CSS } from '@dnd-kit/utilities'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import SaveButton from '~/components/accounts/SaveButton'
+import PfpNftModal from '~/components/accounts/PfpNftModal'
+import { LoadingGridSquaresGallery } from '~/components/nft-collection/NftGrid'
 
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
-
-import { getGalaxyClient } from '~/helpers/clients'
-import { getUserSession } from '~/utils/session.server'
-import { gatewayFromIpfs } from '~/helpers'
-
-import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
+// Other helpers
 
 import * as jose from 'jose'
-import { useEffect } from 'react'
-import PfpNftModal from '~/components/accounts/PfpNftModal'
-
-export const loader: LoaderFunction = async (args) => {
-  const { request } = args
-
-  const session = await getUserSession(request)
-  const jwt = session.get('jwt')
-  const profile: any = jose.decodeJwt(jwt).client_id
-
-  const galaxyClient = await getGalaxyClient()
-  const indexerClient = createTRPCProxyClient<IndexerRouter>({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost/trpc',
-        fetch: Indexer.fetch,
-      }),
-    ],
-  })
-
-  const urn = AddressURNSpace.urn(profile)
-  const { gallery } = await indexerClient.getGallery.query([urn])
-
-  const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata({
-    input: gallery.map((nft) => ({
-      contractAddress: nft.contract,
-      tokenId: nft.tokenId,
-    })),
-  })
-
-  const GalleryOrders: any = {}
-  gallery?.forEach(
-    (nft: {
-      contract: string
-      tokenId: string
-      addressURN: string
-      gallery_order: number
-    }) => {
-      GalleryOrders[`${nft.contract}${nft.tokenId}`] = nft.gallery_order
-    }
-  )
-
-  const ownedNfts = metadata?.ownedNfts.map((nft) => {
-    const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
-    let error = false
-    if (nft.error) {
-      error = true
-    }
-
-    const details = [
-      {
-        name: 'NFT Contract',
-        value: nft.contract?.address,
-        isCopyable: true,
-      },
-      {
-        name: 'NFT Standard',
-        value: nft.contractMetadata?.tokenType,
-        isCopyable: false,
-      },
-    ]
-    if (nft.id && nft.id.tokenId) {
-      details.push({
-        name: 'Token ID',
-        value: BigInt(nft.id?.tokenId).toString(10),
-        isCopyable: true,
-      })
-    }
-    return {
-      url: gatewayFromIpfs(media?.raw),
-      thumbnailUrl: gatewayFromIpfs(media?.thumbnail ?? media?.raw),
-      error: error,
-      title: nft.title,
-      tokenId: nft.id?.tokenId,
-      contract: nft.contract,
-      collectionTitle: nft.contractMetadata?.name,
-      details,
-      gallery_order:
-        GalleryOrders[`${nft.contract?.address}${nft.id?.tokenId}`],
-    }
-  })
-
-  /** Trick to perform permutation according to gallery_order param  */
-  const result = Array.from(Array(ownedNfts.length))
-  ownedNfts?.forEach((nft) => (result[nft.gallery_order] = nft))
-
-  // Setup og tag data
-  // check generate and return og image
-
-  return json({
-    gallery: result,
-  })
-}
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { useRouteData } from '~/hooks'
+import { requireJWT } from '~/utils/session.server'
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
+import { getGalaxyClient } from '~/helpers/clients'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -223,10 +129,35 @@ export type GalleryData = {
 
 const Nft = forwardRef(
   ({ nft, url, index, faded, isDragging, style, ...props }: any, ref) => {
+    /**
+     * It re-renders this small component quite often
+     * every time user changes screen size
+     */
+    const [width, setWidth] = useState(0)
+    useLayoutEffect(() => {
+      function updateSize() {
+        setWidth(window.innerWidth)
+      }
+      window.addEventListener('resize', updateSize)
+      updateSize()
+      return () => window.removeEventListener('resize', updateSize)
+    }, [])
+
     const inlineStyles = {
       opacity: faded ? '0.2' : isDragging ? '0' : '1',
       transformOrigin: '0 0',
-      height: 200,
+      /**
+       * It's the height of nft when it's dragged
+       * Don't know how to write it better so keep it for now
+       */
+      height:
+        width < 640
+          ? '30rem'
+          : width < 768
+          ? '20rem'
+          : width < 1024
+          ? '18rem'
+          : '14rem',
       gridRowStart: null,
       gridColumnStart: null,
       backgroundImage: `url("${url}")`,
@@ -236,8 +167,17 @@ const Nft = forwardRef(
       borderRadius: '0.5rem',
       ...style,
     }
-
-    return <div ref={ref} style={inlineStyles} {...props} />
+    return (
+      <div
+        ref={ref}
+        style={inlineStyles}
+        className="w-full
+    flex justify-center items-center
+    transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
+    bg-[#F9FAFB] rounded-lg"
+        {...props}
+      />
+    )
   }
 )
 
@@ -271,16 +211,15 @@ const SortableNft = (props: any) => {
 }
 
 const Gallery = () => {
-  const { gallery } = useLoaderData()
+  // STATE
   const actionData = useActionData()
   const { targetAddress, pfp } = useRouteData<GalleryData>('routes/account')
 
-  const initialState = JSON.stringify(gallery)
+  const [initialState, setInitialState] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const [curatedNfts, setCuratedNfts] = useState(gallery)
-  const [curatedNftsSet, setCuratedNftsSet] = useState(
-    new Set(gallery.map((nft: any) => nft.contract.address + nft.tokenId))
-  )
+  const [curatedNfts, setCuratedNfts] = useState([])
+  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([]))
   const [isFormChanged, setFormChanged] = useState(false)
 
   const transition = useTransition()
@@ -291,6 +230,56 @@ const Gallery = () => {
   const submit = useSubmit()
 
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
+
+  // REACT HOOKS
+  useEffect(() => {
+    if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
+      setFormChanged(true)
+    }
+  }, [curatedNfts])
+
+  useEffect(() => {
+    if (transition.type === 'actionReload') {
+      setFormChanged(false)
+      notify(!actionData?.errors)
+    }
+  }, [transition])
+
+  useEffect(() => {
+    ;(async () => {
+      const request = `/nfts/gallery?owner=${targetAddress}`
+
+      const nftReq: any = await fetch(request)
+      const nftRes: any = await nftReq.json()
+
+      // Do not need to sort them alphabetically here
+      setInitialState(nftRes.gallery)
+      setCuratedNfts(nftRes.gallery)
+      setCuratedNftsSet(
+        new Set(
+          nftRes.gallery.map((nft: any) => nft.contract.address + nft.tokenId)
+        )
+      )
+    })()
+    setLoading(false)
+  }, [])
+
+  // HANDLERS
+  const notify = (success: boolean = true) => {
+    if (success) {
+      toast.success('Saved')
+    } else {
+      toast.error('Save Failed -- Please try again')
+    }
+  }
+
+  const handleDragCancel = () => {
+    setActiveId(null)
+  }
+
+  const handleSubmit = (event: any) => {
+    submit(curatedNfts, { replace: true })
+  }
 
   const handleDragStart = (event: any) => {
     setActiveId(event.active.id)
@@ -309,36 +298,6 @@ const Gallery = () => {
     }
 
     setActiveId(null)
-  }
-
-  // REACT HOOKS
-  useEffect(() => {
-    if (JSON.stringify(curatedNfts) !== initialState) {
-      setFormChanged(true)
-    }
-  }, [curatedNfts])
-
-  useEffect(() => {
-    if (transition.type === 'actionReload') {
-      setFormChanged(false)
-      notify(!actionData?.errors)
-    }
-  }, [transition])
-
-  const notify = (success: boolean = true) => {
-    if (success) {
-      toast.success('Saved')
-    } else {
-      toast.error('Save Failed -- Please try again')
-    }
-  }
-
-  const handleDragCancel = () => {
-    setActiveId(null)
-  }
-
-  const handleSubmit = (event: any) => {
-    submit(curatedNfts, { replace: true })
   }
 
   return (
@@ -365,6 +324,10 @@ const Gallery = () => {
             setCuratedNftsSet(new Set([...curatedNftsSet, ID]))
             setCuratedNfts([...curatedNfts, nft])
             setIsOpen(false)
+          } else {
+            toast('This NFT is already in your list', {
+              icon: '🤔',
+            })
           }
         }}
       />
@@ -380,14 +343,13 @@ const Gallery = () => {
           <div
             style={{
               display: 'grid',
-              // repeat(4, 1fr) here - means 4 columns
-              // gridTemplateColumns: `repeat(${4}, 1fr)`,
               gridGap: 10,
               padding: 10,
             }}
-            className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
+            flex flex-col justify-center items-center"
           >
-            <div className="w-full bg-[#F9FAFB] rounded-lg">
+            <div className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  bg-[#F9FAFB] rounded-lg">
               <div className="flex flex-col justify-center items-center h-full text-gray-400">
                 <HiOutlinePlusCircle
                   size={60}
@@ -398,6 +360,7 @@ const Gallery = () => {
                 <Text>Add NFT</Text>
               </div>
             </div>
+            {loading && <LoadingGridSquaresGallery numberOfCells={30} />}
             {curatedNfts.map((nft: any, i: number) => {
               return (
                 <SortableNft
@@ -405,8 +368,6 @@ const Gallery = () => {
                   url={nft.url}
                   index={i}
                   nft={nft}
-                  className="flex justify-center items-center
-                w-full h-[60rem] sm:h-80 md:h-72 lg:h-60 bg-[#F9FAFB] rounded-lg"
                 />
               )
             })}
@@ -439,10 +400,12 @@ const Gallery = () => {
         <SaveButton
           isFormChanged={isFormChanged}
           discardFn={() => {
-            setCuratedNfts(gallery)
+            setCuratedNfts(initialState)
             setCuratedNftsSet(
               new Set(
-                gallery.map((nft: any) => nft.contract.address + nft.tokenId)
+                initialState.map(
+                  (nft: any) => nft.contract.address + nft.tokenId
+                )
               )
             )
           }}

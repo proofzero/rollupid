@@ -1,16 +1,69 @@
 import { HiArrowNarrowRight } from 'react-icons/hi'
+import { Text } from '@kubelt/design-system'
 
 import { gatewayFromIpfs } from '~/helpers'
 
 import missingNftSvg from '~/assets/missing-nft.svg'
 import { useState } from 'react'
 
-const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
+const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
   const [loadFail, setLoadFail] = useState(false)
 
   return (
-    <div
-      className="rounded-lg
+    <>
+      {hovered ? (
+        <div className="relative cursor-pointer group">
+          <div
+            onClick={() => {
+              handleSelectedNft(nft)
+            }}
+            className="absolute
+        left-0 right-0 top-0 bottom-0
+        p-1 lg:p-4 flex flex-col
+        justify-end transition-all
+        duration-300 rounded-lg
+        invisible
+        group-hover:visible
+        hover:bg-black/[.4]"
+          >
+            <Text
+              size="sm"
+              weight="semibold"
+              className="text-white
+        invisible
+        group-hover:visible
+        hover:opacity-100
+        "
+            >
+              {nft.collectionTitle}
+            </Text>
+            <Text
+              size="sm"
+              weight="semibold"
+              className="text-white
+        invisible
+        group-hover:visible
+        hover:opacity-100
+       "
+            >
+              {nft.title}
+            </Text>
+          </div>
+
+          <img
+            className="w-full rounded-lg"
+            src={
+              loadFail
+                ? missingNftSvg
+                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+            }
+            onError={(e) => setLoadFail(true)}
+            alt="collection-item"
+          />
+        </div>
+      ) : (
+        <div
+          className="rounded-lg
           truncate
           shadow 
           transition-shadow
@@ -22,13 +75,12 @@ const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
           flex-col
           align-center justify-center
          "
-      onClick={() => {
-        handleSelectedNft(nft)
-      }}
-    >
-      <img
-        className="rounded-t-lg block
-        // for now smaller height
+          onClick={() => {
+            handleSelectedNft(nft)
+          }}
+        >
+          <img
+            className="rounded-t-lg block
                 lg:h-[8rem]
                 md:h-[11rem]
                 sm:h-[12rem]
@@ -36,28 +88,30 @@ const SelectableNft = ({ nft, selected, handleSelectedNft }: any) => {
                 object-contain 
                 mx-auto 
               "
-        src={
-          loadFail
-            ? missingNftSvg
-            : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
-        }
-        onError={(e) => setLoadFail(true)}
-        alt="collection-representation"
-      />
-      <div
-        className="flex text-gray-600
+            src={
+              loadFail
+                ? missingNftSvg
+                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+            }
+            onError={(e) => setLoadFail(true)}
+            alt="collection-representation"
+          />
+          <div
+            className="flex text-gray-600
             flex-row whitespace-nowrap 
             w-full
             justify-between items-center px-4 py-3"
-      >
-        <div className="truncate leading-none">
-          {nft.collectionTitle ? nft.collectionTitle : ' '}
+          >
+            <div className="truncate leading-none">
+              {nft.collectionTitle ? nft.collectionTitle : ' '}
+            </div>
+            <div className="text-xl">
+              <HiArrowNarrowRight />
+            </div>
+          </div>
         </div>
-        <div className="text-xl">
-          <HiArrowNarrowRight />
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   )
 }
 
