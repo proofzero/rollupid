@@ -167,7 +167,17 @@ const Nft = forwardRef(
       borderRadius: '0.5rem',
       ...style,
     }
-    return <div ref={ref} style={inlineStyles} {...props} />
+    return (
+      <div
+        ref={ref}
+        style={inlineStyles}
+        className="w-full
+    flex justify-center items-center
+    transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
+    bg-[#F9FAFB] rounded-lg"
+        {...props}
+      />
+    )
   }
 )
 
@@ -358,10 +368,6 @@ const Gallery = () => {
                   url={nft.url}
                   index={i}
                   nft={nft}
-                  className="w-full
-                  flex justify-center items-center
-                  transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
-                  bg-[#F9FAFB] rounded-lg"
                 />
               )
             })}
