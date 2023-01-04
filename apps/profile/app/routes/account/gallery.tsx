@@ -40,11 +40,6 @@ import { LoadingGridSquaresGallery } from '~/components/nft-collection/NftGrid'
 
 // Other helpers
 
-import { getUserSession } from '~/utils/session.server'
-import { gatewayFromIpfs } from '@kubelt/utils'
-
-import { json } from '@remix-run/cloudflare'
-
 import * as jose from 'jose'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { useRouteData } from '~/hooks'
