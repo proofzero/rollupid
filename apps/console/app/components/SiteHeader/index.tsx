@@ -3,20 +3,25 @@
  */
 
 import { Form } from '@remix-run/react'
+import { gatewayFromIpfs } from '@kubelt/utils'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
-// TODO display user's 3iD avatar.
-import avatar from '~/images/avatar.png'
 
 // KubeltHeader
 // -----------------------------------------------------------------------------
 
-type KubeltHeaderProps = {}
+type KubeltHeaderProps = {
+  avatarUrl: string
+}
 
-export default function KubeltHeader({}: KubeltHeaderProps) {
+export default function KubeltHeader(props: KubeltHeaderProps) {
   return (
     <header className="flex flex-row-reverse shadow-xl p-4 bg-white text-slate-500">
       <Form action="/logout" method="post">
-        <img className="inline-block pl-6" src={avatar} />
+        <Avatar
+          src={gatewayFromIpfs(props.avatarUrl) || ''}
+          size="xs"
+        />
       </Form>
     </header>
   )

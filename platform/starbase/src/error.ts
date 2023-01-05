@@ -16,6 +16,7 @@ export enum ErrorCode {
   MissingClientSecret = -400,
   MissingProfile = -500,
   InvalidPublishFlag = -600,
+  MissingUpdates = -700,
 }
 
 // JSON-RPC Errors
@@ -39,6 +40,11 @@ export const ErrorMissingClientSecret: RpcErrorDetail = {
 export const ErrorMissingProfile: RpcErrorDetail = {
   code: ErrorCode.MissingProfile,
   message: 'missing profile data',
+}
+
+export const ErrorMissingUpdates: RpcErrorDetail = {
+  code: ErrorCode.MissingUpdates,
+  message: 'missing update data',
 }
 
 export const ErrorMappingClientId: RpcErrorDetail = {

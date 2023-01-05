@@ -27,10 +27,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     clientId: string
     secretTimestamp?: number
     apiKeyTimestamp?: number
-    app: {
-      timestamp: number
-      title: string
-    }
+    timestamp: number
+    name: string
   }
   
   let rotationResult

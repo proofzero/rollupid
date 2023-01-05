@@ -1,5 +1,7 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { useState } from 'react'
+import { DeleteAppModal } from '../DeleteAppModal/DeleteAppModal'
 
 import {
   ApplicationListItem,
@@ -22,6 +24,15 @@ export const ApplicationList = ({
     }
   }
 
+  const [actionApp, setActionApp] = useState<
+    | {
+        clientId: string
+        name: string
+      }
+    | undefined
+  >()
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
   return (
     <div>
       <section className="flex justify-between items-start">
@@ -43,7 +54,7 @@ export const ApplicationList = ({
         </div>
 
         <div className="flex space-x-2 items-center">
-          <ApplicationListItemPublishedState />
+          <ApplicationListItemPublishedState published={false} />
           <Text size="xs" weight="normal" className="text-gray-500">
             Unpublished
           </Text>
@@ -51,8 +62,29 @@ export const ApplicationList = ({
       </section>
 
       <section className="flex flex-col space-y-2">
+        {actionApp && (
+          <DeleteAppModal
+            isOpen={deleteModalOpen}
+            deleteAppCallback={() => {
+              setDeleteModalOpen(false)
+            }}
+            clientId={actionApp?.clientId}
+            appName={actionApp?.name}
+          />
+        )}
+
         {applications.map((ali) => (
-          <ApplicationListItem key={ali.id} {...ali} />
+          <ApplicationListItem
+            key={ali.id}
+            {...ali}
+            onDeleteApplication={(clientId, appName) => {
+              setActionApp({
+                clientId,
+                name: appName,
+              })
+              setDeleteModalOpen(true)
+            }}
+          />
         ))}
       </section>
     </div>

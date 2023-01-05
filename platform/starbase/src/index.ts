@@ -69,6 +69,7 @@ import {
   ErrorMissingClientName,
   ErrorMissingClientSecret,
   ErrorMissingProfile,
+  ErrorMissingUpdates,
 } from './error'
 
 // Schema
@@ -77,9 +78,12 @@ import {
 // Import the OpenRPC schema for this API.
 import schema from './schema'
 import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
-import { AppApiKeyCheckParams } from './types'
 import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { create } from 'lodash'
+import {
+  AppApiKeyCheckParams,
+  AppPublishRequestParams,
+  AppUpdateRequestParams,
+} from './types'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -264,9 +268,7 @@ const kb_appCreate = openrpc.method(schema, {
       const appId: string = <string>app.$.id
       // Create a platform URN that uniquely represents the just-created
       // application.
-      const appURN =
-        ApplicationURNSpace.urn(appId) +
-        `?+clientName=${encodeURIComponent(clientName)}`
+      const appURN = ApplicationURNSpace.urn(appId)
 
       const edgesClient = createEdgesClient(edges)
 
@@ -278,11 +280,6 @@ const kb_appCreate = openrpc.method(schema, {
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
-      // const edgeRes = await linkAccountApp(
-      //   edges,
-      //   accountURN,
-      //   ApplicationURNSpace.urn(appId)
-      // )
       if (!edgeRes.edge) {
         console.error({ edgeRes })
         await app._.cmp.delete()
@@ -327,7 +324,16 @@ const kb_appUpdate = openrpc.method(schema, {
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      const clientId = _.get(request, ['params', 'clientId'])
+      if (!request.params) {
+        throw new Error('Expected request params')
+      }
+
+      const reqParams = (request.params as any)[0] as AppUpdateRequestParams
+      if (!reqParams) {
+        throw new Error('Expected request params to have param object')
+      }
+
+      const { clientId, updates } = reqParams
       if (clientId === undefined) {
         return openrpc.error(request, ErrorMissingClientId)
       }
@@ -345,9 +351,8 @@ const kb_appUpdate = openrpc.method(schema, {
       // TODO guarantee that only public fields are being stored; apply
       // schema to incoming profile data.
       // NB: we should always have data here after JSON-RPC checking in place
-      const profile = _.get(request, ['params', 'profile'])
-      if (profile === null) {
-        return openrpc.error(request, ErrorMissingProfile)
+      if (updates === null) {
+        return openrpc.error(request, ErrorMissingUpdates)
       }
 
       const app = await openrpc.discover(sbApplication, {
@@ -361,14 +366,12 @@ const kb_appUpdate = openrpc.method(schema, {
       invariant(appId === app.$.id, 'object IDs must match')
 
       // Store application profile data in the app component.
-      const appResult = await app.update({
-        profile,
-      })
+      const appResult = await app.update({ updates })
 
       return openrpc.response(request, {
         account: accountURN,
         clientId,
-        profile,
+        appResult,
       })
     }
   ),
@@ -398,9 +401,12 @@ const kb_appDelete = openrpc.method(schema, {
       // TODO better typing
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
-      const clientId = _.get(request, ['params', 'clientId'])
+      console.debug(request)
+      const clientId = (request?.params as any)[0]?.clientId
+      // const clientId = _.get(request, ['params', 'clientId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
+
       if (undefined === clientId) {
         return openrpc.error(request, ErrorMissingClientId)
       }
@@ -499,15 +505,18 @@ const kb_appList = openrpc.method(schema, {
 
         for (let i = 0; i < edgeListArr.length; i++) {
           const edge = edgeListArr[i]
+          const appId = ApplicationURNSpace.decode(
+            edge.dst.id as ApplicationURN
+          )
 
           const app = await openrpc.discover(sbApplication, {
             token,
             tag: 'starbase-app',
-            id: ApplicationURNSpace.decode(edge.dst.id as ApplicationURN),
+            id: appId,
           })
 
           const appListingDetails = await app.fetch()
-          appList.push(appListingDetails)
+          appList.push(_.merge(appListingDetails, appId))
         }
       }
 
@@ -882,8 +891,17 @@ const kb_appPublish = openrpc.method(schema, {
       const lookup: KVNamespace = context.get(KEY_LOOKUP)
       const token = context.get(KEY_TOKEN)
 
-      // Get the ID of the app that we are rotating the secret for.
-      const clientId = _.get(request, ['params', 'clientId'])
+      if (!request.params) {
+        throw new Error('Expected request params')
+      }
+
+      const reqParams = (request.params as any)[0] as AppPublishRequestParams
+      if (!reqParams) {
+        throw new Error('Expected request params to have param object')
+      }
+
+      const { clientId, published } = reqParams
+
       // TODO once we conformance check the request against the schema,
       // we can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
@@ -900,8 +918,6 @@ const kb_appPublish = openrpc.method(schema, {
         return openrpc.error(request, detail)
       }
 
-      // This is the requested publication state of the application.
-      const published = _.get(request, ['params', 'published'])
       if (typeof published !== 'boolean') {
         const detail = Object.assign(
           { data: { published } },
@@ -933,7 +949,7 @@ const kb_appPublish = openrpc.method(schema, {
           return openrpc.error(request, ErrorMissingClientSecret)
         }
         // clientName
-        const clientName = _.get(record, 'clientName')
+        const clientName = _.get(record, 'name')
         if (_.isUndefined(clientName) || clientName === '') {
           return openrpc.error(request, ErrorMissingClientName)
         }

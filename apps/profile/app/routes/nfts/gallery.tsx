@@ -8,7 +8,7 @@ import { getGalaxyClient } from '~/helpers/clients'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)

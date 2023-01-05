@@ -12,7 +12,7 @@ import defaultAvatar from '~/assets/circle_gradient.png'
 import SignOutLink from '~/components/sign-out-link'
 
 import styles from './headNav.css'
-import { gatewayFromIpfs } from '~/helpers'
+import { gatewayFromIpfs } from '@kubelt/utils'
 
 export const links = () => [{ rel: 'stylesheet', href: styles }]
 

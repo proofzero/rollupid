@@ -82,11 +82,11 @@ const rpcSchema: RpcSchema = {
           },
         },
         {
-          name: 'profile',
-          description: 'The public application profile fields',
+          name: 'updates',
+          description: 'The app properties to be updated',
           required: true,
           schema: {
-            $ref: '#/components/contentDescriptors/Profile',
+            $ref: '#/components/contentDescriptors/AppUpdate',
           },
         },
       ],
@@ -243,7 +243,6 @@ const rpcSchema: RpcSchema = {
       },
       errors: [],
     },
-
     {
       name: 'kb_appPublish',
       summary: 'Set the publication status of an application',
@@ -322,6 +321,14 @@ const rpcSchema: RpcSchema = {
           $ref: '#/components/schemas/ClientId',
         },
       },
+      AppUpdate: {
+        name: 'updates',
+        required: true,
+        description: 'The app properties to be updated',
+        schema: {
+          $ref: '#/components/schema/AppUpdate',
+        },
+      },
       Profile: {
         name: 'profile',
         required: true,
@@ -371,6 +378,103 @@ const rpcSchema: RpcSchema = {
           },
           clientSecret: {
             type: 'string',
+          },
+          redirectURI: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^([a-z][a-z0-9+-.])*://',
+          },
+          termsURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          websiteURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          mirrorURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          discordUser: {
+            type: 'string',
+          },
+          mediumUser: {
+            type: 'string',
+          },
+          twitterUser: {
+            type: 'string',
+          },
+        },
+      },
+      AppDetails: {
+        type: 'object',
+        required: ['clientId', 'published', 'name', 'timestamp'],
+        properties: {
+          appId: {
+            type: 'string',
+          },
+          clientId: {
+            type: 'string',
+          },
+          published: {
+            type: 'boolean',
+          },
+          secretTimestamp: {
+            type: 'number',
+          },
+          name: {
+            type: 'string',
+          },
+          icon: {
+            type: 'string',
+          },
+          redirectURI: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^([a-z][a-z0-9+-.])*://',
+          },
+          termsURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          websiteURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          mirrorURL: {
+            type: 'string',
+            format: 'uri',
+            pattern: '^https?://',
+          },
+          discordUser: {
+            type: 'string',
+          },
+          mediumUser: {
+            type: 'string',
+          },
+          twitterUser: {
+            type: 'string',
+          },
+        },
+      },
+      AppUpdate: {
+        type: 'object',
+        required: ['name', 'published'],
+        properties: {
+          name: {
+            type: 'string',
+          },
+          icon: {
+            type: 'string',
+          },
+          published: {
+            type: 'boolean',
           },
           redirectURI: {
             type: 'string',

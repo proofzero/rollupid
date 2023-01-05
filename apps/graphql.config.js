@@ -27,6 +27,16 @@ module.exports = {
                 rawRequest: false,
               },
             },
+            'console/app/utilities/galaxy.server.ts': {
+              plugins: [
+                'typescript',
+                'typescript-operations',
+                'typescript-graphql-request',
+              ],
+              config: {
+                rawRequest: false,
+              },
+            },
           },
         },
       },

@@ -23,20 +23,30 @@ import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
-import { getStarbaseClient } from '~/utilities/platform.server'
+import { getGalaxyClient, getStarbaseClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
+  avatarUrl: string
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = getStarbaseClient(jwt)
+  const galaxyClient = await getGalaxyClient()
 
   try {
     const apps = await starbaseClient.kb_appList() // TODO: update result type
-    return json<LoaderData>({ apps })
+
+    const profileRes = await galaxyClient.getProfile(undefined, {
+      [PlatformJWTAssertionHeader]: jwt,
+    })
+  
+    const avatarUrl = profileRes.profile?.pfp?.image || ''
+  
+    return json<LoaderData>({ apps, avatarUrl })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -47,14 +57,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 // -----------------------------------------------------------------------------
 
 export default function DashboardIndexPage() {
-  const { apps } = useLoaderData()
+  const { apps, avatarUrl } = useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">
       <SiteMenu apps={apps} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
-        <SiteHeader />
+        <SiteHeader avatarUrl={avatarUrl} />
         <div className="bg-gray-50 p-6 h-full">
           <div className="mb-11">
             <InfoPanelDashboard />

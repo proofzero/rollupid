@@ -15,10 +15,10 @@ type AppBoxProps = {
   // Application model instances
   apps: {
     clientId: string
-    app: {
-      title: string
-      timestamp: number
-    }
+    name: string
+    timestamp: number
+    published: boolean
+    icon: string
   }[]
   // Link target for creating a new application.
   createLink: string
@@ -30,9 +30,10 @@ export default function AppBox(props: AppBoxProps) {
   // TODO: Get more app details here...
   const mappedApps = props.apps.map((app) => ({
     id: app.clientId,
-    created: new Date(app.app.timestamp),
-    title: app.app.title,
-    published: false,
+    created: new Date(app.timestamp),
+    name: app.name,
+    published: app.published,
+    icon: app.icon,
   }))
 
   return (

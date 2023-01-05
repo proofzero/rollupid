@@ -1,6 +1,5 @@
 import { initTRPC } from '@trpc/server'
 import { ZodError } from 'zod'
-import { proxyDurable } from 'itty-durable'
 
 import { Context } from '../context'
 

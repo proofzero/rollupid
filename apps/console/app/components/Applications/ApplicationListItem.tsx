@@ -26,35 +26,36 @@ export const ApplicationListItemIcon = ({
   iconUrl,
 }: ApplicationListItemIconProps) => (
   <div className="rounded-l w-16 h-14 flex justify-center items-center bg-gray-200 overflow-hidden">
-    {!iconUrl && <Text className="text-gray-500">{title.substring(0, 1)}</Text>}
+    {!iconUrl && <Text className="text-gray-500">{title?.substring(0, 1)}</Text>}
     {iconUrl && <img src={iconUrl} className="object-cover" />}
   </div>
 )
 
 export type ApplicationListItemProps = {
   id: string
-  title: string
+  name: string
   created: Date
-  iconUrl?: string
+  icon?: string
   published?: boolean
-  panel?: React.ReactNode
+  onDeleteApplication?: (clientId: string, appName: string) => void
 }
 export const ApplicationListItem = ({
   id,
-  title,
+  name,
   created,
-  iconUrl,
+  icon,
   published,
+  onDeleteApplication,
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
     <section>
-      <ApplicationListItemIcon title={title} iconUrl={iconUrl} />
+      <ApplicationListItemIcon title={name} iconUrl={icon} />
     </section>
 
     <section className="px-4 flex-1">
       <div className="flex flex-row space-x-2 items-center">
         <Text size="sm" weight="medium" className="text-gray-900">
-          {title}
+          {name}
         </Text>
         <ApplicationListItemPublishedState published={published} />
       </div>
@@ -103,7 +104,9 @@ export const ApplicationListItem = ({
                 as="div"
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
                 onClick={() => {
-                  /* Need to handle */
+                  if (onDeleteApplication) {
+                    onDeleteApplication(id, name)
+                  }
                 }}
               >
                 <HiOutlineTrash className="text-xl font-normal text-red-500" />
