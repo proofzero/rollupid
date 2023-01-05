@@ -17,17 +17,16 @@ export default /* GraphQL */ `
     pfp: PFP
   }
 
+  type link {
+    name: String
+    url: String
+  }
+
   type DefaultProfile implements Profile {
     displayName: String
     pfp: PFP
     defaultAddress: URN
   }
-
-  link {
-    name: String
-    url: String
-  }
-
 
   type ThreeIDProfile implements Profile {
     displayName: String
@@ -39,11 +38,17 @@ export default /* GraphQL */ `
     website: String
     defaultAddress: URN
     addresses: [URN!]
+    links: [link]
   }
 
   input PFPInput {
     image: String!
     isToken: Boolean
+  }
+
+  input linkInput {
+    name: String
+    url: String
   }
 
   input ThreeIDProfileInput {
@@ -55,6 +60,7 @@ export default /* GraphQL */ `
     location: String
     website: String
     defaultAddress: URN
+    links: [linkInput]
   }
 
   type Query {
