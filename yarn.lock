@@ -3106,13 +3106,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:3.18.0":
-  version: 3.18.0
-  resolution: "@cloudflare/workers-types@npm:3.18.0"
-  checksum: 9a54a4fbd12eed19495cf6774cd48b0e97aaee093d40d2ae8e7a11c58937b8ad5173588efca5e138c373c6d6730faf96f2385eee203dab3fdb91565885efb0cd
-  languageName: node
-  linkType: hard
-
 "@cloudflare/workers-types@npm:4.20221111.1":
   version: 4.20221111.1
   resolution: "@cloudflare/workers-types@npm:4.20221111.1"
@@ -3406,22 +3399,6 @@ __metadata:
     postcss: ^8.2
     postcss-selector-parser: ^6.0.10
   checksum: a2045a27276a6cfe645b6e212afc217d9a43174ea7a1fa1ab8918d5a0ace72380fbd9837fe1920c547985c11a9070dc48c5c80d483d3f581ddf7aa688204d44f
-  languageName: node
-  linkType: hard
-
-"@databases/split-sql-query@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@databases/split-sql-query@npm:1.0.3"
-  peerDependencies:
-    "@databases/sql": "*"
-  checksum: 84463edf88f78465ff169c17186c6adc1dea4d4493763e6bc92101f71a8b6d645363e8e66765d5e48055c27556fcb82b25f370b8b1d30f7da07ebef540f32f0c
-  languageName: node
-  linkType: hard
-
-"@databases/sql@npm:3.2.0":
-  version: 3.2.0
-  resolution: "@databases/sql@npm:3.2.0"
-  checksum: b8be069087ffefb522d6c1cf56394b303cd0ab45bcf45bd58bce0d064e71d3fafd8de3c86164a4a7cb69efdac54e7f4a1c965bf5d54d609378c5ff17a38522a7
   languageName: node
   linkType: hard
 
@@ -6464,7 +6441,6 @@ __metadata:
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/types": "workspace:*"
     "@trpc/server": 10.7.0
-    "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -6517,27 +6493,31 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.edges@workspace:platform/edges"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
-    "@databases/split-sql-query": 1.0.3
-    "@databases/sql": 3.2.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
-    "@types/node": 18.11.9
-    better-sqlite3: 8.0.0
+    "@trpc/server": 10.7.0
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    better-sqlite3: 8.0.1
     cross-env: 7.0.3
+    drizzle-kit: 0.14.1
+    drizzle-orm: 0.14.2
+    drizzle-orm-sqlite: 0.14.3
     eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
     prettier: 2.7.1
     reflect-metadata: 0.1.13
     sqlite3: 5.1.2
     tap: 16.3.2
-    ts-node: 10.9.1
     typeorm: 0.3.10
     typescript: 4.8.4
     urns: 0.6.0
     wrangler: 2.4.4
     yarn-run-all: 3.1.1
+    zod: 3.20.2
   languageName: unknown
   linkType: soft
 
@@ -17223,14 +17203,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:8.0.0":
-  version: 8.0.0
-  resolution: "better-sqlite3@npm:8.0.0"
+"better-sqlite3@npm:8.0.1":
+  version: 8.0.1
+  resolution: "better-sqlite3@npm:8.0.1"
   dependencies:
     bindings: ^1.5.0
     node-gyp: latest
     prebuild-install: ^7.1.0
-  checksum: 6f82847bec81ad15a54628def6c83ed3d25daf4cd43f9951d3aa926a3510c2d11413126134a4ac7f77335e06c4c5fcb769f9b777f2e131a32217304eb4b1f55c
+  checksum: 533b2cc32bd54e2a943a4f63e079f8cc8945879b7a0ebd2085b948824ea067792f6f903ab75ba75d7cafc5f8f973354cdf9a042fa6216e077925d07a8df1bead
   languageName: node
   linkType: hard
 
@@ -21535,6 +21515,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"drizzle-kit@npm:0.14.1":
+  version: 0.14.1
+  resolution: "drizzle-kit@npm:0.14.1"
+  dependencies:
+    chalk: ^5.2.0
+    commander: ^9.4.1
+    esbuild: ^0.15.18
+    esbuild-register: ^3.4.2
+    hanji: ^0.0.3
+    json-diff: 0.9.0
+    zod: ^3.20.2
+  bin:
+    drizzle-kit: index.js
+  checksum: da48aded43abcffe8b5118e7c4683466e82f8811e8dbd2ab370f436000aea9a37efbdab7f7becc5600f3ca17077e5966ce56cff25a4a260b96441953c3583f67
+  languageName: node
+  linkType: hard
+
 "drizzle-orm-sqlite@npm:0.14.2":
   version: 0.14.2
   resolution: "drizzle-orm-sqlite@npm:0.14.2"
@@ -21554,6 +21551,28 @@ __metadata:
     sqlite3:
       optional: true
   checksum: 10351c8513ea0791a2649df938ba8c8f52015b514529a6d326ce95bb84f48ed528e20025f37c8d9b6a16f6a67eab55276dca04e0ce57b9859e1f3f9ccdc01987
+  languageName: node
+  linkType: hard
+
+"drizzle-orm-sqlite@npm:0.14.3":
+  version: 0.14.3
+  resolution: "drizzle-orm-sqlite@npm:0.14.3"
+  peerDependencies:
+    "@cloudflare/workers-types": ">=3 <4"
+    "@types/better-sqlite3": ">=7 <9"
+    better-sqlite3: ">=7 <9"
+    drizzle-orm: ">=0.14 <0.15"
+    sqlite3: ">=5 <6"
+  peerDependenciesMeta:
+    "@cloudflare/workers-types":
+      optional: true
+    "@types/better-sqlite3":
+      optional: true
+    better-sqlite3:
+      optional: true
+    sqlite3:
+      optional: true
+  checksum: a44723822f9b128f3f9e269d2ddec2d1ae6eb178e9ada2c6b098696092b29cadf0a221401af9ba1876cabe114bc89bc002b0ca8f97db1b0e499145cc2202c4e8
   languageName: node
   linkType: hard
 

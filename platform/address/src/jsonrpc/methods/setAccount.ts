@@ -7,6 +7,8 @@ import type {
   RpcRequest,
   RpcService,
 } from '@kubelt/openrpc'
+import createEdgesClient from '@kubelt/platform-clients/edges'
+
 import type { AccountURN } from '@kubelt/urns/account'
 import type { AddressURN } from '@kubelt/urns/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -16,6 +18,7 @@ import { linkAccountAddress } from '@kubelt/graph/util'
 import { ErrorInvalidAccountId } from '../errors'
 
 import { SetAccountParams } from '../../types'
+import { EDGE_ADDRESS } from '@kubelt/graph/edges'
 
 export default async (
   service: Readonly<RpcService>,
@@ -51,26 +54,21 @@ export default async (
   // Store the owning account for the address node in the node itself.
   await nodeClient.setAccount({ account })
 
-  // Create a link between owning account node and the owned address
-  // node using the edges service.
-  const linkResult = await linkAccountAddress(
-    edges,
-    account as AccountURN,
-    fullAddress
-  )
+  const edgesClient = createEdgesClient(edges)
+  const linkResult = await edgesClient.makeEdge.mutate({
+    src: account,
+    dst: fullAddress,
+    tag: EDGE_ADDRESS,
+  })
 
   // TODO how about a nice predicate fn to distinguish these error
   // results?
-  if (Object.hasOwn(linkResult, 'code')) {
-    const rpcError = linkResult as RpcErrorDetail
-    return openrpc.error(request, rpcError)
-  } else {
-    const edge = linkResult as Edge
-    return openrpc.response(request, {
-      set: {
-        account: edge.src,
-        address: edge.dst,
-      },
-    })
-  }
+
+  const edge = linkResult.edge
+  return openrpc.response(request, {
+    set: {
+      account: edge.src,
+      address: edge.dst,
+    },
+  })
 }

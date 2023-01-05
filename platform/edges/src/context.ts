@@ -1,10 +1,8 @@
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { Account } from '.'
 import type { Environment } from './types'
-import createEdgesClient from '@kubelt/platform-clients/edges'
+import * as db from './db'
 
 /**
  * Defines your inner context shape.
@@ -12,10 +10,7 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
  */
 interface CreateInnerContextOptions
   extends Partial<CreateNextContextOptions & BaseContext> {
-  Account: DurableObjectNamespace
-  Edges: Fetcher
-  account?: DurableObjectStubProxy<Account>
-  accountURN?: string
+  EDGES: D1Database
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -27,10 +22,10 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const edges = createEdgesClient(opts.Edges)
+  const graph = db.init(opts.EDGES)
   return {
+    graph,
     ...opts,
-    edges,
   }
 }
 /**

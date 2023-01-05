@@ -1,5 +1,7 @@
 import { BaseURN, URNSpace, parseURN } from 'urns'
 
+export { parseURN }
+
 // Object URN
 export type ObjectURN = BaseURN<'durable-object', string>
 export type ObjectURNSpace<NSS extends string> = URNSpace<

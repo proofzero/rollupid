@@ -4,15 +4,20 @@
  * Utilities for inserting data into the database.
  */
 
-import * as _ from 'lodash'
-
 import * as urns from 'urns'
 
 import { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeTag, Node } from '@kubelt/graph'
-
-import type { EdgeId, EdgeRecord, Graph, NodeRecord } from '../types'
+import type {
+  Edge,
+  EdgeTag,
+  Node,
+  EdgeId,
+  EdgeRecord,
+  Graph,
+  NodeRecord,
+} from '../types'
+import { qc } from './select'
 
 // node()
 // -----------------------------------------------------------------------------
@@ -71,22 +76,23 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   // Insert node record into the "node" table.
   const nid = parsedURN.nid
   const nss = parsedURN.nss
-  const fc = parsedURN.fragment || ""
+  const fc = parsedURN.fragment || ''
 
   // We store the base URN as the unique node identifer.
   const id = `urn:${nid}:${nss}`
 
-  await g.db.prepare(
-    'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) ON CONFLICT DO NOTHING'
-  )
-  .bind(id, nid, nss, fc)
-  .run()
+  await g.db
+    .prepare(
+      'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) ON CONFLICT DO NOTHING'
+    )
+    .bind(id, nid, nss, fc)
+    .run()
 
   // Update the join table that records the linkage between a node
   // record and the set of records that represent the q-component
   // key/value pairs found in the node URN.
   //
-  // JOIN TABLE: node_qcomp_urnq_component (nodeUrn, urnqComponentId)
+  // JOIN TABLE: node_qcomp_urnq_component (nodeUrn, qcomp)
   if (parsedURN.qcomponent) {
     // Get the IDs of the q-component records for the node URN.
     const qcParams = new URLSearchParams(parsedURN.qcomponent)
@@ -97,23 +103,18 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     for (const [key, value] of qcParams.entries()) {
       selects.push(qcStmt.bind(key, value))
     }
-    const qcResult = await g.db.batch(selects)
+    const qcResult = await g.db.batch<{ id: number }>(selects)
     // Collect an array of row IDs from the table rows containing q-components.
-    const allRowIds = _.reduce(qcResult, (acc: number[], o: Record<string, unknown>): number[] => {
-      const results = _.get(o, 'results')
-      if (results == undefined) {
-        return acc
-      }
-      return _.concat(acc, _.map(results, (result: unknown): number => {
-        return _.get(result, 'id') || -1
-      }))
-    }, [])
-    // Filter out any negative (error) row IDs.
-    const rowIds = _.filter(allRowIds, (n) => { return n >= 0 })
+    const rowIds = qcResult
+      .map((row) => {
+        const qcIds = row.results?.map((result) => result.id)
+        return qcIds
+      })
+      .flat()
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const qcJoinStmt = g.db.prepare(
-      'INSERT INTO node_qcomp_urnq_component (nodeUrn, urnqComponentId) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
+      'INSERT INTO node_qcomp_urnq_component (nodeUrn, qcomp) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
     )
     const inserts = []
     for (const rowId of rowIds) {
@@ -127,7 +128,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   // q-components, but updates the node_qcomp_urnr_component table
   // instead.
   //
-  // JOIN TABLE: node_qcomp_urnr_component (nodeUrn, urnrComponentId)
+  // JOIN TABLE: node_qcomp_urnr_component (nodeUrn, rcomp)
   if (parsedURN.rcomponent) {
     const rcParams = new URLSearchParams(parsedURN.rcomponent)
     const rcStmt = g.db.prepare(
@@ -137,23 +138,19 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     for (const [key, value] of rcParams.entries()) {
       selects.push(rcStmt.bind(key, value))
     }
-    const rcResult = await g.db.batch(selects)
-    // Collect an array of row IDs fro the table rows containing r-components.
-    const allRowIds = _.reduce(rcResult, (acc: number[], o: Record<string, unknown>): number[] => {
-      const results = _.get(o, 'results')
-      if (results === undefined) {
-        return acc
-      }
-      return _.concat(acc, _.map(results, (result: unknown): number => {
-        return _.get(result, 'id') || -1
-      }))
-    }, [])
-    // Filter out any negative (error) row IDs.
-    const rowIds = _.filter(allRowIds, (n) => { return n >= 0 })
+    const rcResult = await g.db.batch<{ id: number }>(selects)
+
+    const rowIds = rcResult
+      .map((row) => {
+        const rcIds = row.results?.map((result) => result.id)
+        return rcIds
+      })
+      .flat()
+
     // Add an entry to the join table for each r-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
-      'INSERT INTO node_rcomp_urnr_component (nodeUrn, urnrComponentId) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
+      'INSERT INTO node_rcomp_urnr_component (nodeUrn, rcomp) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
     )
     const inserts = []
     for (const rowId of rowIds) {
@@ -163,11 +160,10 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   }
 
   // Get the ID of the inserted node.
-  const node = g.db.prepare(
-    'SELECT * FROM node WHERE urn = ?1'
-  )
-  .bind(id)
-  .first() as unknown
+  const node = g.db
+    .prepare('SELECT * FROM node WHERE urn = ?1')
+    .bind(id)
+    .first() as unknown
 
   return node as NodeRecord
 }
@@ -195,8 +191,8 @@ export async function edge(
 
     const insertEdge = `
       INSERT INTO edge (
-        srcUrn,
-        dstUrn,
+        src,
+        dst,
         tag
       )
       VALUES (
@@ -213,15 +209,16 @@ export async function edge(
       .then(async (result) => {
         // TODO check for error; there is a .success property in the
         // result but referring to it causes a type error.
-        if (_.get(result, 'success', false) === false) {
+        if (result.error) {
           reject()
         }
 
-        const edge = await g.db.prepare(
-          'SELECT * FROM edge WHERE srcUrn = ?1 AND dstUrn = ?2 AND tag = ?3'
-        )
-        .bind(srcParam, dstParam, tagParam)
-        .first()
+        const edge = await g.db
+          .prepare(
+            'SELECT * FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3'
+          )
+          .bind(srcParam, dstParam, tagParam)
+          .first()
 
         resolve(edge as EdgeRecord)
       })

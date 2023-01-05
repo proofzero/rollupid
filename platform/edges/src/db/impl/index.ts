@@ -4,8 +4,6 @@
  * Implemenations of the edge-related database methods.
  */
 
-import { EdgeDirection } from '@kubelt/graph'
-
 import * as insert from './insert'
 import * as remove from './remove'
 import * as select from './select'
@@ -15,9 +13,17 @@ import * as select from './select'
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Edge, EdgeTag, EdgeQuery, EdgesOptions, Node } from '@kubelt/graph'
-
-import type { EdgeRecord, EdgeId, Graph, NodeRecord, Token } from '../types'
+import type {
+  Node,
+  Edge,
+  EdgeQuery,
+  EdgeRecord,
+  EdgeId,
+  Graph,
+  NodeRecord,
+  Token,
+  EdgeTag,
+} from '../types'
 
 // init()
 // -----------------------------------------------------------------------------
@@ -64,7 +70,10 @@ export async function unlink(
 // node()
 // -----------------------------------------------------------------------------
 
-export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|undefined> {
+export async function node(
+  g: Graph,
+  nodeId: AnyURN | undefined
+): Promise<Node | undefined> {
   return select.node(g, nodeId)
 }
 
@@ -74,7 +83,7 @@ export async function node(g: Graph, nodeId: AnyURN|undefined): Promise<Node|und
 export async function edges(
   g: Graph,
   query: EdgeQuery,
-  opt?: EdgesOptions,
+  opt?: any
 ): Promise<Edge[]> {
   return select.edges(g, query, opt)
 }

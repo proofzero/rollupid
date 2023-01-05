@@ -4,12 +4,32 @@
  * Edge-related types.
  */
 
-import type { EdgeTag } from '@kubelt/graph'
+import { z } from 'zod'
 
 import type { AnyURN } from '@kubelt/urns'
+import { EdgeURN } from '@kubelt/urns/edge'
+import {
+  EdgeDirectionInput,
+  NodeFilterInput,
+} from '@kubelt/platform-middleware/inputValidators'
+import { EdgeQueryInput, Edge, Node } from '../jsonrpc/middleware/validators'
 
 // Types
 // -----------------------------------------------------------------------------
+
+export type EdgeQuery = z.infer<typeof EdgeQueryInput>
+
+export type Edge = z.infer<typeof Edge>
+
+export type Node = z.infer<typeof Node>
+
+export type EdgeDirection = z.infer<typeof EdgeDirectionInput>
+
+export type NodeFilter = z.infer<typeof NodeFilterInput>
+
+export type Permission = string
+
+export type EdgeTag = EdgeURN
 
 // An authorization token
 export type Token = string
@@ -36,9 +56,9 @@ export interface EdgeRecord {
   // The edge identifier
   id: number
   // The URN of the source node, where the edge originates.
-  srcUrn: AnyURN
+  src: AnyURN
   // The URN of the sink node, where the edge terminates.
-  dstUrn: AnyURN
+  dst: AnyURN
   // The "type" of the edge.
   tag: EdgeTag
 }

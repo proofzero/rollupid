@@ -4,11 +4,9 @@
  * Utilities for removing data from the database.
  */
 
-import type { EdgeTag } from '@kubelt/graph'
-
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Graph } from '../types'
+import type { Graph, EdgeTag } from '../types'
 
 // edge()
 // -----------------------------------------------------------------------------
@@ -24,14 +22,12 @@ export async function edge(
 ): Promise<number> {
   return new Promise((resolve, reject) => {
     g.db
-      .prepare(
-        'DELETE FROM edge WHERE srcUrn = ?1 AND dstUrn = ?2 AND tag = ?3'
-      )
+      .prepare('DELETE FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3')
       .bind(src, dst, tag)
       .run()
       .then((result) => {
-        const { changes } = result
-        resolve(changes)
+        const { success } = result
+        resolve(success ? 1 : 0)
       })
       .catch((e: unknown) => {
         // NB: using instanceof to narrow the type of e doesn't appear to

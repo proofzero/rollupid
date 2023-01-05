@@ -1,12 +1,10 @@
 import { z } from 'zod'
-import { listAddresses } from '@kubelt/graph/util'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURN } from '@kubelt/urns/address'
 
-import type { Edge } from '@kubelt/graph'
-
-import type { AddressURN } from '@kubelt/urns/address'
+import { Edge, EdgeDirection } from '@kubelt/graph'
+import { EDGE_ADDRESS } from '@kubelt/graph/edges'
 
 import type { AddressList } from '../middlewares/addressList'
 
@@ -24,28 +22,34 @@ export const getAddressesMethod = async ({
   input: GetAddressesParams
   ctx: Context
 }): Promise<AddressList> => {
+  const query = {
+    // We are only interested in edges that start at the account node and
+    // terminate at the address node, assuming that account nodes link to
+    // the address nodes that they own.
+    id: input.account,
+    // We only want edges that link to address nodes.
+    tag: EDGE_ADDRESS,
+    // Account -> Address edges indicate ownership.
+    dir: EdgeDirection.Outgoing,
+
+    dst: {
+      // Only keep edges having the given node type. The node type is
+      // specified as an r-component in node URNs.
+      rc: {
+        addr_type: input.type,
+      },
+    },
+  }
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  const edgeResult = await listAddresses(ctx.Edges, input.account, input?.type)
-
-  if (!Array.isArray(edgeResult)) {
-    // Should this be a TRPCError?
-    throw new Error(edgeResult.message)
-  }
+  // const edgeResult = await listAddresses(ctx.Edges, input.account, input?.type)
+  const edgesResult = await ctx.edges.getEdges.query({ query })
 
   // The source nodes in the returned edges are the URNs of the
   // account nodes.
-  const addresses: AddressList = edgeResult.reduce(
-    (acc: AddressURN[], edge: Edge) => {
-      if (!AddressURNSpace.is(edge.dst.urn)) {
-        return acc
-      }
-      const urn = edge.dst.urn as AddressURN
-      acc.push(urn)
-      return acc
-    },
-    []
-  )
+  const addresses = edgesResult.edges.map((edge: Edge) => {
+    return edge.dst.urn as AddressURN
+  })
 
   return addresses
 }
