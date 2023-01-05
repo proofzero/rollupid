@@ -21,7 +21,7 @@ export type VerifyAuthorizationParams = z.infer<
   typeof VerifyAuthorizationMethodInput
 >
 
-export default verifyAuthorizationMethod = async ({
+export const verifyAuthorizationMethod = async ({
   input,
   ctx,
 }: {
