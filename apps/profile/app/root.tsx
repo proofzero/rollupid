@@ -36,14 +36,11 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 function Analytics(props) {
   return (
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={props.tag}"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', {props.tag});
+      window.dataLayer = window.dataLayer || []
+      function gtag(){dataLayer.push(arguments)}
+      gtag('js', new Date())
+      gtag('config', {props.tag})
     </script>
   )
 }
@@ -107,6 +104,7 @@ export default function App() {
             __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <script async src="https://www.googletagmanager.com/gtag/js?id={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
         <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
@@ -147,6 +145,7 @@ export function ErrorBoundary({ error }) {
         />
         <Scripts />
         <LiveReload port={8002} />
+        <script async src="https://www.googletagmanager.com/gtag/js?id={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
         <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
@@ -209,6 +208,7 @@ export function CatchBoundary() {
         />
         <Scripts />
         <LiveReload port={8002} />
+        <script async src="https://www.googletagmanager.com/gtag/js?id={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
         <Analytics tag={windows.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
