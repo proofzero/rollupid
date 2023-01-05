@@ -24,7 +24,7 @@ export const AuthorizeMethodOutput = z.object({
 
 export type AuthorizeParams = z.infer<typeof AuthorizeMethodInput>
 
-export default const authorizeMethod = async ({
+export const authorizeMethod = async ({
   input,
   ctx,
 }: {
@@ -57,3 +57,5 @@ export default const authorizeMethod = async ({
 
   return { ...result }
 }
+
+export default authorizeMethod

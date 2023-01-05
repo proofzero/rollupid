@@ -21,7 +21,7 @@ export type VerifyAuthorizationParams = z.infer<
   typeof VerifyAuthorizationMethodInput
 >
 
-export default const verifyAuthorizationMethod = async ({
+export default verifyAuthorizationMethod = async ({
   input,
   ctx,
 }: {
@@ -36,3 +36,5 @@ export default const verifyAuthorizationMethod = async ({
   const result = await accessNode.class.verify(token) // throws exceptin if invalid from jose
   return result.payload
 }
+
+export default verifyAuthorizationMethod 

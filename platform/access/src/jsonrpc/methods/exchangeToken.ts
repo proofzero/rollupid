@@ -40,7 +40,7 @@ export const ExchangeTokenMethodOutput = z.object({
 
 export type ExchangeTokenParams = z.infer<typeof ExchangeTokenMethodInput>
 
-export default const exchangeTokenMethod = async ({
+export const exchangeTokenMethod = async ({
   input,
   ctx,
 }: {
@@ -128,3 +128,5 @@ export default const exchangeTokenMethod = async ({
     throw new Error(`unsupported grant type: ${grantType}`)
   }
 }
+
+export default exchangeTokenMethod  
