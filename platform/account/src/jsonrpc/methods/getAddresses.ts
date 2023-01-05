@@ -1,12 +1,9 @@
 import { z } from 'zod'
-import { listAddresses } from '@kubelt/graph/util'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import { AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURN } from '@kubelt/urns/address'
 
-import { Edge, EdgeDirection, EdgeQuery } from '@kubelt/graph'
-import type { AccountURN } from '@kubelt/urns/account'
-import type { AddressURN } from '@kubelt/urns/address'
+import { Edge, EdgeDirection } from '@kubelt/graph'
 import { EDGE_ADDRESS } from '@kubelt/graph/edges'
 
 import type { AddressList } from '../middlewares/addressList'
