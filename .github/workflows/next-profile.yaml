@@ -35,9 +35,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Code Generation
-        run: yarn gql
-
       - name: Test
         run: yarn workspaces foreach -i -v -t --include profile run test
 

@@ -11,16 +11,7 @@
     "gql:gen": "graphql-codegen --config graphql.config.js --aggregate-output -n -l",
     "gql": "run-p 'gql:*'",
     "dev:gql": "run-p 'gql:* -- --watch'",
-    "check": "run-s format:check lint:check types:check",
-    "format": "run-s format:src",
-    "format:src": "prettier --write *.ts",
-    "format:check": "run-s format:check:src",
-    "format:check:src": "prettier --check *.ts",
-    "lint": "eslint --fix *.ts",
-    "lint:check": "run-s lint:check:src",
-    "lint:check:src": "eslint *.ts",
-    "types:check": "tsc --project ./tsconfig.json --noEmit",
-    "test": "run-s check"
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.16.3",

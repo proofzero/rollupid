@@ -53,9 +53,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
-      - name: Code Generation
-        run: yarn gql
-
       - name: Build
         run: yarn build
 
