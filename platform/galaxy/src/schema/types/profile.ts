@@ -26,8 +26,8 @@ export default /* GraphQL */ `
     bio: String
     job: String
     location: String
-    website: String
     links: [Link!]
+    website: String
     addresses: [URN!]
   }
 

@@ -1,10 +1,10 @@
+import { getSdk } from '@kubelt/galaxy-client'
 import createAccessClient from '@kubelt/platform-clients/access'
 import createAddressClient from '@kubelt/platform-clients/address'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
-import { getSdk } from '~/galaxy.server'
 
 export function getStarbaseClient() {
   return createStarbaseClient(Starbase)

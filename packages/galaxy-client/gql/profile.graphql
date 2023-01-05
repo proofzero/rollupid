@@ -15,6 +15,11 @@ query getProfile {
     location
     job
     bio
+    links {
+      name
+      url
+      verified
+    }
     website
   }
 }

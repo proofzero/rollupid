@@ -1,0 +1,34 @@
+{
+  "name": "@kubelt/galaxy-client",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kubelt Platform Clients",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Kubelt, Inc.",
+  "main": "index.ts",
+  "scripts": {
+    "gql:gen": "graphql-codegen --config graphql.config.js --aggregate-output -n -l",
+    "gql": "run-p 'gql:*'",
+    "dev:gql": "run-p 'gql:* -- --watch'",
+    "check": "run-s format:check lint:check types:check",
+    "format": "run-s format:src",
+    "format:src": "prettier --write *.ts",
+    "format:check": "run-s format:check:src",
+    "format:check:src": "prettier --check *.ts",
+    "lint": "eslint --fix *.ts",
+    "lint:check": "run-s lint:check:src",
+    "lint:check:src": "eslint *.ts",
+    "types:check": "tsc --project ./tsconfig.json --noEmit",
+    "test": "run-s check"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "2.16.3",
+    "@graphql-codegen/client-preset": "1.1.1",
+    "@graphql-codegen/typescript-graphql-request": "4.5.7",
+    "@graphql-codegen/typescript-resolvers": "2.7.5",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.8.0",
+    "typescript": "4.8.4"
+  }
+}
