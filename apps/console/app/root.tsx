@@ -26,14 +26,11 @@ import tailwindStylesheetUrl from './styles/tailwind.css'
 
 function Analytics(props) {
   return (
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={props.tag}"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', {props.tag});
+      window.dataLayer = window.dataLayer || []
+      function gtag(){dataLayer.push(arguments)}
+      gtag('js', new Date())
+      gtag('config', {props.tag})
     </script>
   )
 }
@@ -79,6 +76,7 @@ export default function App() {
         />
         <Scripts />
         <LiveReload />
+        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
         <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
