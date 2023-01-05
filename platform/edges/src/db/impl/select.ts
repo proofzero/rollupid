@@ -211,13 +211,15 @@ export async function edges(
   // Returns true if every key/value pair in the query components is
   // matched exactly in the node components.
   function hasProps(
-    queryComp: Record<string, string>,
-    nodeComp: Record<string, string>
+    queryComp: Record<string, string | undefined>,
+    nodeComp: Record<string, string | undefined>
   ): boolean {
     //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
     //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-    const qSet = new Set(Object.entries(queryComp))
+    const qSet = new Set(Object.entries(queryComp).flat())
     const nList = Object.entries(nodeComp)
+      .flat()
+      .filter((e) => e !== undefined)
     return nList.filter((e) => qSet.has(e)).length === nList.length
   }
 
