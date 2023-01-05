@@ -1,7 +1,7 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
-import { ThreeIdProfile } from '~/utils/galaxy.server'
+import { Profile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.profile) {
@@ -27,7 +27,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
   }
 
-  const profile = profileRes.profileFromAddress as ThreeIdProfile
+  const profile = profileRes.profileFromAddress as Profile
 
   // Tempory solution: check profile defaultAddress is the same as params profile
   const claimed = !!profile.defaultAddress

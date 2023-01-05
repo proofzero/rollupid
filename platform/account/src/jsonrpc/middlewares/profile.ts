@@ -20,6 +20,7 @@ export const ProfileSchema = z.object({
       z.object({
         name: z.string(),
         url: z.string().url().or(z.literal('')),
+        verified: z.boolean(),
       })
     )
     .optional(),

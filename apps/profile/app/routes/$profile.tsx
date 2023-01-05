@@ -29,9 +29,8 @@ import HeadNav from '~/components/head-nav'
 import { loader as profileLoader } from '~/routes/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
-import { strings, ogImage, clients } from '~/helpers'
-import { gatewayFromIpfs } from '@kubelt/utils'
-import type { ThreeIdProfile } from '~/utils/galaxy.server'
+import { gatewayFromIpfs, strings, ogImage, clients } from '~/helpers'
+import type { Profile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
@@ -58,7 +57,7 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    profile = profileRes.profile as ThreeIdProfile
+    profile = profileRes.profile as Profile
     loggedInUserProfile = {
       ...profile,
       claimed: true,

@@ -40,6 +40,8 @@ export const loader = async ({ request }) => {
     profileRes.profile?.pfp,
   ]
 
+  console.log(profileRes.profile)
+
   const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
     addressOrEns: address,
   })

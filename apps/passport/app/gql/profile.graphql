@@ -1,6 +1,5 @@
 query getProfile {
   profile {
-    displayName
     pfp {
       ... on StandardPFP {
         image
@@ -10,17 +9,16 @@ query getProfile {
         isToken
       }
     }
-    ... on ThreeIDProfile {
-      defaultAddress
-      cover
-      location
-      job
-      bio
-      website
-    }
+    displayName
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    website
   }
 }
 
-mutation updateProfile($profile: ThreeIDProfileInput) {
-  updateThreeIDProfile(profile: $profile)
+mutation updateProfile($profile: ProfileInput) {
+  updateProfile(profile: $profile)
 }
