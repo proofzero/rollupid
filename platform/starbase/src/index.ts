@@ -406,7 +406,7 @@ const kb_appDelete = openrpc.method(schema, {
       // const clientId = _.get(request, ['params', 'clientId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
-      
+
       if (undefined === clientId) {
         return openrpc.error(request, ErrorMissingClientId)
       }
