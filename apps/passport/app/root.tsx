@@ -33,14 +33,11 @@ import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 function Analytics(props) {
   return (
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={props.tag}"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', props.tag);
+      window.dataLayer = window.dataLayer || []
+      function gtag(){dataLayer.push(arguments)}
+      gtag('js', new Date())
+      gtag('config', props.tag)
     </script>
   )
 }
@@ -103,7 +100,8 @@ export default function App() {
           async
           src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
         ></script>
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG }/>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
+        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -131,7 +129,8 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG }/>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
+        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -185,7 +184,8 @@ export function CatchBoundary() {
             __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
           }}
         />
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG }/>
+        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
+        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
