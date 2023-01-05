@@ -3009,7 +3009,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.17.8, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.5.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4":
   version: 7.20.6
   resolution: "@babel/runtime@npm:7.20.6"
   dependencies:
@@ -5138,16 +5138,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:1.6.6":
-  version: 1.6.6
-  resolution: "@headlessui/react@npm:1.6.6"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: 6ebb34bde0bd2a5045ae29a2bac1dc166f7163c9ad98aabe5abb580c3c770d0b3040d5992045f9e68b6c8e8eca5bf7eca71276ff9b1696a9fb88a9380d8fcf96
-  languageName: node
-  linkType: hard
-
 "@headlessui/react@npm:1.7.4":
   version: 1.7.4
   resolution: "@headlessui/react@npm:1.7.4"
@@ -5169,15 +5159,6 @@ __metadata:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
   checksum: 0658251a38a23cb6e41bc4edb15184fa8a5470f57f8c9d948a1aa5ce4da5b1d6ec24ac488ce5d5dbf0ed49c0ad1f147a03db4d6661262eb60a1eed299527a0f0
-  languageName: node
-  linkType: hard
-
-"@heroicons/react@npm:2.0.10":
-  version: 2.0.10
-  resolution: "@heroicons/react@npm:2.0.10"
-  peerDependencies:
-    react: ">= 16"
-  checksum: 40e0fc0289f7b12239e307d887d3cdbf80c5157a42e5b1c313b291800e9a30a191f6310c2dcc08a8a0132b238ff37e62ecd2f6b1696cf81043d48154566b8643
   languageName: node
   linkType: hard
 
@@ -5928,52 +5909,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kubelt-ui/threeid.themes.base-theme@npm:0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1":
-  version: 0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1
-  resolution: "@kubelt-ui/threeid.themes.base-theme@npm:0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40kubelt-ui%2Fthreeid.themes.base-theme%2F-%2F%40kubelt-ui-threeid.themes.base-theme-0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1.tgz"
-  dependencies:
-    "@teambit/base-react.theme.theme-provider": 1.95.3
-    "@teambit/design.theme.icons-font": 1.0.8
-    classnames: 2.3.2
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.1.5
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: d3876a7f40f307a7751ea6cf41a1083629640857db5dfd9a5c13605ad9846036c77876d70eb98b4d951438883fd3236cc1c69211e5bbad0bb415b903353b07c0
-  languageName: node
-  linkType: hard
-
-"@kubelt-ui/threeid.ui.button@npm:0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455":
-  version: 0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455
-  resolution: "@kubelt-ui/threeid.ui.button@npm:0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40kubelt-ui%2Fthreeid.ui.button%2F-%2F%40kubelt-ui-threeid.ui.button-0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455.tgz"
-  dependencies:
-    "@teambit/design.ui.buttons.button": 1.96.5
-    classnames: 2.3.2
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.1.5
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 45a800d3d10ec09b16148fdeda4e588da070f0e0cd5595a0f2b4792bf7c4520e16f4fc4dd5f10b67885c1151f5665e3ce03cf78392909909851e8369953b6911
-  languageName: node
-  linkType: hard
-
-"@kubelt-ui/threeid.ui.heading@npm:0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda":
-  version: 0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda
-  resolution: "@kubelt-ui/threeid.ui.heading@npm:0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40kubelt-ui%2Fthreeid.ui.heading%2F-%2F%40kubelt-ui-threeid.ui.heading-0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda.tgz"
-  dependencies:
-    "@teambit/base-ui.text.heading": 1.0.4
-    classnames: 2.3.2
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.1.5
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: a8e50f31ec663e0c98431261c1bc024a6488604bf111404e742495718c8f9691f1bb1bc684ef74e33745e1b84426b5f35365e94c144780640d805af037680342
-  languageName: node
-  linkType: hard
-
 "@kubelt/alchemy-client@workspace:packages/alchemy-client":
   version: 0.0.0-use.local
   resolution: "@kubelt/alchemy-client@workspace:packages/alchemy-client"
@@ -6039,11 +5974,6 @@ __metadata:
   dependencies:
     "@babel/core": ^7.20.2
     "@cloudflare/workers-types": 4.20221111.1
-    "@headlessui/react": 1.6.6
-    "@heroicons/react": 2.0.10
-    "@kubelt-ui/threeid.themes.base-theme": 0.0.0-24b4397f498cd16a5c8ab054dc6be17396ad19c1
-    "@kubelt-ui/threeid.ui.button": 0.0.0-5f7529e79d91e3a23b160c338391abfd412a7455
-    "@kubelt-ui/threeid.ui.heading": 0.0.0-fcbfc503969e70a9076d9fb871fc90e580cd1fda
     "@kubelt/design-system": "*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
@@ -6068,7 +5998,6 @@ __metadata:
     "@storybook/react": ^6.5.13
     "@storybook/testing-library": ^0.0.13
     "@tailwindcss/forms": 0.5.3
-    "@tanstack/react-query": 4.2.3
     "@types/node": 18.11.9
     "@types/puppeteer": 5.4.6
     "@types/react": 17.0.47
@@ -6097,9 +6026,7 @@ __metadata:
     eslint-plugin-storybook: 0.6.7
     ethers: 5.7.0
     flowbite: 1.5.4
-    graphql: 16.6.0
     graphql-request: 5.0.0
-    graphql-tag: 2.12.6
     jose: 4.11.0
     miniflare: 2.6.0
     npm-run-all: 4.1.5
@@ -6115,7 +6042,6 @@ __metadata:
     storybook-addon-sass-postcss: 0.1.3
     style-loader: 3.3.1
     tailwindcss: 3.1.8
-    typed-json-rpc: 1.1.0
     typescript: 4.7.4
     wagmi: 0.8.5
     webpack: 5.75.0
@@ -8883,143 +8809,6 @@ __metadata:
   version: 1.1.0
   resolution: "@protobufjs/utf8@npm:1.1.0"
   checksum: f9bf3163d13aaa3b6f5e6fbf37a116e094ea021c0e1f2a7ccd0e12a29e2ce08dafba4e8b36e13f8ed7397e1591610ce880ed1289af4d66cf4ace8a36a9557278
-  languageName: node
-  linkType: hard
-
-"@react-aria/button@npm:3.3.3":
-  version: 3.3.3
-  resolution: "@react-aria/button@npm:3.3.3"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-    "@react-aria/focus": ^3.4.1
-    "@react-aria/interactions": ^3.5.1
-    "@react-aria/utils": ^3.8.2
-    "@react-stately/toggle": ^3.2.3
-    "@react-types/button": ^3.4.1
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1
-  checksum: e4e32dce6b1d271f8e86c788767bd806ae049421d5f36ad84204462b92e3be75a3034b7339399505503744134794a0bd04e93e02ce3eb5d95e60c59548aded4c
-  languageName: node
-  linkType: hard
-
-"@react-aria/focus@npm:^3.4.1":
-  version: 3.10.0
-  resolution: "@react-aria/focus@npm:3.10.0"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-    "@react-aria/interactions": ^3.13.0
-    "@react-aria/utils": ^3.14.1
-    "@react-types/shared": ^3.16.0
-    clsx: ^1.1.1
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 6dea192f4f73103f753baec9199ae45fffe6d8d42926afb24687fc2e44002e897ec887180f9cefeada51ef344feffc953a126711a56b6e9777862a1db4fe9414
-  languageName: node
-  linkType: hard
-
-"@react-aria/interactions@npm:^3.13.0, @react-aria/interactions@npm:^3.5.1":
-  version: 3.13.0
-  resolution: "@react-aria/interactions@npm:3.13.0"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-    "@react-aria/utils": ^3.14.1
-    "@react-types/shared": ^3.16.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: caa72fe0fc59c370268c3341b7efc64852a32904837cac5c185e8afb3138dfb90d74e17de1049eddf1b667149c7051ad56356a1aca33cb27fc3421dc6be6c37c
-  languageName: node
-  linkType: hard
-
-"@react-aria/ssr@npm:^3.4.0":
-  version: 3.4.0
-  resolution: "@react-aria/ssr@npm:3.4.0"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: e35d4db9fd4a62abbff8790ca4abc322df3a7127ac1c5ff6c13c74d0ff5f64e41e6461de1dceb859f1a0fe2461b5071061723ddc260de747bd9d029429f96eac
-  languageName: node
-  linkType: hard
-
-"@react-aria/utils@npm:^3.14.1, @react-aria/utils@npm:^3.8.2":
-  version: 3.14.1
-  resolution: "@react-aria/utils@npm:3.14.1"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-    "@react-aria/ssr": ^3.4.0
-    "@react-stately/utils": ^3.5.1
-    "@react-types/shared": ^3.16.0
-    clsx: ^1.1.1
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: a25d9a94840ee65d4bca0855df777a42993ae301ca004a9cab8ed3b97c404397d6f7ed1a0856d361bddf6d919f834fabe693172fbd38eda40759247c90b8929d
-  languageName: node
-  linkType: hard
-
-"@react-stately/toggle@npm:^3.2.3":
-  version: 3.4.3
-  resolution: "@react-stately/toggle@npm:3.4.3"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-    "@react-stately/utils": ^3.5.1
-    "@react-types/checkbox": ^3.4.1
-    "@react-types/shared": ^3.16.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 302fb76c38f7316efd9de840fb4d80ba30d842a23c2adb95b7c4937b0bbfbf43b9f282e314480d831169bc05f7b11637485e733e3cacc0e834b06e662918a696
-  languageName: node
-  linkType: hard
-
-"@react-stately/utils@npm:^3.5.1":
-  version: 3.5.1
-  resolution: "@react-stately/utils@npm:3.5.1"
-  dependencies:
-    "@babel/runtime": ^7.6.2
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: f748331ae393f97b3e6fcccd37b767358f49229520b9500f82ed4c620bff36ef3c01d4ba9679ac7b9d6d78c5f6e711186c98bd0e6482ec27a6fbf26c5d0aa3cc
-  languageName: node
-  linkType: hard
-
-"@react-types/button@npm:3.4.1":
-  version: 3.4.1
-  resolution: "@react-types/button@npm:3.4.1"
-  dependencies:
-    "@react-types/shared": ^3.8.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1
-  checksum: 3d5c05ce228117b2c57085e9d2a5827bb4f2c5a6303902faf355495badd69fcbe751963be2266c7f79ba04681c98e0ac6f087aab3554089a5fd582493f21d03f
-  languageName: node
-  linkType: hard
-
-"@react-types/button@npm:^3.4.1":
-  version: 3.7.0
-  resolution: "@react-types/button@npm:3.7.0"
-  dependencies:
-    "@react-types/shared": ^3.16.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: e5c1bc38b20d2e123492ea59b9c1637671b83d1b5081b3ac414bc20858ff3300465c7b4bc9b714f3e062bf471eebfe7a68210e23a8731bba1ae1b0ae7a2cd16d
-  languageName: node
-  linkType: hard
-
-"@react-types/checkbox@npm:^3.4.1":
-  version: 3.4.1
-  resolution: "@react-types/checkbox@npm:3.4.1"
-  dependencies:
-    "@react-types/shared": ^3.16.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 6d16b9c9a0a94966b29c8b6c0aae7b91ddbc317a8ac31c36538f5628486b7d342bb74196d2c35f926c1faa5430e74fd1dcfe11e73e3dd1f6e8b0e9fd6870c890
-  languageName: node
-  linkType: hard
-
-"@react-types/shared@npm:^3.16.0, @react-types/shared@npm:^3.8.0":
-  version: 3.16.0
-  resolution: "@react-types/shared@npm:3.16.0"
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
-  checksum: 3bb3aa77f4938fcd7788c5c5abf24f8f3d3c034d555962e44202d09673844cbb31d7b280edc9ac432bdd06847bc253527f8946f2604b9c88d5fcb96fdc56fbd1
   languageName: node
   linkType: hard
 
@@ -12650,13 +12439,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:4.2.3":
-  version: 4.2.3
-  resolution: "@tanstack/query-core@npm:4.2.3"
-  checksum: b37efdc32b1731575eba398eda3b7a4cd3ed25ee1032d5200124c37ab4e58711d310e2e29e9e51284553a7c03c85e55cf8da6833bc3b1e215e0e43e7399ab3ca
-  languageName: node
-  linkType: hard
-
 "@tanstack/query-persist-client-core@npm:4.19.1":
   version: 4.19.1
   resolution: "@tanstack/query-persist-client-core@npm:4.19.1"
@@ -12705,26 +12487,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:4.2.3":
-  version: 4.2.3
-  resolution: "@tanstack/react-query@npm:4.2.3"
-  dependencies:
-    "@tanstack/query-core": 4.2.3
-    "@types/use-sync-external-store": ^0.0.3
-    use-sync-external-store: ^1.2.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-    react-native: "*"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 0a38ae05271e1669c6efd5cc77608103b6dfde577ecdc88c3f0e72953aea11c102c9b5a49fa2ca822f260a68f9f9646c5e847e7d87c99117b2c2e3b1356cbc8b
-  languageName: node
-  linkType: hard
-
 "@tanstack/react-query@npm:^4.14.5":
   version: 4.19.1
   resolution: "@tanstack/react-query@npm:4.19.1"
@@ -12741,101 +12503,6 @@ __metadata:
     react-native:
       optional: true
   checksum: cce8b51c5cbaff007efb2fc54c5e03a2191e363626226903c345ae9baf0d48a36fc322383e24aff4f12250e672da67d3ceaa9819bbb16ace98a5c7bdff098a61
-  languageName: node
-  linkType: hard
-
-"@teambit/base-react.buttons.button@npm:1.96.5":
-  version: 1.96.5
-  resolution: "@teambit/base-react.buttons.button@npm:1.96.5::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40teambit%2Fbase-react.buttons.button%2F-%2F%40teambit-base-react.buttons.button-1.96.5.tgz"
-  dependencies:
-    "@react-aria/button": 3.3.3
-    "@react-types/button": 3.4.1
-    "@teambit/base-react.navigation.link": 2.0.27
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.1.5
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 98e43e1b9d39d9937b1ab59b5074c97c888bfce8eb9b7021c701dc4a1406f5d47493e9544b54758224da571fd2c610dc114e391084f00bfa8b877c91bf82769b
-  languageName: node
-  linkType: hard
-
-"@teambit/base-react.navigation.link@npm:2.0.27":
-  version: 2.0.27
-  resolution: "@teambit/base-react.navigation.link@npm:2.0.27::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40teambit%2Fbase-react.navigation.link%2F-%2F%40teambit-base-react.navigation.link-2.0.27.tgz"
-  dependencies:
-    "@teambit/base-ui.routing.compare-url": 1.0.0
-    classnames: 2.3.1
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.0.0
-    "@types/react": ^17.0.0
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 33e6fc9d6560ffc1dfb1c608e27faba0ed0c87b29f4aafc381a978d464222d02e9b68a1bbb7b22cea3cf561fcdf8451d30c5395c696f3d797c62476d2aad8a9c
-  languageName: node
-  linkType: hard
-
-"@teambit/base-react.theme.theme-provider@npm:1.95.3":
-  version: 1.95.3
-  resolution: "@teambit/base-react.theme.theme-provider@npm:1.95.3::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40teambit%2Fbase-react.theme.theme-provider%2F-%2F%40teambit-base-react.theme.theme-provider-1.95.3.tgz"
-  dependencies:
-    core-js: ^3.0.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: b579b9bc873a14a8189909215b3cd490649a5aef97c1248d1d5437b59275728881bfb838b4bc5a15ea014b9aee445aeedb204ab8e48510f7e7029f3e57e0f0b2
-  languageName: node
-  linkType: hard
-
-"@teambit/base-ui.routing.compare-url@npm:1.0.0":
-  version: 1.0.0
-  resolution: "@teambit/base-ui.routing.compare-url@npm:1.0.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40teambit%2Fbase-ui.routing.compare-url%2F-%2Fbase-ui.routing.compare-url-1.0.0.tgz"
-  dependencies:
-    core-js: ^3.0.0
-    url-parse: 1.5.1
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: c57cbab0c094a1b3783a4ff07f7b7a7d2b1e3586379ebac4fb262806d10d7bad8782485d367639e1250560a48459e6a257e23298f4aa2808f004fb9c0ed571ec
-  languageName: node
-  linkType: hard
-
-"@teambit/base-ui.text.heading@npm:1.0.4":
-  version: 1.0.4
-  resolution: "@teambit/base-ui.text.heading@npm:1.0.4::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40teambit%2Fbase-ui.text.heading%2F-%2Fbase-ui.text.heading-1.0.4.tgz"
-  dependencies:
-    core-js: ^3.0.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 4796ab01f47ab064eb61abc29b09a058e742649c0a804aa0bc624ecece2445e7772a2e0305cf50f260082543175ec9c148455540d4dfe1ff5ce88e105d3d8084
-  languageName: node
-  linkType: hard
-
-"@teambit/design.theme.icons-font@npm:1.0.8":
-  version: 1.0.8
-  resolution: "@teambit/design.theme.icons-font@npm:1.0.8::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40teambit%2Fdesign.theme.icons-font%2F-%2Fdesign.theme.icons-font-1.0.8.tgz"
-  dependencies:
-    core-js: ^3.0.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-    react-dom: ^16.8.0 || ^17.0.0
-  checksum: 635b9fee3675c3228c725c2ff2918bf7d8439f3a943a47202ec4b2e4db4af6efce9229fd569bdbdc92ea890c32fe44c5df131ece0b3a89bd305680079ab95926
-  languageName: node
-  linkType: hard
-
-"@teambit/design.ui.buttons.button@npm:1.96.5":
-  version: 1.96.5
-  resolution: "@teambit/design.ui.buttons.button@npm:1.96.5::__archiveUrl=https%3A%2F%2Fnode.bit.cloud%2F%40teambit%2Fdesign.ui.buttons.button%2F-%2F%40teambit-design.ui.buttons.button-1.96.5.tgz"
-  dependencies:
-    "@teambit/base-react.buttons.button": 1.96.5
-    classnames: 2.3.1
-    core-js: ^3.0.0
-  peerDependencies:
-    "@testing-library/react": ^12.1.5
-    react: ^16.8.0 || ^17.0.0
-  checksum: d5507710e8eecee15a7cecd2ddbb13fb9667eef15fe3c40f1bf9b1c1af21cd62745f77fff5f3529ef4160fe247d2eef517da439267ca5429fda2a96a3e5be59a
   languageName: node
   linkType: hard
 
@@ -13909,13 +13576,6 @@ __metadata:
   version: 2.0.6
   resolution: "@types/unist@npm:2.0.6"
   checksum: 25cb860ff10dde48b54622d58b23e66214211a61c84c0f15f88d38b61aa1b53d4d46e42b557924a93178c501c166aa37e28d7f6d994aba13d24685326272d5db
-  languageName: node
-  linkType: hard
-
-"@types/use-sync-external-store@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@types/use-sync-external-store@npm:0.0.3"
-  checksum: 161ddb8eec5dbe7279ac971531217e9af6b99f7783213566d2b502e2e2378ea19cf5e5ea4595039d730aa79d3d35c6567d48599f69773a02ffcff1776ec2a44e
   languageName: node
   linkType: hard
 
@@ -18835,14 +18495,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:2.3.1":
-  version: 2.3.1
-  resolution: "classnames@npm:2.3.1"
-  checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
-  languageName: node
-  linkType: hard
-
-"classnames@npm:2.3.2, classnames@npm:^2.2.6, classnames@npm:^2.3.2":
+"classnames@npm:^2.2.6, classnames@npm:^2.3.2":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
@@ -19094,7 +18747,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.0.4, clsx@npm:^1.1.0, clsx@npm:^1.1.1":
+"clsx@npm:^1.0.4, clsx@npm:^1.1.0":
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
@@ -19806,7 +19459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.0.0, core-js@npm:^3.0.1, core-js@npm:^3.0.4, core-js@npm:^3.19.2, core-js@npm:^3.6.5, core-js@npm:^3.8.2":
+"core-js@npm:^3.0.1, core-js@npm:^3.0.4, core-js@npm:^3.19.2, core-js@npm:^3.6.5, core-js@npm:^3.8.2":
   version: 3.26.1
   resolution: "core-js@npm:3.26.1"
   checksum: 0a01149f51ff1e9f41d1ea49cc4c9222047949ea597189ede7c4cf8cde3b097766b9c7615acc77c86fe65b4002f20b638a133dfba7b41dba830d707aeeed45ad
@@ -43632,16 +43285,6 @@ __metadata:
   dependencies:
     prepend-http: ^2.0.0
   checksum: 1040e357750451173132228036aff1fd04abbd43eac1fb3e4fca7495a078bcb8d33cb765fe71ad7e473d9c94d98fd67adca63bd2716c815a2da066198dd37217
-  languageName: node
-  linkType: hard
-
-"url-parse@npm:1.5.1":
-  version: 1.5.1
-  resolution: "url-parse@npm:1.5.1"
-  dependencies:
-    querystringify: ^2.1.1
-    requires-port: ^1.0.0
-  checksum: ce5c400db52d83b941944502000081e2338e46834cf16f2888961dc034ea5d49dbeb85ac8fdbe28c3fe738c09320a71a2f6d9286b748895cd464b1e208b6b991
   languageName: node
   linkType: hard
 
