@@ -3106,13 +3106,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:3.18.0":
-  version: 3.18.0
-  resolution: "@cloudflare/workers-types@npm:3.18.0"
-  checksum: 9a54a4fbd12eed19495cf6774cd48b0e97aaee093d40d2ae8e7a11c58937b8ad5173588efca5e138c373c6d6730faf96f2385eee203dab3fdb91565885efb0cd
-  languageName: node
-  linkType: hard
-
 "@cloudflare/workers-types@npm:4.20221111.1":
   version: 4.20221111.1
   resolution: "@cloudflare/workers-types@npm:4.20221111.1"
@@ -6516,7 +6509,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform.edges@workspace:platform/edges"
   dependencies:
-    "@cloudflare/workers-types": 3.18.0
+    "@cloudflare/workers-types": 4.20221111.1
     "@databases/split-sql-query": 1.0.3
     "@databases/sql": 3.2.0
     "@kubelt/openrpc": "workspace:*"

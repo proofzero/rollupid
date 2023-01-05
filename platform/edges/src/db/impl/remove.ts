@@ -28,8 +28,8 @@ export async function edge(
       .bind(src, dst, tag)
       .run()
       .then((result) => {
-        const { changes } = result
-        resolve(changes)
+        const { success } = result
+        resolve(success ? 1 : 0)
       })
       .catch((e: unknown) => {
         // NB: using instanceof to narrow the type of e doesn't appear to
