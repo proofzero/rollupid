@@ -7,7 +7,7 @@ import { json } from '@remix-run/cloudflare'
 
 export const loader = ({ request }: any) => {
   const splittedUrl = request.url.split('/')
-  const path = splittedUrl[splittedUrl.length - 1]
+  const path = splittedUrl[splittedUrl.length - 1].split('?')[0]
 
   return json({
     path,
@@ -68,6 +68,15 @@ export default function AccountSetting() {
           name="tabs"
           className="block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
           // defaultValue={tabs.find((tab) => tab?.current).name}
+          onChange={(evt) => {
+            const path = evt.target.value.toLowerCase()
+            if (tabs[path].disabled) {
+              return
+            }
+
+            navigate(`./${path}`, { replace: true })
+            setCurrentTab(tabs[path].name)
+          }}
         >
           {Object.keys(tabs).map((path: string) => (
             <option key={tabs[path].name}>{tabs[path].name}</option>
