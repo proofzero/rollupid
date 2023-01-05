@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { Form } from '@remix-run/react'
+
+import type { ActionFunction } from 'react-router-dom'
+import { useSubmit, Form } from '@remix-run/react'
+
+import { requireJWT } from '~/utils/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
+import { getGalaxyClient } from '~/helpers/clients'
 
 import { HiOutlineTrash } from 'react-icons/hi'
 import { RxDragHandleDots2 } from 'react-icons/rx'
@@ -10,17 +16,82 @@ import { Button, Text } from '@kubelt/design-system'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
+import { useRouteData } from '~/hooks'
+
+export type ProfileData = {
+  targetAddress: string
+  displayName: string
+  isOwner: boolean
+  pfp: {
+    image: string
+    isToken: string
+  }
+  links: {
+    name: string
+    url: string
+    verified: boolean
+  }[]
+}
+
+export const action: ActionFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+
+  const formData = await request.formData()
+
+  console.log(formData)
+  const name = formData.get('name')
+
+  console.log('ONE', formData.get('name'))
+  console.log('TWO', formData.get('name'))
+
+  const url = formData.get('url')
+  console.log(name, url)
+  const galaxyClient = await getGalaxyClient()
+  const profileRes = await galaxyClient.getProfile(undefined, {
+    'KBT-Access-JWT-Assertion': jwt,
+  })
+
+  const { displayName, job, location, bio, website, pfp, links } =
+    profileRes.profile
+  await galaxyClient.updateProfile(
+    {
+      profile: {
+        displayName,
+        // TODO: support for default address
+        job,
+        location,
+        bio,
+        website,
+        pfp,
+        links: [...links, { name, url, verified: false }],
+      },
+    },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
+    }
+  )
+
+  return null
+}
+
 export default function AccountSettingsLinks() {
+  const [links, setLinks] = useState(
+    useRouteData<ProfileData>('routes/account')?.links
+  )
   const [isFormChanged, setFormChanged] = useState(false)
-  const initialLinks = [{ name: '', url: '' }]
+  const initialLinks = [{ name: '', url: '', verified: false }]
   const [newLinks, setNewLinks] = useState(initialLinks)
   const [trackingLinks, setTrakingLinks] = useState(initialLinks)
+  const submit = useSubmit()
 
-  const [links, setLinks] = useState([
-    { name: 'My Website', url: 'https://blog.pillowguy.me' },
-  ])
+  const handleSubmit = (event: any) => {
+    console.log('NEW LINKS', trackingLinks)
+    submit(trackingLinks, { replace: true })
 
-  console.log(newLinks, trackingLinks)
+    setNewLinks(initialLinks)
+    setTrakingLinks(initialLinks)
+  }
+
   return (
     <>
       <Text
@@ -39,12 +110,14 @@ export default function AccountSettingsLinks() {
         Add links manually
       </Text>
       <Form
+        method="post"
         onChange={() => {
           setFormChanged(true)
         }}
         onReset={() => {
           setFormChanged(false)
         }}
+        onSubmit={handleSubmit}
         className="min-h-[35.563rem] relative"
       >
         <div className="flex flex-col">
@@ -69,6 +142,7 @@ export default function AccountSettingsLinks() {
                   <InputText
                     type="text"
                     id="Name"
+                    name="name"
                     heading="Name"
                     placeholder="My Website"
                     defaultValue={link.name}
@@ -92,6 +166,7 @@ export default function AccountSettingsLinks() {
                   <InputText
                     type="url"
                     id="url"
+                    name="url"
                     heading="URL"
                     defaultValue={link.url}
                     placeholder="https://mywebsite.com"
@@ -128,25 +203,28 @@ export default function AccountSettingsLinks() {
           })}
         </div>
         <div className="flex flex-col mb-3">
-          {links.map((link: any, i: number) => (
+          {(links || []).map((link: any, i: number) => (
             <div
               key={`${link.name || 'My Website'}-${
                 link.url || 'https://mywebsite.com'
               }-${i}`}
-              className="h-[4rem]
+              className="
               border border-gray-300 rounded-md
-              px-4 py-3
+              px-4 py-3 mb-3
                flex flex-row items-center justify-around truncate
                "
             >
               <div className="flex flex-row items-center grow ">
                 <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                <div
+                <button
                   className="bg-gray-100 w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               flex items-center justify-center "
+                  onClick={() => {
+                    navigator.clipboard.writeText(link.url)
+                  }}
                 >
                   <TbLink size={22} />
-                </div>
+                </button>
                 <div className="flex flex-col truncate">
                   <Text weight="medium">{link.name}</Text>
                   <Text className="text-gray-500">{link.url}</Text>
@@ -154,11 +232,16 @@ export default function AccountSettingsLinks() {
               </div>
 
               <Button
-                className="mr-4 bg-gray-100 border-none
-                flex flex-row items-center justify-between
-                mr-4"
-                btnType="secondary-alt "
-                btnSize="sm"
+                className="mr-4 h-[40px] 
+                bg-gray-100 focus:bg-gray-100 border-none
+                flex flex-row items-center justify-around
+                text-gray-600"
+                btnType="secondary-alt"
+                btnSize="base"
+                onClick={() => {
+                  setLinks(links.filter((link, id) => id !== i))
+                  setNewLinks([...newLinks, links[i]])
+                }}
               >
                 <FiEdit size={18} />
                 Edit
@@ -167,6 +250,7 @@ export default function AccountSettingsLinks() {
           ))}
         </div>
         <button
+          type="button"
           onClick={() => {
             setNewLinks([...newLinks, { name: '', url: '' }])
             setTrakingLinks([...trackingLinks, { name: '', url: '' }])
@@ -183,6 +267,7 @@ export default function AccountSettingsLinks() {
 
         <div className="absolute bottom-0 right-0">
           <SaveButton
+            onClick={handleSubmit}
             isFormChanged={isFormChanged}
             discardFn={() => {
               setNewLinks(initialLinks)
