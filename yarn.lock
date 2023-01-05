@@ -3402,22 +3402,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@databases/split-sql-query@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@databases/split-sql-query@npm:1.0.3"
-  peerDependencies:
-    "@databases/sql": "*"
-  checksum: 84463edf88f78465ff169c17186c6adc1dea4d4493763e6bc92101f71a8b6d645363e8e66765d5e48055c27556fcb82b25f370b8b1d30f7da07ebef540f32f0c
-  languageName: node
-  linkType: hard
-
-"@databases/sql@npm:3.2.0":
-  version: 3.2.0
-  resolution: "@databases/sql@npm:3.2.0"
-  checksum: b8be069087ffefb522d6c1cf56394b303cd0ab45bcf45bd58bce0d064e71d3fafd8de3c86164a4a7cb69efdac54e7f4a1c965bf5d54d609378c5ff17a38522a7
-  languageName: node
-  linkType: hard
-
 "@design-systems/utils@npm:2.12.0":
   version: 2.12.0
   resolution: "@design-systems/utils@npm:2.12.0"
@@ -6510,25 +6494,24 @@ __metadata:
   resolution: "@kubelt/platform.edges@workspace:platform/edges"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@databases/split-sql-query": 1.0.3
-    "@databases/sql": 3.2.0
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
     "@trpc/server": 10.7.0
-    "@types/node": 18.11.9
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
     better-sqlite3: 8.0.0
     cross-env: 7.0.3
     drizzle-kit: 0.14.1
     drizzle-orm: 0.14.2
     drizzle-orm-sqlite: 0.14.3
     eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
     prettier: 2.7.1
     reflect-metadata: 0.1.13
     sqlite3: 5.1.2
     tap: 16.3.2
-    ts-node: 10.9.1
     typeorm: 0.3.10
     typescript: 4.8.4
     urns: 0.6.0
