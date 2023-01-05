@@ -40,7 +40,7 @@ export const ExchangeTokenMethodOutput = z.object({
 
 export type ExchangeTokenParams = z.infer<typeof ExchangeTokenMethodInput>
 
-export const exchangeTokenMethod = async ({
+default export const exchangeTokenMethod = async ({
   input,
   ctx,
 }: {
