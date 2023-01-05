@@ -225,11 +225,11 @@ export type Profile = {
 export type Query = {
   __typename?: 'Query';
   contractsForAddress?: Maybe<NftContracts>;
-  ensAddress: Scalars['String'];
+  ensAddress?: Maybe<Scalars['String']>;
   ensAddressAvatar?: Maybe<Scalars['String']>;
   ensDisplayName?: Maybe<Scalars['String']>;
   getCuratedGallery?: Maybe<NfTsWithChain>;
-  getNFTMetadataBatch?: Maybe<NfTsNoProps>;
+  getNFTMetadataBatch?: Maybe<NfTs>;
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
@@ -341,7 +341,7 @@ export type GetEnsAddressQueryVariables = Exact<{
 }>;
 
 
-export type GetEnsAddressQuery = { __typename?: 'Query', ensAddress: string };
+export type GetEnsAddressQuery = { __typename?: 'Query', ensAddress?: string | null };
 
 export type GetEnsDisplayNameQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -372,7 +372,7 @@ export type GetNftMetadataQueryVariables = Exact<{
 }>;
 
 
-export type GetNftMetadataQuery = { __typename?: 'Query', getNFTMetadataBatch?: { __typename?: 'NFTsNoProps', ownedNfts: Array<{ __typename?: 'NFTNoProps', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
+export type GetNftMetadataQuery = { __typename?: 'Query', getNFTMetadataBatch?: { __typename?: 'NFTs', ownedNfts: Array<{ __typename?: 'NFT', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, id?: { __typename?: 'Id', tokenId?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
 
 export type GetGalleryQueryVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -534,6 +534,13 @@ export const GetNftMetadataDocument = gql`
       media {
         raw
         thumbnail
+      }
+      metadata {
+        properties {
+          name
+          value
+          display
+        }
       }
       error
       contractMetadata {
