@@ -11,6 +11,8 @@ export interface AddressApi extends BaseApi {
   kb_getAccount(): AccountURN
   kb_setAccount(account: AccountURN): void
   kb_unsetAccount(): void
+  kb_getData(): object
+  kb_setData(data: object): void
   kb_getNonce(
     address: string,
     template: string,

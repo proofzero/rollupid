@@ -44,6 +44,31 @@ export const schema: RpcSchema = {
       },
     },
     {
+      name: 'kb_getData',
+      params: [],
+      result: {
+        name: 'data',
+        schema: {
+          type: 'object',
+        },
+      },
+    },
+    {
+      name: 'kb_setData',
+      params: [
+        {
+          name: 'data',
+          schema: {
+            type: 'object',
+          },
+        },
+      ],
+      result: {
+        name: 'set data result',
+        schema: {},
+      },
+    },
+    {
       name: 'kb_getNonce',
       params: [
         {

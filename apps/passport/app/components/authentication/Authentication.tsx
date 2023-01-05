@@ -2,6 +2,8 @@ import { ConnectButton } from '../../../app/components/connect-button/ConnectBut
 import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
 
+import ConnectGoogleButton from '~/components/connect-google-button'
+
 export type AuthenticationProps = {
   logoURL?: string
   enableWalletConnect: boolean
@@ -43,16 +45,7 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
-      {/* <Button
-        className={'button'}
-        btnType={'secondary-alt'}
-        btnSize={'xxl'}
-        disabled
-      >
-        @ Connect with Email
-        <br />
-        (coming soon)
-      </Button> */}
+      {/* <ConnectGoogleButton /> */}
     </div>
   )
 }

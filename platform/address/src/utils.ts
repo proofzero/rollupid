@@ -8,6 +8,7 @@ export const isNodeType = (type: string): type is NodeType => {
   switch (type) {
     case NodeType.Crypto:
     case NodeType.Contract:
+    case NodeType.OAuth:
       return true
     default:
       return false
