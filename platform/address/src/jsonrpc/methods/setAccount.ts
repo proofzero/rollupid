@@ -61,14 +61,6 @@ export default async (
     tag: EDGE_ADDRESS,
   })
 
-  // Create a link between owning account node and the owned address
-  // node using the edges service.
-  // const linkResult = await linkAccountAddress(
-  //   edges,
-  //   account as AccountURN,
-  //   fullAddress
-  // )
-
   // TODO how about a nice predicate fn to distinguish these error
   // results?
 
