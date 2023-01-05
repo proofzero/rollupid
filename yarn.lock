@@ -6547,9 +6547,11 @@ __metadata:
   resolution: "@kubelt/platform.object@workspace:platform/object"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
+    "@trpc/server": 10.7.0
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
