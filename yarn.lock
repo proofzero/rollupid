@@ -6366,6 +6366,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/platform-clients@workspace:packages/platform-clients"
   dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/platform.address": "workspace:*"
     "@kubelt/platform.object": "workspace:*"
