@@ -114,6 +114,7 @@ export const ErrorBoundary = ({
           }}
         />
         <Scripts />
+        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
         <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
