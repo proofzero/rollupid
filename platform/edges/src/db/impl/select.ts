@@ -47,7 +47,7 @@ export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
     JOIN
       urnq_component uc
     ON
-      nc.urnqComponentId = uc.id
+      nc.qcomp = uc.id
     WHERE
       nc.nodeUrn = ?1
   `
@@ -82,7 +82,7 @@ export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
     JOIN
       urnr_component uc
     ON
-      nc.urnrComponentId = uc.id
+      nc.rcomp = uc.id
     WHERE
       nc.nodeUrn = ?1
   `
@@ -143,7 +143,7 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
     FROM
       permission p
     JOIN
-      edge_permissions_permission e
+      edge_permission e
     ON
       e.permissionId = p.id
     WHERE
@@ -186,13 +186,13 @@ export async function edges(
   // that originate or terminate at the given node ID.
   switch (query.dir) {
     case EdgeDirection.Incoming:
-      sql = `SELECT * FROM edge e WHERE (e.dstUrn = ?1)`
+      sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
       break
     case EdgeDirection.Outgoing:
-      sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1)`
+      sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
       break
     default:
-      sql = `SELECT * FROM edge e WHERE (e.srcUrn = ?1 OR e.dstUrn = ?1)`
+      sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
   }
 
   // Filter edges by tag, if provided.
@@ -239,21 +239,21 @@ export async function edges(
 
       // fragment
       if (query?.src?.fr !== undefined) {
-        const srcNode = await node(g, edge.srcUrn)
+        const srcNode = await node(g, edge.src)
         if (srcNode !== undefined && srcNode.fragment !== query.src.fr) {
           return result
         }
       }
       // q-components
       if (query?.src?.qc !== undefined) {
-        const srcQc = await qc(g, edge.srcUrn)
+        const srcQc = await qc(g, edge.src)
         if (!hasProps(query.src.qc, srcQc)) {
           return result
         }
       }
       // r-components
       if (query?.src?.rc !== undefined) {
-        const srcRc = await rc(g, edge.srcUrn)
+        const srcRc = await rc(g, edge.src)
         if (!hasProps(query.src.rc, srcRc)) {
           return result
         }
@@ -263,21 +263,21 @@ export async function edges(
 
       // fragment
       if (query?.dst?.fr !== undefined) {
-        const dstNode = await node(g, edge.dstUrn)
+        const dstNode = await node(g, edge.dst)
         if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
           return result
         }
       }
       // q-components
       if (query?.dst?.qc !== undefined) {
-        const dstQc = await qc(g, edge.dstUrn)
+        const dstQc = await qc(g, edge.dst)
         if (!hasProps(query?.dst?.qc, dstQc)) {
           return result
         }
       }
       // r-components
       if (query?.dst?.rc !== undefined) {
-        const dstRc = await rc(g, edge.dstUrn)
+        const dstRc = await rc(g, edge.dst)
         if (!hasProps(query.dst.rc, dstRc)) {
           return result
         }
@@ -300,15 +300,15 @@ export async function edges(
   // Enrich each edge with the details of the referenced nodes.
   return Promise.all(
     edges.map(async (edgeRec: EdgeRecord): Promise<Edge> => {
-      const srcNode: Node | undefined = await node(g, edgeRec.srcUrn)
+      const srcNode: Node | undefined = await node(g, edgeRec.src)
       if (!srcNode) {
-        throw new Error(`error getting node: ${edgeRec.srcUrn}`)
+        throw new Error(`error getting node: ${edgeRec.src}`)
       }
       const src: Node = { ...srcNode, id: `urn:${srcNode.nid}:${srcNode.nss}` }
 
-      const dstNode: Node | undefined = await node(g, edgeRec.dstUrn)
+      const dstNode: Node | undefined = await node(g, edgeRec.dst)
       if (!dstNode) {
-        throw new Error(`error getting node: ${edgeRec.dstUrn}`)
+        throw new Error(`error getting node: ${edgeRec.dst}`)
       }
       const dst: Node = { ...dstNode, id: `urn:${dstNode.nid}:${dstNode.nss}` }
 
@@ -335,7 +335,7 @@ export async function edges(
 export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
-      .prepare('SELECT * FROM edge WHERE dstURN = ?1')
+      .prepare('SELECT * FROM edge WHERE dst = ?1')
       .bind(nodeId.toString())
       .all()
       .then((result) => {
@@ -356,7 +356,7 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
-      .prepare('SELECT * FROM edge WHERE srcURN = ?1')
+      .prepare('SELECT * FROM edge WHERE src = ?1')
       .bind(nodeId.toString())
       .all()
       .then((result) => {

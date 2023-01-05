@@ -92,7 +92,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   // record and the set of records that represent the q-component
   // key/value pairs found in the node URN.
   //
-  // JOIN TABLE: node_qcomp_urnq_component (nodeUrn, urnqComponentId)
+  // JOIN TABLE: node_qcomp_urnq_component (nodeUrn, qcomp)
   if (parsedURN.qcomponent) {
     // Get the IDs of the q-component records for the node URN.
     const qcParams = new URLSearchParams(parsedURN.qcomponent)
@@ -114,7 +114,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const qcJoinStmt = g.db.prepare(
-      'INSERT INTO node_qcomp_urnq_component (nodeUrn, urnqComponentId) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
+      'INSERT INTO node_qcomp_urnq_component (nodeUrn, qcomp) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
     )
     const inserts = []
     for (const rowId of rowIds) {
@@ -128,7 +128,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   // q-components, but updates the node_qcomp_urnr_component table
   // instead.
   //
-  // JOIN TABLE: node_qcomp_urnr_component (nodeUrn, urnrComponentId)
+  // JOIN TABLE: node_qcomp_urnr_component (nodeUrn, rcomp)
   if (parsedURN.rcomponent) {
     const rcParams = new URLSearchParams(parsedURN.rcomponent)
     const rcStmt = g.db.prepare(
@@ -150,7 +150,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each r-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
-      'INSERT INTO node_rcomp_urnr_component (nodeUrn, urnrComponentId) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
+      'INSERT INTO node_rcomp_urnr_component (nodeUrn, rcomp) VALUES (?1, ?2) ON CONFLICT DO NOTHING'
     )
     const inserts = []
     for (const rowId of rowIds) {
@@ -191,8 +191,8 @@ export async function edge(
 
     const insertEdge = `
       INSERT INTO edge (
-        srcUrn,
-        dstUrn,
+        src,
+        dst,
         tag
       )
       VALUES (
@@ -215,7 +215,7 @@ export async function edge(
 
         const edge = await g.db
           .prepare(
-            'SELECT * FROM edge WHERE srcUrn = ?1 AND dstUrn = ?2 AND tag = ?3'
+            'SELECT * FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3'
           )
           .bind(srcParam, dstParam, tagParam)
           .first()

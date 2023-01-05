@@ -1,7 +1,7 @@
 {
   "version": "3",
   "dialect": "sqlite",
-  "id": "a27d369c-c55f-4f37-b58f-45cf705780da",
+  "id": "6e4cf784-ee7c-4929-8d80-d83adbf95081",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "urnq_component": {
@@ -148,6 +148,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "permissionId": {
+          "name": "permissionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {
@@ -155,7 +161,7 @@
           "name": "IDX_edge_permission_pk",
           "columns": [
             "edgeId",
-            "edgeId"
+            "permissionId"
           ],
           "isUnique": true
         },
@@ -169,7 +175,7 @@
         "IDX_edge_permission_permission": {
           "name": "IDX_edge_permission_permission",
           "columns": [
-            "edgeId"
+            "permissionId"
           ],
           "isUnique": false
         }
@@ -188,12 +194,12 @@
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
-        "edge_permission_edgeId_permission_id_fk": {
-          "name": "edge_permission_edgeId_permission_id_fk",
+        "edge_permission_permissionId_permission_id_fk": {
+          "name": "edge_permission_permissionId_permission_id_fk",
           "tableFrom": "edge_permission",
           "tableTo": "permission",
           "columnsFrom": [
-            "edgeId"
+            "permissionId"
           ],
           "columnsTo": [
             "id"

@@ -56,9 +56,9 @@ export interface EdgeRecord {
   // The edge identifier
   id: number
   // The URN of the source node, where the edge originates.
-  srcUrn: AnyURN
+  src: AnyURN
   // The URN of the sink node, where the edge terminates.
-  dstUrn: AnyURN
+  dst: AnyURN
   // The "type" of the edge.
   tag: EdgeTag
 }

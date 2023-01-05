@@ -18,6 +18,7 @@ import * as openrpc from '@kubelt/openrpc'
 import invariant from 'tiny-invariant'
 
 //import { checkEnv } from '@kubelt/utils'
+import createEdgesClient from '@kubelt/platform-clients/edges'
 
 import { Edge, EdgeDirection, EdgeQuery } from '@kubelt/graph'
 
@@ -77,6 +78,8 @@ import {
 import schema from './schema'
 import { ParamsArray } from '@kubelt/openrpc/impl/jsonrpc'
 import { AppApiKeyCheckParams } from './types'
+import { EDGE_APPLICATION } from '@kubelt/graph/edges'
+import { create } from 'lodash'
 
 // Durable Objects
 // -----------------------------------------------------------------------------
@@ -265,14 +268,22 @@ const kb_appCreate = openrpc.method(schema, {
         ApplicationURNSpace.urn(appId) +
         `?+clientName=${encodeURIComponent(clientName)}`
 
+      const edgesClient = createEdgesClient(edges)
+
+      const edgeRes = await edgesClient.makeEdge.mutate({
+        src: accountURN,
+        dst: ApplicationURNSpace.urn(appId),
+        tag: EDGE_APPLICATION,
+      })
+
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
-      const edgeRes = await linkAccountApp(
-        edges,
-        accountURN,
-        ApplicationURNSpace.urn(appId)
-      )
-      if (!(edgeRes as any).edge) {
+      // const edgeRes = await linkAccountApp(
+      //   edges,
+      //   accountURN,
+      //   ApplicationURNSpace.urn(appId)
+      // )
+      if (!edgeRes.edge) {
         console.error({ edgeRes })
         await app._.cmp.delete()
         throw `starbase.kb_appCreate: failed to create edge`
@@ -422,7 +433,13 @@ const kb_appDelete = openrpc.method(schema, {
 
       // Make a call to the remote edges service to remove the link
       // between the owning account node and the application node.
-      const edgeRes = await unlinkAccountApp(edges, accountURN, appURN)
+      const edgeClient = createEdgesClient(edges)
+      const edgeRes = await edgeClient.removeEdge.mutate({
+        src: accountURN,
+        dst: appURN,
+        tag: EDGE_APPLICATION,
+      })
+      // const edgeRes = await unlinkAccountApp(edges, accountURN, appURN)
 
       // Remove the entry from the client ID => object ID lookup table.
       await lookup.delete(clientId)
@@ -457,7 +474,16 @@ const kb_appList = openrpc.method(schema, {
 
       // Get the list of edges linking an account node (identified by
       // URN to its applications).
-      const edgeList = await listApplications(edges, accountURN)
+      const edgesClient = createEdgesClient(edges)
+      const edgeList = await edgesClient.getEdges.query({
+        query: {
+          id: accountURN,
+          dir: EdgeDirection.Outgoing,
+          tag: EDGE_APPLICATION,
+        },
+      })
+
+      // const edgeList = await listApplications(edges, accountURN)
 
       const sbApplication: DurableObjectNamespace = context.get(KEY_APPLICATION)
 
@@ -468,8 +494,8 @@ const kb_appList = openrpc.method(schema, {
       // f-component, or the full URN.
 
       const appList = []
-      if (edgeList) {
-        const edgeListArr = edgeList as Edge[]
+      if (edgeList.edges) {
+        const edgeListArr = edgeList.edges as Edge[]
 
         for (let i = 0; i < edgeListArr.length; i++) {
           const edge = edgeListArr[i]

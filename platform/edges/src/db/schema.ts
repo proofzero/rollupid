@@ -181,7 +181,7 @@ export const edgePermission = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    permission: integer('edgeId')
+    permissionId: integer('permissionId')
       .notNull()
       .references(() => permission.id, {
         onDelete: 'no action',
@@ -191,9 +191,9 @@ export const edgePermission = sqliteTable(
   (table) => ({
     edge_permission: uniqueIndex('IDX_edge_permission_pk').on(
       table.edgeId,
-      table.permission
+      table.permissionId
     ),
     nodeUrn: index('IDX_edge_permission_edgeId').on(table.edgeId),
-    permission: index('IDX_edge_permission_permission').on(table.permission),
+    permission: index('IDX_edge_permission_permission').on(table.permissionId),
   })
 )
