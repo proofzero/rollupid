@@ -16,13 +16,13 @@ CREATE TABLE edge (
 	`src` text NOT NULL,
 	`dst` text NOT NULL,
 	FOREIGN KEY (`src`) REFERENCES node(`urn`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`dst`) REFERENCES node(`urn`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`dst`) REFERENCES node(`urn`) ON UPDATE no action ON DELETE no action
 );
 
 CREATE TABLE edge_permission (
 	`edgeId` integer NOT NULL,
 	FOREIGN KEY (`edgeId`) REFERENCES edge(`id`) ON UPDATE cascade ON DELETE cascade
-	FOREIGN KEY (`edgeId`) REFERENCES permission(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`edgeId`) REFERENCES permission(`id`) ON UPDATE no action ON DELETE no action
 );
 
 CREATE TABLE node (
