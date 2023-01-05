@@ -280,11 +280,6 @@ const kb_appCreate = openrpc.method(schema, {
 
       // We need to create an edge between the logged in user node (aka
       // account) and the new app.
-      // const edgeRes = await linkAccountApp(
-      //   edges,
-      //   accountURN,
-      //   ApplicationURNSpace.urn(appId)
-      // )
       if (!edgeRes.edge) {
         console.error({ edgeRes })
         await app._.cmp.delete()
@@ -403,19 +398,10 @@ const kb_appDelete = openrpc.method(schema, {
       // This value is extracted by authCheck.
       const accountURN = context.get(KEY_ACCOUNT_ID) as AccountURN
 
-      if (!request.params) {
-        throw new Error('Expected request params')
-      }
-
-      const reqParams = (request.params as any)[0] as {
-        clientId: string
-      }
-      if (!reqParams) {
-        throw new Error('Expected request params to have param object')
-      }
-
-      const { clientId } = reqParams
-
+      // TODO better typing
+      // TODO once we conformance check the request against the schema, we
+      // can be sure that the required parameter(s) are present.
+      const clientId = _.get(request, ['params', 'clientId'])
       // TODO once we conformance check the request against the schema, we
       // can be sure that the required parameter(s) are present.
       if (undefined === clientId) {
