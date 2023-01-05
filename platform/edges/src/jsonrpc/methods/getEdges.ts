@@ -1,8 +1,8 @@
 import * as db from '../../db'
 import { z } from 'zod'
 import { Context } from '../../context'
-import { Edge, EdgeQueryInput } from '../middleware/validators'
-import { Edge as EdgeType } from '../../db/types'
+import { Edge as EdgeInput, EdgeQueryInput } from '../middleware/validators'
+import { Edge } from '../../db/types'
 
 export const GetEdgesMethodInput = z.object({
   query: EdgeQueryInput,
@@ -11,7 +11,7 @@ export const GetEdgesMethodInput = z.object({
 
 export const GetEdgesMethodOutput = z.object({
   id: z.string(),
-  edges: z.array(Edge),
+  edges: z.array(EdgeInput),
 })
 
 export type GetEdgesParams = z.infer<typeof GetEdgesMethodInput>
@@ -24,7 +24,7 @@ export const getEdgesMethod = async ({
   ctx: Context
 }): Promise<{
   id: string
-  edges: EdgeType[]
+  edges: Edge[]
 }> => {
   const nodeId = input.query.id
 

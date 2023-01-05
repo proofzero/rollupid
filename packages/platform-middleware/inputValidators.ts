@@ -52,6 +52,6 @@ export const EdgeDirectionInput = z.enum(['incoming', 'outgoing'])
 export const NodeFilterInput = z.object({
   id: AnyURNInput.optional(),
   fr: z.string().optional(),
-  qc: z.record(z.string(), z.string()).optional(),
-  rc: z.record(z.string(), z.string()).optional(),
+  qc: z.record(z.string(), z.string().optional()).optional(),
+  rc: z.record(z.string(), z.string().optional()).optional(),
 })

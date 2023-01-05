@@ -4,6 +4,7 @@ import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { Account } from '.'
 import type { Environment } from './types'
+import createEdgesClient from '@kubelt/platform-clients/edges'
 
 /**
  * Defines your inner context shape.
@@ -26,8 +27,10 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
+  const edges = createEdgesClient(opts.Edges)
   return {
     ...opts,
+    edges,
   }
 }
 /**

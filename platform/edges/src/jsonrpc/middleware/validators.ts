@@ -20,8 +20,8 @@ export const Node = z.object({
   nid: z.string(),
   nss: z.string(),
   fragment: z.string(),
-  qc: z.record(z.string(), z.string()),
-  rc: z.record(z.string(), z.string()),
+  qc: z.record(z.string()),
+  rc: z.record(z.string()),
 })
 
 export const Edge = z.object({
