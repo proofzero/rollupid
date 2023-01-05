@@ -37,4 +37,4 @@ export const verifyAuthorizationMethod = async ({
   return result.payload
 }
 
-export default verifyAuthorizationMethod 
+export default verifyAuthorizationMethod

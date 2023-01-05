@@ -19,7 +19,7 @@ export const getProfileMethod = async ({
 }): Promise<Profile | null> => {
   const node = await initAccountNodeByName(input.account, ctx.Account)
   const result = await node.class.getProfile()
-  
+
   const blobs = ['getProfile']
   const doubles = [1]
   const indexes = ['index'.slice(-32)] // Must cap index at 32 bytes.

@@ -129,4 +129,4 @@ export const exchangeTokenMethod = async ({
   }
 }
 
-export default exchangeTokenMethod  
+export default exchangeTokenMethod
