@@ -5,12 +5,11 @@
  */
 
 import * as Account from './account'
-import * as Address from './address'
 
 import * as Router from './router'
 
 import BaseContext from './context'
 
-export { Account, Address, Router }
+export { Account, Router }
 
 export type { BaseContext }
