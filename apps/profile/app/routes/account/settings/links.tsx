@@ -43,6 +43,11 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
+  /**
+   * Updated names and urls are fetched from inputText
+   * And separately I created hidden input for previous unchanged links
+   * to not forget to include them on profile too
+   */
   const updatedNames: any = formData.getAll('name')
   const updatedUrls: any = formData.getAll('url')
   const remainedLinks: any = JSON.parse(formData.get('links'))
@@ -58,6 +63,10 @@ export const action: ActionFunction = async ({ request }) => {
   const errors = {}
 
   updatedLinks.forEach((link: any, id: number) => {
+    /** This is the way
+     * I attach new props to an empty object
+     */
+
     if (!link.name) {
       errors[`${id}`] = {}
       errors[`${id}`].name = 'All links must have name'
@@ -79,6 +88,11 @@ export const action: ActionFunction = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
   const updatedProfile = profileRes.profile
+
+  /** TODO:
+   * fetch errors when this updated profile doesn't
+   * pass back-end schema validation
+   */
   await galaxyClient.updateProfile(
     {
       profile: {
@@ -119,6 +133,7 @@ export default function AccountSettingsLinks() {
 
   return (
     <>
+      {/* Disabled for now */}
       <Text
         size="base"
         weight="semibold"
@@ -134,7 +149,6 @@ export default function AccountSettingsLinks() {
       >
         Add links manually
       </Text>
-
       <Form
         method="post"
         onChange={() => {
@@ -148,7 +162,9 @@ export default function AccountSettingsLinks() {
       >
         <div className="flex flex-col">
           {newLinks.map((link: any, i: number) => {
+            //Check if there is an error
             const isError = actionData?.errors && actionData?.errors[`${i}`]
+
             return (
               <div
                 key={`${link.name || 'My Website'}-${
@@ -200,6 +216,7 @@ export default function AccountSettingsLinks() {
                     }
                   />
                 </div>
+                {/* Delete current link */}
                 <button
                   type="button"
                   onClick={() => {
@@ -217,7 +234,7 @@ export default function AccountSettingsLinks() {
               </div>
             )
           })}
-
+          {/* Links that are already in account DO */}
           <div className="flex flex-col mb-3">
             {(links || []).map((link: any, i: number) => (
               <div
@@ -247,7 +264,7 @@ export default function AccountSettingsLinks() {
                     <Text className="text-gray-500">{link.url}</Text>
                   </div>
                 </div>
-
+                {/* Puts current link in "modification" regyme */}
                 <Button
                   className="mr-4 h-[40px] 
                 bg-gray-100 focus:bg-gray-100 border-none
@@ -279,8 +296,13 @@ export default function AccountSettingsLinks() {
           </button>
         </div>
 
-        {/* This div prevents everything from overlapping with
-        div below with absolute position */}
+        {/* Form has an absolute relative position
+        div below has relative - this way this button sticks to 
+        bottom right
+
+        This div with h-[4rem] prevents everything from overlapping with
+        div with absolute position below  */}
+
         <div className="h-[4rem]" />
 
         <div className="absolute bottom-0 right-0">
