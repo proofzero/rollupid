@@ -6,7 +6,6 @@ import {
   useTransition,
   useOutletContext,
   useActionData,
-  useNavigate,
 } from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
@@ -44,16 +43,30 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  const updatedLinks: any = JSON.parse(formData.get('links'))
+  const updatedNames: any = formData.getAll('name')
+  const updatedUrls: any = formData.getAll('url')
+  const remainedLinks: any = JSON.parse(formData.get('links'))
 
-  let errors = {}
+  const updatedLinks: any = remainedLinks.concat(
+    updatedNames.map((name: string, i: number) => ({
+      name,
+      url: updatedUrls[i],
+      verified: false,
+    }))
+  )
 
-  updatedLinks.forEach((link: any) => {
+  const errors = {}
+
+  updatedLinks.forEach((link: any, id: number) => {
     if (!link.name) {
-      errors.name = 'All links must have name'
+      errors[`${id}`] = {}
+      errors[`${id}`].name = 'All links must have name'
+      if (!errors['text']) errors['text'] = 'All links must have name'
     }
     if (!link.url) {
-      errors.url = 'All links must have URL'
+      if (!errors[`${id}`]) errors[`${id}`] = {}
+      errors[`${id}`].url = 'All links must have URL'
+      if (!errors['text']) errors['text'] = 'All links must have URL'
     }
   })
 
@@ -65,17 +78,11 @@ export const action: ActionFunction = async ({ request }) => {
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
-
-  const { displayName, job, location, bio, website, pfp } = profileRes.profile
+  const updatedProfile = profileRes.profile
   await galaxyClient.updateProfile(
     {
       profile: {
-        displayName,
-        job,
-        location,
-        bio,
-        website,
-        pfp,
+        ...updatedProfile,
         links: updatedLinks,
       },
     },
@@ -84,7 +91,7 @@ export const action: ActionFunction = async ({ request }) => {
     }
   )
 
-  return null
+  return { updatedLinks }
 }
 
 export default function AccountSettingsLinks() {
@@ -92,27 +99,23 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
-  useEffect(() => {
-    if (transition.type === 'actionReload') {
-      setFormChanged(false)
-      notificationHandler(!actionData?.errors)
-    }
-  }, [transition])
-
   const [links, setLinks] = useState(
-    useRouteData<ProfileData>('routes/account')?.links
+    useRouteData<ProfileData>('routes/account')?.links || []
   )
-
-  const navigate = useNavigate()
 
   const [isFormChanged, setFormChanged] = useState(false)
 
   const initialLinks = [{ name: '', url: '', verified: false }]
 
   const [newLinks, setNewLinks] = useState(initialLinks)
-  const [hiddenLinks, setHiddenLinks] = useState(initialLinks)
 
-  console.log(newLinks)
+  useEffect(() => {
+    if (transition.type === 'actionReload') {
+      setFormChanged(false)
+      setLinks(actionData?.updatedLinks)
+      notificationHandler(!actionData?.errors)
+    }
+  }, [transition])
 
   return (
     <>
@@ -131,11 +134,21 @@ export default function AccountSettingsLinks() {
       >
         Add links manually
       </Text>
-      <div className="min-h-[31.563rem]">
+
+      <Form
+        method="post"
+        onChange={() => {
+          setFormChanged(true)
+        }}
+        onReset={() => {
+          setNewLinks(initialLinks)
+          setFormChanged(false)
+        }}
+        className="relative min-h-[35.563rem]"
+      >
         <div className="flex flex-col">
           {newLinks.map((link: any, i: number) => {
-            console.log('HELLO')
-            console.log(link)
+            const isError = actionData?.errors && actionData?.errors[`${i}`]
             return (
               <div
                 key={`${link.name || 'My Website'}-${
@@ -155,65 +168,44 @@ export default function AccountSettingsLinks() {
                   <InputText
                     type="text"
                     id="Name"
+                    name="name"
+                    required={true}
                     heading="Name"
                     placeholder="My Website"
                     defaultValue={link.name}
-                    onChange={(value) => {
-                      setFormChanged(true)
-                      setHiddenLinks(
-                        hiddenLinks.map((link, id) => {
-                          if (id == i)
-                            return {
-                              name: value,
-                              url: link.url,
-                              verified: link.verified,
-                            }
-                          return link
-                        })
-                      )
-                    }}
-                    // error={actionData?.errors?.website}
+                    error={
+                      isError && actionData?.errors[`${i}`]['name']
+                        ? actionData?.errors[`${i}`]['name']
+                        : ''
+                    }
                   />
                 </div>
-
                 <div
                   className="
                 w-full
                 sm:w-[53%] sm:mr-[3%]"
                 >
                   <InputText
-                    type="URL"
+                    type="url"
                     id="URL"
+                    name="url"
+                    required={true}
                     heading="URL"
                     defaultValue={link.url}
                     placeholder="https://mywebsite.com"
-                    onChange={(value) => {
-                      setFormChanged(true)
-                      setHiddenLinks(
-                        hiddenLinks.map((link, id) => {
-                          if (id == i)
-                            return {
-                              name: link.name,
-                              url: value,
-                              verified: link.verified,
-                            }
-                          return link
-                        })
-                      )
-                    }}
-                    // error={actionData?.errors?.website}
+                    error={
+                      isError && actionData?.errors[`${i}`]['url']
+                        ? actionData?.errors[`${i}`]['url']
+                        : ''
+                    }
                   />
                 </div>
                 <button
+                  type="button"
                   onClick={() => {
                     setFormChanged(true)
                     setNewLinks(
-                      hiddenLinks.filter((link, id) => {
-                        return i !== id
-                      })
-                    )
-                    setHiddenLinks(
-                      hiddenLinks.filter((link, id) => {
+                      newLinks.filter((link, id) => {
                         return i !== id
                       })
                     )
@@ -225,98 +217,77 @@ export default function AccountSettingsLinks() {
               </div>
             )
           })}
-        </div>
-        <div className="flex flex-col mb-3">
-          {(links || []).map((link: any, i: number) => (
-            <div
-              key={`${link.name || 'My Website'}-${
-                link.url || 'https://mywebsite.com'
-              }-${i}`}
-              className="
+
+          <div className="flex flex-col mb-3">
+            {(links || []).map((link: any, i: number) => (
+              <div
+                key={`${link.name || 'My Website'}-${
+                  link.url || 'https://mywebsite.com'
+                }-${i}`}
+                className="
               border border-gray-300 rounded-md
               px-4 py-3 mb-3
                flex flex-row items-center justify-around truncate
                "
-            >
-              <div className="flex flex-row items-center grow ">
-                <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                <button
-                  className="bg-gray-100 w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
+              >
+                <div className="flex flex-row items-center grow ">
+                  <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
+                  <button
+                    type="button"
+                    className="bg-gray-100 w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               flex items-center justify-center "
-                  onClick={() => {
-                    navigator.clipboard.writeText(link.url)
-                  }}
-                >
-                  <TbLink size={22} />
-                </button>
-                <div className="flex flex-col truncate">
-                  <Text weight="medium">{link.name}</Text>
-                  <Text className="text-gray-500">{link.url}</Text>
+                    onClick={() => {
+                      navigator.clipboard.writeText(link.url)
+                    }}
+                  >
+                    <TbLink size={22} />
+                  </button>
+                  <div className="flex flex-col truncate">
+                    <Text weight="medium">{link.name}</Text>
+                    <Text className="text-gray-500">{link.url}</Text>
+                  </div>
                 </div>
-              </div>
 
-              <Button
-                className="mr-4 h-[40px] 
+                <Button
+                  className="mr-4 h-[40px] 
                 bg-gray-100 focus:bg-gray-100 border-none
                 flex flex-row items-center justify-around
                 text-gray-600"
-                btnType="secondary-alt"
-                btnSize="base"
-                onClick={() => {
-                  setLinks(links.filter((link, id) => id !== i))
-                  setNewLinks([...hiddenLinks, links[i]])
-                  setHiddenLinks([...hiddenLinks, links[i]])
-                }}
-              >
-                <FiEdit size={18} />
-                Edit
-              </Button>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setNewLinks([...newLinks, { name: '', url: '', verified: false }])
-            setHiddenLinks([
-              ...hiddenLinks,
-              { name: '', url: '', verified: false },
-            ])
-          }}
-          className="right-0 text-indigo-500 text-base w-full
+                  btnType="secondary-alt"
+                  btnSize="base"
+                  onClick={() => {
+                    setLinks(links.filter((link, id) => id !== i))
+                    setNewLinks([...newLinks, links[i]])
+                  }}
+                >
+                  <FiEdit size={18} />
+                  Edit
+                </Button>
+              </div>
+            ))}
+          </div>
+          <input type="hidden" name="links" value={JSON.stringify(links)} />
+          <button
+            type="button"
+            onClick={() => {
+              setNewLinks([...newLinks, { name: '', url: '', verified: false }])
+            }}
+            className="right-0 text-indigo-500 text-base w-max
           text-left"
-        >
-          + Add More
-        </button>
-      </div>
-      {/* This div prevents everything from overlapping with
+          >
+            + Add More
+          </button>
+        </div>
+
+        {/* This div prevents everything from overlapping with
         div below with absolute position */}
-      <div className="h-[4rem]" />
-      <Form
-        method="post"
-        onChange={() => {
-          setFormChanged(true)
-        }}
-        onReset={() => {
-          setNewLinks(initialLinks)
-          setHiddenLinks(initialLinks)
-          setFormChanged(false)
-          setNewLinks(initialLinks)
-          setHiddenLinks(initialLinks)
-        }}
-        className="relative"
-      >
-        <input
-          type="hidden"
-          name="links"
-          value={JSON.stringify((links || []).concat(hiddenLinks))}
-        />
+        <div className="h-[4rem]" />
+
         <div className="absolute bottom-0 right-0">
           <SaveButton
             isFormChanged={isFormChanged}
             discardFn={() => {
               setNewLinks(initialLinks)
-              setHiddenLinks(initialLinks)
             }}
           />
         </div>

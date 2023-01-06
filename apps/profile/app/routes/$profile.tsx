@@ -453,7 +453,7 @@ const ProfileLayout = () => {
         )}
 
         <div className="mt-12 lg:mt-24">
-          <div className="hidden sm:block">
+          <div className="block">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {Object.keys(tabs).map((tab) => (
