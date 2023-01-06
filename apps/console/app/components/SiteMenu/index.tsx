@@ -136,7 +136,7 @@ function AppMenu({ props }: AppMenuProps) {
       <AppSelect apps={props.apps} selected={props.selected} />
 
       {props.selected && (
-        <section className="pt-5 px-2 hidden md:flex md:flex-col">
+        <section className="pt-5 px-2 md:flex md:flex-col">
           <NavLink
             to={`/apps/${props.selected}`}
             end
