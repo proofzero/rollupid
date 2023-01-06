@@ -1,70 +1,82 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
+import { CryptoAddressProfile, NftarVoucher } from '@kubelt/types/address'
+import { AddressURNSpace } from '@kubelt/urns/address'
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const nodeClient = context.get('node_client')
-  const profile = await nodeClient.getProfile()
+import { Context } from '../../context'
+import { AddressProfile, CryptoAddressType } from '../../types'
+
+export const getAddressProfile = async ({
+  input,
+  ctx,
+}: {
+  input: void
+  ctx: Context
+}): Promise<AddressProfile> => {
+  const nodeClient = ctx.address
+  const profile = await nodeClient?.class.getProfile()
   if (profile) {
-    return openrpc.response(request, profile)
+    return profile
+  }
+  const address = await nodeClient?.class.getAddress()
+  const type = await nodeClient?.class.getType()
+
+  if (!address || !type) {
+    throw new Error('missing address or type')
   }
 
-  const address = await nodeClient.getAddress()
-  const type = await nodeClient.getType()
+  switch (type) {
+    case CryptoAddressType.Ethereum:
+    case CryptoAddressType.ETH: {
+      const ethProfile = await getCryptoAddressProfile(
+        AddressURNSpace.decode(address),
+        type,
+        ctx
+      )
+      await nodeClient?.class.setProfile(ethProfile)
+      return ethProfile
+    }
+    default:
+      // if we don't have a profile at this point then something is wrong
+      // profiles are set on OAuth nodes when setData is called
+      throw new Error('Unsupported address type')
+  }
+}
 
+const getCryptoAddressProfile = async (
+  address: string,
+  type: CryptoAddressType,
+  ctx: Context
+): Promise<CryptoAddressProfile> => {
   const ensClient = new ENSUtils()
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
 
-  const newProfile = {
-    cover: '',
+  const newProfile: CryptoAddressProfile = {
+    address: address,
     displayName: displayName || address,
-    pfp: {
-      image: avatar || '',
-      isToken: !!avatar,
-    },
+    avatar: avatar || '',
   }
 
   try {
     const chainType = type === 'eth' ? 'ethereum' : type
-    const voucher = await getNftarVoucher(address, chainType, context)
+    // NOTE: nftar is really slow and we plan on speeding it up
+    const voucher = await getNftarVoucher(address, chainType, ctx)
     if (!voucher) {
-      return openrpc.error(request, {
-        code: -32500,
-        message: 'Unable to get voucher from Nftar',
-      })
+      throw new Error('Unable to get voucher from Nftar')
     }
     const pfp = gatewayFromIpfs(voucher.metadata.image)
-    const cover = gatewayFromIpfs(voucher.metadata.cover)
 
-    newProfile.pfp.image ||= pfp
-    newProfile.cover = cover
+    newProfile.avatar ||= pfp
+    newProfile.nftarVoucher = voucher
 
-    await nodeClient.setPfpVoucher({ voucher })
-    await nodeClient.setProfile({ profile: newProfile })
-
-    return openrpc.response(request, newProfile)
+    return newProfile
   } catch (error) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: (error as Error).message,
-    })
+    throw (error as Error).message
   }
 }
 
 type NftarError = {
   data: {
     message: string
-  }
-}
-
-type NftarVoucher = {
-  metadata: {
-    cover: string
-    image: string
   }
 }
 
@@ -76,13 +88,13 @@ type NftarResponse = {
 const getNftarVoucher = async (
   address: string,
   type: string,
-  context: RpcContext
+  context: Context
 ): Promise<NftarVoucher | undefined> => {
   const request = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${context.get('TOKEN_NFTAR')}`,
+      Authorization: `Bearer ${context.TOKEN_NFTAR}`,
     },
     body: JSON.stringify({
       id: 1,
@@ -92,12 +104,12 @@ const getNftarVoucher = async (
         account: address,
         blockchain: {
           name: type,
-          chainId: context.get('NFTAR_CHAIN_ID'),
+          chainId: context.NFTAR_CHAIN_ID,
         },
       },
     }),
   }
-  const response = await fetch(`${context.get('NFTAR_URL')}`, request)
+  const response = await fetch(`${context.NFTAR_URL}`, request)
   const responseBody: NftarResponse = await response.json()
 
   if ('error' in responseBody) {

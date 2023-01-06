@@ -1,12 +1,14 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { AccountURN } from '@kubelt/urns/account'
+import { Context } from '../../context'
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const nodeClient = context.get('node_client')
-  const account = await nodeClient.getAccount()
-  return openrpc.response(request, account)
+export const getAccountMethod = async ({
+  input,
+  ctx,
+}: {
+  input: void
+  ctx: Context
+}): Promise<AccountURN | undefined> => {
+  const nodeClient = ctx.address
+  const account = await nodeClient?.class.getAccount()
+  return account
 }

@@ -14,10 +14,14 @@ import { ENSRes } from '@kubelt/platform-clients/ens-utils'
  */
 interface CreateInnerContextOptions
   extends Partial<CreateNextContextOptions & BaseContext> {
+  TOKEN_NFTAR: string
+  NFTAR_CHAIN_ID: string
+  NFTAR_URL: string
   CryptoAddress: DurableObjectNamespace
   OAuthAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
   Edges: Fetcher
+  Access: Fetcher
   address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>
   addressURN?: AddressURN
   nodeType?: NodeType

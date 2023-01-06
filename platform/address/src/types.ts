@@ -1,4 +1,7 @@
-import { RpcContext } from '@kubelt/openrpc'
+import { z } from 'zod'
+import { CryptoAddressProfile } from '@kubelt/types/address'
+import { GetGoogleOAuthDataSchema } from './jsonrpc/validators/oauth'
+import { GoogleRawProfileSchema } from './jsonrpc/validators/profile'
 
 export interface Environment {
   Access: Fetcher
@@ -14,11 +17,6 @@ export interface Environment {
   TOKEN_NFTAR: string
   NFTAR_URL: string
 
-  BLOCKCHAIN_ACTIVITY: Queue
-}
-
-export interface AddressRpcContext extends RpcContext {
-  NFTAR_URL: string
   BLOCKCHAIN_ACTIVITY: Queue
 }
 
@@ -56,29 +54,10 @@ export interface Challenge {
   timestamp: number
 }
 
-export type SetAccountParams = [account: string]
+export type OAuthGoogleProfile = z.infer<typeof GoogleRawProfileSchema>
 
-export type UnsetAccountParams = [account: string]
+export type AddressProfile = CryptoAddressProfile | OAuthGoogleProfile
 
-export type SetDataParams = [data: object]
+export type OAuthGoogleData = z.infer<typeof GetGoogleOAuthDataSchema>
 
-export type GetNonceParams = [
-  address: string,
-  template: string,
-  redirectUri: string,
-  scope: string[],
-  state: string
-]
-
-export type VerifyNonceParams = [nonce: string, signature: string]
-
-export type AddressProfile = {
-  cover: string
-  displayName: string
-  pfp: {
-    image: string
-    isToken?: boolean
-  }
-}
-
-export type SetAddressProfileParams = [profile: Partial<AddressProfile>]
+export type OAuthDataSchema = OAuthGoogleData // TODO: change to z.union when more are supported

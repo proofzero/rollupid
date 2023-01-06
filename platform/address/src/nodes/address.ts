@@ -62,14 +62,6 @@ export default class Address extends DOProxy {
     return await this.state.storage.delete('account')
   }
 
-  async getData<Data>(): Promise<Data | undefined> {
-    return await this.state.storage.get<Data>('data')
-  }
-
-  async setData<Data>(data: Data): Promise<void> {
-    return await this.state.storage.put('data', data)
-  }
-
   async getProfile(): Promise<AddressProfile | undefined> {
     return await this.state.storage.get<AddressProfile>('profile')
   }

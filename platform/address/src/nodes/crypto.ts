@@ -6,6 +6,9 @@ import { NONCE_OPTIONS } from '../constants'
 import type { Challenge, CryptoAddressType } from '../types'
 import { recoverEthereumAddress } from '../utils'
 import Address from './address'
+
+import { DurableObjectStubProxy } from 'do-proxy'
+
 export default class CryptoAddress extends Address {
   async getType(): Promise<CryptoAddressType> {
     return (await super.getType()) as CryptoAddressType
@@ -59,14 +62,6 @@ export default class CryptoAddress extends Address {
     return challenge
   }
 
-  async getPfpVoucher(): Promise<unknown> {
-    return await this.state.storage.get('pfpVoucher')
-  }
-
-  async setPfpVoucher(voucher: unknown): Promis<void> {
-    return await this.state.storage.put('pfpVoucher', voucher)
-  }
-
   async alarm() {
     const challenges: Map<string, Challenge> =
       (await this.state.storage.get('challenges')) || new Map()
@@ -78,3 +73,5 @@ export default class CryptoAddress extends Address {
     await this.state.storage.put('challenges', challenges)
   }
 }
+
+export type CryptoAddressProxyStub = DurableObjectStubProxy<CryptoAddress>

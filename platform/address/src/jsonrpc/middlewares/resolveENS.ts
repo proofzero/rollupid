@@ -1,6 +1,5 @@
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
-import { Address } from '@kubelt/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { Context } from '../../context'
 

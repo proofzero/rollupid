@@ -54,7 +54,7 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
     ctx: {
       ...ctx,
       rparams,
-      addressURN: name,
+      addressURN: AddressURNSpace.urn(name),
       addrType,
       nodeType,
       params: new URLSearchParams(qcomponent as string),
