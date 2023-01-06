@@ -4,7 +4,7 @@ export interface IENSUtils {
   getENSAddressAvatar(addressOrEns: string): Promise<string | null>
 }
 
-type ENSRes = {
+export type ENSRes = {
   address: string
   avatar: string | null
   displayName: string | null

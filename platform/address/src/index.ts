@@ -1,7 +1,6 @@
 import { Router } from 'itty-router'
 import { error } from 'itty-router-extras'
 
-import { CryptoAddressType } from './types'
 import CryptoAddress from './nodes/crypto'
 import ContractAddress from './nodes/contract'
 import OAuthAddress from './nodes/oauth'
@@ -12,5 +11,5 @@ const index = Router()
   .all('*', () => error(404, 'not found'))
 
 // TODO: export ContractAddress when ready
-export { CryptoAddress, CryptoAddressType, OAuthAddress }
+export { CryptoAddress, OAuthAddress, ContractAddress }
 export default { fetch: index.handle }

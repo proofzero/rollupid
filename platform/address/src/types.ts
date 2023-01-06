@@ -1,5 +1,4 @@
 import { RpcContext } from '@kubelt/openrpc'
-import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
 
 export interface Environment {
   Access: Fetcher
@@ -34,9 +33,19 @@ export enum CryptoAddressType {
   ETH = 'eth',
 }
 
+export enum ContractAddressType {
+  Ethereum = 'ethereum',
+  ETH = 'eth',
+}
+
 export enum OAuthAddressType {
   Google = 'google',
 }
+
+export type AddressType =
+  | CryptoAddressType
+  | OAuthAddressType
+  | ContractAddressType
 
 export interface Challenge {
   address: string

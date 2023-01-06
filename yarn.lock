@@ -6514,9 +6514,11 @@ __metadata:
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
+    do-proxy: 1.3.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
@@ -6525,6 +6527,7 @@ __metadata:
     prettier: 2.7.1
     typescript: 4.8.4
     wrangler: 2.4.4
+    zod: 3.20.2
   languageName: unknown
   linkType: soft
 
@@ -12672,6 +12675,13 @@ __metadata:
   version: 10.7.0
   resolution: "@trpc/server@npm:10.7.0"
   checksum: 6f63b8792b574c19e121cb90fa72b0093040fe3608512641a0ba762ac585a6eb030cdd9cdbc669387a067143d74e0c62f5fe6c3cb102ea2a447d618d561c9a8e
+  languageName: node
+  linkType: hard
+
+"@trpc/server@npm:10.8.1":
+  version: 10.8.1
+  resolution: "@trpc/server@npm:10.8.1"
+  checksum: 91f86aad0166f98ee67e271d5c8f6301d832f351fb884f82ff4e95eef6edd7d0fc2b6dc777aea1951bce0d68e7ae3e622315847112daac70558aafadfc05f62e
   languageName: node
   linkType: hard
 

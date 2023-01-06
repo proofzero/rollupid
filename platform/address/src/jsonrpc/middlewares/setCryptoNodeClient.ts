@@ -1,21 +1,32 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext } from '@kubelt/openrpc'
 import { NodeType } from '../../types'
+import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { Context } from '../../context'
+import { initContractNodeByName, initCryptoNodeByName } from '../../nodes'
 
-export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (context.get('node_type') == NodeType.Crypto) {
-    const CryptoAddress: DurableObjectNamespace = context.get('CryptoAddress')
-    const name = context.get('name')
-    const nodeClient = await openrpc.discover(CryptoAddress, { name })
-    context.set('node_client', nodeClient)
-    return
+export const setCryptoNodeClient: BaseMiddlewareFunction<Context> = async ({
+  next,
+  ctx,
+}) => {
+  if (!ctx.addressURN) {
+    throw new Error('missing addressURN')
   }
-  if (context.get('node_type') == NodeType.Contract) {
-    const ContractAddress: DurableObjectNamespace =
-      context.get('ContractAddress')
-    const name = context.get('name')
-    const nodeClient = await openrpc.discover(ContractAddress, { name })
-    context.set('node_client', nodeClient)
-    return
+  if (ctx.nodeType == NodeType.Crypto) {
+    const node = await initCryptoNodeByName(ctx.addressURN, ctx.CryptoAddress)
+    return next({
+      ctx: {
+        ...ctx,
+        address: node,
+      },
+    })
   }
+  if (ctx.nodeType == NodeType.Contract) {
+    const node = await initContractNodeByName(ctx.addressURN, ctx.CryptoAddress)
+    return next({
+      ctx: {
+        ...ctx,
+        address: node,
+      },
+    })
+  }
+  return next({ ctx })
 }

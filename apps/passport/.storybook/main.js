@@ -15,6 +15,14 @@ module.exports = {
   core: {
     builder: '@storybook/builder-webpack5',
   },
+  refs: () => {
+    return {
+      design: {
+        title: 'Design System Storybook',
+        url: 'http://localhost:6006',
+      },
+    }
+  },
   // webpackFinal: async (config, { configType }) => {
   //   const { module } = config
   //   const { rules } = module

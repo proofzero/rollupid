@@ -1,14 +1,18 @@
 import { isAddress as isEthAddress } from '@ethersproject/address'
 
-import type { RpcContext } from '@kubelt/openrpc'
+import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { Context } from '../../context'
 
 import { NodeType } from '../../types'
 import { isNodeType } from '../../utils'
 
-export default (request: Readonly<Request>, context: RpcContext) => {
-  const header = request.headers.get('X-3RN')
+export const parse3RN: BaseMiddlewareFunction<Context> = async ({
+  ctx,
+  next,
+}) => {
+  const header = ctx.req?.headers.get('X-3RN')
   if (!header) {
     throw new Error('missing X-3RN header')
   }
@@ -21,33 +25,39 @@ export default (request: Readonly<Request>, context: RpcContext) => {
 
   const { rcomponent, qcomponent } = AddressURNSpace.parse(urn)
   const rparams = new URLSearchParams(rcomponent || '')
-  context.set('rparams', rparams)
 
-  let type = rparams.get('addr_type')
-  if (!type) {
+  let addrType = rparams.get('addr_type')
+  if (!addrType) {
     if (isEthAddress(name)) {
-      type = 'ethereum'
+      addrType = 'ethereum'
     } else if (name.endsWith('.eth')) {
-      type = 'ethereum'
+      addrType = 'ethereum'
     }
   }
 
-  context.set('name', name) // if it's an ENS name, it will be resolved later to an address in resolveENS middleware
-  context.set('addr_type', type)
-  context.set('params', new URLSearchParams(qcomponent as string))
-
-  const nodeType = rparams.get('node_type') || ''
+  let nodeType = rparams.get('node_type') || ''
   if (nodeType && !isNodeType(nodeType)) {
     throw `invalid 3RN node type: ${nodeType}`
   }
 
   if (nodeType) {
-    context.set('node_type', nodeType)
+    //sleep
   } else if (name.startsWith('0x')) {
-    context.set('node_type', NodeType.Crypto)
+    nodeType = NodeType.Crypto
   } else if (name.endsWith('.eth')) {
-    context.set('node_type', NodeType.Crypto)
+    nodeType = NodeType.Crypto
   } else {
     throw `cannot determine node type: ${urn}`
   }
+
+  return next({
+    ctx: {
+      ...ctx,
+      rparams,
+      addressURN: name,
+      addrType,
+      nodeType,
+      params: new URLSearchParams(qcomponent as string),
+    },
+  })
 }
