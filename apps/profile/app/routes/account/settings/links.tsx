@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
-import { useSubmit, Form } from '@remix-run/react'
+import {
+  Form,
+  useTransition,
+  useOutletContext,
+  useActionData,
+  useNavigate,
+} from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
@@ -38,32 +44,39 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData()
 
-  console.log(formData)
-  const name = formData.get('name')
+  const updatedLinks: any = JSON.parse(formData.get('links'))
 
-  console.log('ONE', formData.get('name'))
-  console.log('TWO', formData.get('name'))
+  let errors = {}
 
-  const url = formData.get('url')
-  console.log(name, url)
+  updatedLinks.forEach((link: any) => {
+    if (!link.name) {
+      errors.name = 'All links must have name'
+    }
+    if (!link.url) {
+      errors.url = 'All links must have URL'
+    }
+  })
+
+  if (Object.keys(errors).length) {
+    return { errors }
+  }
+
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const { displayName, job, location, bio, website, pfp, links } =
-    profileRes.profile
+  const { displayName, job, location, bio, website, pfp } = profileRes.profile
   await galaxyClient.updateProfile(
     {
       profile: {
         displayName,
-        // TODO: support for default address
         job,
         location,
         bio,
         website,
         pfp,
-        links: [...links, { name, url, verified: false }],
+        links: updatedLinks,
       },
     },
     {
@@ -75,22 +88,31 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsLinks() {
+  const { notificationHandler } = useOutletContext<any>()
+  const transition = useTransition()
+  const actionData = useActionData()
+
+  useEffect(() => {
+    if (transition.type === 'actionReload') {
+      setFormChanged(false)
+      notificationHandler(!actionData?.errors)
+    }
+  }, [transition])
+
   const [links, setLinks] = useState(
     useRouteData<ProfileData>('routes/account')?.links
   )
+
+  const navigate = useNavigate()
+
   const [isFormChanged, setFormChanged] = useState(false)
+
   const initialLinks = [{ name: '', url: '', verified: false }]
+
   const [newLinks, setNewLinks] = useState(initialLinks)
-  const [trackingLinks, setTrakingLinks] = useState(initialLinks)
-  const submit = useSubmit()
+  const [hiddenLinks, setHiddenLinks] = useState(initialLinks)
 
-  const handleSubmit = (event: any) => {
-    console.log('NEW LINKS', trackingLinks)
-    submit(trackingLinks, { replace: true })
-
-    setNewLinks(initialLinks)
-    setTrakingLinks(initialLinks)
-  }
+  console.log(newLinks)
 
   return (
     <>
@@ -109,20 +131,11 @@ export default function AccountSettingsLinks() {
       >
         Add links manually
       </Text>
-      <Form
-        method="post"
-        onChange={() => {
-          setFormChanged(true)
-        }}
-        onReset={() => {
-          setFormChanged(false)
-        }}
-        onSubmit={handleSubmit}
-        className="min-h-[35.563rem] relative"
-      >
+      <div className="min-h-[31.563rem]">
         <div className="flex flex-col">
           {newLinks.map((link: any, i: number) => {
-            console.log('from renderer', link)
+            console.log('HELLO')
+            console.log(link)
             return (
               <div
                 key={`${link.name || 'My Website'}-${
@@ -142,14 +155,19 @@ export default function AccountSettingsLinks() {
                   <InputText
                     type="text"
                     id="Name"
-                    name="name"
                     heading="Name"
                     placeholder="My Website"
                     defaultValue={link.name}
                     onChange={(value) => {
-                      setTrakingLinks(
-                        trackingLinks.map((link, id) => {
-                          if (id == i) return { name: value, url: link.url }
+                      setFormChanged(true)
+                      setHiddenLinks(
+                        hiddenLinks.map((link, id) => {
+                          if (id == i)
+                            return {
+                              name: value,
+                              url: link.url,
+                              verified: link.verified,
+                            }
                           return link
                         })
                       )
@@ -164,16 +182,21 @@ export default function AccountSettingsLinks() {
                 sm:w-[53%] sm:mr-[3%]"
                 >
                   <InputText
-                    type="url"
-                    id="url"
-                    name="url"
+                    type="URL"
+                    id="URL"
                     heading="URL"
                     defaultValue={link.url}
                     placeholder="https://mywebsite.com"
                     onChange={(value) => {
-                      setTrakingLinks(
-                        trackingLinks.map((link, id) => {
-                          if (id == i) return { name: link.name, url: value }
+                      setFormChanged(true)
+                      setHiddenLinks(
+                        hiddenLinks.map((link, id) => {
+                          if (id == i)
+                            return {
+                              name: link.name,
+                              url: value,
+                              verified: link.verified,
+                            }
                           return link
                         })
                       )
@@ -183,13 +206,14 @@ export default function AccountSettingsLinks() {
                 </div>
                 <button
                   onClick={() => {
-                    setTrakingLinks(
-                      trackingLinks.filter((link, id) => {
+                    setFormChanged(true)
+                    setNewLinks(
+                      hiddenLinks.filter((link, id) => {
                         return i !== id
                       })
                     )
-                    setNewLinks(
-                      trackingLinks.filter((link, id) => {
+                    setHiddenLinks(
+                      hiddenLinks.filter((link, id) => {
                         return i !== id
                       })
                     )
@@ -240,7 +264,8 @@ export default function AccountSettingsLinks() {
                 btnSize="base"
                 onClick={() => {
                   setLinks(links.filter((link, id) => id !== i))
-                  setNewLinks([...newLinks, links[i]])
+                  setNewLinks([...hiddenLinks, links[i]])
+                  setHiddenLinks([...hiddenLinks, links[i]])
                 }}
               >
                 <FiEdit size={18} />
@@ -252,26 +277,46 @@ export default function AccountSettingsLinks() {
         <button
           type="button"
           onClick={() => {
-            setNewLinks([...newLinks, { name: '', url: '' }])
-            setTrakingLinks([...trackingLinks, { name: '', url: '' }])
+            setNewLinks([...newLinks, { name: '', url: '', verified: false }])
+            setHiddenLinks([
+              ...hiddenLinks,
+              { name: '', url: '', verified: false },
+            ])
           }}
           className="right-0 text-indigo-500 text-base w-full
           text-left"
         >
           + Add More
         </button>
-
-        {/* This div prevents everything from overlapping with
+      </div>
+      {/* This div prevents everything from overlapping with
         div below with absolute position */}
-        <div className="h-[4rem]" />
-
+      <div className="h-[4rem]" />
+      <Form
+        method="post"
+        onChange={() => {
+          setFormChanged(true)
+        }}
+        onReset={() => {
+          setNewLinks(initialLinks)
+          setHiddenLinks(initialLinks)
+          setFormChanged(false)
+          setNewLinks(initialLinks)
+          setHiddenLinks(initialLinks)
+        }}
+        className="relative"
+      >
+        <input
+          type="hidden"
+          name="links"
+          value={JSON.stringify((links || []).concat(hiddenLinks))}
+        />
         <div className="absolute bottom-0 right-0">
           <SaveButton
-            onClick={handleSubmit}
             isFormChanged={isFormChanged}
             discardFn={() => {
               setNewLinks(initialLinks)
-              setTrakingLinks(initialLinks)
+              setHiddenLinks(initialLinks)
             }}
           />
         </div>

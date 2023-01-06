@@ -6,6 +6,7 @@ import {
   FaGlobe,
   FaMapMarkerAlt,
   FaTrash,
+  FaCheckCircle,
 } from 'react-icons/fa'
 
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
@@ -147,6 +148,7 @@ const ProfileLayout = () => {
     cover,
     website,
     path,
+    links,
   } = useLoaderData()
   const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
@@ -423,6 +425,28 @@ const ProfileLayout = () => {
                     </a>
                   </div>
                 )}
+              </div>
+              <div className="flex flex-col lg:flex-row lg:space-x-2 justify-start lg:items-center text-gray-500 font-size-lg">
+                {links.map((link: any, i: number) => (
+                  <button
+                    key={`${link.name}-${link.url}-${i}`}
+                    className="bg-gray-300 rounded-full
+                    text-gray-[#4b5563]
+                    flex
+                    justify-center
+                    items-center
+                    mt-[1.625rem]
+                    mr-[1rem]
+                    w-[131px] h-[40px]"
+                  >
+                    <a href={link.url} className="flex flex-row items-center">
+                      {link.verified && (
+                        <FaCheckCircle className="mr-[0.5rem]" />
+                      )}
+                      {link.name}
+                    </a>
+                  </button>
+                ))}
               </div>
             </div>
           </div>

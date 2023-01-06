@@ -33,8 +33,6 @@ export const loader = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  console.log(profileRes.profile)
-
   const [avatarUrl, isToken, address, pfp, links] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,

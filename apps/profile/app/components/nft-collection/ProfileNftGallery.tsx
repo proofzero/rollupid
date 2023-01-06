@@ -103,7 +103,7 @@ const ProfileNftGallery = ({
         </Text>
       )}
       {!loading && !refresh && isOwner && !loadedNfts.length && (
-        <ShowPartners />
+        <ShowPartners isGallery={true} />
       )}
 
       {loadedNfts.length > 0 && (
