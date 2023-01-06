@@ -25,6 +25,7 @@ import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
 
 import { initAccountNodeByName } from '../nodes'
+import { Analytics } from '@kubelt/platform-middleware/analytics'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -61,6 +62,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
+    .use(Analytics)
     .input(GetProfileInput)
     .output(ProfileSchema.nullable())
     .query(getProfileMethod),

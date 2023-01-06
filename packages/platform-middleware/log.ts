@@ -1,6 +1,7 @@
+import { BaseContext } from '@kubelt/types'
 import { BaseMiddlewareFunction } from './types'
 
-export const LogUsage: BaseMiddlewareFunction<unknown> = async ({
+export const LogUsage: BaseMiddlewareFunction<BaseContext> = async ({
   next,
   path,
   type,

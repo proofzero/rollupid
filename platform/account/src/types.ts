@@ -5,6 +5,7 @@ import { ProfileSchema } from './jsonrpc/validators/profile'
 export interface Environment {
   Account: DurableObjectNamespace
   Edges: Fetcher
+  Analytics: AnalyticsEngineDataset
 }
 
 export type AddressList = z.infer<typeof AddressListSchema>
