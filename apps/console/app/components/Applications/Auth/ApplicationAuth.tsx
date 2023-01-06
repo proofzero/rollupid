@@ -8,6 +8,8 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
+import { FaCopy } from 'react-icons/fa'
+import { Toaster, toast } from 'react-hot-toast'
 
 type ApplicationAuthProps = {
   appDetails: {
@@ -51,7 +53,7 @@ export const ApplicationAuth = ({
           Save
         </Button>
       </div>
-
+    <Toaster position="top-right" reverseOrder={false} />
     <RotateCredsModal
         isOpen={rollKeyModalOpen}
         rotateCallback={() => {
@@ -74,6 +76,19 @@ export const ApplicationAuth = ({
               </div>
 
               <div className="flex-1">
+              <div className='flex justify-end' >
+                <Text size='sm'
+                  weight="medium"
+                  className={(!oAuth.appSecret ? 'hidden' : '') + ' absolute text-indigo-500 cursor-pointer py-1'}
+                  onClick={() => {
+                    navigator.clipboard.writeText(oAuth.appSecret || '')
+                    toast.success("Client secret copied to clipboard!", { duration: 2000 })
+                  }}
+                >
+                  <FaCopy className='mr-3'></FaCopy>
+                </Text>
+              </div>
+
                 <ReadOnlyInput
                   id="oAuthAppSecret"
                   label="Application Secret"

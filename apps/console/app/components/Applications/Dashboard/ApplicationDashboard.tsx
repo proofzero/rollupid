@@ -5,6 +5,8 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
+import { FaCopy } from 'react-icons/fa'
+import { Toaster, toast } from 'react-hot-toast'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -36,6 +38,7 @@ export const ApplicationDashboard = ({
         Dashboard
       </Text>
 
+      <Toaster position="top-right" reverseOrder={false} />
       <RotateCredsModal
         isOpen={apiKeyRollModalOpen}
         rotateCallback={() => {
@@ -74,6 +77,18 @@ export const ApplicationDashboard = ({
               </div>
             }
           >
+            <div className='flex justify-end' >
+              <Text size='sm' 
+                weight="medium"
+                className={(!galaxyGql.apiKey ? 'hidden' : '') + ' absolute text-indigo-500 cursor-pointer py-1'}
+                onClick={() => {
+                  navigator.clipboard.writeText(galaxyGql.apiKey || '')
+                  toast.success("API key copied to clipboard!", { duration: 2000 })
+                }}
+                >
+                  <FaCopy className='mr-3'></FaCopy>
+                </Text>
+            </div>
             <ReadOnlyInput
               id="gqlApiKey"
               label="API Key"
@@ -109,12 +124,24 @@ export const ApplicationDashboard = ({
                 label="Application ID"
                 value={oAuth.appId}
               />
+              <div className='flex justify-end' >
+                <Text size='sm'
+                  weight="medium"
+                  className={(!oAuth.appSecret ? 'hidden' : '') + ' absolute text-indigo-500 cursor-pointer py-4'}
+                  onClick={() => {
+                    navigator.clipboard.writeText(oAuth.appSecret || '')
+                    toast.success("Client secret copied to clipboard!", { duration: 2000 })
+                  }}
+                >
+                  <FaCopy className='mr-3'></FaCopy>
+                </Text>
+              </div>
               <ReadOnlyInput
                 id="oAuthAppSecret"
                 label="Application Secret"
                 value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
                 hidden={oAuth.appSecret ? false : true}
-              />
+              ></ReadOnlyInput>
             </div>
           </Panel>
 
