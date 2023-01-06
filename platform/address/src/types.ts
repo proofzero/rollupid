@@ -3,6 +3,7 @@ import { GetGoogleOAuthDataSchema } from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
+  NFTarVoucherSchema,
 } from './jsonrpc/validators/profile'
 
 export interface Environment {
@@ -63,3 +64,5 @@ export type AddressProfile = CryptoAddressProfile | OAuthGoogleProfile
 export type OAuthGoogleData = z.infer<typeof GetGoogleOAuthDataSchema>
 
 export type OAuthDataSchema = OAuthGoogleData // TODO: change to z.union when more are supported
+
+export type NFTarVoucher = z.infer<typeof NFTarVoucherSchema>

@@ -1,10 +1,14 @@
 import { z } from 'zod'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
-import { CryptoAddressProfile, NftarVoucher } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import { Context } from '../../context'
-import { AddressProfile, CryptoAddressType } from '../../types'
+import {
+  AddressProfile,
+  CryptoAddressProfile,
+  CryptoAddressType,
+  NFTarVoucher,
+} from '../../types'
 import { AddressProfileSchema } from '../validators/profile'
 
 export const GetAddressProfileOutput = AddressProfileSchema
@@ -88,14 +92,14 @@ type NftarError = {
 
 type NftarResponse = {
   error?: NftarError
-  result?: NftarVoucher
+  result?: NFTarVoucher
 }
 
 const getNftarVoucher = async (
   address: string,
   type: string,
   context: Context
-): Promise<NftarVoucher | undefined> => {
+): Promise<NFTarVoucher | undefined> => {
   const request = {
     method: 'POST',
     headers: {
