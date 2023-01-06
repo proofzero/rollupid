@@ -6418,7 +6418,7 @@ __metadata:
   dependencies:
     "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
@@ -6442,7 +6442,7 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
@@ -6469,7 +6469,7 @@ __metadata:
     "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/types": "workspace:*"
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -6531,7 +6531,7 @@ __metadata:
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     better-sqlite3: 8.0.1
@@ -6579,7 +6579,7 @@ __metadata:
   resolution: "@kubelt/platform.object@workspace:platform/object"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -6601,7 +6601,7 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@kubelt/openrpc": "*"
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -6739,7 +6739,7 @@ __metadata:
     "@moralisweb3/common-core": 2.10.1
     "@moralisweb3/evm-api": 2.10.1
     "@moralisweb3/streams": 2.10.1
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
@@ -12659,13 +12659,6 @@ __metadata:
   peerDependencies:
     "@trpc/server": 10.7.0
   checksum: fb2abc442d8f326183250b9f1138bbc07cfc84ac17cc366b68c7c0c41857537060de986fdc6cf10b822555367adc4c3143d47ccf940ea3a02426c9576c1f9927
-  languageName: node
-  linkType: hard
-
-"@trpc/server@npm:10.7.0":
-  version: 10.7.0
-  resolution: "@trpc/server@npm:10.7.0"
-  checksum: 6f63b8792b574c19e121cb90fa72b0093040fe3608512641a0ba762ac585a6eb030cdd9cdbc669387a067143d74e0c62f5fe6c3cb102ea2a447d618d561c9a8e
   languageName: node
   linkType: hard
 

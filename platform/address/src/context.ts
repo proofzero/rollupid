@@ -1,6 +1,6 @@
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
-import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { OAuthAddress, CryptoAddress } from '.'
 import type { Environment, NodeType, AddressType } from './types'
@@ -13,7 +13,7 @@ import { ENSRes } from '@kubelt/platform-clients/ens-utils'
  * Add fields here that the inner context brings.
  */
 interface CreateInnerContextOptions
-  extends Partial<CreateNextContextOptions & BaseContext> {
+  extends Partial<FetchCreateContextFnOptions & BaseContext> {
   TOKEN_NFTAR: string
   NFTAR_CHAIN_ID: string
   NFTAR_URL: string
@@ -50,13 +50,13 @@ export async function createContextInner(opts: CreateInnerContextOptions) {
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContext(
-  opts: CreateNextContextOptions,
+  opts: FetchCreateContextFnOptions,
   env: Environment
 ) {
   const contextInner = await createContextInner({ ...opts, ...env })
   return {
     req: opts.req,
-    res: opts.res,
+    resHeaders: opts.resHeaders,
     ...contextInner,
   }
 }
