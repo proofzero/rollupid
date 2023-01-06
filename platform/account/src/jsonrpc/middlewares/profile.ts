@@ -15,6 +15,15 @@ export const ProfileSchema = z.object({
   job: z.string().max(30).optional(),
   location: z.string().max(30).optional(),
   website: z.string().url().or(z.literal('')).optional(),
+  links: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().url().or(z.literal('')),
+        verified: z.boolean(),
+      })
+    )
+    .optional(),
 })
 
 // TODO: move to types packages

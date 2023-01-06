@@ -22,7 +22,7 @@ type ResolverContext = {
   accountURN: AccountURN
 }
 
-const threeIDResolvers: Resolvers = {
+const profileResolvers: Resolvers = {
   Query: {
     profile: async (
       _parent: any,
@@ -52,7 +52,6 @@ const threeIDResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.kb_getAccount()
-      console.log({ accountURN })
 
       if (!accountURN) {
         console.log(
@@ -95,13 +94,13 @@ const threeIDResolvers: Resolvers = {
     },
   },
   Mutation: {
-    updateThreeIDProfile: async (
+    updateProfile: async (
       _parent: any,
       { profile },
       { env, jwt, accountURN }: ResolverContext
     ) => {
       console.log(
-        `galaxy.updateThreeIDProfile: updating profile for account: ${accountURN}`
+        `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
 
       const accountClient = createAccountClient(env.Account, {
@@ -130,15 +129,6 @@ const threeIDResolvers: Resolvers = {
       return true
     },
   },
-  Profile: {
-    __resolveType: (obj: any) => {
-      if (obj.pfp) {
-        // TODO: what makes a ThreeIDProfile unique from others?
-        return 'ThreeIDProfile'
-      }
-      return 'DefaultProfile'
-    },
-  },
   PFP: {
     __resolveType: (obj: any) => {
       if (obj.isToken) {
@@ -149,14 +139,10 @@ const threeIDResolvers: Resolvers = {
   },
 }
 
-const ThreeIDResolverComposition = {
+const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey()],
   'Query.profileFromAddress': [setupContext(), hasApiKey()],
-  'Mutation.updateThreeIDProfile': [
-    setupContext(),
-    hasApiKey(),
-    isAuthorized(),
-  ],
+  'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
-export default composeResolvers(threeIDResolvers, ThreeIDResolverComposition)
+export default composeResolvers(profileResolvers, ProfileResolverComposition)

@@ -6,13 +6,14 @@ import {
   FaGlobe,
   FaMapMarkerAlt,
   FaTrash,
+  FaCheckCircle,
 } from 'react-icons/fa'
 
-import { json, LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import {
   Link,
   Outlet,
-  useCatch,
   useNavigate,
   useFetcher,
   useLoaderData,
@@ -31,7 +32,7 @@ import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 import { strings, ogImage, clients } from '~/helpers'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import type { ThreeIdProfile } from '~/utils/galaxy.server'
+import type { Profile } from '~/utils/galaxy.server'
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
@@ -58,7 +59,7 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    profile = profileRes.profile as ThreeIdProfile
+    profile = profileRes.profile as Profile
     loggedInUserProfile = {
       ...profile,
       claimed: true,
@@ -148,6 +149,7 @@ const ProfileLayout = () => {
     cover,
     website,
     path,
+    links,
   } = useLoaderData()
   const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
@@ -417,7 +419,7 @@ const ProfileLayout = () => {
                 {website && (
                   <div className="flex flex-row space-x-2 items-center">
                     <FaGlobe />
-                    <a href={website} target="_blank">
+                    <a href={website} rel="noreferrer" target="_blank">
                       <Text weight="medium" className="text-indigo-500">
                         {website}
                       </Text>
@@ -425,12 +427,34 @@ const ProfileLayout = () => {
                   </div>
                 )}
               </div>
+              <div className="flex flex-col lg:flex-row lg:space-x-2 justify-start lg:items-center text-gray-500 font-size-lg">
+                {links.map((link: any, i: number) => (
+                  <button
+                    key={`${link.name}-${link.url}-${i}`}
+                    className="bg-gray-300 rounded-full
+                    text-gray-[#4b5563]
+                    flex
+                    justify-center
+                    items-center
+                    mt-[1.625rem]
+                    mr-[1rem]
+                    w-[131px] h-[40px]"
+                  >
+                    <a href={link.url} className="flex flex-row items-center">
+                      {link.verified && (
+                        <FaCheckCircle className="mr-[0.5rem]" />
+                      )}
+                      {link.name}
+                    </a>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
         <div className="mt-12 lg:mt-24">
-          <div className="hidden sm:block">
+          <div className="block">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {Object.keys(tabs).map((tab) => (

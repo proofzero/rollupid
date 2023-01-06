@@ -12,26 +12,22 @@ export default /* GraphQL */ `
     isToken: Boolean
   }
 
-  interface Profile {
-    displayName: String
-    pfp: PFP
+  type Link {
+    name: String
+    url: String
+    verified: Boolean
   }
 
-  type DefaultProfile implements Profile {
+  type Profile {
     displayName: String
-    pfp: PFP
     defaultAddress: URN
-  }
-
-  type ThreeIDProfile implements Profile {
-    displayName: String
     pfp: PFP
     cover: String
     bio: String
     job: String
     location: String
+    links: [Link!]
     website: String
-    defaultAddress: URN
     addresses: [URN!]
   }
 
@@ -40,7 +36,13 @@ export default /* GraphQL */ `
     isToken: Boolean
   }
 
-  input ThreeIDProfileInput {
+  input LinkInput {
+    name: String
+    url: String
+    verified: Boolean
+  }
+
+  input ProfileInput {
     displayName: String
     pfp: PFPInput
     cover: String
@@ -49,6 +51,7 @@ export default /* GraphQL */ `
     location: String
     website: String
     defaultAddress: URN
+    links: [LinkInput]
   }
 
   type Query {
@@ -57,6 +60,6 @@ export default /* GraphQL */ `
   }
 
   type Mutation {
-    updateThreeIDProfile(profile: ThreeIDProfileInput): Boolean
+    updateProfile(profile: ProfileInput): Boolean
   }
 `

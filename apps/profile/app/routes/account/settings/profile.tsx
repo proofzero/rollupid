@@ -23,7 +23,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { parseURN } from 'urns'
-import type { ThreeIdProfile } from '~/utils/galaxy.server'
+import type { Profile } from '~/utils/galaxy.server'
 import SaveButton from '~/components/accounts/SaveButton'
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -34,7 +34,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  const profile = profileRes.profile as ThreeIdProfile
+  const profile = profileRes.profile as Profile
 
   const parsedURN = parseURN(profile.defaultAddress)
 

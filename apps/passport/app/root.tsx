@@ -14,6 +14,7 @@ import {
   ScrollRestoration,
   useCatch,
   useParams,
+  useTransition,
 } from '@remix-run/react'
 
 import { ThreeIdButton } from '~/components'
@@ -27,6 +28,7 @@ import icon16 from '~/assets/favicon-16x16.png'
 import faviconSvg from '~/assets/three-id-logo.svg'
 import social from '~/assets/passport-social.png'
 
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
 export const meta: MetaFunction = () => ({
@@ -63,6 +65,7 @@ export const loader: LoaderFunction = () => {
 }
 
 export default function App() {
+  const transition = useTransition()
   const browserEnv = useLoaderData()
   return (
     <html lang="en">
@@ -71,6 +74,7 @@ export default function App() {
         <Links />
       </head>
       <body style={{ backgroundColor: '#F9FAFB' }}>
+        {transition.state === 'loading' && <Loader />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />

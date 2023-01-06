@@ -53,7 +53,7 @@ const PartnerUrl = ({ title, description, imgSrc, url }: PartnerUrlProps) => {
   )
 }
 
-const ShowPartners = () => {
+const ShowPartners = ({ isGallery = false }) => {
   return (
     <div className="mb-2">
       <div className="my-9 flex flex-row justify-center items-center">
@@ -68,7 +68,9 @@ const ShowPartners = () => {
             Oh no!
           </Text>
           <Text size="2xl" weight="medium" className="text-gray-400">
-            Looks like you don't own any NFTs
+            {isGallery
+              ? "Looks like you don't have NFTs in your gallery"
+              : "Looks like you don't own any NFTs"}
           </Text>
         </div>
       </div>

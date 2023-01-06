@@ -1,0 +1,25 @@
+{
+  "name": "@kubelt/galaxy-client",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kubelt Platform Clients",
+  "keywords": [],
+  "license": "ISC",
+  "author": "Kubelt, Inc.",
+  "main": "index.ts",
+  "scripts": {
+    "gql:gen": "graphql-codegen --config graphql.config.js --aggregate-output -n -l",
+    "gql": "run-p 'gql:*'",
+    "dev:gql": "run-p 'gql:* -- --watch'",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "2.16.3",
+    "@graphql-codegen/client-preset": "1.1.1",
+    "@graphql-codegen/typescript-graphql-request": "4.5.7",
+    "@graphql-codegen/typescript-resolvers": "2.7.5",
+    "npm-run-all": "4.1.5",
+    "prettier": "2.8.0",
+    "typescript": "4.8.4"
+  }
+}
