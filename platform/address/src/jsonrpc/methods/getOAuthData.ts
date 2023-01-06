@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { Context } from '../../context'
 import { OAuthAddressProxyStub } from '../../nodes/oauth'
 import { OAuthDataSchema } from '../../types'
@@ -10,10 +9,10 @@ export const getOAuthDataMethod = async ({
   input,
   ctx,
 }: {
-  input: void
+  input: unknown
   ctx: Context
-}): Promise<OAuthDataSchema | undefined> => {
+}): Promise<OAuthDataSchema> => {
   const nodeClient = ctx.address as OAuthAddressProxyStub
-  const data = await nodeClient?.class.getData()
+  const data = (await nodeClient?.class.getData()) as OAuthDataSchema
   return data
 }

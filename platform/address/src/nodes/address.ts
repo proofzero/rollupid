@@ -50,10 +50,6 @@ export default class Address extends DOProxy {
     }
   }
 
-  async getAccount(): Promise<AccountURN | undefined> {
-    return await this.state.storage.get<AccountURN>('account')
-  }
-
   async setAccount(account: AccountURN): Promise<void> {
     return await this.state.storage.put('account', account)
   }
@@ -66,8 +62,8 @@ export default class Address extends DOProxy {
     return await this.state.storage.get<AddressProfile>('profile')
   }
 
-  async setProfile(profile: AddressProfile): Promise<void> {
-    const p = (await this.state.storage.get<AddressProfile>('profile')) || {}
+  async setProfile<TProfile>(profile: TProfile): Promise<void> {
+    const p = (await this.state.storage.get<TProfile>('profile')) || {}
     Object.assign(p, profile)
     return await this.state.storage.put('profile', p)
   }

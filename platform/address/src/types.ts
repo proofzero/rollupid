@@ -1,7 +1,9 @@
 import { z } from 'zod'
-import { CryptoAddressProfile } from '@kubelt/types/address'
 import { GetGoogleOAuthDataSchema } from './jsonrpc/validators/oauth'
-import { GoogleRawProfileSchema } from './jsonrpc/validators/profile'
+import {
+  CryptoAddressProfileSchema,
+  GoogleRawProfileSchema,
+} from './jsonrpc/validators/profile'
 
 export interface Environment {
   Access: Fetcher
@@ -55,7 +57,7 @@ export interface Challenge {
 }
 
 export type OAuthGoogleProfile = z.infer<typeof GoogleRawProfileSchema>
-
+export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile = CryptoAddressProfile | OAuthGoogleProfile
 
 export type OAuthGoogleData = z.infer<typeof GetGoogleOAuthDataSchema>

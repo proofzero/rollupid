@@ -23,7 +23,7 @@ export const SetAccountOutput = z.object({
 type SetAccountParams = z.infer<typeof SetAccountInput>
 type SetAccountResult = z.infer<typeof SetAccountOutput>
 
-export const getAccountMethod = async ({
+export const setAccountMethod = async ({
   input,
   ctx,
 }: {

@@ -1,17 +1,23 @@
+import { z } from 'zod'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { CryptoAddressProfile, NftarVoucher } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import { Context } from '../../context'
 import { AddressProfile, CryptoAddressType } from '../../types'
+import { AddressProfileSchema } from '../validators/profile'
 
-export const getAddressProfile = async ({
+export const GetAddressProfileOutput = AddressProfileSchema
+
+type GetAddressProfileResult = z.infer<typeof GetAddressProfileOutput>
+
+export const getAddressProfileMethod = async ({
   input,
   ctx,
 }: {
-  input: void
+  input: unknown
   ctx: Context
-}): Promise<AddressProfile> => {
+}): Promise<GetAddressProfileResult> => {
   const nodeClient = ctx.address
   const profile = await nodeClient?.class.getProfile()
   if (profile) {
@@ -32,8 +38,8 @@ export const getAddressProfile = async ({
         type,
         ctx
       )
-      await nodeClient?.class.setProfile(ethProfile)
-      return ethProfile
+      await nodeClient?.class.setProfile<CryptoAddressProfile>(ethProfile)
+      return ethProfile as AddressProfile
     }
     default:
       // if we don't have a profile at this point then something is wrong

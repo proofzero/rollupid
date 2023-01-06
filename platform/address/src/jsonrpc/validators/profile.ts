@@ -1,5 +1,12 @@
 import { z } from 'zod'
 
+export const CryptoAddressProfileSchema = z.object({
+  address: z.string(),
+  avatar: z.string().optional(),
+  displayName: z.string().optional(),
+  nftarVoucher: z.any().optional(),
+})
+
 export const GoogleRawProfileSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -10,3 +17,8 @@ export const GoogleRawProfileSchema = z.object({
   email: z.string(),
   email_verified: z.boolean(),
 })
+
+export const AddressProfileSchema = z.union([
+  CryptoAddressProfileSchema,
+  GoogleRawProfileSchema,
+])

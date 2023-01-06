@@ -4,7 +4,7 @@ import { OAuthAddressProxyStub } from '../../nodes/oauth'
 import { OAuthDataSchema, OAuthGoogleData } from '../../types'
 import { GetGoogleOAuthDataSchema } from '../validators/oauth'
 
-export const GetOAuthDataInput = GetGoogleOAuthDataSchema // TODO: add other schemas with z.union
+export const SetOAuthDataInput = GetGoogleOAuthDataSchema // TODO: add other schemas with z.union
 
 export const setOAuthDataMethod = async ({
   input,

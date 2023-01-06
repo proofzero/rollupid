@@ -11,6 +11,8 @@ export const GetNonceInput = z.object({
   state: z.string(),
 })
 
+export const GetNonceOutput = z.string()
+
 type GetNonceParams = z.infer<typeof GetNonceInput>
 
 export const getNonceMethod = async ({
