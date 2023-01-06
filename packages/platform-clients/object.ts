@@ -1,24 +1,16 @@
-import type {
-  GetObjectResult,
-  ObjectValue,
-  PutObjectOptions,
-  PutObjectResult,
-} from '@kubelt/platform.object/src/types'
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { Router } from '@kubelt/types'
+import { ClientOptions } from './types'
 
-import type { BaseApi } from './base'
-import createClient from './fetcher'
-
-export interface ObjectApi extends BaseApi {
-  kb_getObject(namespace: string, path: string): Promise<GetObjectResult>
-  kb_putObject(
-    namespace: string,
-    path: string,
-    value: ObjectValue,
-    options: PutObjectOptions
-  ): Promise<PutObjectResult>
-}
-
-export default (
-  fetcher: Fetcher,
-  requestInit?: RequestInit<RequestInitCfProperties> | undefined
-) => createClient<ObjectApi>(fetcher, requestInit)
+export default (fetcher: Fetcher, options?: ClientOptions) =>
+  createTRPCProxyClient<Router.ObjectRouter>({
+    links: [
+      httpBatchLink({
+        url: 'http://localhost/trpc',
+        fetch: fetcher.fetch,
+        headers() {
+          return options?.headers || {}
+        },
+      }),
+    ],
+  })
