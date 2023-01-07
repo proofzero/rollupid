@@ -1,6 +1,10 @@
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-import type { ScopeDescriptor } from '@kubelt/security/scopes'
 import { z } from 'zod'
+
+export interface Environment {
+  ApplicationDONamespace: DurableObjectNamespace
+  Edges: Fetcher
+}
 
 export type AppCreateResult = z.infer<typeof AppCreateResultSchema>
 
@@ -34,6 +38,47 @@ export const AppUpdateRequestParamsSchema = z.object({
   })
 })
 
+export const AppObjectSchema = z.object({
+  name: z.string(),
+  icon: z.string().optional(),
+  redirectURI: z.string().optional(),
+  termsURL: z.string().optional(),
+  websiteURL: z.string().optional(),
+  mirrorURL: z.string().optional(),
+  discordUser: z.string().optional(),
+  mediumUser: z.string().optional(),
+  twitterUser: z.string().optional()
+})
+
+export type AppObject = z.infer<typeof AppObjectSchema>
+
+export const AppUpdateableFieldsSchema = z.object({
+  clientName: z.string(),
+  published: z.boolean(),
+  app: AppObjectSchema
+})
+
+export const AppReadableFieldsSchema = z.object({
+  clientId: z.string(),
+  secretTimestamp: z.date(),
+  apiKeyTimestamp: z.date()
+})
+
+export const AppInternalFieldSchema = z.object({
+  clientSecret: z.string(),
+  apiKey: z.string(),
+  apiKeySigningKeyPair: z.string()
+})
+
+export const AllFieldsSchema = AppUpdateableFieldsSchema
+  .merge(AppReadableFieldsSchema)
+  .merge(AppInternalFieldSchema)
+
+export type AppUpdateableFields = z.infer<typeof AppUpdateableFieldsSchema>
+export type AppReadableFields = z.infer<typeof AppReadableFieldsSchema>
+export type AppInternalFieldSchema = z.infer<typeof AppInternalFieldSchema>
+export type AppAllFields = z.infer<typeof AllFieldsSchema>
+
 export type AppPublishRequestParams = z.infer<typeof AppPublishRequestParamsSchema>
 
 export const AppPublishRequestParamsSchema = z.object({
@@ -43,6 +88,11 @@ export const AppPublishRequestParamsSchema = z.object({
 
 export type AppProfileResult = object
 
+export const AppClientIdParamSchema = z.object({
+  clientId: z.string()
+})
+
+export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
 
 //TODO(betim): remove
 // export type AppScopesResult = {
