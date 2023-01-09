@@ -24,11 +24,5 @@ export const getNonceMethod = async ({
   const { address, template, redirectUri, scope, state } = input
 
   const nodeClient = ctx.address as CryptoAddressProxyStub
-  return await nodeClient.class.getNonce(
-    address,
-    template,
-    redirectUri,
-    scope,
-    state
-  )
+  return nodeClient.class.getNonce(address, template, redirectUri, scope, state)
 }

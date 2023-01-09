@@ -11,7 +11,7 @@ export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
   const nodeType = ctx.nodeType
   console.log('checkCryptoNodes: nodeType', nodeType)
   if (nodeType != NodeType.Crypto && nodeType != NodeType.Contract) {
-    return await next({ ctx })
+    return next({ ctx })
   }
 
   const addrType = ctx.addrType
@@ -20,5 +20,5 @@ export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
     throw `unsupported crypto address type: ${addrType}`
   }
 
-  return await next({ ctx })
+  return next({ ctx })
 }
