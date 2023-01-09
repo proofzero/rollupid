@@ -62,9 +62,9 @@ export const hasAddressesMethod = async ({
     })
   )
   // The input set of addresses to check.
-  const addresses = new Set(input.addresses)
+  const inputAddresses = new Set(input.addresses)
 
   // Determine if set B is a subset of set A. A set B is a subset of A
   // if all elements of B are in set
-  return set.subset(owned, addresses)
+  return set.subset(ownedAddresses, inputAddresses)
 }

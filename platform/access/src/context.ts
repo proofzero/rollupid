@@ -4,6 +4,7 @@ import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
 import type { Environment } from './types'
+import type { AccountURN } from '@kubelt/urns/account'
 
 /**
  * Defines your inner context shape.
@@ -11,12 +12,15 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
+  Edges: Fetcher
   Access: DurableObjectNamespace
   access?: Access
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher
   starbaseClient?: ReturnType<typeof createStarbaseClient>
+  // Added by middleware if available.
+  accountURN?: AccountURN
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

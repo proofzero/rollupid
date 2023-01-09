@@ -1,9 +1,10 @@
-import { BaseContext } from '@kubelt/types'
-import type { inferAsyncReturnType } from '@trpc/server'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { Account } from '.'
-import type { Environment } from './types'
 import createEdgesClient from '@kubelt/platform-clients/edges'
+import type { AccountURN } from '@kubelt/urns/account'
+import type { Environment } from './types'
+import type { inferAsyncReturnType } from '@trpc/server'
+import { Account } from '.'
+import { BaseContext } from '@kubelt/types'
+import { DurableObjectStubProxy } from 'do-proxy'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
 /**
@@ -15,7 +16,8 @@ interface CreateInnerContextOptions
   Account: DurableObjectNamespace
   Edges: Fetcher
   account?: DurableObjectStubProxy<Account>
-  accountURN?: string
+  // Set by middleware if provided via JWT.
+  accountURN?: AccountURN
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

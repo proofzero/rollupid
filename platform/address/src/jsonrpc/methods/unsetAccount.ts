@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Context } from '../../context'
 import type { AddressURN } from '@kubelt/urns/address'
 import { AccountURNSpace } from '@kubelt/urns/account'
-
+import { Context } from '../../context'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import getEdgesClient from '@kubelt/platform-clients/edges'
 
@@ -30,6 +30,7 @@ export const unsetAccountMethod = async ({
   input: UnsetAccountParams
   ctx: Context
 }): Promise<UnsetAccountResult> => {
+  // TODO replace with usage of InjectEdges middleware
   const edgesClient = getEdgesClient(ctx.Edges)
   const nodeClient = ctx.address
 
@@ -44,7 +45,8 @@ export const unsetAccountMethod = async ({
   // Remove the stored account in the node.
   await nodeClient?.class.unsetAccount()
 
-  const unlinkResult = await edgesClient.removeEdge.mutate({
+  // Unlink the address and account nodes, removing the "account" edge.
+  await edgesClient.removeEdge.mutate({
     src: account,
     dst: address,
     tag: EDGE_ADDRESS,

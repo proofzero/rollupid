@@ -42,7 +42,6 @@ export const getAddressesMethod = async ({
   }
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  // const edgeResult = await listAddresses(ctx.Edges, input.account, input?.type)
   const edgesResult = await ctx.edges.getEdges.query({ query })
 
   // The source nodes in the returned edges are the URNs of the

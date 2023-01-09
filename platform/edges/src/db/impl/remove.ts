@@ -19,7 +19,7 @@ export async function edge(
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
+): Promise<any> {
   return new Promise((resolve, reject) => {
     g.db
       .prepare('DELETE FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3')

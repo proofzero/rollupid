@@ -3,6 +3,11 @@ import { initTRPC } from '@trpc/server'
 import { Context } from '../context'
 
 import {
+  ValidateJWT,
+  JWTAssertionTokenFromHeader,
+} from '@kubelt/platform-middleware/jwt'
+
+import {
   authorizeMethod,
   AuthorizeMethodInput,
   AuthorizeMethodOutput,
@@ -17,6 +22,16 @@ import {
   VerifyAuthorizationMethodInput,
   VerifyAuthorizationMethodOutput,
 } from './methods/verifyAuthorization'
+import {
+  getSessionMethod,
+  GetSessionMethodInput,
+  GetSessionMethodOutput,
+} from './methods/getSession'
+import {
+  revokeSessionMethod,
+  RevokeSessionMethodInput,
+  RevokeSessionMethodOutput,
+} from './methods/revokeSession'
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
@@ -38,4 +53,18 @@ export const appRouter = t.router({
     .input(VerifyAuthorizationMethodInput)
     .output(VerifyAuthorizationMethodOutput)
     .query(verifyAuthorizationMethod),
+  getSession: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(GetSessionMethodInput)
+    .output(GetSessionMethodOutput)
+    .query(getSessionMethod),
+  revokeSession: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(RevokeSessionMethodInput)
+    .output(RevokeSessionMethodOutput)
+    .query(revokeSessionMethod),
 })
