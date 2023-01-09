@@ -6,6 +6,7 @@ export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
   next,
   ctx,
 }) => {
+  console.log('initCryptoNode: ctx.nodeType', ctx.nodeType)
   if (ctx.nodeType != NodeType.Crypto) {
     return next({ ctx })
   }
@@ -22,6 +23,8 @@ export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
   if (!addrType) {
     throw new Error('missing addrType')
   }
+
+  console.log('initCryptoNode: addressNode', addressNode.class)
 
   const address = await addressNode.class.getAddress()
   const type = await addressNode.class.getType()
@@ -53,5 +56,6 @@ export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
     //   })
     // }
   }
+  console.log('initCryptoNode: address', address)
   return next({ ctx })
 }
