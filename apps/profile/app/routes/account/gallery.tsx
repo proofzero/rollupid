@@ -298,7 +298,7 @@ const Gallery = () => {
         NFT Gallery
       </Text>
       <Toaster position="top-right" reverseOrder={false} />
-      <Text className="border-none pb-6">
+      <Text className="border-none pb-6 text-gray-500">
         Here you can curate your profile gallery to show off your most precious
         NFTs
       </Text>
