@@ -4,17 +4,18 @@
 
 * [Overview](3id/overview/index.md)
   * [Glossary](3id/overview/glossary.md)
-* [Guides](3id/guides/index.md)
+* [Guides](3id/guides/guides.md)
   * [Setting up your first app](3id/guides/app-setup.md)
-* [Profile](3id/profile/index.md)
+* [Profile](3id/profile/profile.md)
   * [Profile Reference](3id/profile/reference.md)
-* [Console](3id/console/index.md)
+* [Console](3id/console/console.md)
   * [Console Reference](3id/console/reference.md)
-* [Passport](3id/passport/index.md)
-* [Galaxy](3id/galaxy/index.md)
-* [Graph](3id/graph/index.md)
+* [Passport](3id/passport/passport.md)
+* [Galaxy](3id/galaxy/galaxy.md)
+  * [Galaxy Reference](3id/galaxy/reference.md)
+* [Graph](3id/graph/graph.md)
   * [Graph Reference](3id/graph/reference.md)
-* [FAQ](3id/faq/index.md)
+* [FAQ](3id/faq/faq.md)
 
 <!--
 ## Use headings to create page groups like this one​
