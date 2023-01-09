@@ -1,24 +1,21 @@
 import { z } from 'zod'
-import { Context } from "../context";
+import { Context } from '../context'
 import * as oauth from '../../0xAuth'
-import { getApplicationNodeByClientId } from '../../nodes/application/application';
-import { ApplicationURNSpace } from '@kubelt/urns/application';
-import { AppClientIdParamSchema } from '../../types';
+import { getApplicationNodeByClientId } from '../../nodes/application'
+import { AppClientIdParamSchema } from '../../types'
 import * as secret from '../../secret'
-
 
 export const RotateClientSecretOutputSchema = z.object({
   secret: z.string(),
 })
 
-export const rotateClientSecret = async({
-  input, 
-  ctx
-}:{
-  input: z.infer<typeof AppClientIdParamSchema>,
+export const rotateClientSecret = async ({
+  input,
+  ctx,
+}: {
+  input: z.infer<typeof AppClientIdParamSchema>
   ctx: Context
-}) : Promise<z.infer<typeof RotateClientSecretOutputSchema>> => {
-  
+}): Promise<z.infer<typeof RotateClientSecretOutputSchema>> => {
   //Make secret and hash it
   const clientSecret = oauth.makeClientSecret()
   const hashedSecret = await secret.hash(clientSecret)
@@ -29,6 +26,6 @@ export const rotateClientSecret = async({
 
   //Return non-hashed version of secret
   return {
-    secret: clientSecret
+    secret: clientSecret,
   }
 }

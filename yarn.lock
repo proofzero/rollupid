@@ -6626,7 +6626,7 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
-    "@trpc/server": 10.7.0
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.189
     cross-env: 7.0.3
@@ -12661,6 +12661,13 @@ __metadata:
   peerDependencies:
     "@trpc/server": 10.7.0
   checksum: fb2abc442d8f326183250b9f1138bbc07cfc84ac17cc366b68c7c0c41857537060de986fdc6cf10b822555367adc4c3143d47ccf940ea3a02426c9576c1f9927
+  languageName: node
+  linkType: hard
+
+"@trpc/server@npm:10.8.1":
+  version: 10.8.1
+  resolution: "@trpc/server@npm:10.8.1"
+  checksum: 91f86aad0166f98ee67e271d5c8f6301d832f351fb884f82ff4e95eef6edd7d0fc2b6dc777aea1951bce0d68e7ae3e622315847112daac70558aafadfc05f62e
   languageName: node
   linkType: hard
 

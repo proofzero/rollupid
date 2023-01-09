@@ -1,29 +1,27 @@
 import { z } from 'zod'
-import { Context } from "../context";
-import { listApplications } from '@kubelt/graph/util';
+import { Context } from '../context'
+import { listApplications } from '@kubelt/graph/util'
 import * as oauth from '../../0xAuth'
-import { getApplicationNodeByClientId } from '../../nodes/application/application';
-import { ApplicationURNSpace } from '@kubelt/urns/application';
+import { getApplicationNodeByClientId } from '../../nodes/application'
+import { ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges';
-
+import { EDGE_APPLICATION } from '@kubelt/graph/edges'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),
 })
 
 export const CreateAppOutputSchema = z.object({
-  clinetId: z.string()
+  clinetId: z.string(),
 })
 
-export const createApp = async({
-  input, 
-  ctx
-}:{
-  input: z.infer<typeof CreateAppInputSchema>,
+export const createApp = async ({
+  input,
+  ctx,
+}: {
+  input: z.infer<typeof CreateAppInputSchema>
   ctx: Context
-}) : Promise<z.infer<typeof CreateAppOutputSchema>> => {
-  
+}): Promise<z.infer<typeof CreateAppOutputSchema>> => {
   //TODO(betim) check if app with that name exists for account
 
   // Create initial OAuth configuration for the application. There
@@ -32,7 +30,8 @@ export const createApp = async({
   // OAuth secret and return it to the caller.
   const clientId = oauth.makeClientId()
   const appURN = ApplicationURNSpace.urn(clientId)
-  
+  if (!ctx.accountURN) throw new Error('No account URN in context')
+
   const appDO = await getApplicationNodeByClientId(clientId, ctx.Starbase)
   await appDO.class.init(clientId, input.clientName)
 
@@ -47,12 +46,14 @@ export const createApp = async({
 
   if (!edgeRes.edge) {
     console.error({ edgeRes })
-    throw new Error(`Could not link app ${clientId} to account ${ctx.accountURN}`)
+    throw new Error(
+      `Could not link app ${clientId} to account ${ctx.accountURN}`
+    )
   } else {
     console.log(`Created app ${clientId} for account ${ctx.accountURN}`)
   }
 
   return {
-    clinetId: clientId
+    clinetId: clientId,
   }
 }

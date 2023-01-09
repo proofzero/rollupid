@@ -7,19 +7,15 @@ import {
   AppUpdateableFieldsSchema,
 } from '../../types'
 
-export const GetAppDetailsOutputSchema = AppUpdateableFieldsSchema.merge(
-  AppReadableFieldsSchema
-)
-
-export const getAppDetails = async ({
+export const getAppProfile = async ({
   input,
   ctx,
 }: {
   input: z.infer<typeof AppClientIdParamSchema>
   ctx: Context
-}): Promise<z.infer<typeof GetAppDetailsOutputSchema>> => {
+}): Promise<z.infer<typeof AppUpdateableFieldsSchema>> => {
   const appDO = await getApplicationNodeByClientId(input.clientId, ctx.Starbase)
-  const appDetails = await appDO.class.getDetails()
+  const appProfile = await appDO.class.getProfile()
 
-  return appDetails
+  return appProfile
 }

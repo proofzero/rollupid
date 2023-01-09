@@ -1,24 +1,23 @@
 import { z } from 'zod'
-import { Context } from "../context";
-import { getApplicationNodeByClientId } from '../../nodes/application/application';
-import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application';
+import { Context } from '../context'
+import { getApplicationNodeByClientId } from '../../nodes/application'
+import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges';
-import {  EdgeDirection } from '@kubelt/graph';
-import { AppClientIdParamSchema, AppObject, AppObjectSchema } from '../../types';
+import { EDGE_APPLICATION } from '@kubelt/graph/edges'
+import { EdgeDirection } from '@kubelt/graph'
+import { AppClientIdParamSchema, AppObject, AppObjectSchema } from '../../types'
 
-export const ListAppsOutputSchema = z.array(
-  AppObjectSchema
-)
+export const ListAppsOutputSchema = z.array(AppObjectSchema)
 
-export const listApps = async({
-  input, 
-  ctx
-}:{
-  input: z.infer<typeof AppClientIdParamSchema>,
+export const listApps = async ({
+  input,
+  ctx,
+}: {
+  input: z.infer<typeof AppClientIdParamSchema>
   ctx: Context
-}) : Promise<z.infer<typeof ListAppsOutputSchema>> => {
-  
+}): Promise<z.infer<typeof ListAppsOutputSchema>> => {
+  if (!ctx.accountURN) throw new Error('No account URN in context')
+
   //Get application edges for the given accountURN
   const edgesClient = createEdgesClient(ctx.Edges)
   const edgeList = await edgesClient.getEdges.query({
@@ -28,7 +27,7 @@ export const listApps = async({
       tag: EDGE_APPLICATION,
     },
   })
-  
+
   //Iterate through edges, pull out the clientId, and get app objects for each
   //app edge
   const result: AppObject[] = []
@@ -36,9 +35,9 @@ export const listApps = async({
     const appURN = edge.dst.id as ApplicationURN
     const clientId = ApplicationURNSpace.decode(appURN)
     const appDO = await getApplicationNodeByClientId(clientId, ctx.Starbase)
-    const appDetails = await appDO.class.getDetails();
+    const appDetails = await appDO.class.getDetails()
     result.push(appDetails.app)
   }
-  
+
   return result
 }

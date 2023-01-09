@@ -3,14 +3,40 @@ import { ZodError } from 'zod'
 
 import { Context } from './context'
 import { LogUsage } from '@kubelt/platform-middleware/log'
-import { createApp, CreateAppInputSchema, CreateAppOutputSchema } from './methods/createApp'
-import { JWTAssertionTokenFromHeader, ValidateJWT } from '@kubelt/platform-middleware/jwt'
+import {
+  createApp,
+  CreateAppInputSchema,
+  CreateAppOutputSchema,
+} from './methods/createApp'
+import {
+  JWTAssertionTokenFromHeader,
+  ValidateJWT,
+} from '@kubelt/platform-middleware/jwt'
 import { deleteApp } from './methods/deleteApp'
-import { getAppDetails, GetAppDetailsOutputSchema } from './methods/getAppDetails'
+import {
+  getAppDetails,
+  GetAppDetailsOutputSchema,
+} from './methods/getAppDetails'
 import { listApps, ListAppsOutputSchema } from './methods/listApps'
-import { AppClientIdParamSchema } from '../types'
-import { rotateClientSecret, RotateClientSecretOutputSchema } from './methods/rotateClientSecret'
+import { AppClientIdParamSchema, AppUpdateableFieldsSchema } from '../types'
+import {
+  rotateClientSecret,
+  RotateClientSecretOutputSchema,
+} from './methods/rotateClientSecret'
 import { rotateApiKey, RotateApiKeyOutputSchema } from './methods/rotateApiKey'
+import {
+  checkAppAuth,
+  CheckAppAuthInputSchema,
+  CheckAppAuthOutputSchema,
+} from './methods/checkAppAuth'
+import {
+  publishApp,
+  PublishAppInputSchema,
+  PublishAppOutputSchema,
+} from './methods/publishApp'
+import { getAppProfile } from './methods/getAppProfile'
+import { updateApp, UpdateAppInputSchema } from './methods/updateApp'
+import { getScopes } from './methods/getAppProfile copy'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -41,6 +67,12 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(AppClientIdParamSchema)
     .mutation(deleteApp),
+  updateApp: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(UpdateAppInputSchema)
+    .mutation(updateApp),
   getAppDetails: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
@@ -48,6 +80,13 @@ export const appRouter = t.router({
     .input(AppClientIdParamSchema)
     .output(GetAppDetailsOutputSchema)
     .query(getAppDetails),
+  getAppProfile: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(AppClientIdParamSchema)
+    .output(AppUpdateableFieldsSchema)
+    .query(getAppProfile),
   listApps: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
@@ -68,6 +107,22 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(AppClientIdParamSchema)
     .output(RotateApiKeyOutputSchema)
-    .mutation(rotateApiKey)
-
+    .mutation(rotateApiKey),
+  checkAppAuth: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(CheckAppAuthInputSchema)
+    .output(CheckAppAuthOutputSchema)
+    .query(checkAppAuth),
+  publishApp: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(LogUsage)
+    .input(PublishAppInputSchema)
+    .output(PublishAppOutputSchema)
+    .query(publishApp),
+  getScopes: t.procedure
+    //TODO: Revisit when implementing scopes
+    .query(getScopes),
 })
