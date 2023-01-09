@@ -12,7 +12,7 @@ import {
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
-import { AccountURN } from '@kubelt/urns/account'
+import type { AccountURN } from '@kubelt/urns/account'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -33,7 +33,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
     const addressClient = getAddressClient(defaultProfileURN)
-    profile = await addressClient.kb_getAddressProfile() // this will detect the kind of address
+    profile = await addressClient.getAddressProfile.query() // this will detect the kind of address
     if (!profile) {
       throw json("Couldn't find profile", 400)
     }

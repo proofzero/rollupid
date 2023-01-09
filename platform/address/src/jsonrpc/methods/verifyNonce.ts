@@ -1,69 +1,54 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { z } from 'zod'
+import { Context } from '../../context'
+import { CryptoAddressProxyStub } from '../../nodes/crypto'
 
-import { ResponseType } from '@kubelt/platform.access/src/types'
+import getAccessClient from '@kubelt/platform-clients/access'
+import { ResponseType } from '@kubelt/platform.access/src/types' // TODO: move to types?
 
-import { Challenge, CryptoAddressType, VerifyNonceParams } from '../../types'
+import { Challenge } from '../../types'
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const addressType = context.get('addr_type')
-  switch (addressType) {
-    case CryptoAddressType.Ethereum:
-    case CryptoAddressType.ETH:
-      break
-    default:
-      return openrpc.error(request, {
-        code: -32500,
-        message: `kb_verifyNonce: not supported address type: ${addressType}`,
-      })
-  }
+export const VerifyNonceInput = z.object({
+  nonce: z.string(),
+  signature: z.string(),
+})
 
-  const [nonce, signature] = request.params as VerifyNonceParams
-  if (!nonce) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing nonce',
-    })
-  }
-  if (!signature) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing signature',
-    })
-  }
+// TODO: move to shared validators?
+export const VerifyNonceOutput = z.object({
+  code: z.string(),
+  state: z.string(),
+})
 
-  const nodeClient = context.get('node_client')
+type VerifyNonceParams = z.infer<typeof VerifyNonceInput>
+
+type VerifyNonceResult = z.infer<typeof VerifyNonceOutput>
+
+export const verifyNonceMethod = async ({
+  input,
+  ctx,
+}: {
+  input: VerifyNonceParams
+  ctx: Context
+}): Promise<VerifyNonceResult> => {
+  const { nonce, signature } = input
+
+  const nodeClient = ctx.address as CryptoAddressProxyStub
   const {
     address: clientId,
     redirectUri,
     scope,
     state,
-  }: Challenge = await nodeClient.verifyNonce({ nonce, signature })
+  }: Challenge = await nodeClient.class.verifyNonce(nonce, signature)
 
-  const account = await nodeClient.resolveAccount()
+  const account = await nodeClient.class.resolveAccount()
   const responseType = ResponseType.Code
 
-  const accessClient = context.get('Access')
-  try {
-    const result = await accessClient.authorize.mutate({
-      account,
-      responseType,
-      clientId,
-      redirectUri,
-      scope,
-      state,
-    })
-
-    return openrpc.response(request, result)
-  } catch (error) {
-    console.error(error)
-    return openrpc.error(request, {
-      code: -32500,
-      message: (error as Error).message,
-    })
-  }
+  const accessClient = getAccessClient(ctx.Access)
+  return accessClient.authorize.mutate({
+    account,
+    responseType,
+    clientId,
+    redirectUri,
+    scope,
+    state,
+  })
 }

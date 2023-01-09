@@ -1,16 +1,29 @@
-import { Router } from 'itty-router'
-import { error } from 'itty-router-extras'
-
-import { CryptoAddressType } from './types'
+import {
+  fetchRequestHandler,
+  FetchCreateContextFnOptions,
+} from '@trpc/server/adapters/fetch'
+// import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/next'
+import { createContext } from './context'
+import { appRouter } from './jsonrpc/router'
 import CryptoAddress from './nodes/crypto'
 import ContractAddress from './nodes/contract'
 import OAuthAddress from './nodes/oauth'
-import jsonrpc from './jsonrpc'
+import type { Environment } from './types'
 
-const index = Router()
-  .post('/jsonrpc', jsonrpc)
-  .all('*', () => error(404, 'not found'))
-
-// TODO: export ContractAddress when ready
-export { CryptoAddress, CryptoAddressType, OAuthAddress }
-export default { fetch: index.handle }
+export default {
+  async fetch(request: Request, env: Environment): Promise<Response> {
+    return fetchRequestHandler({
+      endpoint: '/trpc',
+      req: request,
+      router: appRouter,
+      onError({ error, type, path, input, ctx, req }) {
+        console.error('Error:', error)
+        // TODO: report somehwere
+      },
+      createContext: (opts) =>
+        createContext(opts as FetchCreateContextFnOptions, env),
+    })
+  },
+}
+//FetchCreateContextFnOptions
+export { CryptoAddress, ContractAddress, OAuthAddress }

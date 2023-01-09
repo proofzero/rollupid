@@ -1,13 +1,13 @@
 import * as set from 'ts-set-utils'
 import { z } from 'zod'
-import { listAddresses } from '@kubelt/graph/util'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import type { AddressList } from '../middlewares/addressList'
-import type { Edge } from '@kubelt/graph'
+import { Edge, EdgeDirection } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
+import { EDGE_ADDRESS } from '@kubelt/graph/edges'
 
 // Should this live in @kubelt/platform-middlewares/inputValidators?
 export const AddressListInput = z.custom<AddressList>((input) => {
@@ -42,12 +42,18 @@ export const hasAddressesMethod = async ({
   // Return the list of edges between the account node and any address
   // nodes. Don't filter the addresses by type, we want them all (the
   // total number is normally going to be small).
-  const edgeList = await listAddresses(ctx.Edges, input.account)
-
-  if (!Array.isArray(edgeList)) {
-    // Should this be a TRPCError?
-    throw new Error(edgeList.message)
+  const query = {
+    // We are only interested in edges that start at the account node and
+    // terminate at the address node, assuming that account nodes link to
+    // the address nodes that they own.
+    id: input.account,
+    // We only want edges that link to address nodes.
+    tag: EDGE_ADDRESS,
+    // Account -> Address edges indicate ownership.
+    dir: EdgeDirection.Outgoing,
   }
+  const edgesResult = await ctx.edges.getEdges.query({ query })
+  const edgeList = edgesResult.edges
 
   // A set of the addresses owned by the account.
   const owned = new Set(

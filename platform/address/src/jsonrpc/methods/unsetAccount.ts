@@ -1,46 +1,62 @@
-import * as graph from '@kubelt/graph'
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
-import type { AccountURN } from '@kubelt/urns/account'
+import { z } from 'zod'
+import { AccountURN } from '@kubelt/urns/account'
+import { Context } from '../../context'
 import type { AddressURN } from '@kubelt/urns/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { EDGE_ADDRESS } from '@kubelt/graph/edges'
 import { unlinkAccountAddress } from '@kubelt/graph/util'
+import getEdgesClient from '@kubelt/platform-clients/edges'
 
-import { ErrorInvalidAccountId } from '../errors'
+import {
+  AccountURNInput,
+  AddressURNInput,
+} from '@kubelt/platform-middleware/inputValidators'
 
-import { UnsetAccountParams } from '../../types'
+export const UnsetAccountInput = AccountURNInput
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const edges: Fetcher = context.get('Edges')
-  const nodeClient = context.get('node_client')
+export const UnsetAccountOutput = z.object({
+  unset: z.object({
+    account: AccountURNInput,
+    address: AddressURNInput,
+  }),
+})
+
+type UnsetAccountParams = z.infer<typeof UnsetAccountInput>
+type UnsetAccountResult = z.infer<typeof UnsetAccountOutput>
+
+export const unsetAccountMethod = async ({
+  input,
+  ctx,
+}: {
+  input: UnsetAccountParams
+  ctx: Context
+}): Promise<UnsetAccountResult> => {
+  const edgesClient = getEdgesClient(ctx.Edges)
+  const nodeClient = ctx.address
 
   // Get the address associated with the X-3RN included in the request.
-  const name = context.get('name')
-  const address = AddressURNSpace.urn(name) as AddressURN
+  const address = ctx.addressURN as AddressURN
 
-  const [account] = request.params as UnsetAccountParams
+  const account = input
   if (!AccountURNSpace.is(account)) {
-    const detail = Object.assign({ data: account }, ErrorInvalidAccountId)
-    return openrpc.error(request, detail)
+    throw new Error('Invalid account URN')
   }
 
   // Remove the stored account in the node.
-  await nodeClient.unsetAccount()
+  await nodeClient?.class.unsetAccount()
 
-  // Unlink the address and account nodes, removing the "account" edge.
-  const unlinkResult = await unlinkAccountAddress(edges, account, address)
+  const unlinkResult = await edgesClient.removeEdge.mutate({
+    src: account,
+    dst: address,
+    tag: EDGE_ADDRESS,
+  })
 
-  return openrpc.response(request, {
+  return {
     unset: {
       account: account,
       address: address,
     },
-  })
+  }
 }

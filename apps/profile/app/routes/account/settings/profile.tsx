@@ -14,6 +14,7 @@ import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import type { CryptoAddressProfile } from '@kubelt/platform.address/src/types'
 
 import { gatewayFromIpfs } from '@kubelt/utils'
 import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
@@ -23,7 +24,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { parseURN } from 'urns'
-import type { Profile } from '~/utils/galaxy.server'
+import type { Profile } from '@kubelt/galaxy-client'
 import SaveButton from '~/components/accounts/SaveButton'
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -50,12 +51,14 @@ export const loader: LoaderFunction = async ({ request }) => {
       'X-3RN': `urn:threeid:address/${address}`,
     },
   })
-  const voucher = await addressClient.kb_getPfpVoucher()
+
+  const addressProfile = await addressClient.getAddressProfile.query()
+  const { nftarVoucher } = addressProfile as CryptoAddressProfile
 
   return json({
     address,
-    generatedPfp: voucher?.metadata?.image,
-    generatedPfpMinted: nftsForAddress.ownedNfts.length,
+    generatedPfp: nftarVoucher?.metadata?.image,
+    generatedPfpMinted: nftsForAddress?.ownedNfts.length,
     ...profileRes.profile,
   })
 }

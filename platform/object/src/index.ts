@@ -1,5 +1,7 @@
-import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import {
+  fetchRequestHandler,
+  FetchCreateContextFnOptions,
+} from '@trpc/server/adapters/fetch'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
 import Meta from './nodes/meta'
@@ -16,7 +18,7 @@ export default {
         // TODO: report somehwere
       },
       createContext: (opts) =>
-        createContext(opts as CreateNextContextOptions, env),
+        createContext(opts as FetchCreateContextFnOptions, env),
     })
   },
 }

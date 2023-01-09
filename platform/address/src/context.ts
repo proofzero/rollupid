@@ -1,13 +1,12 @@
-import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-
-import createStarbaseClient, {
-  StarbaseApi,
-} from '@kubelt/platform-clients/starbase'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
-
-import { Access, Authorization } from '.'
-import type { Environment } from './types'
+import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import { DurableObjectStubProxy } from 'do-proxy'
+import { OAuthAddress, CryptoAddress } from '.'
+import type { Environment, NodeType, AddressType } from './types'
+import createEdgesClient from '@kubelt/platform-clients/edges'
+import { AddressURN } from '@kubelt/urns/address'
+import { ENSRes } from '@kubelt/platform-clients/ens-utils'
 
 /**
  * Defines your inner context shape.
@@ -15,12 +14,19 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  Access: DurableObjectNamespace
-  access?: Access
-  Authorization: DurableObjectNamespace
-  authorization?: Authorization
-  Starbase: Fetcher
-  starbaseClient?: StarbaseApi
+  TOKEN_NFTAR: string
+  NFTAR_CHAIN_ID: string
+  NFTAR_URL: string
+  CryptoAddress: DurableObjectNamespace
+  OAuthAddress: DurableObjectNamespace
+  ContractAddress: DurableObjectNamespace
+  Edges: Fetcher
+  Access: Fetcher
+  address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>
+  addressURN?: AddressURN
+  nodeType?: NodeType
+  addrType?: AddressType
+  addressDescription?: ENSRes
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -32,10 +38,10 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const starbaseClient = createStarbaseClient(opts.Starbase)
+  const edges = createEdgesClient(opts.Edges)
   return {
-    starbaseClient,
     ...opts,
+    edges,
   }
 }
 /**

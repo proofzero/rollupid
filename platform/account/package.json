@@ -35,7 +35,7 @@
     "@kubelt/platform-middleware": "workspace:*",
     "@kubelt/platform.access": "workspace:*",
     "@kubelt/types": "workspace:*",
-    "@trpc/server": "10.7.0",
+    "@trpc/server": "10.8.1",
     "do-proxy": "1.3.1",
     "itty-durable": "1.6.0",
     "itty-router-extras": "0.4.2",

@@ -1,5 +1,5 @@
 import { HiArrowNarrowRight } from 'react-icons/hi'
-import { Text } from '@kubelt/design-system'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import { gatewayFromIpfs } from '@kubelt/utils'
 

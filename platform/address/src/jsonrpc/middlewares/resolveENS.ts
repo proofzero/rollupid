@@ -1,19 +1,31 @@
-import type { RpcContext } from '@kubelt/openrpc'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
+import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { Context } from '../../context'
 
 import { CryptoAddressType } from '../../types'
 
-export default async (request: Readonly<Request>, context: RpcContext) => {
+export const resolveENS: BaseMiddlewareFunction<Context> = async ({
+  next,
+  ctx,
+}) => {
   if (
-    context.get('addr_type') != CryptoAddressType.Ethereum ||
-    context.get('addr_type') != CryptoAddressType.ETH
+    ctx.addressURN &&
+    (ctx.addrType == CryptoAddressType.Ethereum ||
+      ctx.addrType == CryptoAddressType.ETH)
   ) {
-    return
+    const ensClient = new ENSUtils()
+    const response = await ensClient.getEnsEntry(
+      AddressURNSpace.decode(ctx.addressURN)
+    )
+
+    return next({
+      ctx: {
+        ...ctx,
+        name: response.address,
+        addressDescription: response,
+      },
+    })
   }
-
-  const ensClient = new ENSUtils()
-  const response = await ensClient.getEnsEntry(context.get('name'))
-
-  context.set('name', response.address)
-  context.set('address_description', response)
+  return next({ ctx })
 }

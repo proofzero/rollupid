@@ -1,5 +1,10 @@
-import { RpcContext } from '@kubelt/openrpc'
-import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+import { z } from 'zod'
+import { GetGoogleOAuthDataSchema } from './jsonrpc/validators/oauth'
+import {
+  CryptoAddressProfileSchema,
+  GoogleRawProfileSchema,
+  NFTarVoucherSchema,
+} from './jsonrpc/validators/profile'
 
 export interface Environment {
   Access: Fetcher
@@ -18,11 +23,6 @@ export interface Environment {
   BLOCKCHAIN_ACTIVITY: Queue
 }
 
-export interface AddressRpcContext extends RpcContext {
-  NFTAR_URL: string
-  BLOCKCHAIN_ACTIVITY: Queue
-}
-
 export enum NodeType {
   Crypto = 'crypto',
   Contract = 'contract',
@@ -34,9 +34,19 @@ export enum CryptoAddressType {
   ETH = 'eth',
 }
 
+export enum ContractAddressType {
+  Ethereum = 'ethereum',
+  ETH = 'eth',
+}
+
 export enum OAuthAddressType {
   Google = 'google',
 }
+
+export type AddressType =
+  | CryptoAddressType
+  | OAuthAddressType
+  | ContractAddressType
 
 export interface Challenge {
   address: string
@@ -47,29 +57,12 @@ export interface Challenge {
   timestamp: number
 }
 
-export type SetAccountParams = [account: string]
+export type OAuthGoogleProfile = z.infer<typeof GoogleRawProfileSchema>
+export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
+export type AddressProfile = CryptoAddressProfile | OAuthGoogleProfile
 
-export type UnsetAccountParams = [account: string]
+export type OAuthGoogleData = z.infer<typeof GetGoogleOAuthDataSchema>
 
-export type SetDataParams = [data: object]
+export type OAuthDataSchema = OAuthGoogleData // TODO: change to z.union when more are supported
 
-export type GetNonceParams = [
-  address: string,
-  template: string,
-  redirectUri: string,
-  scope: string[],
-  state: string
-]
-
-export type VerifyNonceParams = [nonce: string, signature: string]
-
-export type AddressProfile = {
-  cover: string
-  displayName: string
-  pfp: {
-    image: string
-    isToken?: boolean
-  }
-}
-
-export type SetAddressProfileParams = [profile: Partial<AddressProfile>]
+export type NFTarVoucher = z.infer<typeof NFTarVoucherSchema>

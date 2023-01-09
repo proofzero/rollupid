@@ -1,91 +1,34 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext, RpcRequest, RpcService } from '@kubelt/openrpc'
+import { z } from 'zod'
+import { Context } from '../../context'
+import { CryptoAddressProxyStub } from '../../nodes/crypto'
 
-import { CryptoAddressType, GetNonceParams } from '../../types'
+export const GetNonceInput = z.object({
+  address: z.string(),
+  template: z.string(),
+  redirectUri: z.string(),
+  scope: z.array(z.string()),
+  state: z.string(),
+})
 
-export default async (
-  service: Readonly<RpcService>,
-  request: Readonly<RpcRequest>,
-  context: Readonly<RpcContext>
-) => {
-  const [address, template, redirectUri, scope, state] =
-    request.params as GetNonceParams
+export const GetNonceOutput = z.string()
 
-  const addressType = context.get('addr_type')
-  switch (addressType) {
-    case CryptoAddressType.Ethereum:
-    case CryptoAddressType.ETH:
-      break
-    default:
-      return openrpc.error(request, {
-        code: -32500,
-        message: `not supported adress type: ${addressType}`,
-      })
-  }
+type GetNonceParams = z.infer<typeof GetNonceInput>
 
-  if (!address) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing address',
-    })
-  }
+export const getNonceMethod = async ({
+  input,
+  ctx,
+}: {
+  input: GetNonceParams
+  ctx: Context
+}): Promise<string> => {
+  const { address, template, redirectUri, scope, state } = input
 
-  if (!template) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing template',
-    })
-  }
-
-  if (typeof template != 'string') {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'template is not a string',
-    })
-  }
-
-  if (!template.includes('{{nonce}}')) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'template missing nonce variable',
-    })
-  }
-
-  if (!redirectUri) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing redirect URI',
-    })
-  }
-
-  if (!scope) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing scope',
-    })
-  }
-
-  if (!state) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: 'missing state',
-    })
-  }
-
-  const nodeClient = context.get('node_client')
-  try {
-    const result = await nodeClient.getNonce({
-      address,
-      template,
-      redirectUri,
-      scope,
-      state,
-    })
-    return openrpc.response(request, result)
-  } catch (error) {
-    return openrpc.error(request, {
-      code: -32500,
-      message: (error as Error).message,
-    })
-  }
+  const nodeClient = ctx.address as CryptoAddressProxyStub
+  return await nodeClient.class.getNonce(
+    address,
+    template,
+    redirectUri,
+    scope,
+    state
+  )
 }

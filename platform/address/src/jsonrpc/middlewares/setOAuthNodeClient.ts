@@ -1,14 +1,23 @@
-import * as openrpc from '@kubelt/openrpc'
-import type { RpcContext } from '@kubelt/openrpc'
 import { NodeType } from '../../types'
+import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { Context } from '../../context'
+import { initOAuthNodeByName } from '../../nodes'
 
-export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (context.get('node_type') != NodeType.OAuth) {
-    return
+export const setOAuthNodeClient: BaseMiddlewareFunction<Context> = async ({
+  next,
+  ctx,
+}) => {
+  if (!ctx.addressURN) {
+    throw new Error('missing addressURN')
   }
-
-  const OAuthAddress: DurableObjectNamespace = context.get('OAuthAddress')
-  const name = context.get('name')
-  const nodeClient = await openrpc.discover(OAuthAddress, { name })
-  context.set('node_client', nodeClient)
+  if (ctx.nodeType == NodeType.OAuth) {
+    const node = await initOAuthNodeByName(ctx.addressURN, ctx.OAuthAddress)
+    return next({
+      ctx: {
+        ...ctx,
+        address: node,
+      },
+    })
+  }
+  return next({ ctx })
 }

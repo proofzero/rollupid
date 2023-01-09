@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-import { Address } from '@kubelt/types'
 import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
+import { CryptoAddressType } from '@kubelt/platform/address/src/types'
 
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (AddressURNSpace.parse(input as AddressURN) === null) {
@@ -19,23 +19,21 @@ export const AccountURNInput = z.custom<AccountURN>((input) => {
   return input as AccountURN
 })
 
-export const CryptoAddressTypeInput = z.custom<Address.CryptoAddressType>(
-  (input) => {
-    let addrType: Address.CryptoAddressType
-    switch (input) {
-      case Address.CryptoAddressType.Ethereum:
-        addrType = Address.CryptoAddressType.Ethereum
-        break
-      case Address.CryptoAddressType.ETH:
-        addrType = Address.CryptoAddressType.ETH
-        break
-      default:
-        throw new TypeError(`invalid crypto address type: ${input}`)
-    }
-
-    return addrType
+export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {
+  let addrType: CryptoAddressType
+  switch (input) {
+    case CryptoAddressType.Ethereum:
+      addrType = CryptoAddressType.Ethereum
+      break
+    case CryptoAddressType.ETH:
+      addrType = CryptoAddressType.ETH
+      break
+    default:
+      throw new TypeError(`invalid crypto address type: ${input}`)
   }
-)
+
+  return addrType
+})
 
 export const AnyURNInput = z.custom<AnyURN>((input) => {
   parseURN(input as string)

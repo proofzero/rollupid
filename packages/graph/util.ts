@@ -16,8 +16,6 @@ import { EdgeDirection, EdgesOptions, NodeFilter } from './types'
 
 import { EDGE_ADDRESS, EDGE_APPLICATION } from './edges'
 
-import { Address } from '@kubelt/types'
-
 import * as graph from './index'
 
 // Account <=> Address
@@ -100,7 +98,7 @@ export async function unlinkAccountApp(
 export async function listAddresses(
   edges: Fetcher,
   account: AccountURN,
-  addrType?: Address.CryptoAddressType
+  addrType?: any
 ): ReturnType<typeof graph.edges> {
   // Construct the query for edges linking an account node and address
   // node (of optional address type).

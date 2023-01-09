@@ -1,25 +1,34 @@
-import type { RpcContext } from '@kubelt/openrpc'
+import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { Context } from '../../context'
 import { NodeType } from '../../types'
 
-export default async (request: Readonly<Request>, context: RpcContext) => {
-  if (
-    context.get('node_type') != NodeType.Crypto &&
-    context.get('node_type') != NodeType.Contract
-  ) {
-    return
+export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
+  next,
+  ctx,
+}) => {
+  if (ctx.nodeType != NodeType.Crypto) {
+    return next({ ctx })
   }
 
-  const nodeClient = context.get('node_client')
-  if (!nodeClient) {
-    return
+  const addressNode = ctx.address
+  const addressURN = ctx.addressURN
+  const addrType = ctx.addrType
+  if (!addressNode) {
+    throw new Error('missing address node')
+  }
+  if (!addressURN) {
+    throw new Error('missing addressURN')
+  }
+  if (!addrType) {
+    throw new Error('missing addrType')
   }
 
-  const address = await nodeClient.getAddress()
-  const type = await nodeClient.getType()
+  const address = await addressNode.class.getAddress()
+  const type = await addressNode.class.getType()
 
   if (!address || !type) {
-    await nodeClient.setAddress({ address: context.get('name') })
-    await nodeClient.setType({ type: context.get('addr_type') })
+    await addressNode.class.setAddress(addressURN)
+    await addressNode.class.setType(addrType)
 
     // TODO: when contracts are supported we can monitor contracts too
     // if (context.get('node_type') == NodeType.Crypto) {
@@ -44,4 +53,5 @@ export default async (request: Readonly<Request>, context: RpcContext) => {
     //   })
     // }
   }
+  return next({ ctx })
 }
