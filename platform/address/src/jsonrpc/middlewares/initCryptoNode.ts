@@ -1,6 +1,7 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
-import { NodeType } from '../../types'
+import { CryptoAddressProxyStub } from '../../nodes/crypto'
+import { CryptoAddressType, NodeType } from '../../types'
 
 export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
   next,
@@ -11,9 +12,9 @@ export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
     return next({ ctx })
   }
 
-  const addressNode = ctx.address
+  const addressNode = ctx.address as CryptoAddressProxyStub
   const addressURN = ctx.addressURN
-  const addrType = ctx.addrType
+  const addrType = ctx.addrType as CryptoAddressType
   if (!addressNode) {
     throw new Error('missing address node')
   }
