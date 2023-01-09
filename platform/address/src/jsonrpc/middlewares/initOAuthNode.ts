@@ -1,6 +1,7 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
-import { NodeType } from '../../types'
+import { OAuthAddressProxyStub } from '../../nodes/oauth'
+import { NodeType, OAuthAddressType } from '../../types'
 
 export const initOAuthNode: BaseMiddlewareFunction<Context> = async ({
   next,
@@ -10,9 +11,9 @@ export const initOAuthNode: BaseMiddlewareFunction<Context> = async ({
     return next({ ctx })
   }
 
-  const nodeClient = ctx.address
+  const nodeClient = ctx.address as OAuthAddressProxyStub
   const addressURN = ctx.addressURN
-  const addrType = ctx.addrType
+  const addrType = ctx.addrType as OAuthAddressType
   if (!nodeClient) {
     throw new Error('missing node client')
   }
