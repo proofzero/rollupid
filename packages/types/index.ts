@@ -10,6 +10,8 @@ import * as Router from './router'
 
 import BaseContext from './context'
 
-export { Account, Router }
+import * as Graph from './edges.ts'
+
+export { Account, Router, Graph }
 
 export type { BaseContext }

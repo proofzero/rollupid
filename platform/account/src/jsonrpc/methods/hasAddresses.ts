@@ -4,10 +4,10 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { Edge, EdgeDirection } from '@kubelt/graph'
+import type { AddressList } from '../../types'
+import { Graph } from '@kubelt/types'
 import type { AccountURN } from '@kubelt/urns/account'
-import { EDGE_ADDRESS } from '@kubelt/graph/edges'
-import { AddressList } from '../../types'
+import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 
 // Should this live in @kubelt/platform-middlewares/inputValidators?
 export const AddressListInput = z.custom<AddressList>((input) => {
@@ -50,14 +50,14 @@ export const hasAddressesMethod = async ({
     // We only want edges that link to address nodes.
     tag: EDGE_ADDRESS,
     // Account -> Address edges indicate ownership.
-    dir: EdgeDirection.Outgoing,
+    dir: Graph.EdgeDirection.Outgoing,
   }
   const edgesResult = await ctx.edges.getEdges.query({ query })
   const edgeList = edgesResult.edges
 
   // A set of the addresses owned by the account.
   const owned = new Set(
-    edgeList.map((edge: Edge) => {
+    edgeList.map((edge: Graph.Edge) => {
       return edge.dst.urn
     })
   )

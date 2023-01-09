@@ -3,9 +3,10 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import { AddressURN } from '@kubelt/urns/address'
 
-import { Edge, EdgeDirection } from '@kubelt/graph'
-import { EDGE_ADDRESS } from '@kubelt/graph/edges'
-import { AddressList } from '../../types'
+import { Graph } from '@kubelt/types'
+import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
+
+import type { AddressList } from '../../types'
 
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
@@ -29,7 +30,7 @@ export const getAddressesMethod = async ({
     // We only want edges that link to address nodes.
     tag: EDGE_ADDRESS,
     // Account -> Address edges indicate ownership.
-    dir: EdgeDirection.Outgoing,
+    dir: Graph.EdgeDirection.Outgoing,
 
     dst: {
       // Only keep edges having the given node type. The node type is
@@ -46,7 +47,7 @@ export const getAddressesMethod = async ({
 
   // The source nodes in the returned edges are the URNs of the
   // account nodes.
-  const addresses = edgesResult.edges.map((edge: Edge) => {
+  const addresses = edgesResult.edges.map((edge: Graph.Edge) => {
     return edge.dst.urn as AddressURN
   })
 

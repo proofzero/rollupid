@@ -1,12 +1,9 @@
 import { z } from 'zod'
-import { AccountURN } from '@kubelt/urns/account'
 import { Context } from '../../context'
 import type { AddressURN } from '@kubelt/urns/address'
-import { AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
-import { EDGE_ADDRESS } from '@kubelt/graph/edges'
-import { unlinkAccountAddress } from '@kubelt/graph/util'
+import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import getEdgesClient from '@kubelt/platform-clients/edges'
 
 import {

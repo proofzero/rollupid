@@ -42,7 +42,6 @@
     "yarn-run-all": "3.1.1"
   },
   "dependencies": {
-    "@kubelt/openrpc": "workspace:*",
     "@kubelt/security": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@trpc/server": "10.8.1",

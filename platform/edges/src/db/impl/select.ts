@@ -24,7 +24,7 @@ import type {
   RComponents,
   Permission,
 } from '../types'
-import { EdgeDirection } from '@kubelt/graph'
+import { EdgeDirection } from '@kubelt/types/edges'
 
 // qc()
 // -----------------------------------------------------------------------------
