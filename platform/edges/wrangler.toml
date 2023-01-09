@@ -18,8 +18,9 @@ workers_dev = false
 
 [[d1_databases]]
 binding = "EDGES"
-database_name = "edges-dev"
+database_name = "edges"
 database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d"
+migrations_dir = "migrations"
 
 # Secrets
 # -----------------------------------------------------------------------------
@@ -48,7 +49,7 @@ local_protocol = "http"
 
 [env.dev]
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-dev", database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d" }
+  { binding = "EDGES", database_name = "edges-dev", database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d", migrations_dir = "migrations" }
 ]
 
 [env.dev.vars]
@@ -60,7 +61,7 @@ ENVIRONMENT = "dev"
 [env.next]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98" }
+  { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98", migrations_dir = "migrations" }
 ]
 
 [env.next.vars]
@@ -72,7 +73,7 @@ ENVIRONMENT = "next"
 [env.current]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-next", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd" }
+  { binding = "EDGES", database_name = "edges-next", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" }
 ]
 
 [env.current.vars]
