@@ -26,7 +26,9 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Cover } from '~/components/profile/cover/Cover'
 import HeadNav from '~/components/head-nav'
+import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
 
+import ConditionalTooltip from '~/components/conditional-tooltip'
 import { loader as profileLoader } from '~/routes/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
@@ -49,6 +51,8 @@ export const loader: LoaderFunction = async (args) => {
   const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
     addressOrEns: params.profile,
   })
+
+  const { gallery } = await (await galleryLoader(args)).json()
 
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
@@ -93,6 +97,7 @@ export const loader: LoaderFunction = async (args) => {
     targetAddress,
     ogImageURL,
     path,
+    isGalleryDisabled: !(gallery && gallery.length > 0),
   })
 }
 
@@ -150,6 +155,7 @@ const ProfileLayout = () => {
     website,
     path,
     links,
+    isGalleryDisabled,
   } = useLoaderData()
   const { claimed } = loggedInUserProfile
   const [coverUrl, setCoverUrl] = useState(cover)
@@ -275,7 +281,10 @@ const ProfileLayout = () => {
         }`}
       >
         {isOwner && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-gray-800/25 rounded-b-xl">
+          <div
+            className="absolute top-0 left-0 right-0 bottom-0 flex
+          justify-center items-center bg-gray-800/25 rounded-b-xl"
+          >
             <input
               ref={coverUploadRef}
               type="file"
@@ -331,7 +340,11 @@ const ProfileLayout = () => {
         )}
       </Cover>
 
-      <div className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-end px-8 mt-[-6em]">
+      <div
+        className="max-w-7xl w-full min-h-[192px] mx-auto flex flex-col
+        lg:flex-row justify-center lg:justify-between items-center lg:items-end
+        px-8 mt-[-6em]"
+      >
         <Avatar
           src={gatewayFromIpfs(pfp.image) as string}
           size="lg"
@@ -358,7 +371,10 @@ const ProfileLayout = () => {
 
       <div className="mt-3 max-w-[82rem] overflow-visible w-full mx-auto p-3 lg:py-0 lg:px-4">
         {!claimed && (
-          <div className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row space-y-4 lg:space-y-0 flex-row justify-between mt-7">
+          <div
+            className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
+          space-y-4 lg:space-y-0 flex-row justify-between mt-7"
+          >
             <div>
               <Text className="text-gray-600" size="lg" weight="semibold">
                 This Account is yet to be claimed - Are you the owner?
@@ -397,7 +413,10 @@ const ProfileLayout = () => {
                 {bio}
               </Text>
 
-              <div className="flex flex-col lg:flex-row lg:space-x-10 justify-start lg:items-center text-gray-500 font-size-lg">
+              <div
+                className="flex flex-col lg:flex-row lg:space-x-10 justify-start
+              lg:items-center text-gray-500 font-size-lg"
+              >
                 {location && (
                   <div className="flex flex-row space-x-2 items-center wrap">
                     <FaMapMarkerAlt />
@@ -427,9 +446,12 @@ const ProfileLayout = () => {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col lg:flex-row lg:space-x-2 justify-start lg:items-center text-gray-500 font-size-lg">
-                {links &&
-                  links.map((link: any, i: number) => (
+              {links && (
+                <div
+                  className="flex flex-col lg:flex-row lg:space-x-2
+                justify-start lg:items-center text-gray-500 font-size-lg"
+                >
+                  {links.map((link: any, i: number) => (
                     <button
                       key={`${link.name}-${link.url}-${i}`}
                       className="bg-gray-300 rounded-full
@@ -449,7 +471,8 @@ const ProfileLayout = () => {
                       </a>
                     </button>
                   ))}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -458,24 +481,32 @@ const ProfileLayout = () => {
           <div className="block">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                {Object.keys(tabs).map((tab) => (
-                  <button
-                    key={tabs[tab]}
-                    onClick={() => {
-                      setCurrentTab(tabs[tab])
-                      navigate(`./${tab}`, { replace: true })
-                    }}
-                    className={classNames(
-                      tabs[tab] === currentTab
-                        ? 'border-indigo-500 font-semibold text-gray-800'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                      '',
-                      'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-                    )}
-                  >
-                    {tabs[tab]}
-                  </button>
-                ))}
+                {Object.keys(tabs).map((tab) => {
+                  return (
+                    <ConditionalTooltip
+                      key={tabs[tab]}
+                      content="Gallery is empty"
+                      condition={tab === 'gallery' && isGalleryDisabled}
+                    >
+                      <button
+                        disabled={tab === 'gallery' && isGalleryDisabled}
+                        onClick={() => {
+                          setCurrentTab(tabs[tab])
+                          navigate(`./${tab}`, { replace: true })
+                        }}
+                        className={classNames(
+                          tabs[tab] === currentTab
+                            ? 'border-indigo-500 font-semibold text-gray-800'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                          '',
+                          'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                        )}
+                      >
+                        {tabs[tab]}
+                      </button>
+                    </ConditionalTooltip>
+                  )
+                })}
               </nav>
             </div>
           </div>

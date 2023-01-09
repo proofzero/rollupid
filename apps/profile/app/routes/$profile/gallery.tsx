@@ -1,6 +1,11 @@
 import ProfileNftGallery from '~/components/nft-collection/ProfileNftGallery'
 import { useRouteData } from '~/hooks'
 
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { redirect } from '@remix-run/cloudflare'
+
+import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
+
 export type ProfileData = {
   targetAddress: string
   displayName: string
@@ -13,6 +18,14 @@ export type ProfileData = {
 
 export type GalleryData = {
   gallery: any[]
+}
+
+export const loader: LoaderFunction = async (args) => {
+  const { params } = args
+  const { gallery } = await (await galleryLoader(args)).json()
+  if (!gallery || !gallery.length)
+    return redirect(`/${params.profile}/collection`)
+  return null
 }
 
 const ProfileRoute = () => {

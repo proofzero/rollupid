@@ -253,6 +253,7 @@ export default function AccountSettingsProfile() {
                 </Text>
 
                 <img
+                  alt="generated pfp"
                   src={gatewayFromIpfs(generatedPfp)}
                   style={{
                     width: 33,
@@ -271,7 +272,7 @@ export default function AccountSettingsProfile() {
         </div>
 
         <Form
-          className="flex flex-col space-y-9 mt-12"
+          className="flex flex-col space-y-9 mt-12 relative"
           method="post"
           onChange={() => {
             setFormChanged(true)

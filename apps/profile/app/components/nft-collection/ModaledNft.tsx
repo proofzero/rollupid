@@ -25,8 +25,8 @@ const ModaledNft = ({ nft, isModal }: any) => {
             isOpen={showModal}
             handleClose={() => setShowModal(false)}
           />
-          <div className="relative cursor-pointer group">
-            <button
+          <button className="relative cursor-pointer group">
+            <div
               onClick={() => {
                 if (!loadFail) {
                   setShowModal(true)
@@ -63,7 +63,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
               >
                 {nft.title}
               </Text>
-            </button>
+            </div>
 
             <img
               className="w-full rounded-lg"
@@ -75,7 +75,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
               onError={(e) => setLoadFail(true)}
               alt="collection-item"
             />
-          </div>
+          </button>
         </>
       ) : (
         <button

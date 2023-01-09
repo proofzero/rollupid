@@ -12,8 +12,8 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
   return (
     <>
       {hovered ? (
-        <div className="relative cursor-pointer group">
-          <button
+        <button className="relative cursor-pointer group">
+          <div
             onClick={() => {
               handleSelectedNft(nft)
             }}
@@ -22,7 +22,6 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
         left-0 right-0 top-0 bottom-0
         p-1 lg:p-4 flex flex-col
         justify-end transition-all
-        w-full
         duration-300 rounded-lg
         invisible
         group-hover:visible
@@ -50,7 +49,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             >
               {nft.title}
             </Text>
-          </button>
+          </div>
 
           <img
             className="w-full rounded-lg"
@@ -62,7 +61,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             onError={(e) => setLoadFail(true)}
             alt="collection-item"
           />
-        </div>
+        </button>
       ) : (
         <button
           className="rounded-lg

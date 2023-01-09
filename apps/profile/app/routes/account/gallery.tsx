@@ -5,13 +5,7 @@ import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
 
-import {
-  useLoaderData,
-  useSubmit,
-  Form,
-  useActionData,
-  useTransition,
-} from '@remix-run/react'
+import { Form, useActionData, useTransition } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 // Styles
@@ -65,6 +59,9 @@ export const action: ActionFunction = async ({ request }) => {
 
   let errors: any = {}
 
+  /**
+   * This part mutates D1 table for gallery
+   */
   const nfts = JSON.parse(formData.get('gallery'))
 
   nfts.forEach((nft: any) => {
@@ -227,7 +224,6 @@ const Gallery = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
-  const submit = useSubmit()
 
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
 
@@ -260,8 +256,8 @@ const Gallery = () => {
           nftRes.gallery.map((nft: any) => nft.contract.address + nft.tokenId)
         )
       )
+      setLoading(false)
     })()
-    setLoading(false)
   }, [])
 
   // HANDLERS
@@ -275,10 +271,6 @@ const Gallery = () => {
 
   const handleDragCancel = () => {
     setActiveId(null)
-  }
-
-  const handleSubmit = (event: any) => {
-    submit(curatedNfts, { replace: true })
   }
 
   const handleDragStart = (event: any) => {
@@ -394,13 +386,14 @@ const Gallery = () => {
         onReset={() => {
           setFormChanged(false)
         }}
-        onSubmit={handleSubmit}
+        className="relative"
       >
         <input
           type="hidden"
           name="gallery"
           value={JSON.stringify(curatedNfts)}
         />
+
         <SaveButton
           isFormChanged={isFormChanged}
           discardFn={() => {

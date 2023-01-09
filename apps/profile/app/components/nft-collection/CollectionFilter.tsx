@@ -21,7 +21,11 @@ const CollectionFilter = ({
       className="w-full flex items-center justify-start 
         sm:justify-end lg:justify-end my-5"
     >
-      <div className="w-full sm:w-auto mt-1 block rounded-md border-gray-300 py-2 text-base">
+      <div
+        className="w-full sm:w-auto mt-1 block
+                   rounded-md border-gray-300
+                   py-2 text-base"
+      >
         <div>
           <div className="dropdown relative">
             <button

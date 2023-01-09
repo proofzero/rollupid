@@ -10,7 +10,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 type PfpNftModalProps = {
   account: string
-  text: string
+  text?: string
   pfp: string
   isOpen: boolean
   handleClose: (value: boolean) => void
