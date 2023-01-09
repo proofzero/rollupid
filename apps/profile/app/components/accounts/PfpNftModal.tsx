@@ -31,11 +31,13 @@ const PfpNftModal = ({
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
       <div
         className="flex-1 relative transform rounded-lg bg-white px-4 pt-5 
-      pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto"
+      pb-4 text-left shadow-xl transition-all overflow-y-auto"
       >
-        <Text className="pb-4 text-gray-800" size="2xl" weight="bold">
-          {text}
-        </Text>
+        {text?.length && (
+          <Text className="pb-4 text-gray-800" size="2xl" weight="bold">
+            {text}
+          </Text>
+        )}
 
         {collection.length ? (
           <ProfileNftSingleCollection

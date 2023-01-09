@@ -24,7 +24,7 @@ export const LoadingGridSquares = ({ numberOfCells = 10 }) => {
 
   return (
     <>
-      <div className="mt-[92px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
+      <div className="mt-[82px] mx-[32px] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
         {performer.map((item: any, i: number) => {
           return (
             <div
