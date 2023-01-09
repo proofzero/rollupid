@@ -11,7 +11,7 @@ services = [
 
 [[ d1_databases ]]
 binding = "COLLECTIONS" # i.e. available in your Worker on env.DB
-database_name = "collections-dev"
+database_name = "collections"
 database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
 migrations_dir = "migrations"
 
