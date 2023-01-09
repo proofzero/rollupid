@@ -2,7 +2,7 @@ name = "address"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
 node_compat = true
-workers_dev = false
+workers_dev = true
 
 durable_objects.bindings = [
   { name = "CryptoAddress", class_name = "CryptoAddress" },

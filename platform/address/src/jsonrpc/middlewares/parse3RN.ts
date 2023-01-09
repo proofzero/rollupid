@@ -50,11 +50,15 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
     throw `cannot determine node type: ${urn}`
   }
 
+  const addressURN = AddressURNSpace.urn(name)
+
+  console.log('parse3RN', { name, addrType, nodeType, rparams, addressURN })
+
   return next({
     ctx: {
       ...ctx,
       rparams,
-      addressURN: AddressURNSpace.urn(name),
+      addressURN,
       addrType,
       nodeType,
       params: new URLSearchParams(qcomponent as string),
