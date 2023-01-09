@@ -1,8 +1,5 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-
-import createStarbaseClient, {
-  StarbaseApi,
-} from '@kubelt/platform-clients/starbase'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 
@@ -20,7 +17,7 @@ interface CreateInnerContextOptions
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher
-  starbaseClient?: StarbaseApi
+  starbaseClient?: ReturnType<typeof createStarbaseClient>
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

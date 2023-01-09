@@ -12,7 +12,7 @@ export const CreateAppInputSchema = z.object({
 })
 
 export const CreateAppOutputSchema = z.object({
-  clinetId: z.string(),
+  clientId: z.string(),
 })
 
 export const createApp = async ({
@@ -54,6 +54,6 @@ export const createApp = async ({
   }
 
   return {
-    clinetId: clientId,
+    clientId: clientId,
   }
 }

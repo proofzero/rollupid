@@ -5,7 +5,7 @@ export const getScopes = async ({
   input,
   ctx,
 }: {
-  input: any
+  input: never
   ctx: Context
 }): Promise<any> => {
   //TODO: this isn't implemented. Here as a placeholder

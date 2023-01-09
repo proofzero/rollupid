@@ -17,7 +17,7 @@ import {
   getAppDetails,
   GetAppDetailsOutputSchema,
 } from './methods/getAppDetails'
-import { listApps, ListAppsOutputSchema } from './methods/listApps'
+import { listApps, ListAppsOutputSchema, NoInput } from './methods/listApps'
 import { AppClientIdParamSchema, AppUpdateableFieldsSchema } from '../types'
 import {
   rotateClientSecret,
@@ -37,21 +37,13 @@ import {
 import { getAppProfile } from './methods/getAppProfile'
 import { updateApp, UpdateAppInputSchema } from './methods/updateApp'
 import { getScopes } from './methods/getAppProfile copy'
+import {
+  checkApiKey,
+  CheckApiKeyInputSchema,
+  CheckApiKeyOutputSchema,
+} from './methods/checkApiKey'
 
-const t = initTRPC.context<Context>().create({
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.code === 'BAD_REQUEST' && error.cause instanceof ZodError
-            ? error.cause.flatten()
-            : null,
-      },
-    }
-  },
-})
+const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
   createApp: t.procedure
@@ -91,7 +83,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
+    .input(NoInput)
     .output(ListAppsOutputSchema)
     .query(listApps),
   rotateClientSecret: t.procedure
@@ -121,8 +113,17 @@ export const appRouter = t.router({
     .use(LogUsage)
     .input(PublishAppInputSchema)
     .output(PublishAppOutputSchema)
-    .query(publishApp),
+    .mutation(publishApp),
+  checkApiKey: t.procedure
+    //This endpoint doesn't require a JWT
+    .use(LogUsage)
+    .input(CheckApiKeyInputSchema)
+    .output(CheckApiKeyOutputSchema)
+    .query(checkApiKey),
   getScopes: t.procedure
     //TODO: Revisit when implementing scopes
+    .input(NoInput)
     .query(getScopes),
 })
+
+export type StarbaseRouter = typeof appRouter

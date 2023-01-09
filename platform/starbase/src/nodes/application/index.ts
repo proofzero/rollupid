@@ -12,7 +12,11 @@ import {
   SignJWT,
 } from 'jose'
 import { STARBASE_API_KEY_ISSUER } from '../../constants'
-import type { AppReadableFields, AppUpdateableFields } from '../../types'
+import type {
+  AppObject,
+  AppReadableFields,
+  AppUpdateableFields,
+} from '../../types'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -61,17 +65,15 @@ export default class ApplicationNode extends DOProxy {
     this.state.storage.deleteAll()
   }
 
-  async update(updates: AppUpdateableFields): Promise<void> {
+  async update(updates: Partial<AppObject>): Promise<void> {
     //Merge values in app object
     const storedValues = this.state.storage.get('app')
     const mergedEntries = new Map(Object.entries(storedValues))
-    Object.entries(updates.app).forEach(([k, v]) => {
+    Object.entries(updates).forEach(([k, v]) => {
       mergedEntries.set(k, v)
     })
     const mergedObject = Object.fromEntries(mergedEntries.entries())
 
-    //Place merged object in storage, for legacy reasons ignore the rest
-    //May need to revisit
     await this.state.storage.put('app', mergedObject)
   }
 

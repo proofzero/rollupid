@@ -9,11 +9,13 @@ import { AppClientIdParamSchema, AppObject, AppObjectSchema } from '../../types'
 
 export const ListAppsOutputSchema = z.array(AppObjectSchema)
 
+export const NoInput = z.never()
+
 export const listApps = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof AppClientIdParamSchema>
+  input: z.infer<typeof NoInput>
   ctx: Context
 }): Promise<z.infer<typeof ListAppsOutputSchema>> => {
   if (!ctx.accountURN) throw new Error('No account URN in context')

@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { AppUpdateableFieldsSchema } from '../../types'
+import { AppObjectSchema, AppUpdateableFieldsSchema } from '../../types'
 
 export const UpdateAppInputSchema = z.object({
   clientId: z.string(),
-  updates: AppUpdateableFieldsSchema,
+  updates: AppObjectSchema.partial(),
 })
 
 export const updateApp = async ({

@@ -6,8 +6,9 @@ import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
-import { getStarbaseClient, StarbaseClient } from '~/utilities/platform.server'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -21,22 +22,19 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
-  const appDetails = (await starbaseClient.kb_appDetails(params.clientId)) as {
-    appId: string
-    clientId: string
-    secretTimestamp?: number
-    apiKeyTimestamp?: number
-    timestamp: number
-    name: string
-  }
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
+  const appDetails = (await starbaseClient.getAppDetails.query({ clientId: params.clientId }))
   
   let rotationResult
   //If there's no timestamps, then the secrets have never been set, signifying the app
   //has just been created; we rotate both secrets and set the timestamps
   if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
     rotationResult = await rotateSecrets(starbaseClient, params.clientId, RollType.RollBothSecrets);
-    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
+    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now().toString()
   }
 
   return json({
@@ -52,7 +50,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
 
   const formData = await request.formData()
   const op = formData.get('op')
@@ -75,17 +77,19 @@ type RotatedSecrets = {
   rotatedClientSecret: string | null
 }
 
-async function rotateSecrets(starbaseClient: StarbaseClient, clientId: string, op: string): Promise<RotatedSecrets> {
+async function rotateSecrets(starbaseClient: ReturnType<typeof createStarbaseClient>, clientId: string, op: string): Promise<RotatedSecrets> {
   let result: RotatedSecrets = {
     rotatedApiKey: null,
     rotatedClientSecret: null
   }
 
   if (op === RollType.RollAPIKey || op === RollType.RollBothSecrets)
-    result.rotatedApiKey = (await starbaseClient.kb_appRotateApiKey({ clientId: clientId})).apiKey
+    result.rotatedApiKey = (await starbaseClient.rotateApiKey.mutate({ clientId})).apiKey
 
-  if (op === RollType.RollClientSecret || op === RollType.RollBothSecrets)
-    result.rotatedClientSecret = (await starbaseClient.kb_appRotateSecret(clientId)).secret.split(":")[1]
+  if (op === RollType.RollClientSecret || op === RollType.RollBothSecrets){
+    const response = await starbaseClient.rotateClientSecret.mutate({ clientId })
+    result.rotatedClientSecret = response.secret.split(":")[1]
+  }
 
   return result
 

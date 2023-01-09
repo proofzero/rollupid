@@ -23,9 +23,10 @@ import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
-import { getGalaxyClient, getStarbaseClient } from '~/utilities/platform.server'
+import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 type LoaderData = {
   apps: Awaited<ReturnType<typeof getApplicationListItems>>
@@ -34,11 +35,16 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
+  
   const galaxyClient = await getGalaxyClient()
 
   try {
-    const apps = await starbaseClient.kb_appList() // TODO: update result type
+    const apps = await starbaseClient.listApps.query()
 
     const profileRes = await galaxyClient.getProfile(undefined, {
       [PlatformJWTAssertionHeader]: jwt,

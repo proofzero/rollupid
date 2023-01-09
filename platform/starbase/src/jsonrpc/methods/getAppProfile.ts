@@ -1,11 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import {
-  AppClientIdParamSchema,
-  AppReadableFieldsSchema,
-  AppUpdateableFieldsSchema,
-} from '../../types'
+import { AppClientIdParamSchema, AppUpdateableFieldsSchema } from '../../types'
 
 export const getAppProfile = async ({
   input,

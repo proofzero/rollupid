@@ -35,7 +35,7 @@
     "typescript": "4.8.4"
   },
   "dependencies": {
-    "@trpc/client": "10.7.0",
+    "@trpc/client": "10.8.1",
     "typed-json-rpc": "1.1.0"
   }
 }
