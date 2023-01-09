@@ -15,7 +15,7 @@ export default class CryptoAddress extends Address {
   }
 
   async getNonce(
-    address: AddressURN,
+    address: string,
     template: string,
     redirectUri: string,
     scope: string[],

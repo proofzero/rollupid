@@ -49,7 +49,7 @@ export const CryptoAddressProfileSchema = z.object({
 })
 
 export const GoogleRawProfileSchema = z.object({
-  id: z.string(),
+  sub: z.string(),
   name: z.string(),
   given_name: z.string(),
   family_name: z.string(),

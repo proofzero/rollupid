@@ -12,6 +12,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import { useEffect, useState } from 'react'
 import { getAddressClient } from '~/platform.server'
+import { AddressURN } from '@kubelt/urns/address'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -28,13 +29,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
   const addressClient = getAddressClient(addressURN)
   try {
-    const nonce = await addressClient.kb_getNonce(
-      params.address as string, // as client_id
-      signMessageTemplate,
-      PASSPORT_REDIRECT_URL,
-      ['admin'], // todo: change scope
-      state
-    )
+    const nonce = await addressClient.getNonce.query({
+      address: address as string,
+      template: signMessageTemplate,
+      state,
+      redirectUri: PASSPORT_REDIRECT_URL,
+      scope: ['admin'],
+    })
     return json({ nonce, address, state })
   } catch (e) {
     console.error('Error getting nonce', e)
@@ -49,10 +50,10 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const formData = await request.formData()
 
   // TODO: validate from data
-  const { code } = await addressClient.kb_verifyNonce(
-    formData.get('nonce') as string,
-    formData.get('signature') as string
-  )
+  const { code } = await addressClient.verifyNonce.mutate({
+    nonce: formData.get('nonce') as string,
+    signature: formData.get('signature') as string,
+  })
 
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams

@@ -1,10 +1,9 @@
-import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { z } from 'zod'
 import { Context } from '../../context'
 import { CryptoAddressProxyStub } from '../../nodes/crypto'
 
 export const GetNonceInput = z.object({
-  address: AddressURNInput,
+  address: z.string(),
   template: z.string(),
   redirectUri: z.string(),
   scope: z.array(z.string()),

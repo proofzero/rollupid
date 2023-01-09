@@ -252,7 +252,7 @@ export type ProfileInput = {
 export type Query = {
   __typename?: 'Query';
   contractsForAddress?: Maybe<NftContracts>;
-  ensAddress: Scalars['String'];
+  ensAddress?: Maybe<Scalars['String']>;
   ensAddressAvatar?: Maybe<Scalars['String']>;
   ensDisplayName?: Maybe<Scalars['String']>;
   getCuratedGallery?: Maybe<NfTsWithChain>;
@@ -332,7 +332,7 @@ export type GetEnsAddressQueryVariables = Exact<{
 }>;
 
 
-export type GetEnsAddressQuery = { __typename?: 'Query', ensAddress: string };
+export type GetEnsAddressQuery = { __typename?: 'Query', ensAddress?: string | null };
 
 export type GetEnsDisplayNameQueryVariables = Exact<{
   addressOrEns: Scalars['String'];

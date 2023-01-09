@@ -17,7 +17,8 @@ import { RxDragHandleDots2 } from 'react-icons/rx'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 
-import { Button, Text } from '@kubelt/design-system'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 

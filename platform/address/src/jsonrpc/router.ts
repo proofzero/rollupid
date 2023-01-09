@@ -79,7 +79,7 @@ export const appRouter = t.router({
     .use(initOAuthNode)
     .input(UnsetAccountInput)
     .output(UnsetAccountOutput)
-    .query(unsetAccountMethod),
+    .mutation(unsetAccountMethod),
   getAddressProfile: t.procedure
     .use(LogUsage)
     .use(parse3RN)
@@ -114,7 +114,7 @@ export const appRouter = t.router({
     .use(initOAuthNode)
     .input(VerifyNonceInput)
     .output(VerifyNonceOutput)
-    .query(verifyNonceMethod),
+    .mutation(verifyNonceMethod),
   getOAuthData: t.procedure
     .use(LogUsage)
     .use(parse3RN)
@@ -136,5 +136,5 @@ export const appRouter = t.router({
     .use(initCryptoNode)
     .use(initOAuthNode)
     .input(SetOAuthDataInput)
-    .query(setOAuthDataMethod),
+    .mutation(setOAuthDataMethod),
 })
