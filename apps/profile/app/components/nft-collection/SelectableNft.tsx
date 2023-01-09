@@ -13,7 +13,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
     <>
       {hovered ? (
         <div className="relative cursor-pointer group">
-          <div
+          <button
             onClick={() => {
               handleSelectedNft(nft)
             }}
@@ -48,7 +48,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             >
               {nft.title}
             </Text>
-          </div>
+          </button>
 
           <img
             className="w-full rounded-lg"
@@ -62,7 +62,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           />
         </div>
       ) : (
-        <div
+        <button
           className="rounded-lg
           truncate
           shadow 
@@ -109,7 +109,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
               <HiArrowNarrowRight />
             </div>
           </div>
-        </div>
+        </button>
       )}
     </>
   )
