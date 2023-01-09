@@ -18,9 +18,11 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
               handleSelectedNft(nft)
             }}
             className="absolute
+        items-center
         left-0 right-0 top-0 bottom-0
         p-1 lg:p-4 flex flex-col
         justify-end transition-all
+        w-full
         duration-300 rounded-lg
         invisible
         group-hover:visible

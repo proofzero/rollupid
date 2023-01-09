@@ -349,17 +349,21 @@ const Gallery = () => {
             className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
           >
-            <div className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  bg-[#F9FAFB] rounded-lg">
+            <button
+              className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  
+              bg-gray-50 hover:bg-gray-100 transition-colors
+              rounded-lg"
+              onClick={() => setIsOpen(true)}
+            >
               <div className="flex flex-col justify-center items-center h-full text-gray-400">
                 <HiOutlinePlusCircle
                   size={60}
                   fontWeight={100}
                   className="mb-2 font-extralight"
-                  onClick={() => setIsOpen(true)}
                 />
                 <Text>Add NFT</Text>
               </div>
-            </div>
+            </button>
             {loading && <LoadingGridSquaresGallery numberOfCells={30} />}
             {curatedNfts.map((nft: any, i: number) => {
               return (
