@@ -10,18 +10,18 @@ export default {
 const applications: ApplicationListItemProps[] = [
   {
     title: 'Courtyard',
-    created: new Date(),
+    createdTimestamp: new Date(),
     published: true,
     iconUrl: 'https://picsum.photos/250/250',
   },
   {
     title: 'Pokemon',
-    created: new Date(),
+    createdTimestamp: new Date(),
     iconUrl: 'https://picsum.photos/250/250',
   },
   {
     title: 'Baseball',
-    created: new Date(),
+    createdTimestamp: new Date(),
     published: true,
   },
 ]

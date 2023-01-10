@@ -41,7 +41,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon}
     })
-    console.log("LOADER RESHAED", reshapedApps)
   
     let avatarUrl = ''
     try {

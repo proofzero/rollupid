@@ -1,5 +1,4 @@
 import { initTRPC } from '@trpc/server'
-import { ZodError } from 'zod'
 
 import { Context } from './context'
 import { LogUsage } from '@kubelt/platform-middleware/log'
@@ -36,12 +35,12 @@ import {
 } from './methods/publishApp'
 import { getAppProfile } from './methods/getAppProfile'
 import { updateApp, UpdateAppInputSchema } from './methods/updateApp'
-import { getScopes } from './methods/getAppProfile copy'
 import {
   checkApiKey,
   CheckApiKeyInputSchema,
   CheckApiKeyOutputSchema,
 } from './methods/checkApiKey'
+import { getScopes } from './methods/getScopes'
 
 const t = initTRPC.context<Context>().create()
 
@@ -120,9 +119,10 @@ export const appRouter = t.router({
     .input(CheckApiKeyInputSchema)
     .output(CheckApiKeyOutputSchema)
     .query(checkApiKey),
-  // getScopes: t.procedure
-  //   //TODO: Revisit when implementing scopes
-  //   .query(getScopes),
+  getScopes: t.procedure
+    //TODO: Revisit when implementing scopes
+    .input(NoInput)
+    .query(getScopes),
 })
 
 export type StarbaseRouter = typeof appRouter

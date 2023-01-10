@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           pfp: {
             image: cryptoAddressProfile.avatar || '',
           },
-          cover: voucher.metadata.cover,
+          cover: voucher.metadata?.cover,
         },
       },
       {
@@ -69,8 +69,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const sbClient = getStarbaseClient(jwt)
 
-    const [/*scopeMeta,*/ appProfile] = await Promise.all([
-      // sbClient.getScopes.query(),
+    const [scopeMeta, appProfile] = await Promise.all([
+      sbClient.getScopes.query(),
       sbClient.getAppProfile.query({
         clientId: client_id,
       }),
@@ -80,7 +80,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       clientId: client_id,
       appProfile,
       userProfile: profile,
-      scopeMeta: [], // TODO: scopeMeta,
+      scopeMeta: scopeMeta,
       state,
     })
   } catch (e) {
