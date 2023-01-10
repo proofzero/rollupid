@@ -1,5 +1,7 @@
 import { EdgeSpace, EdgeURN } from '@kubelt/urns/edge'
 
+export const HEADER_3RN = 'X-3RN'
+
 export const ACCOUNT_OPTIONS = {
   length: 24,
 }

@@ -23,6 +23,7 @@ interface CreateInnerContextOptions
   Edges: Fetcher
   Access: Fetcher
   address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>
+  address3RN?: AddressURN
   addressURN?: AddressURN
   nodeType?: NodeType
   addrType?: AddressType

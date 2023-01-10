@@ -44,6 +44,7 @@ import { initOAuthNode } from './middlewares/initOAuthNode'
 import { getVoucherMethod, GetVoucherOutput } from './methods/getVoucher'
 import { SetVoucherInput, setVoucherMethod } from './methods/setVoucher'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
+import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 
 const t = initTRPC.context<Context>().create()
 
@@ -159,4 +160,12 @@ export const appRouter = t.router({
     .use(initCryptoNode)
     .input(SetVoucherInput)
     .mutation(setVoucherMethod),
+  initVault: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(setCryptoNodeClient)
+    .use(setOAuthNodeClient)
+    .use(initOAuthNode)
+    .output(InitVaultOutput)
+    .mutation(initVaultMethod),
 })

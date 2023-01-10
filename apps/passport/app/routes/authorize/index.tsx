@@ -14,8 +14,10 @@ import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import type { AccountURN } from '@kubelt/urns/account'
+import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
-import { CryptoAddressProfile } from '@kubelt/platform/address/src/types'
+import { NodeType } from '@kubelt/platform/address/src/types'
+import type { CryptoAddressProfile, OAuthGoogleProfile } from '@kubelt/platform/address/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -26,6 +28,9 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
   const session = await getUserSession(request)
   const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
+
+  const parsedURN = AddressURNSpace.parse(defaultProfileURN)
+  const rparams = new URLSearchParams(parsedURN.rcomponent || '')
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfileFromAddress(
@@ -38,27 +43,53 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (!profile) {
     const addressClient = getAddressClient(defaultProfileURN)
-    // TODO: with social account we need a method to determine which type of profile
-
     const addressProfile = await addressClient.getAddressProfile.query()
-    const voucher = await addressClient.getVoucher.query()
 
-    const cryptoAddressProfile = addressProfile as CryptoAddressProfile
-    await galaxyClient.updateProfile(
-      {
-        profile: {
-          defaultAddress: defaultProfileURN,
-          displayName: cryptoAddressProfile.displayName,
-          pfp: {
-            image: cryptoAddressProfile.avatar || '',
+    if (rparams.get('node_type') == NodeType.Crypto) {
+      const voucher = addressClient.getVoucher.query()
+      const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+      await galaxyClient.updateProfile(
+        {
+          profile: {
+            defaultAddress: defaultProfileURN,
+            displayName: cryptoAddressProfile.displayName,
+            pfp: {
+              image: cryptoAddressProfile.avatar || '',
+            },
+            cover: voucher.metadata?.cover,
           },
-          cover: voucher.metadata?.cover,
         },
-      },
-      {
+        {
+          [PlatformJWTAssertionHeader]: jwt,
+        }
+      )
+    } else if (rparams.get('node_type') == NodeType.OAuth) {
+      const { profile: accountProfile } = await galaxyClient.getProfile({}, {
         [PlatformJWTAssertionHeader]: jwt,
+      })
+
+      if (!accountProfile) {
+        const vaultAddressURN = await addressClient.initVault.mutate()
+        const vaultAddressClient = getAddressClient(vaultAddressURN)
+        const voucher = await vaultAddressClient.getVoucher.query()
+        const oauthAddressProfile = addressProfile as OAuthGoogleProfile
+        await galaxyClient.updateProfile(
+          {
+            profile: {
+              defaultAddress: defaultProfileURN,
+              displayName: oauthAddressProfile.name,
+              pfp: {
+                image: oauthAddressProfile.picture,
+              },
+              cover: voucher.metadata?.cover,
+            },
+          },
+          {
+            [PlatformJWTAssertionHeader]: jwt,
+          }
+        )
       }
-    )
+    }
   }
 
   // if no client id let's redirect to the first party app select page
