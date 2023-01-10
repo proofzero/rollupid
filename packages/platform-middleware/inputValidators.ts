@@ -5,6 +5,8 @@ import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 import { CryptoAddressType } from '@kubelt/platform/address/src/types'
 
+export const NoInput = z.undefined()
+
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (AddressURNSpace.parse(input as AddressURN) === null) {
     throw new Error('Invalid AddressURN entry')

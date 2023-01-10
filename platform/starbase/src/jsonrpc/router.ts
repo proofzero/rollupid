@@ -17,7 +17,7 @@ import {
   GetAppDetailsInput,
   GetAppDetailsOutput,
 } from './methods/getAppDetails'
-import { listApps, ListAppsOutput, NoInput } from './methods/listApps'
+import { listApps, ListAppsOutput } from './methods/listApps'
 import {
   rotateClientSecret,
   RotateClientSecretInput,
@@ -50,6 +50,7 @@ import {
   CheckApiKeyOutput,
 } from './methods/checkApiKey'
 import { getScopes } from './methods/getScopes'
+import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
 const t = initTRPC.context<Context>().create()
 
