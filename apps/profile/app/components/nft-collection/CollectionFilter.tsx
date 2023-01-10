@@ -19,7 +19,7 @@ const CollectionFilter = ({
   return (
     <div
       className="w-full flex items-center justify-start 
-        sm:justify-end lg:justify-end my-5"
+        sm:justify-end lg:justify-end my-5 px-3 lg:px-4"
     >
       <div
         className="w-full sm:w-auto mt-1 block

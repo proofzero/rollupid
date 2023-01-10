@@ -163,7 +163,7 @@ const ProfileLayout = () => {
   const [currentTab, setCurrentTab] = useState<string>(tabs[path])
 
   const navigate = useNavigate()
-  
+
   const fetcher = useFetcher()
 
   useEffect(() => {
@@ -373,11 +373,11 @@ const ProfileLayout = () => {
         )}
       </div>
 
-      <div className="mt-3 max-w-[82rem] overflow-visible w-full mx-auto p-3 lg:py-0 lg:px-4">
+      <div className="mt-3 max-w-[82rem] overflow-visible w-full mx-auto py-3 lg:py-0">
         {!claimed && (
           <div
             className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
-          space-y-4 lg:space-y-0 flex-row justify-between mt-7"
+          space-y-4 lg:space-y-0 flex-row justify-between mt-7 px-3 lg:px-4"
           >
             <div>
               <Text className="text-gray-600" size="lg" weight="semibold">
@@ -399,7 +399,7 @@ const ProfileLayout = () => {
         )}
 
         {claimed && (
-          <div>
+          <div className="px-3 lg:px-4">
             <Text
               className="mt-5 mb-2.5 text-gray-800"
               weight="bold"
@@ -482,7 +482,7 @@ const ProfileLayout = () => {
         )}
 
         <div className="mt-12 lg:mt-24">
-          <div className="block">
+          <div className="block px-3 lg:px-4">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                 {Object.keys(tabs).map((tab) => {

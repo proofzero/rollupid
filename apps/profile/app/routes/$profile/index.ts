@@ -5,8 +5,6 @@ import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
 
 export const loader: LoaderFunction = async (args) => {
   const { params } = args
-  const url = new URL(args.request.url)
-  url.searchParams.set('owner', params.profile)
 
   const { gallery } = await (await galleryLoader(args)).json()
 

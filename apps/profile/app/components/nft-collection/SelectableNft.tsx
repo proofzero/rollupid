@@ -52,13 +52,9 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="rounded-lg
-            lg:h-[8rem]
-            md:h-[11rem]
-            sm:h-[12rem]
-            h-[20rem]
-            object-contain 
-            mx-auto"
+            className="object-contain
+             min-w-full
+             rounded-lg"
             src={
               loadFail
                 ? missingNftSvg
@@ -71,30 +67,23 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
       ) : (
         <button
           className="rounded-lg
-          truncate
-          shadow 
-          transition-shadow
-          text-sm 
-          font-semibold
-          w-full
-          hover:shadow-xl 
-          flex
-          flex-col
-          align-center justify-center
+            truncate
+            shadow 
+            transition-shadow
+            text-sm 
+            font-semibold
+            w-full
+            hover:shadow-lg
          "
           onClick={() => {
             handleSelectedNft(nft)
           }}
         >
           <img
-            className="rounded-t-lg block
-                lg:h-[8rem]
-                md:h-[11rem]
-                sm:h-[12rem]
-                h-[20rem]
-                object-contain 
-                mx-auto 
-              "
+            className="rounded-t-lg
+            w-full
+            object-contain
+            "
             src={
               loadFail
                 ? missingNftSvg

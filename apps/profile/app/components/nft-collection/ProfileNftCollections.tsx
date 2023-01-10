@@ -184,7 +184,8 @@ const ProfileNftCollections = ({
               }}
               className="flex 
               w-full
-              space-x-[16px]"
+              space-x-[16px]
+              px-3 lg:px-4"
               // conditional width
               columnClassName="bg-clip-padding 
               min-w-[calc(20%-12.8px)]
