@@ -41,12 +41,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon}
     })
-    console.log(reshapedApps)
-    const profileRes = await galaxyClient.getProfile(undefined, {
-      [PlatformJWTAssertionHeader]: jwt,
-    })
+    console.log("LOADER RESHAED", reshapedApps)
   
-    const avatarUrl = profileRes.profile?.pfp?.image || ''
+    let avatarUrl = ''
+    try {
+      const profileRes = await galaxyClient.getProfile(undefined, {
+        [PlatformJWTAssertionHeader]: jwt,
+      })
+      avatarUrl = profileRes.profile?.pfp?.image || ''
+    } catch (e) {
+      console.error("Could not retrieve profile image.", e)
+    }
   
     return json<LoaderData>({ apps: reshapedApps, clientId, avatarUrl })
   } catch (error) {

@@ -10,17 +10,19 @@ import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 
 type ApplicationAuthProps = {
-  app: {
-    name: string
+  appDetails: {
     published: boolean
-    icon?: string
-    redirectURI?: string
-    termsURL?: string
-    websiteURL?: string
-    twitterUser?: string
-    mediumUser?: string
-    mirrorURL?: string
-    discordUser?: string
+    app: {
+      name: string
+      icon?: string
+      redirectURI?: string
+      termsURL?: string
+      websiteURL?: string
+      twitterUser?: string
+      mediumUser?: string
+      mirrorURL?: string
+      discordUser?: string
+    }
   }
   oAuth: {
     appId: string
@@ -32,7 +34,7 @@ type ApplicationAuthProps = {
 }
 
 export const ApplicationAuth = ({
-  app,
+  appDetails,
   oAuth,
   onDelete,
 }: ApplicationAuthProps) => {
@@ -112,7 +114,7 @@ export const ApplicationAuth = ({
               <InputToggle
                 id="published"
                 label="Published"
-                checked={app.published}
+                checked={appDetails.published}
               />
             </div>
           </Panel>
@@ -126,7 +128,7 @@ export const ApplicationAuth = ({
               <Input
                 id="name"
                 label="Application Name"
-                defaultValue={app.name}
+                defaultValue={appDetails.app.name}
                 required
               />
             </div>
@@ -155,7 +157,7 @@ export const ApplicationAuth = ({
                 label="Redirect URL"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={app.redirectURI}
+                defaultValue={appDetails.app.redirectURI}
               />
             </div>
             <div className="flex-1">
@@ -164,7 +166,7 @@ export const ApplicationAuth = ({
                 label="Terms of Service URL"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={app.termsURL}
+                defaultValue={appDetails.app.termsURL}
               />
             </div>
             <div className="flex-1">
@@ -173,13 +175,13 @@ export const ApplicationAuth = ({
                 label="Website"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={app.websiteURL}
+                defaultValue={appDetails.app.websiteURL}
               />
             </div>
           </div>
 
           <div>
-            <IconPicker id="icon" url={app.icon} />
+            <IconPicker id="icon" url={appDetails.app.icon} />
           </div>
         </div>
       </Panel>
@@ -192,7 +194,7 @@ export const ApplicationAuth = ({
                 id="websiteURL"
                 label="Website"
                 preLabel="https://"
-                defaultValue={app.websiteURL}
+                defaultValue={appDetails.app.websiteURL}
               />
             </div>
             <div className="flex-1">
@@ -200,7 +202,7 @@ export const ApplicationAuth = ({
                 id="twitterUser"
                 label="Twitter"
                 preLabel="https://twitter.com/"
-                defaultValue={app.twitterUser}
+                defaultValue={appDetails.app.twitterUser}
               />
             </div>
           </div>
@@ -211,7 +213,7 @@ export const ApplicationAuth = ({
                 id="mediumUser"
                 label="Medium"
                 preLabel="https://medium.com/@"
-                defaultValue={app.mediumUser}
+                defaultValue={appDetails.app.mediumUser}
               />
             </div>
             <div className="flex-1">
@@ -219,7 +221,7 @@ export const ApplicationAuth = ({
                 id="mirrorURL"
                 label="Mirror"
                 preLabel="https://mirror.xyz/"
-                defaultValue={app.mirrorURL}
+                defaultValue={appDetails.app.mirrorURL}
               />
             </div>
           </div>
@@ -230,7 +232,7 @@ export const ApplicationAuth = ({
                 id="discordUser"
                 label="Discord"
                 preLabel="http://discord.com/"
-                defaultValue={app.discordUser}
+                defaultValue={appDetails.app.discordUser}
               />
             </div>
 

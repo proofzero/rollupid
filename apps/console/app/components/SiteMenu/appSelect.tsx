@@ -47,7 +47,6 @@ type AppListboxProps = {
 
 function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
-  console.debug("wooo", apps)
   const [selected] = useState(
     apps && apps.length !== 0
       ? selectedAppIndex < 0

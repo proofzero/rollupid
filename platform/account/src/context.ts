@@ -43,7 +43,6 @@ export async function createContext(
   env: Environment
 ) {
   const contextInner = await createContextInner({ ...opts, ...env })
-  console.debug("EDGES", env.Edges)
   return {
     req: opts.req,
     resHeaders: opts.resHeaders,

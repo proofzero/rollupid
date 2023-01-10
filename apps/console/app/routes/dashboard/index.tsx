@@ -76,8 +76,6 @@ export default function DashboardIndexPage() {
   const { apps, avatarUrl } = useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
-  console.debug("ROUTES DASHBOARD", apps)
-
   return (
     <div className="flex flex-col md:flex-row min-h-full">
       <SiteMenu apps={apps} />

@@ -21,7 +21,6 @@ export const listApps = async ({
   ctx: Context
 }): Promise<z.infer<typeof ListAppsOutputSchema>> => {
   if (!ctx.accountURN) throw new Error('No account URN in context')
-  console.debug('BEFORE EDGES')
   //Get application edges for the given accountURN
   const edgesClient = createEdgesClient(ctx.Edges)
   const edgeList = await edgesClient.getEdges.query({
@@ -31,14 +30,12 @@ export const listApps = async ({
       tag: EDGE_APPLICATION,
     },
   })
-  console.debug('AFTER EDGES')
   //Iterate through edges, pull out the clientId, and get app objects for each
   //app edge
   const result = []
   for (const edge of edgeList && edgeList.edges) {
     const appURN = edge.dst.id as ApplicationURN
     const clientId = ApplicationURNSpace.decode(appURN)
-    console.debug('INSIDE LOOP', clientId, ctx.StarbaseApp)
     try {
       const appDO = await getApplicationNodeByClientId(
         clientId,
@@ -51,6 +48,5 @@ export const listApps = async ({
     }
   }
 
-  console.debug('AFTER LOOP', result)
   return result
 }

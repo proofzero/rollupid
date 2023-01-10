@@ -103,8 +103,8 @@ export default class StarbaseApp extends DOProxy {
     return result
   }
 
-  async publish(): Promise<void> {
-    this.state.storage.put('published', true)
+  async publish(published: boolean): Promise<void> {
+    this.state.storage.put('published', published)
   }
 
   async rotateClientSecret(clientSecret: string): Promise<void> {

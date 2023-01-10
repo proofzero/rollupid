@@ -28,7 +28,6 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  console.debug("starbase fetches", opts)
   const starbaseClient = createStarbaseClient(opts.Starbase)
   return {
     starbaseClient,
@@ -44,7 +43,6 @@ export async function createContext(
   opts: FetchCreateContextFnOptions,
   env: Environment
 ) {
-  console.debug("STAAAAA**********\n\n\n", env.Starbase)
   const contextInner = await createContextInner({ ...opts, ...env })
   
   return {

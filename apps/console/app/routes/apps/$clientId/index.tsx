@@ -28,7 +28,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   })
   const appDetails = (await starbaseClient.getAppDetails.query({ clientId: params.clientId }))
-  console.debug("DEEETS", appDetails)
   let rotationResult
   //If there's no timestamps, then the secrets have never been set, signifying the app
   //has just been created; we rotate both secrets and set the timestamps

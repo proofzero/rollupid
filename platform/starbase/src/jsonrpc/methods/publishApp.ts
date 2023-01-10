@@ -27,14 +27,14 @@ export const publishApp = async ({
     ctx.StarbaseApp
   )
   const appDetails = await appDO.class.getDetails()
-  if (appDetails.clientName?.length > 0 || false)
+  if (appDetails.clientName?.length === 0 || false)
     throw new Error('Client name is required to publish the app')
 
   const hasClientSecret = await appDO.class.hasClientSecret()
   if (!hasClientSecret)
     throw new Error('Client secret must be set to publish app')
 
-  await appDO.class.publish()
+  await appDO.class.publish(input.published)
 
   return {
     published: true,

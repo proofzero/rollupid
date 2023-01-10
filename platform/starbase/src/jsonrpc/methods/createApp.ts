@@ -32,7 +32,6 @@ export const createApp = async ({
   const appURN = ApplicationURNSpace.urn(clientId)
   if (!ctx.accountURN) throw new Error('No account URN in context')
 
-  console.debug('BEFORE CALL', clientId, ctx.StarbaseApp)
   const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   await appDO.class.init(clientId, input.clientName)
 

@@ -12664,13 +12664,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/server@npm:10.7.0":
-  version: 10.7.0
-  resolution: "@trpc/server@npm:10.7.0"
-  checksum: 6f63b8792b574c19e121cb90fa72b0093040fe3608512641a0ba762ac585a6eb030cdd9cdbc669387a067143d74e0c62f5fe6c3cb102ea2a447d618d561c9a8e
-  languageName: node
-  linkType: hard
-
 "@trpc/server@npm:10.8.1":
   version: 10.8.1
   resolution: "@trpc/server@npm:10.8.1"

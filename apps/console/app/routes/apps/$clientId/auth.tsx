@@ -55,7 +55,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   return json({
-    app: appDetails,
+    appDetails: appDetails,
     rotatedSecret,
   })
 }
@@ -127,7 +127,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
 
-  const { app } = useLoaderData()
+  const { appDetails } = useLoaderData()
   const rotatedSecret =
     useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
 
@@ -136,8 +136,8 @@ export default function AppDetailIndexPage() {
   return (
     <>
       <DeleteAppModal
-        clientId={app.clientId}
-        appName={app.name}
+        clientId={appDetails.clientId}
+        appName={appDetails.app.name}
         deleteAppCallback={() => {
           setDeleteModalOpen(false)
         }}
@@ -147,11 +147,11 @@ export default function AppDetailIndexPage() {
       <Form method="post" encType="multipart/form-data">
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
-          app={app}
+          appDetails={appDetails}
           oAuth={{
-            appId: app.appId,
+            appId: appDetails.clientId,
             appSecret: rotatedSecret,
-            createdAt: new Date(app.secretTimestamp),
+            createdAt: new Date(appDetails.secretTimestamp),
             onKeyRoll: () => {
               submit(
                 {
