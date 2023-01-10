@@ -3,7 +3,6 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import type { Edge } from '@kubelt/graph'
 import type { AccessURN } from '@kubelt/urns/access'
-import { AccessURNSpace } from '@kubelt/urns/access'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 import { EdgeDirection } from '@kubelt/graph'
@@ -20,18 +19,7 @@ export type GetSessionsParams = z.infer<typeof GetSessionsMethodInput>
 // Output
 // -----------------------------------------------------------------------------
 
-// Consider moving to inputValidators if potentially reusable.
-export const accessValidator = z.custom<AccessURN>((input) => {
-  if (typeof input !== 'string') {
-    throw new Error(`input is not a string: ${input}`)
-  }
-  if (!AccessURNSpace.is(input)) {
-    throw new Error(`invalid access URN: ${input}`)
-  }
-  return input as AccessURN
-})
-
-export const GetSessionsMethodOutput = z.array(accessValidator)
+export const GetSessionsMethodOutput = z.array(inputValidators.AccessURNInput)
 
 // Method
 // -----------------------------------------------------------------------------
