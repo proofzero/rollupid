@@ -4,6 +4,7 @@ import {
   AllFieldsSchema,
   AppClientIdParamSchema,
   AppInternalFieldSchema,
+  AppObjectSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from './jsonrpc/validators/app'
@@ -20,3 +21,4 @@ export type AppReadableFields = z.infer<typeof AppReadableFieldsSchema>
 export type AppInternalField = z.infer<typeof AppInternalFieldSchema>
 export type AppAllFields = z.infer<typeof AllFieldsSchema>
 export type AppClientIdParam = z.infer<typeof AppClientIdParamSchema>
+export type AppObject = z.infer<typeof AppObjectSchema>
