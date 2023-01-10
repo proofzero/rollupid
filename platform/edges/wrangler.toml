@@ -19,7 +19,7 @@ workers_dev = false
 [[d1_databases]]
 binding = "EDGES"
 database_name = "edges"
-database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d"
+database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd"
 migrations_dir = "migrations"
 
 # Secrets
@@ -49,7 +49,7 @@ local_protocol = "http"
 
 [env.dev]
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-dev", database_id = "7e2bb4f6-9a3e-4136-aa71-d634db545b4d", migrations_dir = "migrations" }
+  { binding = "EDGES", database_name = "edges-dev", database_id = "d5dc9f97-0f8e-4af7-90dd-cb84e44309bd", migrations_dir = "migrations" }
 ]
 
 [env.dev.vars]
