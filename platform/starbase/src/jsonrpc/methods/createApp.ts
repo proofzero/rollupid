@@ -1,11 +1,10 @@
 import { z } from 'zod'
 import { Context } from '../context'
-import { listApplications } from '@kubelt/graph/util'
 import * as oauth from '../../0xAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges'
+import { EDGE_APPLICATION } from '../../types'
 
 export const CreateAppInputSchema = z.object({
   clientName: z.string(),

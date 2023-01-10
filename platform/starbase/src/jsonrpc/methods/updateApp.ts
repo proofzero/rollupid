@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { AppObjectSchema, AppUpdateableFieldsSchema } from '../../types'
+import { AppObjectSchema } from '../validators/app'
 
-export const UpdateAppInputSchema = z.object({
+export const UpdateAppInput = z.object({
   clientId: z.string(),
   updates: AppObjectSchema.partial(),
 })
@@ -12,7 +12,7 @@ export const updateApp = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof UpdateAppInputSchema>
+  input: z.infer<typeof UpdateAppInput>
   ctx: Context
 }): Promise<void> => {
   const appDO = await getApplicationNodeByClientId(

@@ -5,9 +5,11 @@ import {
   AppClientIdParamSchema,
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
-} from '../../types'
+} from '../validators/app'
 
-export const GetAppDetailsOutputSchema = AppUpdateableFieldsSchema.merge(
+export const GetAppDetailsInput = AppClientIdParamSchema
+
+export const GetAppDetailsOutput = AppUpdateableFieldsSchema.merge(
   AppReadableFieldsSchema
 )
 
@@ -15,9 +17,9 @@ export const getAppDetails = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof AppClientIdParamSchema>
+  input: z.infer<typeof GetAppDetailsInput>
   ctx: Context
-}): Promise<z.infer<typeof GetAppDetailsOutputSchema>> => {
+}): Promise<z.infer<typeof GetAppDetailsOutput>> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp
