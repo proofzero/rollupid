@@ -18,7 +18,7 @@ export const getAppDetails = async ({
   input: z.infer<typeof AppClientIdParamSchema>
   ctx: Context
 }): Promise<z.infer<typeof GetAppDetailsOutputSchema>> => {
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.Starbase)
+  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
   const appDetails = await appDO.class.getDetails()
 
   return appDetails

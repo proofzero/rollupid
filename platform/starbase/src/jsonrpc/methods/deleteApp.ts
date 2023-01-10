@@ -16,7 +16,7 @@ export const deleteApp = async ({
   const appURN = ApplicationURNSpace.urn(input.clientId)
   if (!ctx.accountURN) throw new Error('No account URN in context')
 
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.Starbase)
+  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
 
   const edgesClient = createEdgesClient(ctx.Edges)
   await edgesClient.removeEdge.mutate({

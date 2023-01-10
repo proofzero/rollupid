@@ -12,8 +12,6 @@ import folderPlus from '~/images/folderPlus.svg'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { getApplicationListItems } from '~/models/app.server'
-
 //import { useUser } from "~/utils";
 
 import SiteMenu from '~/components/SiteMenu'
@@ -29,7 +27,13 @@ import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 type LoaderData = {
-  apps: Awaited<ReturnType<typeof getApplicationListItems>>
+  apps: {
+    clientId: string,
+    name?: string,
+    icon?: string,
+    published?: boolean,
+    timestamp?: string
+  }[]
   avatarUrl: string
 }
 
@@ -42,17 +46,23 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
   
   const galaxyClient = await getGalaxyClient()
-
   try {
     const apps = await starbaseClient.listApps.query()
-
-    const profileRes = await galaxyClient.getProfile(undefined, {
-      [PlatformJWTAssertionHeader]: jwt,
+    const reshapedApps = apps.map((a) => {
+      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon, published: a.published, timestamp: ''}
     })
-  
-    const avatarUrl = profileRes.profile?.pfp?.image || ''
-  
-    return json<LoaderData>({ apps, avatarUrl })
+
+    let avatarUrl = ''
+    try {
+      const profileRes = await galaxyClient.getProfile(undefined, {
+        [PlatformJWTAssertionHeader]: jwt,
+      })
+      avatarUrl = profileRes.profile?.pfp?.image || ''
+    } catch (e) {
+      console.error("Could not retrieve profile image.", e)
+    }
+
+    return json<LoaderData>({ apps: reshapedApps, avatarUrl })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -65,6 +75,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function DashboardIndexPage() {
   const { apps, avatarUrl } = useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
+
+  console.debug("ROUTES DASHBOARD", apps)
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">

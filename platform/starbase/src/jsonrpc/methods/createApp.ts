@@ -32,7 +32,8 @@ export const createApp = async ({
   const appURN = ApplicationURNSpace.urn(clientId)
   if (!ctx.accountURN) throw new Error('No account URN in context')
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.Starbase)
+  console.debug("BEFORE CALL", clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   await appDO.class.init(clientId, input.clientName)
 
   // We need to create an edge between the logged in user node (aka

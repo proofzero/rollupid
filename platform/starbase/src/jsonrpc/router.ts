@@ -120,10 +120,9 @@ export const appRouter = t.router({
     .input(CheckApiKeyInputSchema)
     .output(CheckApiKeyOutputSchema)
     .query(checkApiKey),
-  getScopes: t.procedure
-    //TODO: Revisit when implementing scopes
-    .input(NoInput)
-    .query(getScopes),
+  // getScopes: t.procedure
+  //   //TODO: Revisit when implementing scopes
+  //   .query(getScopes),
 })
 
 export type StarbaseRouter = typeof appRouter

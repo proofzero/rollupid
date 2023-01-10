@@ -4,6 +4,7 @@ import {
 } from '@trpc/server/adapters/fetch'
 import { createContext } from './jsonrpc/context'
 import { appRouter } from './jsonrpc/router'
+import StarbaseApp from './nodes/application'
 import type { Environment } from './types'
 
 export default {
@@ -21,3 +22,5 @@ export default {
     })
   },
 }
+
+export { StarbaseApp as StarbaseApplication }

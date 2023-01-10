@@ -38,7 +38,7 @@ const JWT_OPTIONS = {
   },
 }
 
-export default class ApplicationNode extends DOProxy {
+export default class StarbaseApp extends DOProxy {
   declare state: DurableObjectState
 
   constructor(state: DurableObjectState) {
@@ -52,7 +52,7 @@ export default class ApplicationNode extends DOProxy {
       clientId,
       clientName,
       app: {
-        timestamp: Date.now(),
+        timestamp: Date.now().toString(),
         name: clientName,
       },
     }
@@ -109,6 +109,7 @@ export default class ApplicationNode extends DOProxy {
 
   async rotateClientSecret(clientSecret: string): Promise<void> {
     this.state.storage.put({ clientSecret })
+    this.state.storage.put('secretTimestamp', Date.now())
   }
 
   async validateClientSecret(hashedClientSecret: string): Promise<boolean> {
@@ -117,8 +118,9 @@ export default class ApplicationNode extends DOProxy {
   }
 
   async rotateApiKey(appUrn: ApplicationURN): Promise<string> {
-    const apiKey = this.generateAndStore(appUrn)
+    const apiKey = await this.generateAndStore(appUrn)
     this.state.storage.put('apiKey', apiKey)
+    this.state.storage.put('apiKeyTimestamp', Date.now())
     return apiKey
   }
 
@@ -189,7 +191,7 @@ export const getApplicationNodeByClientId = async (
   clientId: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const proxy = ApplicationNode.wrap(durableObject)
+  const proxy = StarbaseApp.wrap(durableObject)
   const appDO = proxy.getByName(clientId)
   return appDO
 }

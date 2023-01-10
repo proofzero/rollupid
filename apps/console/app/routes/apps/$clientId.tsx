@@ -14,8 +14,8 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 type AppData = 
   {
     clientId: string
-    name: string
-    icon: string
+    name?: string
+    icon?: string
   }[]
 
 
@@ -37,15 +37,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const clientId = params?.clientId
 
   try {
-    const apps = (await starbaseClient.listApps.query()) as AppData
-
+    const apps = await starbaseClient.listApps.query()
+    const reshapedApps = apps.map((a) => {
+      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon}
+    })
+    console.log(reshapedApps)
     const profileRes = await galaxyClient.getProfile(undefined, {
       [PlatformJWTAssertionHeader]: jwt,
     })
   
     const avatarUrl = profileRes.profile?.pfp?.image || ''
   
-    return json<LoaderData>({ apps, clientId, avatarUrl })
+    return json<LoaderData>({ apps: reshapedApps, clientId, avatarUrl })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })

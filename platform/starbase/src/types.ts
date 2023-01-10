@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export interface Environment {
-  Starbase: DurableObjectNamespace
+  StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
 }
 
@@ -21,15 +21,15 @@ export type AppObject = z.infer<typeof AppObjectSchema>
 
 export const AppUpdateableFieldsSchema = z.object({
   clientName: z.string(),
-  published: z.boolean(),
-  app: AppObjectSchema,
+  published: z.boolean().optional(),
+  app: AppObjectSchema.optional(),
 })
 
 export const AppReadableFieldsSchema = z.object({
   clientId: z.string(),
-  secretTimestamp: z.date(),
-  apiKeyTimestamp: z.date(),
-  scopes: z.array(z.string()),
+  secretTimestamp: z.number().optional(),
+  apiKeyTimestamp: z.number().optional(),
+  scopes: z.array(z.string()).optional(),
 })
 
 export const AppInternalFieldSchema = z.object({

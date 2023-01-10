@@ -28,13 +28,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     }
   })
   const appDetails = (await starbaseClient.getAppDetails.query({ clientId: params.clientId }))
-  
+  console.debug("DEEETS", appDetails)
   let rotationResult
   //If there's no timestamps, then the secrets have never been set, signifying the app
   //has just been created; we rotate both secrets and set the timestamps
   if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
     rotationResult = await rotateSecrets(starbaseClient, params.clientId, RollType.RollBothSecrets);
-    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now().toString()
+    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
   }
 
   return json({
@@ -121,7 +121,7 @@ export default function AppDetailIndexPage() {
         },
       }}
       oAuth={{
-        appId: app.appId,
+        appId: app.clientId,
         appSecret: rotatedClientSecret,
         createdAt: new Date(app.secretTimestamp),
         onKeyRoll: () => {

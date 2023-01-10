@@ -25,7 +25,7 @@ export const checkAppAuth = async ({
 }): Promise<z.infer<typeof CheckAppAuthOutputSchema>> => {
   const { redirectURI, clientId, clientSecret, scopes } = input
 
-  const appDO = await getApplicationNodeByClientId(clientId, ctx.Starbase)
+  const appDO = await getApplicationNodeByClientId(clientId, ctx.StarbaseApp)
   const appDetails = await appDO.class.getDetails()
 
   //To remove potential duplicates, we convert to set
@@ -42,7 +42,7 @@ export const checkAppAuth = async ({
   const secretValidity = await appDO.class.validateClientSecret(hashedSecret)
 
   const result =
-    validScopes && secretValidity && redirectURI === appDetails.app.redirectURI
+    validScopes && secretValidity && redirectURI === appDetails.app?.redirectURI
 
   return {
     valid: result,

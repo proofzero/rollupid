@@ -11,7 +11,7 @@ import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  Starbase: DurableObjectNamespace
+  StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
   accountURN?: AccountURN
 }

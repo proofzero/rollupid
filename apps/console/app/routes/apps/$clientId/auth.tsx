@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     // This is a client 'hack' as the date
     // is populated from the graph
     // on subsequent requests
-    appDetails.secretTimestamp = Date.now().toString()
+    appDetails.secretTimestamp = Date.now()
   }
 
   return json({
