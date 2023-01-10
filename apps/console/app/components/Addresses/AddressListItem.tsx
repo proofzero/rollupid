@@ -10,6 +10,7 @@ export const AddressListItemIcon = ({ iconUrl }: AddressListItemIconProps) => (
 )
 
 export type AddressListItemProps = {
+  id: string
   icon: string
   title: string
   wallet: string
@@ -18,6 +19,7 @@ export type AddressListItemProps = {
   address: string
 }
 export const AddressListItem = ({
+  id,
   icon,
   title,
   wallet,
