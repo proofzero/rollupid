@@ -41,6 +41,8 @@ import { setCryptoNodeClient } from './middlewares/setCryptoNodeClient'
 import { setOAuthNodeClient } from './middlewares/setOAuthNodeClient'
 import { initCryptoNode } from './middlewares/initCryptoNode'
 import { initOAuthNode } from './middlewares/initOAuthNode'
+import { getVoucherMethod, GetVoucherOutput } from './methods/getVoucher'
+import { SetVoucherInput, setVoucherMethod } from './methods/setVoucher'
 
 const t = initTRPC.context<Context>().create()
 
@@ -97,9 +99,7 @@ export const appRouter = t.router({
     .use(checkCryptoNodes)
     .use(resolveENS)
     .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
     .use(initCryptoNode)
-    .use(initOAuthNode)
     .input(GetNonceInput)
     .output(GetNonceOutput)
     .query(getNonceMethod),
@@ -109,32 +109,42 @@ export const appRouter = t.router({
     .use(checkCryptoNodes)
     .use(resolveENS)
     .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
     .use(initCryptoNode)
-    .use(initOAuthNode)
     .input(VerifyNonceInput)
     .output(VerifyNonceOutput)
     .mutation(verifyNonceMethod),
   getOAuthData: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(checkCryptoNodes)
     .use(resolveENS)
-    .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
-    .use(initCryptoNode)
     .use(initOAuthNode)
     .output(GetOAuthDataOutput)
     .query(getOAuthDataMethod),
   setOAuthData: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(checkCryptoNodes)
-    .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
-    .use(initCryptoNode)
     .use(initOAuthNode)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
+  getVoucher: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(resolveENS)
+    .use(setCryptoNodeClient)
+    .use(initCryptoNode)
+    .output(GetVoucherOutput)
+    .query(getVoucherMethod),
+  setVoucher: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(resolveENS)
+    .use(setCryptoNodeClient)
+    .use(initCryptoNode)
+    .input(SetVoucherInput)
+    .mutation(setVoucherMethod),
 })

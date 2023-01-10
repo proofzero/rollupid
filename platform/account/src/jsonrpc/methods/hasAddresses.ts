@@ -4,10 +4,10 @@ import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import type { AddressList } from '../middlewares/addressList'
 import { Edge, EdgeDirection } from '@kubelt/graph'
 import type { AccountURN } from '@kubelt/urns/account'
 import { EDGE_ADDRESS } from '@kubelt/graph/edges'
+import { AddressList } from '../../types'
 
 // Should this live in @kubelt/platform-middlewares/inputValidators?
 export const AddressListInput = z.custom<AddressList>((input) => {

@@ -76,9 +76,9 @@ const profileResolvers: Resolvers = {
             [PlatformJWTAssertionHeader]: jwt,
           },
         })
-        let accountProfile = (await accountClient.getProfile.query({
+        let accountProfile = await accountClient.getProfile.query({
           account: accountURN,
-        })) as any
+        })
 
         if (!accountProfile) {
           const addressProfile =

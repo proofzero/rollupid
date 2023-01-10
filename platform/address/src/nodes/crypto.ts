@@ -2,7 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
-import type { Challenge, CryptoAddressType } from '../types'
+import type { Challenge, CryptoAddressType, NFTarVoucher } from '../types'
 import { recoverEthereumAddress } from '../utils'
 import Address from './address'
 
@@ -59,6 +59,14 @@ export default class CryptoAddress extends Address {
     this.state.storage.put('challenges', challenges)
 
     return challenge
+  }
+
+  async setVoucher(voucher: NFTarVoucher): Promise<void> {
+    return await this.state.storage.put('voucher', voucher)
+  }
+
+  async getVoucher(): Promise<NFTarVoucher | undefined> {
+    return await this.state.storage.get<NFTarVoucher>('voucher')
   }
 
   async alarm() {

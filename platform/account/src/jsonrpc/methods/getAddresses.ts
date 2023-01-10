@@ -5,8 +5,7 @@ import { AddressURN } from '@kubelt/urns/address'
 
 import { Edge, EdgeDirection } from '@kubelt/graph'
 import { EDGE_ADDRESS } from '@kubelt/graph/edges'
-
-import type { AddressList } from '../middlewares/addressList'
+import { AddressList } from '../../types'
 
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,

@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import type { Profile } from '../middlewares/profile'
 import { initAccountNodeByName } from '../../nodes'
+import { Profile } from '../../types'
 
 export const GetProfileInput = z.object({
   account: inputValidators.AccountURNInput,

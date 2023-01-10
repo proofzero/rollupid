@@ -25,6 +25,3 @@ export const ProfileSchema = z.object({
     )
     .optional(),
 })
-
-// TODO: move to types packages
-export type Profile = z.infer<typeof ProfileSchema>

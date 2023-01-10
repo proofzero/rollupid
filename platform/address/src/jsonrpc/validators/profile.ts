@@ -45,7 +45,6 @@ export const CryptoAddressProfileSchema = z.object({
   address: z.string(),
   avatar: z.string().optional(),
   displayName: z.string().optional(),
-  nftarVoucher: z.any().optional(),
 })
 
 export const GoogleRawProfileSchema = z.object({
