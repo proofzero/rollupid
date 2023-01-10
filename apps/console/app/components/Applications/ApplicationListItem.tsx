@@ -34,7 +34,7 @@ export const ApplicationListItemIcon = ({
 export type ApplicationListItemProps = {
   id: string
   name?: string
-  created?: Date
+  createdTimestamp?: number
   icon?: string
   published?: boolean
   onDeleteApplication?: (clientId: string, appName: string) => void
@@ -42,7 +42,7 @@ export type ApplicationListItemProps = {
 export const ApplicationListItem = ({
   id,
   name,
-  created,
+  createdTimestamp,
   icon,
   published,
   onDeleteApplication,
@@ -61,7 +61,7 @@ export const ApplicationListItem = ({
       </div>
 
       <Text size="sm" weight="normal" className="text-gray-400">
-        {created?.toDateString()}
+        { createdTimestamp && new Date(createdTimestamp).toDateString() }
       </Text>
     </section>
 

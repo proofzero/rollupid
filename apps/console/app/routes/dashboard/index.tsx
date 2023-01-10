@@ -32,7 +32,7 @@ type LoaderData = {
     name?: string,
     icon?: string,
     published?: boolean,
-    timestamp?: string
+    createdTimestamp?: number
   }[]
   avatarUrl: string
 }
@@ -49,7 +49,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   try {
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
-      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon, published: a.published, timestamp: ''}
+      return { 
+        clientId: a.clientId, 
+        name: a.app?.name, 
+        icon: a.app?.icon, 
+        published: a.published, 
+        createdTimestamp: a.createdTimestamp
+      }
     })
 
     let avatarUrl = ''

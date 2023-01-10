@@ -29,6 +29,7 @@ export const AppReadableFieldsSchema = z.object({
   clientId: z.string(),
   secretTimestamp: z.number().optional(),
   apiKeyTimestamp: z.number().optional(),
+  createdTimestamp: z.number().optional(),
   scopes: z.array(z.string()).optional(),
 })
 

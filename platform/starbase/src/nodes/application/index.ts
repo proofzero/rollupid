@@ -13,6 +13,7 @@ import {
 } from 'jose'
 import { STARBASE_API_KEY_ISSUER } from '../../constants'
 import type {
+  AppAllFields,
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
@@ -48,13 +49,13 @@ export default class StarbaseApp extends DOProxy {
 
   async init(clientId: string, clientName: string): Promise<void> {
     //These key-vals get stored as key-vals in the DO itself
-    const entriesToStore = {
+    const entriesToStore:Partial<AppAllFields> = {
       clientId,
       clientName,
       app: {
-        timestamp: Date.now().toString(),
         name: clientName,
       },
+      createdTimestamp: Date.now()
     }
     this.state.storage.put(entriesToStore)
   }
@@ -85,6 +86,7 @@ export default class StarbaseApp extends DOProxy {
       'published',
       'secretTimestamp',
       'apiKeyTimestamp',
+      'createdTimestamp',
       'scopes',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
