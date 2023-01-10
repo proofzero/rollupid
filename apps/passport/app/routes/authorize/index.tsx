@@ -33,12 +33,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     console.log('no profile found, creating one')
     const defaultProfileURN = session.get('defaultProfileUrn')
     const addressClient = getAddressClient(defaultProfileURN)
-    profile = await addressClient.getAddressProfile.query() // this will detect the kind of address
+    const [profile, voucher] = await Promise.all([
+      addressClient.getAddressProfile.query(), // this will detect the kind of address
+      addressClient.getVoucher.query(),
+    ])
     if (!profile) {
       throw json("Couldn't find profile", 400)
     }
     const updated = await galaxyClient.updateProfile(
-      { profile: { ...profile, defaultAddress: defaultProfileURN } },
+      {
+        profile: {
+          ...profile,
+          ...{ avatar: voucher.metadata.image },
+          defaultAddress: defaultProfileURN,
+        },
+      },
       {
         'KBT-Access-JWT-Assertion': session.get('jwt'),
       }
