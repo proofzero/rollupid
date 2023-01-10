@@ -54,7 +54,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
-          command: d1 --env dev execute edges-dev --file=./edges.sql
+          command: d1 migrations apply edges
           environment: 'dev'
 
       - name: Deploy edges dev Worker
