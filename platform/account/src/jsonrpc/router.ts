@@ -3,14 +3,14 @@ import { ZodError } from 'zod'
 
 import { Context } from '../context'
 
-import { AddressList } from './middlewares/addressList'
+import { AddressListSchema } from './validators/addressList'
 
 import { getProfileMethod, GetProfileInput } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import { getAddressesMethod, GetAddressesInput } from './methods/getAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
 
-import { ProfileSchema } from './middlewares/profile'
+import { ProfileSchema } from './validators/profile'
 
 import {
   ValidateJWT,
@@ -73,7 +73,7 @@ export const appRouter = t.router({
     .use(Scopes)
     .use(LogUsage)
     .input(GetAddressesInput)
-    .output(AddressList)
+    .output(AddressListSchema)
     .mutation(getAddressesMethod),
   hasAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)

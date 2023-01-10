@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import { ProfileSchema } from '../middlewares/profile'
+import { ProfileSchema } from '../validators/profile'
 
 export const SetProfileInput = z.object({
   name: inputValidators.AccountURNInput,

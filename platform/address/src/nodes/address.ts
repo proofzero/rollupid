@@ -25,7 +25,7 @@ export default class Address extends DOProxy {
   }
 
   async getType(): Promise<AddressType | undefined> {
-    return await this.state.storage.get<AddressType>('address')
+    return await this.state.storage.get<AddressType>('type')
   }
 
   async setType(type: AddressType): Promise<void> {
@@ -48,6 +48,10 @@ export default class Address extends DOProxy {
       await this.state.storage.put('account', urn)
       return urn
     }
+  }
+
+  async getAccount(): Promise<AccountURN | undefined> {
+    return await this.state.storage.get<AccountURN>('account')
   }
 
   async setAccount(account: AccountURN): Promise<void> {

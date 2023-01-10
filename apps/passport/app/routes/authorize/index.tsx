@@ -12,7 +12,10 @@ import {
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import type { AccountURN } from '@kubelt/urns/account'
+import type { AddressURN } from '@kubelt/urns/address'
+import { CryptoAddressProfile } from '@kubelt/platform/address/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -22,36 +25,40 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
   const jwt = await requireJWT(request)
   const session = await getUserSession(request)
+  const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
 
   const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    'KBT-Access-JWT-Assertion': jwt,
-  })
-
-  let profile
-  if (!profileRes.profile) {
-    console.log('no profile found, creating one')
-    const defaultProfileURN = session.get('defaultProfileUrn')
-    const addressClient = getAddressClient(defaultProfileURN)
-    profile = await addressClient.getAddressProfile.query() // this will detect the kind of address
-    if (!profile) {
-      throw json("Couldn't find profile", 400)
+  const profileRes = await galaxyClient.getProfileFromAddress(
+    { addressURN: defaultProfileURN },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
     }
-    const updated = await galaxyClient.updateProfile(
-      { profile: { ...profile, defaultAddress: defaultProfileURN } },
-      {
-        'KBT-Access-JWT-Assertion': session.get('jwt'),
-      }
-    )
-    if (!updated) {
-      throw json("Couldn't update profile", 400)
-    }
-  } else {
-    profile = profileRes.profile
-  }
+  )
+  const profile = profileRes.profileFromAddress
 
   if (!profile) {
-    throw json({ message: 'No profile found', isAuthenticated: true }, 400)
+    const addressClient = getAddressClient(defaultProfileURN)
+    // TODO: with social account we need a method to determine which type of profile
+    const [addressProfile, voucher] = await Promise.all([
+      addressClient.getAddressProfile.query(),
+      addressClient.getVoucher.query(),
+    ])
+    const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+    await galaxyClient.updateProfile(
+      {
+        profile: {
+          defaultAddress: defaultProfileURN,
+          displayName: cryptoAddressProfile.displayName,
+          pfp: {
+            image: cryptoAddressProfile.avatar || '',
+          },
+          cover: voucher.metadata.cover,
+        },
+      },
+      {
+        [PlatformJWTAssertionHeader]: jwt,
+      }
+    )
   }
 
   // if no client id let's redirect to the first party app select page
@@ -59,22 +66,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect('/apps')
   }
 
-  // if profile is null we need to provision a default profile
-  // we can do that by getting the address profile and then setting the account profile
-  // TODO: create a get address profile galaxy operation
-  // TODO: call set profile mutation from galaxy
-
   try {
     const sbClient = getStarbaseClient(jwt)
 
-    const scopeMeta = await sbClient.getScopes.query()
-    const appProfile = await sbClient.getAppProfile.query({ clientId: client_id })
+    const [/*scopeMeta,*/ appProfile] = await Promise.all([
+      // sbClient.getScopes.query(),
+      sbClient.getAppProfile.query({
+        clientId: client_id,
+      }),
+    ])
 
     return json({
       clientId: client_id,
       appProfile,
       userProfile: profile,
-      scopeMeta,
+      scopeMeta: [], // TODO: scopeMeta,
       state,
     })
   } catch (e) {

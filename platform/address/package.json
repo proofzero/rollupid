@@ -45,7 +45,7 @@
     "@kubelt/types": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@trpc/server": "10.8.1",
-    "do-proxy": "1.3.1",
+    "do-proxy": "1.3.3",
     "itty-router": "2.6.6",
     "itty-router-extras": "0.4.2",
     "remix-auth-google": "1.2.0",

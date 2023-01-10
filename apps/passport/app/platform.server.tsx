@@ -10,8 +10,8 @@ import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 export function getStarbaseClient(jwt: string) {
   return createStarbaseClient(Starbase, {
     headers: {
-      [PlatformJWTAssertionHeader]: jwt
-    }
+      [PlatformJWTAssertionHeader]: jwt,
+    },
   })
 }
 

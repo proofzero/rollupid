@@ -1,4 +1,3 @@
-import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
@@ -8,12 +7,12 @@ import { setupContext, isAuthorized, hasApiKey } from './utils'
 
 import Env from '../../env'
 import { Resolvers } from './typedefs'
-import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
-import { Profile } from '@kubelt/platform.account/src/jsonrpc/middlewares/profile'
+import { Profile } from '@kubelt/platform.account/src/types'
+import { CryptoAddressProfile } from '../../../../address/src/types'
 
 type ResolverContext = {
   env: Env
@@ -51,46 +50,56 @@ const profileResolvers: Resolvers = {
           'X-3RN': addressURN,
         },
       })
-      const accountURN = await addressClient.kb_getAccount()
+      const accountURN = await addressClient.getAccount.query()
 
+      // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
           'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
         )
         const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
         try {
-          const addressProfile = await addressClient.kb_getAddressProfile()
+          const [addressProfile, voucher] = await Promise.all([
+            addressClient.getAddressProfile.query(),
+            addressClient.getVoucher.query(), // TODO: should only get if we know this is a crypto address
+          ])
+
           if (!addressProfile) {
             throw new GraphQLError(errorMessage)
           }
-          return addressProfile
+          // NOTE: the above case is needs to change when social vault accounts hooked up
+          // We will need to call for addresses and then get the profile?
+          // Or have utility to manage the mapping?
+          const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+          console.log(
+            'galaxy.profileFromAddress: returning address profile',
+            cryptoAddressProfile
+          )
+          return {
+            displayName: cryptoAddressProfile.displayName,
+            pfp: {
+              image: cryptoAddressProfile.avatar as string,
+            },
+            cover: voucher.metadata.cover,
+            defaultAddress: addressURN,
+          }
         } catch (e) {
           console.error(errorMessage)
           throw new GraphQLError(errorMessage)
         }
       }
 
-      try {
-        const accountClient = createAccountClient(env.Account, {
-          headers: {
-            [PlatformJWTAssertionHeader]: jwt,
-          },
-        })
-        let accountProfile = await accountClient.getProfile.query({
-          account: accountURN,
-        })
+      // get the account profile
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let accountProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
 
-        if (!accountProfile) {
-          accountProfile =
-            (await addressClient.kb_getAddressProfile()) as Profile
-        }
-
-        return accountProfile
-      } catch (e) {
-        const errorMessage = `galaxy.profileFromAddress: failed to create profile for address ${addressURN}`
-        console.error(errorMessage, e)
-        throw new GraphQLError(errorMessage)
-      }
+      return accountProfile
     },
   },
   Mutation: {

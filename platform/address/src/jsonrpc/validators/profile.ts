@@ -14,8 +14,19 @@ const NFTarTraitsSchema = z.object({
 })
 
 export const NFTarVoucherSchema = z.object({
-  recipient: z.string(),
-  uri: z.string(),
+  voucher: z.object({
+    recipient: z.string(),
+    uri: z.string(),
+    signature: z.string(),
+  }),
+  signature: z.object({
+    message: z.string(),
+    messageHash: z.string(),
+    v: z.string(),
+    r: z.string(),
+    s: z.string(),
+    signature: z.string(),
+  }),
   metadata: z.object({
     name: z.string(),
     description: z.string(),
@@ -24,12 +35,9 @@ export const NFTarVoucherSchema = z.object({
     external_url: z.string(),
     properties: z.object({
       metadata: z.object({
-        blockchain: z.object({
-          properties: z.object({
-            name: z.string(),
-            chain: z.string(),
-          }),
-        }),
+        name: z.string(),
+        chainId: z.number(),
+        account: z.string(),
       }),
       traits: z.object({
         trait0: NFTarTraitsSchema,
@@ -37,6 +45,10 @@ export const NFTarVoucherSchema = z.object({
         trait2: NFTarTraitsSchema,
         trait3: NFTarTraitsSchema,
       }),
+      GEN: z.string(),
+      Priority: z.string(),
+      Friend: z.string(),
+      Points: z.string(),
     }),
   }),
 })
@@ -45,7 +57,6 @@ export const CryptoAddressProfileSchema = z.object({
   address: z.string(),
   avatar: z.string().optional(),
   displayName: z.string().optional(),
-  nftarVoucher: z.any().optional(),
 })
 
 export const GoogleRawProfileSchema = z.object({

@@ -10,6 +10,7 @@ import {
   NFTarVoucher,
 } from '../../types'
 import { AddressProfileSchema } from '../validators/profile'
+import { CryptoAddressProxyStub } from '../../nodes/crypto'
 
 export const GetAddressProfileOutput = AddressProfileSchema
 
@@ -37,11 +38,20 @@ export const getAddressProfileMethod = async ({
   switch (type) {
     case CryptoAddressType.Ethereum:
     case CryptoAddressType.ETH: {
-      const ethProfile = await getCryptoAddressProfile(
-        AddressURNSpace.decode(address),
-        type,
-        ctx
-      )
+      const decodedAddress = AddressURNSpace.decode(address)
+      const [ethProfile, voucher] = await Promise.all([
+        getCryptoAddressProfile(decodedAddress),
+        getNftarVoucher(decodedAddress, type, ctx),
+      ])
+
+      if (!voucher) {
+        throw new Error('Unable to get voucher from Nftar')
+      }
+      const pfp = gatewayFromIpfs(voucher.metadata.image)
+      ethProfile.avatar ||= pfp
+
+      await (nodeClient as CryptoAddressProxyStub).class.setVoucher(voucher)
+
       await nodeClient?.class.setProfile<CryptoAddressProfile>(ethProfile)
       return ethProfile as AddressProfile
     }
@@ -53,9 +63,7 @@ export const getAddressProfileMethod = async ({
 }
 
 const getCryptoAddressProfile = async (
-  address: string,
-  type: CryptoAddressType,
-  ctx: Context
+  address: string
 ): Promise<CryptoAddressProfile> => {
   const ensClient = new ENSUtils()
   const { avatar, displayName } = await ensClient.getEnsEntry(address)
@@ -66,22 +74,7 @@ const getCryptoAddressProfile = async (
     avatar: avatar || '',
   }
 
-  try {
-    const chainType = type === 'eth' ? 'ethereum' : type
-    // NOTE: nftar is really slow and we plan on speeding it up
-    const voucher = await getNftarVoucher(address, chainType, ctx)
-    if (!voucher) {
-      throw new Error('Unable to get voucher from Nftar')
-    }
-    const pfp = gatewayFromIpfs(voucher.metadata.image)
-
-    newProfile.avatar ||= pfp
-    newProfile.nftarVoucher = voucher
-
-    return newProfile
-  } catch (error) {
-    throw (error as Error).message
-  }
+  return newProfile
 }
 
 type NftarError = {
