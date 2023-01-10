@@ -6447,7 +6447,7 @@ __metadata:
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.1
+    do-proxy: 1.3.3
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     jose: 4.11.0
@@ -6473,7 +6473,7 @@ __metadata:
     "@types/node": 18.11.9
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.1
+    do-proxy: 1.3.3
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-durable: 1.6.0
@@ -6508,7 +6508,7 @@ __metadata:
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.1
+    do-proxy: 1.3.3
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
@@ -6584,7 +6584,7 @@ __metadata:
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.1
+    do-proxy: 1.3.3
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     itty-router: 2.6.6
@@ -6606,7 +6606,7 @@ __metadata:
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
-    do-proxy: 1.3.1
+    do-proxy: 1.3.3
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     npm-run-all: 4.1.5
@@ -21054,12 +21054,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"do-proxy@npm:1.3.1":
-  version: 1.3.1
-  resolution: "do-proxy@npm:1.3.1"
+"do-proxy@npm:1.3.3":
+  version: 1.3.3
+  resolution: "do-proxy@npm:1.3.3"
   peerDependencies:
     "@cloudflare/workers-types": ^4.20221111.1
-  checksum: 5763f397c87132980c346fa4ca1b7d70318f77f416c2fe9a540e4719f35beca978e74aac9a456e02e832e3560c1f69a5e7b9152e6776bbad0bd5e154bc2e39b9
+  checksum: 2456b1327806cec01631c628b340a6f48a1731626b98240d5212a571913e020f9fbb63825c7d4961eeae182ba65287a2ce34850cf13e7f9c126016954fc404a0
   languageName: node
   linkType: hard
 

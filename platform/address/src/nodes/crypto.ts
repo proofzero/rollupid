@@ -1,18 +1,12 @@
 import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
-import { AddressURN } from '@kubelt/urns/address'
 
 import { NONCE_OPTIONS } from '../constants'
-import type {
-  Challenge,
-  CryptoAddressProfile,
-  CryptoAddressType,
-} from '../types'
+import type { Challenge, CryptoAddressType } from '../types'
 import { recoverEthereumAddress } from '../utils'
 import Address from './address'
 
 import { DurableObjectStubProxy } from 'do-proxy'
-import { AccountURN } from '@kubelt/urns/account'
 
 export default class CryptoAddress extends Address {
   async getType(): Promise<CryptoAddressType> {
@@ -76,39 +70,6 @@ export default class CryptoAddress extends Address {
       }
     }
     await this.state.storage.put('challenges', challenges)
-  }
-
-  // parent methods
-  async getAddress(): Promise<AddressURN | undefined> {
-    return super.getAddress()
-  }
-
-  async setAddress(address: AddressURN): Promise<void> {
-    return super.setAddress(address)
-  }
-
-  async setType(type: CryptoAddressType): Promise<void> {
-    return super.setType(type)
-  }
-
-  async resolveAccount(): Promise<AccountURN> {
-    return super.resolveAccount()
-  }
-
-  async setAccount(account: AccountURN): Promise<void> {
-    return super.setAccount(account)
-  }
-
-  async unsetAccount(): Promise<boolean> {
-    return super.unsetAccount()
-  }
-
-  async getProfile(): Promise<CryptoAddressProfile | undefined> {
-    return super.getProfile() as Promise<CryptoAddressProfile | undefined>
-  }
-
-  async setProfile<TProfile>(profile: TProfile): Promise<void> {
-    return super.setProfile(profile)
   }
 }
 
