@@ -37,16 +37,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - name: Drop edges D1 Database
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
-          accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '2.6.2'
-          workingDirectory: 'platform/edges'
-          command: d1 --env dev delete edges-dev
-          environment: 'dev'
-
       - name: Deploy edges D1 Database
         uses: cloudflare/wrangler-action@2.0.0
         with:
@@ -54,7 +44,7 @@ jobs:
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '2.6.2'
           workingDirectory: 'platform/edges'
-          command: d1 migrations apply edges
+          command: d1 migrations apply edges-dev --env dev
           environment: 'dev'
 
       - name: Deploy edges dev Worker
