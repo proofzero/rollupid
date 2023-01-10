@@ -47,7 +47,7 @@ jobs:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: 'platform/edges'
-          command: d1 execute --env next edges-next --file=./edges.sql
+          command: d1 migrations apply edges
           environment: 'next'
 
       - name: Deploy edges next Worker
