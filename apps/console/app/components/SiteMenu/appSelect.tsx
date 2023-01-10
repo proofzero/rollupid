@@ -36,11 +36,10 @@ function indexFor(
 
 type AppListboxProps = {
   // The list of apps to display in the dropdown.
-  // TODO tighten up this definition
   apps: {
     clientId: string
-    name: string
-    icon: string
+    name?: string
+    icon?: string
   }[]
   //
   selectedAppIndex: number
@@ -48,9 +47,8 @@ type AppListboxProps = {
 
 function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
-
   const [selected] = useState(
-    apps.length !== 0
+    apps && apps.length !== 0
       ? selectedAppIndex < 0
         ? {
             clientId: 'none',
@@ -95,7 +93,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   {selected.clientId === 'none' && (
                     <HiGlobeAlt
                       className={`h-6 w-6 ${
-                        apps.length === 0 ? 'text-gray-600' : 'text-gray-300'
+                        apps?.length === 0 ? 'text-gray-600' : 'text-gray-300'
                       } mr-2.5`}
                     />
                   )}
@@ -116,7 +114,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   <Text
                     weight="medium"
                     className={`${
-                      apps.length === 0 ? 'text-gray-600' : 'text-white'
+                      apps?.length === 0 ? 'text-gray-600' : 'text-white'
                     }`}
                   >
                     {selected.name}
@@ -152,7 +150,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                     </Text>
                   </Listbox.Option>
 
-                  {apps.map((app) => (
+                  {apps?.map((app) => (
                     <Listbox.Option key={app.clientId} value={app}>
                       {({ selected, active }) => (
                         <>
@@ -201,11 +199,10 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
 
 type AppSelectProps = {
   // The list of apps to display in the dropdown.
-  // TODO tighten up this definition
   apps: {
     clientId: string
-    name: string
-    icon: string
+    name?: string
+    icon?: string
   }[]
   // The currently selected application ID.
   selected?: string

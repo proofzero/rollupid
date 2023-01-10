@@ -33,8 +33,8 @@ export const ApplicationListItemIcon = ({
 
 export type ApplicationListItemProps = {
   id: string
-  name: string
-  created: Date
+  name?: string
+  created?: Date
   icon?: string
   published?: boolean
   onDeleteApplication?: (clientId: string, appName: string) => void
@@ -49,7 +49,7 @@ export const ApplicationListItem = ({
 }: ApplicationListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white">
     <section>
-      <ApplicationListItemIcon title={name} iconUrl={icon} />
+      <ApplicationListItemIcon title={name ?? ''} iconUrl={icon} />
     </section>
 
     <section className="px-4 flex-1">
@@ -61,7 +61,7 @@ export const ApplicationListItem = ({
       </div>
 
       <Text size="sm" weight="normal" className="text-gray-400">
-        {created.toDateString()}
+        {created?.toDateString()}
       </Text>
     </section>
 
@@ -105,7 +105,7 @@ export const ApplicationListItem = ({
                 className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
                 onClick={() => {
                   if (onDeleteApplication) {
-                    onDeleteApplication(id, name)
+                    onDeleteApplication(id, name ?? '')
                   }
                 }}
               >

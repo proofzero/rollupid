@@ -1,9 +1,9 @@
-import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
-import { Access, Authorization } from '.'
-import type { Environment } from './types'
+import type { Environment } from '../types'
+import createEdgesClient from '@kubelt/platform-clients/edges'
+import { AccountURN } from '@kubelt/urns/account'
+import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
 /**
  * Defines your inner context shape.
@@ -11,12 +11,9 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  Access: DurableObjectNamespace
-  access?: Access
-  Authorization: DurableObjectNamespace
-  authorization?: Authorization
-  Starbase: Fetcher
-  starbaseClient?: ReturnType<typeof createStarbaseClient>
+  StarbaseApp: DurableObjectNamespace
+  Edges: Fetcher
+  accountURN?: AccountURN
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
@@ -28,10 +25,10 @@ interface CreateInnerContextOptions
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
 export async function createContextInner(opts: CreateInnerContextOptions) {
-  const starbaseClient = createStarbaseClient(opts.Starbase)
+  const edges = createEdgesClient(opts.Edges)
   return {
-    starbaseClient,
     ...opts,
+    edges,
   }
 }
 /**
@@ -44,10 +41,9 @@ export async function createContext(
   env: Environment
 ) {
   const contextInner = await createContextInner({ ...opts, ...env })
-
   return {
     req: opts.req,
-    resHeaders: opts.resHeaders,
+    res: opts.resHeaders,
     ...contextInner,
   }
 }

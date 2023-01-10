@@ -75,11 +75,10 @@ const MenuLink = (props: MenuLinkProps) => {
 
 type KubeltMenuProps = {
   // An array of application objects.
-  // TODO tighten this up
   apps: {
     clientId: string
-    name: string
-    icon: string
+    name?: string
+    icon?: string
   }[]
   // Current selected application ID.
   selected?: string

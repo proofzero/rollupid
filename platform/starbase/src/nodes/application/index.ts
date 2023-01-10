@@ -1,361 +1,197 @@
-/**
- * @module @kubelt/do.starbase
- * @file src/index.ts
- */
-
-import * as _ from 'lodash'
-
-import * as openrpc from '@kubelt/openrpc'
-
-import type {
-  RpcAlarm,
-  RpcInput,
-  RpcOutput,
-  RpcParams,
-  RpcResult,
-} from '@kubelt/openrpc/component'
-
+import { hexlify } from '@ethersproject/bytes'
+import { randomBytes } from '@ethersproject/random'
+import { ApplicationURN } from '@kubelt/urns/application'
+import { DOProxy } from 'do-proxy'
 import {
-  FieldAccess,
-  alarm,
-  component,
-  field,
-  method,
-  requiredField,
-  requiredScope,
-  scopes,
-} from '@kubelt/openrpc/component'
+  exportJWK,
+  generateKeyPair,
+  importJWK,
+  JWK,
+  jwtVerify,
+  KeyLike,
+  SignJWT,
+} from 'jose'
+import { STARBASE_API_KEY_ISSUER } from '../../constants'
+import type {
+  AppObject,
+  AppReadableFields,
+  AppUpdateableFields,
+} from '../../types'
 
-// The OpenRPC schema that defines the RPC API provided by the Durable Object.
-import schema from './schema'
-import * as apiKeyUtils from './apiKeyUtils'
+type AppDetails = AppUpdateableFields & AppReadableFields
+type AppProfile = AppUpdateableFields
 
-// StarbaseApplication
-// -----------------------------------------------------------------------------
-// A Durable Object for storing Kubelt Application state.
+interface KeyPair {
+  publicKey: KeyLike | Uint8Array
+  privateKey: KeyLike | Uint8Array
+}
 
-// TODO this decorator adds RPC methods that allow the component to
-// be treated as a graph node.
-// - [optional] constrain the types of edges
-// - [optional] provide edge type (allowed properties)
-// - [optional] constrain types of target node?
-// - [optional] conform to EdgeStorage interface
-//   - [default] ComponentStorage: store in DO state
-//   - KVStorage: store in KV store
-//   - D1Storage: store in D1 database
-//   - RPCStorage: make remote RPC call to store edge
-//@node()
+interface KeyPairSerialized {
+  publicKey: JWK
+  privateKey: JWK
+}
 
-// TODO list allowed signers (provide public key(s))
-// @signer()
-
-/**
- * Stores state that describes a Starbase application.
- *
- * @note This class needs to implement all of the methods defined in
- * the OpenRPC schema or an error will be thrown upon construction.
- */
-// Should this version be an argument to @component(schema, "v1")?
-//@version("v1")
-@component(schema)
-@scopes(['owner' /* 'starbase.read', 'starbase.write'*/])
-@field({
-  name: 'app',
-  doc: 'An application object',
-  defaultValue: {},
-  /*
-  scopes: {
-    read: ["starbase.read"],
-    write: ["starbase.write"],
+const JWT_OPTIONS = {
+  alg: 'ES256',
+  jti: {
+    length: 24,
   },
-  validator: (x) => { return true },
-  schemas: {
-    v1: {
-    }
-    v2: {
-      up: () => {
-        // up migrate to new version
-      }
-      down: () => {
-        // down migrate to old version
-      }
-      }
+}
+
+export default class StarbaseApp extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
   }
-  */
-})
-@field({
-  name: 'published',
-  doc: 'Application publication flag',
-  defaultValue: false,
-})
-@field({
-  name: 'clientId',
-  doc: 'The OAuth client id for the application',
-  defaultValue: '',
-})
-@field({
-  name: 'secret',
-  doc: 'The OAuth client secret for the application',
-  defaultValue: '',
-})
-@field({
-  name: 'apiKey',
-  doc: 'The API key for the application',
-  defaultValue: null,
-})
-@field({
-  name: 'apiKeySigningKeyPair',
-  doc: 'The signing keypair for signing the API key for app',
-  defaultValue: null,
-})
-export class StarbaseApplication {
-  // init
-  // ---------------------------------------------------------------------------
-  // Store the initial copy of the application record. Used to set up
-  // fixture nodes for internal platform apps, which is why it updates
-  // the secret. Once we no longer need to initialize the platform in
-  // this way we can remove this method.
 
-  @method('init')
-  //@requiredScope('starbase.write')
-  @requiredField('clientName', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('clientId', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('timestamp', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
-  init(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    if (!params.has('clientId') || !params.has('clientName')) {
-      const message = `missing parameter "clientId" or "clientName" from request`
-      // TODO need a better way to return errors:
-      // - additional RpcCallable parameter that is an error map; errors
-      //   set on that map trigger the return of a JSON-RPC error
-      //   response.
-      // - exceptions
-      return Promise.resolve({
-        error: message,
-      })
+  async init(clientId: string, clientName: string): Promise<void> {
+    //These key-vals get stored as key-vals in the DO itself
+    const entriesToStore = {
+      clientId,
+      clientName,
+      app: {
+        timestamp: Date.now().toString(),
+        name: clientName,
+      },
     }
+    this.state.storage.put(entriesToStore)
+  }
 
-    const clientId = params.get('clientId')
-    const clientName = params.get('clientName')
+  async delete(): Promise<void> {
+    //As per docs, this doesn't guarnatee deletion in cases of failure.
+    //Only a subset of data may be deleted
+    this.state.storage.deleteAll()
+  }
 
-    const timestamp = Date.now()
-
-    output.set('clientId', clientId)
-    output.set('clientName', clientName)
-
-    output.set('app', {
-      timestamp,
-      name: clientName,
+  async update(updates: Partial<AppObject>): Promise<void> {
+    //Merge values in app object
+    const storedValues = this.state.storage.get('app')
+    const mergedEntries = new Map(Object.entries(storedValues))
+    Object.entries(updates).forEach(([k, v]) => {
+      mergedEntries.set(k, v)
     })
+    const mergedObject = Object.fromEntries(mergedEntries.entries())
 
-    return Promise.resolve(true)
+    await this.state.storage.put('app', mergedObject)
   }
 
-  // update
-  // ---------------------------------------------------------------------------
-
-  // Mark this method as being the implementation of the update method
-  // from the OpenRPC schema.
-  @method('update')
-  // The write scope is required to invoke this method. If the caller
-  // lacks the scope they receive an error method indicating that they
-  // lack permission, and this method handler is not invoked.
-  //@requiredScope('starbase.write')
-  // Allow this method to update the value of the "app" field of the
-  // component.
-  @requiredField('app', [FieldAccess.Read, FieldAccess.Write])
-  // The RPC method implementation.
-  async update(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    // Read the supplied "profile" request parameter and write it to the
-    // output "app" field, merging with the existing app data.
-    const app = input.get('app')
-    const { updates } = Object.fromEntries(params)
-
-    // TODO: Need to handle published differently
-    const merged = _.merge(app, _.omit(updates, ['published']))
-
-    output.set('app', merged)
-
-    return Promise.resolve(merged)
+  async getDetails(): Promise<AppDetails> {
+    const keysWeWant: Array<keyof AppDetails> = [
+      'app',
+      'clientId',
+      'clientName',
+      'published',
+      'secretTimestamp',
+      'apiKeyTimestamp',
+      'scopes',
+    ]
+    const appObj = await this.state.storage.get(keysWeWant)
+    const result = Object.fromEntries(appObj) as AppDetails
+    return result
   }
 
-  // fetch
-  // ---------------------------------------------------------------------------
-
-  @method('fetch')
-  //@requiredScope('starbase.read')
-  @requiredField('app', [FieldAccess.Read])
-  @requiredField('clientId', [FieldAccess.Read])
-  @requiredField('published', [FieldAccess.Read])
-  @requiredField('secretTimestamp', [FieldAccess.Read])
-  @requiredField('apiKeyTimestamp', [FieldAccess.Read])
-  appFetch(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const clientId = input.get('clientId')
-    const published = input.get('published')
-    const secretTimestamp = input.get('secretTimestamp')
-    const apiKeyTimestamp = input.get('apiKeyTimestamp')
-
-    const app = input.get('app')
-
-    return Promise.resolve(
-      _.merge(
-        {
-          clientId,
-          published,
-          secretTimestamp,
-          apiKeyTimestamp,
-        },
-        app
-      )
-    )
+  async getProfile(): Promise<AppProfile> {
+    const keysWeWant: Array<keyof AppProfile> = [
+      'app',
+      'clientName',
+      'published',
+    ]
+    const appObj = await this.state.storage.get(keysWeWant)
+    const result = Object.fromEntries(appObj) as AppProfile
+    return result
   }
 
-  // profile
-  // ---------------------------------------------------------------------------
-
-  @method('profile')
-  //@requiredScope('starbase.read')
-  @requiredField('app', [FieldAccess.Read])
-  @requiredField('published', [FieldAccess.Read])
-  profile(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const app = input.get('app')
-    const published = input.get('published')
-
-    // If the application is not published we shouldn't return any
-    // information.
-    let profile = {}
-    if (published == true) {
-      // These fields are stored separately, but out of an abundance of
-      // caution we make sure they're not present in the returned profile.
-      profile = _.omit(app, ['clientSecret', 'published'])
-    }
-
-    return Promise.resolve(profile)
+  async publish(published: boolean): Promise<void> {
+    this.state.storage.put('published', published)
   }
 
-  // hasSecret
-  // -----------------------------------------------------------------------------
-
-  @method('hasSecret')
-  //@requiredScope()
-  @requiredField('secret', [FieldAccess.Read])
-  hasSecret(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const secret = input.get('secret')
-    const exists = _.isString(secret) && _.trim(secret) !== ''
-
-    return Promise.resolve(exists)
+  async rotateClientSecret(clientSecret: string): Promise<void> {
+    this.state.storage.put({ clientSecret })
+    this.state.storage.put('secretTimestamp', Date.now())
   }
 
-  // rotateSecret
-  // ---------------------------------------------------------------------------
-
-  @method('rotateSecret')
-  //@requiredScope()
-  @requiredField('secret', [FieldAccess.Write])
-  @requiredField('secretTimestamp', [FieldAccess.Write])
-  rotateSecret(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    // The new hashed secret is provided in the request.
-    const secret = params.get('secret')
-    output.set('secret', secret)
-    output.set('secretTimestamp', Date.now())
-
-    return Promise.resolve(true)
+  async validateClientSecret(hashedClientSecret: string): Promise<boolean> {
+    const storedSecret = await this.state.storage.get('clientSecret')
+    return storedSecret === hashedClientSecret
   }
 
-  // rotateSecret
-  // ---------------------------------------------------------------------------
-
-  @method('rotateApiKey')
-  //@requiredScope()
-  @requiredField('apiKey', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('apiKeySigningKeyPair', [FieldAccess.Read, FieldAccess.Write])
-  @requiredField('apiKeyTimestamp', [FieldAccess.Write])
-  async rotateApiKey(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const apiKey = await apiKeyUtils.generateAndStore(params, input, output)
-    output.set('apiKey', apiKey)
-    output.set('apiKeyTimestamp', Date.now())
+  async rotateApiKey(appUrn: ApplicationURN): Promise<string> {
+    const apiKey = await this.generateAndStore(appUrn)
+    this.state.storage.put('apiKey', apiKey)
+    this.state.storage.put('apiKeyTimestamp', Date.now())
     return apiKey
   }
 
-  @method('validateApiKey')
-  //@requiredScope()
-  @requiredField('apiKeySigningKeyPair', [FieldAccess.Read])
-  @requiredField('apiKey', [FieldAccess.Read])
-  async validateApiKey(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const providedKey = params.get('apiKey')
-    const validJWTForClient = await apiKeyUtils.verify(params, input, output)
-    return validJWTForClient && providedKey === input.get('apiKey')
+  async generateAndStore(appURN: ApplicationURN): Promise<string> {
+    const { privateKey: key } = await this.getJWTSigningKeyPair()
+
+    const apiKey = await new SignJWT({})
+      .setProtectedHeader(JWT_OPTIONS)
+      .setIssuedAt()
+      .setIssuer(STARBASE_API_KEY_ISSUER)
+      .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
+      .setSubject(appURN)
+      .sign(key)
+
+    return apiKey
   }
 
-  // publish
-  // ---------------------------------------------------------------------------
-  // Note that this method simply sets the publication flag as
-  // requested. Any validation of the application data that needs to
-  // happen before the app is published is expected to happen in the
-  // worker.
-
-  @method('publish')
-  //@requiredScope()
-  @requiredField('published', [FieldAccess.Write])
-  publish(
-    params: RpcParams,
-    input: RpcInput,
-    output: RpcOutput
-  ): Promise<RpcResult> {
-    const published = params.get('published')
-    output.set('published', published)
-    return Promise.resolve({ published })
+  async verify(apiKey: string): Promise<boolean> {
+    const { alg } = JWT_OPTIONS
+    const { publicKey: key } = await this.getJWTSigningKeyPair()
+    const options = { algorithms: [alg] }
+    try {
+      await jwtVerify(apiKey, key, options)
+      return true
+    } catch (e) {
+      console.error('Error verifying API key validity.', e)
+      return false
+    }
   }
 
-  // ---------------------------------------------------------------------------
-  // COMPONENT
-  // ---------------------------------------------------------------------------
+  async getJWTSigningKeyPair(): Promise<KeyPair> {
+    const { alg } = JWT_OPTIONS
+    const stored = (await this.state.storage.get(
+      'apiKeySigningKeyPair'
+    )) as KeyPairSerialized
+    if (stored) {
+      return {
+        publicKey: await importJWK(stored.publicKey, alg),
+        privateKey: await importJWK(stored.privateKey, alg),
+      }
+    }
 
-  // rpc.discover
-  // ---------------------------------------------------------------------------
-  // Fetch the schema declared by the component.
-  //
-  // NB: this is a native feature of our underlying OpenRPC library. We don't
-  // need special support for it at the component level, unlike with our extensions.
+    const generated: KeyPair = await generateKeyPair(alg, {
+      extractable: true,
+    })
 
-  // cmp.delete
-  // ---------------------------------------------------------------------------
-  // NB: we delete a durable object by deleting everything within it
-  // (storage.deleteAll). Once the DO shuts down the DO ceases to exist.
+    this.state.storage.put('apiKeySigningKeyPair', {
+      publicKey: await exportJWK(generated.publicKey),
+      privateKey: await exportJWK(generated.privateKey),
+    })
 
-  // cmp.scopes
-  // -----------------------------------------------------------------------------
-  // Returns a list of the scopes declared by the component.
-} // END StarbaseApp
+    return generated
+  }
+
+  async checkApiKey(apiKey: string): Promise<boolean> {
+    const validJWTForClient = await this.verify(apiKey)
+    const storedKey = await this.state.storage.get('apiKey')
+    return validJWTForClient && apiKey === storedKey
+  }
+
+  async hasClientSecret(): Promise<boolean> {
+    const storedSecret = await this.state.storage.get<string>('clientSecret')
+    return (storedSecret && storedSecret.length > 0) || false
+  }
+}
+
+export const getApplicationNodeByClientId = async (
+  clientId: string,
+  durableObject: DurableObjectNamespace
+) => {
+  const proxy = StarbaseApp.wrap(durableObject)
+  const appDO = proxy.getByName(clientId)
+  return appDO
+}

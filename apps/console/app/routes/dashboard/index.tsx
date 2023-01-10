@@ -12,8 +12,6 @@ import folderPlus from '~/images/folderPlus.svg'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { getApplicationListItems } from '~/models/app.server'
-
 //import { useUser } from "~/utils";
 
 import SiteMenu from '~/components/SiteMenu'
@@ -23,30 +21,48 @@ import AppBox from '~/components/AppBox'
 import { useState } from 'react'
 import { NewAppModal } from '~/components/NewAppModal/NewAppModal'
 import { requireJWT } from '~/utilities/session.server'
-import { getGalaxyClient, getStarbaseClient } from '~/utilities/platform.server'
+import { getGalaxyClient } from '~/utilities/platform.server'
 import { InfoPanelDashboard } from '~/components/InfoPanel/InfoPanelDashboard'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 type LoaderData = {
-  apps: Awaited<ReturnType<typeof getApplicationListItems>>
+  apps: {
+    clientId: string,
+    name?: string,
+    icon?: string,
+    published?: boolean,
+    timestamp?: string
+  }[]
   avatarUrl: string
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
+  
   const galaxyClient = await getGalaxyClient()
-
   try {
-    const apps = await starbaseClient.kb_appList() // TODO: update result type
-
-    const profileRes = await galaxyClient.getProfile(undefined, {
-      [PlatformJWTAssertionHeader]: jwt,
+    const apps = await starbaseClient.listApps.query()
+    const reshapedApps = apps.map((a) => {
+      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon, published: a.published, timestamp: ''}
     })
-  
-    const avatarUrl = profileRes.profile?.pfp?.image || ''
-  
-    return json<LoaderData>({ apps, avatarUrl })
+
+    let avatarUrl = ''
+    try {
+      const profileRes = await galaxyClient.getProfile(undefined, {
+        [PlatformJWTAssertionHeader]: jwt,
+      })
+      avatarUrl = profileRes.profile?.pfp?.image || ''
+    } catch (e) {
+      console.error("Could not retrieve profile image.", e)
+    }
+
+    return json<LoaderData>({ apps: reshapedApps, avatarUrl })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })

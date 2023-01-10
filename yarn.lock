@@ -6185,7 +6185,7 @@ __metadata:
     "@storybook/testing-library": 0.0.13
     "@tailwindcss/forms": 0.5.3
     "@tanstack/react-query": 4.16.1
-    "@trpc/client": 10.7.0
+    "@trpc/client": 10.8.1
     "@types/node": 18.11.9
     "@types/puppeteer": 5.4.7
     "@types/react": 18.0.25
@@ -6400,7 +6400,7 @@ __metadata:
     "@kubelt/platform.object": "workspace:*"
     "@kubelt/platform.starbase": "workspace:*"
     "@kubelt/urns": "workspace:*"
-    "@trpc/client": 10.7.0
+    "@trpc/client": 10.8.1
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
@@ -6626,9 +6626,11 @@ __metadata:
     "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
+    "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@types/lodash": 4.14.189
     cross-env: 7.0.3
+    do-proxy: 1.3.1
     esbuild: 0.15.15
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
@@ -12653,12 +12655,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@trpc/client@npm:10.7.0":
-  version: 10.7.0
-  resolution: "@trpc/client@npm:10.7.0"
+"@trpc/client@npm:10.8.1":
+  version: 10.8.1
+  resolution: "@trpc/client@npm:10.8.1"
   peerDependencies:
-    "@trpc/server": 10.7.0
-  checksum: fb2abc442d8f326183250b9f1138bbc07cfc84ac17cc366b68c7c0c41857537060de986fdc6cf10b822555367adc4c3143d47ccf940ea3a02426c9576c1f9927
+    "@trpc/server": 10.8.1
+  checksum: 06a7e6cca68d91188d2de826b7b1d5352af0761daa364fdb04723c3047b0e139125ee813ab66cffd82914f72d60ae3eb4d5a37f2db8484c9506766bf80dcc823
   languageName: node
   linkType: hard
 

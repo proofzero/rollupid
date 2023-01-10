@@ -65,15 +65,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   // TODO: call set profile mutation from galaxy
 
   try {
-    const sbClient = getStarbaseClient()
+    const sbClient = getStarbaseClient(jwt)
 
-    // ======================= TEMPOARY =======================
-    const ids = await sbClient.kb_initPlatform() // TODO: temporary until console is complete
-    console.log('ids', ids)
-    // ======================= TEMPOARY =======================
-
-    const scopeMeta = await sbClient.kb_appScopes()
-    const appProfile = await sbClient.kb_appProfile(client_id)
+    const scopeMeta = await sbClient.getScopes.query()
+    const appProfile = await sbClient.getAppProfile.query({ clientId: client_id })
 
     return json({
       clientId: client_id,

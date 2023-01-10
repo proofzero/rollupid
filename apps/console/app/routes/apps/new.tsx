@@ -1,5 +1,6 @@
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
-import { getStarbaseClient } from '~/utilities/platform.server'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 
 export const action: ActionFunction = async ({ request }) => {
@@ -10,9 +11,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const jwt = await requireJWT(request)
 
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
   try {
-    const { clientId } = await starbaseClient.kb_appCreate(clientName)
+    const { clientId } = await starbaseClient.createApp.mutate({ clientName })
     console.log({ clientId })
     return redirect(`/apps/${clientId}`)
   } catch (error) {

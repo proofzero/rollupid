@@ -5,10 +5,11 @@
 import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
-import { getStarbaseClient } from '~/utilities/platform.server'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useState } from 'react'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -22,27 +23,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
 
-  const appDetails = (await starbaseClient.kb_appDetails(params.clientId)) as {
-    appId: string
-    clientId: string
-    published: boolean
-    icon: string
-    secretTimestamp?: number
-    name: string
-    redirectURI?: string
-    termsURL?: string
-    websiteURL?: string
-    twitterUser?: string
-    mediumUser?: string
-    mirrorURL?: string
-    discordUser?: string
-  }
+  const appDetails = (await starbaseClient.getAppDetails.query({
+    clientId: params.clientId
+  }))
 
   let rotatedSecret
   if (!appDetails.secretTimestamp) {
-    rotatedSecret = await starbaseClient.kb_appRotateSecret(appDetails.clientId)
+    rotatedSecret = await starbaseClient.rotateClientSecret.mutate({
+      clientId: appDetails.clientId
+    })
 
     // The prefix is there just as an aide to users;
     // when they're moving these values
@@ -60,7 +55,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   return json({
-    app: appDetails,
+    appDetails: appDetails,
     rotatedSecret,
   })
 }
@@ -73,7 +68,12 @@ export const action: ActionFunction = async ({ request, params }) => {
   let rotatedSecret
 
   const jwt = await requireJWT(request)
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
+
 
   const formData = await request.formData()
   const op = formData.get('op')
@@ -85,14 +85,16 @@ export const action: ActionFunction = async ({ request, params }) => {
   switch (op) {
     case 'roll_app_secret':
       rotatedSecret = (
-        await starbaseClient.kb_appRotateSecret(params.clientId)
+        await starbaseClient.rotateClientSecret.mutate({
+          clientId: params.clientId
+        })
       ).secret.split(':')[1]
       break
     case 'update_app':
-      await starbaseClient.kb_appUpdate({
+      await starbaseClient.updateApp.mutate({
         clientId: params.clientId,
         updates: {
-          name: formData.get('name') as string,
+          name: formData.get('name')?.toString(),
           icon: formData.get('icon') as string | undefined,
           redirectURI: formData.get('redirectURI') as string | undefined,
           termsURL: formData.get('termsURL') as string | undefined,
@@ -106,7 +108,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
       const published = formData.get('published') === '1' ? true : false
 
-      await starbaseClient.kb_appPublish({
+      await starbaseClient.publishApp.mutate({
         clientId: params.clientId,
         published: published,
       })
@@ -125,7 +127,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
 
-  const { app } = useLoaderData()
+  const { appDetails } = useLoaderData()
   const rotatedSecret =
     useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
 
@@ -134,8 +136,8 @@ export default function AppDetailIndexPage() {
   return (
     <>
       <DeleteAppModal
-        clientId={app.clientId}
-        appName={app.name}
+        clientId={appDetails.clientId}
+        appName={appDetails.app.name}
         deleteAppCallback={() => {
           setDeleteModalOpen(false)
         }}
@@ -145,11 +147,11 @@ export default function AppDetailIndexPage() {
       <Form method="post" encType="multipart/form-data">
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
-          app={app}
+          appDetails={appDetails}
           oAuth={{
-            appId: app.appId,
+            appId: appDetails.clientId,
             appSecret: rotatedSecret,
-            createdAt: new Date(app.secretTimestamp),
+            createdAt: new Date(appDetails.secretTimestamp),
             onKeyRoll: () => {
               submit(
                 {

@@ -1,18 +1,23 @@
 import { ActionFunction, json, redirect } from '@remix-run/cloudflare'
-import { getStarbaseClient } from '~/utilities/platform.server'
+import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const clientId = formData.get('clientId')
+  const clientId = formData.get('clientId')?.toString()
 
   if (!clientId) throw 'Client ID is required'
 
   const jwt = await requireJWT(request)
 
-  const starbaseClient = getStarbaseClient(jwt)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt
+    }
+  })
   try {
-    await starbaseClient.kb_appDelete({
+    await starbaseClient.deleteApp.mutate({
       clientId,
     })
     return redirect(`/`)
