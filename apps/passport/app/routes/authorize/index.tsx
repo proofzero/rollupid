@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           pfp: {
             image: cryptoAddressProfile.avatar || '',
           },
-          cover: voucher.metadata.cover,
+          cover: voucher.metadata?.cover,
         },
       },
       {

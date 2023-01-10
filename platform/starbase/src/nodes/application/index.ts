@@ -49,13 +49,13 @@ export default class StarbaseApp extends DOProxy {
 
   async init(clientId: string, clientName: string): Promise<void> {
     //These key-vals get stored as key-vals in the DO itself
-    const entriesToStore:Partial<AppAllFields> = {
+    const entriesToStore: Partial<AppAllFields> = {
       clientId,
       clientName,
       app: {
         name: clientName,
       },
-      createdTimestamp: Date.now()
+      createdTimestamp: Date.now(),
     }
     this.state.storage.put(entriesToStore)
   }
