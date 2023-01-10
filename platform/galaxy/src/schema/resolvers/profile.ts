@@ -7,7 +7,6 @@ import { setupContext, isAuthorized, hasApiKey } from './utils'
 
 import Env from '../../env'
 import { Resolvers } from './typedefs'
-import { isCompositeType } from 'graphql'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'

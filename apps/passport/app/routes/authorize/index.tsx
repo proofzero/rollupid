@@ -6,14 +6,12 @@ import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import {
   getAccessClient,
-  getAddressClient,
   getGalaxyClient,
   getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
-import type { CryptoAddressProfile } from '@kubelt/platform/address/src/types'
 import type { AddressURN } from '@kubelt/urns/address'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
