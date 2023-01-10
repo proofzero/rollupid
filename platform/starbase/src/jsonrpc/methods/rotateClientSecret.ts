@@ -21,7 +21,10 @@ export const rotateClientSecret = async ({
   const hashedSecret = await secret.hash(clientSecret)
 
   //Store hashed version of secret
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    input.clientId,
+    ctx.StarbaseApp
+  )
   await appDO.class.rotateClientSecret(hashedSecret)
 
   //Return non-hashed version of secret

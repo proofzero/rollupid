@@ -15,6 +15,9 @@ export const updateApp = async ({
   input: z.infer<typeof UpdateAppInputSchema>
   ctx: Context
 }): Promise<void> => {
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    input.clientId,
+    ctx.StarbaseApp
+  )
   appDO.class.update(input.updates)
 }

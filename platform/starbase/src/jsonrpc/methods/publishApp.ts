@@ -22,7 +22,10 @@ export const publishApp = async ({
   input: z.infer<typeof PublishAppInputSchema>
   ctx: Context
 }): Promise<z.infer<typeof PublishAppOutputSchema>> => {
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    input.clientId,
+    ctx.StarbaseApp
+  )
   const appDetails = await appDO.class.getDetails()
   if (appDetails.clientName?.length > 0 || false)
     throw new Error('Client name is required to publish the app')

@@ -10,7 +10,10 @@ export const getAppProfile = async ({
   input: z.infer<typeof AppClientIdParamSchema>
   ctx: Context
 }): Promise<z.infer<typeof AppUpdateableFieldsSchema>> => {
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    input.clientId,
+    ctx.StarbaseApp
+  )
   const appProfile = await appDO.class.getProfile()
 
   return appProfile

@@ -18,7 +18,10 @@ export const rotateApiKey = async ({
   const appURN = ApplicationURNSpace.urn(input.clientId)
   console.log(`rotating API key for ${appURN}`)
 
-  const appDO = await getApplicationNodeByClientId(input.clientId, ctx.StarbaseApp)
+  const appDO = await getApplicationNodeByClientId(
+    input.clientId,
+    ctx.StarbaseApp
+  )
   const result = await appDO.class.rotateApiKey(appURN)
 
   return {
