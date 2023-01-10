@@ -44,7 +44,7 @@ export async function createContext(
   env: Environment
 ) {
   const contextInner = await createContextInner({ ...opts, ...env })
-  
+
   return {
     req: opts.req,
     resHeaders: opts.resHeaders,
