@@ -7,6 +7,7 @@
 // Imported Types
 // -----------------------------------------------------------------------------
 
+import { Graph } from '@kubelt/types'
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
 import type {
@@ -24,7 +25,6 @@ import type {
   RComponents,
   Permission,
 } from '../types'
-import { EdgeDirection } from '@kubelt/types/edges'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -185,10 +185,10 @@ export async function edges(
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
   switch (query.dir) {
-    case EdgeDirection.Incoming:
+    case Graph.EdgeDirection.Incoming:
       sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
       break
-    case EdgeDirection.Outgoing:
+    case Graph.EdgeDirection.Outgoing:
       sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
       break
     default:

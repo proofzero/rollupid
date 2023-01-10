@@ -10,7 +10,7 @@ import * as Router from './router'
 
 import BaseContext from './context'
 
-import * as Graph from './edges.ts'
+import * as Graph from './graph'
 
 export { Account, Router, Graph }
 
