@@ -72,7 +72,7 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full">
-				{!GATag ? null : (
+        {!GATag ? null : (
           <>
             <script
               async
