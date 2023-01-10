@@ -1,5 +1,6 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createEdgesClient from '@kubelt/platform-clients/edges'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
@@ -12,14 +13,16 @@ import type { AccountURN } from '@kubelt/urns/account'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
-  Edges: Fetcher
   Access: DurableObjectNamespace
   access?: Access
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher
   starbaseClient?: ReturnType<typeof createStarbaseClient>
-  // Added by middleware if available.
+  EDGES: Fetcher
+  // Added by InjectEdges middleware.
+  edgesClient?: ReturnType<typeof createEdgesClient>
+  // Added by ValidateJWT middleware.
   accountURN?: AccountURN
 }
 /**

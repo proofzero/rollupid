@@ -13,7 +13,7 @@ export interface KeyPairSerialized {
 export interface Environment {
   Access: DurableObjectNamespace
   Authorization: DurableObjectNamespace
-  Edges: Fetcher
+  EDGES: Fetcher
   Starbase: Fetcher
 }
 

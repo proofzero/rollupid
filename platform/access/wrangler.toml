@@ -9,7 +9,7 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
-  { binding = "Edges", service = "edges" },
+  { binding = "EDGES", service = "edges" },
   { binding = "Starbase", service = "starbase" },
 ]
 

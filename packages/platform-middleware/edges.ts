@@ -5,12 +5,12 @@ export const InjectEdges: BaseMiddlewareFunction<{
   EDGES?: Fetcher
 }> = ({ ctx, next }) => {
   if (!ctx.EDGES) throw new Error('No EDGES binding found in context')
-  const edges = createEdgesClient(ctx.EDGES)
+  const edgesClient = createEdgesClient(ctx.EDGES)
 
   return next({
     ctx: {
       ...ctx,
-      edges,
+      edgesClient,
     },
   })
 }

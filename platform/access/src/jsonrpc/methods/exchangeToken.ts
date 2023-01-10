@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-import createEdgesClient from '@kubelt/platform-clients/edges'
-
 import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 
 import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
@@ -85,9 +83,9 @@ export const exchangeTokenMethod = async ({
 
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
-    const edgesClient = createEdgesClient(ctx.Edges)
     const access = AccessURNSpace.urn(iss)
-    await edgesClient.makeEdge.mutate({
+    // NB: we use InjectEdges middleware to inject this service client.
+    await ctx.edgesClient!.makeEdge.mutate({
       src: account,
       dst: access,
       tag: EDGE_ACCESS,

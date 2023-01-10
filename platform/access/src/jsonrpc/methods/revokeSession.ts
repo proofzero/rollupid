@@ -2,14 +2,12 @@
 
 import { z } from 'zod'
 
+import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { AccessURNSpace } from '@kubelt/urns/access'
-
-import createEdgesClient from '@kubelt/platform-clients/edges'
 import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 export const RevokeSessionMethodInput = AccessURNInput
 
@@ -37,9 +35,8 @@ export const revokeSessionMethod = async ({
   await accessNode.class.revoke()
 
   // Delete the edge linking an account node to an access (session)
-  // node.
-  const edgesClient = createEdgesClient(ctx.Edges)
-  await edgesClient.removeEdge.mutate({
+  // node. NB: we use the InjectEdges middleware to supply this client.
+  await ctx.edgesClient!.removeEdge.mutate({
     // We use the RequireAccount middleware to ensure that the account
     // value is present on the context, so it should not be possible for
     // it to be udnefined here in spite of the optional type marker on

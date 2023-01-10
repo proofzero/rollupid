@@ -2,6 +2,8 @@ import { initTRPC } from '@trpc/server'
 
 import { Context } from '../context'
 
+import { InjectEdges } from '@kubelt/platform-middleware/edges'
+
 import {
   ValidateJWT,
   JWTAssertionTokenFromHeader,
@@ -46,6 +48,7 @@ export const appRouter = t.router({
     .mutation(authorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
+    .use(InjectEdges)
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
@@ -66,6 +69,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
+    .use(InjectEdges)
     .use(LogUsage)
     .input(RevokeSessionMethodInput)
     .output(RevokeSessionMethodOutput)
