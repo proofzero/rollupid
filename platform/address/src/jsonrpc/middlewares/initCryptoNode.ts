@@ -24,8 +24,6 @@ export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing addrType')
   }
 
-  console.log('initCryptoNode: addressNode', addressNode.class)
-
   const address = await addressNode.class.getAddress()
   const type = await addressNode.class.getType()
 

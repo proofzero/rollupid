@@ -50,6 +50,10 @@ export default class Address extends DOProxy {
     }
   }
 
+  async getAccount(): Promise<AccountURN | undefined> {
+    return await this.state.storage.get<AccountURN>('account')
+  }
+
   async setAccount(account: AccountURN): Promise<void> {
     return await this.state.storage.put('account', account)
   }

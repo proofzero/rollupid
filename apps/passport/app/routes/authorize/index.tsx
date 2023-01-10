@@ -6,13 +6,16 @@ import { ResponseType } from '@kubelt/platform.access/src/types'
 
 import {
   getAccessClient,
+  getAddressClient,
   getGalaxyClient,
   getStarbaseClient,
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import type { AccountURN } from '@kubelt/urns/account'
 import type { AddressURN } from '@kubelt/urns/address'
+import { CryptoAddressProfile } from '@kubelt/platform/address/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -28,13 +31,34 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const profileRes = await galaxyClient.getProfileFromAddress(
     { addressURN: defaultProfileURN },
     {
-      'KBT-Access-JWT-Assertion': jwt,
+      [PlatformJWTAssertionHeader]: jwt,
     }
   )
   const profile = profileRes.profileFromAddress
 
   if (!profile) {
-    throw json({ message: 'No profile found', isAuthenticated: true }, 400)
+    const addressClient = getAddressClient(defaultProfileURN)
+    // TODO: with social account we need a method to determine which type of profile
+    const [addressProfile, voucher] = await Promise.all([
+      addressClient.getAddressProfile.query(),
+      addressClient.getVoucher.query(),
+    ])
+    const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+    await galaxyClient.updateProfile(
+      {
+        profile: {
+          defaultAddress: defaultProfileURN,
+          displayName: cryptoAddressProfile.displayName,
+          pfp: {
+            image: cryptoAddressProfile.avatar || '',
+          },
+          cover: voucher.metadata.cover,
+        },
+      },
+      {
+        [PlatformJWTAssertionHeader]: jwt,
+      }
+    )
   }
 
   // if no client id let's redirect to the first party app select page
@@ -45,14 +69,18 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   try {
     const sbClient = getStarbaseClient(jwt)
 
-    const scopeMeta = await sbClient.getScopes.query()
-    const appProfile = await sbClient.getAppProfile.query({ clientId: client_id })
+    const [/*scopeMeta,*/ appProfile] = await Promise.all([
+      // sbClient.getScopes.query(),
+      sbClient.getAppProfile.query({
+        clientId: client_id,
+      }),
+    ])
 
     return json({
       clientId: client_id,
       appProfile,
       userProfile: profile,
-      scopeMeta,
+      scopeMeta: [], // TODO: scopeMeta,
       state,
     })
   } catch (e) {

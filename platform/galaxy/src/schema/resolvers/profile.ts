@@ -50,7 +50,7 @@ const profileResolvers: Resolvers = {
           'X-3RN': addressURN,
         },
       })
-      const accountURN = await addressClient.resolveAccount.query()
+      const accountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address
       if (!accountURN) {
@@ -61,7 +61,7 @@ const profileResolvers: Resolvers = {
         try {
           const [addressProfile, voucher] = await Promise.all([
             addressClient.getAddressProfile.query(),
-            addressClient.getVoucher.query(),
+            addressClient.getVoucher.query(), // TODO: should only get if we know this is a crypto address
           ])
 
           if (!addressProfile) {
@@ -71,6 +71,10 @@ const profileResolvers: Resolvers = {
           // We will need to call for addresses and then get the profile?
           // Or have utility to manage the mapping?
           const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+          console.log(
+            'galaxy.profileFromAddress: returning address profile',
+            cryptoAddressProfile
+          )
           return {
             displayName: cryptoAddressProfile.displayName,
             pfp: {
@@ -86,22 +90,16 @@ const profileResolvers: Resolvers = {
       }
 
       // get the account profile
-      try {
-        const accountClient = createAccountClient(env.Account, {
-          headers: {
-            [PlatformJWTAssertionHeader]: jwt,
-          },
-        })
-        let accountProfile = await accountClient.getProfile.query({
-          account: accountURN,
-        })
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let accountProfile = await accountClient.getProfile.query({
+        account: accountURN,
+      })
 
-        return accountProfile
-      } catch (e) {
-        const errorMessage = `galaxy.profileFromAddress: failed to create profile for address ${addressURN}`
-        console.error(errorMessage, e)
-        throw new GraphQLError(errorMessage)
-      }
+      return accountProfile
     },
   },
   Mutation: {

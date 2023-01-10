@@ -1,5 +1,5 @@
 import { DOProxy } from 'do-proxy'
-import type { Profile } from '../jsonrpc/middlewares/profile'
+import type { Profile } from '../types'
 
 export default class Account extends DOProxy {
   declare state: DurableObjectState

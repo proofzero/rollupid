@@ -24,7 +24,7 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
   // TODO exchange token for access token
   const addressClient = getAddressClient(addressURN)
-  const account = await addressClient.resolveAccount.query()
+  const account = await addressClient.resolveAccount.query() // creates and associates account if there is none
 
   const grantType = GrantType.AuthenticationCode
   const redirectUri = PASSPORT_REDIRECT_URL
