@@ -3,6 +3,8 @@ import type {
   LinksFunction,
   LoaderFunction,
 } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+
 import {
   Links,
   LiveReload,
@@ -10,11 +12,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
   useTransition,
+  useLoaderData,
+  useCatch,
 } from '@remix-run/react'
-import { json } from '@remix-run/cloudflare'
 
-import { useLoaderData, useCatch } from '@remix-run/react'
+import { useEffect } from 'react'
 
 import designStyles from '@kubelt/design-system/src/styles/global.css'
 import styles from './styles/tailwind.css'
@@ -34,15 +38,7 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
-function Analytics() {
-  return (
-    <script
-      defer
-      src="https://static.cloudflareinsights.com/beacon.min.js"
-      data-cf-beacon='{"token": "12f78d22b1d24f27b1c63e262a850b2e"}, "spa": false}'
-    ></script>
-  )
-}
+import * as gtag from "~/utils/gtags.client";
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -76,13 +72,24 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = () => {
   return json({
-    ENV: {},
+    ENV: {
+      INTERNAL_GOOGLE_ANALYTICS_TAG
+    },
   })
 }
 
 export default function App() {
+  const location = useLocation()
   const browserEnv = useLoaderData()
   const transition = useTransition()
+
+  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  useEffect(() => {
+    if (GATag) {
+      gtag.pageview(location.pathname, GATag);
+    }
+  }, [location, GATag]);
 
   return (
     <html lang="en">
@@ -91,17 +98,38 @@ export default function App() {
         <Links />
       </head>
       <body>
+        {!GATag ? null : (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
+            />
+            <script
+              async
+              id="gtag-init"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GATag}', {
+                    page_path: window.location.pathname,
+                  });
+              `,
+              }}
+            />
+          </>
+        )}
         {transition.state === 'loading' && <Loader />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
-        <Analytics />
+        <LiveReload port={8002} />
       </body>
     </html>
   )
@@ -135,7 +163,6 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <Analytics />
       </body>
     </html>
   )
@@ -143,6 +170,17 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
+  const location = useLocation()
+  const browserEnv = useLoaderData()
+  const transition = useTransition()
+
+  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  useEffect(() => {
+    if (GATag) {
+      gtag.pageview(location.pathname, GATag);
+    }
+  }, [location, GATag]);
 
   let secondary = 'Something went wrong'
   switch (caught.status) {
@@ -163,6 +201,28 @@ export function CatchBoundary() {
         <Links />
       </head>
       <body className="error-screen bg-white h-full min-h-screen">
+        {!GATag ? null : (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
+            />
+            <script
+              async
+              id="gtag-init"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GATag}', {
+                    page_path: window.location.pathname,
+                  });
+              `,
+              }}
+            />
+          </>
+        )}
         <div
           style={{
             backgroundColor: '#192030',
@@ -189,9 +249,13 @@ export function CatchBoundary() {
           </article>
         </div>
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+          }}
+        />
         <Scripts />
         <LiveReload port={8002} />
-        <Analytics />
       </body>
     </html>
   )
