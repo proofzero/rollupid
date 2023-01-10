@@ -40,8 +40,6 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
-    "@kubelt/graph": "workspace:*",
-    "@kubelt/openrpc": "workspace:*",
     "@kubelt/security": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@trpc/server": "10.8.1",

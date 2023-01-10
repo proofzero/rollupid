@@ -4,11 +4,11 @@ import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 import { decodeJwt } from 'jose'
 
-export const CheckApiKeyInputSchema = z.object({
+export const CheckApiKeyInput = z.object({
   apiKey: z.string(),
 })
 
-export const CheckApiKeyOutputSchema = z.object({
+export const CheckApiKeyOutput = z.object({
   valid: z.boolean(),
 })
 
@@ -16,9 +16,9 @@ export const checkApiKey = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof CheckApiKeyInputSchema>
+  input: z.infer<typeof CheckApiKeyInput>
   ctx: Context
-}): Promise<z.infer<typeof CheckApiKeyOutputSchema>> => {
+}): Promise<z.infer<typeof CheckApiKeyOutput>> => {
   const jwtSub = decodeJwt(input.apiKey).sub as ApplicationURN
   const clientId = ApplicationURNSpace.parse(jwtSub).decoded
 

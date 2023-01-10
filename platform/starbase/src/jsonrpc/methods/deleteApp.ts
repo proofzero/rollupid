@@ -3,14 +3,16 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { AppClientIdParamSchema } from '../../types'
+import { AppClientIdParamSchema } from '../validators/app'
+import { EDGE_APPLICATION } from '../../types'
+
+export const DeleteAppInput = AppClientIdParamSchema
 
 export const deleteApp = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof AppClientIdParamSchema>
+  input: z.infer<typeof DeleteAppInput>
   ctx: Context
 }): Promise<void> => {
   const appURN = ApplicationURNSpace.urn(input.clientId)

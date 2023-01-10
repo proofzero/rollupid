@@ -8,11 +8,11 @@ export default class OAuthAddress extends Address {
   }
 
   async getData(): Promise<OAuthDataSchema | undefined> {
-    return await this.state.storage.get<OAuthDataSchema>('data')
+    return this.state.storage.get<OAuthDataSchema>('data')
   }
 
   async setData(data: OAuthDataSchema): Promise<void> {
-    return await this.state.storage.put('data', data)
+    return this.state.storage.put('data', data)
   }
 }
 

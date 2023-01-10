@@ -31,7 +31,6 @@
   },
   "dependencies": {
     "@ethersproject/address": "5.7.0",
-    "@kubelt/graph": "workspace:*",
     "@kubelt/platform-middleware": "workspace:*",
     "@kubelt/platform.access": "workspace:*",
     "@kubelt/types": "workspace:*",

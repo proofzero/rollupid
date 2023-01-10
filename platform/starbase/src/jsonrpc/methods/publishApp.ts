@@ -1,17 +1,13 @@
 import { z } from 'zod'
 import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { ApplicationURNSpace } from '@kubelt/urns/application'
-import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { AppClientIdParamSchema } from '../../types'
 
-export const PublishAppInputSchema = z.object({
+export const PublishAppInput = z.object({
   clientId: z.string(),
   published: z.boolean(),
 })
 
-export const PublishAppOutputSchema = z.object({
+export const PublishAppOutput = z.object({
   published: z.boolean(),
 })
 
@@ -19,9 +15,9 @@ export const publishApp = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof PublishAppInputSchema>
+  input: z.infer<typeof PublishAppInput>
   ctx: Context
-}): Promise<z.infer<typeof PublishAppOutputSchema>> => {
+}): Promise<z.infer<typeof PublishAppOutput>> => {
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp

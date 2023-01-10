@@ -6,7 +6,7 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import type { AddressURN } from '@kubelt/urns/address'
 import { AccountURNSpace } from '@kubelt/urns/account'
 
-import { EDGE_ADDRESS } from '@kubelt/graph/edges'
+import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
 import {
   AccountURNInput,
   AddressURNInput,

@@ -33,7 +33,6 @@
   "dependencies": {
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
-    "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@trpc/server": "10.8.1",

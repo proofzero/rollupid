@@ -11,36 +11,46 @@ import {
   JWTAssertionTokenFromHeader,
   ValidateJWT,
 } from '@kubelt/platform-middleware/jwt'
-import { deleteApp } from './methods/deleteApp'
+import { deleteApp, DeleteAppInput } from './methods/deleteApp'
 import {
   getAppDetails,
-  GetAppDetailsOutputSchema,
+  GetAppDetailsInput,
+  GetAppDetailsOutput,
 } from './methods/getAppDetails'
-import { listApps, ListAppsOutputSchema, NoInput } from './methods/listApps'
-import { AppClientIdParamSchema, AppUpdateableFieldsSchema } from '../types'
+import { listApps, ListAppsOutput } from './methods/listApps'
 import {
   rotateClientSecret,
-  RotateClientSecretOutputSchema,
+  RotateClientSecretInput,
+  RotateClientSecretOutput,
 } from './methods/rotateClientSecret'
-import { rotateApiKey, RotateApiKeyOutputSchema } from './methods/rotateApiKey'
+import {
+  rotateApiKey,
+  RotateApiKeyInput,
+  RotateApiKeyOutput,
+} from './methods/rotateApiKey'
 import {
   checkAppAuth,
-  CheckAppAuthInputSchema,
-  CheckAppAuthOutputSchema,
+  CheckAppAuthInput,
+  CheckAppAuthOutput,
 } from './methods/checkAppAuth'
 import {
   publishApp,
-  PublishAppInputSchema,
-  PublishAppOutputSchema,
+  PublishAppInput,
+  PublishAppOutput,
 } from './methods/publishApp'
-import { getAppProfile } from './methods/getAppProfile'
-import { updateApp, UpdateAppInputSchema } from './methods/updateApp'
+import {
+  getAppProfile,
+  GetAppProfileInput,
+  GetAppProfileOutput,
+} from './methods/getAppProfile'
+import { updateApp, UpdateAppInput } from './methods/updateApp'
 import {
   checkApiKey,
-  CheckApiKeyInputSchema,
-  CheckApiKeyOutputSchema,
+  CheckApiKeyInput,
+  CheckApiKeyOutput,
 } from './methods/checkApiKey'
 import { getScopes } from './methods/getScopes'
+import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
 const t = initTRPC.context<Context>().create()
 
@@ -56,68 +66,68 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
+    .input(DeleteAppInput)
     .mutation(deleteApp),
   updateApp: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(UpdateAppInputSchema)
+    .input(UpdateAppInput)
     .mutation(updateApp),
   getAppDetails: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
-    .output(GetAppDetailsOutputSchema)
+    .input(GetAppDetailsInput)
+    .output(GetAppDetailsOutput)
     .query(getAppDetails),
   getAppProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
-    .output(AppUpdateableFieldsSchema)
+    .input(GetAppProfileInput)
+    .output(GetAppProfileOutput)
     .query(getAppProfile),
   listApps: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
     .input(NoInput)
-    .output(ListAppsOutputSchema)
+    .output(ListAppsOutput)
     .query(listApps),
   rotateClientSecret: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
-    .output(RotateClientSecretOutputSchema)
+    .input(RotateClientSecretInput)
+    .output(RotateClientSecretOutput)
     .mutation(rotateClientSecret),
   rotateApiKey: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(AppClientIdParamSchema)
-    .output(RotateApiKeyOutputSchema)
+    .input(RotateApiKeyInput)
+    .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
   checkAppAuth: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(CheckAppAuthInputSchema)
-    .output(CheckAppAuthOutputSchema)
+    .input(CheckAppAuthInput)
+    .output(CheckAppAuthOutput)
     .query(checkAppAuth),
   publishApp: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(PublishAppInputSchema)
-    .output(PublishAppOutputSchema)
+    .input(PublishAppInput)
+    .output(PublishAppOutput)
     .mutation(publishApp),
   checkApiKey: t.procedure
     //This endpoint doesn't require a JWT
     .use(LogUsage)
-    .input(CheckApiKeyInputSchema)
-    .output(CheckApiKeyOutputSchema)
+    .input(CheckApiKeyInput)
+    .output(CheckApiKeyOutput)
     .query(checkApiKey),
   getScopes: t.procedure
     //TODO: Revisit when implementing scopes

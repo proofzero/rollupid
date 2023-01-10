@@ -12,7 +12,8 @@ import {
   EdgeDirectionInput,
   NodeFilterInput,
 } from '@kubelt/platform-middleware/inputValidators'
-import { EdgeQueryInput, Edge, Node } from '../jsonrpc/middleware/validators'
+import { EdgeQueryInput, Edge } from '../jsonrpc/validators/edge'
+import { Node } from '../jsonrpc/validators/node'
 
 // Types
 // -----------------------------------------------------------------------------

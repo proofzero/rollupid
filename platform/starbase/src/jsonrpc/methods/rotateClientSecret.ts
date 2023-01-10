@@ -2,10 +2,11 @@ import { z } from 'zod'
 import { Context } from '../context'
 import * as oauth from '../../0xAuth'
 import { getApplicationNodeByClientId } from '../../nodes/application'
-import { AppClientIdParamSchema } from '../../types'
 import * as secret from '../../secret'
+import { AppClientIdParamSchema } from '../validators/app'
 
-export const RotateClientSecretOutputSchema = z.object({
+export const RotateClientSecretInput = AppClientIdParamSchema
+export const RotateClientSecretOutput = z.object({
   secret: z.string(),
 })
 
@@ -13,9 +14,9 @@ export const rotateClientSecret = async ({
   input,
   ctx,
 }: {
-  input: z.infer<typeof AppClientIdParamSchema>
+  input: z.infer<typeof RotateClientSecretInput>
   ctx: Context
-}): Promise<z.infer<typeof RotateClientSecretOutputSchema>> => {
+}): Promise<z.infer<typeof RotateClientSecretOutput>> => {
   //Make secret and hash it
   const clientSecret = oauth.makeClientSecret()
   const hashedSecret = await secret.hash(clientSecret)

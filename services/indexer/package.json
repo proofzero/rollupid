@@ -34,7 +34,6 @@
     "wrangler": "2.4.4"
   },
   "dependencies": {
-    "@kubelt/openrpc": "workspace:*",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/platform-middleware": "workspace:*",
     "@kubelt/urns": "workspace:*",

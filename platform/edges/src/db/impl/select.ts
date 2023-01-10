@@ -7,6 +7,7 @@
 // Imported Types
 // -----------------------------------------------------------------------------
 
+import { Graph } from '@kubelt/types'
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
 import type {
@@ -15,7 +16,7 @@ import type {
   Node,
   EdgeQuery,
   EdgeRecord,
-  Graph,
+  Graph as GraphDB,
   NodeRecord,
   NodeFilter,
   QComponent,
@@ -24,7 +25,6 @@ import type {
   RComponents,
   Permission,
 } from '../types'
-import { EdgeDirection } from '@kubelt/graph'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -37,7 +37,7 @@ import { EdgeDirection } from '@kubelt/graph'
  * @param nodeId - a node URN
  * @returns a map of q-components for the node
  */
-export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
+export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
   const query = `
     SELECT
       uc.key,
@@ -72,7 +72,7 @@ export async function qc(g: Graph, nodeId: AnyURN): Promise<QComponents> {
  * @param nodeId - a node URN
  * @returns a map of r-components for the node
  */
-export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
+export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
   const query = `
     SELECT
       uc.key,
@@ -100,7 +100,7 @@ export async function rc(g: Graph, nodeId: AnyURN): Promise<RComponents> {
 // -----------------------------------------------------------------------------
 
 export async function node(
-  g: Graph,
+  g: GraphDB,
   nodeId: AnyURN | undefined
 ): Promise<Node | undefined> {
   if (!nodeId) {
@@ -136,7 +136,7 @@ export async function node(
 // -----------------------------------------------------------------------------
 // TODO should this be exposed to return the permissions for an edge?
 
-async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
+async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
   const query = `
     SELECT
       name
@@ -164,7 +164,7 @@ async function permissions(g: Graph, edgeId: number): Promise<Permission[]> {
  *
  */
 export async function edges(
-  g: Graph,
+  g: GraphDB,
   query: EdgeQuery,
   opt?: any
 ): Promise<Edge[]> {
@@ -185,10 +185,10 @@ export async function edges(
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
   switch (query.dir) {
-    case EdgeDirection.Incoming:
+    case Graph.EdgeDirection.Incoming:
       sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
       break
-    case EdgeDirection.Outgoing:
+    case Graph.EdgeDirection.Outgoing:
       sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
       break
     default:
@@ -332,7 +332,7 @@ export async function edges(
 /**
  *
  */
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
+export async function incoming(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
       .prepare('SELECT * FROM edge WHERE dst = ?1')
@@ -353,7 +353,7 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 /**
  *
  */
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
+export async function outgoing(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
   return new Promise((resolve, reject) => {
     g.db
       .prepare('SELECT * FROM edge WHERE src = ?1')

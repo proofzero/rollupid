@@ -3,15 +3,17 @@ import { Context } from '../context'
 import { getApplicationNodeByClientId } from '../../nodes/application'
 import { ApplicationURN, ApplicationURNSpace } from '@kubelt/urns/application'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_APPLICATION } from '@kubelt/graph/edges'
-import { EdgeDirection } from '@kubelt/graph'
-import { AppReadableFieldsSchema, AppUpdateableFieldsSchema } from '../../types'
+import {
+  AppReadableFieldsSchema,
+  AppUpdateableFieldsSchema,
+} from '../validators/app'
+import { EdgeDirection } from '@kubelt/types/graph'
+import { EDGE_APPLICATION } from '../../types'
+import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
-export const ListAppsOutputSchema = z.array(
+export const ListAppsOutput = z.array(
   AppUpdateableFieldsSchema.merge(AppReadableFieldsSchema)
 )
-
-export const NoInput = z.undefined()
 
 export const listApps = async ({
   input,
@@ -19,7 +21,7 @@ export const listApps = async ({
 }: {
   input: z.infer<typeof NoInput>
   ctx: Context
-}): Promise<z.infer<typeof ListAppsOutputSchema>> => {
+}): Promise<z.infer<typeof ListAppsOutput>> => {
   if (!ctx.accountURN) throw new Error('No account URN in context')
   //Get application edges for the given accountURN
   const edgesClient = createEdgesClient(ctx.Edges)

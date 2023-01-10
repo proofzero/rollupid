@@ -3081,13 +3081,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cfworker/json-schema@npm:1.12.5":
-  version: 1.12.5
-  resolution: "@cfworker/json-schema@npm:1.12.5"
-  checksum: 1f8870cb3bb6e88b846c19f53b7746b9ab165f7e559a0ece2be74adf6b57e92bccb98b00d587216373eb9287840863087519af9d3c87e7c243f655bc27fc6371
-  languageName: node
-  linkType: hard
-
 "@cloudflare/kv-asset-handler@npm:^0.1.3":
   version: 0.1.3
   resolution: "@cloudflare/kv-asset-handler@npm:0.1.3"
@@ -6327,63 +6320,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kubelt/graph@workspace:*, @kubelt/graph@workspace:packages/graph":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/graph@workspace:packages/graph"
-  dependencies:
-    "@kubelt/security": "workspace:*"
-    "@kubelt/types": "workspace:*"
-    "@kubelt/urns": "workspace:*"
-    "@microsoft/api-extractor": 7.33.6
-    "@types/node": 18.11.9
-    cross-env: 7.0.3
-    eslint: 8.28.0
-    prettier: 2.7.1
-    reflect-metadata: 0.1.13
-    sqlite3: 5.1.2
-    typeorm: 0.3.10
-    typescript: 4.8.4
-    urns: 0.6.0
-    yarn-run-all: 3.1.1
-  languageName: unknown
-  linkType: soft
-
-"@kubelt/openrpc@*, @kubelt/openrpc@workspace:*, @kubelt/openrpc@workspace:packages/openrpc":
-  version: 0.0.0-use.local
-  resolution: "@kubelt/openrpc@workspace:packages/openrpc"
-  dependencies:
-    "@cfworker/json-schema": 1.12.5
-    "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/graph": "workspace:*"
-    "@microsoft/api-extractor": 7.33.6
-    "@open-rpc/meta-schema": 1.14.2
-    "@types/itty-router-extras": 0.4.0
-    "@types/lodash": 4.14.189
-    "@types/node": 18.11.9
-    "@types/tap": 15.0.7
-    "@typescript-eslint/eslint-plugin": 5.45.0
-    "@typescript-eslint/parser": 5.45.0
-    cross-env: 7.0.3
-    date-fns: 2.29.3
-    esbuild: 0.15.15
-    eslint: 8.28.0
-    eslint-plugin-tsdoc: 0.2.17
-    fast-check: 3.3.0
-    itty-router: 2.6.6
-    itty-router-extras: 0.4.2
-    jose: 4.11.0
-    js-convert-case: 4.2.0
-    lodash: 4.17.21
-    npm-run-all: 4.1.5
-    prettier: 2.7.1
-    reflect-metadata: 0.1.13
-    tap: 16.3.0
-    tiny-invariant: 1.3.1
-    ts-set-utils: 0.2.0
-    typescript: 4.8.4
-  languageName: unknown
-  linkType: soft
-
 "@kubelt/packages@workspace:packages":
   version: 0.0.0-use.local
   resolution: "@kubelt/packages@workspace:packages"
@@ -6439,7 +6375,6 @@ __metadata:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/random": 5.7.0
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@trpc/server": 10.8.1
@@ -6465,7 +6400,6 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/address": 5.7.0
-    "@kubelt/graph": "workspace:*"
     "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/platform.access": "workspace:*"
     "@kubelt/types": "workspace:*"
@@ -6499,8 +6433,6 @@ __metadata:
     "@ethersproject/random": 5.7.0
     "@ethersproject/signing-key": 5.7.0
     "@ethersproject/transactions": 5.7.0
-    "@kubelt/graph": "workspace:*"
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/types": "workspace:*"
     "@kubelt/urns": "workspace:*"
@@ -6527,7 +6459,6 @@ __metadata:
   resolution: "@kubelt/platform.edges@workspace:platform/edges"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@microsoft/api-extractor": 7.33.6
@@ -6601,7 +6532,6 @@ __metadata:
   resolution: "@kubelt/platform.ping@workspace:platform/ping"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/openrpc": "*"
     "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
     "@typescript-eslint/eslint-plugin": 5.42.1
@@ -6623,8 +6553,6 @@ __metadata:
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
     "@ethersproject/bytes": 5.7.0
-    "@kubelt/graph": "workspace:*"
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/security": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@trpc/server": 10.8.1
@@ -6735,7 +6663,6 @@ __metadata:
   resolution: "@kubelt/services.indexer@workspace:services/indexer"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
-    "@kubelt/openrpc": "workspace:*"
     "@kubelt/platform-clients": "workspace:*"
     "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/urns": "workspace:*"
@@ -8629,13 +8556,6 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": ^12.11.0
   checksum: fd6f75e0b19b90d1a3d244d2b0c323ed8f2f05e474a281f60a321986683548ef2e0ec2b3a946aa9405d6092e055344455f69f58957c60f58368c8bdda5b7d2ab
-  languageName: node
-  linkType: hard
-
-"@open-rpc/meta-schema@npm:1.14.2":
-  version: 1.14.2
-  resolution: "@open-rpc/meta-schema@npm:1.14.2"
-  checksum: 63d3672aeea6941a96522ab2b7a9f95c4b3216ea6d7b700bdbb0ca0595b0ad28e439818d22788991a36403953e39cda9f8c7a99ed5c18258b0a45b815ecfaf8b
   languageName: node
   linkType: hard
 
@@ -13646,15 +13566,6 @@ __metadata:
   version: 2.0.1
   resolution: "@types/stack-utils@npm:2.0.1"
   checksum: 205fdbe3326b7046d7eaf5e494d8084f2659086a266f3f9cf00bccc549c8e36e407f88168ad4383c8b07099957ad669f75f2532ed4bc70be2b037330f7bae019
-  languageName: node
-  linkType: hard
-
-"@types/tap@npm:15.0.7":
-  version: 15.0.7
-  resolution: "@types/tap@npm:15.0.7"
-  dependencies:
-    "@types/node": "*"
-  checksum: 65e8ca861ab6a495a171c1a06e131fe46b7241959d064aa69ab9e56837ca5b672e9a2c173f652cc6ee43fa5bd49a5cc0f0e94442b3ad9517f3b60a3d7853db6f
   languageName: node
   linkType: hard
 
@@ -24237,15 +24148,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-check@npm:3.3.0":
-  version: 3.3.0
-  resolution: "fast-check@npm:3.3.0"
-  dependencies:
-    pure-rand: ^5.0.2
-  checksum: 94767971594dd9eebeaa6897b3937a5a7d96abb7ab249f6cb7fb2115ad7ac9d6a5709501f7e57086bd35806669bddc7f420f247d66aa23c9c66ddda7268b2b23
-  languageName: node
-  linkType: hard
-
 "fast-deep-equal@npm:^3.1.1, fast-deep-equal@npm:^3.1.3":
   version: 3.1.3
   resolution: "fast-deep-equal@npm:3.1.3"
@@ -29008,7 +28910,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jackspeak@npm:^1.4.1, jackspeak@npm:^1.4.2":
+"jackspeak@npm:^1.4.2":
   version: 1.4.2
   resolution: "jackspeak@npm:1.4.2"
   dependencies:
@@ -30147,13 +30049,6 @@ __metadata:
   version: 4.11.1
   resolution: "jose@npm:4.11.1"
   checksum: cd15cba258d0fd20f6168631ce2e94fda8442df80e43c1033c523915cecdf390a1cc8efe0eab0c2d65935ca973d791c668aea80724d2aa9c2879d4e70f3081d7
-  languageName: node
-  linkType: hard
-
-"js-convert-case@npm:4.2.0":
-  version: 4.2.0
-  resolution: "js-convert-case@npm:4.2.0"
-  checksum: cb94edecc1fa896221aafc6be548482adadfe1cde291793d47886ed14da6416ba06d22daebb59cfe462b9bb402dfbadc1e06cba1ec088513ee896c37dbb863e7
   languageName: node
   linkType: hard
 
@@ -37031,13 +36926,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pure-rand@npm:^5.0.2":
-  version: 5.0.5
-  resolution: "pure-rand@npm:5.0.5"
-  checksum: 824b906f7f66695c15ed9a898ff650e925723515e999de0360b0726ebad924ce41a74cc2ac60409dc6c55f5781008855f32ecd0fe0a1f40fbce293d48bd11dd1
-  languageName: node
-  linkType: hard
-
 "pvtsutils@npm:^1.3.2":
   version: 1.3.2
   resolution: "pvtsutils@npm:1.3.2"
@@ -41441,7 +41329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tap-parser@npm:^11.0.0, tap-parser@npm:^11.0.1, tap-parser@npm:^11.0.2":
+"tap-parser@npm:^11.0.0, tap-parser@npm:^11.0.2":
   version: 11.0.2
   resolution: "tap-parser@npm:11.0.2"
   dependencies:
@@ -41460,56 +41348,6 @@ __metadata:
   dependencies:
     yaml: ^1.10.2
   checksum: 842024ca2aee6a3016182b1c06d69807b859e2da09639ad17b16bd31370d3cc54e6b083a67629c0680c7180628115b768ac9803cfea13fc13455ff57737a8964
-  languageName: node
-  linkType: hard
-
-"tap@npm:16.3.0":
-  version: 16.3.0
-  resolution: "tap@npm:16.3.0"
-  dependencies:
-    "@isaacs/import-jsx": ^4.0.1
-    "@types/react": ^17
-    chokidar: ^3.3.0
-    findit: ^2.0.0
-    foreground-child: ^2.0.0
-    fs-exists-cached: ^1.0.0
-    glob: ^7.1.6
-    ink: ^3.2.0
-    isexe: ^2.0.0
-    istanbul-lib-processinfo: ^2.0.2
-    jackspeak: ^1.4.1
-    libtap: ^1.4.0
-    minipass: ^3.1.1
-    mkdirp: ^1.0.4
-    nyc: ^15.1.0
-    opener: ^1.5.1
-    react: ^17.0.2
-    rimraf: ^3.0.0
-    signal-exit: ^3.0.6
-    source-map-support: ^0.5.16
-    tap-mocha-reporter: ^5.0.3
-    tap-parser: ^11.0.1
-    tap-yaml: ^1.0.0
-    tcompare: ^5.0.7
-    treport: ^3.0.3
-    which: ^2.0.2
-  peerDependencies:
-    coveralls: ^3.1.1
-    flow-remove-types: ">=2.112.0"
-    ts-node: ">=8.5.2"
-    typescript: ">=3.7.2"
-  peerDependenciesMeta:
-    coveralls:
-      optional: true
-    flow-remove-types:
-      optional: true
-    ts-node:
-      optional: true
-    typescript:
-      optional: true
-  bin:
-    tap: bin/run.js
-  checksum: d5243af29dcd0742f164ba42729724ffcff26f0ff60ada9e8df65535004e7851fb197b0cedf01d2ec215cb0cc20b8eeddaf29c9cea40c5e7758744cbde550c44
   languageName: node
   linkType: hard
 
@@ -42129,7 +41967,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"treport@npm:^3.0.3, treport@npm:^3.0.4":
+"treport@npm:^3.0.4":
   version: 3.0.4
   resolution: "treport@npm:3.0.4"
   dependencies:

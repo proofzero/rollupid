@@ -17,11 +17,11 @@ export default class Address extends DOProxy {
   }
 
   async getAddress(): Promise<AddressURN | undefined> {
-    return await this.state.storage.get<AddressURN>('address')
+    return this.state.storage.get<AddressURN>('address')
   }
 
   async setAddress(address: AddressURN): Promise<void> {
-    return await this.state.storage.put('address', address)
+    return this.state.storage.put('address', address)
   }
 
   async getType(): Promise<AddressType | undefined> {
@@ -39,7 +39,7 @@ export default class Address extends DOProxy {
         return stored
       } else {
         const urn = AccountURNSpace.urn(stored)
-        await this.state.storage.put('account', urn)
+        this.state.storage.put('account', urn)
         return urn
       }
     } else {
@@ -55,20 +55,20 @@ export default class Address extends DOProxy {
   }
 
   async setAccount(account: AccountURN): Promise<void> {
-    return await this.state.storage.put('account', account)
+    return this.state.storage.put('account', account)
   }
 
   async unsetAccount(): Promise<boolean> {
-    return await this.state.storage.delete('account')
+    return this.state.storage.delete('account')
   }
 
   async getProfile(): Promise<AddressProfile | undefined> {
-    return await this.state.storage.get<AddressProfile>('profile')
+    return this.state.storage.get<AddressProfile>('profile')
   }
 
   async setProfile<TProfile>(profile: TProfile): Promise<void> {
     const p = (await this.state.storage.get<TProfile>('profile')) || {}
     Object.assign(p, profile)
-    return await this.state.storage.put('profile', p)
+    return this.state.storage.put('profile', p)
   }
 }
