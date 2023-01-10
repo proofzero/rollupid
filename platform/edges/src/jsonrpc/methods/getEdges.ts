@@ -1,7 +1,7 @@
 import * as db from '../../db'
 import { z } from 'zod'
 import { Context } from '../../context'
-import { Edge as EdgeInput, EdgeQueryInput } from '../middleware/validators'
+import { Edge as EdgeInput, EdgeQueryInput } from '../validators/edge'
 import { Edge } from '../../db/types'
 
 export const GetEdgesMethodInput = z.object({

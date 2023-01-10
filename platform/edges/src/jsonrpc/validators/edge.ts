@@ -5,6 +5,7 @@ import {
   NodeFilterInput,
 } from '@kubelt/platform-middleware/inputValidators'
 import { z } from 'zod'
+import { Node } from './node'
 
 export const EdgeQueryInput = z.object({
   id: AnyURNInput,
@@ -12,16 +13,6 @@ export const EdgeQueryInput = z.object({
   dir: EdgeDirectionInput.optional(),
   src: NodeFilterInput.optional(),
   dst: NodeFilterInput.optional(),
-})
-
-export const Node = z.object({
-  id: AnyURNInput,
-  urn: AnyURNInput,
-  nid: z.string(),
-  nss: z.string(),
-  fragment: z.string(),
-  qc: z.record(z.string()),
-  rc: z.record(z.string()),
 })
 
 export const Edge = z.object({

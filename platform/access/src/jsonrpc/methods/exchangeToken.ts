@@ -9,7 +9,7 @@ import { initAuthorizationNodeByName, initAccessNodeByName } from '../../nodes'
 
 import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
 import { GrantType } from '../../types'
-import { tokenValidator } from '../middleware/validators'
+import { tokenValidator } from '../validators/token'
 
 export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   z.object({

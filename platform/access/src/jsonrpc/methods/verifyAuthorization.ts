@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { tokenValidator } from '../middleware/validators'
+import { tokenValidator } from '../validators/token'
 
 export const VerifyAuthorizationMethodInput = z.object({
   token: tokenValidator,
