@@ -3,8 +3,11 @@ import type {
   LinksFunction,
   LoaderFunction,
 } from '@remix-run/cloudflare'
+
 import { json } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+
+import { useEffect } from "react";
+
 import {
   Links,
   LiveReload,
@@ -14,7 +17,9 @@ import {
   ScrollRestoration,
   useCatch,
   useParams,
+  useLocation,
   useTransition,
+  useLoaderData
 } from '@remix-run/react'
 
 import { ThreeIdButton } from '~/components'
@@ -31,16 +36,7 @@ import social from '~/assets/passport-social.png'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
-function Analytics(props) {
-  return (
-    <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag(){dataLayer.push(arguments)}
-      gtag('js', new Date())
-      gtag('config', props.tag)
-    </script>
-  )
-}
+import * as gtag from "~/utils/gtags.client";
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -71,14 +67,24 @@ export const loader: LoaderFunction = () => {
     ENV: {
       THREEID_APP_URL,
       INTERNAL_GOOGLE_ANALYTICS_TAG,
-      APIKEY_ALCHEMY_PUBLIC: APIKEY_ALCHEMY_PUBLIC,
+      APIKEY_ALCHEMY_PUBLIC,
     },
   })
 }
 
 export default function App() {
+  const location = useLocation();
   const transition = useTransition()
   const browserEnv = useLoaderData()
+
+  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  useEffect(() => {
+    if (GATag) {
+      gtag.pageview(location.pathname, GATag);
+    }
+  }, [location, GATag]);
+
   return (
     <html lang="en">
       <head>
@@ -86,22 +92,42 @@ export default function App() {
         <Links />
       </head>
       <body style={{ backgroundColor: '#F9FAFB' }}>
+        {!GATag ? null : (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
+            />
+            <script
+              async
+              id="gtag-init"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GATag}', {
+                    page_path: window.location.pathname,
+                  });
+              `,
+              }}
+            />
+          </>
+        )}
         {transition.state === 'loading' && <Loader />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <LiveReload />
         <script
           async
           src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
         ></script>
-        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -116,7 +142,6 @@ export function ErrorBoundary({ error }) {
         <Meta />
         <Links />
       </head>
-
       <body className="min-h-[100dvh] flex justify-center items-center">
         <div className="w-full">
           <ErrorPage
@@ -129,8 +154,6 @@ export function ErrorBoundary({ error }) {
         <ScrollRestoration />
         <Scripts />
         <LiveReload port={8002} />
-        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
@@ -181,11 +204,9 @@ export function CatchBoundary() {
         <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
           }}
         />
-        <script async src="https://www.googletagmanager.com/gtag/js?id={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG}"></script>
-        <Analytics tag={window.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG} />
       </body>
     </html>
   )
