@@ -3,6 +3,7 @@
  */
 
 import type {
+  json,
   MetaFunction,
   LinksFunction,
   LoaderFunction,
