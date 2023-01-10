@@ -19,6 +19,8 @@ import { TbLink } from 'react-icons/tb'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { Tooltip } from 'flowbite-react'
+
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
@@ -174,8 +176,8 @@ export default function AccountSettingsLinks() {
                 className="
               flex flex-col w-full 
               sm:flex-row sm:w-full sm:justify-start sm:items-center
-              mb-4 py-3 px-3
-              rounded-md border border-gray-300"
+              mb-4 py-3 px-3 truncate
+              rounded-md border border-gray-300 "
               >
                 <div
                   className="
@@ -244,30 +246,38 @@ export default function AccountSettingsLinks() {
                 }-${i}`}
                 className="
               border border-gray-300 rounded-md
-              px-4 py-3 mb-3
-               flex flex-row items-center justify-around truncate
+              px-4 py-3 mb-3 truncate
+               flex flex-row items-center justify-between
                "
               >
-                <div className="flex flex-row items-center grow ">
-                  <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                  <button
-                    type="button"
-                    className="bg-gray-100 w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
-              flex items-center justify-center "
-                    onClick={() => {
-                      navigator.clipboard.writeText(link.url)
-                    }}
-                  >
-                    <TbLink size={22} />
+                <div className="flex flex-row items-center w-full truncate">
+                  <button className="text-gray-400">
+                    <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
                   </button>
-                  <div className="flex flex-col truncate">
-                    <Text weight="medium">{link.name}</Text>
-                    <Text className="text-gray-500">{link.url}</Text>
+                  <Tooltip content="Copy" className="text-black">
+                    <button
+                      type="button"
+                      className="bg-gray-100 hover:bg-gray-200 transition-colors 
+                    w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
+                    text-gray-700
+              flex items-center justify-center "
+                      onClick={() => {
+                        navigator.clipboard.writeText(link.url)
+                      }}
+                    >
+                      <TbLink size={22} />
+                    </button>
+                  </Tooltip>
+                  <div className="flex flex-col w-max-[600px]">
+                    <Text weight="medium" className="truncate">
+                      {link.name}
+                    </Text>
+                    <Text className="text-gray-500 truncate">{link.url}</Text>
                   </div>
                 </div>
                 {/* Puts current link in "modification" regyme */}
                 <Button
-                  className="mr-4 h-[40px] 
+                  className="mr-4 h-[40px]
                 bg-gray-100 focus:bg-gray-100 border-none
                 flex flex-row items-center justify-around
                 text-gray-600"
