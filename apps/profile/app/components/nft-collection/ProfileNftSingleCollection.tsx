@@ -155,7 +155,7 @@ const ProfileNftSingleCollection = ({
               </Text>
             </button>
           ) : (
-            <Link to={`/${account}`}>
+            <Link to={`/${account}/collection`}>
               <Text
                 className="mb-12 text-gray-600"
                 size="base"

@@ -163,8 +163,12 @@ const ProfileLayout = () => {
   const [currentTab, setCurrentTab] = useState<string>(tabs[path])
 
   const navigate = useNavigate()
-
+  
   const fetcher = useFetcher()
+
+  useEffect(() => {
+    setCurrentTab(tabs[path])
+  }, [path])
 
   // watch for cover load
   useEffect(() => {

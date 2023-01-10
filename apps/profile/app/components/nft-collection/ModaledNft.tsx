@@ -87,20 +87,14 @@ const ModaledNft = ({ nft, isModal }: any) => {
           font-semibold
           w-full
           hover:shadow-xl 
-          flex
-          flex-col
-          align-center justify-center
+          
          "
         >
           <Link to={`./${nft.details[0].value}`}>
             <img
-              className="rounded-t-lg block
-                lg:h-[13rem]
-                md:h-[14rem]
-                sm:h-[15rem]
-                h-[20rem]
-                object-contain 
-                mx-auto 
+              className="rounded-t-lg
+              w-full
+                object-contain
               "
               src={
                 loadFail
@@ -108,13 +102,13 @@ const ModaledNft = ({ nft, isModal }: any) => {
                   : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
               }
               onError={(e) => setLoadFail(true)}
-              alt="collection-representation"
+              alt="collection representative"
             />
             <div
               className="flex text-gray-600
             flex-row whitespace-nowrap 
-            w-full
-            justify-between items-center px-4 py-3"
+            w-full justify-between items-center
+            px-4 py-3"
             >
               <div className="truncate leading-none">
                 {nft.collectionTitle ? nft.collectionTitle : ' '}
