@@ -12,7 +12,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
   return (
     <>
       {hovered ? (
-        <button className="relative cursor-pointer group">
+        <button className="relative w-full cursor-pointer group">
           <div
             onClick={() => {
               handleSelectedNft(nft)

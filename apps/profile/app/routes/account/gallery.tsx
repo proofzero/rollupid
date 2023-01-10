@@ -303,6 +303,7 @@ const Gallery = () => {
 
       <PfpNftModal
         account={targetAddress}
+        text="Pick curated NFTs"
         isOpen={isOpen}
         pfp={pfp.image}
         handleClose={() => {

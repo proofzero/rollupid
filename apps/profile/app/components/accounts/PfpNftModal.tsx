@@ -35,7 +35,7 @@ const PfpNftModal = ({
       pb-4 text-left shadow-xl transition-all overflow-y-auto"
       >
         {text?.length && (
-          <Text className="pb-4 text-gray-800" size="2xl" weight="bold">
+          <Text className="lg:px-4 px-3 pb-2 text-gray-800" size="2xl" weight="bold">
             {text}
           </Text>
         )}
