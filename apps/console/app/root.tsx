@@ -3,11 +3,12 @@
  */
 
 import type {
-  json,
   MetaFunction,
   LinksFunction,
   LoaderFunction,
 } from '@remix-run/cloudflare'
+
+import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
