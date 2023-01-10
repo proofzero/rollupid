@@ -3,8 +3,11 @@ import type {
   LinksFunction,
   LoaderFunction,
 } from '@remix-run/cloudflare'
+
 import { json } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+
+import { useEffect } from "react";
+
 import {
   Links,
   LiveReload,
@@ -14,7 +17,9 @@ import {
   ScrollRestoration,
   useCatch,
   useParams,
+  useLocation,
   useTransition,
+  useLoaderData
 } from '@remix-run/react'
 
 import { ThreeIdButton } from '~/components'
@@ -30,6 +35,8 @@ import social from '~/assets/passport-social.png'
 
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
+
+import * as gtag from "~/utils/gtags.client";
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -59,14 +66,25 @@ export const loader: LoaderFunction = () => {
   return json({
     ENV: {
       THREEID_APP_URL,
-      APIKEY_ALCHEMY_PUBLIC: APIKEY_ALCHEMY_PUBLIC,
+      INTERNAL_GOOGLE_ANALYTICS_TAG,
+      APIKEY_ALCHEMY_PUBLIC,
     },
   })
 }
 
 export default function App() {
+  const location = useLocation();
   const transition = useTransition()
   const browserEnv = useLoaderData()
+
+  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+
+  useEffect(() => {
+    if (GATag) {
+      gtag.pageview(location.pathname, GATag);
+    }
+  }, [location, GATag]);
+
   return (
     <html lang="en">
       <head>
@@ -74,16 +92,38 @@ export default function App() {
         <Links />
       </head>
       <body style={{ backgroundColor: '#F9FAFB' }}>
+        {!GATag ? null : (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
+            />
+            <script
+              async
+              id="gtag-init"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GATag}', {
+                    page_path: window.location.pathname,
+                  });
+              `,
+              }}
+            />
+          </>
+        )}
         {transition.state === 'loading' && <Loader />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
           }}
         />
+        <LiveReload />
         <script
           async
           src="https://unpkg.com/flowbite@1.5.4/dist/flowbite.js"
@@ -102,7 +142,6 @@ export function ErrorBoundary({ error }) {
         <Meta />
         <Links />
       </head>
-
       <body className="min-h-[100dvh] flex justify-center items-center">
         <div className="w-full">
           <ErrorPage
@@ -165,7 +204,7 @@ export function CatchBoundary() {
         <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
           }}
         />
       </body>
