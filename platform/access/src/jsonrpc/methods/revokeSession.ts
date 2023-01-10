@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { AccessURNSpace } from '@kubelt/urns/access'
 
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { EDGE_ACCESS } from '@kubelt/graph/edges'
+import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'

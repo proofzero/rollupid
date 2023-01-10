@@ -1,15 +1,11 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-
 import type { Edge } from '@kubelt/graph'
 import type { AccessURN } from '@kubelt/urns/access'
-
 import { AccessURNSpace } from '@kubelt/urns/access'
-
 import createEdgesClient from '@kubelt/platform-clients/edges'
-
-import { EDGE_ACCESS } from '@kubelt/graph/edges'
+import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 import { EdgeDirection } from '@kubelt/graph'
 
 // Input
