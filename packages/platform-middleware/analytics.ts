@@ -7,6 +7,7 @@ export const Analytics: BaseMiddlewareFunction<{
   accountURN?: AccountURN
 }> = async ({ ctx, path, type, next }) => {
   const rayId = ctx.req?.headers.get('Ray-ID') || null
+  // Not all calls have the Ray-ID header unless we pass it through.
   // if (!rayId) throw new Error('No Ray-ID found in request headers')
 
   const accountURN: string = ctx.accountURN || 'no account URN'
@@ -15,7 +16,7 @@ export const Analytics: BaseMiddlewareFunction<{
   const pre: AnalyticsEngineDataPoint = {
     blobs: [ path, type, 'BEFORE', accountURN, rayId ],
     // doubles: [],
-    indexes: [rayId],
+    indexes: [rayId], // TODO: Need a sampling index.
   }
 
   console.log('service precall analytics', JSON.stringify(pre))
@@ -29,7 +30,7 @@ export const Analytics: BaseMiddlewareFunction<{
   const post: AnalyticsEngineDataPoint = {
     blobs: [ path, type, 'AFTER', accountURN, rayId ],
     // doubles: [],
-    indexes: [rayId],
+    indexes: [rayId], // TODO: Need a sampling index.
   }
 
   console.log('service postcall analytics', JSON.stringify(post))
