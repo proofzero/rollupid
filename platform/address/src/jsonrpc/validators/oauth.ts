@@ -3,7 +3,7 @@ import { GoogleRawProfileSchema } from './profile'
 
 export const GetGoogleOAuthDataSchema = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
+  refreshToken: z.string().optional(),
   extraParams: z.object({
     expires_in: z.number(),
     scope: z.string(),
