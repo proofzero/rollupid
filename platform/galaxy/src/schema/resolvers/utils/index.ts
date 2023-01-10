@@ -42,11 +42,9 @@ export const isAuthorized = () => (next) => (root, args, context, info) => {
 }
 
 export const hasApiKey = () => (next) => async (root, args, context, info) => {
-
   //If request isn't coming from a service binding then we check for API key validity;
   //otherwise we passthrough to next middleware
   if (!isFromCFBinding(context.request)) {
-
     const apiKey = context.apiKey
     if (!apiKey) {
       throw new GraphQLYogaError('No API Key provided.', {
@@ -68,9 +66,9 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
       throw new GraphQLYogaError('Unable to validate given API key.', {
         extensions: {
           http: {
-            status: 401
-          }
-        }
+            status: 401,
+          },
+        },
       })
     }
 
@@ -87,7 +85,6 @@ export const hasApiKey = () => (next) => async (root, args, context, info) => {
 
   return next(root, args, context, info)
 }
-
 
 export async function checkHTTPStatus(response: Response) {
   if (response.status !== 200) {

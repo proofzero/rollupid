@@ -1,4 +1,6 @@
 export default /* GraphQL */ `
+  scalar JSON
+
   interface PFP {
     image: String
   }
@@ -44,6 +46,7 @@ export default /* GraphQL */ `
 
   input ProfileInput {
     displayName: String
+    nftarVoucher: JSON
     pfp: PFPInput
     cover: String
     bio: String

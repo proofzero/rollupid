@@ -51,7 +51,7 @@ const profileResolvers: Resolvers = {
           'X-3RN': addressURN,
         },
       })
-      const accountURN = await addressClient.kb_getAccount()
+      const accountURN = await addressClient.resolveAccount.query()
 
       if (!accountURN) {
         console.log(
@@ -59,7 +59,7 @@ const profileResolvers: Resolvers = {
         )
         const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
         try {
-          const addressProfile = await addressClient.kb_getAddressProfile()
+          const addressProfile = await addressClient.getAddressProfile.query()
           if (!addressProfile) {
             throw new GraphQLError(errorMessage)
           }
@@ -82,7 +82,7 @@ const profileResolvers: Resolvers = {
 
         if (!accountProfile) {
           accountProfile =
-            (await addressClient.kb_getAddressProfile()) as Profile
+            (await addressClient.getAddressProfile.query()) as any as Profile
         }
 
         return accountProfile

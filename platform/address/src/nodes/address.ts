@@ -25,7 +25,7 @@ export default class Address extends DOProxy {
   }
 
   async getType(): Promise<AddressType | undefined> {
-    return await this.state.storage.get<AddressType>('address')
+    return await this.state.storage.get<AddressType>('type')
   }
 
   async setType(type: AddressType): Promise<void> {
