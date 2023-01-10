@@ -6,7 +6,7 @@ import { AppClientIdParamSchema } from '../validators/app'
 
 export const RotateApiKeyInput = AppClientIdParamSchema
 
-export const RotateApiKeyOutputSchema = z.object({
+export const RotateApiKeyOutput = z.object({
   apiKey: z.string(),
 })
 
@@ -16,7 +16,7 @@ export const rotateApiKey = async ({
 }: {
   input: z.infer<typeof RotateApiKeyInput>
   ctx: Context
-}): Promise<z.infer<typeof RotateApiKeyOutputSchema>> => {
+}): Promise<z.infer<typeof RotateApiKeyOutput>> => {
   const appURN = ApplicationURNSpace.urn(input.clientId)
   console.log(`rotating API key for ${appURN}`)
 

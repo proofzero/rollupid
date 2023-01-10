@@ -11,7 +11,7 @@ import {
   JWTAssertionTokenFromHeader,
   ValidateJWT,
 } from '@kubelt/platform-middleware/jwt'
-import { deleteApp, DeleteAppInputSchema } from './methods/deleteApp'
+import { deleteApp, DeleteAppInput } from './methods/deleteApp'
 import {
   getAppDetails,
   GetAppDetailsInput,
@@ -26,7 +26,7 @@ import {
 import {
   rotateApiKey,
   RotateApiKeyInput,
-  RotateApiKeyOutputSchema,
+  RotateApiKeyOutput,
 } from './methods/rotateApiKey'
 import {
   checkAppAuth,
@@ -65,7 +65,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
-    .input(DeleteAppInputSchema)
+    .input(DeleteAppInput)
     .mutation(deleteApp),
   updateApp: t.procedure
     .use(JWTAssertionTokenFromHeader)
@@ -106,7 +106,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .input(RotateApiKeyInput)
-    .output(RotateApiKeyOutputSchema)
+    .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
   checkAppAuth: t.procedure
     .use(JWTAssertionTokenFromHeader)
