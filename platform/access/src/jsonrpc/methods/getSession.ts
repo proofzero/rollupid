@@ -6,7 +6,7 @@ import { AccessURNSpace } from '@kubelt/urns/access'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { AccessURNInput } from '../middleware/validators'
+import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 export const GetSessionMethodInput = AccessURNInput
 

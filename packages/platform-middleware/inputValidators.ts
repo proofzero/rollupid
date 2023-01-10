@@ -1,11 +1,23 @@
 import { z } from 'zod'
+import { AccessURN, AccessURNSpace } from '@kubelt/urns/access'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 import { CryptoAddressType } from '@kubelt/platform/address/src/types'
 
+
 export const NoInput = z.undefined()
+
+export const AccessURNInput = z.custom<AccessURN>((input) => {
+  if (typeof input !== 'string') {
+    throw new Error(`input is not a string: ${input}`)
+  }
+  if (!AccessURNSpace.is(input.trim())) {
+    throw new Error(`invalid AccessURN entry: ${input}`)
+  }
+  return input as AccessURN
+})
 
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (typeof input !== 'string') {

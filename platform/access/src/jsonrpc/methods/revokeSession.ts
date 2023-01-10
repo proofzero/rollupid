@@ -9,7 +9,7 @@ import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
 
 import { Context } from '../../context'
 import { initAccessNodeByName } from '../../nodes'
-import { AccessURNInput } from '../middleware/validators'
+import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 export const RevokeSessionMethodInput = AccessURNInput
 
