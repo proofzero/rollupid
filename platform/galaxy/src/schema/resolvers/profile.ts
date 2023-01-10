@@ -1,4 +1,3 @@
-import * as jose from 'jose'
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
@@ -13,7 +12,8 @@ import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
-import { Profile } from '@kubelt/platform.account/src/jsonrpc/middlewares/profile'
+import { Profile } from '@kubelt/platform.account/src/types'
+import { CryptoAddressProfile } from '../../../../address/src/types'
 
 type ResolverContext = {
   env: Env
@@ -53,23 +53,40 @@ const profileResolvers: Resolvers = {
       })
       const accountURN = await addressClient.resolveAccount.query()
 
+      // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
           'galaxy.profileFromAddress: attempt to resolve profile from address w/o account'
         )
         const errorMessage = `galaxy:profileFromAddress: no profile found for address ${addressURN}`
         try {
-          const addressProfile = await addressClient.getAddressProfile.query()
+          const [addressProfile, voucher] = await Promise.all([
+            addressClient.getAddressProfile.query(),
+            addressClient.getVoucher.query(),
+          ])
+
           if (!addressProfile) {
             throw new GraphQLError(errorMessage)
           }
-          return addressProfile
+          // NOTE: the above case is needs to change when social vault accounts hooked up
+          // We will need to call for addresses and then get the profile?
+          // Or have utility to manage the mapping?
+          const cryptoAddressProfile = addressProfile as CryptoAddressProfile
+          return {
+            displayName: cryptoAddressProfile.displayName,
+            pfp: {
+              image: cryptoAddressProfile.avatar as string,
+            },
+            cover: voucher.metadata.cover,
+            defaultAddress: addressURN,
+          }
         } catch (e) {
           console.error(errorMessage)
           throw new GraphQLError(errorMessage)
         }
       }
 
+      // get the account profile
       try {
         const accountClient = createAccountClient(env.Account, {
           headers: {
@@ -79,15 +96,6 @@ const profileResolvers: Resolvers = {
         let accountProfile = await accountClient.getProfile.query({
           account: accountURN,
         })
-
-        if (!accountProfile) {
-          const addressProfile =
-            (await addressClient.getAddressProfile.query()) as any
-          accountProfile = {
-            defaultAddress: addressProfile.address,
-            displayName: addressProfile.displayName,
-          }
-        }
 
         return accountProfile
       } catch (e) {

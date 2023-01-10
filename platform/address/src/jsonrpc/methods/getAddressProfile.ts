@@ -48,7 +48,6 @@ export const getAddressProfileMethod = async ({
         throw new Error('Unable to get voucher from Nftar')
       }
       const pfp = gatewayFromIpfs(voucher.metadata.image)
-
       ethProfile.avatar ||= pfp
 
       await (nodeClient as CryptoAddressProxyStub).class.setVoucher(voucher)
