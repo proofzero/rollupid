@@ -5,6 +5,7 @@ import { Context } from '../context'
 import {
   ValidateJWT,
   JWTAssertionTokenFromHeader,
+  RequireAccount,
 } from '@kubelt/platform-middleware/jwt'
 
 import {
@@ -56,6 +57,7 @@ export const appRouter = t.router({
   getSession: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
+    .use(RequireAccount)
     .use(LogUsage)
     .input(GetSessionMethodInput)
     .output(GetSessionMethodOutput)
@@ -63,6 +65,7 @@ export const appRouter = t.router({
   revokeSession: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
+    .use(RequireAccount)
     .use(LogUsage)
     .input(RevokeSessionMethodInput)
     .output(RevokeSessionMethodOutput)

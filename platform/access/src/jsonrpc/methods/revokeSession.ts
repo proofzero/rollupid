@@ -27,9 +27,6 @@ export const revokeSessionMethod = async ({
   // The ValidateJWT middleware extracts the account URN from the JWT
   // and places it on the context.
   const account = ctx?.accountURN
-  if (account === undefined) {
-    throw new Error(`missing account`)
-  }
   const access = input
 
   const name = AccessURNSpace.decode(input)
@@ -43,7 +40,11 @@ export const revokeSessionMethod = async ({
   // node.
   const edgesClient = createEdgesClient(ctx.Edges)
   await edgesClient.removeEdge.mutate({
-    src: account,
+    // We use the RequireAccount middleware to ensure that the account
+    // value is present on the context, so it should not be possible for
+    // it to be udnefined here in spite of the optional type marker on
+    // the context definition.
+    src: account!,
     dst: access,
     tag: EDGE_ACCESS,
   })
