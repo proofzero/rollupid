@@ -30,7 +30,8 @@ const PfpNftModal = ({
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
       <div
-        className="flex-1 relative transform rounded-lg bg-white px-4 pt-5 
+        className="flex-1 relative transform rounded-lg bg-white 
+        overflow-x-visible h-max w-screen min-[480px]:w-full px-2 pt-5 
       pb-4 text-left shadow-xl transition-all overflow-y-auto"
       >
         {text?.length && (

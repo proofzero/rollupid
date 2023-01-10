@@ -157,7 +157,7 @@ const Nft = forwardRef(
           : '14rem',
       gridRowStart: null,
       gridColumnStart: null,
-      backgroundImage: `url("${url}")`,
+      // backgroundImage: `url("${url}")`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundColor: 'grey',
@@ -165,11 +165,14 @@ const Nft = forwardRef(
       ...style,
     }
     return (
-      <div
+      <img
+        src={`${url}`}
+        alt="NFT visual"
         ref={ref}
         style={inlineStyles}
         className="w-full
     flex justify-center items-center
+    object-none
     transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
     bg-[#F9FAFB] rounded-lg"
         {...props}
@@ -293,7 +296,13 @@ const Gallery = () => {
   }
 
   return (
-    <div className="min-h-[60vh]">
+    <Form
+      method="post"
+      onReset={() => {
+        setFormChanged(false)
+      }}
+      className="relative min-h-[60vh]"
+    >
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         NFT Gallery
       </Text>
@@ -306,7 +315,7 @@ const Gallery = () => {
       <PfpNftModal
         account={targetAddress}
         isOpen={isOpen}
-        pfp={pfp}
+        pfp={pfp.image}
         handleClose={() => {
           setIsOpen(false)
         }}
@@ -338,10 +347,11 @@ const Gallery = () => {
               gridGap: 10,
               padding: 10,
             }}
-            className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
+            className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
           >
             <button
+              type="button"
               className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  
               bg-gray-50 hover:bg-gray-100 transition-colors
               rounded-lg"
@@ -381,34 +391,21 @@ const Gallery = () => {
           ) : null}
         </DragOverlay>
       </DndContext>
-      <Form
-        method="post"
-        onReset={() => {
-          setFormChanged(false)
-        }}
-        className="relative"
-      >
-        <input
-          type="hidden"
-          name="gallery"
-          value={JSON.stringify(curatedNfts)}
-        />
 
-        <SaveButton
-          isFormChanged={isFormChanged}
-          discardFn={() => {
-            setCuratedNfts(initialState)
-            setCuratedNftsSet(
-              new Set(
-                initialState.map(
-                  (nft: any) => nft.contract.address + nft.tokenId
-                )
-              )
+      <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
+
+      <SaveButton
+        isFormChanged={isFormChanged}
+        discardFn={() => {
+          setCuratedNfts(initialState)
+          setCuratedNftsSet(
+            new Set(
+              initialState.map((nft: any) => nft.contract.address + nft.tokenId)
             )
-          }}
-        />
-      </Form>
-    </div>
+          )
+        }}
+      />
+    </Form>
   )
 }
 

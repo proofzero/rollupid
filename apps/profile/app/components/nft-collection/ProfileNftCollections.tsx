@@ -191,8 +191,10 @@ const ProfileNftCollections = ({
                     key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
                     className="flex
                       justify-center
-                      pl-[10%]
-                      w-[90%]
+                      w-[95%]
+                      pl-[5%]
+                      sm:pl-[10%]
+                      sm:w-[90%]
                       mb-10
                       "
                   >

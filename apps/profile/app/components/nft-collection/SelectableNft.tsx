@@ -52,7 +52,13 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="w-full rounded-lg"
+            className="rounded-lg
+            lg:h-[8rem]
+            md:h-[11rem]
+            sm:h-[12rem]
+            h-[20rem]
+            object-contain 
+            mx-auto"
             src={
               loadFail
                 ? missingNftSvg
