@@ -1,6 +1,6 @@
 // platform/ping:src/index.ts
 /**
- * This Cloudflare worker provides an example OpenRPC ping service.
+ * This Cloudflare worker provides an example rpc ping service.
  *
  * @packageDocumentation
  */

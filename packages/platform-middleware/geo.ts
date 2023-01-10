@@ -1,5 +1,3 @@
-// @kubelt/openrpc:middleware/geolocation.ts
-
 import { GeoContext } from '@kubelt/types/context'
 import type { BaseMiddlewareFunction } from './types'
 
