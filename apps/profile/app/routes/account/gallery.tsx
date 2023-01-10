@@ -147,21 +147,8 @@ const Nft = forwardRef(
        * It's the height of nft when it's dragged
        * Don't know how to write it better so keep it for now
        */
-      height:
-        width < 640
-          ? '30rem'
-          : width < 768
-          ? '20rem'
-          : width < 1024
-          ? '18rem'
-          : '14rem',
-      gridRowStart: null,
-      gridColumnStart: null,
-      // backgroundImage: `url("${url}")`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundColor: 'grey',
-      borderRadius: '0.5rem',
+      height: '100%',
+
       ...style,
     }
     return (
@@ -170,11 +157,13 @@ const Nft = forwardRef(
         alt="NFT visual"
         ref={ref}
         style={inlineStyles}
-        className="w-full
+        className="w-full h-full
     flex justify-center items-center
-    object-none
-    transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
-    bg-[#F9FAFB] rounded-lg"
+    object-contain
+    transition-transform transition-colors
+    duration-150 hover:duration-150 hover:scale-[1.02]
+    hover:bg-gray-100
+    bg-gray-50 rounded-lg"
         {...props}
       />
     )
@@ -352,7 +341,7 @@ const Gallery = () => {
           >
             <button
               type="button"
-              className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  
+              className="w-full h-full
               bg-gray-50 hover:bg-gray-100 transition-colors
               rounded-lg"
               onClick={() => setIsOpen(true)}
