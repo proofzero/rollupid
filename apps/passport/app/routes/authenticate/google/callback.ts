@@ -1,6 +1,8 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import type { GoogleExtraParams, GoogleProfile } from 'remix-auth-google'
 
+import { keccak256 } from '@ethersproject/keccak256'
+
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
@@ -10,7 +12,6 @@ import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
 import { authenticator } from '~/auth.server'
 import { getAddressClient, getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
-import { keccak256 } from 'ethers/lib/utils'
 
 type AuthenticationResult = {
   accessToken: string

@@ -22,6 +22,7 @@
     "build-storybook": "npx tailwindcss -o ./app/styles/tailwind.css && build-storybook"
   },
   "dependencies": {
+    "@ethersproject/keccak256": "5.7.0",
     "@kubelt/design-system": "*",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/platform.access": "workspace:*",
@@ -84,7 +85,6 @@
     "eslint-plugin-react": "7.31.10",
     "eslint-plugin-standard": "5.0.0",
     "eslint-plugin-storybook": "0.6.7",
-    "ethers": "5.7.0",
     "miniflare": "2.6.0",
     "npm-run-all": "4.1.5",
     "postcss": "8.4.19",
