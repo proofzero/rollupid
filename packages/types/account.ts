@@ -1,3 +1,5 @@
+import { AddressURN } from '@kubelt/urns/address'
+
 export type AccountProfile = {
   cover: string
   displayName: string
@@ -5,4 +7,5 @@ export type AccountProfile = {
     image: string
     isToken?: boolean
   }
+  defaultAddress?: AddressURN
 }

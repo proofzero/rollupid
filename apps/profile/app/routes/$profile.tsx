@@ -19,14 +19,13 @@ import {
 } from '@remix-run/react'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
+import type { AccountProfile } from '@kubelt/types/account'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Cover } from '~/components/profile/cover/Cover'
 import HeadNav from '~/components/head-nav'
-import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
-
 import ConditionalTooltip from '~/components/conditional-tooltip'
 import { Links } from '~/components/profile/links'
 import { loader as profileLoader } from '~/routes/$profile.json'
@@ -34,7 +33,7 @@ import { loader as profileLoader } from '~/routes/$profile.json'
 import { getUserSession } from '~/utils/session.server'
 import { strings, ogImage, clients } from '~/helpers'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import type { Profile } from '~/utils/galaxy.server'
+import { getGallery } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
   const { request, params } = args
@@ -52,8 +51,6 @@ export const loader: LoaderFunction = async (args) => {
     addressOrEns: params.profile,
   })
 
-  const { gallery } = await (await galleryLoader(args)).json()
-
   // get the logged in user profile for the UI
   let loggedInUserProfile = {}
   let isOwner = false
@@ -63,7 +60,7 @@ export const loader: LoaderFunction = async (args) => {
     const profileRes = await galaxyClient.getProfile(undefined, {
       'KBT-Access-JWT-Assertion': jwt,
     })
-    profile = profileRes.profile as Profile
+    profile = profileRes.profile as AccountProfile
     loggedInUserProfile = {
       ...profile,
       claimed: true,
@@ -81,6 +78,8 @@ export const loader: LoaderFunction = async (args) => {
   } else {
     claimed = true
   }
+
+  const gallery = await getGallery(targetAddress as string)
 
   // Setup og tag data
   // check generate and return og image
@@ -455,7 +454,7 @@ const ProfileLayout = () => {
           </div>
         )}
 
-        <div className="mt-12 lg:mt-24">
+        <div className="mt-12">
           <div className="block px-3 lg:px-4">
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8" aria-label="Tabs">

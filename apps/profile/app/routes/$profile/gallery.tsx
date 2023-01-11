@@ -4,7 +4,7 @@ import { useRouteData } from '~/hooks'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 
-import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
+import { getGallery, getGalleryWithMetadata } from '~/helpers/nfts'
 
 export type ProfileData = {
   targetAddress: string
@@ -21,10 +21,9 @@ export type GalleryData = {
 }
 
 export const loader: LoaderFunction = async (args) => {
-  const { params } = args
-  const { gallery } = await (await galleryLoader(args)).json()
-  if (!gallery || !gallery.length)
-    return redirect(`/${params.profile}/collection`)
+  const profile = args.params.profile as string
+  const { gallery } = await getGalleryWithMetadata(profile)
+  if (!gallery || !gallery.length) return redirect(`/${profile}/collection`)
   return null
 }
 

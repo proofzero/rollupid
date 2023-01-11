@@ -1,16 +1,15 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
-
-import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
+import { getGallery } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
-  const { params } = args
+  const profile = args.params.profile as string
 
-  const { gallery } = await (await galleryLoader(args)).json()
+  const gallery = await getGallery(profile)
 
   if (gallery.length) {
-    return redirect(`/${params.profile}/gallery`)
+    return redirect(`/${profile}/gallery`)
   }
 
-  return redirect(`/${params.profile}/collection`)
+  return redirect(`/${profile}/collection`)
 }
