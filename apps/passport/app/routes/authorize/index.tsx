@@ -39,10 +39,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   if (!profile) {
     const addressClient = getAddressClient(defaultProfileURN)
     // TODO: with social account we need a method to determine which type of profile
-    const [addressProfile, voucher] = await Promise.all([
-      addressClient.getAddressProfile.query(),
-      addressClient.getVoucher.query(),
-    ])
+
+    const addressProfile = await addressClient.getAddressProfile.query()
+    const voucher = await addressClient.getVoucher.query()
+
     const cryptoAddressProfile = addressProfile as CryptoAddressProfile
     await galaxyClient.updateProfile(
       {
