@@ -19,6 +19,7 @@ query getProfile {
       name
       url
       verified
+      links_order
     }
     website
   }
@@ -45,6 +46,7 @@ query getProfileFromAddress($addressURN: URN!) {
       name
       url
       verified
+      links_order
     }
     website
   }

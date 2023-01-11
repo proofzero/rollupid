@@ -120,15 +120,6 @@ const Nft = forwardRef(
      * It re-renders this small component quite often
      * every time user changes screen size
      */
-    const [width, setWidth] = useState(0)
-    useLayoutEffect(() => {
-      function updateSize() {
-        setWidth(window.innerWidth)
-      }
-      window.addEventListener('resize', updateSize)
-      updateSize()
-      return () => window.removeEventListener('resize', updateSize)
-    }, [])
 
     const inlineStyles = {
       opacity: faded ? '0.2' : isDragging ? '0' : '1',

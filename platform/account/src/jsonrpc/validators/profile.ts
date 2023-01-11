@@ -22,6 +22,7 @@ export const ProfileSchema = z.object({
         name: z.string(),
         url: z.string().url().or(z.literal('')),
         verified: z.boolean(),
+        links_order: z.number(),
       })
     )
     .optional()

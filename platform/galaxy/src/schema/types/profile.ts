@@ -16,6 +16,7 @@ export default /* GraphQL */ `
     name: String
     url: String
     verified: Boolean
+    links_order: Number
   }
 
   type Profile {
@@ -40,6 +41,7 @@ export default /* GraphQL */ `
     name: String
     url: String
     verified: Boolean
+    links_order: Number
   }
 
   input ProfileInput {
