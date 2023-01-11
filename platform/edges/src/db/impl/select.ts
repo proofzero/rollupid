@@ -207,7 +207,6 @@ export async function edges(
 
   const result = await statement.all()
 
-  console.log({ result })
   // TODO check result.success and handle query error
   let edges: EdgeRecord[] = result.results as EdgeRecord[]
 
