@@ -6,7 +6,6 @@ import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
 import { CryptoAddressType } from '@kubelt/platform/address/src/types'
 
-
 export const NoInput = z.undefined()
 
 export const AccessURNInput = z.custom<AccessURN>((input) => {

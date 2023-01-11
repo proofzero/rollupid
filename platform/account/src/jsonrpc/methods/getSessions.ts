@@ -1,11 +1,10 @@
-import { z } from 'zod'
-import { inputValidators } from '@kubelt/platform-middleware'
-import { Context } from '../../context'
-import type { Edge } from '@kubelt/graph'
-import type { AccessURN } from '@kubelt/urns/access'
 import createEdgesClient from '@kubelt/platform-clients/edges'
+import type { AccessURN } from '@kubelt/urns/access'
+import { Context } from '../../context'
 import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
-import { EdgeDirection } from '@kubelt/graph'
+import { Graph } from '@kubelt/types'
+import { inputValidators } from '@kubelt/platform-middleware'
+import { z } from 'zod'
 
 // Input
 // -----------------------------------------------------------------------------
@@ -46,12 +45,12 @@ export const getSessionsMethod = async ({
       // We only want edges that link to Access nodes (sessions).
       tag: EDGE_ACCESS,
       // Account -> Access edges indicate session ownership.
-      dir: EdgeDirection.Outgoing,
+      dir: Graph.EdgeDirection.Outgoing,
     },
   })
 
   // Returns a list of Access node URNs.
-  return edgesResult.edges.map((edge: Edge) => {
+  return edgesResult.edges.map((edge: Graph.Edge) => {
     return edge.dst.urn as AccessURN
   })
 }

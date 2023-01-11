@@ -56,7 +56,7 @@ export const hasAddressesMethod = async ({
   const edgeList = edgesResult.edges
 
   // A set of the addresses owned by the account.
-  const owned = new Set(
+  const ownedAddresses = new Set(
     edgeList.map((edge: Graph.Edge) => {
       return edge.dst.urn
     })
