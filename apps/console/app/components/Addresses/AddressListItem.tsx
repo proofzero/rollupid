@@ -89,7 +89,7 @@ export const AddressListItem = ({
           {/* Menu could be injected from outside */}
           <Menu>
             <Menu.Button>
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex justify-center items-center cursor-pointer">
+              <div className="w-10 h-10 rounded-lg hover:bg-gray-100 focus:bg-gray-100 flex justify-center items-center cursor-pointer">
                 <HiDotsHorizontal className="text-lg text-gray-500" />
               </div>
             </Menu.Button>
@@ -108,7 +108,7 @@ export const AddressListItem = ({
                   {onRenameAccount && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onRenameAccount(id)
                       }}
@@ -124,7 +124,7 @@ export const AddressListItem = ({
                   {onChangeAvatar && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onChangeAvatar(id)
                       }}
@@ -140,7 +140,7 @@ export const AddressListItem = ({
                   {onSetPrimary && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onSetPrimary(id)
                       }}
@@ -156,7 +156,7 @@ export const AddressListItem = ({
                   {onSetPrivate && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onSetPrivate(id)
                       }}
@@ -174,7 +174,7 @@ export const AddressListItem = ({
                   {onDisconnect && (
                     <Menu.Item
                       as="div"
-                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                      className="py-2 px-4 flex items-center space-x-3 cursor-pointer hover:bg-gray-100 focus:bg-gray-100"
                       onClick={() => {
                         onDisconnect(id)
                       }}
