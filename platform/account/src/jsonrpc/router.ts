@@ -72,6 +72,7 @@ export const appRouter = t.router({
     .use(Scopes)
     .use(injectAccountNode)
     .use(LogUsage)
+    .use(Analytics)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
   getAddresses: t.procedure
@@ -79,6 +80,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
+    .use(Analytics)
     .input(GetAddressesInput)
     .output(AddressListSchema)
     .query(getAddressesMethod),
@@ -87,6 +89,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
+    .use(Analytics)
     .input(HasAddressesInput)
     .mutation(hasAddressesMethod),
   getSessions: t.procedure
