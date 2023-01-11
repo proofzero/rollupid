@@ -100,7 +100,7 @@ const generate = async (
   // We only set the creation time once, not when refreshing the token /
   // session.
   const creationTime = storage.get('creationTime')
-  if (creationTime === undefined) {
+  if (!creationTime) {
     await storage.put('creationTime', Date.now())
   }
 
