@@ -1,13 +1,9 @@
 // @kubelt/platform.access:src/jsonrpc/methods/revokeSession.ts
 
 import { z } from 'zod'
-
 import { AccessURNInput } from '@kubelt/platform-middleware/inputValidators'
-import { AccessURNSpace } from '@kubelt/urns/access'
 import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
-
 import { Context } from '../../context'
-import { initAccessNodeByName } from '../../nodes'
 
 export const RevokeSessionMethodInput = AccessURNInput
 
@@ -27,12 +23,10 @@ export const revokeSessionMethod = async ({
   const account = ctx?.accountURN
   const access = input
 
-  const name = AccessURNSpace.decode(input)
-  const accessNode = await initAccessNodeByName(name, ctx.Access)
-
   // Create the session object state; we don't control when it's garbage
-  // collected.
-  await accessNode.class.revoke()
+  // collected. The InjectAccessNode middleware injects the accessNode
+  // DO stub.
+  await ctx.accessNode!.class.revoke()
 
   // Delete the edge linking an account node to an access (session)
   // node. NB: we use the InjectEdges middleware to supply this client.

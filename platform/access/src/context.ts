@@ -6,6 +6,7 @@ import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
 import type { Environment } from './types'
 import type { AccountURN } from '@kubelt/urns/account'
+import { DurableObjectStubProxy } from 'do-proxy'
 
 /**
  * Defines your inner context shape.
@@ -15,6 +16,7 @@ interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Access: DurableObjectNamespace
   access?: Access
+  accessNode?: DurableObjectStubProxy<Access>
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher
