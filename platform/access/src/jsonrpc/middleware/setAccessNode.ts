@@ -4,7 +4,7 @@ import { AccessURNSpace } from '@kubelt/urns/access'
 import { initAccessNodeByName } from '../../nodes'
 import { Context } from '../../context'
 
-export const InjectAccessNode: BaseMiddlewareFunction<Context> = async ({
+export const setAccessNode: BaseMiddlewareFunction<Context> = async ({
   next,
   ctx,
 }) => {
@@ -22,7 +22,7 @@ export const InjectAccessNode: BaseMiddlewareFunction<Context> = async ({
 
   const accessNode = await initAccessNodeByName(jwt.iss, ctx.Access)
 
-  if (accessNode === undefined) {
+  if (!accessNode) {
     throw new Error('unable to get access node client')
   }
 

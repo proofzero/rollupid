@@ -10,7 +10,7 @@ import {
   RequireAccount,
 } from '@kubelt/platform-middleware/jwt'
 
-import { InjectAccessNode } from './middleware/injectAccessNode'
+import { setAccessNode } from './middleware/setAccessNode'
 
 import {
   authorizeMethod,
@@ -63,7 +63,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(RequireAccount)
-    .use(InjectAccessNode)
+    .use(setAccessNode)
     .use(LogUsage)
     .input(GetSessionMethodInput)
     .output(GetSessionMethodOutput)
@@ -73,7 +73,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(RequireAccount)
     .use(InjectEdges)
-    .use(InjectAccessNode)
+    .use(setAccessNode)
     .use(LogUsage)
     .input(RevokeSessionMethodInput)
     .output(RevokeSessionMethodOutput)
