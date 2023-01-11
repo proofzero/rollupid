@@ -30,6 +30,7 @@ export const Analytics: BaseMiddlewareFunction<{
   }
 
   console.log('service precall analytics', JSON.stringify(pre))
+  console.log(ctx.Analytics)
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({

@@ -15,7 +15,7 @@ interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Account: DurableObjectNamespace
   Edges: Fetcher
-  // Analytics: AnalyticsEngineDataset
+  Analytics: AnalyticsEngineDataset
   account?: DurableObjectStubProxy<Account>
   // accountURN?: string
 }

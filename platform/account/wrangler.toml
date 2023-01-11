@@ -19,6 +19,10 @@ new_classes = ["Core"]
 tag = "v1"
 renamed_classes = [{ from = "Core", to = "Account" }]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AccountAnalytics"  },
+]
+
 [dev]
 port = 9494
 local_protocol = "http"
@@ -31,6 +35,10 @@ services = [
   { binding = "Edges", service = "edges-dev" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AccountAnalyticsDev"  },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
@@ -39,10 +47,18 @@ services = [
   { binding = "Edges", service = "edges-next" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AccountAnalyticsNext"  },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Account", class_name = "Account" }
 ]
 services = [
   { binding = "Edges", service = "edges-current" }
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AccountAnalyticsCurrent"  },
 ]
