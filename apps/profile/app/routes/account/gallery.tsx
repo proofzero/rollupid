@@ -40,7 +40,7 @@ import { useRouteData } from '~/hooks'
 import { requireJWT } from '~/utils/session.server'
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
-import { getGalaxyClient } from '~/helpers/clients'
+import { getGalaxyClient, getIndexerClient } from '~/helpers/clients'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -97,15 +97,7 @@ export const action: ActionFunction = async ({ request }) => {
     gallery_order: i,
   }))
 
-  const indexerClient = createTRPCProxyClient<IndexerRouter>({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost/trpc',
-        fetch: Indexer.fetch,
-      }),
-    ],
-  })
-
+  const indexerClient = getIndexerClient()
   await indexerClient.setGallery.mutate(gallery)
 
   return null
