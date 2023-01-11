@@ -7,7 +7,7 @@ export const Analytics: BaseMiddlewareFunction<{
   accountURN?: AccountURN
 }> = async ({ ctx, path, type, next }) => {
   const rayId = ctx.req?.headers.get('cf-ray') || null
-  if (!rayId) throw new Error('No CF-Ray found in request headers')
+  // if (!rayId) throw new Error('No CF-Ray found in request headers')
 
   // const idx = JSON.stringify(ctx.req?.clone())
   // console.log('unique data in here?', idx)
