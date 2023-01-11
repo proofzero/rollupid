@@ -3,6 +3,7 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
 
 import ConnectGoogleButton from '~/components/connect-google-button'
+import ConnectGithubButton from '../connect-github-button'
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -46,6 +47,7 @@ export function Authentication({
         connectErrorCallback={connectErrorCallback}
       />
       {/* <ConnectGoogleButton /> */}
+      <ConnectGithubButton></ConnectGithubButton>
     </div>
   )
 }
