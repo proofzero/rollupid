@@ -1,4 +1,7 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { PrimaryPill } from '@kubelt/design-system/src/atoms/pills/PrimaryPill'
+import { IconPill } from '@kubelt/design-system/src/atoms/pills/IconPill'
+import { HiOutlineEyeOff } from 'react-icons/hi'
 
 type AddressListItemIconProps = {
   iconUrl: string
@@ -17,6 +20,8 @@ export type AddressListItemProps = {
   network: string
   chain: string
   address: string
+  primary?: boolean
+  hidden?: boolean
 }
 export const AddressListItem = ({
   id,
@@ -26,6 +31,8 @@ export const AddressListItem = ({
   network,
   chain,
   address,
+  primary = false,
+  hidden = false,
 }: AddressListItemProps) => (
   <article className="flex justify-center items-center border border-gray-200 shadow-sm rounded bg-white p-4">
     <section className="mx-4">
@@ -33,10 +40,14 @@ export const AddressListItem = ({
     </section>
 
     <section className="flex-1 flex flex-col space-y-1.5">
-      <div className="flex flex-row">
+      <div className="flex flex-row items-center space-x-2">
         <Text size="base" weight="semibold" className="text-gray-800">
           {title}
         </Text>
+
+        {primary && <PrimaryPill text="Primary" />}
+
+        {hidden && <IconPill Icon={HiOutlineEyeOff} />}
       </div>
 
       <div className="flex flex-row">

@@ -16,6 +16,7 @@ const addresses: AddressListItemProps[] = [
     network: 'Ethereum',
     chain: 'Mainnet',
     address: '0x3c153bE191088a34bAc04013b511EF538718d645',
+    primary: true,
   },
   {
     id: '2',
@@ -34,6 +35,7 @@ const addresses: AddressListItemProps[] = [
     network: 'Polygon',
     chain: 'Mainnet',
     address: '0x012AC2a88F9244f004255b29AFCD349beE097B48',
+    hidden: true,
   },
 ]
 
