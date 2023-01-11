@@ -24,13 +24,15 @@ export const LoadingGridSquares = ({ numberOfCells = 10 }) => {
 
   return (
     <>
-      <div className="mt-[82px] mx-[32px] grid 
+      <div
+        className="mt-[82px] mx-[32px] grid 
       grid-cols-5 
       max-[1280px]:grid-cols-4
       max-[1024px]:grid-cols-3
-      max-[768px]:grid-cols-5
+      max-[768px]:grid-cols-2
       max-[640px]:grid-cols-1
-      gap-10">
+      gap-10"
+      >
         {performer.map((item: any, i: number) => {
           return (
             <div
@@ -56,7 +58,7 @@ export const LoadingGridSquaresGallery = ({ numberOfCells = 10 }) => {
           <div
             key={i}
             className="w-full 
-            h-[60rem] sm:h-80 md:h-72 lg:h-56 
+            h-[12rem] md:h-72 lg:h-56 
               bg-gray-200 animate-pulse rounded-lg"
           ></div>
         )
