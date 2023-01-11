@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { React, useState, useEffect } from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
 import {
@@ -7,6 +7,14 @@ import {
   useOutletContext,
   useActionData,
 } from '@remix-run/react'
+
+import { useSensor, useSensors, DndContext, closestCenter } from '@dnd-kit/core'
+import {
+  useSortable,
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 
 import { requireJWT } from '~/utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
@@ -111,14 +119,45 @@ export const action: ActionFunction = async ({ request }) => {
   return { updatedLinks }
 }
 
+export const SortableItem = (props) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {/* ... */}
+    </div>
+  )
+}
+
 export default function AccountSettingsLinks() {
   const { notificationHandler } = useOutletContext<any>()
   const transition = useTransition()
   const actionData = useActionData()
 
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
+
   const [links, setLinks] = useState(
     useRouteData<ProfileData>('routes/account')?.links || []
   )
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setLinks((links) => {
+        const oldIndex = links.indexOf(active.id)
+        const newIndex = links.indexOf(over.id)
+
+        return arrayMove(links, oldIndex, newIndex)
+      })
+    }
+  }
 
   const [isFormChanged, setFormChanged] = useState(false)
 
@@ -239,60 +278,73 @@ export default function AccountSettingsLinks() {
           })}
           {/* Links that are already in account DO */}
           <div className="flex flex-col mb-3">
-            {(links || []).map((link: any, i: number) => (
-              <div
-                key={`${link.name || 'My Website'}-${
-                  link.url || 'https://mywebsite.com'
-                }-${i}`}
-                className="
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={links as any[]}
+                strategy={verticalListSortingStrategy}
+              >
+                {(links || []).map((link: any, i: number) => (
+                  <div
+                    key={`${link.name || 'My Website'}-${
+                      link.url || 'https://mywebsite.com'
+                    }-${i}`}
+                    className="
               border border-gray-300 rounded-md
               px-4 py-3 mb-3 truncate
                flex flex-row items-center justify-between
                "
-              >
-                <div className="flex flex-row items-center w-full truncate">
-                  <button className="text-gray-400">
-                    <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                  </button>
-                  <Tooltip content="Copy" className="text-black">
-                    <button
-                      type="button"
-                      className="bg-gray-100 hover:bg-gray-200 transition-colors 
+                  >
+                    <div className="flex flex-row items-center w-full truncate">
+                      <button className="text-gray-400">
+                        <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
+                      </button>
+                      <Tooltip content="Copy" className="text-black">
+                        <button
+                          type="button"
+                          className="bg-gray-100 hover:bg-gray-200 transition-colors 
                     w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
                     text-gray-700
               flex items-center justify-center "
-                      onClick={() => {
-                        navigator.clipboard.writeText(link.url)
-                      }}
-                    >
-                      <TbLink size={22} />
-                    </button>
-                  </Tooltip>
-                  <div className="flex flex-col w-max-[600px]">
-                    <Text weight="medium" className="truncate">
-                      {link.name}
-                    </Text>
-                    <Text className="text-gray-500 truncate">{link.url}</Text>
-                  </div>
-                </div>
-                {/* Puts current link in "modification" regyme */}
-                <Button
-                  className="mr-4 h-[40px]
+                          onClick={() => {
+                            navigator.clipboard.writeText(link.url)
+                          }}
+                        >
+                          <TbLink size={22} />
+                        </button>
+                      </Tooltip>
+                      <div className="flex flex-col w-max-[600px]">
+                        <Text weight="medium" className="truncate">
+                          {link.name}
+                        </Text>
+                        <Text className="text-gray-500 truncate">
+                          {link.url}
+                        </Text>
+                      </div>
+                    </div>
+                    {/* Puts current link in "modification" regyme */}
+                    <Button
+                      className="mr-4 h-[40px]
                 bg-gray-100 focus:bg-gray-100 border-none
                 flex flex-row items-center justify-around
                 text-gray-600"
-                  btnType="secondary-alt"
-                  btnSize="base"
-                  onClick={() => {
-                    setLinks(links.filter((link, id) => id !== i))
-                    setNewLinks([...newLinks, links[i]])
-                  }}
-                >
-                  <FiEdit size={18} />
-                  Edit
-                </Button>
-              </div>
-            ))}
+                      btnType="secondary-alt"
+                      btnSize="base"
+                      onClick={() => {
+                        setLinks(links.filter((link, id) => id !== i))
+                        setNewLinks([...newLinks, links[i]])
+                      }}
+                    >
+                      <FiEdit size={18} />
+                      Edit
+                    </Button>
+                  </div>
+                ))}
+              </SortableContext>
+            </DndContext>
           </div>
           <input type="hidden" name="links" value={JSON.stringify(links)} />
           <button
