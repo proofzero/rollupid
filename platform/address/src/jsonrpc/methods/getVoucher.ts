@@ -17,5 +17,6 @@ export const getVoucherMethod = async ({
   ctx: Context
 }): Promise<GetVoucherResult | undefined> => {
   const nodeClient = ctx.address as CryptoAddressProxyStub
-  return nodeClient.class.getVoucher()
+  const voucher = nodeClient.class.getVoucher()
+  return voucher
 }
