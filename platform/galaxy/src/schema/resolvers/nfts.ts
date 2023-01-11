@@ -1,7 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
-import createAddressClient from '@kubelt/platform-clients/address'
 import createIndexerClient from '@kubelt/platform-clients/indexer'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
@@ -16,8 +15,6 @@ import {
 } from '../../../../../packages/alchemy-client'
 
 import { hasApiKey, setupContext, sliceIntoChunks } from './utils'
-import { print } from 'graphql'
-import account from '@kubelt/platform-clients/account'
 
 type ResolverContext = {
   env: Env

@@ -1,8 +1,7 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { getIndexerClient } from '~/helpers/clients'
+import { getGallery } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const srcUrl = new URL(request.url)
@@ -15,11 +14,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     throw new Error('Owner required')
   }
 
-  const profile: any = owner
-
-  const indexerClient = getIndexerClient()
-
-  const urn: any = AddressURNSpace.urn(profile)
-  const { gallery }: any = await indexerClient.getGallery.query([urn])
+  const gallery = getGallery(owner)
   return json({ gallery })
 }

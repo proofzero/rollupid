@@ -38,8 +38,6 @@ import * as jose from 'jose'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { useRouteData } from '~/hooks'
 import { requireJWT } from '~/utils/session.server'
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
-import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
 import { getGalaxyClient, getIndexerClient } from '~/helpers/clients'
 
 export const action: ActionFunction = async ({ request }) => {

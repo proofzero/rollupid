@@ -12,7 +12,7 @@ services = [
 [[ d1_databases ]]
 binding = "COLLECTIONS" # i.e. available in your Worker on env.DB
 database_name = "collections"
-database_id = "13213d87-dc22-442a-ad81-afb8139edbf4"
+database_id = "6b8d7d24-75a2-493f-93d7-149927d340a9"
 migrations_dir = "migrations"
 
 [[queues.producers]]
@@ -36,7 +36,7 @@ services = [
   { binding = "Edges", service = "edges-dev" }
 ]
 d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-dev", database_id = "13213d87-dc22-442a-ad81-afb8139edbf4", migrations_dir = "migrations" }
+  { binding = "COLLECTIONS", database_name = "collections-dev", database_id = "6b8d7d24-75a2-493f-93d7-149927d340a9", migrations_dir = "migrations" }
 ]
 
 [env.dev.vars]
@@ -47,7 +47,7 @@ services = [
   { binding = "Edges", service = "edges-next" }
 ]
 d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-next", database_id = "9f4437bc-1a3f-4e4d-8c7f-19cf964d28d1", migrations_dir = "migrations" }
+  { binding = "COLLECTIONS", database_name = "collections-next", database_id = "63ee76ae-6440-43a9-9183-13b7515d2752", migrations_dir = "migrations" }
 ]
 
 [env.next.vars]
@@ -58,7 +58,7 @@ services = [
   { binding = "Edges", service = "edges-current" }
 ]
 d1_databases = [
-  { binding = "COLLECTIONS", database_name = "collections-current", database_id = "e20e21e5-f1c1-4679-ad3c-65a3854bcb30", migrations_dir = "migrations" }
+  { binding = "COLLECTIONS", database_name = "collections-current", database_id = "e3caaae6-d327-4a0b-92b0-a35b7f9ac819", migrations_dir = "migrations" }
 ]
 
 [env.current.vars]

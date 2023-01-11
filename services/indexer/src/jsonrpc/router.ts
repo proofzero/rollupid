@@ -1,7 +1,11 @@
 import { initTRPC } from '@trpc/server'
 import { Context } from '../context'
 
-import { GetGalleryInput, getGalleryMethod } from './methods/getGallery'
+import {
+  GetGalleryInput,
+  getGalleryMethod,
+  GetGalleryOutput,
+} from './methods/getGallery'
 import { GetTokensInput, getTokensMethod } from './methods/getTokens'
 import { IndexTokenInput, indexTokenMethod } from './methods/indexTokens'
 import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
@@ -34,6 +38,7 @@ export const appRouter = t.router({
     .use(scopes)
     .use(logUsage)
     .input(GetGalleryInput)
+    .output(GetGalleryOutput)
     .query(getGalleryMethod),
   setGallery: t.procedure
     .use(scopes)

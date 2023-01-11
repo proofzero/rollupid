@@ -3,6 +3,7 @@ import React from 'react'
 import { Text } from '../../atoms/text/Text'
 import { Pepe } from '../../atoms/pepe/Pepe'
 import { ButtonAnchor } from '../../atoms/buttons/ButtonAnchor'
+import { Button } from '../../atoms/buttons/Button'
 
 import { FaDiscord } from 'react-icons/fa'
 
@@ -36,9 +37,17 @@ export function ErrorPage({ code, message, trace }: ErrorPageProps) {
       </section>
 
       <section className="flex flex-col justify-center items-center mt-6">
-        <ButtonAnchor btnSize="xxl" btnType="primary" href="/">
-          Go back to homepage
-        </ButtonAnchor>
+        <Button
+          btnSize="xxl"
+          btnType="primary"
+          onClick={() =>
+            window && document.referrer
+              ? (window.location = document.referrer)
+              : history.back()
+          }
+        >
+          Go back
+        </Button>
         <Text className="my-3">or</Text>
         <ButtonAnchor
           btnSize="xxl"

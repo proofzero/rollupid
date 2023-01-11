@@ -33,7 +33,10 @@ export const setGalleryMethod = async ({
     ON CONFLICT (tokenId, contract)
     DO UPDATE SET addressURN = excluded.addressURN, gallery_order = excluded.gallery_order`
 
-  const upsertGallery = await ctx.COLLECTIONS?.prepare(upsertSQL).all()
+  console.log({ upsertSQL })
+  const upsertGalleryStmt = await ctx.COLLECTIONS?.prepare(upsertSQL)
+
+  const upsertGallery = await upsertGalleryStmt?.all()
 
   console.log({ upsertGallery })
 
