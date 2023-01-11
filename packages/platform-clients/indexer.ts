@@ -21,7 +21,7 @@ export default (fetcher: Fetcher, options?: ClientOptions) =>
     links: [
       httpBatchLink({
         url: 'http://localhost/trpc',
-        fetch: fetcher.fetch,
+        fetch: fetcher.fetch.bind(fetcher), // NOTE: preflight middleware?,
         headers() {
           return options?.headers || {}
         },
