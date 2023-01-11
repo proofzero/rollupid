@@ -149,9 +149,7 @@ async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
     WHERE
       e.edgeId = ?1
   `
-  console.log('permissions')
   const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
-  console.log({ result })
   // TODO check result.success and handle query error
   const perms = result.results
 
