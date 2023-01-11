@@ -149,8 +149,9 @@ async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
     WHERE
       e.edgeId = ?1
   `
+  console.log('permissions')
   const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
-
+  console.log({ result })
   // TODO check result.success and handle query error
   const perms = result.results
 
@@ -195,16 +196,20 @@ export async function edges(
       sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
   }
 
+  let statement
+
   // Filter edges by tag, if provided.
-  if (!query.tag) {
+  if (query.tag) {
     sql = [sql, 'e.tag = ?2'].join(' AND ')
+
+    statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
+  } else {
+    statement = g.db.prepare(sql).bind(query.id.toString())
   }
 
-  const result = await g.db
-    .prepare(sql)
-    .bind(query.id.toString(), query.tag)
-    .all()
+  const result = await statement.all()
 
+  console.log({ result })
   // TODO check result.success and handle query error
   let edges: EdgeRecord[] = result.results as EdgeRecord[]
 
