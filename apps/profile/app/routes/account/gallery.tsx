@@ -148,7 +148,7 @@ const Nft = forwardRef(
         ref={ref}
         style={inlineStyles}
         className="w-full h-full
-        min-h-[10rem]
+        min-h-[12rem] md:min-h-[16rem] lg:min-h-[14rem]
     flex justify-center items-center
     object-contain
     transition-transform transition-colors
@@ -338,7 +338,11 @@ const Gallery = () => {
               rounded-lg"
               onClick={() => setIsOpen(true)}
             >
-              <div className="flex flex-col justify-center items-center h-full text-gray-400">
+              <div
+                className="flex flex-col justify-center items-center h-full
+                min-h-[12rem] md:min-h-[16rem] lg:min-h-[14rem]
+                text-gray-400"
+              >
                 <HiOutlinePlusCircle
                   size={60}
                   fontWeight={100}
