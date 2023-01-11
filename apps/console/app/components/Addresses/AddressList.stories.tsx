@@ -17,6 +17,11 @@ const addresses: AddressListItemProps[] = [
     chain: 'Mainnet',
     address: '0x3c153bE191088a34bAc04013b511EF538718d645',
     primary: true,
+    onRenameAccount: (id) => {},
+    onChangeAvatar: (id) => {},
+    onSetPrimary: (id) => {},
+    onSetPrivate: (id) => {},
+    onDisconnect: (id) => {},
   },
   {
     id: '2',
@@ -26,6 +31,9 @@ const addresses: AddressListItemProps[] = [
     network: 'Ethereum',
     chain: 'Mainnet',
     address: '0x2062dDb9924991c5CfB6af89A12FB4F405965d3d',
+    onRenameAccount: (id) => {},
+    onChangeAvatar: (id) => {},
+    onDisconnect: (id) => {},
   },
   {
     id: '3',
