@@ -116,21 +116,30 @@ const ProfileNftGallery = ({
           <Masonry
             breakpointCols={{
               default: 5,
+              1280: 4,
               1024: 3,
               768: 2,
               640: 1,
             }}
-            className="flex w-auto"
-            columnClassName="bg-clip-padding"
+            className="flex 
+              w-full
+              space-x-[16px]
+              px-3 lg:px-4"
+            // conditional width
+            columnClassName="bg-clip-padding 
+              min-w-[calc(20%-12.8px)]
+              max-[1280px]:min-w-[calc(25%-12px)]
+              max-[1024px]:min-w-[calc(33.33333%-10.667px)]
+              max-[768px]:min-w-[calc(50%-8px)]
+              max-[640px]:min-w-full"
           >
             {loadedNfts.map((nft, i) => (
               <div
                 key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
                 className="flex
-                        justify-center
-                        pl-[10%]
-                        w-[90%]
-                        mb-10"
+                  justify-center
+                  min-w-full
+                  mb-10"
               >
                 {nftRenderer(
                   nft,

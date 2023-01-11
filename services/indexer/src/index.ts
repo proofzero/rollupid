@@ -1,5 +1,5 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
-import type { CreateNextContextOptions } from '@trpc/server/adapters/next'
+import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
@@ -24,8 +24,11 @@ export default {
       endpoint: '/trpc',
       req: request,
       router: appRouter,
+      onError({ error, type, path, input, ctx, req }) {
+        console.error('Error:', error)
+      },
       createContext: (opts) =>
-        createContext(opts as CreateNextContextOptions, env),
+        createContext(opts as FetchCreateContextFnOptions, env),
     })
   },
   queue,

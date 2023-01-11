@@ -131,9 +131,10 @@ const ProfileNftSingleCollection = ({
               onClick={() => {
                 setCollection('')
               }}
+              className="lg:px-4 px-3"
             >
               <Text
-                className="mb-12 text-gray-600"
+                className="mb-12 text-gray-600 "
                 size="base"
                 weight="semibold"
               >
@@ -155,14 +156,14 @@ const ProfileNftSingleCollection = ({
               </Text>
             </button>
           ) : (
-            <Link to={`/${account}`}>
+            <Link to={`/${account}/collection`}>
               <Text
                 className="mb-12 text-gray-600"
                 size="base"
                 weight="semibold"
               >
                 {loadedNfts[0].collectionTitle?.length ? (
-                  <div>
+                  <div className="lg:px-4 px-3">
                     <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
                     {loadedNfts[0].collectionTitle}
                   </div>
@@ -188,12 +189,21 @@ const ProfileNftSingleCollection = ({
             <Masonry
               breakpointCols={{
                 default: 5,
+                1280: 4,
                 1024: 3,
                 768: 2,
                 640: 1,
               }}
-              className="flex w-auto"
-              columnClassName="bg-clip-padding"
+              className="flex 
+              w-full
+              space-x-[16px]
+              px-3 lg:px-4"
+              columnClassName="bg-clip-padding 
+              min-w-[calc(20%-12.8px)]
+              max-[1280px]:min-w-[calc(25%-12px)]
+              max-[1024px]:min-w-[calc(33.33333%-10.667px)]
+              max-[768px]:min-w-[calc(50%-8px)]
+              max-[640px]:min-w-full"
             >
               {loadedNfts.map((nft, i) => (
                 // Filtering collection by
@@ -203,10 +213,9 @@ const ProfileNftSingleCollection = ({
                 <div
                   key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${i}`}
                   className="flex
-                        justify-center
-                        pl-[10%]
-                        w-[90%]
-                        mb-10"
+                  justify-center
+                  min-w-full
+                  mb-10"
                 >
                   {nftRenderer(
                     nft,

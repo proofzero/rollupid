@@ -41,7 +41,7 @@ export const Modal = ({
           <div className="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity" />
         </Transition.Child>
         <div className="fixed inset-0 z-[101] overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-2 text-center sm:p-0">
+          <div className="flex min-h-full items-center justify-center min-[480px]:p-2 text-center sm:p-0">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -55,7 +55,7 @@ export const Modal = ({
                 <div
                   className={`flex flex-col ${
                     fixed
-                      ? `w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
+                      ? `w-full min-[480px]:w-[96vw] lg:w-[62vw] h-[96vh] lg:h-[76vh]`
                       : `max-w-[96vw] lg:w-full max-h-[89vh] lg:h-full pb-10`
                   }`}
                 >

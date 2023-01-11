@@ -12,12 +12,13 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
   return (
     <>
       {hovered ? (
-        <div className="relative cursor-pointer group">
+        <button className="relative w-full cursor-pointer group">
           <div
             onClick={() => {
               handleSelectedNft(nft)
             }}
             className="absolute
+        items-center
         left-0 right-0 top-0 bottom-0
         p-1 lg:p-4 flex flex-col
         justify-end transition-all
@@ -51,7 +52,9 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
           </div>
 
           <img
-            className="w-full rounded-lg"
+            className="object-contain
+             min-w-full
+             rounded-lg"
             src={
               loadFail
                 ? missingNftSvg
@@ -60,34 +63,27 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
             onError={(e) => setLoadFail(true)}
             alt="collection-item"
           />
-        </div>
+        </button>
       ) : (
-        <div
+        <button
           className="rounded-lg
-          truncate
-          shadow 
-          transition-shadow
-          text-sm 
-          font-semibold
-          w-full
-          hover:shadow-xl 
-          flex
-          flex-col
-          align-center justify-center
+            truncate
+            shadow 
+            transition-shadow
+            text-sm 
+            font-semibold
+            w-full
+            hover:shadow-lg
          "
           onClick={() => {
             handleSelectedNft(nft)
           }}
         >
           <img
-            className="rounded-t-lg block
-                lg:h-[8rem]
-                md:h-[11rem]
-                sm:h-[12rem]
-                h-[20rem]
-                object-contain 
-                mx-auto 
-              "
+            className="rounded-t-lg
+            w-full
+            object-contain
+            "
             src={
               loadFail
                 ? missingNftSvg
@@ -109,7 +105,7 @@ const SelectableNft = ({ nft, hovered = false, handleSelectedNft }: any) => {
               <HiArrowNarrowRight />
             </div>
           </div>
-        </div>
+        </button>
       )}
     </>
   )

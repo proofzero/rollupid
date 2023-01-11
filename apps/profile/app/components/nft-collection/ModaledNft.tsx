@@ -25,7 +25,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
             isOpen={showModal}
             handleClose={() => setShowModal(false)}
           />
-          <div className="relative cursor-pointer group">
+          <button className="relative cursor-pointer w-full group">
             <div
               onClick={() => {
                 if (!loadFail) {
@@ -66,7 +66,9 @@ const ModaledNft = ({ nft, isModal }: any) => {
             </div>
 
             <img
-              className="w-full rounded-lg"
+              className="object-contain
+              min-w-full
+              rounded-lg"
               src={
                 loadFail
                   ? missingNftSvg
@@ -75,10 +77,10 @@ const ModaledNft = ({ nft, isModal }: any) => {
               onError={(e) => setLoadFail(true)}
               alt="collection-item"
             />
-          </div>
+          </button>
         </>
       ) : (
-        <div
+        <button
           className="rounded-lg
           truncate
           shadow 
@@ -86,21 +88,14 @@ const ModaledNft = ({ nft, isModal }: any) => {
           text-sm 
           font-semibold
           w-full
-          hover:shadow-xl 
-          flex
-          flex-col
-          align-center justify-center
+          hover:shadow-lg
          "
         >
           <Link to={`./${nft.details[0].value}`}>
             <img
-              className="rounded-t-lg block
-                lg:h-[13rem]
-                md:h-[14rem]
-                sm:h-[15rem]
-                h-[20rem]
-                object-contain 
-                mx-auto 
+              className="rounded-t-lg
+              w-full
+              object-contain
               "
               src={
                 loadFail
@@ -108,13 +103,13 @@ const ModaledNft = ({ nft, isModal }: any) => {
                   : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
               }
               onError={(e) => setLoadFail(true)}
-              alt="collection-representation"
+              alt="collection representative"
             />
             <div
               className="flex text-gray-600
             flex-row whitespace-nowrap 
-            w-full
-            justify-between items-center px-4 py-3"
+            w-full justify-between items-center
+            px-4 py-3"
             >
               <div className="truncate leading-none">
                 {nft.collectionTitle ? nft.collectionTitle : ' '}
@@ -124,7 +119,7 @@ const ModaledNft = ({ nft, isModal }: any) => {
               </div>
             </div>
           </Link>
-        </div>
+        </button>
       )}
     </>
   )

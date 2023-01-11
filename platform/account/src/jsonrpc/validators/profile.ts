@@ -6,15 +6,16 @@ export const ProfileSchema = z.object({
   pfp: z
     .object({
       image: z.string(),
-      isToken: z.boolean().optional(),
+      isToken: z.boolean().optional().nullable(),
     })
-    .optional(),
-  cover: z.string().optional(),
+    .optional()
+    .nullable(),
+  cover: z.string().optional().nullable(),
   defaultAddress: inputValidators.AddressURNInput,
-  bio: z.string().max(256).optional(),
-  job: z.string().max(30).optional(),
-  location: z.string().max(30).optional(),
-  website: z.string().url().or(z.literal('')).optional(),
+  bio: z.string().max(256).optional().nullable(),
+  job: z.string().max(30).optional().nullable(),
+  location: z.string().max(30).optional().nullable(),
+  website: z.string().url().or(z.literal('')).optional().nullable(),
   links: z
     .array(
       z.object({
@@ -23,5 +24,6 @@ export const ProfileSchema = z.object({
         verified: z.boolean(),
       })
     )
-    .optional(),
+    .optional()
+    .nullable(),
 })

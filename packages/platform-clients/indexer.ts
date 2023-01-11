@@ -1,7 +1,8 @@
 import type { AddressURN } from '@kubelt/urns/address'
-
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { ClientOptions } from './types'
 import type { BaseApi } from './base'
-import createClient from './fetcher'
+import { Router } from '@kubelt/types'
 
 type TokenRecord = {
   tokenId: string
@@ -15,7 +16,15 @@ export interface IndexerApi extends BaseApi {
   kb_getGallery(addresses: AddressURN[]): object | undefined
 }
 
-export default (
-  fetcher: Fetcher,
-  requestInit?: RequestInit<RequestInitCfProperties> | undefined
-) => createClient<IndexerApi>(fetcher, requestInit)
+export default (fetcher: Fetcher, options?: ClientOptions) =>
+  createTRPCProxyClient<Router.IndexerRouter>({
+    links: [
+      httpBatchLink({
+        url: 'http://localhost/trpc',
+        fetch: fetcher.fetch.bind(fetcher), // NOTE: preflight middleware?,
+        headers() {
+          return options?.headers || {}
+        },
+      }),
+    ],
+  })

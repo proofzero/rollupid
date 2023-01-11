@@ -127,26 +127,26 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
-      <NavLink
-        to={item.href}
-        // @ts-ignore
-        style={({ isActive }) => {
-          return isActive && item.href != '#' ? activeStyle : undefined
-        }}
-        className="text-sm group lg:border-l-2 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start hover:text-gray-500 hover:bg-gray-100"
-      >
-        <item.icon
-          className={classNames(
-            !item.exists && 'opacity-25 cursor-not-allowed',
-            'text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center'
-          )}
-          style={{
-            color: '#4B5563',
+      <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
+        <NavLink
+          to={item.href}
+          // @ts-ignore
+          style={({ isActive }) => {
+            return isActive && item.href != '#' ? activeStyle : undefined
           }}
-          aria-hidden="true"
-        />
+          className="text-sm group lg:border-l-2 px-4 py-4 flex self-center justify-center items-center flex-row lg:justify-start lg:items-start hover:text-gray-500 hover:bg-gray-100"
+        >
+          <item.icon
+            className={classNames(
+              !item.exists && 'opacity-25 cursor-not-allowed',
+              'text-sm flex-shrink-0 -ml-1 lg:mr-3 h-6 w-6 self-center'
+            )}
+            style={{
+              color: '#4B5563',
+            }}
+            aria-hidden="true"
+          />
 
-        <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
           <span
             className={classNames(
               !item.exists && 'opacity-25 cursor-not-allowed',
@@ -161,8 +161,8 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
               {item.name}
             </Text>
           </span>
-        </ConditionalTooltip>
-      </NavLink>
+        </NavLink>{' '}
+      </ConditionalTooltip>
     </div>
   )
 }

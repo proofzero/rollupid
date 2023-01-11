@@ -5,13 +5,7 @@ import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
 
-import {
-  useLoaderData,
-  useSubmit,
-  Form,
-  useActionData,
-  useTransition,
-} from '@remix-run/react'
+import { Form, useActionData, useTransition } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 // Styles
@@ -65,6 +59,9 @@ export const action: ActionFunction = async ({ request }) => {
 
   let errors: any = {}
 
+  /**
+   * This part mutates D1 table for gallery
+   */
   const nfts = JSON.parse(formData.get('gallery'))
 
   nfts.forEach((nft: any) => {
@@ -150,31 +147,24 @@ const Nft = forwardRef(
        * It's the height of nft when it's dragged
        * Don't know how to write it better so keep it for now
        */
-      height:
-        width < 640
-          ? '30rem'
-          : width < 768
-          ? '20rem'
-          : width < 1024
-          ? '18rem'
-          : '14rem',
-      gridRowStart: null,
-      gridColumnStart: null,
-      backgroundImage: `url("${url}")`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundColor: 'grey',
-      borderRadius: '0.5rem',
+      height: '100%',
+
       ...style,
     }
     return (
-      <div
+      <img
+        src={`${url}`}
+        alt="NFT visual"
         ref={ref}
         style={inlineStyles}
-        className="w-full
+        className="w-full h-full
+        min-h-[10rem]
     flex justify-center items-center
-    transition-transform duration-150 hover:duration-150 hover:scale-[1.02]
-    bg-[#F9FAFB] rounded-lg"
+    object-contain
+    transition-transform transition-colors
+    duration-150 hover:duration-150 hover:scale-[1.02]
+    hover:bg-gray-100
+    bg-gray-50 rounded-lg"
         {...props}
       />
     )
@@ -227,7 +217,6 @@ const Gallery = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
-  const submit = useSubmit()
 
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
 
@@ -260,8 +249,8 @@ const Gallery = () => {
           nftRes.gallery.map((nft: any) => nft.contract.address + nft.tokenId)
         )
       )
+      setLoading(false)
     })()
-    setLoading(false)
   }, [])
 
   // HANDLERS
@@ -275,10 +264,6 @@ const Gallery = () => {
 
   const handleDragCancel = () => {
     setActiveId(null)
-  }
-
-  const handleSubmit = (event: any) => {
-    submit(curatedNfts, { replace: true })
   }
 
   const handleDragStart = (event: any) => {
@@ -301,20 +286,27 @@ const Gallery = () => {
   }
 
   return (
-    <div className="min-h-[60vh]">
+    <Form
+      method="post"
+      onReset={() => {
+        setFormChanged(false)
+      }}
+      className="relative min-h-[60vh]"
+    >
       <Text size="xl" weight="bold" className="my-4 text-gray-900">
         NFT Gallery
       </Text>
       <Toaster position="top-right" reverseOrder={false} />
-      <Text className="border-none pb-6">
+      <Text className="border-none pb-6 text-gray-500">
         Here you can curate your profile gallery to show off your most precious
         NFTs
       </Text>
 
       <PfpNftModal
         account={targetAddress}
+        text="Pick curated NFTs"
         isOpen={isOpen}
-        pfp={pfp}
+        pfp={pfp.image}
         handleClose={() => {
           setIsOpen(false)
         }}
@@ -346,20 +338,25 @@ const Gallery = () => {
               gridGap: 10,
               padding: 10,
             }}
-            className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
+            className="grid-cols-2 md:grid-cols-3 lg:grid-cols-4
             flex flex-col justify-center items-center"
           >
-            <div className="w-full h-[30rem] sm:h-80 md:h-72 lg:h-56  bg-[#F9FAFB] rounded-lg">
+            <button
+              type="button"
+              className="w-full h-full
+              bg-gray-50 hover:bg-gray-100 transition-colors
+              rounded-lg"
+              onClick={() => setIsOpen(true)}
+            >
               <div className="flex flex-col justify-center items-center h-full text-gray-400">
                 <HiOutlinePlusCircle
                   size={60}
                   fontWeight={100}
                   className="mb-2 font-extralight"
-                  onClick={() => setIsOpen(true)}
                 />
                 <Text>Add NFT</Text>
               </div>
-            </div>
+            </button>
             {loading && <LoadingGridSquaresGallery numberOfCells={30} />}
             {curatedNfts.map((nft: any, i: number) => {
               return (
@@ -385,33 +382,21 @@ const Gallery = () => {
           ) : null}
         </DragOverlay>
       </DndContext>
-      <Form
-        method="post"
-        onReset={() => {
-          setFormChanged(false)
-        }}
-        onSubmit={handleSubmit}
-      >
-        <input
-          type="hidden"
-          name="gallery"
-          value={JSON.stringify(curatedNfts)}
-        />
-        <SaveButton
-          isFormChanged={isFormChanged}
-          discardFn={() => {
-            setCuratedNfts(initialState)
-            setCuratedNftsSet(
-              new Set(
-                initialState.map(
-                  (nft: any) => nft.contract.address + nft.tokenId
-                )
-              )
+
+      <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
+
+      <SaveButton
+        isFormChanged={isFormChanged}
+        discardFn={() => {
+          setCuratedNfts(initialState)
+          setCuratedNftsSet(
+            new Set(
+              initialState.map((nft: any) => nft.contract.address + nft.tokenId)
             )
-          }}
-        />
-      </Form>
-    </div>
+          )
+        }}
+      />
+    </Form>
   )
 }
 

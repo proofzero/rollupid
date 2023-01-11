@@ -182,8 +182,17 @@ const ProfileNftCollections = ({
                 768: 2,
                 640: 1,
               }}
-              className="flex w-auto"
-              columnClassName="bg-clip-padding"
+              className="flex 
+              w-full
+              space-x-[16px]
+              px-3 lg:px-4"
+              // conditional width
+              columnClassName="bg-clip-padding 
+              min-w-[calc(20%-12.8px)]
+              max-[1280px]:min-w-[calc(25%-12px)]
+              max-[1024px]:min-w-[calc(33.33333%-10.667px)]
+              max-[768px]:min-w-[calc(50%-8px)]
+              max-[640px]:min-w-full"
             >
               {filteredLoadedNfts.map((nft, index) => {
                 return (
@@ -191,10 +200,8 @@ const ProfileNftCollections = ({
                     key={`${nft.collectionTitle}_${nft.title}_${nft.url}_${index}`}
                     className="flex
                       justify-center
-                      pl-[10%]
-                      w-[90%]
-                      mb-10
-                      "
+                      min-w-full
+                      mb-10"
                   >
                     {nftRenderer(
                       nft,

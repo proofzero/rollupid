@@ -1,37 +1,17 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
-
 import { getGalaxyClient } from '~/helpers/clients'
 
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
 
 import { gatewayFromIpfs } from '@kubelt/utils'
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const srcUrl = new URL(request.url)
-
-  const owner = srcUrl.searchParams.get('owner')
-  if (!owner) {
-    throw new Error('Owner required')
-  }
-
-  const profile: any = owner
+export const loader: LoaderFunction = async (args) => {
+  const { gallery } = await (await galleryLoader(args)).json()
 
   const galaxyClient = await getGalaxyClient()
-  const indexerClient = createTRPCProxyClient<IndexerRouter>({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost/trpc',
-        fetch: Indexer.fetch,
-      }),
-    ],
-  })
 
-  const urn: any = AddressURNSpace.urn(profile)
-  const { gallery }: any = await indexerClient.getGallery.query([urn])
   const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata({
     input: gallery.map((nft: any) => ({
       contractAddress: nft.contract,
