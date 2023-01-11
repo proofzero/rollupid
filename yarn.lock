@@ -6389,7 +6389,6 @@ __metadata:
     jose: 4.11.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
-    typed-json-rpc: 1.1.0
     typescript: 4.8.4
     wrangler: 2.7.1
     zod: 3.20.2
