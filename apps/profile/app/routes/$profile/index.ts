@@ -7,8 +7,6 @@ export const loader: LoaderFunction = async (args) => {
 
   const gallery = await getGallery(profile)
 
-  console.log('should redirect?', gallery)
-
   if (gallery.length) {
     return redirect(`/${profile}/gallery`)
   }
