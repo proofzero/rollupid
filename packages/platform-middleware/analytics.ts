@@ -6,9 +6,19 @@ export const Analytics: BaseMiddlewareFunction<{
   req?: Request
   accountURN?: AccountURN
 }> = async ({ ctx, path, type, next }) => {
-  const rayId = ctx.req?.headers.get('Ray-ID') || null
-  // Not all calls have the Ray-ID header unless we pass it through.
-  // if (!rayId) throw new Error('No Ray-ID found in request headers')
+  const rayId = ctx.req?.headers.get('cf-ray') || null
+  if (!rayId) throw new Error('No CF-Ray found in request headers')
+
+  // const idx = JSON.stringify(ctx.req?.clone())
+  // console.log('unique data in here?', idx)
+
+  // const hdrs = ctx.req?.clone().headers
+  // for (const [key, value] of hdrs.entries()) {
+  //   console.log('header', key, value)
+  // }
+
+  // const bdy = JSON.stringify(await ctx.req?.clone().text())
+  // console.log('unique data in body text?', bdy)
 
   const accountURN: string = ctx.accountURN || 'no account URN'
 
