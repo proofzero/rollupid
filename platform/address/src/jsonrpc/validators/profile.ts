@@ -36,7 +36,7 @@ export const NFTarVoucherSchema = z.object({
     properties: z.object({
       metadata: z.object({
         name: z.string(),
-        chainId: z.number(),
+        chainId: z.number().or(z.string()),
         account: z.string(),
       }),
       traits: z.object({

@@ -1,10 +1,9 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import type { IndexerRouter } from '../../../../../services/indexer/src/jsonrpc/router'
+import getIndexerClient from '@kubelt/platform-clients/indexer'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const srcUrl = new URL(request.url)
@@ -19,14 +18,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const profile: any = owner
 
-  const indexerClient = createTRPCProxyClient<IndexerRouter>({
-    links: [
-      httpBatchLink({
-        url: 'http://localhost/trpc',
-        fetch: Indexer.fetch,
-      }),
-    ],
-  })
+  const indexerClient = await getIndexerClient(Indexer)
 
   const urn: any = AddressURNSpace.urn(profile)
   const { gallery }: any = await indexerClient.getGallery.query([urn])

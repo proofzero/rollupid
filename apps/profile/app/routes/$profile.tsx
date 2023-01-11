@@ -6,7 +6,6 @@ import {
   FaGlobe,
   FaMapMarkerAlt,
   FaTrash,
-  FaCheckCircle,
 } from 'react-icons/fa'
 
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
@@ -29,6 +28,7 @@ import HeadNav from '~/components/head-nav'
 import { loader as galleryLoader } from '~/routes/nfts/galleryFromD1'
 
 import ConditionalTooltip from '~/components/conditional-tooltip'
+import { Links } from '~/components/profile/links'
 import { loader as profileLoader } from '~/routes/$profile.json'
 
 import { getUserSession } from '~/utils/session.server'
@@ -450,37 +450,7 @@ const ProfileLayout = () => {
                   </div>
                 )}
               </div>
-              {links && (
-                <div
-                  className="flex flex-col 
-                  sm:flex-row sm:flex-wrap
-                justify-start lg:items-center text-gray-500 font-size-lg"
-                >
-                  {links.map((link: any, i: number) => (
-                    <button
-                      key={`${link.name}-${link.url}-${i}`}
-                      className="
-                      bg-gray-100 hover:bg-gray-200
-                      transition-colors
-                      rounded-full
-                      text-gray-[#4b5563]
-                      flex
-                      justify-center
-                      items-center
-                      mt-[1.625rem] sm:mr-[16px]
-                      w-full sm:w-[131px] 
-                      h-[40px]"
-                    >
-                      <a href={link.url} className="flex flex-row items-center">
-                        {link.verified && (
-                          <FaCheckCircle className="mr-[0.5rem]" />
-                        )}
-                        {link.name}
-                      </a>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <Links links={links} />
             </div>
           </div>
         )}

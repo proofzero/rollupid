@@ -158,6 +158,7 @@ const Nft = forwardRef(
         ref={ref}
         style={inlineStyles}
         className="w-full h-full
+        min-h-[10rem]
     flex justify-center items-center
     object-contain
     transition-transform transition-colors
