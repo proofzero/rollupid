@@ -1,8 +1,0 @@
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "kb_appProfile",
-  "params": {
-    "clientId": "f5f43b2354c644360f6ba49c9e7b5e5a"
-  }
-}
