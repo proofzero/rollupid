@@ -28,8 +28,8 @@ export const InjectAccessNode: BaseMiddlewareFunction<Context> = async ({
 
   return await next({
     ctx: {
-      accessNode,
       ...ctx,
+      accessNode,
     },
   })
 }
