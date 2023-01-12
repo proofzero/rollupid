@@ -1,3 +1,4 @@
+import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
 import { AddressListItem, AddressListItemProps } from './AddressListItem'
 
 type AddressListProps = {
@@ -6,12 +7,10 @@ type AddressListProps = {
 
 export const AddressList = ({ addresses }: AddressListProps) => {
   return (
-    <div>
-      <section className="flex flex-col space-y-2">
-        {addresses.map((ali) => (
-          <AddressListItem key={ali.id} {...ali} />
-        ))}
-      </section>
-    </div>
+    <SortableList
+      items={addresses.map((ali) => (
+        <AddressListItem key={ali.id} {...ali} />
+      ))}
+    />
   )
 }
