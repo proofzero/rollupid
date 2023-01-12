@@ -19,11 +19,21 @@ export const loader = ({ request }: any) => {
  * it is easier to navigate tabs.
  */
 
-const tabs = {
+const tabs: {
+  [key: string]: {
+    name: string
+    path?: string
+    disabled?: boolean
+  }
+} = {
   profile: { name: 'Profile' },
   links: { name: 'Links' },
   integrations: { name: 'Integrations', disabled: true },
-  connections: { name: 'Connected Accounts', disabled: true },
+  connections: {
+    name: 'Connected Accounts',
+    path: 'connections',
+    disabled: true,
+  },
 }
 
 function classNames(...classes: any) {

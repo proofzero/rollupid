@@ -9,7 +9,7 @@ import Env from '../../env'
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURN } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { Profile } from '@kubelt/platform.account/src/types'
 import { CryptoAddressProfile } from '../../../../address/src/types'
@@ -101,6 +101,39 @@ const profileResolvers: Resolvers = {
 
       return accountProfile
     },
+    connectedAddresses: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { env, jwt }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          'X-3RN': addressURN,
+        },
+      })
+
+      const addressUrns = [addressURN]
+
+      const accountURN = await addressClient.getAccount.query()
+      if (!accountURN) {
+        // If there is no account URN
+        // it's assumed that this is the only
+        // 'connected' address
+        return addressUrns
+      }
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      const connectedAccounts = await accountClient.getAddresses.query({
+        account: accountURN,
+      })
+
+      return addressUrns.concat(connectedAccounts)
+    },
   },
   Mutation: {
     updateProfile: async (
@@ -151,6 +184,7 @@ const profileResolvers: Resolvers = {
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey()],
   'Query.profileFromAddress': [setupContext(), hasApiKey()],
+  'Query.connectedAddresses': [setupContext(), hasApiKey()],
   'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized()],
 }
 
