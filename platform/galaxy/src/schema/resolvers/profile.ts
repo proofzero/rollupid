@@ -101,6 +101,37 @@ const profileResolvers: Resolvers = {
 
       return accountProfile
     },
+    connectedAddresses: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { env, jwt }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          'X-3RN': addressURN,
+        },
+      })
+
+      const accountURN = await addressClient.getAccount.query()
+      if (!accountURN) {
+        // If there is no account URN
+        // it's assumed that this is the only
+        // 'connected' address
+        return [addressURN]
+      }
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      const connectedAccounts = await accountClient.getAddresses.query({
+        account: accountURN,
+      })
+
+      return connectedAccounts
+    },
   },
   Mutation: {
     updateProfile: async (
@@ -151,6 +182,7 @@ const profileResolvers: Resolvers = {
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey()],
   'Query.profileFromAddress': [setupContext(), hasApiKey()],
+  'Query.connectedAddresses': [setupContext(), hasApiKey()],
   'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized()],
 }
 

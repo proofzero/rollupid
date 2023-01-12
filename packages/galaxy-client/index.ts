@@ -252,6 +252,7 @@ export type ProfileInput = {
 
 export type Query = {
   __typename?: 'Query';
+  connectedAddresses?: Maybe<Array<Maybe<Scalars['URN']>>>;
   contractsForAddress?: Maybe<NftContracts>;
   ensAddress?: Maybe<Scalars['String']>;
   ensAddressAvatar?: Maybe<Scalars['String']>;
@@ -261,6 +262,11 @@ export type Query = {
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
+};
+
+
+export type QueryConnectedAddressesArgs = {
+  addressURN: Scalars['URN'];
 };
 
 
@@ -327,6 +333,13 @@ export type TokenUriInput = {
   gateway?: InputMaybe<Scalars['String']>;
   raw?: InputMaybe<Scalars['String']>;
 };
+
+export type GetConnectedAddressesQueryVariables = Exact<{
+  addressURN: Scalars['URN'];
+}>;
+
+
+export type GetConnectedAddressesQuery = { __typename?: 'Query', connectedAddresses?: Array<any | null> | null };
 
 export type GetEnsAddressQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -400,6 +413,11 @@ export type UpdateProfileMutationVariables = Exact<{
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: boolean | null };
 
 
+export const GetConnectedAddressesDocument = gql`
+    query getConnectedAddresses($addressURN: URN!) {
+  connectedAddresses(addressURN: $addressURN)
+}
+    `;
 export const GetEnsAddressDocument = gql`
     query getEnsAddress($addressOrEns: String!) {
   ensAddress(addressOrEns: $addressOrEns)
@@ -627,6 +645,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    getConnectedAddresses(variables: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesQuery>(GetConnectedAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddresses', 'query');
+    },
     getEnsAddress(variables: GetEnsAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsAddressQuery>(GetEnsAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsAddress', 'query');
     },
