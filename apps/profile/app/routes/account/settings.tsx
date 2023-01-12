@@ -29,7 +29,11 @@ const tabs: {
   profile: { name: 'Profile' },
   links: { name: 'Links' },
   integrations: { name: 'Integrations', disabled: true },
-  connections: { name: 'Connected Accounts', path: 'connections' },
+  connections: {
+    name: 'Connected Accounts',
+    path: 'connections',
+    disabled: true,
+  },
 }
 
 function classNames(...classes: any) {
