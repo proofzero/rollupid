@@ -1,9 +1,10 @@
 import { Context } from '../../context'
 import { OAuthAddressProxyStub } from '../../nodes/oauth'
-import { OAuthDataSchema } from '../../types'
-import { GetGoogleOAuthDataSchema } from '../validators/oauth'
+import { OAuthData } from '../../types'
+import { OAuthDataSchema } from '../validators/oauth'
+import { z } from 'zod'
 
-export const GetOAuthDataOutput = GetGoogleOAuthDataSchema // TODO: add other schemas with z.union
+export const GetOAuthDataOutput = OAuthDataSchema
 
 export const getOAuthDataMethod = async ({
   input,
@@ -11,8 +12,8 @@ export const getOAuthDataMethod = async ({
 }: {
   input: unknown
   ctx: Context
-}): Promise<OAuthDataSchema> => {
+}): Promise<z.infer<typeof GetOAuthDataOutput>> => {
   const nodeClient = ctx.address as OAuthAddressProxyStub
-  const data = (await nodeClient?.class.getData()) as OAuthDataSchema
+  const data = (await nodeClient?.class.getData()) as OAuthData
   return data
 }

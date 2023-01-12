@@ -5,7 +5,8 @@ import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 
 import { HEADER_3RN } from '../../constants'
 import { Context } from '../../context'
-import { NodeType } from '../../types'
+
+import { NodeType } from '@kubelt/types/address'
 import { isNodeType } from '../../utils'
 
 export const parse3RN: BaseMiddlewareFunction<Context> = async ({

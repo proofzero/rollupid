@@ -1,16 +1,10 @@
+import { OAuthAddressType } from '@kubelt/types/address'
 import { z } from 'zod'
+import Address from '../../nodes/address'
 import { GoogleRawProfileSchema } from './profile'
 
-export const GetGoogleOAuthDataSchema = z.object({
-  accessToken: z.string(),
-  refreshToken: z.string().optional(),
-  extraParams: z.object({
-    expires_in: z.number(),
-    scope: z.string(),
-    token_type: z.string(),
-    id_token: z.string(),
-  }),
-  profile: z.object({
+export const GoogleProfileSchema = z.object({
+    provider: z.literal(OAuthAddressType.Google),
     id: z.string(),
     displayName: z.string(),
     name: z.object({
@@ -28,5 +22,69 @@ export const GetGoogleOAuthDataSchema = z.object({
       })
     ),
     _json: GoogleRawProfileSchema,
-  }),
 })
+
+export const GithubProfileSchema = z.object({
+  provider: z.literal(OAuthAddressType.GitHub),
+  id: z.string(),
+	displayName: z.string(),
+	name: z.object({
+		familyName: z.string(),
+		givenName: z.string(),
+		middleName: z.string(),
+	}),
+	emails: z.array(z.object({value: z.string(), })),
+	photos: z.array(z.object({value: z.string(), })),
+	_json: z.object({
+		login: z.string(),
+		id: z.number(),
+		node_id: z.string(),
+		avatar_url: z.string(),
+		gravatar_id: z.string(),
+		url: z.string(),
+		html_url: z.string(),
+		followers_url: z.string(),
+		following_url: z.string(),
+		gists_url: z.string(),
+		starred_url: z.string(),
+		subscriptions_url: z.string(),
+		organizations_url: z.string(),
+		repos_url: z.string(),
+		events_url: z.string(),
+		received_events_url: z.string(),
+		type: z.string(),
+		site_admin: z.boolean(),
+		name: z.string(),
+		company: z.string(),
+		blog: z.string(),
+		location: z.string(),
+		email: z.string(),
+		hireable: z.boolean(),
+		bio: z.string(),
+		twitter_username: z.string(),
+		public_repos: z.number(),
+		public_gists: z.number(),
+		followers: z.number(),
+		following: z.number(),
+		created_at: z.string(),
+		updated_at: z.string(),
+	})
+
+})
+
+export const OAuthDataSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  extraParams: z.object({
+    expires_in: z.number().optional(),
+    scope: z.string().optional(),
+    token_type: z.string().optional(),
+    id_token: z.string().optional(),
+  }),
+  profile: z.discriminatedUnion('provider', [
+    GoogleProfileSchema,
+    GithubProfileSchema,
+  ])
+})
+
+type githubtype = z.infer<typeof GithubProfileSchema>

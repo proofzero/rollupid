@@ -2,7 +2,7 @@ import { keccak256 } from '@ethersproject/keccak256'
 import { recoverPublicKey } from '@ethersproject/signing-key'
 import { computeAddress } from '@ethersproject/transactions'
 
-import { CryptoAddressType, NodeType } from './types'
+import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {

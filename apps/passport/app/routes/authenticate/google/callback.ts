@@ -12,19 +12,13 @@ import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
 import { authenticator } from '~/auth.server'
 import { getAddressClient, getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
-
-type AuthenticationResult = {
-  accessToken: string
-  refreshToken: string
-  extraParams: GoogleExtraParams
-  profile: GoogleProfile
-}
+import { OAuthData } from '@kubelt/platform.address/src/types'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const authRes = (await authenticator.authenticate(
     'google',
     request
-  )) as AuthenticationResult
+  )) as OAuthData
 
   const { profile } = authRes
 

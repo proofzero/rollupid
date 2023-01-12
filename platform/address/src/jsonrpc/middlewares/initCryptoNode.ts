@@ -1,6 +1,6 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
-import { NodeType } from '../../types'
+import { NodeType } from '@kubelt/types/address'
 
 export const initCryptoNode: BaseMiddlewareFunction<Context> = async ({
   next,

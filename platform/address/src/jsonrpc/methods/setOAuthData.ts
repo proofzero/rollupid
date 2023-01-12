@@ -1,24 +1,29 @@
 import { z } from 'zod'
 import { Context } from '../../context'
 import { OAuthAddressProxyStub } from '../../nodes/oauth'
-import { OAuthDataSchema, OAuthGoogleData } from '../../types'
-import { GetGoogleOAuthDataSchema } from '../validators/oauth'
+import { OAuthDataSchema } from '../validators/oauth'
+import { OAuthAddressType } from '@kubelt/types/address'
 
-export const SetOAuthDataInput = GetGoogleOAuthDataSchema // TODO: add other schemas with z.union
+export const SetOAuthDataInput = OAuthDataSchema 
 
 export const setOAuthDataMethod = async ({
   input,
   ctx,
 }: {
-  input: OAuthDataSchema
+  input: z.infer<typeof OAuthDataSchema>
   ctx: Context
 }): Promise<void> => {
   const nodeClient = ctx.address as OAuthAddressProxyStub
   await nodeClient.class.setData(input)
 
-  // next we want to set the oauth account address
-  // right now it's only google but we would need to do checks when more are added
-  nodeClient.class.setProfile(input.profile._json)
+  switch (input.profile.provider) {
+    case OAuthAddressType.Google || OAuthAddressType.GitHub:
+      nodeClient.class.setProfile(input.profile._json)
+      break
+    //Other cases to be added here, depending on Oauth provider data schema
+    default:
+      throw new Error('Unsupported OAuth provider response provided.')
+  }
 
   return
 }

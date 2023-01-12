@@ -1,4 +1,4 @@
-import { NodeType } from '../../types'
+import { NodeType } from '@kubelt/types/address'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
 import { initOAuthNodeByName } from '../../nodes'
