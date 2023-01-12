@@ -61,7 +61,7 @@ export const AddressListItem = ({
     onDisconnect
 
   return (
-    <>
+    <div className="flex flex-row w-full items-center">
       <section className="mx-4">
         <AddressListItemIcon iconUrl={icon} />
       </section>
@@ -192,6 +192,6 @@ export const AddressListItem = ({
           </Menu>
         </section>
       )}
-    </>
+    </div>
   )
 }
