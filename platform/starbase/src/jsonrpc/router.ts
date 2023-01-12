@@ -52,6 +52,8 @@ import {
 import { getScopes } from './methods/getScopes'
 import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
+import { Analytics } from '@kubelt/platform-middleware/analytics'
+
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
@@ -59,6 +61,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(CreateAppInputSchema)
     .output(CreateAppOutputSchema)
     .mutation(createApp),
@@ -66,18 +69,21 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(DeleteAppInput)
     .mutation(deleteApp),
   updateApp: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(UpdateAppInput)
     .mutation(updateApp),
   getAppDetails: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(GetAppDetailsInput)
     .output(GetAppDetailsOutput)
     .query(getAppDetails),
@@ -85,6 +91,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
     .query(getAppProfile),
@@ -92,6 +99,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(NoInput)
     .output(ListAppsOutput)
     .query(listApps),
@@ -99,6 +107,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(RotateClientSecretInput)
     .output(RotateClientSecretOutput)
     .mutation(rotateClientSecret),
@@ -106,6 +115,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(RotateApiKeyInput)
     .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
@@ -113,6 +123,7 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(CheckAppAuthInput)
     .output(CheckAppAuthOutput)
     .query(checkAppAuth),
@@ -120,17 +131,20 @@ export const appRouter = t.router({
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)
     .use(LogUsage)
+    .use(Analytics)
     .input(PublishAppInput)
     .output(PublishAppOutput)
     .mutation(publishApp),
   checkApiKey: t.procedure
     //This endpoint doesn't require a JWT
     .use(LogUsage)
+    .use(Analytics)
     .input(CheckApiKeyInput)
     .output(CheckApiKeyOutput)
     .query(checkApiKey),
   getScopes: t.procedure
     //TODO: Revisit when implementing scopes
+    .use(Analytics)
     .input(NoInput)
     .query(getScopes),
 })
