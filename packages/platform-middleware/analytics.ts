@@ -9,31 +9,29 @@ export const Analytics: BaseMiddlewareFunction<{
   const rayId = ctx.req?.headers.get('cf-ray') || null
   // if (!rayId) throw new Error('No CF-Ray found in request headers')
 
-  // console.log('context', ctx)
-  console.log('request', ctx.req)
+  const accountURN = ctx.accountURN || null
 
-  // const idx = JSON.stringify(ctx.req?.clone())
-  // console.log('unique data in here?', idx)
+  const raw_key = rayId || accountURN || ctx.req?.headers.get('kbt-access-jwt-assertion') || 'no key'
+  const enc_key = new TextEncoder().encode(raw_key);
+  const hash = await crypto.subtle.digest({
+      name: 'SHA-256',
+    },
+    enc_key
+  )
 
-  const hdrs = ctx.req?.headers
-  for (const [key, value] of hdrs.entries()) {
-    console.log('header', key, value)
-  }
-
-  // const bdy = JSON.stringify(await ctx.req?.clone().text())
-  // console.log('unique data in body text?', bdy)
-
-  const accountURN: string = ctx.accountURN || 'no account URN'
+  // Convert to a hex string.
+  const hashkey = [...new Uint8Array(hash)]
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('').slice(-32)
 
   // Pre-method call analytics.
   const pre: AnalyticsEngineDataPoint = {
     blobs: [ path, type, 'BEFORE', accountURN, rayId ],
     // doubles: [],
-    indexes: [rayId], // TODO: Need a sampling index.
+    indexes: [hashkey], // TODO: Need a sampling index.
   }
 
   console.log('service precall analytics', JSON.stringify(pre))
-  console.log(ctx.Analytics)
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({
@@ -44,7 +42,7 @@ export const Analytics: BaseMiddlewareFunction<{
   const post: AnalyticsEngineDataPoint = {
     blobs: [ path, type, 'AFTER', accountURN, rayId ],
     // doubles: [],
-    indexes: [rayId], // TODO: Need a sampling index.
+    indexes: [hashkey], // TODO: Need a sampling index.
   }
 
   console.log('service postcall analytics', JSON.stringify(post))
