@@ -2,7 +2,7 @@
   "name": "@kubelt/apps.passport",
   "version": "0.1.0",
   "private": true,
-  "sideEffects": true,
+  "sideEffects": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "run-s 'build:*'",
