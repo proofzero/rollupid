@@ -23,7 +23,7 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
-  { binding = "Edges", service = "edges-dev" },
+  { binding = "EDGES", service = "edges-dev" },
   { binding = "Starbase", service = "starbase-dev" },
 ]
 
@@ -33,7 +33,7 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
-  { binding = "Edges", service = "edges-next" },
+  { binding = "EDGES", service = "edges-next" },
   { binding = "Starbase", service = "starbase-next" },
 ]
 
@@ -43,7 +43,7 @@ durable_objects.bindings = [
   { name = "Authorization", class_name = "Authorization" },
 ]
 services = [
-  { binding = "Edges", service = "edges-current" },
+  { binding = "EDGES", service = "edges-current" },
   { binding = "Starbase", service = "starbase-current" },
 ]
 

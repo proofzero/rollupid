@@ -1,8 +1,0 @@
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "kb_getSession",
-  "params": [
-    "urn:threeid:access/00000001857efe799e324867f1f1060b0c023136535e260dec5ba0abb717da87"
-  ]
-}
