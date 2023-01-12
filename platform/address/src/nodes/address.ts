@@ -1,10 +1,6 @@
 import { DOProxy } from 'do-proxy'
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 
-import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
-
-import { ACCOUNT_OPTIONS } from '../constants'
+import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN } from '@kubelt/urns/address'
 import { AddressProfile, AddressType } from '../types'
 
@@ -30,24 +26,6 @@ export default class Address extends DOProxy {
 
   async setType(type: AddressType): Promise<void> {
     return await this.state.storage.put('type', type)
-  }
-
-  async resolveAccount(): Promise<AccountURN> {
-    const stored = await this.state.storage.get<AccountURN>('account')
-    if (stored) {
-      if (AccountURNSpace.is(stored)) {
-        return stored
-      } else {
-        const urn = AccountURNSpace.urn(stored)
-        this.state.storage.put('account', urn)
-        return urn
-      }
-    } else {
-      const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
-      const urn = AccountURNSpace.urn(name)
-      await this.state.storage.put('account', urn)
-      return urn
-    }
   }
 
   async getAccount(): Promise<AccountURN | undefined> {

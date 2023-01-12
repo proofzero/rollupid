@@ -1,10 +1,10 @@
 import { isAddress as isEthAddress } from '@ethersproject/address'
 
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { HEADER_3RN } from '../../constants'
 import { Context } from '../../context'
-
 import { NodeType } from '../../types'
 import { isNodeType } from '../../utils'
 
@@ -12,7 +12,7 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   ctx,
   next,
 }) => {
-  const header = ctx.req?.headers.get('X-3RN')
+  const header = ctx.address3RN || ctx.req?.headers.get(HEADER_3RN)
   if (!header) {
     throw new Error('missing X-3RN header')
   }

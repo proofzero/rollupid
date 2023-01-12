@@ -39,6 +39,7 @@
     "@ethersproject/random": "5.7.0",
     "@ethersproject/signing-key": "5.7.0",
     "@ethersproject/transactions": "5.7.0",
+    "@ethersproject/wallet": "5.7.0",
     "@kubelt/platform-clients": "workspace:*",
     "@kubelt/types": "workspace:*",
     "@kubelt/urns": "workspace:*",
