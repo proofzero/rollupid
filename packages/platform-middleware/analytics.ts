@@ -9,13 +9,16 @@ export const Analytics: BaseMiddlewareFunction<{
   const rayId = ctx.req?.headers.get('cf-ray') || null
   // if (!rayId) throw new Error('No CF-Ray found in request headers')
 
+  // console.log('context', ctx)
+  console.log('request', ctx.req)
+
   // const idx = JSON.stringify(ctx.req?.clone())
   // console.log('unique data in here?', idx)
 
-  // const hdrs = ctx.req?.clone().headers
-  // for (const [key, value] of hdrs.entries()) {
-  //   console.log('header', key, value)
-  // }
+  const hdrs = ctx.req?.headers
+  for (const [key, value] of hdrs.entries()) {
+    console.log('header', key, value)
+  }
 
   // const bdy = JSON.stringify(await ctx.req?.clone().text())
   // console.log('unique data in body text?', bdy)
