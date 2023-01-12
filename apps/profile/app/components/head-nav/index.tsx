@@ -6,6 +6,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import classNames from 'classnames'
 
 import logo from '~/assets/three-id-logo-white.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
@@ -23,21 +24,19 @@ const userNavigation = [
   { name: 'Sign out', component: SignOutLink },
 ]
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
 const user = {
   imageUrl: defaultAvatar,
 }
 
 type HeadNavProps = {
+  handle: string | undefined
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
-  loggedIn?: string | undefined
+  loggedIn?: boolean | undefined
 }
 
 export default function HeadNav({
+  handle,
   avatarUrl,
   loggedIn,
   isToken = false,
@@ -48,7 +47,10 @@ export default function HeadNav({
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
   const navigation = [
-    { name: 'My Profile', to: `/${loggedIn}` },
+    {
+      name: 'My Profile',
+      to: handle ? `/u/${handle}` : '/account/settings/connections',
+    },
     { name: 'Account', to: '/account' },
   ]
 

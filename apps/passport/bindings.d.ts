@@ -5,6 +5,7 @@ declare global {
   const Galaxy: Fetcher
   const Access: Fetcher
   const Starbase: Fetcher
+  const Images: Fetcher
 
   const SECRET_SESSION_SALT: string
   const COOKIE_DOMAIN: string
@@ -19,7 +20,7 @@ declare global {
 
   const INTERNAL_GITHUB_OAUTH_CLIENT_ID: string
   const SECRET_GITHUB_OAUTH_CLIENT_SECRET: string
-  const INTERNAL_GITHUB_OAUTH_CALLBACK_URL: string 
+  const INTERNAL_GITHUB_OAUTH_CALLBACK_URL: string
 
   const INTERNAL_TWITTER_OAUTH_CLIENT_ID: string
   const SECRET_TWITTER_OAUTH_CLIENT_SECRET: string

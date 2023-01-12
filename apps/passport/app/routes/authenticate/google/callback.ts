@@ -28,7 +28,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(profile._json.email))
   const address = (AddressURNSpace.urn(hash) +
-    '?+node_type=oauth&addr_type=google') as AddressURN
+    `?+node_type=oauth&addr_type=google?=alias=${profile._json.email}`) as AddressURN
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
 

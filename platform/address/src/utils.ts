@@ -2,29 +2,59 @@ import { keccak256 } from '@ethersproject/keccak256'
 import { recoverPublicKey } from '@ethersproject/signing-key'
 import { computeAddress } from '@ethersproject/transactions'
 
-import { CryptoAddressType, NodeType } from '@kubelt/types/address'
+import {
+  CryptoAddressType,
+  HandleAddressType,
+  NodeType,
+  OAuthAddressType,
+} from './types'
 
 export const isNodeType = (type: string): type is NodeType => {
   switch (type) {
     case NodeType.Crypto:
     case NodeType.Contract:
     case NodeType.OAuth:
+    case NodeType.Handle:
       return true
     default:
       return false
   }
 }
 
-export const isCryptoAddressType = (
-  type: string
-): type is CryptoAddressType => {
+export const isCryptoAddressType = (type: string) => {
   switch (type) {
     case CryptoAddressType.Ethereum:
     case CryptoAddressType.ETH:
-      return true
+      return NodeType.Crypto
     default:
       return false
   }
+}
+
+export const isOAuthAddressType = (type: string) => {
+  switch (type) {
+    case OAuthAddressType.Google:
+      return NodeType.OAuth
+    default:
+      return false
+  }
+}
+
+export const isHandleAddressType = (type: string) => {
+  switch (type) {
+    case HandleAddressType.Handle:
+      return NodeType.Handle
+    default:
+      return false
+  }
+}
+
+export const isValidAddressType = (type: string) => {
+  return (
+    isCryptoAddressType(type) ||
+    isOAuthAddressType(type) ||
+    isHandleAddressType(type)
+  )
 }
 
 export const recoverEthereumAddress = (

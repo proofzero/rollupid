@@ -12,7 +12,10 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import { useEffect, useState } from 'react'
 import { getAddressClient } from '~/platform.server'
-import { AddressURN } from '@kubelt/urns/address'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { IDRefURNSpace } from '@kubelt/urns/idref'
+import { CryptoAddressType } from '@kubelt/types/address'
+import { keccak256 } from '@ethersproject/keccak256'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -26,7 +29,12 @@ This will not trigger a blockchain transaction or cost any gas fees.
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
   const state = Math.random().toString(36).substring(7)
-  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
+  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
+  const encoder = new TextEncoder()
+  const hash = keccak256(encoder.encode(idref))
+  const addressURN = `${AddressURNSpace.urn(
+    hash
+  )}?+node_type=crypto&addr_type=eth?=alias=${address}`
   const addressClient = getAddressClient(addressURN)
   try {
     const nonce = await addressClient.getNonce.query({
@@ -45,7 +53,12 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { address } = params
-  const addressURN = `urn:threeid:address/${address}?+node_type=crypto&addr_type=ethereum`
+  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
+  const encoder = new TextEncoder()
+  const hash = keccak256(encoder.encode(idref))
+  const addressURN = `${AddressURNSpace.urn(
+    hash
+  )}?+node_type=crypto&addr_type=eth?=alias=${address}`
   const addressClient = getAddressClient(addressURN)
   const formData = await request.formData()
 
@@ -58,7 +71,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   // TODO: handle the error case
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
-  searchParams.set('addr_type', 'ethereum')
+  searchParams.set('addr_type', 'eth')
   return redirect(
     `/authenticate/${
       params.address

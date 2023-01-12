@@ -7,6 +7,9 @@ import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { appRouter } from '../router'
 import { Context } from '../../context'
 import { initCryptoNodeByName } from '../../nodes'
+import { IDRefURNSpace } from '@kubelt/urns/idref'
+import { keccak256 } from '@ethersproject/keccak256'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 export const InitVaultOutput = AddressURNInput
 
@@ -27,13 +30,18 @@ export const initVaultMethod = async ({
   }
 
   const vault = Wallet.createRandom()
+
+  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(vault.address)
+  const encoder = new TextEncoder()
+  const hash = keccak256(encoder.encode(idref))
+
   const vaultNode = await initCryptoNodeByName(
-    AddressURNSpace.urn(vault.address),
+    AddressURNSpace.urn(hash),
     ctx.CryptoAddress
   )
   await vaultNode.storage.put('privateKey', vault.privateKey)
 
-  const address3RN: AddressURN = `urn:threeid:address/${vault.address}?+node_type=crypto&addr_type=ethereum`
+  const address3RN: AddressURN = `urn:threeid:address/${vault.address}?+node_type=crypto&addr_type=eth?=alias=${vault.address}&hidden=true`
   const caller = appRouter.createCaller({
     ...ctx,
     address3RN,

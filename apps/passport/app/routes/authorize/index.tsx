@@ -12,12 +12,18 @@ import {
 } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
-import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import type { CryptoAddressProfile, OAuthGoogleProfile, OAuthTwitterProfile } from '@kubelt/platform/address/src/types'
+import { NodeType, OAuthAddressType } from '@kubelt/platform/address/src/types'
+import type {
+  CryptoAddressProfile,
+  OAuthGoogleProfile,
+  OAuthTwitterProfile,
+  OAuthGithubProfile,
+} from '@kubelt/platform/address/src/types'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { generateGradient } from '~/utils/gradient.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -43,77 +49,75 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (!profile) {
     const addressClient = getAddressClient(defaultProfileURN)
-    const addressProfile = await addressClient.getAddressProfile.query()
+    const addressProfile = await addressClient.getAddressProfile
+      .query()
+      .then(async (res) => {
+        switch (rparams.get('node_type')) {
+          case NodeType.Crypto:
+            const cryptoAddressProfile = res as CryptoAddressProfile
 
-    if (rparams.get('node_type') == NodeType.Crypto) {
-      const voucher = await addressClient.getVoucher.query()
-      const cryptoAddressProfile = addressProfile as CryptoAddressProfile
-      await galaxyClient.updateProfile(
-        {
-          profile: {
-            defaultAddress: defaultProfileURN,
-            displayName: cryptoAddressProfile.displayName,
-            pfp: {
-              image: cryptoAddressProfile.avatar || '',
-            },
-            cover: voucher?.metadata?.cover || '',
-          },
-        },
-        {
-          [PlatformJWTAssertionHeader]: jwt,
+            let gradient = await generateGradient(cryptoAddressProfile.address)
+
+            return {
+              displayName:
+                cryptoAddressProfile.displayName ||
+                cryptoAddressProfile.address,
+              pfp: {
+                image: cryptoAddressProfile.avatar || gradient,
+              },
+              cover: gradient,
+            }
+          case NodeType.OAuth:
+            switch (rparams.get('addr_type')) {
+              case OAuthAddressType.GitHub:
+                const githubProfile = res as OAuthGithubProfile
+                gradient = await generateGradient(
+                  githubProfile?.login as string
+                )
+
+                return {
+                  displayName: githubProfile?.name || githubProfile?.login,
+                  pfp: {
+                    image: githubProfile?.avatar_url || gradient,
+                  },
+                  cover: gradient,
+                }
+
+              case OAuthAddressType.Google:
+                const googleProfile = res as OAuthGoogleProfile
+                gradient = await generateGradient(googleProfile.email as string)
+                return {
+                  displayName: googleProfile.name,
+                  pfp: {
+                    image: googleProfile?.picture,
+                  },
+                  cover: gradient,
+                }
+              case OAuthAddressType.Twitter:
+                const twitterProfile = res as OAuthTwitterProfile
+                gradient = await generateGradient(twitterProfile.id.toString())
+
+                return {
+                  displayName: twitterProfile.name,
+                  pfp: {
+                    image: twitterProfile.profile_image_url_https,
+                  },
+                  cover: gradient,
+                }
+              default:
+                throw new Error(
+                  'Unsupported OAuth type encountered in profile response.'
+                )
+            }
         }
-      )
-    } else if (rparams.get('node_type') == NodeType.OAuth) {
-      const { profile: accountProfile } = await galaxyClient.getProfile({}, {
-        [PlatformJWTAssertionHeader]: jwt,
       })
 
-      if (!accountProfile) {
-        const vaultAddressURN = await addressClient.initVault.mutate()
-        const vaultAddressClient = getAddressClient(vaultAddressURN)
-        const voucher = await vaultAddressClient.getVoucher.query()
-        let normalizedFields:{name?:string, picture?:string} = {}
-        switch (rparams.get("addr_type")) {
-          case OAuthAddressType.GitHub:
-            normalizedFields = {
-              name: (addressProfile as any).name ?? (addressProfile as any).login,
-              picture: (addressProfile as any).avatar_url
-            }
-            break
-          case OAuthAddressType.Google:
-            const oauthAddressProfile = addressProfile as OAuthGoogleProfile
-            normalizedFields = {
-              name: oauthAddressProfile.name,
-              picture: oauthAddressProfile.picture
-            }
-            break
-          case OAuthAddressType.Twitter:
-            const twitterProfile = addressProfile as OAuthTwitterProfile
-            normalizedFields = {
-              name: twitterProfile.name,
-              picture: twitterProfile.profile_image_url_https,
-            }
-            break
-          default:
-            throw new Error("Unsupported OAuth type encountered in profile response.")
-        }
-        await galaxyClient.updateProfile(
-          {
-            profile: {
-              defaultAddress: defaultProfileURN,
-              displayName: normalizedFields.name,
-              pfp: {
-                image: normalizedFields.picture || '',
-              },
-              cover: voucher?.metadata?.cover || '',
-            },
-          },
-          {
-            [PlatformJWTAssertionHeader]: jwt,
-          }
-        )
+    await galaxyClient.updateProfile(
+      { profile: addressProfile },
+      {
+        [PlatformJWTAssertionHeader]: jwt,
       }
-    }
+    )
   }
 
   // if no client id let's redirect to the first party app select page

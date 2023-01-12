@@ -8,4 +8,5 @@ declare global {
   const COOKIE_DOMAIN: string
   const PASSPORT_URL: string
   const STORAGE_NAMESPACE: string
+  const INTERNAL_GOOGLE_ANALYTICS_TAG: string
 }

@@ -28,7 +28,8 @@ export default /* GraphQL */ `
     location: String
     links: [Link!]
     website: String
-    addresses: [URN!]
+    addresses: [Node!]
+    handle: String
   }
 
   input PFPInput {
@@ -57,6 +58,7 @@ export default /* GraphQL */ `
   type Query {
     profile: Profile
     profileFromAddress(addressURN: URN!): Profile
+    connectedAddresses: [Node!]
   }
 
   type Mutation {

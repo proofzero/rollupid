@@ -6,7 +6,7 @@ import type {
 
 import { json } from '@remix-run/cloudflare'
 
-import { useEffect } from "react";
+import { useEffect } from 'react'
 
 import {
   Links,
@@ -19,7 +19,7 @@ import {
   useParams,
   useLocation,
   useTransition,
-  useLoaderData
+  useLoaderData,
 } from '@remix-run/react'
 
 import { ThreeIdButton } from '~/components'
@@ -36,7 +36,7 @@ import social from '~/assets/passport-social.png'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 
-import * as gtag from "~/utils/gtags.client";
+import * as gtag from '~/utils/gtags.client'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -73,7 +73,7 @@ export const loader: LoaderFunction = () => {
 }
 
 export default function App() {
-  const location = useLocation();
+  const location = useLocation()
   const transition = useTransition()
   const browserEnv = useLoaderData()
 
@@ -81,9 +81,9 @@ export default function App() {
 
   useEffect(() => {
     if (GATag) {
-      gtag.pageview(location.pathname, GATag);
+      gtag.pageview(location.pathname, GATag)
     }
-  }, [location, GATag]);
+  }, [location, GATag])
 
   return (
     <html lang="en">
@@ -120,7 +120,9 @@ export default function App() {
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(
+              browserEnv.ENV
+            )}`,
           }}
         />
         <LiveReload />
@@ -148,6 +150,7 @@ export function ErrorBoundary({ error }) {
             code="Error"
             message="Something went terribly wrong!"
             trace={error?.stack}
+            error={error}
           />
         </div>
 
@@ -204,7 +207,9 @@ export function CatchBoundary() {
         <LiveReload port={8002} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv?.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(
+              browserEnv?.ENV
+            )}`,
           }}
         />
       </body>

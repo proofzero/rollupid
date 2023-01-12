@@ -14,6 +14,8 @@ services = [
   { binding = "Edges", service = "edges" }
 ]
 
+
+
 [[queues.producers]]
  queue = "blockchain-activity"
  binding = "BLOCKCHAIN_ACTIVITY"
@@ -62,6 +64,9 @@ services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" }
 ]
+kv_namespaces = [
+  { binding = "HANDLES", id = "fca42f2091f14eebb9226513ed8a4c09" }
+]
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
@@ -80,6 +85,9 @@ durable_objects.bindings = [
 services = [
   { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" }
+]
+kv_namespaces = [
+  { binding = "HANDLES", id = "814a8ca024cd4fda8a667a4143cb4825" }
 ]
 
 analytics_engine_datasets = [
@@ -100,6 +108,10 @@ services = [
   { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" }
 ]
+kv_namespaces = [
+  { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" }
+]
+
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },

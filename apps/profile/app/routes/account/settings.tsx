@@ -1,11 +1,21 @@
-import { Outlet, useLoaderData, useNavigate } from '@remix-run/react'
+import {
+  Outlet,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from '@remix-run/react'
 import { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
+import type { LoaderFunction } from '@remix-run/cloudflare'
+
+import classNames from 'classnames'
+
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { json } from '@remix-run/cloudflare'
+import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
 
-export const loader = ({ request }: any) => {
+export const loader: LoaderFunction = async ({ request }) => {
   const splittedUrl = request.url.split('/')
   const path = splittedUrl[splittedUrl.length - 1].split('?')[0]
 
@@ -36,12 +46,9 @@ const tabs: {
   },
 }
 
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function AccountSetting() {
   const { path } = useLoaderData()
+  const ctx = useOutletContext()
 
   const [currentTab, setCurrentTab] = useState<string | undefined>(
     tabs[path].name
@@ -125,6 +132,7 @@ export default function AccountSetting() {
       <div>
         <Outlet
           context={{
+            ...ctx,
             notificationHandler: notify,
           }}
         />

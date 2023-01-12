@@ -5,10 +5,7 @@ declare global {
   const COOKIE_DOMAIN: string
   const SESSON_SECRET: string
   const PASSPORT_URL: String
-  const MINTPFP_CONTRACT_ADDRESS: string
-  const VALID_CHAIN_ID_NAME: string
-  const TOKEN_NFTAR: string
-  const NFTAR_URL: string
+  const INTERNAL_GOOGLE_ANALYTICS_TAG: String
 
   const Galaxy: Fetcher
   const Address: Fetcher

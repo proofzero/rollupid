@@ -1,8 +1,5 @@
-import { json } from '@remix-run/cloudflare'
-
-import { useLoaderData } from '@remix-run/react'
+import { useOutletContext } from '@remix-run/react'
 import { FaDiscord, FaTwitter } from 'react-icons/fa'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 
 import FAQ from '~/components/FAQ'
 
@@ -14,37 +11,12 @@ import Heading from '~/components/typography/Heading'
 import SectionTitle from '~/components/typography/SectionTitle'
 import SectionHeading from '~/components/typography/SectionHeading'
 import SectionHeadingSubtle from '~/components/typography/SectionHeadingSubtle'
-import { getGalaxyClient } from '~/helpers/clients'
-import { requireJWT, parseJwt, getUserSession } from '~/utils/session.server'
-
-// @ts-ignore
-export const loader = async ({ request }) => {
-  const jwt = await requireJWT(request, '/auth')
-
-  const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
-
-  const [isToken, displayname] = [
-    profileRes.profile?.pfp?.isToken || false,
-    profileRes.profile?.displayName,
-  ]
-
-  return json({
-    isToken,
-    displayname,
-    profile: profileRes.profile,
-  })
-}
+import type { Profile } from '@kubelt/galaxy-client'
 
 const completeSteps = [
   {
-    title: 'Claim your 3ID',
-    isCompleted: true,
-  },
-  {
     title: 'Configure Profile',
+    isCompleted: false,
     description: (
       <>
         <Text className="mb-1 text-gray-400" size="sm" weight="normal">
@@ -70,10 +42,9 @@ const comingNext = [
 ]
 
 export default function Welcome() {
-  const { isToken, displayname, profile } = useLoaderData()
+  const { profile } = useOutletContext<{ profile: Profile }>()
 
-  completeSteps[0].isCompleted = isToken
-  completeSteps[1].isCompleted = Object.keys(profile || {}).length > 1
+  completeSteps[0].isCompleted = Object.keys(profile || {}).length > 1
 
   const percentage =
     (completeSteps.filter((step) => step.isCompleted).length /
@@ -91,7 +62,7 @@ export default function Welcome() {
       >
         <Heading className="mb-3 flex flex-col lg:flex-row gap-4">
           <span className="order-2 text-center justify-center align-center lg:order-1">
-            Congratulations, {displayname}!
+            Congratulations, {profile.displayName}!
           </span>
           <span className="order-1 text-center justify-center align-center lg:order-2">
             🎉

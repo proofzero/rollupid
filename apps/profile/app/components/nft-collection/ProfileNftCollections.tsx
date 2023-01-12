@@ -34,7 +34,7 @@ export type ProfileNftCollectionsProps = {
     selected: boolean,
     handleSelectedNft?: any
   ) => JSX.Element
-  nftGrid: JSX.Element
+  nftGrid?: JSX.Element
 }
 
 const ProfileNftCollections = ({

@@ -5,7 +5,12 @@ import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
 
-import { Form, useActionData, useTransition } from '@remix-run/react'
+import {
+  Form,
+  useActionData,
+  useOutletContext,
+  useTransition,
+} from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
 // Styles
@@ -34,26 +39,22 @@ import { LoadingGridSquaresGallery } from '~/components/nft-collection/NftGrid'
 
 // Other helpers
 
-import * as jose from 'jose'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { useRouteData } from '~/hooks'
-import { requireJWT } from '~/utils/session.server'
-import { getGalaxyClient, getIndexerClient } from '~/helpers/clients'
+import { getIndexerClient } from '~/helpers/clients'
+import { Node, Profile } from '@kubelt/galaxy-client'
+import { IDRefURNSpace } from '@kubelt/urns/idref'
+import { CryptoAddressType } from '@kubelt/types/address'
+import { keccak256 } from 'ethers/lib/utils'
 
 export const action: ActionFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
-
-  const galaxyClient = await getGalaxyClient()
-
-  const profile: any = jose.decodeJwt(jwt).client_id
-
-  const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
-    addressOrEns: profile,
-  })
-
-  const urn = AddressURNSpace.urn(targetAddress)
-
   const formData = await request.formData()
+  const targetAddress = formData.get('address')?.toString()
+  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(
+    targetAddress as string
+  )
+  const encoder = new TextEncoder()
+  const hash = keccak256(encoder.encode(idref))
+  const addressURN = AddressURNSpace.urn(hash)
 
   let errors: any = {}
 
@@ -62,6 +63,7 @@ export const action: ActionFunction = async ({ request }) => {
    */
   const nfts = JSON.parse(formData.get('gallery'))
 
+  // TODO: replace with zod?
   nfts.forEach((nft: any) => {
     if (!nft.tokenId) {
       errors[`tokenID`] = ['Nft should have token ID']
@@ -91,7 +93,7 @@ export const action: ActionFunction = async ({ request }) => {
   const gallery = nfts.map((nft: any, i: number) => ({
     tokenId: nft.tokenId,
     contract: nft.contract.address,
-    addressURN: urn,
+    addressURN,
     gallery_order: i,
   }))
 
@@ -183,7 +185,15 @@ const SortableNft = (props: any) => {
 const Gallery = () => {
   // STATE
   const actionData = useActionData()
-  const { targetAddress, pfp } = useRouteData<GalleryData>('routes/account')
+  const { profile, cryptoAddresses } = useOutletContext<{
+    profile: Profile
+    cryptoAddresses: Node[]
+  }>()
+
+  console.log({ cryptoAddresses })
+
+  //TODO: update pfp components to take multiple addresses
+  const temporaryAddress = cryptoAddresses?.map((a) => a?.qc?.alias)[0]
 
   const [initialState, setInitialState] = useState([])
   const [loading, setLoading] = useState(true)
@@ -216,7 +226,10 @@ const Gallery = () => {
 
   useEffect(() => {
     ;(async () => {
-      const request = `/nfts/gallery?owner=${targetAddress}`
+      const addressQueryParams = new URLSearchParams({
+        owner: temporaryAddress,
+      })
+      const request = `/nfts/gallery?${addressQueryParams.toString()}`
 
       const nftReq: any = await fetch(request)
       const nftRes: any = await nftReq.json()
@@ -283,10 +296,10 @@ const Gallery = () => {
       </Text>
 
       <PfpNftModal
-        account={targetAddress}
+        account={temporaryAddress}
         text="Pick curated NFTs"
         isOpen={isOpen}
-        pfp={pfp.image}
+        pfp={profile?.pfp?.image}
         handleClose={() => {
           setIsOpen(false)
         }}
@@ -368,6 +381,7 @@ const Gallery = () => {
       </DndContext>
 
       <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
+      <input type="hidden" name="address" value={temporaryAddress} />
 
       <SaveButton
         isFormChanged={isFormChanged}

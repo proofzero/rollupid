@@ -36,15 +36,13 @@ import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
-import { resolveENS } from './middlewares/resolveENS'
 import { setCryptoNodeClient } from './middlewares/setCryptoNodeClient'
 import { setOAuthNodeClient } from './middlewares/setOAuthNodeClient'
 import { initCryptoNode } from './middlewares/initCryptoNode'
 import { initOAuthNode } from './middlewares/initOAuthNode'
-import { getVoucherMethod, GetVoucherOutput } from './methods/getVoucher'
-import { SetVoucherInput, setVoucherMethod } from './methods/setVoucher'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
+import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
 
@@ -55,7 +53,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
@@ -67,7 +65,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
@@ -79,7 +77,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
@@ -92,7 +90,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
@@ -105,7 +103,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
@@ -117,7 +115,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
     .use(Analytics)
@@ -128,7 +125,6 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
     .use(Analytics)
@@ -138,7 +134,7 @@ export const appRouter = t.router({
   getOAuthData: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(resolveENS)
+    .use(checkOAuthNode)
     .use(setOAuthNodeClient)
     .use(initOAuthNode)
     .use(Analytics)
@@ -147,35 +143,16 @@ export const appRouter = t.router({
   setOAuthData: t.procedure
     .use(LogUsage)
     .use(parse3RN)
-    .use(setCryptoNodeClient)
+    .use(checkOAuthNode)
     .use(setOAuthNodeClient)
     .use(initOAuthNode)
     .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
-  getVoucher: t.procedure
-    .use(LogUsage)
-    .use(parse3RN)
-    .use(checkCryptoNodes)
-    .use(resolveENS)
-    .use(setCryptoNodeClient)
-    .use(initCryptoNode)
-    .use(Analytics)
-    .output(GetVoucherOutput)
-    .query(getVoucherMethod),
-  setVoucher: t.procedure
-    .use(LogUsage)
-    .use(parse3RN)
-    .use(checkCryptoNodes)
-    .use(resolveENS)
-    .use(setCryptoNodeClient)
-    .use(initCryptoNode)
-    .use(Analytics)
-    .input(SetVoucherInput)
-    .mutation(setVoucherMethod),
   initVault: t.procedure
     .use(LogUsage)
     .use(parse3RN)
+    .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initOAuthNode)

@@ -7,6 +7,8 @@ type BaseContext = {
   Analytics?: AnalyticsEngineDataset
   token?: string
   accountURN?: AccountURN
+  rparams?: URLSearchParams
+  qparams?: URLSearchParams
   [GeoContext]?: IncomingRequestCfProperties<unknown>
 }
 export default BaseContext

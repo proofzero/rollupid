@@ -22,11 +22,14 @@ interface CreateInnerContextOptions
   OAuthAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
+  HANDLES: KVNamespace
   Edges: Fetcher
   Access: Fetcher
   address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>
   address3RN?: AddressURN
   addressURN?: AddressURN
+  alias?: string
+  hashedIdref?: string
   nodeType?: NodeType
   addrType?: AddressType
   addressDescription?: ENSRes

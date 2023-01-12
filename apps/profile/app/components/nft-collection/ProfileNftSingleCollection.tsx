@@ -22,7 +22,8 @@ export type ProfileNftSingleCollectionProps = {
     title: string
     collectionTitle: string
   }[]
-  isModal: boolean
+  backLink: string
+  isModal?: boolean
   isOwner?: boolean
   preload?: boolean
   detailsModal?: boolean
@@ -36,7 +37,7 @@ export type ProfileNftSingleCollectionProps = {
     selected: boolean,
     handleSelectedNft?: any
   ) => JSX.Element
-  nftGrid: JSX.Element
+  nftGrid?: JSX.Element
 }
 
 const ProfileNftSingleCollection = ({
@@ -44,6 +45,7 @@ const ProfileNftSingleCollection = ({
   isModal = false,
   isOwner = true,
   account,
+  backLink,
   setCollection,
   displayname,
   preload = false,
@@ -156,7 +158,7 @@ const ProfileNftSingleCollection = ({
               </Text>
             </button>
           ) : (
-            <Link to={`/${account}/collection`}>
+            <Link to={backLink}>
               <Text
                 className="mb-12 text-gray-600"
                 size="base"

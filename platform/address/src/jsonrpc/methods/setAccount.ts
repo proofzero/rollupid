@@ -30,12 +30,6 @@ export const setAccountMethod = async ({
 }): Promise<SetAccountResult> => {
   const nodeClient = ctx.address
 
-  // When the X-3RN header is parsed, the r-components contain details
-  // of the type of address.
-  const addrType = ctx.addrType
-  const nodeType = ctx.nodeType
-  const rComponents = `addr_type=${addrType}&node_type=${nodeType}`
-
   // This is the core part of the address, e.g. an Ethereum wallet
   // address, an e-mail address, etc. It's taken from the X-3RN header
   // included in the request.
@@ -44,7 +38,7 @@ export const setAccountMethod = async ({
   // This address used to link the account node to the address node must
   // have the node_type and addr_type URN r-components included so they
   // can be stored in the database for later querying.
-  const fullAddress = `${address}?+${rComponents}` as AddressURN
+  const fullAddress = `${address}?+${ctx.rparams}?=${ctx.qparams}` as AddressURN
 
   const account = input
   if (!AccountURNSpace.is(account)) {

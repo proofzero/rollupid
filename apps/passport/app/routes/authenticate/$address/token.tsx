@@ -1,12 +1,12 @@
+import { keccak256 } from '@ethersproject/keccak256'
 import { GrantType } from '@kubelt/platform.access/src/types'
+import { CryptoAddressType } from '@kubelt/types/address'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { IDRefURNSpace } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import {
-  getAccessClient,
-  getAddressClient,
-  getGalaxyClient,
-} from '~/platform.server'
+import { getAccessClient, getAddressClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
@@ -20,9 +20,14 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
   if (!address || !node_type || !addr_type || !code) {
     throw json({ message: 'Invalid params' }, 400)
   }
-  const addressURN = `urn:threeid:address/${address}?+node_type=${node_type}&addr_type=${addr_type}`
 
   // TODO exchange token for access token
+  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
+  const encoder = new TextEncoder()
+  const hash = keccak256(encoder.encode(idref))
+  const addressURN = `${AddressURNSpace.urn(
+    hash
+  )}?+node_type=${node_type}&addr_type=${addr_type}?=alias=${address}`
   const addressClient = getAddressClient(addressURN)
   const account = await addressClient.resolveAccount.query() // creates and associates account if there is none
 
@@ -42,11 +47,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
         redirectUri,
         grantType,
       })
-
-    const galaxyClient = await getGalaxyClient()
-    await galaxyClient.getProfileFromAddress({
-      addressURN,
-    }) // lazy try to upgrade to profile in new account
 
     // TODO: store refresh token in DO and set alarm to refresh
 

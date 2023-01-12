@@ -10,6 +10,7 @@ query getProfile {
       }
     }
     displayName
+    handle
     defaultAddress
     cover
     location
@@ -19,6 +20,14 @@ query getProfile {
       name
       url
       verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
     }
     website
   }
@@ -36,6 +45,7 @@ query getProfileFromAddress($addressURN: URN!) {
       }
     }
     displayName
+    handle
     defaultAddress
     cover
     location
@@ -46,7 +56,27 @@ query getProfileFromAddress($addressURN: URN!) {
       url
       verified
     }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
     website
+  }
+}
+
+query getConnectedAddresses {
+  connectedAddresses {
+    id
+    urn
+    nid
+    nss
+    fragment
+    qc
+    rc
   }
 }
 

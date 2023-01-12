@@ -21,7 +21,7 @@ export const setOAuthDataMethod = async ({
     case OAuthAddressType.GitHub:
       return nodeClient.class.setProfile(input.profile._json)
     case OAuthAddressType.Twitter:
-      return nodeClient.class.setProfile(input.profile)
+      return nodeClient.class.setProfile(input.profile) // TODO: make consistent with other providers?
   }
 
   throw new Error('Unsupported OAuth provider response provided.')

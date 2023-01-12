@@ -1,9 +1,8 @@
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AccountURNSpace } from '@kubelt/urns/account'
 import * as jose from 'jose'
 import { BaseMiddlewareFunction } from './types'
-
-export const PlatformJWTAssertionHeader = 'KBT-Access-JWT-Assertion'
 
 export const JWTAssertionTokenFromHeader: BaseMiddlewareFunction<{
   req?: Request

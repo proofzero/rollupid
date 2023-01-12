@@ -1,12 +1,9 @@
-import { json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import { useLoaderData, useOutletContext } from '@remix-run/react'
 
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import { useRouteData } from '~/hooks'
+import type { AddressURN } from '@kubelt/urns/address'
 import ProfileNftSingleCollection from '~/components/nft-collection/ProfileNftSingleCollection'
-
-import type { ProfileData } from './collection'
 
 export const loader: LoaderFunction = async (args) => {
   const { params } = args
@@ -18,17 +15,18 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  const { targetAddress, displayName, isOwner } =
-    useRouteData<ProfileData>('routes/$profile')
+  const { profile } = useOutletContext<{
+    profile: { handle: string; addresses: AddressURN[] }
+  }>()
 
   return (
     <>
       <ProfileNftSingleCollection
-        account={targetAddress}
-        displayname={displayName}
-        isOwner={isOwner}
+        account={profile.addresses[0]}
+        displayname={profile.handle}
         detailsModal
         collection={collection}
+        backLink={`/u/${profile.handle}/collections`}
       />
     </>
   )

@@ -47,7 +47,7 @@ export default class Address extends DOProxy {
 
   async setProfile<TProfile>(profile: TProfile): Promise<void> {
     const p = (await this.state.storage.get<TProfile>('profile')) || {}
-    Object.assign(p, profile)
-    return this.state.storage.put('profile', p)
+    const newProfile = { ...p, ...profile }
+    return this.state.storage.put('profile', newProfile)
   }
 }

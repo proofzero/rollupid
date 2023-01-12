@@ -17,7 +17,7 @@ export default {
       req: request,
       router: appRouter,
       onError({ error, type, path, input, ctx, req }) {
-        console.error('Error:', error)
+        console.error('Error:', type, path, input, error)
         // TODO: report somehwere
       },
       createContext: (opts) =>
