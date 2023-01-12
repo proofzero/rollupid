@@ -13,10 +13,15 @@ import { randomBytes } from '@ethersproject/random'
 
 import { JWT_OPTIONS } from '../constants'
 
-import { ExchangeTokenResult, KeyPair, KeyPairSerialized } from '../types'
+import {
+  ExchangeTokenResult,
+  KeyPair,
+  KeyPairSerialized,
+  SessionDetails,
+} from '../types'
 import { AccountURN } from '@kubelt/urns/account'
 
-export default class Authorization extends DOProxy {
+export default class Access extends DOProxy {
   declare state: DurableObjectState
 
   constructor(state: DurableObjectState) {
@@ -54,9 +59,30 @@ export default class Authorization extends DOProxy {
     ])
     if (!account || !clientId || !scope) throw new Error('Invalid token')
     await verify(token, this.state.storage)
+    // NB: this reschedules the alarm for the new expiry time.
     return generate(iss, account, clientId, scope, this.state.storage)
   }
-}
+
+  async revoke(): Promise<boolean> {
+    await this.state.storage.deleteAll()
+    return true
+  }
+
+  async status(): Promise<SessionDetails> {
+    const expired = await this.state.storage.get<boolean>('expired')
+    const expiryTime = await this.state.storage.get<number>('expiryTime')
+    let expiry
+    if (expiryTime) {
+      expiry = new Date(expiryTime).toUTCString()
+    }
+    const creation = await this.state.storage.get<string>('creationTime')
+    return { expired, creation, expiry }
+  }
+
+  async alarm(): Promise<void> {
+    await this.state.storage.put('expired', true)
+  }
+} // Access
 
 const generate = async (
   objectId: string,
@@ -71,12 +97,31 @@ const generate = async (
     storage.put('scope', scope),
   ])
 
+  // We only set the creation time once, not when refreshing the token /
+  // session.
+  const creationTime = storage.get('creationTime')
+  if (!creationTime) {
+    await storage.put('creationTime', Date.now())
+  }
+
+  const expired = storage.get('expired')
+  if (expired === undefined) {
+    await storage.put('expired', false)
+  }
+
   const { alg, ttl } = JWT_OPTIONS
   const { privateKey: key } = await getJWTSigningKeyPair(storage)
 
+  // We store expiry as milliseconds since epoch.
+  const expiryTimeMs = Date.now() + ttl
+  await storage.put('expiryTime', expiryTimeMs)
+
+  // JWT expiry time is in *seconds* since the epoch.
+  const expirationTime = Math.floor((expiryTimeMs * 1000) / 1000)
+
   const accessToken = await new SignJWT({ client_id: clientId, scope })
     .setProtectedHeader({ alg })
-    .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
+    .setExpirationTime(expirationTime)
     .setIssuedAt()
     .setIssuer(objectId)
     .setJti(hexlify(randomBytes(JWT_OPTIONS.jti.length)))
@@ -85,11 +130,19 @@ const generate = async (
 
   const refreshToken = await new SignJWT({})
     .setProtectedHeader({ alg })
-    .setExpirationTime(Math.floor((Date.now() + ttl * 1000) / 1000))
+    .setExpirationTime(expirationTime)
     .setIssuedAt()
     .setIssuer(objectId)
     .setSubject(account)
     .sign(key)
+
+  // Schedule an alarm that executes after this session expires in order
+  // to delete the session state and perform other cleanup. Note that
+  // refreshing the JWT that represents the session will result in the
+  // alarm being rescheduled for after the new expiry time.
+  const ms = (ttl + 1) * 1000
+  // Accepts Date or ms since epoch.
+  storage.setAlarm(ms)
 
   return {
     accessToken,

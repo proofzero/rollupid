@@ -1,0 +1,8 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "kb_verifyAuthorization",
+  "params": [
+    "eyJhbGciOiJFUzI1NiJ9.eyJjbGllbnRfaWQiOiJmb29iYXIiLCJleHAiOjE2NzUzNTQzMDksImlhdCI6MTY3Mjc2MjMwOSwiaXNzIjoieHh5eXp6IiwianRpIjoiMHg3MjIzYWUxOTBjMzIxYTUwNGI5MWVhZjNjZTQ3ZGE3NGFlMGRhYWYzYTFjM2VmZjQiLCJzdWIiOiJ1cm46dGhyZWVpZDphY2NvdW50LzB4MTIzNDEyMzQxMjM0In0.lldyzLPEs5q12zyhL3dpSWRMvqhJchFhL9IHDvZx0QrkC7P6GUfmdRBJAmlCFb2jOQcnLFcUIeuESCPGjRwsFw"
+  ]
+}

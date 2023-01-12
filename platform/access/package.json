@@ -34,10 +34,11 @@
     "@ethersproject/bytes": "5.7.0",
     "@ethersproject/random": "5.7.0",
     "@kubelt/platform-clients": "workspace:*",
+    "@kubelt/platform-middleware": "workspace:*",
     "@kubelt/urns": "workspace:*",
     "@trpc/server": "10.8.1",
     "do-proxy": "1.3.3",
     "jose": "4.11.0",
-    "typed-json-rpc": "1.1.0"
+    "zod": "3.20.2"
   }
 }

@@ -2,6 +2,16 @@ import { initTRPC } from '@trpc/server'
 
 import { Context } from '../context'
 
+import { InjectEdges } from '@kubelt/platform-middleware/edges'
+
+import {
+  ValidateJWT,
+  JWTAssertionTokenFromHeader,
+  RequireAccount,
+} from '@kubelt/platform-middleware/jwt'
+
+import { setAccessNode } from './middleware/setAccessNode'
+
 import {
   authorizeMethod,
   AuthorizeMethodInput,
@@ -17,6 +27,16 @@ import {
   VerifyAuthorizationMethodInput,
   VerifyAuthorizationMethodOutput,
 } from './methods/verifyAuthorization'
+import {
+  getSessionMethod,
+  GetSessionMethodInput,
+  GetSessionMethodOutput,
+} from './methods/getSession'
+import {
+  revokeSessionMethod,
+  RevokeSessionMethodInput,
+  RevokeSessionMethodOutput,
+} from './methods/revokeSession'
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
@@ -30,6 +50,7 @@ export const appRouter = t.router({
     .mutation(authorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
+    .use(InjectEdges)
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
@@ -38,4 +59,23 @@ export const appRouter = t.router({
     .input(VerifyAuthorizationMethodInput)
     .output(VerifyAuthorizationMethodOutput)
     .query(verifyAuthorizationMethod),
+  getSession: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
+    .use(setAccessNode)
+    .use(LogUsage)
+    .input(GetSessionMethodInput)
+    .output(GetSessionMethodOutput)
+    .query(getSessionMethod),
+  revokeSession: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(RequireAccount)
+    .use(InjectEdges)
+    .use(setAccessNode)
+    .use(LogUsage)
+    .input(RevokeSessionMethodInput)
+    .output(RevokeSessionMethodOutput)
+    .query(revokeSessionMethod),
 })

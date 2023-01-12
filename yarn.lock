@@ -6325,6 +6325,7 @@ __metadata:
     "@ethersproject/bytes": 5.7.0
     "@ethersproject/random": 5.7.0
     "@kubelt/platform-clients": "workspace:*"
+    "@kubelt/platform-middleware": "workspace:*"
     "@kubelt/urns": "workspace:*"
     "@trpc/server": 10.8.1
     "@types/itty-router-extras": 0.4.0
@@ -6337,9 +6338,9 @@ __metadata:
     jose: 4.11.0
     npm-run-all: 4.1.5
     prettier: 2.7.1
-    typed-json-rpc: 1.1.0
     typescript: 4.8.4
     wrangler: 2.7.1
+    zod: 3.20.2
   languageName: unknown
   linkType: soft
 

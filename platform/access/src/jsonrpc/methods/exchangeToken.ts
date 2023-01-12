@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { EDGE_ACCESS } from '@kubelt/platform.access/src/constants'
+
 import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
 import { AccessURNSpace } from '@kubelt/urns/access'
 import { AccountURNSpace } from '@kubelt/urns/account'
@@ -79,43 +81,19 @@ export const exchangeTokenMethod = async ({
       scope: [], //scope,
     })
 
+    // Create an edge between Account and Access nodes to record the
+    // existence of a user "session".
+    const access = AccessURNSpace.urn(iss)
+    // NB: we use InjectEdges middleware to inject this service client.
+    await ctx.edgesClient!.makeEdge.mutate({
+      src: account,
+      dst: access,
+      tag: EDGE_ACCESS,
+    })
+
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
     throw new Error('not implemented')
-    // const { account, code, redirectUri, clientId, clientSecret } = input
-
-    // const name = AccessURNSpace.fullUrn(account, {
-    //   r: URN_NODE_TYPE_AUTHORIZATION,
-    //   q: { clientId },
-    // })
-
-    // const authorizationNode = await initAuthorizationNodeByName(
-    //   name,
-    //   ctx.Authorization
-    // )
-    // const { scope } = await authorizationNode.params(code)
-
-    // const validated = await ctx.starbaseClient.kb_appAuthCheck({
-    //   redirectURI: redirectUri,
-    //   scopes: scope,
-    //   clientId,
-    //   clientSecret,
-    // })
-    // if (validated) {
-    //   const { scope } = await authorizationNode.exchangeCode(
-    //     code,
-    //     redirectUri,
-    //     clientId
-    //   )
-
-    //   // create a new id but use it as the name
-    //   const objectId = ctx.Access.newUniqueId().toString()
-    //   const accessNode = await initAccessNodeByName(objectId, ctx.Access)
-    //   const result = await accessNode.generate({ account, clientId, scope })
-    //   return result
-    // } else {
-    //   throw new Error(`failed authorization attempt`)
-    // }
   } else if (grantType == GrantType.RefreshToken) {
     const {
       token: { iss, token },

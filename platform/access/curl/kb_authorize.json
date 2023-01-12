@@ -1,0 +1,13 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "kb_authorize",
+  "params": [
+    "urn:threeid:account/foo",
+    "code",
+    "clientId",
+    "http://example.com/redirect",
+    "scope",
+    "state"
+  ]
+}

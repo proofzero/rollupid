@@ -56,15 +56,15 @@ export const hasAddressesMethod = async ({
   const edgeList = edgesResult.edges
 
   // A set of the addresses owned by the account.
-  const owned = new Set(
+  const ownedAddresses = new Set(
     edgeList.map((edge: Graph.Edge) => {
       return edge.dst.urn
     })
   )
   // The input set of addresses to check.
-  const addresses = new Set(input.addresses)
+  const inputAddresses = new Set(input.addresses)
 
   // Determine if set B is a subset of set A. A set B is a subset of A
   // if all elements of B are in set
-  return set.subset(owned, addresses)
+  return set.subset(ownedAddresses, inputAddresses)
 }

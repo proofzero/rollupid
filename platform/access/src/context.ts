@@ -1,9 +1,12 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createEdgesClient from '@kubelt/platform-clients/edges'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
 import type { Environment } from './types'
+import type { AccountURN } from '@kubelt/urns/account'
+import { DurableObjectStubProxy } from 'do-proxy'
 
 /**
  * Defines your inner context shape.
@@ -13,10 +16,16 @@ interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Access: DurableObjectNamespace
   access?: Access
+  accessNode?: DurableObjectStubProxy<Access>
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher
   starbaseClient?: ReturnType<typeof createStarbaseClient>
+  EDGES: Fetcher
+  // Added by InjectEdges middleware.
+  edgesClient?: ReturnType<typeof createEdgesClient>
+  // Added by ValidateJWT middleware.
+  accountURN?: AccountURN
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
