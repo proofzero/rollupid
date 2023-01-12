@@ -140,11 +140,16 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
+  const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
 
   const [links, setLinks] = useState(
     useRouteData<ProfileData>('routes/account')?.links || []
   )
+
+  const handleDragStart = ({ active }) => {
+    setActiveId(active)
+  }
 
   const handleDragEnd = (event) => {
     const { active, over } = event
@@ -282,6 +287,7 @@ export default function AccountSettingsLinks() {
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
             >
               <SortableContext
                 items={links as any[]}
@@ -344,6 +350,9 @@ export default function AccountSettingsLinks() {
                   </div>
                 ))}
               </SortableContext>
+              <DragOverlay>
+                {activeId ? <Item id={activeId} /> : null}
+              </DragOverlay>
             </DndContext>
           </div>
           <input type="hidden" name="links" value={JSON.stringify(links)} />
