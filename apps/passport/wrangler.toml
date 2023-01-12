@@ -1,11 +1,6 @@
 name = "passport"
 
 workers_dev = false
-[unsafe]
-bindings = [
-  { name="cf_ctx", type="metadata"}
-]
-
 
 main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates

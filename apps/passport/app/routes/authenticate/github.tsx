@@ -7,6 +7,9 @@ export async function loader() {
   return redirect("/authenticate");
 }
 
-export const action: ActionFunction = ({ request }: ActionArgs) => {
-  return authenticator.authenticate(GitHubStrategyDefaultName, request)
+export const action: ActionFunction = async ({ request }: ActionArgs) => {
+  console.debug("GITHUB action:", request)
+  const blah = await authenticator.authenticate(GitHubStrategyDefaultName, request)
+  console.debug("GITHUB action after", blah)
+  return blah
 }

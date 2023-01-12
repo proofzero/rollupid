@@ -43,7 +43,7 @@ authenticator.use(new GitHubStrategy(
   {
     clientID: INTERNAL_GITHUB_OAUTH_CLIENT_ID, 
     clientSecret: SECRET_GITHUB_OAUTH_CLIENT_SECRET, 
-    callbackURL: INTERNAL_GITHUB_OAUTH_CLIENT_ID, 
+    callbackURL: INTERNAL_GITHUB_OAUTH_CALLBACK_URL, 
     allowSignup: false,
     scope: []
   }, async({...args}) => { 
