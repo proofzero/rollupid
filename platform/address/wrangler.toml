@@ -28,6 +28,10 @@ MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AddressAnalytics"  },
+]
+
 [dev]
 port = 9191
 local_protocol = "http"
@@ -59,6 +63,10 @@ services = [
   { binding = "Edges", service = "edges-dev" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AddressAnalyticsDev"  },
+]
+
 [env.dev.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
@@ -74,6 +82,10 @@ services = [
   { binding = "Edges", service = "edges-next" }
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AddressAnalyticsNext"  },
+]
+
 [env.next.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
@@ -87,6 +99,10 @@ durable_objects.bindings = [
 services = [
   { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" }
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "AddressAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

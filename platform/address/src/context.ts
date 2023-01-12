@@ -21,6 +21,7 @@ interface CreateInnerContextOptions
   CryptoAddress: DurableObjectNamespace
   OAuthAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
+  Analytics: AnalyticsEngineDataset
   Edges: Fetcher
   Access: Fetcher
   address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>

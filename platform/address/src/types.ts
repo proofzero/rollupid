@@ -8,6 +8,7 @@ import {
 
 export interface Environment {
   Access: Fetcher
+  Analytics: AnalyticsEngineDataset
   Edges: Fetcher
   CryptoAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
