@@ -14,7 +14,7 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
-import { hasApiKey, setupContext, sliceIntoChunks } from './utils'
+import { hasApiKey, setupContext, sliceIntoChunks, logAnalytics } from './utils'
 
 type ResolverContext = {
   env: Env
@@ -66,6 +66,7 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'nftsForAddress', 'query:gql', 'BEFORE', owner)
       const ethClient: AlchemyClient = new AlchemyClient({
         key: env.APIKEY_ALCHEMY_ETH,
         chain: AlchemyChain.ethereum,
@@ -115,6 +116,7 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'contractsForAddress', 'query:gql', 'BEFORE', owner)
       let contracts: any[] = []
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
@@ -293,6 +295,7 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'getNFTMetadataBatch', 'query:gql', 'BEFORE', input[0].contractAddress+input[0].tokenId)
       let ownedNfts: any[] = []
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.APIKEY_ALCHEMY_ETH,
@@ -328,6 +331,7 @@ const nftsResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'getCuratedGallery', 'query:gql', 'BEFORE', addressURN)
       const indexerClient = createIndexerClient(env.Indexer)
 
       let gallery: any = []
@@ -353,6 +357,7 @@ const nftsResolvers: Resolvers = {
       { gallery }: { gallery: any[] },
       { env, jwt, addressURN }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'updateCuratedGallery', 'mutation:gql', 'BEFORE', addressURN, jwt)
       const indexerClient = createIndexerClient(env.Indexer)
 
       // TODO: Return the gallery we've created. Need to enforce

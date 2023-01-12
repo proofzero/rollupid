@@ -137,3 +137,41 @@ export function sliceIntoChunks(arr: any, chunkSize: number) {
   }
   return res
 }
+
+// Ref the other services: blobs: [ path, type, 'AFTER', accountURN, rayId ],
+export function logAnalytics(dataset: AnalyticsEngineDataset, method: string, type: string, when: string, name?: string, jwt?: string) {
+  if (!dataset) return false
+
+  const nullableName = name || null
+  const nullableJWT = jwt || null
+
+  const raw_key = nullableJWT || nullableName || 'anonymous'
+
+  // If we need to make these more unique we can hash the key. Necessitates making this async.
+  // const enc_key = new TextEncoder().encode(raw_key);
+  // const hash = await crypto.subtle.digest({
+  //     name: 'SHA-256',
+  //   },
+  //   enc_key
+  // )
+
+  // // Convert to a hex string.
+  // const hashkey = [...new Uint8Array(hash)]
+  //     .map(b => b.toString(16).padStart(2, '0'))
+  //     .join('').slice(-32)
+
+  const datapoint: AnalyticsEngineDataPoint = {
+    blobs: [ method, type, when, nullableName, nullableJWT ],
+
+    // doubles: [],
+
+    // Keys are max 32 bytes so we take the last 32 bytes.
+    indexes: [raw_key.slice(-32)]
+  }
+
+  dataset.writeDataPoint(datapoint)
+
+  console.log('resolver call analytics', JSON.stringify(datapoint))
+
+  return true
+}
