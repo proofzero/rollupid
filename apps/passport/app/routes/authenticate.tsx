@@ -5,7 +5,6 @@ import { WagmiConfig, createClient } from 'wagmi'
 import { getDefaultClient } from 'connectkit'
 
 import { getUserSession } from '~/session.server'
-import gradientBG from '~/assets/gradient.jpg'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -28,14 +27,15 @@ export default function Index() {
   const client = createClient(
     getDefaultClient({
       appName: '3ID',
-      alchemyId: typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
+      alchemyId:
+        typeof window !== 'undefined' && window.ENV.APIKEY_ALCHEMY_PUBLIC,
     })
   )
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
         style={{
-          backgroundImage: `url(${gradientBG})`,
+          backgroundImage: `url(https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/918fa1e6-d9c2-40d3-15cf-63131a2d8400/public)`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}
