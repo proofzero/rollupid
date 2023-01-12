@@ -9,7 +9,7 @@ import Env from '../../env'
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AccountURN } from '@kubelt/urns/account'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AddressURN } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { Profile } from '@kubelt/platform.account/src/types'
 import { CryptoAddressProfile } from '../../../../address/src/types'
@@ -112,12 +112,14 @@ const profileResolvers: Resolvers = {
         },
       })
 
+      const addressUrns = [addressURN]
+
       const accountURN = await addressClient.getAccount.query()
       if (!accountURN) {
         // If there is no account URN
         // it's assumed that this is the only
         // 'connected' address
-        return [addressURN]
+        return addressUrns
       }
 
       const accountClient = createAccountClient(env.Account, {
@@ -130,7 +132,7 @@ const profileResolvers: Resolvers = {
         account: accountURN,
       })
 
-      return connectedAccounts
+      return addressUrns.concat(connectedAccounts)
     },
   },
   Mutation: {
