@@ -1,9 +1,0 @@
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "kb_revokeSession",
-  "params": [
-    "urn:threeid:account/foo",
-    "urn:threeid:access/000000018582a72ede0bb451240cc8dbe9fd953301734f23ec5ba0abb717da87"
-  ]
-}
