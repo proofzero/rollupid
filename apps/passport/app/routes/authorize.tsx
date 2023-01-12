@@ -1,7 +1,6 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { Outlet } from '@remix-run/react'
 import { requireJWT } from '~/session.server'
-import gradientBG from '~/assets/gradient.jpg'
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
@@ -17,7 +16,7 @@ export default function Authorize() {
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
         style={{
-          backgroundImage: `url(${gradientBG})`,
+          backgroundImage: `url(https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/918fa1e6-d9c2-40d3-15cf-63131a2d8400/public)`,
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}

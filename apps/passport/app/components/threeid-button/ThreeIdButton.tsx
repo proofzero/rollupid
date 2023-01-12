@@ -1,4 +1,7 @@
-import { Button, ButtonProps } from '@kubelt/design-system'
+import {
+  Button,
+  ButtonProps,
+} from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import threeIdLogo from './3id.svg'
 

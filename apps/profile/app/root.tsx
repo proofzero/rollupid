@@ -30,7 +30,6 @@ import icon32 from './assets/favicon-32x32.png'
 import icon16 from './assets/favicon-16x16.png'
 import faviconSvg from './assets/favicon.svg'
 import maskIcon from './assets/safari-pinned-tab.svg'
-import pepe from './assets/pepe.svg'
 import logo from './assets/three-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
@@ -38,7 +37,7 @@ import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
-import * as gtag from "~/utils/gtags.client";
+import * as gtag from '~/utils/gtags.client'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -73,7 +72,7 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = () => {
   return json({
     ENV: {
-      INTERNAL_GOOGLE_ANALYTICS_TAG
+      INTERNAL_GOOGLE_ANALYTICS_TAG,
     },
   })
 }
@@ -87,9 +86,9 @@ export default function App() {
 
   useEffect(() => {
     if (GATag) {
-      gtag.pageview(location.pathname, GATag);
+      gtag.pageview(location.pathname, GATag)
     }
-  }, [location, GATag]);
+  }, [location, GATag])
 
   return (
     <html lang="en">
@@ -126,7 +125,9 @@ export default function App() {
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(
+              browserEnv.ENV
+            )}`,
           }}
         />
         <LiveReload port={8002} />
@@ -178,9 +179,9 @@ export function CatchBoundary() {
 
   useEffect(() => {
     if (GATag) {
-      gtag.pageview(location.pathname, GATag);
+      gtag.pageview(location.pathname, GATag)
     }
-  }, [location, GATag]);
+  }, [location, GATag])
 
   let secondary = 'Something went wrong'
   switch (caught.status) {
@@ -244,14 +245,20 @@ export function CatchBoundary() {
               <p className="error-secondary-message text-center">{secondary}</p>
             </div>
             <div className="relative -mr-20">
-              <img alt="pepe" className="m-auto pb-12" src={pepe} />
+              <img
+                alt="pepe"
+                className="m-auto pb-12"
+                src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/967142b1-ced3-4bd1-bda1-7bacd2224800/public"
+              />
             </div>
           </article>
         </div>
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(
+              browserEnv.ENV
+            )}`,
           }}
         />
         <Scripts />
