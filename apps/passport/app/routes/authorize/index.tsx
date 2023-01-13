@@ -17,7 +17,7 @@ import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
-import type { CryptoAddressProfile, OAuthGoogleProfile } from '@kubelt/platform/address/src/types'
+import type { CryptoAddressProfile, OAuthGoogleProfile, OAuthTwitterProfile } from '@kubelt/platform/address/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -85,6 +85,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             normalizedFields = {
               name: oauthAddressProfile.name,
               picture: oauthAddressProfile.picture
+            }
+            break
+          case OAuthAddressType.Twitter:
+            const twitterProfile = addressProfile as OAuthTwitterProfile
+            normalizedFields = {
+              name: twitterProfile.name,
+              picture: twitterProfile.profile_image_url_https,
             }
             break
           default:

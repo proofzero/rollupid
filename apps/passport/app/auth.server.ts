@@ -2,6 +2,7 @@ import { createCookieSessionStorage } from "@remix-run/cloudflare";
 import { Authenticator } from 'remix-auth'
 import { GoogleStrategy } from 'remix-auth-google'
 import { GitHubStrategy } from 'remix-auth-github'
+import { TwitterStrategy } from 'remix-auth-twitter'
 
 const sessionSecret = SECRET_SESSION_SALT
 if (!sessionSecret) {
@@ -50,4 +51,22 @@ authenticator.use(new GitHubStrategy(
     //Return all fields
     return { ...args }
   })
+)
+
+authenticator.use(
+  new TwitterStrategy(
+    {
+      clientID: INTERNAL_TWITTER_OAUTH_CLIENT_ID,
+      clientSecret: SECRET_TWITTER_OAUTH_CLIENT_SECRET,
+      callbackURL: INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
+      includeEmail: true,
+    },
+    async ({ accessToken, accessTokenSecret, profile }) => {
+      return {
+        accessToken,
+        accessTokenSecret,
+        profile,
+      }
+    }
+  )
 )

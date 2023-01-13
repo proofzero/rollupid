@@ -4,14 +4,13 @@ import type { GoogleExtraParams, GoogleProfile } from 'remix-auth-google'
 import { keccak256 } from '@ethersproject/keccak256'
 
 import type { AddressURN } from '@kubelt/urns/address'
-import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
+import { OAuthAddressType } from '@kubelt/types/address'
 
 import { authenticator } from '~/auth.server'
-import { getAddressClient, getAccessClient } from '~/platform.server'
-import { createUserSession } from '~/session.server'
+import { getAddressClient } from '~/platform.server'
+import { authenticateAddress } from '~/utils/authenticate.server'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
@@ -21,6 +20,10 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   )) as OAuthData
 
   const { profile } = authRes
+
+  if (profile.provider != OAuthAddressType.Google) {
+    throw new Error('unrecognized profile provider')
+  }
 
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(profile._json.email))
@@ -32,38 +35,4 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   await addressClient.setOAuthData.mutate(authRes)
 
   return authenticateAddress(address, account)
-}
-
-const authenticateAddress = async (
-  address: AddressURN,
-  account: AccountURN
-) => {
-  const accessClient = getAccessClient()
-
-  const clientId = address
-  const redirectUri = PASSPORT_REDIRECT_URL
-  const scope = ['admin']
-  const state = ''
-  const { code } = await accessClient.authorize.mutate({
-    account,
-    responseType: ResponseType.Code,
-    clientId,
-    redirectUri,
-    scope,
-    state,
-  })
-
-  const grantType = GrantType.AuthenticationCode
-  const { accessToken, refreshToken } = await accessClient.exchangeToken.mutate(
-    {
-      grantType,
-      account,
-      code,
-      redirectUri,
-      clientId,
-    }
-  )
-
-  const redirectURL = '/authorize'
-  return createUserSession(accessToken, redirectURL, address)
 }

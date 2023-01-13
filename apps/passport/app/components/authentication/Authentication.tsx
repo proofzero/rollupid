@@ -4,6 +4,7 @@ import circleLogo from './circle-logo.svg'
 
 import ConnectGoogleButton from '~/components/connect-google-button'
 import ConnectGithubButton from '../connect-github-button'
+import ConnectTwitterButton from '~/components/connect-twitter-button'
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -48,10 +49,13 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
-      <div className={enableOAuthConnect ? '' : 'hidden'}>
-        <ConnectGoogleButton />
-        <ConnectGithubButton></ConnectGithubButton>
-      </div>
+      {enableOAuthConnect ? (
+        <>
+          <ConnectGoogleButton />
+          <ConnectGithubButton />
+          <ConnectTwitterButton />
+        </>
+      ) : null}
     </div>
   )
 }

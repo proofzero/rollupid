@@ -74,17 +74,29 @@ export const GithubProfileSchema = z.object({
     .nullable(),
 })
 
+export const TwitterProfileSchema = z.object({
+  provider: z.literal(OAuthAddressType.Twitter),
+  id: z.number(),
+  name: z.string(),
+  screen_name: z.string(),
+  profile_image_url_https: z.string(),
+})
+
 export const OAuthDataSchema = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
-  extraParams: z.object({
-    expires_in: z.number().optional(),
-    scope: z.string().optional(),
-    token_type: z.string().optional(),
-    id_token: z.string().optional(),
-  }),
+  accessTokenSecret: z.string().optional(),
+  refreshToken: z.string().optional(),
+  extraParams: z
+    .object({
+      expires_in: z.number().optional(),
+      scope: z.string().optional(),
+      token_type: z.string().optional(),
+      id_token: z.string().optional(),
+    })
+    .optional(),
   profile: z.discriminatedUnion('provider', [
     GoogleProfileSchema,
     GithubProfileSchema,
+    TwitterProfileSchema,
   ]),
 })

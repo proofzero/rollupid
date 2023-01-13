@@ -4,6 +4,7 @@ import {
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
   NFTarVoucherSchema,
+  TwitterProfileSchema,
 } from './jsonrpc/validators/profile'
 
 export interface Environment {
@@ -33,8 +34,12 @@ export interface Challenge {
 }
 
 export type OAuthGoogleProfile = z.infer<typeof GoogleRawProfileSchema>
+export type OAuthTwitterProfile = z.infer<typeof TwitterProfileSchema>
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
-export type AddressProfile = CryptoAddressProfile | OAuthGoogleProfile
+export type AddressProfile =
+  | CryptoAddressProfile
+  | OAuthGoogleProfile
+  | OAuthTwitterProfile
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
 
