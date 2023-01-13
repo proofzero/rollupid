@@ -67,7 +67,6 @@ export const loader = async ({ request }) => {
     address,
     avatarUrl,
     isToken,
-    // links,
     links: orderedLinks,
   })
 }

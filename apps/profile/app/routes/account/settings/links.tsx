@@ -86,9 +86,16 @@ export const action: ActionFunction = async ({ request }) => {
     links_order: i,
   }))
 
+  const prevLinksLen = updatedRemainedLinks.length
+
   const updatedLinks: any = updatedRemainedLinks.concat(
     updatedNames.map((name: string, i: number) => {
-      return { name, url: updatedUrls[i], verified: false, links_order: i }
+      return {
+        name,
+        url: updatedUrls[i],
+        verified: false,
+        links_order: i + prevLinksLen,
+      }
     })
   )
 
