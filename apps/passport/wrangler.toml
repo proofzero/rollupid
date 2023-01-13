@@ -8,18 +8,18 @@ compatibility_date = "2022-04-05"
 
 # Services binding for local development
 services = [
-  { binding = "Account", service = "account"},
-  { binding = "Access", service = "access"},
-  { binding = "Address", service = "address"},
-  { binding = "Galaxy", service = "galaxy"},
-  { binding = "Starbase", service = "starbase"},
+  { binding = "Account", service = "account" },
+  { binding = "Access", service = "access" },
+  { binding = "Address", service = "address" },
+  { binding = "Galaxy", service = "galaxy" },
+  { binding = "Starbase", service = "starbase" },
 ]
 
 [site]
-  bucket = "./public"
+bucket = "./public"
 
 [build]
-  command = "yarn build -- --sourcemap"
+command = "yarn build -- --sourcemap"
 
 [dev]
 port = 9696
@@ -31,6 +31,7 @@ CONSOLE_APP_URL = "http://localhost:9898"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/github/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]
@@ -38,11 +39,11 @@ routes = [
   { pattern = "passport-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Account", service = "account-dev"},
-  { binding = "Access", service = "access-dev"},
-  { binding = "Address", service = "address-dev"},
-  { binding = "Galaxy", service = "galaxy-dev"},
-  { binding = "Starbase", service = "starbase-dev"},
+  { binding = "Account", service = "account-dev" },
+  { binding = "Access", service = "access-dev" },
+  { binding = "Address", service = "address-dev" },
+  { binding = "Galaxy", service = "galaxy-dev" },
+  { binding = "Starbase", service = "starbase-dev" },
 ]
 
 [env.dev.vars]
@@ -51,6 +52,7 @@ CONSOLE_APP_URL = "https://console-dev.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/github/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
@@ -58,11 +60,11 @@ routes = [
   { pattern = "passport-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Account", service = "account-next"},
-  { binding = "Access", service = "access-next"},
-  { binding = "Address", service = "address-next"},
-  { binding = "Galaxy", service = "galaxy-next"},
-  { binding = "Starbase", service = "starbase-next"},
+  { binding = "Account", service = "account-next" },
+  { binding = "Access", service = "access-next" },
+  { binding = "Address", service = "address-next" },
+  { binding = "Galaxy", service = "galaxy-next" },
+  { binding = "Starbase", service = "starbase-next" },
 
 ]
 
@@ -72,21 +74,22 @@ CONSOLE_APP_URL = "https://console-next.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/github/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
-  command = "yarn build"
+command = "yarn build"
 
 [env.current]
 routes = [
   { pattern = "passport.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Account", service = "account-current"},
-  { binding = "Access", service = "access-current"},
-  { binding = "Address", service = "address-current"},
-  { binding = "Galaxy", service = "galaxy-current"},
-  { binding = "Starbase", service = "starbase-current"},
+  { binding = "Account", service = "account-current" },
+  { binding = "Access", service = "access-current" },
+  { binding = "Address", service = "address-current" },
+  { binding = "Galaxy", service = "galaxy-current" },
+  { binding = "Starbase", service = "starbase-current" },
 
 ]
 
@@ -96,7 +99,8 @@ CONSOLE_APP_URL = "https://console.threid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
+INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/github/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]
-  command = "yarn build"
+command = "yarn build"
