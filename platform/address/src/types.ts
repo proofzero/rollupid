@@ -2,11 +2,11 @@ import { z } from 'zod'
 import {
   GithubProfileSchema,
   GoogleProfileSchema,
+  MicrosoftProfileSchema,
   OAuthDataSchema,
 } from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
-  GoogleRawProfileSchema,
   NFTarVoucherSchema,
   TwitterProfileSchema,
 } from './jsonrpc/validators/profile'
@@ -50,6 +50,7 @@ export enum OAuthAddressType {
   Google = 'google',
   GitHub = 'github',
   Twitter = 'twitter',
+  Microsoft = 'microsoft',
 }
 
 export enum HandleAddressType {
@@ -74,12 +75,16 @@ export interface Challenge {
 export type OAuthGoogleProfile = z.infer<typeof GoogleProfileSchema>['_json']
 export type OAuthTwitterProfile = z.infer<typeof TwitterProfileSchema>
 export type OAuthGithubProfile = z.infer<typeof GithubProfileSchema>['_json']
+export type OAuthMicrosoftProfile = z.infer<
+  typeof MicrosoftProfileSchema
+>['_json']
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
   | CryptoAddressProfile
   | OAuthGoogleProfile
   | OAuthTwitterProfile
   | OAuthGithubProfile
+  | OAuthMicrosoftProfile
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
 

@@ -78,11 +78,11 @@ export default class CryptoAddress {
   }
 
   static async alarm(address: Address) {
-    const challenges: Map<string, Challenge> =
-      (await address.state.storage.get('challenges')) || new Map()
-    for (const [nonce, challenge] of challenges) {
+    const challenges: Record<string, Challenge> =
+      (await address.state.storage.get('challenges')) || {}
+    for (const [nonce, challenge] of Object.entries(challenges)) {
       if (challenge.timestamp + NONCE_OPTIONS.ttl * 1000 <= Date.now()) {
-        challenges.delete(nonce)
+        delete challenges[nonce]
       }
     }
     await address.state.storage.put('challenges', challenges)

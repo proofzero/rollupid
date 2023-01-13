@@ -33,6 +33,9 @@ export const isCryptoAddressType = (type: string | undefined) => {
 
 export const isOAuthAddressType = (type: string | undefined) => {
   switch (type) {
+    case OAuthAddressType.GitHub:
+    case OAuthAddressType.Microsoft:
+    case OAuthAddressType.Twitter:
     case OAuthAddressType.Google:
       return NodeType.OAuth
     default:

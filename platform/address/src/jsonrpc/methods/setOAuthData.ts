@@ -20,10 +20,11 @@ export const setOAuthDataMethod = async ({
   switch (input.profile.provider) {
     case OAuthAddressType.Google:
     case OAuthAddressType.GitHub:
+    case OAuthAddressType.Microsoft:
       return ctx.address?.class.setProfile(input.profile._json)
     case OAuthAddressType.Twitter:
-      return ctx.address?.class.setProfile(input.profile) // TODO: make consistent with other providers?
+      return ctx.address?.class.setProfile(input.profile)
+    default:
+      throw new Error('Unsupported OAuth provider response provided.')
   }
-
-  throw new Error('Unsupported OAuth provider response provided.')
 }

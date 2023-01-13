@@ -23,6 +23,7 @@ import { required as requiredEnv } from './env'
 import social from './assets/social.png'
 import wasm from './assets/svg2png_wasm_bg.wasm'
 import colors from './assets/colors.json'
+import { keccak256 } from '@ethersproject/keccak256'
 
 // Environment
 // -----------------------------------------------------------------------------
@@ -50,6 +51,21 @@ export interface Env {
   HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID: string
 }
 
+type CFImageUploadResponse = {
+  success: boolean
+  errors: []
+  result: {
+    id: string
+    filename: string
+    metadata: {
+      [key: string]: string
+    }
+    requiredSignedURLs: boolean
+    variants: string[]
+    uploaded: string
+  }
+}
+
 // Service
 // -----------------------------------------------------------------------------
 
@@ -59,6 +75,7 @@ router
   .post(
     '/upload',
     async (request: Request, env: Env, ctx: ExecutionContext) => {
+      console.log('New request on /upload')
       checkEnv(requiredEnv, env as unknown as Record<string, unknown>)
       const { headers } = request
       const contentType = headers.get('content-type') || ''
@@ -82,7 +99,7 @@ router
       // Configuration for the direct_upload Cloudflare API call:
       const formData = new FormData()
       // Is a signature token required to access the uploaded image?
-      formData.append('requireSignedURLs', false)
+      formData.append('requireSignedURLs', 'false')
       formData.append('metadata', metadata)
       formData.append('expiry', expiry)
       // URL for "Create authenticated direct upload URL V2" endpoint.
@@ -121,7 +138,10 @@ router
       //     "id": "<image-id>"
       //   }
       // }
-      const direct_upload = await response.json()
+      const direct_upload = await response.json<{
+        success: boolean
+        result: object
+      }>()
       if (!direct_upload.success) {
         return new Response(JSON.stringify(direct_upload), {
           status: 500,
@@ -218,7 +238,10 @@ router
       <image id="hexagonimage" width="2128" height="428" xlink:href="${fg}"/>
       </defs>
   </svg>`
-      await initialize(wasm).catch((e) => {})
+      await initialize(wasm).catch((e: Error) => {
+        //We don't log the expected error
+        if (!e.message.startsWith('Already initialized.')) console.error(e)
+      })
       const ogImage = await svg2png(svg)
       // return new Response(ogImage, { headers: { 'content-type': 'image/png' } })
 
@@ -252,7 +275,7 @@ router
           }>()
         )
         .catch((e) => {
-          console.debug("Couldn't upload og image to CF")
+          console.error("Couldn't upload og image to CF")
         })
 
       //prob already exsists
@@ -280,8 +303,11 @@ router
       env: Env,
       ctx: ExecutionContext
     ) => {
+      //Hash input to 42 char in length
+      const hash = keccak256(new TextEncoder().encode(request.params.address))
+
       // turn address inti UInt8Array and pick colors for color list
-      const data = new TextEncoder().encode(request.params.address)
+      const data = new TextEncoder().encode(hash)
 
       console.log(request.params.address, { data })
 
@@ -311,7 +337,7 @@ router
 
       const svg = `<svg width="100%" height="100%" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g clip-path="url(#clip0_20_82)">
-        <g filter="url(#filter0_f_20_82)">
+        <g filter="url(#filter0_f_20_82)">initia
           <path d="M128.6 0H0V322.2L106.2 134.75L128.6 0Z" fill="${colors[rowOne]}"></path>
           <path d="M0 322.2V400H240H320L106.2 134.75L0 322.2Z" fill="${colors[rowTwo]}"></path>
           <path d="M320 400H400V78.75L106.2 134.75L320 400Z" fill="${colors[rowFour]}"></path>
@@ -326,7 +352,10 @@ router
         </filter>
       </defs>
       </svg>`
-      await initialize(wasm).catch((e) => {})
+      await initialize(wasm).catch((e: any) => {
+        //We don't log the expected error
+        if (!e.message.startsWith('Already initialized.')) console.error(e)
+      })
       const ogImage = await svg2png(svg)
 
       const id = await crypto.subtle
@@ -351,30 +380,87 @@ router
           body: formData,
         }
       )
-        .then((res) =>
-          res.json<{
-            success: boolean
-            result: { variants: string[] }
-            errors: any
-          }>()
-        )
-        .catch((e) => {
-          console.debug("Couldn't upload gradient image to CF", e)
-          console.log('Constructing gradient image')
-          const cached = `https://imagedelivery.net/${env.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
-          console.debug({ cached })
-          return {
-            success: false,
-            result: { variants: [cached] },
-          }
-        })
 
-      return new Response(
-        imageUrlJson.result.variants.filter((v) => v.includes('public'))[0],
+      let responseJSON = null
+      if (imageUrlJson.status === 409) {
+        //If image has previously been uploaded, we get a HTTP 409, so we return the cached one
+        const cached = `https://imagedelivery.net/${env.HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID}/${id}/public`
+        responseJSON = {
+          success: false,
+          result: { variants: [cached] },
+        }
+      } else {
+        responseJSON = await imageUrlJson.json<{
+          success: boolean
+          result: { variants: string[] }
+          errors: any
+        }>()
+      }
+
+      const res = new Response(
+        responseJSON.result.variants.filter((v) => v.includes('public'))[0],
         {
           headers: { 'content-type': 'text/plain' },
         }
       )
+      return res
+    }
+  )
+  .post(
+    '/uploadImageBlob',
+    async (request: Request, env: Env, ctx: ExecutionContext) => {
+      console.log('New request on /uploadImageBlob')
+      const uploadURL = `https://api.cloudflare.com/client/v4/accounts/${env.INTERNAL_CLOUDFLARE_ACCOUNT_ID}/images/v1`
+      const contentType = request.headers.get('content-type')
+      if (!contentType?.startsWith('multipart/form-data'))
+        throw new Error('Bad request: Expecting form data in request.')
+
+      let reqFormData = null
+      try {
+        reqFormData = await request.formData()
+        if (!reqFormData) throw new Error('No formdata found in request.')
+      } catch (e) {
+        console.error('Could not parse form data from request.', e)
+        return
+      }
+      const reqBlob = reqFormData.get('imageBlob')
+      if (!reqBlob)
+        throw new Error('Bad request: Expected image blob in request.')
+
+      const formData = new FormData()
+      formData.append('file', reqBlob)
+
+      const uploadRequest = new Request(uploadURL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.TOKEN_CLOUDFLARE_API}`,
+        },
+        // NB: do *not* explicitly set the Content-Type header to
+        // "multipart/form-data"; this prevents the header from being set
+        // with the correct boundary expression used to delimit form
+        // fields in the request body.
+        body: formData,
+      })
+
+      let result = null
+      try {
+        const response = await fetch(uploadRequest)
+        const responseJson = await response.json<CFImageUploadResponse>()
+        if (!responseJson.success || !responseJson.result?.variants)
+          throw new Error('Upload unsuccessful', { cause: response.statusText })
+
+        //There should be only one variant, as we haven't defined others
+        result = JSON.stringify({ imageUrl: responseJson.result.variants[0] })
+      } catch (e) {
+        console.error('Could not send upload image blob to Image cache.', e)
+      }
+
+      return new Response(result, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        status: 200,
+      })
     }
   )
   .get('*', () => new Response('Not found', { status: 404 }))

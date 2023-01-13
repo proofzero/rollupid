@@ -35,6 +35,7 @@ COOKIE_DOMAIN = "localhost"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/github/callback"
 INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/twitter/callback"
+INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/microsoft/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]

@@ -1,15 +1,12 @@
 name = "account"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
+compatibility_flags = ["url_standard"]
 node_compat = true
 workers_dev = false
 
-durable_objects.bindings = [
-  { name = "Account", class_name = "Account" }
-]
-services = [
-  { binding = "Edges", service = "edges" }
-]
+durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+services = [{ binding = "Edges", service = "edges" }]
 
 [[migrations]]
 tag = "v0"
@@ -20,7 +17,7 @@ tag = "v1"
 renamed_classes = [{ from = "Core", to = "Account" }]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics" },
 ]
 
 [dev]
@@ -28,37 +25,25 @@ port = 9494
 local_protocol = "http"
 
 [env.dev]
-durable_objects.bindings = [
-  { name = "Account", class_name = "Account" }
-]
-services = [
-  { binding = "Edges", service = "edges-dev" }
-]
+durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+services = [{ binding = "Edges", service = "edges-dev" }]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev" },
 ]
 
 [env.next]
-durable_objects.bindings = [
-  { name = "Account", class_name = "Account" }
-]
-services = [
-  { binding = "Edges", service = "edges-next" }
-]
+durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+services = [{ binding = "Edges", service = "edges-next" }]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext" },
 ]
 
 [env.current]
-durable_objects.bindings = [
-  { name = "Account", class_name = "Account" }
-]
-services = [
-  { binding = "Edges", service = "edges-current" }
-]
+durable_objects.bindings = [{ name = "Account", class_name = "Account" }]
+services = [{ binding = "Edges", service = "edges-current" }]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent" },
 ]

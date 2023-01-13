@@ -38,7 +38,6 @@ export const action: ActionFunction = async ({ request }) => {
   const bio = formData.get('bio')?.toString()
   let computedIsToken =
     formData.get('pfp_isToken')?.toString() === '1' ? true : false
-
   const galaxyClient = await getGalaxyClient()
   // TODO: handle and return form errors
   await galaxyClient.updateProfile(
@@ -72,7 +71,10 @@ export default function AccountSettingsProfile() {
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const temporaryAddress =
+    cryptoAddresses && cryptoAddresses.length
+      ? cryptoAddresses?.map((a) => a.qc.alias)[0]
+      : ''
 
   const {
     displayName,

@@ -4817,6 +4817,7 @@ __metadata:
     remix-auth: 3.4.0
     remix-auth-github: 1.3.0
     remix-auth-google: 1.2.0
+    remix-auth-microsoft: 2.0.0
     remix-auth-twitter: 0.1.1
     sass: 1.54.7
     sass-loader: 13.2.0
@@ -5302,6 +5303,7 @@ __metadata:
   resolution: "@kubelt/services.images@workspace:services/images"
   dependencies:
     "@cloudflare/workers-types": 4.20221111.1
+    "@ethersproject/keccak256": 5.7.0
     date-fns: 2.29.3
     image-data-uri: 2.0.1
     itty-router: 2.6.6
@@ -35865,7 +35867,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth-oauth2@npm:^1.1.0, remix-auth-oauth2@npm:^1.4.0":
+"remix-auth-microsoft@npm:2.0.0":
+  version: 2.0.0
+  resolution: "remix-auth-microsoft@npm:2.0.0"
+  dependencies:
+    remix-auth: ^3.0.0
+    remix-auth-oauth2: ^1.0.0
+  peerDependencies:
+    "@remix-run/server-runtime": ^1.0.0
+  checksum: a4b43ce5bdffa3b14d9fe35240ba2e9f83d51143bfa8084b485bce074e6d7ed1f9dd2f6d03fc3133c0940bfb83f127c0ff6b5ccb2bda37dda350d79fe55d0dcf
+  languageName: node
+  linkType: hard
+
+"remix-auth-oauth2@npm:^1.0.0, remix-auth-oauth2@npm:^1.1.0, remix-auth-oauth2@npm:^1.4.0":
   version: 1.5.0
   resolution: "remix-auth-oauth2@npm:1.5.0"
   dependencies:
@@ -35894,7 +35908,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth@npm:3.4.0, remix-auth@npm:^3.2.2, remix-auth@npm:^3.4.0":
+"remix-auth@npm:3.4.0, remix-auth@npm:^3.0.0, remix-auth@npm:^3.2.2, remix-auth@npm:^3.4.0":
   version: 3.4.0
   resolution: "remix-auth@npm:3.4.0"
   dependencies:

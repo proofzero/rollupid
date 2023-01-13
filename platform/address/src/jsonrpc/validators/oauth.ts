@@ -1,6 +1,6 @@
 import { OAuthAddressType } from '@kubelt/types/address'
 import { z } from 'zod'
-import { GoogleRawProfileSchema } from './profile'
+import { GoogleRawProfileSchema, MicrosoftRawProfileSchema } from './profile'
 
 export const GoogleProfileSchema = z.object({
   provider: z.literal(OAuthAddressType.Google),
@@ -21,6 +21,20 @@ export const GoogleProfileSchema = z.object({
     })
   ),
   _json: GoogleRawProfileSchema,
+})
+
+export const MicrosoftProfileSchema = z.object({
+  provider: z.literal(OAuthAddressType.Microsoft),
+  id: z.string(),
+  displayName: z.string(),
+  _json: MicrosoftRawProfileSchema,
+  name: z
+    .object({
+      familyName: z.string().nullable(),
+      givenName: z.string().nullable(),
+    })
+    .nullable(),
+  emails: z.array(z.object({ value: z.string().nullable() })),
 })
 
 export const GithubProfileSchema = z.object({
@@ -98,5 +112,6 @@ export const OAuthDataSchema = z.object({
     GoogleProfileSchema,
     GithubProfileSchema,
     TwitterProfileSchema,
+    MicrosoftProfileSchema,
   ]),
 })

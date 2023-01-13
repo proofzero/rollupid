@@ -5,9 +5,9 @@ import { AddressURNSpace } from '@kubelt/urns/address'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 
 import { authenticator } from '~/auth.server'
-import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import { keccak256 } from 'ethers/lib/utils'
+import { getAddressClient } from '~/platform.server'
+import { keccak256 } from '@ethersproject/keccak256'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
@@ -20,9 +20,8 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 
   const { profile } = authRes
 
-  if (profile.provider != OAuthAddressType.GitHub) {
-    throw new Error('unrecognized profile provider')
-  }
+  if (profile.provider !== OAuthAddressType.GitHub)
+    throw new Error('Unsupported provider returned in Github callback.')
 
   const idref = IDRefURNSpace(OAuthAddressType.GitHub).urn(profile.id)
   const encoder = new TextEncoder()
