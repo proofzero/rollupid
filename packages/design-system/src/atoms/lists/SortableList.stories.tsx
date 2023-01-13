@@ -6,6 +6,11 @@ export default {
   component: SortableList,
 }
 
-const Template = (args) => <SortableList {...args} items={['Hello', 'world']} />
+const Template = (args) => (
+  <SortableList
+    {...args}
+    items={[<p key={'Foo'}>Hello</p>, <p key={'Bar'}>world</p>]}
+  />
+)
 
 export const Default = Template.bind({})
