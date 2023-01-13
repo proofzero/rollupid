@@ -51,7 +51,7 @@ export const ValidateJWT: BaseMiddlewareFunction<{
  * or is not valid.
  */
 export const RequireAccount: BaseMiddlewareFunction<{
-  accountURN?: string
+  accountURN?: AccountURN
 }> = ({ ctx, next }) => {
   if (!ctx?.accountURN) {
     throw new Error(`missing account`)
