@@ -58,10 +58,8 @@ export const loader = async ({ request }) => {
       ).ensAddress || ''
   }
 
-  // const orderedLinks = Array.from(Array(links.length))
-  // links?.forEach((link) => (orderedLinks[links.links_order] = link))
-
-  console.log(links)
+  const orderedLinks = Array.from(Array(links.length))
+  links?.forEach((link) => (orderedLinks[link.links_order] = link))
 
   return json({
     targetAddress,
@@ -69,8 +67,8 @@ export const loader = async ({ request }) => {
     address,
     avatarUrl,
     isToken,
-    links,
-    // links: orderedLinks,
+    // links,
+    links: orderedLinks,
   })
 }
 

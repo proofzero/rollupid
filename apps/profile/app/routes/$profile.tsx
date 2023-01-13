@@ -88,6 +88,12 @@ export const loader: LoaderFunction = async (args) => {
   )
   const ogImageURL = await ogImage(profile.cover, profile.pfp.image, cacheKey)
 
+  if (profile.links && profile.links.length) {
+    const orderedLinks = Array.from(Array(profile.links.length))
+    profile.links?.forEach((link) => (orderedLinks[link.links_order] = link))
+    profile.links = orderedLinks
+  }
+
   return json({
     claimed,
     ...profile,

@@ -49,6 +49,7 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import { useRouteData } from '~/hooks'
+import { link } from 'fs'
 
 export type ProfileData = {
   targetAddress: string
@@ -62,6 +63,7 @@ export type ProfileData = {
     name: string
     url: string
     verified: boolean
+    links_order: number
   }[]
 }
 
@@ -79,10 +81,13 @@ export const action: ActionFunction = async ({ request }) => {
   const updatedUrls: any = formData.getAll('url')
   const remainedLinks: any = JSON.parse(formData.get('links'))
 
-  const updatedLinks: any = remainedLinks.concat(
+  const updatedRemainedLinks: any = remainedLinks.map((link, i) => ({
+    ...link,
+    links_order: i,
+  }))
+
+  const updatedLinks: any = updatedRemainedLinks.concat(
     updatedNames.map((name: string, i: number) => {
-      console.log('HELLO MAN')
-      console.log(i)
       return { name, url: updatedUrls[i], verified: false, links_order: i }
     })
   )
@@ -109,9 +114,6 @@ export const action: ActionFunction = async ({ request }) => {
   if (Object.keys(errors).length) {
     return { errors }
   }
-
-  console.log('FROM LINKS', updatedLinks)
-
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
@@ -201,10 +203,15 @@ const SortableLink = (props: any) => {
                       text-gray-600"
         btnType="secondary-alt"
         btnSize="base"
-        // onClick={() => {
-        //   setLinks(links.filter((link, id) => id !== i))
-        //   setNewLinks([...newLinks, links[i]])
-        // }}
+        onClick={() => {
+          props.setLinks(
+            props.links.filter((link, id) => id !== parseInt(props.id))
+          )
+          props.setNewLinks([
+            ...props.newLinks,
+            props.links[parseInt(props.id)],
+          ])
+        }}
       >
         <FiEdit size={18} />
         Edit
@@ -214,14 +221,10 @@ const SortableLink = (props: any) => {
 }
 
 export default function AccountSettingsLinks() {
-  const [items, setItems] = useState(['1', '2', '3'])
-
   const { notificationHandler } = useOutletContext<any>()
   const transition = useTransition()
   const actionData = useActionData()
 
-  const [activeId, setActiveId] = useState(null)
-  const [activeLink, setActiveLink] = useState(null)
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -230,20 +233,10 @@ export default function AccountSettingsLinks() {
     })
   )
 
-  const [links, setLinks] = useState(
+  const initialOldLinks =
     useRouteData<ProfileData>('routes/account')?.links || []
-  )
 
-  const handleDragCancel = () => {
-    setActiveLink(null)
-    setActiveId(null)
-  }
-
-  const handleDragStart = ({ active }: { active: any }) => {
-    const id = parseInt(active.id)
-    setActiveLink(active.data.current.sortable.items[id])
-    setActiveId(id as any)
-  }
+  const [links, setLinks] = useState(initialOldLinks)
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
@@ -259,13 +252,13 @@ export default function AccountSettingsLinks() {
       })
       setFormChanged(true)
     }
-    setActiveId(null)
-    setActiveLink(null)
   }
 
   const [isFormChanged, setFormChanged] = useState(false)
 
-  const initialLinks = [{ name: '', url: '', verified: false }]
+  const initialLinks = [
+    { name: '', url: '', verified: false, gallery_order: null },
+  ]
 
   const [newLinks, setNewLinks] = useState(initialLinks)
 
@@ -384,8 +377,6 @@ export default function AccountSettingsLinks() {
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragCancel={handleDragCancel}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
@@ -399,6 +390,10 @@ export default function AccountSettingsLinks() {
                     }-${i}`}
                     id={`${i}`}
                     link={link}
+                    links={links}
+                    setNewLinks={setNewLinks}
+                    setLinks={setLinks}
+                    newLinks={newLinks}
                   />
                 ))}
               </SortableContext>
@@ -421,6 +416,7 @@ export default function AccountSettingsLinks() {
           isFormChanged={isFormChanged}
           discardFn={() => {
             setNewLinks(initialLinks)
+            setLinks(initialOldLinks)
           }}
         />
       </Form>
