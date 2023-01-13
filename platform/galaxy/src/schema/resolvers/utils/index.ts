@@ -175,3 +175,10 @@ export function logAnalytics(dataset: AnalyticsEngineDataset, method: string, ty
 
   return true
 }
+
+// Special case for NFTs -- get analytics at the contract level.
+export function logNFTBatchAnalytics(dataset: AnalyticsEngineDataset, method: string, type: string, when: string, nftBatch: any[]) {
+  for (const nft of nftBatch) {
+    logAnalytics(dataset, method, type, when, nft.contractAddress, nft.tokenId)
+  }
+}

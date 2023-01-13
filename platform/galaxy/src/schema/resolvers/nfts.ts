@@ -14,7 +14,7 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
-import { hasApiKey, setupContext, sliceIntoChunks, logAnalytics } from './utils'
+import { hasApiKey, setupContext, sliceIntoChunks, logAnalytics, logNFTBatchAnalytics } from './utils'
 
 type ResolverContext = {
   env: Env
@@ -295,7 +295,7 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      logAnalytics(env.Analytics, 'getNFTMetadataBatch', 'query:gql', 'BEFORE', input[0].contractAddress+input[0].tokenId)
+      logNFTBatchAnalytics(env.Analytics, 'getNFTMetadataBatch', 'query:gql', 'BEFORE', input)
       let ownedNfts: any[] = []
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.APIKEY_ALCHEMY_ETH,
