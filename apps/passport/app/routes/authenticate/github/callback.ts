@@ -1,38 +1,40 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
-import type { GoogleExtraParams, GoogleProfile } from 'remix-auth-google'
-
-import { keccak256 } from '@ethersproject/keccak256'
 
 import type { AddressURN } from '@kubelt/urns/address'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
+import { IDRefURNSpace } from '@kubelt/urns/idref'
 
 import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
 
 import { authenticator } from '~/auth.server'
 import { getAddressClient, getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
+import { keccak256 } from 'ethers/lib/utils'
+import { GitHubStrategyDefaultName } from 'remix-auth-github'
+import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const authRes = (await authenticator.authenticate(
-    'google',
+    GitHubStrategyDefaultName,
     request
   )) as OAuthData
 
   const { profile } = authRes
 
+  const idref = IDRefURNSpace(OAuthAddressType.GitHub).urn(profile.id)
   const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(profile._json.email))
+  const hash = keccak256(encoder.encode(idref))
   const address = (AddressURNSpace.urn(hash) +
-    '?+node_type=oauth&addr_type=google') as AddressURN
+    `?+node_type=${ NodeType.OAuth }&addr_type=${ OAuthAddressType.GitHub}`) as AddressURN
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
-
+    
   await addressClient.setOAuthData.mutate(authRes)
-
   return authenticateAddress(address, account)
 }
+
 
 const authenticateAddress = async (
   address: AddressURN,

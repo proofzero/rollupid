@@ -2,7 +2,8 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
-import type { Challenge, CryptoAddressType, NFTarVoucher } from '../types'
+import type { Challenge, NFTarVoucher } from '../types'
+import type { CryptoAddressType } from '@kubelt/types/address'
 import { recoverEthereumAddress } from '../utils'
 import Address from './address'
 

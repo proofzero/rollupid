@@ -2,7 +2,8 @@ import { DOProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN } from '@kubelt/urns/address'
-import { AddressProfile, AddressType } from '../types'
+import { AddressProfile } from '../types'
+import type { AddressType } from '@kubelt/types/address'
 
 export default class Address extends DOProxy {
   declare state: DurableObjectState

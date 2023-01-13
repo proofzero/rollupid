@@ -4,7 +4,7 @@ import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 import { AnyURN, parseURN } from '@kubelt/urns'
 import { EdgeURN } from '@kubelt/urns/edge'
-import { CryptoAddressType } from '@kubelt/platform/address/src/types'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 export const NoInput = z.undefined()
 

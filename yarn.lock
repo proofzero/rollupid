@@ -6232,6 +6232,7 @@ __metadata:
     react: 18.2.0
     react-dom: 18.2.0
     remix-auth: 3.4.0
+    remix-auth-github: 1.3.0
     remix-auth-google: 1.2.0
     sass: 1.54.7
     sass-loader: 13.2.0
@@ -38119,6 +38120,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"remix-auth-github@npm:1.3.0":
+  version: 1.3.0
+  resolution: "remix-auth-github@npm:1.3.0"
+  dependencies:
+    remix-auth-oauth2: ^1.4.0
+  peerDependencies:
+    "@remix-run/server-runtime": ^1.0.0
+    remix-auth: ^3.4.0
+  checksum: e38aa2263475eea2079bf8f45113bab366f95ba04c336485f18dff34b103130cb365aa502422929f3db5d42f7b89ff617360bb514311c8bb8f25d2de6dcb5ba2
+  languageName: node
+  linkType: hard
+
 "remix-auth-google@npm:1.2.0":
   version: 1.2.0
   resolution: "remix-auth-google@npm:1.2.0"
@@ -38131,7 +38144,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth-oauth2@npm:^1.1.0":
+"remix-auth-oauth2@npm:^1.1.0, remix-auth-oauth2@npm:^1.4.0":
   version: 1.5.0
   resolution: "remix-auth-oauth2@npm:1.5.0"
   dependencies:

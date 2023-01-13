@@ -3,14 +3,10 @@ import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
 import { Context } from '../../context'
-import {
-  AddressProfile,
-  CryptoAddressProfile,
-  CryptoAddressType,
-  NFTarVoucher,
-} from '../../types'
+import { AddressProfile, CryptoAddressProfile, NFTarVoucher } from '../../types'
 import { AddressProfileSchema } from '../validators/profile'
 import { CryptoAddressProxyStub } from '../../nodes/crypto'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 export const GetAddressProfileOutput = AddressProfileSchema
 

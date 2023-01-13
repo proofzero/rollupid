@@ -1,4 +1,4 @@
-import { ContractAddressType } from '../types'
+import { ContractAddressType } from '@kubelt/types/address'
 import Address from './address'
 import { DurableObjectStubProxy } from 'do-proxy'
 

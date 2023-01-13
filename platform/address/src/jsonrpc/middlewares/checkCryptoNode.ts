@@ -1,7 +1,7 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
 
-import { NodeType } from '../../types'
+import { NodeType } from '@kubelt/types/address'
 import { isCryptoAddressType } from '../../utils'
 
 export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({

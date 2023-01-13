@@ -3,10 +3,12 @@ import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
 
 import ConnectGoogleButton from '~/components/connect-google-button'
+import ConnectGithubButton from '../connect-github-button'
 
 export type AuthenticationProps = {
   logoURL?: string
   enableWalletConnect: boolean
+  enableOAuthConnect?: boolean
   connectCallback: (address: string) => void
   connectErrorCallback: (error: Error) => void
 }
@@ -14,6 +16,7 @@ export type AuthenticationProps = {
 export function Authentication({
   logoURL,
   enableWalletConnect = true,
+  enableOAuthConnect = false,
   connectCallback,
   connectErrorCallback,
 }: AuthenticationProps) {
@@ -45,7 +48,10 @@ export function Authentication({
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
-      {/* <ConnectGoogleButton /> */}
+      <div className={enableOAuthConnect ? '' : 'hidden'}>
+        <ConnectGoogleButton />
+        <ConnectGithubButton></ConnectGithubButton>
+      </div>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { Context } from '../../context'
 
-import { CryptoAddressType } from '../../types'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 export const resolveENS: BaseMiddlewareFunction<Context> = async ({
   next,

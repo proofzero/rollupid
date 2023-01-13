@@ -16,7 +16,7 @@ import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
-import { NodeType } from '@kubelt/platform/address/src/types'
+import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import type { CryptoAddressProfile, OAuthGoogleProfile } from '@kubelt/platform/address/src/types'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
@@ -46,7 +46,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     const addressProfile = await addressClient.getAddressProfile.query()
 
     if (rparams.get('node_type') == NodeType.Crypto) {
-      const voucher = addressClient.getVoucher.query()
+      const voucher = await addressClient.getVoucher.query()
       const cryptoAddressProfile = addressProfile as CryptoAddressProfile
       await galaxyClient.updateProfile(
         {
@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             pfp: {
               image: cryptoAddressProfile.avatar || '',
             },
-            cover: voucher.metadata?.cover,
+            cover: voucher?.metadata?.cover || '',
           },
         },
         {
@@ -72,16 +72,33 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         const vaultAddressURN = await addressClient.initVault.mutate()
         const vaultAddressClient = getAddressClient(vaultAddressURN)
         const voucher = await vaultAddressClient.getVoucher.query()
-        const oauthAddressProfile = addressProfile as OAuthGoogleProfile
+        let normalizedFields:{name?:string, picture?:string} = {}
+        switch (rparams.get("addr_type")) {
+          case OAuthAddressType.GitHub:
+            normalizedFields = {
+              name: (addressProfile as any).name ?? (addressProfile as any).login,
+              picture: (addressProfile as any).avatar_url
+            }
+            break
+          case OAuthAddressType.Google:
+            const oauthAddressProfile = addressProfile as OAuthGoogleProfile
+            normalizedFields = {
+              name: oauthAddressProfile.name,
+              picture: oauthAddressProfile.picture
+            }
+            break
+          default:
+            throw new Error("Unsupported OAuth type encountered in profile response.")
+        }
         await galaxyClient.updateProfile(
           {
             profile: {
               defaultAddress: defaultProfileURN,
-              displayName: oauthAddressProfile.name,
+              displayName: normalizedFields.name,
               pfp: {
-                image: oauthAddressProfile.picture,
+                image: normalizedFields.picture || '',
               },
-              cover: voucher.metadata?.cover,
+              cover: voucher?.metadata?.cover || '',
             },
           },
           {
