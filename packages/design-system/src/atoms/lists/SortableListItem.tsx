@@ -1,17 +1,14 @@
 import { useSortable } from '@dnd-kit/sortable'
-import React, { JSXElementConstructor, Key, ReactElement } from 'react'
+import React, { Key, ReactNode } from 'react'
 import { CSS } from '@dnd-kit/utilities'
 import { RxDragHandleDots2 } from 'react-icons/rx'
 
-export type KeyedItem = Required<
-  ReactElement<any, string | JSXElementConstructor<any>>
->
-
 export type SortableListItemProps = {
-  children: KeyedItem
+  children: ReactNode
+  id: Key
 }
 
-export const SortableListItem = ({ children }: SortableListItemProps) => {
+export const SortableListItem = ({ id, children }: SortableListItemProps) => {
   const {
     attributes,
     listeners,
@@ -19,7 +16,7 @@ export const SortableListItem = ({ children }: SortableListItemProps) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: children.key })
+  } = useSortable({ id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
