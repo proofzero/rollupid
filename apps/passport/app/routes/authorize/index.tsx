@@ -46,7 +46,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     const addressProfile = await addressClient.getAddressProfile.query()
 
     if (rparams.get('node_type') == NodeType.Crypto) {
-      const voucher = addressClient.getVoucher.query()
+      const voucher = await addressClient.getVoucher.query()
       const cryptoAddressProfile = addressProfile as CryptoAddressProfile
       await galaxyClient.updateProfile(
         {
@@ -56,7 +56,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             pfp: {
               image: cryptoAddressProfile.avatar || '',
             },
-            cover: voucher.metadata?.cover,
+            cover: voucher?.metadata?.cover || '',
           },
         },
         {
@@ -98,7 +98,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               pfp: {
                 image: normalizedFields.picture || '',
               },
-              cover: voucher.metadata?.cover || '',
+              cover: voucher?.metadata?.cover || '',
             },
           },
           {

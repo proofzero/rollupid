@@ -36,7 +36,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
 
   const profile = profileRes.profile as Profile
-  console.debug("profile loader", profile.defaultAddress)
   const parsedURN = parseURN(profile.defaultAddress)
 
   const address = parsedURN.nss.split('/')[1]
@@ -48,7 +47,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const addressClient = getCryptoAddressClient({
     headers: {
-      'X-3RN': `urn:threeid:address/${address}`,
+      'X-3RN': profile.defaultAddress,
     },
   })
 

@@ -33,7 +33,6 @@ export const loader = async ({ request }) => {
     'KBT-Access-JWT-Assertion': jwt,
   })
 
-  console.debug("account loader", profileRes.profile, profileRes.profile?.defaultAddress)
   const [avatarUrl, isToken, address, pfp, links] = [
     profileRes.profile?.pfp?.image,
     profileRes.profile?.pfp?.isToken,
@@ -41,10 +40,17 @@ export const loader = async ({ request }) => {
     profileRes.profile?.pfp,
     profileRes.profile?.links,
   ]
-
-  const { ensAddress: targetAddress } = await galaxyClient.getEnsAddress({
-    addressOrEns: address,
-  })
+  
+  let targetAddress = address
+  if (profileRes.profile?.defaultAddress && 
+    parseURN(profileRes.profile?.defaultAddress).rcomponent?.includes('oauth')) {
+      targetAddress = address
+     
+  } else {
+    targetAddress = (await galaxyClient.getEnsAddress({
+      addressOrEns: address,
+    })).ensAddress || ''
+  }
 
   return json({
     targetAddress,

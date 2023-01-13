@@ -12,7 +12,6 @@ export const setOAuthNodeClient: BaseMiddlewareFunction<Context> = async ({
   }
   if (ctx.nodeType == NodeType.OAuth) {
     const node = await initOAuthNodeByName(ctx.addressURN, ctx.OAuthAddress)
-    console.debug("setOAUTHNODECLIENT middleware", ctx.addressURN, ctx.OAuthAddress)
     return next({
       ctx: {
         ...ctx,

@@ -16,7 +16,6 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
-  console.debug("Start of github loader")
   const authRes = (await authenticator.authenticate(
     GitHubStrategyDefaultName,
     request
@@ -29,12 +28,10 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const hash = keccak256(encoder.encode(idref))
   const address = (AddressURNSpace.urn(hash) +
     `?+node_type=${ NodeType.OAuth }&addr_type=${ OAuthAddressType.GitHub}`) as AddressURN
-  console.debug(address)
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
     
   await addressClient.setOAuthData.mutate(authRes)
-  console.debug("github loader before authenticateADdress")
   return authenticateAddress(address, account)
 }
 
@@ -69,7 +66,6 @@ const authenticateAddress = async (
     }
   )
 
-  console.debug("authenicateAddress, before authorize")
   const redirectURL = '/authorize'
   return createUserSession(accessToken, redirectURL, address)
 }

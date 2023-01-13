@@ -15,8 +15,6 @@ export const setOAuthDataMethod = async ({
 }): Promise<void> => {
   const nodeClient = ctx.address as OAuthAddressProxyStub
   await nodeClient.class.setData(input)
-  console.debug(input)
-  console.debug("is true", Object.values(OAuthAddressType).includes(input.profile.provider))
 
   if (Object.values(OAuthAddressType).includes(input.profile.provider))
     nodeClient.class.setProfile(input.profile._json)

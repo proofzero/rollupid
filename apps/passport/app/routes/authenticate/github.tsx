@@ -8,8 +8,6 @@ export async function loader() {
 }
 
 export const action: ActionFunction = async ({ request }: ActionArgs) => {
-  console.debug("GITHUB action:", request)
-  const blah = await authenticator.authenticate(GitHubStrategyDefaultName, request)
-  console.debug("GITHUB action after", blah)
-  return blah
+  const result = await authenticator.authenticate(GitHubStrategyDefaultName, request)
+  return result
 }

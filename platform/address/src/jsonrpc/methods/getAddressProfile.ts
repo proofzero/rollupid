@@ -123,7 +123,6 @@ const getNftarVoucher = async (
 }
 
 const gatewayFromIpfs = (ipfsUrl: string): string => {
-  console.debug("match", ipfsUrl)
   const regex =
     /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
   const match = ipfsUrl?.match(regex)

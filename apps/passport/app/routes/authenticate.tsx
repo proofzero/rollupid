@@ -9,7 +9,6 @@ import { getUserSession } from '~/session.server'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  console.debug("AUTHENTICATE LOADER", request)
   const session = await getUserSession(request)
   const searchParams = new URL(request.url).searchParams
 
