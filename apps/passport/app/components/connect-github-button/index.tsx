@@ -1,7 +1,7 @@
 import { Form } from '@remix-run/react'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-// import logoSvg from './logo.svg'
+import logoSvg from './github-mark.svg'
 
 export default function ConnectGithubButton() {
   return (<Form action='/authenticate/github' method='post'>
@@ -27,7 +27,7 @@ export default function ConnectGithubButton() {
           width: 20,
           margin: '0 7px',
         }}>
-        <img alt='Github' />
+        <img src={logoSvg} alt='Github' />
       </span> Connect With Github
     </Button>
   </Form>)

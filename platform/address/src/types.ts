@@ -23,7 +23,6 @@ export interface Environment {
   BLOCKCHAIN_ACTIVITY: Queue
 }
 
-
 export interface Challenge {
   address: string
   template: string

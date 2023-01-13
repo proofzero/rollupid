@@ -4,7 +4,7 @@ import { OAuthAddressProxyStub } from '../../nodes/oauth'
 import { OAuthDataSchema } from '../validators/oauth'
 import { OAuthAddressType } from '@kubelt/types/address'
 
-export const SetOAuthDataInput = OAuthDataSchema 
+export const SetOAuthDataInput = OAuthDataSchema
 
 export const setOAuthDataMethod = async ({
   input,
@@ -18,8 +18,7 @@ export const setOAuthDataMethod = async ({
 
   if (Object.values(OAuthAddressType).includes(input.profile.provider))
     nodeClient.class.setProfile(input.profile._json)
-  else
-      throw new Error('Unsupported OAuth provider response provided.')
+  else throw new Error('Unsupported OAuth provider response provided.')
 
   return
 }
