@@ -13,7 +13,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import React, { Key, ReactNode, useState } from 'react'
+import React, { Key, ReactNode, useEffect, useState } from 'react'
 
 import { SortableListItem } from './SortableListItem'
 
@@ -42,6 +42,10 @@ export const SortableList = <T extends SortableItem>({
   )
 
   const [itemList, setItemList] = useState(items)
+
+  useEffect(() => {
+    setItemList(items)
+  }, [items])
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
