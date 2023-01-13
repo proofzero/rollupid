@@ -69,7 +69,7 @@ deleted_classes = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "StarbaseAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 # Environment: dev
@@ -86,7 +86,7 @@ durable_objects.bindings = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "StarbaseAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.dev.vars]
@@ -106,7 +106,7 @@ durable_objects.bindings = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "StarbaseAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.next.vars]
@@ -126,7 +126,7 @@ durable_objects.bindings = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "StarbaseAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

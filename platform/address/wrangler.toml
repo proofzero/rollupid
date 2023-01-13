@@ -29,7 +29,7 @@ NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AddressAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 [dev]
@@ -64,7 +64,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AddressAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.dev.vars]
@@ -83,7 +83,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AddressAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.next.vars]
@@ -102,7 +102,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AddressAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

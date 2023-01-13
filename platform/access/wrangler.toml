@@ -14,7 +14,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccessAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 [dev]
@@ -32,7 +32,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccessAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.next]
@@ -46,7 +46,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccessAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.current]
@@ -60,7 +60,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccessAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [[migrations]]

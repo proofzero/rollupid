@@ -20,7 +20,7 @@ tag = "v1"
 renamed_classes = [{ from = "Core", to = "Account" }]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccountAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 [dev]
@@ -36,7 +36,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccountAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.next]
@@ -48,7 +48,7 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccountAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.current]
@@ -60,5 +60,5 @@ services = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "AccountAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]

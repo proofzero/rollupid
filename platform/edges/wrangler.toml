@@ -45,7 +45,7 @@ port = 8686
 local_protocol = "http"
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "EdgeAnalytics"  },
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 # Environment: dev
@@ -60,7 +60,7 @@ d1_databases = [
 ENVIRONMENT = "dev"
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "EdgeAnalyticsDev"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 # Environment: next
@@ -73,7 +73,7 @@ d1_databases = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "EdgeAnalyticsNext"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.next.vars]
@@ -89,7 +89,7 @@ d1_databases = [
 ]
 
 analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "EdgeAnalyticsCurrent"  },
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]
