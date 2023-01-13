@@ -37,18 +37,16 @@ export const SortableListItem = ({ children }: SortableListItemProps) => {
       ref={setNodeRef}
       style={style}
     >
-      <div className={`flex flex-row items-center w-full truncate`}>
-        <button
-          className="text-gray-400 mr-[14px]"
-          type="button"
-          {...attributes}
-          {...listeners}
-        >
-          <RxDragHandleDots2 size={22} />{' '}
-        </button>
+      <button
+        className="text-gray-400 mr-[14px]"
+        type="button"
+        {...attributes}
+        {...listeners}
+      >
+        <RxDragHandleDots2 size={22} />{' '}
+      </button>
 
-        <div>{children}</div>
-      </div>
+      <div className="flex flex-1">{children}</div>
     </div>
   )
 }
