@@ -8,26 +8,19 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import React from 'react'
+import React, { useState } from 'react'
 import { KeyedItem, SortableListItem } from './SortableListItem'
 
 export type SortableListProps = {
   items: KeyedItem[]
-  handleDragCancel: () => void
-  handleDragStart: ({ active }: { active: any }) => void
-  handleDragEnd: (event: any) => void
 }
 
-export const SortableList = ({
-  handleDragCancel,
-  handleDragStart,
-  handleDragEnd,
-  items,
-}: SortableListProps) => {
+export const SortableList = ({ items }: SortableListProps) => {
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -36,21 +29,34 @@ export const SortableList = ({
     })
   )
 
+  const [itemList, setItemList] = useState(items)
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setItemList((itemList) => {
+        const oldIndex = itemList.findIndex((el) => el.key === active.id)
+        const newIndex = itemList.findIndex((el) => el.key === over.id)
+
+        return arrayMove(itemList, oldIndex, newIndex)
+      })
+    }
+  }
+
   return (
     <section className="flex flex-col">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragCancel={handleDragCancel}
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={items.map((item) => item.key)}
+          items={itemList.map((item) => item.key)}
           strategy={verticalListSortingStrategy}
         >
-          {items.map((item) => (
-            <SortableListItem>{item}</SortableListItem>
+          {itemList.map((item) => (
+            <SortableListItem key={item.key}>{item}</SortableListItem>
           ))}
         </SortableContext>
       </DndContext>
