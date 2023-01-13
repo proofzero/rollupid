@@ -40,16 +40,22 @@ export const loader = async ({ request }) => {
     profileRes.profile?.pfp,
     profileRes.profile?.links,
   ]
-  
+
   let targetAddress = address
-  if (profileRes.profile?.defaultAddress && 
-    parseURN(profileRes.profile?.defaultAddress).rcomponent?.includes('oauth')) {
-      targetAddress = address
-     
+  if (
+    profileRes.profile?.defaultAddress &&
+    parseURN(profileRes.profile?.defaultAddress).rcomponent?.includes(
+      'node_type=oauth'
+    )
+  ) {
+    targetAddress = address
   } else {
-    targetAddress = (await galaxyClient.getEnsAddress({
-      addressOrEns: address,
-    })).ensAddress || ''
+    targetAddress =
+      (
+        await galaxyClient.getEnsAddress({
+          addressOrEns: address,
+        })
+      ).ensAddress || ''
   }
 
   return json({
