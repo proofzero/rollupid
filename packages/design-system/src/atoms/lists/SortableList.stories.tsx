@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Key } from 'react'
 import { SortableList } from './SortableList'
 
 export default {
@@ -9,7 +9,11 @@ export default {
 const Template = (args) => (
   <SortableList
     {...args}
-    items={[<p key={'Foo'}>Hello</p>, <p key={'Bar'}>world</p>]}
+    items={[
+      { key: 'hello', val: 'Hello' },
+      { key: 'world', val: 'world!' },
+    ]}
+    itemRenderer={(item) => <p>{item.val}</p>}
   />
 )
 

@@ -13,14 +13,26 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import React, { useState } from 'react'
-import { KeyedItem, SortableListItem } from './SortableListItem'
+import React, { Key, ReactNode, useState } from 'react'
 
-export type SortableListProps = {
-  items: KeyedItem[]
+import { SortableListItem } from './SortableListItem'
+
+type SortableItem = {
+  key: Key
+  val: any
 }
 
-export const SortableList = ({ items }: SortableListProps) => {
+export type SortableListProps<T extends SortableItem> = {
+  items: T[]
+  itemRenderer: (item: T) => ReactNode
+  onItemsReordered?: (reorderedItems: T[]) => void
+}
+
+export const SortableList = <T extends SortableItem>({
+  items,
+  itemRenderer,
+  onItemsReordered,
+}: SortableListProps<T>) => {
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -39,7 +51,13 @@ export const SortableList = ({ items }: SortableListProps) => {
         const oldIndex = itemList.findIndex((el) => el.key === active.id)
         const newIndex = itemList.findIndex((el) => el.key === over.id)
 
-        return arrayMove(itemList, oldIndex, newIndex)
+        const newArray = arrayMove(itemList, oldIndex, newIndex)
+
+        if (onItemsReordered) {
+          onItemsReordered(newArray)
+        }
+
+        return newArray
       })
     }
   }
@@ -56,7 +74,9 @@ export const SortableList = ({ items }: SortableListProps) => {
           strategy={verticalListSortingStrategy}
         >
           {itemList.map((item) => (
-            <SortableListItem key={item.key}>{item}</SortableListItem>
+            <SortableListItem key={item.key} id={item.key}>
+              {itemRenderer(item)}
+            </SortableListItem>
           ))}
         </SortableContext>
       </DndContext>

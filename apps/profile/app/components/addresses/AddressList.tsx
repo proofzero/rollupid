@@ -8,9 +8,8 @@ type AddressListProps = {
 export const AddressList = ({ addresses }: AddressListProps) => {
   return (
     <SortableList
-      items={addresses.map((ali) => (
-        <AddressListItem key={ali.id} {...ali} />
-      ))}
+      items={addresses.map((ali) => ({ key: ali.id, val: ali }))}
+      itemRenderer={(item) => <AddressListItem key={item.key} {...item.val} />}
     />
   )
 }
