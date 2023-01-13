@@ -1,4 +1,10 @@
-import { React, useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useRef,
+  useLayoutEffect,
+} from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
 import {
@@ -8,13 +14,23 @@ import {
   useActionData,
 } from '@remix-run/react'
 
-import { useSensor, useSensors, DndContext, closestCenter } from '@dnd-kit/core'
+import {
+  useSensor,
+  useSensors,
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+} from '@dnd-kit/core'
 import {
   useSortable,
   arrayMove,
   SortableContext,
   verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 import { requireJWT } from '~/utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
@@ -29,6 +45,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Tooltip } from 'flowbite-react'
 
+import SortApp from '~/components/nft-collection/Check'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
@@ -119,9 +136,15 @@ export const action: ActionFunction = async ({ request }) => {
   return { updatedLinks }
 }
 
-export const SortableItem = (props) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id })
+const SortableLink = (props: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props.id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -129,39 +152,113 @@ export const SortableItem = (props) => {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {/* ... */}
+    <div
+      className={`
+                   border border-gray-300 rounded-md
+                    px-4 py-3 mb-3 truncate bg-white
+                    flex flex-row items-center justify-between
+                    ${isDragging ? 'shadow-inner z-100' : ''}
+                     `}
+      ref={setNodeRef}
+      style={style}
+    >
+      <div className={`flex flex-row items-center w-full truncate`}>
+        <button
+          className="text-gray-400"
+          type="button"
+          {...attributes}
+          {...listeners}
+        >
+          <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
+        </button>
+        <Tooltip content="Copy" className="text-black">
+          <button
+            type="button"
+            className="bg-gray-100 hover:bg-gray-200 transition-colors
+              w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
+              text-gray-700
+        flex items-center justify-center "
+            onClick={() => {
+              navigator.clipboard.writeText(props.link.url)
+            }}
+          >
+            <TbLink size={22} />
+          </button>
+        </Tooltip>
+        <div className="flex flex-col max-w-[600px]">
+          <Text weight="medium" className="truncate">
+            {props.link.name}
+          </Text>
+          <Text className="text-gray-500 truncate">{props.link.url}</Text>
+        </div>
+      </div>
+      {/* // Puts current link in "modification" regyme */}
+      <Button
+        className="mr-4 h-[40px]
+                      bg-gray-100 focus:bg-gray-100 border-none
+                      flex flex-row items-center justify-around
+                      text-gray-600"
+        btnType="secondary-alt"
+        btnSize="base"
+        // onClick={() => {
+        //   setLinks(links.filter((link, id) => id !== i))
+        //   setNewLinks([...newLinks, links[i]])
+        // }}
+      >
+        <FiEdit size={18} />
+        Edit
+      </Button>
     </div>
   )
 }
 
 export default function AccountSettingsLinks() {
+  const [items, setItems] = useState(['1', '2', '3'])
+
   const { notificationHandler } = useOutletContext<any>()
   const transition = useTransition()
   const actionData = useActionData()
 
   const [activeId, setActiveId] = useState(null)
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
+  const [activeLink, setActiveLink] = useState(null)
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   const [links, setLinks] = useState(
     useRouteData<ProfileData>('routes/account')?.links || []
   )
 
-  const handleDragStart = ({ active }) => {
-    setActiveId(active)
+  const handleDragCancel = () => {
+    setActiveLink(null)
+    setActiveId(null)
   }
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event
+  const handleDragStart = ({ active }: { active: any }) => {
+    const id = parseInt(active.id)
+    setActiveLink(active.data.current.sortable.items[id])
+    setActiveId(id as any)
+  }
 
-    if (active.id !== over.id) {
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+    const active_id = parseInt(active.id)
+    const over_id = parseInt(over.id)
+
+    if (active_id !== over_id) {
       setLinks((links) => {
-        const oldIndex = links.indexOf(active.id)
-        const newIndex = links.indexOf(over.id)
+        const oldIndex = parseInt(active.id)
+        const newIndex = parseInt(over.id)
 
         return arrayMove(links, oldIndex, newIndex)
       })
     }
+    setActiveId(null)
+    setActiveLink(null)
   }
 
   const [isFormChanged, setFormChanged] = useState(false)
@@ -188,7 +285,6 @@ export default function AccountSettingsLinks() {
       >
         Connected Account Links
       </Text>
-      <div></div>
       <Text
         size="base"
         weight="semibold"
@@ -218,7 +314,7 @@ export default function AccountSettingsLinks() {
                   link.url || 'https://mywebsite.com'
                 }-${i}`}
                 className="
-              flex flex-col w-full 
+              flex flex-col w-full
               sm:flex-row sm:w-full sm:justify-start sm:items-center
               mb-4 py-3 px-3 truncate
               rounded-md border border-gray-300 "
@@ -286,73 +382,24 @@ export default function AccountSettingsLinks() {
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
               onDragStart={handleDragStart}
+              onDragCancel={handleDragCancel}
+              onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={links as any[]}
+                items={links.map((link, id) => `${id}`)}
                 strategy={verticalListSortingStrategy}
               >
                 {(links || []).map((link: any, i: number) => (
-                  <div
+                  <SortableLink
                     key={`${link.name || 'My Website'}-${
                       link.url || 'https://mywebsite.com'
                     }-${i}`}
-                    className="
-              border border-gray-300 rounded-md
-              px-4 py-3 mb-3 truncate
-               flex flex-row items-center justify-between
-               "
-                  >
-                    <div className="flex flex-row items-center w-full truncate">
-                      <button className="text-gray-400">
-                        <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                      </button>
-                      <Tooltip content="Copy" className="text-black">
-                        <button
-                          type="button"
-                          className="bg-gray-100 hover:bg-gray-200 transition-colors 
-                    w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
-                    text-gray-700
-              flex items-center justify-center "
-                          onClick={() => {
-                            navigator.clipboard.writeText(link.url)
-                          }}
-                        >
-                          <TbLink size={22} />
-                        </button>
-                      </Tooltip>
-                      <div className="flex flex-col w-max-[600px]">
-                        <Text weight="medium" className="truncate">
-                          {link.name}
-                        </Text>
-                        <Text className="text-gray-500 truncate">
-                          {link.url}
-                        </Text>
-                      </div>
-                    </div>
-                    {/* Puts current link in "modification" regyme */}
-                    <Button
-                      className="mr-4 h-[40px]
-                bg-gray-100 focus:bg-gray-100 border-none
-                flex flex-row items-center justify-around
-                text-gray-600"
-                      btnType="secondary-alt"
-                      btnSize="base"
-                      onClick={() => {
-                        setLinks(links.filter((link, id) => id !== i))
-                        setNewLinks([...newLinks, links[i]])
-                      }}
-                    >
-                      <FiEdit size={18} />
-                      Edit
-                    </Button>
-                  </div>
+                    id={`${i}`}
+                    link={link}
+                  />
                 ))}
               </SortableContext>
-              <DragOverlay>
-                {activeId ? <Item id={activeId} /> : null}
-              </DragOverlay>
             </DndContext>
           </div>
           <input type="hidden" name="links" value={JSON.stringify(links)} />

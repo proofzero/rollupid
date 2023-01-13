@@ -129,7 +129,6 @@ const Nft = forwardRef(
        * Don't know how to write it better so keep it for now
        */
       height: '100%',
-
       ...style,
     }
     return (
