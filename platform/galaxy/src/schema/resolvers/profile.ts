@@ -38,6 +38,7 @@ const profileResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+      console.log('form Profile', accountProfile)
       return accountProfile
     },
     profileFromAddress: async (
@@ -50,6 +51,7 @@ const profileResolvers: Resolvers = {
           'X-3RN': addressURN,
         },
       })
+      console.log('From resolver', addressURN)
       const accountURN = await addressClient.getAccount.query()
 
       // return the address profile if no account is associated with the address

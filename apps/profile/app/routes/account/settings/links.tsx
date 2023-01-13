@@ -45,7 +45,6 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Tooltip } from 'flowbite-react'
 
-import SortApp from '~/components/nft-collection/Check'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
@@ -81,11 +80,11 @@ export const action: ActionFunction = async ({ request }) => {
   const remainedLinks: any = JSON.parse(formData.get('links'))
 
   const updatedLinks: any = remainedLinks.concat(
-    updatedNames.map((name: string, i: number) => ({
-      name,
-      url: updatedUrls[i],
-      verified: false,
-    }))
+    updatedNames.map((name: string, i: number) => {
+      console.log('HELLO MAN')
+      console.log(i)
+      return { name, url: updatedUrls[i], verified: false, links_order: i }
+    })
   )
 
   const errors = {}
@@ -110,6 +109,8 @@ export const action: ActionFunction = async ({ request }) => {
   if (Object.keys(errors).length) {
     return { errors }
   }
+
+  console.log('FROM LINKS', updatedLinks)
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
@@ -256,6 +257,7 @@ export default function AccountSettingsLinks() {
 
         return arrayMove(links, oldIndex, newIndex)
       })
+      setFormChanged(true)
     }
     setActiveId(null)
     setActiveLink(null)
