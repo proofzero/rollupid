@@ -1,5 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
+import address from '../types/address'
 import { Resolvers } from './typedefs'
 
 import { hasApiKey, setupContext, logAnalytics } from './utils'
@@ -7,18 +8,15 @@ import { hasApiKey, setupContext, logAnalytics } from './utils'
 const addressResolvers: Resolvers = {
   Query: {
     ensDisplayName: async (_parent, { addressOrEns }, { env }) => {
-      // logAnalytics
-      console.log(env.Analytics)
+      logAnalytics(env.Analytics, 'ensDisplayName', 'query:gql', 'BEFORE', addressOrEns)
       return new ENSUtils().getENSDisplayName(addressOrEns)
     },
     ensAddress: async (_parent, { addressOrEns }, { env }) => {
-      // logAnalytics
-      console.log(env.Analytics)
+      logAnalytics(env.Analytics, 'ensAddress', 'query:gql', 'BEFORE', addressOrEns)
       return new ENSUtils().getENSAddress(addressOrEns)
     },
     ensAddressAvatar: async (_parent, { addressOrEns }, { env }) => {
-      // logAnalytics
-      console.log(env.Analytics)
+      logAnalytics(env.Analytics, 'ensAddressAvatar', 'query:gql', 'BEFORE', addressOrEns)
       return new ENSUtils().getENSAddressAvatar(addressOrEns)
     }
   },
