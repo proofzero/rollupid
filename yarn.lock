@@ -6234,6 +6234,7 @@ __metadata:
     remix-auth: 3.4.0
     remix-auth-github: 1.3.0
     remix-auth-google: 1.2.0
+    remix-auth-twitter: 0.1.1
     sass: 1.54.7
     sass-loader: 13.2.0
     storybook-addon-sass-postcss: 0.1.3
@@ -19769,6 +19770,13 @@ __metadata:
     randombytes: ^2.0.0
     randomfill: ^1.0.3
   checksum: c1609af82605474262f3eaa07daa0b2140026bd264ab316d4bf1170272570dbe02f0c49e29407fe0d3634f96c507c27a19a6765fb856fed854a625f9d15618e2
+  languageName: node
+  linkType: hard
+
+"crypto-js@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "crypto-js@npm:4.1.1"
+  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
   languageName: node
   linkType: hard
 
@@ -37303,6 +37311,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom@npm:^17.0.2":
+  version: 17.0.2
+  resolution: "react-dom@npm:17.0.2"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+    scheduler: ^0.20.2
+  peerDependencies:
+    react: 17.0.2
+  checksum: 1c1eaa3bca7c7228d24b70932e3d7c99e70d1d04e13bb0843bbf321582bc25d7961d6b8a6978a58a598af2af496d1cedcfb1bf65f6b0960a0a8161cb8dab743c
+  languageName: node
+  linkType: hard
+
 "react-element-to-jsx-string@npm:^14.3.4":
   version: 14.3.4
   resolution: "react-element-to-jsx-string@npm:14.3.4"
@@ -38158,7 +38179,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remix-auth@npm:3.4.0, remix-auth@npm:^3.4.0":
+"remix-auth-twitter@npm:0.1.1":
+  version: 0.1.1
+  resolution: "remix-auth-twitter@npm:0.1.1"
+  dependencies:
+    crypto-js: ^4.1.1
+    debug: ^4.3.3
+    react-dom: ^17.0.2
+    remix-auth: ^3.2.2
+    uuid: ^8.3.2
+  peerDependencies:
+    "@remix-run/server-runtime": ^1.6.3
+  checksum: eb81a539cf66658c44110decc4b278e516ad060f1afb6700dec60773ee1bbed45785771bdef10c92298fcefc2d76416cf378336f5ecc0b3e055677e72cdc6436
+  languageName: node
+  linkType: hard
+
+"remix-auth@npm:3.4.0, remix-auth@npm:^3.2.2, remix-auth@npm:^3.4.0":
   version: 3.4.0
   resolution: "remix-auth@npm:3.4.0"
   dependencies:

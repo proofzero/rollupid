@@ -17,6 +17,7 @@ export enum ContractAddressType {
 export enum OAuthAddressType {
   Google = 'google',
   GitHub = 'github',
+  Twitter = 'twitter',
 }
 
 export type AddressType =

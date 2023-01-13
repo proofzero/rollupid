@@ -32,6 +32,7 @@ PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/twitter/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.dev]
@@ -53,6 +54,7 @@ PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.threeid.xyz/authenticate/twitter/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [env.next]
@@ -75,6 +77,7 @@ PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.threeid.xyz/authenticate/twitter/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 [env.next.build]
@@ -100,6 +103,7 @@ PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
 INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/github/callback"
+INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.threeid.xyz/authenticate/twitter/callback"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 
 [env.current.build]

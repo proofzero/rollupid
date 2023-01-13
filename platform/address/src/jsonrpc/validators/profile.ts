@@ -78,8 +78,16 @@ export const GithubRawProfileSubsetSchema = z.object({
   avatar_url: z.string(),
 })
 
+export const TwitterProfileSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  screen_name: z.string(),
+  profile_image_url_https: z.string(),
+})
+
 export const AddressProfileSchema = z.union([
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
   GithubRawProfileSubsetSchema,
+  TwitterProfileSchema,
 ])
