@@ -1,4 +1,5 @@
 export default (ipfsUrl: string | undefined): string | undefined => {
+  console.debug("iso match", ipfsUrl)
   const regex =
     /ipfs:\/\/(?<prefix>ipfs\/)?(?<cid>[a-zA-Z0-9]+)(?<path>(?:\/[\w.-]+)+)?/
   const match = ipfsUrl?.match(regex)

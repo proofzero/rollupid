@@ -15,15 +15,13 @@ export const setOAuthDataMethod = async ({
 }): Promise<void> => {
   const nodeClient = ctx.address as OAuthAddressProxyStub
   await nodeClient.class.setData(input)
+  console.debug(input)
+  console.debug("is true", Object.values(OAuthAddressType).includes(input.profile.provider))
 
-  switch (input.profile.provider) {
-    case OAuthAddressType.Google || OAuthAddressType.GitHub:
-      nodeClient.class.setProfile(input.profile._json)
-      break
-    //Other cases to be added here, depending on Oauth provider data schema
-    default:
+  if (Object.values(OAuthAddressType).includes(input.profile.provider))
+    nodeClient.class.setProfile(input.profile._json)
+  else
       throw new Error('Unsupported OAuth provider response provided.')
-  }
 
   return
 }

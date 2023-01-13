@@ -1,6 +1,5 @@
 import { OAuthAddressType } from '@kubelt/types/address'
 import { z } from 'zod'
-import Address from '../../nodes/address'
 import { GoogleRawProfileSchema } from './profile'
 
 export const GoogleProfileSchema = z.object({
@@ -24,17 +23,19 @@ export const GoogleProfileSchema = z.object({
     _json: GoogleRawProfileSchema,
 })
 
-export const GithubProfileSchema = z.object({
-  provider: z.literal(OAuthAddressType.GitHub),
+export const GithubProfileSchema = 
+
+  z.object({
+   provider: z.literal(OAuthAddressType.GitHub) ,
   id: z.string(),
 	displayName: z.string(),
 	name: z.object({
-		familyName: z.string(),
-		givenName: z.string(),
-		middleName: z.string(),
-	}),
-	emails: z.array(z.object({value: z.string(), })),
-	photos: z.array(z.object({value: z.string(), })),
+		familyName: z.string().nullable(),
+		givenName: z.string().nullable(),
+		middleName: z.string().nullable(),
+	}).nullable(),
+	emails: z.array(z.object({value: z.string().nullable(), })),
+	photos: z.array(z.object({value: z.string().nullable(), })),
 	_json: z.object({
 		login: z.string(),
 		id: z.number(),
@@ -54,22 +55,21 @@ export const GithubProfileSchema = z.object({
 		received_events_url: z.string(),
 		type: z.string(),
 		site_admin: z.boolean(),
-		name: z.string(),
-		company: z.string(),
+		name: z.string().nullable(),
+		company: z.string().nullable(),
 		blog: z.string(),
-		location: z.string(),
-		email: z.string(),
-		hireable: z.boolean(),
-		bio: z.string(),
-		twitter_username: z.string(),
+		location: z.string().nullable(),
+		email: z.string().nullable(),
+		hireable: z.boolean().nullable(),
+		bio: z.string().nullable(),
+		twitter_username: z.string().nullable(),
 		public_repos: z.number(),
 		public_gists: z.number(),
 		followers: z.number(),
 		following: z.number(),
 		created_at: z.string(),
 		updated_at: z.string(),
-	})
-
+	}).nullable()
 })
 
 export const OAuthDataSchema = z.object({
@@ -86,5 +86,3 @@ export const OAuthDataSchema = z.object({
     GithubProfileSchema,
   ])
 })
-
-type githubtype = z.infer<typeof GithubProfileSchema>

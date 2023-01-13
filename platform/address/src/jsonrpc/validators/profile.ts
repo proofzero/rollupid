@@ -70,7 +70,16 @@ export const GoogleRawProfileSchema = z.object({
   email_verified: z.boolean(),
 })
 
+//Going for a subset of the full profile as there are a lot of (unneeded) fields there
+export const GithubRawProfileSubsetSchema = z.object({
+  login: z.string(),
+  name: z.string().nullable(),
+  url: z.string(),
+  avatar_url: z.string(),
+})
+
 export const AddressProfileSchema = z.union([
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
+  GithubRawProfileSubsetSchema,
 ])

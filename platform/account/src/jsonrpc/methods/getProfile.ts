@@ -18,6 +18,8 @@ export const getProfileMethod = async ({
   ctx: Context
 }): Promise<Profile | null> => {
   const node = await initAccountNodeByName(input.account, ctx.Account)
+  console.debug("account before get profile")
   const result = await node.class.getProfile()
+  console.debug("account after get profile", result)
   return result
 }

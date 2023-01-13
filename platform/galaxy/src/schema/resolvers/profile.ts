@@ -38,6 +38,7 @@ const profileResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+      console.debug("galaxy getProfile", accountProfile)
       return accountProfile
     },
     profileFromAddress: async (

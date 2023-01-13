@@ -2,7 +2,7 @@
   "name": "@kubelt/apps.console",
   "version": "0.1.0",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": true,
   "scripts": {
     "storybook:css": "npx tailwindcss -o ./app/styles/tailwind.css --watch",
     "storybook:start": "start-storybook -p 6008",

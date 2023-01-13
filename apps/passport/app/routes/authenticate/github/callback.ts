@@ -28,7 +28,8 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
   const address = (AddressURNSpace.urn(hash) +
-    `?+node_type=${ NodeType.OAuth }?=addr_type=${ OAuthAddressType.GitHub}`) as AddressURN
+    `?+node_type=${ NodeType.OAuth }&addr_type=${ OAuthAddressType.GitHub}`) as AddressURN
+  console.debug(address)
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
     

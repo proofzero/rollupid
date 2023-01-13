@@ -36,7 +36,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   })
 
   const profile = profileRes.profile as Profile
-
+  console.debug("profile loader", profile.defaultAddress)
   const parsedURN = parseURN(profile.defaultAddress)
 
   const address = parsedURN.nss.split('/')[1]
