@@ -10,61 +10,24 @@ import {
 import {
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import React from 'react'
-import { ReactNode } from 'react'
-import { CSS } from '@dnd-kit/utilities'
-import { RxDragHandleDots2 } from 'react-icons/rx'
+import { KeyedItem, SortableListItem } from './SortableListItem'
 
 export type SortableListProps = {
-  items: string[]
+  items: KeyedItem[]
+  handleDragCancel: () => void
+  handleDragStart: ({ active }: { active: any }) => void
+  handleDragEnd: (event: any) => void
 }
 
-const SortableListItem = ({ id, ...rest }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <div
-      className={`
-               border border-gray-300 rounded-md
-                px-4 py-3 mb-3 truncate bg-white
-                flex flex-row items-center justify-between
-                ${isDragging ? 'shadow-inner z-100' : ''}
-                 `}
-      ref={setNodeRef}
-      style={style}
-    >
-      <div className={`flex flex-row items-center w-full truncate`}>
-        <button
-          className="text-gray-400"
-          type="button"
-          {...attributes}
-          {...listeners}
-        >
-          <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-        </button>
-
-        <div>Fubar</div>
-      </div>
-    </div>
-  )
-}
-
-export const SortableList = ({ items }: SortableListProps) => {
+export const SortableList = ({
+  handleDragCancel,
+  handleDragStart,
+  handleDragEnd,
+  items,
+}: SortableListProps) => {
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -72,12 +35,6 @@ export const SortableList = ({ items }: SortableListProps) => {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
-
-  const handleDragCancel = () => {}
-
-  const handleDragStart = ({ active }: { active: any }) => {}
-
-  const handleDragEnd = (event: any) => {}
 
   return (
     <section className="flex flex-col">
@@ -89,11 +46,11 @@ export const SortableList = ({ items }: SortableListProps) => {
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={items.map((item, index) => item)}
+          items={items.map((item) => item.key)}
           strategy={verticalListSortingStrategy}
         >
-          {items.map((i) => (
-            <SortableListItem key={i} id={i} />
+          {items.map((item) => (
+            <SortableListItem>{item}</SortableListItem>
           ))}
         </SortableContext>
       </DndContext>
