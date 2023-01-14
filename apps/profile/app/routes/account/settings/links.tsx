@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  forwardRef,
-  useRef,
-  useLayoutEffect,
-} from 'react'
+import React, { useState, useEffect } from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
 import {
@@ -40,6 +34,7 @@ import { HiOutlineTrash } from 'react-icons/hi'
 import { RxDragHandleDots2 } from 'react-icons/rx'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
+import { AiOutlinePlus } from 'react-icons/ai'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -49,7 +44,6 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import { useRouteData } from '~/hooks'
-import { link } from 'fs'
 
 export type ProfileData = {
   targetAddress: string
@@ -63,7 +57,6 @@ export type ProfileData = {
     name: string
     url: string
     verified: boolean
-    links_order: number
   }[]
 }
 
@@ -81,20 +74,12 @@ export const action: ActionFunction = async ({ request }) => {
   const updatedUrls: any = formData.getAll('url')
   const remainedLinks: any = JSON.parse(formData.get('links'))
 
-  const updatedRemainedLinks: any = remainedLinks.map((link, i) => ({
-    ...link,
-    links_order: i,
-  }))
-
-  const prevLinksLen = updatedRemainedLinks.length
-
-  const updatedLinks: any = updatedRemainedLinks.concat(
+  const updatedLinks: any = remainedLinks.concat(
     updatedNames.map((name: string, i: number) => {
       return {
         name,
         url: updatedUrls[i],
         verified: false,
-        links_order: i + prevLinksLen,
       }
     })
   )
@@ -166,8 +151,8 @@ const SortableLink = (props: any) => {
       className={`
                    border border-gray-300 rounded-md
                     px-4 py-3 mb-3 truncate bg-white
-                    flex flex-row items-center justify-between
-                    ${isDragging ? 'shadow-inner z-100' : ''}
+                    flex flex-row items-center justify-between z-100
+                    ${isDragging ? 'shadow-xl ' : ''}
                      `}
       ref={setNodeRef}
       style={style}
@@ -263,9 +248,7 @@ export default function AccountSettingsLinks() {
 
   const [isFormChanged, setFormChanged] = useState(false)
 
-  const initialLinks = [
-    { name: '', url: '', verified: false, gallery_order: null },
-  ]
+  const initialLinks: any[] = []
 
   const [newLinks, setNewLinks] = useState(initialLinks)
 
@@ -306,6 +289,34 @@ export default function AccountSettingsLinks() {
         className="relative min-h-[35.563rem]"
       >
         <div className="flex flex-col">
+          {/* Links that are already in account DO */}
+          <div className="flex flex-col mb-3">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={links.map((link, id) => `${id}`)}
+                strategy={verticalListSortingStrategy}
+              >
+                {(links || []).map((link: any, i: number) => (
+                  <SortableLink
+                    key={`${link.name || 'My Website'}-${
+                      link.url || 'https://mywebsite.com'
+                    }-${i}`}
+                    id={`${i}`}
+                    link={link}
+                    links={links}
+                    setNewLinks={setNewLinks}
+                    setLinks={setLinks}
+                    newLinks={newLinks}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </div>
+          <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
             //Check if there is an error
             const isError = actionData?.errors && actionData?.errors[`${i}`]
@@ -379,44 +390,19 @@ export default function AccountSettingsLinks() {
               </div>
             )
           })}
-          {/* Links that are already in account DO */}
-          <div className="flex flex-col mb-3">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={links.map((link, id) => `${id}`)}
-                strategy={verticalListSortingStrategy}
-              >
-                {(links || []).map((link: any, i: number) => (
-                  <SortableLink
-                    key={`${link.name || 'My Website'}-${
-                      link.url || 'https://mywebsite.com'
-                    }-${i}`}
-                    id={`${i}`}
-                    link={link}
-                    links={links}
-                    setNewLinks={setNewLinks}
-                    setLinks={setLinks}
-                    newLinks={newLinks}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </div>
-          <input type="hidden" name="links" value={JSON.stringify(links)} />
-          <button
+          <Button
             type="button"
             onClick={() => {
               setNewLinks([...newLinks, { name: '', url: '', verified: false }])
             }}
-            className="right-0 text-indigo-500 text-base w-max
-          text-left"
+            btnType={'secondary'}
+            btnSize={'xl'}
+            className="right-0 !text-gray-600
+            border-none mb-4 lg:mb-0 w-max text-left
+            flex flew-row items-center justify-between"
           >
-            + Add More
-          </button>
+            <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
+          </Button>
         </div>
 
         <SaveButton

@@ -1,4 +1,4 @@
-import { Button } from '@kubelt/design-system'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 const SaveButton = ({ isFormChanged, discardFn }: any) => {
   return (
