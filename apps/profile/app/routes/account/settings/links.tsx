@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
 import {
@@ -8,6 +8,24 @@ import {
   useActionData,
 } from '@remix-run/react'
 
+import {
+  useSensor,
+  useSensors,
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+} from '@dnd-kit/core'
+import {
+  useSortable,
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 import { requireJWT } from '~/utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -16,6 +34,7 @@ import { HiOutlineTrash } from 'react-icons/hi'
 import { RxDragHandleDots2 } from 'react-icons/rx'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
+import { AiOutlinePlus } from 'react-icons/ai'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -56,11 +75,13 @@ export const action: ActionFunction = async ({ request }) => {
   const remainedLinks: any = JSON.parse(formData.get('links'))
 
   const updatedLinks: any = remainedLinks.concat(
-    updatedNames.map((name: string, i: number) => ({
-      name,
-      url: updatedUrls[i],
-      verified: false,
-    }))
+    updatedNames.map((name: string, i: number) => {
+      return {
+        name,
+        url: updatedUrls[i],
+        verified: false,
+      }
+    })
   )
 
   const errors = {}
@@ -85,7 +106,6 @@ export const action: ActionFunction = async ({ request }) => {
   if (Object.keys(errors).length) {
     return { errors }
   }
-
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
     'KBT-Access-JWT-Assertion': jwt,
@@ -111,18 +131,124 @@ export const action: ActionFunction = async ({ request }) => {
   return { updatedLinks }
 }
 
+const SortableLink = (props: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: props.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  }
+
+  return (
+    <div
+      className={`
+                   border border-gray-300 rounded-md
+                    px-4 py-3 mb-3 truncate bg-white
+                    flex flex-row items-center justify-between z-100
+                    ${isDragging ? 'shadow-xl ' : ''}
+                     `}
+      ref={setNodeRef}
+      style={style}
+    >
+      <div className={`flex flex-row items-center w-full truncate`}>
+        <button
+          className="text-gray-400"
+          type="button"
+          {...attributes}
+          {...listeners}
+        >
+          <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
+        </button>
+        <Tooltip content="Copy" className="text-black">
+          <button
+            type="button"
+            className="bg-gray-100 hover:bg-gray-200 transition-colors
+              w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
+              text-gray-700
+        flex items-center justify-center "
+            onClick={() => {
+              navigator.clipboard.writeText(props.link.url)
+            }}
+          >
+            <TbLink size={22} />
+          </button>
+        </Tooltip>
+        <div className="flex flex-col max-w-[600px]">
+          <Text weight="medium" className="truncate">
+            {props.link.name}
+          </Text>
+          <Text className="text-gray-500 truncate">{props.link.url}</Text>
+        </div>
+      </div>
+      {/* // Puts current link in "modification" regyme */}
+      <Button
+        className="mr-4 h-[40px]
+                      bg-gray-100 focus:bg-gray-100 border-none
+                      flex flex-row items-center justify-around
+                      text-gray-600"
+        btnType="secondary-alt"
+        btnSize="base"
+        onClick={() => {
+          props.setLinks(
+            props.links.filter((link, id) => id !== parseInt(props.id))
+          )
+          props.setNewLinks([
+            ...props.newLinks,
+            props.links[parseInt(props.id)],
+          ])
+        }}
+      >
+        <FiEdit size={18} />
+        Edit
+      </Button>
+    </div>
+  )
+}
+
 export default function AccountSettingsLinks() {
   const { notificationHandler } = useOutletContext<any>()
   const transition = useTransition()
   const actionData = useActionData()
 
-  const [links, setLinks] = useState(
-    useRouteData<ProfileData>('routes/account')?.links || []
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   )
+
+  const initialOldLinks =
+    useRouteData<ProfileData>('routes/account')?.links || []
+
+  const [links, setLinks] = useState(initialOldLinks)
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+    const active_id = parseInt(active.id)
+    const over_id = parseInt(over.id)
+
+    if (active_id !== over_id) {
+      setLinks((links) => {
+        const oldIndex = parseInt(active.id)
+        const newIndex = parseInt(over.id)
+
+        return arrayMove(links, oldIndex, newIndex)
+      })
+      setFormChanged(true)
+    }
+  }
 
   const [isFormChanged, setFormChanged] = useState(false)
 
-  const initialLinks = [{ name: '', url: '', verified: false }]
+  const initialLinks: any[] = []
 
   const [newLinks, setNewLinks] = useState(initialLinks)
 
@@ -144,7 +270,6 @@ export default function AccountSettingsLinks() {
       >
         Connected Account Links
       </Text>
-      <div></div>
       <Text
         size="base"
         weight="semibold"
@@ -164,6 +289,34 @@ export default function AccountSettingsLinks() {
         className="relative min-h-[35.563rem]"
       >
         <div className="flex flex-col">
+          {/* Links that are already in account DO */}
+          <div className="flex flex-col mb-3">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={links.map((link, id) => `${id}`)}
+                strategy={verticalListSortingStrategy}
+              >
+                {(links || []).map((link: any, i: number) => (
+                  <SortableLink
+                    key={`${link.name || 'My Website'}-${
+                      link.url || 'https://mywebsite.com'
+                    }-${i}`}
+                    id={`${i}`}
+                    link={link}
+                    links={links}
+                    setNewLinks={setNewLinks}
+                    setLinks={setLinks}
+                    newLinks={newLinks}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </div>
+          <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
             //Check if there is an error
             const isError = actionData?.errors && actionData?.errors[`${i}`]
@@ -174,7 +327,7 @@ export default function AccountSettingsLinks() {
                   link.url || 'https://mywebsite.com'
                 }-${i}`}
                 className="
-              flex flex-col w-full 
+              flex flex-col w-full
               sm:flex-row sm:w-full sm:justify-start sm:items-center
               mb-4 py-3 px-3 truncate
               rounded-md border border-gray-300 "
@@ -237,80 +390,26 @@ export default function AccountSettingsLinks() {
               </div>
             )
           })}
-          {/* Links that are already in account DO */}
-          <div className="flex flex-col mb-3">
-            {(links || []).map((link: any, i: number) => (
-              <div
-                key={`${link.name || 'My Website'}-${
-                  link.url || 'https://mywebsite.com'
-                }-${i}`}
-                className="
-              border border-gray-300 rounded-md
-              px-4 py-3 mb-3 truncate
-               flex flex-row items-center justify-between
-               "
-              >
-                <div className="flex flex-row items-center w-full truncate">
-                  <button className="text-gray-400">
-                    <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-                  </button>
-                  <Tooltip content="Copy" className="text-black">
-                    <button
-                      type="button"
-                      className="bg-gray-100 hover:bg-gray-200 transition-colors 
-                    w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
-                    text-gray-700
-              flex items-center justify-center "
-                      onClick={() => {
-                        navigator.clipboard.writeText(link.url)
-                      }}
-                    >
-                      <TbLink size={22} />
-                    </button>
-                  </Tooltip>
-                  <div className="flex flex-col w-max-[600px]">
-                    <Text weight="medium" className="truncate">
-                      {link.name}
-                    </Text>
-                    <Text className="text-gray-500 truncate">{link.url}</Text>
-                  </div>
-                </div>
-                {/* Puts current link in "modification" regyme */}
-                <Button
-                  className="mr-4 h-[40px]
-                bg-gray-100 focus:bg-gray-100 border-none
-                flex flex-row items-center justify-around
-                text-gray-600"
-                  btnType="secondary-alt"
-                  btnSize="base"
-                  onClick={() => {
-                    setLinks(links.filter((link, id) => id !== i))
-                    setNewLinks([...newLinks, links[i]])
-                  }}
-                >
-                  <FiEdit size={18} />
-                  Edit
-                </Button>
-              </div>
-            ))}
-          </div>
-          <input type="hidden" name="links" value={JSON.stringify(links)} />
-          <button
+          <Button
             type="button"
             onClick={() => {
               setNewLinks([...newLinks, { name: '', url: '', verified: false }])
             }}
-            className="right-0 text-indigo-500 text-base w-max
-          text-left"
+            btnType={'secondary'}
+            btnSize={'xl'}
+            className="right-0 !text-gray-600
+            border-none mb-4 lg:mb-0 w-max text-left
+            flex flew-row items-center justify-between"
           >
-            + Add More
-          </button>
+            <AiOutlinePlus size={22} className="mr-[11px]" /> Add Link
+          </Button>
         </div>
 
         <SaveButton
           isFormChanged={isFormChanged}
           discardFn={() => {
             setNewLinks(initialLinks)
+            setLinks(initialOldLinks)
           }}
         />
       </Form>

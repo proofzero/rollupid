@@ -1,6 +1,6 @@
-import { Button } from '@kubelt/design-system'
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-const SaveButton = ({ isFormChanged, discardFn }: any) => {
+const SaveButton = ({ isFormChanged, discardFn, size = 'xl' }: any) => {
   return (
     <>
       {/* Form where this button is used should have 
@@ -19,7 +19,7 @@ const SaveButton = ({ isFormChanged, discardFn }: any) => {
               <Button
                 type="reset"
                 btnType={'secondary'}
-                btnSize={'xl'}
+                btnSize={size}
                 className="!text-gray-600 border-none mb-4 lg:mb-0"
                 onClick={discardFn}
               >
@@ -29,7 +29,7 @@ const SaveButton = ({ isFormChanged, discardFn }: any) => {
             <Button
               isSubmit
               btnType={'primary'}
-              btnSize={'xl'}
+              btnSize={size}
               className="mb-4 lg:mb-0"
             >
               Save
@@ -40,7 +40,7 @@ const SaveButton = ({ isFormChanged, discardFn }: any) => {
             <Button
               isSubmit
               btnType={'primary'}
-              btnSize={'xl'}
+              btnSize={size}
               className="mb-4 lg:mb-0"
               disabled
             >
