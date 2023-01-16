@@ -1,34 +1,22 @@
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AccountURN } from '@kubelt/urns/account'
-import { DeploymentMetadata } from '@kubelt/types'
 import { BaseMiddlewareFunction } from './types'
 
-export const Analytics: BaseMiddlewareFunction<{
+export const CustomAnalytics: BaseMiddlewareFunction<{
   Analytics?: AnalyticsEngineDataset
-  ServiceDeploymentMetadata?: DeploymentMetadata
   req?: Request
   accountURN?: AccountURN
-}> = async ({ ctx, path, type, next }) => { //resHeaders, 
+}> = async ({ ctx, path, type, next }) => {
   const rayId = ctx.req?.headers.get('cf-ray') || null
   // if (!rayId) throw new Error('No CF-Ray found in request headers')
 
-  console.log('testing1', ctx.Analytics ? 'Analytics' : 'no analytics binding')
-  console.log('testing2', ctx.ServiceDeploymentMetadata ? 'ServiceMetadata' : 'no metadata binding')
-
-  // TODO: Activity-specific custom object tracking per-method (new middleware).
-
   const accountURN = ctx.accountURN || null
 
-  // TODO: Move to the types from the types package and parse JWT here for account URN.
   const raw_key =
-    accountURN ||
-    ctx.req?.headers.get(PlatformJWTAssertionHeader) ||
-    ctx.req?.headers.get('kbt-access-jwt-assertion') ||
     rayId ||
+    accountURN ||
+    ctx.req?.headers.get('kbt-access-jwt-assertion') ||
     'no key'
   const enc_key = new TextEncoder().encode(raw_key)
-
-  // TODO: Bad perf. Only do this if there's no unique key.
   const hash = await crypto.subtle.digest(
     {
       name: 'SHA-256',
@@ -49,6 +37,7 @@ export const Analytics: BaseMiddlewareFunction<{
     indexes: [hashkey], // TODO: Need a sampling index.
   }
 
+  console.log('service precall analytics', JSON.stringify(pre))
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({
@@ -62,6 +51,7 @@ export const Analytics: BaseMiddlewareFunction<{
     indexes: [hashkey], // TODO: Need a sampling index.
   }
 
+  console.log('service postcall analytics', JSON.stringify(post))
   ctx.Analytics?.writeDataPoint(post)
 
   return result

@@ -1,7 +1,7 @@
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import createEdgesClient from '@kubelt/platform-clients/edges'
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
 import type { Environment } from './types'
@@ -18,6 +18,7 @@ interface CreateInnerContextOptions
   access?: Access
   accessNode?: DurableObjectStubProxy<Access>
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher

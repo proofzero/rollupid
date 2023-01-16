@@ -17,6 +17,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [dev]
 port = 9393
 local_protocol = "http"
@@ -35,6 +39,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -49,6 +57,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Access", class_name = "Access" },
@@ -61,6 +73,10 @@ services = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [[migrations]]

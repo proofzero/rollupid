@@ -1,5 +1,7 @@
 import { KeyLike, JWK } from 'jose'
 
+import { DeploymentMetadata } from '@kubelt/types'
+
 export interface KeyPair {
   publicKey: KeyLike | Uint8Array
   privateKey: KeyLike | Uint8Array
@@ -14,6 +16,7 @@ export interface Environment {
   Access: DurableObjectNamespace
   Authorization: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   EDGES: Fetcher
   Starbase: Fetcher
 }
