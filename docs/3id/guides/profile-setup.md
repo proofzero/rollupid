@@ -55,3 +55,21 @@ Click **+ Add Link**, enter the information for a link, and hit _enter_ or selec
 At the top of the page select "My Profile". This will take you back to your public profile page. Notice that you profile now displays a new link.
 
 ![A new link!](../img/profile-walkthrough/profile-done-ss.png)
+
+## Select "Edit Profile"
+
+Now let's add an NFT to our gallery. Select "Edit Profile". This will take you back to the account settings page. Select "NFT Gallery".
+
+![NFT Gallery setup page.](../img/profile-walkthrough/account-nft-ss.png)
+
+## Add an NFT
+
+Select **Add NFT**, select a collection, and pick a new NFT. Now click **Save**.
+
+![NFT Gallery setup page.](../img/profile-walkthrough/account-nft-picker-ss.png)
+
+## Select "My Profile"
+
+At the top-left of the page head back to your public profile page.
+
+![Configured profile page.](../img/profile-walkthrough/profile-done-link-nft-ss.png)
