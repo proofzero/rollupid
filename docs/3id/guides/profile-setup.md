@@ -4,34 +4,29 @@ This a getting started guide for personal profiles. [Developer instructions are 
 
 ## Passport Login
 
-When you first login you'll be presented with a selection of applications. Select **My 3ID** to manage your profile.
+Log in to the application and select **My 3ID** to manage your profile.
 
 ![](../img/profile-walkthrough/passport-ss.png)
 
-## Connect with 3ID Passport
+## Account Dashboard
 
-First, connect with 3ID Passport: [https://passport.threeid.xyz](https://passport.threeid.xyz). You’ll see a screen like this:
+From the account dashboard you'll be able to configure your profile settings, NFT gallery, and quick links.
 
-![](../img/profile-walkthrough/account-ss.png)
+![The account dashboard.](../img/profile-walkthrough/account-ss.png)
 
-## Select Console
+## Select "My Profile"
 
-Console is where you’ll create and configure your 3ID Application. Select Console and you’ll see your list of applications — 
+In the top-left of the screen select **My Profile**. On the profile screen you can:
 
-![Console is your command center -- but first you need an app!](../img/console-dashboard.png)
+* Set your **cover photo**,
+* View your **gallery**,
+* View your **NFT collections**, and
+* **Edit your profile.**
 
-## Click “Create Application”
+![The user profile page.](../img/profile-walkthrough/profile-ss.png)
 
-— but you don’t have one yet! Click the big “Create Application” button in the middle of the screen and you’ll be taken to the dashboard for a new application.
+## Select "Edit Profile"
 
-![Your command and control plane for your app.](../img/console-app-create.png)
+In the top-right of the profile screen select **Edit Profile**. This will take you to the account settings page.
 
-## Open 0xAuth Settings
-
-Click the second item in the sidebar on the left, **0xAuth**. This will open the authorization configuration settings for your 3ID application. If you’ve configured an OAuth application before, 0xAuth configuration should look familiar:
-
-![Configure your OxAuth/OAuth settings!](../img/console-app-0xauth.png)
-
-## Configure Your Application Data
-
-Now you can configure your application data. [See the Console Reference](../console/reference.md) for more information.
+![The account settings page.](../img/profile-walkthrough/account-settings-profile-ss.png)
