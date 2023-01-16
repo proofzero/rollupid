@@ -2,9 +2,9 @@
 
 This a getting started guide for personal profiles. [Developer instructions are here.](./app-setup.md)
 
-## Login Flow
+## Passport Login
 
-First
+![](../img/profile-walkthrough/passport-ss.png)
 
 ## Connect with 3ID Passport
 
