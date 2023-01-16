@@ -1,4 +1,5 @@
 export interface Environment {
+  Analytics: AnalyticsEngineDataset
   Bucket: R2Bucket
   Meta: DurableObjectNamespace
 }

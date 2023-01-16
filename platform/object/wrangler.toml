@@ -10,9 +10,17 @@ r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
 [dev]
 port = 9595
 local_protocol = "http"
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+]
 
 [env.dev]
 durable_objects.bindings = [
@@ -30,12 +38,20 @@ r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-next", preview_bucket_name = "threeid-next" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-current", preview_bucket_name = "threeid-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [[migrations]]

@@ -9,6 +9,7 @@ import type { Environment } from './types'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
+  Analytics: AnalyticsEngineDataset
   Meta: DurableObjectNamespace
   Bucket: R2Bucket
 }
