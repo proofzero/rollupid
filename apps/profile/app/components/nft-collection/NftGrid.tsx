@@ -14,12 +14,13 @@ import CollectionFilter from './CollectionFilter'
 
 export type NftGridProps = {
   account: string
-  nfts?: any[]
+  nfts: any[]
   pfp?: string
   isOwner?: boolean
   displayText: string
   preload?: boolean
   detailsModal?: boolean
+
   filters?: boolean
   pageKey?: string
   isModal: boolean
@@ -30,6 +31,7 @@ export type NftGridProps = {
   getMoreNfts?: () => void
   handleSelectedNft?: (nft: any) => void
   handleRedirect?: () => void
+  setCollection?: (s: string) => void
 
   nftRenderer?: (
     nft: any,
@@ -49,6 +51,7 @@ const NftGrid = ({
   displayText,
   isModal = false,
   isModalNft = false,
+  setCollection,
   preload = false,
   filters = false,
   handleSelectedNft,
@@ -68,12 +71,16 @@ const NftGrid = ({
   const [openedFilters, setOpenedFilters] = useState(false)
   const [textFilter, setTextFilter] = useState('')
   const [curFilter, setCurFilter] = useState('All Collections')
-  const [colFilters, setColFilters] = useState([] as any[])
+  const [colFilters, setColFilters] = useState([
+    { title: 'All Collections', img: undefined },
+    { title: 'Untitled Collections', img: undefined },
+  ])
   const [displayedNfts, setDisplayedNfts] = useState(nfts)
 
   useEffect(() => {
     if (filters) {
       setColFilters([
+        ...colFilters,
         ...nfts.reduce((acc: any, nft: any) => {
           if (
             nft.collectionTitle &&
@@ -148,7 +155,7 @@ const NftGrid = ({
               {isModal ? (
                 <button
                   onClick={() => {
-                    setCollection('')
+                    ;(setCollection as (s: string) => void)('')
                   }}
                   className="lg:px-4 px-3"
                 >

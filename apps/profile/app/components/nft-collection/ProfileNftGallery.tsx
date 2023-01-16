@@ -2,8 +2,6 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import Masonry from 'react-masonry-css'
 
-import { HiArrowNarrowLeft } from 'react-icons/hi'
-
 import { useFetcher } from '@remix-run/react'
 
 import InfiniteScroll from 'react-infinite-scroll-component'

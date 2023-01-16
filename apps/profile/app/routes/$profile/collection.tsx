@@ -28,7 +28,7 @@ const ProfileRoute = () => {
 
   const fetcher = useFetcher()
 
-  const getMoreNfts = async () => {
+  const getMoreNfts = () => {
     const request = `/nfts?owner=${targetAddress}${
       pageKey ? `&pageKey=${pageKey}` : ''
     }`
@@ -76,6 +76,7 @@ const ProfileRoute = () => {
 
   return (
     <NftGrid
+      isModal={false}
       loadingConditions={loading || refresh}
       nfts={loadedNfts}
       account={targetAddress}

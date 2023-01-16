@@ -31,7 +31,7 @@ const CollectionForProfileRoute = () => {
   const fetcher = useFetcher()
   const navigate = useNavigate()
 
-  const getMoreNfts = async () => {
+  const getMoreNfts = () => {
     const request = `/nfts/collection?owner=${targetAddress}${
       pageKey ? `&pageKey=${pageKey}` : ''
     }&collection=${collection}`
