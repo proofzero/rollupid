@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 import type { ActionFunction } from 'react-router-dom'
 import {
@@ -8,30 +8,11 @@ import {
   useActionData,
 } from '@remix-run/react'
 
-import {
-  useSensor,
-  useSensors,
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-} from '@dnd-kit/core'
-import {
-  useSortable,
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-
 import { requireJWT } from '~/utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { getGalaxyClient } from '~/helpers/clients'
 
 import { HiOutlineTrash } from 'react-icons/hi'
-import { RxDragHandleDots2 } from 'react-icons/rx'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
@@ -44,6 +25,7 @@ import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
 import { useRouteData } from '~/hooks'
+import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
 
 export type ProfileData = {
   targetAddress: string
@@ -132,60 +114,27 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 const SortableLink = (props: any) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: props.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
   return (
-    <div
-      className={`
-                   border border-gray-300 rounded-md
-                    px-4 py-3 mb-3 truncate bg-white
-                    flex flex-row items-center justify-between z-100
-                    ${isDragging ? 'shadow-xl ' : ''}
-                     `}
-      ref={setNodeRef}
-      style={style}
-    >
-      <div className={`flex flex-row items-center w-full truncate`}>
+    <div className={`flex flex-row items-center w-full truncate`}>
+      <Tooltip content="Copy" className="text-black">
         <button
-          className="text-gray-400"
           type="button"
-          {...attributes}
-          {...listeners}
-        >
-          <RxDragHandleDots2 size={22} className="mr-[14px]" />{' '}
-        </button>
-        <Tooltip content="Copy" className="text-black">
-          <button
-            type="button"
-            className="bg-gray-100 hover:bg-gray-200 transition-colors
+          className="bg-gray-100 hover:bg-gray-200 transition-colors
               w-[2.25rem] h-[2.25rem] mr-[14px] rounded-full
               text-gray-700
         flex items-center justify-center "
-            onClick={() => {
-              navigator.clipboard.writeText(props.link.url)
-            }}
-          >
-            <TbLink size={22} />
-          </button>
-        </Tooltip>
-        <div className="flex flex-col max-w-[600px]">
-          <Text weight="medium" className="truncate">
-            {props.link.name}
-          </Text>
-          <Text className="text-gray-500 truncate">{props.link.url}</Text>
-        </div>
+          onClick={() => {
+            navigator.clipboard.writeText(props.link.url)
+          }}
+        >
+          <TbLink size={22} />
+        </button>
+      </Tooltip>
+      <div className="flex flex-col flex-1">
+        <Text weight="medium" className="truncate">
+          {props.link.name}
+        </Text>
+        <Text className="text-gray-500 truncate">{props.link.url}</Text>
       </div>
       {/* // Puts current link in "modification" regyme */}
       <Button
@@ -217,34 +166,10 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
   const initialOldLinks =
     useRouteData<ProfileData>('routes/account')?.links || []
 
   const [links, setLinks] = useState(initialOldLinks)
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event
-    const active_id = parseInt(active.id)
-    const over_id = parseInt(over.id)
-
-    if (active_id !== over_id) {
-      setLinks((links) => {
-        const oldIndex = parseInt(active.id)
-        const newIndex = parseInt(over.id)
-
-        return arrayMove(links, oldIndex, newIndex)
-      })
-      setFormChanged(true)
-    }
-  }
 
   const [isFormChanged, setFormChanged] = useState(false)
 
@@ -291,30 +216,26 @@ export default function AccountSettingsLinks() {
         <div className="flex flex-col">
           {/* Links that are already in account DO */}
           <div className="flex flex-col mb-3">
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={links.map((link, id) => `${id}`)}
-                strategy={verticalListSortingStrategy}
-              >
-                {(links || []).map((link: any, i: number) => (
-                  <SortableLink
-                    key={`${link.name || 'My Website'}-${
-                      link.url || 'https://mywebsite.com'
-                    }-${i}`}
-                    id={`${i}`}
-                    link={link}
-                    links={links}
-                    setNewLinks={setNewLinks}
-                    setLinks={setLinks}
-                    newLinks={newLinks}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
+            <SortableList
+              items={links.map((l, i) => ({ key: `${i}`, val: l }))}
+              itemRenderer={(item) => (
+                <SortableLink
+                  key={`${item.val.name || 'My Website'}-${
+                    item.val.url || 'https://mywebsite.com'
+                  }-${item.key}`}
+                  id={`${item.key}`}
+                  link={item.val}
+                  links={links}
+                  setNewLinks={setNewLinks}
+                  setLinks={setLinks}
+                  newLinks={newLinks}
+                />
+              )}
+              onItemsReordered={(items) => {
+                setLinks(items.map((i) => i.val))
+                setFormChanged(true)
+              }}
+            />
           </div>
           <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
