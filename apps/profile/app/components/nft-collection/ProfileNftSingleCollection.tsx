@@ -4,7 +4,7 @@ import Masonry from 'react-masonry-css'
 
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 
-import { Link } from '@remix-run/react'
+import { Link, useFetcher } from '@remix-run/react'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useMemo, useState } from 'react'
@@ -59,7 +59,7 @@ const ProfileNftSingleCollection = ({
   const [refresh, setRefresh] = useState(true)
 
   const [loadedNfts, setLoadedNfts] = useState(nfts)
-
+  const fetcher = useFetcher()
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
 
@@ -70,17 +70,20 @@ const ProfileNftSingleCollection = ({
       pageKey ? `&pageKey=${pageKey}` : ''
     }&collection=${collection}`
 
-    const nftReq: any = await fetch(request)
-    const nftRes: any = await nftReq.json()
-
-    // Do not need to sort them alphabetically here
-    setLoadedNfts([...loadedNfts, ...nftRes.ownedNfts])
-    setPageLink(nftRes.pageKey ?? null)
-
-    if (refresh) {
-      setRefresh(false)
-    }
+    fetcher.load(request)
   }
+
+  useEffect(() => {
+    if (fetcher.data) {
+      // Do not need to sort them alphabetically here
+      setLoadedNfts([...loadedNfts, ...fetcher.data.gallery])
+      setPageLink(fetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [fetcher.data])
 
   useEffect(() => {
     if (pageKey) {

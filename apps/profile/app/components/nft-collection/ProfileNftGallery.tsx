@@ -4,7 +4,7 @@ import Masonry from 'react-masonry-css'
 
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 
-import { Link } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useMemo, useState } from 'react'
@@ -52,23 +52,27 @@ const ProfileNftGallery = ({
 
   const [loadedNfts, setLoadedNfts] = useState(nfts)
 
+  const fetcher = useFetcher()
+
   const [loading, setLoading] = useState(true)
 
   const [selectedNft, setSelectedNft] = useState('')
 
   const getGallery = async () => {
     const request = `/nfts/gallery?owner=${account}`
-
-    const nftReq: any = await fetch(request)
-    const nftRes: any = await nftReq.json()
-
-    // Do not need to sort them alphabetically here
-    setLoadedNfts([...loadedNfts, ...nftRes.gallery])
-
-    if (refresh) {
-      setRefresh(false)
-    }
+    fetcher.load(request)
   }
+
+  useEffect(() => {
+    if (fetcher.data) {
+      // Do not need to sort them alphabetically here
+      setLoadedNfts([...loadedNfts, ...fetcher.data.gallery])
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [fetcher.data])
 
   useEffect(() => {
     getGallery()

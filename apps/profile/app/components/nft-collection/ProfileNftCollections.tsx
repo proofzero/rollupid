@@ -8,6 +8,8 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useMemo, useState } from 'react'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
+import { useFetcher } from '@remix-run/react'
+
 import LoadingGrid from './NftGrid'
 import ShowPartners from './ShowPartners'
 import ModaledNft from './ModaledNft'
@@ -53,6 +55,8 @@ const ProfileNftCollections = ({
 }: ProfileNftCollectionsProps) => {
   const [refresh, setRefresh] = useState(true)
 
+  const fetcher = useFetcher()
+
   const [loadedNfts, setLoadedNfts] = useState(nfts)
 
   const [pageKey, setPageLink] = useState<string | undefined>()
@@ -75,40 +79,43 @@ const ProfileNftCollections = ({
       pageKey ? `&pageKey=${pageKey}` : ''
     }`
 
-    const nftReq: any = await fetch(request)
-    const nftRes: any = await nftReq.json()
-
-    /* We already have only 1 NFT per collection
-     ** No need to put it in additional Set data structure
-     */
-    setColFilters([
-      ...colFilters,
-      ...nftRes.ownedNfts.reduce((acc: any, nft: any) => {
-        if (
-          nft.collectionTitle &&
-          nft.collectionTitle !== 'All Collections' &&
-          nft.collectionTitle !== 'Untitled Collections'
-        ) {
-          return [
-            ...acc,
-            {
-              title: nft.collectionTitle,
-              img: nft.thumbnailUrl ? nft.thumbnailUrl : undefined,
-            },
-          ]
-        } else {
-          return acc
-        }
-      }, []),
-    ])
-
-    setLoadedNfts(mergeSortedNfts(loadedNfts, nftRes.ownedNfts))
-    setPageLink(nftRes.pageKey ?? null)
-
-    if (refresh) {
-      setRefresh(false)
-    }
+    fetcher.load(request)
   }
+
+  useEffect(() => {
+    if (fetcher.data) {
+      /* We already have only 1 NFT per collection
+       ** No need to put it in additional set
+       */
+      setColFilters([
+        ...colFilters,
+        ...fetcher.data.ownedNfts.reduce((acc: any, nft: any) => {
+          if (
+            nft.collectionTitle &&
+            nft.collectionTitle !== 'All Collections' &&
+            nft.collectionTitle !== 'Untitled Collections'
+          ) {
+            return [
+              ...acc,
+              {
+                title: nft.collectionTitle,
+                img: nft.thumbnailUrl ? nft.thumbnailUrl : undefined,
+              },
+            ]
+          } else {
+            return acc
+          }
+        }, []),
+      ])
+
+      setLoadedNfts(mergeSortedNfts(loadedNfts, fetcher.data.ownedNfts))
+      setPageLink(fetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [fetcher.data])
 
   useEffect(() => {
     if (pageKey) {
