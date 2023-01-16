@@ -1,11 +1,11 @@
-import NftGrid from '~/components/nft-collection/NftGrid'
+import FilteredNftGrid from '~/components/nft-collection/FilteredNftGrid'
 import { useRouteData } from '~/hooks'
 import { useState, useEffect, useMemo } from 'react'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
 
-import { getGalleryWithMetadata, getGallery } from '~/helpers/nfts'
+import { getGallery } from '~/helpers/nfts'
 import { useFetcher } from '@remix-run/react'
 
 export type ProfileData = {
@@ -76,7 +76,7 @@ const ProfileRoute = () => {
 
   return (
     <>
-      <NftGrid
+      <FilteredNftGrid
         nfts={loadedNfts}
         account={targetAddress}
         isOwner={isOwner}

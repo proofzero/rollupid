@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useFetcher } from '@remix-run/react'
 
 import { useRouteData } from '~/hooks'
-import NftGrid from '~/components/nft-collection/NftGrid'
+import UnfilteredNftGrid from '~/components/nft-collection/UnfilteredNftGrid'
 
 import type { ProfileData } from './collection'
 
@@ -77,7 +77,7 @@ const CollectionForProfileRoute = () => {
   }, [])
 
   return (
-    <NftGrid
+    <UnfilteredNftGrid
       nfts={loadedNfts}
       isModal={false}
       handleRedirect={() => {

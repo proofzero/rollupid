@@ -1,4 +1,4 @@
-import NftGrid from '~/components/nft-collection/NftGrid'
+import FilteredNftGrid from '~/components/nft-collection/FilteredNftGrid'
 import { useRouteData } from '~/hooks'
 
 import { mergeSortedNfts } from '~/helpers/nfts'
@@ -75,7 +75,7 @@ const ProfileRoute = () => {
   }, [refresh])
 
   return (
-    <NftGrid
+    <FilteredNftGrid
       isModal={false}
       loadingConditions={loading || refresh}
       nfts={loadedNfts}

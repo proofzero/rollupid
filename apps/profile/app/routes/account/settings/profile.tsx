@@ -3,6 +3,7 @@ import {
   useActionData,
   useOutletContext,
   useTransition,
+  useFetcher,
 } from '@remix-run/react'
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
@@ -16,8 +17,12 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { gatewayFromIpfs } from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import { useEffect, useRef, useState } from 'react'
-import type { ActionFunction } from '@remix-run/cloudflare'
+
+import { useEffect, useRef, useState, useMemo } from 'react'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import { parseURN } from 'urns'
+import type { Profile } from '@kubelt/galaxy-client'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
 import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
@@ -152,13 +157,91 @@ export default function AccountSettingsProfile() {
     setPfpUploading(false)
   }
 
+  // ------------------- START OF MODAL PART ---------------------- //
+  // STATE
+  const [refresh, setRefresh] = useState(true)
+  const [loadedNfts, setLoadedNfts] = useState([] as any[])
+  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
+  const [collection, setCollection] = useState('')
+
+  const modalFetcher = useFetcher()
+
+  // MOST IMPORTANT HELPER - THIS FETCHES NFTS IN MODAL
+
+  const getMoreNfts = () => {
+    let request
+
+    if (collection) {
+      request = `/nfts/collection?owner=${address}${
+        pageKey ? `&pageKey=${pageKey}` : ''
+      }&collection=${collection}`
+    } else {
+      request = `/nfts?owner=${address}${pageKey ? `&pageKey=${pageKey}` : ''}`
+    }
+
+    modalFetcher.load(request)
+  }
+
+  // HOOKS
+  useEffect(() => {
+    if (modalFetcher.data) {
+      /* We already have only 1 NFT per collection
+       ** No need to put it in additional set
+       */
+
+      setLoadedNfts(modalFetcher.data.ownedNfts)
+      setPageLink(modalFetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [modalFetcher.data])
+
+  useEffect(() => {
+    getMoreNfts()
+  }, [collection])
+
+  useEffect(() => {
+    if (pageKey) {
+      setLoading(true)
+      getMoreNfts()
+    } else if (pageKey === null) {
+      setLoading(false)
+    }
+  }, [pageKey])
+
+  useMemo(() => {
+    setRefresh(true)
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [])
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      await getMoreNfts()
+    }
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
+
+  // --------------------- END OF MODAL PART ---------------------- //
+
   return (
     <>
       <PfpNftModal
-        text={'Select NFT Avatar'}
         account={temporaryAddress}
-        pfp={pfpUrl}
+        nfts={loadedNfts}
+        collection={collection}
+        setCollection={setCollection}
+        displayName={displayName as string}
+        loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
+        text={'Select NFT Avatar'}
         isOpen={nftPfpModalOpen}
+        pfp={pfpUrl as string}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
       />
