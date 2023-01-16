@@ -44,6 +44,10 @@ ENVIRONMENT = "local"
 port = 8686
 local_protocol = "http"
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
 # Environment: dev
 # -----------------------------------------------------------------------------
 
@@ -55,6 +59,10 @@ d1_databases = [
 [env.dev.vars]
 ENVIRONMENT = "dev"
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+]
+
 # Environment: next
 # -----------------------------------------------------------------------------
 
@@ -62,6 +70,10 @@ ENVIRONMENT = "dev"
 
 d1_databases = [
   { binding = "EDGES", database_name = "edges-next", database_id = "35573801-81b5-4c57-8a79-286343476d98", migrations_dir = "migrations" }
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
 [env.next.vars]
@@ -74,6 +86,10 @@ ENVIRONMENT = "next"
 
 d1_databases = [
   { binding = "EDGES", database_name = "edges-next", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" }
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

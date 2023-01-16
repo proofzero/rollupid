@@ -17,6 +17,10 @@ services = [
 port = 8787
 local_protocol = "http"
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
 [vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -28,6 +32,10 @@ services = [
   { binding = "Address", service = "address-dev" },
   { binding = "Starbase", service = "starbase-dev" },
   { binding = "Indexer", service = "indexer-dev" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.dev.vars]
@@ -43,6 +51,10 @@ services = [
   { binding = "Indexer", service = "indexer-next" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+]
+
 [env.next.vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -54,6 +66,10 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Starbase", service = "starbase-current" },
   { binding = "Indexer", service = "indexer-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

@@ -17,6 +17,7 @@ interface CreateInnerContextOptions
   Access: DurableObjectNamespace
   access?: Access
   accessNode?: DurableObjectStubProxy<Access>
+  Analytics: AnalyticsEngineDataset
   Authorization: DurableObjectNamespace
   authorization?: Authorization
   Starbase: Fetcher

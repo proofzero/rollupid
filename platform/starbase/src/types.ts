@@ -10,6 +10,7 @@ import {
 } from './jsonrpc/validators/app'
 
 export interface Environment {
+  Analytics: AnalyticsEngineDataset
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
 }

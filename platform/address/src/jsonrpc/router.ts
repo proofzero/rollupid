@@ -46,6 +46,8 @@ import { SetVoucherInput, setVoucherMethod } from './methods/setVoucher'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 
+import { Analytics } from '@kubelt/platform-middleware/analytics'
+
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
@@ -58,6 +60,7 @@ export const appRouter = t.router({
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
+    .use(Analytics)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),
   getAccount: t.procedure
@@ -69,6 +72,7 @@ export const appRouter = t.router({
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
+    .use(Analytics)
     .output(GetAccountOutput)
     .query(getAccountMethod),
   setAccount: t.procedure
@@ -80,6 +84,7 @@ export const appRouter = t.router({
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
+    .use(Analytics)
     .input(SetAccountInput)
     .output(SetAccountOutput)
     .query(setAccountMethod),
@@ -92,6 +97,7 @@ export const appRouter = t.router({
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
+    .use(Analytics)
     .input(UnsetAccountInput)
     .output(UnsetAccountOutput)
     .mutation(unsetAccountMethod),
@@ -104,6 +110,7 @@ export const appRouter = t.router({
     .use(setOAuthNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
+    .use(Analytics)
     .output(GetAddressProfileOutput)
     .query(getAddressProfileMethod),
   getNonce: t.procedure
@@ -113,6 +120,7 @@ export const appRouter = t.router({
     .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
+    .use(Analytics)
     .input(GetNonceInput)
     .output(GetNonceOutput)
     .query(getNonceMethod),
@@ -123,6 +131,7 @@ export const appRouter = t.router({
     .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
+    .use(Analytics)
     .input(VerifyNonceInput)
     .output(VerifyNonceOutput)
     .mutation(verifyNonceMethod),
@@ -132,6 +141,7 @@ export const appRouter = t.router({
     .use(resolveENS)
     .use(setOAuthNodeClient)
     .use(initOAuthNode)
+    .use(Analytics)
     .output(GetOAuthDataOutput)
     .query(getOAuthDataMethod),
   setOAuthData: t.procedure
@@ -140,6 +150,7 @@ export const appRouter = t.router({
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
     .use(initOAuthNode)
+    .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
   getVoucher: t.procedure
@@ -149,6 +160,7 @@ export const appRouter = t.router({
     .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
+    .use(Analytics)
     .output(GetVoucherOutput)
     .query(getVoucherMethod),
   setVoucher: t.procedure
@@ -158,6 +170,7 @@ export const appRouter = t.router({
     .use(resolveENS)
     .use(setCryptoNodeClient)
     .use(initCryptoNode)
+    .use(Analytics)
     .input(SetVoucherInput)
     .mutation(setVoucherMethod),
   initVault: t.procedure

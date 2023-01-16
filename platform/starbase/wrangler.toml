@@ -68,6 +68,10 @@ deleted_classes = [
   "StarbaseUser",
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
 # Environment: dev
 # -----------------------------------------------------------------------------
 
@@ -79,6 +83,10 @@ services = [
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
 [env.dev.vars]
@@ -97,6 +105,10 @@ durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+]
+
 [env.next.vars]
 ENVIRONMENT = "next"
 
@@ -111,6 +123,10 @@ services = [
 
 durable_objects.bindings = [
   { name = "StarbaseApp", class_name = "StarbaseApplication" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
 ]
 
 [env.current.vars]

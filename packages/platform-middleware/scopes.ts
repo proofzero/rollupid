@@ -1,6 +1,7 @@
+import { BaseContext } from '@kubelt/types'
 import { BaseMiddlewareFunction } from './types'
 
-export const Scopes: BaseMiddlewareFunction<unknown> = async ({
+export const Scopes: BaseMiddlewareFunction<BaseContext> = async ({
   ctx,
   next,
 }) => {

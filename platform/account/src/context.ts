@@ -15,9 +15,9 @@ interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Account: DurableObjectNamespace
   Edges: Fetcher
+  Analytics: AnalyticsEngineDataset
   account?: DurableObjectStubProxy<Account>
-  // Set by middleware if provided via JWT.
-  accountURN?: AccountURN
+  // accountURN?: string
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

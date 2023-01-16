@@ -40,22 +40,27 @@ import {
 
 import { LogUsage } from '@kubelt/platform-middleware/log'
 
+import { Analytics } from '@kubelt/platform-middleware/analytics'
+
 const t = initTRPC.context<Context>().create()
 
 export const appRouter = t.router({
   authorize: t.procedure
     .use(LogUsage)
+    .use(Analytics)
     .input(AuthorizeMethodInput)
     .output(AuthorizeMethodOutput)
     .mutation(authorizeMethod),
   exchangeToken: t.procedure
     .use(LogUsage)
+    .use(Analytics)
     .use(InjectEdges)
     .input(ExchangeTokenMethodInput)
     .output(ExchangeTokenMethodOutput)
     .mutation(exchangeTokenMethod),
   verifyAuthorization: t.procedure
     .use(LogUsage)
+    .use(Analytics)
     .input(VerifyAuthorizationMethodInput)
     .output(VerifyAuthorizationMethodOutput)
     .query(verifyAuthorizationMethod),
@@ -65,6 +70,7 @@ export const appRouter = t.router({
     .use(RequireAccount)
     .use(setAccessNode)
     .use(LogUsage)
+    .use(Analytics)
     .input(GetSessionMethodInput)
     .output(GetSessionMethodOutput)
     .query(getSessionMethod),
@@ -75,6 +81,7 @@ export const appRouter = t.router({
     .use(InjectEdges)
     .use(setAccessNode)
     .use(LogUsage)
+    .use(Analytics)
     .input(RevokeSessionMethodInput)
     .output(RevokeSessionMethodOutput)
     .query(revokeSessionMethod),

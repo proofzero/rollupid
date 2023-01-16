@@ -10,6 +10,7 @@ import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
  */
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
+  Analytics: AnalyticsEngineDataset
   EDGES: D1Database
 }
 /**

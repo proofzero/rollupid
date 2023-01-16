@@ -3,7 +3,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 
-import { setupContext, isAuthorized, hasApiKey } from './utils'
+import { setupContext, isAuthorized, hasApiKey, logAnalytics } from './utils'
 
 import Env from '../../env'
 import { Resolvers } from './typedefs'
@@ -29,6 +29,7 @@ const profileResolvers: Resolvers = {
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
+      logAnalytics(env.Analytics, 'profile', 'query:gql', 'BEFORE', accountURN, jwt)
 
       const accountClient = createAccountClient(env.Account, {
         headers: {
@@ -46,6 +47,7 @@ const profileResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env, jwt }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'profileFromAddress', 'query:gql', 'BEFORE', addressURN, jwt)
       const addressClient = createAddressClient(env.Address, {
         headers: {
           'X-3RN': addressURN,
@@ -108,6 +110,7 @@ const profileResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env, jwt }: ResolverContext
     ) => {
+      logAnalytics(env.Analytics, 'connectedAddresses', 'query:gql', 'BEFORE', addressURN, jwt)
       const addressClient = createAddressClient(env.Address, {
         headers: {
           'X-3RN': addressURN,
@@ -146,6 +149,7 @@ const profileResolvers: Resolvers = {
       console.log(
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
       )
+      logAnalytics(env.Analytics, 'updateProfile', 'mutation:gql', 'BEFORE', accountURN, jwt)
 
       const accountClient = createAccountClient(env.Account, {
         headers: {
