@@ -212,6 +212,10 @@ export default function AccountSettingsLinks() {
           setNewLinks(initialLinks)
           setFormChanged(false)
         }}
+        onSubmit={() => {
+          setNewLinks(initialLinks)
+          setFormChanged(false)
+        }}
         className="relative min-h-[35.563rem]"
       >
         <div className="flex flex-col">
