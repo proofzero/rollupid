@@ -49,3 +49,9 @@ Let's add a link to our public profile page. In the tabs at the top of the page,
 Click **+ Add Link**, enter the information for a link, and hit _enter_ or select **Save**.
 
 ![Progress on the link settings page.](../img/profile-walkthrough/account-settings-links-done-ss.png)
+
+## Select "My Profile"
+
+At the top of the page select "My Profile". This will take you back to your public profile page. Notice that you profile now displays a new link.
+
+![A new link!](../img/profile-walkthrough/profile-done-ss.png)
