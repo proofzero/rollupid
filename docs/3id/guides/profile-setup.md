@@ -1,12 +1,16 @@
-# Getting Started With 3ID
+# Setting up your profile
 
-This a getting started guide for developers. [You can get started with your personal 3ID profile here.](https://my.threeid.xyz)
+This a getting started guide for personal profiles. [Developer instructions are here.](./app-setup.md)
+
+## Login Flow
+
+First
 
 ## Connect with 3ID Passport
 
 First, connect with 3ID Passport: [https://passport.threeid.xyz](https://passport.threeid.xyz). You’ll see a screen like this:
 
-![3ID Passport is your launchpad.](../img/profile-walkthrough/account-ss.png)
+![](../img/profile-walkthrough/account-ss.png)
 
 ## Select Console
 
