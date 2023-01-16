@@ -4,6 +4,8 @@ This a getting started guide for personal profiles. [Developer instructions are 
 
 ## Passport Login
 
+When you first login you'll be presented with a selection of applications. Select **My 3ID** to manage your profile.
+
 ![](../img/profile-walkthrough/passport-ss.png)
 
 ## Connect with 3ID Passport
