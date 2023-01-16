@@ -8,8 +8,13 @@ import { Toaster, toast } from 'react-hot-toast'
 import {
   Form,
   useActionData,
+<<<<<<< HEAD
   useOutletContext,
   useTransition,
+=======
+  useTransition,
+  useFetcher,
+>>>>>>> 04266436 (chore(gallery): initial fetcher commit)
 } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
@@ -196,13 +201,13 @@ const Gallery = () => {
   const temporaryAddress = cryptoAddresses?.map((a) => a?.urn)[0]
 
   const [initialState, setInitialState] = useState([])
-  const [loading, setLoading] = useState(true)
 
   const [curatedNfts, setCuratedNfts] = useState([])
   const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([]))
   const [isFormChanged, setFormChanged] = useState(false)
 
   const transition = useTransition()
+  const fetcher = useFetcher()
 
   const [isOpen, setIsOpen] = useState(false)
   const [activeId, setActiveId] = useState(null)
@@ -225,6 +230,7 @@ const Gallery = () => {
   }, [transition])
 
   useEffect(() => {
+<<<<<<< HEAD
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
         owner: temporaryAddress,
@@ -233,18 +239,26 @@ const Gallery = () => {
 
       const nftReq: any = await fetch(request)
       const nftRes: any = await nftReq.json()
+=======
+    const request = `/nfts/gallery?owner=${targetAddress}`
+    fetcher.load(request)
+  }, [])
+>>>>>>> 04266436 (chore(gallery): initial fetcher commit)
 
+  useEffect(() => {
+    if (fetcher.data) {
       // Do not need to sort them alphabetically here
-      setInitialState(nftRes.gallery)
-      setCuratedNfts(nftRes.gallery)
+      setInitialState(fetcher.data.gallery)
+      setCuratedNfts(fetcher.data.gallery)
       setCuratedNftsSet(
         new Set(
-          nftRes.gallery.map((nft: any) => nft.contract.address + nft.tokenId)
+          fetcher.data.gallery.map(
+            (nft: any) => nft.contract.address + nft.tokenId
+          )
         )
       )
-      setLoading(false)
-    })()
-  }, [])
+    }
+  }, [fetcher.data])
 
   // HANDLERS
   const notify = (success: boolean = true) => {
@@ -354,7 +368,9 @@ const Gallery = () => {
                 <Text>Add NFT</Text>
               </div>
             </button>
-            {loading && <LoadingGridSquaresGallery numberOfCells={30} />}
+            {fetcher.state === 'loading' && (
+              <LoadingGridSquaresGallery numberOfCells={30} />
+            )}
             {curatedNfts.map((nft: any, i: number) => {
               return (
                 <SortableNft
