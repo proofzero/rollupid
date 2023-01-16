@@ -10,7 +10,7 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useMemo, useState } from 'react'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
-import LoadingGrid from './NftGrid'
+import LoadingGrid from './LoadingNftGrid'
 import ShowPartners from './ShowPartners'
 import ModaledNft from './ModaledNft'
 
@@ -56,14 +56,14 @@ const ProfileNftSingleCollection = ({
   ),
   nftGrid = <LoadingGrid />,
 }: ProfileNftSingleCollectionProps) => {
+  /** STATE */
   const [refresh, setRefresh] = useState(true)
-
   const [loadedNfts, setLoadedNfts] = useState(nfts)
-  const fetcher = useFetcher()
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
-
   const [selectedNft, setSelectedNft] = useState('')
+
+  const fetcher = useFetcher()
 
   const getMoreNfts = async () => {
     const request = `/nfts/collection?owner=${account}${
@@ -73,6 +73,7 @@ const ProfileNftSingleCollection = ({
     fetcher.load(request)
   }
 
+  /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
       // Do not need to sort them alphabetically here
@@ -94,13 +95,6 @@ const ProfileNftSingleCollection = ({
     }
   }, [pageKey])
 
-  useMemo(() => {
-    setRefresh(true)
-
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [account])
-
   useEffect(() => {
     const asyncFn = async () => {
       await getMoreNfts()
@@ -110,6 +104,13 @@ const ProfileNftSingleCollection = ({
       asyncFn()
     }
   }, [refresh])
+
+  useMemo(() => {
+    setRefresh(true)
+
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [account])
 
   return (
     <div className="mt-9">

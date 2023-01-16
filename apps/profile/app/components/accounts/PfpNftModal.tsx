@@ -1,7 +1,7 @@
 import ProfileNftCollections from '~/components/nft-collection/ProfileNftCollections'
 import ProfileNftSingleCollection from '../nft-collection/ProfileNftSingleCollection'
 import SelectableNft from '~/components/nft-collection/SelectableNft'
-import { LoadingGridSquares } from '../nft-collection/NftGrid'
+import { LoadingGridSquares } from '../nft-collection/LoadingNftGrid'
 
 import { useState } from 'react'
 

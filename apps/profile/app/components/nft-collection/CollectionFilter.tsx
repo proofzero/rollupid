@@ -32,23 +32,14 @@ const CollectionFilter = ({
               className="
           dropdown-toggle
           ease-in-out
-          flex
-          flex-row
-          justify-between
-          items-center
-          bg-white
-          text-[#1f2937]
+          flex flex-row
+          justify-between items-center
+          text-[#1f2937] text-base font-medium
           shadow-sm
-          border
-          border-solid
-          border-[#d1d5db]
-          hover:bg-[#d1d5db]
-          sm:min-w-[17.2rem]
-          min-w-full
-          py-[10px]
-          px-[12px]
-          font-medium
-          text-base
+          border border-solid border-[#d1d5db]
+          bg-white hover:bg-[#d1d5db]
+          min-w-full sm:min-w-[17.2rem]
+          py-[10px] px-[12px]
           rounded-md
           "
               type="button"
@@ -70,26 +61,15 @@ const CollectionFilter = ({
             <ul
               className="
           dropdown-menu
-          list-none
           w-full
-          absolute
-          bg-white
-          text-base
-          z-50
-          float-left
-          sm:max-h-[20rem]
-          min-[480px]:max-h-[20rem]
-          max-h-[23rem]
-          py-2
-          rounded-lg
-          shadow-xl
-          mt-1
+          absolute z-50
+          text-base float-left
+          max-h-[23rem] min-[480px]:max-h-[20rem] 
+          rounded-lg shadow-xl
+          m-0 mt-1 py-2 px-1
           overflow-auto
-          hidden
-          m-0
-          bg-clip-padding
-          border-none
-          px-1
+          bg-white bg-clip-padding
+          hidden border-none list-none
           items-center
         "
               aria-labelledby="dropdownMenuButton1"
@@ -108,21 +88,17 @@ const CollectionFilter = ({
                 .filter((filter: any) =>
                   filter.title.toLowerCase().includes(textFilter.toLowerCase())
                 )
-                .map((colName: string, i: number) => (
+                .map((colName: any, i: number) => (
                   <li key={`${colName.title}_${i}`}>
                     <div
                       className="
                       dropdown-item
-                      flex 
+                      flex flex-row
                       select-none
-                      flex-row
-                      sm:max-w-[17rem]
                       overflow-auto
-                      bg-transparent
-                      w-full
-                      hover:bg-gray-100
-                      py-2
-                      pl-1
+                      bg-transparent hover:bg-gray-100
+                      w-full sm:max-w-[17rem]
+                      py-2 pl-1
                       block"
                       onClick={(event: any) => {
                         setCurFilter(colName.title || 'Untitled Collection')

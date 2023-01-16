@@ -40,7 +40,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import { LoadingGridSquaresGallery } from '~/components/nft-collection/NftGrid'
+import { LoadingGridSquaresGallery } from '~/components/nft-collection/LoadingNftGrid'
 
 // Other helpers
 

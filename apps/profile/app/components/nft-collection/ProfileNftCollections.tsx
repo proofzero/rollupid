@@ -10,7 +10,7 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 
 import { useFetcher } from '@remix-run/react'
 
-import LoadingGrid from './NftGrid'
+import LoadingGrid from './LoadingNftGrid'
 import ShowPartners from './ShowPartners'
 import ModaledNft from './ModaledNft'
 import CollectionFilter from './CollectionFilter'
@@ -53,26 +53,20 @@ const ProfileNftCollections = ({
   ),
   nftGrid = <LoadingGrid />,
 }: ProfileNftCollectionsProps) => {
+  /** STATE */
   const [refresh, setRefresh] = useState(true)
-
-  const fetcher = useFetcher()
-
   const [loadedNfts, setLoadedNfts] = useState(nfts)
-
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
-
   const [openedFilters, setOpenedFilters] = useState(false)
-
   const [textFilter, setTextFilter] = useState('')
   const [curFilter, setCurFilter] = useState('All Collections')
-
   const [colFilters, setColFilters] = useState([
     { title: 'All Collections', img: undefined },
     { title: 'Untitled Collections', img: undefined },
   ])
-
   const [selectedNft, setSelectedNft] = useState('')
+  const fetcher = useFetcher()
 
   const getMoreNfts = async () => {
     const request = `/nfts?owner=${account}${
@@ -81,7 +75,7 @@ const ProfileNftCollections = ({
 
     fetcher.load(request)
   }
-
+  /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
       /* We already have only 1 NFT per collection
@@ -126,13 +120,6 @@ const ProfileNftCollections = ({
     }
   }, [pageKey])
 
-  useMemo(() => {
-    setRefresh(true)
-
-    setLoadedNfts([])
-    setPageLink(undefined)
-  }, [account])
-
   useEffect(() => {
     const asyncFn = async () => {
       await getMoreNfts()
@@ -142,6 +129,13 @@ const ProfileNftCollections = ({
       asyncFn()
     }
   }, [refresh])
+
+  useMemo(() => {
+    setRefresh(true)
+
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [account])
 
   const filteredLoadedNfts = loadedNfts.filter(
     (nft) =>
