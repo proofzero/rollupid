@@ -6,6 +6,7 @@
   * [Glossary](3id/overview/glossary.md)
 * [Guides](3id/guides/guides.md)
   * [Setting up your first app](3id/guides/app-setup.md)
+  * [Profile Walkthrough](3id/guides/profile-setup.md)
 * [Profile](3id/profile/profile.md)
   * [Profile Reference](3id/profile/reference.md)
 * [Console](3id/console/console.md)
