@@ -219,8 +219,6 @@ export async function edges(
   // TODO check result.success and handle query error
   let edges: EdgeRecord[] = result.results as EdgeRecord[]
 
-  console.log({ qeury: JSON.stringify(query), edges })
-
   // Returns true if every key/value pair in the query components is
   // matched exactly in the node components.
   function hasProps(
@@ -245,7 +243,6 @@ export async function edges(
       if (qList.includes(e)) {
         const q = queryComp[e]?.toString() // convert boolean to string
         const n = nodeComp[e]
-        console.log({ q, n })
         return q === n
       }
       return true

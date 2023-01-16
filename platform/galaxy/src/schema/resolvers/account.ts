@@ -38,7 +38,6 @@ const accountResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
-      console.log('form Profile', accountProfile)
       return accountProfile
     },
     profileFromAddress: async (
@@ -59,10 +58,7 @@ const accountResolvers: Resolvers = {
           'X-3RN': addressURN, // note: ens names will be resolved
         },
       })
-      console.log('From resolver', addressURN)
       const accountURN = await addressClient.getAccount.query()
-
-      console.log({ accountURN })
 
       // return the address profile if no account is associated with the address
       if (!accountURN) {
@@ -82,8 +78,6 @@ const accountResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
-
-      console.log({ accountProfile })
 
       return accountProfile
     },
@@ -109,8 +103,6 @@ const accountResolvers: Resolvers = {
       const addresses = await accountClient.getAddresses.query({
         account: accountURN,
       })
-
-      console.log({ addresses })
 
       return addresses
     },
@@ -147,7 +139,6 @@ const accountResolvers: Resolvers = {
         ...profile,
       } as Profile
 
-      console.log({ accountURN, newProfile })
       // TODO: Return the profile we've created. Need to enforce
       // the GraphQL types when setting data otherwise we're able
       // to set a value that can't be returned.
