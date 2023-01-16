@@ -73,7 +73,7 @@ const ProfileNftSingleCollection = ({
     fetcher.load(request)
   }
 
-  /** HOOKS */
+  /** REACT HOOKS */
   useEffect(() => {
     if (fetcher.data) {
       // Do not need to sort them alphabetically here
@@ -126,8 +126,8 @@ const ProfileNftSingleCollection = ({
       {loadedNfts.length > 0 && (
         <>
           {/**
-           * This "isModal" variable is reffering to gallery
-           *  or settings/profile where this whole component is
+           * This "isModal" variable is reffering to `/gallery`
+           *  or `/settings/profile` where this whole component is
            *  opened in the modal. When collection sets to empty
            *  string it switches this modal to show all collections.
            */}

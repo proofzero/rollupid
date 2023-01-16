@@ -1,47 +1,48 @@
-import NftGrid from '~/components/nft-collection/NftGrid'
-import { useRouteData } from '~/hooks'
-
-import { mergeSortedNfts } from '~/helpers/nfts'
-
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import { useLoaderData, useNavigate } from '@remix-run/react'
 import { useState, useEffect, useMemo } from 'react'
 
 import { useFetcher } from '@remix-run/react'
 
-export type ProfileData = {
-  targetAddress: string
-  displayName: string
-  isOwner: boolean
-  pfp: {
-    image: string
-    isToken: string
-  }
+import { useRouteData } from '~/hooks'
+import NftGrid from '~/components/nft-collection/NftGrid'
+
+import type { ProfileData } from './collection'
+
+export const loader: LoaderFunction = async (args) => {
+  const { params } = args
+
+  return json({
+    collection: params.collection,
+  })
 }
 
-const ProfileRoute = () => {
-  const { targetAddress, displayName, isOwner, pfp } =
+const CollectionForProfileRoute = () => {
+  const { collection } = useLoaderData()
+  const { targetAddress, displayName, isOwner } =
     useRouteData<ProfileData>('routes/$profile')
-
+  /** STATE */
   const [refresh, setRefresh] = useState(true)
   const [loadedNfts, setLoadedNfts] = useState([] as any[])
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
 
   const fetcher = useFetcher()
+  const navigate = useNavigate()
 
   const getMoreNfts = async () => {
-    const request = `/nfts?owner=${targetAddress}${
+    const request = `/nfts/collection?owner=${targetAddress}${
       pageKey ? `&pageKey=${pageKey}` : ''
-    }`
+    }&collection=${collection}`
+
     fetcher.load(request)
   }
   /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
-      /* We already have only 1 NFT per collection
-       ** No need to put it in additional set
-       */
-
-      setLoadedNfts(mergeSortedNfts(loadedNfts, fetcher.data.ownedNfts))
+      // Do not need to sort them alphabetically here
+      setLoadedNfts([...loadedNfts, ...fetcher.data.ownedNfts])
       setPageLink(fetcher.data.pageKey ?? null)
 
       if (refresh) {
@@ -59,35 +60,41 @@ const ProfileRoute = () => {
     }
   }, [pageKey])
 
+  useEffect(() => {
+    const asyncFn = async () => {
+      await getMoreNfts()
+    }
+
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
+
   useMemo(() => {
     setRefresh(true)
     setLoadedNfts([])
     setPageLink(undefined)
   }, [])
 
-  useEffect(() => {
-    const asyncFn = async () => {
-      await getMoreNfts()
-    }
-    if (refresh) {
-      asyncFn()
-    }
-  }, [refresh])
-
   return (
     <NftGrid
-      loadingConditions={loading || refresh}
       nfts={loadedNfts}
+      isModal={false}
+      handleRedirect={() => {
+        navigate(`/${targetAddress}/collection`, { replace: true })
+      }}
+      loadingConditions={loading || refresh}
       account={targetAddress}
-      pfp={pfp.image}
+      isModalNft={true}
       isOwner={isOwner}
-      filters={true}
       displayText={`Looks like ${
         displayName ?? targetAddress
       } doesn't own any NFTs`}
       detailsModal
+      filters={false}
+      collection={collection}
     />
   )
 }
 
-export default ProfileRoute
+export default CollectionForProfileRoute

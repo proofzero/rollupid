@@ -1,6 +1,7 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import Masonry from 'react-masonry-css'
+import { HiArrowNarrowLeft } from 'react-icons/hi'
 
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useEffect, useState } from 'react'
@@ -14,17 +15,21 @@ import CollectionFilter from './CollectionFilter'
 export type NftGridProps = {
   account: string
   nfts?: any[]
-  pfp: string
+  pfp?: string
   isOwner?: boolean
-  displaytext: string
+  displayText: string
   preload?: boolean
   detailsModal?: boolean
   filters?: boolean
   pageKey?: string
+  isModal: boolean
   loadingConditions: boolean
+  isModalNft?: boolean
+  collection?: string
 
   getMoreNfts?: () => void
   handleSelectedNft?: (nft: any) => void
+  handleRedirect?: () => void
 
   nftRenderer?: (
     nft: any,
@@ -41,13 +46,16 @@ const NftGrid = ({
   account,
   getMoreNfts,
   pageKey,
-  displaytext,
+  displayText,
+  isModal = false,
+  isModalNft = false,
   preload = false,
   filters = false,
   handleSelectedNft,
+  handleRedirect,
   pfp,
   nftRenderer = (nft) => (
-    <ModaledNft nft={nft} isModal={false} account={account} />
+    <ModaledNft nft={nft} isModal={isModalNft} account={account} />
   ),
   nftGrid = <LoadingGrid />,
 }: NftGridProps) => {
@@ -101,13 +109,17 @@ const NftGrid = ({
   }, [nfts, filters, curFilter])
   // ----------- END OF THE FILTERS NEEDED BLOCK ---------------- //
 
+  useEffect(() => {
+    setDisplayedNfts(nfts)
+  }, [nfts])
+
   const [selectedNft, setSelectedNft] = useState('')
 
   return (
     <>
       {!loadingConditions && !isOwner && !displayedNfts.length && (
         <Text className="text-center text-gray-300" size="2xl" weight="medium">
-          {displaytext}
+          {displayText}
         </Text>
       )}
       {!loadingConditions && !displayedNfts.length && isOwner && (
@@ -116,6 +128,7 @@ const NftGrid = ({
       {/* If we browse all collections of a user */}
       {displayedNfts.length ? (
         <>
+          {/* Filters are only displayed for the component with all nfts */}
           {filters && (
             <CollectionFilter
               colFilters={colFilters}
@@ -128,7 +141,72 @@ const NftGrid = ({
               pfp={pfp}
             />
           )}
+          {/* When there are no filters - this means it's '$profile/gallery'
+           or a single collection routes */}
+          {!filters ? (
+            <>
+              {isModal ? (
+                <button
+                  onClick={() => {
+                    setCollection('')
+                  }}
+                  className="lg:px-4 px-3"
+                >
+                  <Text
+                    className="mt-9 mb-12 text-gray-600 "
+                    size="base"
+                    weight="semibold"
+                  >
+                    {displayedNfts[0].collectionTitle?.length ? (
+                      <div>
+                        <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                        {displayedNfts[0].collectionTitle}
+                      </div>
+                    ) : (
+                      <Text
+                        className="mt-9 mb-12 text-gray-600"
+                        size="base"
+                        weight="semibold"
+                      >
+                        <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                        Back to collections
+                      </Text>
+                    )}
+                  </Text>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    ;(handleRedirect as () => void)()
+                  }}
+                >
+                  <Text
+                    className="mt-9 mb-12 text-gray-600"
+                    size="base"
+                    weight="semibold"
+                  >
+                    {displayedNfts[0].collectionTitle?.length ? (
+                      <div className="lg:px-4 px-3">
+                        <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                        {displayedNfts[0].collectionTitle}
+                      </div>
+                    ) : (
+                      <Text
+                        className="mt-9 mb-12 text-gray-600"
+                        size="base"
+                        weight="semibold"
+                      >
+                        <HiArrowNarrowLeft className="inline mr-8"></HiArrowNarrowLeft>
+                        Back to collections
+                      </Text>
+                    )}
+                  </Text>
+                </button>
+              )}
+            </>
+          ) : null}
 
+          {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}
           <InfiniteScroll
             dataLength={displayedNfts.length} //This is important field to render the next data
             next={preload ? () => {} : (getMoreNfts as () => void)}
