@@ -30,7 +30,7 @@ export const getEdgesMethod = async ({
 
   // Get the list of the edges selected by the query, modifying the
   // result as per any options.
-  const edges = await db.edges(ctx.graph, input.query, input.opt)
+  const edges = await db.edges(ctx.db, input.query, input.opt)
 
   return {
     id: nodeId,

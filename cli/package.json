@@ -1,0 +1,14 @@
+{
+  "name": "@kubelt/cli",
+  "version": "0.1.0",
+  "private": true,
+  "useWorkspaces": true,
+  "workspaces": [
+    "*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces foreach -p -v -i run build",
+    "test": "yarn workspaces foreach -p -v -i run test"
+  },
+  "packageManager": "yarn@3.2.4"
+}

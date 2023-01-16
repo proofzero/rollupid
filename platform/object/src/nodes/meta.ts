@@ -2,7 +2,7 @@ import { DOProxy } from 'do-proxy'
 
 import { Visibility } from '../types'
 
-export default class Object extends DOProxy {
+export default class MetaObject extends DOProxy {
   declare state: DurableObjectState
 
   async get(): Promise<{

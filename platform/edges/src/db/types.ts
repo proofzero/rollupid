@@ -37,11 +37,6 @@ export type Token = string
 
 export type EdgeId = number
 
-export interface Graph {
-  // The binding for the D1 edges database.
-  db: D1Database
-}
-
 export interface NodeRecord {
   // The full node URN
   urn: AnyURN

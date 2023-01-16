@@ -1,0 +1,42 @@
+{
+  "name": "@kubelt/cli.edges",
+  "version": "0.1.0",
+  "author": "ProofZero Inc.",
+  "description": "Utility for working with edges service",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild ./src/ --bundle --platform=node --outfile=dist/index.js",
+    "format": "run-s format:src",
+    "format:src": "prettier --write **/*.ts",
+    "format:check": "run-s format:check:*",
+    "format:check:src": "prettier --check **/*.ts",
+    "lint": "eslint --fix .",
+    "lint:check": "run-s lint:check:*",
+    "lint:check:src": "eslint *.ts",
+    "types:check": "tsc --project tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.18",
+    "@types/node-fetch": "2.6.2",
+    "@types/yargs": "17.0.19",
+    "@typescript-eslint/eslint-plugin": "5.42.1",
+    "@typescript-eslint/parser": "5.42.1",
+    "esbuild": "0.17.2",
+    "eslint": "8.28.0",
+    "eslint-config-prettier": "8.5.0",
+    "node-fetch": "3.3.0",
+    "prettier": "2.7.1",
+    "typescript": "4.8.4",
+    "yargs": "17.6.2"
+  },
+  "dependencies": {
+    "@kubelt/platform-clients": "workspace:*",
+    "@kubelt/urns": "workspace:*",
+    "cross-env": "7.0.3",
+    "reflect-metadata": "0.1.13",
+    "urns": "0.6.0"
+  },
+  "packageManager": "yarn@3.2.4",
+  "license": "UNLICENSED"
+}

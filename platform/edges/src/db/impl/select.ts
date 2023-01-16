@@ -7,7 +7,12 @@
 // Imported Types
 // -----------------------------------------------------------------------------
 
-import { Graph } from '@kubelt/types'
+import * as Graph from '@kubelt/types/graph'
+import { createURN, parseURN } from 'urns'
+import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+import { SQL } from 'drizzle-orm/sql'
+import { and, eq, or } from 'drizzle-orm/expressions'
+import { edge as edgeTable, permission, edgePermission, node as nodeTable, nodeQcompUrnqComponent, nodeRcompUrnrComponent, URNRComponent, URNQComponent } from '../schema'
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
 import type {
@@ -16,7 +21,6 @@ import type {
   Node,
   EdgeQuery,
   EdgeRecord,
-  Graph as GraphDB,
   NodeRecord,
   NodeFilter,
   QComponent,
@@ -37,28 +41,36 @@ import type {
  * @param nodeId - a node URN
  * @returns a map of q-components for the node
  */
-export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
-  const query = `
-    SELECT
-      uc.key,
-      uc.value
-    FROM
-      node_qcomp_urnq_component nc
-    JOIN
-      urnq_component uc
-    ON
-      nc.qcomp = uc.id
-    WHERE
-      nc.nodeUrn = ?1
-  `
-  const qcomp = await g.db
-    .prepare(query)
-    .bind(nodeId.toString())
-    .all<QComponent>()
-  // Convert the result collection into a property bag object.
-  if (qcomp.results)
-    return qcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
-  else return {}
+export async function qc(db: DrizzleD1Database, nodeId: AnyURN): Promise<QComponents> {
+  const nc = nodeQcompUrnqComponent
+  const uc = URNQComponent
+
+  // SELECT
+  //   uc.key,
+  //   uc.value
+  // FROM
+  //   node_qcomp_urnq_component nc
+  // JOIN
+  //   urnq_component uc
+  // ON
+  //   nc.qcomp = uc.id
+  // WHERE
+  //   nc.nodeUrn = ?1
+
+  const results = await db.select(nc)
+        .fields({
+          key: nc.nodeUrn,
+          value: nc.qcomp,
+        })
+        .leftJoin(uc, eq(nc.qcomp, uc.id))
+        .where(eq(nc.nodeUrn, nodeId.toString()))
+        .all()
+
+  if (results) {
+    // Convert the result collection into an property bag object.
+    return results.reduce((prev, curr) => ({...prev, ...curr}), {})
+  }
+  return {}
 }
 
 // rc()
@@ -72,88 +84,108 @@ export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
  * @param nodeId - a node URN
  * @returns a map of r-components for the node
  */
-export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
-  const query = `
-    SELECT
-      uc.key,
-      uc.value
-    FROM
-      node_rcomp_urnr_component nc
-    JOIN
-      urnr_component uc
-    ON
-      nc.rcomp = uc.id
-    WHERE
-      nc.nodeUrn = ?1
-  `
-  const rcomp = await g.db
-    .prepare(query)
-    .bind(nodeId.toString())
-    .all<RComponent>()
-  // Convert the result collection into an property bag object.
-  if (rcomp.results)
-    return rcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
-  else return {}
+export async function rc(db: DrizzleD1Database, nodeId: AnyURN): Promise<RComponents> {
+  const nc = nodeRcompUrnrComponent
+  const uc = URNRComponent
+
+  // SELECT
+  //   uc.key,
+  //   uc.value
+  // FROM
+  //   node_rcomp_urnr_component nc
+  // JOIN
+  //   urnr_component uc
+  // ON
+  //   nc.rcomp = uc.id
+  // WHERE
+  //   nc.nodeUrn = ?1
+
+  const results = await db.select(nc)
+        .fields({
+          key: nc.nodeUrn,
+          value: nc.rcomp,
+        })
+        .leftJoin(uc, eq(nc.rcomp, uc.id))
+        .where(eq(nc.nodeUrn, nodeId.toString()))
+        .all()
+
+  if (results) {
+    // Convert the result collection into an property bag object.
+    return results.reduce((prev, curr) => ({...prev, ...curr}), {})
+  }
+  return {}
 }
 
 // node()
 // -----------------------------------------------------------------------------
 
 export async function node(
-  g: GraphDB,
+  db: DrizzleD1Database,
   nodeId: AnyURN | undefined
 ): Promise<Node | undefined> {
   if (!nodeId) {
     return undefined
   }
 
-  const query = `
-    SELECT
-      *
-    FROM
-      node
-    WHERE
-      urn = ?1
-  `
-  const node = await g.db.prepare(query).bind(nodeId.toString()).first<Node>()
-
-  if (!node) {
+  const nodeRecord = await db.select(nodeTable)
+        .where(eq(nodeTable.urn, nodeId.toString()))
+        .get()
+  if (!nodeRecord) {
     return undefined
   }
 
-  const nodeUrn = node.urn
+  const qcMap = await qc(db, nodeRecord.urn as AnyURN)
+  const rcMap = await rc(db, nodeRecord.urn as AnyURN)
 
-  const qcMap = await qc(g, nodeUrn as AnyURN)
-  node.qc = qcMap
+  const parsed = parseURN(nodeRecord.urn)
+  const id = createURN(parsed.nid, parsed.nss)
 
-  const rcMap = await rc(g, nodeUrn as AnyURN)
-  node.rc = rcMap
+  const node: Node = {
+    // NB: the id is the "base URN" excluding f-, r-, and q-components.
+    // Should this field be called "base"?
+    id,
+    urn: nodeRecord.urn as AnyURN,
+    nid: nodeRecord.nid,
+    nss: nodeRecord.nss,
+    fragment: nodeRecord.fragment,
+    qc: qcMap,
+    rc: rcMap,
+  }
 
-  return node as Node
+  return node
 }
 
 // permissions()
 // -----------------------------------------------------------------------------
 // TODO should this be exposed to return the permissions for an edge?
 
-async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
-  const query = `
-    SELECT
-      name
-    FROM
-      permission p
-    JOIN
-      edge_permission e
-    ON
-      e.permissionId = p.id
-    WHERE
-      e.edgeId = ?1
-  `
-  const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
-  // TODO check result.success and handle query error
-  const perms = result.results
+async function permissions(
+  db: DrizzleD1Database,
+  edgeId: number
+): Promise<Permission[]> {
+  const p = permission
+  const ep = edgePermission
 
-  return perms as Permission[]
+  // SELECT
+  //   name
+  // FROM
+  //   permission p
+  // JOIN
+  //   edge_permission ep
+  // ON
+  //   ep.permissionId = p.id
+  // WHERE
+  //   e.edgeId = ?1
+  const results = await db.select(p)
+        .fields({ name: p.name })
+        .leftJoin(ep, eq(ep.permissionId, p.id))
+        .where(eq(ep.edgeId, edgeId))
+        .all()
+
+  return results.reduce((prev, curr) => {
+    prev.push(curr.name)
+    return prev
+  }, [] as Permission[])
 }
 
 // edges()
@@ -163,12 +195,10 @@ async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
  *
  */
 export async function edges(
-  g: GraphDB,
+  db: DrizzleD1Database,
   query: EdgeQuery,
   opt?: any
 ): Promise<Edge[]> {
-  let sql: string
-
   // If a node ID is not supplied, we're returning no edges.
   //
   // TODO we don't want to allow for the possibility of all edges being
@@ -178,137 +208,59 @@ export async function edges(
     return []
   }
 
+  const e = edgeTable
+
+  // Build up the WHERE clause of the query.
+  let where: SQL | undefined
+
   // Filter returned edges by direction; if we're asked for "outgoing"
   // edges, the node ID is for the "source" node of the edge. If we're
   // asked for "incoming" edges, the node ID is for the "destination"
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
   switch (query.dir) {
-    case Graph.EdgeDirection.Incoming:
-      sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
-      break
-    case Graph.EdgeDirection.Outgoing:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
-      break
-    default:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
+  case Graph.EdgeDirection.Incoming:
+    // SELECT * FROM edge e WHERE (e.dst = ?1)
+    where = eq(e.dst, query.id.toString())
+    break
+  case Graph.EdgeDirection.Outgoing:
+    // SELECT * FROM edge e WHERE (e.src = ?1)
+    where = eq(e.src, query.id.toString())
+    break
+  default:
+    // SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)
+    where = or(
+      eq(e.src, query.id),
+      eq(e.dst, query.id),
+    )
   }
-
-  let statement
 
   // Filter edges by tag, if provided.
   if (query.tag) {
-    sql = [sql, 'e.tag = ?2'].join(' AND ')
-
-    statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
-  } else {
-    statement = g.db.prepare(sql).bind(query.id.toString())
+    where = and(
+      eq(e.tag, query.tag),
+      where
+    )
   }
 
-  const result = await statement.all()
+  const results = await db.select(e).where(where).all()
 
-  // TODO check result.success and handle query error
-  let edges: EdgeRecord[] = result.results as EdgeRecord[]
+  let edges = results as EdgeRecord[]
 
-  // Returns true if every key/value pair in the query components is
-  // matched exactly in the node components.
-  function hasProps(
-    queryComp: Record<string, string | undefined>,
-    nodeComp: Record<string, string | undefined>
-  ): boolean {
-    //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
-    //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-    const qSet = new Set(Object.entries(queryComp).flat())
-    const nList = Object.entries(nodeComp)
-      .flat()
-      .filter((e) => e !== undefined)
-    return nList.filter((e) => qSet.has(e)).length === nList.length
-  }
-
-  async function nodeFilter(
-    edges: EdgeRecord[],
-    query: EdgeQuery
-  ): Promise<EdgeRecord[]> {
-    // A reducing function over a set of edges that discards any edges
-    // which don't match the filter criteria supplied in the EdgeQuery.
-    async function queryFilter(
-      resultPromise: Promise<EdgeRecord[]>,
-      edge: EdgeRecord
-    ): Promise<EdgeRecord[]> {
-      const result = await resultPromise
-
-      // SRC
-
-      // fragment
-      if (query?.src?.fr !== undefined) {
-        const srcNode = await node(g, edge.src)
-        if (srcNode !== undefined && srcNode.fragment !== query.src.fr) {
-          return result
-        }
-      }
-      // q-components
-      if (query?.src?.qc !== undefined) {
-        const srcQc = await qc(g, edge.src)
-        if (!hasProps(query.src.qc, srcQc)) {
-          return result
-        }
-      }
-      // r-components
-      if (query?.src?.rc !== undefined) {
-        const srcRc = await rc(g, edge.src)
-        if (!hasProps(query.src.rc, srcRc)) {
-          return result
-        }
-      }
-
-      // DST
-
-      // fragment
-      if (query?.dst?.fr !== undefined) {
-        const dstNode = await node(g, edge.dst)
-        if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
-          return result
-        }
-      }
-      // q-components
-      if (query?.dst?.qc !== undefined) {
-        const dstQc = await qc(g, edge.dst)
-        if (!hasProps(query?.dst?.qc, dstQc)) {
-          return result
-        }
-      }
-      // r-components
-      if (query?.dst?.rc !== undefined) {
-        const dstRc = await rc(g, edge.dst)
-        if (!hasProps(query.dst.rc, dstRc)) {
-          return result
-        }
-      }
-
-      // Include the current edge in the list of returned edges; it has
-      // passed filtering.
-      result.push(edge)
-
-      return result
-    }
-
-    return edges.reduce(queryFilter, Promise.resolve([]))
-  }
-
-  if (query?.src !== undefined || query?.dst !== undefined) {
-    edges = await nodeFilter(edges, query)
+  if (query?.src || query?.dst) {
+    edges = await nodeFilter(db, edges, query)
   }
 
   // Enrich each edge with the details of the referenced nodes.
   return Promise.all(
     edges.map(async (edgeRec: EdgeRecord): Promise<Edge> => {
-      const srcNode: Node | undefined = await node(g, edgeRec.src)
+      const srcNode: Node | undefined = await node(db, edgeRec.src)
       if (!srcNode) {
         throw new Error(`error getting node: ${edgeRec.src}`)
       }
       const src: Node = { ...srcNode, id: `urn:${srcNode.nid}:${srcNode.nss}` }
 
-      const dstNode: Node | undefined = await node(g, edgeRec.dst)
+      const dstNode: Node | undefined = await node(db, edgeRec.dst)
       if (!dstNode) {
         throw new Error(`error getting node: ${edgeRec.dst}`)
       }
@@ -316,7 +268,7 @@ export async function edges(
 
       const tag = edgeRec.tag
 
-      const perms = await permissions(g, edgeRec.id)
+      const perms = await permissions(db, edgeRec.id)
 
       return {
         tag,
@@ -328,44 +280,129 @@ export async function edges(
   )
 }
 
+// Returns true if every key/value pair in the query components is
+// matched exactly in the node components.
+function hasProps(
+  queryComp: Record<string, string | undefined>,
+  nodeComp: Record<string, string | undefined>
+): boolean {
+  const qSet = new Set(Object.entries(queryComp).flat())
+  const nList = Object.entries(nodeComp)
+        .flat()
+        .filter((e) => e !== undefined)
+  return nList.filter((e) => qSet.has(e)).length === nList.length
+}
+
+// Filter a collection of edges using an EdgeQuery, returning only the
+// edges that match.
+async function nodeFilter(
+  db: DrizzleD1Database,
+  edges: EdgeRecord[],
+  query: EdgeQuery
+): Promise<EdgeRecord[]> {
+  // A reducing function over a set of edges that discards any edges
+  // which don't match the filter criteria supplied in the EdgeQuery.
+  async function queryFilter(
+    resultPromise: Promise<EdgeRecord[]>,
+    edge: EdgeRecord
+  ): Promise<EdgeRecord[]> {
+    const result = await resultPromise
+
+    // SRC
+
+    // fragment
+    if (query?.src?.fr !== undefined) {
+      const srcNode = await node(db, edge.src)
+      if (srcNode !== undefined && srcNode.fragment !== query.src.fr) {
+        return result
+      }
+    }
+    // q-components
+    if (query?.src?.qc !== undefined) {
+      const srcQc = await qc(db, edge.src)
+      if (!hasProps(query.src.qc, srcQc)) {
+        return result
+      }
+    }
+    // r-components
+    if (query?.src?.rc !== undefined) {
+      const srcRc = await rc(db, edge.src)
+      if (!hasProps(query.src.rc, srcRc)) {
+        return result
+      }
+    }
+
+    // DST
+
+    // fragment
+    if (query?.dst?.fr !== undefined) {
+      const dstNode = await node(db, edge.dst)
+      if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
+        return result
+      }
+    }
+    // q-components
+    if (query?.dst?.qc !== undefined) {
+      const dstQc = await qc(db, edge.dst)
+      if (!hasProps(query?.dst?.qc, dstQc)) {
+        return result
+      }
+    }
+    // r-components
+    if (query?.dst?.rc !== undefined) {
+      const dstRc = await rc(db, edge.dst)
+      if (!hasProps(query.dst.rc, dstRc)) {
+        return result
+      }
+    }
+
+    // Include the current edge in the list of returned edges; it has
+    // passed filtering.
+    result.push(edge)
+
+    return result
+  }
+
+  return edges.reduce(queryFilter, Promise.resolve([]))
+}
+
+
 // incoming()
 // -----------------------------------------------------------------------------
+// TODO include permissions in results (join permissions table).
 
 /**
- *
+ * Return a list of all the edges that terminate at the node with the
+ * given node ID.
  */
-export async function incoming(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
-  return new Promise((resolve, reject) => {
-    g.db
-      .prepare('SELECT * FROM edge WHERE dst = ?1')
-      .bind(nodeId.toString())
-      .all()
-      .then((result) => {
-        resolve(<Edge[]>result.results)
-      })
-      .catch((e: unknown) => {
-        reject(e)
-      })
-  })
+export async function incoming(
+  db: DrizzleD1Database,
+  nodeId: AnyURN
+): Promise<Edge[]> {
+  const query = {
+    id: nodeId,
+    dir: Graph.EdgeDirection.Incoming,
+  }
+
+  return edges(db, query)
 }
 
 // outgoing()
 // -----------------------------------------------------------------------------
+// TODO include permissions in results (join permissions table)..
 
 /**
- *
+ * Return a list of all the edges that originate at the node with the
+ * given node ID.
  */
-export async function outgoing(g: GraphDB, nodeId: AnyURN): Promise<Edge[]> {
-  return new Promise((resolve, reject) => {
-    g.db
-      .prepare('SELECT * FROM edge WHERE src = ?1')
-      .bind(nodeId.toString())
-      .all()
-      .then((result) => {
-        resolve(<Edge[]>result.results)
-      })
-      .catch((e: unknown) => {
-        reject(e)
-      })
-  })
+export async function outgoing(
+  db: DrizzleD1Database,
+  nodeId: AnyURN
+): Promise<Edge[]> {
+  const query = {
+    id: nodeId,
+    dir: Graph.EdgeDirection.Outgoing,
+  }
+
+  return edges(db, query)
 }

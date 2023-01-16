@@ -27,7 +27,7 @@ export const removeEdgeMethod = async ({
 }): Promise<{
   removed: number
 }> => {
-  const edgeId = await db.unlink(ctx.graph, input.src, input.dst, input.tag)
+  const edgeId = await db.unlink(ctx.db, input.src, input.dst, input.tag)
 
   console.log(
     `deleted edge ${edgeId}: ${input.src} =[${input.tag}]=> ${input.dst}`

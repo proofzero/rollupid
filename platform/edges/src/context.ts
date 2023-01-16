@@ -3,6 +3,7 @@ import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
 import * as db from './db'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
 
 /**
  * Defines your inner context shape.
@@ -12,6 +13,7 @@ interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   EDGES: D1Database
 }
+type InnerContext = CreateInnerContextOptions & { db: DrizzleD1Database }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.
  *
@@ -21,12 +23,11 @@ interface CreateInnerContextOptions
  *
  * @see https://trpc.io/docs/context#inner-and-outer-context
  */
-export async function createContextInner(opts: CreateInnerContextOptions) {
-  const graph = db.init(opts.EDGES)
-  return {
-    graph,
-    ...opts,
-  }
+export async function createContextInner(
+  opts: CreateInnerContextOptions
+): Promise<InnerContext> {
+  const drizzleD1Database = db.init(opts.EDGES)
+  return { ...opts, db: drizzleD1Database }
 }
 /**
  * Outer context. Used in the routers and will e.g. bring `req` & `res` to the context as "not `undefined`".

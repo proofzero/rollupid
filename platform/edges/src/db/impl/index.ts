@@ -4,6 +4,8 @@
  * Implemenations of the edge-related database methods.
  */
 
+import { drizzle, DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+
 import * as insert from './insert'
 import * as remove from './remove'
 import * as select from './select'
@@ -19,7 +21,6 @@ import type {
   EdgeQuery,
   EdgeRecord,
   EdgeId,
-  Graph,
   NodeRecord,
   Token,
   EdgeTag,
@@ -28,10 +29,8 @@ import type {
 // init()
 // -----------------------------------------------------------------------------
 
-export function init(db: D1Database): Graph {
-  return {
-    db,
-  }
+export function init(db: D1Database): DrizzleD1Database {
+  return drizzle(db)
 }
 
 // link()
@@ -40,64 +39,64 @@ export function init(db: D1Database): Graph {
 // TODO support permissions / scopes
 
 export async function link(
-  g: Graph,
+  db: DrizzleD1Database,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
 ): Promise<EdgeRecord> {
-  const srcNode = await insert.node(g, src)
+  const srcNode = await insert.node(db, src)
   // TODO check for error
 
-  const dstNode = await insert.node(g, dst)
+  const dstNode = await insert.node(db, dst)
   // TODO check for error
 
   // Return existing edge ID (if found) or new edge ID (if created).
-  return insert.edge(g, srcNode.urn, dstNode.urn, tag)
+  return insert.edge(db, srcNode.urn, dstNode.urn, tag)
 }
 
 // unlink()
 // -----------------------------------------------------------------------------
 
 export async function unlink(
-  g: Graph,
+  db: DrizzleD1Database,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
 ): Promise<number> {
-  return remove.edge(g, src, dst, tag)
+  return remove.edge(db, src, dst, tag)
 }
 
 // node()
 // -----------------------------------------------------------------------------
 
 export async function node(
-  g: Graph,
+  db: DrizzleD1Database,
   nodeId: AnyURN | undefined
 ): Promise<Node | undefined> {
-  return select.node(g, nodeId)
+  return select.node(db, nodeId)
 }
 
 // edges()
 // -----------------------------------------------------------------------------
 
 export async function edges(
-  g: Graph,
+  db: DrizzleD1Database,
   query: EdgeQuery,
   opt?: any
 ): Promise<Edge[]> {
-  return select.edges(g, query, opt)
+  return select.edges(db, query, opt)
 }
 
 // incoming()
 // -----------------------------------------------------------------------------
 
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.incoming(g, nodeId)
+export async function incoming(db: DrizzleD1Database, nodeId: AnyURN): Promise<Edge[]> {
+  return select.incoming(db, nodeId)
 }
 
 // outgoing()
 // -----------------------------------------------------------------------------
 
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return select.outgoing(g, nodeId)
+export async function outgoing(db: DrizzleD1Database, nodeId: AnyURN): Promise<Edge[]> {
+  return select.outgoing(db, nodeId)
 }

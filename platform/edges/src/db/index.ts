@@ -4,6 +4,8 @@
  * Platform edges database interface.
  */
 
+import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+
 import * as impl from './impl/index'
 
 // Imported Types
@@ -17,7 +19,6 @@ import type {
   EdgeQuery,
   EdgeRecord,
   EdgeId,
-  Graph,
   NodeRecord,
   Token,
   EdgeDirection,
@@ -27,7 +28,7 @@ import type {
 // Exported Types
 // -----------------------------------------------------------------------------
 
-export type { EdgeTag, Graph }
+export type { EdgeTag }
 
 // Exports
 // -----------------------------------------------------------------------------
@@ -40,7 +41,7 @@ export { EdgeDirection }
 /**
  * Create a handle for the graph database.
  */
-export function init(db: D1Database): Graph {
+export function init(db: D1Database): ReturnType<typeof impl.init> {
   return impl.init(db)
 }
 
@@ -51,10 +52,10 @@ export function init(db: D1Database): Graph {
  * Lookup a single node in the database and return it as an object.
  */
 export async function node(
-  g: Graph,
+  db: DrizzleD1Database,
   nodeId: AnyURN | undefined
-): Promise<Node | undefined> {
-  return impl.node(g, nodeId)
+): ReturnType<typeof impl.node> {
+  return impl.node(db, nodeId)
 }
 
 // edges()
@@ -64,11 +65,11 @@ export async function node(
  * Return the set of edges that either originate or terminate at a node.
  */
 export async function edges(
-  g: Graph,
+  db: DrizzleD1Database,
   query: EdgeQuery,
   opt?: any
-): Promise<Edge[]> {
-  return impl.edges(g, query, opt)
+): ReturnType<typeof impl.edges> {
+  return impl.edges(db, query, opt)
 }
 
 // incoming()
@@ -77,8 +78,8 @@ export async function edges(
 /**
  * Return the set of edges that terminate at a node.
  */
-export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return impl.incoming(g, nodeId)
+export async function incoming(db: DrizzleD1Database, nodeId: AnyURN): ReturnType<typeof impl.incoming> {
+  return impl.incoming(db, nodeId)
 }
 
 // outgoing()
@@ -87,8 +88,8 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
 /**
  * Return the set of edges that originate at a node.
  */
-export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return impl.outgoing(g, nodeId)
+export async function outgoing(db: DrizzleD1Database, nodeId: AnyURN): ReturnType<typeof impl.outgoing> {
+  return impl.outgoing(db, nodeId)
 }
 
 // link()
@@ -105,12 +106,12 @@ export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
  * @returns the ID of the created edge, or -1 on error
  */
 export async function link(
-  g: Graph,
+  db: DrizzleD1Database,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<EdgeRecord> {
-  return impl.link(g, src, dst, tag)
+): ReturnType<typeof impl.link> {
+  return impl.link(db, src, dst, tag)
 }
 
 // unlink()
@@ -122,10 +123,10 @@ export async function link(
  * @returns the number of edges removed.
  */
 export async function unlink(
-  g: Graph,
+  db: DrizzleD1Database,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
-): Promise<number> {
-  return impl.unlink(g, src, dst, tag)
+): ReturnType<typeof impl.unlink> {
+  return impl.unlink(db, src, dst, tag)
 }

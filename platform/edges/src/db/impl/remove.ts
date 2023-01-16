@@ -5,8 +5,10 @@
  */
 
 import type { AnyURN } from '@kubelt/urns'
-
-import type { Graph, EdgeTag } from '../types'
+import type { EdgeTag } from '../types'
+import { DrizzleD1Database } from 'drizzle-orm-sqlite/d1'
+import { edge as edgeTable } from '../schema'
+import { and, eq, or } from 'drizzle-orm/expressions'
 
 // edge()
 // -----------------------------------------------------------------------------
@@ -15,31 +17,24 @@ import type { Graph, EdgeTag } from '../types'
  * Removes an edge from the database.
  */
 export async function edge(
-  g: Graph,
+  db: DrizzleD1Database,
   src: AnyURN,
   dst: AnyURN,
   tag: EdgeTag
 ): Promise<any> {
-  return new Promise((resolve, reject) => {
-    g.db
-      .prepare('DELETE FROM edge WHERE src = ?1 AND dst = ?2 AND tag = ?3')
-      .bind(src, dst, tag)
-      .run()
-      .then((result) => {
-        const { success } = result
-        resolve(success ? 1 : 0)
-      })
-      .catch((e: unknown) => {
-        // NB: using instanceof to narrow the type of e doesn't appear to
-        // work.
-        /*
-      if (e instanceof Error) {
-        reject(e.cause.message)
-      } else {
-        reject(String(e))
-      }
-      */
-        reject(e)
-      })
-  })
+  const e = edgeTable
+
+  // DELETE FROM
+  //   edge
+  // WHERE
+  //   src = ?1 AND dst = ?2 AND tag = ?3
+  const where = and(
+    eq(e.src, src.toString()),
+    eq(e.dst, dst.toString()),
+    eq(e.tag, tag.toString()),
+  )
+
+  return db.delete(e)
+    .where(where)
+    .run()
 }
