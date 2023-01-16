@@ -6253,8 +6253,6 @@ __metadata:
   dependencies:
     "@babel/core": 7.20.2
     "@cloudflare/workers-types": 4.20221111.1
-    "@dnd-kit/core": 6.0.6
-    "@dnd-kit/sortable": 7.0.1
     "@headlessui/react": 1.7.4
     "@heroicons/react": 2.0.13
     "@kubelt/design-system": "*"
@@ -30791,6 +30789,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "kubelt@workspace:."
   dependencies:
+    "@dnd-kit/core": 6.0.6
+    "@dnd-kit/sortable": 7.0.1
     auto: 10.37.6
     npm-run-all: 4.1.5
   languageName: unknown
