@@ -59,7 +59,6 @@ const accountResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.getAccount.query()
-      console.log({ addressURN, accountURN })
       // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
@@ -75,7 +74,6 @@ const accountResolvers: Resolvers = {
         },
       })
 
-      console.log('HERERE')
       // should also return the handle if it exists
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,

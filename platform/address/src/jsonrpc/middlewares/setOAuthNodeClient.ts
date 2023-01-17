@@ -11,7 +11,11 @@ export const setOAuthNodeClient: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing addressURN')
   }
   if (ctx.nodeType == NodeType.OAuth) {
-    const node = await initOAuthNodeByName(ctx.addressURN, ctx.OAuthAddress)
+    const node = await initOAuthNodeByName(
+      ctx.addressURN,
+      ctx.DefaultAddress,
+      ctx.OAuthAddress
+    )
     return next({
       ctx: {
         ...ctx,

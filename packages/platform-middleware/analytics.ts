@@ -1,3 +1,4 @@
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AccountURN } from '@kubelt/urns/account'
 import { BaseMiddlewareFunction } from './types'
 
@@ -14,7 +15,7 @@ export const Analytics: BaseMiddlewareFunction<{
   const raw_key =
     rayId ||
     accountURN ||
-    ctx.req?.headers.get('kbt-access-jwt-assertion') ||
+    ctx.req?.headers.get(PlatformJWTAssertionHeader) ||
     'no key'
   const enc_key = new TextEncoder().encode(raw_key)
   const hash = await crypto.subtle.digest(

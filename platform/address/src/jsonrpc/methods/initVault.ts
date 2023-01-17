@@ -37,6 +37,7 @@ export const initVaultMethod = async ({
 
   const vaultNode = await initCryptoNodeByName(
     AddressURNSpace.urn(hash),
+    ctx.DefaultAddress,
     ctx.CryptoAddress
   )
   await vaultNode.storage.put('privateKey', vault.privateKey)

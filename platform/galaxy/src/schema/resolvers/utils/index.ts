@@ -20,6 +20,7 @@ export function parseJwt(token: string): JWTPayload {
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
+
   const parsedJwt = jwt && parseJwt(jwt)
   const accountURN: AccountURN = parsedJwt && parsedJwt.sub
 
@@ -139,7 +140,14 @@ export function sliceIntoChunks(arr: any, chunkSize: number) {
 }
 
 // Ref the other services: blobs: [ path, type, 'AFTER', accountURN, rayId ],
-export function logAnalytics(dataset: AnalyticsEngineDataset, method: string, type: string, when: string, name?: string, jwt?: string) {
+export function logAnalytics(
+  dataset: AnalyticsEngineDataset,
+  method: string,
+  type: string,
+  when: string,
+  name?: string,
+  jwt?: string
+) {
   if (!dataset) return false
 
   const nullableName = name || null
@@ -161,12 +169,12 @@ export function logAnalytics(dataset: AnalyticsEngineDataset, method: string, ty
   //     .join('').slice(-32)
 
   const datapoint: AnalyticsEngineDataPoint = {
-    blobs: [ method, type, when, nullableName, nullableJWT ],
+    blobs: [method, type, when, nullableName, nullableJWT],
 
     // doubles: [],
 
     // Keys are max 32 bytes so we take the last 32 bytes.
-    indexes: [raw_key.slice(-32)]
+    indexes: [raw_key.slice(-32)],
   }
 
   dataset.writeDataPoint(datapoint)
@@ -177,7 +185,13 @@ export function logAnalytics(dataset: AnalyticsEngineDataset, method: string, ty
 }
 
 // Special case for NFTs -- get analytics at the contract level.
-export function logNFTBatchAnalytics(dataset: AnalyticsEngineDataset, method: string, type: string, when: string, nftBatch: any[]) {
+export function logNFTBatchAnalytics(
+  dataset: AnalyticsEngineDataset,
+  method: string,
+  type: string,
+  when: string,
+  nftBatch: any[]
+) {
   for (const nft of nftBatch) {
     logAnalytics(dataset, method, type, when, nft.contractAddress, nft.tokenId)
   }

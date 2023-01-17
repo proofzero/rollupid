@@ -14,13 +14,11 @@ export const getAccountMethod = async ({
   input: unknown
   ctx: Context
 }): Promise<GetAccountResult> => {
-  console.log('getAccountMethod', ctx.address)
   if (isHandleAddressType(ctx.addrType as string)) {
     throw new Error('Not implemented')
   }
 
   const nodeClient = ctx.address
   const account = await nodeClient?.class.getAccount()
-  console.log('get account', { account })
   return account
 }

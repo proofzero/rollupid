@@ -4,7 +4,7 @@ import classNames from 'classnames'
 
 const tabs: Record<string, string> = {
   gallery: 'Gallery',
-  collection: 'NFT Collections',
+  collections: 'NFT Collections',
 }
 
 export type ProfileTabsProps = {
@@ -19,7 +19,7 @@ const ProfileTabs = ({
   handleTab,
 }: ProfileTabsProps) => {
   const [currentTab, setCurrentTab] = useState<string>(
-    tabs[path] || 'collection'
+    tabs[path] || 'collections'
   )
   return (
     <div className="block px-3 lg:px-4">

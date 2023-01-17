@@ -1,1 +1,1 @@
-export const PlatformJWTAssertionHeader = 'KBT-Access-JWT-Assertion'
+export const PlatformJWTAssertionHeader = 'kbt-access-jwt-assertion'

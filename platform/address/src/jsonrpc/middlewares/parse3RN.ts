@@ -14,7 +14,6 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing X-3RN header')
   }
   let addressURN = header as AddressURN
-  console.log('parse address urn', { addressURN })
   const hashedIdref = AddressURNSpace.decode(addressURN)
 
   if (!hashedIdref) {

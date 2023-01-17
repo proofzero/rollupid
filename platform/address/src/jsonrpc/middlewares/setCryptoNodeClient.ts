@@ -10,9 +10,20 @@ export const setCryptoNodeClient: BaseMiddlewareFunction<Context> = async ({
   if (!ctx.addressURN) {
     throw new Error('missing addressURN')
   }
-  console.log('setCryptoNodeClient: nodeType', ctx.nodeType)
+  console.log(
+    'setCryptoNodeClient: nodeType',
+    ctx.nodeType,
+    ctx.DefaultAddress,
+    ctx.CryptoAddress
+  )
   if (ctx.nodeType == NodeType.Crypto) {
-    const node = await initCryptoNodeByName(ctx.addressURN, ctx.CryptoAddress)
+    const node = await initCryptoNodeByName(
+      ctx.addressURN,
+      ctx.DefaultAddress,
+      ctx.CryptoAddress
+    )
+
+    console.log({ class: node.class }, { crypto: node.crypto.class })
     return next({
       ctx: {
         ...ctx,
@@ -23,6 +34,7 @@ export const setCryptoNodeClient: BaseMiddlewareFunction<Context> = async ({
   if (ctx.nodeType == NodeType.Contract) {
     const node = await initContractNodeByName(
       ctx.addressURN,
+      ctx.DefaultAddress,
       ctx.ContractAddress
     )
     return next({

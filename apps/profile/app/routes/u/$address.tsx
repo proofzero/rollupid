@@ -21,19 +21,32 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 import defaultOG from '~/assets/3ID_profiles_OG.png'
 import { NodeType } from '@kubelt/platform.address/src/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
+import { getUserSession } from '~/utils/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { Node, Profile } from '@kubelt/galaxy-client'
+import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
+import { Links } from '~/components/profile/links/links'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address } = params
   const galaxyClient = await getGalaxyClient()
+
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
 
   // first lets check if this address is a valid handle
   // TODO: create a getProfileFromHandle method
 
   // if not handle is this let's assume this is an idref
   const profile = await galaxyClient
-    .getProfileFromAddress({
-      addressURN: `${AddressURNSpace.urn(address as string)}`,
-    })
+    .getProfileFromAddress(
+      {
+        addressURN: `${AddressURNSpace.urn(address as string)}`,
+      },
+      {
+        [PlatformJWTAssertionHeader]: jwt,
+      }
+    )
     .then((res) => res.profileFromAddress)
     .catch((err) => {
       console.debug({ err })
@@ -101,50 +114,106 @@ export const meta: MetaFunction = ({
 }
 
 const UserAddressLayout = () => {
-  const { cover, pfp, profile, path, cryptoAddresses } = useLoaderData()
-  const ctx = useOutletContext<object>()
+  const { profile, path, cryptoAddresses } = useLoaderData<{
+    profile: Profile
+    path: string
+    cryptoAddresses: Node[]
+  }>()
+  const ctx = useOutletContext<{
+    loggedInProfile: Profile | null
+  }>()
 
   const navigate = useNavigate()
 
   return (
     <ProfileLayout
-      Cover={<Cover src={gatewayFromIpfs(cover)} />}
+      Cover={<Cover src={gatewayFromIpfs(profile.cover as string)} />}
       Avatar={
         <Avatar
-          src={gatewayFromIpfs(pfp) as string}
+          src={gatewayFromIpfs(profile.pfp?.image as string) as string}
           size="lg"
           hex={true}
           border
         />
       }
       Claim={
-        <div
-          className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
-          space-y-4 lg:space-y-0 flex-row justify-between mt-7 px-3 lg:px-4"
-        >
-          <div>
-            <Text className="text-gray-600" size="lg" weight="semibold">
-              This Account is yet to be claimed - Are you the owner?
-            </Text>
-            <Text
-              className="break-all text-gray-500"
-              size="base"
-              weight="normal"
-            >
-              {profile.address}
-            </Text>
-          </div>
+        <div className="px-3 lg:px-4">
+          <Text className="mt-5 mb-2.5 text-gray-800" weight="bold" size="4xl">
+            {profile.displayName}
+          </Text>
 
-          <a href="https://passport.threeid.xyz/">
-            <Button>Claim This Account</Button>
-          </a>
+          <div className="flex flex-col space-around">
+            <Text
+              className="break-normal text-gray-500 mb-12"
+              size="base"
+              weight="medium"
+            >
+              {profile.bio}
+            </Text>
+
+            <div
+              className="flex flex-col lg:flex-row lg:space-x-10 justify-start
+              lg:items-center text-gray-500 font-size-lg"
+            >
+              {profile.location && (
+                <div className="flex flex-row space-x-2 items-center wrap">
+                  <FaMapMarkerAlt />
+                  <Text weight="medium" className="text-gray-500">
+                    {profile.location}
+                  </Text>
+                </div>
+              )}
+
+              {profile.job && (
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaBriefcase />
+                  <Text weight="medium" className="text-gray-500">
+                    {profile.job}
+                  </Text>
+                </div>
+              )}
+
+              {profile.website && (
+                <div className="flex flex-row space-x-2 items-center">
+                  <FaGlobe />
+                  <a href={profile.website} rel="noreferrer" target="_blank">
+                    <Text weight="medium" className="text-indigo-500">
+                      {profile.website}
+                    </Text>
+                  </a>
+                </div>
+              )}
+            </div>
+            <Links links={profile.links} />
+          </div>
         </div>
       }
+      // Claim={
+      //   <div
+      //     className="rounded-md bg-gray-50 py-4 px-6 flex flex-col lg:flex-row
+      //     space-y-4 lg:space-y-0 flex-row justify-between mt-7 px-3 lg:px-4"
+      //   >
+      //     <div>
+      //       <Text className="text-gray-600" size="lg" weight="semibold">
+      //         This Account is yet to be claimed - Are you the owner?
+      //       </Text>
+      //       <Text
+      //         className="break-all text-gray-500"
+      //         size="base"
+      //         weight="normal"
+      //       >
+      //         {profile.address}
+      //       </Text>
+      //     </div>
+
+      //     <a href="https://passport.threeid.xyz/">
+      //       <Button>Claim This Account</Button>
+      //     </a>
+      //   </div>
+      // }
       Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
-      <Outlet
-        context={{ ...ctx, cover, pfp, profile, path, cryptoAddresses }}
-      />
+      <Outlet context={{ ...ctx, profile, path, cryptoAddresses }} />
     </ProfileLayout>
   )
 }

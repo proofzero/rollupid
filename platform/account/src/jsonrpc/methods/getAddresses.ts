@@ -28,6 +28,7 @@ export const getAddressesMethod = async ({
   input: GetAddressesParams
   ctx: Context
 }): Promise<GetAddressesOutput> => {
+  // TODO: scopes on addresses
   const query = {
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to

@@ -21,6 +21,7 @@ export const ValidateJWT: BaseMiddlewareFunction<{
   token?: string
 }> = ({ ctx, next }) => {
   if (!ctx.token) throw new Error('No token found in middleware context')
+
   const jwt = jose.decodeJwt(ctx.token)
 
   // TODO: validate token

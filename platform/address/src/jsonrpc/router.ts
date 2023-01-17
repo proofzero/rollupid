@@ -45,6 +45,7 @@ import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { setDefaultNodeClient } from './middlewares/setDefaultNodeClient'
 
 const t = initTRPC.context<Context>().create()
 
@@ -56,6 +57,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
     .use(Analytics)
@@ -68,6 +70,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
     .use(Analytics)
@@ -80,6 +83,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
     .use(Analytics)
@@ -93,6 +97,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
     .use(Analytics)
@@ -106,6 +111,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initCryptoNode)
     .use(initOAuthNode)
     .use(Analytics)
@@ -155,6 +161,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setCryptoNodeClient)
     .use(setOAuthNodeClient)
+    .use(setDefaultNodeClient)
     .use(initOAuthNode)
     .output(InitVaultOutput)
     .mutation(initVaultMethod),
