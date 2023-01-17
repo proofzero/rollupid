@@ -133,8 +133,6 @@ const UserAddressLayout = () => {
     loggedInProfile: Profile | null
   }>()
 
-  console.log(cryptoAddresses, profile)
-
   const navigate = useNavigate()
   const fetcher = useFetcher()
 

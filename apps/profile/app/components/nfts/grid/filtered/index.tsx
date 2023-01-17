@@ -129,7 +129,7 @@ const FilteredNftGrid = ({
             setOpenedFilters={setOpenedFilters}
             setTextFilter={setTextFilter}
             textFilter={textFilter}
-            pfp={pfp}
+            pfp={pfp as string}
           />
 
           {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}

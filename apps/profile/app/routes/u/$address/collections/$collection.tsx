@@ -8,8 +8,9 @@ import {
 } from '@remix-run/react'
 import { useState, useEffect, useMemo } from 'react'
 
-import UnfilteredNftGrid from '~/components/nft-collection/UnfilteredNftGrid'
 import type { Node, Profile } from '@kubelt/galaxy-client'
+
+import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
 
 export const loader: LoaderFunction = async (args) => {
   const { params } = args

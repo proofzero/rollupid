@@ -1,4 +1,4 @@
-import FilteredNftGrid from '~/components/nft-collection/FilteredNftGrid'
+import FilteredNftGrid from '~/components/nfts/grid/filtered'
 import { useState, useEffect, useMemo } from 'react'
 
 import type { LoaderFunction } from '@remix-run/cloudflare'

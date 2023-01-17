@@ -75,9 +75,7 @@ export default function AccountSettingsProfile() {
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = AddressURNSpace.decode(
-    cryptoAddresses?.map((a) => a.urn)[0] as AddressURN
-  )
+  const temporaryAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
 
   const {
     displayName,

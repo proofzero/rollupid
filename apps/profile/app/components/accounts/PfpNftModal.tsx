@@ -1,7 +1,7 @@
-import FilteredNftGrid from '../nft-collection/FilteredNftGrid'
-import UnfilteredNftGrid from '../nft-collection/UnfilteredNftGrid'
-import SelectableNft from '~/components/nft-collection/SelectableNft'
-import { LoadingGridSquares } from '../nft-collection/LoadingNftGrid'
+import FilteredNftGrid from '~/components/nfts/grid/filtered'
+import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
+import SelectableNft from '~/components/nfts/interactible'
+import { LoadingGridSquares } from '~/components/nfts/grid/loading'
 
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'

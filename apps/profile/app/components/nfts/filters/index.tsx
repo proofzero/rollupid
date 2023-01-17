@@ -1,16 +1,16 @@
 import InputText from '../../inputs/InputText'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import { ReactComponent as noFilter } from '~/assets/no-filter.svg'
+import noFilter from '../../../assets/no-filter.svg'
 
 import { FaSearch } from 'react-icons/fa'
 import { HiChevronUp, HiOutlineCheck } from 'react-icons/hi'
 
 export type FilterProps = {
-  colFilters: { title: string; img: string }[]
-  curFilter?: string
+  colFilters: { title: string; img?: string }[]
+  curFilter: string
   openedFilters: boolean
-  textFilter?: string
+  textFilter: string
   pfp: string
 
   setOpenedFilters: (val: boolean) => void
@@ -25,7 +25,7 @@ const Filters = ({
   openedFilters,
   setOpenedFilters,
   setTextFilter,
-  textFilter,
+  textFilter = '',
   pfp,
 }: FilterProps) => {
   return (
@@ -126,7 +126,7 @@ const Filters = ({
                           }
                           onError={({ currentTarget }) => {
                             currentTarget.onerror = null
-                            // currentTarget.src = noFilter
+                            currentTarget.src = noFilter
                           }}
                           alt="+"
                         />

@@ -1,7 +1,5 @@
-import FilteredNftGrid from '~/components/nft-collection/FilteredNftGrid'
-
+import FilteredNftGrid from '~/components/nfts/grid/filtered'
 import { mergeSortedNfts } from '~/helpers/nfts'
-
 import { useState, useEffect, useMemo } from 'react'
 
 import type { Node, Profile } from '@kubelt/galaxy-client'

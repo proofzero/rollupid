@@ -1,6 +1,6 @@
-import SectionTitle from '~/components/typography/SectionTitle'
-import SectionHeading from '~/components/typography/SectionHeading'
-import SmallRegularBlock from '~/components/typography/SmallRegularBlock'
+import SectionTitle from '../typography/SectionTitle'
+import SectionHeading from '../typography/SectionHeading'
+import SmallRegularBlock from '../typography/SmallRegularBlock'
 
 import styles from './FAQ.css'
 
@@ -41,7 +41,9 @@ const contents = [
           href={`https://opensea.io/collection/3id-invite`}
           className="mx-1"
         >
-          <Text type="span" size="sm" className="text-indigo-500">OpenSea</Text>
+          <Text type="span" size="sm" className="text-indigo-500">
+            OpenSea
+          </Text>
         </a>
 
         <SmallRegularBlock type="span">
@@ -98,7 +100,9 @@ const contents = [
             href={`https://github.com/kubelt/kubelt/tree/main/nftar`}
             className="mx-1"
           >
-            <Text type="span" size="sm" className="text-indigo-500">here</Text>
+            <Text type="span" size="sm" className="text-indigo-500">
+              here
+            </Text>
           </a>
 
           <SmallRegularBlock type="span">
@@ -121,7 +125,9 @@ const contents = [
           href={`https://kubelt.com`}
           className="mx-1"
         >
-          <Text type="span" size="sm" className="text-indigo-500">Kubelt</Text>
+          <Text type="span" size="sm" className="text-indigo-500">
+            Kubelt
+          </Text>
         </a>
 
         <SmallRegularBlock type="span">
