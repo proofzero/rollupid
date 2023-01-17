@@ -18,6 +18,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const galaxyClient = await getGalaxyClient()
 
   const urn = AddressURNSpace.urn(hash) // TODO: introduce new sub-urn hash
+
+  console.log({ urn, address })
   // check if address is registered to an account
   const profile = await galaxyClient
     .getProfileFromAddress({
@@ -39,11 +41,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // and it has been marked as public
   // and therefore can be redirected /u/<handle>
   if (profile.handle) {
-    // TODO: check for handle
-
     // redirect to /u/<handle> if handle present
     return redirect(`/u/${profile.handle}`)
   }
+
+  if (profile?.addresses?.length) {
+    const handle = AddressURNSpace.decode(
+      profile.addresses[0].urn as AddressURN
+    )
+    return redirect(`/u/${handle}`)
+  }
+
   return json({
     profile,
     addressUrn: urn,

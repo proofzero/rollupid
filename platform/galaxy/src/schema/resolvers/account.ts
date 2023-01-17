@@ -7,7 +7,7 @@ import { setupContext, isAuthorized, hasApiKey, logAnalytics } from './utils'
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
-import { AddressURN } from '@kubelt/urns/address'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { Profile } from '@kubelt/platform.account/src/types'
 import { CryptoAddressProfile } from '@kubelt/platform.address/src/types'
 import { ResolverContext } from './common'
@@ -79,11 +79,14 @@ const accountResolvers: Resolvers = {
         account: accountURN,
       })
 
+      const baseUrn = AddressURNSpace.urn(
+        AddressURNSpace.parse(addressURN).decoded
+      )
+
       // check if the addressURN is in the account's connected addresses (if hidden it won't be)
       if (
-        !accountProfile?.addresses.filter(
-          (address) => addressURN === address.urn
-        ).length
+        !accountProfile?.addresses.filter((address) => baseUrn === address.urn)
+          .length
       ) {
         console.log('galaxy.profileFromAddress: address is hidden')
         throw new GraphQLError("Address doesn't have an associated account", {
