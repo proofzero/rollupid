@@ -3,15 +3,16 @@ import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
 import type { Challenge, NFTarVoucher } from '../types'
-import type { CryptoAddressType } from '@kubelt/types/address'
 import { recoverEthereumAddress } from '../utils'
-import Address from './address'
 
-import { DurableObjectStubProxy } from 'do-proxy'
+import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
-export default class CryptoAddress extends Address {
-  async getType(): Promise<CryptoAddressType> {
-    return (await super.getType()) as CryptoAddressType
+export default class CryptoAddress extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
   }
 
   async getNonce(

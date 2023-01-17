@@ -193,7 +193,7 @@ const Gallery = () => {
   console.log({ cryptoAddresses })
 
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = cryptoAddresses?.map((a) => a?.qc?.alias)[0]
+  const temporaryAddress = cryptoAddresses?.map((a) => a?.urn)[0]
 
   const [initialState, setInitialState] = useState([])
   const [loading, setLoading] = useState(true)

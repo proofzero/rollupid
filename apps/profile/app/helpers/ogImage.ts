@@ -37,3 +37,22 @@ export default async (
     pfp: fg,
   }
 }
+
+export const ogImageFromProfile = async (pfp: string, cover: string) => {
+  const key = await cacheKey(`og-image-${pfp}-${cover}`)
+  const ogImage = await Images.fetch(
+    `http://localhost/ogimage?bg=${pfp}&fg=${cover}`,
+    {
+      cf: {
+        cacheEverything: true,
+        cacheTtl: 86400,
+        cacheKey: key,
+      },
+    }
+  )
+    .then((res) => res.text())
+    .catch((err) => {
+      console.debug("Couldn't fetch ogImage", err)
+    })
+  return ogImage
+}

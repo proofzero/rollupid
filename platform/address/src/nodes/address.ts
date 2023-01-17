@@ -1,4 +1,4 @@
-import { DOProxy } from 'do-proxy'
+import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN } from '@kubelt/urns/address'
@@ -51,3 +51,5 @@ export default class Address extends DOProxy {
     return this.state.storage.put('profile', newProfile)
   }
 }
+
+export type DefaultAddressProxyStub = DurableObjectStubProxy<Address>

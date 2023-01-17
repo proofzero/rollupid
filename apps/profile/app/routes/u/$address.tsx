@@ -7,71 +7,64 @@ import {
   useOutletContext,
 } from '@remix-run/react'
 
-import { gatewayFromIpfs } from '@kubelt/utils'
-import { Avatar } from '@kubelt/design-system'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
-import type { CryptoAddressProfile } from '@kubelt/platform.address/src/types'
-import { AddressURNSpace } from '@kubelt/urns/address'
-
 import { getGalaxyClient } from '~/helpers/clients'
-import { ogImage } from '~/helpers'
+import { ogImageFromProfile } from '~/helpers/ogImage'
+
+import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
+import { gatewayFromIpfs } from '@kubelt/utils'
 import defaultOG from '~/assets/3ID_profiles_OG.png'
+import { NodeType } from '@kubelt/platform.address/src/types'
+import { AddressURNSpace } from '@kubelt/urns/address'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address } = params
-
-  // check if address is registered to an account
   const galaxyClient = await getGalaxyClient()
 
-  // if no profile render /b/eth/<address> page
-  const [addressProfile] = await Promise.all([
-    galaxyClient
-      .getAddressProfile({
-        addressURN: `${AddressURNSpace.urn(
-          address as string
-        )}?+addr_type=eth?=addr=${address as string}`,
-      })
-      .then((res) => res.addressProfile as CryptoAddressProfile)
-      .catch((err) => {
-        return {
-          address: null,
-          avatar: null,
-          displayName: null,
-        }
-      }),
-  ])
+  // first lets check if this address is a valid handle
+  // TODO: create a getProfileFromHandle method
 
-  if (!addressProfile.address) {
-    throw new Response(
-      JSON.stringify({
-        ogImage: defaultOG,
-        errors: [{ code: 400, message: 'Profile could not be resolved' }],
-      }),
-      { status: 400 }
-    )
+  // if not handle is this let's assume this is an idref
+  const profile = await galaxyClient
+    .getProfileFromAddress({
+      addressURN: `${AddressURNSpace.urn(address as string)}`,
+    })
+    .then((res) => res.profileFromAddress)
+    .catch((err) => {
+      console.debug({ err })
+      // this could return null if the address is not linked to an account
+      // or the account is linked and marked as private
+      // or if the account is invalid
+      return null
+    })
+
+  if (!profile) {
+    throw json({ message: 'Profile could not be resolved' }, { status: 404 })
   }
 
-  let {
-    ogImage: genOgImage,
-    cover,
-    pfp,
-  } = await ogImage(addressProfile.avatar, addressProfile.address)
+  const ogImage = await ogImageFromProfile(
+    profile.pfp?.image as string,
+    profile.cover as string
+  )
 
   const splittedUrl = request.url.split('/')
   const path = splittedUrl[splittedUrl.length - 1]
 
+  const cryptoAddresses = profile.addresses?.filter(
+    (addr) => addr.rc.nodeType === NodeType.Crypto
+  )
+
   return json({
-    ogImage: genOgImage || defaultOG,
-    cover,
-    pfp,
-    address,
+    profile,
+    cryptoAddresses,
+    uname: profile.handle || address,
+    ogImage: ogImage || defaultOG,
     path,
-    profile: addressProfile,
   })
 }
 
@@ -79,7 +72,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export const meta: MetaFunction = ({
   data,
 }: {
-  data: { ogImage: string; profile?: { displayName: string; address: string } }
+  data: { ogImage: string; uname: string }
 }) => {
   const meta = {
     'og:title': '3ID Decentralized Profile',
@@ -96,22 +89,19 @@ export const meta: MetaFunction = ({
     'twitter:site': '@threeid_xyz',
     'twitter:card': 'summary_large_image',
   }
-  if (!data || !data.profile) return meta
-  const { profile } = data
+  if (!data || !data.uname) return meta
   return {
     ...meta,
-    'og:title': `${profile.displayName || profile.address}'s 3ID Profile`,
-    'twitter:title': `${profile.displayName || profile.address}'s 3ID Profile`,
-    'og:url': `https://my.threeid.xyz/b/eth/${profile.address}`,
-    'og:image:alt': `${profile.displayName || profile.address}'s 3ID Profile`,
-    'twitter:image:alt': `${
-      profile.displayName || profile.address
-    }'s 3ID Profile`,
+    'og:title': `${data.uname}'s 3ID Profile`,
+    'twitter:title': `${data.uname}'s 3ID Profile`,
+    'og:url': `https://my.threeid.xyz/u/${data.uname}`,
+    'og:image:alt': `${data.uname}'s 3ID Profile`,
+    'twitter:image:alt': `${data.uname}'s 3ID Profile`,
   }
 }
 
-const EthAddress = () => {
-  const { cover, pfp, profile, path } = useLoaderData()
+const UserAddressLayout = () => {
+  const { cover, pfp, profile, path, cryptoAddresses } = useLoaderData()
   const ctx = useOutletContext<object>()
 
   const navigate = useNavigate()
@@ -152,9 +142,11 @@ const EthAddress = () => {
       }
       Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
-      <Outlet context={{ ...ctx, cover, pfp, profile, path }} />
+      <Outlet
+        context={{ ...ctx, cover, pfp, profile, path, cryptoAddresses }}
+      />
     </ProfileLayout>
   )
 }
 
-export default EthAddress
+export default UserAddressLayout

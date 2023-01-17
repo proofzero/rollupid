@@ -1,6 +1,5 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AddressList } from '~/components/addresses/AddressList'
 import { useOutletContext } from '@remix-run/react'
 import { AddressListItemProps } from '~/components/Addresses/AddressListItem'

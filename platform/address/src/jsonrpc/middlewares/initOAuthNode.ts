@@ -21,14 +21,13 @@ export const initOAuthNode: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing addressURN')
   }
 
-  if (!addrType) {
-    throw new Error('missing addrType')
-  }
-
   const address = await nodeClient.class.getAddress()
   const type = await nodeClient.class.getType()
 
   if (!address || !type) {
+    if (!addrType) {
+      throw new Error('missing addrType')
+    }
     await nodeClient.class.setAddress(addressURN)
     await nodeClient.class.setType(addrType)
   }

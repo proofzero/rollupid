@@ -14,6 +14,7 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing X-3RN header')
   }
   let addressURN = header as AddressURN
+  console.log('parse address urn', { addressURN })
   const hashedIdref = AddressURNSpace.decode(addressURN)
 
   if (!hashedIdref) {
@@ -27,15 +28,17 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   const addrType = rparams.get('addr_type')
   const alias = qparams.get('alias')
 
-  if (!addrType) {
-    throw `cannot determine node type: ${addressURN}. Please provide a node_type or addr_type r-component.`
-  }
+  // if (!addrType) {
+  //   throw `cannot determine node type: ${addressURN}. Please provide a node_type or addr_type r-component.`
+  // }
 
-  const nodeType = isValidAddressType(addrType)
+  const nodeType = addrType
+    ? isValidAddressType(addrType)
+    : rparams.get('node_type')
 
-  if (!nodeType) {
-    throw `invalid 3RN address type: ${addrType}`
-  }
+  // if (!nodeType) {
+  //   throw `invalid 3RN address type: ${addrType}`
+  // }
 
   // add the name qc param
   addressURN = `${AddressURNSpace.urn(hashedIdref)}`

@@ -15,6 +15,7 @@ export interface Environment {
   Access: Fetcher
   Analytics: AnalyticsEngineDataset
   Edges: Fetcher
+  DefaultAddress: DurableObjectNamespace
   CryptoAddress: DurableObjectNamespace
   ContractAddress: DurableObjectNamespace
   OAuthAddress: DurableObjectNamespace

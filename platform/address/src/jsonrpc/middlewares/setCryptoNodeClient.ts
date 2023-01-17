@@ -21,7 +21,10 @@ export const setCryptoNodeClient: BaseMiddlewareFunction<Context> = async ({
     })
   }
   if (ctx.nodeType == NodeType.Contract) {
-    const node = await initContractNodeByName(ctx.addressURN, ctx.CryptoAddress)
+    const node = await initContractNodeByName(
+      ctx.addressURN,
+      ctx.ContractAddress
+    )
     return next({
       ctx: {
         ...ctx,

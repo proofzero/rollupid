@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
-import { AddressURNSpace } from '@kubelt/urns/address'
 
 import { Context } from '../../context'
 import { CryptoAddressProfile, CryptoAddressType } from '../../types'

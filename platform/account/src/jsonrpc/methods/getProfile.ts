@@ -34,8 +34,7 @@ export const getProfileMethod = async ({
     node.class.getProfile(),
     caller.getAddresses({ account: input.account }),
   ])
-
   if (!profile) return null
 
-  return { ...profile, addresses }
+  return { ...profile, addresses, handle: undefined }
 }

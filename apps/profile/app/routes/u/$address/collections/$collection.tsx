@@ -1,8 +1,8 @@
+import { Node } from '@kubelt/galaxy-client'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import { useLoaderData, useOutletContext } from '@remix-run/react'
 
-import type { AddressURN } from '@kubelt/urns/address'
 import ProfileNftSingleCollection from '~/components/nft-collection/ProfileNftSingleCollection'
 
 export const loader: LoaderFunction = async (args) => {
@@ -15,18 +15,23 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  const { profile } = useOutletContext<{
-    profile: { handle: string; addresses: AddressURN[] }
+  const { profile, cryptoAddresses, uname } = useOutletContext<{
+    profile: { displayName: string }
+    cryptoAddresses: Node[]
+    uname: string
   }>()
+
+  // TODO: change the ProfileNFTGallery to take multiple addresses
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.urn)[0]
 
   return (
     <>
       <ProfileNftSingleCollection
-        account={profile.addresses[0]}
-        displayname={profile.handle}
+        account={tempTargetAddress}
+        displayname={profile.displayName || tempTargetAddress}
         detailsModal
         collection={collection}
-        backLink={`/u/${profile.handle}/collections`}
+        backLink={`/u/${uname}/collections`}
       />
     </>
   )

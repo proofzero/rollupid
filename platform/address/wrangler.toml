@@ -5,6 +5,7 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
+  { name = "DefaultAddress", class_name = "Address" },
   { name = "CryptoAddress", class_name = "CryptoAddress" },
   { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
@@ -55,8 +56,13 @@ deleted_classes = ["Core"]
 tag = "v3"
 new_classes = ["OAuthAddress"]
 
+[[migrations]]
+tag = "v"
+new_classes = ["Address"]
+
 [env.dev]
 durable_objects.bindings = [
+  { name = "DefaultAddress", class_name = "Address" },
   { name = "CryptoAddress", class_name = "CryptoAddress" },
   { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
@@ -79,6 +85,7 @@ NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
+  { name = "DefaultAddress", class_name = "Address" },
   { name = "CryptoAddress", class_name = "CryptoAddress" },
   { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]
@@ -101,6 +108,7 @@ NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
+  { name = "DefaultAddress", class_name = "Address" },
   { name = "CryptoAddress", class_name = "CryptoAddress" },
   { name = "OAuthAddress", class_name = "OAuthAddress" },
 ]

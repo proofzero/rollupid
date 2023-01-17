@@ -5,6 +5,7 @@ import {
 // import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/next'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
+import Address from './nodes/address'
 import CryptoAddress from './nodes/crypto'
 import ContractAddress from './nodes/contract'
 import OAuthAddress from './nodes/oauth'
@@ -26,4 +27,4 @@ export default {
   },
 }
 //FetchCreateContextFnOptions
-export { CryptoAddress, ContractAddress, OAuthAddress }
+export { CryptoAddress, ContractAddress, OAuthAddress, Address }

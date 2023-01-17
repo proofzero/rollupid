@@ -1,10 +1,11 @@
-import { ContractAddressType } from '@kubelt/types/address'
-import Address from './address'
-import { DurableObjectStubProxy } from 'do-proxy'
+import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
-export default class ContractAddress extends Address {
-  async getType(): Promise<ContractAddressType | undefined> {
-    return (await super.getType()) as ContractAddressType
+export default class ContractAddress extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
   }
 }
 export type ContractAddressProxyStub = DurableObjectStubProxy<ContractAddress>

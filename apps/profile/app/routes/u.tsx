@@ -15,14 +15,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return null
 }
 
-const BlockchainLayout = () => {
+const UserLayout = () => {
   const { loggedInUserProfile } = useOutletContext<{
     loggedInUserProfile: GetProfileQuery['profile'] | null
   }>()
   return <Outlet context={{ loggedInUserProfile }} />
 }
 
-export default BlockchainLayout
+export default UserLayout
 
 export function CatchBoundary() {
   const caught = useCatch()

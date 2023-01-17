@@ -5,7 +5,7 @@ import { redirect } from '@remix-run/cloudflare'
 
 import { getGallery, getGalleryWithMetadata } from '~/helpers/nfts'
 import { useOutletContext } from '@remix-run/react'
-import { Profile } from '@kubelt/galaxy-client'
+import { Node, Profile } from '@kubelt/galaxy-client'
 
 export type ProfileData = {
   targetAddress: string
@@ -22,20 +22,20 @@ export type GalleryData = {
 }
 
 export const loader: LoaderFunction = async ({ params }) => {
-  const { handle } = params
-  const { gallery } = await getGalleryWithMetadata(handle as string)
-  if (!gallery || !gallery.length) return redirect(`/u/${handle}/collection`)
+  const { address } = params
+  const { gallery } = await getGalleryWithMetadata(address as string)
+  if (!gallery || !gallery.length) return redirect(`/u/${address}/collection`)
   return null
 }
 
 const ProfileGallery = () => {
-  const { profile } = useOutletContext<{
+  const { profile, cryptoAddresses } = useOutletContext<{
     profile: Profile
+    cryptoAddresses: Node[]
   }>()
 
-  const tempTargetAddress = profile?.addresses?.map(
-    (n) => (n.qc as { alias: string }).alias
-  )[0]
+  // TODO: change the ProfileNFTGallery to take multiple addresses
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.urn)[0]
 
   return (
     <>

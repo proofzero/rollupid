@@ -36,6 +36,8 @@ export const resolveAccountMethod = async ({
     const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
     const urn = AccountURNSpace.urn(name)
 
+    console.log('set account', { urn })
+
     const caller = appRouter.createCaller(ctx)
     await caller.setAccount(urn)
     await caller.initVault()

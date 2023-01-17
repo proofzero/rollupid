@@ -1,11 +1,12 @@
+import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 import { OAuthData } from '../types'
-import Address from './address'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthAddressType } from '@kubelt/types/address'
 
-export default class OAuthAddress extends Address {
-  async getType(): Promise<OAuthAddressType> {
-    return (await super.getType()) as OAuthAddressType
+export default class OAuthAddress extends DOProxy {
+  declare state: DurableObjectState
+
+  constructor(state: DurableObjectState) {
+    super(state)
+    this.state = state
   }
 
   async getData(): Promise<OAuthData | undefined> {

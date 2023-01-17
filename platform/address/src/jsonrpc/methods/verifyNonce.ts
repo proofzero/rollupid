@@ -7,6 +7,7 @@ import { ResponseType } from '@kubelt/platform.access/src/types' // TODO: move t
 
 import { appRouter } from '../router'
 import { Challenge } from '../../types'
+import { CryptoNode } from '../../nodes'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
@@ -32,13 +33,13 @@ export const verifyNonceMethod = async ({
 }): Promise<VerifyNonceResult> => {
   const { nonce, signature } = input
 
-  const nodeClient = ctx.address as CryptoAddressProxyStub
+  const nodeClient = ctx.address as CryptoNode
   const {
     address: clientId,
     redirectUri,
     scope,
     state,
-  }: Challenge = await nodeClient.class.verifyNonce(nonce, signature)
+  }: Challenge = await nodeClient.crypto.class.verifyNonce(nonce, signature)
 
   const caller = appRouter.createCaller(ctx)
   const account = await caller.resolveAccount()

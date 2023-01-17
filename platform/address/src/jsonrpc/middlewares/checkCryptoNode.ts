@@ -53,7 +53,7 @@ export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
       })
     } else if (alias && isEthAddress(alias)) {
       return next({ ctx: { ...ctx, nodeType: NodeType.Crypto } })
-    } else throw `invalid crypto address ref: ${hashedIdref}`
+    }
   }
 
   return next({ ctx })

@@ -59,7 +59,7 @@ const accountResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.getAccount.query()
-
+      console.log({ addressURN, accountURN })
       // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
@@ -74,10 +74,14 @@ const accountResolvers: Resolvers = {
           [PlatformJWTAssertionHeader]: jwt,
         },
       })
+
+      console.log('HERERE')
       // should also return the handle if it exists
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+
+      console.log('HERERE', { accountProfile })
 
       return accountProfile
     },

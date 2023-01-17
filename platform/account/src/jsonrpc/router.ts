@@ -5,7 +5,11 @@ import { Context } from '../context'
 
 import { AddressListSchema } from './validators/addressList'
 
-import { getProfileMethod, GetProfileInput } from './methods/getProfile'
+import {
+  getProfileMethod,
+  GetProfileInput,
+  GetProfileOutput,
+} from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import { getAddressesMethod, GetAddressesInput } from './methods/getAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
@@ -64,7 +68,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(GetProfileInput)
-    .output(ProfileSchema.nullable())
+    .output(GetProfileOutput)
     .query(getProfileMethod),
   setProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)

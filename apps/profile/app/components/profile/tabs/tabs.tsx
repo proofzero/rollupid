@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import ConditionalTooltip from '~/components/conditional-tooltip'
+import classNames from 'classnames'
 
 const tabs: Record<string, string> = {
   gallery: 'Gallery',
   collection: 'NFT Collections',
-}
-
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
 }
 
 export type ProfileTabsProps = {
