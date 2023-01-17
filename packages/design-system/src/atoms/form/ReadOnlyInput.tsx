@@ -1,6 +1,7 @@
 import React from 'react'
 import { InputHTMLAttributes } from 'react'
 import { HiEyeOff } from 'react-icons/hi'
+import { Copier } from '../copier/Copier'
 import { Text } from '../text/Text'
 
 export type ReadOnlyInputProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -8,6 +9,8 @@ export type ReadOnlyInputProps = InputHTMLAttributes<HTMLInputElement> & {
   value: string
   label: string
   hidden?: boolean
+  copyable?: boolean
+  onCopy?: (value: string) => void
 }
 
 export const ReadOnlyInput = ({
@@ -18,17 +21,23 @@ export const ReadOnlyInput = ({
   readOnly,
   value,
   className,
+  copyable = false,
+  onCopy,
   ...rest
 }: ReadOnlyInputProps) => {
   const computedName = name ?? id
 
   return (
     <div className="flex flex-col">
-      <label htmlFor={id}>
-        <Text size="sm" weight="medium" className="text-gray-700 mb-2">
-          {label}
-        </Text>
-      </label>
+      <div className="flex flex-row justify-between">
+        <label htmlFor={id}>
+          <Text size="sm" weight="medium" className="text-gray-700 mb-2">
+            {label}
+          </Text>
+        </label>
+
+        {copyable && <Copier value={value} onCopy={onCopy} />}
+      </div>
 
       {/* Would `disabled` also work instead of overwriting focus properties ?*/}
       <div className="relative">

@@ -13,6 +13,13 @@ const Template = () => (
       createdAt: new Date(),
       onKeyRoll: () => {},
     }}
+    onDelete={() => {}}
+    appDetails={{
+      app: {
+        name: 'Foo',
+      },
+      published: true,
+    }}
   />
 )
 

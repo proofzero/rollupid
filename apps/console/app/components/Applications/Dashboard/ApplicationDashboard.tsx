@@ -5,6 +5,8 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
+import { FaCopy } from 'react-icons/fa'
+import { Toaster, toast } from 'react-hot-toast'
 
 type ApplicationDashboardProps = {
   galaxyGql: {
@@ -21,14 +23,13 @@ type ApplicationDashboardProps = {
   logins?: any[]
 }
 
-
 export const ApplicationDashboard = ({
   galaxyGql,
   oAuth,
 }: ApplicationDashboardProps) => {
-
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
-  const [clientSecretRollModalOpen, setClientSecretRollModalOpen] = useState(false)
+  const [clientSecretRollModalOpen, setClientSecretRollModalOpen] =
+    useState(false)
 
   return (
     <section>
@@ -36,20 +37,23 @@ export const ApplicationDashboard = ({
         Dashboard
       </Text>
 
+      <Toaster position="top-right" reverseOrder={false} />
       <RotateCredsModal
         isOpen={apiKeyRollModalOpen}
         rotateCallback={() => {
           setApiKeyRollModalOpen(false)
           galaxyGql.onKeyRoll()
         }}
-        closeCallback={() => setApiKeyRollModalOpen(false)} />
+        closeCallback={() => setApiKeyRollModalOpen(false)}
+      />
       <RotateCredsModal
         isOpen={clientSecretRollModalOpen}
         rotateCallback={() => {
           setClientSecretRollModalOpen(false)
           oAuth.onKeyRoll()
         }}
-        closeCallback={() => setClientSecretRollModalOpen(false)} />
+        closeCallback={() => setClientSecretRollModalOpen(false)}
+      />
 
       <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
         <div className="flex-1 flex flex-col space-y-5">
@@ -79,6 +83,12 @@ export const ApplicationDashboard = ({
               label="API Key"
               value={galaxyGql.apiKey ?? 's3cr3t-l337-h4x0r5'}
               hidden={galaxyGql.apiKey ? false : true}
+              copyable={galaxyGql.apiKey ? true : false}
+              onCopy={() =>
+                toast.success('Client secret copied to clipboard!', {
+                  duration: 2000,
+                })
+              }
             />
           </Panel>
 
@@ -109,11 +119,18 @@ export const ApplicationDashboard = ({
                 label="Application ID"
                 value={oAuth.appId}
               />
+
               <ReadOnlyInput
                 id="oAuthAppSecret"
                 label="Application Secret"
                 value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
                 hidden={oAuth.appSecret ? false : true}
+                copyable={oAuth.appSecret ? true : false}
+                onCopy={() =>
+                  toast.success('Client secret copied to clipboard!', {
+                    duration: 2000,
+                  })
+                }
               />
             </div>
           </Panel>
