@@ -8,8 +8,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
-import { FaCopy } from 'react-icons/fa'
-import { Toaster, toast } from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 
 type ApplicationAuthProps = {
   appDetails: {
@@ -53,14 +52,15 @@ export const ApplicationAuth = ({
           Save
         </Button>
       </div>
-    <Toaster position="top-right" reverseOrder={false} />
-    <RotateCredsModal
+      <Toaster position="top-right" reverseOrder={false} />
+      <RotateCredsModal
         isOpen={rollKeyModalOpen}
         rotateCallback={() => {
           setRollKeyModalOpen(false)
           oAuth.onKeyRoll()
         }}
-        closeCallback={() => setRollKeyModalOpen(false)} />
+        closeCallback={() => setRollKeyModalOpen(false)}
+      />
 
       <div className="flex flex-col md:flex-row space-y-5 lg:space-y-0 lg:space-x-5">
         <div className="flex-1">
@@ -76,24 +76,17 @@ export const ApplicationAuth = ({
               </div>
 
               <div className="flex-1">
-              <div className='flex justify-end' >
-                <Text size='sm'
-                  weight="medium"
-                  className={(!oAuth.appSecret ? 'hidden' : '') + ' absolute text-indigo-500 cursor-pointer py-1'}
-                  onClick={() => {
-                    navigator.clipboard.writeText(oAuth.appSecret || '')
-                    toast.success("Client secret copied to clipboard!", { duration: 2000 })
-                  }}
-                >
-                  <FaCopy className='mr-3'></FaCopy>
-                </Text>
-              </div>
-
                 <ReadOnlyInput
                   id="oAuthAppSecret"
                   label="Application Secret"
                   value={oAuth.appSecret ?? 's3cr3t-l337-h4x0r5'}
                   hidden={oAuth.appSecret ? false : true}
+                  copyable={oAuth.appSecret ? true : false}
+                  onCopy={() =>
+                    toast.success('Client secret copied to clipboard!', {
+                      duration: 2000,
+                    })
+                  }
                   disabled
                 />
               </div>
@@ -149,20 +142,32 @@ export const ApplicationAuth = ({
             </div>
 
             <div className="flex-1">
-              <ReadOnlyInput id="appScopes" label="Scopes" value="User profile" />
+              <ReadOnlyInput
+                id="appScopes"
+                label="Scopes"
+                value="User profile"
+              />
             </div>
           </div>
 
           <div className="my-8 md:my-0">
-            <ReadOnlyInput id="appDomains" label="Domain(s)" value="" required />
+            <ReadOnlyInput
+              id="appDomains"
+              label="Domain(s)"
+              value=""
+              required
+            />
             <Text
-                    type="span"
-                    size="xs"
-                    weight="medium"
-                    className="text-gray-400"
-                    ><a className="text-indigo-500" href="https://discord.gg/threeid">
-                    Contact us
-                  </a> to enable this feature</Text>
+              type="span"
+              size="xs"
+              weight="medium"
+              className="text-gray-400"
+            >
+              <a className="text-indigo-500" href="https://discord.gg/threeid">
+                Contact us
+              </a>{' '}
+              to enable this feature
+            </Text>
           </div>
 
           <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
