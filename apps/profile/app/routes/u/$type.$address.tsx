@@ -9,7 +9,7 @@ import { redirect } from 'react-router-dom'
 import { getGalaxyClient } from '~/helpers/clients'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { address } = params
+  const { address, type } = params
 
   const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
   const encoder = new TextEncoder()
@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // check if address is registered to an account
   const profile = await galaxyClient
     .getProfileFromAddress({
-      addressURN: `${urn}?+addr_type=google?=alias=${address}`,
+      addressURN: `${urn}?+addr_type=eth?=alias=${address}`,
     })
     .then((res) => res.profileFromAddress)
     .catch((err) => {
@@ -35,6 +35,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
 
   if (!profile) {
+    // todo: do public eth / ens / githun / twitter lookup switch on $type
+    // galaxyclient.addressProfile({ addressURN: urn })
+    // if found then show claim account layout
+
     throw json({ error: 'not found' }, { status: 404 })
   }
   // if profile then this address is linked
@@ -67,7 +71,7 @@ const Eth = () => {
   return (
     <>
       TODO: some simple splash page using the profile loader data plus maybe
-      some gh specific stuff
+      some eth specific stuff
       {JSON.stringify(profile)}
     </>
   )
