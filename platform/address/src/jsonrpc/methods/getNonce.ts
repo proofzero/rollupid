@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { CryptoAddressProxyStub } from '../../nodes/crypto'
+import { AddressNode } from '../../nodes'
+import CryptoAddress from '../../nodes/crypto'
 
 export const GetNonceInput = z.object({
   address: z.string(),
@@ -22,7 +23,6 @@ export const getNonceMethod = async ({
   ctx: Context
 }): Promise<string> => {
   const { address, template, redirectUri, scope, state } = input
-
-  const nodeClient = ctx.address as CryptoAddressProxyStub
-  return nodeClient.class.getNonce(address, template, redirectUri, scope, state)
+  const nodeClient = new CryptoAddress(ctx.address as AddressNode)
+  return nodeClient.getNonce(address, template, redirectUri, scope, state)
 }

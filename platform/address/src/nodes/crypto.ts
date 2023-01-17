@@ -3,15 +3,17 @@ import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
 import type { Challenge, NFTarVoucher } from '../types'
-import type { CryptoAddressType } from '@kubelt/types/address'
 import { recoverEthereumAddress } from '../utils'
+
+import { AddressNode } from '.'
+import { DurableObjectStubProxy } from 'do-proxy'
 import Address from './address'
 
-import { DurableObjectStubProxy } from 'do-proxy'
+export default class CryptoAddress {
+  declare node: AddressNode
 
-export default class CryptoAddress extends Address {
-  async getType(): Promise<CryptoAddressType> {
-    return (await super.getType()) as CryptoAddressType
+  constructor(node: AddressNode) {
+    this.node = node
   }
 
   async getNonce(
@@ -24,26 +26,31 @@ export default class CryptoAddress extends Address {
     const nonce = hexlify(randomBytes(NONCE_OPTIONS.length))
     const timestamp = Date.now()
 
-    const challenges: Map<string, Challenge> =
-      (await this.state.storage.get('challenges')) || new Map()
-    challenges.set(nonce, {
+    const challenges =
+      (await this.node.storage.get<Record<string, Challenge>>('challenges')) ||
+      {}
+    console.log({ challenges })
+    // const challenges: Map<string, Challenge> =
+    //   (await this.node.storage.get('challenges')) || new Map()
+    challenges[nonce] = {
       address,
       template,
       redirectUri,
       scope,
       state,
       timestamp,
-    })
-    this.state.storage.put('challenges', challenges)
-    this.state.storage.setAlarm(NONCE_OPTIONS.ttl)
+    }
+    this.node.storage.put('challenges', challenges)
+    this.node.storage.setAlarm(NONCE_OPTIONS.ttl)
 
     return nonce
   }
 
   async verifyNonce(nonce: string, signature: string): Promise<Challenge> {
-    const challenges: Map<string, Challenge> =
-      (await this.state.storage.get('challenges')) || new Map()
-    const challenge = challenges.get(nonce)
+    const challenges: Record<string, Challenge> =
+      (await this.node.storage.get<Record<string, Challenge>>('challenges')) ||
+      {}
+    const challenge = challenges[nonce]
 
     if (!challenge) {
       throw new Error('not matching nonce')
@@ -56,30 +63,28 @@ export default class CryptoAddress extends Address {
       throw new Error('not matching address')
     }
 
-    challenges.delete(nonce)
-    this.state.storage.put('challenges', challenges)
+    delete challenges[nonce]
+    this.node.storage.put('challenges', challenges)
 
     return challenge
   }
 
   async setVoucher(voucher: NFTarVoucher): Promise<void> {
-    return await this.state.storage.put('voucher', voucher)
+    return await this.node.storage.put('voucher', voucher)
   }
 
   async getVoucher(): Promise<NFTarVoucher | undefined> {
-    return await this.state.storage.get<NFTarVoucher>('voucher')
+    return await this.node.storage.get<NFTarVoucher>('voucher')
   }
 
-  async alarm() {
+  static async alarm(address: Address) {
     const challenges: Map<string, Challenge> =
-      (await this.state.storage.get('challenges')) || new Map()
+      (await address.state.storage.get('challenges')) || new Map()
     for (const [nonce, challenge] of challenges) {
       if (challenge.timestamp + NONCE_OPTIONS.ttl * 1000 <= Date.now()) {
         challenges.delete(nonce)
       }
     }
-    await this.state.storage.put('challenges', challenges)
+    await address.state.storage.put('challenges', challenges)
   }
 }
-
-export type CryptoAddressProxyStub = DurableObjectStubProxy<CryptoAddress>

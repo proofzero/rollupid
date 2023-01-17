@@ -5,8 +5,8 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
+ 
 ]
 
 services = [
@@ -53,14 +53,21 @@ deleted_classes = ["Core"]
 tag = "v3"
 new_classes = ["OAuthAddress"]
 
+[[migrations]]
+tag = "v4"
+deleted_classes = ["CryptoAddress", "OAuthAddress"]
+new_classes = ["Address"]
+
 [env.dev]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" }
+]
+kv_namespaces = [
+  { binding = "HANDLES", id = "fca42f2091f14eebb9226513ed8a4c09" }
 ]
 
 analytics_engine_datasets = [
@@ -74,12 +81,14 @@ NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" }
+]
+kv_namespaces = [
+  { binding = "HANDLES", id = "814a8ca024cd4fda8a667a4143cb4825" }
 ]
 
 analytics_engine_datasets = [
@@ -93,13 +102,16 @@ NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-current" },
   { binding = "Edges", service = "edges-current" }
 ]
+kv_namespaces = [
+  { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" }
+]
+
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },

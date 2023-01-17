@@ -5,12 +5,10 @@ export enum NodeType {
 }
 
 export enum CryptoAddressType {
-  Ethereum = 'ethereum',
   ETH = 'eth',
 }
 
 export enum ContractAddressType {
-  Ethereum = 'ethereum',
   ETH = 'eth',
 }
 

@@ -9,7 +9,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useState } from 'react'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -25,18 +25,18 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(Starbase, {
     headers: {
-      [PlatformJWTAssertionHeader]: jwt
-    }
+      [PlatformJWTAssertionHeader]: jwt,
+    },
   })
 
-  const appDetails = (await starbaseClient.getAppDetails.query({
-    clientId: params.clientId
-  }))
+  const appDetails = await starbaseClient.getAppDetails.query({
+    clientId: params.clientId,
+  })
 
   let rotatedSecret
   if (!appDetails.secretTimestamp) {
     rotatedSecret = await starbaseClient.rotateClientSecret.mutate({
-      clientId: appDetails.clientId
+      clientId: appDetails.clientId,
     })
 
     // The prefix is there just as an aide to users;
@@ -70,10 +70,9 @@ export const action: ActionFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(Starbase, {
     headers: {
-      [PlatformJWTAssertionHeader]: jwt
-    }
+      [PlatformJWTAssertionHeader]: jwt,
+    },
   })
-
 
   const formData = await request.formData()
   const op = formData.get('op')
@@ -86,7 +85,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     case 'roll_app_secret':
       rotatedSecret = (
         await starbaseClient.rotateClientSecret.mutate({
-          clientId: params.clientId
+          clientId: params.clientId,
         })
       ).secret.split(':')[1]
       break

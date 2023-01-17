@@ -9,6 +9,14 @@ export default {
     src: {
       defaultValue: 'https://picsum.photos/1920/256',
     },
+    isOwner: {
+      defaultValue: false,
+    },
+    updateCoverHandler: {
+      defaultValue: (file: string) => {
+        console.log('updateCoverHandler', file)
+      },
+    },
   },
 }
 

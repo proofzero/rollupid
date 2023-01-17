@@ -1,12 +1,11 @@
-import { redirect, json } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { useLoaderData, NavLink } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
 import { BiCog, BiIdCard, BiLink } from 'react-icons/bi'
 import { HiOutlineHome, HiOutlineViewGridAdd } from 'react-icons/hi'
-
-import { parseURN } from 'urns'
+import classNames from 'classnames'
 
 import { requireJWT } from '~/utils/session.server'
 
@@ -14,57 +13,35 @@ import styles from '~/styles/account.css'
 
 import { links as faqStyles } from '~/components/FAQ'
 
-import HeadNav from '~/components/head-nav'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getGalaxyClient } from '~/helpers/clients'
+import { getAccountAddresses, getAccountProfile } from '~/helpers/profile'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 
 export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
 }
 
 // @ts-ignore
-export const loader = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
-  const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    'KBT-Access-JWT-Assertion': jwt,
-  })
+  const [profile, addresses] = await Promise.all([
+    getAccountProfile(jwt),
+    getAccountAddresses(jwt),
+  ])
 
-  const [avatarUrl, isToken, address, pfp, links] = [
-    profileRes.profile?.pfp?.image,
-    profileRes.profile?.pfp?.isToken,
-    parseURN(profileRes.profile?.defaultAddress).nss.split('/')[1],
-    profileRes.profile?.pfp,
-    profileRes.profile?.links,
-  ]
-
-  let targetAddress = address
-  if (
-    profileRes.profile?.defaultAddress &&
-    parseURN(profileRes.profile?.defaultAddress).rcomponent?.includes(
-      'node_type=oauth'
-    )
-  ) {
-    targetAddress = address
-  } else {
-    targetAddress =
-      (
-        await galaxyClient.getEnsAddress({
-          addressOrEns: address,
-        })
-      ).ensAddress || ''
-  }
+  const cryptoAddresses =
+    addresses?.filter((e) => {
+      if (!e.rc) return false
+      return e?.rc?.node_type === 'crypto'
+    }) || []
 
   return json({
-    targetAddress,
-    pfp,
-    address,
-    avatarUrl,
-    isToken,
-    links,
+    profile,
+    addresses,
+    cryptoAddresses,
   })
 }
 
@@ -86,39 +63,37 @@ const subNavigation = [
   { name: 'Settings', href: 'settings', icon: BiCog, exists: true },
 ]
 
-function classNames(...classes: any) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function AccountLayout() {
-  const { address, avatarUrl, isToken } = useLoaderData()
+  const { profile, addresses, cryptoAddresses } = useLoaderData<{
+    profile: Profile
+    addresses: Node[]
+    cryptoAddresses: Node[]
+  }>()
   return (
-    <>
-      <div className="min-h-full">
-        <div className="header lg:px-4">
-          <HeadNav avatarUrl={avatarUrl} isToken={isToken} loggedIn={address} />
-        </div>
-
-        <main className="-mt-72 pb-12">
-          <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
-            <div className="overflow-hidden bg-white shadow rounded-lg">
-              <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
-                <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
-                  <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
-                    {subNavigation.map((item) => (
-                      <SideNavItem key={item.name} item={item} />
-                    ))}
-                  </nav>
-                </aside>
-                <div className="divide-y divide-gray-200 px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
-                  <Outlet />
-                </div>
-              </div>
+    <main className="-mt-72 pb-12">
+      <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
+        <div className="overflow-hidden bg-white shadow rounded-lg">
+          <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
+            <aside className="fixed bottom-0 z-50 w-full lg:relative lg:col-start-1 lg:col-end-3 bg-gray-50">
+              <nav className="flex flex-row justify-center items-center lg:flex-none lg:block lg:mt-8 space-y-1">
+                {subNavigation.map((item) => (
+                  <SideNavItem key={item.name} item={item} />
+                ))}
+              </nav>
+            </aside>
+            <div className="divide-y divide-gray-200 px-4 sm:mb-16 lg:col-start-3 lg:col-end-13 lg:p-4 lg:p-8">
+              <Outlet
+                context={{
+                  profile,
+                  addresses,
+                  cryptoAddresses,
+                }}
+              />
             </div>
           </div>
-        </main>
+        </div>
       </div>
-    </>
+    </main>
   )
 }
 
@@ -140,7 +115,11 @@ const SideNavItem = ({ item }: SideNavItemProps) => {
   }
   return (
     <div className={'basis-1/4 lg:w-100 content-center self-center z-50'}>
-      <ConditionalTooltip content="Coming Soon" condition={!item.exists}>
+      <ConditionalTooltip
+        content="Coming Soon"
+        condition={!item.exists}
+        placement={'top-start'}
+      >
         <NavLink
           to={item.href}
           // @ts-ignore

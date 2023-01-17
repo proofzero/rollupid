@@ -3,9 +3,11 @@ import { ZodError } from 'zod'
 
 import { Context } from '../context'
 
-import { AddressListSchema } from './validators/addressList'
-
-import { getProfileMethod, GetProfileInput } from './methods/getProfile'
+import {
+  getProfileMethod,
+  GetProfileInput,
+  GetProfileOutput,
+} from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
 import { getAddressesMethod, GetAddressesInput } from './methods/getAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
@@ -14,8 +16,6 @@ import {
   GetSessionsMethodInput,
   GetSessionsMethodOutput,
 } from './methods/getSessions'
-
-import { ProfileSchema } from './validators/profile'
 
 import {
   ValidateJWT,
@@ -64,7 +64,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(Analytics)
     .input(GetProfileInput)
-    .output(ProfileSchema.nullable())
+    .output(GetProfileOutput)
     .query(getProfileMethod),
   setProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
@@ -77,12 +77,11 @@ export const appRouter = t.router({
     .mutation(setProfileMethod),
   getAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
-    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
     .input(GetAddressesInput)
-    .output(AddressListSchema)
+    // .output(AddressListSchema)
     .query(getAddressesMethod),
   hasAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)

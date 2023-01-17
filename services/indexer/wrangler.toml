@@ -27,7 +27,7 @@ max_batch_timeout = 5 # optional: defaults to 5 seconds
 [vars]
 
 [dev]
-port = 8989
+port = 8990
 local_protocol = "http"
 
 [env.dev]

@@ -56,9 +56,14 @@ export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
     .bind(nodeId.toString())
     .all<QComponent>()
   // Convert the result collection into a property bag object.
-  if (qcomp.results)
-    return qcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
-  else return {}
+
+  if (qcomp.results) {
+    const reduced = qcomp.results?.reduce(
+      (prev, curr) => prev.set(curr.key, curr.value),
+      new Map<string, string>()
+    )
+    return Object.fromEntries(reduced)
+  } else return {}
 }
 
 // rc()
@@ -91,9 +96,13 @@ export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
     .bind(nodeId.toString())
     .all<RComponent>()
   // Convert the result collection into an property bag object.
-  if (rcomp.results)
-    return rcomp.results?.reduce((prev, curr) => ({ ...prev, ...curr }), {})
-  else return {}
+  if (rcomp.results) {
+    const reduced = rcomp.results?.reduce(
+      (prev, curr) => prev.set(curr.key, curr.value),
+      new Map<string, string>()
+    )
+    return Object.fromEntries(reduced)
+  } else return {}
 }
 
 // node()
@@ -213,16 +222,35 @@ export async function edges(
   // Returns true if every key/value pair in the query components is
   // matched exactly in the node components.
   function hasProps(
-    queryComp: Record<string, string | undefined>,
-    nodeComp: Record<string, string | undefined>
+    queryComp: Record<string, string | boolean | undefined>,
+    nodeComp: Record<string, string | boolean>
   ): boolean {
     //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
     //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-    const qSet = new Set(Object.entries(queryComp).flat())
-    const nList = Object.entries(nodeComp)
-      .flat()
-      .filter((e) => e !== undefined)
-    return nList.filter((e) => qSet.has(e)).length === nList.length
+
+    const nodeKeys = Object.keys(nodeComp)
+
+    // if there is nothing to filter on then default to true
+    if (!nodeKeys.length) {
+      return true
+    }
+
+    const qList = Object.keys(queryComp)
+      // .flat()
+      .filter((e) => queryComp[e] !== undefined)
+
+    const matches = nodeKeys.filter((e) => {
+      if (qList.includes(e)) {
+        const q = queryComp[e]?.toString() // convert boolean to string
+        const n = nodeComp[e]
+        return q === n
+      }
+      return true
+    })
+
+    // console.log({ queryComp, qList, nodeComp, matches })
+
+    return nodeKeys.length == matches.length
   }
 
   async function nodeFilter(
@@ -264,21 +292,21 @@ export async function edges(
       // DST
 
       // fragment
-      if (query?.dst?.fr !== undefined) {
+      if (query?.dst?.fr) {
         const dstNode = await node(g, edge.dst)
         if (dstNode !== undefined && dstNode.fragment !== query.dst.fr) {
           return result
         }
       }
       // q-components
-      if (query?.dst?.qc !== undefined) {
+      if (query?.dst?.qc && Object.keys(query?.dst?.qc).length) {
         const dstQc = await qc(g, edge.dst)
         if (!hasProps(query?.dst?.qc, dstQc)) {
           return result
         }
       }
       // r-components
-      if (query?.dst?.rc !== undefined) {
+      if (query?.dst?.rc && Object.keys(query?.dst?.rc).length) {
         const dstRc = await rc(g, edge.dst)
         if (!hasProps(query.dst.rc, dstRc)) {
           return result

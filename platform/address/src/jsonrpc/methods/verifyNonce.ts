@@ -1,12 +1,13 @@
 import { z } from 'zod'
 import { Context } from '../../context'
-import { CryptoAddressProxyStub } from '../../nodes/crypto'
 
 import getAccessClient from '@kubelt/platform-clients/access'
 import { ResponseType } from '@kubelt/platform.access/src/types' // TODO: move to types?
 
 import { appRouter } from '../router'
 import { Challenge } from '../../types'
+import { AddressNode } from '../../nodes'
+import CryptoAddress from '../../nodes/crypto'
 
 export const VerifyNonceInput = z.object({
   nonce: z.string(),
@@ -32,13 +33,13 @@ export const verifyNonceMethod = async ({
 }): Promise<VerifyNonceResult> => {
   const { nonce, signature } = input
 
-  const nodeClient = ctx.address as CryptoAddressProxyStub
+  const nodeClient = new CryptoAddress(ctx.address as AddressNode)
   const {
     address: clientId,
     redirectUri,
     scope,
     state,
-  }: Challenge = await nodeClient.class.verifyNonce(nonce, signature)
+  }: Challenge = await nodeClient.verifyNonce(nonce, signature)
 
   const caller = appRouter.createCaller(ctx)
   const account = await caller.resolveAccount()

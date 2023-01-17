@@ -5,7 +5,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import type { ScopeMeta } from './components/authorization/Authorization'
 import { GraphQLClient } from 'graphql-request'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 export function getStarbaseClient(jwt: string) {
   return createStarbaseClient(Starbase, {

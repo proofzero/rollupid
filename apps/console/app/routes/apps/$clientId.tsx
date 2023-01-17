@@ -8,16 +8,14 @@ import SiteHeader from '~/components/SiteHeader'
 
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
-type AppData = 
-  {
-    clientId: string
-    name?: string
-    icon?: string
-  }[]
-
+type AppData = {
+  clientId: string
+  name?: string
+  icon?: string
+}[]
 
 type LoaderData = {
   apps: AppData
@@ -29,8 +27,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(Starbase, {
     headers: {
-      [PlatformJWTAssertionHeader]: jwt
-    }
+      [PlatformJWTAssertionHeader]: jwt,
+    },
   })
   const galaxyClient = await getGalaxyClient()
 
@@ -39,9 +37,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   try {
     const apps = await starbaseClient.listApps.query()
     const reshapedApps = apps.map((a) => {
-      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon}
+      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
-  
+
     let avatarUrl = ''
     try {
       const profileRes = await galaxyClient.getProfile(undefined, {
@@ -49,9 +47,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       })
       avatarUrl = profileRes.profile?.pfp?.image || ''
     } catch (e) {
-      console.error("Could not retrieve profile image.", e)
+      console.error('Could not retrieve profile image.', e)
     }
-  
+
     return json<LoaderData>({ apps: reshapedApps, clientId, avatarUrl })
   } catch (error) {
     console.error({ error })

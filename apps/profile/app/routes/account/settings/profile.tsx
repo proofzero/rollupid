@@ -1,7 +1,6 @@
 import {
   Form,
   useActionData,
-  useLoaderData,
   useOutletContext,
   useTransition,
 } from '@remix-run/react'
@@ -9,58 +8,21 @@ import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import InputText from '~/components/inputs/InputText'
 import { requireJWT } from '~/utils/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import InputTextarea from '~/components/inputs/InputTextarea'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import type { CryptoAddressProfile } from '@kubelt/platform.address/src/types'
 
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { getGalaxyClient, getCryptoAddressClient } from '~/helpers/clients'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 import { useEffect, useRef, useState } from 'react'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
-import { parseURN } from 'urns'
-import type { Profile } from '@kubelt/galaxy-client'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const jwt = await requireJWT(request)
-
-  const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    'KBT-Access-JWT-Assertion': jwt,
-  })
-
-  const profile = profileRes.profile as Profile
-  const parsedURN = parseURN(profile.defaultAddress)
-
-  const address = parsedURN.nss.split('/')[1]
-
-  const { nftsForAddress } = await galaxyClient.getNftsForAddress({
-    owner: address,
-    contractAddresses: [MINTPFP_CONTRACT_ADDRESS],
-  })
-
-  const addressClient = getCryptoAddressClient({
-    headers: {
-      'X-3RN': profile.defaultAddress,
-    },
-  })
-
-  const addressProfile = await addressClient.getAddressProfile.query()
-  const { nftarVoucher } = addressProfile as CryptoAddressProfile
-
-  return json({
-    address,
-    generatedPfp: nftarVoucher?.metadata?.image,
-    generatedPfpMinted: nftsForAddress?.ownedNfts.length,
-    ...profileRes.profile,
-  })
-}
+import { getGalaxyClient } from '~/helpers/clients'
+import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -101,7 +63,16 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsProfile() {
-  const { notificationHandler } = useOutletContext<any>()
+  const { notificationHandler, profile, cryptoAddresses } = useOutletContext<{
+    profile: Profile
+    cryptoAddresses: Node[]
+    notificationHandler: (success: boolean) => void
+  }>()
+
+  //TODO: update pfp components to take multiple addresses
+  const temporaryAddress = AddressURNSpace.decode(
+    cryptoAddresses?.map((a) => a.urn)[0] as AddressURN
+  )
 
   const {
     displayName,
@@ -110,13 +81,13 @@ export default function AccountSettingsProfile() {
     bio,
     website,
     pfp,
-    address,
-    generatedPfp,
-    generatedPfpMinted,
-  } = useLoaderData()
+    // address,
+    // generatedPfp,
+    // generatedPfpMinted,
+  } = profile
 
-  const [pfpUrl, setPfpUrl] = useState(pfp?.image)
-  const [isToken, setIsToken] = useState<boolean>(pfp?.isToken ?? false)
+  const [pfpUrl, setPfpUrl] = useState(pfp?.image || undefined)
+  const [isToken, setIsToken] = useState<boolean>(false)
 
   const actionData = useActionData()
 
@@ -126,7 +97,7 @@ export default function AccountSettingsProfile() {
       setFormChanged(false)
       notificationHandler(!actionData?.errors)
     }
-  }, [transition])
+  }, [actionData?.errors, notificationHandler, transition])
 
   const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
 
@@ -185,7 +156,7 @@ export default function AccountSettingsProfile() {
     <>
       <PfpNftModal
         text={'Select NFT Avatar'}
-        account={address}
+        account={temporaryAddress}
         pfp={pfpUrl}
         isOpen={nftPfpModalOpen}
         handleClose={handlePfpModalClose}
@@ -244,29 +215,6 @@ export default function AccountSettingsProfile() {
                 Upload an Image
               </Button>
             </div>
-
-            {generatedPfp && (
-              <div className="flex flex-col space-y-2.5 items-center lg:items-start">
-                <Text className="text-gray-400" size="sm" weight="medium">
-                  Or use your 1/1 gradient
-                </Text>
-
-                <img
-                  alt="generated pfp"
-                  src={gatewayFromIpfs(generatedPfp)}
-                  style={{
-                    width: 33,
-                    height: 33,
-                  }}
-                  className="rounded-md cursor-pointer"
-                  onClick={() => {
-                    setPfpUrl(generatedPfp)
-                    setIsToken(generatedPfpMinted)
-                    setFormChanged(true)
-                  }}
-                />
-              </div>
-            )}
           </div>
         </div>
 
@@ -288,7 +236,7 @@ export default function AccountSettingsProfile() {
               id="displayName"
               heading="Display Name *"
               placeholder="Your Display Name"
-              defaultValue={displayName}
+              defaultValue={displayName || ''}
               required={true}
               error={actionData?.errors.displayName}
               maxChars={50}
@@ -308,7 +256,7 @@ export default function AccountSettingsProfile() {
                 heading="Job"
                 placeholder="Your Job"
                 Icon={FaBriefcase}
-                defaultValue={job}
+                defaultValue={job || ''}
                 maxChars={30}
               />
 
@@ -329,7 +277,7 @@ export default function AccountSettingsProfile() {
                 heading="Location"
                 placeholder="Your Location"
                 Icon={FaMapMarkerAlt}
-                defaultValue={location}
+                defaultValue={location || ''}
                 maxChars={30}
               />
 
@@ -350,7 +298,7 @@ export default function AccountSettingsProfile() {
             id="website"
             heading="Website"
             Icon={FaGlobe}
-            defaultValue={website}
+            defaultValue={website || ''}
             error={actionData?.errors?.website}
           />
 
@@ -365,7 +313,7 @@ export default function AccountSettingsProfile() {
             heading="Bio"
             charLimit={256}
             rows={3}
-            defaultValue={bio}
+            defaultValue={bio || ''}
             error={actionData?.errors.bio}
           />
 
@@ -376,7 +324,7 @@ export default function AccountSettingsProfile() {
           )}
           <SaveButton
             isFormChanged={isFormChanged}
-            discardFn={() => setPfpUrl(pfp?.image)}
+            discardFn={() => setPfpUrl(pfp?.image || undefined)}
           />
         </Form>
       </div>

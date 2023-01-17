@@ -10,7 +10,7 @@ export const NoInput = z.undefined()
 
 export const AccessURNInput = z.custom<AccessURN>((input) => {
   if (typeof input !== 'string') {
-    throw new Error(`input is not a string: ${input}`)
+    throw new Error(`AccessURNInput is not a string: ${input}`)
   }
   const parsed = AccessURNSpace.parse(input as AccessURN)
   if (!AccessURNSpace.is(`urn:threeid:${parsed.nss}`)) {
@@ -21,7 +21,7 @@ export const AccessURNInput = z.custom<AccessURN>((input) => {
 
 export const AddressURNInput = z.custom<AddressURN>((input) => {
   if (typeof input !== 'string') {
-    throw new Error(`input is not a string: ${input}`)
+    throw new Error(`AddressURNInput is not a string: ${input}`)
   }
   const parsed = AddressURNSpace.parse(input as AddressURN)
   if (!AddressURNSpace.is(`urn:threeid:${parsed.nss}`)) {
@@ -40,9 +40,6 @@ export const AccountURNInput = z.custom<AccountURN>((input) => {
 export const CryptoAddressTypeInput = z.custom<CryptoAddressType>((input) => {
   let addrType: CryptoAddressType
   switch (input) {
-    case CryptoAddressType.Ethereum:
-      addrType = CryptoAddressType.Ethereum
-      break
     case CryptoAddressType.ETH:
       addrType = CryptoAddressType.ETH
       break
@@ -68,6 +65,6 @@ export const EdgeDirectionInput = z.enum(['incoming', 'outgoing'])
 export const NodeFilterInput = z.object({
   id: AnyURNInput.optional(),
   fr: z.string().optional(),
-  qc: z.record(z.string(), z.string().optional()).optional(),
-  rc: z.record(z.string(), z.string().optional()).optional(),
+  qc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
+  rc: z.record(z.string(), z.string().or(z.boolean()).optional()).optional(),
 })

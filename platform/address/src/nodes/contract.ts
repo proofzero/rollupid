@@ -1,10 +1,15 @@
-import { ContractAddressType } from '@kubelt/types/address'
-import Address from './address'
 import { DurableObjectStubProxy } from 'do-proxy'
+import Address from './address'
 
-export default class ContractAddress extends Address {
-  async getType(): Promise<ContractAddressType | undefined> {
-    return (await super.getType()) as ContractAddressType
+export default class ContractAddress {
+  declare node: Address
+
+  constructor(node: Address) {
+    this.node = node
+  }
+
+  static async alarm(address: Address) {
+    console.log({ alarm: 'oauth' })
   }
 }
 export type ContractAddressProxyStub = DurableObjectStubProxy<ContractAddress>

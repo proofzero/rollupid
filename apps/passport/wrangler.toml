@@ -14,6 +14,7 @@ services = [
   { binding = "Address", service = "address" },
   { binding = "Galaxy", service = "galaxy" },
   { binding = "Starbase", service = "starbase" },
+  { binding = "Images", service = "images" },
 ]
 
 [site]
@@ -46,6 +47,7 @@ services = [
   { binding = "Address", service = "address-dev" },
   { binding = "Galaxy", service = "galaxy-dev" },
   { binding = "Starbase", service = "starbase-dev" },
+  { binding = "Images", service = "images-dev" },
 ]
 
 [env.dev.vars]
@@ -68,7 +70,7 @@ services = [
   { binding = "Address", service = "address-next" },
   { binding = "Galaxy", service = "galaxy-next" },
   { binding = "Starbase", service = "starbase-next" },
-
+  { binding = "Images", service = "images-next" },
 ]
 
 [env.next.vars]
@@ -94,7 +96,7 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Galaxy", service = "galaxy-current" },
   { binding = "Starbase", service = "starbase-current" },
-
+  { binding = "Images", service = "images-current" },
 ]
 
 [env.current.vars]

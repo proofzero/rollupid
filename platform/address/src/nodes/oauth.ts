@@ -1,19 +1,25 @@
+import { DurableObjectStubProxy } from 'do-proxy'
+import { AddressNode } from '.'
 import { OAuthData } from '../types'
 import Address from './address'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthAddressType } from '@kubelt/types/address'
 
-export default class OAuthAddress extends Address {
-  async getType(): Promise<OAuthAddressType> {
-    return (await super.getType()) as OAuthAddressType
+export default class OAuthAddress {
+  declare node: AddressNode
+
+  constructor(node: AddressNode) {
+    this.node = node
   }
 
   async getData(): Promise<OAuthData | undefined> {
-    return this.state.storage.get<OAuthData>('data')
+    return this.node.storage.get<OAuthData>('data')
   }
 
   async setData(data: OAuthData): Promise<void> {
-    return this.state.storage.put('data', data)
+    return this.node.storage.put('data', data)
+  }
+
+  static async alarm(address: Address) {
+    console.log({ alarm: 'oauth' })
   }
 }
 

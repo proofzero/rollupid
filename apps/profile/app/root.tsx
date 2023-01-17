@@ -34,10 +34,15 @@ import logo from './assets/three-id-logo.svg'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import type { GetProfileQuery } from '@kubelt/galaxy-client'
 
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
+import { getUserSession } from './utils/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { getGalaxyClient } from './helpers/clients'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -69,8 +74,34 @@ export const links: LinksFunction = () => [
   ...headNavLink(),
 ]
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  // let's fetch the user profile if they are logged in
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt') as string
+
+  const galaxyClient = await getGalaxyClient()
+  const loggedInUserProfile = await galaxyClient
+    .getProfile(
+      {},
+      {
+        [PlatformJWTAssertionHeader]: jwt,
+      }
+    )
+    .then((res) => res.profile)
+    .catch((err) => {
+      return null
+    })
+
+  let handle = loggedInUserProfile?.handle
+  if (!handle && loggedInUserProfile?.addresses?.length) {
+    handle = AddressURNSpace.decode(
+      loggedInUserProfile.addresses[0].urn as AddressURN
+    )
+  }
+
   return json({
+    loggedInUserProfile,
+    handle,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
     },
@@ -79,10 +110,16 @@ export const loader: LoaderFunction = () => {
 
 export default function App() {
   const location = useLocation()
-  const browserEnv = useLoaderData()
+  const { ENV, loggedInUserProfile, handle } = useLoaderData<{
+    ENV: {
+      INTERNAL_GOOGLE_ANALYTICS_TAG: string
+    }
+    loggedInUserProfile: GetProfileQuery['profile'] | null
+    handle: string | undefined
+  }>()
   const transition = useTransition()
 
-  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const GATag = ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
   useEffect(() => {
     if (GATag) {
@@ -120,14 +157,27 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' && <Loader />}
-        <Outlet />
+        <div className="bg-white h-full min-h-screen overflow-visible">
+          <div
+            className="header lg:px-4"
+            style={{
+              backgroundColor: '#192030',
+            }}
+          >
+            <HeadNav
+              loggedIn={!!loggedInUserProfile}
+              handle={handle}
+              avatarUrl={loggedInUserProfile?.pfp?.image as string}
+            />
+          </div>
+
+          <Outlet context={{ loggedInUserProfile }} />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv.ENV
-            )}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(ENV)}`,
           }}
         />
         <LiveReload port={8002} />
@@ -157,6 +207,7 @@ export function ErrorBoundary({ error }) {
               code="500"
               message="Something went terribly wrong!"
               trace={error?.stack}
+              error={error}
             />
           </div>
         </div>
@@ -171,17 +222,6 @@ export function ErrorBoundary({ error }) {
 
 export function CatchBoundary() {
   const caught = useCatch()
-  const location = useLocation()
-  const browserEnv = useLoaderData()
-  const transition = useTransition()
-
-  const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
-
-  useEffect(() => {
-    if (GATag) {
-      gtag.pageview(location.pathname, GATag)
-    }
-  }, [location, GATag])
 
   let secondary = 'Something went wrong'
   switch (caught.status) {
@@ -201,66 +241,18 @@ export function CatchBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="error-screen bg-white h-full min-h-screen">
-        {!GATag ? null : (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${GATag}`}
-            />
-            <script
-              async
-              id="gtag-init"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${GATag}', {
-                    page_path: window.location.pathname,
-                  });
-              `,
-              }}
-            />
-          </>
-        )}
-        <div
-          style={{
-            backgroundColor: '#192030',
-          }}
-        >
-          <HeadNav
-            loggedIn={caught.data?.loggedIn}
-            avatarUrl={caught.data?.loggedInUserProfile?.pfp?.image}
-            isToken={caught.data?.loggedInUserProfile?.pfp?.isToken}
-          />
+      <body className="error-screen">
+        <div className="wrapper grid grid-row-3 gap-4">
+          <nav className="col-span-3">
+            <img src={logo} alt="threeid" />
+          </nav>
+
+          <div className="col-span-3">
+            <ErrorPage code={caught.status.toString()} message={secondary} />
+          </div>
         </div>
-        <div
-          className="wrapper grid grid-row-3 gap-4"
-          style={{ marginTop: '-128px' }}
-        >
-          <article className="content col-span-3">
-            <div className="error justify-center items-center">
-              <p className="error-message text-center">{caught.status}</p>
-              <p className="error-secondary-message text-center">{secondary}</p>
-            </div>
-            <div className="relative -mr-20">
-              <img
-                alt="pepe"
-                className="m-auto pb-12"
-                src="https://imagedelivery.net/VqQy1abBMHYDZwVsTbsSMw/967142b1-ced3-4bd1-bda1-7bacd2224800/public"
-              />
-            </div>
-          </article>
-        </div>
+
         <ScrollRestoration />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(
-              browserEnv.ENV
-            )}`,
-          }}
-        />
         <Scripts />
         <LiveReload port={8002} />
       </body>

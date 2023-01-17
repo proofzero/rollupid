@@ -1,5 +1,5 @@
-import profileResolver from './profile'
+import accountResolver from './account'
 import addressResolver from './address'
 import nftsResolver from './nfts'
 
-export { profileResolver, addressResolver, nftsResolver }
+export { accountResolver, addressResolver, nftsResolver }

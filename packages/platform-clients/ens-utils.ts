@@ -14,7 +14,14 @@ export type ENSRes = {
 class ENSUtils implements IENSUtils {
   async getEnsEntry(address: string): Promise<ENSRes> {
     const ensRes = await fetch(
-      `https://api.ensideas.com/ens/resolve/${address}`
+      `https://api.ensideas.com/ens/resolve/${address}`,
+      {
+        cf: {
+          cacheEverything: true,
+          cacheTtl: 86400,
+          cacheKey: address,
+        },
+      }
     )
 
     const res: ENSRes = await ensRes.json()

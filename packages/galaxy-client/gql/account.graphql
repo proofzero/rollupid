@@ -1,0 +1,85 @@
+query getProfile {
+  profile {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    links {
+      name
+      url
+      verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
+    website
+  }
+}
+
+query getProfileFromAddress($addressURN: URN!) {
+  profileFromAddress(addressURN: $addressURN) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    links {
+      name
+      url
+      verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
+    website
+  }
+}
+
+query getConnectedAddresses {
+  connectedAddresses {
+    id
+    urn
+    nid
+    nss
+    fragment
+    qc
+    rc
+  }
+}
+
+mutation updateProfile($profile: ProfileInput) {
+  updateProfile(profile: $profile)
+}

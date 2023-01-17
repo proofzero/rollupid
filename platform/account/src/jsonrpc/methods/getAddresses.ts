@@ -1,19 +1,25 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import { AddressURN } from '@kubelt/urns/address'
 
 import { Graph } from '@kubelt/types'
 import { EDGE_ADDRESS } from '@kubelt/platform.address/src/constants'
-
-import type { AddressList } from '../../types'
+import { Node } from '../../../../edges/src/jsonrpc/validators/node'
 
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
-  type: inputValidators.CryptoAddressTypeInput.optional(),
+  filter: z
+    .object({
+      type: inputValidators.CryptoAddressTypeInput.optional(),
+      hidden: z.boolean().optional(),
+    })
+    .optional(),
 })
 
 export type GetAddressesParams = z.infer<typeof GetAddressesInput>
+
+export const GetAddressesOutput = z.array(Node)
+export type GetAddressesOutput = z.infer<typeof GetAddressesOutput>
 
 export const getAddressesMethod = async ({
   input,
@@ -21,7 +27,8 @@ export const getAddressesMethod = async ({
 }: {
   input: GetAddressesParams
   ctx: Context
-}): Promise<AddressList> => {
+}): Promise<GetAddressesOutput> => {
+  // TODO: scopes on addresses
   const query = {
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to
@@ -36,19 +43,16 @@ export const getAddressesMethod = async ({
       // Only keep edges having the given node type. The node type is
       // specified as an r-component in node URNs.
       rc: {
-        addr_type: input.type,
+        addr_type: input.filter?.type,
+      },
+      qc: {
+        hidden: input.filter?.hidden || false,
       },
     },
   }
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  const edgesResult = await ctx.edges.getEdges.query({ query })
-
-  // The source nodes in the returned edges are the URNs of the
-  // account nodes.
-  const addresses = edgesResult.edges.map((edge: Graph.Edge) => {
-    return edge.dst.urn as AddressURN
-  })
-
-  return addresses
+  return ctx.edges.getEdges
+    .query({ query })
+    .then((res) => res.edges.map((e) => e.dst))
 }

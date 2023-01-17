@@ -50,7 +50,7 @@ export const getSessionsMethod = async ({
   })
 
   // Returns a list of Access node URNs.
-  return edgesResult.edges.map((edge: Graph.Edge) => {
+  return edgesResult.edges.map((edge) => {
     return edge.dst.urn as AccessURN
   })
 }

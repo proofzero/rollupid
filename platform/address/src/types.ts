@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { OAuthDataSchema } from './jsonrpc/validators/oauth'
+import {
+  GithubProfileSchema,
+  GoogleProfileSchema,
+  OAuthDataSchema,
+} from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
@@ -11,9 +15,9 @@ export interface Environment {
   Access: Fetcher
   Analytics: AnalyticsEngineDataset
   Edges: Fetcher
-  CryptoAddress: DurableObjectNamespace
-  ContractAddress: DurableObjectNamespace
-  OAuthAddress: DurableObjectNamespace
+  Address: DurableObjectNamespace
+
+  HANDLES: KVNamespace
 
   COLLECTIONS: D1Database
 
@@ -25,6 +29,39 @@ export interface Environment {
   BLOCKCHAIN_ACTIVITY: Queue
 }
 
+export enum NodeType {
+  Crypto = 'crypto',
+  Contract = 'contract',
+  OAuth = 'oauth',
+  Handle = 'handle',
+}
+
+export enum CryptoAddressType {
+  Ethereum = 'ethereum',
+  ETH = 'eth',
+}
+
+export enum ContractAddressType {
+  Ethereum = 'ethereum',
+  ETH = 'eth',
+}
+
+export enum OAuthAddressType {
+  Google = 'google',
+  GitHub = 'github',
+  Twitter = 'twitter',
+}
+
+export enum HandleAddressType {
+  Handle = 'handle',
+}
+
+export type AddressType =
+  | CryptoAddressType
+  | OAuthAddressType
+  | ContractAddressType
+  | HandleAddressType
+
 export interface Challenge {
   address: string
   template: string
@@ -34,13 +71,15 @@ export interface Challenge {
   timestamp: number
 }
 
-export type OAuthGoogleProfile = z.infer<typeof GoogleRawProfileSchema>
+export type OAuthGoogleProfile = z.infer<typeof GoogleProfileSchema>['_json']
 export type OAuthTwitterProfile = z.infer<typeof TwitterProfileSchema>
+export type OAuthGithubProfile = z.infer<typeof GithubProfileSchema>['_json']
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
   | CryptoAddressProfile
   | OAuthGoogleProfile
   | OAuthTwitterProfile
+  | OAuthGithubProfile
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
 

@@ -1,16 +1,21 @@
-import { DOProxy } from 'do-proxy'
+import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN } from '@kubelt/urns/address'
-import { AddressProfile } from '../types'
-import type { AddressType } from '@kubelt/types/address'
+import { AddressProfile, Environment, NodeType } from '../types'
+import { AddressType } from '@kubelt/types/address'
+import CryptoAddress from './crypto'
+import ContractAddress from './contract'
+import OAuthAddress from './oauth'
 
 export default class Address extends DOProxy {
   declare state: DurableObjectState
+  declare env: Environment
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: Environment) {
     super(state)
     this.state = state
+    this.env = env
   }
 
   async getAddress(): Promise<AddressURN | undefined> {
@@ -19,6 +24,14 @@ export default class Address extends DOProxy {
 
   async setAddress(address: AddressURN): Promise<void> {
     return this.state.storage.put('address', address)
+  }
+
+  async getNodeType(): Promise<NodeType | undefined> {
+    return await this.state.storage.get<NodeType>('nodeType')
+  }
+
+  async setNodeType(type: NodeType): Promise<void> {
+    return await this.state.storage.put('nodeType', type)
   }
 
   async getType(): Promise<AddressType | undefined> {
@@ -47,7 +60,23 @@ export default class Address extends DOProxy {
 
   async setProfile<TProfile>(profile: TProfile): Promise<void> {
     const p = (await this.state.storage.get<TProfile>('profile')) || {}
-    Object.assign(p, profile)
-    return this.state.storage.put('profile', p)
+    const newProfile = { ...p, ...profile }
+    return this.state.storage.put('profile', newProfile)
+  }
+
+  async alarm() {
+    const type = await this.getNodeType()
+    switch (type) {
+      case NodeType.Crypto:
+        return CryptoAddress.alarm(this)
+      case NodeType.OAuth:
+        return OAuthAddress.alarm(this)
+      case NodeType.Contract:
+        return ContractAddress.alarm(this)
+      default:
+        console.log('Unknown node type', type)
+    }
   }
 }
+
+export type DefaultAddressProxyStub = DurableObjectStubProxy<Address>

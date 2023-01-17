@@ -1,13 +1,12 @@
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthAddress, CryptoAddress } from '.'
 import type { Environment } from './types'
 import type { AddressType, NodeType } from '@kubelt/types/address'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AddressURN } from '@kubelt/urns/address'
 import { ENSRes } from '@kubelt/platform-clients/ens-utils'
+import { AddressNode } from './nodes'
 
 /**
  * Defines your inner context shape.
@@ -18,15 +17,16 @@ interface CreateInnerContextOptions
   TOKEN_NFTAR: string
   NFTAR_CHAIN_ID: string
   NFTAR_URL: string
-  CryptoAddress: DurableObjectNamespace
-  OAuthAddress: DurableObjectNamespace
-  ContractAddress: DurableObjectNamespace
+  Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
+  HANDLES: KVNamespace
   Edges: Fetcher
   Access: Fetcher
-  address?: DurableObjectStubProxy<CryptoAddress | OAuthAddress>
+  address?: AddressNode
   address3RN?: AddressURN
   addressURN?: AddressURN
+  alias?: string
+  hashedIdref?: string
   nodeType?: NodeType
   addrType?: AddressType
   addressDescription?: ENSRes

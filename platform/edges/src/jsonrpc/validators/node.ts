@@ -7,6 +7,6 @@ export const Node = z.object({
   nid: z.string(),
   nss: z.string(),
   fragment: z.string(),
-  qc: z.record(z.string()),
-  rc: z.record(z.string()),
+  qc: z.record(z.string()).or(z.boolean()),
+  rc: z.record(z.string()).or(z.boolean()),
 })

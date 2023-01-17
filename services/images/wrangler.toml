@@ -1,11 +1,25 @@
 # cfw/icons/wrangler.toml
 
 name = "images"
+
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
+compatibility_flags = [ "formdata_parser_supports_files" ] # required
+
 
 # We'll access these services through their external names.
 workers_dev = false
+
+[[build.upload.rules]]
+globs = ["**/*.wasm"]
+type = "CompiledWasm"
+
+[[build.upload.rules]]
+globs = ["**/*.png"]
+type = "Data"
+
+[vars]
+HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
 # Secrets are set via the dashboard, or using the wrangler CLI:
 # $ wrangler secret put <KEY> [--env]
@@ -24,6 +38,7 @@ local_protocol = "http"
 # - minimum: 2 minutes (120)
 # - maximum: 6 hours (21600)
 UPLOAD_WINDOW_SECONDS = 200
+HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
 
 [env.next]
 
@@ -32,6 +47,8 @@ UPLOAD_WINDOW_SECONDS = 200
 # - minimum: 2 minutes (120)
 # - maximum: 6 hours (21600)
 UPLOAD_WINDOW_SECONDS = 200
+HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
+
 
 [env.current]
 
@@ -40,3 +57,5 @@ UPLOAD_WINDOW_SECONDS = 200
 # - minimum: 2 minutes (120)
 # - maximum: 6 hours (21600)
 UPLOAD_WINDOW_SECONDS = 200
+HASH_INTERNAL_CLOUDFLARE_ACCOUNT_ID = "VqQy1abBMHYDZwVsTbsSMw"
+

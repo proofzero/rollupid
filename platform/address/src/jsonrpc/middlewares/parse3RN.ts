@@ -1,13 +1,9 @@
-import { isAddress as isEthAddress } from '@ethersproject/address'
-
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 
 import { HEADER_3RN } from '../../constants'
 import { Context } from '../../context'
-
-import { NodeType } from '@kubelt/types/address'
-import { isNodeType } from '../../utils'
+import { isValidAddressType } from '../../utils'
 
 export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   ctx,
@@ -17,51 +13,54 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   if (!header) {
     throw new Error('missing X-3RN header')
   }
-  const urn = header as AddressURN
-  const name = AddressURNSpace.decode(urn)
+  let addressURN = header as AddressURN
+  const hashedIdref = AddressURNSpace.decode(addressURN)
 
-  if (!name) {
-    throw `missing 3RN name: ${urn}`
+  if (!hashedIdref) {
+    throw `missing 3RN name: ${addressURN}`
   }
 
-  const { rcomponent, qcomponent } = AddressURNSpace.parse(urn)
+  const { rcomponent, qcomponent } = AddressURNSpace.parse(addressURN)
   const rparams = new URLSearchParams(rcomponent || '')
+  const qparams = new URLSearchParams(qcomponent || '')
 
-  let addrType = rparams.get('addr_type')
-  if (!addrType) {
-    if (isEthAddress(name)) {
-      addrType = 'ethereum'
-    } else if (name.endsWith('.eth')) {
-      addrType = 'ethereum'
-    }
-  }
+  const addrType = rparams.get('addr_type')
+  const alias = qparams.get('alias')
 
-  let nodeType = rparams.get('node_type') || ''
-  if (nodeType && !isNodeType(nodeType)) {
-    throw `invalid 3RN node type: ${nodeType}`
-  }
+  // if (!addrType) {
+  //   throw `cannot determine node type: ${addressURN}. Please provide a node_type or addr_type r-component.`
+  // }
 
-  if (nodeType) {
-    //sleep
-  } else if (name.startsWith('0x')) {
-    nodeType = NodeType.Crypto
-  } else if (name.endsWith('.eth')) {
-    nodeType = NodeType.Crypto
-  } else {
-    throw `cannot determine node type: ${urn}`
-  }
+  const nodeType = addrType
+    ? isValidAddressType(addrType)
+    : rparams.get('node_type')
 
-  const addressURN = AddressURNSpace.urn(name)
+  // if (!nodeType) {
+  //   throw `invalid 3RN address type: ${addrType}`
+  // }
 
-  console.log('parse3RN', { name, addrType, nodeType, rparams, addressURN })
+  // add the name qc param
+  addressURN = `${AddressURNSpace.urn(hashedIdref)}`
+
+  console.log('parse3RN', {
+    hashedIdref,
+    addrType,
+    nodeType,
+    alias,
+    rparams,
+    addressURN,
+  })
 
   return next({
     ctx: {
       ...ctx,
       rparams,
+      qparams,
       addressURN,
       addrType,
       nodeType,
+      alias,
+      hashedIdref,
       params: new URLSearchParams(qcomponent as string),
     },
   })

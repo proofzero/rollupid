@@ -13,6 +13,7 @@ export const ResolveAccountOutput = AccountURNInput
 
 type ResolveAccountResult = z.infer<typeof ResolveAccountOutput>
 
+// NOTE: this method should only be called for new users
 export const resolveAccountMethod = async ({
   input,
   ctx,
@@ -35,8 +36,11 @@ export const resolveAccountMethod = async ({
     const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
     const urn = AccountURNSpace.urn(name)
 
+    console.log('set account', { urn })
+
     const caller = appRouter.createCaller(ctx)
-    caller.setAccount(urn)
+    await caller.setAccount(urn)
+    await caller.initVault()
 
     return urn
   }

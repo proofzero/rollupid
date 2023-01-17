@@ -6,18 +6,24 @@ import { ButtonAnchor } from '../../atoms/buttons/ButtonAnchor'
 import { Button } from '../../atoms/buttons/Button'
 
 import { FaDiscord } from 'react-icons/fa'
+import JSONPretty from 'react-json-pretty'
 
 export type ErrorPageProps = {
   code: string
   message: string
   trace?: string
+  error?: {
+    message: string
+  }
 }
 
-export function ErrorPage({ code, message, trace }: ErrorPageProps) {
+export function ErrorPage({ code, message, trace, error }: ErrorPageProps) {
+  const json = error?.message.replace('Unexpected error.: ', '')
+
   return (
     <article className="relative m-4">
       <section
-        className="absolute top-0 hidden lg:block lg:top-1/3 right-0 xl:right-[10%] 2xl:right-[15%]"
+        className="absolute top-0 hidden lg:block right-0 xl:right-[10%] 2xl:right-[22%]"
         style={{
           zIndex: -1,
         }}
@@ -66,8 +72,15 @@ export function ErrorPage({ code, message, trace }: ErrorPageProps) {
             <Text weight="semibold" className="text-gray-800">
               Error message
             </Text>
-            <Text size="sm" className="break-all leading-loose">
-              {trace}
+            <Text
+              size="sm"
+              className="break-all leading-loose overflow-scroll max-h-80 text-xs p-4 bg-[#f3f4f6] shadow-inner rounded-md"
+            >
+              <JSONPretty
+                id="json-pretty"
+                data={json}
+                style={{ background: 'none' }}
+              ></JSONPretty>
             </Text>
           </div>
         </section>

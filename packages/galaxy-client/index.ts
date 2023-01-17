@@ -17,6 +17,8 @@ export type Scalars = {
   URN: any;
 };
 
+export type AddressProfile = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthTwitterProfile;
+
 export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
@@ -39,6 +41,21 @@ export type ContractMetadata = {
   symbol?: Maybe<Scalars['String']>;
   tokenType?: Maybe<TokenType>;
   totalSupply?: Maybe<Scalars['String']>;
+};
+
+export type CryptoAddressProfile = {
+  __typename?: 'CryptoAddressProfile';
+  address: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
+  displayName?: Maybe<Scalars['String']>;
+};
+
+export type Edge = {
+  __typename?: 'Edge';
+  dst: Node;
+  perms?: Maybe<Array<Maybe<Scalars['String']>>>;
+  src: Node;
+  tag: Scalars['String'];
 };
 
 export type Id = {
@@ -196,6 +213,52 @@ export type NfTsWithChain = {
   ownedNfts: Array<NftWithChain>;
 };
 
+export type Node = {
+  __typename?: 'Node';
+  fragment?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  nid: Scalars['String'];
+  nss: Scalars['String'];
+  qc?: Maybe<Scalars['JSON']>;
+  rc?: Maybe<Scalars['JSON']>;
+  urn: Scalars['String'];
+};
+
+export type OAuthGithubProfile = {
+  __typename?: 'OAuthGithubProfile';
+  avatar_url: Scalars['String'];
+  bio?: Maybe<Scalars['Boolean']>;
+  email?: Maybe<Scalars['String']>;
+  followers: Scalars['Int'];
+  following: Scalars['Int'];
+  id: Scalars['Int'];
+  location?: Maybe<Scalars['String']>;
+  loign: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  public_gists: Scalars['Int'];
+  public_repos: Scalars['Int'];
+};
+
+export type OAuthGoogleProfile = {
+  __typename?: 'OAuthGoogleProfile';
+  email: Scalars['String'];
+  email_verified: Scalars['Boolean'];
+  family_name: Scalars['String'];
+  given_name: Scalars['String'];
+  locale: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  picture: Scalars['String'];
+  sub: Scalars['String'];
+};
+
+export type OAuthTwitterProfile = {
+  __typename?: 'OAuthTwitterProfile';
+  id: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  profile_image_url_https: Scalars['String'];
+  screen_name: Scalars['String'];
+};
+
 export type OpenSeaMetadata = {
   __typename?: 'OpenSeaMetadata';
   collectionName?: Maybe<Scalars['String']>;
@@ -226,11 +289,12 @@ export type PfpInput = {
 
 export type Profile = {
   __typename?: 'Profile';
-  addresses?: Maybe<Array<Scalars['URN']>>;
+  addresses?: Maybe<Array<Node>>;
   bio?: Maybe<Scalars['String']>;
   cover?: Maybe<Scalars['String']>;
   defaultAddress?: Maybe<Scalars['URN']>;
   displayName?: Maybe<Scalars['String']>;
+  handle?: Maybe<Scalars['String']>;
   job?: Maybe<Scalars['String']>;
   links?: Maybe<Array<Link>>;
   location?: Maybe<Scalars['String']>;
@@ -252,11 +316,10 @@ export type ProfileInput = {
 
 export type Query = {
   __typename?: 'Query';
-  connectedAddresses?: Maybe<Array<Maybe<Scalars['URN']>>>;
+  addressProfile?: Maybe<AddressProfile>;
+  connectedAddresses?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
-  ensAddress?: Maybe<Scalars['String']>;
-  ensAddressAvatar?: Maybe<Scalars['String']>;
-  ensDisplayName?: Maybe<Scalars['String']>;
+  ensProfile?: Maybe<CryptoAddressProfile>;
   getCuratedGallery?: Maybe<NfTsWithChain>;
   getNFTMetadataBatch?: Maybe<NfTs>;
   nftsForAddress?: Maybe<NfTs>;
@@ -265,7 +328,7 @@ export type Query = {
 };
 
 
-export type QueryConnectedAddressesArgs = {
+export type QueryAddressProfileArgs = {
   addressURN: Scalars['URN'];
 };
 
@@ -277,17 +340,7 @@ export type QueryContractsForAddressArgs = {
 };
 
 
-export type QueryEnsAddressArgs = {
-  addressOrEns: Scalars['String'];
-};
-
-
-export type QueryEnsAddressAvatarArgs = {
-  addressOrEns: Scalars['String'];
-};
-
-
-export type QueryEnsDisplayNameArgs = {
+export type QueryEnsProfileArgs = {
   addressOrEns: Scalars['String'];
 };
 
@@ -334,26 +387,43 @@ export type TokenUriInput = {
   raw?: InputMaybe<Scalars['String']>;
 };
 
-export type GetConnectedAddressesQueryVariables = Exact<{
+export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
+
+export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
 
 
-export type GetConnectedAddressesQuery = { __typename?: 'Query', connectedAddresses?: Array<any | null> | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
 
-export type GetEnsAddressQueryVariables = Exact<{
+export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetConnectedAddressesQuery = { __typename?: 'Query', connectedAddresses?: Array<{ __typename?: 'Node', id: string, urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
+
+export type UpdateProfileMutationVariables = Exact<{
+  profile?: InputMaybe<ProfileInput>;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: boolean | null };
+
+export type GetAddressProfileQueryVariables = Exact<{
+  addressURN: Scalars['URN'];
+}>;
+
+
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } | null };
+
+export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
 }>;
 
 
-export type GetEnsAddressQuery = { __typename?: 'Query', ensAddress?: string | null };
-
-export type GetEnsDisplayNameQueryVariables = Exact<{
-  addressOrEns: Scalars['String'];
-}>;
-
-
-export type GetEnsDisplayNameQuery = { __typename?: 'Query', ensDisplayName?: string | null };
+export type GetEnsProfileQuery = { __typename?: 'Query', ensProfile?: { __typename?: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | null };
 
 export type GetNftsForAddressQueryVariables = Exact<{
   owner: Scalars['String'];
@@ -393,39 +463,128 @@ export type UpdateGalleryMutationVariables = Exact<{
 
 export type UpdateGalleryMutation = { __typename?: 'Mutation', updateCuratedGallery?: boolean | null };
 
-export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
-
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null } | null };
-
-export type GetProfileFromAddressQueryVariables = Exact<{
-  addressURN: Scalars['URN'];
-}>;
-
-
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null } | null };
-
-export type UpdateProfileMutationVariables = Exact<{
-  profile?: InputMaybe<ProfileInput>;
-}>;
-
-
-export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile?: boolean | null };
-
-
+export const GetProfileDocument = gql`
+    query getProfile {
+  profile {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    links {
+      name
+      url
+      verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
+    website
+  }
+}
+    `;
+export const GetProfileFromAddressDocument = gql`
+    query getProfileFromAddress($addressURN: URN!) {
+  profileFromAddress(addressURN: $addressURN) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    links {
+      name
+      url
+      verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
+    website
+  }
+}
+    `;
 export const GetConnectedAddressesDocument = gql`
-    query getConnectedAddresses($addressURN: URN!) {
-  connectedAddresses(addressURN: $addressURN)
+    query getConnectedAddresses {
+  connectedAddresses {
+    id
+    urn
+    nid
+    nss
+    fragment
+    qc
+    rc
+  }
 }
     `;
-export const GetEnsAddressDocument = gql`
-    query getEnsAddress($addressOrEns: String!) {
-  ensAddress(addressOrEns: $addressOrEns)
+export const UpdateProfileDocument = gql`
+    mutation updateProfile($profile: ProfileInput) {
+  updateProfile(profile: $profile)
 }
     `;
-export const GetEnsDisplayNameDocument = gql`
-    query getEnsDisplayName($addressOrEns: String!) {
-  ensDisplayName(addressOrEns: $addressOrEns)
+export const GetAddressProfileDocument = gql`
+    query getAddressProfile($addressURN: URN!) {
+  addressProfile(addressURN: $addressURN) {
+    __typename
+    ... on CryptoAddressProfile {
+      address
+      avatar
+      displayName
+    }
+    ... on OAuthGoogleProfile {
+      name
+      picture
+    }
+    ... on OAuthTwitterProfile {
+      name
+      profile_image_url_https
+    }
+    ... on OAuthGithubProfile {
+      name
+      avatar_url
+    }
+  }
+}
+    `;
+export const GetEnsProfileDocument = gql`
+    query getEnsProfile($addressOrEns: String!) {
+  ensProfile(addressOrEns: $addressOrEns) {
+    address
+    avatar
+    displayName
+  }
 }
     `;
 export const GetNftsForAddressDocument = gql`
@@ -578,65 +737,6 @@ export const UpdateGalleryDocument = gql`
   updateCuratedGallery(gallery: $gallery)
 }
     `;
-export const GetProfileDocument = gql`
-    query getProfile {
-  profile {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-    defaultAddress
-    cover
-    location
-    job
-    bio
-    links {
-      name
-      url
-      verified
-    }
-    website
-  }
-}
-    `;
-export const GetProfileFromAddressDocument = gql`
-    query getProfileFromAddress($addressURN: URN!) {
-  profileFromAddress(addressURN: $addressURN) {
-    pfp {
-      ... on StandardPFP {
-        image
-      }
-      ... on NFTPFP {
-        image
-        isToken
-      }
-    }
-    displayName
-    defaultAddress
-    cover
-    location
-    job
-    bio
-    links {
-      name
-      url
-      verified
-    }
-    website
-  }
-}
-    `;
-export const UpdateProfileDocument = gql`
-    mutation updateProfile($profile: ProfileInput) {
-  updateProfile(profile: $profile)
-}
-    `;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 
@@ -645,14 +745,23 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    getConnectedAddresses(variables: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
+    getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
+    },
+    getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');
+    },
+    getConnectedAddresses(variables?: GetConnectedAddressesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetConnectedAddressesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetConnectedAddressesQuery>(GetConnectedAddressesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getConnectedAddresses', 'query');
     },
-    getEnsAddress(variables: GetEnsAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsAddressQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEnsAddressQuery>(GetEnsAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsAddress', 'query');
+    updateProfile(variables?: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProfileMutation>(UpdateProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProfile', 'mutation');
     },
-    getEnsDisplayName(variables: GetEnsDisplayNameQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsDisplayNameQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetEnsDisplayNameQuery>(GetEnsDisplayNameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsDisplayName', 'query');
+    getAddressProfile(variables: GetAddressProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfileQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfileQuery>(GetAddressProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfile', 'query');
+    },
+    getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');
     },
     getNftsForAddress(variables: GetNftsForAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetNftsForAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetNftsForAddressQuery>(GetNftsForAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getNftsForAddress', 'query');
@@ -668,15 +777,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     updateGallery(variables?: UpdateGalleryMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateGalleryMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateGalleryMutation>(UpdateGalleryDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateGallery', 'mutation');
-    },
-    getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
-    },
-    getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');
-    },
-    updateProfile(variables?: UpdateProfileMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateProfileMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<UpdateProfileMutation>(UpdateProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateProfile', 'mutation');
     }
   };
 }

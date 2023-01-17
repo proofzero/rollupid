@@ -3,19 +3,19 @@ import { z } from 'zod'
 
 export const ProfileSchema = z.object({
   displayName: z.string().max(50),
+  handle: z.string().optional(),
   pfp: z
     .object({
       image: z.string(),
-      isToken: z.boolean().optional().nullable(),
+      isToken: z.boolean().optional(),
     })
-    .optional()
-    .nullable(),
-  cover: z.string().optional().nullable(),
-  defaultAddress: inputValidators.AddressURNInput,
-  bio: z.string().max(256).optional().nullable(),
-  job: z.string().max(30).optional().nullable(),
-  location: z.string().max(30).optional().nullable(),
-  website: z.string().url().or(z.literal('')).optional().nullable(),
+    .optional(),
+  cover: z.string().optional(),
+  defaultAddress: inputValidators.AddressURNInput.optional(),
+  bio: z.string().max(256).optional(),
+  job: z.string().max(30).optional(),
+  location: z.string().max(30).optional(),
+  website: z.string().url().or(z.literal('')).optional(),
   links: z
     .array(
       z.object({
@@ -24,6 +24,5 @@ export const ProfileSchema = z.object({
         verified: z.boolean(),
       })
     )
-    .optional()
-    .nullable(),
+    .optional(),
 })

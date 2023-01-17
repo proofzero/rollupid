@@ -6,7 +6,12 @@ import { Edge } from '../../db/types'
 
 export const GetEdgesMethodInput = z.object({
   query: EdgeQueryInput,
-  opt: z.any().optional(),
+  opt: z
+    .object({
+      limit: z.number().optional(),
+      offset: z.number().optional(),
+    })
+    .optional(),
 })
 
 export const GetEdgesMethodOutput = z.object({

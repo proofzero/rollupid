@@ -1,30 +1,12 @@
-import ContractAddress from './contract'
-import CryptoAddress from './crypto'
-import OAuthAddress from './oauth'
+import Address from './address'
 
-export const initCryptoNodeByName = async (
+export const initAddressNodeByName = (
   name: string,
   durableObject: DurableObjectNamespace
 ) => {
-  const MY_DO_BINDING = CryptoAddress.wrap(durableObject)
+  const MY_DO_BINDING = Address.wrap(durableObject)
   const node = MY_DO_BINDING.getByName(name)
   return node
 }
 
-export const initOAuthNodeByName = async (
-  name: string,
-  durableObject: DurableObjectNamespace
-) => {
-  const MY_DO_BINDING = OAuthAddress.wrap(durableObject)
-  const node = MY_DO_BINDING.getByName(name)
-  return node
-}
-
-export const initContractNodeByName = async (
-  name: string,
-  durableObject: DurableObjectNamespace
-) => {
-  const MY_DO_BINDING = ContractAddress.wrap(durableObject)
-  const node = MY_DO_BINDING.getByName(name)
-  return node
-}
+export type AddressNode = ReturnType<typeof initAddressNodeByName>

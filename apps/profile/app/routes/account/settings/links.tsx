@@ -9,23 +9,22 @@ import {
 } from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/platform-middleware/jwt'
 import { getGalaxyClient } from '~/helpers/clients'
 
+import { Tooltip } from 'flowbite-react'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
+import { Profile } from '@kubelt/galaxy-client'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { Tooltip } from 'flowbite-react'
+import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
-
-import { useRouteData } from '~/hooks'
-import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
 
 export type ProfileData = {
   targetAddress: string
@@ -162,12 +161,14 @@ const SortableLink = (props: any) => {
 }
 
 export default function AccountSettingsLinks() {
-  const { notificationHandler } = useOutletContext<any>()
+  const { profile, notificationHandler } = useOutletContext<{
+    profile: Profile
+    notificationHandler: (success: boolean) => void
+  }>()
   const transition = useTransition()
   const actionData = useActionData()
 
-  const initialOldLinks =
-    useRouteData<ProfileData>('routes/account')?.links || []
+  const initialOldLinks = profile.links || []
 
   const [links, setLinks] = useState(initialOldLinks)
 

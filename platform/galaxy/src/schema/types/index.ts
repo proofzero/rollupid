@@ -1,6 +1,7 @@
 import common from './common'
+import edges from './edges'
 import address from './address'
-import profile from './profile'
+import account from './account'
 import nfts from './nfts'
 
-export default [common, address, profile, nfts]
+export default [common, edges, address, account, nfts]

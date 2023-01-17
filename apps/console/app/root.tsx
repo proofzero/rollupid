@@ -23,12 +23,12 @@ import {
   useLoaderData,
 } from '@remix-run/react'
 
-import { useEffect } from "react"
+import { useEffect } from 'react'
 
 import globalStyles from '@kubelt/design-system/src/styles/global.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 
-import * as gtag from "~/utils/gtags.client"
+import * as gtag from '~/utils/gtags.client'
 
 export const links: LinksFunction = () => {
   return [
@@ -48,7 +48,7 @@ export const meta: MetaFunction = () => ({
 export const loader: LoaderFunction = () => {
   return json({
     ENV: {
-      INTERNAL_GOOGLE_ANALYTICS_TAG
+      INTERNAL_GOOGLE_ANALYTICS_TAG,
     },
   })
 }
@@ -98,7 +98,9 @@ export default function App() {
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
-            __html: `!window ? null : window.ENV = ${JSON.stringify(browserEnv.ENV)}`,
+            __html: `!window ? null : window.ENV = ${JSON.stringify(
+              browserEnv.ENV
+            )}`,
           }}
         />
         <Scripts />
@@ -113,6 +115,7 @@ export const ErrorBoundary = ({
 }: {
   error?: {
     stack: any
+    message: string
   }
 }) => {
   return (
@@ -128,6 +131,7 @@ export const ErrorBoundary = ({
             code="Error"
             message="Something went terribly wrong!"
             trace={error?.stack}
+            error={error}
           />
         </div>
 
