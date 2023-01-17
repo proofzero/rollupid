@@ -104,6 +104,8 @@ export default function AccountSettingsProfile() {
     }
   }, [actionData?.errors, notificationHandler, transition])
 
+  const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
+
   const handlePfpModalClose = (val: boolean) => {
     setNftPfpModalOpen(val)
   }
@@ -161,8 +163,8 @@ export default function AccountSettingsProfile() {
   const [loadedNfts, setLoadedNfts] = useState([] as any[])
   const [pageKey, setPageLink] = useState<string | undefined>()
   const [loading, setLoading] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [collection, setCollection] = useState('')
-  const [nftPfpModalOpen, setNftPfpModalOpen] = useState(false)
 
   const modalFetcher = useFetcher()
 
@@ -172,11 +174,13 @@ export default function AccountSettingsProfile() {
     let request
 
     if (collection) {
-      request = `/nfts/collection?owner=${address}${
+      request = `/nfts/collection?owner=${temporaryAddress}${
         pageKey ? `&pageKey=${pageKey}` : ''
       }&collection=${collection}`
     } else {
-      request = `/nfts?owner=${address}${pageKey ? `&pageKey=${pageKey}` : ''}`
+      request = `/nfts?owner=${temporaryAddress}${
+        pageKey ? `&pageKey=${pageKey}` : ''
+      }`
     }
 
     modalFetcher.load(request)

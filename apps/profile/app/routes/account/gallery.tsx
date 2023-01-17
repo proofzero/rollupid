@@ -42,11 +42,10 @@ import { LoadingGridSquaresGallery } from '~/components/nft-collection/LoadingNf
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { getIndexerClient } from '~/helpers/clients'
-import { Node, Profile } from '@kubelt/galaxy-client'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { keccak256 } from 'ethers/lib/utils'
-import { useRouteData } from '~/hooks'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -186,16 +185,14 @@ const SortableNft = (props: any) => {
 
 const Gallery = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses } = useOutletContext<{
+  const { profile, cryptoAddresses, isOwner } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
   }>()
 
-  console.log({ cryptoAddresses })
-
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = cryptoAddresses?.map((a) => a?.urn)[0]
-  const { targetAddress, pfp, displayName, isOwner } = profile
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const { displayName } = profile
 
   // ------------------- START OF GALLERY PART -------------------- //
   // STATE
@@ -231,7 +228,7 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        owner: temporaryAddress,
+        owner: tempTargetAddress,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
       galleryFetcher.load(request)
@@ -303,11 +300,11 @@ const Gallery = () => {
     let request
 
     if (collection) {
-      request = `/nfts/collection?owner=${targetAddress}${
+      request = `/nfts/collection?owner=${tempTargetAddress}${
         pageKey ? `&pageKey=${pageKey}` : ''
       }&collection=${collection}`
     } else {
-      request = `/nfts?owner=${targetAddress}${
+      request = `/nfts?owner=${tempTargetAddress}${
         pageKey ? `&pageKey=${pageKey}` : ''
       }`
     }
@@ -379,12 +376,11 @@ const Gallery = () => {
       </Text>
 
       <PfpNftModal
-        account={temporaryAddress}
         nfts={loadedNfts}
         collection={collection}
         setCollection={setCollection}
         displayName={displayName as string}
-        account={targetAddress}
+        account={tempTargetAddress}
         loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
         text={'Pick curated NFTs'}
         isOpen={isOpen}
@@ -472,7 +468,7 @@ const Gallery = () => {
       </DndContext>
 
       <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
-      <input type="hidden" name="address" value={temporaryAddress} />
+      <input type="hidden" name="address" value={tempTargetAddress} />
 
       <SaveButton
         isFormChanged={isFormChanged}
