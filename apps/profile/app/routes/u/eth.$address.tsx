@@ -35,6 +35,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
 
   if (!profile) {
+    // todo: do public lookup
+
     throw json({ error: 'not found' }, { status: 404 })
   }
   // if profile then this address is linked
