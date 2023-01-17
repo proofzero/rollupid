@@ -42,6 +42,7 @@ import * as gtag from '~/utils/gtags.client'
 import { getUserSession } from './utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { getGalaxyClient } from './helpers/clients'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -90,8 +91,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     .catch((err) => {
       return null
     })
+
+  let handle = loggedInUserProfile?.handle
+  if (!handle && loggedInUserProfile?.addresses?.length) {
+    handle = AddressURNSpace.decode(
+      loggedInUserProfile.addresses[0].urn as AddressURN
+    )
+  }
+
   return json({
     loggedInUserProfile,
+    handle,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
     },
@@ -100,11 +110,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   const location = useLocation()
-  const { ENV, loggedInUserProfile } = useLoaderData<{
+  const { ENV, loggedInUserProfile, handle } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
     }
     loggedInUserProfile: GetProfileQuery['profile'] | null
+    handle: string | undefined
   }>()
   const transition = useTransition()
 
@@ -155,7 +166,7 @@ export default function App() {
           >
             <HeadNav
               loggedIn={!!loggedInUserProfile}
-              handle={loggedInUserProfile?.handle}
+              handle={handle}
               avatarUrl={loggedInUserProfile?.pfp?.image as string}
             />
           </div>

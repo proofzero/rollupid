@@ -78,7 +78,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     (addr) => addr.rc.nodeType === NodeType.Crypto
   )
 
-  console.log({ profile }, profile.addresses, urn)
   const matches = profile.addresses?.filter((addr) => urn === addr.urn)
 
   return json({
