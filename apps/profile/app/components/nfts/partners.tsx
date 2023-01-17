@@ -2,13 +2,13 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import SectionTitle from '../typography/SectionTitle'
 
-import opensea from '~/assets/partners/opensea.svg'
-import rarible from '~/assets/partners/rarible.svg'
-import superrare from '~/assets/partners/superrare.svg'
-import polygon from '~/assets/partners/polygon.svg'
-import book from '~/assets/book.svg'
+import opensea from '../../assets/partners/opensea.svg'
+import rarible from '../../assets/partners/rarible.svg'
+import superrare from '../../assets/partners/superrare.svg'
+import polygon from '../../assets/partners/polygon.svg'
+import book from '../../assets/book.svg'
 
-import noNfts from '~/assets/No_NFT_Found.svg'
+import noNfts from '../../assets/No_NFT_Found.svg'
 
 import { ButtonAnchor } from '@kubelt/design-system/src/atoms/buttons/ButtonAnchor'
 

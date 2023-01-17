@@ -1,10 +1,10 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { HiArrowNarrowLeft } from 'react-icons/hi'
 import { useEffect, useState } from 'react'
-import LoadingGrid from '~/components/nfts/grid/loading'
-import ShowPartners from '~/components/nfts/partners'
-import NftGrid from '~/components/nfts/grid'
-import ModaledNft from '~/components/nfts/interactible/modaled'
+import LoadingGrid from '../loading'
+import ShowPartners from '../../partners'
+import NftGrid from '../../grid'
+import ModaledNft from '../../interactible/modaled'
 
 export type UnfilteredNftGridProps = {
   account: string

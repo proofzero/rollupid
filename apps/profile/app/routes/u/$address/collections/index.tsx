@@ -3,7 +3,7 @@ import { mergeSortedNfts } from '~/helpers/nfts'
 import { useState, useEffect, useMemo } from 'react'
 
 import type { Node, Profile } from '@kubelt/galaxy-client'
-import { useFetcher, useOutletContext } from '@remix-run/react'
+import { useFetcher, useOutletContext, useNavigate } from '@remix-run/react'
 
 export type ProfileData = {
   targetAddress: string
@@ -33,6 +33,7 @@ const ProfileRoute = () => {
   const [loading, setLoading] = useState(true)
 
   const fetcher = useFetcher()
+  const navigate = useNavigate()
 
   const getMoreNfts = () => {
     const request = `/nfts?owner=${tempTargetAddress}${
@@ -40,6 +41,11 @@ const ProfileRoute = () => {
     }`
     fetcher.load(request)
   }
+
+  const handleRedirect = (collection: string) => {
+    return navigate(`./${collection}`)
+  }
+
   /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
@@ -82,6 +88,9 @@ const ProfileRoute = () => {
 
   return (
     <FilteredNftGrid
+      handleSelectedNft={(nft) => {
+        handleRedirect(nft.contract.address)
+      }}
       isModal={false}
       loadingConditions={loading || refresh}
       nfts={loadedNfts}

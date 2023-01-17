@@ -1,10 +1,10 @@
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { useEffect, useState } from 'react'
-import LoadingGrid from '~/components/nfts/grid/loading'
-import NftGrid from '~/components/nfts/grid'
-import ShowPartners from '~/components/nfts/partners'
-import CollectionFilter from '~/components/nfts/filters'
-import ModaledNft from '~/components/nfts/interactible/modaled'
+import LoadingGrid from '../loading'
+import NftGrid from '../'
+import ShowPartners from '../../partners'
+import CollectionFilter from '../../filters'
+import ModaledNft from '../../interactible/modaled'
 
 export type FilteredNftGridProps = {
   account: string
@@ -24,7 +24,6 @@ export type FilteredNftGridProps = {
 
   getMoreNfts?: () => void
   handleSelectedNft?: (nft: any) => void
-  handleRedirect?: () => void
   setCollection?: (s: string) => void
 
   nftRenderer?: (
@@ -47,8 +46,12 @@ const FilteredNftGrid = ({
   preload = false,
   handleSelectedNft,
   pfp,
-  nftRenderer = (nft) => (
-    <ModaledNft nft={nft} isModal={isModalNft} account={account} />
+  nftRenderer = (nft, isSelected, handleRedirect) => (
+    <ModaledNft
+      nft={nft}
+      isModal={isModalNft}
+      handleRedirect={handleRedirect}
+    />
   ),
   nftGrid = <LoadingGrid />,
 }: FilteredNftGridProps) => {
@@ -136,10 +139,8 @@ const FilteredNftGrid = ({
           <NftGrid
             nfts={displayedNfts}
             loadingConditions={loadingConditions}
-            account={account}
             getMoreNfts={getMoreNfts}
             pageKey={pageKey}
-            isModalNft={isModalNft}
             preload={preload}
             nftRenderer={nftRenderer}
             handleSelectedNft={handleSelectedNft}

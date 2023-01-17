@@ -1,11 +1,10 @@
 import Masonry from 'react-masonry-css'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
-import LoadingGrid from '~/components/nfts/grid/loading'
+import LoadingGrid from './loading'
 import { useState } from 'react'
 
 export type NftGridProps = {
-  account: string
   nfts: any[]
   pfp?: string
   isOwner?: boolean
@@ -15,7 +14,6 @@ export type NftGridProps = {
   filters?: boolean
   pageKey?: string
   loadingConditions: boolean
-  isModalNft?: boolean
   collection?: string
 
   getMoreNfts?: () => void
@@ -34,10 +32,8 @@ export type NftGridProps = {
 const NftGrid = ({
   nfts = [],
   loadingConditions,
-  account,
   getMoreNfts,
   pageKey,
-  isModalNft = false,
   preload = false,
   handleSelectedNft,
   nftRenderer,
