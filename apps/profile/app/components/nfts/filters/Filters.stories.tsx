@@ -1,13 +1,13 @@
 // import type { FilterProps } from './index'
-import Filters from './index'
+import FiltersComp from './index'
 import React, { useState } from 'react'
 
 // import threeIdLogo from '../../../assets/three-id-logo.svg'
 // import noFilter from '../../../assets/no-filter.svg'
 
 export default {
-  title: 'Atoms/NFTs/Filters',
-  component: Filters,
+  title: 'Atoms/NFTs',
+  component: FiltersComp,
 }
 
 const Template = () => {
@@ -17,7 +17,7 @@ const Template = () => {
 
   return (
     <>
-      <Filters
+      <FiltersComp
         colFilters={[
           { title: 'All Collections', img: undefined },
           { title: 'Untitled Collections', img: undefined },
@@ -34,4 +34,4 @@ const Template = () => {
   )
 }
 
-export const Default = Template.bind({})
+export const Filters = Template.bind({})
