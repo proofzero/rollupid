@@ -4,7 +4,6 @@ name = "images"
 
 main = "src/index.ts"
 compatibility_date = "2022-10-05"
-compatibility_flags = [ "formdata_parser_supports_files" ] # required
 
 
 # We'll access these services through their external names.
