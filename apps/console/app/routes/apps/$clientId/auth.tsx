@@ -29,9 +29,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     },
   })
 
-  const appDetails = await starbaseClient.getAppDetails.query({
-    clientId: params.clientId,
-  })
+  const [appDetails, scopeMeta] = await Promise.all([
+    starbaseClient.getAppDetails.query({
+      clientId: params.clientId,
+    }),
+    starbaseClient.getScopes.query(),
+  ])
 
   let rotatedSecret
   if (!appDetails.secretTimestamp) {
@@ -55,7 +58,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   return json({
-    appDetails: appDetails,
+    appDetails,
+    scopeMeta,
     rotatedSecret,
   })
 }
@@ -125,10 +129,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
+  const { appDetails, scopeMeta, rotatedSecret: loadedSecret } = useLoaderData()
+  const actionData = useActionData<{ rotatedSecret?: string }>()
 
-  const { appDetails } = useLoaderData()
-  const rotatedSecret =
-    useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
+  const rotatedSecret = loadedSecret || actionData?.rotatedSecret
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
@@ -147,6 +151,7 @@ export default function AppDetailIndexPage() {
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
           appDetails={appDetails}
+          scopeMeta={scopeMeta}
           oAuth={{
             appId: appDetails.clientId,
             appSecret: rotatedSecret,

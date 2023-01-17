@@ -1,6 +1,6 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useLoaderData, useSubmit, useTransition } from '@remix-run/react'
 
 import { ResponseType } from '@kubelt/platform.access/src/types'
 
@@ -30,6 +30,7 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { generateGradient } from '~/utils/gradient.server'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
+  console.log('START')
   const url = new URL(request.url)
   const client_id = url.searchParams.get('client_id')
   const state = url.searchParams.get('state')
@@ -41,8 +42,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const parsedURN = AddressURNSpace.parse(defaultProfileURN)
   const rparams = new URLSearchParams(parsedURN.rcomponent || '')
-
-  console.log({ defaultProfileURN, parsedURN, rparams })
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfileFromAddress(
@@ -158,6 +157,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect('/apps')
   }
 
+  console.log({ jwt })
+
   try {
     const sbClient = getStarbaseClient(jwt)
 
@@ -167,6 +168,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         clientId: client_id,
       }),
     ])
+
+    console.log({ scopeMeta, appProfile })
 
     return json({
       clientId: client_id,
@@ -225,6 +228,7 @@ export default function Authorize() {
   const { clientId, appProfile, userProfile, scopeMeta, state } =
     useLoaderData()
   const submit = useSubmit()
+  const transition = useTransition()
 
   const cancelCallback = () => {
     submit(
@@ -249,6 +253,7 @@ export default function Authorize() {
       appProfile={appProfile}
       userProfile={userProfile}
       scopeMeta={scopeMeta.scopes}
+      transition={transition.state}
       cancelCallback={cancelCallback}
       authorizeCallback={authorizeCallback}
     />

@@ -32,7 +32,7 @@ export default function Apps() {
       description: 'Manage your 3ID applications',
       icon: consoleIcon,
       url: CONSOLE_APP_URL,
-      disabled: true,
+      disabled: false,
     },
   ]
   return (

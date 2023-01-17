@@ -9,12 +9,14 @@ import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import toast, { Toaster } from 'react-hot-toast'
+import { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 
 type ApplicationAuthProps = {
   appDetails: {
     published: boolean
     app: {
       name: string
+      scopes: ScopeMeta[]
       icon?: string
       redirectURI?: string
       termsURL?: string
@@ -25,6 +27,7 @@ type ApplicationAuthProps = {
       discordUser?: string
     }
   }
+  scopeMeta: Record<string, ScopeMeta>
   oAuth: {
     appId: string
     appSecret: string
@@ -37,6 +40,7 @@ type ApplicationAuthProps = {
 export const ApplicationAuth = ({
   appDetails,
   oAuth,
+  scopeMeta,
   onDelete,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
@@ -145,7 +149,7 @@ export const ApplicationAuth = ({
               <ReadOnlyInput
                 id="appScopes"
                 label="Scopes"
-                value="User profile"
+                value={Object.keys(scopeMeta)}
               />
             </div>
           </div>

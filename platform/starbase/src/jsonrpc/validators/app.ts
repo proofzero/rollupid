@@ -1,9 +1,16 @@
 import { z } from 'zod'
 
+export const ScopeMeta = z.object({
+  name: z.string(),
+  description: z.string(),
+  class: z.string(),
+})
+
 export const AppObjectSchema = z.object({
   name: z.string(),
+  redirectURI: z.string(),
+  scopes: z.array(ScopeMeta).default([]),
   icon: z.string().optional(),
-  redirectURI: z.string().optional(),
   termsURL: z.string().optional(),
   websiteURL: z.string().optional(),
   mirrorURL: z.string().optional(),
