@@ -6,10 +6,10 @@ import { AddressURNInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { appRouter } from '../router'
 import { Context } from '../../context'
-import { initCryptoNodeByName } from '../../nodes'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { keccak256 } from '@ethersproject/keccak256'
 import { CryptoAddressType } from '@kubelt/types/address'
+import { initAddressNodeByName } from '../../nodes'
 
 export const InitVaultOutput = AddressURNInput
 
@@ -35,10 +35,9 @@ export const initVaultMethod = async ({
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
 
-  const vaultNode = await initCryptoNodeByName(
+  const vaultNode = await initAddressNodeByName(
     AddressURNSpace.urn(hash),
-    ctx.DefaultAddress,
-    ctx.CryptoAddress
+    ctx.Address
   )
   await vaultNode.storage.put('privateKey', vault.privateKey)
 

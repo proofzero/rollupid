@@ -38,6 +38,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const parsedURN = AddressURNSpace.parse(defaultProfileURN)
   const rparams = new URLSearchParams(parsedURN.rcomponent || '')
 
+  console.log({ defaultProfileURN, parsedURN, rparams })
+
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfileFromAddress(
     { addressURN: defaultProfileURN },
@@ -47,7 +49,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
   const profile = profileRes.profileFromAddress
 
+  console.log({ profile })
+
   if (!profile) {
+    console.log("Profile doesn't exist, creating one...")
     const addressClient = getAddressClient(defaultProfileURN)
     const addressProfile = await addressClient.getAddressProfile
       .query()
@@ -58,6 +63,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
             let gradient = await generateGradient(cryptoAddressProfile.address)
 
+            console.log({ cryptoAddressProfile })
             return {
               displayName:
                 cryptoAddressProfile.displayName ||
@@ -111,7 +117,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
         }
       })
-
+    console.log({ addressProfile })
     await galaxyClient.updateProfile(
       { profile: addressProfile },
       {

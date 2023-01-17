@@ -5,17 +5,14 @@ node_compat = true
 workers_dev = false
 
 durable_objects.bindings = [
-  { name = "DefaultAddress", class_name = "Address" },
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
+ 
 ]
 
 services = [
   { binding = "Access", service = "access" },
   { binding = "Edges", service = "edges" }
 ]
-
-
 
 [[queues.producers]]
  queue = "blockchain-activity"
@@ -57,14 +54,13 @@ tag = "v3"
 new_classes = ["OAuthAddress"]
 
 [[migrations]]
-tag = "v"
+tag = "v4"
+deleted_classes = ["CryptoAddress", "OAuthAddress"]
 new_classes = ["Address"]
 
 [env.dev]
 durable_objects.bindings = [
-  { name = "DefaultAddress", class_name = "Address" },
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-dev" },
@@ -85,9 +81,7 @@ NFTAR_CHAIN_ID=5
 
 [env.next]
 durable_objects.bindings = [
-  { name = "DefaultAddress", class_name = "Address" },
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-next" },
@@ -108,9 +102,7 @@ NFTAR_CHAIN_ID=5
 
 [env.current]
 durable_objects.bindings = [
-  { name = "DefaultAddress", class_name = "Address" },
-  { name = "CryptoAddress", class_name = "CryptoAddress" },
-  { name = "OAuthAddress", class_name = "OAuthAddress" },
+  { name = "Address", class_name = "Address" },
 ]
 services = [
   { binding = "Access", service = "access-current" },

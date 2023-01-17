@@ -17,10 +17,7 @@ interface CreateInnerContextOptions
   TOKEN_NFTAR: string
   NFTAR_CHAIN_ID: string
   NFTAR_URL: string
-  DefaultAddress: DurableObjectNamespace
-  CryptoAddress: DurableObjectNamespace
-  OAuthAddress: DurableObjectNamespace
-  ContractAddress: DurableObjectNamespace
+  Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   HANDLES: KVNamespace
   Edges: Fetcher

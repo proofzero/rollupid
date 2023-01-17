@@ -36,16 +36,13 @@ import { setOAuthDataMethod, SetOAuthDataInput } from './methods/setOAuthData'
 import { LogUsage } from '@kubelt/platform-middleware/log'
 import { parse3RN } from './middlewares/parse3RN'
 import { checkCryptoNodes } from './middlewares/checkCryptoNode'
-import { setCryptoNodeClient } from './middlewares/setCryptoNodeClient'
-import { setOAuthNodeClient } from './middlewares/setOAuthNodeClient'
-import { initCryptoNode } from './middlewares/initCryptoNode'
-import { initOAuthNode } from './middlewares/initOAuthNode'
+import { initAddressNode } from './middlewares/initAddressNode'
 import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
-import { setDefaultNodeClient } from './middlewares/setDefaultNodeClient'
+import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
 
 const t = initTRPC.context<Context>().create()
 
@@ -55,11 +52,8 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initCryptoNode)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),
@@ -68,11 +62,8 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initCryptoNode)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .output(GetAccountOutput)
     .query(getAccountMethod),
@@ -81,11 +72,8 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initCryptoNode)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .input(SetAccountInput)
     .output(SetAccountOutput)
@@ -95,11 +83,8 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initCryptoNode)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .input(UnsetAccountInput)
     .output(UnsetAccountOutput)
@@ -109,11 +94,8 @@ export const appRouter = t.router({
     .use(parse3RN)
     .use(checkCryptoNodes)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initCryptoNode)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .output(GetAddressProfileOutput)
     .query(getAddressProfileMethod),
@@ -121,8 +103,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(setCryptoNodeClient)
-    .use(initCryptoNode)
+    .use(setAddressNodeClient)
     .use(Analytics)
     .input(GetNonceInput)
     .output(GetNonceOutput)
@@ -131,8 +112,7 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkCryptoNodes)
-    .use(setCryptoNodeClient)
-    .use(initCryptoNode)
+    .use(setAddressNodeClient)
     .use(Analytics)
     .input(VerifyNonceInput)
     .output(VerifyNonceOutput)
@@ -141,8 +121,8 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkOAuthNode)
-    .use(setOAuthNodeClient)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .output(GetOAuthDataOutput)
     .query(getOAuthDataMethod),
@@ -150,8 +130,8 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkOAuthNode)
-    .use(setOAuthNodeClient)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .use(Analytics)
     .input(SetOAuthDataInput)
     .mutation(setOAuthDataMethod),
@@ -159,10 +139,8 @@ export const appRouter = t.router({
     .use(LogUsage)
     .use(parse3RN)
     .use(checkOAuthNode)
-    .use(setCryptoNodeClient)
-    .use(setOAuthNodeClient)
-    .use(setDefaultNodeClient)
-    .use(initOAuthNode)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
     .output(InitVaultOutput)
     .mutation(initVaultMethod),
 })

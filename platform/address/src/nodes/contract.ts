@@ -1,11 +1,15 @@
-import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
+import { DurableObjectStubProxy } from 'do-proxy'
+import Address from './address'
 
-export default class ContractAddress extends DOProxy {
-  declare state: DurableObjectState
+export default class ContractAddress {
+  declare node: Address
 
-  constructor(state: DurableObjectState) {
-    super(state)
-    this.state = state
+  constructor(node: Address) {
+    this.node = node
+  }
+
+  static async alarm(address: Address) {
+    console.log({ alarm: 'oauth' })
   }
 }
 export type ContractAddressProxyStub = DurableObjectStubProxy<ContractAddress>

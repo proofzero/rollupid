@@ -74,18 +74,23 @@ const accountResolvers: Resolvers = {
         },
       })
 
+      console.log("galaxy.profileFromAddress: getting account's profile")
       // should also return the handle if it exists
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+      console.log('HERERE', { addressURN, accountProfile })
 
       const baseUrn = AddressURNSpace.urn(
         AddressURNSpace.parse(addressURN).decoded
       )
 
+      console.log({ baseUrn })
+
       // check if the addressURN is in the account's connected addresses (if hidden it won't be)
       if (
-        !accountProfile?.addresses.filter((address) => baseUrn === address.urn)
+        accountProfile &&
+        !accountProfile.addresses.filter((address) => baseUrn === address.urn)
           .length
       ) {
         console.log('galaxy.profileFromAddress: address is hidden')
@@ -99,7 +104,7 @@ const accountResolvers: Resolvers = {
         })
       }
 
-      console.log('HERERE', { accountProfile })
+      console.log('RETURN')
 
       return accountProfile
     },

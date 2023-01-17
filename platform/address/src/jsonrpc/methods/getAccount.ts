@@ -20,5 +20,6 @@ export const getAccountMethod = async ({
 
   const nodeClient = ctx.address
   const account = await nodeClient?.class.getAccount()
+  console.log({ account })
   return account
 }
