@@ -79,6 +79,23 @@ const accountResolvers: Resolvers = {
         account: accountURN,
       })
 
+      // check if the addressURN is in the account's connected addresses (if hidden it won't be)
+      if (
+        !accountProfile?.addresses.filter(
+          (address) => addressURN === address.urn
+        ).length
+      ) {
+        console.log('galaxy.profileFromAddress: address is hidden')
+        throw new GraphQLError("Address doesn't have an associated account", {
+          extensions: {
+            code: 'Address not found',
+            http: {
+              status: 404,
+            },
+          },
+        })
+      }
+
       console.log('HERERE', { accountProfile })
 
       return accountProfile

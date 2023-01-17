@@ -1,38 +1,44 @@
+import { useEffect, useState } from 'react'
 import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
+  useFetcher,
   useLoaderData,
   useNavigate,
   useOutletContext,
 } from '@remix-run/react'
 
+import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
+
+import { getUserSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
 
-import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { gatewayFromIpfs } from '@kubelt/utils'
+import { NodeType } from '@kubelt/platform.address/src/types'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { Node, Profile } from '@kubelt/galaxy-client'
+
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
 import ProfileLayout from '~/components/profile/layout'
-import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
-import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import { gatewayFromIpfs } from '@kubelt/utils'
-import defaultOG from '~/assets/3ID_profiles_OG.png'
-import { NodeType } from '@kubelt/platform.address/src/types'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import { getUserSession } from '~/utils/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { Node, Profile } from '@kubelt/galaxy-client'
-import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Links } from '~/components/profile/links/links'
 
+import defaultOG from '~/assets/3ID_profiles_OG.png'
+
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { address } = params
+  const address = params.address as string
+
   const galaxyClient = await getGalaxyClient()
 
   const session = await getUserSession(request)
   const jwt = session.get('jwt')
+
+  const urn = AddressURNSpace.urn(address)
 
   // first lets check if this address is a valid handle
   // TODO: create a getProfileFromHandle method
@@ -41,7 +47,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const profile = await galaxyClient
     .getProfileFromAddress(
       {
-        addressURN: `${AddressURNSpace.urn(address as string)}`,
+        addressURN: `${urn}`,
       },
       {
         [PlatformJWTAssertionHeader]: jwt,
@@ -72,12 +78,16 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     (addr) => addr.rc.nodeType === NodeType.Crypto
   )
 
+  console.log({ profile }, profile.addresses, urn)
+  const matches = profile.addresses?.filter((addr) => urn === addr.urn)
+
   return json({
     profile,
     cryptoAddresses,
     uname: profile.handle || address,
     ogImage: ogImage || defaultOG,
     path,
+    isOwner: matches && matches.length > 0,
   })
 }
 
@@ -114,20 +124,51 @@ export const meta: MetaFunction = ({
 }
 
 const UserAddressLayout = () => {
-  const { profile, path, cryptoAddresses } = useLoaderData<{
+  const { profile, path, cryptoAddresses, isOwner } = useLoaderData<{
     profile: Profile
     path: string
     cryptoAddresses: Node[]
+    isOwner: boolean
   }>()
   const ctx = useOutletContext<{
     loggedInProfile: Profile | null
   }>()
 
+  console.log({ isOwner })
+
   const navigate = useNavigate()
+  const fetcher = useFetcher()
+
+  const [coverUrl, setCoverUrl] = useState(
+    gatewayFromIpfs(profile.cover as string)
+  )
+
+  useEffect(() => {
+    if (fetcher.type === 'done') {
+      setCoverUrl(fetcher.data)
+    }
+  }, [fetcher])
 
   return (
     <ProfileLayout
-      Cover={<Cover src={gatewayFromIpfs(profile.cover as string)} />}
+      Cover={
+        <Cover
+          src={coverUrl}
+          isOwner={isOwner}
+          updateCoverHandler={async (cover: string) => {
+            setCoverUrl(cover)
+            return fetcher.submit(
+              {
+                url: cover,
+              },
+              {
+                method: 'post',
+                action: '/account/settings/profile/update-cover',
+              }
+            )
+          }}
+        />
+      }
       Avatar={
         <Avatar
           src={gatewayFromIpfs(profile.pfp?.image as string) as string}

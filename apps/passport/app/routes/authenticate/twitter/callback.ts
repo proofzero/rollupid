@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
   const address = (AddressURNSpace.urn(hash) +
-    `?+node_type=${NodeType.OAuth}&addr_type=${OAuthAddressType.Twitter}?=alias=${profile.name}`) as AddressURN
+    `?+node_type=${NodeType.OAuth}&addr_type=${OAuthAddressType.Twitter}?=alias=${profile.name}&hidden=true`) as AddressURN
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
 
