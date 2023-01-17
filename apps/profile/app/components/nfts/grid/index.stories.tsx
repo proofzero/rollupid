@@ -3,7 +3,7 @@ import NftGrid from '.'
 import ModaledNft from '../interactible/modaled'
 
 export default {
-  title: 'Molecules/nfts/grid',
+  title: 'Molecules/NFTs/grid',
   component: NftGrid,
   argTypes: {
     quantity: {

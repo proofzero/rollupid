@@ -2,7 +2,7 @@ import React from 'react'
 import ShowPartners from './partners'
 
 export default {
-  title: 'Molecules/nfts',
+  title: 'Molecules/NFTs',
   component: ShowPartners,
 }
 

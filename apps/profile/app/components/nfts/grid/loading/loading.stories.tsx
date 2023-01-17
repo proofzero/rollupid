@@ -2,7 +2,7 @@ import React from 'react'
 import LoadingGrid from '.'
 
 export default {
-  title: 'Molecules/nfts/grid',
+  title: 'Molecules/NFTs/grid',
   component: LoadingGrid,
   argTypes: {
     quantity: {
