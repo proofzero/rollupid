@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
 
   if (!profile) {
-    // todo: do public lookup
+    // todo: do public eth / ens lookup
 
     throw json({ error: 'not found' }, { status: 404 })
   }
