@@ -31,7 +31,7 @@ export const getProfileMethod = async ({
   const caller = appRouter.createCaller(ctx)
 
   const getAddressesCall = ctx.token
-    ? caller.getAddresses
+    ? caller.getOwnAddresses
     : caller.getPublicAddresses
 
   const [profile, addresses] = await Promise.all([
