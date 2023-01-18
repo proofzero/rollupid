@@ -3,6 +3,7 @@ import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
+import { MultiSelect } from '@kubelt/design-system/src/atoms/form/MultiSelect'
 import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
@@ -16,7 +17,7 @@ type ApplicationAuthProps = {
     published: boolean
     app: {
       name: string
-      scopes: ScopeMeta[]
+      scopes: string[]
       icon?: string
       redirectURI?: string
       termsURL?: string
@@ -27,7 +28,7 @@ type ApplicationAuthProps = {
       discordUser?: string
     }
   }
-  scopeMeta: Record<string, ScopeMeta>
+  scopeMeta: ScopeMeta
   oAuth: {
     appId: string
     appSecret: string
@@ -44,6 +45,16 @@ export const ApplicationAuth = ({
   onDelete,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
+
+  console.log({ appDetails, oAuth, scopeMeta, onDelete })
+
+  const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
+    return {
+      id: key,
+      val: value.name,
+      desc: value.description,
+    }
+  })
 
   return (
     <section className="flex flex-col space-y-5">
@@ -146,10 +157,24 @@ export const ApplicationAuth = ({
             </div>
 
             <div className="flex-1">
-              <ReadOnlyInput
-                id="appScopes"
+              <MultiSelect
                 label="Scopes"
-                value={Object.keys(scopeMeta)}
+                fieldName="scopes"
+                items={Object.entries(scopeMeta).map(([key, value]) => {
+                  return {
+                    id: key,
+                    val: value.name,
+                    desc: value.description,
+                  }
+                })}
+                selectedItems={appDetails.app.scopes.map((scope) => {
+                  const meta = scopeMeta[scope]
+                  return {
+                    id: scope,
+                    val: meta.name,
+                    desc: meta.description,
+                  }
+                })}
               />
             </div>
           </div>

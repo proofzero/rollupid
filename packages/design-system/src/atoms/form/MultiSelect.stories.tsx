@@ -1,5 +1,6 @@
 import React from 'react'
-import MultiSelect from './MultiSelect'
+import { SCOPES } from '@kubelt/security/scopes'
+import { MultiSelect } from './MultiSelect'
 
 export default {
   title: 'Atoms/Form/MultiSelectCombo',
@@ -11,18 +12,13 @@ const Template = (args) => (
     {...args}
     label="MultiSelect"
     fieldName="scopes"
-    items={[
-      {
-        key: 'foo',
-        val: 'bar',
-        class: 'baz',
-      },
-      {
-        key: 'alice',
-        val: 'bob',
-        class: 'candice',
-      },
-    ]}
+    items={Object.entries(SCOPES).map(([key, value]) => {
+      return {
+        id: key,
+        val: value.name,
+        desc: value.description,
+      }
+    })}
   />
 )
 

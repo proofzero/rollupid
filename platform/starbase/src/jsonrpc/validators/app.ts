@@ -1,15 +1,18 @@
 import { z } from 'zod'
 
-export const ScopeMeta = z.object({
-  name: z.string(),
-  description: z.string(),
-  class: z.string(),
-})
+export const ScopeMeta = z.record(
+  z.string().refine((k) => k.startsWith('scope://')),
+  z.object({
+    name: z.string(),
+    description: z.string(),
+    class: z.string(),
+  })
+)
 
 export const AppObjectSchema = z.object({
   name: z.string(),
-  redirectURI: z.string(),
-  scopes: z.array(ScopeMeta).default([]),
+  scopes: z.set(z.string()).or(z.array(z.string())), // some reason we can't send Set because it fails as object?
+  redirectURI: z.string().optional(),
   icon: z.string().optional(),
   termsURL: z.string().optional(),
   websiteURL: z.string().optional(),
@@ -32,7 +35,6 @@ export const AppReadableFieldsSchema = z.object({
   secretTimestamp: z.number().optional(),
   apiKeyTimestamp: z.number().optional(),
   createdTimestamp: z.number().optional(),
-  scopes: z.array(z.string()).optional(),
 })
 
 export const AppInternalFieldSchema = z.object({

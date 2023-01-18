@@ -169,8 +169,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       }),
     ])
 
-    console.log({ scopeMeta, appProfile })
-
     return json({
       clientId: client_id,
       appProfile,

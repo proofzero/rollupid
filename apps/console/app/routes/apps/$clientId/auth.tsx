@@ -81,6 +81,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData()
   const op = formData.get('op')
 
+  // console.log({ scopes: JSON.stringify(formData) })
+
   // As part of the rolling operation
   // we only need to remove the keys
   // because the loader gets called again
@@ -94,10 +96,20 @@ export const action: ActionFunction = async ({ request, params }) => {
       ).secret.split(':')[1]
       break
     case 'update_app':
+      const entries = formData.entries()
+      const scopes = Array.from(entries)
+        .filter((entry) => {
+          return entry[0].endsWith('][id]')
+        })
+        .map((entry) => entry[1] as string)
+
+      console.log({ scopes })
+
       await starbaseClient.updateApp.mutate({
         clientId: params.clientId,
         updates: {
           name: formData.get('name')?.toString(),
+          scopes: Array.from(scopes),
           icon: formData.get('icon') as string | undefined,
           redirectURI: formData.get('redirectURI') as string | undefined,
           termsURL: formData.get('termsURL') as string | undefined,
@@ -151,7 +163,7 @@ export default function AppDetailIndexPage() {
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
           appDetails={appDetails}
-          scopeMeta={scopeMeta}
+          scopeMeta={scopeMeta.scopes}
           oAuth={{
             appId: appDetails.clientId,
             appSecret: rotatedSecret,

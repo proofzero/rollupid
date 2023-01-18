@@ -15,12 +15,12 @@
 
 //https://headlessui.com/react/combobox
 
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 import classNames from 'classnames'
 
-type SelectItem = { key: string; val: string; class: string }
+type SelectItem = { id: string; val: string; desc: string }
 export type MultiSelectProps = {
   label: string
   fieldName: string
@@ -28,32 +28,38 @@ export type MultiSelectProps = {
   selectedItems?: SelectItem[]
 }
 
-export default function MultiSelect({
+export function MultiSelect({
   label,
   fieldName,
   items,
   selectedItems = [],
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
-  // const [selectedPerson, setSelectedPerson] = useState(null)
   const [selectedValues, setSelectedValues] = useState(selectedItems)
+
+  console.log({ selectedValues })
 
   const filterItems =
     query === ''
       ? items
       : items.filter((item) => {
-          return item.key.toLowerCase().includes(query.toLowerCase())
+          return (
+            item.val.toLowerCase().includes(query.toLowerCase()) ||
+            item.id.toLowerCase().includes(query.toLowerCase())
+          )
         })
-
-  useEffect(() => {
-    console.log({ selectedValues })
-  }, [selectedValues])
 
   return (
     <Combobox
       as="div"
+      by="id" // compare values
       value={selectedValues}
-      onChange={setSelectedValues}
+      onChange={(e) => {
+        console.log({ e })
+        console.log({ selectedValues })
+
+        setSelectedValues(e)
+      }}
       name={fieldName}
       multiple
     >
@@ -61,38 +67,18 @@ export default function MultiSelect({
         {label}
       </Combobox.Label>
       <div className="relative mt-1">
-        <Combobox.Input
-          className="hidden"
-          onChange={(e) => {
-            return
-          }}
-          displayValue={(items) =>
-            selectedValues.map((item) => item.key).join(',')
-          }
-        />
         <div className="w-full min-h-24 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
           {selectedValues.length ? (
             selectedValues.map((item, key) => (
-              <>
-                <span key={key}>
-                  <span
-                    contentEditable={false}
-                    className={
-                      'bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border'
-                    }
-                  >
-                    {item.key}
-                  </span>
-                  {/* <div
-                  id="tooltip-default"
-                  role="tooltip"
-                  className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+              <span key={key}>
+                <span
+                  className={
+                    'bg-indigo-50 text-indigo-600 p-1 m-1 rounded-md border'
+                  }
                 >
-                  Tooltip content
-                  <div className="tooltip-arrow" data-popper-arrow></div>
-                </div> */}
+                  {item.val}
                 </span>
-              </>
+              </span>
             ))
           ) : (
             <span className="opacity-0">no select</span>
@@ -107,17 +93,17 @@ export default function MultiSelect({
 
         <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
           <>
-            <input
+            <Combobox.Input
               className="w-full min-h-24 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="filter scopes"
               // displayValue={(items) =>
-              //   selectedValues.map((item) => item.key).join(',')
+              //   selectedValues.map((item) => item.class).join(',')
               // }
+              placeholder="filter scopes"
             />
             {filterItems.map((item) => (
               <Combobox.Option
-                key={item.val}
+                key={item.id}
                 value={item}
                 // as={Fragment}
                 className={({ active }) =>
@@ -136,7 +122,7 @@ export default function MultiSelect({
                           selected && 'font-semibold'
                         )}
                       >
-                        {item.key}
+                        {item.id}
                       </span>
                       <span
                         className={classNames(

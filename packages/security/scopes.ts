@@ -41,12 +41,16 @@ export const SCOPE_ADMIM: Scope = scope('scope://threeid.xyz/admin.admin')
 /**
  * The scope required to read account object.
  */
-export const SCOPE_ACCOUNT_READ: Scope = scope('scope://threeid.xyz/account.read')
+export const SCOPE_ACCOUNT_READ: Scope = scope(
+  'scope://threeid.xyz/account#read'
+)
 
 /**
  * The scope required to write to account object.
  */
-export const SCOPE_ACCOUNT_WRITE: Scope = scope('scope://threeid.xyz/account.read')
+export const SCOPE_ACCOUNT_WRITE: Scope = scope(
+  'scope://threeid.xyz/account#read'
+)
 
 /**
  * The scope representing the ability to read profile data.
@@ -54,7 +58,7 @@ export const SCOPE_ACCOUNT_WRITE: Scope = scope('scope://threeid.xyz/account.rea
  * @alpha
  */
 export const SCOPE_PROFILE_READ: Scope = scope(
-  'scope://threeid.xyz/profile.read'
+  'scope://threeid.xyz/profile#read'
 )
 
 /**
@@ -63,7 +67,7 @@ export const SCOPE_PROFILE_READ: Scope = scope(
  * @alpha
  */
 export const SCOPE_PROFILE_WRITE: Scope = scope(
-  'scope://threeid.xyz/profile.write'
+  'scope://threeid.xyz/profile#write'
 )
 
 /**
@@ -72,7 +76,7 @@ export const SCOPE_PROFILE_WRITE: Scope = scope(
  * @alpha
  */
 export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = scope(
-  'scope://threeid.xyx/connected-accounts.read'
+  'scope://threeid.xyx/connected-accounts#read'
 )
 
 // SPECIALIZED SCOPES
@@ -83,7 +87,7 @@ export const SCOPE_CONNECTED_ACCOUNTS_READ: Scope = scope(
  * @alpha
  */
 export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = scope(
-  'scope://threeid.xyz/blockchain-account/{{ account }}.manage'
+  'scope://threeid.xyz/blockchain-account/{{ idref }}#manage'
 )
 
 /**
@@ -92,7 +96,7 @@ export const SCOPE_BLOCKCHAIN_ACCOUNT_MANAGE: Scope = scope(
  * @alpha
  */
 export const SCOPE_BLOCKCHAIN_ACCOUNT_TRANSACT: Scope = scope(
-  'scope://threeid.xyz/blockchain-account/transact/{{ account }}.write'
+  'scope://threeid.xyz/blockchain-account/transact/{{ idref }}#write'
 )
 
 /**
