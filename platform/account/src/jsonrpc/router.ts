@@ -84,6 +84,12 @@ export const appRouter = t.router({
     .input(GetAddressesInput)
     // .output(AddressListSchema)
     .query(getAddressesMethod),
+  getPublicAddresses: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAddressesInput)
+    // .output(AddressListSchema)
+    .query(getAddressesMethod),
   hasAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)

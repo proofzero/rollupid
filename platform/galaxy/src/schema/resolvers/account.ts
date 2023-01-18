@@ -9,7 +9,6 @@ import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { Profile } from '@kubelt/platform.account/src/types'
-import { CryptoAddressProfile } from '@kubelt/platform.address/src/types'
 import { ResolverContext } from './common'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
@@ -79,13 +78,10 @@ const accountResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
-      console.log('HERERE', { addressURN, accountProfile })
 
       const baseUrn = AddressURNSpace.urn(
         AddressURNSpace.parse(addressURN).decoded
       )
-
-      console.log({ baseUrn })
 
       // check if the addressURN is in the account's connected addresses (if hidden it won't be)
       if (

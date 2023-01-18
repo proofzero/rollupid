@@ -30,9 +30,13 @@ export const getProfileMethod = async ({
   const node = await initAccountNodeByName(input.account, ctx.Account)
   const caller = appRouter.createCaller(ctx)
 
+  const getAddressesCall = ctx.token
+    ? caller.getAddresses
+    : caller.getPublicAddresses
+
   const [profile, addresses] = await Promise.all([
     node.class.getProfile(),
-    caller.getAddresses({ account: input.account }),
+    getAddressesCall({ account: input.account }),
   ])
   if (!profile) return null
 

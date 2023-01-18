@@ -221,31 +221,28 @@ export async function edges(
 
   // Returns true if every key/value pair in the query components is
   // matched exactly in the node components.
-  function hasProps(
+  function hasCompMatches(
     queryComp: Record<string, string | boolean | undefined>,
     nodeComp: Record<string, string | boolean>
   ): boolean {
-    //console.log(`query: ${JSON.stringify(queryComp, null, 2)}`)
-    //console.log(`node: ${JSON.stringify(nodeComp, null, 2)}`)
-
     const nodeKeys = Object.keys(nodeComp)
 
-    // if there is nothing to filter on then default to true
-    if (!nodeKeys.length) {
-      return true
-    }
-
-    const qList = Object.keys(queryComp)
+    const compKeys = Object.keys(queryComp)
       // .flat()
       .filter((e) => queryComp[e] !== undefined)
 
+    // if there is nothing to filter on then default to true
+    if (!compKeys.length) {
+      return true
+    }
+
     const matches = nodeKeys.filter((e) => {
-      if (qList.includes(e)) {
+      if (compKeys.includes(e)) {
         const q = queryComp[e]?.toString() // convert boolean to string
         const n = nodeComp[e]
         return q === n
       }
-      return true
+      return false
     })
 
     // console.log({ queryComp, qList, nodeComp, matches })
@@ -277,14 +274,14 @@ export async function edges(
       // q-components
       if (query?.src?.qc !== undefined) {
         const srcQc = await qc(g, edge.src)
-        if (!hasProps(query.src.qc, srcQc)) {
+        if (!hasCompMatches(query.src.qc, srcQc)) {
           return result
         }
       }
       // r-components
       if (query?.src?.rc !== undefined) {
         const srcRc = await rc(g, edge.src)
-        if (!hasProps(query.src.rc, srcRc)) {
+        if (!hasCompMatches(query.src.rc, srcRc)) {
           return result
         }
       }
@@ -301,14 +298,14 @@ export async function edges(
       // q-components
       if (query?.dst?.qc && Object.keys(query?.dst?.qc).length) {
         const dstQc = await qc(g, edge.dst)
-        if (!hasProps(query?.dst?.qc, dstQc)) {
+        if (!hasCompMatches(query?.dst?.qc, dstQc)) {
           return result
         }
       }
       // r-components
       if (query?.dst?.rc && Object.keys(query?.dst?.rc).length) {
         const dstRc = await rc(g, edge.dst)
-        if (!hasProps(query.dst.rc, dstRc)) {
+        if (!hasCompMatches(query.dst.rc, dstRc)) {
           return result
         }
       }

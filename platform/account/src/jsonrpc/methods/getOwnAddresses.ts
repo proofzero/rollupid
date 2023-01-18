@@ -11,7 +11,6 @@ export const GetAddressesInput = z.object({
   filter: z
     .object({
       type: inputValidators.CryptoAddressTypeInput.optional(),
-      hidden: z.boolean().optional(),
     })
     .optional(),
 })
@@ -29,10 +28,8 @@ export const getAddressesMethod = async ({
   ctx: Context
 }): Promise<GetAddressesOutput> => {
   // TODO: check scopes on jwt for now we will just use the accountURN to you get get your own addresses
-  const accountURN = ctx.accountURN as string
-
-  if (input.account !== accountURN) {
-    return []
+  if (input.account !== ctx.accountURN) {
+    throw Error('Invalid account input')
   }
 
   const query = {
@@ -52,7 +49,7 @@ export const getAddressesMethod = async ({
         addr_type: input.filter?.type,
       },
       qc: {
-        hidden: input.filter?.hidden || false,
+        hidden: true,
       },
     },
   }
