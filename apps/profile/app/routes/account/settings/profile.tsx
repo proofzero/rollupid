@@ -22,7 +22,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
-import { getMoreNftsSettingsModal } from '~/helpers/nfts'
+import { getMoreNftsModal } from '~/helpers/nfts'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
@@ -180,23 +180,13 @@ export default function AccountSettingsProfile() {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsSettingsModal(
-      modalFetcher,
-      temporaryAddress,
-      collection,
-      pageKey
-    )
+    getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsSettingsModal(
-        modalFetcher,
-        temporaryAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -210,12 +200,7 @@ export default function AccountSettingsProfile() {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsSettingsModal(
-        modalFetcher,
-        temporaryAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
     }
     if (refresh) {
       asyncFn()

@@ -106,41 +106,42 @@ export const getGallery = async (owner: string) => {
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
+const generateQuery = (params: any[]) => {
+  const query = new URLSearchParams()
+  params.forEach((param: any) => {
+    if (param.value) {
+      query.set(param.name, param.value)
+    }
+  })
+  return query
+}
+
 const getMoreNfts = (fetcher: any, request: string) => {
   fetcher.load(request)
 }
 
-export const getMoreNftsGalleryModal = (
-  fetcher: any,
-  targetAddress: string,
-  collection?: string,
-  pageKey?: string
-) => {
-  const request = collection
-    ? `/nfts/collection?owner=${targetAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }&collection=${collection}`
-    : `/nfts?owner=${targetAddress}${pageKey ? `&pageKey=${pageKey}` : ''}`
-  getMoreNfts(fetcher, request)
-}
-
 export const getMoreNftsGallery = (fetcher: any, targetAddress: string) => {
-  const request = `/nfts/gallery?owner=${targetAddress}`
+  const query = generateQuery([{ name: 'owner', value: targetAddress }])
+  const request = `/nfts/gallery?${query}`
   getMoreNfts(fetcher, request)
 }
 
-export const getMoreNftsSettingsModal = (
+export const getMoreNftsModal = (
   fetcher: any,
   targetAddress: string,
   collection?: string,
   pageKey?: string
 ) => {
-  const request = collection
-    ? `/nfts/collection?owner=${targetAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }&collection=${collection}`
-    : `/nfts?owner=${targetAddress}${pageKey ? `&pageKey=${pageKey}` : ''}`
-  getMoreNfts(fetcher, request)
+  const query = generateQuery([
+    { name: 'owner', value: targetAddress },
+    { name: 'pageKey', value: pageKey },
+    { name: 'collection', value: collection },
+  ])
+  if (collection) {
+    getMoreNfts(fetcher, `/nfts/collection?${query}`)
+  } else {
+    getMoreNfts(fetcher, `/nfts?${query}`)
+  }
 }
 
 export const getMoreNftsSingleCollection = (
@@ -149,9 +150,13 @@ export const getMoreNftsSingleCollection = (
   collection: string,
   pageKey?: string
 ) => {
-  const request = `/nfts/collection?owner=${targetAddress}${
-    pageKey ? `&pageKey=${pageKey}` : ''
-  }&collection=${collection}`
+  const query = generateQuery([
+    { name: 'owner', value: targetAddress },
+    { name: 'pageKey', value: pageKey },
+    { name: 'collection', value: collection },
+  ])
+  console.log(query.toString())
+  const request = `/nfts/collection?${query}`
   getMoreNfts(fetcher, request)
 }
 
@@ -160,9 +165,12 @@ export const getMoreNftsAllCollections = (
   targetAddress: string,
   pageKey?: string
 ) => {
-  const request = `/nfts?owner=${targetAddress}${
-    pageKey ? `&pageKey=${pageKey}` : ''
-  }`
+  const query = generateQuery([
+    { name: 'owner', value: targetAddress },
+    { name: 'pageKey', value: pageKey },
+  ])
+  console.log(query.toString())
+  const request = `/nfts?${query}`
   getMoreNfts(fetcher, request)
 }
 

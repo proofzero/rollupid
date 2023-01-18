@@ -46,7 +46,7 @@ import type { Node, Profile } from '@kubelt/galaxy-client'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { keccak256 } from 'ethers/lib/utils'
-import { getMoreNftsGalleryModal } from '~/helpers/nfts'
+import { getMoreNftsModal } from '~/helpers/nfts'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -313,23 +313,13 @@ const Gallery = () => {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsGalleryModal(
-      modalFetcher,
-      tempTargetAddress,
-      collection,
-      pageKey
-    )
+    getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsGalleryModal(
-        modalFetcher,
-        tempTargetAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -343,12 +333,7 @@ const Gallery = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsGalleryModal(
-        modalFetcher,
-        tempTargetAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
     }
     if (refresh) {
       asyncFn()
