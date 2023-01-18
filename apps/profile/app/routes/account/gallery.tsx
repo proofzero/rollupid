@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ request }) => {
   )
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
-  const addressURN = AddressURNSpace.urn(hash)
+  const urn = AddressURNSpace.urn(hash)
 
   let errors: any = {}
 
@@ -91,10 +91,12 @@ export const action: ActionFunction = async ({ request }) => {
     }
   }
 
+  console.log(urn)
+
   const gallery = nfts.map((nft: any, i: number) => ({
     tokenId: nft.tokenId,
     contract: nft.contract.address,
-    addressURN,
+    addressURN: urn,
     gallery_order: i,
   }))
 
@@ -191,7 +193,12 @@ const Gallery = () => {
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+  const tempTargetAddress = AddressURNSpace.decode(
+    cryptoAddresses?.map(
+      (a) => a.urn
+    )[0] as `urn:threeid:address/${string}${string}`
+  )
+
   const { displayName } = profile
 
   // ------------------- START OF GALLERY PART -------------------- //
