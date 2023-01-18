@@ -77,6 +77,7 @@ export const appRouter = t.router({
     .mutation(setProfileMethod),
   getAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
