@@ -6,7 +6,8 @@ import { redirect } from '@remix-run/cloudflare'
 
 import type { Node, Profile } from '@kubelt/galaxy-client'
 
-import { getGallery } from '~/helpers/nfts'
+import { getGallery, getMoreNftsGallery } from '~/helpers/nfts'
+
 import { useFetcher, useOutletContext } from '@remix-run/react'
 
 export type ProfileData = {
@@ -50,10 +51,6 @@ const ProfileRoute = () => {
 
   const fetcher = useFetcher()
 
-  const getGallery = async () => {
-    const request = `/nfts/gallery?owner=${targetAddress}`
-    fetcher.load(request)
-  }
   /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
@@ -69,7 +66,7 @@ const ProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getGallery()
+      getMoreNftsGallery(fetcher, tempTargetAddress)
     }
 
     if (refresh) {

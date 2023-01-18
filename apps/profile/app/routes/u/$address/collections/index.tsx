@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import { useFetcher, useOutletContext, useNavigate } from '@remix-run/react'
+import { getMoreNftsAllCollections } from '~/helpers/nfts'
 
 export type ProfileData = {
   targetAddress: string
@@ -35,13 +36,6 @@ const ProfileRoute = () => {
   const fetcher = useFetcher()
   const navigate = useNavigate()
 
-  const getMoreNfts = () => {
-    const request = `/nfts?owner=${tempTargetAddress}${
-      pageKey ? `&pageKey=${pageKey}` : ''
-    }`
-    fetcher.load(request)
-  }
-
   const handleRedirect = (collection: string) => {
     return navigate(`./${collection}`)
   }
@@ -65,7 +59,7 @@ const ProfileRoute = () => {
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNfts()
+      getMoreNftsAllCollections(fetcher, tempTargetAddress, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -79,7 +73,7 @@ const ProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      await getMoreNfts()
+      getMoreNftsAllCollections(fetcher, tempTargetAddress, pageKey)
     }
     if (refresh) {
       asyncFn()

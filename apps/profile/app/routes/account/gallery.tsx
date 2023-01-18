@@ -46,6 +46,7 @@ import type { Node, Profile } from '@kubelt/galaxy-client'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { keccak256 } from 'ethers/lib/utils'
+import { getMoreNftsGalleryModal } from '~/helpers/nfts'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -90,8 +91,6 @@ export const action: ActionFunction = async ({ request }) => {
       errors,
     }
   }
-
-  console.log(urn)
 
   const gallery = nfts.map((nft: any, i: number) => ({
     tokenId: nft.tokenId,
@@ -187,17 +186,13 @@ const SortableNft = (props: any) => {
 
 const Gallery = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses, isOwner } = useOutletContext<{
+  const { profile, cryptoAddresses } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const tempTargetAddress = AddressURNSpace.decode(
-    cryptoAddresses?.map(
-      (a) => a.urn
-    )[0] as `urn:threeid:address/${string}${string}`
-  )
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
 
   const { displayName } = profile
 
@@ -301,24 +296,6 @@ const Gallery = () => {
 
   const modalFetcher = useFetcher()
 
-  // MOST IMPORTANT HELPER - THIS FETCHES NFTS IN MODAL
-
-  const getMoreNfts = () => {
-    let request
-
-    if (collection) {
-      request = `/nfts/collection?owner=${tempTargetAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }&collection=${collection}`
-    } else {
-      request = `/nfts?owner=${tempTargetAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }`
-    }
-
-    modalFetcher.load(request)
-  }
-
   // HOOKS
   useEffect(() => {
     if (modalFetcher.data) {
@@ -336,13 +313,23 @@ const Gallery = () => {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNfts()
+    getMoreNftsGalleryModal(
+      modalFetcher,
+      tempTargetAddress,
+      collection,
+      pageKey
+    )
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNfts()
+      getMoreNftsGalleryModal(
+        modalFetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -356,7 +343,12 @@ const Gallery = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      await getMoreNfts()
+      getMoreNftsGalleryModal(
+        modalFetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
     }
     if (refresh) {
       asyncFn()

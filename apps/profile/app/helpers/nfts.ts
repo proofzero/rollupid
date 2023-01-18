@@ -104,6 +104,70 @@ export const getGallery = async (owner: string) => {
   return gallery
 }
 
+// ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
+
+const getMoreNfts = (fetcher: any, request: string) => {
+  fetcher.load(request)
+}
+
+export const getMoreNftsGalleryModal = (
+  fetcher: any,
+  targetAddress: string,
+  collection?: string,
+  pageKey?: string
+) => {
+  const request = collection
+    ? `/nfts/collection?owner=${targetAddress}${
+        pageKey ? `&pageKey=${pageKey}` : ''
+      }&collection=${collection}`
+    : `/nfts?owner=${targetAddress}${pageKey ? `&pageKey=${pageKey}` : ''}`
+  getMoreNfts(fetcher, request)
+}
+
+export const getMoreNftsGallery = (fetcher: any, targetAddress: string) => {
+  const request = `/nfts/gallery?owner=${targetAddress}`
+  getMoreNfts(fetcher, request)
+}
+
+export const getMoreNftsSettingsModal = (
+  fetcher: any,
+  targetAddress: string,
+  collection?: string,
+  pageKey?: string
+) => {
+  const request = collection
+    ? `/nfts/collection?owner=${targetAddress}${
+        pageKey ? `&pageKey=${pageKey}` : ''
+      }&collection=${collection}`
+    : `/nfts?owner=${targetAddress}${pageKey ? `&pageKey=${pageKey}` : ''}`
+  getMoreNfts(fetcher, request)
+}
+
+export const getMoreNftsSingleCollection = (
+  fetcher: any,
+  targetAddress: string,
+  collection: string,
+  pageKey?: string
+) => {
+  const request = `/nfts/collection?owner=${targetAddress}${
+    pageKey ? `&pageKey=${pageKey}` : ''
+  }&collection=${collection}`
+  getMoreNfts(fetcher, request)
+}
+
+export const getMoreNftsAllCollections = (
+  fetcher: any,
+  targetAddress: string,
+  pageKey?: string
+) => {
+  const request = `/nfts?owner=${targetAddress}${
+    pageKey ? `&pageKey=${pageKey}` : ''
+  }`
+  getMoreNfts(fetcher, request)
+}
+
+// ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
+
 export const getGalleryWithMetadata = async (owner: string) => {
   const gallery = await getGallery(owner)
 
@@ -174,7 +238,7 @@ export const getGalleryWithMetadata = async (owner: string) => {
   })
 
   /** Trick to perform permutation according to gallery_order param  */
-  const result = Array.from(Array(ownedNfts.length))
+  const result = Array.from(Array((ownedNfts as any[]).length))
   ownedNfts?.forEach((nft) => (result[nft.gallery_order] = nft))
   // Setup og tag data
   // check generate and return og image

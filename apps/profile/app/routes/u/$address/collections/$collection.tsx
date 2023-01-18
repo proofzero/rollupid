@@ -11,6 +11,7 @@ import { useState, useEffect, useMemo } from 'react'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 
 import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
+import { getMoreNftsSingleCollection } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
   const { params } = args
@@ -42,13 +43,6 @@ const CollectionForProfileRoute = () => {
   const fetcher = useFetcher()
   const navigate = useNavigate()
 
-  const getMoreNfts = () => {
-    const request = `/nfts/collection?owner=${tempTargetAddress}${
-      pageKey ? `&pageKey=${pageKey}` : ''
-    }&collection=${collection}`
-
-    fetcher.load(request)
-  }
   /** HOOKS */
   useEffect(() => {
     if (fetcher.data) {
@@ -65,7 +59,12 @@ const CollectionForProfileRoute = () => {
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNfts()
+      getMoreNftsSingleCollection(
+        fetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -73,7 +72,12 @@ const CollectionForProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      await getMoreNfts()
+      getMoreNftsSingleCollection(
+        fetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
     }
 
     if (refresh) {

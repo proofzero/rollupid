@@ -19,15 +19,12 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 
 import { useEffect, useRef, useState, useMemo } from 'react'
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
-import { json } from '@remix-run/cloudflare'
-import { parseURN } from 'urns'
-import type { Profile } from '@kubelt/galaxy-client'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
+import { getMoreNftsSettingsModal } from '~/helpers/nfts'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -166,24 +163,6 @@ export default function AccountSettingsProfile() {
 
   const modalFetcher = useFetcher()
 
-  // MOST IMPORTANT HELPER - THIS FETCHES NFTS IN MODAL
-
-  const getMoreNfts = () => {
-    let request
-
-    if (collection) {
-      request = `/nfts/collection?owner=${temporaryAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }&collection=${collection}`
-    } else {
-      request = `/nfts?owner=${temporaryAddress}${
-        pageKey ? `&pageKey=${pageKey}` : ''
-      }`
-    }
-
-    modalFetcher.load(request)
-  }
-
   // HOOKS
   useEffect(() => {
     if (modalFetcher.data) {
@@ -201,13 +180,23 @@ export default function AccountSettingsProfile() {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNfts()
+    getMoreNftsSettingsModal(
+      modalFetcher,
+      temporaryAddress,
+      collection,
+      pageKey
+    )
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNfts()
+      getMoreNftsSettingsModal(
+        modalFetcher,
+        temporaryAddress,
+        collection,
+        pageKey
+      )
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -221,7 +210,12 @@ export default function AccountSettingsProfile() {
 
   useEffect(() => {
     const asyncFn = async () => {
-      await getMoreNfts()
+      getMoreNftsSettingsModal(
+        modalFetcher,
+        temporaryAddress,
+        collection,
+        pageKey
+      )
     }
     if (refresh) {
       asyncFn()
