@@ -128,16 +128,18 @@ const FilteredNftGrid = ({
             className="w-full flex items-center justify-start 
         sm:justify-end lg:justify-end my-5 px-3 lg:px-4"
           >
-            <CollectionFilter
-              colFilters={colFilters}
-              setCurFilter={setCurFilter}
-              curFilter={curFilter}
-              openedFilters={openedFilters}
-              setOpenedFilters={setOpenedFilters}
-              setTextFilter={setTextFilter}
-              textFilter={textFilter}
-              pfp={pfp as string}
-            />
+            <div className=" min-w-full sm:min-w-[17.2rem]">
+              <CollectionFilter
+                colFilters={colFilters}
+                setCurFilter={setCurFilter}
+                curFilter={curFilter}
+                openedFilters={openedFilters}
+                setOpenedFilters={setOpenedFilters}
+                setTextFilter={setTextFilter}
+                textFilter={textFilter}
+                pfp={pfp as string}
+              />
+            </div>
           </div>
 
           {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}

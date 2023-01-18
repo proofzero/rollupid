@@ -193,6 +193,7 @@ const FAQ = () => {
                     ? 'accordion-collapse collapse show'
                     : 'accordion-collapse collapse'
                 }
+                role="button"
                 aria-labelledby={`heading-${index}`}
                 data-bs-parent="#accordionFaq"
               >

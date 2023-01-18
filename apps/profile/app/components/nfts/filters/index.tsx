@@ -44,9 +44,9 @@ const Filters = ({
           justify-between items-center
           text-[#1f2937] text-base font-medium
           shadow-sm
+          min-w-full
           border border-solid border-[#d1d5db]
           bg-white hover:bg-[#d1d5db]
-          min-w-full sm:min-w-[17.2rem]
           py-[10px] px-[12px]
           rounded-md
           "

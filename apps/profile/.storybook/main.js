@@ -10,6 +10,7 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    '@storybook/addon-a11y',
   ],
   staticDirs: [{ from: '../app/assets', to: 'static/media/app/assets' }],
   webpackFinal: async (config, { configType }) => {
