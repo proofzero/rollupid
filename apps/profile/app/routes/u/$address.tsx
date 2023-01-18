@@ -55,7 +55,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     )
     .then((res) => res.profileFromAddress)
     .catch((err) => {
-      console.debug({ err })
+      console.error({ err })
       // this could return null if the address is not linked to an account
       // or the account is linked and marked as private
       // or if the account is invalid

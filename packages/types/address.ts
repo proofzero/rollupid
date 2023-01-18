@@ -16,6 +16,7 @@ export enum OAuthAddressType {
   Google = 'google',
   GitHub = 'github',
   Twitter = 'twitter',
+  Microsoft = 'microsoft',
 }
 
 export type AddressType =

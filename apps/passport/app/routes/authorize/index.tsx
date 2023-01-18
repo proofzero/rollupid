@@ -15,7 +15,11 @@ import { getUserSession, parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import type { AddressURN } from '@kubelt/urns/address'
-import { NodeType, OAuthAddressType } from '@kubelt/platform/address/src/types'
+import {
+  NodeType,
+  OAuthAddressType,
+  OAuthMicrosoftProfile,
+} from '@kubelt/platform/address/src/types'
 import type {
   CryptoAddressProfile,
   OAuthGoogleProfile,
@@ -58,10 +62,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
       .query()
       .then(async (res) => {
         switch (rparams.get('node_type')) {
-          case NodeType.Crypto:
+          case NodeType.Crypto: {
             const cryptoAddressProfile = res as CryptoAddressProfile
 
-            let gradient = await generateGradient(cryptoAddressProfile.address)
+            const gradient = await generateGradient(
+              cryptoAddressProfile.address
+            )
 
             console.log({ cryptoAddressProfile })
             return {
@@ -73,11 +79,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               },
               cover: gradient,
             }
+          }
           case NodeType.OAuth:
             switch (rparams.get('addr_type')) {
-              case OAuthAddressType.GitHub:
+              case OAuthAddressType.GitHub: {
                 const githubProfile = res as OAuthGithubProfile
-                gradient = await generateGradient(
+                const gradient = await generateGradient(
                   githubProfile?.login as string
                 )
 
@@ -88,10 +95,13 @@ export const loader: LoaderFunction = async ({ request, context }) => {
                   },
                   cover: gradient,
                 }
+              }
 
-              case OAuthAddressType.Google:
+              case OAuthAddressType.Google: {
                 const googleProfile = res as OAuthGoogleProfile
-                gradient = await generateGradient(googleProfile.email as string)
+                const gradient = await generateGradient(
+                  googleProfile.email as string
+                )
                 return {
                   displayName: googleProfile.name,
                   pfp: {
@@ -99,9 +109,12 @@ export const loader: LoaderFunction = async ({ request, context }) => {
                   },
                   cover: gradient,
                 }
-              case OAuthAddressType.Twitter:
+              }
+              case OAuthAddressType.Twitter: {
                 const twitterProfile = res as OAuthTwitterProfile
-                gradient = await generateGradient(twitterProfile.id.toString())
+                const gradient = await generateGradient(
+                  twitterProfile.id.toString()
+                )
 
                 return {
                   displayName: twitterProfile.name,
@@ -110,6 +123,21 @@ export const loader: LoaderFunction = async ({ request, context }) => {
                   },
                   cover: gradient,
                 }
+              }
+              case OAuthAddressType.Microsoft: {
+                const microsoftProfile = res as OAuthMicrosoftProfile
+                const gradient = await generateGradient(
+                  microsoftProfile.sub.toString()
+                )
+                return {
+                  displayName: microsoftProfile.name,
+                  pfp: {
+                    //Cached profile image
+                    image: microsoftProfile.threeidImageUrl,
+                  },
+                  cover: gradient,
+                }
+              }
               default:
                 throw new Error(
                   'Unsupported OAuth type encountered in profile response.'
@@ -117,7 +145,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
         }
       })
-    console.log({ addressProfile })
     await galaxyClient.updateProfile(
       { profile: addressProfile },
       {

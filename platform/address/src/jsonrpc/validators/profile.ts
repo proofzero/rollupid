@@ -85,9 +85,21 @@ export const TwitterProfileSchema = z.object({
   profile_image_url_https: z.string(),
 })
 
+export const MicrosoftRawProfileSchema = z.object({
+  sub: z.string(),
+  name: z.string(),
+  given_name: z.string(),
+  family_name: z.string(),
+  picture: z.string(),
+  email: z.string(),
+  //This stores the cached version of the profile image
+  threeidImageUrl: z.string().optional(),
+})
+
 export const AddressProfileSchema = z.union([
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
   GithubRawProfileSubsetSchema,
   TwitterProfileSchema,
+  MicrosoftRawProfileSchema,
 ])

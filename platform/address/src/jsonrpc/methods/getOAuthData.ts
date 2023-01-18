@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { AddressNode } from '../../nodes'
 import OAuthAddress from '../../nodes/oauth'
 
-export const GetOAuthDataOutput = OAuthDataSchema
+export const GetOAuthDataOutput = OAuthDataSchema.optional()
 
 export const getOAuthDataMethod = async ({
   input,

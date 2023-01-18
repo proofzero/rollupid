@@ -28,7 +28,7 @@ export default async (
   )
     .then((res) => res.text())
     .catch((err) => {
-      console.debug("Couldn't fetch ogImage", err)
+      console.error("Couldn't fetch ogImage", err)
     })
 
   return {
@@ -52,7 +52,7 @@ export const ogImageFromProfile = async (pfp: string, cover: string) => {
   )
     .then((res) => res.text())
     .catch((err) => {
-      console.debug("Couldn't fetch ogImage", err)
+      console.error("Couldn't fetch ogImage", err)
     })
   return ogImage
 }

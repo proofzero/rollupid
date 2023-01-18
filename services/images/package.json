@@ -17,6 +17,7 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
+    "@ethersproject/keccak256": "5.7.0",
     "date-fns": "2.29.3",
     "image-data-uri": "2.0.1",
     "itty-router": "2.6.6",
