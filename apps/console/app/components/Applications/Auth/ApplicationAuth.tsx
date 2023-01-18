@@ -36,6 +36,8 @@ type ApplicationAuthProps = {
     onKeyRoll: () => void
   }
   onDelete: () => void
+  setIsFormChanged: (val: boolean) => void
+  isFormChanged: boolean
 }
 
 export const ApplicationAuth = ({
@@ -43,6 +45,8 @@ export const ApplicationAuth = ({
   oAuth,
   scopeMeta,
   onDelete,
+  isFormChanged,
+  setIsFormChanged,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
 
@@ -62,8 +66,7 @@ export const ApplicationAuth = ({
         <Text size="2xl" weight="semibold" className="text-gray-900">
           0xAuth
         </Text>
-
-        <Button type="submit" btnType="primary-alt">
+        <Button type="submit" btnType="primary-alt" disabled={!isFormChanged}>
           Save
         </Button>
       </div>
@@ -135,6 +138,9 @@ export const ApplicationAuth = ({
           <Panel title="Application Status">
             <div className="flex flex-col h-full justify-center">
               <InputToggle
+                onToggle={() => {
+                  setIsFormChanged(true)
+                }}
                 id="published"
                 label="Published"
                 checked={appDetails.published}

@@ -2,7 +2,8 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
@@ -10,6 +11,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import toast from 'react-hot-toast'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -133,6 +135,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   return {
     rotatedSecret,
+    errors: {},
   }
 }
 
@@ -141,12 +144,24 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
-  const { appDetails, scopeMeta, rotatedSecret: loadedSecret } = useLoaderData()
-  const actionData = useActionData<{ rotatedSecret?: string }>()
+  const loaderData = useLoaderData()
+  const actionData = useActionData()
 
-  const rotatedSecret = loadedSecret || actionData?.rotatedSecret
+  const [isFormChanged, setIsFormChanged] = useState(false)
+  const { appDetails, scopeMeta } = loaderData
+  const rotatedSecret = loaderData?.rotatedSecret || actionData?.rotatedSecret
+
+  const errors = actionData?.errors
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const notify = (success: boolean = true) => {
+    if (success) {
+      toast.success('Saved')
+    } else {
+      toast.error('Save Failed -- Please try again')
+    }
+  }
 
   return (
     <>
@@ -158,8 +173,20 @@ export default function AppDetailIndexPage() {
         }}
         isOpen={deleteModalOpen}
       />
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
-      <Form method="post" encType="multipart/form-data">
+      <Form
+        method="post"
+        encType="multipart/form-data"
+        onChange={() => {
+          setIsFormChanged(true)
+        }}
+        onSubmit={() => {
+          notify(Object.keys(errors).length === 0)
+          console.log('yo')
+          setIsFormChanged(false)
+        }}
+      >
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
           appDetails={appDetails}
@@ -179,6 +206,8 @@ export default function AppDetailIndexPage() {
               )
             },
           }}
+          isFormChanged={isFormChanged}
+          setIsFormChanged={setIsFormChanged}
           onDelete={() => {
             setDeleteModalOpen(true)
           }}
