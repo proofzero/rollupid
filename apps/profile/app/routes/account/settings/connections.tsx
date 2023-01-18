@@ -2,7 +2,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
 import { useOutletContext } from '@remix-run/react'
-import { AddressListItemProps } from '~/components/Addresses/AddressListItem'
+import { AddressListItemProps } from '~/components/addresses/AddressListItem'
 import { Node } from '@kubelt/galaxy-client'
 
 const AccountSettingsConnections = () => {
@@ -15,6 +15,7 @@ const AccountSettingsConnections = () => {
     const qparams = new URLSearchParams(node.qc || '')
     const addrType = rparams.get('addr_type')
     const alias = qparams.get('alias')
+
     return {
       id: node.urn,
       type: addrType,
