@@ -1,25 +1,29 @@
 import React from 'react'
-import { SCOPES } from '@kubelt/security/scopes'
+import { SCOPES_JSON } from '@kubelt/security/scopes'
 import { MultiSelect } from './MultiSelect'
 
 export default {
   title: 'Atoms/Form/MultiSelectCombo',
   component: MultiSelect,
+  argTypes: {
+    label: {
+      defaultValue: 'Label',
+    },
+    fieldName: {
+      defaultValue: 'fieldName',
+    },
+    items: {
+      defaultValue: Object.entries(SCOPES_JSON).map(([key, value]) => {
+        return {
+          id: key,
+          val: value.name,
+          desc: value.description,
+        }
+      }),
+    },
+  },
 }
 
-const Template = (args) => (
-  <MultiSelect
-    {...args}
-    label="MultiSelect"
-    fieldName="scopes"
-    items={Object.entries(SCOPES).map(([key, value]) => {
-      return {
-        id: key,
-        val: value.name,
-        desc: value.description,
-      }
-    })}
-  />
-)
+const Template = (args) => <MultiSelect {...args} />
 
 export const Default = Template.bind({})

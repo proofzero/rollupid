@@ -37,8 +37,6 @@ export function MultiSelect({
   const [query, setQuery] = useState('')
   const [selectedValues, setSelectedValues] = useState(selectedItems)
 
-  console.log({ selectedValues })
-
   const filterItems =
     query === ''
       ? items
