@@ -123,7 +123,11 @@ const accountResolvers: Resolvers = {
         },
       })
 
-      const addresses = await accountClient.getOwnAddresses.query({
+      const addressesCall = jwt
+        ? accountClient.getOwnAddresses
+        : accountClient.getPublicAddresses
+
+      const addresses = await addressesCall.query({
         account: accountURN,
       })
 
