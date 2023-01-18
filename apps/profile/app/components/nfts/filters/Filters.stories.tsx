@@ -1,8 +1,8 @@
 import FiltersComp from './index'
 import React, { useState } from 'react'
 
-// import threeIdLogo from '../../../assets/three-id-logo.svg'
-// import noFilter from '../../../assets/no-filter.svg'
+import threeIdLogo from '../../../assets/three-id-logo.svg'
+import noFilter from '../../../assets/no-filter.svg'
 
 export default {
   title: 'Atoms/NFTs',

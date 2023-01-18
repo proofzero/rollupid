@@ -1,5 +1,6 @@
 import React from 'react'
 import UnfilteredGrid from '.'
+import threeIdLogo from '../../../../assets/three-id-logo.svg'
 
 export default {
   title: 'Molecules/NFTs/grid',
@@ -15,7 +16,7 @@ export default {
 const Template = ({ quantity }: { quantity: number }) => {
   const nfts = Array(quantity).fill({
     collectionTitle: 'Lorem Ipsum',
-    thumbnailUrl: 'https://avatars.githubusercontent.com/u/96090171?s=400&v=4',
+    thumbnailUrl: threeIdLogo,
   })
 
   return (
