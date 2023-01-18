@@ -1,4 +1,3 @@
-// import type { FilterProps } from './index'
 import FiltersComp from './index'
 import React, { useState } from 'react'
 
@@ -16,21 +15,19 @@ const Template = () => {
   const [curFilter, setCurFilter] = useState('All Collections')
 
   return (
-    <>
-      <FiltersComp
-        colFilters={[
-          { title: 'All Collections', img: undefined },
-          { title: 'Untitled Collections', img: undefined },
-        ]}
-        curFilter={curFilter}
-        openedFilters={openedFilters}
-        textFilter={textFilter}
-        pfp={'https://avatars.githubusercontent.com/u/96090171?s=400&v=4'}
-        setOpenedFilters={setOpenedFilters}
-        setTextFilter={setTextFilter}
-        setCurFilter={setCurFilter}
-      />
-    </>
+    <FiltersComp
+      colFilters={[
+        { title: 'All Collections', img: undefined },
+        { title: 'Untitled Collections', img: undefined },
+      ]}
+      curFilter={curFilter}
+      openedFilters={openedFilters}
+      textFilter={textFilter}
+      pfp={'https://avatars.githubusercontent.com/u/96090171?s=400&v=4'}
+      setOpenedFilters={setOpenedFilters}
+      setTextFilter={setTextFilter}
+      setCurFilter={setCurFilter}
+    />
   )
 }
 

@@ -11,7 +11,7 @@ module.exports = {
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
   ],
-  staticDirs: ['../app/assets'],
+  staticDirs: [{ from: '../app/assets', to: 'static/media/app/assets' }],
   webpackFinal: async (config, { configType }) => {
     // `configType` has a value of 'DEVELOPMENT' or 'PRODUCTION'
     // You can change the configuration based on that.
@@ -28,8 +28,12 @@ module.exports = {
             },
           },
         },
+        // 'css-loader',
       ],
-      include: path.resolve(__dirname, '../app'),
+      include: [
+        path.resolve(__dirname, '../app'),
+        path.resolve(__dirname, '../app/routes'),
+      ],
     })
 
     // Make whatever fine-grained changes you need
@@ -45,20 +49,6 @@ module.exports = {
         Buffer: ['buffer', 'Buffer'],
       })
     )
-
-    const fileLoaderRule = config.module.rules.find(
-      (rule) => rule.test && rule.test.test('.svg')
-    )
-    fileLoaderRule.exclude = /\.svg$/
-
-    config.module.rules.push({
-      test: /\.svg$/,
-      enforce: 'pre',
-      use: [{ loader: require.resolve('@svgr/webpack') }],
-      issuer: {
-        and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
-      },
-    })
 
     return config
   },

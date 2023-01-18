@@ -124,16 +124,21 @@ const FilteredNftGrid = ({
       {(displayedNfts.length && !loadingConditions) ||
       curFilter === 'Untitled Collections' ? (
         <>
-          <CollectionFilter
-            colFilters={colFilters}
-            setCurFilter={setCurFilter}
-            curFilter={curFilter}
-            openedFilters={openedFilters}
-            setOpenedFilters={setOpenedFilters}
-            setTextFilter={setTextFilter}
-            textFilter={textFilter}
-            pfp={pfp as string}
-          />
+          <div
+            className="w-full flex items-center justify-start 
+        sm:justify-end lg:justify-end my-5 px-3 lg:px-4"
+          >
+            <CollectionFilter
+              colFilters={colFilters}
+              setCurFilter={setCurFilter}
+              curFilter={curFilter}
+              openedFilters={openedFilters}
+              setOpenedFilters={setOpenedFilters}
+              setTextFilter={setTextFilter}
+              textFilter={textFilter}
+              pfp={pfp as string}
+            />
+          </div>
 
           {/* GENERIC GRID FOR ALL NFT-RELATED COMPONENTS */}
           <NftGrid
