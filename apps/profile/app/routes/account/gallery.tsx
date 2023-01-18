@@ -454,17 +454,29 @@ const Gallery = () => {
       <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
       <input type="hidden" name="address" value={tempTargetAddress} />
 
-      <SaveButton
-        isFormChanged={isFormChanged}
-        discardFn={() => {
-          setCuratedNfts(initialState)
-          setCuratedNftsSet(
-            new Set(
-              initialState.map((nft: any) => nft.contract.address + nft.tokenId)
+      {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+      <div className="h-[4rem]" />
+      <div className="absolute bottom-0 right-0">
+        <SaveButton
+          isFormChanged={isFormChanged}
+          discardFn={() => {
+            setCuratedNfts(initialState)
+            setCuratedNftsSet(
+              new Set(
+                initialState.map(
+                  (nft: any) => nft.contract.address + nft.tokenId
+                )
+              )
             )
-          )
-        }}
-      />
+          }}
+        />
+      </div>
     </Form>
   )
 }

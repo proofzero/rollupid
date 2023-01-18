@@ -331,13 +331,23 @@ export default function AccountSettingsLinks() {
           </Button>
         </div>
 
-        <SaveButton
-          isFormChanged={isFormChanged}
-          discardFn={() => {
-            setNewLinks(initialLinks)
-            setLinks(initialOldLinks)
-          }}
-        />
+        {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+        <div className="h-[4rem]" />
+        <div className="absolute bottom-0 right-0">
+          <SaveButton
+            isFormChanged={isFormChanged}
+            discardFn={() => {
+              setNewLinks(initialLinks)
+              setLinks(initialOldLinks)
+            }}
+          />
+        </div>
       </Form>
     </>
   )

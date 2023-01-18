@@ -21,13 +21,23 @@ const UnsavedChangesModal = ({ isOpen, handleClose }) => {
               </Text>
             </div>
           </div>
-          <SaveButton
-            size="l"
-            isFormChanged={true}
-            discardFn={() => {
-              console.log('hey')
-            }}
-          />
+          {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+          <div className="h-[4rem]" />
+          <div className="absolute bottom-0 right-0">
+            <SaveButton
+              size="l"
+              isFormChanged={true}
+              discardFn={() => {
+                console.log('hey')
+              }}
+            />
+          </div>
         </div>
       </div>
     </Modal>
