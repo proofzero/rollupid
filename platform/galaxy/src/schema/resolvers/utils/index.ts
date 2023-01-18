@@ -7,6 +7,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import Env from '../../../env'
 import { isFromCFBinding } from '@kubelt/utils'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -18,7 +19,7 @@ export function parseJwt(token: string): JWTPayload {
 }
 
 export const setupContext = () => (next) => (root, args, context, info) => {
-  const jwt = context.request.headers.get('KBT-Access-JWT-Assertion')
+  const jwt = context.request.headers.get(PlatformJWTAssertionHeader)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
 
   const parsedJwt = jwt && parseJwt(jwt)

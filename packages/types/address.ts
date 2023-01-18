@@ -1,5 +1,6 @@
 export enum NodeType {
   Crypto = 'crypto',
+  Vault = 'vault',
   Contract = 'contract',
   OAuth = 'oauth',
 }

@@ -31,6 +31,7 @@ export interface Environment {
 
 export enum NodeType {
   Crypto = 'crypto',
+  Vault = 'vault',
   Contract = 'contract',
   OAuth = 'oauth',
   Handle = 'handle',
