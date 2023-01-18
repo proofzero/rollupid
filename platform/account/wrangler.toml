@@ -1,7 +1,6 @@
 name = "account"
 main = "src/index.ts"
 compatibility_date = "2022-10-26"
-compatibility_flags = ["url_standard"]
 node_compat = true
 workers_dev = false
 
