@@ -28,7 +28,13 @@ export const getAddressesMethod = async ({
   input: GetAddressesParams
   ctx: Context
 }): Promise<GetAddressesOutput> => {
-  // TODO: scopes on addresses
+  // TODO: check scopes on jwt for now we will just use the accountURN to you get get your own addresses
+  const accountURN = ctx.accountURN as string
+
+  if (input.account !== accountURN) {
+    return []
+  }
+
   const query = {
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to

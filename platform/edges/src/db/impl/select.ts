@@ -250,7 +250,7 @@ export async function edges(
 
     // console.log({ queryComp, qList, nodeComp, matches })
 
-    return nodeKeys.length == matches.length
+    return matches.length > 0
   }
 
   async function nodeFilter(
