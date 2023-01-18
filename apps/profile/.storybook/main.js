@@ -1,3 +1,6 @@
+const webpack = require('webpack')
+const path = require('path')
+
 module.exports = {
   stories: [
     '../app/components/**/*.stories.mdx',
@@ -7,7 +10,9 @@ module.exports = {
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
+    '@storybook/addon-a11y',
   ],
+  staticDirs: [{ from: '../app/assets', to: 'static/media/app/assets' }],
   framework: '@storybook/react',
   core: {
     builder: 'webpack5',

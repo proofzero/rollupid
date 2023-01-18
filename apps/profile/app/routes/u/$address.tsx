@@ -21,7 +21,7 @@ import { gatewayFromIpfs } from '@kubelt/utils'
 import { NodeType } from '@kubelt/platform.address/src/types'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { Node, Profile } from '@kubelt/galaxy-client'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 
 import { Cover } from '~/components/profile/cover/Cover'
 import ProfileTabs from '~/components/profile/tabs/tabs'
@@ -75,7 +75,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const path = splittedUrl[splittedUrl.length - 1]
 
   const cryptoAddresses = profile.addresses?.filter(
-    (addr) => addr.rc.nodeType === NodeType.Crypto
+    (addr) => addr.rc.node_type === NodeType.Crypto
   )
 
   const matches = profile.addresses?.filter((addr) => urn === addr.urn)
@@ -132,8 +132,6 @@ const UserAddressLayout = () => {
   const ctx = useOutletContext<{
     loggedInProfile: Profile | null
   }>()
-
-  console.log({ isOwner })
 
   const navigate = useNavigate()
   const fetcher = useFetcher()

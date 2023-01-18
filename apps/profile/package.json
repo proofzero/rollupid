@@ -62,6 +62,7 @@
     "@remix-run/dev": "1.10.0",
     "@remix-run/eslint-config": "1.10.0",
     "@remix-run/serve": "1.10.0",
+    "@storybook/addon-a11y": "6.5.15",
     "@storybook/addon-actions": "6.5.13",
     "@storybook/addon-docs": "6.5.13",
     "@storybook/addon-essentials": "6.5.13",

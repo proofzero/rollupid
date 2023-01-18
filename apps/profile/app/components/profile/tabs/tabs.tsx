@@ -29,7 +29,6 @@ const ProfileTabs = ({
             if (!enableGallery && tab === 'gallery') return null
             return (
               <ConditionalTooltip
-                placement="top"
                 key={tabs[tab]}
                 content="Gallery is empty"
                 condition={tab === 'gallery' && enableGallery}

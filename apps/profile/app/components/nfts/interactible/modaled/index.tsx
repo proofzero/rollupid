@@ -1,18 +1,16 @@
 import { useState } from 'react'
 
-import NftModal from './NftModal'
+import NftModal from '../../modal'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-
-import { Link } from '@remix-run/react'
 
 import { HiArrowNarrowRight } from 'react-icons/hi'
 
 import { gatewayFromIpfs } from '@kubelt/utils'
 
-import missingNftSvg from '~/assets/missing-nft.svg'
+import missingNftSvg from '../../../../assets/missing-nft.svg'
 
-const ModaledNft = ({ nft, isModal }: any) => {
+const ModaledNft = ({ nft, isModal, handleRedirect }: any) => {
   const [showModal, setShowModal] = useState(false)
 
   const [loadFail, setLoadFail] = useState(false)
@@ -90,35 +88,36 @@ const ModaledNft = ({ nft, isModal }: any) => {
           w-full
           hover:shadow-lg
          "
+          onClick={() => {
+            handleRedirect(nft)
+          }}
         >
-          <Link to={`./${nft.details[0].value}`}>
-            <img
-              className="rounded-t-lg
+          <img
+            className="rounded-t-lg
               w-full
               object-contain
               "
-              src={
-                loadFail
-                  ? missingNftSvg
-                  : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
-              }
-              onError={(e) => setLoadFail(true)}
-              alt="collection representative"
-            />
-            <div
-              className="flex text-gray-600
+            src={
+              loadFail
+                ? missingNftSvg
+                : gatewayFromIpfs(nft.thumbnailUrl ?? nft.url)
+            }
+            onError={(e) => setLoadFail(true)}
+            alt="collection representative"
+          />
+          <div
+            className="flex text-gray-600
             flex-row whitespace-nowrap 
             w-full justify-between items-center
             px-4 py-3"
-            >
-              <div className="truncate leading-none">
-                {nft.collectionTitle ? nft.collectionTitle : ' '}
-              </div>
-              <div className="text-xl">
-                <HiArrowNarrowRight />
-              </div>
+          >
+            <div className="truncate leading-none">
+              {nft.collectionTitle ? nft.collectionTitle : ' '}
             </div>
-          </Link>
+            <div className="text-xl">
+              <HiArrowNarrowRight />
+            </div>
+          </div>
         </button>
       )}
     </>

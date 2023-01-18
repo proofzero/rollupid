@@ -3,6 +3,7 @@ import {
   useActionData,
   useOutletContext,
   useTransition,
+  useFetcher,
 } from '@remix-run/react'
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
@@ -16,13 +17,14 @@ import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
 import { gatewayFromIpfs } from '@kubelt/utils'
 
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import { useEffect, useRef, useState } from 'react'
+
+import { useEffect, useRef, useState, useMemo } from 'react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 import SaveButton from '~/components/accounts/SaveButton'
 import { getGalaxyClient } from '~/helpers/clients'
-import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
+import { getMoreNftsModal } from '~/helpers/nfts'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const action: ActionFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
@@ -70,9 +72,7 @@ export default function AccountSettingsProfile() {
   }>()
 
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = AddressURNSpace.decode(
-    cryptoAddresses?.map((a) => a.urn)[0] as AddressURN
-  )
+  const temporaryAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
 
   const {
     displayName,
@@ -152,13 +152,75 @@ export default function AccountSettingsProfile() {
     setPfpUploading(false)
   }
 
+  // ------------------- START OF MODAL PART ---------------------- //
+  // STATE
+  const [refresh, setRefresh] = useState(true)
+  const [loadedNfts, setLoadedNfts] = useState([] as any[])
+  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
+  const [collection, setCollection] = useState('')
+
+  const modalFetcher = useFetcher()
+
+  // HOOKS
+  useEffect(() => {
+    if (modalFetcher.data) {
+      /* We already have only 1 NFT per collection
+       ** No need to put it in additional set
+       */
+
+      setLoadedNfts(modalFetcher.data.ownedNfts)
+      setPageLink(modalFetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [modalFetcher.data])
+
+  useEffect(() => {
+    getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+  }, [collection])
+
+  useEffect(() => {
+    if (pageKey) {
+      setLoading(true)
+      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+    } else if (pageKey === null) {
+      setLoading(false)
+    }
+  }, [pageKey])
+
+  useMemo(() => {
+    setRefresh(true)
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [])
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+    }
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
+
+  // --------------------- END OF MODAL PART ---------------------- //
+
   return (
     <>
       <PfpNftModal
-        text={'Select NFT Avatar'}
         account={temporaryAddress}
-        pfp={pfpUrl}
+        nfts={loadedNfts}
+        collection={collection}
+        setCollection={setCollection}
+        displayName={displayName as string}
+        loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
+        text={'Select NFT Avatar'}
         isOpen={nftPfpModalOpen}
+        pfp={pfpUrl as string}
         handleClose={handlePfpModalClose}
         handleSelectedNft={handleSelectedNft}
       />
@@ -322,10 +384,21 @@ export default function AccountSettingsProfile() {
               {actionData?.errors.bio}
             </Text>
           )}
-          <SaveButton
-            isFormChanged={isFormChanged}
-            discardFn={() => setPfpUrl(pfp?.image || undefined)}
-          />
+
+          {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+          <div className="h-[4rem]" />
+          <div className="absolute bottom-0 right-0">
+            <SaveButton
+              isFormChanged={isFormChanged}
+              discardFn={() => setPfpUrl(pfp?.image || undefined)}
+            />
+          </div>
         </Form>
       </div>
     </>

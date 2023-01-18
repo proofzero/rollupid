@@ -1,6 +1,6 @@
 // React
 
-import { useState, forwardRef, useEffect, useLayoutEffect } from 'react'
+import { useState, forwardRef, useEffect, useMemo } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 
 // Remix
@@ -10,6 +10,7 @@ import {
   useActionData,
   useOutletContext,
   useTransition,
+  useFetcher,
 } from '@remix-run/react'
 import type { ActionFunction } from '@remix-run/cloudflare'
 
@@ -35,16 +36,17 @@ import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
-import { LoadingGridSquaresGallery } from '~/components/nft-collection/NftGrid'
+import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 
 // Other helpers
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { getIndexerClient } from '~/helpers/clients'
-import { Node, Profile } from '@kubelt/galaxy-client'
+import type { Node, Profile } from '@kubelt/galaxy-client'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { keccak256 } from 'ethers/lib/utils'
+import { getMoreNftsModal } from '~/helpers/nfts'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
@@ -54,7 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
   )
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
-  const addressURN = AddressURNSpace.urn(hash)
+  const urn = AddressURNSpace.urn(hash)
 
   let errors: any = {}
 
@@ -93,7 +95,7 @@ export const action: ActionFunction = async ({ request }) => {
   const gallery = nfts.map((nft: any, i: number) => ({
     tokenId: nft.tokenId,
     contract: nft.contract.address,
-    addressURN,
+    addressURN: urn,
     gallery_order: i,
   }))
 
@@ -183,34 +185,35 @@ const SortableNft = (props: any) => {
 }
 
 const Gallery = () => {
-  // STATE
   const actionData = useActionData()
   const { profile, cryptoAddresses } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
   }>()
 
-  console.log({ cryptoAddresses })
-
   //TODO: update pfp components to take multiple addresses
-  const temporaryAddress = cryptoAddresses?.map((a) => a?.urn)[0]
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+
+  const { displayName } = profile
+
+  // ------------------- START OF GALLERY PART -------------------- //
+  // STATE
 
   const [initialState, setInitialState] = useState([])
-  const [loading, setLoading] = useState(true)
 
-  const [curatedNfts, setCuratedNfts] = useState([])
-  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([]))
+  const [curatedNfts, setCuratedNfts] = useState([] as any)
+  const [curatedNftsSet, setCuratedNftsSet] = useState(new Set([] as any))
   const [isFormChanged, setFormChanged] = useState(false)
 
   const transition = useTransition()
+  const galleryFetcher = useFetcher()
 
-  const [isOpen, setIsOpen] = useState(false)
   const [activeId, setActiveId] = useState(null)
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor))
 
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
 
-  // REACT HOOKS
+  // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
   useEffect(() => {
     if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
       setFormChanged(true)
@@ -227,24 +230,27 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        owner: temporaryAddress,
+        owner: tempTargetAddress,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
-
-      const nftReq: any = await fetch(request)
-      const nftRes: any = await nftReq.json()
-
-      // Do not need to sort them alphabetically here
-      setInitialState(nftRes.gallery)
-      setCuratedNfts(nftRes.gallery)
-      setCuratedNftsSet(
-        new Set(
-          nftRes.gallery.map((nft: any) => nft.contract.address + nft.tokenId)
-        )
-      )
-      setLoading(false)
+      galleryFetcher.load(request)
     })()
   }, [])
+
+  useEffect(() => {
+    if (galleryFetcher.data) {
+      // Do not need to sort them alphabetically here
+      setInitialState(galleryFetcher.data.gallery)
+      setCuratedNfts(galleryFetcher.data.gallery)
+      setCuratedNftsSet(
+        new Set(
+          galleryFetcher.data.gallery.map(
+            (nft: any) => nft.contract.address + nft.tokenId
+          )
+        )
+      )
+    }
+  }, [galleryFetcher.data])
 
   // HANDLERS
   const notify = (success: boolean = true) => {
@@ -278,6 +284,64 @@ const Gallery = () => {
     setActiveId(null)
   }
 
+  // ------------------- END OF GALLERY PART ---------------------- //
+  // ------------------- START OF MODAL PART ---------------------- //
+  // STATE
+  const [refresh, setRefresh] = useState(true)
+  const [loadedNfts, setLoadedNfts] = useState([] as any[])
+  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
+  const [collection, setCollection] = useState('')
+
+  const modalFetcher = useFetcher()
+
+  // HOOKS
+  useEffect(() => {
+    if (modalFetcher.data) {
+      /* We already have only 1 NFT per collection
+       ** No need to put it in additional set
+       */
+
+      setLoadedNfts(modalFetcher.data.ownedNfts)
+      setPageLink(modalFetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [modalFetcher.data])
+
+  useEffect(() => {
+    getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+  }, [collection])
+
+  useEffect(() => {
+    if (pageKey) {
+      setLoading(true)
+      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+    } else if (pageKey === null) {
+      setLoading(false)
+    }
+  }, [pageKey])
+
+  useMemo(() => {
+    setRefresh(true)
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [])
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+    }
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
+
+  // --------------------- END OF MODAL PART ---------------------- //
+
   return (
     <Form
       method="post"
@@ -296,10 +360,15 @@ const Gallery = () => {
       </Text>
 
       <PfpNftModal
-        account={temporaryAddress}
-        text="Pick curated NFTs"
+        nfts={loadedNfts}
+        collection={collection}
+        setCollection={setCollection}
+        displayName={displayName as string}
+        account={tempTargetAddress}
+        loadingConditions={refresh || loading || modalFetcher.state !== 'idle'}
+        text={'Pick curated NFTs'}
         isOpen={isOpen}
-        pfp={profile?.pfp?.image}
+        pfp={profile?.pfp?.image as string}
         handleClose={() => {
           setIsOpen(false)
         }}
@@ -354,7 +423,9 @@ const Gallery = () => {
                 <Text>Add NFT</Text>
               </div>
             </button>
-            {loading && <LoadingGridSquaresGallery numberOfCells={30} />}
+            {galleryFetcher.state === 'loading' && (
+              <LoadingGridSquaresGallery numberOfCells={30} />
+            )}
             {curatedNfts.map((nft: any, i: number) => {
               return (
                 <SortableNft
@@ -381,19 +452,31 @@ const Gallery = () => {
       </DndContext>
 
       <input type="hidden" name="gallery" value={JSON.stringify(curatedNfts)} />
-      <input type="hidden" name="address" value={temporaryAddress} />
+      <input type="hidden" name="address" value={tempTargetAddress} />
 
-      <SaveButton
-        isFormChanged={isFormChanged}
-        discardFn={() => {
-          setCuratedNfts(initialState)
-          setCuratedNftsSet(
-            new Set(
-              initialState.map((nft: any) => nft.contract.address + nft.tokenId)
+      {/* Form where this button is used should have 
+          an absolute relative position
+          div below has relative - this way this button sticks to 
+          bottom right
+
+          This div with h-[4rem] prevents everything from overlapping with
+          div with absolute position below  */}
+      <div className="h-[4rem]" />
+      <div className="absolute bottom-0 right-0">
+        <SaveButton
+          isFormChanged={isFormChanged}
+          discardFn={() => {
+            setCuratedNfts(initialState)
+            setCuratedNftsSet(
+              new Set(
+                initialState.map(
+                  (nft: any) => nft.contract.address + nft.tokenId
+                )
+              )
             )
-          )
-        }}
-      />
+          }}
+        />
+      </div>
     </Form>
   )
 }

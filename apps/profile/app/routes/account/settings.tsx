@@ -114,7 +114,6 @@ export default function AccountSetting() {
                   navigate(`./${path}`, { replace: true })
                   setCurrentTab(tabs[path].name)
                 }}
-                // prefetch="render"
                 className={classNames(
                   tabs[path].name === currentTab
                     ? 'border-indigo-500 font-semibold text-gray-800'

@@ -1,9 +1,17 @@
-import { Node } from '@kubelt/galaxy-client'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+  useFetcher,
+} from '@remix-run/react'
+import { useState, useEffect, useMemo } from 'react'
 
-import ProfileNftSingleCollection from '~/components/nft-collection/ProfileNftSingleCollection'
+import type { Node, Profile } from '@kubelt/galaxy-client'
+
+import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
+import { getMoreNftsSingleCollection } from '~/helpers/nfts'
 
 export const loader: LoaderFunction = async (args) => {
   const { params } = args
@@ -15,25 +23,94 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  const { profile, cryptoAddresses, uname } = useOutletContext<{
-    profile: { displayName: string }
+  const { profile, cryptoAddresses, isOwner } = useOutletContext<{
+    profile: Profile
     cryptoAddresses: Node[]
-    uname: string
+    isOwner: boolean
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
-  const tempTargetAddress = cryptoAddresses?.map((a) => a.urn)[0]
+  const tempTargetAddress = cryptoAddresses?.map((a) => a.qc.alias)[0]
+
+  const { displayName } = profile
+
+  /** STATE */
+  const [refresh, setRefresh] = useState(true)
+  const [loadedNfts, setLoadedNfts] = useState([] as any[])
+  const [pageKey, setPageLink] = useState<string | undefined>()
+  const [loading, setLoading] = useState(true)
+
+  const fetcher = useFetcher()
+  const navigate = useNavigate()
+
+  /** HOOKS */
+  useEffect(() => {
+    if (fetcher.data) {
+      // Do not need to sort them alphabetically here
+      setLoadedNfts([...loadedNfts, ...fetcher.data.ownedNfts])
+      setPageLink(fetcher.data.pageKey ?? null)
+
+      if (refresh) {
+        setRefresh(false)
+      }
+    }
+  }, [fetcher.data])
+
+  useEffect(() => {
+    if (pageKey) {
+      setLoading(true)
+      getMoreNftsSingleCollection(
+        fetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
+    } else if (pageKey === null) {
+      setLoading(false)
+    }
+  }, [pageKey])
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      getMoreNftsSingleCollection(
+        fetcher,
+        tempTargetAddress,
+        collection,
+        pageKey
+      )
+    }
+
+    if (refresh) {
+      asyncFn()
+    }
+  }, [refresh])
+
+  useMemo(() => {
+    setRefresh(true)
+    setLoadedNfts([])
+    setPageLink(undefined)
+  }, [])
 
   return (
-    <>
-      <ProfileNftSingleCollection
-        account={tempTargetAddress}
-        displayname={profile.displayName || tempTargetAddress}
-        detailsModal
-        collection={collection}
-        backLink={`/u/${uname}/collections`}
-      />
-    </>
+    <UnfilteredNftGrid
+      nfts={loadedNfts}
+      isModal={false}
+      handleRedirect={() => {
+        navigate(`/u/${cryptoAddresses[0].nss.split('/')[1]}/collections`, {
+          replace: true,
+        })
+      }}
+      loadingConditions={loading || refresh}
+      account={tempTargetAddress} // #TODO: replace with list of visible addresses
+      isModalNft={true}
+      isOwner={isOwner}
+      displayText={`Looks like ${
+        displayName ?? tempTargetAddress
+      } doesn't own any NFTs`}
+      detailsModal
+      filters={false}
+      collection={collection}
+    />
   )
 }
 

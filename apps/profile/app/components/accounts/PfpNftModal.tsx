@@ -1,9 +1,7 @@
-import ProfileNftCollections from '~/components/nft-collection/ProfileNftCollections'
-import ProfileNftSingleCollection from '../nft-collection/ProfileNftSingleCollection'
-import SelectableNft from '~/components/nft-collection/SelectableNft'
-import { LoadingGridSquares } from '../nft-collection/NftGrid'
-
-import { useState } from 'react'
+import FilteredNftGrid from '~/components/nfts/grid/filtered'
+import UnfilteredNftGrid from '~/components/nfts/grid/unfiltered'
+import SelectableNft from '~/components/nfts/interactible'
+import { LoadingGridSquares } from '~/components/nfts/grid/loading'
 
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -11,21 +9,34 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 type PfpNftModalProps = {
   account: string
   text?: string
+  nfts: any[]
   pfp: string
+  displayName: string
   isOpen: boolean
+  loadingConditions: boolean
+  collection: string
+
+  setCollection: (collection: string) => void
   handleClose: (value: boolean) => void
   handleSelectedNft: (nft: any) => void
 }
 
 const PfpNftModal = ({
+  nfts,
   text,
   account,
   isOpen,
   pfp,
+  loadingConditions,
   handleClose,
+  displayName,
   handleSelectedNft,
+  collection,
+  setCollection,
 }: PfpNftModalProps) => {
-  const [collection, setCollection] = useState('')
+  const displayText = `Looks like ${
+    displayName ?? account
+  } doesn't own any NFTs`
 
   return (
     <Modal isOpen={isOpen} fixed handleClose={handleClose}>
@@ -46,9 +57,12 @@ const PfpNftModal = ({
         )}
 
         {collection.length ? (
-          <ProfileNftSingleCollection
+          <UnfilteredNftGrid
+            nfts={nfts}
             account={account}
             isModal={true}
+            displayText={displayText}
+            loadingConditions={loadingConditions}
             setCollection={setCollection}
             collection={collection}
             preload={true}
@@ -68,10 +82,14 @@ const PfpNftModal = ({
             nftGrid={<LoadingGridSquares numberOfCells={30} />}
           />
         ) : (
-          <ProfileNftCollections
+          <FilteredNftGrid
+            nfts={nfts}
             account={account}
             preload={true}
+            isModal={true}
+            displayText={displayText}
             pfp={pfp}
+            loadingConditions={loadingConditions}
             filters
             handleSelectedNft={(nft) => {
               setCollection(nft.contract.address)
