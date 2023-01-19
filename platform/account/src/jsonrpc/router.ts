@@ -28,7 +28,7 @@ import { LogUsage } from '@kubelt/platform-middleware/log'
 import { Scopes } from '@kubelt/platform-middleware/scopes'
 
 import { initAccountNodeByName } from '../nodes'
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { Analytics, CustomAnalyticsFunctionType } from '@kubelt/platform-middleware/analytics'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -60,11 +60,29 @@ export const injectAccountNode = t.middleware(async ({ ctx, next }) => {
   })
 })
 
+export const injectCustomAnalytics = t.middleware(async ({ctx, next}) => {
+  const CustomAnalyticsFunction: CustomAnalyticsFunctionType = () => {
+    return {
+      blobs: ['test custom blob'],
+      double: [0.777],
+      indexes: ['test custom index'],
+    } as AnalyticsEngineDataPoint
+  }
+
+  return next({
+    ctx: {
+      CustomAnalyticsFunction,
+      ...ctx,
+    },
+  })
+})
+
 export const appRouter = t.router({
   getProfile: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(Scopes)
     .use(LogUsage)
+    .use(injectCustomAnalytics)
     .use(Analytics)
     .input(GetProfileInput)
     .output(GetProfileOutput)
