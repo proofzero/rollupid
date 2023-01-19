@@ -9,9 +9,11 @@ import {
   AppUpdateableFieldsSchema,
   ScopeMeta,
 } from './jsonrpc/validators/app'
+import { DeploymentMetadata } from '@kubelt/types'
 
 export interface Environment {
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
 }

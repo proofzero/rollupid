@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from '../types'
 import createEdgesClient from '@kubelt/platform-clients/edges'
@@ -12,6 +12,7 @@ import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
   accountURN?: AccountURN
