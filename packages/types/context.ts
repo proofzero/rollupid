@@ -1,5 +1,5 @@
 import { AccountURN } from '@kubelt/urns/account'
-
+import { CustomAnalyticsFunctionType } from '@kubelt/platform-middleware/analytics'
 export const GeoContext = 'com.kubelt.geo/location'
 
 export type DeploymentMetadata = {
@@ -15,6 +15,7 @@ type BaseContext = {
   req?: Request
   Analytics?: AnalyticsEngineDataset
   ServiceDeploymentMetadata?: DeploymentMetadata
+  CustomAnalyticsFunction?: CustomAnalyticsFunctionType
   token?: string
   accountURN?: AccountURN
   rparams?: URLSearchParams

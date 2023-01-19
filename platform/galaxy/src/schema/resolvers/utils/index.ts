@@ -188,7 +188,7 @@ export const logAnalytics = () => (next) => async (root, args, context, info) =>
       service.deploymentTimestamp,
       method,
       type,
-      when,
+      // when,
       nullableName,
       nullableJWT,
     ],
