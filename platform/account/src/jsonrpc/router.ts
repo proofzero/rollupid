@@ -9,7 +9,10 @@ import {
   GetProfileOutput,
 } from './methods/getProfile'
 import { setProfileMethod, SetProfileInput } from './methods/setProfile'
-import { getAddressesMethod, GetAddressesInput } from './methods/getAddresses'
+import {
+  getOwnAddressesMethod,
+  GetAddressesInput,
+} from './methods/getOwnAddresses'
 import { hasAddressesMethod, HasAddressesInput } from './methods/hasAddresses'
 import {
   getSessionsMethod,
@@ -75,14 +78,21 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetProfileInput)
     .mutation(setProfileMethod),
-  getAddresses: t.procedure
+  getOwnAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
     .use(Scopes)
     .use(LogUsage)
     .use(Analytics)
     .input(GetAddressesInput)
     // .output(AddressListSchema)
-    .query(getAddressesMethod),
+    .query(getOwnAddressesMethod),
+  getPublicAddresses: t.procedure
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAddressesInput)
+    // .output(AddressListSchema)
+    .query(getOwnAddressesMethod),
   hasAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)

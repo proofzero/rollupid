@@ -11,7 +11,6 @@ export const GetAddressesInput = z.object({
   filter: z
     .object({
       type: inputValidators.CryptoAddressTypeInput.optional(),
-      hidden: z.boolean().optional(),
     })
     .optional(),
 })
@@ -21,14 +20,18 @@ export type GetAddressesParams = z.infer<typeof GetAddressesInput>
 export const GetAddressesOutput = z.array(Node)
 export type GetAddressesOutput = z.infer<typeof GetAddressesOutput>
 
-export const getAddressesMethod = async ({
+export const getOwnAddressesMethod = async ({
   input,
   ctx,
 }: {
   input: GetAddressesParams
   ctx: Context
 }): Promise<GetAddressesOutput> => {
-  // TODO: scopes on addresses
+  // TODO: check scopes on jwt for now we will just use the accountURN to you get get your own addresses
+  if (input.account !== ctx.accountURN) {
+    throw Error('Invalid account input')
+  }
+
   const query = {
     // We are only interested in edges that start at the account node and
     // terminate at the address node, assuming that account nodes link to
@@ -46,10 +49,11 @@ export const getAddressesMethod = async ({
         addr_type: input.filter?.type,
       },
       qc: {
-        hidden: input.filter?.hidden || false,
+        hidden: true,
       },
     },
   }
+
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
   return ctx.edges.getEdges

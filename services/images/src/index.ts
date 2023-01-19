@@ -20,7 +20,6 @@ import { checkEnv } from '@kubelt/utils'
 import { svg2png, initialize } from 'svg2png-wasm'
 
 import { required as requiredEnv } from './env'
-import social from './assets/social.png'
 import wasm from './assets/svg2png_wasm_bg.wasm'
 import colors from './assets/colors.json'
 import { keccak256 } from '@ethersproject/keccak256'

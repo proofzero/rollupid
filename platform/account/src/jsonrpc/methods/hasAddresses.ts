@@ -39,6 +39,9 @@ export const hasAddressesMethod = async ({
   input: HasAddressesParams
   ctx: Context
 }) => {
+  if (input.account !== ctx.accountURN) {
+    throw Error('Invalid account input')
+  }
   // Return the list of edges between the account node and any address
   // nodes. Don't filter the addresses by type, we want them all (the
   // total number is normally going to be small).
@@ -51,6 +54,10 @@ export const hasAddressesMethod = async ({
     tag: EDGE_ADDRESS,
     // Account -> Address edges indicate ownership.
     dir: Graph.EdgeDirection.Outgoing,
+
+    qc: {
+      hidden: input.account === ctx.accountURN,
+    },
   }
   const edgesResult = await ctx.edges.getEdges.query({ query })
   const edgeList = edgesResult.edges

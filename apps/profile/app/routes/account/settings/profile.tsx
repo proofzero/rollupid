@@ -125,9 +125,16 @@ export default function AccountSettingsProfile() {
 
     setPfpUploading(true)
 
-    const imgUploadUrl = (await fetch('/api/image-upload-url', {
-      method: 'post',
-    }).then((res) => res.json())) as string
+    const imgUploadUrl = (await fetch(
+      '/account/settings/profile/image-upload-url',
+      {
+        method: 'post',
+      }
+    )
+      .then((res) => res.json())
+      .catch((e) => {
+        console.error(e)
+      })) as string
 
     const formData = new FormData()
     formData.append('file', pfpFile)

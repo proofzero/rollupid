@@ -8,7 +8,7 @@ import { appRouter } from '../router'
 import { Context } from '../../context'
 import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { keccak256 } from '@ethersproject/keccak256'
-import { CryptoAddressType } from '@kubelt/types/address'
+import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 import { initAddressNodeByName } from '../../nodes'
 
 export const InitVaultOutput = AddressURNInput
@@ -34,14 +34,17 @@ export const initVaultMethod = async ({
   const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(vault.address)
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
+  const vaultUrn = AddressURNSpace.urn(hash)
 
-  const vaultNode = await initAddressNodeByName(
-    AddressURNSpace.urn(hash),
-    ctx.Address
-  )
-  await vaultNode.storage.put('privateKey', vault.privateKey)
+  const vaultNode = await initAddressNodeByName(vaultUrn, ctx.Address)
+  await Promise.all([
+    vaultNode.storage.put('privateKey', vault.privateKey), // #TODO: vault class needed
+    vaultNode.class.setAddress(vaultUrn),
+    vaultNode.class.setNodeType(NodeType.Vault),
+    vaultNode.class.setType(CryptoAddressType.ETH),
+  ])
 
-  const address3RN: AddressURN = `urn:threeid:address/${vault.address}?+node_type=crypto&addr_type=eth?=alias=${vault.address}&hidden=true`
+  const address3RN: AddressURN = `${vaultUrn}?+node_type=${NodeType.Vault}&addr_type=${CryptoAddressType.ETH}?=alias=${vault.address}&hidden=true`
   const caller = appRouter.createCaller({
     ...ctx,
     address3RN,
