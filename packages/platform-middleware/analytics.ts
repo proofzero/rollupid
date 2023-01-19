@@ -8,7 +8,7 @@ export const Analytics: BaseMiddlewareFunction<{
   ServiceDeploymentMetadata?: DeploymentMetadata
   req?: Request
   accountURN?: AccountURN
-}> = async ({ ctx, path, type, next }) => { 
+}> = async ({ ctx, path, type, next }) => {
   const rayId = ctx.req?.headers.get('cf-ray') || null
   // if (!rayId) throw new Error('No CF-Ray found in request headers')
   console.log('rayId: ', rayId)
@@ -16,8 +16,10 @@ export const Analytics: BaseMiddlewareFunction<{
   const service = {
     name: ctx.ServiceDeploymentMetadata?.name || 'unknown',
     deploymentId: ctx.ServiceDeploymentMetadata?.deployment?.id || 'unknown',
-    deploymentNumber: String(ctx.ServiceDeploymentMetadata?.deployment?.number) || 'unknown',
-    deploymentTimestamp: ctx.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
+    deploymentNumber:
+      String(ctx.ServiceDeploymentMetadata?.deployment?.number) || 'unknown',
+    deploymentTimestamp:
+      ctx.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
   }
 
   const accountURN = ctx.accountURN || null
@@ -31,7 +33,7 @@ export const Analytics: BaseMiddlewareFunction<{
     'no key'
 
   console.log('raw_key: ', raw_key)
-  
+
   const enc_key = new TextEncoder().encode(raw_key)
 
   // TODO: Bad perf. Only do this if there's no unique key.
@@ -50,7 +52,17 @@ export const Analytics: BaseMiddlewareFunction<{
 
   // Pre-method call analytics.
   const pre: AnalyticsEngineDataPoint = {
-    blobs: [service.name, service.deploymentId, service.deploymentNumber, service.deploymentTimestamp, path, type, 'BEFORE', accountURN, rayId],
+    blobs: [
+      service.name,
+      service.deploymentId,
+      service.deploymentNumber,
+      service.deploymentTimestamp,
+      path,
+      type,
+      'BEFORE',
+      accountURN,
+      rayId,
+    ],
     // doubles: [],
     indexes: [hashkey], // TODO: Need a sampling index.
   }
