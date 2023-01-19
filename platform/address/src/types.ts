@@ -18,8 +18,9 @@ export interface Environment {
   Images: Fetcher
   Analytics: AnalyticsEngineDataset
   Address: DurableObjectNamespace
+  Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
-
+  
   HANDLES: KVNamespace
 
   MINTPFP_CONTRACT_ADDRESS: string
