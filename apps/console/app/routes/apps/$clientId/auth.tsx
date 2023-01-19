@@ -4,14 +4,19 @@
 
 import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { Form, useActionData, useLoaderData, useSubmit } from '@remix-run/react'
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useSubmit,
+  useOutletContext,
+} from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import toast from 'react-hot-toast'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -66,12 +71,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   })
 }
 
+type notificationHandlerType = (val: boolean) => void
+
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
     throw new Error('Application client id is required for the requested route')
   }
 
-  let rotatedSecret
+  let rotatedSecret, updates
 
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(Starbase, {
@@ -82,6 +89,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const formData = await request.formData()
   const op = formData.get('op')
+  const published = formData.get('published') === 'true'
 
   // console.log({ scopes: JSON.stringify(formData) })
 
@@ -107,23 +115,22 @@ export const action: ActionFunction = async ({ request, params }) => {
 
       console.log({ scopes })
 
+      updates = {
+        name: formData.get('name')?.toString(),
+        icon: formData.get('icon') as string | undefined,
+        redirectURI: formData.get('redirectURI') as string | undefined,
+        termsURL: formData.get('termsURL') as string | undefined,
+        websiteURL: formData.get('websiteURL') as string | undefined,
+        twitterUser: formData.get('twitterUser') as string | undefined,
+        mediumUser: formData.get('mediumUser') as string | undefined,
+        mirrorURL: formData.get('mirrorURL') as string | undefined,
+        discordUser: formData.get('discordUser') as string | undefined,
+      }
+
       await starbaseClient.updateApp.mutate({
         clientId: params.clientId,
-        updates: {
-          name: formData.get('name')?.toString(),
-          scopes: Array.from(scopes),
-          icon: formData.get('icon') as string | undefined,
-          redirectURI: formData.get('redirectURI') as string | undefined,
-          termsURL: formData.get('termsURL') as string | undefined,
-          websiteURL: formData.get('websiteURL') as string | undefined,
-          twitterUser: formData.get('twitterUser') as string | undefined,
-          mediumUser: formData.get('mediumUser') as string | undefined,
-          mirrorURL: formData.get('mirrorURL') as string | undefined,
-          discordUser: formData.get('discordUser') as string | undefined,
-        },
+        updates,
       })
-
-      const published = formData.get('published') === '1' ? true : false
 
       await starbaseClient.publishApp.mutate({
         clientId: params.clientId,
@@ -135,6 +142,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   return {
     rotatedSecret,
+    updatedApp: { published, app: { ...updates } },
     errors: {},
   }
 }
@@ -144,6 +152,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
+
+  const { notificationHandler } =
+    useOutletContext<{ notificationHandler: notificationHandlerType }>()
+
   const loaderData = useLoaderData()
   const actionData = useActionData()
 
@@ -151,17 +163,20 @@ export default function AppDetailIndexPage() {
   const { appDetails, scopeMeta } = loaderData
   const rotatedSecret = loaderData?.rotatedSecret || actionData?.rotatedSecret
 
+  if (actionData?.updatedApp) {
+    appDetails.app = actionData.updatedApp.app
+    appDetails.publised = actionData.updatedApp.published
+  }
+
   const errors = actionData?.errors
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-
-  const notify = (success: boolean = true) => {
-    if (success) {
-      toast.success('Saved')
-    } else {
-      toast.error('Save Failed -- Please try again')
+  useEffect(() => {
+    if (errors) {
+      notificationHandler(Object.keys(errors).length === 0)
     }
-  }
+  }, [errors])
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
   return (
     <>
@@ -173,7 +188,6 @@ export default function AppDetailIndexPage() {
         }}
         isOpen={deleteModalOpen}
       />
-      {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
       <Form
         method="post"
@@ -182,8 +196,6 @@ export default function AppDetailIndexPage() {
           setIsFormChanged(true)
         }}
         onSubmit={() => {
-          notify(Object.keys(errors).length === 0)
-          console.log('yo')
           setIsFormChanged(false)
         }}
       >
@@ -205,6 +217,17 @@ export default function AppDetailIndexPage() {
                 }
               )
             },
+          }}
+          onTogglePublished={(appDetails: any) => {
+            submit(
+              {
+                ...appDetails.app,
+                published: appDetails.published, //|| actionData.published,
+                op: 'update_app',
+              },
+              { method: 'post', replace: true }
+            )
+            setIsFormChanged(false)
           }}
           isFormChanged={isFormChanged}
           setIsFormChanged={setIsFormChanged}

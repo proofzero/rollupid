@@ -9,34 +9,38 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
-import toast, { Toaster } from 'react-hot-toast'
-import { ScopeMeta } from '@kubelt/platform/starbase/src/types'
+import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
+import toast from 'react-hot-toast'
+
+type appDetailsProps = {
+  published: boolean
+  app: {
+    name: string
+    scopes: string[]
+    icon?: string
+    redirectURI?: string
+    termsURL?: string
+    websiteURL?: string
+    twitterUser?: string
+    mediumUser?: string
+    mirrorURL?: string
+    discordUser?: string
+  }
+}
 
 type ApplicationAuthProps = {
-  appDetails: {
-    published: boolean
-    app: {
-      name: string
-      scopes: string[]
-      icon?: string
-      redirectURI?: string
-      termsURL?: string
-      websiteURL?: string
-      twitterUser?: string
-      mediumUser?: string
-      mirrorURL?: string
-      discordUser?: string
-    }
-  }
-  scopeMeta: ScopeMeta
+  appDetails: appDetailsProps
+
   oAuth: {
     appId: string
     appSecret: string
     createdAt: Date
     onKeyRoll: () => void
   }
+  scopeMeta: ScopeMeta
   onDelete: () => void
   setIsFormChanged: (val: boolean) => void
+  onTogglePublished: (val: appDetailsProps) => void
   isFormChanged: boolean
 }
 
@@ -46,9 +50,13 @@ export const ApplicationAuth = ({
   scopeMeta,
   onDelete,
   isFormChanged,
+  onTogglePublished,
   setIsFormChanged,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
+  const [formData, setFormData] = useState<appDetailsProps>(appDetails)
+
+  console.log(formData)
 
   console.log({ appDetails, oAuth, scopeMeta, onDelete })
 
@@ -70,7 +78,7 @@ export const ApplicationAuth = ({
           Save
         </Button>
       </div>
-      <Toaster position="top-right" reverseOrder={false} />
+
       <RotateCredsModal
         isOpen={rollKeyModalOpen}
         rotateCallback={() => {
@@ -138,12 +146,18 @@ export const ApplicationAuth = ({
           <Panel title="Application Status">
             <div className="flex flex-col h-full justify-center">
               <InputToggle
-                onToggle={() => {
+                onToggle={(state) => {
+                  if (state) {
+                    onTogglePublished({
+                      published: true,
+                      app: { ...formData.app },
+                    })
+                  }
                   setIsFormChanged(true)
                 }}
                 id="published"
                 label="Published"
-                checked={appDetails.published}
+                checked={formData.published}
               />
             </div>
           </Panel>
@@ -157,7 +171,16 @@ export const ApplicationAuth = ({
               <Input
                 id="name"
                 label="Application Name"
-                defaultValue={appDetails.app.name}
+                defaultValue={formData.app.name}
+                onChange={(event) => {
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      name: event.currentTarget.value,
+                    },
+                  })
+                }}
                 required
               />
             </div>
@@ -209,34 +232,61 @@ export const ApplicationAuth = ({
             <div className="flex-1">
               <PreLabeledInput
                 id="redirectURI"
+                onChange={(event) => {
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      redirectURI: event?.currentTarget.value,
+                    },
+                  })
+                }}
                 label="Redirect URL"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.redirectURI}
+                defaultValue={formData.app.redirectURI}
               />
             </div>
             <div className="flex-1">
               <PreLabeledInput
                 id="termsURL"
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      termsURL: event?.currentTarget.value,
+                    },
+                  })
+                }
                 label="Terms of Service URL"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.termsURL}
+                defaultValue={formData.app.termsURL}
               />
             </div>
             <div className="flex-1">
               <PreLabeledInput
                 id="websiteURL"
+                onChange={(event) => {
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      websiteURL: event?.currentTarget.value,
+                    },
+                  })
+                }}
                 label="Website"
                 preLabel="http://"
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.websiteURL}
+                defaultValue={formData.app.websiteURL}
               />
             </div>
           </div>
 
           <div>
-            <IconPicker id="icon" url={appDetails.app.icon} />
+            <IconPicker id="icon" url={formData.app.icon} />
           </div>
         </div>
       </Panel>
@@ -246,18 +296,36 @@ export const ApplicationAuth = ({
           <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
               <PreLabeledInput
-                id="websiteURL"
-                label="Website"
-                preLabel="https://"
-                defaultValue={appDetails.app.websiteURL}
+                id="discordUser"
+                label="Discord"
+                preLabel="http://discord.com/"
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      discordUser: event?.currentTarget.value,
+                    },
+                  })
+                }
+                defaultValue={formData.app.discordUser}
               />
             </div>
             <div className="flex-1">
               <PreLabeledInput
                 id="twitterUser"
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      twitterUser: event?.currentTarget.value,
+                    },
+                  })
+                }
                 label="Twitter"
                 preLabel="https://twitter.com/"
-                defaultValue={appDetails.app.twitterUser}
+                defaultValue={formData.app.twitterUser}
               />
             </div>
           </div>
@@ -268,7 +336,7 @@ export const ApplicationAuth = ({
                 id="mediumUser"
                 label="Medium"
                 preLabel="https://medium.com/@"
-                defaultValue={appDetails.app.mediumUser}
+                defaultValue={formData.app.mediumUser}
               />
             </div>
             <div className="flex-1">
@@ -276,22 +344,18 @@ export const ApplicationAuth = ({
                 id="mirrorURL"
                 label="Mirror"
                 preLabel="https://mirror.xyz/"
-                defaultValue={appDetails.app.mirrorURL}
+                onChange={(event) =>
+                  setFormData({
+                    ...formData,
+                    app: {
+                      ...formData.app,
+                      mirrorURL: event?.currentTarget.value,
+                    },
+                  })
+                }
+                defaultValue={formData.app.mirrorURL}
               />
             </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
-            <div className="flex-1">
-              <PreLabeledInput
-                id="discordUser"
-                label="Discord"
-                preLabel="http://discord.com/"
-                defaultValue={appDetails.app.discordUser}
-              />
-            </div>
-
-            <div className="flex-1 hidden md:inline-flex">&nbsp;</div>
           </div>
         </div>
       </Panel>
