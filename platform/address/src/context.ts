@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'
@@ -19,6 +19,7 @@ interface CreateInnerContextOptions
   NFTAR_URL: string
   Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   HANDLES: KVNamespace
   Edges: Fetcher
   Access: Fetcher
