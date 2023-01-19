@@ -41,6 +41,33 @@ const addressResolvers: Resolvers = {
 
       return addressProfile
     },
+    addressProfiles: async (
+      _parent: any,
+      { addressURNList }: { addressURNList: AddressURN[] },
+      { env, jwt }: ResolverContext
+    ) => {
+      logAnalytics(
+        env.Analytics,
+        'addressProfile',
+        'query:gql',
+        'BEFORE',
+        addressURNList.join(', ')
+      )
+
+      const profiles = await Promise.all(
+        addressURNList.map(async (urn) => {
+          const addressClient = createAddressClient(env.Address, {
+            headers: {
+              'X-3RN': urn,
+            },
+          })
+
+          return addressClient.getAddressProfile.query()
+        })
+      )
+
+      return profiles
+    },
   },
   Mutation: {},
 
@@ -68,8 +95,9 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.addressProfile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.ensProfile': [setupContext(), hasApiKey()],
+  'Query.addressProfile': [setupContext(), hasApiKey()],
+  'Query.addressProfiles': [setupContext(), hasApiKey()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

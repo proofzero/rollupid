@@ -61,5 +61,6 @@ export default /* GraphQL */ `
   type Query {
     ensProfile(addressOrEns: String!): CryptoAddressProfile
     addressProfile(addressURN: URN!): AddressProfile
+    addressProfiles(addressURNList: [URN!]): [AddressProfile]
   }
 `

@@ -373,6 +373,7 @@ export type ProfileInput = {
 export type Query = {
   __typename?: 'Query';
   addressProfile?: Maybe<AddressProfile>;
+  addressProfiles?: Maybe<Array<Maybe<AddressProfile>>>;
   connectedAddresses?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
   ensProfile?: Maybe<CryptoAddressProfile>;
@@ -386,6 +387,11 @@ export type Query = {
 
 export type QueryAddressProfileArgs = {
   addressURN: Scalars['URN'];
+};
+
+
+export type QueryAddressProfilesArgs = {
+  addressURNList?: InputMaybe<Array<Scalars['URN']>>;
 };
 
 
@@ -497,6 +503,13 @@ export type GetAddressProfileQueryVariables = Exact<{
 
 
 export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null };
+
+export type GetAddressProfilesQueryVariables = Exact<{
+  addressURNList?: InputMaybe<Array<Scalars['URN']> | Scalars['URN']>;
+}>;
+
+
+export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles?: Array<{ __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } | null> | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -677,6 +690,30 @@ export const GetAddressProfileDocument = gql`
         name
         picture
       }
+    }
+  }
+}
+    `;
+export const GetAddressProfilesDocument = gql`
+    query getAddressProfiles($addressURNList: [URN!]) {
+  addressProfiles(addressURNList: $addressURNList) {
+    __typename
+    ... on CryptoAddressProfile {
+      address
+      avatar
+      displayName
+    }
+    ... on OAuthGoogleProfile {
+      name
+      picture
+    }
+    ... on OAuthTwitterProfile {
+      name
+      profile_image_url_https
+    }
+    ... on OAuthGithubProfile {
+      name
+      avatar_url
     }
   }
 }
@@ -868,6 +905,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getAddressProfile(variables: GetAddressProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfileQuery>(GetAddressProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfile', 'query');
+    },
+    getAddressProfiles(variables?: GetAddressProfilesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfilesQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfilesQuery>(GetAddressProfilesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfiles', 'query');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetEnsProfileQuery>(GetEnsProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getEnsProfile', 'query');
