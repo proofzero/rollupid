@@ -31,7 +31,7 @@ export type AuthorizationProps = {
   authorizeCallback: (scopes: string[]) => void
 }
 
-const scopeIcons = {
+const scopeIcons: Record<string, string> = {
   account: accountClassIcon,
   address: addressClassIcon,
 }
@@ -83,7 +83,7 @@ export function Authorization({
             style={{ color: '#6B7280' }}
             className={'flex flex-col font-light text-base gap-2'}
           >
-            {Object.keys(scopeMeta).map((scope, i) => {
+            {appProfile.scopes.map((scope, i) => {
               return (
                 <li key={i} className={'flex flex-row gap-4 items-center'}>
                   <span>

@@ -122,9 +122,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect('/apps')
   }
 
+  if (!state) {
+    throw json({ message: 'Missing required fields: state' }, 400)
+  }
+
   try {
     const sbClient = getStarbaseClient(jwt)
 
+    // When scopes are powered by an index we can just query for the scopes we have in the app
     const [scopeMeta, appProfile] = await Promise.all([
       sbClient.getScopes.query(),
       sbClient.getAppProfile.query({
@@ -176,6 +181,8 @@ export const action: ActionFunction = async ({ request, context }) => {
     state,
   })
 
+  console.log({ authorizeRes })
+
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }
@@ -191,6 +198,8 @@ export default function Authorize() {
   const submit = useSubmit()
   const transition = useTransition()
 
+  console.log({ clientId, appProfile, userProfile, scopeMeta, state })
+
   const cancelCallback = () => {
     submit(
       {
@@ -205,13 +214,13 @@ export default function Authorize() {
     form.append('scopes', scopes.join(','))
     form.append('state', state)
     form.append('client_id', clientId)
-    form.append('redirect_uri', appProfile.redirectURI)
+    form.append('redirect_uri', appProfile.app.redirectURI)
     submit(form, { method: 'post' })
   }
 
   return (
     <Authorization
-      appProfile={appProfile}
+      appProfile={appProfile.app}
       userProfile={userProfile}
       scopeMeta={scopeMeta.scopes}
       transition={transition.state}
