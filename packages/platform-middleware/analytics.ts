@@ -8,14 +8,17 @@ export const Analytics: BaseMiddlewareFunction<{
   ServiceDeploymentMetadata?: DeploymentMetadata
   req?: Request
   accountURN?: AccountURN
-}> = async ({ ctx, path, type, next }) => { //resHeaders, 
+}> = async ({ ctx, path, type, next }) => { 
   const rayId = ctx.req?.headers.get('cf-ray') || null
   // if (!rayId) throw new Error('No CF-Ray found in request headers')
+  console.log('rayId: ', rayId)
 
-  console.log('testing1', ctx.Analytics ? 'Analytics' : 'no analytics binding')
-  console.log('testing2', ctx.ServiceDeploymentMetadata ? 'ServiceMetadata' : 'no metadata binding')
-
-  // TODO: Activity-specific custom object tracking per-method (new middleware).
+  const service = {
+    name: ctx.ServiceDeploymentMetadata?.name || 'unknown',
+    deploymentId: ctx.ServiceDeploymentMetadata?.deployment?.id || 'unknown',
+    deploymentNumber: String(ctx.ServiceDeploymentMetadata?.deployment?.number) || 'unknown',
+    deploymentTimestamp: ctx.ServiceDeploymentMetadata?.deployment?.timestamp || 'unknown',
+  }
 
   const accountURN = ctx.accountURN || null
 
@@ -26,6 +29,9 @@ export const Analytics: BaseMiddlewareFunction<{
     ctx.req?.headers.get('kbt-access-jwt-assertion') ||
     rayId ||
     'no key'
+
+  console.log('raw_key: ', raw_key)
+  
   const enc_key = new TextEncoder().encode(raw_key)
 
   // TODO: Bad perf. Only do this if there's no unique key.
@@ -44,7 +50,7 @@ export const Analytics: BaseMiddlewareFunction<{
 
   // Pre-method call analytics.
   const pre: AnalyticsEngineDataPoint = {
-    blobs: [path, type, 'BEFORE', accountURN, rayId],
+    blobs: [service.name, service.deploymentId, service.deploymentNumber, service.deploymentTimestamp, path, type, 'BEFORE', accountURN, rayId],
     // doubles: [],
     indexes: [hashkey], // TODO: Need a sampling index.
   }
