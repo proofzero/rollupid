@@ -14,7 +14,7 @@ import {
 export interface Environment {
   Access: Fetcher
   Edges: Fetcher
-  Image: Fetcher
+  Images: Fetcher
   Analytics: AnalyticsEngineDataset
   Address: DurableObjectNamespace
 

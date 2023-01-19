@@ -66,6 +66,7 @@ export const getAddressProfileMethod = async ({
     case CryptoAddressType.ETH: {
       const cryptoNode = new CryptoAddress(nodeClient)
       const profile = await cryptoNode.getProfile()
+      console.log({ profile })
       return {
         type: CryptoAddressType.ETH,
         profile,

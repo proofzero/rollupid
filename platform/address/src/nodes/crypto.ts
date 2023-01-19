@@ -78,7 +78,9 @@ export default class CryptoAddress {
 
     if (!address) throw new Error('address not found')
 
-    const profile = await getCryptoAddressProfile(address as string)
+    console.log({ nickname, gradient, address })
+
+    const profile = await getCryptoAddressProfile(address)
 
     if (!profile.avatar) {
       profile.avatar = gradient

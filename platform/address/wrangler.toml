@@ -11,7 +11,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Access", service = "access" },
   { binding = "Edges", service = "edges" },
-  { name = "Image", class_name= "image"}
+  { binding = "Images", service= "images"}
 ]
 
 [[queues.producers]]
@@ -65,7 +65,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Edges", service = "edges-dev" },
-  { name = "Image", class_name= "image-dev"}
+  { binding = "Images", service= "images-dev"}
 ]
 kv_namespaces = [
   { binding = "HANDLES", id = "fca42f2091f14eebb9226513ed8a4c09" }
@@ -87,7 +87,7 @@ durable_objects.bindings = [
 services = [
   { binding = "Access", service = "access-next" },
   { binding = "Edges", service = "edges-next" },
-  { name = "Image", class_name= "image-next"}
+  { binding = "Images", service= "images-next"}
 ]
 kv_namespaces = [
   { binding = "HANDLES", id = "814a8ca024cd4fda8a667a4143cb4825" }
@@ -108,8 +108,8 @@ durable_objects.bindings = [
 ]
 services = [
   { binding = "Access", service = "access-current" },
-  { binding = "Edges", service = "edges-current" }
-  { name = "Image", class_name= "image-current"}
+  { binding = "Edges", service = "edges-current" },
+  { binding = "Images", service= "images-current"}
 ]
 kv_namespaces = [
   { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" }

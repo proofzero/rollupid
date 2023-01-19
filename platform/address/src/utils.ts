@@ -23,7 +23,6 @@ export const isNodeType = (type: string): type is NodeType => {
 
 export const isCryptoAddressType = (type: string | undefined) => {
   switch (type) {
-    case CryptoAddressType.Ethereum:
     case CryptoAddressType.ETH:
       return NodeType.Crypto
     default:
