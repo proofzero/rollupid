@@ -40,7 +40,5 @@ export const loader: LoaderFunction = async ({ request }) => {
     })
     .then((res) => res.exchangeToken)
 
-  return json({
-    token,
-  })
+  // TODO: complete the excchange and store the token and create session
 }
