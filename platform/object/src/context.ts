@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 import type { Environment } from './types'
@@ -10,6 +10,7 @@ import type { Environment } from './types'
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   Meta: DurableObjectNamespace
   Bucket: R2Bucket
 }
