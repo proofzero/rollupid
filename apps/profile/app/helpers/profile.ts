@@ -40,3 +40,22 @@ export const getAddressProfile = async (
 
   return profile
 }
+
+export const getAddressProfiles = async (
+  jwt: string,
+  addressURNList: AddressURN[]
+) => {
+  const galaxyClient = await getGalaxyClient()
+  const addressProfileRes = await galaxyClient.getAddressProfiles(
+    {
+      addressURNList,
+    },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
+    }
+  )
+
+  const { addressProfiles } = addressProfileRes
+
+  return addressProfiles
+}
