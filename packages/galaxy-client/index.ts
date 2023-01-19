@@ -23,7 +23,7 @@ export type AddressProfile = {
   type: Scalars['String'];
 };
 
-export type AddressProfiles = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthTwitterProfile;
+export type AddressProfiles = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
 export type Chain = {
   __typename?: 'Chain';
@@ -64,6 +64,22 @@ export type Edge = {
   tag: Scalars['String'];
 };
 
+export type ExchangeTokenInput = {
+  account?: InputMaybe<Scalars['URN']>;
+  clientId?: InputMaybe<Scalars['String']>;
+  clientSecret?: InputMaybe<Scalars['String']>;
+  code?: InputMaybe<Scalars['String']>;
+  grantType: Scalars['String'];
+  redirectUri?: InputMaybe<Scalars['String']>;
+  token?: InputMaybe<Scalars['String']>;
+};
+
+export type ExchangeTokenResult = {
+  __typename?: 'ExchangeTokenResult';
+  accessToken: Scalars['String'];
+  refreshToken: Scalars['String'];
+};
+
 export type Id = {
   __typename?: 'Id';
   tokenId?: Maybe<Scalars['String']>;
@@ -84,8 +100,14 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  exchangeToken?: Maybe<ExchangeTokenResult>;
   updateCuratedGallery?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type MutationExchangeTokenArgs = {
+  exchange?: InputMaybe<ExchangeTokenInput>;
 };
 
 
@@ -257,6 +279,16 @@ export type OAuthGoogleProfile = {
   sub: Scalars['String'];
 };
 
+export type OAuthMicrosoftProfile = {
+  __typename?: 'OAuthMicrosoftProfile';
+  email: Scalars['String'];
+  family_name: Scalars['String'];
+  given_name: Scalars['String'];
+  name?: Maybe<Scalars['String']>;
+  picture: Scalars['String'];
+  sub: Scalars['String'];
+};
+
 export type OAuthTwitterProfile = {
   __typename?: 'OAuthTwitterProfile';
   id: Scalars['Int'];
@@ -393,6 +425,13 @@ export type TokenUriInput = {
   raw?: InputMaybe<Scalars['String']>;
 };
 
+export type ExchangeTokenMutationVariables = Exact<{
+  exchange?: InputMaybe<ExchangeTokenInput>;
+}>;
+
+
+export type ExchangeTokenMutation = { __typename?: 'Mutation', exchangeToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
+
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -422,7 +461,7 @@ export type GetAddressProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null };
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -470,6 +509,14 @@ export type UpdateGalleryMutationVariables = Exact<{
 export type UpdateGalleryMutation = { __typename?: 'Mutation', updateCuratedGallery?: boolean | null };
 
 
+export const ExchangeTokenDocument = gql`
+    mutation exchangeToken($exchange: ExchangeTokenInput) {
+  exchangeToken(exchange: $exchange) {
+    accessToken
+    refreshToken
+  }
+}
+    `;
 export const GetProfileDocument = gql`
     query getProfile {
   profile {
@@ -582,6 +629,10 @@ export const GetAddressProfileDocument = gql`
       ... on OAuthGithubProfile {
         name
         avatar_url
+      }
+      ... on OAuthMicrosoftProfile {
+        name
+        picture
       }
     }
   }
@@ -754,6 +805,9 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    exchangeToken(variables?: ExchangeTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExchangeTokenMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<ExchangeTokenMutation>(ExchangeTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exchangeToken', 'mutation');
+    },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
     },

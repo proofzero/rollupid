@@ -43,6 +43,7 @@ export default /* GraphQL */ `
     given_name: String!
     family_name: String!
     email: String!
+    picture: String!
   }
 
   union AddressProfiles =
