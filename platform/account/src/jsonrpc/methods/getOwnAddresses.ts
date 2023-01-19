@@ -53,6 +53,7 @@ export const getOwnAddressesMethod = async ({
       },
     },
   }
+
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
   return ctx.edges.getEdges

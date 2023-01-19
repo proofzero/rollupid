@@ -240,9 +240,15 @@ export async function edges(
       if (compKeys.includes(e)) {
         const q = queryComp[e]?.toString() // convert boolean to string
         const n = nodeComp[e]
+        console.log({
+          e,
+          q: queryComp[e]?.toString(),
+          n: nodeComp[e],
+          pass: q === n,
+        })
         return q === n
       }
-      return false
+      return true
     })
 
     // console.log({ queryComp, qList, nodeComp, matches })
