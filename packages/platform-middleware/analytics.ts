@@ -64,7 +64,7 @@ export const Analytics: BaseMiddlewareFunction<{
       rayId,
     ],
     // doubles: [],
-    indexes: [hashkey], // TODO: Need a sampling index.
+    indexes: [hashkey],
   }
 
   ctx.Analytics?.writeDataPoint(pre)
@@ -75,9 +75,19 @@ export const Analytics: BaseMiddlewareFunction<{
 
   // Post-method call analytics.
   const post: AnalyticsEngineDataPoint = {
-    blobs: [path, type, 'AFTER', accountURN, rayId],
+    blobs: [
+      service.name,
+      service.deploymentId,
+      service.deploymentNumber,
+      service.deploymentTimestamp,
+      path,
+      type,
+      'AFTER',
+      accountURN,
+      rayId,
+    ],
     // doubles: [],
-    indexes: [hashkey], // TODO: Need a sampling index.
+    indexes: [hashkey],
   }
 
   ctx.Analytics?.writeDataPoint(post)

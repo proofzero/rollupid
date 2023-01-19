@@ -13,13 +13,7 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
-import {
-  hasApiKey,
-  setupContext,
-  sliceIntoChunks,
-  logAnalytics,
-  logNFTBatchAnalytics,
-} from './utils'
+import { hasApiKey, setupContext, sliceIntoChunks, logAnalytics } from './utils'
 
 type ResolverContext = {
   env: Env
@@ -71,13 +65,6 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'nftsForAddress',
-        'query:gql',
-        'BEFORE',
-        owner
-      )
       const ethClient: AlchemyClient = new AlchemyClient({
         key: env.APIKEY_ALCHEMY_ETH,
         chain: AlchemyChain.ethereum,
@@ -127,13 +114,6 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'contractsForAddress',
-        'query:gql',
-        'BEFORE',
-        owner
-      )
       let contracts: any[] = []
 
       const alchemyClient: AlchemyClient = new AlchemyClient({
@@ -312,13 +292,6 @@ const nftsResolvers: Resolvers = {
       },
       { env }: ResolverContext
     ) => {
-      logNFTBatchAnalytics(
-        env.Analytics,
-        'getNFTMetadataBatch',
-        'query:gql',
-        'BEFORE',
-        input
-      )
       let ownedNfts: any[] = []
       const alchemyClient: AlchemyClient = new AlchemyClient({
         key: env.APIKEY_ALCHEMY_ETH,
@@ -354,13 +327,17 @@ const nftsResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'getCuratedGallery',
-        'query:gql',
-        'BEFORE',
-        addressURN
-      )
+      const indexerClient = createIndexerClient(env.Indexer)
+
+      let gallery: any = []
+
+      try {
+        gallery = await indexerClient.kb_getGallery([
+          `urn:threeid:address/${AddressURNSpace.parse(addressURN).decoded}`,
+        ])
+      } catch (ex) {
+        console.error(ex)
+      }
 
       // TODO: fetch from account
       return {
@@ -376,23 +353,30 @@ const nftsResolvers: Resolvers = {
       { gallery }: { gallery: any[] },
       { env, jwt, addressURN }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'updateCuratedGallery',
-        'mutation:gql',
-        'BEFORE',
-        addressURN,
-        jwt
-      )
-      // update to account
+      const indexerClient = createIndexerClient(env.Indexer)
+
+      // TODO: Return the gallery we've created. Need to enforce
+      // the GraphQL types when setting data otherwise we're able
+      // to set a value that can't be returned.
+      try {
+        await indexerClient.kb_setGallery(
+          gallery.map((nft) => ({ ...nft, addressURN: '1' }))
+        )
+      } catch (ex) {
+        console.error(ex)
+      }
+
       return true
     },
   },
 }
 
 const NFTsResolverComposition = {
-  'Query.nftsForAddress': [setupContext(), hasApiKey()],
-  'Query.contractsForAddress': [setupContext(), hasApiKey()],
+  'Query.nftsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.contractsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.getNFTMetadataBatch': [setupContext(), logAnalytics()],
+  'Query.getCuratedGallery': [setupContext(), logAnalytics()],
+  'Mutation.updateCuratedGallery': [setupContext(), logAnalytics()],
 }
 
 export default composeResolvers(nftsResolvers, NFTsResolverComposition)

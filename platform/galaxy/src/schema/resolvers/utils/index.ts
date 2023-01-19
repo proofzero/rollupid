@@ -22,10 +22,16 @@ export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get(PlatformJWTAssertionHeader)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
 
+  const analytics = context.env?.Analytics || null
+  const serviceMetadata = context.env?.ServiceDeploymentMetadata || null
+
+  // console.log('context: ', context)
+  // console.log('info: ', info)
+
   const parsedJwt = jwt && parseJwt(jwt)
   const accountURN: AccountURN = parsedJwt && parsedJwt.sub
 
-  return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
+  return next(root, args, { ...context, jwt, apiKey, accountURN, analytics, serviceMetadata }, info)
 }
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {
@@ -140,21 +146,26 @@ export function sliceIntoChunks(arr: any, chunkSize: number) {
   return res
 }
 
-// Ref the other services: blobs: [ path, type, 'AFTER', accountURN, rayId ],
-export function logAnalytics(
-  dataset: AnalyticsEngineDataset,
-  method: string,
-  type: string,
-  when: string,
-  name?: string,
-  jwt?: string
-) {
-  if (!dataset) return false
+export const logAnalytics = () => (next) => async (root, args, context, info) => {
+  const dataset = context.analytics
+  if (!dataset) return next(root, args, context, info)
 
-  const nullableName = name || null
-  const nullableJWT = jwt || null
+  const serviceMetadata = context.serviceMetadata
+  const service = {
+    name: serviceMetadata?.name || 'unknown',
+    deploymentId: serviceMetadata?.deployment?.id || 'unknown',
+    deploymentNumber: String(serviceMetadata?.deployment?.number) || 'unknown',
+    deploymentTimestamp: serviceMetadata?.deployment?.timestamp || 'unknown',
+  }
 
-  const raw_key = nullableJWT || nullableName || 'anonymous'
+  const method = info?.operation?.name?.value || 'unknown'
+  const type = [info?.operation?.operation || 'unknown'].join(':')
+  const when = 'BEFORE'
+
+  const nullableName = context.accountURN || null
+  const nullableJWT = context.jwt || null
+
+  const raw_key = nullableName || nullableJWT || 'anonymous'
 
   // If we need to make these more unique we can hash the key. Necessitates making this async.
   // const enc_key = new TextEncoder().encode(raw_key);
@@ -170,30 +181,23 @@ export function logAnalytics(
   //     .join('').slice(-32)
 
   const datapoint: AnalyticsEngineDataPoint = {
-    blobs: [method, type, when, nullableName, nullableJWT],
-
+    blobs: [
+      service.name,
+      service.deploymentId,
+      service.deploymentNumber,
+      service.deploymentTimestamp,
+      method,
+      type,
+      when,
+      nullableName,
+      nullableJWT,
+    ],
     // doubles: [],
-
-    // Keys are max 32 bytes so we take the last 32 bytes.
-    indexes: [raw_key.slice(-32)],
+    indexes: [raw_key.slice(-32)], // TODO: Need a sampling index.
   }
 
   dataset.writeDataPoint(datapoint)
-
   console.log('resolver call analytics', JSON.stringify(datapoint))
 
-  return true
-}
-
-// Special case for NFTs -- get analytics at the contract level.
-export function logNFTBatchAnalytics(
-  dataset: AnalyticsEngineDataset,
-  method: string,
-  type: string,
-  when: string,
-  nftBatch: any[]
-) {
-  for (const nft of nftBatch) {
-    logAnalytics(dataset, method, type, when, nft.contractAddress, nft.tokenId)
-  }
+  return next(root, args, context, info)
 }

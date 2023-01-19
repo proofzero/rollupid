@@ -20,15 +20,6 @@ const accountResolvers: Resolvers = {
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
-      logAnalytics(
-        env.Analytics,
-        'profile',
-        'query:gql',
-        'BEFORE',
-        accountURN,
-        jwt
-      )
-
       const accountClient = createAccountClient(env.Account, {
         headers: {
           [PlatformJWTAssertionHeader]: jwt,
@@ -44,14 +35,6 @@ const accountResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env, jwt }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'profileFromAddress',
-        'query:gql',
-        'BEFORE',
-        addressURN,
-        jwt
-      )
       const addressClient = createAddressClient(env.Address, {
         headers: {
           [PlatformJWTAssertionHeader]: addressURN, // note: ens names will be resolved
@@ -107,14 +90,6 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'connectedAddresses',
-        'query:gql',
-        'BEFORE',
-        accountURN,
-        jwt
-      )
       const accountClient = createAccountClient(env.Account, {
         headers: {
           [PlatformJWTAssertionHeader]: jwt,
@@ -140,14 +115,6 @@ const accountResolvers: Resolvers = {
     ) => {
       console.log(
         `galaxy.updateProfile: updating profile for account: ${accountURN}`
-      )
-      logAnalytics(
-        env.Analytics,
-        'updateProfile',
-        'mutation:gql',
-        'BEFORE',
-        accountURN,
-        jwt
       )
 
       const accountClient = createAccountClient(env.Account, {
@@ -187,10 +154,10 @@ const accountResolvers: Resolvers = {
 }
 
 const ProfileResolverComposition = {
-  'Query.profile': [setupContext(), hasApiKey()],
-  'Query.profileFromAddress': [setupContext(), hasApiKey()],
-  'Query.connectedAddresses': [setupContext(), hasApiKey()],
-  'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized()],
+  'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
+  'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized(), logAnalytics()],
 }
 
 export default composeResolvers(accountResolvers, ProfileResolverComposition)
