@@ -90,8 +90,8 @@ export const MicrosoftRawProfileSchema = z.object({
   name: z.string(),
   given_name: z.string(),
   family_name: z.string(),
-  picture: z.string(),
   email: z.string(),
+  picture: z.string(),
 })
 
 export const AddressProfileSchema = z.union([

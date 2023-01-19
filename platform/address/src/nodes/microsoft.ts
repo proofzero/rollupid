@@ -8,7 +8,8 @@ export default class MicrosoftAddress extends OAuthAddress {
     const data = await this.getData()
     if (!data) throw new Error('no data')
     const profile = data.profile as OAuthData['profile']
-    return profile._json as OAuthMicrosoftProfile
+    const gradient = this.node.class.getGradient()
+    return { picture: gradient, ...profile._json } as OAuthMicrosoftProfile
   }
 
   static async alarm(address: Address) {

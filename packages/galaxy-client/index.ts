@@ -17,7 +17,13 @@ export type Scalars = {
   URN: any;
 };
 
-export type AddressProfile = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthTwitterProfile;
+export type AddressProfile = {
+  __typename?: 'AddressProfile';
+  profile: AddressProfiles;
+  type: Scalars['String'];
+};
+
+export type AddressProfiles = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthTwitterProfile;
 
 export type Chain = {
   __typename?: 'Chain';
@@ -416,7 +422,7 @@ export type GetAddressProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } | null };
+export type GetAddressProfileQuery = { __typename?: 'Query', addressProfile?: { __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -557,23 +563,26 @@ export const UpdateProfileDocument = gql`
 export const GetAddressProfileDocument = gql`
     query getAddressProfile($addressURN: URN!) {
   addressProfile(addressURN: $addressURN) {
-    __typename
-    ... on CryptoAddressProfile {
-      address
-      avatar
-      displayName
-    }
-    ... on OAuthGoogleProfile {
-      name
-      picture
-    }
-    ... on OAuthTwitterProfile {
-      name
-      profile_image_url_https
-    }
-    ... on OAuthGithubProfile {
-      name
-      avatar_url
+    type
+    profile {
+      __typename
+      ... on CryptoAddressProfile {
+        address
+        avatar
+        displayName
+      }
+      ... on OAuthGoogleProfile {
+        name
+        picture
+      }
+      ... on OAuthTwitterProfile {
+        name
+        profile_image_url_https
+      }
+      ... on OAuthGithubProfile {
+        name
+        avatar_url
+      }
     }
   }
 }

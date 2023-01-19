@@ -9,11 +9,16 @@ import {
   OAuthGoogleProfile,
   OAuthGithubProfile,
   Resolvers,
+  AddressProfiles,
 } from './typedefs'
 import { hasApiKey, setupContext, logAnalytics } from './utils'
 
 import { ResolverContext } from './common'
-import { OAuthTwitterProfile } from '@kubelt/platform.address/src/types'
+import {
+  OAuthMicrosoftProfile,
+  OAuthTwitterProfile,
+} from '@kubelt/platform.address/src/types'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -51,18 +56,22 @@ const addressResolvers: Resolvers = {
     },
   },
   Mutation: {},
-  AddressProfile: {
-    __resolveType: (obj: AddressProfile) => {
+
+  AddressProfiles: {
+    __resolveType: (obj: AddressProfiles) => {
       if ((obj as CryptoAddressProfile).address) {
         return 'CryptoAddressProfile'
       }
-      if ((obj as OAuthGoogleProfile).sub) {
+      if ((obj as OAuthGoogleProfile).picture) {
         return 'OAuthGoogleProfile'
       }
       if ((obj as OAuthTwitterProfile).profile_image_url_https) {
         return 'OAuthTwitterProfile'
       }
       if ((obj as OAuthGithubProfile).avatar_url) {
+        return 'OAuthGithubProfile'
+      }
+      if ((obj as OAuthMicrosoftProfile).sub) {
         return 'OAuthGithubProfile'
       }
       return null

@@ -37,11 +37,25 @@ export default /* GraphQL */ `
     profile_image_url_https: String!
   }
 
-  union AddressProfile =
+  type OAuthMicrosoftProfile {
+    sub: String!
+    name: String
+    given_name: String!
+    family_name: String!
+    email: String!
+  }
+
+  union AddressProfiles =
       CryptoAddressProfile
     | OAuthGoogleProfile
     | OAuthGithubProfile
     | OAuthTwitterProfile
+    | OAuthMicrosoftProfile
+
+  type AddressProfile {
+    type: String!
+    profile: AddressProfiles!
+  }
 
   type Query {
     ensProfile(addressOrEns: String!): CryptoAddressProfile
