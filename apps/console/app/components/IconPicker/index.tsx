@@ -18,13 +18,15 @@ function pickIcon(setIcon, setIconUrl) {
       const iconFile = files.item(0)
       const reader = new FileReader()
       reader.onload = (e) => {
-        setIcon(e.target.result)
+        setIcon(e?.target?.result)
       }
       reader.readAsDataURL(iconFile)
 
       const imgUploadUrl = (await fetch('/api/image-upload-url', {
         method: 'post',
-      }).then((res) => res.json())) as string
+      }).then((res) => {
+        return res.json()
+      })) as string
 
       const formData = new FormData()
       formData.append('file', iconFile)
@@ -134,10 +136,13 @@ export default function IconPicker({
           >
             {appIcon}
           </div>
+
           <div className="grid place-items-center">
             <label
               htmlFor="icon-upload"
-              className="rounded bg-transparent text-sm border border-gray-300 py-2 px-4 hover:bg-indigo-500 hover:text-white focus:bg-indigo-400"
+              className="rounded bg-transparent text-sm border
+                border-gray-300 py-2 px-4 hover:bg-indigo-500
+                hover:text-white focus:bg-indigo-400 hover:cursor-pointer"
             >
               <span>Upload</span>
               <input

@@ -106,7 +106,11 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                         </Text>
                       )}
                       {selected.icon && (
-                        <img src={selected.icon} className="object-cover" />
+                        <img
+                          src={selected.icon}
+                          className="object-cover"
+                          alt="app icon"
+                        />
                       )}
                     </div>
                   )}
@@ -115,7 +119,7 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                     weight="medium"
                     className={`${
                       apps?.length === 0 ? 'text-gray-600' : 'text-white'
-                    }`}
+                    } truncate`}
                   >
                     {selected.name}
                   </Text>
@@ -162,11 +166,15 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                                 </Text>
                               )}
                               {app.icon && (
-                                <img src={app.icon} className="object-cover" />
+                                <img src={app.icon} className="object-cover w-screen h-screen" alt="app icon" />
                               )}
                             </div>
 
-                            <Text size="sm" weight="medium">
+                            <Text
+                              size="sm"
+                              className="truncate"
+                              weight="medium"
+                            >
                               {app.name}
                             </Text>
                           </div>

@@ -1,6 +1,11 @@
-import type { LoaderFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 
-import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
+import {
+  Outlet,
+  useLoaderData,
+  useSubmit,
+  useActionData,
+} from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import SiteMenu from '~/components/SiteMenu'
@@ -20,6 +25,12 @@ type AppData = {
 }[]
 
 type LoaderData = {
+  apps: AppData
+  clientId: string | undefined
+  avatarUrl: string
+}
+
+type ActionData = {
   apps: AppData
   clientId: string | undefined
   avatarUrl: string
@@ -59,11 +70,53 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 }
 
+export const action: ActionFunction = async ({ request, params }) => {
+  console.log('YO!')
+  const jwt = await requireJWT(request)
+
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt,
+    },
+  })
+  const galaxyClient = await getGalaxyClient()
+
+  const clientId = params?.clientId
+
+  try {
+    const apps = await starbaseClient.listApps.query()
+    const reshapedApps = apps.map((a) => {
+      return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
+    })
+
+    let avatarUrl = ''
+    try {
+      const profileRes = await galaxyClient.getProfile(undefined, {
+        [PlatformJWTAssertionHeader]: jwt,
+      })
+      avatarUrl = profileRes.profile?.pfp?.image || ''
+    } catch (e) {
+      console.error('Could not retrieve profile image.', e)
+    }
+
+    console.log({ apps: reshapedApps, clientId, avatarUrl })
+    return json<ActionData>({ apps: reshapedApps, clientId, avatarUrl })
+  } catch (error) {
+    console.error({ error })
+    return json({ error }, { status: 500 })
+  }
+}
+
 // Component
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
-  const { apps, clientId, avatarUrl } = useLoaderData<LoaderData>()
+  const loaderData = useLoaderData<LoaderData>()
+  const actionData = useActionData<ActionData>()
+  const { apps, clientId, avatarUrl } = actionData || loaderData
+  const submit = useSubmit()
+
+  // const actionData = useActionData()
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -71,6 +124,19 @@ export default function AppDetailIndexPage() {
     } else {
       toast.error('Save Failed -- Please try again', { duration: 2000 })
     }
+  }
+
+  const submitHandler = () => {
+    console.log('yo>')
+    submit(
+      {
+        op: 'roll_app_secret',
+      },
+      {
+        method: 'post',
+        replace: true,
+      }
+    )
   }
 
   return (
@@ -84,6 +150,7 @@ export default function AppDetailIndexPage() {
           <Outlet
             context={{
               notificationHandler: notify,
+              submitHandler,
             }}
           />
         </section>
