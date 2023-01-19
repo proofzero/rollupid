@@ -56,7 +56,7 @@ export const hasAddressesMethod = async ({
     dir: Graph.EdgeDirection.Outgoing,
 
     qc: {
-      hidden: !!ctx.token,
+      hidden: input.account == ctx.accountURN,
     },
   }
   const edgesResult = await ctx.edges.getEdges.query({ query })
