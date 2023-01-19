@@ -92,8 +92,6 @@ export const MicrosoftRawProfileSchema = z.object({
   family_name: z.string(),
   picture: z.string(),
   email: z.string(),
-  //This stores the cached version of the profile image
-  threeidImageUrl: z.string().optional(),
 })
 
 export const AddressProfileSchema = z.union([

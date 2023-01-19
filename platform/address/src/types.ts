@@ -13,8 +13,9 @@ import {
 
 export interface Environment {
   Access: Fetcher
-  Analytics: AnalyticsEngineDataset
   Edges: Fetcher
+  Image: Fetcher
+  Analytics: AnalyticsEngineDataset
   Address: DurableObjectNamespace
 
   HANDLES: KVNamespace
@@ -38,12 +39,10 @@ export enum NodeType {
 }
 
 export enum CryptoAddressType {
-  Ethereum = 'ethereum',
   ETH = 'eth',
 }
 
 export enum ContractAddressType {
-  Ethereum = 'ethereum',
   ETH = 'eth',
 }
 

@@ -10,7 +10,6 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
-import cacheImageToCF from '~/utils/cacheImageToCF.server'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const authRes = (await authenticator.authenticate(
@@ -29,18 +28,8 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
     `?+node_type=${NodeType.OAuth}&addr_type=${OAuthAddressType.Microsoft}`) as AddressURN
   const addressClient = getAddressClient(address)
   const account = await addressClient.resolveAccount.query()
-  const existingOAuthData = await addressClient.getOAuthData.query()
 
-  if (existingOAuthData?.profile == null) {
-    //If we don't already have a microsoft oauth data set, we cache
-    //the image and set the OAuth data set for the address
-    const imageUrl = await cacheImageToCF(profile._json.picture, {
-      Authorization: `Bearer ${authRes.accessToken}`,
-    })
-    profile._json.threeidImageUrl = imageUrl
-
-    await addressClient.setOAuthData.mutate(authRes)
-  }
+  await addressClient.setOAuthData.mutate(authRes)
 
   return authenticateAddress(address, account)
 }

@@ -2,12 +2,12 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
-import type { Challenge, NFTarVoucher } from '../types'
+import type { Challenge, CryptoAddressProfile } from '../types'
 import { recoverEthereumAddress } from '../utils'
 
 import { AddressNode } from '.'
-import { DurableObjectStubProxy } from 'do-proxy'
 import Address from './address'
+import ENSUtils from '@kubelt/platform-clients/ens-utils'
 
 export default class CryptoAddress {
   declare node: AddressNode
@@ -69,12 +69,26 @@ export default class CryptoAddress {
     return challenge
   }
 
-  async setVoucher(voucher: NFTarVoucher): Promise<void> {
-    return await this.node.storage.put('voucher', voucher)
-  }
+  async getProfile(): Promise<CryptoAddressProfile> {
+    const [nickname, gradient, address] = await Promise.all([
+      this.node.storage.get<string>('nickname'),
+      this.node.storage.get<string>('gradient'),
+      this.node.storage.get<string>('address'),
+    ])
 
-  async getVoucher(): Promise<NFTarVoucher | undefined> {
-    return await this.node.storage.get<NFTarVoucher>('voucher')
+    if (!address) throw new Error('address not found')
+
+    const profile = await getCryptoAddressProfile(address as string)
+
+    if (!profile.avatar) {
+      profile.avatar = gradient
+    }
+
+    if (!profile.displayName) {
+      profile.displayName = nickname || address
+    }
+
+    return profile
   }
 
   static async alarm(address: Address) {
@@ -87,4 +101,20 @@ export default class CryptoAddress {
     }
     await address.state.storage.put('challenges', challenges)
   }
+}
+
+const getCryptoAddressProfile = async (
+  address: string
+): Promise<CryptoAddressProfile> => {
+  const ensClient = new ENSUtils()
+  console.log('getCryptoAddressProfile: address', address)
+  const { avatar, displayName } = await ensClient.getEnsEntry(address)
+
+  const newProfile: CryptoAddressProfile = {
+    address: address,
+    displayName: displayName || address,
+    avatar: avatar || '',
+  }
+
+  return newProfile
 }
