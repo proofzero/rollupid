@@ -8,6 +8,8 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+
 import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
@@ -21,6 +23,7 @@ import {
   ScrollRestoration,
   useLocation,
   useLoaderData,
+  useTransition,
 } from '@remix-run/react'
 
 import { useEffect } from 'react'
@@ -54,6 +57,7 @@ export const loader: LoaderFunction = () => {
 }
 
 export default function App() {
+  const transition = useTransition()
   const location = useLocation()
   const browserEnv = useLoaderData()
 
@@ -94,6 +98,7 @@ export default function App() {
             />
           </>
         )}
+        {transition.state === 'loading' ? <Loader /> : null}
         <Outlet />
         <ScrollRestoration />
         <script
