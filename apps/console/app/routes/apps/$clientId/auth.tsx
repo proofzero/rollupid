@@ -89,7 +89,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const formData = await request.formData()
   const op = formData.get('op')
-  const published = formData.get('published') === 'true'
+  const published = formData.get('published') === '1'
 
   // console.log({ scopes: JSON.stringify(formData) })
 
@@ -161,12 +161,14 @@ export default function AppDetailIndexPage() {
   const loaderData = useLoaderData()
   const actionData = useActionData()
   const [isFormChanged, setIsFormChanged] = useState(false)
+
+  const [isImgUploading, setIsImgUploading] = useState(false)
   const { appDetails, scopeMeta } = loaderData
   const rotatedSecret = loaderData?.rotatedSecret || actionData?.rotatedSecret
 
   if (actionData?.updatedApp) {
     appDetails.app = actionData.updatedApp.app
-    appDetails.publised = actionData.updatedApp.published
+    appDetails.published = actionData.updatedApp.published
   }
 
   const errors = actionData?.errors
@@ -200,42 +202,34 @@ export default function AppDetailIndexPage() {
           setIsFormChanged(false)
         }}
       >
-        <input type="hidden" name="op" value="update_app" />
-        <ApplicationAuth
-          appDetails={appDetails}
-          scopeMeta={scopeMeta.scopes}
-          oAuth={{
-            appId: appDetails.clientId,
-            appSecret: rotatedSecret,
-            createdAt: new Date(appDetails.secretTimestamp),
-            onKeyRoll: () => {
-              submit(
-                {
-                  op: 'roll_app_secret',
-                },
-                {
-                  method: 'post',
-                }
-              )
-            },
-          }}
-          onTogglePublished={(appDetails: any) => {
-            submit(
-              {
-                ...appDetails.app,
-                published: appDetails.published, //|| actionData.published,
-                op: 'update_app',
+        <fieldset disabled={isImgUploading}>
+          <input type="hidden" name="op" value="update_app" />
+          <ApplicationAuth
+            appDetails={appDetails}
+            scopeMeta={scopeMeta.scopes}
+            setIsImgUploading={setIsImgUploading}
+            oAuth={{
+              appId: appDetails.clientId,
+              appSecret: rotatedSecret,
+              createdAt: new Date(appDetails.secretTimestamp),
+              onKeyRoll: () => {
+                submit(
+                  {
+                    op: 'roll_app_secret',
+                  },
+                  {
+                    method: 'post',
+                  }
+                )
               },
-              { method: 'post', replace: true }
-            )
-            setIsFormChanged(false)
-          }}
-          isFormChanged={isFormChanged}
-          setIsFormChanged={setIsFormChanged}
-          onDelete={() => {
-            setDeleteModalOpen(true)
-          }}
-        />
+            }}
+            isFormChanged={isFormChanged}
+            setIsFormChanged={setIsFormChanged}
+            onDelete={() => {
+              setDeleteModalOpen(true)
+            }}
+          />
+        </fieldset>
       </Form>
     </>
   )

@@ -64,6 +64,7 @@ type IconPickerProps = {
   // An error message to display
   errorMessage?: string
   setIsFormChanged: (val: boolean) => void
+  setIsImgUploading: (val: boolean) => void
 }
 
 export default function IconPicker({
@@ -72,6 +73,7 @@ export default function IconPicker({
   invalid,
   errorMessage,
   setIsFormChanged,
+  setIsImgUploading,
 }: IconPickerProps) {
   const [icon, setIcon] = useState(url !== undefined ? url : '')
   const [iconUrl, setIconUrl] = useState(url !== undefined ? url : '')
@@ -157,7 +159,9 @@ export default function IconPicker({
                 onChange={async (event) => {
                   event.stopPropagation()
                   setIsFormChanged(false)
+                  setIsImgUploading(true)
                   await pickIcon(setIcon, setIconUrl)(event)
+                  setIsImgUploading(false)
                   setIsFormChanged(true)
                 }}
               />
