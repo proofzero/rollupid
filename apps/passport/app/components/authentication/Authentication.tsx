@@ -8,6 +8,7 @@ import ConnectTwitterButton from '~/components/connect-twitter-button'
 import ConnectMicrosoftButton from '../connect-microsoft-button'
 
 export type AuthenticationProps = {
+  searchParams: string
   logoURL?: string
   enableWalletConnect: boolean
   enableOAuthConnect?: boolean
@@ -16,6 +17,7 @@ export type AuthenticationProps = {
 }
 
 export function Authentication({
+  searchParams,
   logoURL,
   enableWalletConnect = true,
   enableOAuthConnect = false,
@@ -52,10 +54,10 @@ export function Authentication({
       />
       {enableOAuthConnect ? (
         <>
-          <ConnectGoogleButton />
-          <ConnectGithubButton />
-          <ConnectTwitterButton />
-          <ConnectMicrosoftButton />
+          <ConnectGoogleButton searchParams={searchParams} />
+          <ConnectGithubButton searchParams={searchParams} />
+          <ConnectTwitterButton searchParams={searchParams} />
+          <ConnectMicrosoftButton searchParams={searchParams} />
         </>
       ) : null}
     </div>

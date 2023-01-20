@@ -11,7 +11,6 @@ import {
   TwitterProfileSchema,
 } from '../validators/profile'
 import { OAuthAddressType } from '@kubelt/types/address'
-import OAuthAddress from '../../nodes/oauth'
 import CryptoAddress from '../../nodes/crypto'
 import GithubAddress from '../../nodes/github'
 import GoogleAddress from '../../nodes/google'

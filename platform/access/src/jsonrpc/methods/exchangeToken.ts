@@ -92,6 +92,8 @@ export const exchangeTokenMethod = async ({
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
+    const { code, redirectUri, clientId, clientSecret } = input
+
     throw new Error('not implemented')
   } else if (grantType == GrantType.RefreshToken) {
     const {

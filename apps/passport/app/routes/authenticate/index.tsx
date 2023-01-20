@@ -6,14 +6,17 @@ import { Authentication } from '~/components'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const searchParams = new URL(request.url).searchParams
   const oauthEnabled: boolean = searchParams.get('enableOAuth') !== null
-  return { oauthEnabled }
+  return { searchParams: searchParams.toString(), oauthEnabled }
 }
 
 export default function Authenticate() {
   const [enableWalletConnect, setEnableWalletConnect] = useState(true)
-  const { oauthEnabled } = useLoaderData()
+  const { searchParams, oauthEnabled } = useLoaderData()
+
+  console.log({ searchParams })
   return (
     <Authentication
+      searchParams={searchParams}
       enableWalletConnect={enableWalletConnect}
       enableOAuthConnect={oauthEnabled}
       connectCallback={async (address) => {

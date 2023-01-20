@@ -8,7 +8,8 @@ import { createUserSession } from '~/session.server'
 
 export const authenticateAddress = async (
   address: AddressURN,
-  account: AccountURN
+  account: AccountURN,
+  appId?: string
 ) => {
   const accessClient = getAccessClient()
 
@@ -26,16 +27,14 @@ export const authenticateAddress = async (
   })
 
   const grantType = GrantType.AuthenticationCode
-  const { accessToken } = await accessClient.exchangeToken.mutate(
-    {
-      grantType,
-      account,
-      code,
-      redirectUri,
-      clientId,
-    }
-  )
+  const { accessToken } = await accessClient.exchangeToken.mutate({
+    grantType,
+    account,
+    code,
+    redirectUri,
+    clientId,
+  })
 
-  const redirectURL = '/authorize'
+  const redirectURL = appId ? `/authorize?client_id=${appId}` : '/authorize'
   return createUserSession(accessToken, redirectURL, address)
 }
