@@ -6,12 +6,4 @@ import * as edges from './edges'
 import * as scopes from './scopes'
 import * as analytics from './analytics'
 
-export {
-  inputValidators,
-  jwt,
-  geo,
-  log,
-  scopes,
-  edges,
-  analytics,
-}
+export { inputValidators, jwt, geo, log, scopes, edges, analytics }

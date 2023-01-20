@@ -67,20 +67,18 @@ export const Analytics: BaseMiddlewareFunction<{
     // 'BEFORE',
     accountURN,
     rayId,
-    ...customAnalytics?.blobs || [],
+    ...(customAnalytics?.blobs || []),
   ].slice(0, 20) // The maximum allowed number of blobs is 20.
 
   // The total length of blobs must be less than 5120 bytes.
-  while(blobs.length > 0 && blobs.join('').length > 5120) {
+  while (blobs.length > 0 && blobs.join('').length > 5120) {
     blobs.pop()
   }
 
   // Pre-method call analytics.
   const pre: AnalyticsEngineDataPoint = {
-    blobs, 
-    doubles: [
-      ...customAnalytics?.doubles || [],
-    ].slice(0, 20), // The maximum allowed number of doubles is 20.
+    blobs,
+    doubles: [...(customAnalytics?.doubles || [])].slice(0, 20), // The maximum allowed number of doubles is 20.
     indexes: [hashkey.slice(-32)], // Enforce 32 byte limit. The maximum number of indexes is 1.
   }
 

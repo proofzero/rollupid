@@ -16,7 +16,6 @@ export interface Environment {
   Access: Fetcher
   Edges: Fetcher
   Images: Fetcher
-  Analytics: AnalyticsEngineDataset
   Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
