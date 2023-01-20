@@ -1,11 +1,6 @@
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
 
-import {
-  Outlet,
-  useLoaderData,
-  useSubmit,
-  useActionData,
-} from '@remix-run/react'
+import { Outlet, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import SiteMenu from '~/components/SiteMenu'
@@ -112,11 +107,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
-  const actionData = useActionData<ActionData>()
-  const { apps, clientId, avatarUrl } = actionData || loaderData
-  const submit = useSubmit()
 
-  // const actionData = useActionData()
+  const { apps, clientId, avatarUrl } = loaderData
 
   const notify = (success: boolean = true) => {
     if (success) {
@@ -124,19 +116,6 @@ export default function AppDetailIndexPage() {
     } else {
       toast.error('Save Failed -- Please try again', { duration: 2000 })
     }
-  }
-
-  const submitHandler = () => {
-    console.log('yo>')
-    submit(
-      {
-        op: 'roll_app_secret',
-      },
-      {
-        method: 'post',
-        replace: true,
-      }
-    )
   }
 
   return (
@@ -150,7 +129,6 @@ export default function AppDetailIndexPage() {
           <Outlet
             context={{
               notificationHandler: notify,
-              submitHandler,
             }}
           />
         </section>

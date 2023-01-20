@@ -153,10 +153,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
 
-  const { notificationHandler, submitHandler } =
+  const { notificationHandler } =
     useOutletContext<{
       notificationHandler: notificationHandlerType
-      submitHandler: () => void
     }>()
 
   const loaderData = useLoaderData()
@@ -199,7 +198,6 @@ export default function AppDetailIndexPage() {
           setIsFormChanged(true)
         }}
         onSubmit={() => {
-          submitHandler()
           setIsFormChanged(false)
         }}
       >
@@ -232,7 +230,6 @@ export default function AppDetailIndexPage() {
               { method: 'post', replace: true }
             )
             setIsFormChanged(false)
-            submitHandler()
           }}
           isFormChanged={isFormChanged}
           setIsFormChanged={setIsFormChanged}
