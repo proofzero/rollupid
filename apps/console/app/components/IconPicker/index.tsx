@@ -63,6 +63,7 @@ type IconPickerProps = {
   invalid?: boolean
   // An error message to display
   errorMessage?: string
+  setIsFormChanged: (val: boolean) => void
 }
 
 export default function IconPicker({
@@ -70,6 +71,7 @@ export default function IconPicker({
   url,
   invalid,
   errorMessage,
+  setIsFormChanged,
 }: IconPickerProps) {
   const [icon, setIcon] = useState(url !== undefined ? url : '')
   const [iconUrl, setIconUrl] = useState(url !== undefined ? url : '')
@@ -119,6 +121,7 @@ export default function IconPicker({
     ) : (
       <CameraIcon className="h-6 w-6 text-gray-300" aria-hidden="true" />
     )
+
   return (
     <div>
       <label className="text-sm font-medium text-gray-700">
@@ -151,7 +154,12 @@ export default function IconPicker({
                 name="icon"
                 accept="image/png, image/jpeg"
                 className="sr-only"
-                onChange={pickIcon(setIcon, setIconUrl)}
+                onChange={async (event) => {
+                  event.stopPropagation()
+                  setIsFormChanged(false)
+                  await pickIcon(setIcon, setIconUrl)(event)
+                  setIsFormChanged(true)
+                }}
               />
             </label>
           </div>

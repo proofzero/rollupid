@@ -160,7 +160,6 @@ export default function AppDetailIndexPage() {
 
   const loaderData = useLoaderData()
   const actionData = useActionData()
-
   const [isFormChanged, setIsFormChanged] = useState(false)
   const { appDetails, scopeMeta } = loaderData
   const rotatedSecret = loaderData?.rotatedSecret || actionData?.rotatedSecret

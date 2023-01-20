@@ -286,7 +286,11 @@ export const ApplicationAuth = ({
           </div>
 
           <div>
-            <IconPicker id="icon" url={formData.app.icon} />
+            <IconPicker
+              id="icon"
+              setIsFormChanged={setIsFormChanged}
+              url={formData.app.icon}
+            />
           </div>
         </div>
       </Panel>
