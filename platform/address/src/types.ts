@@ -19,7 +19,7 @@ export interface Environment {
   Address: DurableObjectNamespace
   Analytics: AnalyticsEngineDataset
   ServiceDeploymentMetadata: DeploymentMetadata
-  
+
   HANDLES: KVNamespace
 
   MINTPFP_CONTRACT_ADDRESS: string
