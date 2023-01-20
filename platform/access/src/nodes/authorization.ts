@@ -9,7 +9,7 @@ import {
   AuthorizationParameters,
   AuthorizeResult,
   ResponseType,
-} from '../types'
+} from '../types.ts'
 
 export default class Authorization extends DOProxy {
   declare state: DurableObjectState

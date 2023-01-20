@@ -1,5 +1,5 @@
 import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthData, OAuthTwitterProfile } from '../types'
+import { OAuthData, OAuthTwitterProfile } from '../types.ts'
 import Address from './address'
 import OAuthAddress from './oauth'
 

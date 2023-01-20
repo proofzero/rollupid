@@ -4,7 +4,7 @@ import createEdgesClient from '@kubelt/platform-clients/edges'
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Access, Authorization } from '.'
-import type { Environment } from './types'
+import type { Environment } from './types.ts'
 import type { AccountURN } from '@kubelt/urns/account'
 import { DurableObjectStubProxy } from 'do-proxy'
 

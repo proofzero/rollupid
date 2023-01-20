@@ -1,0 +1,68 @@
+input CheckApiKeyInput {
+  apiKey: String!
+}
+
+type CheckApiKeyResult {
+  valid: Boolean!
+}
+
+input CheckAppAuthInput {
+  redirectUri: String!
+  clientId: String!
+  clientSecret: String!
+  scopes: [String!]!
+}
+
+type CheckAppAuthResult {
+  valid: Boolean!
+}
+
+type CreateAppInput {
+  clientName: String!
+}
+
+type AppClientIdParam {
+  clientId: String!
+}
+
+type GetAppDetailsResult {
+  clientName: String!
+  published: Boolean
+  app: AppObject
+  clientId: String!
+  secretTimestamp: String
+  apiKeyTimestamp: String
+  createdTimestamp: String
+}
+
+type AppUpdateableFields {
+  clientName: String!
+  published: Boolean
+  app: AppObject
+}
+
+type ListAppsResult {
+  apps: [GetAppDetailsResult!]!
+}
+
+input PublishAppInput {
+  clientId: String!
+  published: Boolean!
+}
+
+type PublishAppResult {
+  published: Boolean!
+}
+
+type RotateApiKeyResult {
+  apiKey: String!
+}
+
+type RotateClientSecretResult {
+  secret: String!
+}
+
+input UpdateAppInput {
+  clientId: String!
+  updates: AppObject
+}

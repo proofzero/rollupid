@@ -18,7 +18,7 @@ import {
   KeyPair,
   KeyPairSerialized,
   SessionDetails,
-} from '../types'
+} from '../types.ts'
 import { AccountURN } from '@kubelt/urns/account'
 
 export default class Access extends DOProxy {

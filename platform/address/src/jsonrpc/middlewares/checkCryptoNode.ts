@@ -2,7 +2,7 @@ import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { isAddress as isEthAddress } from '@ethersproject/address'
 
 import { Context } from '../../context'
-import { NodeType } from '../../types'
+import { NodeType } from '../../types.ts'
 import { isCryptoAddressType } from '../../utils'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import { IDRefURNSpace } from '@kubelt/urns/idref'

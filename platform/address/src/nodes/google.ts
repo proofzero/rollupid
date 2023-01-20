@@ -1,5 +1,5 @@
 import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthData, OAuthGoogleProfile } from '../types'
+import { OAuthData, OAuthGoogleProfile } from '../types.ts'
 import Address from './address'
 import OAuthAddress from './oauth'
 

@@ -2,7 +2,7 @@ import { hexlify } from '@ethersproject/bytes'
 import { randomBytes } from '@ethersproject/random'
 
 import { NONCE_OPTIONS } from '../constants'
-import type { Challenge, CryptoAddressProfile } from '../types'
+import type { Challenge, CryptoAddressProfile } from '../types.ts'
 import { recoverEthereumAddress } from '../utils'
 
 import { AddressNode } from '.'

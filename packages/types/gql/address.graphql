@@ -1,0 +1,139 @@
+type CryptoAddressProfile {
+  address: String!
+  avatar: String
+  diplayName: String
+}
+
+type GoogleProfile {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  picture: String
+  email: String
+  email_verified: Boolean
+  locale: String
+}
+
+type GithubProfile {
+  login: String!
+  id: Int!
+  node_id: String!
+  avatar_url: String!
+  gravatar_id: String
+  url: String!
+  html_url: String!
+  followers_url: String!
+  following_url: String!
+  gists_url: String!
+  starred_url: String!
+  subscriptions_url: String!
+  organizations_url: String!
+  repos_url: String!
+  events_url: String!
+  received_events_url: String!
+  type: String!
+  site_admin: Boolean!
+  name: String
+  company: String
+  blog: String
+  location: String
+  email: String
+  hireable: Boolean
+  bio: String
+  twitter_username: String
+  public_repos: Int!
+  public_gists: Int!
+  followers: Int!
+  following: Int!
+  created_at: String!
+  updated_at: String!
+}
+
+type TwitterProfile {
+  id: Int!
+  name: String!
+  screen_name: String!
+  profile_image_url: String!
+}
+
+type MicrosoftProfile {
+  sub: String!
+  name: String
+  given_name: String
+  family_name: String
+  picture: String
+  email: String
+}
+
+union AddressProfile =
+    CryptoAddressProfile
+  | GoogleProfile
+  | GithubProfile
+  | TwitterProfile
+  | MicrosoftProfile
+
+enum NodeType {
+  crypto
+  vault
+  contract
+  oauth
+  handle
+}
+
+enum CryptoAddressType {
+  eth
+}
+
+enum ContractAddressType {
+  eth
+}
+
+enum OAuthAddressType {
+  google
+  github
+  twitter
+  microsoft
+  apple
+  discord
+}
+
+enum HandleAddressType {
+  handle
+}
+
+union AddressType =
+    CryptoAddressType
+  | ContractAddressType
+  | OAuthAddressType
+  | HandleAddressType
+
+type Challenge {
+  address: String!
+  template: String!
+  redirectUri: String!
+  scope: String!
+  state: String!
+  timestamp: String!
+}
+
+type OAuthExtraParams {
+  expires_in: Int
+  scope: String
+  token_type: String
+  id_token: String
+}
+
+type OAuthProfileJson {
+  provider: String!
+  _json: AddressProfile!
+}
+
+union OAuthProfile = OAuthProfileJson | TwitterProfile # fix twitter with OAuth2
+type OAuthData {
+  accessToken: String!
+  accessTokenSecret: String
+  refreshToken: String
+  extraParams: OAuthExtraParams
+  profile: OAuthProfile
+}

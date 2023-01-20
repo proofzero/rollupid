@@ -1,5 +1,5 @@
 import { DurableObjectStubProxy } from 'do-proxy'
-import { OAuthData, OAuthGithubProfile } from '../types'
+import { OAuthData, OAuthGithubProfile } from '../types.ts'
 import Address from './address'
 import OAuthAddress from './oauth'
 

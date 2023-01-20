@@ -7,7 +7,6 @@ import {
 } from './jsonrpc/validators/oauth'
 import {
   CryptoAddressProfileSchema,
-  NFTarVoucherSchema,
   TwitterProfileSchema,
 } from './jsonrpc/validators/profile'
 
@@ -87,5 +86,3 @@ export type AddressProfile =
   | OAuthMicrosoftProfile
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
-
-export type NFTarVoucher = z.infer<typeof NFTarVoucherSchema>

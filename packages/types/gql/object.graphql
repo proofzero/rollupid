@@ -1,0 +1,9 @@
+enum Visibility {
+  private
+  public
+}
+
+type IndexRecord {
+  version: Int!
+  visibility: Visibility!
+}

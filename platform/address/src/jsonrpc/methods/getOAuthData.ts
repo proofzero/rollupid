@@ -1,5 +1,5 @@
 import { Context } from '../../context'
-import { OAuthData } from '../../types'
+import { OAuthData } from '../../types.ts'
 import { OAuthDataSchema } from '../validators/oauth'
 import { z } from 'zod'
 import { AddressNode } from '../../nodes'

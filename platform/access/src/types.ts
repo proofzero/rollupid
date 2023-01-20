@@ -1,5 +1,12 @@
 import { KeyLike, JWK } from 'jose'
 
+export interface Environment {
+  Access: DurableObjectNamespace
+  Authorization: DurableObjectNamespace
+  Analytics: AnalyticsEngineDataset
+  EDGES: Fetcher
+  Starbase: Fetcher
+}
 export interface KeyPair {
   publicKey: KeyLike | Uint8Array
   privateKey: KeyLike | Uint8Array
@@ -8,14 +15,6 @@ export interface KeyPair {
 export interface KeyPairSerialized {
   publicKey: JWK
   privateKey: JWK
-}
-
-export interface Environment {
-  Access: DurableObjectNamespace
-  Authorization: DurableObjectNamespace
-  Analytics: AnalyticsEngineDataset
-  EDGES: Fetcher
-  Starbase: Fetcher
 }
 
 export type AuthorizationParameters = {

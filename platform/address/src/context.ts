@@ -1,7 +1,7 @@
 import { BaseContext } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
-import type { Environment } from './types'
+import type { Environment } from './types.ts'
 import type { AddressType, NodeType } from '@kubelt/types/address'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AddressURN } from '@kubelt/urns/address'

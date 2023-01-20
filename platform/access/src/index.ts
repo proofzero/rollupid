@@ -4,7 +4,7 @@ import {
 } from '@trpc/server/adapters/fetch'
 import { createContext } from './context'
 import { appRouter } from './jsonrpc/router'
-import type { Environment } from './types'
+import type { Environment } from './types.ts'
 import Access from './nodes/access'
 import Authorization from './nodes/authorization'
 

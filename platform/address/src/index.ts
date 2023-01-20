@@ -9,7 +9,7 @@ import Address from './nodes/address'
 import CryptoAddress from './nodes/crypto'
 import ContractAddress from './nodes/contract'
 import OAuthAddress from './nodes/oauth'
-import type { Environment } from './types'
+import type { Environment } from './types.ts'
 
 export default {
   async fetch(request: Request, env: Environment): Promise<Response> {

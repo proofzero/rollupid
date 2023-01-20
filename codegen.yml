@@ -1,0 +1,12 @@
+generates:
+  graphql.ts:
+    schema:
+      - 'gql/**/*.graphql'
+    plugins:
+      - typescript
+      - typescript-validation-schema
+      # - 'typescript-resolvers'
+    config:
+      schema: zod
+      withObjectType: true
+      enumsAsTypes: false

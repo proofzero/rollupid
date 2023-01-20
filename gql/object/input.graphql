@@ -1,0 +1,22 @@
+input GetObjectInput {
+  namespace: String!
+  path: String!
+}
+
+# https://github.com/taion/graphql-type-json
+type GetObjectOutput {
+  value: JSON!
+  version: Int!
+}
+
+input PutObjectInput {
+  namespace: String!
+  path: String!
+  value: JSON!
+  visibility: Visibility!
+}
+
+type PutObjectOutput {
+  size: Int!
+  version: Int!
+}

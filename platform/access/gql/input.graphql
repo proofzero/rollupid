@@ -1,0 +1,60 @@
+input AuthorizeInput {
+  profile: ProfileURN!
+  responseType: String!
+  clientId: String!
+  scope: [String!]
+  state: String
+}
+
+type AuthorizationResult {
+  code: String!
+  state: String!
+}
+
+type ExchangeTokenResult {
+  accessToken: String!
+  refreshToken: String!
+}
+
+interface CodeGrant {
+  grantType: GrantType!
+}
+
+type AuthenticationCodeGrant implements CodeGrant {
+  grantType: GrantType!
+  profile: ProfileURN!
+  code: String!
+  redirectUri: String!
+  clientId: String!
+}
+
+type AuthorizationCodeGrant implements CodeGrant {
+  grantType: GrantType!
+  code: String!
+  redirectUri: String!
+  clientId: String!
+  clientSecret: String!
+}
+
+type RefreshTokenGrant implements CodeGrant {
+  grantType: GrantType!
+  refreshToken: String!
+  token: JWTString!
+}
+
+union TokenGrantInput =
+    AuthenticationCodeGrant
+  | AuthorizationCodeGrant
+  | RefreshTokenGrant
+
+type GetSessionResult {
+  session: SessionDetails!
+}
+
+input RevokeSessionInput {
+  accessURN: AccessURN!
+}
+
+type RevokeSessionResult {
+  success: Boolean!
+}

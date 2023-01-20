@@ -1,0 +1,49 @@
+generates:
+  access.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/access.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false
+  address.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/address.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false
+  profile.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/profile.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false
+  edges.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/edges.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false
+  starbase.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/starbase.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false
+  object.ts:
+    schema:
+      # - '../gql-directives'
+      - 'gql/object.graphql'
+    plugins:
+      - typescript
+    config:
+      enumsAsTypes: false

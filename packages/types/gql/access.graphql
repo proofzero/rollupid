@@ -1,0 +1,32 @@
+scalar UInt8Array
+scalar JWTString
+
+enum GrantType {
+  authentication_code
+  authorization_code
+  refresh_token
+}
+
+enum ResponseType {
+  code
+}
+
+type SessionDetails {
+  expired: Boolean
+  creation: String
+  expiry: String
+}
+
+input VerifyAuthorizationInput {
+  token: JWTString
+}
+
+type JWT {
+  iss: String
+  sub: String
+  aud: String # or [String]
+  exp: Int
+  iat: Int
+  jti: String
+  nbf: Int
+}

@@ -5,7 +5,7 @@ import getAccessClient from '@kubelt/platform-clients/access'
 import { ResponseType } from '@kubelt/platform.access/src/types' // TODO: move to types?
 
 import { appRouter } from '../router'
-import { Challenge } from '../../types'
+import { Challenge } from '../../types.ts'
 import { AddressNode } from '../../nodes'
 import CryptoAddress from '../../nodes/crypto'
 

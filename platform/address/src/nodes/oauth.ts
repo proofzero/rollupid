@@ -1,6 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 import { AddressNode } from '.'
-import { AddressProfile, OAuthData } from '../types'
+import { AddressProfile, OAuthData } from '../types.ts'
 import Address from './address'
 
 export default class OAuthAddress {

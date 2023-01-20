@@ -2,7 +2,7 @@ import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
 import { AddressURN } from '@kubelt/urns/address'
-import { AddressProfile, Environment, NodeType } from '../types'
+import { AddressProfile, Environment, NodeType } from '../types.ts'
 import { AddressType } from '@kubelt/types/address'
 import CryptoAddress from './crypto'
 import ContractAddress from './contract'

@@ -1,0 +1,14 @@
+generates:
+  src/schema.ts:
+    schema:
+      - '../../packages/urns/gql/**/*.graphql'
+      - '../../packages/types/gql/access.graphql'
+      - 'gql/**/*.graphql'
+    plugins:
+      - typescript
+      - typescript-validation-schema
+    config:
+      schema: zod
+      withObjectType: true
+      enumsAsTypes: false
+      # importFrom: '@kubelt/types/access'

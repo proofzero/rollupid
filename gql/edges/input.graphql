@@ -1,0 +1,47 @@
+enum EdgeDirection {
+  incoming
+  outgoing
+}
+
+type EdgeQuery {
+  id: URN!
+  tag: EdgeURN
+  dir: EdgeDirection
+  src: Node
+  dst: Node
+}
+
+type EdgeQueryOptions {
+  limit: Int
+  offset: Int
+}
+
+input GetEdgesInput {
+  query: EdgeQuery!
+  options: EdgeQueryOptions
+}
+
+type GetEdgesResult {
+  id: URN!
+  edges: [Edge!]!
+}
+
+input MakeEdgeInput {
+  src: URN!
+  dst: URN!
+  tag: EdgeURN!
+}
+
+type MakeEdgeResult {
+  edge: MakeEdgeInput!
+}
+
+input removeEdge {
+  src: URN!
+  dst: URN!
+  tag: EdgeURN!
+}
+
+type RemoveEdgeResult {
+  remove: EdgeURN!
+}

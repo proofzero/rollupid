@@ -1,0 +1,49 @@
+input GetLinkedProfileResult {
+  profile: ProfileURN
+}
+
+input GetAddressProfileResult {
+  profile: AddressProfile!
+}
+
+input GetNonceInput {
+  address: String!
+  template: String!
+  redirectUri: String!
+  scope: String!
+  state: String!
+}
+
+type GetNonceResult {
+  nonce: String!
+}
+
+input VerifyNonceInput {
+  nonce: String!
+  signature: String!
+}
+
+type VerifyNonceResult {
+  code: String!
+  state: String!
+}
+
+type GetOAuthDataResult {
+  data: OAuthData
+}
+
+input SetOAuthDataInput {
+  data: OAuthData!
+}
+
+type InitVaultResult {
+  vaultURN: AddressURN!
+}
+
+type ResolveProfileResult {
+  profileURN: ProfileURN
+}
+
+input LinkProfileInput {
+  profile: ProfileURN!
+}

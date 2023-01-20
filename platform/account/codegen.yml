@@ -1,0 +1,12 @@
+generates:
+  src/types.ts:
+    schema:
+      - '../../packages/urns/gql/**/*.graphql'
+      - 'gql/**/*.graphql'
+    plugins:
+      - typescript
+      - typescript-validation-schema
+    config:
+      schema: zod
+      withObjectType: true
+      enumsAsTypes: false
