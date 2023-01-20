@@ -50,59 +50,46 @@ export const Analytics: BaseMiddlewareFunction<{
   //   .slice(-32)
 
   const customAnalytics = ctx.CustomAnalyticsFunction?.() || null
+  console.log('customAnalytics -=-=-=-=-=-=-=-=-=-=-=-', customAnalytics)
 
   // The custom analytics can override the defauly hashkey.
   const hashkey = customAnalytics?.indexes?.[0] || raw_key
 
+  const blobs = [
+    service.name,
+    service.deploymentId,
+    service.deploymentNumber,
+    service.deploymentTimestamp,
+    path,
+    type,
+    // 'BEFORE',
+    accountURN,
+    rayId,
+    ...customAnalytics?.blobs || [],
+  ].slice(0, 20) // The maximum allowed number of blobs is 20.
+
+  // The total length of blobs must be less than 5120 bytes.
+  while(blobs.length > 0 && blobs.join('').length > 5120) {
+    blobs.pop()
+  }
+
   // Pre-method call analytics.
   const pre: AnalyticsEngineDataPoint = {
-    blobs: [
-      service.name,
-      service.deploymentId,
-      service.deploymentNumber,
-      service.deploymentTimestamp,
-      path,
-      type,
-      // 'BEFORE',
-      accountURN,
-      rayId,
-      ...customAnalytics?.blobs || [], // The maximum allowed number of blobs is 20.
-    ],
+    blobs, 
     doubles: [
-      ...customAnalytics?.doubles || [], // The maximum allowed number of doubles is 20.
-    ],
+      ...customAnalytics?.doubles || [],
+    ].slice(0, 20), // The maximum allowed number of doubles is 20.
     indexes: [hashkey.slice(-32)], // Enforce 32 byte limit. The maximum number of indexes is 1.
   }
 
-  // console.log('service precall analytics', JSON.stringify(pre))
+  console.log('service precall analytics', JSON.stringify(pre))
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({
     ctx,
   })
 
-  // Post-method call analytics. TODO: Probably remove.
-  // const post: AnalyticsEngineDataPoint = {
-  //   blobs: [
-  //     service.name,
-  //     service.deploymentId,
-  //     service.deploymentNumber,
-  //     service.deploymentTimestamp,
-  //     path,
-  //     type,
-  //     'AFTER',
-  //     accountURN,
-  //     rayId,
-  //     ...customAnalytics?.blobs || [], // The maximum allowed number of blobs is 20.
-  //   ],
-  //   doubles: [
-  //     ...customAnalytics?.doubles || [], // The maximum allowed number of doubles is 20.
-  //   ],
-  //   indexes: [hashkey.slice(-32)],  // Enforce 32 byte limit. The maximum number of indexes is 1.
-  // }
-
-  // console.log('service postcall analytics', JSON.stringify(post))
-  // ctx.Analytics?.writeDataPoint(post)
+  // Post-method call analytics if any.
 
   return result
 }
