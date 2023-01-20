@@ -27,7 +27,7 @@ export const checkAppAuth = async ({
   const appDetails = await appDO.class.getDetails()
 
   //To remove potential duplicates, we convert to set
-  const storedScopes = new Set(appDetails.scopes)
+  const storedScopes = new Set(appDetails.app?.scopes || [])
   let validScopes = true
   for (const e in scopes) {
     if (!storedScopes.has(e)) {

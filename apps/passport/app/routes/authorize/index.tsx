@@ -1,6 +1,6 @@
 import { json, redirect } from '@remix-run/cloudflare'
 import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
-import { useLoaderData, useSubmit } from '@remix-run/react'
+import { useLoaderData, useSubmit, useTransition } from '@remix-run/react'
 
 import { ResponseType } from '@kubelt/platform.access/src/types'
 
@@ -13,21 +13,14 @@ import {
 import { Authorization } from '~/components/authorization/Authorization'
 import { getUserSession, parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
-import { AddressURNSpace } from '@kubelt/urns/address'
-import type { AddressURN } from '@kubelt/urns/address'
 import {
-  NodeType,
+  CryptoAddressType,
   OAuthAddressType,
-  OAuthMicrosoftProfile,
 } from '@kubelt/platform/address/src/types'
-import type {
-  CryptoAddressProfile,
-  OAuthGoogleProfile,
-  OAuthTwitterProfile,
-  OAuthGithubProfile,
-} from '@kubelt/platform/address/src/types'
+
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { generateGradient } from '~/utils/gradient.server'
+import { AddressURN } from '@kubelt/urns/address'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -39,114 +32,85 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const session = await getUserSession(request)
   const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
 
-  const parsedURN = AddressURNSpace.parse(defaultProfileURN)
-  const rparams = new URLSearchParams(parsedURN.rcomponent || '')
-
-  console.log({ defaultProfileURN, parsedURN, rparams })
-
   const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfileFromAddress(
-    { addressURN: defaultProfileURN },
+  const profileRes = await galaxyClient.getProfile(
+    {},
     {
       [PlatformJWTAssertionHeader]: jwt,
     }
   )
-  const profile = profileRes.profileFromAddress
+  const profile = profileRes.profile
 
   console.log({ profile })
 
   if (!profile) {
     console.log("Profile doesn't exist, creating one...")
     const addressClient = getAddressClient(defaultProfileURN)
-    const addressProfile = await addressClient.getAddressProfile
+    const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
-        switch (rparams.get('node_type')) {
-          case NodeType.Crypto: {
-            const cryptoAddressProfile = res as CryptoAddressProfile
-
-            const gradient = await generateGradient(
-              cryptoAddressProfile.address
-            )
-
-            console.log({ cryptoAddressProfile })
+        switch (res.type) {
+          case CryptoAddressType.ETH: {
+            const gradient = await generateGradient(res.profile.address)
             return {
-              displayName:
-                cryptoAddressProfile.displayName ||
-                cryptoAddressProfile.address,
+              displayName: res.profile.displayName || res.profile.address,
               pfp: {
-                image: cryptoAddressProfile.avatar || gradient,
+                image: res.profile.avatar || gradient,
               },
               cover: gradient,
             }
           }
-          case NodeType.OAuth:
-            switch (rparams.get('addr_type')) {
-              case OAuthAddressType.GitHub: {
-                const githubProfile = res as OAuthGithubProfile
-                const gradient = await generateGradient(
-                  githubProfile?.login as string
-                )
-
-                return {
-                  displayName: githubProfile?.name || githubProfile?.login,
-                  pfp: {
-                    image: githubProfile?.avatar_url || gradient,
-                  },
-                  cover: gradient,
-                }
-              }
-
-              case OAuthAddressType.Google: {
-                const googleProfile = res as OAuthGoogleProfile
-                const gradient = await generateGradient(
-                  googleProfile.email as string
-                )
-                return {
-                  displayName: googleProfile.name,
-                  pfp: {
-                    image: googleProfile?.picture,
-                  },
-                  cover: gradient,
-                }
-              }
-              case OAuthAddressType.Twitter: {
-                const twitterProfile = res as OAuthTwitterProfile
-                const gradient = await generateGradient(
-                  twitterProfile.id.toString()
-                )
-
-                return {
-                  displayName: twitterProfile.name,
-                  pfp: {
-                    image: twitterProfile.profile_image_url_https,
-                  },
-                  cover: gradient,
-                }
-              }
-              case OAuthAddressType.Microsoft: {
-                const microsoftProfile = res as OAuthMicrosoftProfile
-                const gradient = await generateGradient(
-                  microsoftProfile.sub.toString()
-                )
-                return {
-                  displayName: microsoftProfile.name,
-                  pfp: {
-                    //Cached profile image
-                    image: microsoftProfile.threeidImageUrl,
-                  },
-                  cover: gradient,
-                }
-              }
-              default:
-                throw new Error(
-                  'Unsupported OAuth type encountered in profile response.'
-                )
+          case OAuthAddressType.GitHub: {
+            const gradient = await generateGradient(res.profile.login)
+            return {
+              displayName: res.profile.name || res.profile.login,
+              pfp: {
+                image: res.profile.avatar_url || gradient,
+              },
+              cover: gradient,
             }
+          }
+          case OAuthAddressType.Google: {
+            const gradient = await generateGradient(res.profile.email)
+            return {
+              displayName: res.profile.name,
+              pfp: {
+                image: res.profile.picture,
+              },
+              cover: gradient,
+            }
+          }
+          case OAuthAddressType.Twitter: {
+            const gradient = await generateGradient(res.profile.id.toString())
+            return {
+              displayName: res.profile.name,
+              pfp: {
+                image: res.profile.profile_image_url_https,
+              },
+              cover: gradient,
+            }
+          }
+          case OAuthAddressType.Microsoft: {
+            const gradient = await generateGradient(res.profile.sub.toString())
+            return {
+              displayName: res.profile.name,
+              pfp: {
+                //Cached profile image
+                image: gradient,
+              },
+              cover: gradient,
+            }
+          }
+          default:
+            throw new Error(
+              'Unsupported OAuth type encountered in profile response.'
+            )
         }
       })
+
+    // set the default profile
     await galaxyClient.updateProfile(
-      { profile: addressProfile },
+      { profile: newProfile },
       {
         [PlatformJWTAssertionHeader]: jwt,
       }
@@ -158,9 +122,14 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect('/apps')
   }
 
+  if (!state) {
+    throw json({ message: 'Missing required fields: state' }, 400)
+  }
+
   try {
     const sbClient = getStarbaseClient(jwt)
 
+    // When scopes are powered by an index we can just query for the scopes we have in the app
     const [scopeMeta, appProfile] = await Promise.all([
       sbClient.getScopes.query(),
       sbClient.getAppProfile.query({
@@ -212,6 +181,8 @@ export const action: ActionFunction = async ({ request, context }) => {
     state,
   })
 
+  console.log({ authorizeRes })
+
   if (!authorizeRes) {
     throw json({ message: 'Failed to authorize' }, 400)
   }
@@ -225,6 +196,9 @@ export default function Authorize() {
   const { clientId, appProfile, userProfile, scopeMeta, state } =
     useLoaderData()
   const submit = useSubmit()
+  const transition = useTransition()
+
+  console.log({ clientId, appProfile, userProfile, scopeMeta, state })
 
   const cancelCallback = () => {
     submit(
@@ -240,15 +214,16 @@ export default function Authorize() {
     form.append('scopes', scopes.join(','))
     form.append('state', state)
     form.append('client_id', clientId)
-    form.append('redirect_uri', appProfile.redirectURI)
+    form.append('redirect_uri', appProfile.app.redirectURI)
     submit(form, { method: 'post' })
   }
 
   return (
     <Authorization
-      appProfile={appProfile}
+      appProfile={appProfile.app}
       userProfile={userProfile}
       scopeMeta={scopeMeta.scopes}
+      transition={transition.state}
       cancelCallback={cancelCallback}
       authorizeCallback={authorizeCallback}
     />

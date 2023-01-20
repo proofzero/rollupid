@@ -7,6 +7,7 @@ import * as ping from './ping'
 import * as ensUtils from './ens-utils'
 import * as cfImageUpload from './cf-image-upload'
 import * as indexer from './indexer'
+import * as image from './image'
 
 export {
   access,
@@ -18,4 +19,5 @@ export {
   ensUtils,
   cfImageUpload,
   indexer,
+  image,
 }

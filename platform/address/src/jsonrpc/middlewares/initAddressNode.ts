@@ -1,3 +1,4 @@
+import ImageClient from '@kubelt/platform-clients/image'
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 import { Context } from '../../context'
 
@@ -23,7 +24,12 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
     if (!addrType || !ctx.nodeType) {
       throw new Error('missing addrType')
     }
-    await nodeClient.class.setAddress(addressURN)
+    if (!ctx.alias) {
+      throw new Error('missing alias')
+    }
+    const gradient = await new ImageClient(ctx.Images).gradient(ctx.alias)
+    await nodeClient.class.setGradient(gradient)
+    await nodeClient.class.setAddress(ctx.alias)
     await nodeClient.class.setType(addrType)
     await nodeClient.class.setNodeType(ctx.nodeType)
   }

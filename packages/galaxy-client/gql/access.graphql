@@ -1,0 +1,6 @@
+mutation exchangeToken($exchange: ExchangeTokenInput) {
+  exchangeToken(exchange: $exchange) {
+    accessToken
+    refreshToken
+  }
+}

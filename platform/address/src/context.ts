@@ -22,6 +22,7 @@ interface CreateInnerContextOptions
   HANDLES: KVNamespace
   Edges: Fetcher
   Access: Fetcher
+  Images: Fetcher
   address?: AddressNode
   address3RN?: AddressURN
   addressURN?: AddressURN

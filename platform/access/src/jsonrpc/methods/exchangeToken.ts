@@ -23,7 +23,6 @@ export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   }),
   z.object({
     grantType: z.literal(GrantType.AuthorizationCode),
-    account: AccountURNInput,
     code: z.string(),
     redirectUri: z.string(),
     clientId: z.string(),

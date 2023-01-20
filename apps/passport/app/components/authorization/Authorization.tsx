@@ -1,18 +1,12 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { ScopeMeta } from '@kubelt/types/application'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
-import subtractLogo from '../../assets/subtract-logo.svg'
 import iIcon from '../../assets/i.svg'
 import accountClassIcon from './account-class-icon.svg'
 import addressClassIcon from './address-class-icon.svg'
-
-export type ScopeMeta = {
-  name: string
-  description: string
-  class: string
-}
 
 export type AppProfile = {
   name: string
@@ -32,12 +26,12 @@ export type AuthorizationProps = {
   userProfile: UserProfile
   appProfile: AppProfile
   scopeMeta: Record<string, ScopeMeta>
-  transition: 'idle' | 'loading'
+  transition: 'idle' | 'loading' | 'submitting'
   cancelCallback: () => void
   authorizeCallback: (scopes: string[]) => void
 }
 
-const scopeIcons = {
+const scopeIcons: Record<string, string> = {
   account: accountClassIcon,
   address: addressClassIcon,
 }

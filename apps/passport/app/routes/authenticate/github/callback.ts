@@ -23,7 +23,9 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   if (profile.provider !== OAuthAddressType.GitHub)
     throw new Error('Unsupported provider returned in Github callback.')
 
-  const idref = IDRefURNSpace(OAuthAddressType.GitHub).urn(profile.id)
+  const idref = IDRefURNSpace(OAuthAddressType.GitHub).urn(
+    profile.id.toString()
+  )
   const encoder = new TextEncoder()
   const hash = keccak256(encoder.encode(idref))
   const address = (AddressURNSpace.urn(hash) +
@@ -32,5 +34,6 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate(authRes)
+
   return authenticateAddress(address, account)
 }

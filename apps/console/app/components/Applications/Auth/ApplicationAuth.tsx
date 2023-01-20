@@ -3,18 +3,21 @@ import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
+import { MultiSelect } from '@kubelt/design-system/src/atoms/form/MultiSelect'
 import { PreLabeledInput } from '@kubelt/design-system/src/atoms/form/PreLabledInput'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
 import toast, { Toaster } from 'react-hot-toast'
+import { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 
 type ApplicationAuthProps = {
   appDetails: {
     published: boolean
     app: {
       name: string
+      scopes: string[]
       icon?: string
       redirectURI?: string
       termsURL?: string
@@ -25,6 +28,7 @@ type ApplicationAuthProps = {
       discordUser?: string
     }
   }
+  scopeMeta: ScopeMeta
   oAuth: {
     appId: string
     appSecret: string
@@ -37,9 +41,20 @@ type ApplicationAuthProps = {
 export const ApplicationAuth = ({
   appDetails,
   oAuth,
+  scopeMeta,
   onDelete,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
+
+  console.log({ appDetails, oAuth, scopeMeta, onDelete })
+
+  const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
+    return {
+      id: key,
+      val: value.name,
+      desc: value.description,
+    }
+  })
 
   return (
     <section className="flex flex-col space-y-5">
@@ -142,10 +157,24 @@ export const ApplicationAuth = ({
             </div>
 
             <div className="flex-1">
-              <ReadOnlyInput
-                id="appScopes"
+              <MultiSelect
                 label="Scopes"
-                value="User profile"
+                fieldName="scopes"
+                items={Object.entries(scopeMeta).map(([key, value]) => {
+                  return {
+                    id: key,
+                    val: value.name,
+                    desc: value.description,
+                  }
+                })}
+                selectedItems={appDetails.app.scopes.map((scope) => {
+                  const meta = scopeMeta[scope]
+                  return {
+                    id: scope,
+                    val: meta.name,
+                    desc: meta.description,
+                  }
+                })}
               />
             </div>
           </div>

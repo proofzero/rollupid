@@ -7,7 +7,7 @@ export const getScopes = async ({
 }: {
   input: undefined
   ctx: Context
-}): Promise<any> => {
+}): Promise<{ scopes: typeof SCOPES_JSON }> => {
   //TODO: this isn't implemented. Here as a placeholder
   return {
     scopes: SCOPES_JSON,

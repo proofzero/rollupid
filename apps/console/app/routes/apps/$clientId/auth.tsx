@@ -29,9 +29,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     },
   })
 
-  const appDetails = await starbaseClient.getAppDetails.query({
-    clientId: params.clientId,
-  })
+  const [appDetails, scopeMeta] = await Promise.all([
+    starbaseClient.getAppDetails.query({
+      clientId: params.clientId,
+    }),
+    starbaseClient.getScopes.query(),
+  ])
 
   let rotatedSecret
   if (!appDetails.secretTimestamp) {
@@ -55,7 +58,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   }
 
   return json({
-    appDetails: appDetails,
+    appDetails,
+    scopeMeta,
     rotatedSecret,
   })
 }
@@ -77,6 +81,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData()
   const op = formData.get('op')
 
+  // console.log({ scopes: JSON.stringify(formData) })
+
   // As part of the rolling operation
   // we only need to remove the keys
   // because the loader gets called again
@@ -90,10 +96,20 @@ export const action: ActionFunction = async ({ request, params }) => {
       ).secret.split(':')[1]
       break
     case 'update_app':
+      const entries = formData.entries()
+      const scopes = Array.from(entries)
+        .filter((entry) => {
+          return entry[0].endsWith('][id]')
+        })
+        .map((entry) => entry[1] as string)
+
+      console.log({ scopes })
+
       await starbaseClient.updateApp.mutate({
         clientId: params.clientId,
         updates: {
           name: formData.get('name')?.toString(),
+          scopes: Array.from(scopes),
           icon: formData.get('icon') as string | undefined,
           redirectURI: formData.get('redirectURI') as string | undefined,
           termsURL: formData.get('termsURL') as string | undefined,
@@ -125,10 +141,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
+  const { appDetails, scopeMeta, rotatedSecret: loadedSecret } = useLoaderData()
+  const actionData = useActionData<{ rotatedSecret?: string }>()
 
-  const { appDetails } = useLoaderData()
-  const rotatedSecret =
-    useLoaderData()?.rotatedSecret || useActionData()?.rotatedSecret
+  const rotatedSecret = loadedSecret || actionData?.rotatedSecret
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
@@ -147,6 +163,7 @@ export default function AppDetailIndexPage() {
         <input type="hidden" name="op" value="update_app" />
         <ApplicationAuth
           appDetails={appDetails}
+          scopeMeta={scopeMeta.scopes}
           oAuth={{
             appId: appDetails.clientId,
             appSecret: rotatedSecret,

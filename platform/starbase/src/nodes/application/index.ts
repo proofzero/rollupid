@@ -54,6 +54,7 @@ export default class StarbaseApp extends DOProxy {
       clientName,
       app: {
         name: clientName,
+        scopes: [],
       },
       createdTimestamp: Date.now(),
     }
@@ -87,7 +88,6 @@ export default class StarbaseApp extends DOProxy {
       'secretTimestamp',
       'apiKeyTimestamp',
       'createdTimestamp',
-      'scopes',
     ]
     const appObj = await this.state.storage.get(keysWeWant)
     const result = Object.fromEntries(appObj) as AppDetails

@@ -38,7 +38,6 @@ export const Analytics: BaseMiddlewareFunction<{
     indexes: [hashkey], // TODO: Need a sampling index.
   }
 
-  console.log('service precall analytics', JSON.stringify(pre))
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({
@@ -52,7 +51,6 @@ export const Analytics: BaseMiddlewareFunction<{
     indexes: [hashkey], // TODO: Need a sampling index.
   }
 
-  console.log('service postcall analytics', JSON.stringify(post))
   ctx.Analytics?.writeDataPoint(post)
 
   return result

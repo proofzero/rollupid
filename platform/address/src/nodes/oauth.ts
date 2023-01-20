@@ -1,6 +1,6 @@
 import { DurableObjectStubProxy } from 'do-proxy'
 import { AddressNode } from '.'
-import { OAuthData } from '../types'
+import { AddressProfile, OAuthData } from '../types'
 import Address from './address'
 
 export default class OAuthAddress {
@@ -17,6 +17,12 @@ export default class OAuthAddress {
   async setData(data: OAuthData): Promise<void> {
     return this.node.storage.put('data', data)
   }
+
+  // async getProfile() {
+  //   const data = await this.getData()
+  //   if (!data) throw new Error('no data')
+  //   return data.profile
+  // }
 
   static async alarm(address: Address) {
     console.log({ alarm: 'oauth' })

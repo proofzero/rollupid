@@ -8,6 +8,7 @@ wrangler_dev = false
 # Services binding for local development
 services = [
   { binding = "Account", service = "account" },
+  { binding = "Access", service = "access" },
   { binding = "Address", service = "address" },
   { binding = "Starbase", service = "starbase"},
   { binding = "Indexer", service = "indexer" },
@@ -29,6 +30,7 @@ ALCHEMY_POLYGON_NETWORK="mumbai"
 route = { pattern = "galaxy-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" }
 services = [
   { binding = "Account", service = "account-dev" },
+  { binding = "Access", service = "access-dev" },
   { binding = "Address", service = "address-dev" },
   { binding = "Starbase", service = "starbase-dev" },
   { binding = "Indexer", service = "indexer-dev" },
@@ -47,6 +49,7 @@ route = { pattern = "galaxy-next.threeid.xyz", custom_domain = true, zone_name =
 services = [
   { binding = "Account", service = "account-next" },
   { binding = "Address", service = "address-next" },
+  { binding = "Access", service = "access-next" },
   { binding = "Starbase", service = "starbase-next" },
   { binding = "Indexer", service = "indexer-next" },
 ]
@@ -64,6 +67,7 @@ route = { pattern = "galaxy.threeid.xyz", custom_domain = true, zone_name = "thr
 services = [
   { binding = "Account", service = "account-current" },
   { binding = "Address", service = "address-current" },
+  { binding = "Access", service = "access-current" },
   { binding = "Starbase", service = "starbase-current" },
   { binding = "Indexer", service = "indexer-current" },
 ]

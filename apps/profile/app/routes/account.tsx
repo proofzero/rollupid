@@ -1,4 +1,4 @@
-import { json } from '@remix-run/cloudflare'
+import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { useLoaderData, NavLink } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
@@ -23,7 +23,6 @@ export function links() {
   return [...faqStyles(), { rel: 'stylesheet', href: styles }]
 }
 
-// @ts-ignore
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
