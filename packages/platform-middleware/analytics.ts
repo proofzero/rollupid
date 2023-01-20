@@ -3,6 +3,8 @@ import { AccountURN } from '@kubelt/urns/account'
 import { DeploymentMetadata } from '@kubelt/types'
 import { BaseMiddlewareFunction } from './types'
 
+// TODO: Refactor to make custom analytics a factory for analytics middleware that injects its own values.
+
 export type CustomAnalyticsFunctionType = () => AnalyticsEngineDataPoint
 
 export const Analytics: BaseMiddlewareFunction<{
@@ -50,7 +52,7 @@ export const Analytics: BaseMiddlewareFunction<{
   //   .slice(-32)
 
   const customAnalytics = ctx.CustomAnalyticsFunction?.() || null
-  console.log('customAnalytics -=-=-=-=-=-=-=-=-=-=-=-', customAnalytics)
+  // console.log('customAnalytics -=-=-=-=-=-=-=-=-=-=-=-', customAnalytics)
 
   // The custom analytics can override the defauly hashkey.
   const hashkey = customAnalytics?.indexes?.[0] || raw_key
@@ -82,7 +84,7 @@ export const Analytics: BaseMiddlewareFunction<{
     indexes: [hashkey.slice(-32)], // Enforce 32 byte limit. The maximum number of indexes is 1.
   }
 
-  console.log('service precall analytics', JSON.stringify(pre))
+  // console.log('service precall analytics', JSON.stringify(pre))
   ctx.Analytics?.writeDataPoint(pre)
 
   const result = await next({
