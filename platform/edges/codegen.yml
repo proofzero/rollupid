@@ -3,8 +3,6 @@ generates:
     schema:
       - '../../packages/urns/gql/**/*.graphql'
       - '../../packages/types/gql/edges.graphql'
-      - '../../packages/types/gql/address.graphql'
-      - '../../packages/types/gql/profile.graphql'
       - 'gql/**/*.graphql'
     plugins:
       - typescript

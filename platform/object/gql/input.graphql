@@ -1,3 +1,5 @@
+scalar JSON
+
 input GetObjectInput {
   namespace: String!
   path: String!

@@ -1,5 +1,8 @@
 scalar URN
+scalar EdgeURN
 scalar ProfileURN
 scalar AddressURN
 scalar ObjectURN
 scalar AccessURN
+scalar AppURN
+scalar ScopeURN
