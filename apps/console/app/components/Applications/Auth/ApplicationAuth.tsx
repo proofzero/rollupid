@@ -12,8 +12,11 @@ import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal
 import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 import toast from 'react-hot-toast'
 
-type appDetailsProps = {
+export type appDetailsProps = {
   published: boolean
+  clientId?: string
+  secretTimestamp: string
+  apiKeyTimestamp: string
   app: {
     name: string
     scopes: string[]

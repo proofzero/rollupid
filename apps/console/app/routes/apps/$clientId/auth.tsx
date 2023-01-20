@@ -2,74 +2,25 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,
   useActionData,
-  useLoaderData,
   useSubmit,
   useOutletContext,
 } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
+import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
-// Component
-// -----------------------------------------------------------------------------
 /**
  * @file app/routes/dashboard/index.tsx
  */
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  if (!params.clientId) {
-    throw new Error('Client id is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
-
-  const [appDetails, scopeMeta] = await Promise.all([
-    starbaseClient.getAppDetails.query({
-      clientId: params.clientId,
-    }),
-    starbaseClient.getScopes.query(),
-  ])
-
-  let rotatedSecret
-  if (!appDetails.secretTimestamp) {
-    rotatedSecret = await starbaseClient.rotateClientSecret.mutate({
-      clientId: appDetails.clientId,
-    })
-
-    // The prefix is there just as an aide to users;
-    // when they're moving these values
-    // (client ID, client secret),
-    // the prefix should help distinguish between them,
-    // rather then the user having to
-    // distinguish between them by e.g. length.
-    // The prefix is part of the secret and is included in the stored hash.
-    rotatedSecret = rotatedSecret.secret.split(':')[1]
-
-    // This is a client 'hack' as the date
-    // is populated from the graph
-    // on subsequent requests
-    appDetails.secretTimestamp = Date.now()
-  }
-
-  return json({
-    appDetails,
-    scopeMeta,
-    rotatedSecret,
-  })
-}
 
 type notificationHandlerType = (val: boolean) => void
 
@@ -140,11 +91,11 @@ export const action: ActionFunction = async ({ request, params }) => {
       break
   }
 
-  return {
+  return json({
     rotatedSecret,
     updatedApp: { published, app: { ...updates } },
     errors: {},
-  }
+  })
 }
 
 // Component
@@ -152,19 +103,20 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function AppDetailIndexPage() {
   const submit = useSubmit()
-
-  const { notificationHandler } =
+  const actionData = useActionData()
+  const outletContextData =
     useOutletContext<{
       notificationHandler: notificationHandlerType
+      appDetails: appDetailsProps
+      rotatedSecret: string
     }>()
-
-  const loaderData = useLoaderData()
-  const actionData = useActionData()
   const [isFormChanged, setIsFormChanged] = useState(false)
 
   const [isImgUploading, setIsImgUploading] = useState(false)
-  const { appDetails, scopeMeta } = loaderData
-  const rotatedSecret = loaderData?.rotatedSecret || actionData?.rotatedSecret
+
+  const { notificationHandler, appDetails, scopeMeta } = outletContextData
+  const rotatedSecret =
+    outletContextData?.rotatedSecret || actionData?.rotatedSecret
 
   if (actionData?.updatedApp) {
     appDetails.app = actionData.updatedApp.app
@@ -184,7 +136,7 @@ export default function AppDetailIndexPage() {
   return (
     <>
       <DeleteAppModal
-        clientId={appDetails.clientId}
+        clientId={appDetails.clientId as string}
         appName={appDetails.app.name}
         deleteAppCallback={() => {
           setDeleteModalOpen(false)
@@ -209,7 +161,7 @@ export default function AppDetailIndexPage() {
             scopeMeta={scopeMeta.scopes}
             setIsImgUploading={setIsImgUploading}
             oAuth={{
-              appId: appDetails.clientId,
+              appId: appDetails.clientId as string,
               appSecret: rotatedSecret,
               createdAt: new Date(appDetails.secretTimestamp),
               onKeyRoll: () => {

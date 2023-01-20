@@ -2,51 +2,21 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import { ActionFunction, json, LoaderFunction } from '@remix-run/cloudflare'
-import { useActionData, useLoaderData, useSubmit } from '@remix-run/react'
+import type { ActionFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
+import { useActionData, useOutletContext, useSubmit } from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 
 // Component
 // -----------------------------------------------------------------------------
 /**
  * @file app/routes/dashboard/index.tsx
  */
-
-export const loader: LoaderFunction = async ({ request, params }) => {
-  if (!params.clientId) {
-    throw new Error('Application client id is required for the requested route')
-  }
-
-  const jwt = await requireJWT(request)
-  const starbaseClient = createStarbaseClient(Starbase, {
-    headers: {
-      [PlatformJWTAssertionHeader]: jwt,
-    },
-  })
-  const appDetails = await starbaseClient.getAppDetails.query({
-    clientId: params.clientId,
-  })
-  let rotationResult
-  //If there's no timestamps, then the secrets have never been set, signifying the app
-  //has just been created; we rotate both secrets and set the timestamps
-  if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
-    rotationResult = await rotateSecrets(
-      starbaseClient,
-      params.clientId,
-      RollType.RollBothSecrets
-    )
-    appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
-  }
-
-  return json({
-    app: appDetails,
-    rotatedSecrets: rotationResult,
-  })
-}
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -114,20 +84,28 @@ async function rotateSecrets(
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
-  const { app } = useLoaderData()
   const submit = useSubmit()
-  const { rotatedClientSecret, rotatedApiKey } = useLoaderData()
-    ?.rotatedSecrets ||
-    useActionData()?.rotatedSecrets || {
-      rotatedClientSecret: null,
-      rotatedApiKey: null,
-    }
+  const actionData = useActionData()
+  const outletContext =
+    useOutletContext<{
+      appDetails: appDetailsProps
+      rotatedSecrets: RotatedSecrets
+    }>()
+
+  const { appDetails: app } = outletContext
+
+  const { rotatedClientSecret, rotatedApiKey } =
+    outletContext?.rotatedSecrets ||
+      actionData?.rotatedSecrets || {
+        rotatedClientSecret: null,
+        rotatedApiKey: null,
+      }
 
   return (
     <ApplicationDashboard
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp),
-        apiKey: rotatedApiKey,
+        apiKey: rotatedApiKey as string,
         onKeyRoll: () => {
           submit(
             {
@@ -140,8 +118,8 @@ export default function AppDetailIndexPage() {
         },
       }}
       oAuth={{
-        appId: app.clientId,
-        appSecret: rotatedClientSecret,
+        appId: app.clientId as string,
+        appSecret: rotatedClientSecret as string,
         createdAt: new Date(app.secretTimestamp),
         onKeyRoll: () => {
           submit(
