@@ -10,12 +10,12 @@ type Link {
 }
 
 type Profile {
-  displayName: String @length(max: 50)
-  handle: String @length(min: 3, max: 15) @pattern(regex: "^[a-zA-Z0-9_]+$")
+  displayName: String @constraint(maxLength: 50)
+  handle: String @constraint(minLength: 3, maxLength: 15)
   avatar: Avatar
   cover: String
-  bio: String @length(max: 256)
-  job: String @length(max: 30)
-  location: String @length(max: 30)
+  bio: String @constraint(maxLength: 256)
+  job: String @constraint(maxLength: 30)
+  location: String @constraint(maxLength: 30)
   links: [Link]
 }

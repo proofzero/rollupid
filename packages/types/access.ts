@@ -1,3 +1,4 @@
+import { z } from 'zod'
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -11,7 +12,6 @@ export type Scalars = {
   Int: number;
   Float: number;
   JWTString: any;
-  UInt8Array: any;
 };
 
 export enum GrantType {
@@ -45,3 +45,46 @@ export type SessionDetails = {
 export type VerifyAuthorizationInput = {
   token?: InputMaybe<Scalars['JWTString']>;
 };
+
+
+type Properties<T> = Required<{
+  [K in keyof T]: z.ZodType<T[K], any, T[K]>;
+}>;
+
+type definedNonNullAny = {};
+
+export const isDefinedNonNullAny = (v: any): v is definedNonNullAny => v !== undefined && v !== null;
+
+export const definedNonNullAnySchema = z.any().refine((v) => isDefinedNonNullAny(v));
+
+export const GrantTypeSchema = z.nativeEnum(GrantType);
+
+export function JwtSchema(): z.ZodObject<Properties<Jwt>> {
+  return z.object<Properties<Jwt>>({
+    __typename: z.literal('JWT').optional(),
+    aud: z.string().nullish(),
+    exp: z.number().nullish(),
+    iat: z.number().nullish(),
+    iss: z.string().nullish(),
+    jti: z.string().nullish(),
+    nbf: z.number().nullish(),
+    sub: z.string().nullish()
+  })
+}
+
+export const ResponseTypeSchema = z.nativeEnum(ResponseType);
+
+export function SessionDetailsSchema(): z.ZodObject<Properties<SessionDetails>> {
+  return z.object<Properties<SessionDetails>>({
+    __typename: z.literal('SessionDetails').optional(),
+    creation: z.string().nullish(),
+    expired: z.boolean().nullish(),
+    expiry: z.string().nullish()
+  })
+}
+
+export function VerifyAuthorizationInputSchema(): z.ZodObject<Properties<VerifyAuthorizationInput>> {
+  return z.object<Properties<VerifyAuthorizationInput>>({
+    token: z.string().nullish()
+  })
+}

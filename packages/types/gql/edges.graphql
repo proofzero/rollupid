@@ -1,3 +1,7 @@
+scalar URN
+scalar EdgeURN
+scalar URNComp
+
 type QC {
   key: String
   value: String
@@ -14,8 +18,8 @@ type Node {
   nid: String
   nss: String
   fragment: String
-  qc: [QC!]!
-  rc: [RC!]!
+  qc: URNComp
+  rc: URNComp
 }
 
 type Edge {

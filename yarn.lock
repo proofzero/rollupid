@@ -5560,6 +5560,7 @@ __metadata:
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0
     eslint-config-prettier: 8.5.0
+    graphql-scalars: 1.20.1
     npm-run-all: 4.1.5
     prettier: 2.8.0
     typescript: 4.8.4
@@ -24566,6 +24567,17 @@ __metadata:
   peerDependencies:
     graphql: 14 - 16
   checksum: 2e8900d10cded401b253a05650719321123e3b0ad5bc57523288892e0226dccf43668ec937753420084f649fb4e3f998f2547c884b746a3e91fa0a43f93e62d4
+  languageName: node
+  linkType: hard
+
+"graphql-scalars@npm:1.20.1":
+  version: 1.20.1
+  resolution: "graphql-scalars@npm:1.20.1"
+  dependencies:
+    tslib: ~2.4.0
+  peerDependencies:
+    graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: 4d3d3f804a31e8db76feb51f089f5e1a0fceacbd98390c0c7b825707bdd7d53754496fa178f47139fa92ba2598605f47a61adbc92bf6f292293c78eb18865e4c
   languageName: node
   linkType: hard
 

@@ -1,49 +1,74 @@
 generates:
   access.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/access.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false
+      scalarSchemas:
+        JWTString: z.string()
+
   address.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/address.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false
+
   profile.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/profile.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false
+      directives:
+        constraint:
+          maxLength: max
+          minLength: min
+
   edges.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/edges.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false
+      scalarSchemas:
+        URNComp: z.record(z.string()).or(z.boolean())
+
   starbase.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/starbase.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false
+
   object.ts:
     schema:
-      # - '../gql-directives'
       - 'gql/object.graphql'
     plugins:
       - typescript
+      - typescript-validation-schema
     config:
+      schema: zod
+      withObjectType: true
       enumsAsTypes: false

@@ -1,3 +1,4 @@
+import { z } from 'zod'
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -22,3 +23,24 @@ export enum Visibility {
   Private = 'private',
   Public = 'public'
 }
+
+
+type Properties<T> = Required<{
+  [K in keyof T]: z.ZodType<T[K], any, T[K]>;
+}>;
+
+type definedNonNullAny = {};
+
+export const isDefinedNonNullAny = (v: any): v is definedNonNullAny => v !== undefined && v !== null;
+
+export const definedNonNullAnySchema = z.any().refine((v) => isDefinedNonNullAny(v));
+
+export function IndexRecordSchema(): z.ZodObject<Properties<IndexRecord>> {
+  return z.object<Properties<IndexRecord>>({
+    __typename: z.literal('IndexRecord').optional(),
+    version: z.number(),
+    visibility: VisibilitySchema
+  })
+}
+
+export const VisibilitySchema = z.nativeEnum(Visibility);

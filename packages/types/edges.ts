@@ -1,3 +1,4 @@
+import { z } from 'zod'
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -12,6 +13,7 @@ export type Scalars = {
   Float: number;
   EdgeURN: any;
   URN: any;
+  URNComp: any;
 };
 
 export type Edge = {
@@ -29,8 +31,8 @@ export type Node = {
   id?: Maybe<Scalars['URN']>;
   nid?: Maybe<Scalars['String']>;
   nss?: Maybe<Scalars['String']>;
-  qc: Array<Qc>;
-  rc: Array<Rc>;
+  qc?: Maybe<Scalars['URNComp']>;
+  rc?: Maybe<Scalars['URNComp']>;
   urn?: Maybe<Scalars['URN']>;
 };
 
@@ -45,3 +47,54 @@ export type Rc = {
   key?: Maybe<Scalars['String']>;
   value?: Maybe<Scalars['String']>;
 };
+
+
+type Properties<T> = Required<{
+  [K in keyof T]: z.ZodType<T[K], any, T[K]>;
+}>;
+
+type definedNonNullAny = {};
+
+export const isDefinedNonNullAny = (v: any): v is definedNonNullAny => v !== undefined && v !== null;
+
+export const definedNonNullAnySchema = z.any().refine((v) => isDefinedNonNullAny(v));
+
+export function EdgeSchema(): z.ZodObject<Properties<Edge>> {
+  return z.object<Properties<Edge>>({
+    __typename: z.literal('Edge').optional(),
+    dst: NodeSchema(),
+    id: definedNonNullAnySchema,
+    perms: z.array(z.string()),
+    src: NodeSchema(),
+    tag: definedNonNullAnySchema
+  })
+}
+
+export function NodeSchema(): z.ZodObject<Properties<Node>> {
+  return z.object<Properties<Node>>({
+    __typename: z.literal('Node').optional(),
+    fragment: z.string().nullish(),
+    id: definedNonNullAnySchema.nullish(),
+    nid: z.string().nullish(),
+    nss: z.string().nullish(),
+    qc: z.record(z.string()).or(z.boolean()).nullish(),
+    rc: z.record(z.string()).or(z.boolean()).nullish(),
+    urn: definedNonNullAnySchema.nullish()
+  })
+}
+
+export function QcSchema(): z.ZodObject<Properties<Qc>> {
+  return z.object<Properties<Qc>>({
+    __typename: z.literal('QC').optional(),
+    key: z.string().nullish(),
+    value: z.string().nullish()
+  })
+}
+
+export function RcSchema(): z.ZodObject<Properties<Rc>> {
+  return z.object<Properties<Rc>>({
+    __typename: z.literal('RC').optional(),
+    key: z.string().nullish(),
+    value: z.string().nullish()
+  })
+}

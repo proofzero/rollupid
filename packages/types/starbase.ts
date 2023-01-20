@@ -1,3 +1,4 @@
+import { z } from 'zod'
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -25,3 +26,30 @@ export type AppObject = {
   twitterUser?: Maybe<Scalars['String']>;
   websiteURL?: Maybe<Scalars['String']>;
 };
+
+
+type Properties<T> = Required<{
+  [K in keyof T]: z.ZodType<T[K], any, T[K]>;
+}>;
+
+type definedNonNullAny = {};
+
+export const isDefinedNonNullAny = (v: any): v is definedNonNullAny => v !== undefined && v !== null;
+
+export const definedNonNullAnySchema = z.any().refine((v) => isDefinedNonNullAny(v));
+
+export function AppObjectSchema(): z.ZodObject<Properties<AppObject>> {
+  return z.object<Properties<AppObject>>({
+    __typename: z.literal('AppObject').optional(),
+    discordUser: z.string().nullish(),
+    icon: z.string().nullish(),
+    mediumUser: z.string().nullish(),
+    mirrorURL: z.string().nullish(),
+    name: z.string(),
+    redirectUri: z.string().nullish(),
+    scopes: z.array(z.string()),
+    termsURL: z.string().nullish(),
+    twitterUser: z.string().nullish(),
+    websiteURL: z.string().nullish()
+  })
+}

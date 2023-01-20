@@ -13,10 +13,12 @@ export type Scalars = {
   Float: number;
   AccessURN: any;
   AddressURN: any;
+  AppURN: any;
+  EdgeURN: any;
   JWTString: any;
   ObjectURN: any;
   ProfileURN: any;
-  UInt8Array: any;
+  ScopeURN: any;
   URN: any;
 };
 
