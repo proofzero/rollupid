@@ -1,31 +1,24 @@
-import { ActionArgs, ActionFunction, redirect } from '@remix-run/cloudflare'
-import {
-  MicrosoftStrategy,
-  MicrosoftStrategyDefaultName,
-} from 'remix-auth-microsoft'
-import { authenticator } from '~/auth.server'
+import { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
+import { authenticator, getMicrosoftStrategy, parseParams } from '~/auth.server'
 
 export const action: ActionFunction = async ({ request }: ActionArgs) => {
-  const searchParams = new URL(request.url).searchParams
-  console.log(`${INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL}?${searchParams}`)
-  authenticator.use(
-    new MicrosoftStrategy(
-      {
-        clientId: INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
-        tenantId: INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
-        clientSecret: SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
-        redirectUri: `${INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL}?${searchParams}`,
-        scope: 'openid profile User.Read offline_access',
-        prompt: '',
-      },
-      async ({ ...args }) => {
-        return { ...args }
-      }
-    )
+  const { clientId, redirectUri, scope, state } = await parseParams(
+    request,
+    true
   )
-  const result = await authenticator.authenticate(
-    MicrosoftStrategyDefaultName,
-    request
+
+  const callbackEncoding = encodeURIComponent(
+    JSON.stringify({
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    })
   )
-  return result
+
+  const callbackURL = `${INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL}?rollup=${callbackEncoding}`
+
+  authenticator.use(getMicrosoftStrategy(callbackURL))
+  return authenticator.authenticate(MicrosoftStrategyDefaultName, request)
 }

@@ -8,11 +8,20 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 
-import { authenticator } from '~/auth.server'
+import { authenticator, getTwitterStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+  const searchParams = new URL(request.url).searchParams
+  const rollupEncoding = searchParams.get('rollup')
+
+  if (!rollupEncoding) throw new Error('Missing rollup encoding.')
+
+  const appData = JSON.parse(decodeURIComponent(rollupEncoding))
+
+  authenticator.use(getTwitterStrategy())
+
   const { accessToken, accessTokenSecret, profile } =
     (await authenticator.authenticate(
       TwitterStrategyDefaultName,
@@ -33,5 +42,5 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
     profile: { ...profile, provider: OAuthAddressType.Twitter },
   })
 
-  return authenticateAddress(address, account)
+  return authenticateAddress(address, account, appData)
 }

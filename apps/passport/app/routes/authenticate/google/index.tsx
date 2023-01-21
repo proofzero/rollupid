@@ -1,25 +1,29 @@
 import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
-import { GoogleStrategy } from 'remix-auth-google'
-import { authenticator } from '~/auth.server'
+import { GoogleStrategyDefaultName } from 'remix-auth-google'
+import {
+  authenticator,
+  getGoogleAuthenticator,
+  parseParams,
+} from '~/auth.server'
 
-export const action: ActionFunction = ({ request }: ActionArgs) => {
-  const searchParams = new URL(request.url).searchParams
-  authenticator.use(
-    new GoogleStrategy(
-      {
-        clientID: INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
-        clientSecret: SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
-        callbackURL: `${INTERNAL_GOOGLE_OAUTH_CALLBACK_URL}?${searchParams}`,
-      },
-      async ({ accessToken, refreshToken, extraParams, profile }) => {
-        return {
-          accessToken,
-          refreshToken,
-          extraParams,
-          profile,
-        }
-      }
-    )
+export const action: ActionFunction = async ({ request }: ActionArgs) => {
+  const { clientId, redirectUri, scope, state } = await parseParams(
+    request,
+    true
   )
-  return authenticator.authenticate('google', request)
+
+  const callbackEncoding = encodeURIComponent(
+    JSON.stringify({
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    })
+  )
+
+  const callbackURL = `${INTERNAL_GOOGLE_OAUTH_CALLBACK_URL}?rollup=${callbackEncoding}`
+
+  authenticator.use(getGoogleAuthenticator(callbackURL))
+
+  return authenticator.authenticate(GoogleStrategyDefaultName, request)
 }

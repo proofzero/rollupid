@@ -1,5 +1,9 @@
 import { createCookieSessionStorage, json } from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
+import { GitHubStrategy } from 'remix-auth-github'
+import { GoogleStrategy } from 'remix-auth-google'
+import { MicrosoftStrategy } from 'remix-auth-microsoft'
+import { TwitterStrategy } from 'remix-auth-twitter'
 
 const sessionSecret = SECRET_SESSION_SALT
 if (!sessionSecret) {
@@ -45,3 +49,62 @@ export const oauthStorage = createCookieSessionStorage({
 })
 
 export const authenticator = new Authenticator(oauthStorage)
+
+export const getGithubAuthenticator = (callbackURL?: string) => {
+  return new GitHubStrategy(
+    {
+      clientID: INTERNAL_GITHUB_OAUTH_CLIENT_ID,
+      clientSecret: SECRET_GITHUB_OAUTH_CLIENT_SECRET,
+      callbackURL: callbackURL || INTERNAL_GITHUB_OAUTH_CALLBACK_URL,
+      allowSignup: false,
+      scope: [],
+    },
+    async ({ ...args }) => {
+      //Return all fields
+      return { ...args }
+    }
+  )
+}
+
+export const getGoogleAuthenticator = (callbackURL?: string) => {
+  return new GoogleStrategy(
+    {
+      clientID: INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
+      callbackURL: callbackURL || INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
+    },
+    async ({ ...args }) => {
+      return { ...args }
+    }
+  )
+}
+
+export const getMicrosoftStrategy = (callbackURL?: string) => {
+  return new MicrosoftStrategy(
+    {
+      clientId: INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
+      tenantId: INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
+      clientSecret: SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
+      redirectUri: callbackURL || INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
+      scope: 'openid profile User.Read offline_access',
+      prompt: '',
+    },
+    async ({ ...args }) => {
+      return { ...args }
+    }
+  )
+}
+
+export const getTwitterStrategy = (callbackURL?: string) => {
+  return new TwitterStrategy(
+    {
+      clientID: INTERNAL_TWITTER_OAUTH_CLIENT_ID,
+      clientSecret: SECRET_TWITTER_OAUTH_CLIENT_SECRET,
+      callbackURL: callbackURL || INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
+      includeEmail: true,
+    },
+    async ({ ...args }) => {
+      return { ...args }
+    }
+  )
+}

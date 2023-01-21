@@ -1,15 +1,25 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { authenticator } from '~/auth.server'
+import { GoogleStrategyDefaultName } from 'remix-auth-google'
+import { authenticator, getGoogleAuthenticator } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+  const searchParams = new URL(request.url).searchParams
+  const rollupEncoding = searchParams.get('rollup')
+
+  if (!rollupEncoding) throw new Error('Missing rollup encoding.')
+
+  const appData = JSON.parse(decodeURIComponent(rollupEncoding))
+
+  authenticator.use(getGoogleAuthenticator())
+
   const authRes = (await authenticator.authenticate(
-    'google',
+    GoogleStrategyDefaultName,
     request
   )) as OAuthData
 
@@ -28,5 +38,5 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account)
+  return authenticateAddress(address, account, appData)
 }

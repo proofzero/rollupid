@@ -2,7 +2,7 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { authenticator } from '~/auth.server'
+import { authenticator, getMicrosoftStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
@@ -10,6 +10,15 @@ import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+  const searchParams = new URL(request.url).searchParams
+  const rollupEncoding = searchParams.get('rollup')
+
+  if (!rollupEncoding) throw new Error('Missing rollup encoding.')
+
+  const appData = JSON.parse(decodeURIComponent(rollupEncoding))
+
+  authenticator.use(getMicrosoftStrategy())
+
   const authRes = (await authenticator.authenticate(
     MicrosoftStrategyDefaultName,
     request
@@ -33,5 +42,5 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account)
+  return authenticateAddress(address, account, appData)
 }

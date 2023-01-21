@@ -6,27 +6,24 @@ import type {
 } from '@remix-run/cloudflare'
 import { TwitterStrategy, TwitterStrategyDefaultName } from 'remix-auth-twitter'
 
-import { authenticator } from '~/auth.server'
+import { authenticator, getTwitterStrategy, parseParams } from '~/auth.server'
 
-export const action: ActionFunction = ({ request }: ActionArgs) => {
-  const searchParams = new URL(request.url).searchParams
-  console.log(`${INTERNAL_TWITTER_OAUTH_CALLBACK_URL}?${searchParams}`)
-  authenticator.use(
-    new TwitterStrategy(
-      {
-        clientID: INTERNAL_TWITTER_OAUTH_CLIENT_ID,
-        clientSecret: SECRET_TWITTER_OAUTH_CLIENT_SECRET,
-        callbackURL: `${INTERNAL_TWITTER_OAUTH_CALLBACK_URL}?${searchParams}`,
-        includeEmail: true,
-      },
-      async ({ accessToken, accessTokenSecret, profile }) => {
-        return {
-          accessToken,
-          accessTokenSecret,
-          profile,
-        }
-      }
-    )
+export const action: ActionFunction = async ({ request }: ActionArgs) => {
+  const { clientId, redirectUri, scope, state } = await parseParams(
+    request,
+    true
   )
+
+  const callbackEncoding = encodeURIComponent(
+    JSON.stringify({
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    })
+  )
+
+  const callbackURL = `${INTERNAL_TWITTER_OAUTH_CALLBACK_URL}?rollup=${callbackEncoding}`
+  authenticator.use(getTwitterStrategy(callbackURL))
   return authenticator.authenticate(TwitterStrategyDefaultName, request)
 }
