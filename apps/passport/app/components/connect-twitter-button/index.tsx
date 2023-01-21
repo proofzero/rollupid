@@ -10,7 +10,7 @@ export default function ConnectTwitterButton({
   searchParams,
 }: ConnectTwitterButtonProps) {
   return (
-    <Form action={`/authenticate/twitter${searchParams}`} method="post">
+    <Form action={`/authenticate/twitter?${searchParams}`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

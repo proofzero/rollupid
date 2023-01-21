@@ -10,7 +10,7 @@ export default function ConnectGithubButton({
   searchParams,
 }: ConnectGithubButtonProps) {
   return (
-    <Form action={`/authenticate/github?=${searchParams}`} method="post">
+    <Form action={`/authenticate/github?${searchParams}`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

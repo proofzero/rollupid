@@ -5,6 +5,7 @@ import { Authentication } from '~/components'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const searchParams = new URL(request.url).searchParams
+
   const oauthEnabled: boolean = searchParams.get('enableOAuth') !== null
   return { searchParams: searchParams.toString(), oauthEnabled }
 }

@@ -10,7 +10,12 @@ import { Session } from '@remix-run/cloudflare'
 export const authenticateAddress = async (
   address: AddressURN,
   account: AccountURN,
-  authorizeSession: Session
+  appData: {
+    clientId: string
+    redirectUri: string
+    state: string
+    scope: string
+  }
 ) => {
   const accessClient = getAccessClient()
 
@@ -36,10 +41,10 @@ export const authenticateAddress = async (
     clientId,
   })
 
-  const authAppId = authorizeSession.get('clientId')
-  const authRedirectUri = authorizeSession.get('redirectUri')
-  const authState = authorizeSession.get('state')
-  const authScope = authorizeSession.get('scope')
+  const authAppId = appData.clientId
+  const authRedirectUri = appData.redirectUri
+  const authState = appData.state
+  const authScope = appData.scope
 
   const redirectURL = `/authorize?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
   return createUserSession(accessToken, redirectURL, address)

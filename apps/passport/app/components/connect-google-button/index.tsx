@@ -10,7 +10,7 @@ export default function ConnectGoogleButton({
   searchParams,
 }: ConnectGoogleButtonProps) {
   return (
-    <Form action={`/authenticate/google${searchParams}`} method="post">
+    <Form action={`/authenticate/google?${searchParams}`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

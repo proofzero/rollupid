@@ -10,7 +10,7 @@ export default function ConnectMicrosoftButton({
   searchParams,
 }: ConnectMicrosoftButtonProps) {
   return (
-    <Form action={`/authenticate/microsoft${searchParams}`} method="post">
+    <Form action={`/authenticate/microsoft?${searchParams}`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

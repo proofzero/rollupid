@@ -52,6 +52,19 @@ export const authenticator = new Authenticator(oauthStorage)
 
 // 0xAuth state
 
+const genCookieProps = (provider: string, clientId: string) => ({
+  cookie: {
+    domain: COOKIE_DOMAIN,
+    path: '/authorize',
+    name: `${provider}-${clientId}`,
+    sameSite: 'lax' as 'lax', // ugh, wtf ts
+    secure: process.env.NODE_ENV == 'production',
+    maxAge: 60 * 5,
+    httpOnly: true,
+    secrets: [sessionSecret],
+  },
+})
+
 export async function create0xAuthSession(
   provider: string,
   clientId: string,
@@ -60,17 +73,13 @@ export async function create0xAuthSession(
   scope: string,
   redirectTo: string
 ) {
-  const oxstorage = createCookieSessionStorage({
-    cookie: {
-      domain: COOKIE_DOMAIN,
-      path: '/authorize',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV == 'production',
-      maxAge: 60 * 5,
-      httpOnly: true,
-      secrets: [sessionSecret],
-    },
-  })
+  const cookieProps = genCookieProps(provider, clientId)
+  const oxstorage = createCookieSessionStorage(cookieProps)
+
+  if (!clientId) throw json({ message: 'client_id is required' }, 400)
+  if (!state) throw json({ message: 'state is required' }, 400)
+  if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+  if (!provider) throw json({ message: 'provider is required' }, 400)
 
   const session = await oxstorage.getSession()
   session.set('provider', provider)
@@ -92,33 +101,14 @@ export async function get0xAuthSession(
 ) {
   const params = new URL(request.url).searchParams
 
-  const clientId = params.get('clientId')
+  console.log({ params })
+
+  const clientId = params.get('client_id')
+  console.log({ clientId })
   if (!clientId) throw json({ message: 'client_id is required' }, 400)
 
-  const state = params.get('state')
-  if (!state) throw json({ message: 'state is required' }, 400)
-
-  const redirectUri = params.get('redirectUri')
-  if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
-
-  const provider = params.get('provider')
-  if (!provider || provider !== callbackProvider)
-    throw json({ message: 'provider is required' }, 400)
-
-  const scope = params.get('scope')?.split(',') || []
-
-  const oxstorage = createCookieSessionStorage({
-    cookie: {
-      domain: COOKIE_DOMAIN,
-      name: `${provider}-${clientId}`,
-      path: '/authorize',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV == 'production',
-      maxAge: 60 * 5,
-      httpOnly: true,
-      secrets: [sessionSecret],
-    },
-  })
+  const cookieProps = genCookieProps(callbackProvider, clientId)
+  const oxstorage = createCookieSessionStorage(cookieProps)
   const session = await oxstorage.getSession(request.headers.get('Cookie'))
   return session
 }

@@ -1,5 +1,7 @@
 import { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
-import { create0xAuthSession, parseParams } from '~/auth.server'
+
+import { GitHubStrategy, GitHubStrategyDefaultName } from 'remix-auth-github'
+import { authenticator, parseParams } from '~/auth.server'
 
 export const action: ActionFunction = async ({ request }: ActionArgs) => {
   const { clientId, redirectUri, scope, state } = await parseParams(
@@ -7,12 +9,36 @@ export const action: ActionFunction = async ({ request }: ActionArgs) => {
     true
   )
 
-  return create0xAuthSession(
-    'github',
-    clientId as string,
-    state as string,
-    redirectUri as string,
-    scope as string,
-    '/authenticate/github/strategy'
+  const callbackEncoding = encodeURIComponent(
+    JSON.stringify({
+      clientId,
+      redirectUri,
+      scope,
+      state,
+    })
   )
+
+  const callbackURL = `${INTERNAL_GITHUB_OAUTH_CALLBACK_URL}?rollup=${callbackEncoding}`
+
+  authenticator.use(
+    new GitHubStrategy(
+      {
+        clientID: INTERNAL_GITHUB_OAUTH_CLIENT_ID,
+        clientSecret: SECRET_GITHUB_OAUTH_CLIENT_SECRET,
+        callbackURL: callbackURL,
+        allowSignup: false,
+        scope: [],
+      },
+      async ({ ...args }) => {
+        //Return all fields
+        return { ...args }
+      }
+    )
+  )
+
+  const result = await authenticator.authenticate(
+    GitHubStrategyDefaultName,
+    request
+  )
+  return result
 }
