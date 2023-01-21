@@ -3,7 +3,7 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { authenticator } from '~/auth.server'
+import { authenticator, get0xAuthSession } from '~/auth.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
@@ -11,6 +11,8 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+  const oxauthSession = await get0xAuthSession(request, 'github')
+
   const authRes = (await authenticator.authenticate(
     GitHubStrategyDefaultName,
     request
@@ -33,5 +35,5 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account)
+  return authenticateAddress(address, account, oxauthSession)
 }

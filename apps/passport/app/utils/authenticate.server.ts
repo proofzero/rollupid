@@ -5,11 +5,12 @@ import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
 
 import { getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
+import { Session } from '@remix-run/cloudflare'
 
 export const authenticateAddress = async (
   address: AddressURN,
   account: AccountURN,
-  appId?: string
+  authorizeSession: Session
 ) => {
   const accessClient = getAccessClient()
 
@@ -35,6 +36,11 @@ export const authenticateAddress = async (
     clientId,
   })
 
-  const redirectURL = appId ? `/authorize?client_id=${appId}` : '/authorize'
+  const authAppId = authorizeSession.get('clientId')
+  const authRedirectUri = authorizeSession.get('redirectUri')
+  const authState = authorizeSession.get('state')
+  const authScope = authorizeSession.get('scope')
+
+  const redirectURL = `/authorize?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
   return createUserSession(accessToken, redirectURL, address)
 }

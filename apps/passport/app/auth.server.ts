@@ -1,16 +1,41 @@
-import { createCookieSessionStorage } from '@remix-run/cloudflare'
+import {
+  createCookieSessionStorage,
+  json,
+  redirect,
+} from '@remix-run/cloudflare'
 import { Authenticator } from 'remix-auth'
-import { GoogleStrategy } from 'remix-auth-google'
-import { GitHubStrategy } from 'remix-auth-github'
-import { TwitterStrategy } from 'remix-auth-twitter'
-import { MicrosoftStrategy } from 'remix-auth-microsoft'
 
 const sessionSecret = SECRET_SESSION_SALT
 if (!sessionSecret) {
   throw new Error('SECRET_SESSION_SALT must be set')
 }
 
-export const sessionStorage = createCookieSessionStorage({
+// params parser
+
+export function parseParams(request: Request, validate?: boolean) {
+  const url = new URL(request.url)
+  const clientId = url.searchParams.get('client_id')
+  const state = url.searchParams.get('state')
+  const redirectUri = url.searchParams.get('redirect_uri')
+  const scope = url.searchParams.get('scope')
+
+  if (validate) {
+    if (!clientId) throw json({ message: 'client_id is required' }, 400)
+    if (!state) throw json({ message: 'state is required' }, 400)
+    if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+  }
+
+  return {
+    clientId,
+    state,
+    redirectUri,
+    scope,
+  }
+}
+
+// OAuth state
+
+export const oauthStorage = createCookieSessionStorage({
   cookie: {
     domain: COOKIE_DOMAIN,
     httpOnly: true,
@@ -23,72 +48,77 @@ export const sessionStorage = createCookieSessionStorage({
   },
 })
 
-export const authenticator = new Authenticator(sessionStorage)
+export const authenticator = new Authenticator(oauthStorage)
 
-// authenticator.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
-//       clientSecret: SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
-//       callbackURL: INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
-//     },
-//     async ({ accessToken, refreshToken, extraParams, profile }) => {
-//       return {
-//         accessToken,
-//         refreshToken,
-//         extraParams,
-//         profile,
-//       }
-//     }
-//   )
-// )
+// 0xAuth state
 
-// authenticator.use(
-//   new GitHubStrategy(
-//     {
-//       clientID: INTERNAL_GITHUB_OAUTH_CLIENT_ID,
-//       clientSecret: SECRET_GITHUB_OAUTH_CLIENT_SECRET,
-//       callbackURL: INTERNAL_GITHUB_OAUTH_CALLBACK_URL,
-//       allowSignup: false,
-//       scope: [],
-//     },
-//     async ({ ...args }) => {
-//       //Return all fields
-//       return { ...args }
-//     }
-//   )
-// )
+export async function create0xAuthSession(
+  provider: string,
+  clientId: string,
+  state: string,
+  redirectUri: string,
+  scope: string,
+  redirectTo: string
+) {
+  const oxstorage = createCookieSessionStorage({
+    cookie: {
+      domain: COOKIE_DOMAIN,
+      path: '/authorize',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 60 * 5,
+      httpOnly: true,
+      secrets: [sessionSecret],
+    },
+  })
 
-// authenticator.use(
-//   new TwitterStrategy(
-//     {
-//       clientID: INTERNAL_TWITTER_OAUTH_CLIENT_ID,
-//       clientSecret: SECRET_TWITTER_OAUTH_CLIENT_SECRET,
-//       callbackURL: INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
-//       includeEmail: true,
-//     },
-//     async ({ accessToken, accessTokenSecret, profile }) => {
-//       return {
-//         accessToken,
-//         accessTokenSecret,
-//         profile,
-//       }
-//     }
-//   )
-// )
+  const session = await oxstorage.getSession()
+  session.set('provider', provider)
+  session.set('clientId', clientId)
+  session.set('state', state)
+  session.set('redirectUri', redirectUri)
+  session.set('scope', scope)
 
-// authenticator.use(
-//   new MicrosoftStrategy(
-//     {
-//       clientId: INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
-//       tenantId: INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
-//       clientSecret: SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
-//       redirectUri: INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
-//       scope: 'openid profile User.Read offline_access',
-//       prompt: '',
-//     },
-//     async ({ ...args }) => {
-//       return { ...args }
-//     }
-//   )
-// )
+  return redirect(redirectTo, {
+    headers: {
+      'Set-Cookie': await oxstorage.commitSession(session),
+    },
+  })
+}
+
+export async function get0xAuthSession(
+  request: Request,
+  callbackProvider: string
+) {
+  const params = new URL(request.url).searchParams
+
+  const clientId = params.get('clientId')
+  if (!clientId) throw json({ message: 'client_id is required' }, 400)
+
+  const state = params.get('state')
+  if (!state) throw json({ message: 'state is required' }, 400)
+
+  const redirectUri = params.get('redirectUri')
+  if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+
+  const provider = params.get('provider')
+  if (!provider || provider !== callbackProvider)
+    throw json({ message: 'provider is required' }, 400)
+
+  const scope = params.get('scope')?.split(',') || []
+
+  const oxstorage = createCookieSessionStorage({
+    cookie: {
+      domain: COOKIE_DOMAIN,
+      name: `${provider}-${clientId}`,
+      path: '/authorize',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 60 * 5,
+      httpOnly: true,
+      secrets: [sessionSecret],
+    },
+  })
+  const session = await oxstorage.getSession(request.headers.get('Cookie'))
+  return session
+}
