@@ -1,10 +1,5 @@
-import { redirect } from '@remix-run/cloudflare'
-import type {
-  ActionArgs,
-  ActionFunction,
-  LoaderFunction,
-} from '@remix-run/cloudflare'
-import { TwitterStrategy, TwitterStrategyDefaultName } from 'remix-auth-twitter'
+import type { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
+import { TwitterStrategyDefaultName } from 'remix-auth-twitter'
 
 import { authenticator, getTwitterStrategy, parseParams } from '~/auth.server'
 
