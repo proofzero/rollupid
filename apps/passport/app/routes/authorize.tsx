@@ -2,7 +2,7 @@ import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AddressURN } from '@kubelt/urns/address'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
-import { Outlet, useOutletContext } from '@remix-run/react'
+import { Outlet, useLoaderData } from '@remix-run/react'
 import { getAddressClient, getGalaxyClient } from '~/platform.server'
 import { getUserSession, requireJWT } from '~/session.server'
 import { generateGradient } from '~/utils/gradient.server'
@@ -104,7 +104,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
-  const ctx = useOutletContext()
+  const { profile } = useLoaderData()
   return (
     <div className={'flex flex-row h-screen justify-center items-center'}>
       <div
@@ -116,7 +116,7 @@ export default function Authorize() {
         className={'basis-2/5 h-screen w-full hidden lg:block'}
       ></div>
       <div className={'basis-full basis-full lg:basis-3/5'}>
-        <Outlet context={ctx} />
+        <Outlet context={{ profile }} />
       </div>
     </div>
   )

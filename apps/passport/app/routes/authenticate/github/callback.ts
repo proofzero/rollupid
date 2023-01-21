@@ -3,7 +3,7 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { authenticator, get0xAuthSession } from '~/auth.server'
+import { authenticator } from '~/auth.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getAddressClient } from '~/platform.server'
 import { keccak256 } from '@ethersproject/keccak256'
