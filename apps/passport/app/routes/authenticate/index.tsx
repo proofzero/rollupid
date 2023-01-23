@@ -7,7 +7,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const searchParams = new URL(request.url).searchParams
 
   const oauthEnabled: boolean = searchParams.get('enableOAuth') !== null
-  return { searchParams: searchParams.toString(), oauthEnabled }
+  return { oauthEnabled }
 }
 
 export default function Authenticate() {
@@ -17,11 +17,10 @@ export default function Authenticate() {
   console.log({ searchParams })
   return (
     <Authentication
-      searchParams={searchParams}
       enableWalletConnect={enableWalletConnect}
       enableOAuthConnect={oauthEnabled}
       connectCallback={async (address) => {
-        window.location.href = `/authenticate/${address}/sign${window.location.search}`
+        window.location.href = `/authenticate/${address}/sign`
       }}
       connectErrorCallback={(error) => {
         console.error(error)

@@ -3,14 +3,9 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import logoSvg from './github-mark.svg'
 
-type ConnectGithubButtonProps = {
-  searchParams: string
-}
-export default function ConnectGithubButton({
-  searchParams,
-}: ConnectGithubButtonProps) {
+export default function ConnectGithubButton() {
   return (
-    <Form action={`/authenticate/github?${searchParams}`} method="post">
+    <Form action={`/authenticate/github`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

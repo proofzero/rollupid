@@ -1,6 +1,7 @@
 import { createEventHandler } from '@remix-run/cloudflare-workers'
 import * as build from '@remix-run/dev/server-build'
 import { getUserSession } from './app/session.server'
+import { parseParams } from './app/auth.server'
 
 addEventListener(
   'fetch',
@@ -10,7 +11,7 @@ addEventListener(
     getLoadContext: (event) => {
       // const session = await getUserSession(event.request)
       return {
-        searchParams: new URL(event.request.url).searchParams,
+        consoleParams: parseParams(event.request),
         // session: session,
         // jwt: session.get('jwt'),
       }

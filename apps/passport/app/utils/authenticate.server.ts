@@ -15,12 +15,13 @@ export const authenticateAddress = async (
     redirectUri: string
     state: string
     scope: string
-  }
+  },
+  env: Env
 ) => {
-  const accessClient = getAccessClient()
+  const accessClient = getAccessClient(env)
 
   const clientId = address
-  const redirectUri = PASSPORT_REDIRECT_URL
+  const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
   const state = ''
   const { code } = await accessClient.authorize.mutate({
@@ -47,5 +48,5 @@ export const authenticateAddress = async (
   const authScope = appData.scope
 
   const redirectURL = `/authorize?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
-  return createUserSession(accessToken, redirectURL, address)
+  return createUserSession(accessToken, redirectURL, address, env),
 }

@@ -11,8 +11,8 @@ import { generateGradient } from '~/utils/gradient.server'
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
   // this will redirect unauthenticated users to the auth page but maintain query params
-  const jwt = await requireJWT(request)
-  const session = await getUserSession(request)
+  const jwt = await requireJWT(request, context.consoleParams, context.env)
+  const session = await getUserSession(request, false, context.env)
   const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
 
   const galaxyClient = await getGalaxyClient()
@@ -28,13 +28,16 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (!profile) {
     console.log("Profile doesn't exist, creating one...")
-    const addressClient = getAddressClient(defaultProfileURN)
+    const addressClient = getAddressClient(defaultProfileURN, context.env)
     const newProfile = await addressClient.getAddressProfile
       .query()
       .then(async (res) => {
         switch (res.type) {
           case CryptoAddressType.ETH: {
-            const gradient = await generateGradient(res.profile.address)
+            const gradient = await generateGradient(
+              res.profile.address,
+              context.env
+            )
             return {
               displayName: res.profile.displayName || res.profile.address,
               pfp: {
@@ -44,7 +47,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
           }
           case OAuthAddressType.GitHub: {
-            const gradient = await generateGradient(res.profile.login)
+            const gradient = await generateGradient(
+              res.profile.login,
+              context.env
+            )
             return {
               displayName: res.profile.name || res.profile.login,
               pfp: {
@@ -54,7 +60,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
           }
           case OAuthAddressType.Google: {
-            const gradient = await generateGradient(res.profile.email)
+            const gradient = await generateGradient(
+              res.profile.email,
+              constext.env
+            )
             return {
               displayName: res.profile.name,
               pfp: {
@@ -64,7 +73,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
           }
           case OAuthAddressType.Twitter: {
-            const gradient = await generateGradient(res.profile.id.toString())
+            const gradient = await generateGradient(
+              res.profile.id.toString(),
+              context.env
+            )
             return {
               displayName: res.profile.name,
               pfp: {
@@ -74,7 +86,10 @@ export const loader: LoaderFunction = async ({ request, context }) => {
             }
           }
           case OAuthAddressType.Microsoft: {
-            const gradient = await generateGradient(res.profile.sub.toString())
+            const gradient = await generateGradient(
+              res.profile.sub.toString(),
+              context.env
+            )
             return {
               displayName: res.profile.name,
               pfp: {

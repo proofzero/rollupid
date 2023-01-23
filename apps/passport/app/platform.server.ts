@@ -6,25 +6,25 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { GraphQLClient } from 'graphql-request'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
-export function getStarbaseClient(jwt: string) {
-  return createStarbaseClient(Starbase, {
+export function getStarbaseClient(jwt: string, env: Env) {
+  return createStarbaseClient(env.Starbase, {
     headers: {
       [PlatformJWTAssertionHeader]: jwt,
     },
   })
 }
 
-export function getAccessClient() {
-  return createAccessClient(Access)
+export function getAccessClient(env: Env) {
+  return createAccessClient(env.Access)
 }
 
-export function getAddressClient(addressUrn: string) {
-  const requestInit: RequestInit = {
+export function getAddressClient(addressUrn: string, env: Env) {
+  const requestInit = {
     headers: {
       'X-3RN': addressUrn,
     },
   }
-  return createAddressClient(Address, requestInit)
+  return createAddressClient(env.Address, requestInit)
 }
 
 export async function getGalaxyClient() {

@@ -3,14 +3,9 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import logoSvg from './microsoft-mark.svg'
 
-type ConnectMicrosoftButtonProps = {
-  searchParams: string
-}
-export default function ConnectMicrosoftButton({
-  searchParams,
-}: ConnectMicrosoftButtonProps) {
+export default function ConnectMicrosoftButton() {
   return (
-    <Form action={`/authenticate/microsoft?${searchParams}`} method="post">
+    <Form action={`/authenticate/microsoft`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

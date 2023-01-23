@@ -3,14 +3,9 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import logoSvg from './logo.svg'
 
-type ConnectGoogleButtonProps = {
-  searchParams: string
-}
-export default function ConnectGoogleButton({
-  searchParams,
-}: ConnectGoogleButtonProps) {
+export default function ConnectGoogleButton() {
   return (
-    <Form action={`/authenticate/google?${searchParams}`} method="post">
+    <Form action={`/authenticate/google`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

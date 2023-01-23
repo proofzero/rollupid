@@ -13,19 +13,15 @@ import { getAccessClient, getStarbaseClient } from '~/platform.server'
 import { Authorization } from '~/components/authorization/Authorization'
 import { parseJwt, requireJWT } from '~/session.server'
 import type { AccountURN } from '@kubelt/urns/account'
-import { parseParams } from '~/auth.server'
 import { Profile } from '@kubelt/galaxy-client'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const { clientId, redirectUri, scope, state } = await parseParams(
-    request,
-    true
-  )
+  const { clientId, redirectUri, scope, state } = context.consoleParams
 
-  const jwt = await requireJWT(request)
+  const jwt = await requireJWT(request, context.consoleParams, context.env)
 
   try {
-    const sbClient = getStarbaseClient(jwt)
+    const sbClient = getStarbaseClient(jwt, context.env)
 
     // When scopes are powered by an index we can just query for the scopes we have in the app
     const [scopeMeta, appProfile] = await Promise.all([

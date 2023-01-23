@@ -9,7 +9,7 @@ import { getUserSession } from '~/session.server'
 // TODO: loader function check if we have a session already
 // redirect if logged in
 export const loader: LoaderFunction = async ({ request, context }) => {
-  const session = await getUserSession(request)
+  const session = await getUserSession(request, false, context.env)
   const searchParams = new URL(request.url).searchParams
 
   if (session.get('jwt') && searchParams.get('client_id')) {
@@ -17,7 +17,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
     return redirect(`/authorize?client_id=${searchParams}`)
   }
   if (session.get('jwt')) {
-    return redirect(CONSOLE_APP_URL)
+    return redirect(context.env.CONSOLE_APP_URL)
   }
   return null
 }

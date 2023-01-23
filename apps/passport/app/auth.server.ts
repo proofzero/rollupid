@@ -5,11 +5,6 @@ import { GoogleStrategy } from 'remix-auth-google'
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
 import { TwitterStrategy } from 'remix-auth-twitter'
 
-const sessionSecret = SECRET_SESSION_SALT
-if (!sessionSecret) {
-  throw new Error('SECRET_SESSION_SALT must be set')
-}
-
 // params parser
 
 export function parseParams(request: Request, validate?: boolean) {
@@ -35,27 +30,31 @@ export function parseParams(request: Request, validate?: boolean) {
 
 // OAuth state
 
-export const oauthStorage = createCookieSessionStorage({
-  cookie: {
-    domain: COOKIE_DOMAIN,
-    httpOnly: true,
-    name: 'oauth',
-    path: '/',
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 4,
-    secrets: [sessionSecret],
-  },
-})
+export const initAuthenticator = (env: Env) => {
+  if (!env.SECRET_SESSION_SALT)
+    throw new Error('SECRET_SESSION_SALT is required')
+  const oauthStorage = createCookieSessionStorage({
+    cookie: {
+      domain: env.COOKIE_DOMAIN,
+      httpOnly: true,
+      name: 'oauth',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 4,
+      secrets: [env.SECRET_SESSION_SALT],
+    },
+  })
 
-export const authenticator = new Authenticator(oauthStorage)
+  return new Authenticator(oauthStorage)
+}
 
-export const getGithubAuthenticator = (callbackURL?: string) => {
+export const getGithubAuthenticator = (env: Env) => {
   return new GitHubStrategy(
     {
-      clientID: INTERNAL_GITHUB_OAUTH_CLIENT_ID,
-      clientSecret: SECRET_GITHUB_OAUTH_CLIENT_SECRET,
-      callbackURL: callbackURL || INTERNAL_GITHUB_OAUTH_CALLBACK_URL,
+      clientID: env.INTERNAL_GITHUB_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_GITHUB_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_GITHUB_OAUTH_CALLBACK_URL,
       allowSignup: false,
       scope: [],
     },
@@ -66,12 +65,12 @@ export const getGithubAuthenticator = (callbackURL?: string) => {
   )
 }
 
-export const getGoogleAuthenticator = (callbackURL?: string) => {
+export const getGoogleAuthenticator = (env: Env) => {
   return new GoogleStrategy(
     {
-      clientID: INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
-      clientSecret: SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
-      callbackURL: callbackURL || INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
+      clientID: env.INTERNAL_GOOGLE_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_GOOGLE_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_GOOGLE_OAUTH_CALLBACK_URL,
     },
     async ({ ...args }) => {
       return { ...args }
@@ -79,13 +78,13 @@ export const getGoogleAuthenticator = (callbackURL?: string) => {
   )
 }
 
-export const getMicrosoftStrategy = (callbackURL?: string) => {
+export const getMicrosoftStrategy = (env: Env) => {
   return new MicrosoftStrategy(
     {
-      clientId: INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
-      tenantId: INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
-      clientSecret: SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
-      redirectUri: callbackURL || INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
+      clientId: env.INTERNAL_MICROSOFT_OAUTH_CLIENT_ID,
+      tenantId: env.INTERNAL_MICROSOFT_OAUTH_TENANT_ID,
+      clientSecret: env.SECRET_MICROSOFT_OAUTH_CLIENT_SECRET,
+      redirectUri: env.INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL,
       scope: 'openid profile User.Read offline_access',
       prompt: '',
     },
@@ -95,12 +94,12 @@ export const getMicrosoftStrategy = (callbackURL?: string) => {
   )
 }
 
-export const getTwitterStrategy = (callbackURL?: string) => {
+export const getTwitterStrategy = (env: Env) => {
   return new TwitterStrategy(
     {
-      clientID: INTERNAL_TWITTER_OAUTH_CLIENT_ID,
-      clientSecret: SECRET_TWITTER_OAUTH_CLIENT_SECRET,
-      callbackURL: callbackURL || INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
+      clientID: env.INTERNAL_TWITTER_OAUTH_CLIENT_ID,
+      clientSecret: env.SECRET_TWITTER_OAUTH_CLIENT_SECRET,
+      callbackURL: env.INTERNAL_TWITTER_OAUTH_CALLBACK_URL,
       includeEmail: true,
     },
     async ({ ...args }) => {

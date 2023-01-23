@@ -3,14 +3,9 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import logoSvg from './logo.svg'
 
-type ConnectTwitterButtonProps = {
-  searchParams: string
-}
-export default function ConnectTwitterButton({
-  searchParams,
-}: ConnectTwitterButtonProps) {
+export default function ConnectTwitterButton() {
   return (
-    <Form action={`/authenticate/twitter?${searchParams}`} method="post">
+    <Form action={`/authenticate/twitter}`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}
