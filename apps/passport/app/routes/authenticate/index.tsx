@@ -14,7 +14,6 @@ export default function Authenticate() {
   const [enableWalletConnect, setEnableWalletConnect] = useState(true)
   const { searchParams, oauthEnabled } = useLoaderData()
 
-  console.log({ searchParams })
   return (
     <Authentication
       enableWalletConnect={enableWalletConnect}

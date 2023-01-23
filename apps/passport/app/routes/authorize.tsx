@@ -24,8 +24,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
   const profile = profileRes.profile
 
-  console.log({ profile })
-
   if (!profile) {
     console.log("Profile doesn't exist, creating one...")
     const addressClient = getAddressClient(defaultProfileURN, context.env)

@@ -24,7 +24,6 @@ export function getAddressClient(addressUrn: string, env: Env) {
       'X-3RN': addressUrn,
     },
   }
-  console.log({ env })
   return createAddressClient(env.Address, requestInit)
 }
 

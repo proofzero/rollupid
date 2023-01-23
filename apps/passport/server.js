@@ -22,11 +22,6 @@ addEventListener(
     build,
     mode: process.env.NODE_ENV,
     getLoadContext: (event) => {
-      // const session = await getUserSession(event.request)
-      console.log(
-        { event },
-        { gloabal: global.THREEID_APP_URL, address: global.Address }
-      )
       return {
         consoleParams: parseParams(event.request),
         env: global, // or globalThis?

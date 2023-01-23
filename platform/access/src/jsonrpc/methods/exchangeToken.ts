@@ -80,8 +80,6 @@ export const exchangeTokenMethod = async ({
       scope: [], //scope,
     })
 
-    console.log('HERE')
-
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
     const access = AccessURNSpace.urn(iss)
@@ -93,8 +91,6 @@ export const exchangeTokenMethod = async ({
       dst: access,
       tag: EDGE_ACCESS,
     })
-
-    console.log('HERE @')
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
