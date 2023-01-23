@@ -65,3 +65,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
     }
   }
 }
+
+mutation updateAddressNickname($nickname: String) {
+  updateAddressNickname(nickname: $nickname)
+}

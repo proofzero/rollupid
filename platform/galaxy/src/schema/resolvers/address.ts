@@ -3,18 +3,16 @@ import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN } from '@kubelt/urns/address'
 
-import {
-  AddressProfile,
-  CryptoAddressProfile,
-  OAuthGoogleProfile,
-  OAuthGithubProfile,
-  Resolvers,
-  AddressProfiles,
-} from './typedefs'
-import { hasApiKey, setupContext, logAnalytics } from './utils'
+import { Resolvers } from './typedefs'
+import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
 
 import { ResolverContext } from './common'
+
 import {
+  AddressProfiles,
+  CryptoAddressProfile,
+  OAuthGithubProfile,
+  OAuthGoogleProfile,
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
@@ -69,8 +67,15 @@ const addressResolvers: Resolvers = {
       return profiles
     },
   },
-  Mutation: {},
-
+  Mutation: {
+    updateAddressNickname: async (
+      _parent: any,
+      { nickname },
+      { env }: ResolverContext
+    ) => {
+      return true
+    },
+  },
   AddressProfiles: {
     __resolveType: (obj: AddressProfiles) => {
       if ((obj as CryptoAddressProfile).address) {
@@ -98,6 +103,11 @@ const AddressResolverComposition = {
   'Query.ensProfile': [setupContext(), hasApiKey()],
   'Query.addressProfile': [setupContext(), hasApiKey()],
   'Query.addressProfiles': [setupContext(), hasApiKey()],
+  'Mutation.updateAddressNickname': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+  ],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

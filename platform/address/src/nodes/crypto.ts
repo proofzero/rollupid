@@ -71,9 +71,9 @@ export default class CryptoAddress {
 
   async getProfile(): Promise<CryptoAddressProfile> {
     const [nickname, gradient, address] = await Promise.all([
-      this.node.storage.get<string>('nickname'),
-      this.node.storage.get<string>('gradient'),
-      this.node.storage.get<string>('address'),
+      this.node.class.getNickname(),
+      this.node.class.getGradient(),
+      this.node.class.getAddress(),
     ])
 
     if (!address) throw new Error('address not found')

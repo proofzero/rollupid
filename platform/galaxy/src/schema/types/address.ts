@@ -63,4 +63,8 @@ export default /* GraphQL */ `
     addressProfile(addressURN: URN!): AddressProfile
     addressProfiles(addressURNList: [URN!]): [AddressProfile]
   }
+
+  type Mutation {
+    updateAddressNickname(nickname: String): Boolean
+  }
 `
