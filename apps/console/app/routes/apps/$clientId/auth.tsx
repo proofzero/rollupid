@@ -31,7 +31,6 @@ import rotateSecrets, { RollType } from '~/helpers/rotation'
 type notificationHandlerType = (val: boolean) => void
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  console.log(params)
   if (!params.clientId) {
     throw new Error('Application client id is required for the requested route')
   }

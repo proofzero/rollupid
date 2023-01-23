@@ -193,7 +193,7 @@ export const ApplicationAuth = ({
                     desc: value.description,
                   }
                 })}
-                selectedItems={appDetails.app.scopes.map((scope) => {
+                selectedItems={appDetails.app.scopes?.map((scope) => {
                   const meta = scopeMeta[scope]
                   return {
                     id: scope,
