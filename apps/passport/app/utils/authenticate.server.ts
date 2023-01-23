@@ -5,7 +5,6 @@ import { GrantType, ResponseType } from '@kubelt/platform.access/src/types'
 
 import { getAccessClient } from '~/platform.server'
 import { createUserSession } from '~/session.server'
-import { Session } from '@remix-run/cloudflare'
 
 export const authenticateAddress = async (
   address: AddressURN,
@@ -48,5 +47,5 @@ export const authenticateAddress = async (
   const authScope = appData.scope
 
   const redirectURL = `/authorize?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
-  return createUserSession(accessToken, redirectURL, address, env),
+  return createUserSession(accessToken, redirectURL, address, env)
 }

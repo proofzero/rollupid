@@ -3,10 +3,9 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
 
-import { authenticator, getGithubAuthenticator } from '~/auth.server'
+import { initAuthenticator, getGithubAuthenticator } from '~/auth.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getAddressClient } from '~/platform.server'
-import { keccak256 } from '@ethersproject/keccak256'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
@@ -22,7 +21,8 @@ export const loader: LoaderFunction = async ({
 
   const appData = JSON.parse(decodeURIComponent(rollupEncoding))
 
-  authenticator.use(getGithubAuthenticator())
+  const authenticator = initAuthenticator(context.env)
+  authenticator.use(getGithubAuthenticator(context.env))
 
   const authRes = (await authenticator.authenticate(
     GitHubStrategyDefaultName,
@@ -41,10 +41,10 @@ export const loader: LoaderFunction = async ({
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.GitHub },
     { alias: profile._json.login, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address)
+  const addressClient = getAddressClient(address, context.env)
   const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account, appData)
+  return authenticateAddress(address, account, appData, context.env)
 }

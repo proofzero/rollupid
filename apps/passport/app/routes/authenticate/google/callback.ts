@@ -2,13 +2,16 @@ import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { GoogleStrategyDefaultName } from 'remix-auth-google'
-import { authenticator, getGoogleAuthenticator } from '~/auth.server'
+import { initAuthenticator, getGoogleAuthenticator } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 
-export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({
+  request,
+  context,
+}: LoaderArgs) => {
   const searchParams = new URL(request.url).searchParams
   const rollupEncoding = searchParams.get('rollup')
 
@@ -16,7 +19,8 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 
   const appData = JSON.parse(decodeURIComponent(rollupEncoding))
 
-  authenticator.use(getGoogleAuthenticator())
+  const authenticator = initAuthenticator(context.env)
+  authenticator.use(getGoogleAuthenticator(context.env))
 
   const authRes = (await authenticator.authenticate(
     GoogleStrategyDefaultName,
@@ -33,10 +37,10 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Google },
     { alias: profile._json.email, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address)
+  const addressClient = getAddressClient(address, context.env)
   const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate(authRes)
 
-  return authenticateAddress(address, account, appData)
+  return authenticateAddress(address, account, appData, context.env)
 }

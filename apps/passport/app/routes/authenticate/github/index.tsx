@@ -2,12 +2,15 @@ import { ActionArgs, ActionFunction } from '@remix-run/cloudflare'
 
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import {
-  authenticator,
+  initAuthenticator,
   getGithubAuthenticator,
   parseParams,
 } from '~/auth.server'
 
-export const action: ActionFunction = async ({ request }: ActionArgs) => {
+export const action: ActionFunction = async ({
+  request,
+  context,
+}: ActionArgs) => {
   const { clientId, redirectUri, scope, state } = await parseParams(
     request,
     true
@@ -22,9 +25,8 @@ export const action: ActionFunction = async ({ request }: ActionArgs) => {
     })
   )
 
-  const callbackURL = `${INTERNAL_GITHUB_OAUTH_CALLBACK_URL}?rollup=${callbackEncoding}`
-
-  authenticator.use(getGithubAuthenticator(callbackURL))
+  const authenticator = initAuthenticator(context.env)
+  authenticator.use(getGithubAuthenticator(context.env))
 
   return authenticator.authenticate(GitHubStrategyDefaultName, request)
 }
