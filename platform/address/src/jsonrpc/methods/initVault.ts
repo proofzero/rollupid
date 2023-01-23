@@ -39,7 +39,7 @@ export const initVaultMethod = async ({
   const vaultNode = await initAddressNodeByName(baseAddressURN, ctx.Address)
   await Promise.all([
     vaultNode.storage.put('privateKey', vault.privateKey), // #TODO: vault class needed
-    vaultNode.class.setAddress(baseAddressURN),
+    vaultNode.class.setAddress(vault.address),
     vaultNode.class.setNodeType(NodeType.Vault),
     vaultNode.class.setType(CryptoAddressType.ETH),
   ])
