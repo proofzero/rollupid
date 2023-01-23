@@ -92,7 +92,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               displayName: res.profile.name,
               pfp: {
                 //Cached profile image
-                image: gradient,
+                image: res.profile.threeidImageUrl,
               },
               cover: gradient,
             }
