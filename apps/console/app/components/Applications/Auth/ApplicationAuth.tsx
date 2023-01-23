@@ -181,6 +181,8 @@ export const ApplicationAuth = ({
             <div className="flex-1">
               <MultiSelect
                 label="Scopes"
+                // 3 - because 3 is default threeid scopes
+                disabled={Object.keys(scopeMeta).length === 3}
                 fieldName="scopes"
                 items={Object.entries(scopeMeta).map(([key, value]) => {
                   return {
@@ -205,6 +207,7 @@ export const ApplicationAuth = ({
             <ReadOnlyInput
               id="appDomains"
               label="Domain(s)"
+              className="cursor-no-drop"
               value=""
               required
             />
