@@ -108,11 +108,13 @@ export const action: ActionFunction = async ({ request, params }) => {
       const [protocolRedirect, pathRedirect]: any =
         updates.redirectURI?.split(':')
 
+      console.log(pathWebsite, pathRedirect, pathTerms)
+
       if (
         protocolWebsite &&
         protocolWebsite === 'http' &&
-        pathWebsite.split('.')[0] !== 'localhost' &&
-        !pathWebsite.includes('127.0.0.1')
+        !pathWebsite.startsWith('//localhost') &&
+        !pathWebsite.startsWith('//127.0.0.1')
       ) {
         errors['websiteURL'] = 'HTTP can only be used for localhost'
       }
@@ -120,8 +122,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       if (
         protocolTerms &&
         protocolTerms === 'http' &&
-        pathTerms.split('.')[0] !== 'localhost' &&
-        !pathTerms.includes('127.0.0.1')
+        !pathTerms.startsWith('//localhost') &&
+        !pathTerms.startsWith('//127.0.0.1')
       ) {
         errors['termsURL'] = 'HTTP can only be used for localhost'
       }
@@ -129,8 +131,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       if (
         protocolRedirect &&
         protocolRedirect === 'http' &&
-        pathRedirect.split('.')[0] !== 'localhost' &&
-        !pathRedirect.includes('127.0.0.1')
+        !pathRedirect.startsWith('//localhost') &&
+        !pathRedirect.startsWith('//127.0.0.1')
       ) {
         errors['redirectURI'] = 'HTTP can only be used for localhost'
       }

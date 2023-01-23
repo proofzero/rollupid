@@ -67,10 +67,6 @@ export const ApplicationAuth = ({
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
   const [formData, setFormData] = useState<appDetailsProps>(appDetails)
 
-  console.log(formData)
-
-  console.log({ appDetails, oAuth, scopeMeta, onDelete })
-
   const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
     return {
       id: key,
@@ -237,14 +233,14 @@ export const ApplicationAuth = ({
               />
               {errors?.redirectURI ? (
                 <Text
-                  className="mb-1.5 text-gray-400"
+                  className="mb-1.5 mt-1.5 text-red-500"
                   size="xs"
                   weight="normal"
                 >
                   {errors.redirectURI || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.38rem]" />
+                <div className="mb-[1.755rem]" />
               )}
             </div>
 
@@ -259,14 +255,14 @@ export const ApplicationAuth = ({
               />
               {errors?.termsURL ? (
                 <Text
-                  className="mb-1.5 text-gray-400"
+                  className="mb-1.5 mt-1.5 text-red-500"
                   size="xs"
                   weight="normal"
                 >
                   {errors.termsURL || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.38rem]" />
+                <div className="mb-[1.755rem]" />
               )}
             </div>
 
@@ -281,14 +277,14 @@ export const ApplicationAuth = ({
               />
               {errors?.websiteURL ? (
                 <Text
-                  className="mb-1.5 text-gray-400"
+                  className="mb-1.5 mt-1.5 text-red-500"
                   size="xs"
                   weight="normal"
                 >
                   {errors.websiteURL || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.38rem]" />
+                <div className="mb-[1.755rem]" />
               )}
             </div>
           </div>
