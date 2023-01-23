@@ -20,7 +20,7 @@ import {
 
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { generateGradient } from '~/utils/gradient.server'
-import { AddressURN } from '@kubelt/urns/address'
+import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const url = new URL(request.url)
@@ -31,6 +31,11 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   const jwt = await requireJWT(request)
   const session = await getUserSession(request)
   const defaultProfileURN = session.get('defaultProfileUrn') as AddressURN
+
+  const parsedURN = AddressURNSpace.componentizedParse(defaultProfileURN)
+  const rparams = parsedURN.rcomponent
+
+  console.log({ defaultProfileURN, parsedURN, rparams })
 
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(

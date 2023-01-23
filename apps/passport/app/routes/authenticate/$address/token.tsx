@@ -1,8 +1,7 @@
-import { keccak256 } from '@ethersproject/keccak256'
 import { GrantType } from '@kubelt/platform.access/src/types'
-import { CryptoAddressType } from '@kubelt/types/address'
+import { AddressType, CryptoAddressType, NodeType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
@@ -12,8 +11,8 @@ import { createUserSession } from '~/session.server'
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
   const { address } = params
-  const node_type = searchParams.get('node_type') as string
-  const addr_type = searchParams.get('addr_type') as string
+  const node_type = searchParams.get('node_type') as NodeType
+  const addr_type = searchParams.get('addr_type') as AddressType
   const state = searchParams.get('state') as string
   const code = searchParams.get('code') as string
 
@@ -21,13 +20,11 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     throw json({ message: 'Invalid params' }, 400)
   }
 
-  // TODO exchange token for access token
-  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
-  const addressURN = `${AddressURNSpace.urn(
-    hash
-  )}?+node_type=${node_type}&addr_type=${addr_type}?=alias=${address}`
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.ETH, address),
+    { node_type: node_type, addr_type: addr_type },
+    { alias: address }
+  )
   const addressClient = getAddressClient(addressURN)
   const account = await addressClient.resolveAccount.query() // creates and associates account if there is none
 

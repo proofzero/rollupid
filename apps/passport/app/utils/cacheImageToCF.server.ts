@@ -30,7 +30,7 @@ export default async (
     body: cacheReqFormData,
     method: 'post',
   })
-  if (!cacheRes) throw new Error('Could not cache image.')
+  if (!cacheRes || !cacheRes.ok) throw new Error('Could not cache image.')
   const cacheResJson = await cacheRes.json<{ imageUrl: string }>()
   return cacheResJson.imageUrl
 }

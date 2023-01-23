@@ -5,9 +5,8 @@ import { Context } from '../../context'
 import { NodeType } from '../../types'
 import { isCryptoAddressType } from '../../utils'
 import ENSUtils from '@kubelt/platform-clients/ens-utils'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
-import { keccak256 } from '@ethersproject/keccak256'
 import { CryptoAddressType } from '@kubelt/types/address'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
 
 export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
   next,
@@ -35,9 +34,7 @@ export const checkCryptoNodes: BaseMiddlewareFunction<Context> = async ({
       const response = await ensClient.getEnsEntry(alias)
       const { address: ethAddress } = response
 
-      const encoder = new TextEncoder()
-      const idfUrn = IDRefURNSpace(CryptoAddressType.ETH).urn(ethAddress)
-      const hash = keccak256(encoder.encode(idfUrn))
+      const hash = generateHashedIDRef(CryptoAddressType.ETH, ethAddress)
 
       if (hash !== hashedIdref) {
         throw `Alias ${alias} does not match ${hashedIdref}`

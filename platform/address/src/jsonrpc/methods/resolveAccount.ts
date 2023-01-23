@@ -28,13 +28,13 @@ export const resolveAccountMethod = async ({
     if (AccountURNSpace.is(stored)) {
       return stored
     } else {
-      const urn = AccountURNSpace.urn(stored)
+      const urn = AccountURNSpace.componentizedUrn(stored)
       nodeClient?.storage.put('account', urn)
       return urn
     }
   } else {
     const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
-    const urn = AccountURNSpace.urn(name)
+    const urn = AccountURNSpace.componentizedUrn(name)
 
     console.log('set account', { urn })
 

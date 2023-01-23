@@ -5453,6 +5453,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kubelt/urns@workspace:packages/urns"
   dependencies:
+    "@ethersproject/keccak256": 5.7.0
     "@typescript-eslint/eslint-plugin": 5.45.0
     "@typescript-eslint/parser": 5.45.0
     eslint: 8.29.0

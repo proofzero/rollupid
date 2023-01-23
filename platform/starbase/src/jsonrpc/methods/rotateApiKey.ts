@@ -17,7 +17,7 @@ export const rotateApiKey = async ({
   input: z.infer<typeof RotateApiKeyInput>
   ctx: Context
 }): Promise<z.infer<typeof RotateApiKeyOutput>> => {
-  const appURN = ApplicationURNSpace.urn(input.clientId)
+  const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
   console.log(`rotating API key for ${appURN}`)
 
   const appDO = await getApplicationNodeByClientId(
