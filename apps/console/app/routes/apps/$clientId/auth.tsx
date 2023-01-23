@@ -2,13 +2,14 @@
  * @file app/routes/dashboard/apps/$appId/index.tsx
  */
 
-import type { ActionFunction } from '@remix-run/cloudflare'
+import type { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Form,
   useActionData,
   useSubmit,
   useOutletContext,
+  useLoaderData,
 } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
 import type {
@@ -28,6 +29,23 @@ import rotateSecrets, { RollType } from '~/helpers/rotation'
  */
 
 type notificationHandlerType = (val: boolean) => void
+
+export const loader: LoaderFunction = async ({ request, params }) => {
+  console.log(params)
+  if (!params.clientId) {
+    throw new Error('Application client id is required for the requested route')
+  }
+  const jwt = await requireJWT(request)
+  const starbaseClient = createStarbaseClient(Starbase, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt,
+    },
+  })
+
+  const scopeMeta = await starbaseClient.getScopes.query()
+
+  return json({ scopeMeta })
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -152,11 +170,12 @@ export default function AppDetailIndexPage() {
       appDetails: appDetailsProps
       rotationResult: any
     }>()
-  const [isFormChanged, setIsFormChanged] = useState(false)
+  const { scopeMeta } = useLoaderData()
 
+  const [isFormChanged, setIsFormChanged] = useState(false)
   const [isImgUploading, setIsImgUploading] = useState(false)
 
-  const { notificationHandler, appDetails, scopeMeta } = outletContextData
+  const { notificationHandler, appDetails } = outletContextData
   const rotatedSecret =
     outletContextData?.rotationResult?.rotatedClientSecret ||
     actionData?.rotatedSecret
