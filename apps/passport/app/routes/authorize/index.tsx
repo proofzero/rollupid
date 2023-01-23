@@ -95,7 +95,6 @@ export const action: ActionFunction = async ({ request, context }) => {
 }
 
 export default function Authorize() {
-  console.debug('before loader')
   const {
     clientId,
     appProfile,
@@ -104,11 +103,11 @@ export default function Authorize() {
     redirectOverride,
     scopeOverride,
   } = useLoaderData()
-  console.debug('before context')
+
   const { profile: userProfile } = useOutletContext<{
     profile: Required<Profile>
   }>()
-  console.debug('before submit')
+
   const submit = useSubmit()
   const transition = useTransition()
 

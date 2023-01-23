@@ -6,7 +6,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getAccessClient, getAddressClient } from '~/platform.server'
-import { createUserSession } from '~/session.server'
+import { createUserSession, getConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
@@ -47,16 +47,23 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
     // TODO: store refresh token in DO and set alarm to refresh
 
+    const appData = await getConsoleParamsSession(request, context.env)
+      .then((session) => JSON.parse(session.get('params')))
+      .catch((err) => {
+        console.log('No console params session found', err)
+        return null
+      })
+
     const {
       clientId: appId,
       redirectUri: consoleAppURI,
-      state,
+      state: appState,
       scope,
-    } = context.consoleParams
+    } = appData
 
     const redirectURL =
       appId && consoleAppURI && state
-        ? `/authorize?client_id=${clientId}&state=${state}&redirect_uri=${consoleAppURI}&scope=${scope}`
+        ? `/authorize?client_id=${appId}&state=${appState}&redirect_uri=${consoleAppURI}&scope=${scope}`
         : `/authorize`
     return createUserSession(accessToken, redirectURL, addressURN, context.env)
   } catch (error) {
