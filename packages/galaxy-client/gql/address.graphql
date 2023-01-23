@@ -34,26 +34,34 @@ query getAddressProfile($addressURN: URN!) {
 
 query getAddressProfiles($addressURNList: [URN!]) {
   addressProfiles(addressURNList: $addressURNList) {
-    __typename
-    ... on CryptoAddressProfile {
-      address
-      avatar
-      displayName
-    }
+    type
+    profile {
+      __typename
+      ... on CryptoAddressProfile {
+        address
+        avatar
+        displayName
+      }
 
-    ... on OAuthGoogleProfile {
-      name
-      picture
-    }
+      ... on OAuthGoogleProfile {
+        name
+        picture
+      }
 
-    ... on OAuthTwitterProfile {
-      name
-      profile_image_url_https
-    }
+      ... on OAuthTwitterProfile {
+        name
+        profile_image_url_https
+      }
 
-    ... on OAuthGithubProfile {
-      name
-      avatar_url
+      ... on OAuthGithubProfile {
+        name
+        avatar_url
+      }
+
+      ... on OAuthMicrosoftProfile {
+        name
+        picture
+      }
     }
   }
 }

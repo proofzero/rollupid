@@ -509,7 +509,7 @@ export type GetAddressProfilesQueryVariables = Exact<{
 }>;
 
 
-export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles?: Array<{ __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } | null> | null };
+export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles?: Array<{ __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null> | null };
 
 export type GetEnsProfileQueryVariables = Exact<{
   addressOrEns: Scalars['String'];
@@ -697,23 +697,30 @@ export const GetAddressProfileDocument = gql`
 export const GetAddressProfilesDocument = gql`
     query getAddressProfiles($addressURNList: [URN!]) {
   addressProfiles(addressURNList: $addressURNList) {
-    __typename
-    ... on CryptoAddressProfile {
-      address
-      avatar
-      displayName
-    }
-    ... on OAuthGoogleProfile {
-      name
-      picture
-    }
-    ... on OAuthTwitterProfile {
-      name
-      profile_image_url_https
-    }
-    ... on OAuthGithubProfile {
-      name
-      avatar_url
+    type
+    profile {
+      __typename
+      ... on CryptoAddressProfile {
+        address
+        avatar
+        displayName
+      }
+      ... on OAuthGoogleProfile {
+        name
+        picture
+      }
+      ... on OAuthTwitterProfile {
+        name
+        profile_image_url_https
+      }
+      ... on OAuthGithubProfile {
+        name
+        avatar_url
+      }
+      ... on OAuthMicrosoftProfile {
+        name
+        picture
+      }
     }
   }
 }
