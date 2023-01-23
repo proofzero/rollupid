@@ -16,17 +16,20 @@ export const loader: LoaderFunction = async ({ request }) => {
   const addressUrns = addresses.map((ca) => ca.urn as AddressURN)
   const profiles = (await getAddressProfiles(jwt, addressUrns)) ?? []
 
-  const addressProfiles: AddressListItemProps[] = profiles
-    ?.filter((p) => p?.__typename === 'CryptoAddressProfile')
+  const cryptoProfiles = profiles
+    .filter((p) => p?.profile.__typename === 'CryptoAddressProfile')
+    .map((p) => p?.profile as CryptoAddressProfile)
     .map((p) => ({
-      id: (p as CryptoAddressProfile).address,
-      address: (p as CryptoAddressProfile).address,
-      title: (p as CryptoAddressProfile).displayName as string,
-      icon: (p as CryptoAddressProfile).avatar as string,
+      id: p.address,
+      address: p.address,
+      title: p.displayName,
+      icon: p.avatar,
       chain: 'Ethereum',
-    }))
+    })) as AddressListItemProps[]
 
-  return { addressProfiles }
+  return {
+    addressProfiles: cryptoProfiles,
+  }
 }
 
 const AccountSettingsConnections = () => {
