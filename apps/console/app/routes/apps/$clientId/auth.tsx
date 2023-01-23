@@ -17,6 +17,7 @@ import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -108,7 +109,7 @@ export default function AppDetailIndexPage() {
     useOutletContext<{
       notificationHandler: notificationHandlerType
       appDetails: appDetailsProps
-      rotatedSecret: string
+      rotationResult: any
     }>()
   const [isFormChanged, setIsFormChanged] = useState(false)
 
@@ -116,7 +117,8 @@ export default function AppDetailIndexPage() {
 
   const { notificationHandler, appDetails, scopeMeta } = outletContextData
   const rotatedSecret =
-    outletContextData?.rotatedSecret || actionData?.rotatedSecret
+    outletContextData?.rotationResult?.rotatedClientSecret ||
+    actionData?.rotatedSecret
 
   if (actionData?.updatedApp) {
     appDetails.app = actionData.updatedApp.app
@@ -135,6 +137,7 @@ export default function AppDetailIndexPage() {
 
   return (
     <>
+      {isImgUploading ? <Loader /> : null}
       <DeleteAppModal
         clientId={appDetails.clientId as string}
         appName={appDetails.app.name}
@@ -163,7 +166,9 @@ export default function AppDetailIndexPage() {
             oAuth={{
               appId: appDetails.clientId as string,
               appSecret: rotatedSecret,
-              createdAt: new Date(appDetails.secretTimestamp),
+              createdAt: new Date(
+                appDetails.secretTimestamp?.toString() as string
+              ),
               onKeyRoll: () => {
                 submit(
                   {

@@ -30,6 +30,13 @@ export default async function rotateSecrets(
     const response = await starbaseClient.rotateClientSecret.mutate({
       clientId,
     })
+    // The prefix is there just as an aide to users;
+    // when they're moving these values
+    // (client ID, client secret),
+    // the prefix should help distinguish between them,
+    // rather then the user having to
+    // distinguish between them by e.g. length.
+    // The prefix is part of the secret and is included in the stored hash.
     result.rotatedClientSecret = response.secret.split(':')[1]
   }
 

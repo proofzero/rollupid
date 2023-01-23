@@ -87,7 +87,10 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
         {({ open }) => (
           <>
             <div className="relative mt-1">
-              <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
+              <Listbox.Button
+                className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
+               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm"
+              >
                 <span className="flex items-center">
                   {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                   {selected.clientId === 'none' && (
@@ -99,20 +102,23 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   )}
 
                   {selected.clientId !== 'none' && (
-                    <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
+                    <>
                       {!selected.icon && (
-                        <Text className="text-gray-500">
-                          {selected.name?.substring(0, 1)}
-                        </Text>
+                        <div className="rounded-full w-6 h-6 flex justify-center shrink-0 
+                        items-center bg-gray-200 overflow-hidden mr-2.5">
+                          <Text className="text-gray-500">
+                            {selected.name?.substring(0, 1)}
+                          </Text>
+                        </div>
                       )}
                       {selected.icon && (
                         <img
                           src={selected.icon}
-                          className="object-cover"
+                          className="object-cover w-6 h-6 rounded-full mr-2.5"
                           alt="app icon"
                         />
                       )}
-                    </div>
+                    </>
                   )}
 
                   <Text
@@ -159,16 +165,20 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                       {({ selected, active }) => (
                         <>
                           <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
-                            <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
-                              {!app.icon && (
+                            {!app.icon && (
+                              <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden mr-2.5">
                                 <Text className="text-gray-500">
                                   {app.name?.substring(0, 1)}
                                 </Text>
-                              )}
-                              {app.icon && (
-                                <img src={app.icon} className="object-cover w-screen h-screen" alt="app icon" />
-                              )}
-                            </div>
+                              </div>
+                            )}
+                            {app.icon && (
+                              <img
+                                src={app.icon}
+                                className="object-cover w-6 h-6 rounded-full mr-2.5"
+                                alt="app icon"
+                              />
+                            )}
 
                             <Text
                               size="sm"

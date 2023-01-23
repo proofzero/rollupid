@@ -13,10 +13,6 @@ import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
 import toast from 'react-hot-toast'
 
 export type appDetailsProps = {
-  published: boolean
-  clientId?: string
-  secretTimestamp: string
-  apiKeyTimestamp: string
   app: {
     name: string
     scopes: string[]
@@ -29,6 +25,10 @@ export type appDetailsProps = {
     mirrorURL?: string
     discordUser?: string
   }
+  published?: boolean
+  clientId?: string
+  secretTimestamp?: number
+  apiKeyTimestamp?: number
 }
 
 type ApplicationAuthProps = {

@@ -89,13 +89,13 @@ export default function AppDetailIndexPage() {
   const outletContext =
     useOutletContext<{
       appDetails: appDetailsProps
-      rotatedSecrets: RotatedSecrets
+      rotationResult: RotatedSecrets
     }>()
 
   const { appDetails: app } = outletContext
 
   const { rotatedClientSecret, rotatedApiKey } =
-    outletContext?.rotatedSecrets ||
+    outletContext?.rotationResult ||
       actionData?.rotatedSecrets || {
         rotatedClientSecret: null,
         rotatedApiKey: null,
@@ -104,7 +104,7 @@ export default function AppDetailIndexPage() {
   return (
     <ApplicationDashboard
       galaxyGql={{
-        createdAt: new Date(app.apiKeyTimestamp),
+        createdAt: new Date(app.apiKeyTimestamp?.toString() as string),
         apiKey: rotatedApiKey as string,
         onKeyRoll: () => {
           submit(
@@ -120,7 +120,7 @@ export default function AppDetailIndexPage() {
       oAuth={{
         appId: app.clientId as string,
         appSecret: rotatedClientSecret as string,
-        createdAt: new Date(app.secretTimestamp),
+        createdAt: new Date(app.secretTimestamp?.toString() as string),
         onKeyRoll: () => {
           submit(
             {
