@@ -5,7 +5,7 @@ import logoSvg from './microsoft-mark.svg'
 
 export default function ConnectMicrosoftButton() {
   return (
-    <Form action="/authenticate/microsoft" method="post">
+    <Form action={`/authenticate/microsoft`} method="post">
       <Button
         className={'button'}
         btnType={'secondary-alt'}

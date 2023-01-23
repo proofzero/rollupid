@@ -36,13 +36,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { alias: address }
   )
 
-  const addressClient = getAddressClient(addressURN)
+  const addressClient = getAddressClient(addressURN, context.env)
   try {
     const nonce = await addressClient.getNonce.query({
       address: address as string,
       template: signMessageTemplate,
       state,
-      redirectUri: PASSPORT_REDIRECT_URL,
+      redirectUri: context.env.PASSPORT_REDIRECT_URL,
       scope: ['admin'],
     })
     return json({ nonce, address, state })
@@ -62,7 +62,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     { alias: address }
   )
   console.log({ addressURN })
-  const addressClient = getAddressClient(addressURN)
+  const addressClient = getAddressClient(addressURN, context.env)
   const formData = await request.formData()
 
   // TODO: validate from data

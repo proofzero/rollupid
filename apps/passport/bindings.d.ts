@@ -1,32 +1,50 @@
 export const seviceBindings = true
+
 declare global {
-  const Address: Fetcher
-  const Account: Fetcher
-  const Galaxy: Fetcher
-  const Access: Fetcher
-  const Starbase: Fetcher
-  const Images: Fetcher
+  interface Env {
+    Address: Fetcher
+    Account: Fetcher
+    Galaxy: Fetcher
+    Access: Fetcher
+    Starbase: Fetcher
+    Images: Fetcher
 
-  const SECRET_SESSION_SALT: string
-  const COOKIE_DOMAIN: string
-  const THREEID_APP_URL: string
-  const CONSOLE_APP_URL: string
-  const PASSPORT_REDIRECT_URL: string
-  const APIKEY_ALCHEMY_PUBLIC: string
+    SECRET_SESSION_SALT: string
+    COOKIE_DOMAIN: string
+    THREEID_APP_URL: string
+    CONSOLE_APP_URL: string
+    PASSPORT_REDIRECT_URL: string
+    APIKEY_ALCHEMY_PUBLIC: string
 
-  const INTERNAL_GOOGLE_OAUTH_CLIENT_ID: string
-  const SECRET_GOOGLE_OAUTH_CLIENT_SECRET: string
-  const INTERNAL_GOOGLE_OAUTH_CALLBACK_URL: string
+    INTERNAL_GOOGLE_ANALYTICS_TAG: string
 
-  const INTERNAL_GITHUB_OAUTH_CLIENT_ID: string
-  const SECRET_GITHUB_OAUTH_CLIENT_SECRET: string
-  const INTERNAL_GITHUB_OAUTH_CALLBACK_URL: string
+    INTERNAL_GOOGLE_OAUTH_CLIENT_ID: string
+    SECRET_GOOGLE_OAUTH_CLIENT_SECRET: string
+    INTERNAL_GOOGLE_OAUTH_CALLBACK_URL: string
 
-  const INTERNAL_TWITTER_OAUTH_CLIENT_ID: string
-  const SECRET_TWITTER_OAUTH_CLIENT_SECRET: string
-  const INTERNAL_TWITTER_OAUTH_CALLBACK_URL: string
-  const INTERNAL_MICROSOFT_OAUTH_CLIENT_ID: string
-  const INTERNAL_MICROSOFT_OAUTH_TENANT_ID: string
-  const SECRET_MICROSOFT_OAUTH_CLIENT_SECRET: string
-  const INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL: string
+    INTERNAL_GITHUB_OAUTH_CLIENT_ID: string
+    SECRET_GITHUB_OAUTH_CLIENT_SECRET: string
+    INTERNAL_GITHUB_OAUTH_CALLBACK_URL: string
+
+    INTERNAL_TWITTER_OAUTH_CLIENT_ID: string
+    SECRET_TWITTER_OAUTH_CLIENT_SECRET: string
+    INTERNAL_TWITTER_OAUTH_CALLBACK_URL: string
+    INTERNAL_MICROSOFT_OAUTH_CLIENT_ID: string
+    INTERNAL_MICROSOFT_OAUTH_TENANT_ID: string
+    SECRET_MICROSOFT_OAUTH_CLIENT_SECRET: string
+    INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL: string
+  }
+
+  interface ConsoleParams {
+    clientId: string
+    redirectUri: string
+    scope: string
+    state: string
+  }
+}
+declare module '@remix-run/cloudflare' {
+  export interface AppLoadContext {
+    env: Env
+    consoleParams: ConsoleParams
+  }
 }

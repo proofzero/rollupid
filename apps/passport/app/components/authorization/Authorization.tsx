@@ -1,6 +1,7 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Avatar } from '@kubelt/design-system/src/atoms/profile/avatar/Avatar'
 import { Spinner } from '@kubelt/design-system/src/atoms/spinner/Spinner'
+import { Profile } from '@kubelt/galaxy-client'
 import { ScopeMeta } from '@kubelt/types/application'
 
 import authorizeCheck from '../../assets/authorize-check.svg'
@@ -23,7 +24,7 @@ export type UserProfile = {
 }
 
 export type AuthorizationProps = {
-  userProfile: UserProfile
+  userProfile: Required<Profile>
   appProfile: AppProfile
   scopeMeta: Record<string, ScopeMeta>
   transition: 'idle' | 'loading' | 'submitting'
@@ -57,8 +58,8 @@ export function Authorization({
     >
       <div className={'flex flex-row items-center justify-center'}>
         <Avatar
-          src={userProfile.pfp.image}
-          hex={userProfile.pfp.isToken}
+          src={userProfile.pfp?.image as string}
+          hex={false}
           size={'sm'}
           // alt="User Profile"
         />

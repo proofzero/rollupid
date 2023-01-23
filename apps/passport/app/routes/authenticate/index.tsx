@@ -5,19 +5,21 @@ import { Authentication } from '~/components'
 
 export const loader: LoaderFunction = async ({ request, context }) => {
   const searchParams = new URL(request.url).searchParams
+
   const oauthEnabled: boolean = searchParams.get('enableOAuth') !== null
   return { oauthEnabled }
 }
 
 export default function Authenticate() {
   const [enableWalletConnect, setEnableWalletConnect] = useState(true)
-  const { oauthEnabled } = useLoaderData()
+  const { searchParams, oauthEnabled } = useLoaderData()
+
   return (
     <Authentication
       enableWalletConnect={enableWalletConnect}
       enableOAuthConnect={oauthEnabled}
       connectCallback={async (address) => {
-        window.location.href = `/authenticate/${address}/sign${window.location.search}`
+        window.location.href = `/authenticate/${address}/sign`
       }}
       connectErrorCallback={(error) => {
         console.error(error)

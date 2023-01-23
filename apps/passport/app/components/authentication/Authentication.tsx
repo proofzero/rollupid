@@ -1,5 +1,4 @@
 import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
-import subtractLogo from '../../assets/subtract-logo.svg'
 import circleLogo from './circle-logo.svg'
 
 import ConnectGoogleButton from '~/components/connect-google-button'

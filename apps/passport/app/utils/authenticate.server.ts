@@ -8,12 +8,19 @@ import { createUserSession } from '~/session.server'
 
 export const authenticateAddress = async (
   address: AddressURN,
-  account: AccountURN
+  account: AccountURN,
+  appData: {
+    clientId: string
+    redirectUri: string
+    state: string
+    scope: string
+  } | null,
+  env: Env
 ) => {
-  const accessClient = getAccessClient()
+  const accessClient = getAccessClient(env)
 
   const clientId = address
-  const redirectUri = PASSPORT_REDIRECT_URL
+  const redirectUri = env.PASSPORT_REDIRECT_URL
   const scope = ['admin']
   const state = ''
   const { code } = await accessClient.authorize.mutate({
@@ -26,16 +33,22 @@ export const authenticateAddress = async (
   })
 
   const grantType = GrantType.AuthenticationCode
-  const { accessToken } = await accessClient.exchangeToken.mutate(
-    {
-      grantType,
-      account,
-      code,
-      redirectUri,
-      clientId,
-    }
-  )
+  const { accessToken } = await accessClient.exchangeToken.mutate({
+    grantType,
+    account,
+    code,
+    redirectUri,
+    clientId,
+  })
 
-  const redirectURL = '/authorize'
-  return createUserSession(accessToken, redirectURL, address)
+  let redirectURL = '/authorize'
+  if (appData) {
+    const authAppId = appData.clientId
+    const authRedirectUri = appData.redirectUri
+    const authState = appData.state
+    const authScope = appData.scope
+    redirectURL += `?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
+  }
+
+  return createUserSession(accessToken, redirectURL, address, env)
 }

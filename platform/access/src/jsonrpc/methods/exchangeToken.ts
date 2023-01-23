@@ -83,6 +83,8 @@ export const exchangeTokenMethod = async ({
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
     const access = AccessURNSpace.urn(iss)
+
+    console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
     await ctx.edgesClient!.makeEdge.mutate({
       src: account,
@@ -92,6 +94,8 @@ export const exchangeTokenMethod = async ({
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
+    const { code, redirectUri, clientId, clientSecret } = input
+
     throw new Error('not implemented')
   } else if (grantType == GrantType.RefreshToken) {
     const {

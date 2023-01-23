@@ -8,11 +8,25 @@ import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 
-import { authenticator } from '~/auth.server'
+import { initAuthenticator, getTwitterStrategy } from '~/auth.server'
 import { getAddressClient } from '~/platform.server'
 import { authenticateAddress } from '~/utils/authenticate.server'
+import { getConsoleParamsSession } from '~/session.server'
 
-export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({
+  request,
+  context,
+}: LoaderArgs) => {
+  const appData = await getConsoleParamsSession(request, context.env)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found', err)
+      return null
+    })
+
+  const authenticator = initAuthenticator(context.env)
+  authenticator.use(getTwitterStrategy(context.env))
+
   const { accessToken, accessTokenSecret, profile } =
     (await authenticator.authenticate(
       TwitterStrategyDefaultName,
@@ -24,7 +38,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
     { node_type: NodeType.OAuth, addr_type: OAuthAddressType.Twitter },
     { alias: profile.name, hidden: 'true' }
   )
-  const addressClient = getAddressClient(address)
+  const addressClient = getAddressClient(address, context.env)
   const account = await addressClient.resolveAccount.query()
 
   await addressClient.setOAuthData.mutate({
@@ -33,5 +47,5 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
     profile: { ...profile, provider: OAuthAddressType.Twitter },
   })
 
-  return authenticateAddress(address, account)
+  return authenticateAddress(address, account, appData, context.env)
 }

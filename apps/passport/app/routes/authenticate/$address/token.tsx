@@ -6,7 +6,7 @@ import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
 import { getAccessClient, getAddressClient } from '~/platform.server'
-import { createUserSession } from '~/session.server'
+import { createUserSession, getConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
@@ -25,14 +25,14 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { node_type: node_type, addr_type: addr_type },
     { alias: address }
   )
-  const addressClient = getAddressClient(addressURN)
+  const addressClient = getAddressClient(addressURN, context.env)
   const account = await addressClient.resolveAccount.query() // creates and associates account if there is none
 
   const grantType = GrantType.AuthenticationCode
-  const redirectUri = PASSPORT_REDIRECT_URL
+  const redirectUri = context.env.PASSPORT_REDIRECT_URL
   const clientId = params.address as string
 
-  const accessClient = getAccessClient()
+  const accessClient = getAccessClient(context.env)
 
   // TODO: handle refresh token
   try {
@@ -47,10 +47,25 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
     // TODO: store refresh token in DO and set alarm to refresh
 
-    const redirectURL = searchParams.get('client_id')
-      ? `/authorize?client_id=${searchParams.get('client_id')}&state=${state}`
-      : `/authorize`
-    return createUserSession(accessToken, redirectURL, addressURN)
+    const appData = await getConsoleParamsSession(request, context.env)
+      .then((session) => JSON.parse(session.get('params')))
+      .catch((err) => {
+        console.log('No console params session found', err)
+        return null
+      })
+
+    const {
+      clientId: appId,
+      redirectUri: consoleAppURI,
+      state: appState,
+      scope,
+    } = appData
+
+    const redirectURL =
+      appId && consoleAppURI && state
+        ? `/authorize?client_id=${appId}&state=${appState}&redirect_uri=${consoleAppURI}&scope=${scope}`
+        : `/authorize`
+    return createUserSession(accessToken, redirectURL, addressURN, context.env)
   } catch (error) {
     console.error({ addressURN, error: JSON.stringify(error) })
     throw json({ message: 'invalid code' }, 400)

@@ -62,12 +62,12 @@ export const links: LinksFunction = () => [
   { rel: 'shortcut icon', type: 'image/svg+xml', href: faviconSvg },
 ]
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = ({ context }) => {
   return json({
     ENV: {
-      THREEID_APP_URL,
-      INTERNAL_GOOGLE_ANALYTICS_TAG,
-      APIKEY_ALCHEMY_PUBLIC,
+      THREEID_APP_URL: context.env.THREEID_APP_URL,
+      INTERNAL_GOOGLE_ANALYTICS_TAG: context.env.INTERNAL_GOOGLE_ANALYTICS_TAG,
+      APIKEY_ALCHEMY_PUBLIC: context.env.APIKEY_ALCHEMY_PUBLIC,
     },
   })
 }
