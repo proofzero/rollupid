@@ -18,6 +18,7 @@ import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+import rotateSecrets, { RollType } from '~/helpers/rotation'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -52,10 +53,12 @@ export const action: ActionFunction = async ({ request, params }) => {
   switch (op) {
     case 'roll_app_secret':
       rotatedSecret = (
-        await starbaseClient.rotateClientSecret.mutate({
-          clientId: params.clientId,
-        })
-      ).secret.split(':')[1]
+        await rotateSecrets(
+          starbaseClient,
+          params.clientId,
+          RollType.RollClientSecret
+        )
+      ).rotatedClientSecret
       break
     case 'update_app':
       const entries = formData.entries()
@@ -103,6 +106,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
+  console.log("HELLO")
   const submit = useSubmit()
   const actionData = useActionData()
   const outletContextData =

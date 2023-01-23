@@ -11,6 +11,8 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import rotateSecrets, { RollType } from '~/helpers/rotation'
+import type { RotatedSecrets } from '~/helpers/rotation'
 
 // Component
 // -----------------------------------------------------------------------------
@@ -42,42 +44,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   return json({
     rotatedSecrets: rotationResult,
   })
-}
-
-const RollType = {
-  RollAPIKey: 'roll_api_key',
-  RollClientSecret: 'roll_app_secret',
-  RollBothSecrets: 'roll_both',
-} as const
-
-type RotatedSecrets = {
-  rotatedApiKey: string | null
-  rotatedClientSecret: string | null
-}
-
-async function rotateSecrets(
-  starbaseClient: ReturnType<typeof createStarbaseClient>,
-  clientId: string,
-  op: string
-): Promise<RotatedSecrets> {
-  let result: RotatedSecrets = {
-    rotatedApiKey: null,
-    rotatedClientSecret: null,
-  }
-
-  if (op === RollType.RollAPIKey || op === RollType.RollBothSecrets)
-    result.rotatedApiKey = (
-      await starbaseClient.rotateApiKey.mutate({ clientId })
-    ).apiKey
-
-  if (op === RollType.RollClientSecret || op === RollType.RollBothSecrets) {
-    const response = await starbaseClient.rotateClientSecret.mutate({
-      clientId,
-    })
-    result.rotatedClientSecret = response.secret.split(':')[1]
-  }
-
-  return result
 }
 
 // Component
