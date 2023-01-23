@@ -4,7 +4,7 @@
  * Derived from TailwindUI > Select Menus > Custom with avatar.
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -47,8 +47,9 @@ type AppListboxProps = {
 
 function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
-  const [selected] = useState(
-    apps && apps.length !== 0
+
+  const initiateSelectedApp = (apps: any[], selectedAppIndex: number) => {
+    return apps && apps.length !== 0
       ? selectedAppIndex < 0
         ? {
             clientId: 'none',
@@ -61,7 +62,15 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
           name: 'No Applications',
           icon: undefined,
         }
+  }
+
+  const [selected, updateSelected] = useState(
+    initiateSelectedApp(apps, selectedAppIndex)
   )
+
+  useEffect(() => {
+    updateSelected(initiateSelectedApp(apps, selectedAppIndex))
+  }, [apps])
 
   const setSelected = (selected: { clientId: string }) => {
     // Using useNavigation hook
@@ -104,8 +113,10 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   {selected.clientId !== 'none' && (
                     <>
                       {!selected.icon && (
-                        <div className="rounded-full w-6 h-6 flex justify-center shrink-0 
-                        items-center bg-gray-200 overflow-hidden mr-2.5">
+                        <div
+                          className="rounded-full w-6 h-6 flex justify-center shrink-0 
+                        items-center bg-gray-200 overflow-hidden mr-2.5"
+                        >
                           <Text className="text-gray-500">
                             {selected.name?.substring(0, 1)}
                           </Text>

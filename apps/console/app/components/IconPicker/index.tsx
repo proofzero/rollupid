@@ -154,7 +154,7 @@ export default function IconPicker({
                 type="file"
                 id="icon-upload"
                 name="icon"
-                accept="image/png, image/jpeg"
+                accept="image/png,image/jpeg,image/gif,image/webp"
                 className="sr-only"
                 onChange={async (event) => {
                   event.stopPropagation()

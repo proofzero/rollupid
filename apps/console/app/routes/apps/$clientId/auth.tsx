@@ -106,7 +106,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
-  console.log("HELLO")
   const submit = useSubmit()
   const actionData = useActionData()
   const outletContextData =
