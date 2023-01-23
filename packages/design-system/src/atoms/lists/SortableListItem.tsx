@@ -27,7 +27,7 @@ export const SortableListItem = ({ id, children }: SortableListItemProps) => {
     <div
       className={`
                border border-gray-300 rounded-md
-                px-4 py-3 mb-3 truncate bg-white
+                px-4 py-3 mb-3 bg-white
                 flex flex-row items-center justify-between
                 ${isDragging ? 'shadow-inner z-100' : ''}
                  `}
