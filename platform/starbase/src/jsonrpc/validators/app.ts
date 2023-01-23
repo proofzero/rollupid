@@ -11,7 +11,7 @@ export const ScopeMeta = z.record(
 
 export const AppObjectSchema = z.object({
   name: z.string(),
-  scopes: z.set(z.string()).or(z.array(z.string())), // some reason we can't send Set because it fails as object?
+  scopes: z.set(z.string()).or(z.array(z.string())).optional(), // some reason we can't send Set because it fails as object?
   redirectURI: z.string().optional(),
   icon: z.string().optional(),
   termsURL: z.string().optional(),
