@@ -60,7 +60,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
           case OAuthAddressType.Google: {
             const gradient = await generateGradient(
               res.profile.email,
-              constext.env
+              context.env
             )
             return {
               displayName: res.profile.name,

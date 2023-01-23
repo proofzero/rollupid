@@ -97,6 +97,7 @@ export async function createConsoleParamsSession(
   const session = await storage.getSession()
   session.set('params', JSON.stringify(consoleParams))
 
+  console.debug('before REDIRECT', JSON.stringify(consoleParams))
   return redirect('/authenticate', {
     headers: {
       'Set-Cookie': await storage.commitSession(session),
@@ -116,9 +117,12 @@ export async function requireJWT(
 ) {
   const session = await getUserSession(request, false, env)
   const jwt = session.get('jwt')
-
+  console.debug('before session If statement')
   if (!jwt || typeof jwt !== 'string') {
-    createConsoleParamsSession(consoleParams, env)
+    console.debug('CONSOLE PARAMS', consoleParams)
+    if (consoleParams.clientId)
+      throw await createConsoleParamsSession(consoleParams, env)
+    else throw redirect('/authenticate')
   }
   if (jwt) {
     const parsedJWT = parseJwt(jwt)
