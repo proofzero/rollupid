@@ -1,11 +1,9 @@
 import type { LoaderArgs, LoaderFunction } from '@remix-run/cloudflare'
 
-import type { AddressURN } from '@kubelt/urns/address'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { authenticator } from '~/auth.server'
-import { getAddressClient, getAccessClient } from '~/platform.server'
-import { keccak256 } from '@ethersproject/keccak256'
+import { getAddressClient } from '~/platform.server'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
@@ -21,13 +19,17 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   if (profile.provider !== OAuthAddressType.Microsoft)
     throw new Error('Unsupported provider returned in Microsoft callback.')
 
-  const idref = IDRefURNSpace(OAuthAddressType.Microsoft).urn(profile.id)
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
-  const address = (AddressURNSpace.urn(hash) +
-    `?+node_type=${NodeType.OAuth}&addr_type=${OAuthAddressType.Microsoft}`) as AddressURN
+  const address = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(OAuthAddressType.Microsoft, profile.id),
+    { addr_type: OAuthAddressType.Microsoft, node_type: NodeType.OAuth },
+    { alias: profile.displayName, hidden: 'true' }
+  )
+
   const addressClient = getAddressClient(address)
+
   const account = await addressClient.resolveAccount.query()
+
+  const existingOAuthData = await addressClient.getOAuthData.query()
 
   await addressClient.setOAuthData.mutate(authRes)
 

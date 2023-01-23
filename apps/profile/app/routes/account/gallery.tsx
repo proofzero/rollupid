@@ -41,22 +41,18 @@ import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 // Other helpers
 
 import { AddressURNSpace } from '@kubelt/urns/address'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { getIndexerClient } from '~/helpers/clients'
 import type { Node, Profile } from '@kubelt/galaxy-client'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
 import { CryptoAddressType } from '@kubelt/types/address'
-import { keccak256 } from 'ethers/lib/utils'
 import { getMoreNftsModal } from '~/helpers/nfts'
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const targetAddress = formData.get('address')?.toString()
-  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(
-    targetAddress as string
+  const targetAddress = formData.get('address')?.toString() || ''
+  const urn = AddressURNSpace.urn(
+    generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
   )
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
-  const urn = AddressURNSpace.urn(hash)
 
   let errors: any = {}
 

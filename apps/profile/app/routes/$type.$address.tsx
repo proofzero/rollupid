@@ -1,29 +1,29 @@
 import { Profile } from '@kubelt/galaxy-client'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { useLoaderData } from '@remix-run/react'
-import { keccak256 } from 'ethers/lib/utils'
 import { redirect } from 'react-router-dom'
 import { getGalaxyClient } from '~/helpers/clients'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
-
-  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
+  if (!address) throw new Error('No address provided with request')
 
   const galaxyClient = await getGalaxyClient()
 
-  const urn = AddressURNSpace.urn(hash) // TODO: introduce new sub-urn hash
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.ETH, address),
+    { addr_type: CryptoAddressType.ETH },
+    { alias: address }
+  )
 
-  console.log({ urn, address })
+  console.log({ addressURN, address })
   // check if address is registered to an account
   const profile = await galaxyClient
     .getProfileFromAddress({
-      addressURN: `${urn}?+addr_type=eth?=alias=${address}`,
+      addressURN,
     })
     .then((res) => res.profileFromAddress)
     .catch((err) => {
@@ -58,7 +58,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   return json({
     profile,
-    addressUrn: urn,
+    addressUrn: AddressURNSpace.getBaseURN(addressURN),
   })
 }
 

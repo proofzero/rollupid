@@ -1,4 +1,4 @@
-import { BaseURN, URNSpace, parseURN } from 'urns'
+import { BaseURN, URNSpace, parseURN, SpaceOptions, FullURN } from 'urns'
 
 export { parseURN }
 
@@ -26,20 +26,31 @@ export const createObjectURNSpace = (): ObjectURNSpace<string> => {
 }
 
 // PLATFORM URN
+export type CompType = { [k: string]: string }
 export type ThreeIdURN<NSS extends string> = BaseURN<'threeid', NSS>
-export type ThreeIdURNSpace<NSS extends string> = URNSpace<
-  'threeid',
-  NSS,
-  string
->
+export type ThreeIdURNSpace<
+  NSS extends string,
+  RComp extends CompType,
+  QComp extends CompType
+> = TypedComponentsURNSpace<'threeid', NSS, RComp, QComp, ThreeIdURN<NSS>>
 
 // general
 export const ThreeIdSpace = new URNSpace('threeid')
 
-export const createThreeIdURNSpace = <NSSPrefix extends string>(
+export const createThreeIdURNSpace = <
+  NSSPrefix extends string,
+  RComp extends CompType,
+  QComp extends CompType
+>(
   prefix?: string // optional if we want to validate prefix
-): ThreeIdURNSpace<`${NSSPrefix}/${string}`> => {
-  return new URNSpace<'threeid', `${NSSPrefix}/${string}`, string>('threeid', {
+): ThreeIdURNSpace<`${NSSPrefix}/${string}`, RComp, QComp> => {
+  return new TypedComponentsURNSpace<
+    'threeid',
+    `${NSSPrefix}/${string}`,
+    RComp,
+    QComp,
+    ThreeIdURN<`${NSSPrefix}/${string}`>
+  >('threeid', {
     encode: (val: string): string => {
       if (!prefix) throw 'cannot encode without prefix'
       return `${prefix}/${val}`
@@ -52,6 +63,95 @@ export const createThreeIdURNSpace = <NSSPrefix extends string>(
       return val
     },
   })
+}
+
+class TypedComponentsURNSpace<
+  NID extends string,
+  NSS extends string,
+  RCompType extends { [k: string]: string } = never,
+  QCompType extends { [k: string]: string } = never,
+  URNType extends BaseURN<NID, NSS> = never
+> extends URNSpace<string, string, string> {
+  constructor(nid: NID, options?: Partial<SpaceOptions<NSS, string>>) {
+    super(nid, options)
+  }
+
+  componentizedUrn(
+    nss: string,
+    rcomps?: RCompType,
+    qcomps?: QCompType
+  ): URNType {
+    //Parent supports record-based qcomps, but not rcomps so we have to stringify
+    let stringifiedRcomp
+    if (rcomps) {
+      const params = new URLSearchParams()
+      Object.entries<string>(rcomps).forEach(([k, v]) => params.append(k, v))
+      stringifiedRcomp = params.toString()
+    }
+
+    return super.fullUrn(nss, {
+      r: stringifiedRcomp,
+      q: qcomps,
+    }) as URNType
+  }
+
+  componentizedParse(
+    urn: `urn:${string}:${string}${string}`
+  ): ParsedComponentizedURN<string, string, RCompType, QCompType> {
+    const s = super.parse(urn)
+    console.debug('COMPONENTIZED PARSE', {
+      urn,
+      rcomps: s.rcomponent,
+      qcomps: s.qcomponent,
+      nid: s.nid,
+      nss: s.nss,
+      nss_encoded: s.nss_encoded,
+      base_urn: this.getBaseURN(urn),
+    })
+    let rcomps = null
+    if (s.rcomponent) {
+      const params = new URLSearchParams(decodeURIComponent(s.rcomponent))
+
+      rcomps = (Object.fromEntries(params.entries()) as RCompType) || null
+    }
+    let qcomps = null
+    if (s.qcomponent) {
+      const params = new URLSearchParams(s.qcomponent)
+      qcomps = (Object.fromEntries(params.entries()) as QCompType) || null
+    }
+
+    let result = {
+      nid: s.nid,
+      nss: s.nss,
+      nss_encoded: s.nss_encoded,
+      decoded: s.nss_encoded,
+      rcomponent: rcomps,
+      qcomponent: qcomps,
+      fragment: null,
+    }
+
+    return result
+  }
+
+  getBaseURN(urn: `urn:${string}:${string}${string}`): URNType {
+    const s = super.parse(urn)
+    return `urn:${s.nid}:${s.nss}` as URNType
+  }
+}
+
+interface ParsedComponentizedURN<
+  NID extends string,
+  NSS extends string,
+  RCompType extends { [k: string]: string },
+  QCompType extends { [k: string]: string }
+> {
+  nid: NID
+  nss: NSS
+  nss_encoded: string
+  decoded: string
+  rcomponent: RCompType | null
+  qcomponent: QCompType | null
+  fragment: string | null
 }
 
 // Any URN

@@ -13,9 +13,8 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { useEffect, useState } from 'react'
 import { getAddressClient } from '~/platform.server'
 import { AddressURNSpace } from '@kubelt/urns/address'
-import { IDRefURNSpace } from '@kubelt/urns/idref'
-import { CryptoAddressType } from '@kubelt/types/address'
-import { keccak256 } from '@ethersproject/keccak256'
+import { generateHashedIDRef } from '@kubelt/urns/idref'
+import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 
 export const signMessageTemplate = `Welcome to 3ID!
 
@@ -28,13 +27,15 @@ This will not trigger a blockchain transaction or cost any gas fees.
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {
   const { address } = params
+  if (!address) throw new Error('No address included in request')
+
   const state = Math.random().toString(36).substring(7)
-  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
-  const addressURN = `${AddressURNSpace.urn(
-    hash
-  )}?+node_type=crypto&addr_type=eth?=alias=${address}`
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.ETH, address),
+    { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    { alias: address }
+  )
+
   const addressClient = getAddressClient(addressURN)
   try {
     const nonce = await addressClient.getNonce.query({
@@ -53,13 +54,13 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
 
 export const action: ActionFunction = async ({ request, context, params }) => {
   const { address } = params
-  const idref = IDRefURNSpace(CryptoAddressType.ETH).urn(address as string)
-  const encoder = new TextEncoder()
-  const hash = keccak256(encoder.encode(idref))
-  const addressURN = `${AddressURNSpace.urn(
-    hash
-  )}?+node_type=crypto&addr_type=eth?=alias=${address}`
+  if (!address) throw new Error('No address included in request')
 
+  const addressURN = AddressURNSpace.componentizedUrn(
+    generateHashedIDRef(CryptoAddressType.ETH, address),
+    { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    { alias: address }
+  )
   console.log({ addressURN })
   const addressClient = getAddressClient(addressURN)
   const formData = await request.formData()

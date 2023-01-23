@@ -20,12 +20,11 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
     throw `missing 3RN name: ${addressURN}`
   }
 
-  const { rcomponent, qcomponent } = AddressURNSpace.parse(addressURN)
-  const rparams = new URLSearchParams(rcomponent || '')
-  const qparams = new URLSearchParams(qcomponent || '')
+  const { rcomponent, qcomponent } =
+    AddressURNSpace.componentizedParse(addressURN)
 
-  const addrType = rparams.get('addr_type')
-  const alias = qparams.get('alias')
+  const addrType = rcomponent?.addr_type
+  const alias = qcomponent?.alias
 
   // if (!addrType) {
   //   throw `cannot determine node type: ${addressURN}. Please provide a node_type or addr_type r-component.`
@@ -33,35 +32,28 @@ export const parse3RN: BaseMiddlewareFunction<Context> = async ({
 
   const nodeType = addrType
     ? isValidAddressType(addrType)
-    : rparams.get('node_type')
+    : rcomponent?.node_type
 
   // if (!nodeType) {
   //   throw `invalid 3RN address type: ${addrType}`
   // }
-
-  // add the name qc param
-  addressURN = `${AddressURNSpace.urn(hashedIdref)}`
 
   console.log('parse3RN', {
     hashedIdref,
     addrType,
     nodeType,
     alias,
-    rparams,
     addressURN,
   })
 
   return next({
     ctx: {
       ...ctx,
-      rparams,
-      qparams,
       addressURN,
       addrType,
       nodeType,
       alias,
       hashedIdref,
-      params: new URLSearchParams(qcomponent as string),
     },
   })
 }
