@@ -11,7 +11,10 @@ import {
   useOutletContext,
 } from '@remix-run/react'
 import { ApplicationAuth } from '~/components/Applications/Auth/ApplicationAuth'
-import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import type {
+  appDetailsProps,
+  errorsAuthProps,
+} from '~/components/Applications/Auth/ApplicationAuth'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
@@ -43,6 +46,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData()
   const op = formData.get('op')
   const published = formData.get('published') === '1'
+  const errors: errorsAuthProps = {}
 
   // console.log({ scopes: JSON.stringify(formData) })
 
@@ -82,23 +86,57 @@ export const action: ActionFunction = async ({ request, params }) => {
         discordUser: formData.get('discordUser') as string | undefined,
       }
 
-      await starbaseClient.updateApp.mutate({
-        clientId: params.clientId,
-        updates,
-      })
+      const [protocolWebsite, pathWebsite]: any = updates.websiteURL?.split(':')
+      const [protocolTerms, pathTerms]: any = updates.termsURL?.split(':')
+      const [protocolRedirect, pathRedirect]: any =
+        updates.redirectURI?.split(':')
 
-      await starbaseClient.publishApp.mutate({
-        clientId: params.clientId,
-        published: published,
-      })
+      if (
+        protocolWebsite &&
+        protocolWebsite === 'http' &&
+        pathWebsite.split('.')[0] !== 'localhost' &&
+        !pathWebsite.includes('127.0.0.1')
+      ) {
+        errors['websiteURL'] = 'HTTP can only be used for localhost'
+      }
 
+      if (
+        protocolTerms &&
+        protocolTerms === 'http' &&
+        pathTerms.split('.')[0] !== 'localhost' &&
+        !pathTerms.includes('127.0.0.1')
+      ) {
+        errors['termsURL'] = 'HTTP can only be used for localhost'
+      }
+
+      if (
+        protocolRedirect &&
+        protocolRedirect === 'http' &&
+        pathRedirect.split('.')[0] !== 'localhost' &&
+        !pathRedirect.includes('127.0.0.1')
+      ) {
+        errors['redirectURI'] = 'HTTP can only be used for localhost'
+      }
+
+      if (Object.keys(errors).length === 0) {
+        await Promise.all([
+          starbaseClient.updateApp.mutate({
+            clientId: params.clientId,
+            updates,
+          }),
+          starbaseClient.publishApp.mutate({
+            clientId: params.clientId,
+            published: published,
+          }),
+        ])
+      }
       break
   }
 
   return json({
     rotatedSecret,
     updatedApp: { published, app: { ...updates } },
-    errors: {},
+    errors,
   })
 }
 
@@ -183,6 +221,7 @@ export default function AppDetailIndexPage() {
                 )
               },
             }}
+            errors={errors}
             isFormChanged={isFormChanged}
             setIsFormChanged={setIsFormChanged}
             onDelete={() => {

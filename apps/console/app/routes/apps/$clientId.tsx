@@ -1,4 +1,4 @@
-import type { LoaderFunction, ActionFunction } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
 
 import { Outlet, useLoaderData } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
@@ -107,7 +107,9 @@ export default function AppDetailIndexPage() {
     if (success) {
       toast.success('Saved', { duration: 2000 })
     } else {
-      toast.error('Save Failed -- Please try again', { duration: 2000 })
+      toast.error('Save Failed -- Please try again', {
+        duration: 2000,
+      })
     }
   }
 

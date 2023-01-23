@@ -31,6 +31,12 @@ export type appDetailsProps = {
   apiKeyTimestamp?: number
 }
 
+export type errorsAuthProps = {
+  websiteURL?: string
+  termsURL?: string
+  redirectURI?: string
+}
+
 type ApplicationAuthProps = {
   appDetails: appDetailsProps
 
@@ -45,6 +51,7 @@ type ApplicationAuthProps = {
   setIsFormChanged?: (val: boolean) => void
   setIsImgUploading?: (val: boolean) => void
   isFormChanged?: boolean
+  errors: errorsAuthProps
 }
 
 export const ApplicationAuth = ({
@@ -55,6 +62,7 @@ export const ApplicationAuth = ({
   isFormChanged,
   setIsImgUploading,
   setIsFormChanged,
+  errors,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
   const [formData, setFormData] = useState<appDetailsProps>(appDetails)
@@ -219,31 +227,69 @@ export const ApplicationAuth = ({
 
           <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="redirectURI"
                 label="Redirect URL"
-                preLabel="http://"
+                type="url"
+                error={errors?.['redirectURI']}
                 placeholder="www.example.com"
                 defaultValue={formData.app.redirectURI}
               />
+              {errors?.redirectURI ? (
+                <Text
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.redirectURI || ''}
+                </Text>
+              ) : (
+                <div className="mb-[1.38rem]" />
+              )}
             </div>
+
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="termsURL"
                 label="Terms of Service URL"
-                preLabel="http://"
+                type="url"
+                error={errors?.['termsURL']}
                 placeholder="www.example.com"
                 defaultValue={formData.app.termsURL}
               />
+              {errors?.termsURL ? (
+                <Text
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.termsURL || ''}
+                </Text>
+              ) : (
+                <div className="mb-[1.38rem]" />
+              )}
             </div>
+
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="websiteURL"
                 label="Website"
-                preLabel="http://"
+                error={errors?.['websiteURL']}
+                type="url"
                 placeholder="www.example.com"
                 defaultValue={formData.app.websiteURL}
               />
+              {errors?.websiteURL ? (
+                <Text
+                  className="mb-1.5 text-gray-400"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.websiteURL || ''}
+                </Text>
+              ) : (
+                <div className="mb-[1.38rem]" />
+              )}
             </div>
           </div>
 
