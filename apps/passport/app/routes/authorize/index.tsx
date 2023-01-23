@@ -18,6 +18,10 @@ import { Profile } from '@kubelt/galaxy-client'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
 
+  if (!clientId) throw json({ message: 'client_id is required' }, 400)
+  if (!state) throw json({ message: 'state is required' }, 400)
+  if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+
   const jwt = await requireJWT(request, context.consoleParams, context.env)
 
   try {
@@ -53,7 +57,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     return redirect(cancel)
   }
 
-  const jwt = await requireJWT(request)
+  const jwt = await requireJWT(request, context.consoleParams, context.env)
   const parsedJWT = parseJwt(jwt)
   const account = parsedJWT.sub as AccountURN
   const responseType = ResponseType.Code
@@ -66,7 +70,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Missing required fields' }, 400)
   }
 
-  const accessClient = getAccessClient()
+  const accessClient = getAccessClient(context.env)
   const authorizeRes = await accessClient.authorize.mutate({
     account,
     responseType,

@@ -9,17 +9,18 @@ import { getAddressClient } from '~/platform.server'
 import { GitHubStrategyDefaultName } from 'remix-auth-github'
 import { NodeType, OAuthAddressType } from '@kubelt/types/address'
 import { OAuthData } from '@kubelt/platform.address/src/types'
+import { getConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({
   request,
   context,
 }: LoaderArgs) => {
-  const searchParams = new URL(request.url).searchParams
-  const rollupEncoding = searchParams.get('rollup')
-
-  if (!rollupEncoding) throw new Error('Missing rollup encoding.')
-
-  const appData = JSON.parse(decodeURIComponent(rollupEncoding))
+  const appData = await getConsoleParamsSession(request, context.env)
+    .then((session) => JSON.parse(session.get('params')))
+    .catch((err) => {
+      console.log('No console params session found', err)
+      return null
+    })
 
   const authenticator = initAuthenticator(context.env)
   authenticator.use(getGithubAuthenticator(context.env))

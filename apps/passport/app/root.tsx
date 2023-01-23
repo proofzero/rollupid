@@ -63,6 +63,7 @@ export const links: LinksFunction = () => [
 ]
 
 export const loader: LoaderFunction = ({ context }) => {
+  console.log({ context })
   return json({
     ENV: {
       THREEID_APP_URL: context.env.THREEID_APP_URL,

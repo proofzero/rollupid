@@ -80,15 +80,21 @@ export const exchangeTokenMethod = async ({
       scope: [], //scope,
     })
 
+    console.log('HERE')
+
     // Create an edge between Account and Access nodes to record the
     // existence of a user "session".
     const access = AccessURNSpace.urn(iss)
+
+    console.log({ access, edgesClient: ctx.edgesClient })
     // NB: we use InjectEdges middleware to inject this service client.
     await ctx.edgesClient!.makeEdge.mutate({
       src: account,
       dst: access,
       tag: EDGE_ACCESS,
     })
+
+    console.log('HERE @')
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {

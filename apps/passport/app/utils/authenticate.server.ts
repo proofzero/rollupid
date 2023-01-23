@@ -14,7 +14,7 @@ export const authenticateAddress = async (
     redirectUri: string
     state: string
     scope: string
-  },
+  } | null,
   env: Env
 ) => {
   const accessClient = getAccessClient(env)
@@ -41,11 +41,14 @@ export const authenticateAddress = async (
     clientId,
   })
 
-  const authAppId = appData.clientId
-  const authRedirectUri = appData.redirectUri
-  const authState = appData.state
-  const authScope = appData.scope
+  let redirectURL = '/authorize'
+  if (appData) {
+    const authAppId = appData.clientId
+    const authRedirectUri = appData.redirectUri
+    const authState = appData.state
+    const authScope = appData.scope
+    redirectURL += `?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
+  }
 
-  const redirectURL = `/authorize?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
   return createUserSession(accessToken, redirectURL, address, env)
 }

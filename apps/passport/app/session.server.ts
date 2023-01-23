@@ -31,17 +31,25 @@ export async function createUserSession(
   defaultProfileUrn: string, // NOTE: storing this temporarily in the session util RPC url remove address
   env: Env
 ) {
-  const storage = getUserSessionStorage(env)
+  const userStorage = getUserSessionStorage(env)
   const parsedJWT = parseJwt(jwt)
-  const session = await storage.getSession()
-  session.set('core', parsedJWT.iss)
-  session.set('jwt', jwt)
-  session.set('defaultProfileUrn', defaultProfileUrn)
+  const userSession = await userStorage.getSession()
+  userSession.set('core', parsedJWT.iss)
+  userSession.set('jwt', jwt)
+  userSession.set('defaultProfileUrn', defaultProfileUrn)
+
+  const consoleParamsStorage = await getConsoleParamsSessionStorage(env)
+  const consoleParamsSession = await consoleParamsStorage.getSession()
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await userStorage.commitSession(userSession))
+  headers.append(
+    'Set-Cookie',
+    await consoleParamsStorage.destroySession(consoleParamsSession)
+  )
 
   return redirect(redirectTo, {
-    headers: {
-      'Set-Cookie': await storage.commitSession(session),
-    },
+    headers,
   })
 }
 
@@ -96,11 +104,7 @@ export async function createConsoleParamsSession(
   })
 }
 
-export async function getConsoleParamsSession(
-  request: Request,
-  renew: boolean = true,
-  env: Env
-) {
+export async function getConsoleParamsSession(request: Request, env: Env) {
   const storage = getConsoleParamsSessionStorage(env)
   return storage.getSession(request.headers.get('Cookie'))
 }
