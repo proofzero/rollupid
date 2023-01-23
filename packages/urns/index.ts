@@ -120,7 +120,7 @@ class TypedComponentsURNSpace<
       qcomps = (Object.fromEntries(params.entries()) as QCompType) || null
     }
 
-    let result = {
+    const result = {
       nid: s.nid,
       nss: s.nss,
       nss_encoded: s.nss_encoded,
