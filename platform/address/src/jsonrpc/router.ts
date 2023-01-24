@@ -46,6 +46,10 @@ import {
   CustomAnalyticsFunctionType,
 } from '@kubelt/platform-middleware/analytics'
 import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
+import {
+  SetAddressNicknameInput,
+  setAddressNicknameMethod,
+} from './methods/setAddressNickname'
 
 const t = initTRPC.context<Context>().create()
 
@@ -121,6 +125,15 @@ export const appRouter = t.router({
     .use(Analytics)
     .output(GetAddressProfileOutput)
     .query(getAddressProfileMethod),
+  setNickname: t.procedure
+    .use(LogUsage)
+    .use(parse3RN)
+    .use(checkCryptoNodes)
+    .use(setAddressNodeClient)
+    .use(initAddressNode)
+    .use(Analytics)
+    .input(SetAddressNicknameInput)
+    .query(setAddressNicknameMethod),
   getNonce: t.procedure
     .use(LogUsage)
     .use(parse3RN)

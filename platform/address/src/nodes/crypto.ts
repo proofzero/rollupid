@@ -84,8 +84,12 @@ export default class CryptoAddress {
       profile.avatar = gradient
     }
 
+    if (nickname) {
+      profile.displayName = nickname
+    }
+
     if (!profile.displayName) {
-      profile.displayName = nickname || address
+      profile.displayName = address
     }
 
     return profile

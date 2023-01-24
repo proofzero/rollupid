@@ -66,6 +66,6 @@ query getAddressProfiles($addressURNList: [URN!]) {
   }
 }
 
-mutation updateAddressNickname($nickname: String) {
-  updateAddressNickname(nickname: $nickname)
+mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
+  updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }

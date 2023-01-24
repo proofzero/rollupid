@@ -65,6 +65,6 @@ export default /* GraphQL */ `
   }
 
   type Mutation {
-    updateAddressNickname(nickname: String): Boolean
+    updateAddressNickname(addressURN: URN!, nickname: String!): Boolean
   }
 `

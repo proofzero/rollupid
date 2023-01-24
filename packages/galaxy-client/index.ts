@@ -130,7 +130,8 @@ export type MutationExchangeRefreshTokenArgs = {
 
 
 export type MutationUpdateAddressNicknameArgs = {
-  nickname?: InputMaybe<Scalars['String']>;
+  addressURN: Scalars['URN'];
+  nickname: Scalars['String'];
 };
 
 
@@ -517,7 +518,8 @@ export type GetAddressProfilesQueryVariables = Exact<{
 export type GetAddressProfilesQuery = { __typename?: 'Query', addressProfiles?: Array<{ __typename?: 'AddressProfile', type: string, profile: { __typename: 'CryptoAddressProfile', address: string, avatar?: string | null, displayName?: string | null } | { __typename: 'OAuthGithubProfile', name?: string | null, avatar_url: string } | { __typename: 'OAuthGoogleProfile', name?: string | null, picture: string } | { __typename: 'OAuthMicrosoftProfile', name?: string | null, picture: string } | { __typename: 'OAuthTwitterProfile', name?: string | null, profile_image_url_https: string } } | null> | null };
 
 export type UpdateAddressNicknameMutationVariables = Exact<{
-  nickname?: InputMaybe<Scalars['String']>;
+  addressURN: Scalars['URN'];
+  nickname: Scalars['String'];
 }>;
 
 
@@ -738,8 +740,8 @@ export const GetAddressProfilesDocument = gql`
 }
     `;
 export const UpdateAddressNicknameDocument = gql`
-    mutation updateAddressNickname($nickname: String) {
-  updateAddressNickname(nickname: $nickname)
+    mutation updateAddressNickname($addressURN: URN!, $nickname: String!) {
+  updateAddressNickname(addressURN: $addressURN, nickname: $nickname)
 }
     `;
 export const GetEnsProfileDocument = gql`
@@ -933,7 +935,7 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     getAddressProfiles(variables?: GetAddressProfilesQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetAddressProfilesQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetAddressProfilesQuery>(GetAddressProfilesDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getAddressProfiles', 'query');
     },
-    updateAddressNickname(variables?: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
+    updateAddressNickname(variables: UpdateAddressNicknameMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<UpdateAddressNicknameMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateAddressNicknameMutation>(UpdateAddressNicknameDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'updateAddressNickname', 'mutation');
     },
     getEnsProfile(variables: GetEnsProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetEnsProfileQuery> {

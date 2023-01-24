@@ -46,7 +46,7 @@ const addressResolvers: Resolvers = {
     ) => {
       logAnalytics(
         env.Analytics,
-        'addressProfile',
+        'addressProfiles',
         'query:gql',
         'BEFORE',
         addressURNList.join(', ')
@@ -70,9 +70,27 @@ const addressResolvers: Resolvers = {
   Mutation: {
     updateAddressNickname: async (
       _parent: any,
-      { nickname },
+      { nickname, addressURN },
       { env }: ResolverContext
     ) => {
+      logAnalytics(
+        env.Analytics,
+        'updateAddressNickname',
+        'query:gql',
+        'BEFORE',
+        addressURN
+      )
+
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          'X-3RN': addressURN,
+        },
+      })
+
+      await addressClient.setNickname.query({
+        nickname,
+      })
+
       return true
     },
   },
