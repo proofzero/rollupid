@@ -70,7 +70,7 @@ export default function AppDetailIndexPage() {
   return (
     <ApplicationDashboard
       galaxyGql={{
-        createdAt: new Date(app.apiKeyTimestamp?.toString() as string),
+        createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,
         onKeyRoll: () => {
           submit(
@@ -86,7 +86,7 @@ export default function AppDetailIndexPage() {
       oAuth={{
         appId: app.clientId as string,
         appSecret: rotatedClientSecret as string,
-        createdAt: new Date(app.secretTimestamp?.toString() as string),
+        createdAt: new Date(app.secretTimestamp as number),
         onKeyRoll: () => {
           submit(
             {

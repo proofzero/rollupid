@@ -47,12 +47,13 @@ const HTTP_MESSAGE = 'HTTP can only be used for localhost'
  *                                   it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
  *     [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
  *   ){0,1}                        - makes this whole bracket optional
- *  ) | $^                         - this pattern matches nothing which means that nothing other than above
- *                                 - can be passed
+ *  )                          
  * )
+ * 
+ * ^ in the beginning and $ in the end means that it should be exact match
  */
 const LOCALHOST_VALIDATION = new RegExp(
-  '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+  '^((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*){0,1}))$'
 )
 
 const updatesSchema = z.object({
