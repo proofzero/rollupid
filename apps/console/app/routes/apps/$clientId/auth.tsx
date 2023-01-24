@@ -34,47 +34,39 @@ type notificationHandlerType = (val: boolean) => void
 
 const HTTP_MESSAGE = 'HTTP can only be used for localhost'
 
+/**
+ * I think regex here is the only option.
+ * Brief explanation:
+ * http([s]){0,1}                 - checks if it's http or https
+ * ((http([s]){0,1}:\/\/){1}      - requires protocol to be set (http:// or https://)
+ * (localhost|127.0.0.1){1}       - allows only localhost as domain and requires on of them
+ * (
+ *  (
+ *   (
+ *    (([:]){1}[0-9]{4}) | \/ ){1} - checks if the next characters are port or slash
+ *                                   it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
+ *     [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
+ *   ){0,1}                        - makes this whole bracket optional
+ *  ) | $^                         - this pattern matches nothing which means that nothing other than above
+ *                                 - can be passed
+ * )
+ */
+const LOCALHOST_VALIDATION = new RegExp(
+  '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+)
+
 const updatesSchema = z.object({
   name: z.string(),
   icon: z.string().url({ message: 'Invalid image upload' }),
   redirectURI: z.union([
-    z.string().regex(
-      /**
-       * I think regex here is the only option.
-       * Brief explanation:
-       * http([s]){0,1}                 - checks if it's http or https
-       * ((http([s]){0,1}:\/\/){1}      - requires protocol to be set (http:// or https://)
-       * (localhost|127.0.0.1){1}       - allows only localhost as domain and requires on of them
-       * (
-       *  (
-       *   (
-       *    (([:]){1}[0-9]{4}) | \/ ){1} - checks if the next characters are port or slash
-       *                                   it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
-       *     [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
-       *   ){0,1}                        - makes this whole bracket optional
-       *  ) | $^                         - this pattern matches nothing which means that nothing other than above
-       *                                 - can be passed
-       * )
-       */
-      new RegExp(
-        '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
-      ),
-      { message: HTTP_MESSAGE }
-    ),
+    z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
     z.string().url().startsWith('https://', {
       message: HTTP_MESSAGE,
     }),
   ]),
   termsURL: z
     .union([
-      z
-        .string()
-        .regex(
-          new RegExp(
-            '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
-          ),
-          { message: HTTP_MESSAGE }
-        ),
+      z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
       z.string().url().startsWith('https://', {
         message: HTTP_MESSAGE,
       }),
@@ -83,14 +75,7 @@ const updatesSchema = z.object({
     .optional(),
   websiteURL: z
     .union([
-      z
-        .string()
-        .regex(
-          new RegExp(
-            '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
-          ),
-          { message: HTTP_MESSAGE }
-        ),
+      z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
       z.string().url().startsWith('https://', {
         message: HTTP_MESSAGE,
       }),
