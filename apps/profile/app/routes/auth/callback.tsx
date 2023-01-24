@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   console.log({ state, storedState })
 
-  if (state !== storedState) {
+  if (storedState && state !== storedState) {
     throw json(
       { error: 'Invalid state' },
       {

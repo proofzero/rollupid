@@ -120,8 +120,6 @@ export const appRouter = t.router({
     .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
   checkAppAuth: t.procedure
-    .use(JWTAssertionTokenFromHeader)
-    .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
     .input(CheckAppAuthInput)

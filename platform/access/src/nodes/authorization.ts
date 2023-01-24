@@ -34,11 +34,11 @@ export default class Authorization extends DOProxy {
 
     console.log('putting', { account }, this.state.id.toString())
 
-    // await Promise.all([
-    await this.state.storage.put('account', account)
-    await this.state.storage.put('clientId', clientId)
-    await this.state.storage.put('code', { redirectUri, scope, timestamp })
-    // ])
+    await this.state.storage.put({
+      account,
+      clientId,
+      code: { redirectUri, scope, timestamp },
+    })
 
     console.log('done')
 

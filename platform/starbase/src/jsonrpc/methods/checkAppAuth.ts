@@ -40,6 +40,14 @@ export const checkAppAuth = async ({
   const hashedSecret = await secret.hash(clientSecret)
   const secretValidity = await appDO.class.validateClientSecret(hashedSecret)
 
+  console.log({
+    clientId,
+    clientSecret,
+    secretValidity,
+    hashedSecret,
+    redirectURI,
+    appDetails: appDetails.app?.redirectURI,
+  })
   // localhost:80/foobar
   // localhost:80/foobar?foo=bar (startsWith should validate this case)
   const result =

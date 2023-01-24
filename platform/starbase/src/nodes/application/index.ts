@@ -116,6 +116,7 @@ export default class StarbaseApp extends DOProxy {
 
   async validateClientSecret(hashedClientSecret: string): Promise<boolean> {
     const storedSecret = await this.state.storage.get('clientSecret')
+    console.log({ storedSecret, hashedClientSecret })
     return storedSecret === hashedClientSecret
   }
 

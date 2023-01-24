@@ -1,12 +1,12 @@
 import { LoaderFunction, redirect } from '@remix-run/cloudflare'
 import {
   createAuthorizeStateSession,
-  getUserSession,
+  getProfileSession,
 } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   // check if the user is already logged in
-  const session = await getUserSession(request)
+  const session = await getProfileSession(request)
   const jwt = session.get('jwt')
   if (jwt) {
     return redirect('/account')
@@ -16,12 +16,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     .join('')
 
   const authParams = new URLSearchParams({
-    client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    state,
-  })
-
-  console.log({
     client_id: CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     state,

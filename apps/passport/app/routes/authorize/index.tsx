@@ -41,8 +41,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
         state,
       })
 
-      console.log({ authorizeRes })
-
       if (!authorizeRes) {
         throw json({ message: 'Failed to authorize' }, 400)
       }

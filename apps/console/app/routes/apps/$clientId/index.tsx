@@ -11,14 +11,17 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
-import rotateSecrets, { RollType } from '~/helpers/rotation'
-import type { RotatedSecrets } from '~/helpers/rotation'
 
 // Component
 // -----------------------------------------------------------------------------
 /**
  * @file app/routes/dashboard/index.tsx
  */
+
+export const RollType = {
+  RollAPIKey: 'roll_api_key',
+  RollClientSecret: 'roll_app_secret',
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -36,14 +39,23 @@ export const action: ActionFunction = async ({ request, params }) => {
   const op = formData.get('op')
   invariant(op && typeof op === 'string', 'Operation should be a string')
 
-  const rotationResult = await rotateSecrets(
-    starbaseClient,
-    params.clientId,
-    op
-  )
-  return json({
-    rotatedSecrets: rotationResult,
-  })
+  switch (op) {
+    case RollType.RollAPIKey:
+      const rotatedApiKey = (
+        await starbaseClient.rotateApiKey.mutate({ clientId:params.clientId })
+      ).apiKey
+      return json({
+        rotatedSecrets: {rotatedApiKey},
+      })
+    case RollType.RollClientSecret:
+      const rotatedClientSecret = (await starbaseClient.rotateClientSecret.mutate({
+        clientId: params.clientId,
+      })).secret
+      return json({
+        rotatedSecrets: {rotatedClientSecret},
+      })
+    default:
+      throw new Error('Invalid operation')
 }
 
 // Component

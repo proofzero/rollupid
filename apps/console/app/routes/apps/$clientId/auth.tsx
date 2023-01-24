@@ -22,7 +22,6 @@ import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import rotateSecrets, { RollType } from '~/helpers/rotation'
 
 import { z } from 'zod'
 
@@ -122,7 +121,29 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const scopeMeta = await starbaseClient.getScopes.query()
 
+<<<<<<< HEAD
   return json({ scopeMeta })
+=======
+  let rotatedSecret
+  if (!appDetails.secretTimestamp) {
+    rotatedSecret = await starbaseClient.rotateClientSecret.mutate({
+      clientId: appDetails.clientId,
+    })
+
+    console.log({ rotatedSecret })
+
+    // This is a client 'hack' as the date
+    // is populated from the graph
+    // on subsequent requests
+    appDetails.secretTimestamp = Date.now()
+  }
+
+  return json({
+    appDetails,
+    scopeMeta,
+    rotatedSecret,
+  })
+>>>>>>> 3de506fb (floow)
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -151,12 +172,9 @@ export const action: ActionFunction = async ({ request, params }) => {
   switch (op) {
     case 'roll_app_secret':
       rotatedSecret = (
-        await rotateSecrets(
-          starbaseClient,
-          params.clientId,
-          RollType.RollClientSecret
-        )
-      ).rotatedClientSecret
+        await starbaseClient.rotateClientSecret.mutate({
+          clientId: params.clientId,
+        })).secret
       break
     case 'update_app':
       const entries = formData.entries()
