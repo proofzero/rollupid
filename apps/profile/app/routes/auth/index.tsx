@@ -1,4 +1,3 @@
-import { AuthButton } from '@kubelt/design-system/src/molecules/auth-button/AuthButton'
 import { LoaderFunction, redirect } from '@remix-run/cloudflare'
 import {
   createAuthorizeStateSession,
@@ -32,12 +31,4 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   // set the state in a cookie
   return createAuthorizeStateSession(state, redirectURL)
-}
-
-export default function AuthLogin() {
-  return (
-    <form method="post">
-      <AuthButton>Login</AuthButton>
-    </form>
-  )
 }

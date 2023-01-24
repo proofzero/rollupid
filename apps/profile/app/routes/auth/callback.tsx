@@ -1,7 +1,10 @@
 import { GrantType } from '@kubelt/platform.access/src/types'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
-import { getAuthorizeStateSession } from '~/utils/session.server'
+import {
+  createProfileSession,
+  getAuthorizeStateSession,
+} from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const params = new URL(request.url).searchParams
@@ -33,6 +36,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const stateSession = await getAuthorizeStateSession(request)
   const storedState = stateSession.get('state')
 
+  console.log({ state, storedState })
+
   if (state !== storedState) {
     throw json(
       { error: 'Invalid state' },
@@ -55,5 +60,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     })
     .then((res) => res.exchangeToken)
 
-  // TODO: complete the excchange and store the token and create session
+  if (!token) {
+    throw json(
+      { error: 'No token exchanged' },
+      {
+        status: 400,
+      }
+    )
+  }
+
+  return createProfileSession(token.accessToken, '/account')
 }

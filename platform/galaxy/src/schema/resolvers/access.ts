@@ -1,6 +1,6 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
-import { GrantType, Resolvers, ExchangeTokenInput } from './typedefs'
+import { GrantType, Resolvers } from './typedefs'
 import { hasApiKey, setupContext } from './utils'
 
 import { ResolverContext } from './common'

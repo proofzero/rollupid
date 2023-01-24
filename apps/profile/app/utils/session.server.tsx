@@ -105,3 +105,50 @@ export async function getAuthorizeStateSession(request: Request) {
   const storage = getAuthorizeStateStorage()
   return storage.getSession(request.headers.get('Cookie'))
 }
+
+// NEW SESSION
+
+const getProfileSessionStorage = () => {
+  return createCookieSessionStorage({
+    cookie: {
+      domain: COOKIE_DOMAIN,
+      name: 'PROFILE_SESSION',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 60 * 60 * 24 * 120,
+      httpOnly: true,
+      secrets: [sessionSecret],
+    },
+  })
+}
+
+export async function createProfileSession(jwt: string, redirectTo: string) {
+  const userStorage = getProfileSessionStorage()
+  const parsedJWT = parseJwt(jwt)
+  const userSession = await userStorage.getSession()
+  userSession.set('core', parsedJWT.iss)
+  userSession.set('jwt', jwt)
+
+  const headers = new Headers()
+  headers.append('Set-Cookie', await userStorage.commitSession(userSession))
+
+  return redirect(redirectTo, {
+    headers,
+  })
+}
+
+// TODO: reset cookie maxAge if valid
+export function getProfileSession(request: Request, renew: boolean = true) {
+  const storage = getProfileSessionStorage()
+  return storage.getSession(request.headers.get('Cookie'))
+}
+
+export async function destroyProfileSession(session: Session) {
+  const storage = getProfileSessionStorage()
+  return redirect(`/auth`, {
+    headers: {
+      'Set-Cookie': await storage.destroySession(session),
+    },
+  })
+}

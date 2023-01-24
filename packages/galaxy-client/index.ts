@@ -25,6 +25,22 @@ export type AddressProfile = {
 
 export type AddressProfiles = CryptoAddressProfile | OAuthGithubProfile | OAuthGoogleProfile | OAuthMicrosoftProfile | OAuthTwitterProfile;
 
+export type AuthenticationTokenInput = {
+  clientId: Scalars['String'];
+  code: Scalars['String'];
+  grantType: GrantType;
+  redirectUri: Scalars['String'];
+};
+
+export type AuthorizationTokenInput = {
+  clientId: Scalars['String'];
+  clientSecret: Scalars['String'];
+  code: Scalars['String'];
+  grantType: GrantType;
+  redirectUri: Scalars['String'];
+  scopes?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
 export type Chain = {
   __typename?: 'Chain';
   chain?: Maybe<Scalars['String']>;
@@ -64,21 +80,17 @@ export type Edge = {
   tag: Scalars['String'];
 };
 
-export type ExchangeTokenInput = {
-  account?: InputMaybe<Scalars['URN']>;
-  clientId?: InputMaybe<Scalars['String']>;
-  clientSecret?: InputMaybe<Scalars['String']>;
-  code?: InputMaybe<Scalars['String']>;
-  grantType: Scalars['String'];
-  redirectUri?: InputMaybe<Scalars['String']>;
-  token?: InputMaybe<Scalars['String']>;
-};
-
 export type ExchangeTokenResult = {
   __typename?: 'ExchangeTokenResult';
   accessToken: Scalars['String'];
   refreshToken: Scalars['String'];
 };
+
+export enum GrantType {
+  AuthenticationCode = 'authentication_code',
+  AuthorizationCode = 'authorization_code',
+  RefreshToken = 'refresh_token'
+}
 
 export type Id = {
   __typename?: 'Id';
@@ -100,14 +112,20 @@ export type LinkInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  exchangeToken?: Maybe<ExchangeTokenResult>;
+  exchangeAuthorizationToken?: Maybe<ExchangeTokenResult>;
+  exchangeRefreshToken?: Maybe<ExchangeTokenResult>;
   updateCuratedGallery?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
 };
 
 
-export type MutationExchangeTokenArgs = {
-  exchange?: InputMaybe<ExchangeTokenInput>;
+export type MutationExchangeAuthorizationTokenArgs = {
+  exchange: AuthorizationTokenInput;
+};
+
+
+export type MutationExchangeRefreshTokenArgs = {
+  exchange: RefreshTokenInput;
 };
 
 
@@ -403,9 +421,19 @@ export type QueryProfileFromAddressArgs = {
   addressURN: Scalars['URN'];
 };
 
+export type RefreshTokenInput = {
+  grantType: GrantType;
+  token: Token;
+};
+
 export type StandardPfp = Pfp & {
   __typename?: 'StandardPFP';
   image?: Maybe<Scalars['String']>;
+};
+
+export type Token = {
+  iss: Scalars['String'];
+  token: Scalars['String'];
 };
 
 export enum TokenType {
@@ -426,11 +454,18 @@ export type TokenUriInput = {
 };
 
 export type ExchangeTokenMutationVariables = Exact<{
-  exchange?: InputMaybe<ExchangeTokenInput>;
+  exchange: AuthorizationTokenInput;
 }>;
 
 
-export type ExchangeTokenMutation = { __typename?: 'Mutation', exchangeToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
+export type ExchangeTokenMutation = { __typename?: 'Mutation', exchangeAuthorizationToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
+
+export type RefreshTokenMutationVariables = Exact<{
+  exchange: RefreshTokenInput;
+}>;
+
+
+export type RefreshTokenMutation = { __typename?: 'Mutation', exchangeRefreshToken?: { __typename?: 'ExchangeTokenResult', accessToken: string, refreshToken: string } | null };
 
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -510,8 +545,16 @@ export type UpdateGalleryMutation = { __typename?: 'Mutation', updateCuratedGall
 
 
 export const ExchangeTokenDocument = gql`
-    mutation exchangeToken($exchange: ExchangeTokenInput) {
-  exchangeToken(exchange: $exchange) {
+    mutation exchangeToken($exchange: AuthorizationTokenInput!) {
+  exchangeAuthorizationToken(exchange: $exchange) {
+    accessToken
+    refreshToken
+  }
+}
+    `;
+export const RefreshTokenDocument = gql`
+    mutation refreshToken($exchange: RefreshTokenInput!) {
+  exchangeRefreshToken(exchange: $exchange) {
     accessToken
     refreshToken
   }
@@ -805,8 +848,11 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    exchangeToken(variables?: ExchangeTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExchangeTokenMutation> {
+    exchangeToken(variables: ExchangeTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ExchangeTokenMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<ExchangeTokenMutation>(ExchangeTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'exchangeToken', 'mutation');
+    },
+    refreshToken(variables: RefreshTokenMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<RefreshTokenMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<RefreshTokenMutation>(RefreshTokenDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'refreshToken', 'mutation');
     },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');

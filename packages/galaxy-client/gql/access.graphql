@@ -1,5 +1,12 @@
-mutation exchangeToken($exchange: ExchangeTokenInput) {
-  exchangeToken(exchange: $exchange) {
+mutation exchangeToken($exchange: AuthorizationTokenInput!) {
+  exchangeAuthorizationToken(exchange: $exchange) {
+    accessToken
+    refreshToken
+  }
+}
+
+mutation refreshToken($exchange: RefreshTokenInput!) {
+  exchangeRefreshToken(exchange: $exchange) {
     accessToken
     refreshToken
   }
