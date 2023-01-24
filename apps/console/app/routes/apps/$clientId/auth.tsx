@@ -24,11 +24,81 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 import rotateSecrets, { RollType } from '~/helpers/rotation'
 
+import { z } from 'zod'
+
 /**
  * @file app/routes/dashboard/index.tsx
  */
 
 type notificationHandlerType = (val: boolean) => void
+
+const updatesSchema = z.object({
+  name: z.string(),
+  icon: z.string().url(),
+  redirectURI: z.union([
+    z.string().url().startsWith('http://localhost', {
+      message: 'HTTP could only be used for localhost',
+    }),
+    z.string().url().startsWith('http://127.0.0.1', {
+      message: 'HTTP could only be used for localhost',
+    }),
+    z.string().url().startsWith('https://', {
+      message: 'HTTP could only be used for localhost',
+    }),
+  ]),
+  termsURL: z
+    .union([
+      z.string().url().startsWith('http://localhost', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().url().startsWith('http://127.0.0.1', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().url().startsWith('https://', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().length(0),
+    ])
+    .optional(),
+  websiteURL: z
+    .union([
+      z.string().url().startsWith('http://localhost', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().url().startsWith('http://127.0.0.1', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().url().startsWith('https://', {
+        message: 'HTTP could only be used for localhost',
+      }),
+      z.string().length(0),
+    ])
+    .optional(),
+  twitterUser: z
+    .string()
+    .url()
+    .startsWith('https://twitter.com/')
+    .optional()
+    .or(z.string().length(0)),
+  mediumUser: z
+    .string()
+    .url()
+    .startsWith('https://medium.com/@')
+    .optional()
+    .or(z.string().length(0)),
+  mirrorURL: z
+    .string()
+    .url()
+    .startsWith('https://mirror.xyz/')
+    .optional()
+    .or(z.string().length(0)),
+  discordUser: z
+    .string()
+    .url()
+    .startsWith('http://discord.com/')
+    .optional()
+    .or(z.string().length(0)),
+})
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   if (!params.clientId) {
@@ -64,8 +134,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   const op = formData.get('op')
   const published = formData.get('published') === '1'
   const errors: errorsAuthProps = {}
-
-  // console.log({ scopes: JSON.stringify(formData) })
 
   // As part of the rolling operation
   // we only need to remove the keys
@@ -103,38 +171,11 @@ export const action: ActionFunction = async ({ request, params }) => {
         discordUser: formData.get('discordUser') as string | undefined,
       }
 
-      const [protocolWebsite, pathWebsite]: any = updates.websiteURL?.split(':')
-      const [protocolTerms, pathTerms]: any = updates.termsURL?.split(':')
-      const [protocolRedirect, pathRedirect]: any =
-        updates.redirectURI?.split(':')
-
-      console.log(pathWebsite, pathRedirect, pathTerms)
-
-      if (
-        protocolWebsite &&
-        protocolWebsite === 'http' &&
-        !pathWebsite.startsWith('//localhost') &&
-        !pathWebsite.startsWith('//127.0.0.1')
-      ) {
-        errors['websiteURL'] = 'HTTP can only be used for localhost'
-      }
-
-      if (
-        protocolTerms &&
-        protocolTerms === 'http' &&
-        !pathTerms.startsWith('//localhost') &&
-        !pathTerms.startsWith('//127.0.0.1')
-      ) {
-        errors['termsURL'] = 'HTTP can only be used for localhost'
-      }
-
-      if (
-        protocolRedirect &&
-        protocolRedirect === 'http' &&
-        !pathRedirect.startsWith('//localhost') &&
-        !pathRedirect.startsWith('//127.0.0.1')
-      ) {
-        errors['redirectURI'] = 'HTTP can only be used for localhost'
+      const zodErrors = updatesSchema.safeParse(updates)
+      if (!zodErrors.success) {
+        zodErrors.error.errors.forEach((er: any) => {
+          errors[`${er.path[0]}`] = er.message
+        })
       }
 
       if (Object.keys(errors).length === 0) {
