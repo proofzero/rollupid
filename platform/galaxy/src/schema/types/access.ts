@@ -4,8 +4,26 @@ export default /* GraphQL */ `
     refreshToken: String!
   }
 
-  input ExchangeTokenInput {
-    grantType: String!
+  enum GrantType {
+    authentication_code
+    authorization_code
+    refresh_token
+  }
+
+  type Token {
+    iss: String!
+    token: String!
+  }
+
+  input AuthenticationTokenInput {
+    grantType: GrantType!
+    code: String!
+    redirectUri: String!
+    clientId: String!
+  }
+
+  input AuthorizationTokenInput {
+    grantType: GrantType!
     code: String!
     redirectUri: String!
     clientId: String!
@@ -13,7 +31,15 @@ export default /* GraphQL */ `
     scopes: [String]
   }
 
+  input RefreshTokenInput {
+    grantType: GrantType!
+    token: Token!
+  }
+
   type Mutation {
-    exchangeToken(exchange: ExchangeTokenInput!): ExchangeTokenResult
+    exchangeAuthorizationToken(
+      exchange: AuthorizationTokenInput!
+    ): ExchangeTokenResult
+    exchangeRefreshToken(exchange: RefreshTokenInput!): ExchangeTokenResult
   }
 `
