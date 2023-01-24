@@ -47,7 +47,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     .exchangeToken({
       exchange: {
         grantType: GrantType.AuthorizationCode,
-        code: params.get('code'),
+        code,
         redirectUri: REDIRECT_URI,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
