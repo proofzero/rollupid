@@ -49,23 +49,23 @@ import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
 
 const t = initTRPC.context<Context>().create()
 
-// Example custom analytics function to log the Ethereum address.
-export const injectCustomAnalytics = t.middleware(async ({ ctx, next }) => {
-  const CustomAnalyticsFunction: CustomAnalyticsFunctionType = () => {
-    return {
-      blobs: [ctx.alias],
-      doubles: [],
-      indexes: [],
-    } as AnalyticsEngineDataPoint
-  }
+// Example custom analytics function.
+// export const injectCustomAnalytics = t.middleware(async ({ ctx, next }) => {
+//   const CustomAnalyticsFunction: CustomAnalyticsFunctionType = () => {
+//     return {
+//       blobs: [ctx.alias],
+//       doubles: [],
+//       indexes: [],
+//     } as AnalyticsEngineDataPoint
+//   }
 
-  return next({
-    ctx: {
-      CustomAnalyticsFunction,
-      ...ctx,
-    },
-  })
-})
+//   return next({
+//     ctx: {
+//       CustomAnalyticsFunction,
+//       ...ctx,
+//     },
+//   })
+// })
 
 export const appRouter = t.router({
   resolveAccount: t.procedure
@@ -75,7 +75,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAddressNodeClient)
     .use(initAddressNode)
-    .use(injectCustomAnalytics)
+    // .use(injectCustomAnalytics)
     .use(Analytics)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),
