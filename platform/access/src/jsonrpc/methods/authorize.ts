@@ -6,7 +6,7 @@ import { Context } from '../../context'
 import { CODE_OPTIONS } from '../../constants'
 import { initAuthorizationNodeByName } from '../../nodes'
 import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from 'crypto'
+import { randomBytes } from '@ethersproject/random'
 
 export const AuthorizeMethodInput = z.object({
   account: AccountURNInput,
@@ -34,6 +34,8 @@ export const authorizeMethod = async ({
   const { account, responseType, clientId, redirectUri, scope, state } = input
 
   const code = hexlify(randomBytes(CODE_OPTIONS.length))
+
+  console.log({ code })
 
   const node = await initAuthorizationNodeByName(code, ctx.Authorization)
   const result = await node.class.authorize(

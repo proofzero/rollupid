@@ -10,7 +10,7 @@ export default /* GraphQL */ `
     refresh_token
   }
 
-  type Token {
+  input Token {
     iss: String!
     token: String!
   }

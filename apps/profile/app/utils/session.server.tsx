@@ -1,4 +1,4 @@
-import type { Session } from '@remix-run/cloudflare'
+import { json, Session } from '@remix-run/cloudflare'
 import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
@@ -67,4 +67,41 @@ export function parseJwt(token: string): JWTPayload {
     throw new Error('Invalid JWT')
   }
   return payload
+}
+
+// Authorize Cookie
+
+const getAuthorizeStateStorage = () => {
+  return createCookieSessionStorage({
+    cookie: {
+      domain: COOKIE_DOMAIN,
+      name: 'PROFILE_AUTH_STATE',
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV == 'production',
+      maxAge: 60 * 5,
+      httpOnly: true,
+      secrets: [sessionSecret],
+    },
+  })
+}
+
+export async function createAuthorizeStateSession(
+  state: string,
+  redirectURL: string
+) {
+  const storage = getAuthorizeStateStorage()
+  const session = await storage.getSession()
+  session.set('state', state)
+
+  return redirect(redirectURL, {
+    headers: {
+      'Set-Cookie': await storage.commitSession(session),
+    },
+  })
+}
+
+export async function getAuthorizeStateSession(request: Request) {
+  const storage = getAuthorizeStateStorage()
+  return storage.getSession(request.headers.get('Cookie'))
 }

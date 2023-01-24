@@ -48,10 +48,9 @@ export const exchangeTokenMethod = async ({
 }) => {
   const { grantType } = input
 
-  console.log({ grantType })
-
   if (grantType == GrantType.AuthenticationCode) {
     const { code, redirectUri, clientId } = input
+    console.log({ code, grantType })
 
     const authorizationNode = await initAuthorizationNodeByName(
       code,

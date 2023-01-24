@@ -1,5 +1,3 @@
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 import { AccountURN } from '@kubelt/urns/account'
 import { DOProxy } from 'do-proxy'
 
@@ -33,19 +31,18 @@ export default class Authorization extends DOProxy {
     }
 
     const timestamp: number = Date.now()
-    const codes: Map<string, AuthorizationParameters> =
-      (await this.state.storage.get<Map<string, AuthorizationParameters>>(
-        'codes'
-      )) || new Map()
-    codes.set(code, { redirectUri, scope, timestamp })
 
-    await Promise.all([
-      this.state.storage.put('account', account),
-      this.state.storage.put('clientId', clientId),
-      this.state.storage.put('codes', codes),
-    ])
+    console.log('putting', { account }, this.state.id.toString())
 
-    this.state.storage.setAlarm(CODE_OPTIONS.ttl)
+    // await Promise.all([
+    await this.state.storage.put('account', account)
+    await this.state.storage.put('clientId', clientId)
+    await this.state.storage.put('code', { redirectUri, scope, timestamp })
+    // ])
+
+    console.log('done')
+
+    await this.state.storage.setAlarm(Date.now() + CODE_OPTIONS.ttl)
 
     return { code, state }
   }
@@ -56,7 +53,7 @@ export default class Authorization extends DOProxy {
     clientId: string
   ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
-    console.log({ account })
+    console.log('getting', { account }, this.state.id.toString())
     if (!account) {
       throw new Error('missing account name')
     }
@@ -66,27 +63,18 @@ export default class Authorization extends DOProxy {
       throw new Error('missing client id')
     }
 
-    const codes = await this.state.storage.get<
-      Map<string, AuthorizationParameters>
-    >('codes')
-    if (!codes) {
-      throw new Error('missing codes')
-    }
-    const stored = codes.get(code)
-    if (!stored) {
-      throw new Error('mismatch code')
+    const params = await this.state.storage.get<AuthorizationParameters>('code')
+    if (!params) {
+      throw new Error('missing code params')
     }
 
-    if (redirectUri != stored.redirectUri) {
+    if (redirectUri != params.redirectUri) {
       throw new Error('mismatch redirect uri')
     }
 
     if (clientId != storedClientId) {
       throw new Error('mismatch client id')
     }
-
-    codes.delete(code)
-    await this.state.storage.put('codes', codes)
 
     return { code }
   }

@@ -54,6 +54,7 @@ const accessResolvers: Resolvers = {
 // TODO: add address middleware
 const AccessResolverComposition = {
   'Mutation.exchangeToken': [setupContext(), hasApiKey()],
+  'Mutation.refreshToken': [setupContext(), hasApiKey()],
 }
 
 export default composeResolvers(accessResolvers, AccessResolverComposition)

@@ -1,11 +1,13 @@
 import { GrantType } from '@kubelt/platform.access/src/types'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
+import { getAuthorizeStateSession } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const params = new URL(request.url).searchParams
 
-  if (!params.get('code')) {
+  const code = params.get('code')
+  if (!code) {
     throw json(
       {
         error: 'No code provided',
@@ -16,11 +18,24 @@ export const loader: LoaderFunction = async ({ request }) => {
     )
   }
 
-  if (!params.get('state')) {
+  const state = params.get('state')
+  if (!state) {
     throw json(
       {
         error: 'No state provided',
       },
+      {
+        status: 400,
+      }
+    )
+  }
+
+  const stateSession = await getAuthorizeStateSession(request)
+  const storedState = stateSession.get('state')
+
+  if (state !== storedState) {
+    throw json(
+      { error: 'Invalid state' },
       {
         status: 400,
       }
