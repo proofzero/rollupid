@@ -94,9 +94,9 @@ const nftsResolvers: Resolvers = {
     ) => {
       let contracts: any[] = []
 
-      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
       try {
+        const { ethereumClient, polygonClient } = getAlchemyClients({ env })
+
         const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
           ethereumClient.getContractsForOwner({
             owner,
@@ -108,21 +108,16 @@ const nftsResolvers: Resolvers = {
           }),
         ])
 
-        const ethContractsAddresses = ethContracts.contracts.map(
-          (contract: any) => contract.address
-        )
-
-        const polygonContractsAddresses = polygonContracts.contracts.map(
-          (contract: any) => contract.address
-        )
-
-        let EthOwnedNfts: any[] = []
-        let PolygonOwnedNfts: any[] = []
-
         // Max limit on Alchemy is 45 contract addresses per request.
         // We need batches with 45 contracts in each
-        const ethBatches = sliceIntoChunks(ethContractsAddresses, 45)
-        const polygonBatches = sliceIntoChunks(polygonContractsAddresses, 45)
+        const ethBatches = sliceIntoChunks(
+          ethContracts.contracts.map((contract: any) => contract.address),
+          45
+        )
+        const polygonBatches = sliceIntoChunks(
+          polygonContracts.contracts.map((contract: any) => contract.address),
+          45
+        )
 
         // This way in each nested collection we have its own Promise.all
         // And one common Promise.all on top of them.
@@ -181,9 +176,9 @@ const nftsResolvers: Resolvers = {
     ) => {
       let ownedNfts: any[] = []
 
-      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
-
       try {
+        const { ethereumClient, polygonClient } = getAlchemyClients({ env })
+
         const [ethNfts, polyNfts] = await Promise.all([
           ethereumClient.getNFTMetadataBatch(input),
           polygonClient.getNFTMetadataBatch(input),
