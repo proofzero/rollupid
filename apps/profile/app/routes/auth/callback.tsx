@@ -58,7 +58,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         clientSecret: CLIENT_SECRET,
       },
     })
-    .then((res) => res.exchangeToken)
+    .then((res) => res.exchangeAuthorizationToken)
 
   if (!token) {
     throw json(
