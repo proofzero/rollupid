@@ -73,8 +73,6 @@ export const ApplicationAuth = ({
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
   const [formData, setFormData] = useState<appDetailsProps>(appDetails)
 
-  console.log(oAuth)
-
   const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
     return {
       id: key,

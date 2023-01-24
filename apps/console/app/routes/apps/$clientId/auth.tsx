@@ -34,54 +34,56 @@ type notificationHandlerType = (val: boolean) => void
 
 const HTTP_MESSAGE = 'HTTP can only be used for localhost'
 
-/**
- * I think regex here is the only option.
- * Brief explanation:
- * http([s]){0,1}                 - checks if it's http or https
- * ((http([s]){0,1}:\/\/){1}      - requires protocol to be set (http:// or https://)
- * (localhost|127.0.0.1){1}       - allows only localhost as domain and requires on of them
- * (
- *  (
- *   (
- *    (([:]){1}[0-9]{4}) | \/ ){1} - checks if the next characters are port or slash
- *                                   it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
- *     [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
- *   ){0,1}                        - makes this whole bracket optional
- *  )                          
- * )
- * 
- * ^ in the beginning and $ in the end means that it should be exact match
- */
-const LOCALHOST_VALIDATION = new RegExp(
-  '^((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*){0,1}))$'
-)
+const URL_VALIDATION = ({
+  val,
+  required,
+}: {
+  val: string
+  required: boolean
+}) => {
+  if (val && val.length) {
+    try {
+      const url = new URL(val)
+      if (url.protocol === 'http:') {
+        return url.hostname === 'localhost' || url.hostname === '127.0.0.1'
+      }
+      if (url.protocol === 'https:') {
+        return true
+      }
+    } catch (ex) {
+      return false
+    }
+  }
+  return !required
+}
 
 const updatesSchema = z.object({
   name: z.string(),
   icon: z.string().url({ message: 'Invalid image upload' }),
-  redirectURI: z.union([
-    z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
-    z.string().url().startsWith('https://', {
-      message: HTTP_MESSAGE,
-    }),
-  ]),
+  redirectURI: z.string().refine(
+    (val) => {
+      return URL_VALIDATION({ val, required: true })
+    },
+    { message: HTTP_MESSAGE }
+  ),
+
   termsURL: z
-    .union([
-      z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
-      z.string().url().startsWith('https://', {
-        message: HTTP_MESSAGE,
-      }),
-      z.string().length(0),
-    ])
+    .string()
+    .refine(
+      (val) => {
+        return URL_VALIDATION({ val, required: false })
+      },
+      { message: HTTP_MESSAGE }
+    )
     .optional(),
   websiteURL: z
-    .union([
-      z.string().regex(LOCALHOST_VALIDATION, { message: HTTP_MESSAGE }),
-      z.string().url().startsWith('https://', {
-        message: HTTP_MESSAGE,
-      }),
-      z.string().length(0),
-    ])
+    .string()
+    .refine(
+      (val) => {
+        return URL_VALIDATION({ val, required: false })
+      },
+      { message: HTTP_MESSAGE }
+    )
     .optional(),
   twitterUser: z
     .string()
