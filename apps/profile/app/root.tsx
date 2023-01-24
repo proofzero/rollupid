@@ -104,6 +104,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     handle,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
+      CONSOLE_APP_URL,
     },
   })
 }
@@ -113,6 +114,7 @@ export default function App() {
   const { ENV, loggedInUserProfile, handle } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
+      CONSOLE_APP_URL: string
     }
     loggedInUserProfile: GetProfileQuery['profile'] | null
     handle: string | undefined
@@ -165,13 +167,18 @@ export default function App() {
             }}
           >
             <HeadNav
+              consoleURL={ENV.CONSOLE_APP_URL}
               loggedIn={!!loggedInUserProfile}
               handle={handle}
               avatarUrl={loggedInUserProfile?.pfp?.image as string}
             />
           </div>
 
-          <Outlet context={{ loggedInUserProfile }} />
+          <Outlet
+            context={{
+              loggedInUserProfile,
+            }}
+          />
         </div>
         <ScrollRestoration />
         <Scripts />

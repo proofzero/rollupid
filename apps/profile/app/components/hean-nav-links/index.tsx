@@ -1,7 +1,7 @@
 import { useSubmit } from '@remix-run/react'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-export default function SignOut({ className }: { className: string }) {
+export function SignOutLink({ className }: { className: string }) {
   let submit = useSubmit()
 
   return (
@@ -14,5 +14,25 @@ export default function SignOut({ className }: { className: string }) {
         Sign Out
       </Text>
     </button>
+  )
+}
+
+export function ConsoleLink({
+  className,
+  consoleURL,
+}: {
+  className: string
+  consoleURL: string
+}) {
+  return (
+    <a
+      className={`${className}  w-full text-left`}
+      style={{ cursor: 'pointer' }}
+      href={consoleURL}
+    >
+      <Text className="truncate text-gray-800" size="sm" weight="medium">
+        Console
+      </Text>
+    </a>
   )
 }

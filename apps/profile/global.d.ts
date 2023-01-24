@@ -5,6 +5,7 @@ declare global {
   const COOKIE_DOMAIN: string
   const SESSON_SECRET: string
   const PASSPORT_URL: string
+  const CONSOLE_APP_URL: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
 
   const CLIENT_ID: string
