@@ -26,12 +26,14 @@ export type MultiSelectProps = {
   fieldName: string
   items: SelectItem[]
   selectedItems?: SelectItem[]
+  disabled?: boolean
 }
 
 export function MultiSelect({
   label,
   fieldName,
   items,
+  disabled = false,
   selectedItems = [],
 }: MultiSelectProps) {
   const [query, setQuery] = useState('')
@@ -64,8 +66,14 @@ export function MultiSelect({
       <Combobox.Label className="block text-sm font-medium text-gray-700">
         {label}
       </Combobox.Label>
-      <div className="relative mt-1">
-        <div className="w-full min-h-24 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+      <div className={`relative mt-1`}>
+        <div
+          className={`${
+            disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
+          } w-full min-h-24 rounded-md border border-gray-300 py-2 pl-3 pr-10 
+        shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm
+          `}
+        >
           {selectedValues.length ? (
             selectedValues.map((item, key) => (
               <span key={key}>
@@ -89,10 +97,17 @@ export function MultiSelect({
           />
         </Combobox.Button>
 
-        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+        <Combobox.Options
+          className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1
+         text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+        >
           <>
             <Combobox.Input
-              className="w-full min-h-24 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+              className={`${
+                disabled ? 'cursor-no-drop bg-gray-100' : 'bg-white'
+              } w-full min-h-24 rounded-md border border-gray-300 
+              py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none
+               focus:ring-1 focus:ring-indigo-500 sm:text-sm`}
               onChange={(event) => setQuery(event.target.value)}
               // displayValue={(items) =>
               //   selectedValues.map((item) => item.class).join(',')

@@ -10,7 +10,7 @@ import classNames from 'classnames'
 
 import logo from '~/assets/three-id-logo-white.svg'
 import defaultAvatar from '~/assets/circle_gradient.png'
-import SignOutLink from '~/components/sign-out-link'
+import { SignOutLink, ConsoleLink } from '~/components/hean-nav-links'
 
 import styles from './headNav.css'
 import { gatewayFromIpfs } from '@kubelt/utils'
@@ -21,6 +21,7 @@ export const links = () => [{ rel: 'stylesheet', href: styles }]
 const userNavigation = [
   // { name: 'Copy Address', href: '#' },
   // { name: 'Account', href: '#' },
+  { name: 'Console', component: ConsoleLink },
   { name: 'Sign out', component: SignOutLink },
 ]
 
@@ -33,6 +34,7 @@ type HeadNavProps = {
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
   loggedIn?: boolean | undefined
+  consoleURL: string
 }
 
 export default function HeadNav({
@@ -40,12 +42,14 @@ export default function HeadNav({
   avatarUrl,
   loggedIn,
   isToken = false,
+  consoleURL,
 }: HeadNavProps) {
   const activeStyle = {
     fontWeight: 600,
     color: 'white',
     backgroundColor: 'rgb(31 41 55)', // bg-gray-800
   }
+
   const navigation = [
     {
       name: 'My Profile',
@@ -153,12 +157,17 @@ export default function HeadNav({
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-md">
+                        <Menu.Items
+                          className="absolute right-0 z-10 mt-2 w-48
+                         origin-top-right bg-white py-1
+                          shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none rounded-md"
+                        >
                           {loggedIn &&
                             userNavigation.map((item) => (
                               <Menu.Item key={item.name}>
                                 {({ active }) => (
                                   <item.component
+                                    consoleURL={consoleURL}
                                     className={classNames(
                                       active ? 'bg-gray-100' : '',
                                       'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'

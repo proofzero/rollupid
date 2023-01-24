@@ -54,17 +54,18 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
         return null
       })
 
-    const {
-      clientId: appId,
-      redirectUri: consoleAppURI,
-      state: appState,
-      scope,
-    } = appData
+    let redirectURL = '/authorize'
+    if (appData) {
+      const {
+        clientId: appId,
+        redirectUri: consoleAppURI,
+        state: appState,
+        scope,
+      } = appData
 
-    const redirectURL =
-      appId && consoleAppURI && state
-        ? `/authorize?client_id=${appId}&state=${appState}&redirect_uri=${consoleAppURI}&scope=${scope}`
-        : `/authorize`
+      redirectURL += `?client_id=${appId}&state=${appState}&redirect_uri=${consoleAppURI}&scope=${scope}`
+    }
+
     return createUserSession(accessToken, redirectURL, addressURN, context.env)
   } catch (error) {
     console.error({ addressURN, error: JSON.stringify(error) })

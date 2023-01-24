@@ -4,7 +4,7 @@
  * Derived from TailwindUI > Select Menus > Custom with avatar.
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
@@ -47,8 +47,9 @@ type AppListboxProps = {
 
 function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
-  const [selected] = useState(
-    apps && apps.length !== 0
+
+  const initiateSelectedApp = (apps: any[], selectedAppIndex: number) => {
+    return apps && apps.length !== 0
       ? selectedAppIndex < 0
         ? {
             clientId: 'none',
@@ -61,7 +62,15 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
           name: 'No Applications',
           icon: undefined,
         }
+  }
+
+  const [selected, updateSelected] = useState(
+    initiateSelectedApp(apps, selectedAppIndex)
   )
+
+  useEffect(() => {
+    updateSelected(initiateSelectedApp(apps, selectedAppIndex))
+  }, [apps])
 
   const setSelected = (selected: { clientId: string }) => {
     // Using useNavigation hook
@@ -87,7 +96,10 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
         {({ open }) => (
           <>
             <div className="relative mt-1">
-              <Listbox.Button className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700 bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm">
+              <Listbox.Button
+                className="relative w-full cursor-default border border-l-0 border-r-0 border-gray-700
+               bg-transparent text-white py-5 pl-4 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none sm:text-sm"
+              >
                 <span className="flex items-center">
                   {/* <img src={selected.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded-full" /> */}
                   {selected.clientId === 'none' && (
@@ -99,23 +111,32 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                   )}
 
                   {selected.clientId !== 'none' && (
-                    <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
+                    <>
                       {!selected.icon && (
-                        <Text className="text-gray-500">
-                          {selected.name?.substring(0, 1)}
-                        </Text>
+                        <div
+                          className="rounded-full w-6 h-6 flex justify-center shrink-0 
+                        items-center bg-gray-200 overflow-hidden mr-2.5"
+                        >
+                          <Text className="text-gray-500">
+                            {selected.name?.substring(0, 1)}
+                          </Text>
+                        </div>
                       )}
                       {selected.icon && (
-                        <img src={selected.icon} className="object-cover" />
+                        <img
+                          src={selected.icon}
+                          className="object-cover w-6 h-6 rounded-full mr-2.5"
+                          alt="app icon"
+                        />
                       )}
-                    </div>
+                    </>
                   )}
 
                   <Text
                     weight="medium"
                     className={`${
                       apps?.length === 0 ? 'text-gray-600' : 'text-white'
-                    }`}
+                    } truncate`}
                   >
                     {selected.name}
                   </Text>
@@ -155,18 +176,26 @@ function AppListbox({ apps, selectedAppIndex }: AppListboxProps) {
                       {({ selected, active }) => (
                         <>
                           <div className="flex items-center py-2 px-4 cursor-pointer hover:bg-gray-700">
-                            <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 overflow-hidden mr-2.5">
-                              {!app.icon && (
+                            {!app.icon && (
+                              <div className="rounded-full w-6 h-6 flex justify-center items-center bg-gray-200 shrink-0 overflow-hidden mr-2.5">
                                 <Text className="text-gray-500">
                                   {app.name?.substring(0, 1)}
                                 </Text>
-                              )}
-                              {app.icon && (
-                                <img src={app.icon} className="object-cover" />
-                              )}
-                            </div>
+                              </div>
+                            )}
+                            {app.icon && (
+                              <img
+                                src={app.icon}
+                                className="object-cover w-6 h-6 rounded-full mr-2.5"
+                                alt="app icon"
+                              />
+                            )}
 
-                            <Text size="sm" weight="medium">
+                            <Text
+                              size="sm"
+                              className="truncate"
+                              weight="medium"
+                            >
                               {app.name}
                             </Text>
                           </div>

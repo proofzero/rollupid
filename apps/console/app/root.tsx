@@ -8,6 +8,8 @@ import type {
   LoaderFunction,
 } from '@remix-run/cloudflare'
 
+import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
+
 import { json } from '@remix-run/cloudflare'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
@@ -21,6 +23,7 @@ import {
   ScrollRestoration,
   useLocation,
   useLoaderData,
+  useTransition,
 } from '@remix-run/react'
 
 import { useEffect } from 'react'
@@ -49,15 +52,18 @@ export const loader: LoaderFunction = () => {
   return json({
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
+      THREEID_APP_URL,
     },
   })
 }
 
 export default function App() {
+  const transition = useTransition()
   const location = useLocation()
   const browserEnv = useLoaderData()
 
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const profileURL = browserEnv.ENV.THREEID_APP_URL
 
   useEffect(() => {
     if (GATag) {
@@ -94,7 +100,8 @@ export default function App() {
             />
           </>
         )}
-        <Outlet />
+        {transition.state === 'loading' ? <Loader /> : null}
+        <Outlet context={{ profileURL }} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{

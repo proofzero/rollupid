@@ -1,4 +1,5 @@
-import { ActionFunction, json } from '@remix-run/cloudflare'
+import type { ActionFunction } from '@remix-run/cloudflare'
+import { json } from '@remix-run/cloudflare'
 
 import CFImageUploadClient from '@kubelt/platform-clients/cf-image-upload'
 

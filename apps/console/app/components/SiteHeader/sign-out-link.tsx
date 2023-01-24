@@ -5,14 +5,14 @@ export default function SignOut({ className }: { className: string }) {
   let submit = useSubmit()
 
   return (
-    <a
-      className={className}
+    <button
+      className={`${className} w-full text-left`}
       style={{ cursor: 'pointer' }}
       onClick={() => submit(null, { method: 'post', action: `/signout/` })}
     >
       <Text className="truncate text-gray-800" size="sm" weight="medium">
         Sign Out
       </Text>
-    </a>
+    </button>
   )
 }

@@ -28,9 +28,10 @@ local_protocol = "http"
 [vars]
 DEPLOY_ENV = "local"
 PASSPORT_URL = "http://localhost:9696"
-COOKIE_DOMAIN = "localhost"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+THREEID_APP_URL = "http://localhost:9797"
+COOKIE_DOMAIN = "localhost"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -47,6 +48,8 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 # Environment: dev
 # -----------------------------------------------------------------------------
 
+
+
 [env.dev]
 
 services = [
@@ -54,6 +57,7 @@ services = [
   { binding = "Images", service = "images-dev" },
   { binding = "Galaxy", service = "galaxy-dev" },
 ]
+
 
 # kv_namespaces = [
 #   { binding = "SESSIONS", id = "719906291cbf4079a0c30cbed684208d", preview_id = "ded590c8008d4a77a42ba53a1ce23003" },
@@ -69,6 +73,7 @@ PASSPORT_URL = "https://passport-dev.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
+THREEID_APP_URL = "https://my-dev.threeid.xyz"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -98,6 +103,7 @@ PASSPORT_URL = "https://passport-next.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
+THREEID_APP_URL = "https://my-next.threeid.xyz"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -128,3 +134,4 @@ PASSPORT_URL = "https://passport.threeid.xyz"
 COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
+THREEID_APP_URL = "https://my.threeid.xyz"

@@ -4,7 +4,7 @@
 
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { Link, useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import folderPlus from '~/images/folderPlus.svg'
@@ -82,11 +82,12 @@ export default function DashboardIndexPage() {
   const { apps, avatarUrl } = useLoaderData<LoaderData>()
   const [newAppModalOpen, setNewAppModalOpen] = useState(false)
 
+  const { profileURL } = useOutletContext<{ profileURL: string }>()
   return (
     <div className="flex flex-col md:flex-row min-h-full">
       <SiteMenu apps={apps} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-white">
-        <SiteHeader avatarUrl={avatarUrl} />
+        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
         <div className="bg-gray-50 p-6 h-full">
           <div className="mb-11">
             <InfoPanelDashboard />

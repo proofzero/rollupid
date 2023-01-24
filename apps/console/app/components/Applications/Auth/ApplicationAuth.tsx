@@ -9,33 +9,55 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import IconPicker from '~/components/IconPicker'
 import { useState } from 'react'
 import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
-import toast, { Toaster } from 'react-hot-toast'
-import { ScopeMeta } from '@kubelt/platform/starbase/src/types'
+import type { ScopeMeta } from '@kubelt/platform/starbase/src/types'
+import toast from 'react-hot-toast'
+
+export type appDetailsProps = {
+  app: {
+    name: string
+    scopes: string[]
+    icon?: string
+    redirectURI?: string
+    termsURL?: string
+    websiteURL?: string
+    twitterUser?: string
+    mediumUser?: string
+    mirrorURL?: string
+    discordUser?: string
+  }
+  published?: boolean
+  clientId?: string
+  secretTimestamp?: number
+  apiKeyTimestamp?: number
+}
+
+export type errorsAuthProps = {
+  websiteURL?: string
+  termsURL?: string
+  redirectURI?: string
+  icon?: string
+  name?: string
+  discordUser?: string
+  twitterUser?: string
+  mediumUser?: string
+  mirrorURL?: string
+}
 
 type ApplicationAuthProps = {
-  appDetails: {
-    published: boolean
-    app: {
-      name: string
-      scopes: string[]
-      icon?: string
-      redirectURI?: string
-      termsURL?: string
-      websiteURL?: string
-      twitterUser?: string
-      mediumUser?: string
-      mirrorURL?: string
-      discordUser?: string
-    }
-  }
-  scopeMeta: ScopeMeta
+  appDetails: appDetailsProps
+
   oAuth: {
     appId: string
     appSecret: string
     createdAt: Date
     onKeyRoll: () => void
   }
+  scopeMeta: ScopeMeta
   onDelete: () => void
+  setIsFormChanged?: (val: boolean) => void
+  setIsImgUploading?: (val: boolean) => void
+  isFormChanged?: boolean
+  errors: errorsAuthProps
 }
 
 export const ApplicationAuth = ({
@@ -43,10 +65,15 @@ export const ApplicationAuth = ({
   oAuth,
   scopeMeta,
   onDelete,
+  isFormChanged,
+  setIsImgUploading,
+  setIsFormChanged,
+  errors,
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
+  const [formData, setFormData] = useState<appDetailsProps>(appDetails)
 
-  console.log({ appDetails, oAuth, scopeMeta, onDelete })
+  console.log(oAuth)
 
   const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
     return {
@@ -62,12 +89,11 @@ export const ApplicationAuth = ({
         <Text size="2xl" weight="semibold" className="text-gray-900">
           0xAuth
         </Text>
-
-        <Button type="submit" btnType="primary-alt">
+        <Button type="submit" btnType="primary-alt" disabled={!isFormChanged}>
           Save
         </Button>
       </div>
-      <Toaster position="top-right" reverseOrder={false} />
+
       <RotateCredsModal
         isOpen={rollKeyModalOpen}
         rotateCallback={() => {
@@ -135,9 +161,13 @@ export const ApplicationAuth = ({
           <Panel title="Application Status">
             <div className="flex flex-col h-full justify-center">
               <InputToggle
+                name="published"
                 id="published"
                 label="Published"
-                checked={appDetails.published}
+                onToggle={() => {
+                  ;(setIsFormChanged as (val: boolean) => {})(true)
+                }}
+                checked={formData.published}
               />
             </div>
           </Panel>
@@ -151,7 +181,8 @@ export const ApplicationAuth = ({
               <Input
                 id="name"
                 label="Application Name"
-                defaultValue={appDetails.app.name}
+                error={errors?.['name']}
+                defaultValue={formData.app.name}
                 required
               />
             </div>
@@ -159,6 +190,7 @@ export const ApplicationAuth = ({
             <div className="flex-1">
               <MultiSelect
                 label="Scopes"
+                disabled={true}
                 fieldName="scopes"
                 items={Object.entries(scopeMeta).map(([key, value]) => {
                   return {
@@ -167,7 +199,7 @@ export const ApplicationAuth = ({
                     desc: value.description,
                   }
                 })}
-                selectedItems={appDetails.app.scopes.map((scope) => {
+                selectedItems={appDetails.app.scopes?.map((scope) => {
                   const meta = scopeMeta[scope]
                   return {
                     id: scope,
@@ -183,6 +215,7 @@ export const ApplicationAuth = ({
             <ReadOnlyInput
               id="appDomains"
               label="Domain(s)"
+              className="cursor-no-drop"
               value=""
               required
             />
@@ -201,36 +234,86 @@ export const ApplicationAuth = ({
 
           <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="redirectURI"
                 label="Redirect URL"
-                preLabel="http://"
+                type="url"
+                required
+                error={errors?.['redirectURI']}
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.redirectURI}
+                defaultValue={formData.app.redirectURI}
               />
+              {errors?.redirectURI ? (
+                <Text
+                  className="mb-1.5 mt-1.5 text-red-500"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.redirectURI || ''}
+                </Text>
+              ) : (
+                <div className="sm:mb-[1.755rem]" />
+              )}
             </div>
+
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="termsURL"
                 label="Terms of Service URL"
-                preLabel="http://"
+                type="url"
+                error={errors?.['termsURL']}
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.termsURL}
+                defaultValue={formData.app.termsURL}
               />
+              {errors?.termsURL ? (
+                <Text
+                  className="mb-1.5 mt-1.5 text-red-500"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.termsURL || ''}
+                </Text>
+              ) : (
+                <div className="sm:mb-[1.755rem]" />
+              )}
             </div>
+
             <div className="flex-1">
-              <PreLabeledInput
+              <Input
                 id="websiteURL"
                 label="Website"
-                preLabel="http://"
+                error={errors?.['websiteURL']}
+                type="url"
                 placeholder="www.example.com"
-                defaultValue={appDetails.app.websiteURL}
+                defaultValue={formData.app.websiteURL}
               />
+              {errors?.websiteURL ? (
+                <Text
+                  className="mb-1.5 mt-1.5 text-red-500"
+                  size="xs"
+                  weight="normal"
+                >
+                  {errors.websiteURL || ''}
+                </Text>
+              ) : (
+                <div className="sm:mb-[1.755rem]" />
+              )}
             </div>
           </div>
 
           <div>
-            <IconPicker id="icon" url={appDetails.app.icon} />
+            <IconPicker
+              id="icon"
+              errorMessage={errors?.['icon']}
+              invalid={
+                errors !== undefined &&
+                errors.hasOwnProperty('icon') &&
+                (errors['icon'] as string).length > 0
+              }
+              setIsFormChanged={setIsFormChanged as (val: boolean) => void}
+              setIsImgUploading={setIsImgUploading as (val: boolean) => void}
+              url={formData.app.icon}
+            />
           </div>
         </div>
       </Panel>
@@ -240,10 +323,10 @@ export const ApplicationAuth = ({
           <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
             <div className="flex-1">
               <PreLabeledInput
-                id="websiteURL"
-                label="Website"
-                preLabel="https://"
-                defaultValue={appDetails.app.websiteURL}
+                id="discordUser"
+                label="Discord"
+                preLabel="http://discord.com/"
+                defaultValue={formData.app.discordUser}
               />
             </div>
             <div className="flex-1">
@@ -251,7 +334,7 @@ export const ApplicationAuth = ({
                 id="twitterUser"
                 label="Twitter"
                 preLabel="https://twitter.com/"
-                defaultValue={appDetails.app.twitterUser}
+                defaultValue={formData.app.twitterUser}
               />
             </div>
           </div>
@@ -262,7 +345,7 @@ export const ApplicationAuth = ({
                 id="mediumUser"
                 label="Medium"
                 preLabel="https://medium.com/@"
-                defaultValue={appDetails.app.mediumUser}
+                defaultValue={formData.app.mediumUser}
               />
             </div>
             <div className="flex-1">
@@ -270,22 +353,9 @@ export const ApplicationAuth = ({
                 id="mirrorURL"
                 label="Mirror"
                 preLabel="https://mirror.xyz/"
-                defaultValue={appDetails.app.mirrorURL}
+                defaultValue={formData.app.mirrorURL}
               />
             </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 md:items-end">
-            <div className="flex-1">
-              <PreLabeledInput
-                id="discordUser"
-                label="Discord"
-                preLabel="http://discord.com/"
-                defaultValue={appDetails.app.discordUser}
-              />
-            </div>
-
-            <div className="flex-1 hidden md:inline-flex">&nbsp;</div>
           </div>
         </div>
       </Panel>

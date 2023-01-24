@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react'
+import { Text } from '@kubelt/design-system'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
 
@@ -18,13 +19,15 @@ function pickIcon(setIcon, setIconUrl) {
       const iconFile = files.item(0)
       const reader = new FileReader()
       reader.onload = (e) => {
-        setIcon(e.target.result)
+        setIcon(e?.target?.result)
       }
       reader.readAsDataURL(iconFile)
 
       const imgUploadUrl = (await fetch('/api/image-upload-url', {
         method: 'post',
-      }).then((res) => res.json())) as string
+      }).then((res) => {
+        return res.json()
+      })) as string
 
       const formData = new FormData()
       formData.append('file', iconFile)
@@ -61,6 +64,8 @@ type IconPickerProps = {
   invalid?: boolean
   // An error message to display
   errorMessage?: string
+  setIsFormChanged: (val: boolean) => void
+  setIsImgUploading: (val: boolean) => void
 }
 
 export default function IconPicker({
@@ -68,6 +73,8 @@ export default function IconPicker({
   url,
   invalid,
   errorMessage,
+  setIsFormChanged,
+  setIsImgUploading,
 }: IconPickerProps) {
   const [icon, setIcon] = useState(url !== undefined ? url : '')
   const [iconUrl, setIconUrl] = useState(url !== undefined ? url : '')
@@ -117,10 +124,11 @@ export default function IconPicker({
     ) : (
       <CameraIcon className="h-6 w-6 text-gray-300" aria-hidden="true" />
     )
+
   return (
     <div>
       <label className="text-sm font-medium text-gray-700">
-        Upload Icon (256x256)
+        Upload Icon* (256x256)
       </label>
       {id && <input type="hidden" name={id} value={iconUrl} />}
       <div className="flex flex-col md:flex-row md:gap-4 items-center mt-2">
@@ -134,27 +142,43 @@ export default function IconPicker({
           >
             {appIcon}
           </div>
+
           <div className="grid place-items-center">
             <label
               htmlFor="icon-upload"
-              className="rounded bg-transparent text-sm border border-gray-300 py-2 px-4 hover:bg-indigo-500 hover:text-white focus:bg-indigo-400"
+              className={`rounded bg-transparent text-sm border
+                 py-2 px-4 hover:bg-indigo-500
+                hover:text-white focus:bg-indigo-400 hover:cursor-pointer
+                ${invalid ? 'border-red-400' : 'border-gray-300'}`}
             >
               <span>Upload</span>
               <input
                 type="file"
                 id="icon-upload"
                 name="icon"
-                accept="image/png, image/jpeg"
+                accept="image/png,image/jpeg,image/gif,image/webp"
                 className="sr-only"
-                onChange={pickIcon(setIcon, setIconUrl)}
+                onChange={async (event) => {
+                  event.stopPropagation()
+                  setIsFormChanged(false)
+                  setIsImgUploading(true)
+                  await pickIcon(setIcon, setIconUrl)(event)
+                  setIsImgUploading(false)
+                  setIsFormChanged(true)
+                }}
               />
             </label>
           </div>
         </div>
         {invalid && (
-          <div className="text-red-700" id="icon-error">
+          <Text
+            className="text-red-500"
+            size="xs"
+            weight="normal"
+            id="icon-error"
+          >
             {errorMessage}
-          </div>
+          </Text>
         )}
       </div>
     </div>

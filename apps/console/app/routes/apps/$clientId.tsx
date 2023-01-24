@@ -1,15 +1,21 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import SiteMenu from '~/components/SiteMenu'
 import SiteHeader from '~/components/SiteHeader'
 
+import toast, { Toaster } from 'react-hot-toast'
+
+import rotateSecrets, { RollType } from '~/helpers/rotation'
+import type { RotatedSecrets } from '~/helpers/rotation'
+
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
 
 type AppData = {
   clientId: string
@@ -19,11 +25,16 @@ type AppData = {
 
 type LoaderData = {
   apps: AppData
-  clientId: string | undefined
   avatarUrl: string
+  appDetails: appDetailsProps
+  rotationResult?: RotatedSecrets
 }
 
 export const loader: LoaderFunction = async ({ request, params }) => {
+  if (!params.clientId) {
+    throw new Error('Client id is required for the requested route')
+  }
+
   const jwt = await requireJWT(request)
   const starbaseClient = createStarbaseClient(Starbase, {
     headers: {
@@ -50,7 +61,33 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       console.error('Could not retrieve profile image.', e)
     }
 
-    return json<LoaderData>({ apps: reshapedApps, clientId, avatarUrl })
+    const appDetails = await starbaseClient.getAppDetails.query({
+      clientId: clientId as string,
+    })
+
+    let rotationResult
+
+    //If there's no timestamps, then the secrets have never been set, signifying the app
+    //has just been created; we rotate both secrets and set the timestamps
+    if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
+      rotationResult = await rotateSecrets(
+        starbaseClient,
+        appDetails.clientId,
+        RollType.RollBothSecrets
+      )
+
+      // This is a client 'hack' as the date
+      // is populated from the graph
+      // on subsequent requests
+      appDetails.secretTimestamp = appDetails.apiKeyTimestamp = Date.now()
+    }
+
+    return json<LoaderData>({
+      apps: reshapedApps,
+      avatarUrl,
+      appDetails: appDetails as appDetailsProps,
+      rotationResult,
+    })
   } catch (error) {
     console.error({ error })
     return json({ error }, { status: 500 })
@@ -61,17 +98,40 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 // -----------------------------------------------------------------------------
 
 export default function AppDetailIndexPage() {
-  const { apps, clientId, avatarUrl } = useLoaderData<LoaderData>()
+  const loaderData = useLoaderData<LoaderData>()
+
+  const { profileURL } = useOutletContext<{ profileURL: string }>()
+
+  const { apps, avatarUrl } = loaderData
+  const { appDetails, rotationResult } = loaderData
+
+  const notify = (success: boolean = true) => {
+    if (success) {
+      toast.success('Saved', { duration: 2000 })
+    } else {
+      toast.error(
+        'Could not save your changes due to errors noted on the page',
+        {
+          duration: 2000,
+        }
+      )
+    }
+  }
 
   return (
     <div className="flex flex-col md:flex-row min-h-full">
-      <SiteMenu apps={apps} selected={clientId} />
-
+      <SiteMenu apps={apps} selected={appDetails.clientId} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
-        <SiteHeader avatarUrl={avatarUrl} />
-
+        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
+        <Toaster position="top-right" reverseOrder={false} />
         <section className="mx-11 my-9">
-          <Outlet />
+          <Outlet
+            context={{
+              notificationHandler: notify,
+              appDetails,
+              rotationResult,
+            }}
+          />
         </section>
       </main>
     </div>

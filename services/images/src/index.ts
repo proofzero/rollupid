@@ -111,6 +111,7 @@ router
       // image itself has been uploaded, send an image details request
       // (accounts/:account_identifier/images/v1/:identifier), and check that
       // the draft: true property is not present.
+
       const uploadRequest = new Request(url, {
         method: 'POST',
         headers: {
