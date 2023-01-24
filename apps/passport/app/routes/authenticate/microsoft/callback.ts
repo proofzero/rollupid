@@ -9,6 +9,7 @@ import { OAuthData } from '@kubelt/platform.address/src/types'
 import { MicrosoftStrategyDefaultName } from 'remix-auth-microsoft'
 import { authenticateAddress } from '~/utils/authenticate.server'
 import { getConsoleParamsSession } from '~/session.server'
+import cacheImageToCF from '~/utils/cacheImageToCF.server'
 
 export const loader: LoaderFunction = async ({
   request,
@@ -40,12 +41,19 @@ export const loader: LoaderFunction = async ({
   )
 
   const addressClient = getAddressClient(address, context.env)
-
   const account = await addressClient.resolveAccount.query()
-
   const existingOAuthData = await addressClient.getOAuthData.query()
 
-  await addressClient.setOAuthData.mutate(authRes)
+  if (existingOAuthData?.profile == null) {
+    //If we don't already have a microsoft oauth data set, we cache
+    //the image and set the OAuth data set for the address
+    const imageUrl = await cacheImageToCF(profile._json.picture, {
+      Authorization: `Bearer ${authRes.accessToken}`,
+    })
+    profile._json.threeidImageUrl = imageUrl
+
+    await addressClient.setOAuthData.mutate(authRes)
+  }
 
   return authenticateAddress(address, account, appData, context.env)
 }
