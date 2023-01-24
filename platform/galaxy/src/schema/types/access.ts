@@ -6,15 +6,14 @@ export default /* GraphQL */ `
 
   input ExchangeTokenInput {
     grantType: String!
-    account: URN
-    code: String
-    redirectUri: String
-    clientId: String
-    clientSecret: String
-    token: String
+    code: String!
+    redirectUri: String!
+    clientId: String!
+    clientSecret: String!
+    scopes: [String]
   }
 
   type Mutation {
-    exchangeToken(exchange: ExchangeTokenInput): ExchangeTokenResult
+    exchangeToken(exchange: ExchangeTokenInput!): ExchangeTokenResult
   }
 `

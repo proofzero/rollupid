@@ -13,9 +13,11 @@ const accessResolvers: Resolvers = {
     exchangeToken: async (_parent, { exchange }, { env }: ResolverContext) => {
       const accessClient = createAccessClient(env.Access)
 
-      const token = await accessClient.exchangeToken.mutate(
-        exchange as ExchangeTokenParams
-      )
+      console.log({ exchange })
+
+      const token = await accessClient.exchangeToken.mutate({
+        ...exchange,
+      } as ExchangeTokenParams)
 
       return token
     },

@@ -20,6 +20,7 @@ export default class Authorization extends DOProxy {
   }
 
   async authorize(
+    code: string,
     account: AccountURN,
     responseType: string,
     clientId: string,
@@ -32,7 +33,6 @@ export default class Authorization extends DOProxy {
     }
 
     const timestamp: number = Date.now()
-    const code = hexlify(randomBytes(CODE_OPTIONS.length))
     const codes: Map<string, AuthorizationParameters> =
       (await this.state.storage.get<Map<string, AuthorizationParameters>>(
         'codes'
@@ -92,15 +92,6 @@ export default class Authorization extends DOProxy {
   }
 
   async alarm() {
-    const codes = await this.state.storage.get<
-      Map<string, AuthorizationParameters>
-    >('codes')
-    if (!codes) return
-    for (const [code, params] of codes) {
-      if (params.timestamp + CODE_OPTIONS.ttl * 1000 <= Date.now()) {
-        codes.delete(code)
-      }
-    }
-    await this.state.storage.put('codes', codes)
+    await this.state.storage.deleteAll() // self-destruct
   }
 }

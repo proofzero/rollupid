@@ -25,8 +25,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     { node_type: node_type, addr_type: addr_type },
     { alias: address }
   )
-  const addressClient = getAddressClient(addressURN, context.env)
-  const account = await addressClient.resolveAccount.query() // creates and associates account if there is none
 
   const grantType = GrantType.AuthenticationCode
   const redirectUri = context.env.PASSPORT_REDIRECT_URL
@@ -39,7 +37,6 @@ export const loader: LoaderFunction = async ({ request, context, params }) => {
     const { accessToken, refreshToken } =
       await accessClient.exchangeToken.mutate({
         code,
-        account,
         clientId,
         redirectUri,
         grantType,
