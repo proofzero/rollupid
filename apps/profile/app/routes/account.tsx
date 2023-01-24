@@ -31,8 +31,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     getAccountAddresses(jwt),
   ])
 
-  console.log(profile)
-
   const cryptoAddresses =
     addresses?.filter((e) => {
       if (!e.rc) return false
