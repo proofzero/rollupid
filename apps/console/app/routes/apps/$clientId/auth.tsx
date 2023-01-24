@@ -32,30 +32,32 @@ import { z } from 'zod'
 
 type notificationHandlerType = (val: boolean) => void
 
+const HTTP_MESSAGE = 'HTTP can only be used for localhost'
+
 const updatesSchema = z.object({
   name: z.string(),
-  icon: z.string().url(),
+  icon: z.string().url({ message: 'Invalid image upload' }),
   redirectURI: z.union([
     z.string().url().startsWith('http://localhost', {
-      message: 'HTTP could only be used for localhost',
+      message: HTTP_MESSAGE,
     }),
     z.string().url().startsWith('http://127.0.0.1', {
-      message: 'HTTP could only be used for localhost',
+      message: HTTP_MESSAGE,
     }),
     z.string().url().startsWith('https://', {
-      message: 'HTTP could only be used for localhost',
+      message: HTTP_MESSAGE,
     }),
   ]),
   termsURL: z
     .union([
       z.string().url().startsWith('http://localhost', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().url().startsWith('http://127.0.0.1', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().url().startsWith('https://', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().length(0),
     ])
@@ -63,13 +65,13 @@ const updatesSchema = z.object({
   websiteURL: z
     .union([
       z.string().url().startsWith('http://localhost', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().url().startsWith('http://127.0.0.1', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().url().startsWith('https://', {
-        message: 'HTTP could only be used for localhost',
+        message: HTTP_MESSAGE,
       }),
       z.string().length(0),
     ])
@@ -232,6 +234,7 @@ export default function AppDetailIndexPage() {
   useEffect(() => {
     if (errors) {
       notificationHandler(Object.keys(errors).length === 0)
+      setIsFormChanged(!(Object.keys(errors).length === 0))
     }
   }, [errors])
 
@@ -255,9 +258,6 @@ export default function AppDetailIndexPage() {
         onChange={() => {
           setIsFormChanged(true)
         }}
-        onSubmit={() => {
-          setIsFormChanged(false)
-        }}
       >
         <fieldset disabled={isImgUploading}>
           <input type="hidden" name="op" value="update_app" />
@@ -268,9 +268,7 @@ export default function AppDetailIndexPage() {
             oAuth={{
               appId: appDetails.clientId as string,
               appSecret: rotatedSecret,
-              createdAt: new Date(
-                appDetails.secretTimestamp?.toString() as string
-              ),
+              createdAt: new Date(appDetails.secretTimestamp as number),
               onKeyRoll: () => {
                 submit(
                   {

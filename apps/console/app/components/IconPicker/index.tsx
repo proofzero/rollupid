@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react'
+import { Text } from '@kubelt/design-system'
 
 import { CameraIcon } from '@heroicons/react/24/outline'
 
@@ -127,7 +128,7 @@ export default function IconPicker({
   return (
     <div>
       <label className="text-sm font-medium text-gray-700">
-        Upload Icon (256x256)
+        Upload Icon* (256x256)
       </label>
       {id && <input type="hidden" name={id} value={iconUrl} />}
       <div className="flex flex-col md:flex-row md:gap-4 items-center mt-2">
@@ -145,9 +146,10 @@ export default function IconPicker({
           <div className="grid place-items-center">
             <label
               htmlFor="icon-upload"
-              className="rounded bg-transparent text-sm border
-                border-gray-300 py-2 px-4 hover:bg-indigo-500
-                hover:text-white focus:bg-indigo-400 hover:cursor-pointer"
+              className={`rounded bg-transparent text-sm border
+                 py-2 px-4 hover:bg-indigo-500
+                hover:text-white focus:bg-indigo-400 hover:cursor-pointer
+                ${invalid ? 'border-red-400' : 'border-gray-300'}`}
             >
               <span>Upload</span>
               <input
@@ -169,9 +171,14 @@ export default function IconPicker({
           </div>
         </div>
         {invalid && (
-          <div className="text-red-700" id="icon-error">
+          <Text
+            className="text-red-500"
+            size="xs"
+            weight="normal"
+            id="icon-error"
+          >
             {errorMessage}
-          </div>
+          </Text>
         )}
       </div>
     </div>

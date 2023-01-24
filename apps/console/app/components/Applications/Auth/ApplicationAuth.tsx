@@ -35,6 +35,12 @@ export type errorsAuthProps = {
   websiteURL?: string
   termsURL?: string
   redirectURI?: string
+  icon?: string
+  name?: string
+  discordUser?: string
+  twitterUser?: string
+  mediumUser?: string
+  mirrorURL?: string
 }
 
 type ApplicationAuthProps = {
@@ -66,6 +72,8 @@ export const ApplicationAuth = ({
 }: ApplicationAuthProps) => {
   const [rollKeyModalOpen, setRollKeyModalOpen] = useState(false)
   const [formData, setFormData] = useState<appDetailsProps>(appDetails)
+
+  console.log(oAuth)
 
   const scopeArray = Object.entries(scopeMeta).map(([key, value]) => {
     return {
@@ -173,6 +181,7 @@ export const ApplicationAuth = ({
               <Input
                 id="name"
                 label="Application Name"
+                error={errors?.['name']}
                 defaultValue={formData.app.name}
                 required
               />
@@ -181,8 +190,7 @@ export const ApplicationAuth = ({
             <div className="flex-1">
               <MultiSelect
                 label="Scopes"
-                // 3 - because 3 is default threeid scopes
-                disabled={Object.keys(scopeMeta).length === 3}
+                disabled={true}
                 fieldName="scopes"
                 items={Object.entries(scopeMeta).map(([key, value]) => {
                   return {
@@ -230,6 +238,7 @@ export const ApplicationAuth = ({
                 id="redirectURI"
                 label="Redirect URL"
                 type="url"
+                required
                 error={errors?.['redirectURI']}
                 placeholder="www.example.com"
                 defaultValue={formData.app.redirectURI}
@@ -243,7 +252,7 @@ export const ApplicationAuth = ({
                   {errors.redirectURI || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.755rem]" />
+                <div className="sm:mb-[1.755rem]" />
               )}
             </div>
 
@@ -265,7 +274,7 @@ export const ApplicationAuth = ({
                   {errors.termsURL || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.755rem]" />
+                <div className="sm:mb-[1.755rem]" />
               )}
             </div>
 
@@ -287,7 +296,7 @@ export const ApplicationAuth = ({
                   {errors.websiteURL || ''}
                 </Text>
               ) : (
-                <div className="mb-[1.755rem]" />
+                <div className="sm:mb-[1.755rem]" />
               )}
             </div>
           </div>
@@ -295,6 +304,12 @@ export const ApplicationAuth = ({
           <div>
             <IconPicker
               id="icon"
+              errorMessage={errors?.['icon']}
+              invalid={
+                errors !== undefined &&
+                errors.hasOwnProperty('icon') &&
+                (errors['icon'] as string).length > 0
+              }
               setIsFormChanged={setIsFormChanged as (val: boolean) => void}
               setIsImgUploading={setIsImgUploading as (val: boolean) => void}
               url={formData.app.icon}

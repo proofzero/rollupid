@@ -102,8 +102,6 @@ export default function AppDetailIndexPage() {
 
   const { profileURL } = useOutletContext<{ profileURL: string }>()
 
-  console.log(profileURL)
-
   const { apps, avatarUrl } = loaderData
   const { appDetails, rotationResult } = loaderData
 
@@ -111,9 +109,12 @@ export default function AppDetailIndexPage() {
     if (success) {
       toast.success('Saved', { duration: 2000 })
     } else {
-      toast.error('Save Failed -- Please try again', {
-        duration: 2000,
-      })
+      toast.error(
+        'Could not save your changes due to errors noted on the page',
+        {
+          duration: 2000,
+        }
+      )
     }
   }
 
