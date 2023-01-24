@@ -41,7 +41,7 @@ const URL_VALIDATION = ({
   val: string
   required: boolean
 }) => {
-  if (val && val.length) {
+  if (val?.length) {
     try {
       const url = new URL(val)
       if (url.protocol === 'http:') {
