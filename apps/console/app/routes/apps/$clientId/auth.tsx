@@ -195,12 +195,6 @@ export const action: ActionFunction = async ({ request, params }) => {
       }
 
       const zodErrors = updatesSchema.safeParse(updates)
-      // const re = new RegExp(
-      //   '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
-      // )
-      // console.log(updates.redirectURI.match(re))
-      // console.log(re.test(updates.redirectURI))
-
       if (!zodErrors.success) {
         zodErrors.error.errors.forEach((er: any) => {
           errors[`${er.path[0]}`] = er.message
