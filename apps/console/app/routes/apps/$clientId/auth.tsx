@@ -44,12 +44,11 @@ const URL_VALIDATION = ({
   if (val?.length) {
     try {
       const url = new URL(val)
-      if (url.protocol === 'http:') {
-        return url.hostname === 'localhost' || url.hostname === '127.0.0.1'
-      }
-      if (url.protocol === 'https:') {
-        return true
-      }
+      console.log(url)
+      const isLocal =
+        url.protocol === 'http:' &&
+        ['localhost', '127.0.0.1'].includes(url.hostname)
+      return isLocal || url.protocol === 'https:'
     } catch (ex) {
       return false
     }
