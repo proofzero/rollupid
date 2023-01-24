@@ -44,7 +44,6 @@ const URL_VALIDATION = ({
   if (val?.length) {
     try {
       const url = new URL(val)
-      console.log(url)
       const isLocal =
         url.protocol === 'http:' &&
         ['localhost', '127.0.0.1'].includes(url.hostname)
