@@ -52,6 +52,7 @@ export const loader: LoaderFunction = () => {
   return json({
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
+      THREEID_APP_URL,
     },
   })
 }
@@ -62,6 +63,7 @@ export default function App() {
   const browserEnv = useLoaderData()
 
   const GATag = browserEnv.ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
+  const profileURL = browserEnv.ENV.THREEID_APP_URL
 
   useEffect(() => {
     if (GATag) {
@@ -99,7 +101,7 @@ export default function App() {
           </>
         )}
         {transition.state === 'loading' ? <Loader /> : null}
-        <Outlet />
+        <Outlet context={{ profileURL }} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{

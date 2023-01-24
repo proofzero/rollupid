@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 
-import { Outlet, useLoaderData } from '@remix-run/react'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
 import { json } from '@remix-run/cloudflare'
 
 import SiteMenu from '~/components/SiteMenu'
@@ -100,6 +100,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function AppDetailIndexPage() {
   const loaderData = useLoaderData<LoaderData>()
 
+  const { profileURL } = useOutletContext<{ profileURL: string }>()
+
+  console.log(profileURL)
+
   const { apps, avatarUrl } = loaderData
   const { appDetails, rotationResult } = loaderData
 
@@ -117,7 +121,7 @@ export default function AppDetailIndexPage() {
     <div className="flex flex-col md:flex-row min-h-full">
       <SiteMenu apps={apps} selected={appDetails.clientId} />
       <main className="flex flex-col flex-initial min-h-full w-full bg-gray-50">
-        <SiteHeader avatarUrl={avatarUrl} />
+        <SiteHeader avatarUrl={avatarUrl} profileURL={profileURL} />
         <Toaster position="top-right" reverseOrder={false} />
         <section className="mx-11 my-9">
           <Outlet
