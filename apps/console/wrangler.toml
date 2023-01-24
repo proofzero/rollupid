@@ -31,7 +31,6 @@ PASSPORT_URL = "http://localhost:9696"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 THREEID_APP_URL = "http://localhost:9797"
-PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
 
 # Site
@@ -75,7 +74,6 @@ COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 THREEID_APP_URL = "https://my-dev.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -106,7 +104,6 @@ COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 THREEID_APP_URL = "https://my-next.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -138,4 +135,3 @@ COOKIE_DOMAIN = "threeid.xyz"
 STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 THREEID_APP_URL = "https://my.threeid.xyz"
-PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
