@@ -33,10 +33,6 @@ INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 THREEID_APP_URL = "http://localhost:9797"
 PASSPORT_REDIRECT_URL = "http://localhost:9696/authenticate/token"
 COOKIE_DOMAIN = "localhost"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/twitter/callback"
-INTERNAL_MICROSOFT_OAUTH_CALLBACK_URL = "http://localhost:9696/authenticate/microsoft/callback"
 
 # Site
 # -----------------------------------------------------------------------------
@@ -80,9 +76,6 @@ STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 THREEID_APP_URL = "https://my-dev.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-dev.threeid.xyz/authenticate/twitter/callback"
 
 # Environment: next
 # -----------------------------------------------------------------------------
@@ -114,9 +107,6 @@ STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 THREEID_APP_URL = "https://my-next.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport-next.threeid.xyz/authenticate/twitter/callback"
 
 # Environment: current
 # -----------------------------------------------------------------------------
@@ -149,6 +139,3 @@ STORAGE_NAMESPACE="console"
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"
 THREEID_APP_URL = "https://my.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
-INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
-INTERNAL_GITHUB_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/github/callback"
-INTERNAL_TWITTER_OAUTH_CALLBACK_URL = "https://passport.threeid.xyz/authenticate/twitter/callback"
