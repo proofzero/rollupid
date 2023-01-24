@@ -5,7 +5,7 @@ import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 
-import { getAccessClient, getAddressClient } from '~/platform.server'
+import { getAccessClient } from '~/platform.server'
 import { createUserSession, getConsoleParamsSession } from '~/session.server'
 
 export const loader: LoaderFunction = async ({ request, context, params }) => {

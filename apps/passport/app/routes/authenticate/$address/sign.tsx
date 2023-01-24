@@ -75,11 +75,13 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
   searchParams.set('addr_type', 'eth')
-  return redirect(
-    `/authenticate/${
-      params.address
-    }/token?${searchParams}&code=${code}&state=${formData.get('state')}`
-  )
+  searchParams.set('code', code)
+  const state = formData.get('state')
+  if (state) {
+    searchParams.set('state', state as string)
+  }
+
+  return redirect(`/authenticate/${params.address}/token?${searchParams}`)
 }
 
 export default function Sign() {

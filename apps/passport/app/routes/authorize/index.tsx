@@ -120,9 +120,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Failed to authorize' }, 400)
   }
 
-  return redirect(
-    `${redirectUri}?code=${authorizeRes.code}&state=${authorizeRes.state}`
-  )
+  const redirectParams = new URLSearchParams({
+    code: authorizeRes.code,
+    state: authorizeRes.state,
+  })
+
+  return redirect(`${redirectUri}?${redirectParams}`)
 }
 
 export default function Authorize() {

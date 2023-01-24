@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   if (session.get('jwt') && searchParams.get('client_id')) {
     const searchParams = new URL(request.url).searchParams
-    return redirect(`/authorize?client_id=${searchParams}`)
+    return redirect(`/authorize?${searchParams}`)
   }
   if (session.get('jwt')) {
     return redirect(context.env.CONSOLE_APP_URL)
