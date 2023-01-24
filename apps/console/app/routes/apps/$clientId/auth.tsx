@@ -47,13 +47,18 @@ const updatesSchema = z.object({
        * (localhost|127.0.0.1){1}       - allows only localhost as domain and requires on of them
        * (
        *  (
-       *   (([:]){1}[0-9]{4}) | \/ ){1} - checks if the next characters are port or slash
-       *                                  it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
-       *    [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
-       *  ){0,1}                        - makes this whole bracket optional
+       *   (
+       *    (([:]){1}[0-9]{4}) | \/ ){1} - checks if the next characters are port or slash
+       *                                   it requires port to be ":xxxx" - 5 characters where x is from 0 to 9
+       *     [a-zA-Z0-9/.?=&:#]*         - allows all url route characters
+       *   ){0,1}                        - makes this whole bracket optional
+       *  ) | $^                         - this pattern matches nothing which means that nothing other than above
+       *                                 - can be passed
        * )
        */
-      /((http([s]){0,1}:\/\/){1}(localhost|127.0.0.1){1}(((([:]){1}[0-9]{4})|\/){1}[a-zA-Z0-9/.?=&:#]*){0,1}){1}/,
+      new RegExp(
+        '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+      ),
       { message: HTTP_MESSAGE }
     ),
     z.string().url().startsWith('https://', {
@@ -65,7 +70,9 @@ const updatesSchema = z.object({
       z
         .string()
         .regex(
-          /((http([s]){0,1}:\/\/){1}(localhost|127.0.0.1){1}(((([:]){1}[0-9]{4})|\/){1}[a-zA-Z0-9/.?=&:#]*){0,1}){1}/,
+          new RegExp(
+            '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+          ),
           { message: HTTP_MESSAGE }
         ),
       z.string().url().startsWith('https://', {
@@ -79,7 +86,9 @@ const updatesSchema = z.object({
       z
         .string()
         .regex(
-          /((http([s]){0,1}:\/\/){1}(localhost|127.0.0.1){1}(((([:]){1}[0-9]{4})|\/){1}[a-zA-Z0-9/.?=&:#]*){0,1}){1}/,
+          new RegExp(
+            '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+          ),
           { message: HTTP_MESSAGE }
         ),
       z.string().url().startsWith('https://', {
@@ -186,6 +195,12 @@ export const action: ActionFunction = async ({ request, params }) => {
       }
 
       const zodErrors = updatesSchema.safeParse(updates)
+      // const re = new RegExp(
+      //   '((http([s]){0,1}://){1}(localhost|127.0.0.1){1}((((([:]){1}[0-9]{4})|/){1}[a-zA-Z0-9/.?=&:#]*)| $^){1}){1}'
+      // )
+      // console.log(updates.redirectURI.match(re))
+      // console.log(re.test(updates.redirectURI))
+
       if (!zodErrors.success) {
         zodErrors.error.errors.forEach((er: any) => {
           errors[`${er.path[0]}`] = er.message
