@@ -11,32 +11,59 @@ import { CryptoAddressProfile } from '@kubelt/galaxy-client'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useState } from 'react'
 import InputText from '~/components/inputs/InputText'
+import { CryptoAddressType } from '@kubelt/types/address'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
   const addresses = (await getAccountAddresses(jwt)) ?? []
   const addressUrns = addresses.map((ca) => ca.urn as AddressURN)
+
+  // This returns profiles without urns
   const profiles = (await getAddressProfiles(jwt, addressUrns)) ?? []
 
-  const cryptoProfiles = profiles
-    .filter((p) => p?.profile.__typename === 'CryptoAddressProfile')
-    .map((p) => p?.profile as CryptoAddressProfile)
-    .map((p, i) => ({
-      id: addresses[i].id,
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const mappedProfiles = profiles.map((p, i) => ({ urn: addressUrns[i], ...p }))
+
+  // Keeping the distinctions to only append
+  // context actions to desired types
+  // e.x. rename to crypto profiles
+  const cryptoProfiles = mappedProfiles
+    .filter((p) => p?.type === CryptoAddressType.ETH)
+    .map((p) => ({ urn: p.urn, ...(p?.profile as CryptoAddressProfile) }))
+    .map((p) => ({
+      id: p.urn,
       address: p.address,
       title: p.displayName,
       icon: p.avatar,
       chain: 'Ethereum',
-    })) as AddressListItemProps[]
+    }))
+
+  const oAuthProfiles = mappedProfiles
+    .filter((p) => p?.type !== CryptoAddressType.ETH)
+    .map((p) => {
+      // To do: add more mappings
+      switch (p?.profile?.__typename) {
+        case 'OAuthGithubProfile':
+          return {
+            id: p.urn,
+            address: p.urn,
+            title: p.profile.name,
+            icon: p.profile.avatar_url,
+            chain: 'GitHub',
+          }
+      }
+    })
 
   return {
-    addressProfiles: cryptoProfiles,
+    cryptoProfiles,
+    oAuthProfiles,
   }
 }
 
 const AccountSettingsConnections = () => {
-  const { addressProfiles } = useLoaderData()
+  const { cryptoProfiles, oAuthProfiles } = useLoaderData()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [actionId, setActionId] = useState<null | string>()
@@ -76,13 +103,15 @@ const AccountSettingsConnections = () => {
         </Modal>
 
         <AddressList
-          addresses={addressProfiles.map((ap: AddressListItemProps) => ({
-            ...ap,
-            onRenameAccount: (id: string) => {
-              setActionId(id)
-              setRenameModalOpen(true)
-            },
-          }))}
+          addresses={cryptoProfiles
+            .map((ap: AddressListItemProps) => ({
+              ...ap,
+              onRenameAccount: (id: string) => {
+                setActionId(id)
+                setRenameModalOpen(true)
+              },
+            }))
+            .concat(oAuthProfiles)}
         />
       </div>
     </section>
