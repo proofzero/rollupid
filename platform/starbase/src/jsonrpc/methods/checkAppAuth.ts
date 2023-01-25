@@ -31,7 +31,7 @@ export const checkAppAuth = async ({
   // const storedScopes = new Set(appDetails.app?.scopes || [])
   // let validScopes = true
   // for (const e in scopes) {
-  //   if (!storedScopes.has(e)) {
+  //   if (!storedScopes. has(e)) {
   //     validScopes = false
   //     break
   //   }

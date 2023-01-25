@@ -36,8 +36,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const stateSession = await getAuthorizeStateSession(request)
   const storedState = stateSession.get('state')
 
-  console.log({ state, storedState })
-
   if (storedState && state !== storedState) {
     throw json(
       { error: 'Invalid state' },

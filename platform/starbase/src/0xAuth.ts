@@ -38,9 +38,5 @@ export function makeClientSecret() {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 
-  console.log({ secret })
-
   return secret
 
-  // return `secret:${secret}`
-}

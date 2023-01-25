@@ -35,8 +35,6 @@ export const authorizeMethod = async ({
 
   const code = hexlify(randomBytes(CODE_OPTIONS.length))
 
-  console.log({ code })
-
   const node = await initAuthorizationNodeByName(code, ctx.Authorization)
   const result = await node.class.authorize(
     code,

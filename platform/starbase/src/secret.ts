@@ -3,12 +3,6 @@
 // hash
 // -----------------------------------------------------------------------------
 
-// export async function hash(s: string): Promise<string> {
-//   const bytes = await sha256.digest(json.encode(s))
-//   const cid = CID.create(1, json.code, bytes)
-//   return cid.toString()
-// }
-
 export async function hash(s: string): Promise<string> {
   const data = new TextEncoder().encode(s)
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)

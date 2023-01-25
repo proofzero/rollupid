@@ -11,13 +11,13 @@ import {
   KeyLike,
   SignJWT,
 } from 'jose'
-import { STARBASE_API_KEY_ISSUER } from '../../constants'
+import { STARBASE_API_KEY_ISSUER } from '../constants'
 import type {
   AppAllFields,
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
-} from '../../types'
+} from '../types'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
@@ -116,7 +116,6 @@ export default class StarbaseApp extends DOProxy {
 
   async validateClientSecret(hashedClientSecret: string): Promise<boolean> {
     const storedSecret = await this.state.storage.get('clientSecret')
-    console.log({ storedSecret, hashedClientSecret })
     return storedSecret === hashedClientSecret
   }
 

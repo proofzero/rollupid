@@ -122,7 +122,6 @@ export const exchangeTokenMethod = async ({
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
-    console.log({ iss })
 
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.class.generate({

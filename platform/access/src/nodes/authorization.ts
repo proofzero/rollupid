@@ -32,15 +32,11 @@ export default class Authorization extends DOProxy {
 
     const timestamp: number = Date.now()
 
-    console.log('putting', { account }, this.state.id.toString())
-
     await this.state.storage.put({
       account,
       clientId,
       code: { redirectUri, scope, timestamp },
     })
-
-    console.log('done')
 
     await this.state.storage.setAlarm(Date.now() + CODE_OPTIONS.ttl)
 
@@ -53,7 +49,6 @@ export default class Authorization extends DOProxy {
     clientId: string
   ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
-    console.log('getting', { account }, this.state.id.toString())
     if (!account) {
       throw new Error('missing account name')
     }

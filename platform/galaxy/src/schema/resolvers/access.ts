@@ -16,8 +16,6 @@ const accessResolvers: Resolvers = {
     ) => {
       const accessClient = createAccessClient(env.Access)
 
-      console.log({ exchange })
-
       if (exchange.grantType === GrantType.AuthorizationCode) {
         return await accessClient.exchangeToken.mutate({
           clientId: exchange.clientId,
@@ -36,8 +34,6 @@ const accessResolvers: Resolvers = {
       { env }: ResolverContext
     ) => {
       const accessClient = createAccessClient(env.Access)
-
-      console.log({ exchange })
 
       if (exchange.grantType === GrantType.RefreshToken) {
         return await accessClient.exchangeToken.mutate({
