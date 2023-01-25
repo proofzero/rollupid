@@ -1,7 +1,7 @@
-import { AddressURNSpace } from '@kubelt/urns/address'
 import { gatewayFromIpfs } from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
 
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 /**
  * Nfts are being sorted server-side
  * this function then allows to merge client Nfts with newly-fetched Nfts
@@ -117,20 +117,20 @@ const getMoreNfts = (fetcher: any, request: string) => {
   fetcher.load(request)
 }
 
-export const getMoreNftsGallery = (fetcher: any, targetAddress: string) => {
-  const query = generateQuery([{ name: 'owner', value: targetAddress }])
+export const getMoreNftsGallery = (fetcher: any, accountURN: string) => {
+  const query = generateQuery([{ name: 'owner', value: accountURN }])
   const request = `/nfts/gallery?${query}`
   getMoreNfts(fetcher, request)
 }
 
 export const getMoreNftsModal = (
   fetcher: any,
-  targetAddress: string,
+  accountURN: string,
   collection?: string,
   pageKey?: string
 ) => {
   const query = generateQuery([
-    { name: 'owner', value: targetAddress },
+    { name: 'owner', value: accountURN },
     { name: 'pageKey', value: pageKey },
     { name: 'collection', value: collection },
   ])
@@ -143,37 +143,35 @@ export const getMoreNftsModal = (
 
 export const getMoreNftsSingleCollection = (
   fetcher: any,
-  targetAddress: string,
+  accountURN: string,
   collection: string,
   pageKey?: string
 ) => {
   const query = generateQuery([
-    { name: 'owner', value: targetAddress },
+    { name: 'owner', value: accountURN },
     { name: 'pageKey', value: pageKey },
     { name: 'collection', value: collection },
   ])
-  console.log(query.toString())
   const request = `/nfts/collection?${query}`
   getMoreNfts(fetcher, request)
 }
 
 export const getMoreNftsAllCollections = (
   fetcher: any,
-  targetAddress: string,
+  accountURN: string,
   pageKey?: string
 ) => {
   const query = generateQuery([
-    { name: 'owner', value: targetAddress },
+    { name: 'owner', value: accountURN },
     { name: 'pageKey', value: pageKey },
   ])
-  console.log(query.toString())
   const request = `/nfts?${query}`
   getMoreNfts(fetcher, request)
 }
 
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
-export const getGalleryWithMetadata = async (owner: string) => {
+export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
   const gallery = await getGallery(owner)
 
   if (!gallery || !gallery.length) {
@@ -182,12 +180,17 @@ export const getGalleryWithMetadata = async (owner: string) => {
 
   const galaxyClient = await getGalaxyClient()
 
-  const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata({
-    input: gallery.map((nft: any) => ({
-      contractAddress: nft.contract,
-      tokenId: nft.tokenId,
-    })),
-  })
+  const { getNFTMetadataBatch: metadata } = await galaxyClient.getNFTMetadata(
+    {
+      input: gallery.map((nft: any) => ({
+        contractAddress: nft.contract,
+        tokenId: nft.tokenId,
+      })),
+    },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
+    }
+  )
 
   const GalleryOrders: any = {}
   gallery?.forEach(

@@ -64,11 +64,13 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function AccountSettingsProfile() {
-  const { notificationHandler, profile, cryptoAddresses } = useOutletContext<{
-    profile: Profile
-    cryptoAddresses: Node[]
-    notificationHandler: (success: boolean) => void
-  }>()
+  const { notificationHandler, profile, cryptoAddresses, accountURN } =
+    useOutletContext<{
+      profile: Profile
+      cryptoAddresses: Node[]
+      notificationHandler: (success: boolean) => void
+      accountURN: string
+    }>()
 
   //TODO: update pfp components to take multiple addresses
   const temporaryAddress =
@@ -189,13 +191,13 @@ export default function AccountSettingsProfile() {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -209,7 +211,7 @@ export default function AccountSettingsProfile() {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, temporaryAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     }
     if (refresh) {
       asyncFn()

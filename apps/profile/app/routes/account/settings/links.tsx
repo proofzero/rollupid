@@ -17,7 +17,7 @@ import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
-import { Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'

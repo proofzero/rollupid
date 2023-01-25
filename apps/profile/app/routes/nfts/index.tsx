@@ -3,9 +3,14 @@ import { json } from '@remix-run/cloudflare'
 
 import { getGalaxyClient } from '~/helpers/clients'
 import { decorateNft, decorateNfts } from '~/helpers/nfts'
+import { getUserSession } from '~/utils/session.server'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
+
+  const session = await getUserSession(request)
+  const jwt = session.get('jwt')
 
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
@@ -14,10 +19,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   const galaxyClient = await getGalaxyClient()
 
   const { contractsForAddress: resColl } =
-    await galaxyClient.getNftsPerCollection({
-      owner,
-      excludeFilters: ['SPAM'],
-    })
+    await galaxyClient.getNftsPerCollection(
+      {
+        owner,
+        excludeFilters: ['SPAM'],
+      },
+      {
+        [PlatformJWTAssertionHeader]: jwt,
+      }
+    )
 
   const ownedNfts = resColl?.contracts.map((contract: any) => {
     const nft: any = contract?.ownedNfts ? contract.ownedNfts[0] : {}

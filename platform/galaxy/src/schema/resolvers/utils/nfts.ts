@@ -17,28 +17,30 @@ type ResolverContext = {
 
 export const getAllNfts = async (
   alchemyClient: AlchemyClient,
-  owner: string,
+  addresses: string[],
   contractAddresses: string[],
   maxRuns: number = 3
 ) => {
   let nfts: any[] = []
 
-  let runs = 0
-  let pageKey
-  do {
-    const res = (await alchemyClient.getNFTs({
-      owner,
-      contractAddresses,
-      pageKey,
-    })) as {
-      ownedNfts: any[]
-      pageKey: string | undefined
-    }
+  for (const address of addresses) {
+    let runs = 0
+    let pageKey
+    do {
+      const res = (await alchemyClient.getNFTs({
+        owner: address,
+        contractAddresses,
+        pageKey,
+      })) as {
+        ownedNfts: any[]
+        pageKey: string | undefined
+      }
 
-    nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
+      nfts = nfts.concat(NFTPropertyMapper(res.ownedNfts))
 
-    pageKey = res.pageKey
-  } while (pageKey && ++runs <= maxRuns)
+      pageKey = res.pageKey
+    } while (pageKey && ++runs <= maxRuns)
+  }
 
   return nfts
 }
@@ -58,40 +60,73 @@ export const getAlchemyClients = ({ env }: { env: ResolverContext['env'] }) => {
   }
 }
 
-export const nftBatchesFetcher = ({
-  batches,
-  owner,
+export const nftBatchesFetcher = async ({
+  contracts,
+  addresses,
   alchemyClient,
 }: {
-  batches: any[]
-  owner: string
+  contracts: any[]
+  addresses: string[]
   alchemyClient: AlchemyClient
 }) => {
-  return batches.map(async (batch: any) => {
-    const visitedMap: any = {}
-    batch.forEach((contract: string) => {
-      visitedMap[`${contract}`] = true
-    })
-    const res: any = []
-    let localBatch = Object.keys(visitedMap)
-    while (localBatch.length > 0) {
-      try {
-        let nfts: any = await alchemyClient.getNFTs({
-          owner,
-          contractAddresses: localBatch,
-          pageSize: localBatch.length * 3,
-        })
-        nfts.ownedNfts.forEach((nft: any) => {
-          delete visitedMap[`${nft.contract.address}`]
-        })
-        localBatch = Object.keys(visitedMap)
-        res.push(nfts.ownedNfts)
-      } catch (ex) {
-        console.error(new GraphQLYogaError(ex as string))
+  // Max limit on Alchemy is 45 contract addresses per request.
+  // We need batches with 45 contracts in each
+
+  const batches = sliceIntoChunks(
+    contracts.map((contract: any) => contract.address),
+    45
+  )
+  // Promise.all only to avoid promise chains
+  return Promise.all(
+    batches.map(async (batch: any) => {
+      const visitedMap: any = {}
+      batch.forEach((contract: string) => {
+        visitedMap[`${contract}`] = true
+      })
+      const res: any = []
+      let localBatch = Object.keys(visitedMap)
+
+      while (localBatch.length > 0) {
+        try {
+          // We have multiple batches and multiple addresses
+          // Essentially we need to mapreduce through them all
+          // - that's why we have nested cycles
+          // then we need to combine nfts in one object - thats why we are using
+          // refuce after
+          const nfts: any = (
+            await Promise.all(
+              addresses.map(async (address) => {
+                return await alchemyClient.getNFTs({
+                  owner: address,
+                  contractAddresses: localBatch,
+                  pageSize: localBatch.length * 3,
+                })
+              })
+            )
+          ).reduce(
+            (acc: any, contract: any) => {
+              return {
+                ownedNfts: acc.ownedNfts.concat(contract.ownedNfts),
+                // they all have same blockHash
+                blockHash: contract.blockHash,
+                totalCount: contract.totalCount + acc.totalCount,
+              }
+            },
+            { ownedNfts: [], blockHash: '', totalCount: 0 }
+          )
+          nfts.ownedNfts.forEach((nft: any) => {
+            delete visitedMap[`${nft.contract.address}`]
+          })
+          localBatch = Object.keys(visitedMap)
+          res.push(nfts.ownedNfts)
+        } catch (ex) {
+          console.error(new GraphQLYogaError(ex as string))
+          break
+        }
       }
-    }
-    return res
-  })
+      return res
+    })
+  )
 }
 
 export function sliceIntoChunks(arr: any, chunkSize: number) {
@@ -149,4 +184,58 @@ export const beautifyContracts = ({
   })
 
   return beautifiedContracts
+}
+
+export const fetchContracts = async ({
+  addresses,
+  ethereumClient,
+  polygonClient,
+  excludeFilters,
+}: {
+  addresses: string[]
+  ethereumClient: AlchemyClient
+  polygonClient: AlchemyClient
+  excludeFilters: string[]
+}) => {
+  const [ethContracts, polyContracts]: [any[], any[]] = await Promise.all([
+    Promise.all(
+      addresses.map(
+        async (address) =>
+          await ethereumClient.getContractsForOwner({
+            address,
+            excludeFilters,
+          })
+      )
+    ),
+    Promise.all(
+      addresses.map(
+        async (address) =>
+          await polygonClient.getContractsForOwner({
+            address,
+            excludeFilters,
+          })
+      )
+    ),
+  ])
+
+  const ethereumContracts = ethContracts.reduce(
+    (acc, instance) => {
+      return {
+        contracts: acc.contracts.concat(instance.contracts),
+        totalCount: acc.totalCount + instance.totalCount,
+      }
+    },
+    { contracts: [], totalCount: 0 }
+  )
+
+  const polygonContracts = polyContracts.reduce(
+    (acc, instance) => {
+      return {
+        contracts: acc.contracts.concat(instance.contracts),
+        totalCount: acc.totalCount + instance.totalCount,
+      }
+    },
+    { contracts: [], totalCount: 0 }
+  )
+  return { ethereumContracts, polygonContracts }
 }

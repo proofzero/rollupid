@@ -4,6 +4,7 @@ import type { JWTPayload } from 'jose'
 
 import { AccountURN } from '@kubelt/urns/account'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccountClient from '@kubelt/platform-clients/account'
 
 import Env from '../../../env'
 import { isFromCFBinding } from '@kubelt/utils'
@@ -16,6 +17,7 @@ export {
   nftBatchesFetcher,
   sliceIntoChunks,
   beautifyContracts,
+  fetchContracts,
 } from './nfts'
 
 // 404: 'USER_NOT_FOUND' as string,
@@ -164,3 +166,29 @@ export const logAnalytics =
 
     return next(root, args, context, info)
   }
+
+export const getConnectedCryptoAddresses = async ({
+  accountURN,
+  Account,
+  jwt,
+}: {
+  accountURN: AccountURN
+  Account: Fetcher
+  jwt: any
+}) => {
+  const accountClient = createAccountClient(Account, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt,
+    },
+  })
+
+  const addressesCall = jwt
+    ? accountClient.getOwnAddresses
+    : accountClient.getPublicAddresses
+
+  const addresses = await addressesCall.query({
+    account: accountURN,
+  })
+
+  return addresses.map((address) => address.qc.alias)
+}

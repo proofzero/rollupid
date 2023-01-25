@@ -184,9 +184,10 @@ const SortableNft = (props: any) => {
 
 const Gallery = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses } = useOutletContext<{
+  const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
+    accountURN: string
   }>()
 
   //TODO: update pfp components to take multiple addresses
@@ -311,13 +312,13 @@ const Gallery = () => {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -331,7 +332,7 @@ const Gallery = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     }
     if (refresh) {
       asyncFn()

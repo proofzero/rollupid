@@ -2,6 +2,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
 
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { Resolvers } from './typedefs'
 import Env from '../../env'
@@ -22,6 +23,8 @@ import {
   getAlchemyClients,
   nftBatchesFetcher,
   beautifyContracts,
+  getConnectedCryptoAddresses,
+  fetchContracts,
 } from './utils'
 
 type ResolverContext = {
@@ -44,7 +47,7 @@ const nftsResolvers: Resolvers = {
         owner: string
         contractAddresses: string[]
       },
-      { env }: ResolverContext
+      { env, jwt }: ResolverContext
     ) => {
       logAnalytics(
         env.Analytics,
@@ -55,12 +58,20 @@ const nftsResolvers: Resolvers = {
       )
       let ownedNfts: any[] = []
 
+      const accountURN = AccountURNSpace.componentizedUrn(owner)
+
+      const addresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
         const [ethNfts, polyNfts] = await Promise.all([
-          getAllNfts(ethereumClient, owner, contractAddresses),
-          getAllNfts(polygonClient, owner, contractAddresses),
+          getAllNfts(ethereumClient, addresses, contractAddresses),
+          getAllNfts(polygonClient, addresses, contractAddresses),
         ])
 
         ownedNfts = ownedNfts.concat(ethNfts, polyNfts)
@@ -90,58 +101,55 @@ const nftsResolvers: Resolvers = {
         excludeFilters: string[]
         pageSize: number
       },
-      { env }: ResolverContext
+      { env, jwt }: ResolverContext
     ) => {
       let contracts: any[] = []
+
+      const accountURN = AccountURNSpace.componentizedUrn(owner)
+
+      const addresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
-        const [ethContracts, polygonContracts]: [any, any] = await Promise.all([
-          ethereumClient.getContractsForOwner({
-            owner,
+        const {
+          ethereumContracts,
+          polygonContracts,
+        }: { ethereumContracts: any; polygonContracts: any } =
+          await fetchContracts({
+            addresses,
+            ethereumClient,
+            polygonClient,
             excludeFilters,
-          }),
-          polygonClient.getContractsForOwner({
-            owner,
-            excludeFilters,
-          }),
-        ])
-
-        // Max limit on Alchemy is 45 contract addresses per request.
-        // We need batches with 45 contracts in each
-        const ethBatches = sliceIntoChunks(
-          ethContracts.contracts.map((contract: any) => contract.address),
-          45
-        )
-        const polygonBatches = sliceIntoChunks(
-          polygonContracts.contracts.map((contract: any) => contract.address),
-          45
-        )
+          })
 
         // This way in each nested collection we have its own Promise.all
         // And one common Promise.all on top of them.
         const [ethNFTs, polygonNFTs] = await Promise.all([
-          await Promise.all(
-            nftBatchesFetcher({
-              batches: ethBatches,
-              owner,
+          Promise.all(
+            await nftBatchesFetcher({
+              contracts: ethereumContracts.contracts,
+              addresses,
               alchemyClient: ethereumClient,
             })
           ),
-          await Promise.all(
-            nftBatchesFetcher({
-              batches: polygonBatches,
-              owner,
+          Promise.all(
+            await nftBatchesFetcher({
+              contracts: polygonContracts.contracts,
+              addresses,
               alchemyClient: polygonClient,
             })
           ),
         ])
 
-        ethContracts.contracts = beautifyContracts({
+        ethereumContracts.contracts = beautifyContracts({
           nfts: ethNFTs,
           chain: AlchemyChain.ethereum,
-          contracts: ethContracts.contracts,
+          contracts: ethereumContracts.contracts,
           network: env.ALCHEMY_ETH_NETWORK,
         })
         polygonContracts.contracts = beautifyContracts({
@@ -151,7 +159,9 @@ const nftsResolvers: Resolvers = {
           contracts: polygonContracts.contracts,
         })
 
-        contracts = ethContracts.contracts.concat(polygonContracts.contracts)
+        contracts = ethereumContracts.contracts.concat(
+          polygonContracts.contracts
+        )
       } catch (ex) {
         console.error(new GraphQLYogaError(ex as string))
       }

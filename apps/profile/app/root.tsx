@@ -40,10 +40,12 @@ import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
 import { getProfileSession } from './utils/session.server'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { getGalaxyClient } from './helpers/clients'
-import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { getRedirectUrlForProfile } from './utils/redirects.server'
+import { parseJwt } from './utils/session.server'
+import { getAccountProfile } from './helpers/profile'
+import type { AddressURN } from '@kubelt/urns/address'
+import { AddressURNSpace } from '@kubelt/urns/address'
+import { AccountURNSpace } from '@kubelt/urns/account'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -80,24 +82,21 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getProfileSession(request)
   const user = session.get('user')
 
-  const galaxyClient = await getGalaxyClient()
-  let loggedInUserProfile = undefined
   let basePath = undefined
+  let loggedInUserProfile
+  let accountURN
+  let handle
+
   if (user) {
     const {
       user: { accessToken: jwt },
     } = session.data
-    loggedInUserProfile = await galaxyClient
-      .getProfile(
-        {},
-        {
-          [PlatformJWTAssertionHeader]: jwt,
-        }
-      )
-      .then((res) => res.profile)
-      .catch((err) => {
-        return null
-      })
+
+    accountURN = AccountURNSpace.parse(
+      parseJwt(jwt).sub as `urn:${string}:${string}${string}`
+    ).decoded
+
+    loggedInUserProfile = await getAccountProfile(jwt)
 
     if (!loggedInUserProfile)
       throw new Error('Could not retrieve logged in use profile.')
@@ -110,6 +109,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({
     loggedInUserProfile,
     basePath,
+    accountURN,
+    handle,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       CONSOLE_APP_URL,
@@ -119,16 +120,16 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   const location = useLocation()
-  const { ENV, loggedInUserProfile, basePath } = useLoaderData<{
+  const { ENV, loggedInUserProfile, basePath, accountURN } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
     }
     loggedInUserProfile: GetProfileQuery['profile'] | null
     basePath: string | undefined
+    accountURN: string
   }>()
   const transition = useTransition()
-
   const GATag = ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
   useEffect(() => {
@@ -186,6 +187,7 @@ export default function App() {
           <Outlet
             context={{
               loggedInUserProfile,
+              accountURN,
             }}
           />
         </div>

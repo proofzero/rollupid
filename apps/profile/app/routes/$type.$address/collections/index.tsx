@@ -17,10 +17,11 @@ export type ProfileData = {
 }
 
 const ProfileRoute = () => {
-  const { profile, cryptoAddresses, isOwner } = useOutletContext<{
+  const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
     isOwner: boolean
+    accountURN: string
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
@@ -59,7 +60,7 @@ const ProfileRoute = () => {
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsAllCollections(fetcher, tempTargetAddress, pageKey)
+      getMoreNftsAllCollections(fetcher, accountURN, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -73,7 +74,7 @@ const ProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsAllCollections(fetcher, tempTargetAddress, pageKey)
+      getMoreNftsAllCollections(fetcher, accountURN, pageKey)
     }
     if (refresh) {
       asyncFn()

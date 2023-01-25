@@ -48,8 +48,7 @@ const tabs: {
 
 export default function AccountSetting() {
   const { path } = useLoaderData()
-  const ctx = useOutletContext()
-
+  const ctx = useOutletContext<{}>()
   const [currentTab, setCurrentTab] = useState<string | undefined>(
     tabs[path].name
   )
