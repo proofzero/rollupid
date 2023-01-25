@@ -28,7 +28,6 @@ services = [
 [vars]
 PASSPORT_URL = "http://localhost:9696"
 CONSOLE_APP_URL = "http://localhost:9898"
-CLIENT_ID = "c311f946f67b6b88dd2b53919f056ad9"
 REDIRECT_URI = "http://localhost:9797/auth/callback"
 COOKIE_DOMAIN = "localhost"
 TWITTER_URL = "https://twitter.com/threeid_xyz"
