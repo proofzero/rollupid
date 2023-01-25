@@ -5039,7 +5039,7 @@ __metadata:
     tiny-invariant: 1.3.1
     typescript: 4.8.4
     wagmi: 0.10.8
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5120,7 +5120,7 @@ __metadata:
     typescript: 4.7.4
     wagmi: 0.10.8
     webpack: 5.75.0
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5212,7 +5212,7 @@ __metadata:
     urns: 0.6.0
     wagmi: 0.10.8
     webpack: 5.75.0
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5370,7 +5370,7 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
     zod: 3.20.2
   languageName: unknown
   linkType: soft
@@ -5399,7 +5399,7 @@ __metadata:
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
     urns: 0.6.0
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5431,7 +5431,7 @@ __metadata:
     prettier: 2.7.1
     remix-auth-google: 1.2.0
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
     zod: 3.20.2
   languageName: unknown
   linkType: soft
@@ -5461,7 +5461,7 @@ __metadata:
     typeorm: 0.3.10
     typescript: 4.8.4
     urns: 0.6.0
-    wrangler: 2.7.1
+    wrangler: 2.8.1
     yarn-run-all: 3.1.1
     zod: 3.20.2
   languageName: unknown
@@ -5484,7 +5484,7 @@ __metadata:
     npm-run-all: 4.1.5
     typescript: 4.8.4
     urn: 1.1.0
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5505,7 +5505,7 @@ __metadata:
     npm-run-all: 4.1.5
     prettier: 2.7.1
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5525,7 +5525,7 @@ __metadata:
     prettier: 2.7.1
     typed-json-rpc: 1.1.0
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5557,7 +5557,7 @@ __metadata:
     tiny-invariant: 1.3.1
     ts-set-utils: 0.2.0
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -5604,7 +5604,7 @@ __metadata:
     svg2png-wasm: 1.3.4
     tiny-invariant: 1.3.1
     typescript: 4.8.4
-    wrangler: 2.7.1
+    wrangler: 2.8.1
   languageName: unknown
   linkType: soft
 
@@ -42916,9 +42916,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrangler@npm:2.7.1":
-  version: 2.7.1
-  resolution: "wrangler@npm:2.7.1"
+"wrangler@npm:2.8.1":
+  version: 2.8.1
+  resolution: "wrangler@npm:2.8.1"
   dependencies:
     "@cloudflare/kv-asset-handler": ^0.2.0
     "@esbuild-plugins/node-globals-polyfill": ^0.1.1
@@ -42942,7 +42942,7 @@ __metadata:
   bin:
     wrangler: bin/wrangler.js
     wrangler2: bin/wrangler.js
-  checksum: adbb0b3412e7fa5054f917bb3ff2012b15e3d5d8fd7e6f547013d51a866d464e9facff3873e5a3b682d36642cea29d46eb666992a0d3560c105e2c69d47e7bcf
+  checksum: b9775fb3104b642242fcfa4b3531e091aeb72a514f1660b976edfc659457f9cd2117e9d3e7d7f0f23b1bb251a32851cd048095628b3bf61c6b58fabf0f25762f
   languageName: node
   linkType: hard
 

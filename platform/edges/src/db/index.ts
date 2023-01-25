@@ -4,7 +4,9 @@
  * Platform edges database interface.
  */
 
-import * as impl from './impl/index'
+import * as insert from './insert'
+import * as remove from './remove'
+import * as select from './select'
 
 // Imported Types
 // -----------------------------------------------------------------------------
@@ -16,10 +18,7 @@ import type {
   Node,
   EdgeQuery,
   EdgeRecord,
-  EdgeId,
   Graph,
-  NodeRecord,
-  Token,
   EdgeDirection,
   EdgeTag,
 } from './types'
@@ -41,7 +40,9 @@ export { EdgeDirection }
  * Create a handle for the graph database.
  */
 export function init(db: D1Database): Graph {
-  return impl.init(db)
+  return {
+    db,
+  }
 }
 
 // node()
@@ -54,7 +55,7 @@ export async function node(
   g: Graph,
   nodeId: AnyURN | undefined
 ): Promise<Node | undefined> {
-  return impl.node(g, nodeId)
+  return select.node(g, nodeId)
 }
 
 // edges()
@@ -68,7 +69,7 @@ export async function edges(
   query: EdgeQuery,
   opt?: any
 ): Promise<Edge[]> {
-  return impl.edges(g, query, opt)
+  return select.edges(g, query, opt)
 }
 
 // incoming()
@@ -78,7 +79,7 @@ export async function edges(
  * Return the set of edges that terminate at a node.
  */
 export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return impl.incoming(g, nodeId)
+  return select.incoming(g, nodeId)
 }
 
 // outgoing()
@@ -88,7 +89,7 @@ export async function incoming(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
  * Return the set of edges that originate at a node.
  */
 export async function outgoing(g: Graph, nodeId: AnyURN): Promise<Edge[]> {
-  return impl.outgoing(g, nodeId)
+  return select.outgoing(g, nodeId)
 }
 
 // link()
@@ -110,7 +111,14 @@ export async function link(
   dst: AnyURN,
   tag: EdgeTag
 ): Promise<EdgeRecord> {
-  return impl.link(g, src, dst, tag)
+  const srcNode = await insert.node(g, src)
+  // TODO check for error
+
+  const dstNode = await insert.node(g, dst)
+  // TODO check for error
+
+  // Return existing edge ID (if found) or new edge ID (if created).
+  return insert.edge(g, srcNode.urn, dstNode.urn, tag)
 }
 
 // unlink()
@@ -127,5 +135,5 @@ export async function unlink(
   dst: AnyURN,
   tag: EdgeTag
 ): Promise<number> {
-  return impl.unlink(g, src, dst, tag)
+  return remove.edge(g, src, dst, tag)
 }

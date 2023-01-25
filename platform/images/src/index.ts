@@ -176,7 +176,6 @@ router
 
             // Encode the bytes into a data URI, given their content type.
             .then(([contentType, hexBuffer]) => {
-              console.log({ contentType })
               let binary = ''
               let bytes = new Uint8Array(hexBuffer as ArrayBuffer)
               let len = bytes.byteLength
@@ -308,8 +307,6 @@ router
 
       // turn address inti UInt8Array and pick colors for color list
       const data = new TextEncoder().encode(hash)
-
-      console.log(request.params.address, { data })
 
       const reduce = (a: number, b: number) => {
         if (a % 2) {

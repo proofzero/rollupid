@@ -86,25 +86,8 @@ export const permission = sqliteTable('permission', {
   name: text('name').notNull(),
 })
 
-export const URNQComponent = sqliteTable(
-  'urnq_component',
-  {
-    id: integer('id').primaryKey({
-      autoIncrement: true,
-    }),
-    key: text('key').notNull(),
-    value: text('value').notNull(),
-  },
-  (table) => ({
-    urnq_component: uniqueIndex('IDX_urnq_component_key_value').on(
-      table.key,
-      table.value
-    ),
-  })
-)
-
-export const nodeQcompUrnqComponent = sqliteTable(
-  'node_qcomp_urnq_component',
+export const nodeQcomp = sqliteTable(
+  'node_qcomp',
   {
     nodeUrn: text('nodeUrn')
       .notNull()
@@ -112,42 +95,22 @@ export const nodeQcompUrnqComponent = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    qcomp: integer('qcomp')
-      .notNull()
-      .references(() => URNQComponent.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    qCompKey: text('qCompKey').notNull(),
+    qCompValue: text('qCompValue').notNull(),
   },
   (table) => ({
-    node_rcomp: uniqueIndex('IDX_node_qcomp_urnq_component_pk').on(
+    node_qcomp: uniqueIndex('IDX_node_qcomp_pk').on(
       table.nodeUrn,
-      table.qcomp
+      table.qCompKey
     ),
-    nodeUrn: index('IDX_node_qcomp_urnq_component_nodeUrn').on(table.nodeUrn),
-    qcomp: index('IDX_node_qcomp_urnq_component_nodeUrn').on(table.qcomp),
+    nodeUrn: index('IDX_node_qcomp_nodeUrn').on(table.nodeUrn),
+    qCompKey: index('IDX_node_qcomp_key').on(table.qCompKey),
+    qCompValue: index('IDX_node_qcomp_value').on(table.qCompValue),
   })
 )
 
-export const URNRComponent = sqliteTable(
-  'urnr_component',
-  {
-    id: integer('id').primaryKey({
-      autoIncrement: true,
-    }),
-    key: text('key').notNull(),
-    value: text('value').notNull(),
-  },
-  (table) => ({
-    urnr_component: uniqueIndex('IDX_urnr_component_key_value').on(
-      table.key,
-      table.value
-    ),
-  })
-)
-
-export const nodeRcompUrnrComponent = sqliteTable(
-  'node_rcomp_urnr_component',
+export const nodeRcomp = sqliteTable(
+  'node_rcomp',
   {
     nodeUrn: text('nodeUrn')
       .notNull()
@@ -155,20 +118,17 @@ export const nodeRcompUrnrComponent = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    rcomp: integer('rcomp')
-      .notNull()
-      .references(() => URNRComponent.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    rCompKey: text('rCompKey').notNull(),
+    rCompValue: text('rCompValue').notNull(),
   },
   (table) => ({
-    node_rcomp: uniqueIndex('IDX_node_rcomp_urnr_component_pk').on(
+    node_rcomp: uniqueIndex('IDX_node_rcomp_pk').on(
       table.nodeUrn,
-      table.rcomp
+      table.rCompKey
     ),
-    nodeUrn: index('IDX_node_rcomp_urnr_component_nodeUrn').on(table.nodeUrn),
-    qcomp: index('IDX_node_rcomp_urnr_component_nodeUrn').on(table.rcomp),
+    nodeUrn: index('IDX_node_rcomp_nodeUrn').on(table.nodeUrn),
+    rCompKey: index('IDX_node_rcomp_key').on(table.rCompKey),
+    rCompValue: index('IDX_node_rcomp_value').on(table.rCompValue),
   })
 )
 
