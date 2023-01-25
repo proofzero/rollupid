@@ -5,6 +5,8 @@ import { GoogleStrategy } from 'remix-auth-google'
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
 import { TwitterStrategy } from 'remix-auth-twitter'
 
+import { AppleStrategy } from '~/utils/applestrategy.server'
+
 // OAuth state
 
 export const initAuthenticator = (env: Env) => {
@@ -83,4 +85,13 @@ export const getTwitterStrategy = (env: Env) => {
       return { ...args }
     }
   )
+}
+
+export const getAppleStrategy = (env: Env) => {
+  return new AppleStrategy({
+    clientID: env.INTERNAL_APPLE_OAUTH_CLIENT_ID,
+    clientSecret: env.SECRET_APPLE_OAUTH_CLIENT_SECRET,
+    callbackURL: env.INTERNAL_APPLE_OAUTH_CALLBACK_URL,
+    scope: 'name email',
+  }, async params => params)
 }

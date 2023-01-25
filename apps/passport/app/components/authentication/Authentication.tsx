@@ -5,6 +5,7 @@ import ConnectGoogleButton from '~/components/connect-google-button'
 import ConnectGithubButton from '../connect-github-button'
 import ConnectTwitterButton from '~/components/connect-twitter-button'
 import ConnectMicrosoftButton from '../connect-microsoft-button'
+import ConnectAppleButton from '../connect-apple-button'
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -55,6 +56,7 @@ export function Authentication({
           <ConnectGithubButton />
           <ConnectTwitterButton />
           <ConnectMicrosoftButton />
+          <ConnectAppleButton />
         </>
       ) : null}
     </div>

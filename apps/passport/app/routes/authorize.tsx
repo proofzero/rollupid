@@ -99,6 +99,17 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               cover: gradient,
             }
           }
+          case OAuthAddressType.Apple: {
+            const gradient = await generateGradient(
+              res.profile.sub.toString(),
+              context.env
+            )
+            const { firstName, lastName } = res.profile.name
+            return {
+              cover: gradient,
+              displayName: `${firstName} ${lastName}`,
+            }
+          }
           default:
             throw new Error(
               'Unsupported OAuth type encountered in profile response.'

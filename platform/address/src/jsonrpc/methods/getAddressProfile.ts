@@ -4,6 +4,7 @@ import { Context } from '../../context'
 import { CryptoAddressType } from '../../types'
 import {
   AddressProfileSchema,
+  AppleProfileSchema,
   CryptoAddressProfileSchema,
   GithubRawProfileSubsetSchema,
   GoogleRawProfileSchema,
@@ -16,6 +17,7 @@ import GithubAddress from '../../nodes/github'
 import GoogleAddress from '../../nodes/google'
 import TwitterAddress from '../../nodes/twitter'
 import MicrosoftAddress from '../../nodes/microsoft'
+import AppleAddress from '../../nodes/apple'
 
 export const GetAddressProfileOutput = z.discriminatedUnion('type', [
   z.object({
@@ -37,6 +39,10 @@ export const GetAddressProfileOutput = z.discriminatedUnion('type', [
   z.object({
     profile: MicrosoftRawProfileSchema,
     type: z.literal(OAuthAddressType.Microsoft),
+  }),
+  z.object({
+    profile: AppleProfileSchema,
+    type: z.literal(OAuthAddressType.Apple),
   }),
 ])
 
@@ -100,6 +106,14 @@ export const getAddressProfileMethod = async ({
       const profile = await oAuthNode.getProfile()
       return {
         type: OAuthAddressType.Microsoft,
+        profile,
+      }
+    }
+    case OAuthAddressType.Apple: {
+      const oAuthNode = new AppleAddress(nodeClient)
+      const profile = await oAuthNode.getProfile()
+      return {
+        type: OAuthAddressType.Apple,
         profile,
       }
     }

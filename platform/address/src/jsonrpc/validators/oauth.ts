@@ -95,6 +95,19 @@ export const TwitterProfileSchema = z.object({
   _json: z.undefined(),
 })
 
+export const AppleProfileSchema = z.object({
+  provider: z.literal(OAuthAddressType.Apple),
+  email: z.string(),
+  name: z
+    .object({
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .optional(),
+  sub: z.string(),
+  _json: z.undefined(),
+})
+
 export const OAuthDataSchema = z.object({
   accessToken: z.string(),
   accessTokenSecret: z.string().optional(),
@@ -112,5 +125,6 @@ export const OAuthDataSchema = z.object({
     GithubProfileSchema,
     TwitterProfileSchema,
     MicrosoftProfileSchema,
+    AppleProfileSchema,
   ]),
 })
