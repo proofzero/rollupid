@@ -49,8 +49,8 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const qcJoinStmt = g.db.prepare(
-      'INSERT INTO node_qcomp (nodeUrn, qCompKey, qCompValue) VALUES (?1, ?2, ?3) \
-        ON CONFLICT(nodeUrn, qcomp) DO UPDATE SET qCompValue=excluded.qCompValue'
+      'INSERT INTO node_qcomp (nodeUrn, key, value) VALUES (?1, ?2, ?3) \
+        ON CONFLICT(nodeUrn, key) DO UPDATE SET value=excluded.value'
     )
     const stmts = []
     for (const [key, value] of qcParams.entries()) {
@@ -71,8 +71,8 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
     // Add an entry to the join table for each q-component row that is
     // used in the node URN.
     const rcJoinStmt = g.db.prepare(
-      'INSERT INTO node_rcomp (nodeUrn, rCompKey, rCompValue) VALUES (?1, ?2, ?3) \
-        ON CONFLICT(nodeUrn, rcomp) DO UPDATE SET rCompValue=excluded.rCompValue'
+      'INSERT INTO node_rcomp (nodeUrn, key, value) VALUES (?1, ?2, ?3) \
+        ON CONFLICT(nodeUrn, key) DO UPDATE SET value=excluded.value'
     )
     const stmts = []
     for (const [key, value] of qcParams.entries()) {

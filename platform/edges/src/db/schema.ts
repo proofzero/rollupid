@@ -95,17 +95,14 @@ export const nodeQcomp = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    qCompKey: text('qCompKey').notNull(),
-    qCompValue: text('qCompValue').notNull(),
+    key: text('key').notNull(),
+    value: text('value').notNull(),
   },
   (table) => ({
-    node_qcomp: uniqueIndex('IDX_node_qcomp_pk').on(
-      table.nodeUrn,
-      table.qCompKey
-    ),
+    node_qcomp: uniqueIndex('IDX_node_qcomp_pk').on(table.nodeUrn, table.key),
     nodeUrn: index('IDX_node_qcomp_nodeUrn').on(table.nodeUrn),
-    qCompKey: index('IDX_node_qcomp_key').on(table.qCompKey),
-    qCompValue: index('IDX_node_qcomp_value').on(table.qCompValue),
+    qCompKey: index('IDX_node_qcomp_key').on(table.key),
+    qCompValue: index('IDX_node_qcomp_value').on(table.value),
   })
 )
 
@@ -118,17 +115,14 @@ export const nodeRcomp = sqliteTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    rCompKey: text('rCompKey').notNull(),
-    rCompValue: text('rCompValue').notNull(),
+    key: text('key').notNull(),
+    value: text('value').notNull(),
   },
   (table) => ({
-    node_rcomp: uniqueIndex('IDX_node_rcomp_pk').on(
-      table.nodeUrn,
-      table.rCompKey
-    ),
+    node_rcomp: uniqueIndex('IDX_node_rcomp_pk').on(table.nodeUrn, table.key),
     nodeUrn: index('IDX_node_rcomp_nodeUrn').on(table.nodeUrn),
-    rCompKey: index('IDX_node_rcomp_key').on(table.rCompKey),
-    rCompValue: index('IDX_node_rcomp_value').on(table.rCompValue),
+    rCompKey: index('IDX_node_rcomp_key').on(table.key),
+    rCompValue: index('IDX_node_rcomp_value').on(table.value),
   })
 )
 

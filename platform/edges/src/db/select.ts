@@ -11,20 +11,17 @@ import { Graph } from '@kubelt/types'
 import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
 
 import type {
-  EdgeTag,
   Edge,
   Node,
   EdgeQuery,
   EdgeRecord,
   Graph as GraphDB,
-  NodeRecord,
-  NodeFilter,
   QComponent,
   QComponents,
   RComponent,
   RComponents,
   Permission,
-} from '../types'
+} from './types'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -40,16 +37,12 @@ import type {
 export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
   const query = `
     SELECT
-      uc.key,
-      uc.value
+      key,
+      value
     FROM
-      node_qcomp_urnq_component nc
-    JOIN
-      urnq_component uc
-    ON
-      nc.qcomp = uc.id
+      node_qcomp
     WHERE
-      nc.nodeUrn = ?1
+      nodeUrn = ?1
   `
   const qcomp = await g.db
     .prepare(query)
@@ -80,16 +73,12 @@ export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
 export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
   const query = `
     SELECT
-      uc.key,
-      uc.value
+      key,
+      value
     FROM
-      node_rcomp_urnr_component nc
-    JOIN
-      urnr_component uc
-    ON
-      nc.rcomp = uc.id
+      node_rcomp
     WHERE
-      nc.nodeUrn = ?1
+      nodeUrn = ?1
   `
   const rcomp = await g.db
     .prepare(query)
