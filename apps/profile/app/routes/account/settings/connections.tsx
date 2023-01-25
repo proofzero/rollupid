@@ -11,26 +11,51 @@ import { CryptoAddressProfile } from '@kubelt/galaxy-client'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
-import { CryptoAddressType } from '@kubelt/types/address'
+import { NodeType } from '@kubelt/types/address'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
   const addresses = (await getAccountAddresses(jwt)) ?? []
-  const addressUrns = addresses.map((ca) => ca.urn as AddressURN)
+
+  // This is a hack mapping for node type
+  // we should get rid of it once edges
+  // gets refactored
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: new URLSearchParams(Object.keys(a.rc)[0]).get('node_type'),
+  }))
 
   // This returns profiles without urns
-  const profiles = (await getAddressProfiles(jwt, addressUrns)) ?? []
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
 
   // This mapps to a new structure that contains urn also;
   // useful for list keys as well as for address context actions as param
-  const mappedProfiles = profiles.map((p, i) => ({ urn: addressUrns[i], ...p }))
+  const mappedProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
 
   // Keeping the distinctions to only append
   // context actions to desired types
   // e.x. rename to crypto profiles
   const cryptoProfiles = mappedProfiles
-    .filter((p) => p?.type === CryptoAddressType.ETH)
+    .filter((p) => p?.nodeType === NodeType.Crypto)
+    .map((p) => ({ urn: p.urn, ...(p?.profile as CryptoAddressProfile) }))
+    .map((p) => ({
+      id: p.urn,
+      address: p.address,
+      title: p.displayName,
+      icon: p.avatar,
+      chain: 'Ethereum',
+    }))
+
+  const vaultProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.Vault)
     .map((p) => ({ urn: p.urn, ...(p?.profile as CryptoAddressProfile) }))
     .map((p) => ({
       id: p.urn,
@@ -41,9 +66,11 @@ export const loader: LoaderFunction = async ({ request }) => {
     }))
 
   const oAuthProfiles = mappedProfiles
-    .filter((p) => p?.type !== CryptoAddressType.ETH)
+    .filter((p) => p?.nodeType === NodeType.OAuth)
     .map((p) => {
       // To do: add more mappings
+      // this will also be refactored
+      // in the future
       switch (p?.profile?.__typename) {
         case 'OAuthGithubProfile':
           return {
@@ -58,12 +85,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return {
     cryptoProfiles,
+    vaultProfiles,
     oAuthProfiles,
   }
 }
 
 const AccountSettingsConnections = () => {
-  const { cryptoProfiles, oAuthProfiles } = useLoaderData()
+  const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [actionId, setActionId] = useState<null | string>()
@@ -152,6 +180,20 @@ const AccountSettingsConnections = () => {
               },
             }))
             .concat(oAuthProfiles)}
+        />
+
+        <Text size="sm" weight="normal" className="text-gray-500 my-7">
+          DEDICATED VAULT ACCOUNTS
+        </Text>
+
+        <AddressList
+          addresses={vaultProfiles.map((ap: AddressListItemProps) => ({
+            ...ap,
+            onRenameAccount: (id: string) => {
+              setActionId(id)
+              setRenameModalOpen(true)
+            },
+          }))}
         />
       </div>
     </section>
