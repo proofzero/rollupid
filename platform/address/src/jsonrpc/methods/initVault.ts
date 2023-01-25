@@ -9,6 +9,7 @@ import { appRouter } from '../router'
 import { Context } from '../../context'
 import { CryptoAddressType, NodeType } from '@kubelt/types/address'
 import { initAddressNodeByName } from '../../nodes'
+import ImageClient from '@kubelt/platform-clients/image'
 
 export const InitVaultOutput = AddressURNInput
 
@@ -32,18 +33,20 @@ export const initVaultMethod = async ({
 
   const address3RN = AddressURNSpace.componentizedUrn(
     generateHashedIDRef(CryptoAddressType.ETH, vault.address),
-    { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
+    { node_type: NodeType.Vault, addr_type: CryptoAddressType.ETH },
     { alias: vault.address, hidden: 'true' }
   )
   const baseAddressURN = AddressURNSpace.getBaseURN(address3RN)
-  const vaultNode = await initAddressNodeByName(baseAddressURN, ctx.Address)
+  const vaultNode = initAddressNodeByName(baseAddressURN, ctx.Address)
+  const gradient = await new ImageClient(ctx.Images).gradient(vault.address)
+
   await Promise.all([
     vaultNode.storage.put('privateKey', vault.privateKey), // #TODO: vault class needed
     vaultNode.class.setAddress(vault.address),
     vaultNode.class.setNodeType(NodeType.Vault),
     vaultNode.class.setType(CryptoAddressType.ETH),
+    vaultNode.class.setGradient(gradient),
   ])
-  await vaultNode.storage.put('privateKey', vault.privateKey)
 
   const caller = appRouter.createCaller({
     ...ctx,
