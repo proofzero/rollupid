@@ -81,18 +81,21 @@ class TypedComponentsURNSpace<
     rcomps?: RCompType,
     qcomps?: QCompType
   ): URNType {
-    //Parent supports record-based qcomps, but not rcomps so we have to stringify
-    let stringifiedRcomp
+    let result = super.urn(nss)
+
     if (rcomps) {
       const params = new URLSearchParams()
       Object.entries<string>(rcomps).forEach(([k, v]) => params.append(k, v))
-      stringifiedRcomp = params.toString()
+      result += `?+${params.toString()}`
     }
 
-    return super.fullUrn(nss, {
-      r: stringifiedRcomp,
-      q: qcomps,
-    }) as URNType
+    if (qcomps) {
+      const params = new URLSearchParams()
+      Object.entries<string>(qcomps).forEach(([k, v]) => params.append(k, v))
+      result += `?=${params.toString()}`
+    }
+
+    return result as URNType
   }
 
   componentizedParse(
