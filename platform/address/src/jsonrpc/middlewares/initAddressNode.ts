@@ -19,7 +19,7 @@ export const initAddressNode: BaseMiddlewareFunction<Context> = async ({
 
   const address = await nodeClient.class.getAddress()
   const type = await nodeClient.class.getType()
-
+  const blah = await nodeClient.storage.list()
   if (!address || !type) {
     if (!addrType || !ctx.nodeType) {
       throw new Error('missing addrType')

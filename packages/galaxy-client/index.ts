@@ -268,7 +268,6 @@ export type NfTsWithChain = {
 export type Node = {
   __typename?: 'Node';
   fragment?: Maybe<Scalars['String']>;
-  id: Scalars['String'];
   nid: Scalars['String'];
   nss: Scalars['String'];
   qc?: Maybe<Scalars['JSON']>;
@@ -494,7 +493,7 @@ export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddr
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetConnectedAddressesQuery = { __typename?: 'Query', connectedAddresses?: Array<{ __typename?: 'Node', id: string, urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
+export type GetConnectedAddressesQuery = { __typename?: 'Query', connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
 
 export type UpdateProfileMutationVariables = Exact<{
   profile?: InputMaybe<ProfileInput>;
@@ -662,7 +661,6 @@ export const GetProfileFromAddressDocument = gql`
 export const GetConnectedAddressesDocument = gql`
     query getConnectedAddresses {
   connectedAddresses {
-    id
     urn
     nid
     nss

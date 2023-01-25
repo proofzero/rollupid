@@ -43,6 +43,7 @@ import { getProfileSession } from './utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { getGalaxyClient } from './helpers/clients'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { getRedirectUrlForProfile } from './utils/redirects.server'
 
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
@@ -82,30 +83,32 @@ export const loader: LoaderFunction = async ({ request }) => {
   } = session.data
 
   const galaxyClient = await getGalaxyClient()
-  const loggedInUserProfile = await galaxyClient
-    .getProfile(
-      {},
-      {
-        [PlatformJWTAssertionHeader]: jwt,
-      }
-    )
-    .then((res) => res.profile)
-    .catch((err) => {
-      return null
-    })
+  let loggedInUserProfile = undefined
+  let basePath = undefined
+  if (jwt) {
+    loggedInUserProfile = await galaxyClient
+      .getProfile(
+        {},
+        {
+          [PlatformJWTAssertionHeader]: jwt,
+        }
+      )
+      .then((res) => res.profile)
+      .catch((err) => {
+        return null
+      })
 
-  let handle = loggedInUserProfile?.handle
-  if (!handle && loggedInUserProfile?.addresses?.length) {
-    handle = AddressURNSpace.decode(
-      loggedInUserProfile.addresses[0].urn as AddressURN
-    )
+    if (!loggedInUserProfile)
+      throw new Error('Could not retrieve logged in use profile.')
+
+    basePath = getRedirectUrlForProfile(loggedInUserProfile)
   }
 
   console.log({ loggedInUserProfile })
 
   return json({
     loggedInUserProfile,
-    handle,
+    basePath,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       CONSOLE_APP_URL,
@@ -115,13 +118,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   const location = useLocation()
-  const { ENV, loggedInUserProfile, handle } = useLoaderData<{
+  const { ENV, loggedInUserProfile, basePath } = useLoaderData<{
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
     }
     loggedInUserProfile: GetProfileQuery['profile'] | null
-    handle: string | undefined
+    basePath: string | undefined
   }>()
   const transition = useTransition()
 
@@ -174,7 +177,7 @@ export default function App() {
             <HeadNav
               consoleURL={ENV.CONSOLE_APP_URL}
               loggedIn={!!loggedInUserProfile}
-              handle={handle}
+              basePath={basePath}
               avatarUrl={loggedInUserProfile?.pfp?.image as string}
             />
           </div>

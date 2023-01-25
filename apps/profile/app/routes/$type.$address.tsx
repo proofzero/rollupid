@@ -1,80 +1,74 @@
-import { Profile } from '@kubelt/galaxy-client'
-import { CryptoAddressType } from '@kubelt/types/address'
+import { Profile, ProfileInput } from '@kubelt/galaxy-client'
+import { OAuthAddressType } from '@kubelt/types/address'
+import {
+  PlatformAddressURNHeader,
+  PlatformJWTAssertionHeader,
+} from '@kubelt/types/headers'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
-import { redirect } from 'react-router-dom'
+import { LoaderFunction, redirect } from '@remix-run/cloudflare'
+import { Outlet, useLoaderData, useOutletContext } from '@remix-run/react'
+import { useParams } from 'react-router-dom'
 import { getGalaxyClient } from '~/helpers/clients'
+import { getRedirectUrlForProfile } from '~/utils/redirects.server'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address, type } = params
   if (!address) throw new Error('No address provided with request')
 
+  const addressURN = AddressURNSpace.componentizedUrn(address)
   const galaxyClient = await getGalaxyClient()
-
-  const addressURN = AddressURNSpace.componentizedUrn(
-    generateHashedIDRef(CryptoAddressType.ETH, address),
-    { addr_type: CryptoAddressType.ETH },
-    { alias: address }
-  )
-
-  console.log({ addressURN, address })
-  // check if address is registered to an account
-  const profile = await galaxyClient
-    .getProfileFromAddress({
-      addressURN,
-    })
-    .then((res) => res.profileFromAddress)
-    .catch((err) => {
-      console.log({ err })
-      // this could return null if the address is not linked to an account
-      // or the account is linked and marked as private
-      // or if the account is invalid
-      return null
-    })
-
-  if (!profile) {
-    // todo: do public eth / ens / githun / twitter lookup switch on $type
-    // galaxyclient.addressProfile({ addressURN: urn })
-    // if found then show claim account layout
-
-    throw json({ error: 'not found' }, { status: 404 })
-  }
-  // if profile then this address is linked
-  // and it has been marked as public
-  // and therefore can be redirected /u/<handle>
-  if (profile.handle) {
-    // redirect to /u/<handle> if handle present
-    return redirect(`/u/${profile.handle}`)
+  let profileAddress = undefined
+  try {
+    profileAddress = await (
+      await galaxyClient.getProfileFromAddress({ addressURN })
+    ).profileFromAddress
+  } catch (e) {
+    //profile doesn't exist for address, so we early return
+    console.log(`Could not find profile for address ${address}. Moving on.`)
   }
 
-  if (profile?.addresses?.length) {
-    const handle = AddressURNSpace.decode(
-      profile.addresses[0].urn as AddressURN
-    )
-    return redirect(`/u/${handle}`)
+  if (profileAddress) {
+    if (type === 'a') {
+      let redirectUrl = getRedirectUrlForProfile(profileAddress)
+      const originalRoute = `/${type}/${address}`
+      //Redirect if we've found a better route
+      if (redirectUrl && originalRoute !== redirectUrl)
+        return redirect(redirectUrl)
+      //otherwise stay on current route
+    } else if (type === 'u') {
+      //TODO: galaxy search by handle
+      console.error('Not implemented')
+    } else {
+      //TODO: Type-based resolvers to be tackled in separate PR
+    }
   }
-
-  return json({
-    profile,
-    addressUrn: AddressURNSpace.getBaseURN(addressURN),
-  })
+  return { profile: profileAddress, addressUrn: addressURN }
 }
 
-const Eth = () => {
+export default function Index() {
   const { profile, addressUrn } = useLoaderData<{
     profile: Profile
     addressUrn: AddressURN
   }>()
 
-  return (
-    <>
-      TODO: some simple splash page using the profile loader data plus maybe
-      some eth specific stuff
-      {JSON.stringify(profile)}
-    </>
-  )
-}
+  const { type, address } = useParams()
 
-export default Eth
+  const outletContext = useOutletContext<{ loggedInUserProfile: Profile }>()
+
+  const { loggedInUserProfile } = outletContext
+  if (profile)
+    return <Outlet context={{ profile: loggedInUserProfile }}></Outlet>
+  else
+    return (
+      <>
+        <h3>404 page - Replace me with real, provider-specific components</h3>
+        <div>
+          This account is waiting to be unlocked. Do you own this account?
+        </div>
+        <div>
+          {type} / {address}
+        </div>
+      </>
+    )
+}

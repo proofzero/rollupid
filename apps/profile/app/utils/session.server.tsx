@@ -123,6 +123,22 @@ export async function requireJWT(request: Request, headers = new Headers()) {
   }
 }
 
+export async function isValidJWT(request: Request): Promise<boolean> {
+  const session = await getProfileSession(request)
+  const jwt = session.get('jwt')
+
+  if (!jwt || typeof jwt !== 'string') {
+    return false
+  }
+
+  const parsedJWT = parseJwt(jwt)
+  if (!parsedJWT.exp || parsedJWT.exp < Date.now() / 1000) {
+    return false
+  }
+
+  return true
+}
+
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
   if (!payload) {

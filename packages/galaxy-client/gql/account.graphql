@@ -70,7 +70,6 @@ query getProfileFromAddress($addressURN: URN!) {
 
 query getConnectedAddresses {
   connectedAddresses {
-    id
     urn
     nid
     nss

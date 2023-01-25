@@ -9,7 +9,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
-    throw new Error('Owner required')
+    return json({})
   }
   const galaxyClient = await getGalaxyClient()
 

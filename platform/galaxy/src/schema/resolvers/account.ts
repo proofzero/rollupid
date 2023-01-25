@@ -10,7 +10,10 @@ import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
-import { PlatformAddressURNHeader, PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import {
+  PlatformAddressURNHeader,
+  PlatformJWTAssertionHeader,
+} from '@kubelt/types/headers'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -20,11 +23,16 @@ const accountResolvers: Resolvers = {
       { env, accountURN, jwt }: ResolverContext
     ) => {
       console.log(`galaxy:profile: getting profile for account: ${accountURN}`)
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
@@ -51,11 +59,16 @@ const accountResolvers: Resolvers = {
       }
 
       // get the account profile
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
 
       console.log("galaxy.profileFromAddress: getting account's profile")
       // should also return the handle if it exists
@@ -91,11 +104,16 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
 
       const addressesCall = jwt
         ? accountClient.getOwnAddresses
