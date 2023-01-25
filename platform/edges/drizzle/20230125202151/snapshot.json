@@ -1,0 +1,326 @@
+{
+  "version": "3",
+  "dialect": "sqlite",
+  "id": "4e6ecbe2-fe5e-4a17-8753-c1ffca5ab61a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "edge": {
+      "name": "edge",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "src": {
+          "name": "src",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dst": {
+          "name": "dst",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_edge_src_dst_tag": {
+          "name": "IDX_edge_src_dst_tag",
+          "columns": [
+            "src",
+            "dst",
+            "tag"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "edge_src_node_urn_fk": {
+          "name": "edge_src_node_urn_fk",
+          "tableFrom": "edge",
+          "tableTo": "node",
+          "columnsFrom": [
+            "src"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "edge_dst_node_urn_fk": {
+          "name": "edge_dst_node_urn_fk",
+          "tableFrom": "edge",
+          "tableTo": "node",
+          "columnsFrom": [
+            "dst"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      }
+    },
+    "edge_permission": {
+      "name": "edge_permission",
+      "columns": {
+        "edgeId": {
+          "name": "edgeId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "permissionId": {
+          "name": "permissionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_edge_permission_pk": {
+          "name": "IDX_edge_permission_pk",
+          "columns": [
+            "edgeId",
+            "permissionId"
+          ],
+          "isUnique": true
+        },
+        "IDX_edge_permission_edgeId": {
+          "name": "IDX_edge_permission_edgeId",
+          "columns": [
+            "edgeId"
+          ],
+          "isUnique": false
+        },
+        "IDX_edge_permission_permission": {
+          "name": "IDX_edge_permission_permission",
+          "columns": [
+            "permissionId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "edge_permission_edgeId_edge_id_fk": {
+          "name": "edge_permission_edgeId_edge_id_fk",
+          "tableFrom": "edge_permission",
+          "tableTo": "edge",
+          "columnsFrom": [
+            "edgeId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "edge_permission_permissionId_permission_id_fk": {
+          "name": "edge_permission_permissionId_permission_id_fk",
+          "tableFrom": "edge_permission",
+          "tableTo": "permission",
+          "columnsFrom": [
+            "permissionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      }
+    },
+    "node": {
+      "name": "node",
+      "columns": {
+        "urn": {
+          "name": "urn",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "nid": {
+          "name": "nid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nss": {
+          "name": "nss",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fragment": {
+          "name": "fragment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {}
+    },
+    "node_qcomp": {
+      "name": "node_qcomp",
+      "columns": {
+        "nodeUrn": {
+          "name": "nodeUrn",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_node_qcomp_nodeUrn": {
+          "name": "IDX_node_qcomp_nodeUrn",
+          "columns": [
+            "nodeUrn"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_qcomp_key": {
+          "name": "IDX_node_qcomp_key",
+          "columns": [
+            "key"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_qcomp_value": {
+          "name": "IDX_node_qcomp_value",
+          "columns": [
+            "value"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "node_qcomp_nodeUrn_node_urn_fk": {
+          "name": "node_qcomp_nodeUrn_node_urn_fk",
+          "tableFrom": "node_qcomp",
+          "tableTo": "node",
+          "columnsFrom": [
+            "nodeUrn"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      }
+    },
+    "node_rcomp": {
+      "name": "node_rcomp",
+      "columns": {
+        "nodeUrn": {
+          "name": "nodeUrn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_node_rcomp_pk": {
+          "name": "IDX_node_rcomp_pk",
+          "columns": [
+            "nodeUrn",
+            "key"
+          ],
+          "isUnique": true
+        },
+        "IDX_node_rcomp_nodeUrn": {
+          "name": "IDX_node_rcomp_nodeUrn",
+          "columns": [
+            "nodeUrn"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_rcomp_key": {
+          "name": "IDX_node_rcomp_key",
+          "columns": [
+            "key"
+          ],
+          "isUnique": false
+        },
+        "IDX_node_rcomp_value": {
+          "name": "IDX_node_rcomp_value",
+          "columns": [
+            "value"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "node_rcomp_nodeUrn_node_urn_fk": {
+          "name": "node_rcomp_nodeUrn_node_urn_fk",
+          "tableFrom": "node_rcomp",
+          "tableTo": "node",
+          "columnsFrom": [
+            "nodeUrn"
+          ],
+          "columnsTo": [
+            "urn"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      }
+    },
+    "permission": {
+      "name": "permission",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {}
+    }
+  },
+  "enums": {}
+}

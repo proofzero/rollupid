@@ -14,13 +14,13 @@ export type PermissionTable = {
 }
 
 export type URNRComponentTable = {
-  id: number
+  nodeUrn: number
   key: string
   value: string
 }
 
 export type URNQComponentTable = {
-  id: number
+  nodeUrn: number
   key: string
   value: string
 }

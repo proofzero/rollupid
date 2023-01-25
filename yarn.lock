@@ -5450,8 +5450,8 @@ __metadata:
     better-sqlite3: 8.0.1
     cross-env: 7.0.3
     drizzle-kit: 0.14.1
-    drizzle-orm: 0.14.2
-    drizzle-orm-sqlite: 0.14.3
+    drizzle-orm: 0.16.1
+    drizzle-orm-sqlite: 0.16.1
     eslint: 8.28.0
     eslint-config-prettier: 8.5.0
     prettier: 2.7.1
@@ -19739,35 +19739,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drizzle-orm-sqlite@npm:0.14.3":
-  version: 0.14.3
-  resolution: "drizzle-orm-sqlite@npm:0.14.3"
+"drizzle-orm-sqlite@npm:0.16.1":
+  version: 0.16.1
+  resolution: "drizzle-orm-sqlite@npm:0.16.1"
   peerDependencies:
-    "@cloudflare/workers-types": ">=3 <4"
-    "@types/better-sqlite3": ">=7 <9"
+    "@cloudflare/workers-types": ">=3"
+    "@types/better-sqlite3": "*"
+    "@types/sql.js": "*"
     better-sqlite3: ">=7 <9"
-    drizzle-orm: ">=0.14 <0.15"
+    drizzle-orm: ">=0.16 <0.17"
+    sql.js: ">=1 <2"
     sqlite3: ">=5 <6"
   peerDependenciesMeta:
     "@cloudflare/workers-types":
       optional: true
     "@types/better-sqlite3":
       optional: true
+    "@types/sql.js":
+      optional: true
     better-sqlite3:
+      optional: true
+    sql.js:
       optional: true
     sqlite3:
       optional: true
-  checksum: a44723822f9b128f3f9e269d2ddec2d1ae6eb178e9ada2c6b098696092b29cadf0a221401af9ba1876cabe114bc89bc002b0ca8f97db1b0e499145cc2202c4e8
+  checksum: 06292584cbed3198792a6f2ffc12df48c2495bb44fcf5019ce36509e4f5b78533cbcd1aac706f3fc91807c1809e54ad0e4c4045f9e13d3289e016c5b91108d9c
   languageName: node
   linkType: hard
 
-"drizzle-orm@npm:0.14.2":
-  version: 0.14.2
-  resolution: "drizzle-orm@npm:0.14.2"
+"drizzle-orm@npm:0.16.1":
+  version: 0.16.1
+  resolution: "drizzle-orm@npm:0.16.1"
   peerDependencies:
-    drizzle-orm-mysql: ">=0.14 <0.15"
-    drizzle-orm-pg: ">=0.14 <0.15"
-    drizzle-orm-sqlite: ">=0.14 <0.15"
+    drizzle-orm-mysql: ">=0.16 <0.17"
+    drizzle-orm-pg: ">=0.16 <0.17"
+    drizzle-orm-sqlite: ">=0.16 <0.17"
   peerDependenciesMeta:
     drizzle-orm-mysql:
       optional: true
@@ -19775,7 +19781,7 @@ __metadata:
       optional: true
     drizzle-orm-sqlite:
       optional: true
-  checksum: 25407f552d7bddd33b23130729c949ff55d0e911829a7430ed12097d0b030d107edbea86a52580061b63b92c26434e042a7bc5a94b36f250e9c42cfa2f6d21c4
+  checksum: 72e437deabdd24d9df6ea00e330958874436b27d94a27282eb8f56d8fafe7a6a13c84c98390513df444381473c7e386ad229cead74f7c8d905c4c7745b310555
   languageName: node
   linkType: hard
 
