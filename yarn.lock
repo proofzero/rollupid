@@ -5449,7 +5449,7 @@ __metadata:
     "@typescript-eslint/parser": 5.42.1
     better-sqlite3: 8.0.1
     cross-env: 7.0.3
-    drizzle-kit: 0.14.1
+    drizzle-kit: 0.16.1
     drizzle-orm: 0.16.1
     drizzle-orm-sqlite: 0.16.1
     eslint: 8.28.0
@@ -5608,6 +5608,66 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+<<<<<<< HEAD
+=======
+"@kubelt/services.indexer@workspace:services/indexer":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/services.indexer@workspace:services/indexer"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@kubelt/platform-clients": "workspace:*"
+    "@kubelt/platform-middleware": "workspace:*"
+    "@kubelt/urns": "workspace:*"
+    "@moralisweb3/common-core": 2.10.1
+    "@moralisweb3/evm-api": 2.10.1
+    "@moralisweb3/streams": 2.10.1
+    "@trpc/server": 10.8.1
+    "@types/itty-router-extras": 0.4.0
+    "@typescript-eslint/eslint-plugin": 5.42.1
+    "@typescript-eslint/parser": 5.42.1
+    drizzle-kit: 0.16.1
+    drizzle-orm: 0.16.1
+    drizzle-orm-sqlite: 0.16.1
+    eslint: 8.28.0
+    eslint-config-prettier: 8.5.0
+    itty-router: 2.6.6
+    itty-router-extras: 0.4.2
+    npm-run-all: 4.1.5
+    prettier: 2.7.1
+    stream: 0.0.2
+    typescript: 4.8.4
+    wrangler: 2.8.1
+    zod: 3.20.2
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/services.webhooks@workspace:services/webhooks":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/services.webhooks@workspace:services/webhooks"
+  dependencies:
+    "@cloudflare/workers-types": 4.20221111.1
+    "@kubelt/urns": "workspace:*"
+    "@moralisweb3/evm-utils": 2.10.0
+    concurrently: 7.5.0
+    itty-router: 2.6.6
+    moralis: 2.10.0
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+    web3: 1.8.1
+    wrangler: 2.8.1
+  languageName: unknown
+  linkType: soft
+
+"@kubelt/services@workspace:services":
+  version: 0.0.0-use.local
+  resolution: "@kubelt/services@workspace:services"
+  dependencies:
+    npm-run-all: 4.1.5
+    typescript: 4.8.4
+  languageName: unknown
+  linkType: soft
+
+>>>>>>> 0c493197 (wip: new schema)
 "@kubelt/smartcontracts.crdt@workspace:smartcontracts/eth/crdt":
   version: 0.0.0-use.local
   resolution: "@kubelt/smartcontracts.crdt@workspace:smartcontracts/eth/crdt"
@@ -19722,20 +19782,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "drizzle-kit@npm:0.14.1":
   version: 0.14.1
   resolution: "drizzle-kit@npm:0.14.1"
+=======
+"drizzle-kit@npm:0.16.1":
+  version: 0.16.1
+  resolution: "drizzle-kit@npm:0.16.1"
+>>>>>>> 0c493197 (wip: new schema)
   dependencies:
     chalk: ^5.2.0
     commander: ^9.4.1
     esbuild: ^0.15.18
     esbuild-register: ^3.4.2
+<<<<<<< HEAD
     hanji: ^0.0.3
+=======
+    hanji: ^0.0.5
+>>>>>>> 0c493197 (wip: new schema)
     json-diff: 0.9.0
     zod: ^3.20.2
   bin:
     drizzle-kit: index.js
+<<<<<<< HEAD
   checksum: da48aded43abcffe8b5118e7c4683466e82f8811e8dbd2ab370f436000aea9a37efbdab7f7becc5600f3ca17077e5966ce56cff25a4a260b96441953c3583f67
+=======
+  checksum: 74845853aa3d5bd5e67cb05a4d89c0d1eb6c2baa750b83855ffe2192c4bb54d4d0c2c092fe51190a5c55e3127ada4a1a3cc2241443271955787804c51188d5c7
+>>>>>>> 0c493197 (wip: new schema)
   languageName: node
   linkType: hard
 
@@ -24644,13 +24718,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hanji@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "hanji@npm:0.0.3"
+"hanji@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "hanji@npm:0.0.5"
   dependencies:
     lodash.throttle: ^4.1.1
     sisteransi: ^1.0.5
-  checksum: a2aca8ecbf93eadca6c8679efbb24c3eb710511526db24aaa1f4fcb94e0b3a9493d37db59ec76fbc566acf8e9fa50829c51ace83bcc09c94935f70523a600c62
+  checksum: f52fd5dcf2b7125c8bb0495cf7d57d7db220bf7e9839fee0dfb802b5bc56274fdd8ccfd7b0fb8a77b26052b3bdeafc69282d7d57288f8eddf4b8e2575d90a36c
   languageName: node
   linkType: hard
 

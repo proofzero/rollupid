@@ -7,7 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "wrangler publish --dry-run --outdir=dist",
-    "db:generate": "drizzle-kit generate --dialect=sqlite --schema=src/db/schema.ts",
+    "db:generate": "drizzle-kit generate:sqlite --schema=src/db/schema.ts",
+    "db:execute": "wrangler d1 migrations apply edges --local",
     "dev": "run-s dev:local",
     "dev:local": "run-s types:check wrangler:local",
     "docs": "run-s build:* docs:*",
@@ -32,7 +33,7 @@
     "@typescript-eslint/eslint-plugin": "5.42.1",
     "@typescript-eslint/parser": "5.42.1",
     "better-sqlite3": "8.0.1",
-    "drizzle-kit": "0.14.1",
+    "drizzle-kit": "0.16.1",
     "eslint": "8.28.0",
     "eslint-config-prettier": "8.5.0",
     "prettier": "2.7.1",

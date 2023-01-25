@@ -5,13 +5,8 @@ import {
   text,
   index,
   uniqueIndex,
+  primaryKey,
 } from 'drizzle-orm-sqlite'
-
-export type PermissionTable = {
-  id: number
-  edges: EdgeTable[]
-  name: string
-}
 
 export type URNRComponentTable = {
   nodeUrn: number
@@ -40,7 +35,6 @@ export type EdgeTable = {
   src: NodeTable
   dst: NodeTable
   tag: string
-  permission: PermissionTable[]
 }
 
 export const node = sqliteTable('node', {
@@ -53,9 +47,6 @@ export const node = sqliteTable('node', {
 export const edge = sqliteTable(
   'edge',
   {
-    id: integer('id').primaryKey({
-      autoIncrement: true,
-    }),
     tag: text('tag').notNull(),
     src: text('src')
       .notNull()
@@ -71,11 +62,7 @@ export const edge = sqliteTable(
       }),
   },
   (table) => ({
-    edge: uniqueIndex('IDX_edge_src_dst_tag').on(
-      table.src,
-      table.dst,
-      table.tag
-    ),
+    edge: primaryKey(table.src, table.dst, table.tag),
   })
 )
 
@@ -99,7 +86,7 @@ export const nodeQcomp = sqliteTable(
     value: text('value').notNull(),
   },
   (table) => ({
-    node_qcomp: uniqueIndex('IDX_node_qcomp_pk').on(table.nodeUrn, table.key),
+    node_qcomp: primaryKey(table.nodeUrn, table.key),
     nodeUrn: index('IDX_node_qcomp_nodeUrn').on(table.nodeUrn),
     qCompKey: index('IDX_node_qcomp_key').on(table.key),
     qCompValue: index('IDX_node_qcomp_value').on(table.value),
@@ -119,35 +106,9 @@ export const nodeRcomp = sqliteTable(
     value: text('value').notNull(),
   },
   (table) => ({
-    node_rcomp: uniqueIndex('IDX_node_rcomp_pk').on(table.nodeUrn, table.key),
+    node_rcomp: primaryKey(table.nodeUrn, table.key),
     nodeUrn: index('IDX_node_rcomp_nodeUrn').on(table.nodeUrn),
     rCompKey: index('IDX_node_rcomp_key').on(table.key),
     rCompValue: index('IDX_node_rcomp_value').on(table.value),
-  })
-)
-
-export const edgePermission = sqliteTable(
-  'edge_permission',
-  {
-    edgeId: integer('edgeId')
-      .notNull()
-      .references(() => edge.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
-    permissionId: integer('permissionId')
-      .notNull()
-      .references(() => permission.id, {
-        onDelete: 'no action',
-        onUpdate: 'no action',
-      }),
-  },
-  (table) => ({
-    edge_permission: uniqueIndex('IDX_edge_permission_pk').on(
-      table.edgeId,
-      table.permissionId
-    ),
-    nodeUrn: index('IDX_edge_permission_edgeId').on(table.edgeId),
-    permission: index('IDX_edge_permission_permission').on(table.permissionId),
   })
 )

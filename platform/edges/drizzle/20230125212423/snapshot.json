@@ -1,18 +1,12 @@
 {
-  "version": "3",
+  "version": "4",
   "dialect": "sqlite",
-  "id": "4e6ecbe2-fe5e-4a17-8753-c1ffca5ab61a",
+  "id": "e404d9a3-8d4f-405c-a90d-f100a568292f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "edge": {
       "name": "edge",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true
-        },
         "tag": {
           "name": "tag",
           "type": "text",
@@ -32,17 +26,7 @@
           "notNull": true
         }
       },
-      "indexes": {
-        "IDX_edge_src_dst_tag": {
-          "name": "IDX_edge_src_dst_tag",
-          "columns": [
-            "src",
-            "dst",
-            "tag"
-          ],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "edge_src_node_urn_fk": {
           "name": "edge_src_node_urn_fk",
@@ -70,74 +54,14 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         }
-      }
-    },
-    "edge_permission": {
-      "name": "edge_permission",
-      "columns": {
-        "edgeId": {
-          "name": "edgeId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "permissionId": {
-          "name": "permissionId",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
       },
-      "indexes": {
-        "IDX_edge_permission_pk": {
-          "name": "IDX_edge_permission_pk",
+      "compositePrimaryKeys": {
+        "edge_src_dst_tag_pk": {
           "columns": [
-            "edgeId",
-            "permissionId"
-          ],
-          "isUnique": true
-        },
-        "IDX_edge_permission_edgeId": {
-          "name": "IDX_edge_permission_edgeId",
-          "columns": [
-            "edgeId"
-          ],
-          "isUnique": false
-        },
-        "IDX_edge_permission_permission": {
-          "name": "IDX_edge_permission_permission",
-          "columns": [
-            "permissionId"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "edge_permission_edgeId_edge_id_fk": {
-          "name": "edge_permission_edgeId_edge_id_fk",
-          "tableFrom": "edge_permission",
-          "tableTo": "edge",
-          "columnsFrom": [
-            "edgeId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "edge_permission_permissionId_permission_id_fk": {
-          "name": "edge_permission_permissionId_permission_id_fk",
-          "tableFrom": "edge_permission",
-          "tableTo": "permission",
-          "columnsFrom": [
-            "permissionId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+            "src",
+            "dst",
+            "tag"
+          ]
         }
       }
     },
@@ -170,7 +94,8 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "compositePrimaryKeys": {}
     },
     "node_qcomp": {
       "name": "node_qcomp",
@@ -178,13 +103,13 @@
         "nodeUrn": {
           "name": "nodeUrn",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "key": {
           "name": "key",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "value": {
@@ -231,6 +156,14 @@
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
+      },
+      "compositePrimaryKeys": {
+        "node_qcomp_nodeUrn_key_pk": {
+          "columns": [
+            "nodeUrn",
+            "key"
+          ]
+        }
       }
     },
     "node_rcomp": {
@@ -256,14 +189,6 @@
         }
       },
       "indexes": {
-        "IDX_node_rcomp_pk": {
-          "name": "IDX_node_rcomp_pk",
-          "columns": [
-            "nodeUrn",
-            "key"
-          ],
-          "isUnique": true
-        },
         "IDX_node_rcomp_nodeUrn": {
           "name": "IDX_node_rcomp_nodeUrn",
           "columns": [
@@ -300,6 +225,14 @@
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
+      },
+      "compositePrimaryKeys": {
+        "node_rcomp_nodeUrn_key_pk": {
+          "columns": [
+            "nodeUrn",
+            "key"
+          ]
+        }
       }
     },
     "permission": {
@@ -309,7 +242,8 @@
           "name": "id",
           "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "autoincrement": true
         },
         "name": {
           "name": "name",
@@ -319,7 +253,8 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "compositePrimaryKeys": {}
     }
   },
   "enums": {}
