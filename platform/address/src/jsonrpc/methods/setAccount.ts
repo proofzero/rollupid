@@ -30,15 +30,7 @@ export const setAccountMethod = async ({
 }): Promise<SetAccountResult> => {
   const nodeClient = ctx.address
 
-  // This is the core part of the address, e.g. an Ethereum wallet
-  // address, an e-mail address, etc. It's taken from the X-3RN header
-  // included in the request.
-  // Convert to a base URN with no components.
-  const address = ctx.addressURN
-  // This address used to link the account node to the address node must
-  // have the node_type and addr_type URN r-components included so they
-  // can be stored in the database for later querying.
-  const fullAddress = `${address}?+${ctx.rparams}?=${ctx.qparams}` as AddressURN
+  const address = ctx.addressURN as AddressURN
 
   const account = input
   if (!AccountURNSpace.is(account)) {
@@ -51,7 +43,7 @@ export const setAccountMethod = async ({
   const edgesClient = createEdgesClient(ctx.Edges)
   const linkResult = await edgesClient.makeEdge.mutate({
     src: account,
-    dst: fullAddress,
+    dst: address,
     tag: EDGE_ADDRESS,
   })
 
