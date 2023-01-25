@@ -99,6 +99,7 @@ const AccountSettingsConnections = () => {
 
   useEffect(() => {
     const selectedProfile = cryptoProfiles
+      .concat(vaultProfiles)
       .concat(oAuthProfiles)
       .find((p: any) => p.id === actionId)
 
