@@ -19,8 +19,8 @@ workers_dev = false
 
 # Services binding for local development
 services = [
-  { binding = "Galaxy", service = "galaxy"},
-  { binding = "Address", service = "address"},
+  { binding = "Galaxy", service = "galaxy" },
+  { binding = "Address", service = "address" },
   { binding = "Images", service = "images" },
   { binding = "Indexer", service = "indexer" },
 ]
@@ -28,21 +28,21 @@ services = [
 [vars]
 PASSPORT_URL = "http://localhost:9696"
 CONSOLE_APP_URL = "http://localhost:9898"
-CLIENT_ID = "16a3fb1bfe6484b9ba91b524e0de0f5b"
+CLIENT_ID = "c311f946f67b6b88dd2b53919f056ad9"
 REDIRECT_URI = "http://localhost:9797/auth/callback"
 COOKIE_DOMAIN = "localhost"
-TWITTER_URL="https://twitter.com/threeid_xyz"
-DISCORD_URL="https://discord.gg/threeid"
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.threeid.xyz/api"
-NFTAR_CHAIN_ID=5
+TWITTER_URL = "https://twitter.com/threeid_xyz"
+DISCORD_URL = "https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 [site]
-  bucket = "./public"
+bucket = "./public"
 
 [build]
-  command = "yarn build -- --sourcemap"
+command = "yarn build -- --sourcemap"
 
 [dev]
 port = 9797
@@ -56,8 +56,8 @@ routes = [
   { pattern = "my-dev.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Galaxy", service = "galaxy-dev"},
-  { binding = "Address", service = "address-dev"},
+  { binding = "Galaxy", service = "galaxy-dev" },
+  { binding = "Address", service = "address-dev" },
   { binding = "Images", service = "images-dev" },
   { binding = "Indexer", service = "indexer-dev" },
 
@@ -68,11 +68,11 @@ CONSOLE_APP_URL = "https://console-dev.threid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-dev.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL="https://twitter.com/threeid_xyz"
-DISCORD_URL="https://discord.gg/threeid"
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.threeid.xyz/api"
-NFTAR_CHAIN_ID=5
+TWITTER_URL = "https://twitter.com/threeid_xyz"
+DISCORD_URL = "https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-NHNH4KRWC3"
 
 # next (staging)
@@ -83,14 +83,14 @@ routes = [
   { pattern = "my-next.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Galaxy", service = "galaxy-next"},
-  { binding = "Address", service = "address-next"},
+  { binding = "Galaxy", service = "galaxy-next" },
+  { binding = "Address", service = "address-next" },
   { binding = "Images", service = "images-next" },
   { binding = "Indexer", service = "indexer-next" },
 
 ]
 [env.next.build]
-  command = "yarn build"
+command = "yarn build"
 
 [env.next.vars]
 PASSPORT_URL = "https://passport-next.threeid.xyz"
@@ -98,11 +98,11 @@ CONSOLE_APP_URL = "https://console-next.threid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-next.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL="https://twitter.com/threeid_xyz"
-DISCORD_URL="https://discord.gg/threeid"
-MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
-NFTAR_URL="https://test.nftar.threeid.xyz/api"
-NFTAR_CHAIN_ID=5
+TWITTER_URL = "https://twitter.com/threeid_xyz"
+DISCORD_URL = "https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS = "0x028aE75Bb01eef2A581172607b93af8D24F50643"
+NFTAR_URL = "https://test.nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID = 5
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-X7ZN16M4NB"
 
 # current (production)
@@ -113,13 +113,13 @@ routes = [
   { pattern = "my.threeid.xyz", custom_domain = true, zone_name = "threeid.xyz" },
 ]
 services = [
-  { binding = "Galaxy", service = "galaxy-current"},
-  { binding = "Address", service = "address-current"},
+  { binding = "Galaxy", service = "galaxy-current" },
+  { binding = "Address", service = "address-current" },
   { binding = "Images", service = "images-current" },
   { binding = "Indexer", service = "indexer-current" },
 ]
 [env.current.build]
-  command = "yarn build"
+command = "yarn build"
 
 [env.current.vars]
 PASSPORT_URL = "https://passport.threeid.xyz"
@@ -127,9 +127,9 @@ CONSOLE_APP_URL = "https://console.threid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
-TWITTER_URL="https://twitter.com/threeid_xyz"
-DISCORD_URL="https://discord.gg/threeid"
-MINTPFP_CONTRACT_ADDRESS="0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
-NFTAR_URL="https://nftar.threeid.xyz/api"
-NFTAR_CHAIN_ID=1
+TWITTER_URL = "https://twitter.com/threeid_xyz"
+DISCORD_URL = "https://discord.gg/threeid"
+MINTPFP_CONTRACT_ADDRESS = "0x3ebfaFE60F3Ac34f476B2f696Fc2779ff1B03193"
+NFTAR_URL = "https://nftar.threeid.xyz/api"
+NFTAR_CHAIN_ID = 1
 INTERNAL_GOOGLE_ANALYTICS_TAG = "G-675VJMWSRY"

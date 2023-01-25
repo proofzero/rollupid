@@ -1,4 +1,4 @@
-import { json, Session } from '@remix-run/cloudflare'
+import { Session } from '@remix-run/cloudflare'
 import { createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
 import * as jose from 'jose'
 import type { JWTPayload } from 'jose'
@@ -9,42 +9,12 @@ if (!sessionSecret) {
   throw new Error('SECRET_SESSION_SALT must be set')
 }
 
-const storage = createCookieSessionStorage({
-  cookie: {
-    name: '3ID_SESSION',
-    domain: COOKIE_DOMAIN,
-    // normally you want this to be `secure: true`
-    // but that doesn't work on localhost for Safari
-    // https://web.dev/when-to-use-local-https/
-    secure: true,
-    secrets: [sessionSecret],
-    sameSite: true,
-    path: '/',
-    maxAge: 60 * 60 * 4,
-    // httpOnly: true,
-  },
-})
-
-// TODO: reset cookie maxAge if valid
-export function getUserSession(request: Request, renew: boolean = true) {
-  return storage.getSession(request.headers.get('Cookie'))
-}
-
-export async function destroyUserSession(session: Session) {
-  return redirect('/', {
-    headers: {
-      'Set-Cookie': await storage.destroySession(session),
-    },
-  })
-}
-
 export async function requireJWT(
   request: Request,
   redirectTo: string = new URL(request.url).pathname
 ) {
-  const session = await getUserSession(request)
+  const session = await getProfileSession(request)
   const jwt = session.get('jwt')
-  // const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
 
   if (!jwt || typeof jwt !== 'string') {
     throw redirect(PASSPORT_URL)
@@ -52,11 +22,9 @@ export async function requireJWT(
   if (jwt) {
     const parsedJWT = parseJwt(jwt)
     if (parsedJWT.exp < Date.now() / 1000) {
-      throw await destroyUserSession(session)
+      throw await destroyProfileSession(session)
     }
   }
-
-  // eventSubmit("3ID user event", `request:${request.url}`, session.get("core"))
 
   return jwt
 }
@@ -146,9 +114,10 @@ export function getProfileSession(request: Request, renew: boolean = true) {
 
 export async function destroyProfileSession(session: Session) {
   const storage = getProfileSessionStorage()
-  return redirect(`/auth`, {
+  const cookie = await storage.destroySession(session)
+  return redirect('https://threeid.xyz/profiles', {
     headers: {
-      'Set-Cookie': await storage.destroySession(session),
+      'Set-Cookie': cookie,
     },
   })
 }

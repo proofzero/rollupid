@@ -24,6 +24,7 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
 
 import { z } from 'zod'
+import { RollType } from '~/types'
 
 /**
  * @file app/routes/dashboard/index.tsx

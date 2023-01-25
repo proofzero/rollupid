@@ -11,6 +11,7 @@ import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { requireJWT } from '~/utilities/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import { RollType, RotatedSecrets } from '~/types'
 
 // Component
 // -----------------------------------------------------------------------------
