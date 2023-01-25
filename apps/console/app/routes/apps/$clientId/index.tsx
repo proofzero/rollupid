@@ -18,11 +18,6 @@ import type { appDetailsProps } from '~/components/Applications/Auth/Application
  * @file app/routes/dashboard/index.tsx
  */
 
-export const RollType = {
-  RollAPIKey: 'roll_api_key',
-  RollClientSecret: 'roll_app_secret',
-}
-
 export const action: ActionFunction = async ({ request, params }) => {
   if (!params.clientId) {
     throw new Error('Application client id is required for the requested route')
@@ -42,20 +37,23 @@ export const action: ActionFunction = async ({ request, params }) => {
   switch (op) {
     case RollType.RollAPIKey:
       const rotatedApiKey = (
-        await starbaseClient.rotateApiKey.mutate({ clientId:params.clientId })
+        await starbaseClient.rotateApiKey.mutate({ clientId: params.clientId })
       ).apiKey
       return json({
-        rotatedSecrets: {rotatedApiKey},
+        rotatedSecrets: { rotatedApiKey },
       })
     case RollType.RollClientSecret:
-      const rotatedClientSecret = (await starbaseClient.rotateClientSecret.mutate({
-        clientId: params.clientId,
-      })).secret
+      const rotatedClientSecret = (
+        await starbaseClient.rotateClientSecret.mutate({
+          clientId: params.clientId,
+        })
+      ).secret
       return json({
-        rotatedSecrets: {rotatedClientSecret},
+        rotatedSecrets: { rotatedClientSecret },
       })
     default:
       throw new Error('Invalid operation')
+  }
 }
 
 // Component

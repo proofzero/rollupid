@@ -121,29 +121,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const scopeMeta = await starbaseClient.getScopes.query()
 
-<<<<<<< HEAD
   return json({ scopeMeta })
-=======
-  let rotatedSecret
-  if (!appDetails.secretTimestamp) {
-    rotatedSecret = await starbaseClient.rotateClientSecret.mutate({
-      clientId: appDetails.clientId,
-    })
-
-    console.log({ rotatedSecret })
-
-    // This is a client 'hack' as the date
-    // is populated from the graph
-    // on subsequent requests
-    appDetails.secretTimestamp = Date.now()
-  }
-
-  return json({
-    appDetails,
-    scopeMeta,
-    rotatedSecret,
-  })
->>>>>>> 3de506fb (floow)
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -170,11 +148,12 @@ export const action: ActionFunction = async ({ request, params }) => {
   // because the loader gets called again
   // populating the values if empty
   switch (op) {
-    case 'roll_app_secret':
+    case RollType.RollClientSecret:
       rotatedSecret = (
         await starbaseClient.rotateClientSecret.mutate({
           clientId: params.clientId,
-        })).secret
+        })
+      ).secret
       break
     case 'update_app':
       const entries = formData.entries()
@@ -297,7 +276,7 @@ export default function AppDetailIndexPage() {
               onKeyRoll: () => {
                 submit(
                   {
-                    op: 'roll_app_secret',
+                    op: RollType.RollClientSecret,
                   },
                   {
                     method: 'post',

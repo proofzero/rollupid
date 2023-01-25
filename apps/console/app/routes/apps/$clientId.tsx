@@ -8,8 +8,6 @@ import SiteHeader from '~/components/SiteHeader'
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import type { RotatedSecrets } from '~/helpers/rotation'
-
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'

@@ -65,6 +65,8 @@ services = [
 [env.dev.vars]
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
 CONSOLE_APP_URL = "https://console-dev.threid.xyz"
+CLIENT_ID = "<console client id>"
+REDIRECT_URI = "https://my-dev.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
 TWITTER_URL="https://twitter.com/threeid_xyz"
 DISCORD_URL="https://discord.gg/threeid"
@@ -93,6 +95,8 @@ services = [
 [env.next.vars]
 PASSPORT_URL = "https://passport-next.threeid.xyz"
 CONSOLE_APP_URL = "https://console-next.threid.xyz"
+CLIENT_ID = "<console client id>"
+REDIRECT_URI = "https://my-next.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
 TWITTER_URL="https://twitter.com/threeid_xyz"
 DISCORD_URL="https://discord.gg/threeid"
@@ -120,6 +124,8 @@ services = [
 [env.current.vars]
 PASSPORT_URL = "https://passport.threeid.xyz"
 CONSOLE_APP_URL = "https://console.threid.xyz"
+CLIENT_ID = "<console client id>"
+REDIRECT_URI = "https://my.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
 TWITTER_URL="https://twitter.com/threeid_xyz"
 DISCORD_URL="https://discord.gg/threeid"

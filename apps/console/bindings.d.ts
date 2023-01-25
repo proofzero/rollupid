@@ -10,4 +10,14 @@ declare global {
   const STORAGE_NAMESPACE: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
   const THREEID_APP_URL: string
+
+  enum RollType {
+    RollAPIKey = 'roll_api_key',
+    RollClientSecret = 'roll_app_secret',
+  }
+
+  type RotatedSecrets = {
+    rotatedApiKey: string
+    rotatedClientSecret: string
+  }}
 }
