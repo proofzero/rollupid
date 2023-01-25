@@ -35,7 +35,6 @@ export const authenticateAddress = async (
   const grantType = GrantType.AuthenticationCode
   const { accessToken } = await accessClient.exchangeToken.mutate({
     grantType,
-    account,
     code,
     redirectUri,
     clientId,
@@ -47,7 +46,14 @@ export const authenticateAddress = async (
     const authRedirectUri = appData.redirectUri
     const authState = appData.state
     const authScope = appData.scope
-    redirectURL += `?client_id=${authAppId}&redirect_uri=${authRedirectUri}&state=${authState}&scope=${authScope}`
+    const urlParams = new URLSearchParams({
+      client_id: authAppId,
+      redirect_uri: authRedirectUri,
+      state: authState,
+      scope: authScope,
+    })
+
+    redirectURL += `?${urlParams}`
   }
 
   return createUserSession(accessToken, redirectURL, address, env)

@@ -4,8 +4,6 @@
  * Utilities for generating an OAuth profile.
  */
 
-import { hexlify } from '@ethersproject/bytes'
-
 // Constants
 // -----------------------------------------------------------------------------
 
@@ -20,10 +18,9 @@ const ID_LENGTH_BYTES = 16
  *
  */
 export function makeClientId() {
-  const idBuffer = new Uint8Array(ID_LENGTH_BYTES)
-  const idData = crypto.getRandomValues(idBuffer)
-  // Strip off "0x" prefix.
-  const id = hexlify(idData).slice(2)
+  const id = [...crypto.getRandomValues(new Uint8Array(ID_LENGTH_BYTES))]
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 
   return id
 }
@@ -35,10 +32,11 @@ export function makeClientId() {
  *
  */
 export function makeClientSecret() {
-  const secBuffer = new Uint8Array(SECRET_LENGTH_BYTES)
-  const secData = crypto.getRandomValues(secBuffer)
-  // Strip off "0x" prefix.
-  const secret = hexlify(secData).slice(2)
+  const secret = [
+    ...crypto.getRandomValues(new Uint8Array(SECRET_LENGTH_BYTES)),
+  ]
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
 
-  return `secret:${secret}`
+  return secret
 }

@@ -1,12 +1,12 @@
 import { z } from 'zod'
 
 import { AccountURNInput } from '@kubelt/platform-middleware/inputValidators'
-import { AccessURNSpace } from '@kubelt/urns/access'
-import { AccountURNSpace } from '@kubelt/urns/account'
 
 import { Context } from '../../context'
-import { URN_NODE_TYPE_AUTHORIZATION } from '../../constants'
+import { CODE_OPTIONS } from '../../constants'
 import { initAuthorizationNodeByName } from '../../nodes'
+import { hexlify } from '@ethersproject/bytes'
+import { randomBytes } from '@ethersproject/random'
 
 export const AuthorizeMethodInput = z.object({
   account: AccountURNInput,
@@ -33,14 +33,11 @@ export const authorizeMethod = async ({
 }) => {
   const { account, responseType, clientId, redirectUri, scope, state } = input
 
-  const accountId = AccountURNSpace.decode(account)
-  const name = AccessURNSpace.fullUrn(accountId, {
-    r: URN_NODE_TYPE_AUTHORIZATION,
-    q: { clientId },
-  })
+  const code = hexlify(randomBytes(CODE_OPTIONS.length))
 
-  const node = await initAuthorizationNodeByName(name, ctx.Authorization)
+  const node = await initAuthorizationNodeByName(code, ctx.Authorization)
   const result = await node.class.authorize(
+    code,
     account,
     responseType,
     clientId,

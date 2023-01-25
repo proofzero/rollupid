@@ -22,9 +22,9 @@ import { DeleteAppModal } from '~/components/DeleteAppModal/DeleteAppModal'
 import { useEffect, useState } from 'react'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { Loader } from '@kubelt/design-system/src/molecules/loader/Loader'
-import rotateSecrets, { RollType } from '~/helpers/rotation'
 
 import { z } from 'zod'
+import { RollType } from '~/types'
 
 /**
  * @file app/routes/dashboard/index.tsx
@@ -149,14 +149,12 @@ export const action: ActionFunction = async ({ request, params }) => {
   // because the loader gets called again
   // populating the values if empty
   switch (op) {
-    case 'roll_app_secret':
+    case RollType.RollClientSecret:
       rotatedSecret = (
-        await rotateSecrets(
-          starbaseClient,
-          params.clientId,
-          RollType.RollClientSecret
-        )
-      ).rotatedClientSecret
+        await starbaseClient.rotateClientSecret.mutate({
+          clientId: params.clientId,
+        })
+      ).secret
       break
     case 'update_app':
       const entries = formData.entries()
@@ -279,7 +277,7 @@ export default function AppDetailIndexPage() {
               onKeyRoll: () => {
                 submit(
                   {
-                    op: 'roll_app_secret',
+                    op: RollType.RollClientSecret,
                   },
                   {
                     method: 'post',

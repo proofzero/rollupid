@@ -1,5 +1,3 @@
-import { hexlify } from '@ethersproject/bytes'
-import { randomBytes } from '@ethersproject/random'
 import { AccountURN } from '@kubelt/urns/account'
 import { DOProxy } from 'do-proxy'
 
@@ -20,6 +18,7 @@ export default class Authorization extends DOProxy {
   }
 
   async authorize(
+    code: string,
     account: AccountURN,
     responseType: string,
     clientId: string,
@@ -32,20 +31,14 @@ export default class Authorization extends DOProxy {
     }
 
     const timestamp: number = Date.now()
-    const code = hexlify(randomBytes(CODE_OPTIONS.length))
-    const codes: Map<string, AuthorizationParameters> =
-      (await this.state.storage.get<Map<string, AuthorizationParameters>>(
-        'codes'
-      )) || new Map()
-    codes.set(code, { redirectUri, scope, timestamp })
 
-    await Promise.all([
-      this.state.storage.put('account', account),
-      this.state.storage.put('clientId', clientId),
-      this.state.storage.put('codes', codes),
-    ])
+    await this.state.storage.put({
+      account,
+      clientId,
+      code: { redirectUri, scope, timestamp },
+    })
 
-    this.state.storage.setAlarm(CODE_OPTIONS.ttl)
+    await this.state.storage.setAlarm(Date.now() + CODE_OPTIONS.ttl)
 
     return { code, state }
   }
@@ -56,7 +49,6 @@ export default class Authorization extends DOProxy {
     clientId: string
   ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
-    console.log({ account })
     if (!account) {
       throw new Error('missing account name')
     }
@@ -66,18 +58,12 @@ export default class Authorization extends DOProxy {
       throw new Error('missing client id')
     }
 
-    const codes = await this.state.storage.get<
-      Map<string, AuthorizationParameters>
-    >('codes')
-    if (!codes) {
-      throw new Error('missing codes')
-    }
-    const stored = codes.get(code)
-    if (!stored) {
-      throw new Error('mismatch code')
+    const params = await this.state.storage.get<AuthorizationParameters>('code')
+    if (!params) {
+      throw new Error('missing code params')
     }
 
-    if (redirectUri != stored.redirectUri) {
+    if (redirectUri != params.redirectUri) {
       throw new Error('mismatch redirect uri')
     }
 
@@ -85,22 +71,10 @@ export default class Authorization extends DOProxy {
       throw new Error('mismatch client id')
     }
 
-    codes.delete(code)
-    await this.state.storage.put('codes', codes)
-
     return { code }
   }
 
   async alarm() {
-    const codes = await this.state.storage.get<
-      Map<string, AuthorizationParameters>
-    >('codes')
-    if (!codes) return
-    for (const [code, params] of codes) {
-      if (params.timestamp + CODE_OPTIONS.ttl * 1000 <= Date.now()) {
-        codes.delete(code)
-      }
-    }
-    await this.state.storage.put('codes', codes)
+    await this.state.storage.deleteAll() // self-destruct
   }
 }

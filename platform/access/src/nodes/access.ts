@@ -91,11 +91,11 @@ const generate = async (
   scope: any,
   storage: DurableObjectStorage
 ) => {
-  await Promise.all([
-    storage.put('account', account),
-    storage.put('clientId', clientId),
-    storage.put('scope', scope),
-  ])
+  await storage.put({
+    account,
+    clientId,
+    scope,
+  })
 
   // We only set the creation time once, not when refreshing the token /
   // session.

@@ -1,7 +1,10 @@
-import type { ActionFunction } from '@remix-run/cloudflare'
-import { getUserSession, destroyUserSession } from '~/utils/session.server'
+import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import {
+  getProfileSession,
+  destroyProfileSession,
+} from '~/utils/session.server'
 
 export const action: ActionFunction = async ({ request }) => {
-  const session = await getUserSession(request)
-  return await destroyUserSession(session)
+  const session = await getProfileSession(request)
+  return await destroyProfileSession(session)
 }

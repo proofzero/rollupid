@@ -24,6 +24,8 @@ export const loader: LoaderFunction = async ({ request, context }) => {
   )
   const profile = profileRes.profile
 
+  console.log({ profile })
+
   if (!profile) {
     console.log("Profile doesn't exist, creating one...")
     const addressClient = getAddressClient(defaultProfileURN, context.env)
@@ -92,7 +94,7 @@ export const loader: LoaderFunction = async ({ request, context }) => {
               displayName: res.profile.name,
               pfp: {
                 //Cached profile image
-                image: res.profile.threeidImageUrl,
+                image: res.profile.threeidImageUrl as string,
               },
               cover: gradient,
             }

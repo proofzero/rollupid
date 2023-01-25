@@ -100,8 +100,6 @@ const accountResolvers: Resolvers = {
         })
       }
 
-      console.log('RETURN')
-
       return accountProfile
     },
     connectedAddresses: async (

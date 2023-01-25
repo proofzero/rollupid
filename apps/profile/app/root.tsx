@@ -39,7 +39,7 @@ import type { GetProfileQuery } from '@kubelt/galaxy-client'
 import HeadNav, { links as headNavLink } from '~/components/head-nav'
 
 import * as gtag from '~/utils/gtags.client'
-import { getUserSession } from './utils/session.server'
+import { getProfileSession } from './utils/session.server'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { getGalaxyClient } from './helpers/clients'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
@@ -76,7 +76,7 @@ export const links: LinksFunction = () => [
 
 export const loader: LoaderFunction = async ({ request }) => {
   // let's fetch the user profile if they are logged in
-  const session = await getUserSession(request)
+  const session = await getProfileSession(request)
   const jwt = session.get('jwt') as string
 
   const galaxyClient = await getGalaxyClient()

@@ -20,9 +20,38 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const jwt = await requireJWT(request, context.consoleParams, context.env)
 
+  console.log({ scope })
+
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
     if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)
+    if (!scope || !Array.isArray(scope) || scope.length === 0) {
+      // auto authorize if no scope is provided
+
+      const parsedJWT = parseJwt(jwt)
+      const account = parsedJWT.sub as AccountURN
+      const responseType = ResponseType.Code
+      const accessClient = getAccessClient(context.env)
+      const authorizeRes = await accessClient.authorize.mutate({
+        account,
+        responseType,
+        clientId,
+        redirectUri,
+        scope: [],
+        state,
+      })
+
+      if (!authorizeRes) {
+        throw json({ message: 'Failed to authorize' }, 400)
+      }
+
+      const redirectParams = new URLSearchParams({
+        code: authorizeRes.code,
+        state: authorizeRes.state,
+      })
+
+      return redirect(`${redirectUri}?${redirectParams}`)
+    }
   } else {
     return redirect(context.env.CONSOLE_APP_URL)
   }
@@ -89,9 +118,12 @@ export const action: ActionFunction = async ({ request, context }) => {
     throw json({ message: 'Failed to authorize' }, 400)
   }
 
-  return redirect(
-    `${redirectUri}?code=${authorizeRes.code}&state=${authorizeRes.state}`
-  )
+  const redirectParams = new URLSearchParams({
+    code: authorizeRes.code,
+    state: authorizeRes.state,
+  })
+
+  return redirect(`${redirectUri}?${redirectParams}`)
 }
 
 export default function Authorize() {

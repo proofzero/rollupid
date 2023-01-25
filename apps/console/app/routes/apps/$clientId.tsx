@@ -8,9 +8,6 @@ import SiteHeader from '~/components/SiteHeader'
 
 import toast, { Toaster } from 'react-hot-toast'
 
-import rotateSecrets, { RollType } from '~/helpers/rotation'
-import type { RotatedSecrets } from '~/helpers/rotation'
-
 import { requireJWT } from '~/utilities/session.server'
 import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
@@ -66,15 +63,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     })
 
     let rotationResult
-
     //If there's no timestamps, then the secrets have never been set, signifying the app
     //has just been created; we rotate both secrets and set the timestamps
     if (!appDetails.secretTimestamp && !appDetails.apiKeyTimestamp) {
-      rotationResult = await rotateSecrets(
-        starbaseClient,
-        appDetails.clientId,
-        RollType.RollBothSecrets
-      )
+      const [apiKeyRes, secretRes] = await Promise.all([
+        starbaseClient.rotateApiKey.mutate({ clientId }),
+        starbaseClient.rotateClientSecret.mutate({
+          clientId,
+        }),
+      ])
+
+      rotationResult = {
+        rotatedApiKey: apiKeyRes.apiKey,
+        rotatedClientSecret: secretRes.secret,
+      }
 
       // This is a client 'hack' as the date
       // is populated from the graph

@@ -1,11 +1,16 @@
 import { GrantType } from '@kubelt/platform.access/src/types'
 import { json, LoaderFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
+import {
+  createProfileSession,
+  getAuthorizeStateSession,
+} from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const params = new URL(request.url).searchParams
 
-  if (!params.get('code')) {
+  const code = params.get('code')
+  if (!code) {
     throw json(
       {
         error: 'No code provided',
@@ -16,11 +21,24 @@ export const loader: LoaderFunction = async ({ request }) => {
     )
   }
 
-  if (!params.get('state')) {
+  const state = params.get('state')
+  if (!state) {
     throw json(
       {
         error: 'No state provided',
       },
+      {
+        status: 400,
+      }
+    )
+  }
+
+  const stateSession = await getAuthorizeStateSession(request)
+  const storedState = stateSession.get('state')
+
+  if (storedState && state !== storedState) {
+    throw json(
+      { error: 'Invalid state' },
       {
         status: 400,
       }
@@ -32,13 +50,22 @@ export const loader: LoaderFunction = async ({ request }) => {
     .exchangeToken({
       exchange: {
         grantType: GrantType.AuthorizationCode,
-        code: params.get('code'),
+        code,
         redirectUri: REDIRECT_URI,
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRET,
       },
     })
-    .then((res) => res.exchangeToken)
+    .then((res) => res.exchangeAuthorizationToken)
 
-  // TODO: complete the excchange and store the token and create session
+  if (!token) {
+    throw json(
+      { error: 'No token exchanged' },
+      {
+        status: 400,
+      }
+    )
+  }
+
+  return createProfileSession(token.accessToken, '/account')
 }

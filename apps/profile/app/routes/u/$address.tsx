@@ -11,7 +11,7 @@ import {
 
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
 
-import { getUserSession } from '~/utils/session.server'
+import { getProfileSession } from '~/utils/session.server'
 import { getGalaxyClient } from '~/helpers/clients'
 import { ogImageFromProfile } from '~/helpers/ogImage'
 
@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const galaxyClient = await getGalaxyClient()
 
-  const session = await getUserSession(request)
+  const session = await getProfileSession(request)
   const jwt = session.get('jwt')
 
   const urn = AddressURNSpace.urn(address)

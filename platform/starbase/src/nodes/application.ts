@@ -11,13 +11,13 @@ import {
   KeyLike,
   SignJWT,
 } from 'jose'
-import { STARBASE_API_KEY_ISSUER } from '../../constants'
+import { STARBASE_API_KEY_ISSUER } from '../constants'
 import type {
   AppAllFields,
   AppObject,
   AppReadableFields,
   AppUpdateableFields,
-} from '../../types'
+} from '../types'
 
 type AppDetails = AppUpdateableFields & AppReadableFields
 type AppProfile = AppUpdateableFields
