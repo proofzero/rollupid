@@ -9,7 +9,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./services
+    working-directory: ./platform
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - run: nix-build services.nix
+      - run: nix-build platform.nix
 
       - name: Cache Dependencies
         id: cache-modules
@@ -45,7 +45,7 @@ jobs:
         with:
           apiToken: ${{ secrets.TOKEN_CLOUDFLARE_API }}
           accountId: ${{ secrets.INTERNAL_CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: 'services/images'
+          workingDirectory: 'platform/images'
           command: publish --env dev
           environment: 'dev'
           # This causes secrets to be set as if by: $ wrangler secret put.
