@@ -143,15 +143,6 @@ export async function getRPCResult(response: Response) {
   return json.result?.value
 }
 
-export function sliceIntoChunks(arr: any, chunkSize: number) {
-  const res = []
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize)
-    res.push(chunk)
-  }
-  return res
-}
-
 export const logAnalytics =
   () => (next) => async (root, args, context, info) => {
     const method = info?.operation?.name?.value || 'unknown'
