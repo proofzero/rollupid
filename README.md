@@ -15,16 +15,13 @@
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-access.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-address.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-account.yaml/badge.svg)
+![](https://github.com/kubelt/kubelt/actions/workflows/main-images.yaml/badge.svg)
 
 ##### Apps
 
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-profile.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-console.yaml/badge.svg)
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-passport.yaml/badge.svg)
-
-##### Services
-
-![](https://github.com/kubelt/kubelt/actions/workflows/main-images.yaml/badge.svg)
 
 ##### Packages
 
