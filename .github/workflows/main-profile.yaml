@@ -51,9 +51,13 @@ jobs:
           secrets: |
             SECRET_SESSION_SALT
             TOKEN_NFTAR
+            CLIENT_ID
+            CLIENT_SECRET
         env:
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_DEV }}
           TOKEN_NFTAR: ${{ secrets.TOKEN_NFTAR_DEV }}
+          CLIENT_ID: ${{ secrets.INTERNAL_CONSOLE_OAUTH_CLIENT_ID_DEV }}
+          CLIENT_SECRET: ${{ secrets.SECRET_CONSOLE_OAUTH_CLIENT_SECRET_DEV }}
       # - name: Cache playwright binaries
       #   id: playwright-cache
       #   uses: actions/cache@v3
