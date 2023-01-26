@@ -25,4 +25,14 @@ export const ProfileSchema = z.object({
       })
     )
     .optional(),
+  gallery: z
+    .array(
+      z.object({
+        contract: z.string(),
+        tokenId: z.string(),
+        galleryOrder: z.number(),
+      })
+    )
+    .optional()
+    .nullable(),
 })

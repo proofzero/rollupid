@@ -95,10 +95,14 @@ export const decorateNfts = (ownedNfts: any) => {
   return sortedNfts
 }
 
-export const getGallery = async (owner: string) => {
+export const getGallery = async (owner: string, jwt: string) => {
   // TODO: get from account
-
-  return []
+  const galaxyClient = await getGalaxyClient()
+  const { profile } = await galaxyClient.getProfile(undefined, {
+    [PlatformJWTAssertionHeader]: jwt,
+  })
+  console.log({ profile })
+  return profile?.gallery || []
 }
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
@@ -172,7 +176,7 @@ export const getMoreNftsAllCollections = (
 // ------ end of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
 
 export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
-  const gallery = await getGallery(owner)
+  const gallery = await getGallery(owner, jwt)
 
   if (!gallery || !gallery.length) {
     return { gallery: [] }
@@ -194,13 +198,8 @@ export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
 
   const GalleryOrders: any = {}
   gallery?.forEach(
-    (nft: {
-      contract: string
-      tokenId: string
-      addressURN: string
-      gallery_order: number
-    }) => {
-      GalleryOrders[`${nft.contract}${nft.tokenId}`] = nft.gallery_order
+    (nft: { contract: string; tokenId: string; galleryOrder: number }) => {
+      GalleryOrders[`${nft.contract}${nft.tokenId}`] = nft.galleryOrder
     }
   )
 
@@ -240,14 +239,13 @@ export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
       collectionTitle: nft.contractMetadata?.name,
       properties: nft.metadata?.properties,
       details,
-      gallery_order:
-        GalleryOrders[`${nft.contract?.address}${nft.id?.tokenId}`],
+      galleryOrder: GalleryOrders[`${nft.contract?.address}${nft.id?.tokenId}`],
     }
   })
 
-  /** Trick to perform permutation according to gallery_order param  */
+  /** Trick to perform permutation according to galleryOrder param  */
   const result = Array.from(Array((ownedNfts as any[]).length))
-  ownedNfts?.forEach((nft) => (result[nft.gallery_order] = nft))
+  ownedNfts?.forEach((nft) => (result[nft.galleryOrder] = nft))
   // Setup og tag data
   // check generate and return og image
 

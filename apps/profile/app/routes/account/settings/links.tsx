@@ -88,21 +88,15 @@ export const action: ActionFunction = async ({ request }) => {
     return { errors }
   }
   const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
-  const updatedProfile = profileRes.profile
 
   /** TODO:
    * fetch errors when this updated profile doesn't
    * pass back-end schema validation
    */
+
   await galaxyClient.updateProfile(
     {
-      profile: {
-        ...updatedProfile,
-        links: updatedLinks,
-      },
+      profile: { links: updatedLinks },
     },
     {
       [PlatformJWTAssertionHeader]: jwt,
@@ -165,6 +159,7 @@ export default function AccountSettingsLinks() {
     profile: Profile
     notificationHandler: (success: boolean) => void
   }>()
+
   const transition = useTransition()
   const actionData = useActionData()
 

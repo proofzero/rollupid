@@ -1,10 +1,12 @@
 import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import { GraphQLYogaError } from '@graphql-yoga/common'
+import createAccountClient from '@kubelt/platform-clients/account'
 
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { AccountURNSpace } from '@kubelt/urns/account'
+import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
 import { Resolvers } from './typedefs'
+import { Profile } from '@kubelt/platform.account/src/types'
 import Env from '../../env'
 import {
   AlchemyChain,
@@ -12,6 +14,8 @@ import {
   AlchemyClientConfig,
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
+
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import {
   hasApiKey,
@@ -229,29 +233,7 @@ const nftsResolvers: Resolvers = {
     },
   },
 
-  Mutation: {
-    //@ts-ignore
-    updateCuratedGallery: async (
-      _parent: any,
-      { gallery }: { gallery: any[] },
-      { env, jwt, addressURN }: ResolverContext
-    ) => {
-      const indexerClient = createIndexerClient(env.Indexer)
-
-      // TODO: Return the gallery we've created. Need to enforce
-      // the GraphQL types when setting data otherwise we're able
-      // to set a value that can't be returned.
-      try {
-        await indexerClient.kb_setGallery(
-          gallery.map((nft) => ({ ...nft, addressURN: '1' }))
-        )
-      } catch (ex) {
-        console.error(ex)
-      }
-
-      return true
-    },
-  },
+  Mutation: {},
 }
 
 const NFTsResolverComposition = {
@@ -259,7 +241,6 @@ const NFTsResolverComposition = {
   'Query.contractsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.getNFTMetadataBatch': [setupContext(), logAnalytics()],
   'Query.getCuratedGallery': [setupContext(), logAnalytics()],
-  'Mutation.updateCuratedGallery': [setupContext(), logAnalytics()],
 }
 
 export default composeResolvers(nftsResolvers, NFTsResolverComposition)

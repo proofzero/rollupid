@@ -141,7 +141,3 @@ query getGallery($addressURN: URN!) {
     }
   }
 }
-
-mutation updateGallery($gallery: [NFTInput]) {
-  updateCuratedGallery(gallery: $gallery)
-}

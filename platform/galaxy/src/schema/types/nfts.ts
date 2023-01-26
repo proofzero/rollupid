@@ -7,12 +7,14 @@ export default /* GraphQL */ `
     ERC721
     ERC1155
   }
+
   enum OpenSeaSafeListStatus {
     not_requested
     requested
     approved
     verified
   }
+
   type OpenSeaMetadata {
     floorPrice: Float
     collectionName: String
@@ -23,6 +25,7 @@ export default /* GraphQL */ `
     twitterUsername: String
     discordUrl: String
   }
+
   type NFTMedia {
     raw: String
     gateway: String
@@ -30,6 +33,7 @@ export default /* GraphQL */ `
     format: String
     bytes: String
   }
+
   type ContractMetadata {
     name: String
     symbol: String
@@ -37,21 +41,26 @@ export default /* GraphQL */ `
     tokenType: TokenType
     openSea: OpenSeaMetadata!
   }
+
   type Contract {
     address: String
   }
+
   type Id {
     tokenId: String
   }
+
   type TokenURI {
     raw: String
     gateway: String
   }
+
   type NFTProperty {
     name: String
     value: String
     display: String
   }
+
   type NFTMetadata {
     image: String
     external_url: String
@@ -97,6 +106,7 @@ export default /* GraphQL */ `
     chain: String
     network: String
   }
+
   type NFTWithChain {
     contract: Contract
     title: String
@@ -109,9 +119,11 @@ export default /* GraphQL */ `
     contractMetadata: ContractMetadata
     chain: Chain
   }
+
   type NFTsWithChain {
     ownedNfts: [NFTWithChain!]!
   }
+
   type NFTContract {
     address: String
     totalBalance: Int
@@ -125,8 +137,15 @@ export default /* GraphQL */ `
     ownedNfts: [NFTWithChain!]
     chain: Chain
   }
+
   type NFTContracts {
     contracts: [NFTContract!]!
+  }
+
+  type Gallery {
+    contract: String!
+    tokenId: String!
+    galleryOrder: Int!
   }
 
   input ContractInput {
@@ -142,13 +161,19 @@ export default /* GraphQL */ `
     tokenId: String
     contract: String
     addressURN: String
-    gallery_order: Int
+    galleryOrder: Int
   }
 
   input NFTMetadataInput {
     contractAddress: String
     tokenId: String
     tokenType: String
+  }
+
+  input GalleryInput {
+    contract: String!
+    tokenId: String!
+    galleryOrder: Int!
   }
 
   type Query {
@@ -160,8 +185,5 @@ export default /* GraphQL */ `
     ): NFTContracts
     getCuratedGallery(addressURN: URN): NFTsWithChain
     getNFTMetadataBatch(input: [NFTMetadataInput]): NFTs
-  }
-  type Mutation {
-    updateCuratedGallery(gallery: [NFTInput]): Boolean
   }
 `

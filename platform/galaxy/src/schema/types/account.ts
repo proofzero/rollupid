@@ -30,6 +30,7 @@ export default /* GraphQL */ `
     website: String
     addresses: [Node!]
     handle: String
+    gallery: [Gallery!]
   }
 
   input PFPInput {
@@ -53,6 +54,8 @@ export default /* GraphQL */ `
     website: String
     defaultAddress: URN
     links: [LinkInput]
+    addresses: [NodeInput!]
+    gallery: [GalleryInput!]
   }
 
   type Query {

@@ -29,6 +29,11 @@ query getProfile {
       rc
       fragment
     }
+    gallery {
+      contract
+      tokenId
+      galleryOrder
+    }
     website
   }
 }
@@ -63,6 +68,11 @@ query getProfileFromAddress($addressURN: URN!) {
       qc
       rc
       fragment
+    }
+    gallery {
+      contract
+      tokenId
+      galleryOrder
     }
     website
   }

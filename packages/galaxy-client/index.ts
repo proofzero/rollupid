@@ -85,6 +85,19 @@ export type ExchangeTokenResult = {
   refreshToken: Scalars['String'];
 };
 
+export type Gallery = {
+  __typename?: 'Gallery';
+  contract: Scalars['String'];
+  galleryOrder: Scalars['Int'];
+  tokenId: Scalars['String'];
+};
+
+export type GalleryInput = {
+  contract: Scalars['String'];
+  galleryOrder: Scalars['Int'];
+  tokenId: Scalars['String'];
+};
+
 export enum GrantType {
   AuthenticationCode = 'authentication_code',
   AuthorizationCode = 'authorization_code',
@@ -136,7 +149,7 @@ export type MutationUpdateAddressNicknameArgs = {
 
 
 export type MutationUpdateCuratedGalleryArgs = {
-  gallery?: InputMaybe<Array<InputMaybe<NftInput>>>;
+  gallery?: InputMaybe<Array<InputMaybe<GalleryInput>>>;
 };
 
 
@@ -180,7 +193,7 @@ export type NftContracts = {
 export type NftInput = {
   addressURN?: InputMaybe<Scalars['String']>;
   contract?: InputMaybe<Scalars['String']>;
-  gallery_order?: InputMaybe<Scalars['Int']>;
+  galleryOrder?: InputMaybe<Scalars['Int']>;
   tokenId?: InputMaybe<Scalars['String']>;
 };
 
@@ -275,6 +288,15 @@ export type Node = {
   urn: Scalars['String'];
 };
 
+export type NodeInput = {
+  fragment?: InputMaybe<Scalars['String']>;
+  nid: Scalars['String'];
+  nss: Scalars['String'];
+  qc?: InputMaybe<Scalars['JSON']>;
+  rc?: InputMaybe<Scalars['JSON']>;
+  urn: Scalars['String'];
+};
+
 export type OAuthGithubProfile = {
   __typename?: 'OAuthGithubProfile';
   avatar_url: Scalars['String'];
@@ -355,6 +377,7 @@ export type Profile = {
   cover?: Maybe<Scalars['String']>;
   defaultAddress?: Maybe<Scalars['URN']>;
   displayName?: Maybe<Scalars['String']>;
+  gallery?: Maybe<Array<Gallery>>;
   handle?: Maybe<Scalars['String']>;
   job?: Maybe<Scalars['String']>;
   links?: Maybe<Array<Link>>;
@@ -364,10 +387,12 @@ export type Profile = {
 };
 
 export type ProfileInput = {
+  addresses?: InputMaybe<Array<NodeInput>>;
   bio?: InputMaybe<Scalars['String']>;
   cover?: InputMaybe<Scalars['String']>;
   defaultAddress?: InputMaybe<Scalars['URN']>;
   displayName?: InputMaybe<Scalars['String']>;
+  gallery?: InputMaybe<Array<GalleryInput>>;
   job?: InputMaybe<Scalars['String']>;
   links?: InputMaybe<Array<InputMaybe<LinkInput>>>;
   location?: InputMaybe<Scalars['String']>;
@@ -481,14 +506,14 @@ export type RefreshTokenMutation = { __typename?: 'Mutation', exchangeRefreshTok
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, galleryOrder: number }> | null } | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, galleryOrder: number }> | null } | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -563,7 +588,7 @@ export type GetGalleryQueryVariables = Exact<{
 export type GetGalleryQuery = { __typename?: 'Query', getCuratedGallery?: { __typename?: 'NFTsWithChain', ownedNfts: Array<{ __typename?: 'NFTWithChain', title?: string | null, description?: string | null, error?: string | null, contract?: { __typename?: 'Contract', address?: string | null } | null, media: Array<{ __typename?: 'NFTMedia', raw?: string | null, thumbnail?: string | null }>, metadata?: { __typename?: 'NFTMetadata', properties?: Array<{ __typename?: 'NFTProperty', name?: string | null, value?: string | null, display?: string | null } | null> | null } | null, contractMetadata?: { __typename?: 'ContractMetadata', name?: string | null, tokenType?: TokenType | null } | null }> } | null };
 
 export type UpdateGalleryMutationVariables = Exact<{
-  gallery?: InputMaybe<Array<InputMaybe<NftInput>> | InputMaybe<NftInput>>;
+  gallery?: InputMaybe<Array<InputMaybe<GalleryInput>> | InputMaybe<GalleryInput>>;
 }>;
 
 
@@ -618,6 +643,11 @@ export const GetProfileDocument = gql`
       rc
       fragment
     }
+    gallery {
+      contract
+      tokenId
+      galleryOrder
+    }
     website
   }
 }
@@ -653,6 +683,11 @@ export const GetProfileFromAddressDocument = gql`
       qc
       rc
       fragment
+    }
+    gallery {
+      contract
+      tokenId
+      galleryOrder
     }
     website
   }
@@ -897,7 +932,7 @@ export const GetGalleryDocument = gql`
 }
     `;
 export const UpdateGalleryDocument = gql`
-    mutation updateGallery($gallery: [NFTInput]) {
+    mutation updateGallery($gallery: [GalleryInput]) {
   updateCuratedGallery(gallery: $gallery)
 }
     `;

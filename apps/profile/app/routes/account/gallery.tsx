@@ -34,12 +34,14 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 
 // Other helpers
-
+import { getProfileSession } from '~/utils/session.server'
+import { getGalaxyClient } from '~/helpers/clients'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { Node, Profile } from '@kubelt/galaxy-client'
@@ -52,7 +54,8 @@ export const action: ActionFunction = async ({ request }) => {
   const urn = AddressURNSpace.urn(
     generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
   )
-
+  const session = await getProfileSession(request)
+  const jwt = session.get('jwt')
   let errors: any = {}
 
   /**
@@ -92,15 +95,24 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const gallery = nfts.map((nft: any, i: number) => ({
-    tokenId: nft.tokenId,
     contract: nft.contract.address,
-    addressURN: urn,
-    gallery_order: i,
+    tokenId: nft.tokenId,
+    galleryOrder: i,
   }))
+
+  const galaxyClient = await getGalaxyClient()
+  await galaxyClient.updateProfile(
+    {
+      profile: { gallery },
+    },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
+    }
+  )
 
   // TODO: update gallery on account
 
-  return null
+  return true
 }
 
 export type GalleryData = {
@@ -213,6 +225,7 @@ const Gallery = () => {
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
 
   // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
+
   useEffect(() => {
     if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
       setFormChanged(true)
@@ -229,7 +242,7 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        owner: tempTargetAddress,
+        owner: accountURN,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
       galleryFetcher.load(request)
