@@ -33,7 +33,7 @@ const addressResolvers: Resolvers = {
     ) => {
       const addressClient = createAddressClient(env.Address, {
         headers: {
-          [PlatformJWTAssertionHeader]: addressURN,
+          [PlatformAddressURNHeader]: addressURN,
         },
       })
 
