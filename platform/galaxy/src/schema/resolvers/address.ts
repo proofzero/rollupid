@@ -19,6 +19,7 @@ import {
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
 import { CryptoAddressType } from '@kubelt/types/address'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -46,7 +47,7 @@ const addressResolvers: Resolvers = {
       )
       const addressClient = createAddressClient(env.Address, {
         headers: {
-          'X-3RN': addressURN,
+          [PlatformJWTAssertionHeader]: addressURN,
         },
       })
 

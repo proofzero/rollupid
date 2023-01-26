@@ -14,7 +14,7 @@ const getUserSessionStorage = (env: Env) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: '3ID_SESSION',
+      name: 'PASSPORT_SESSION',
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
@@ -78,7 +78,7 @@ const getConsoleParamsSessionStorage = (env: Env) => {
   return createCookieSessionStorage({
     cookie: {
       domain: env.COOKIE_DOMAIN,
-      name: '3ID_CONSOLE_PARAMS_SESSION',
+      name: 'CONSOLE_PARAMS_SESSION',
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',

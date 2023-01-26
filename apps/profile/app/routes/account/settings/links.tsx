@@ -89,7 +89,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
   const galaxyClient = await getGalaxyClient()
   const profileRes = await galaxyClient.getProfile(undefined, {
-    'KBT-Access-JWT-Assertion': jwt,
+    [PlatformJWTAssertionHeader]: jwt,
   })
   const updatedProfile = profileRes.profile
 

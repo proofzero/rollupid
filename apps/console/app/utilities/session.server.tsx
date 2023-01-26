@@ -39,7 +39,7 @@ const MAX_AGE = 60 * 60 * 4
  */
 const storage = createCookieSessionStorage({
   cookie: {
-    name: '3ID_SESSION',
+    name: 'PASSPORT_SESSION',
     domain: COOKIE_DOMAIN,
     // normally you want this to be `secure: true`
     // but that doesn't work on localhost for Safari

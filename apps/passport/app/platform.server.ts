@@ -4,7 +4,10 @@ import createAddressClient from '@kubelt/platform-clients/address'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 
 import { GraphQLClient } from 'graphql-request'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import {
+  PlatformAddressURNHeader,
+  PlatformJWTAssertionHeader,
+} from '@kubelt/types/headers'
 
 export function getStarbaseClient(jwt: string, env: Env) {
   return createStarbaseClient(env.Starbase, {
@@ -21,7 +24,7 @@ export function getAccessClient(env: Env) {
 export function getAddressClient(addressUrn: string, env: Env) {
   const requestInit = {
     headers: {
-      'X-3RN': addressUrn,
+      [PlatformAddressURNHeader]: addressUrn,
     },
   }
   return createAddressClient(env.Address, requestInit)

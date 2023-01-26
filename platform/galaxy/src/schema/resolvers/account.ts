@@ -54,7 +54,7 @@ const accountResolvers: Resolvers = {
       )
       const addressClient = createAddressClient(env.Address, {
         headers: {
-          'X-3RN': addressURN, // note: ens names will be resolved
+          [PlatformJWTAssertionHeader]: addressURN, // note: ens names will be resolved
         },
       })
       const accountURN = await addressClient.getAccount.query()
