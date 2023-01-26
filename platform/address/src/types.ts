@@ -10,13 +10,15 @@ import {
   NFTarVoucherSchema,
   TwitterProfileSchema,
 } from './jsonrpc/validators/profile'
+import { DeploymentMetadata } from '@kubelt/types'
 
 export interface Environment {
   Access: Fetcher
   Edges: Fetcher
   Images: Fetcher
-  Analytics: AnalyticsEngineDataset
   Address: DurableObjectNamespace
+  Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
 
   HANDLES: KVNamespace
 

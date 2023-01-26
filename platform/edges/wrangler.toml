@@ -31,6 +31,10 @@ migrations_dir = "migrations"
 # Required secrets:
 # N/A
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 # Environment
 # -----------------------------------------------------------------------------
 
@@ -48,6 +52,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 # Environment: dev
 # -----------------------------------------------------------------------------
 
@@ -63,6 +71,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 # Environment: next
 # -----------------------------------------------------------------------------
 
@@ -74,6 +86,10 @@ d1_databases = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.next.vars]
@@ -90,6 +106,10 @@ d1_databases = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.current.vars]

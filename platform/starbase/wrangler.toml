@@ -36,6 +36,17 @@ kv_namespaces = [
   { binding = "LOOKUP", id = "27035c39f40343a4a0deab740f2b9fcc", preview_id = "883765b4372d42bea90c67e2e6bfb64b" }
 ]
 
+# Analytics
+# -----------------------------------------------------------------------------
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 # Secrets
 # -----------------------------------------------------------------------------
 
@@ -55,6 +66,14 @@ ENVIRONMENT = "local"
 port = 9090
 local_protocol = "http"
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [[migrations]]
 tag = "v2"
 # new_classes = [
@@ -66,10 +85,6 @@ tag = "v2"
 deleted_classes = [
   "StarbaseContract",
   "StarbaseUser",
-]
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
 ]
 
 # Environment: dev
@@ -87,6 +102,10 @@ durable_objects.bindings = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.dev.vars]
@@ -109,6 +128,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.next.vars]
 ENVIRONMENT = "next"
 
@@ -127,6 +150,10 @@ durable_objects.bindings = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.current.vars]

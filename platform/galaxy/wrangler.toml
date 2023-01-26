@@ -13,12 +13,20 @@ services = [
   { binding = "Starbase", service = "starbase"},
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [dev]
 port = 8787
 local_protocol = "http"
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [vars]
@@ -38,6 +46,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.dev.vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -55,6 +67,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.next.vars]
 ALCHEMY_ETH_NETWORK="goerli"
 ALCHEMY_POLYGON_NETWORK="mumbai"
@@ -70,6 +86,10 @@ services = [
 
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.current.vars]

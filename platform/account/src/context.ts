@@ -3,7 +3,7 @@ import type { AccountURN } from '@kubelt/urns/account'
 import type { Environment } from './types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import { Account } from '.'
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import { DurableObjectStubProxy } from 'do-proxy'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 
@@ -16,8 +16,9 @@ interface CreateInnerContextOptions
   Account: DurableObjectNamespace
   Edges: Fetcher
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   account?: DurableObjectStubProxy<Account>
-  // accountURN?: string
+  // accountURN?: AccountURN
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

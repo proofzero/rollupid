@@ -14,6 +14,14 @@ services = [
   { binding = "Images", service= "images"}
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [[queues.producers]]
  queue = "blockchain-activity"
  binding = "BLOCKCHAIN_ACTIVITY"
@@ -27,10 +35,6 @@ max_batch_timeout = 5 # optional: defaults to 5 seconds
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
 NFTAR_CHAIN_ID=5
-
-analytics_engine_datasets = [
-  { binding = "Analytics", dataset = "PlatformAnalytics"  },
-]
 
 [dev]
 port = 9191
@@ -75,6 +79,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.dev.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
@@ -97,6 +105,10 @@ analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
 ]
 
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.next.vars]
 MINTPFP_CONTRACT_ADDRESS="0x028aE75Bb01eef2A581172607b93af8D24F50643"
 NFTAR_URL="https://test.nftar.threeid.xyz/api"
@@ -115,9 +127,12 @@ kv_namespaces = [
   { binding = "HANDLES", id = "d7d0ac60a79f4848bf8372b01a487888" }
 ]
 
-
 analytics_engine_datasets = [
   { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [env.current.vars]

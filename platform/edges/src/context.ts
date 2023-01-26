@@ -1,4 +1,4 @@
-import { BaseContext } from '@kubelt/types'
+import { BaseContext, DeploymentMetadata } from '@kubelt/types'
 import type { inferAsyncReturnType } from '@trpc/server'
 import type { Environment } from './types'
 import * as db from './db'
@@ -11,6 +11,7 @@ import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
 interface CreateInnerContextOptions
   extends Partial<FetchCreateContextFnOptions & BaseContext> {
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   EDGES: D1Database
 }
 /**

@@ -1,4 +1,8 @@
+import { DeploymentMetadata } from '@kubelt/types'
+
 export interface Environment {
+  Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   Bucket: R2Bucket
   Meta: DurableObjectNamespace
 }

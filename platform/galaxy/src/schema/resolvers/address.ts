@@ -24,13 +24,6 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 const addressResolvers: Resolvers = {
   Query: {
     ensProfile: async (_parent, { addressOrEns }, { env }: ResolverContext) => {
-      logAnalytics(
-        env.Analytics,
-        'ensProfile',
-        'query:gql',
-        'BEFORE',
-        addressOrEns
-      )
       return new ENSUtils().getEnsEntry(addressOrEns)
     },
     addressProfile: async (
@@ -38,13 +31,6 @@ const addressResolvers: Resolvers = {
       { addressURN }: { addressURN: AddressURN },
       { env }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'addressProfile',
-        'query:gql',
-        'BEFORE',
-        addressURN
-      )
       const addressClient = createAddressClient(env.Address, {
         headers: {
           [PlatformJWTAssertionHeader]: addressURN,
@@ -82,8 +68,8 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [setupContext(), hasApiKey()],
-  'Query.addressProfile': [setupContext(), hasApiKey()],
+  'Query.ensProfile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.addressProfile': [setupContext(), hasApiKey(), logAnalytics()],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

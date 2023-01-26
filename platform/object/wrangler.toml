@@ -10,6 +10,14 @@ r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalytics"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [dev]
 port = 9595
 local_protocol = "http"
@@ -22,6 +30,14 @@ r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-dev", preview_bucket_name = "threeid-dev" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsDev"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.next]
 durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
@@ -30,12 +46,28 @@ r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-next", preview_bucket_name = "threeid-next" },
 ]
 
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsNext"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
+]
+
 [env.current]
 durable_objects.bindings = [
   { name = "Meta", class_name = "Meta" }
 ]
 r2_buckets = [
   { binding = "Bucket", bucket_name = "threeid-current", preview_bucket_name = "threeid-current" },
+]
+
+analytics_engine_datasets = [
+  { binding = "Analytics", dataset = "PlatformAnalyticsCurrent"  },
+]
+
+unsafe.bindings = [
+  { type = "metadata", name = "ServiceDeploymentMetadata" },
 ]
 
 [[migrations]]

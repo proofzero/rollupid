@@ -9,6 +9,8 @@ import { ACCOUNT_OPTIONS } from '../../constants'
 import { Context } from '../../context'
 import { appRouter } from '../router'
 
+import { WriteAnalyticsDataPoint } from '@kubelt/platform-clients/analytics'
+
 export const ResolveAccountOutput = AccountURNInput
 
 type ResolveAccountResult = z.infer<typeof ResolveAccountOutput>
@@ -23,25 +25,35 @@ export const resolveAccountMethod = async ({
 }): Promise<ResolveAccountResult> => {
   const nodeClient = ctx.address
 
+  let resultURN: AccountURN
+  let eventName: string
+
   const stored = await nodeClient?.storage.get<AccountURN>('account')
   if (stored) {
     if (AccountURNSpace.is(stored)) {
-      return stored
+      eventName = 'account-stored'
+      resultURN = stored
     } else {
       const urn = AccountURNSpace.componentizedUrn(stored)
       nodeClient?.storage.put('account', urn)
-      return urn
+      eventName = 'account-created-space'
+      resultURN = urn
     }
   } else {
     const name = hexlify(randomBytes(ACCOUNT_OPTIONS.length))
     const urn = AccountURNSpace.componentizedUrn(name)
 
-    console.log('set account', { urn })
-
     const caller = appRouter.createCaller(ctx)
     await caller.setAccount(urn)
     await caller.initVault()
 
-    return urn
+    eventName = 'account-created-vault'
+    resultURN = urn
   }
+
+  WriteAnalyticsDataPoint(ctx, {
+    blobs: [ctx.alias, resultURN, eventName],
+  } as AnalyticsEngineDataPoint)
+
+  return resultURN
 }

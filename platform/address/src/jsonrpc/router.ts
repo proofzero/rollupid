@@ -41,10 +41,31 @@ import { getAccountMethod, GetAccountOutput } from './methods/getAccount'
 import { InitVaultOutput, initVaultMethod } from './methods/initVault'
 import { checkOAuthNode } from './middlewares/checkOAuthNode'
 
-import { Analytics } from '@kubelt/platform-middleware/analytics'
+import {
+  Analytics,
+  CustomAnalyticsFunctionType,
+} from '@kubelt/platform-middleware/analytics'
 import { setAddressNodeClient } from './middlewares/setAddressNodeClient'
 
 const t = initTRPC.context<Context>().create()
+
+// Example custom analytics function.
+// export const injectCustomAnalytics = t.middleware(async ({ ctx, next }) => {
+//   const CustomAnalyticsFunction: CustomAnalyticsFunctionType = () => {
+//     return {
+//       blobs: [ctx.alias],
+//       doubles: [],
+//       indexes: [],
+//     } as AnalyticsEngineDataPoint
+//   }
+
+//   return next({
+//     ctx: {
+//       CustomAnalyticsFunction,
+//       ...ctx,
+//     },
+//   })
+// })
 
 export const appRouter = t.router({
   resolveAccount: t.procedure
@@ -54,6 +75,7 @@ export const appRouter = t.router({
     .use(checkOAuthNode)
     .use(setAddressNodeClient)
     .use(initAddressNode)
+    // .use(injectCustomAnalytics)
     .use(Analytics)
     .output(ResolveAccountOutput)
     .query(resolveAccountMethod),

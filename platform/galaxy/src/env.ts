@@ -1,3 +1,5 @@
+import { DeploymentMetadata } from '@kubelt/types'
+
 export default interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
   // MY_KV_NAMESPACE: KVNamespace;
@@ -8,6 +10,7 @@ export default interface Env {
   // Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
   // MY_BUCKET: R2Bucket;
   Analytics: AnalyticsEngineDataset
+  ServiceDeploymentMetadata: DeploymentMetadata
   Account: Fetcher
   Address: Fetcher
   Starbase: Fetcher
