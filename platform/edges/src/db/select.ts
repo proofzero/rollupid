@@ -8,7 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import { Graph } from '@kubelt/types'
-import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
+import type { AnyURN } from '@kubelt/urns'
 
 import type {
   Edge,
@@ -20,7 +20,6 @@ import type {
   QComponents,
   RComponent,
   RComponents,
-  Permission,
 } from './types'
 
 // qc()
@@ -128,30 +127,6 @@ export async function node(
   node.rc = rcMap
 
   return node as Node
-}
-
-// permissions()
-// -----------------------------------------------------------------------------
-// TODO should this be exposed to return the permissions for an edge?
-
-async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
-  const query = `
-    SELECT
-      name
-    FROM
-      permission p
-    JOIN
-      edge_permission e
-    ON
-      e.permissionId = p.id
-    WHERE
-      e.edgeId = ?1
-  `
-  const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
-  // TODO check result.success and handle query error
-  const perms = result.results
-
-  return perms as Permission[]
 }
 
 // edges()
@@ -336,13 +311,10 @@ export async function edges(
 
       const tag = edgeRec.tag
 
-      const perms = await permissions(g, edgeRec.id)
-
       return {
         tag,
         src,
         dst,
-        perms,
       }
     })
   )

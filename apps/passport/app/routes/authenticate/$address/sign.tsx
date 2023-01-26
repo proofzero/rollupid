@@ -65,6 +65,8 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   const addressClient = getAddressClient(addressURN, context.env)
   const formData = await request.formData()
 
+  console.log('here1')
+
   // TODO: validate from data
   const { code } = await addressClient.verifyNonce.mutate({
     nonce: formData.get('nonce') as string,
@@ -72,6 +74,7 @@ export const action: ActionFunction = async ({ request, context, params }) => {
   })
 
   // TODO: handle the error case
+  console.log('here2')
   const searchParams = new URL(request.url).searchParams
   searchParams.set('node_type', 'crypto')
   searchParams.set('addr_type', 'eth')

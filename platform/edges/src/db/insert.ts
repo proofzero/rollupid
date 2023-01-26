@@ -33,11 +33,11 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
   await g.db
     .prepare(
       'INSERT INTO node (urn, nid, nss, fragment) VALUES (?1, ?2, ?3, ?4) \
-        ON CONFLICT(fragment) DO UPDATE SET fragment = excluded.fragment'
+        ON CONFLICT(urn) DO UPDATE SET fragment = excluded.fragment'
     )
     .bind(id, nid, nss, fc)
     .run()
-
+  console.debug('fragment insert')
   // Update the join table that records the linkage between a node
   // record and the set of records that represent the q-component
   // key/value pairs found in the node URN.
@@ -57,6 +57,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
       stmts.push(qcJoinStmt.bind(id, key, value))
     }
     await g.db.batch(stmts)
+    console.debug('node_qcomp insert')
   }
 
   // Update the join table that links a node record and the associated
@@ -79,6 +80,7 @@ export async function node(g: Graph, urn: AnyURN): Promise<NodeRecord> {
       stmts.push(rcJoinStmt.bind(id, key, value))
     }
     await g.db.batch(stmts)
+    console.debug('node_rcomp insert')
   }
 
   // Get the ID of the inserted node.

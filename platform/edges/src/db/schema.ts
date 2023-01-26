@@ -66,13 +66,6 @@ export const edge = sqliteTable(
   })
 )
 
-export const permission = sqliteTable('permission', {
-  id: integer('id').primaryKey({
-    autoIncrement: true,
-  }),
-  name: text('name').notNull(),
-})
-
 export const nodeQcomp = sqliteTable(
   'node_qcomp',
   {

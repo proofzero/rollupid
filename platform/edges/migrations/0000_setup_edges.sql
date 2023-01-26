@@ -30,11 +30,6 @@ CREATE TABLE node_rcomp (
 	FOREIGN KEY (`nodeUrn`) REFERENCES node(`urn`) ON UPDATE cascade ON DELETE cascade
 );
 
-CREATE TABLE permission (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`name` text NOT NULL
-);
-
 CREATE INDEX IDX_node_qcomp_nodeUrn ON node_qcomp (`nodeUrn`);
 CREATE INDEX IDX_node_qcomp_key ON node_qcomp (`key`);
 CREATE INDEX IDX_node_qcomp_value ON node_qcomp (`value`);

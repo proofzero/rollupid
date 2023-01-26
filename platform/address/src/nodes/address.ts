@@ -1,8 +1,7 @@
 import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
-import { AddressURN } from '@kubelt/urns/address'
-import { AddressProfile, Environment, NodeType } from '../types'
+import { Environment, NodeType } from '../types'
 import { AddressType } from '@kubelt/types/address'
 import CryptoAddress from './crypto'
 import ContractAddress from './contract'
@@ -64,6 +63,7 @@ export default class Address extends DOProxy {
 
   async alarm() {
     const type = await this.getNodeType()
+    console.log('nodetype', { type })
     switch (type) {
       case NodeType.Crypto:
         return CryptoAddress.alarm(this)
