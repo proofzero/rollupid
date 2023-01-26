@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({
   const appData = await getConsoleParamsSession(request, context.env)
     .then((session) => JSON.parse(session.get('params')))
     .catch((err) => {
-      console.log('No console params session found', err)
+      console.log('No console params session found')
       return null
     })
 
