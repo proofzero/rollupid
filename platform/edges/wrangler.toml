@@ -101,7 +101,7 @@ ENVIRONMENT = "next"
 [env.current]
 
 d1_databases = [
-  { binding = "EDGES", database_name = "edges-next", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" }
+  { binding = "EDGES", database_name = "edges-current", database_id = "27b77920-664e-4e52-84ca-72be96b9a3fd", migrations_dir = "migrations" }
 ]
 
 analytics_engine_datasets = [
