@@ -11,7 +11,6 @@ services = [
   { binding = "Access", service = "access" },
   { binding = "Address", service = "address" },
   { binding = "Starbase", service = "starbase"},
-  { binding = "Indexer", service = "indexer" },
 ]
 
 [dev]
@@ -33,7 +32,6 @@ services = [
   { binding = "Access", service = "access-dev" },
   { binding = "Address", service = "address-dev" },
   { binding = "Starbase", service = "starbase-dev" },
-  { binding = "Indexer", service = "indexer-dev" },
 ]
 
 analytics_engine_datasets = [
@@ -51,7 +49,6 @@ services = [
   { binding = "Address", service = "address-next" },
   { binding = "Access", service = "access-next" },
   { binding = "Starbase", service = "starbase-next" },
-  { binding = "Indexer", service = "indexer-next" },
 ]
 
 analytics_engine_datasets = [
@@ -69,7 +66,6 @@ services = [
   { binding = "Address", service = "address-current" },
   { binding = "Access", service = "access-current" },
   { binding = "Starbase", service = "starbase-current" },
-  { binding = "Indexer", service = "indexer-current" },
 ]
 
 analytics_engine_datasets = [

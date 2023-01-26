@@ -42,7 +42,6 @@ import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
-import { getIndexerClient } from '~/helpers/clients'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 import { CryptoAddressType } from '@kubelt/types/address'
 import { getMoreNftsModal } from '~/helpers/nfts'
@@ -59,7 +58,11 @@ export const action: ActionFunction = async ({ request }) => {
   /**
    * This part mutates D1 table for gallery
    */
-  const nfts = JSON.parse(formData.get('gallery'))
+  const updatedGallery = formData.get('gallery') as string
+  if (!updatedGallery) {
+    throw new Error('Gallery should not be empty')
+  }
+  const nfts = JSON.parse(updatedGallery)
 
   // TODO: replace with zod?
   nfts.forEach((nft: any) => {
@@ -95,8 +98,7 @@ export const action: ActionFunction = async ({ request }) => {
     gallery_order: i,
   }))
 
-  const indexerClient = getIndexerClient()
-  await indexerClient.setGallery.mutate(gallery)
+  // TODO: update gallery on account
 
   return null
 }

@@ -1,6 +1,6 @@
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { gatewayFromIpfs } from '@kubelt/utils'
-import { getGalaxyClient, getIndexerClient } from './clients'
+import { getGalaxyClient } from './clients'
 
 /**
  * Nfts are being sorted server-side
@@ -96,12 +96,9 @@ export const decorateNfts = (ownedNfts: any) => {
 }
 
 export const getGallery = async (owner: string) => {
-  const indexerClient = getIndexerClient()
+  // TODO: get from account
 
-  const urn = AddressURNSpace.urn(owner)
-  const { gallery } = await indexerClient.getGallery.query([urn])
-
-  return gallery
+  return []
 }
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS
