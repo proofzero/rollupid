@@ -26,7 +26,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthGoogleProfile':
       return {
         id: profile.urn,
-        address: profile.urn,
+        address: profile.name,
         title: profile.name,
         icon: profile.picture,
         chain: 'Google',
@@ -34,7 +34,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthTwitterProfile':
       return {
         id: profile.urn,
-        address: profile.urn,
+        address: profile.name,
         title: profile.name,
         icon: profile.profile_image_url_https,
         chain: 'Twitter',
@@ -42,7 +42,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthGithubProfile':
       return {
         id: profile.urn,
-        address: profile.urn,
+        address: profile.name,
         title: profile.name,
         icon: profile.avatar_url,
         chain: 'GitHub',
@@ -50,7 +50,7 @@ const normalizeProfile = (profile: any) => {
     case 'OAuthMicrosoftProfile':
       return {
         id: profile.urn,
-        address: profile.urn,
+        address: profile.name,
         title: profile.name,
         icon: profile.picture,
         chain: 'Microsoft',
@@ -127,7 +127,7 @@ const AccountSettingsConnections = () => {
   return (
     <section>
       <div className="flex flex-row-reverse mt-7">
-        <Button>Connect Account</Button>
+        <Button disabled>Connect Account</Button>
       </div>
 
       <div className="mt-1">
