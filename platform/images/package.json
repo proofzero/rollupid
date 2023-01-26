@@ -12,7 +12,7 @@
     "build": "wrangler publish --dry-run --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 0",
     "dev:wrangler": "wrangler dev --local --persist",
-    "dev": "run-p dev:*",
+    "dev": "run-p 'dev:*'",
     "deploy": "wrangler publish"
   },
   "dependencies": {
