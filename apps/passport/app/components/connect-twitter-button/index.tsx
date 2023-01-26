@@ -5,7 +5,7 @@ import logoSvg from './logo.svg'
 
 export default function ConnectTwitterButton() {
   return (
-    <Form action={`/authenticate/twitter}`} method="post">
+    <Form action={'/authenticate/twitter'} method='post'>
       <Button
         className={'button'}
         btnType={'secondary-alt'}
