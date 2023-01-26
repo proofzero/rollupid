@@ -44,14 +44,6 @@ const addressResolvers: Resolvers = {
       { addressURNList }: { addressURNList: AddressURN[] },
       { env, jwt }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'addressProfiles',
-        'query:gql',
-        'BEFORE',
-        addressURNList.join(', ')
-      )
-
       const profiles = await Promise.all(
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
@@ -73,14 +65,6 @@ const addressResolvers: Resolvers = {
       { nickname, addressURN },
       { env }: ResolverContext
     ) => {
-      logAnalytics(
-        env.Analytics,
-        'updateAddressNickname',
-        'query:gql',
-        'BEFORE',
-        addressURN
-      )
-
       const addressClient = createAddressClient(env.Address, {
         headers: {
           'X-3RN': addressURN,
