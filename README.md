@@ -25,8 +25,6 @@
 ##### Services
 
 ![](https://github.com/kubelt/kubelt/actions/workflows/main-images.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-indexer.yaml/badge.svg)
-![](https://github.com/kubelt/kubelt/actions/workflows/main-webhooks.yaml/badge.svg)
 
 ##### Packages
 

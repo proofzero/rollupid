@@ -5,7 +5,6 @@ import { appRouter as edgesRouter } from '@kubelt/platform/edges/src/jsonrpc/rou
 import { appRouter as pingRouter } from '@kubelt/platform/ping/src/jsonrpc/router'
 import { appRouter as objectRouter } from '@kubelt/platform/object/src/jsonrpc/router'
 import { appRouter as starbaseRouter } from '@kubelt/platform/starbase/src/jsonrpc/router'
-import { appRouter as indexerRouter } from '@kubelt/services/indexer/src/jsonrpc/router'
 
 export type AccountRouter = typeof accountRouter
 
@@ -20,5 +19,3 @@ export type PingRouter = typeof pingRouter
 export type ObjectRouter = typeof objectRouter
 
 export type StarbaseRouter = typeof starbaseRouter
-
-export type IndexerRouter = typeof indexerRouter
