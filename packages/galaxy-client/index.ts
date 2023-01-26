@@ -75,7 +75,6 @@ export type CryptoAddressProfile = {
 export type Edge = {
   __typename?: 'Edge';
   dst: Node;
-  perms?: Maybe<Array<Maybe<Scalars['String']>>>;
   src: Node;
   tag: Scalars['String'];
 };
