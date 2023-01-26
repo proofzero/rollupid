@@ -12,6 +12,7 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
+import { action } from '~/routes/signout'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -163,14 +164,14 @@ const AccountSettingsConnections = () => {
                 required
                 heading=""
                 name="name"
+                disabled={actionProfile?.title.endsWith('.eth')}
                 defaultValue={actionProfile?.title ?? ''}
               />
               {actionProfile?.address && (
                 <Text size="xs" weight="normal" className="text-gray-500 mt-2">
-                  {actionProfile?.address}
+                  address: {actionProfile?.address}
                 </Text>
               )}
-
               <div className="flex justify-end items-center space-x-3 mt-20">
                 <Button
                   btnType="secondary-alt"
@@ -191,10 +192,12 @@ const AccountSettingsConnections = () => {
           addresses={cryptoProfiles
             .map((ap: AddressListItemProps) => ({
               ...ap,
-              onRenameAccount: (id: string) => {
-                setActionId(id)
-                setRenameModalOpen(true)
-              },
+              onRenameAccount: ap.title.endsWith('.eth')
+                ? null
+                : (id: string) => {
+                    setActionId(id)
+                    setRenameModalOpen(true)
+                  },
             }))
             .concat(oAuthProfiles)}
         />

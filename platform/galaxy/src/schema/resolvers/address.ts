@@ -16,8 +16,10 @@ import {
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
-import { CryptoAddressType } from '@kubelt/types/address'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import {
+  PlatformAddressURNHeader,
+  PlatformJWTAssertionHeader,
+} from '@kubelt/types/headers'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -48,7 +50,7 @@ const addressResolvers: Resolvers = {
         addressURNList.map(async (urn) => {
           const addressClient = createAddressClient(env.Address, {
             headers: {
-              'X-3RN': urn,
+              [PlatformAddressURNHeader]: urn,
             },
           })
 
@@ -67,7 +69,7 @@ const addressResolvers: Resolvers = {
     ) => {
       const addressClient = createAddressClient(env.Address, {
         headers: {
-          'X-3RN': addressURN,
+          [PlatformAddressURNHeader]: addressURN,
         },
       })
 

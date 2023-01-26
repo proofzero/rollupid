@@ -84,7 +84,7 @@ export default class CryptoAddress {
       profile.avatar = gradient
     }
 
-    if (nickname) {
+    if (profile.displayName?.startsWith('0x') && nickname) {
       profile.displayName = nickname
     }
 
@@ -116,7 +116,7 @@ const getCryptoAddressProfile = async (
 
   const newProfile: CryptoAddressProfile = {
     address: address,
-    displayName: displayName || address,
+    displayName: displayName || '',
     avatar: avatar || '',
   }
 
