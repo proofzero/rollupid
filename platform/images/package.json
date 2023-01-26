@@ -11,9 +11,8 @@
   "scripts": {
     "build": "wrangler publish --dry-run --outdir=dist",
     "test": "echo \"Error: no test specified\" && exit 0",
-    "services:wrangler": "wrangler dev --local --persist",
-    "services": "run-p 'services:*'",
-    "start": "run-p dev",
+    "dev:wrangler": "wrangler dev --local --persist",
+    "dev": "run-p dev:*",
     "deploy": "wrangler publish"
   },
   "dependencies": {
