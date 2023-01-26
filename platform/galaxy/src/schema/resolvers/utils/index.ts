@@ -9,6 +9,8 @@ import Env from '../../../env'
 import { isFromCFBinding } from '@kubelt/utils'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
+import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
+
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
   const payload = jose.decodeJwt(token)
@@ -21,12 +23,6 @@ export function parseJwt(token: string): JWTPayload {
 export const setupContext = () => (next) => (root, args, context, info) => {
   const jwt = context.request.headers.get(PlatformJWTAssertionHeader)
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
-
-  const analytics = context.env?.Analytics || null
-  const serviceMetadata = context.env?.ServiceDeploymentMetadata || null
-
-  // console.log('context: ', context)
-  // console.log('info: ', info)
 
   const parsedJwt = jwt && parseJwt(jwt)
   const accountURN: AccountURN = parsedJwt && parsedJwt.sub
@@ -147,57 +143,18 @@ export function sliceIntoChunks(arr: any, chunkSize: number) {
 }
 
 export const logAnalytics = () => (next) => async (root, args, context, info) => {
-  const dataset = context.analytics
-  if (!dataset) return next(root, args, context, info)
-
-  const serviceMetadata = context.serviceMetadata
-  const service = {
-    name: serviceMetadata?.name || 'unknown',
-    deploymentId: serviceMetadata?.deployment?.id || 'unknown',
-    deploymentNumber: String(serviceMetadata?.deployment?.number) || 'unknown',
-    deploymentTimestamp: serviceMetadata?.deployment?.timestamp || 'unknown',
-  }
-
   const method = info?.operation?.name?.value || 'unknown'
-  const type = [info?.operation?.operation || 'unknown'].join(':')
-  const when = 'BEFORE'
-
-  const nullableName = context.accountURN || null
-  const nullableJWT = context.jwt || null
-
-  const raw_key = nullableName || nullableJWT || 'anonymous'
-
-  // If we need to make these more unique we can hash the key. Necessitates making this async.
-  // const enc_key = new TextEncoder().encode(raw_key);
-  // const hash = await crypto.subtle.digest({
-  //     name: 'SHA-256',
-  //   },
-  //   enc_key
-  // )
-
-  // // Convert to a hex string.
-  // const hashkey = [...new Uint8Array(hash)]
-  //     .map(b => b.toString(16).padStart(2, '0'))
-  //     .join('').slice(-32)
+  const type = [info?.operation?.operation || 'unknown', 'gql'].join(':')
 
   const datapoint: AnalyticsEngineDataPoint = {
     blobs: [
-      service.name,
-      service.deploymentId,
-      service.deploymentNumber,
-      service.deploymentTimestamp,
       method,
       type,
-      // when,
-      nullableName,
-      nullableJWT,
       context.apiKey,
     ],
-    // doubles: [],
-    indexes: [raw_key.slice(-32)], // TODO: Need a sampling index.
   }
 
-  dataset.writeDataPoint(datapoint)
+  WriteAnalyticsDataPoint(context, datapoint)
   console.log('resolver call analytics', JSON.stringify(datapoint))
 
   return next(root, args, context, info)
