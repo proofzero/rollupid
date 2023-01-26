@@ -10,7 +10,7 @@ import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { PlatformAddressURNHeader, PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -38,7 +38,7 @@ const accountResolvers: Resolvers = {
     ) => {
       const addressClient = createAddressClient(env.Address, {
         headers: {
-          [PlatformJWTAssertionHeader]: addressURN, // note: ens names will be resolved
+          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
         },
       })
       const accountURN = await addressClient.getAccount.query()
