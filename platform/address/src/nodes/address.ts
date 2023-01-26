@@ -63,7 +63,6 @@ export default class Address extends DOProxy {
 
   async alarm() {
     const type = await this.getNodeType()
-    console.log('nodetype', { type })
     switch (type) {
       case NodeType.Crypto:
         return CryptoAddress.alarm(this)
