@@ -35,6 +35,8 @@ export const authorizeMethod = async ({
 
   const code = hexlify(randomBytes(CODE_OPTIONS.length))
 
+  // TODO: validate the scopes are legitmate here or when we ask for it back in exchangeToken
+
   const node = await initAuthorizationNodeByName(code, ctx.Authorization)
   const result = await node.class.authorize(
     code,

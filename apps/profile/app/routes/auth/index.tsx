@@ -1,28 +1,12 @@
-import { LoaderFunction, redirect } from '@remix-run/cloudflare'
-import {
-  createAuthorizeStateSession,
-  getProfileSession,
-} from '~/utils/session.server'
+import { LoaderFunction } from '@remix-run/cloudflare'
+import { getRollupAuthenticator } from '~/utils/session.server'
 
 export const loader: LoaderFunction = async ({ request }) => {
-  // check if the user is already logged in
-  const session = await getProfileSession(request)
-  const jwt = session.get('jwt')
-  if (jwt) {
-    return redirect('/account')
-  }
-  const state = [...crypto.getRandomValues(new Uint8Array(8))]
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-
-  const authParams = new URLSearchParams({
-    client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    state,
+  const authenticator = getRollupAuthenticator()
+  await authenticator.isAuthenticated(request, {
+    successRedirect: '/account',
+    // failureRedirect: 'https://threeid.xyz/profiles',
   })
 
-  const redirectURL = `${PASSPORT_URL}/authorize?${authParams}`
-
-  // set the state in a cookie
-  return createAuthorizeStateSession(state, redirectURL)
+  return authenticator.authenticate('rollup', request)
 }

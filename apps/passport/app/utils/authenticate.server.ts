@@ -36,7 +36,6 @@ export const authenticateAddress = async (
   const { accessToken } = await accessClient.exchangeToken.mutate({
     grantType,
     code,
-    redirectUri,
     clientId,
   })
 

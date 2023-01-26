@@ -53,4 +53,5 @@ export type SessionDetails = {
   expired?: boolean
   creation?: string
   expiry?: string
+  expiryTime?: number
 }

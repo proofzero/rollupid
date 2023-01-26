@@ -26,6 +26,8 @@ services = [
 
 [vars]
 PASSPORT_URL = "http://localhost:9696"
+PASSPORT_AUTH_URL = "http://localhost:9696/authorize"
+PASSPORT_TOKEN_URL = "http://127.0.0.1:9696/token"
 CONSOLE_APP_URL = "http://localhost:9898"
 REDIRECT_URI = "http://localhost:9797/auth/callback"
 COOKIE_DOMAIN = "localhost"
