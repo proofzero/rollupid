@@ -191,6 +191,7 @@ export const logAnalytics = () => (next) => async (root, args, context, info) =>
       // when,
       nullableName,
       nullableJWT,
+      context.apiKey,
     ],
     // doubles: [],
     indexes: [raw_key.slice(-32)], // TODO: Need a sampling index.
