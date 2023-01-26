@@ -13,6 +13,51 @@ import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
 
+const normalizeProfile = (profile: any) => {
+  switch (profile.__typename) {
+    case 'CryptoAddressProfile':
+      return {
+        id: profile.urn,
+        address: profile.address,
+        title: profile.displayName,
+        icon: profile.avatar,
+        chain: 'Ethereum',
+      }
+    case 'OAuthGoogleProfile':
+      return {
+        id: profile.urn,
+        address: profile.urn,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Google',
+      }
+    case 'OAuthTwitterProfile':
+      return {
+        id: profile.urn,
+        address: profile.urn,
+        title: profile.name,
+        icon: profile.profile_image_url_https,
+        chain: 'Twitter',
+      }
+    case 'OAuthGithubProfile':
+      return {
+        id: profile.urn,
+        address: profile.urn,
+        title: profile.name,
+        icon: profile.avatar_url,
+        chain: 'GitHub',
+      }
+    case 'OAuthMicrosoftProfile':
+      return {
+        id: profile.urn,
+        address: profile.urn,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Microsoft',
+      }
+  }
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
@@ -41,43 +86,18 @@ export const loader: LoaderFunction = async ({ request }) => {
   // e.x. rename to crypto profiles
   const cryptoProfiles = mappedProfiles
     .filter((p) => p?.nodeType === NodeType.Crypto)
-    .map((p) => ({ urn: p.urn, ...(p?.profile as CryptoAddressProfile) }))
-    .map((p) => ({
-      id: p.urn,
-      address: p.address,
-      title: p.displayName,
-      icon: p.avatar,
-      chain: 'Ethereum',
-    }))
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
 
   const vaultProfiles = mappedProfiles
     .filter((p) => p?.nodeType === NodeType.Vault)
-    .map((p) => ({ urn: p.urn, ...(p?.profile as CryptoAddressProfile) }))
-    .map((p) => ({
-      id: p.urn,
-      address: p.address,
-      title: p.displayName,
-      icon: p.avatar,
-      chain: 'Ethereum',
-    }))
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
 
   const oAuthProfiles = mappedProfiles
     .filter((p) => p?.nodeType === NodeType.OAuth)
-    .map((p) => {
-      // To do: add more mappings
-      // this will also be refactored
-      // in the future
-      switch (p?.profile?.__typename) {
-        case 'OAuthGithubProfile':
-          return {
-            id: p.urn,
-            address: p.urn,
-            title: p.profile.name,
-            icon: p.profile.avatar_url,
-            chain: 'GitHub',
-          }
-      }
-    })
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
 
   return {
     cryptoProfiles,

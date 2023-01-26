@@ -109,7 +109,7 @@ const addressResolvers: Resolvers = {
         return 'OAuthGithubProfile'
       }
       if ((obj as OAuthMicrosoftProfile).sub) {
-        return 'OAuthGithubProfile'
+        return 'OAuthMicrosoftProfile'
       }
       return null
     },
