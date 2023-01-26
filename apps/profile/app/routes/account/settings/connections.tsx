@@ -17,13 +17,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
   const addresses = (await getAccountAddresses(jwt)) ?? []
-
-  // This is a hack mapping for node type
-  // we should get rid of it once edges
-  // gets refactored
   const addressTypeUrns = addresses.map((a) => ({
     urn: a.urn,
-    nodeType: new URLSearchParams(Object.keys(a.rc)[0]).get('node_type'),
+    nodeType: a.rc.node_type,
   }))
 
   // This returns profiles without urns
