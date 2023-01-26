@@ -41,7 +41,7 @@ export default class CryptoAddress {
       timestamp,
     }
     this.node.storage.put('challenges', challenges)
-    this.node.storage.setAlarm(NONCE_OPTIONS.ttl)
+    this.node.storage.setAlarm(Date.now() + NONCE_OPTIONS.ttl)
 
     return nonce
   }
@@ -77,8 +77,6 @@ export default class CryptoAddress {
     ])
 
     if (!address) throw new Error('address not found')
-
-    console.log({ nickname, gradient, address })
 
     const profile = await getCryptoAddressProfile(address)
 

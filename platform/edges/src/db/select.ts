@@ -8,23 +8,19 @@
 // -----------------------------------------------------------------------------
 
 import { Graph } from '@kubelt/types'
-import type { AnyURN, AnyURNSpace } from '@kubelt/urns'
+import type { AnyURN } from '@kubelt/urns'
 
 import type {
-  EdgeTag,
   Edge,
   Node,
   EdgeQuery,
   EdgeRecord,
   Graph as GraphDB,
-  NodeRecord,
-  NodeFilter,
   QComponent,
   QComponents,
   RComponent,
   RComponents,
-  Permission,
-} from '../types'
+} from './types'
 
 // qc()
 // -----------------------------------------------------------------------------
@@ -40,16 +36,12 @@ import type {
 export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
   const query = `
     SELECT
-      uc.key,
-      uc.value
+      key,
+      value
     FROM
-      node_qcomp_urnq_component nc
-    JOIN
-      urnq_component uc
-    ON
-      nc.qcomp = uc.id
+      node_qcomp
     WHERE
-      nc.nodeUrn = ?1
+      nodeUrn = ?1
   `
   const qcomp = await g.db
     .prepare(query)
@@ -80,16 +72,12 @@ export async function qc(g: GraphDB, nodeId: AnyURN): Promise<QComponents> {
 export async function rc(g: GraphDB, nodeId: AnyURN): Promise<RComponents> {
   const query = `
     SELECT
-      uc.key,
-      uc.value
+      key,
+      value
     FROM
-      node_rcomp_urnr_component nc
-    JOIN
-      urnr_component uc
-    ON
-      nc.rcomp = uc.id
+      node_rcomp
     WHERE
-      nc.nodeUrn = ?1
+      nodeUrn = ?1
   `
   const rcomp = await g.db
     .prepare(query)
@@ -139,30 +127,6 @@ export async function node(
   node.rc = rcMap
 
   return node as Node
-}
-
-// permissions()
-// -----------------------------------------------------------------------------
-// TODO should this be exposed to return the permissions for an edge?
-
-async function permissions(g: GraphDB, edgeId: number): Promise<Permission[]> {
-  const query = `
-    SELECT
-      name
-    FROM
-      permission p
-    JOIN
-      edge_permission e
-    ON
-      e.permissionId = p.id
-    WHERE
-      e.edgeId = ?1
-  `
-  const result = await g.db.prepare(query).bind(edgeId).all<Permission>()
-  // TODO check result.success and handle query error
-  const perms = result.results
-
-  return perms as Permission[]
 }
 
 // edges()
@@ -347,13 +311,10 @@ export async function edges(
 
       const tag = edgeRec.tag
 
-      const perms = await permissions(g, edgeRec.id)
-
       return {
         tag,
         src,
         dst,
-        perms,
       }
     })
   )

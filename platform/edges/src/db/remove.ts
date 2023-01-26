@@ -6,7 +6,7 @@
 
 import type { AnyURN } from '@kubelt/urns'
 
-import type { Graph, EdgeTag } from '../types'
+import type { Graph, EdgeTag } from './types'
 
 // edge()
 // -----------------------------------------------------------------------------

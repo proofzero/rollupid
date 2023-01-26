@@ -20,5 +20,4 @@ export const Edge = z.object({
   src: Node,
   dst: Node,
   tag: EdgeTagInput,
-  perms: z.array(z.string()),
 })

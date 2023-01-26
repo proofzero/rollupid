@@ -61,7 +61,6 @@ export const action: ActionFunction = async ({ request, context, params }) => {
     { node_type: NodeType.Crypto, addr_type: CryptoAddressType.ETH },
     { alias: address }
   )
-  console.log({ addressURN })
   const addressClient = getAddressClient(addressURN, context.env)
   const formData = await request.formData()
 

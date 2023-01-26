@@ -13,6 +13,5 @@ export default /* GraphQL */ `
     src: Node!
     dst: Node!
     tag: String!
-    perms: [String]
   }
 `

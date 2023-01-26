@@ -28,8 +28,6 @@ export type EdgeDirection = z.infer<typeof EdgeDirectionInput>
 
 export type NodeFilter = z.infer<typeof NodeFilterInput>
 
-export type Permission = string
-
 export type EdgeTag = EdgeURN
 
 // An authorization token
