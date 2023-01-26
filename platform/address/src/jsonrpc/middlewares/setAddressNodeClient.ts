@@ -1,4 +1,5 @@
 import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
+import { AddressURNSpace } from '@kubelt/urns/address'
 import { Context } from '../../context'
 import { initAddressNodeByName } from '../../nodes'
 
@@ -10,7 +11,8 @@ export const setAddressNodeClient: BaseMiddlewareFunction<Context> = async ({
     throw new Error('missing addressURN')
   }
 
-  const node = initAddressNodeByName(ctx.addressURN, ctx.Address)
+  const baseUrn = AddressURNSpace.getBaseURN(ctx.addressURN)
+  const node = initAddressNodeByName(baseUrn, ctx.Address)
   return next({
     ctx: {
       ...ctx,

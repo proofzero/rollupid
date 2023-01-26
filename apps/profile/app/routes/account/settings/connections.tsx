@@ -1,36 +1,134 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { useOutletContext } from '@remix-run/react'
-import { AddressListItemProps } from '~/components/Addresses/AddressListItem'
-import { Node } from '@kubelt/galaxy-client'
+import { Form, useLoaderData, useSubmit } from '@remix-run/react'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import { requireJWT } from '~/utils/session.server'
+import { AddressURN } from '@kubelt/urns/address'
+import { AddressListItemProps } from '~/components/addresses/AddressListItem'
+import { LoaderFunction } from '@remix-run/cloudflare'
+import { CryptoAddressProfile } from '@kubelt/galaxy-client'
+import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
+import { useEffect, useState } from 'react'
+import InputText from '~/components/inputs/InputText'
+import { NodeType } from '@kubelt/types/address'
+import { action } from '~/routes/signout'
+
+const normalizeProfile = (profile: any) => {
+  switch (profile.__typename) {
+    case 'CryptoAddressProfile':
+      return {
+        id: profile.urn,
+        address: profile.address,
+        title: profile.displayName,
+        icon: profile.avatar,
+        chain: 'Ethereum',
+      }
+    case 'OAuthGoogleProfile':
+      return {
+        id: profile.urn,
+        address: profile.name,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Google',
+      }
+    case 'OAuthTwitterProfile':
+      return {
+        id: profile.urn,
+        address: profile.name,
+        title: profile.name,
+        icon: profile.profile_image_url_https,
+        chain: 'Twitter',
+      }
+    case 'OAuthGithubProfile':
+      return {
+        id: profile.urn,
+        address: profile.name,
+        title: profile.name,
+        icon: profile.avatar_url,
+        chain: 'GitHub',
+      }
+    case 'OAuthMicrosoftProfile':
+      return {
+        id: profile.urn,
+        address: profile.name,
+        title: profile.name,
+        icon: profile.picture,
+        chain: 'Microsoft',
+      }
+  }
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+
+  const addresses = (await getAccountAddresses(jwt)) ?? []
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: a.rc.node_type,
+  }))
+
+  // This returns profiles without urns
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
+
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const mappedProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
+
+  // Keeping the distinctions to only append
+  // context actions to desired types
+  // e.x. rename to crypto profiles
+  const cryptoProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.Crypto)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  const vaultProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.Vault)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  const oAuthProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.OAuth)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  return {
+    cryptoProfiles,
+    vaultProfiles,
+    oAuthProfiles,
+  }
+}
 
 const AccountSettingsConnections = () => {
-  const { addresses } = useOutletContext<{
-    addresses: Node[]
-  }>()
+  const { cryptoProfiles, vaultProfiles, oAuthProfiles } = useLoaderData()
 
-  const mappedAddresses: AddressListItemProps[] = addresses.map((node) => {
-    const rparams = new URLSearchParams(node.rc || '')
-    const qparams = new URLSearchParams(node.qc || '')
-    const addrType = rparams.get('addr_type')
-    const alias = qparams.get('alias')
-    return {
-      id: node.urn,
-      type: addrType,
-      address: alias as string,
-      chain: 'Foo',
-      network: 'Bar',
-      title: 'Biz',
-      wallet: 'Baz',
-      icon: 'https://picsum.photos/256',
-    }
-  })
+  const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [actionId, setActionId] = useState<null | string>()
+  const [actionProfile, setActionProfile] = useState<any>()
+
+  useEffect(() => {
+    const selectedProfile = cryptoProfiles
+      .concat(vaultProfiles)
+      .concat(oAuthProfiles)
+      .find((p: any) => p.id === actionId)
+
+    setActionProfile(selectedProfile)
+  }, [actionId])
+
+  const submit = useSubmit()
 
   return (
     <section>
       <div className="flex flex-row-reverse mt-7">
-        <Button>Connect Account</Button>
+        <Button disabled>Connect Account</Button>
       </div>
 
       <div className="mt-1">
@@ -38,7 +136,85 @@ const AccountSettingsConnections = () => {
           CONNECTED ACCOUNTS
         </Text>
 
-        <AddressList addresses={mappedAddresses} />
+        <Modal
+          isOpen={renameModalOpen}
+          handleClose={() => setRenameModalOpen(false)}
+        >
+          <div
+            className={`min-w-[437px] relative transform rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
+          >
+            <Text size="lg" weight="semibold" className="text-gray-900 mb-8">
+              Name Your Account
+            </Text>
+
+            <Form
+              method="post"
+              action="/account/settings/connections/rename"
+              onSubmit={(e) => {
+                const targetForm = e.currentTarget
+                submit(targetForm)
+
+                setRenameModalOpen(false)
+                setActionId(undefined)
+              }}
+            >
+              {actionId && <input type="hidden" name="id" value={actionId} />}
+
+              <InputText
+                required
+                heading=""
+                name="name"
+                disabled={actionProfile?.title.endsWith('.eth')}
+                defaultValue={actionProfile?.title ?? ''}
+              />
+              {actionProfile?.address && (
+                <Text size="xs" weight="normal" className="text-gray-500 mt-2">
+                  address: {actionProfile?.address}
+                </Text>
+              )}
+              <div className="flex justify-end items-center space-x-3 mt-20">
+                <Button
+                  btnType="secondary-alt"
+                  onClick={() => setRenameModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button type="submit" btnType="primary">
+                  Save
+                </Button>
+              </div>
+            </Form>
+          </div>
+        </Modal>
+
+        <AddressList
+          addresses={cryptoProfiles
+            .map((ap: AddressListItemProps) => ({
+              ...ap,
+              onRenameAccount: ap.title.endsWith('.eth')
+                ? null
+                : (id: string) => {
+                    setActionId(id)
+                    setRenameModalOpen(true)
+                  },
+            }))
+            .concat(oAuthProfiles)}
+        />
+
+        <Text size="sm" weight="normal" className="text-gray-500 my-7">
+          DEDICATED VAULT ACCOUNTS
+        </Text>
+
+        <AddressList
+          addresses={vaultProfiles.map((ap: AddressListItemProps) => ({
+            ...ap,
+            onRenameAccount: (id: string) => {
+              setActionId(id)
+              setRenameModalOpen(true)
+            },
+          }))}
+        />
       </div>
     </section>
   )

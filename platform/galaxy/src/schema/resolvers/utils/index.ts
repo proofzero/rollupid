@@ -25,9 +25,10 @@ export const setupContext = () => (next) => (root, args, context, info) => {
   const apiKey = context.request.headers.get('X-GALAXY-KEY')
 
   const parsedJwt = jwt && parseJwt(jwt)
+
   const accountURN: AccountURN = parsedJwt && parsedJwt.sub
 
-  return next(root, args, { ...context, jwt, apiKey, accountURN, analytics, serviceMetadata }, info)
+  return next(root, args, { ...context, jwt, apiKey, accountURN }, info)
 }
 
 export const isAuthorized = () => (next) => (root, args, context, info) => {
@@ -142,20 +143,17 @@ export function sliceIntoChunks(arr: any, chunkSize: number) {
   return res
 }
 
-export const logAnalytics = () => (next) => async (root, args, context, info) => {
-  const method = info?.operation?.name?.value || 'unknown'
-  const type = [info?.operation?.operation || 'unknown', 'gql'].join(':')
+export const logAnalytics =
+  () => (next) => async (root, args, context, info) => {
+    const method = info?.operation?.name?.value || 'unknown'
+    const type = [info?.operation?.operation || 'unknown', 'gql'].join(':')
 
-  const datapoint: AnalyticsEngineDataPoint = {
-    blobs: [
-      method,
-      type,
-      context.apiKey,
-    ],
+    const datapoint: AnalyticsEngineDataPoint = {
+      blobs: [method, type, context.apiKey],
+    }
+
+    WriteAnalyticsDataPoint(context, datapoint)
+    console.log('resolver call analytics', JSON.stringify(datapoint))
+
+    return next(root, args, context, info)
   }
-
-  WriteAnalyticsDataPoint(context, datapoint)
-  console.log('resolver call analytics', JSON.stringify(datapoint))
-
-  return next(root, args, context, info)
-}

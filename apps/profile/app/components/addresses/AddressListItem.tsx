@@ -25,12 +25,12 @@ export type AddressListItemProps = {
   id: string
   icon: string
   title: string
-  wallet: string
-  network: string
   chain: string
   address: string
   primary?: boolean
   hidden?: boolean
+  wallet?: string
+  network?: string
   onRenameAccount?: (id: string) => void
   onChangeAvatar?: (id: string) => void
   onSetPrimary?: (id: string) => void
@@ -41,8 +41,6 @@ export const AddressListItem = ({
   id,
   icon,
   title,
-  wallet,
-  network,
   chain,
   address,
   primary = false,
@@ -79,7 +77,7 @@ export const AddressListItem = ({
 
         <div className="flex flex-row">
           <Text size="xs" weight="normal" className="text-gray-500">
-            {wallet} • {network} {chain} • {address}
+            {chain} • {address}
           </Text>
         </div>
       </section>

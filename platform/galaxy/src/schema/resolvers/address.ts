@@ -3,23 +3,23 @@ import ENSUtils from '@kubelt/platform-clients/ens-utils'
 import createAddressClient from '@kubelt/platform-clients/address'
 import { AddressURN } from '@kubelt/urns/address'
 
-import {
-  AddressProfile,
-  CryptoAddressProfile,
-  OAuthGoogleProfile,
-  OAuthGithubProfile,
-  Resolvers,
-  AddressProfiles,
-} from './typedefs'
-import { hasApiKey, setupContext, logAnalytics } from './utils'
+import { Resolvers } from './typedefs'
+import { hasApiKey, setupContext, logAnalytics, isAuthorized } from './utils'
 
 import { ResolverContext } from './common'
+
 import {
+  AddressProfiles,
+  CryptoAddressProfile,
+  OAuthGithubProfile,
+  OAuthGoogleProfile,
   OAuthMicrosoftProfile,
   OAuthTwitterProfile,
 } from '@kubelt/platform.address/src/types'
-import { CryptoAddressType } from '@kubelt/types/address'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import {
+  PlatformAddressURNHeader,
+  PlatformJWTAssertionHeader,
+} from '@kubelt/types/headers'
 
 const addressResolvers: Resolvers = {
   Query: {
@@ -41,9 +41,45 @@ const addressResolvers: Resolvers = {
 
       return addressProfile
     },
-  },
-  Mutation: {},
+    addressProfiles: async (
+      _parent: any,
+      { addressURNList }: { addressURNList: AddressURN[] },
+      { env, jwt }: ResolverContext
+    ) => {
+      const profiles = await Promise.all(
+        addressURNList.map(async (urn) => {
+          const addressClient = createAddressClient(env.Address, {
+            headers: {
+              [PlatformAddressURNHeader]: urn,
+            },
+          })
 
+          return addressClient.getAddressProfile.query()
+        })
+      )
+
+      return profiles
+    },
+  },
+  Mutation: {
+    updateAddressNickname: async (
+      _parent: any,
+      { nickname, addressURN },
+      { env }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          [PlatformAddressURNHeader]: addressURN,
+        },
+      })
+
+      await addressClient.setNickname.query({
+        nickname,
+      })
+
+      return true
+    },
+  },
   AddressProfiles: {
     __resolveType: (obj: AddressProfiles) => {
       if ((obj as CryptoAddressProfile).address) {
@@ -59,7 +95,7 @@ const addressResolvers: Resolvers = {
         return 'OAuthGithubProfile'
       }
       if ((obj as OAuthMicrosoftProfile).sub) {
-        return 'OAuthGithubProfile'
+        return 'OAuthMicrosoftProfile'
       }
       return null
     },
@@ -68,8 +104,14 @@ const addressResolvers: Resolvers = {
 
 // TODO: add address middleware
 const AddressResolverComposition = {
-  'Query.ensProfile': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.addressProfile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.ensProfile': [setupContext(), hasApiKey()],
+  'Query.addressProfile': [setupContext(), hasApiKey()],
+  'Query.addressProfiles': [setupContext(), hasApiKey()],
+  'Mutation.updateAddressNickname': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+  ],
 }
 
 export default composeResolvers(addressResolvers, AddressResolverComposition)

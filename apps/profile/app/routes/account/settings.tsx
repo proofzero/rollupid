@@ -42,7 +42,7 @@ const tabs: {
   connections: {
     name: 'Connected Accounts',
     path: 'connections',
-    disabled: true,
+    disabled: false,
   },
 }
 

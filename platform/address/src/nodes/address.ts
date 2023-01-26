@@ -61,6 +61,14 @@ export default class Address extends DOProxy {
     return this.state.storage.put('gradient', gradient)
   }
 
+  async getNickname(): Promise<string | undefined> {
+    return this.state.storage.get<string>('nickname')
+  }
+
+  async setNickname(nickname: string): Promise<void> {
+    return this.state.storage.put('nickname', nickname)
+  }
+
   async alarm() {
     const type = await this.getNodeType()
     switch (type) {

@@ -28,6 +28,7 @@ const accountResolvers: Resolvers = {
       let accountProfile = await accountClient.getProfile.query({
         account: accountURN,
       })
+
       return accountProfile
     },
     profileFromAddress: async (
@@ -157,7 +158,12 @@ const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
-  'Mutation.updateProfile': [setupContext(), hasApiKey(), isAuthorized(), logAnalytics()],
+  'Mutation.updateProfile': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
 }
 
 export default composeResolvers(accountResolvers, ProfileResolverComposition)
