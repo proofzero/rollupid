@@ -20,8 +20,6 @@ export interface Environment {
 
   HANDLES: KVNamespace
 
-  COLLECTIONS: D1Database
-
   MINTPFP_CONTRACT_ADDRESS: string
   NFTAR_CHAIN_ID: string
   TOKEN_NFTAR: string
