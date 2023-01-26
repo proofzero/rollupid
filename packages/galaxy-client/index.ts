@@ -114,6 +114,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   exchangeAuthorizationToken?: Maybe<ExchangeTokenResult>;
   exchangeRefreshToken?: Maybe<ExchangeTokenResult>;
+  updateAddressNickname?: Maybe<Scalars['Boolean']>;
   updateCuratedGallery?: Maybe<Scalars['Boolean']>;
   updateProfile?: Maybe<Scalars['Boolean']>;
 };
