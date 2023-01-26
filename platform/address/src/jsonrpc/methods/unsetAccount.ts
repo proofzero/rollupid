@@ -33,7 +33,7 @@ export const unsetAccountMethod = async ({
   const edgesClient = getEdgesClient(ctx.Edges)
   const nodeClient = ctx.address
 
-  // Get the address associated with the X-3RN included in the request.
+  // Get the address associated with the PlatformJWTAssertionHeader included in the request.
   const address = ctx.addressURN as AddressURN
 
   const account = input
