@@ -3,22 +3,22 @@ import { BaseMiddlewareFunction } from '@kubelt/platform-middleware/types'
 
 import { Context } from '../../context'
 import { isValidAddressType } from '../../utils'
-import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
+import { PlatformAddressURNHeader } from '@kubelt/types/headers'
 
 export const parse3RN: BaseMiddlewareFunction<Context> = async ({
   ctx,
   next,
 }) => {
   const header =
-    ctx.address3RN || ctx.req?.headers.get(PlatformJWTAssertionHeader)
+    ctx.address3RN || ctx.req?.headers.get(PlatformAddressURNHeader)
   if (!header) {
-    throw new Error(`missing ${PlatformJWTAssertionHeader} header`)
+    throw new Error(`missing ${PlatformAddressURNHeader} header`)
   }
   const addressURN = header as AddressURN
   const hashedIdref = AddressURNSpace.decode(addressURN)
 
   if (!hashedIdref) {
-    throw `missing ${PlatformJWTAssertionHeader} name: ${addressURN}`
+    throw `missing ${PlatformAddressURNHeader} name: ${addressURN}`
   }
 
   const { rcomponent, qcomponent } =
