@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  AppleProfileSchema,
   GithubProfileSchema,
   GoogleProfileSchema,
   MicrosoftProfileSchema,
@@ -51,6 +52,7 @@ export enum OAuthAddressType {
   GitHub = 'github',
   Twitter = 'twitter',
   Microsoft = 'microsoft',
+  Apple = 'apple',
 }
 
 export enum HandleAddressType {
@@ -78,6 +80,8 @@ export type OAuthGithubProfile = z.infer<typeof GithubProfileSchema>['_json']
 export type OAuthMicrosoftProfile = z.infer<
   typeof MicrosoftProfileSchema
 >['_json']
+export type OAuthAppleProfile = z.infer<typeof AppleProfileSchema>
+
 export type CryptoAddressProfile = z.infer<typeof CryptoAddressProfileSchema>
 export type AddressProfile =
   | CryptoAddressProfile
@@ -85,6 +89,7 @@ export type AddressProfile =
   | OAuthTwitterProfile
   | OAuthGithubProfile
   | OAuthMicrosoftProfile
+  | OAuthAppleProfile
 
 export type OAuthData = z.infer<typeof OAuthDataSchema>
 

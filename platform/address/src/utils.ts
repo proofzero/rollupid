@@ -36,6 +36,7 @@ export const isOAuthAddressType = (type: string | undefined) => {
     case OAuthAddressType.Microsoft:
     case OAuthAddressType.Twitter:
     case OAuthAddressType.Google:
+    case OAuthAddressType.Apple:
       return NodeType.OAuth
     default:
       return false

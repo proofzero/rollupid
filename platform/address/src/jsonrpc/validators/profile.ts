@@ -95,10 +95,22 @@ export const MicrosoftRawProfileSchema = z.object({
   threeidImageUrl: z.string().optional(),
 })
 
+export const AppleProfileSchema = z.object({
+  email: z.string(),
+  name: z
+    .object({
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .optional(),
+  sub: z.string(),
+})
+
 export const AddressProfileSchema = z.union([
   CryptoAddressProfileSchema,
   GoogleRawProfileSchema,
   GithubRawProfileSubsetSchema,
   TwitterProfileSchema,
   MicrosoftRawProfileSchema,
+  AppleProfileSchema,
 ])
