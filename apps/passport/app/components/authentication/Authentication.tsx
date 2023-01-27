@@ -1,11 +1,9 @@
 import { ConnectButton } from '../../../app/components/connect-button/ConnectButton'
 import circleLogo from './circle-logo.svg'
+import kubeltLogoSmall from './kubelt.svg'
 
-import ConnectGoogleButton from '~/components/connect-google-button'
-import ConnectGithubButton from '../connect-github-button'
-import ConnectTwitterButton from '~/components/connect-twitter-button'
-import ConnectMicrosoftButton from '../connect-microsoft-button'
-import ConnectAppleButton from '../connect-apple-button'
+import ConnectOAuthButton from '../connect-oauth-button'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 export type AuthenticationProps = {
   logoURL?: string
@@ -45,20 +43,40 @@ export function Authentication({
           How would you like to continue?
         </h2>
       </div>
+
       <ConnectButton
         disabled={!enableWalletConnect}
         connectCallback={connectCallback}
         connectErrorCallback={connectErrorCallback}
       />
+
       {enableOAuthConnect ? (
         <>
-          <ConnectGoogleButton />
-          <ConnectGithubButton />
-          <ConnectTwitterButton />
-          <ConnectMicrosoftButton />
-          <ConnectAppleButton />
+          <div className="my-5 flex flex-row items-center space-x-3">
+            <hr className="h-px w-16 bg-gray-500" />
+            <Text>or</Text>
+            <hr className="h-px w-16 bg-gray-500" />
+          </div>
+
+          <div className="flex flex-row space-x-3 justify-evenly w-full">
+            <ConnectOAuthButton provider="google" />
+            <ConnectOAuthButton provider="apple" />
+          </div>
+
+          <div className="flex flex-row space-x-3 justify-evenly w-full">
+            <ConnectOAuthButton provider="twitter" />
+            <ConnectOAuthButton provider="github" />
+            <ConnectOAuthButton provider="microsoft" />
+          </div>
         </>
       ) : null}
+
+      <div className="mt-14 flex justify-center items-center space-x-2">
+        <img className="w-4 h-4" src={kubeltLogoSmall} />
+        <Text size="xs" weight="normal" className="text-gray-400">
+          Powered by Kubelt
+        </Text>
+      </div>
     </div>
   )
 }
