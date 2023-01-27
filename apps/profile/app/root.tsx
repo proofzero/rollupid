@@ -158,7 +158,8 @@ export default function App() {
             />
           </>
         )}
-        {transition.state === 'loading' && <Loader />}
+        {(transition.state === 'loading' ||
+          transition.state === 'submitting') && <Loader />}
         <div className="bg-white h-full min-h-screen overflow-visible">
           <div
             className="header lg:px-4"

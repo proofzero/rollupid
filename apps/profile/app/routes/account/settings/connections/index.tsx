@@ -1,18 +1,17 @@
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { AddressList } from '~/components/addresses/AddressList'
-import { Form, useLoaderData, useSubmit } from '@remix-run/react'
+import { Form, useFetcher, useLoaderData, useSubmit } from '@remix-run/react'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { requireJWT } from '~/utils/session.server'
 import { AddressURN } from '@kubelt/urns/address'
 import { AddressListItemProps } from '~/components/addresses/AddressListItem'
-import { LoaderFunction } from '@remix-run/cloudflare'
+import { HeadersFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { CryptoAddressProfile } from '@kubelt/galaxy-client'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { useEffect, useState } from 'react'
 import InputText from '~/components/inputs/InputText'
 import { NodeType } from '@kubelt/types/address'
-import { action } from '~/routes/signout'
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
@@ -114,6 +113,8 @@ const AccountSettingsConnections = () => {
   const [actionId, setActionId] = useState<null | string>()
   const [actionProfile, setActionProfile] = useState<any>()
 
+  const fetcher = useFetcher()
+
   useEffect(() => {
     const selectedProfile = cryptoProfiles
       .concat(vaultProfiles)
@@ -123,7 +124,15 @@ const AccountSettingsConnections = () => {
     setActionProfile(selectedProfile)
   }, [actionId])
 
-  const submit = useSubmit()
+  useEffect(() => {
+    if (fetcher.state === 'submitting' && fetcher.type === 'actionSubmission') {
+      setRenameModalOpen(false)
+      setActionId(undefined)
+    }
+    if (fetcher.type === 'actionReload') {
+      fetcher.load('/account/settings/connections')
+    }
+  }, [fetcher])
 
   return (
     <section>
@@ -147,16 +156,16 @@ const AccountSettingsConnections = () => {
               Name Your Account
             </Text>
 
-            <Form
+            <fetcher.Form
               method="post"
               action="/account/settings/connections/rename"
-              onSubmit={(e) => {
-                const targetForm = e.currentTarget
-                submit(targetForm)
+              // onSubmit={(e) => {
+              //   const targetForm = e.currentTarget
+              //   fetcher.submit(targetForm)
 
-                setRenameModalOpen(false)
-                setActionId(undefined)
-              }}
+              //   setRenameModalOpen(false)
+              //   setActionId(undefined)
+              // }}
             >
               {actionId && <input type="hidden" name="id" value={actionId} />}
 
@@ -184,7 +193,7 @@ const AccountSettingsConnections = () => {
                   Save
                 </Button>
               </div>
-            </Form>
+            </fetcher.Form>
           </div>
         </Modal>
 

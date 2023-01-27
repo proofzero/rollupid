@@ -1,5 +1,5 @@
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
-import { ActionFunction, redirect } from '@remix-run/cloudflare'
+import { ActionFunction } from '@remix-run/cloudflare'
 import { getGalaxyClient } from '~/helpers/clients'
 import { requireJWT } from '~/utils/session.server'
 
@@ -22,5 +22,5 @@ export const action: ActionFunction = async ({ request }) => {
     }
   )
 
-  return redirect('/account/settings/connections')
+  return null
 }

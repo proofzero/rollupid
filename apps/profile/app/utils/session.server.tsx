@@ -53,16 +53,21 @@ export async function requireJWT(request: Request, headers = new Headers()) {
   const AuthorizationError = class extends Error {}
 
   const session = await getProfileSession(request)
-  const accessToken = session.get('accessToken')
 
   try {
+    const {
+      user: { accessToken },
+    } = session.data
+
     // if not found, redirect to login, this means the user is not even logged-in
     if (!accessToken) throw redirect('/auth')
 
     const parsedToken = parseJwt(accessToken)
 
+    console.debug({ exp: parsedToken.exp, now: Date.now() })
+
     // if expired throw an error (we can extends Error to create this)
-    if (!parsedToken.exp || parsedToken.exp >= Date.now()) {
+    if (!parsedToken.exp || parsedToken.exp <= Date.now()) {
       throw new AuthorizationError('Expired')
     }
 
@@ -71,17 +76,16 @@ export async function requireJWT(request: Request, headers = new Headers()) {
   } catch (error) {
     // here, check if the error is an AuthorizationError (the one we throw above)
     if (error instanceof AuthorizationError) {
-      const refreshToken = session.get('refreshToken')
+      const {
+        user: { refreshToken },
+      } = session.data
 
+      // refresh the access token
       const form = new FormData()
       form.append('grant_type', 'refresh_token')
-      form.append('refresh_token', refreshToken)
-      // refresh the access token
+      form.append('refresh_token', refreshToken.toString())
       const token = await fetch(PASSPORT_TOKEN_URL, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/x-www-form-urlencoded',
-        },
+        method: 'post',
         body: form,
       })
 
@@ -96,8 +100,10 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       }>()
 
       // update the session with the new values
-      session.set('accessToken', access_token)
-      session.set('refreshToken', refresh_token)
+      session.set('user', {
+        accessToken: access_token,
+        refreshToken: refresh_token,
+      })
 
       // commit the session and append the Set-Cookie header
       headers.append(
@@ -109,7 +115,7 @@ export async function requireJWT(request: Request, headers = new Headers()) {
       if (request.method === 'GET') throw redirect(request.url, { headers })
 
       // return the access token so you can use it in your action
-      return accessToken
+      return access_token
     }
 
     // throw again any unexpected error that could've happened

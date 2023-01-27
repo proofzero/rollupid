@@ -52,13 +52,15 @@ export default class Access extends DOProxy {
   }
 
   async refresh(iss: string, token: string): Promise<ExchangeTokenResult> {
-    const [account, clientId, scope] = await Promise.all([
-      this.state.storage.get<AccountURN>('account'),
-      this.state.storage.get<string>('clientId'),
-      this.state.storage.get<any>('scope'),
-    ])
-    if (!account || !clientId || !scope) throw new Error('Invalid token')
+    const account = await this.state.storage.get<AccountURN>('account')
+    const clientId = await this.state.storage.get<string>('clientId')
+    const scope = await this.state.storage.get<any>('scope')
+
+    if (!account || !clientId) {
+      throw new Error('Invalid token')
+    }
     await verify(token, this.state.storage)
+
     const { expired } = await this.refreshStatus()
     if (expired) throw new Error('Refresh token expired')
     // NB: this reschedules the alarm for the new expiry time.

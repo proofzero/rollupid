@@ -53,7 +53,7 @@ export const action: ActionFunction = async ({ request }) => {
    */
   const updatedNames: any = formData.getAll('name')
   const updatedUrls: any = formData.getAll('url')
-  const remainedLinks: any = JSON.parse(formData.get('links'))
+  const remainedLinks: any = JSON.parse(formData.get('links') as string)
 
   const updatedLinks: any = remainedLinks.concat(
     updatedNames.map((name: string, i: number) => {
