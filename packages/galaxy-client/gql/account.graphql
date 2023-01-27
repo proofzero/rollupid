@@ -16,25 +16,25 @@ query getProfile {
     location
     job
     bio
-    links {
-      name
-      url
-      verified
-    }
-    addresses {
-      urn
-      nid
-      nss
-      qc
-      rc
-      fragment
-    }
-    gallery {
-      contract
-      tokenId
-      galleryOrder
-    }
     website
+  }
+  links {
+    name
+    url
+    verified
+  }
+  addresses {
+    urn
+    nid
+    nss
+    qc
+    rc
+    fragment
+  }
+  gallery {
+    contract
+    tokenId
+    galleryOrder
   }
 }
 
@@ -56,25 +56,26 @@ query getProfileFromAddress($addressURN: URN!) {
     location
     job
     bio
-    links {
-      name
-      url
-      verified
-    }
-    addresses {
-      urn
-      nid
-      nss
-      qc
-      rc
-      fragment
-    }
-    gallery {
-      contract
-      tokenId
-      galleryOrder
-    }
+
     website
+  }
+  links {
+    name
+    url
+    verified
+  }
+  addresses {
+    urn
+    nid
+    nss
+    qc
+    rc
+    fragment
+  }
+  gallery {
+    contract
+    tokenId
+    galleryOrder
   }
 }
 

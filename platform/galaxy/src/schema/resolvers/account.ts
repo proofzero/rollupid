@@ -50,6 +50,7 @@ const accountResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.getAccount.query()
+
       // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
@@ -154,11 +155,11 @@ const accountResolvers: Resolvers = {
       // the GraphQL types when setting data otherwise we're able
       // to set a value that can't be returned.
       // TODO: handle and return form errors
+
       await accountClient.setProfile.mutate({
         name: accountURN,
         profile: newProfile,
       })
-
       return true
     },
   },
