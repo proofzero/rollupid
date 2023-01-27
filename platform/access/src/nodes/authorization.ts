@@ -45,7 +45,6 @@ export default class Authorization extends DOProxy {
 
   async exchangeToken(
     code: string,
-    redirectUri: string,
     clientId: string
   ): Promise<{ code: string }> {
     const account = await this.state.storage.get<AccountURN>('account')
@@ -63,15 +62,15 @@ export default class Authorization extends DOProxy {
       throw new Error('missing code params')
     }
 
-    if (redirectUri != params.redirectUri) {
-      throw new Error('mismatch redirect uri')
-    }
-
     if (clientId != storedClientId) {
       throw new Error('mismatch client id')
     }
 
     return { code }
+  }
+
+  async getScope(): Promise<string[] | undefined> {
+    return await this.state.storage.get<string[]>('scope')
   }
 
   async alarm() {

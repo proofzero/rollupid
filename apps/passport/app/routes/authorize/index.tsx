@@ -20,8 +20,6 @@ export const loader: LoaderFunction = async ({ request, context }) => {
 
   const jwt = await requireJWT(request, context.consoleParams, context.env)
 
-  console.log({ scope })
-
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
     if (!redirectUri) throw json({ message: 'redirect_uri is required' }, 400)

@@ -77,7 +77,9 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   // let's fetch the user profile if they are logged in
   const session = await getProfileSession(request)
-  const jwt = session.get('jwt') as string
+  const {
+    user: { accessToken: jwt },
+  } = session.data
 
   const galaxyClient = await getGalaxyClient()
   const loggedInUserProfile = await galaxyClient
@@ -98,6 +100,8 @@ export const loader: LoaderFunction = async ({ request }) => {
       loggedInUserProfile.addresses[0].urn as AddressURN
     )
   }
+
+  console.log({ loggedInUserProfile })
 
   return json({
     loggedInUserProfile,
@@ -158,7 +162,8 @@ export default function App() {
             />
           </>
         )}
-        {transition.state === 'loading' && <Loader />}
+        {(transition.state === 'loading' ||
+          transition.state === 'submitting') && <Loader />}
         <div className="bg-white h-full min-h-screen overflow-visible">
           <div
             className="header lg:px-4"

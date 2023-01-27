@@ -15,16 +15,13 @@ export const ExchangeTokenMethodInput = z.discriminatedUnion('grantType', [
   z.object({
     grantType: z.literal(GrantType.AuthenticationCode),
     code: z.string(),
-    redirectUri: z.string(),
     clientId: z.string(),
   }),
   z.object({
     grantType: z.literal(GrantType.AuthorizationCode),
     code: z.string(),
-    redirectUri: z.string(),
     clientId: z.string(),
     clientSecret: z.string(),
-    scopes: z.array(z.string()).optional(),
   }),
   z.object({
     grantType: z.literal(GrantType.RefreshToken),
@@ -49,7 +46,7 @@ export const exchangeTokenMethod = async ({
   const { grantType } = input
 
   if (grantType == GrantType.AuthenticationCode) {
-    const { code, redirectUri, clientId } = input
+    const { code, clientId } = input
     console.log({ code, grantType })
 
     const authorizationNode = await initAuthorizationNodeByName(
@@ -58,14 +55,13 @@ export const exchangeTokenMethod = async ({
     )
 
     // TODO: what does this do other than validate code?
-    await authorizationNode.class.exchangeToken(code, redirectUri, clientId)
+    await authorizationNode.class.exchangeToken(code, clientId)
     const account = (await authorizationNode.storage.get<AccountURN>(
       'account'
     )) as AccountURN
 
     // create a new id but use it as the name
     const iss = ctx.Access.newUniqueId().toString()
-    console.log({ iss })
 
     const accessNode = await initAccessNodeByName(iss, ctx.Access)
     const result = await accessNode.class.generate({
@@ -89,15 +85,13 @@ export const exchangeTokenMethod = async ({
 
     return result
   } else if (grantType == GrantType.AuthorizationCode) {
-    const { code, redirectUri, clientId, clientSecret, scopes } = input
+    const { code, clientId, clientSecret } = input
 
     // first step is to get the app profile from starbase
     const validationResult = await ctx.starbaseClient?.checkAppAuth
       .query({
         clientId,
         clientSecret,
-        redirectURI: redirectUri,
-        scopes,
       })
       .then((res) => res.valid)
       .catch((err) => {
@@ -114,8 +108,9 @@ export const exchangeTokenMethod = async ({
       ctx.Authorization
     )
 
-    // TODO: what does this do other than validate code?
-    await authorizationNode.class.exchangeToken(code, redirectUri, clientId)
+    await authorizationNode.class.exchangeToken(code, clientId)
+    // TODO: validate the scopes list is good by gettings scopes stored in the node and comparing to app scopes?
+    const scopes = await authorizationNode.storage.get<string[]>('scopes')
     const account = (await authorizationNode.storage.get<AccountURN>(
       'account'
     )) as AccountURN

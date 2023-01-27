@@ -22,7 +22,6 @@ const accessResolvers: Resolvers = {
           clientSecret: exchange.clientSecret,
           code: exchange.code,
           grantType: exchange.grantType,
-          redirectUri: exchange.redirectUri,
         })
       }
 

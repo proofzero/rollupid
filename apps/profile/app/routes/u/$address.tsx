@@ -36,7 +36,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
-  const jwt = session.get('jwt')
+  const {
+    user: { accessToken: jwt },
+  } = session.data
 
   const urn = AddressURNSpace.urn(address)
 

@@ -52,13 +52,17 @@ export default class Access extends DOProxy {
   }
 
   async refresh(iss: string, token: string): Promise<ExchangeTokenResult> {
-    const [account, clientId, scope] = await Promise.all([
-      this.state.storage.get<AccountURN>('account'),
-      this.state.storage.get<string>('clientId'),
-      this.state.storage.get<any>('scope'),
-    ])
-    if (!account || !clientId || !scope) throw new Error('Invalid token')
+    const account = await this.state.storage.get<AccountURN>('account')
+    const clientId = await this.state.storage.get<string>('clientId')
+    const scope = await this.state.storage.get<any>('scope')
+
+    if (!account || !clientId) {
+      throw new Error('Invalid token')
+    }
     await verify(token, this.state.storage)
+
+    const { expired } = await this.refreshStatus()
+    if (expired) throw new Error('Refresh token expired')
     // NB: this reschedules the alarm for the new expiry time.
     return generate(iss, account, clientId, scope, this.state.storage)
   }
@@ -76,11 +80,37 @@ export default class Access extends DOProxy {
       expiry = new Date(expiryTime).toUTCString()
     }
     const creation = await this.state.storage.get<string>('creationTime')
-    return { expired, creation, expiry }
+    return { expired, creation, expiry, expiryTime }
+  }
+
+  async refreshStatus(): Promise<SessionDetails> {
+    const expired = await this.state.storage.get<boolean>('refreshExpired')
+    const expiryTime = await this.state.storage.get<number>('refreshTime')
+    let expiry
+    if (expiryTime) {
+      expiry = new Date(expiryTime).toUTCString()
+    }
+    const creation = await this.state.storage.get<string>('creationTime')
+    return { expired, creation, expiry, expiryTime }
   }
 
   async alarm(): Promise<void> {
-    await this.state.storage.put('expired', true)
+    const { expired, expiryTime } = await this.status()
+    if (!expired && expiryTime && expiryTime < Date.now()) {
+      await this.state.storage.put('expired', true)
+    }
+    const { expired: refreshExpired, expiryTime: refreshExpiryTime } =
+      await this.refreshStatus()
+    if (
+      !refreshExpired &&
+      refreshExpiryTime &&
+      refreshExpiryTime < Date.now()
+    ) {
+      await this.state.storage.put('refreshExpired', true)
+      // TODO: remove own edge if refresh token is also expired
+      // since these are epxected to expire we don't want to bloat the edges database
+      // or DO storage
+    }
   }
 } // Access
 
@@ -109,12 +139,14 @@ const generate = async (
     await storage.put('expired', false)
   }
 
-  const { alg, ttl } = JWT_OPTIONS
+  const { alg, ttl, refreshTtl } = JWT_OPTIONS
   const { privateKey: key } = await getJWTSigningKeyPair(storage)
 
   // We store expiry as milliseconds since epoch.
   const expiryTimeMs = Date.now() + ttl
+  const refreshTimeMs = Date.now() + refreshTtl
   await storage.put('expiryTime', expiryTimeMs)
+  await storage.put('refreshTime', refreshTimeMs)
 
   // JWT expiry time is in *seconds* since the epoch.
   const expirationTime = Math.floor((expiryTimeMs * 1000) / 1000)
@@ -130,7 +162,7 @@ const generate = async (
 
   const refreshToken = await new SignJWT({})
     .setProtectedHeader({ alg })
-    .setExpirationTime(expirationTime)
+    .setExpirationTime(refreshTimeMs)
     .setIssuedAt()
     .setIssuer(objectId)
     .setSubject(account)
@@ -154,6 +186,9 @@ const verify = async (token: string, storage: DurableObjectStorage) => {
   const { alg } = JWT_OPTIONS
   const { publicKey: key } = await getJWTSigningKeyPair(storage)
   const options = { algorithms: [alg] }
+
+  // TODO: check the token expirytime
+
   return jwtVerify(token, key, options)
 }
 

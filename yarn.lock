@@ -5203,6 +5203,8 @@ __metadata:
     react-infinite-scroll-component: 6.1.0
     react-masonry-css: 1.0.16
     react-router-dom: 6.4.3
+    remix-auth: 3.4.0
+    remix-auth-oauth2: 1.5.0
     sass: 1.56.1
     sass-loader: 13.2.0
     storybook-addon-sass-postcss: 0.1.3

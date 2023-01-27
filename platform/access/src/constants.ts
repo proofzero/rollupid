@@ -13,7 +13,8 @@ export const JWT_OPTIONS = {
   jti: {
     length: 24,
   },
-  ttl: 2592000,
+  ttl: 3600000,
+  refreshTtl: 7776000000,
 }
 
 /**

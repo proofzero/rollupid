@@ -49,10 +49,10 @@ jobs:
           secrets: |
             SECRET_SESSION_SALT
             TOKEN_NFTAR
-            CLIENT_ID
-            CLIENT_SECRET
+            CONSOLE_CLIENT_ID
+            CONSOLE_CLIENT_SECRET
         env:
           SECRET_SESSION_SALT: ${{ secrets.SECRET_SESSION_SALT_TEST }}
           TOKEN_NFTAR: ${{ secrets.INTERNAL_NFTAR_TEST }}
-          CLIENT_ID: ${{ secrets.INTERNAL_CONSOLE_OAUTH_CLIENT_ID_NEXT }}
-          CLIENT_SECRET: ${{ secrets.SECRET_CONSOLE_OAUTH_CLIENT_SECRET_NEXT }}
+          CONSOLE_CLIENT_ID: ${{ secrets.INTERNAL_CONSOLE_OAUTH_CLIENT_ID_NEXT }}
+          CONSOLE_CLIENT_SECRET: ${{ secrets.SECRET_CONSOLE_OAUTH_CLIENT_SECRET_NEXT }}
