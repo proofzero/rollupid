@@ -78,14 +78,15 @@ export const links: LinksFunction = () => [
 export const loader: LoaderFunction = async ({ request }) => {
   // let's fetch the user profile if they are logged in
   const session = await getProfileSession(request)
-  const {
-    user: { accessToken: jwt },
-  } = session.data
+  const user = session.get('user')
 
   const galaxyClient = await getGalaxyClient()
   let loggedInUserProfile = undefined
   let basePath = undefined
-  if (jwt) {
+  if (user) {
+    const {
+      user: { accessToken: jwt },
+    } = session.data
     loggedInUserProfile = await galaxyClient
       .getProfile(
         {},
@@ -204,6 +205,7 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
+  console.debug('ERROR', { error })
   return (
     <html lang="en">
       <head>
@@ -238,6 +240,7 @@ export function ErrorBoundary({ error }) {
 export function CatchBoundary() {
   const caught = useCatch()
 
+  console.debug('CAUGHT', { caught })
   let secondary = 'Something went wrong'
   switch (caught.status) {
     case 404:

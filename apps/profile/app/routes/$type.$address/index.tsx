@@ -3,10 +3,12 @@ import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
+  useCatch,
   useFetcher,
   useLoaderData,
   useNavigate,
   useOutletContext,
+  useParams,
 } from '@remix-run/react'
 
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
@@ -36,15 +38,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
-  const {
-    user: { accessToken: jwt },
-  } = session.data
 
   const urn = AddressURNSpace.urn(address)
 
   // if not handle is this let's assume this is an idref
   let profile = undefined
   try {
+    console.debug('BEFORE CONST')
+    const user = session.get('user')
+    let jwt = user?.accessToken
     profile = await galaxyClient
       .getProfileFromAddress(
         {
@@ -88,7 +90,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     console.log(
       `Galaxy did not return a profile for address ${urn}. Moving on.`
     )
-    return null
+    throw new Response('No address found', { status: 404 })
   }
 }
 
@@ -266,3 +268,37 @@ const UserAddressLayout = () => {
 }
 
 export default UserAddressLayout
+
+export function CatchBoundary() {
+  //   console.debug('ERROR', error)
+  //   const caught = useCatch()
+  //   console.debug('CAUGHT', caught)
+  //   const { address, type } = useParams()
+
+  return (
+    <div>
+      <h3>404 page - Replace me with real, provider-specific components</h3>
+      <div>
+        This account is waiting to be unlocked. Do you own this account?
+      </div>
+      <div>{/* {type} / {address} */}</div>
+    </div>
+  )
+}
+
+// export function ErrorBoundary() {
+//   //   console.debug('ERROR', error)
+//   //   const caught = useCatch()
+//   //   console.debug('CAUGHT', caught)
+//   //   const { address, type } = useParams()
+
+//   return (
+//     <div>
+//       <h3>404 page - Replace me with real, provider-specific components</h3>
+//       <div>
+//         This account is waiting to be unlocked. Do you own this account?
+//       </div>
+//       <div>{/* {type} / {address} */}</div>
+//     </div>
+//   )
+// }

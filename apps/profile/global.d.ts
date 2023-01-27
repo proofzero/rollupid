@@ -10,8 +10,8 @@ declare global {
   const CONSOLE_APP_URL: string
   const INTERNAL_GOOGLE_ANALYTICS_TAG: string
 
-  const CONSOLE_CLIENT_ID: string
-  const CONSOLE_CLIENT_SECRET: string
+  const PROFILE_CLIENT_ID: string
+  const PROFILE_CLIENT_SECRET: string
   const REDIRECT_URI: string
 
   const Galaxy: Fetcher
