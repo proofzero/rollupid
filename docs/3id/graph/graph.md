@@ -1,3 +1,0 @@
-`@kubelt/graph` is a 3iD platform package that facilitates the indexing and "linking" of platform entities. Entities are identified by their [platform URNs](../../../packages/urns] (the `@kubelt/urns` package), and links created between them are stored and made queryable by the [@kubelt/platform.edges](../../../platform/edges) service. The `@kubelt/graph` package provides convenience methods for linking platform entities that call this service under the hood.
-
-The collection of edge types currently understood by the platform is currently defined in this package as well, but using the provided convenience methods should normally remove the need to care about the types of edges created to link entities.

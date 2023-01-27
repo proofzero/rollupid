@@ -1,4 +1,4 @@
-![kubelt-banner](https://user-images.githubusercontent.com/695698/198127215-272ee281-6a3c-49f9-8ca1-ebe0b07f249a.gif)
+![rollup-banner](https://user-images.githubusercontent.com/695698/215112757-531aba51-9539-4512-9c94-82923c1891fc.png)
 
 # Simple & Secure ‍User Identity
 
@@ -27,17 +27,11 @@
 
 TODO
 
-## What is Kubelt?
+## What is Rollup?
 
-Kubelt secures user profiles into private, decentralized identities called 3IDs. With the 0xAuth protocol, applications get to know their customers better and stay in touch with access to rich user profiles, content, services and more.
+Rollup is authorization infrastructure for you apps so you can build great relationships with your users. For more information please checkout our [website](https://rollup.id) and [docs](https://docs.rollup.id).
 
-With Kubelt, users are in control of aggregating their data and connections across multiple identity solutions, creating a secure environment for developers to access rich user data.
-
-This repository hosts Kubelt's libraries, client source code and documentation.
-
-To learn more please see the [Kubelt Docs](https://developers.kubelt.com).
-
-## Kubelt Monorepo Tour
+## Rollup Monorepo Tour
 
 Let's take a look around at the Kubelt Monorepo layout...
 
@@ -49,19 +43,11 @@ The [platform/](platform) directory is where all the core identity services are 
 
 The [apps/](apps) directory is where the presentation layer applications (or backend for frontends) live. These apps include the 3ID user experience as well as the Developer Console app.
 
-## Projects
-
-The [projects/](projects) directory is where non-core applications live such as the PFP generation service and more.
-
-## Smart Contracts
-
-The [smartcontracts/](smartcontracts/) directory contains all of our smart contract code.
-
 ## Packages
 
 The [packages/](packages/) directory contains our libraries and other share components.
 
-### Website / Docs
+### Docs
 
 The [docs/](docs/) directory contains the developer documentation portal.
 
@@ -87,4 +73,4 @@ This monorepo is managed by Yarn workspaces and nested workspaces. You can run `
 
 We are happy to accept contributions of all sized. Feel free to submit a pull request.
 
-Also checkout our [contributing guidelines](https://kubelt.com/docs).
+Also checkout our [contributing guidelines](https://docs.rollup.id).
