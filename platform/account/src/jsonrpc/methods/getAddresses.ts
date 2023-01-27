@@ -1,18 +1,22 @@
 import { z } from 'zod'
 import { inputValidators } from '@kubelt/platform-middleware'
 import { Context } from '../../context'
-import { initAccountNodeByName } from '../../nodes'
+import { appRouter } from '../router'
 import { AddressesSchema } from '../validators/profile'
 
 export const GetAddressesInput = z.object({
   account: inputValidators.AccountURNInput,
+  filter: z
+    .object({
+      type: inputValidators.CryptoAddressTypeInput.optional(),
+    })
+    .optional(),
 })
 
-export const GetAddressesOutput = AddressesSchema.nullable()
-
-export type GetAddressesOutputParams = z.infer<typeof GetAddressesOutput>
-
 export type GetAddressesParams = z.infer<typeof GetAddressesInput>
+
+export const GetAddressesOutput = AddressesSchema.nullable()
+export type GetAddressesOutputParams = z.infer<typeof GetAddressesOutput>
 
 export const getAddressesMethod = async ({
   input,
@@ -21,11 +25,13 @@ export const getAddressesMethod = async ({
   input: GetAddressesParams
   ctx: Context
 }): Promise<GetAddressesOutputParams> => {
-  const node = await initAccountNodeByName(input.account, ctx.Account)
+  const caller = appRouter.createCaller(ctx)
 
-  const addresses = await node.class.getAddresses()
+  const getAddressesCall = ctx.token
+    ? caller.getOwnAddresses
+    : caller.getPublicAddresses
 
-  if (!addresses) return null
+  const addresses = await getAddressesCall({ account: input.account })
 
   return addresses
 }

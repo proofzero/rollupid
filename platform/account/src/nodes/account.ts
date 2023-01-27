@@ -40,8 +40,4 @@ export default class Account extends DOProxy {
     const stored = await this.state.storage.get<Addresses>('addresses')
     return stored || null
   }
-
-  async setAddresses(addresses: Addresses): Promise<void> {
-    return this.state.storage.put('addresses', addresses)
-  }
 }

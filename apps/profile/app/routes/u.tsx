@@ -16,8 +16,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 }
 
 const UserLayout = () => {
-  const { loggedInUserProfile, accountURN } = useOutletContext<{
-    loggedInUserProfile: Profile | null
+  const { profile: loggedInUserProfile, accountURN } = useOutletContext<{
+    profile: Profile | null
     accountURN: string
   }>()
   return <Outlet context={{ loggedInUserProfile, accountURN }} />

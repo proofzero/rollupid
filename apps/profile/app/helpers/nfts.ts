@@ -98,11 +98,10 @@ export const decorateNfts = (ownedNfts: any) => {
 export const getGallery = async (owner: string, jwt: string) => {
   // TODO: get from account
   const galaxyClient = await getGalaxyClient()
-  const { profile } = await galaxyClient.getProfile(undefined, {
+  const { gallery } = await galaxyClient.getProfile(undefined, {
     [PlatformJWTAssertionHeader]: jwt,
   })
-  console.log({ profile })
-  return profile?.gallery || []
+  return gallery || []
 }
 
 // ------ beginning of the VERY HIGHLY IMPURE FUNCTIONS TO FETCH NFTS

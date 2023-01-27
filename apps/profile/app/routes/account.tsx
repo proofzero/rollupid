@@ -64,8 +64,8 @@ export default function AccountLayout() {
     addresses: Node[]
     cryptoAddresses: Node[]
   }>()
-  const { loggedInUserProfile: profile, accountURN } = useOutletContext<{
-    loggedInUserProfile: Profile
+  const { profile, accountURN } = useOutletContext<{
+    profile: Profile
     accountURN: string
   }>()
 

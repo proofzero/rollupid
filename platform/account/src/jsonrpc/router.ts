@@ -20,6 +20,8 @@ import {
   GetSessionsMethodOutput,
 } from './methods/getSessions'
 
+import { getAddressesMethod } from './methods/getAddresses'
+
 import {
   ValidateJWT,
   JWTAssertionTokenFromHeader,
@@ -125,6 +127,15 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(SetGalleryInput)
     .mutation(setGalleryMethod),
+  getAddresses: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(ValidateJWT)
+    .use(Scopes)
+    .use(LogUsage)
+    .use(Analytics)
+    .input(GetAddressesInput)
+    // .output(AddressListSchema)
+    .query(getAddressesMethod),
   getOwnAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)

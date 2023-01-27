@@ -26,11 +26,8 @@ export default /* GraphQL */ `
     bio: String
     job: String
     location: String
-    links: [Link!]
     website: String
-    addresses: [Node!]
     handle: String
-    gallery: [Gallery!]
   }
 
   input PFPInput {
@@ -53,18 +50,20 @@ export default /* GraphQL */ `
     location: String
     website: String
     defaultAddress: URN
-    links: [LinkInput]
-    addresses: [NodeInput!]
-    gallery: [GalleryInput!]
   }
 
   type Query {
     profile: Profile
+    links: [Link!]
+    gallery: [Gallery!]
+    addresses: [Node!]
     profileFromAddress(addressURN: URN!): Profile
     connectedAddresses: [Node!]
   }
 
   type Mutation {
     updateProfile(profile: ProfileInput): Boolean
+    updateLinks(links: [LinkInput!]): Boolean
+    updateGallery(gallery: [GalleryInput!]): Boolean
   }
 `

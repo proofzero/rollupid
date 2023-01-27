@@ -1,4 +1,4 @@
-import type { Profile } from '@kubelt/galaxy-client'
+import type { Profile, Link, Gallery, Node } from '@kubelt/galaxy-client'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import { AddressURN } from '@kubelt/urns/address'
 import { getGalaxyClient } from '~/helpers/clients'
@@ -9,8 +9,8 @@ export const getAccountProfile = async (jwt: string) => {
     [PlatformJWTAssertionHeader]: jwt,
   })
 
-  const profile = profileRes.profile as Profile
-  return profile
+  const { profile, links, gallery, addresses } = profileRes
+  return { profile, links, gallery, addresses }
 }
 
 export const getAccountAddresses = async (jwt: string) => {

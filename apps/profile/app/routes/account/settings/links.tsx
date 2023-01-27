@@ -94,9 +94,9 @@ export const action: ActionFunction = async ({ request }) => {
    * pass back-end schema validation
    */
 
-  await galaxyClient.updateProfile(
+  await galaxyClient.updateLinks(
     {
-      profile: { links: updatedLinks },
+      links: updatedLinks,
     },
     {
       [PlatformJWTAssertionHeader]: jwt,

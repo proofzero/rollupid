@@ -37,6 +37,4 @@ export const GallerySchema = z.array(
   })
 )
 
-export const AddressesSchema = z.object({
-  addresses: z.array(Node),
-})
+export const AddressesSchema = z.array(Node)

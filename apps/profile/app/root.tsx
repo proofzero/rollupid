@@ -83,7 +83,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = session.get('user')
 
   let basePath = undefined
-  let loggedInUserProfile
+  let loggedInProfile
+  let profile, links, addresses, gallery
   let accountURN
   let handle
 
@@ -96,19 +97,25 @@ export const loader: LoaderFunction = async ({ request }) => {
       parseJwt(jwt).sub as `urn:${string}:${string}${string}`
     ).decoded
 
-    loggedInUserProfile = await getAccountProfile(jwt)
+    loggedInProfile = await getAccountProfile(jwt)
 
-    if (!loggedInUserProfile)
-      throw new Error('Could not retrieve logged in use profile.')
+    loggedInProfile = {
+      ...loggedInProfile.profile,
+      links: loggedInProfile.links,
+      gallery: loggedInProfile.gallery,
+      addresses: loggedInProfile.addresses,
+    }
 
-    basePath = getRedirectUrlForProfile(loggedInUserProfile)
+    if (!profile) throw new Error('Could not retrieve logged in use profile.')
+
+    basePath = getRedirectUrlForProfile(loggedInProfile)
   }
 
-  console.log({ loggedInUserProfile })
+  console.log({ profile, links, addresses, gallery })
 
   return json({
-    loggedInUserProfile,
     basePath,
+    profile: loggedInProfile,
     accountURN,
     handle,
     ENV: {
@@ -186,7 +193,7 @@ export default function App() {
 
           <Outlet
             context={{
-              loggedInUserProfile,
+              profile: loggedInUserProfile,
               accountURN,
             }}
           />

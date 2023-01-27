@@ -4,7 +4,6 @@ import {
   ProfileSchema,
   LinksSchema,
   GallerySchema,
-  AddressesSchema,
 } from './jsonrpc/validators/profile'
 import { DeploymentMetadata } from '@kubelt/types'
 
@@ -21,4 +20,4 @@ export type AddressList = z.infer<typeof AddressListSchema>
 export type Profile = z.infer<typeof ProfileSchema>
 export type Links = z.infer<typeof LinksSchema>
 export type Gallery = z.infer<typeof GallerySchema>
-export type Addresses = z.infer<typeof AddressesSchema>
+export type Addresses = z.infer<typeof AddressListSchema>

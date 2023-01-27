@@ -101,9 +101,9 @@ export const action: ActionFunction = async ({ request }) => {
   }))
 
   const galaxyClient = await getGalaxyClient()
-  await galaxyClient.updateProfile(
+  await galaxyClient.updateGallery(
     {
-      profile: { gallery },
+      gallery,
     },
     {
       [PlatformJWTAssertionHeader]: jwt,

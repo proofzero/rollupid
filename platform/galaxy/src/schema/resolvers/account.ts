@@ -8,7 +8,7 @@ import { setupContext, isAuthorized, hasApiKey, logAnalytics } from './utils'
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { Profile } from '@kubelt/platform.account/src/types'
+import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import {
   PlatformAddressURNHeader,
@@ -39,6 +39,64 @@ const accountResolvers: Resolvers = {
 
       return accountProfile
     },
+
+    //@ts-ignore
+    links: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      console.log(`galaxy:links: getting links for account: ${accountURN}`)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let links = await accountClient.getLinks.query({
+        account: accountURN,
+      })
+
+      return links
+    },
+
+    gallery: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let gallery = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+
+      return gallery
+    },
+
+    addresses: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy:addresses: getting addresses for account: ${accountURN}`
+      )
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let addresses = await accountClient.getAddresses.query({
+        account: accountURN,
+      })
+
+      return addresses
+    },
+
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -162,6 +220,54 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
+    //@ts-ignore
+    updateLinks: async (
+      _parent: any,
+      { links }: { links: Links },
+      { env, jwt, accountURN }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+      )
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      await accountClient.setLinks.mutate({
+        name: accountURN,
+        links,
+      })
+      return true
+    },
+    updateGallery: async (
+      _parent: any,
+      { gallery }: { gallery: Gallery },
+      { env, jwt, accountURN }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+      )
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      // TODO: Return the profile we've created. Need to enforce
+      // the GraphQL types when setting data otherwise we're able
+      // to set a value that can't be returned.
+      // TODO: handle and return form errors
+
+      await accountClient.setGallery.mutate({
+        name: accountURN,
+        gallery,
+      })
+      return true
+    },
   },
   PFP: {
     __resolveType: (obj: any) => {
@@ -175,9 +281,24 @@ const accountResolvers: Resolvers = {
 
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.addresses': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
   'Mutation.updateProfile': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.updateLinks': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.updateGallery': [
     setupContext(),
     hasApiKey(),
     isAuthorized(),
