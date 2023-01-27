@@ -5021,8 +5021,8 @@ __metadata:
     "@storybook/react": 6.5.13
     "@storybook/testing-library": 0.0.13
     "@tailwindcss/forms": 0.5.3
-    "@types/react": 18.0.25
-    "@types/react-dom": 18.0.8
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
     babel-loader: 9.1.0
     bcryptjs: 2.4.3
     chromatic: 6.13.1
@@ -5073,8 +5073,8 @@ __metadata:
     "@tailwindcss/forms": 0.5.3
     "@types/node": 18.11.9
     "@types/puppeteer": 5.4.6
-    "@types/react": 18.0.9
-    "@types/react-dom": 18.0.9
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
     "@typescript-eslint/eslint-plugin": 5.42.1
     "@typescript-eslint/parser": 5.42.1
     autoprefixer: 10.4.8
@@ -5161,8 +5161,8 @@ __metadata:
     "@trpc/client": 10.8.1
     "@types/node": 18.11.9
     "@types/puppeteer": 5.4.7
-    "@types/react": 18.0.25
-    "@types/react-dom": 18.0.9
+    "@types/react": 18.0.27
+    "@types/react-dom": 18.0.10
     "@typescript-eslint/eslint-plugin": 5.44.0
     "@typescript-eslint/parser": 5.44.0
     autoprefixer: 10.4.13
@@ -11880,21 +11880,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:18.0.8":
-  version: 18.0.8
-  resolution: "@types/react-dom@npm:18.0.8"
+"@types/react-dom@npm:18.0.10":
+  version: 18.0.10
+  resolution: "@types/react-dom@npm:18.0.10"
   dependencies:
     "@types/react": "*"
-  checksum: 522e5e949d05f35c6037a2290838c9c7ff92a9d06f7d96b993c7c3f5a86d8f3a6337e059c94e6fb0920227f445e5d1ce10fbfe3d9bbd95fb82a5539249d90646
-  languageName: node
-  linkType: hard
-
-"@types/react-dom@npm:18.0.9":
-  version: 18.0.9
-  resolution: "@types/react-dom@npm:18.0.9"
-  dependencies:
-    "@types/react": "*"
-  checksum: e744e3feba25fc43733289d4df4d9c0e59fcca7f34e8c89d75f81a339accb2bd70236d69382d47d2c0ad06a1529b2e56aa6171fe175854d60e07156ddceedfcb
+  checksum: ff8282d5005a0b1cd95fb65bf79d3d8485e4cfe2aaf052129033a178684b940014a3f4536bc20d573f8a01cf4c6f4770c74988cef7c2b5cac3041d9f172647e3
   languageName: node
   linkType: hard
 
@@ -11909,25 +11900,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.0.25":
-  version: 18.0.25
-  resolution: "@types/react@npm:18.0.25"
+"@types/react@npm:18.0.27":
+  version: 18.0.27
+  resolution: "@types/react@npm:18.0.27"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: 231d658c45abdef044a716b4502774f1585d8336d73b2f5bd68f181acbfc874b7a457686ecd29b415b43ed0922c309bab7e2cf96832d188a3f4f1b02f2af760a
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:18.0.9":
-  version: 18.0.9
-  resolution: "@types/react@npm:18.0.9"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: 162364dad716d9017ee34aabf2ea37499709ebbdef70392ae1b39225985971e1a46f121efb9c5c7da92144ee1d96d4525df806a7c1c03a5db7fd31dd034ddc7a
+  checksum: 600fdbc39a92ea4a77047db3e12f05f67776a710f5918248c0189a59ac2a38900c9db5a5d2e433a16df528a3ecab1aa114b322cacea573bb1ca2fc0b094c52d1
   languageName: node
   linkType: hard
 

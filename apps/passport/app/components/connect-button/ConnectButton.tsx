@@ -1,11 +1,24 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import classNames from 'classnames'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import type { ButtonProps } from '@kubelt/design-system/src/atoms/buttons/Button'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import { ConnectKitProvider, ConnectKitButton } from 'connectkit'
 
 import walletsSvg from './wallets.svg'
+
+async function getConnectKit() {
+  let _connectKit: any
+  if (!_connectKit) {
+    _connectKit = await import('connectkit')
+  }
+  return _connectKit
+}
+async function getWagmiKit() {
+  let _wagmi: any
+  if (!_wagmi) {
+    _wagmi = await import('wagmi')
+  }
+  return _wagmi
+}
 
 export type ConnectButtonProps = {
   connectCallback: (address: string) => void
@@ -23,60 +36,74 @@ export function ConnectButton({
   className,
   ...rest
 }: ConnectButtonProps) {
-  const { disconnect } = useDisconnect()
-  const { error } = useConnect()
-  const { address, isConnected, isConnecting, isDisconnected, status } =
-    useAccount()
+  const [wagmi, setWagmi] = useState({
+    useAccount: () => ({
+      address: '' as `0x${string}`,
+      isConnected: false,
+      isConnecting: false,
+      isDisconnected: false,
+      status: '',
+    }),
+    useConnect: () => ({
+      error: null as Error | null,
+    }),
+    useDisconnect: () => ({
+      disconnect: () => {},
+    }),
+  })
+  const [connectKit, setConnectKit] = useState<typeof import('connectkit')>()
 
-  useEffect(() => {
-    if (isConnected) {
-      connectCallback(address)
-    }
-  }, [isConnected])
+  const loadWeb3 = () => async () => {
+    console.log('lazy loading web3')
+    const w = await getWagmiKit()
+    const c = await getConnectKit()
+    setWagmi(w)
+    setConnectKit(c)
+  }
+  loadWeb3()()
 
-  useEffect(() => {
-    if (error) {
-      disconnect()
-      connectErrorCallback(error)
-    }
-  }, [error])
+  if (wagmi && connectKit && typeof document !== 'undefined') {
+    return (
+      <connectKit.ConnectKitProvider>
+        <connectKit.ConnectKitButton.Custom>
+          {({ isConnected, isConnecting, show, hide, address, ensName }) => {
+            if (isConnected && address) {
+              connectCallback(address)
+            }
 
-  return (
-    <ConnectKitProvider>
-      <ConnectKitButton.Custom>
-        {({ isConnected, isConnecting, show, hide, address, ensName }) => {
-          return (
-            <Button
-              btnType="secondary-alt"
-              className={classNames('button', className)}
-              disabled={isConnecting}
-              onClick={show}
-              style={{
-                height: 50,
-                width: '100%',
-                fontSize: 16,
-                fontWeight: 500,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <span
+            return (
+              <Button
+                btnType="secondary-alt"
+                className={classNames('button', className)}
+                disabled={isConnecting}
+                onClick={show}
                 style={{
-                  backgroundRepeat: 'no-repeat',
-                  backgroundSize: '100%',
-                  height: 20,
-                  width: 20,
-                  margin: '0 7px',
+                  height: 50,
+                  width: '100%',
+                  fontSize: 16,
+                  fontWeight: 500,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
-                <img src={walletsSvg} />
-              </span>
-              {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
-            </Button>
-          )
-        }}
-      </ConnectKitButton.Custom>
-    </ConnectKitProvider>
-  )
+                <span
+                  style={{
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: '100%',
+                    height: 20,
+                    width: 20,
+                    margin: '0 7px',
+                  }}
+                >
+                  <img src={walletsSvg} />
+                </span>
+                {!isConnecting ? 'Connect With Wallet' : 'Connecting'}
+              </Button>
+            )
+          }}
+        </connectKit.ConnectKitButton.Custom>
+      </connectKit.ConnectKitProvider>
+    )
+  } else return <></>
 }

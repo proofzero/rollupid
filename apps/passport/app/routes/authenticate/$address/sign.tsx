@@ -10,7 +10,7 @@ import { useAccount, useSignMessage, useDisconnect } from 'wagmi'
 
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getAddressClient } from '~/platform.server'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
@@ -111,22 +111,23 @@ export default function Sign() {
     },
   })
 
-  const startSigning = () => {
+  const startSigning = useCallback(() => {
     signMessage({ message: nonceMessage })
     setSigning(true)
-  }
+  }, [nonceMessage, signMessage])
 
   useEffect(() => {
+    console.log({ isConnected, connector, signing, error })
     if (isConnected && connector) {
       startSigning()
     }
-  }, [connector])
+  }, [isConnected, startSigning, connector])
 
   useEffect(() => {
     if ((!isConnected && signing) || isDisconnected || isConnecting) {
       navigate(`/authenticate${window.location.search}`)
     }
-  }, [isConnected])
+  }, [isConnected, isConnecting, isDisconnected, navigate, signing])
 
   return (
     <div className={'flex flex-col gap-4 h-screen justify-center items-center'}>

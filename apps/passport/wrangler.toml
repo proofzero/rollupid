@@ -54,7 +54,7 @@ services = [
 
 [env.dev.vars]
 THREEID_APP_URL = "https://my-dev.threeid.xyz"
-CONSOLE_APP_URL = "https://console-dev.threid.xyz"
+CONSOLE_APP_URL = "https://console-dev.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-dev.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-dev.threeid.xyz/authenticate/google/callback"
@@ -78,7 +78,7 @@ services = [
 
 [env.next.vars]
 THREEID_APP_URL = "https://my-next.threeid.xyz"
-CONSOLE_APP_URL = "https://console-next.threid.xyz"
+CONSOLE_APP_URL = "https://console-next.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport-next.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport-next.threeid.xyz/authenticate/google/callback"
@@ -105,7 +105,7 @@ services = [
 
 [env.current.vars]
 THREEID_APP_URL = "https://my.threeid.xyz"
-CONSOLE_APP_URL = "https://console.threid.xyz"
+CONSOLE_APP_URL = "https://console.threeid.xyz"
 PASSPORT_REDIRECT_URL = "https://passport.threeid.xyz/authenticate/token"
 COOKIE_DOMAIN = "threeid.xyz"
 INTERNAL_GOOGLE_OAUTH_CALLBACK_URL = "http://passport.threeid.xyz/authenticate/google/callback"
