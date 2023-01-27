@@ -2,7 +2,6 @@ import { decodeJwt } from 'jose'
 import { z } from 'zod'
 
 export const tokenValidator = z.preprocess((token) => {
-  console.log({ token })
   const payload = decodeJwt(token as string)
   if (!payload) {
     throw 'missing JWT payload'

@@ -159,13 +159,6 @@ const AccountSettingsConnections = () => {
             <fetcher.Form
               method="post"
               action="/account/settings/connections/rename"
-              // onSubmit={(e) => {
-              //   const targetForm = e.currentTarget
-              //   fetcher.submit(targetForm)
-
-              //   setRenameModalOpen(false)
-              //   setActionId(undefined)
-              // }}
             >
               {actionId && <input type="hidden" name="id" value={actionId} />}
 

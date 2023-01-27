@@ -18,11 +18,7 @@ import { Profile } from '@kubelt/galaxy-client'
 export const loader: LoaderFunction = async ({ request, context }) => {
   const { clientId, redirectUri, scope, state } = context.consoleParams
 
-  console.log(context.consoleParams)
-
   const jwt = await requireJWT(request, context.consoleParams, context.env)
-
-  console.log({ scope })
 
   if (clientId) {
     if (!state) throw json({ message: 'state is required' }, 400)
