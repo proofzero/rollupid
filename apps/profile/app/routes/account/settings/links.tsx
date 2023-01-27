@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 
-import type { ActionFunction } from 'react-router-dom'
 import {
   Form,
   useTransition,
   useOutletContext,
   useActionData,
+  useLoaderData,
 } from '@remix-run/react'
 
 import { requireJWT } from '~/utils/session.server'
@@ -26,6 +26,11 @@ import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import InputText from '~/components/inputs/InputText'
 import SaveButton from '~/components/accounts/SaveButton'
 
+import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
+import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
+import { AddressURN } from '@kubelt/urns/address'
+import { NodeType } from '@kubelt/types/address'
+
 export type ProfileData = {
   targetAddress: string
   displayName: string
@@ -39,6 +44,51 @@ export type ProfileData = {
     url: string
     verified: boolean
   }[]
+}
+
+const normalizeProfile = (profile: any) => {
+  switch (profile.__typename) {
+    case 'OAuthGithubProfile':
+      return {
+        id: profile.urn,
+        address: profile.html_url,
+        title: 'GitHub',
+        icon: profile.avatar_url,
+      }
+  }
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const jwt = await requireJWT(request)
+
+  const addresses = (await getAccountAddresses(jwt)) ?? []
+  const addressTypeUrns = addresses.map((a) => ({
+    urn: a.urn,
+    nodeType: a.rc.node_type,
+  }))
+
+  // This returns profiles without urns
+  const profiles =
+    (await getAddressProfiles(
+      jwt,
+      addressTypeUrns.map((atu) => atu.urn as AddressURN)
+    )) ?? []
+
+  // This mapps to a new structure that contains urn also;
+  // useful for list keys as well as for address context actions as param
+  const mappedProfiles = profiles.map((p, i) => ({
+    ...addressTypeUrns[i],
+    ...p,
+  }))
+
+  const oAuthProfiles = mappedProfiles
+    .filter((p) => p?.nodeType === NodeType.OAuth)
+    .map((p) => ({ urn: p.urn, ...p?.profile }))
+    .map(normalizeProfile)
+
+  return {
+    oAuthProfiles,
+  }
 }
 
 export const action: ActionFunction = async ({ request }) => {
@@ -163,9 +213,12 @@ export default function AccountSettingsLinks() {
   const transition = useTransition()
   const actionData = useActionData()
 
+  const { oAuthProfiles } = useLoaderData()
+
   const initialOldLinks = profile.links || []
 
   const [links, setLinks] = useState(initialOldLinks)
+  const [oAuthLinks, setOAuthLinks] = useState(oAuthProfiles)
 
   const [isFormChanged, setFormChanged] = useState(false)
 
@@ -187,10 +240,33 @@ export default function AccountSettingsLinks() {
       <Text
         size="base"
         weight="semibold"
-        className="mt-[2.875rem] mb-[1.375rem] text-gray-300"
+        className="mt-[2.875rem] mb-[1.375rem] text-gray-800"
       >
         Connected Account Links
       </Text>
+
+      <SortableList
+        items={oAuthLinks.map((l: any) => ({ key: `${l.id}`, val: l }))}
+        itemRenderer={(item) => (
+          <div className="flex flex-row items-center w-full">
+            <img className="w-9 h-9 rounded-full mr-3.5" src={item.val.icon} />
+
+            <div className="flex flex-col space-y-1.5">
+              <Text size="sm" weight="medium" className="text-gray-700">
+                {item.val.title}
+              </Text>
+              <Text size="xs" weight="normal" className="text-gray-500">
+                {item.val.address}
+              </Text>
+            </div>
+          </div>
+        )}
+        onItemsReordered={(items) => {
+          setOAuthLinks(items.map((i) => i.val))
+          setFormChanged(true)
+        }}
+      />
+
       <Text
         size="base"
         weight="semibold"

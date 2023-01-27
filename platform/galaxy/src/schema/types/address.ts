@@ -20,6 +20,7 @@ export default /* GraphQL */ `
     loign: String!
     id: Int!
     avatar_url: String!
+    html_url: String!
     name: String
     email: String
     bio: Boolean

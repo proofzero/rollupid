@@ -315,6 +315,7 @@ export type OAuthGithubProfile = {
   email?: Maybe<Scalars['String']>;
   followers: Scalars['Int'];
   following: Scalars['Int'];
+  html_url: Scalars['String'];
   id: Scalars['Int'];
   location?: Maybe<Scalars['String']>;
   loign: Scalars['String'];
@@ -759,6 +760,7 @@ export const GetAddressProfileDocument = gql`
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
       ... on OAuthMicrosoftProfile {
         name
@@ -794,6 +796,7 @@ export const GetAddressProfilesDocument = gql`
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
       ... on OAuthMicrosoftProfile {
         name

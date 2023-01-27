@@ -22,6 +22,7 @@ query getAddressProfile($addressURN: URN!) {
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
 
       ... on OAuthMicrosoftProfile {
@@ -61,6 +62,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
       ... on OAuthGithubProfile {
         name
         avatar_url
+        html_url
       }
 
       ... on OAuthMicrosoftProfile {
