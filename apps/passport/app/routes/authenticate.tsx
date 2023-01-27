@@ -1,35 +1,10 @@
 import type { LoaderFunction } from '@remix-run/cloudflare'
 import { redirect } from '@remix-run/cloudflare'
-import { Outlet } from '@remix-run/react'
-import { useState, Suspense, lazy } from 'react'
+import { Suspense } from 'react'
 
 import { getUserSession } from '~/session.server'
-// import { getDefaultClient } from 'connectkit'
-// import { WagmiConfig, createClient } from 'wagmi'
+
 import React from 'react'
-
-// import WagmiConfig from '~/web3/WagmiConfig.client'
-// import createClient from '~/web3/createClient.client'
-// import getDefaultClient from '~/web3/getDefaultClient.client'
-
-// const { WagmiConfig } = lazy(() => import('wagmi'))
-// const createClient = lazy(() => import('~/web3/createClient.client'))
-// const getDefaultClient = lazy(() => import('~/web3/getDefaultClient.client'))
-
-// async function getConnectKit() {
-//   let _connectKit: any
-//   if (!_connectKit) {
-//     _connectKit = await import('connectkit')
-//   }
-//   return _connectKit
-// }
-// async function getWagmiKit() {
-//   let _wagmi: any
-//   if (!_wagmi) {
-//     _wagmi = await import('wagmi')
-//   }
-//   return _wagmi
-// }
 
 // TODO: loader function check if we have a session already
 // redirect if logged in
