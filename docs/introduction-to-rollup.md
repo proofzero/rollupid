@@ -2,7 +2,7 @@
 description: 3ID is authorization infrastructure for you apps so you can build great relationships with your users.
 ---
 
-We want to help developers onboard users to their applications without compromising on security or privacy. We do this by providing a set of tools that make it easy to get users into your application safely and securely with traditional, social, and crypto logins that make them most comfortable. 
+We want to help developers onboard users to their applications without compromising on security or privacy. We do this by providing a set of tools that make it easy to get users into your application safely and securely with traditional, social, and crypto logins that make them most comfortable.
 
 No matter how those users connect, you get one unified user profile: social logins can provision social wallets, crypto users can share their emails privately, and both parties can engage online in valuable ways.
 

@@ -1,17 +1,16 @@
 ---
-description: Step-by-step guide to creating a 3ID application.
+description: Step-by-step guide to creating a Rollup application.
 ---
 
+## Connect with Rollup Passport
 
-## Connect with 3ID Passport
+First, connect with Rollup Passport: [https://passport.rollup.id](https://passport.rollup.id). You’ll see a screen like this:
 
-First, connect with 3ID Passport: [https://passport.threeid.xyz](https://passport.threeid.xyz). You’ll see a screen like this:
-
-![3ID Passport is your launchpad.](../../img/passport.png)
+![Rollup Passport is your launchpad.](../../img/passport.png)
 
 ## Select Console
 
-Console is where you’ll create and configure your 3ID Application. Select Console and you’ll see your list of applications — 
+Console is where you’ll create and configure your Rollup Application. Select Console and you’ll see your list of applications —
 
 ![Console is your command center -- but first you need an app!](../../img/console-dashboard.png)
 
@@ -23,7 +22,7 @@ Console is where you’ll create and configure your 3ID Application. Select Cons
 
 ## Open 0xAuth Settings
 
-Click the second item in the sidebar on the left, **0xAuth**. This will open the authorization configuration settings for your 3ID application. If you’ve configured an OAuth application before, 0xAuth configuration should look familiar:
+Click the second item in the sidebar on the left, **0xAuth**. This will open the authorization configuration settings for your Rollup application. If you’ve configured an OAuth application before, 0xAuth configuration should look familiar:
 
 ![Configure your OxAuth/OAuth settings!](../../img/console-app-0xauth.png)
 

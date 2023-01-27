@@ -4,7 +4,7 @@ Simply look up a unique account resolver ([see below](#resolvers)) and onboard y
 
 ## Getting Started
 
-To get a user's public profile make an HTTP API call to `https://my.threeid.xyz/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
+To get a user's public profile make an HTTP API call to `https://my.rollup.id/<resolver>/json`, where `<resolver>` is a unique account identifier (e.g. an Ethereum address).
 
 ### Resolvers
 
@@ -12,26 +12,26 @@ Resolvers uniquely identify accounts (e.g., an Ethereum address or Google Accoun
 
 Here is the current list of resolvers. [Join our Discord](https://discord.gg/UgwAsJf6C5) to tell us which resolvers you want.
 
-| Resolver | Description                | Example                                    | Status |
-| -------- | -------------------------- | ------------------------------------------ | ------ |
-| Ethereum | Ethereum account addresses | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live   |
-| ENS      | ENS domain names           | alfl.eth                                   | Live   |
-| Google Account | Classic OAuth2 Google Login | alex.flanagan@gmail.com | On Deck |
+| Resolver       | Description                 | Example                                    | Status  |
+| -------------- | --------------------------- | ------------------------------------------ | ------- |
+| Ethereum       | Ethereum account addresses  | 0x3DaC36FE079e311489c6cF5CC456a6f38FE01A52 | Live    |
+| ENS            | ENS domain names            | alfl.eth                                   | Live    |
+| Google Account | Classic OAuth2 Google Login | alex.flanagan@gmail.com                    | On Deck |
 
 ## Making a Request
 
-If you visit a profile link in a browser (e.g., [https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722)](https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722) you can see our own rendering of profile data. If you append `/json` to that URL you can query the same API directly:
+If you visit a profile link in a browser (e.g., [https://my.rollup.id/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722)](https://my.rollup.id/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722) you can see our own rendering of profile data. If you append `/json` to that URL you can query the same API directly:
 
 ```bash
-curl https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
+curl https://my.rollup.id/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json
 ```
 
 Or, for example, with Javascript `fetch`:
 
 ```javascript
-fetch('https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
-  .then(p => p.json())
-  .then(profile => {
+fetch('https://my.rollup.id/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
+  .then((p) => p.json())
+  .then((profile) => {
     console.log('User-set display name:', profile.displayName)
     console.log('URL for user-set PFP: ', profile.pfp.image)
     console.log('URL for user-set cover photo: ', profile.cover)
@@ -45,7 +45,7 @@ fetch('https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json')
 
 ## 3ID Profile Response
 
-If you feed the above `curl` through a tool like `jq`, for example with `curl https://my.threeid.xyz/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
+If you feed the above `curl` through a tool like `jq`, for example with `curl https://my.rollup.id/0x68dc0Ee494FF6546C2547409F89C2cf097EE4722/json -s | jq`, you get the profile JSON object:
 
 ```json
 {

@@ -1,5 +1,5 @@
 ---
-description: How to publish and integrate your 3ID with your app
+description: How to publish and integrate your Rollup with your app
 ---
 
 TODO

@@ -1,3 +1,0 @@
----
-description: TODO galaxy reference
----
