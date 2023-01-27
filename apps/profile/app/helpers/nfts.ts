@@ -1,5 +1,6 @@
 import { gatewayFromIpfs } from '@kubelt/utils'
 import { getGalaxyClient } from './clients'
+import { getAccountProfile } from './profile'
 
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 /**
@@ -97,10 +98,10 @@ export const decorateNfts = (ownedNfts: any) => {
 
 export const getGallery = async (owner: string, jwt: string) => {
   // TODO: get from account
-  const galaxyClient = await getGalaxyClient()
-  const { gallery } = await galaxyClient.getProfile(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
+  const profile = await getAccountProfile(jwt)
+
+  const { gallery } = profile
+
   return gallery || []
 }
 

@@ -107,6 +107,9 @@ const nftsResolvers: Resolvers = {
       },
       { env, jwt }: ResolverContext
     ) => {
+      console.log(
+        `galaxy.contractsForAddress: getting contracts for account: ${owner}`
+      )
       let contracts: any[] = []
 
       const accountURN = AccountURNSpace.componentizedUrn(owner)

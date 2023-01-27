@@ -55,7 +55,10 @@ export const action: ActionFunction = async ({ request }) => {
     generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
   )
   const session = await getProfileSession(request)
-  const jwt = session.get('jwt')
+  const user = session.get('user')
+
+  const jwt = user.accessToken
+
   let errors: any = {}
 
   /**
@@ -245,6 +248,7 @@ const Gallery = () => {
         owner: accountURN,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
+
       galleryFetcher.load(request)
     })()
   }, [])

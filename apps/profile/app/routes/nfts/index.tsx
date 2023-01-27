@@ -10,7 +10,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const srcUrl = new URL(request.url)
 
   const session = await getProfileSession(request)
-  const jwt = session.get('jwt')
+  const user = session.get('user')
+
+  const jwt = user.accessToken
 
   const owner = srcUrl.searchParams.get('owner')
   if (!owner) {
@@ -18,7 +20,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const galaxyClient = await getGalaxyClient()
-
   const { contractsForAddress: resColl } =
     await galaxyClient.getNftsPerCollection(
       {

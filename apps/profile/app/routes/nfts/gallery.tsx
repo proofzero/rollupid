@@ -8,7 +8,9 @@ export const loader: LoaderFunction = async (args) => {
   const srcUrl = new URL(args.request.url)
 
   const session = await getProfileSession(args.request)
-  const jwt = session.get('jwt')
+  const user = session.get('user')
+
+  const jwt = user.accessToken
 
   /**
    * params.profile is called from `$profile/gallery` route

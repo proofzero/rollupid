@@ -125,7 +125,9 @@ export async function requireJWT(request: Request, headers = new Headers()) {
 
 export async function isValidJWT(request: Request): Promise<boolean> {
   const session = await getProfileSession(request)
-  const jwt = session.get('jwt')
+  const user = session.get('user')
+
+  const jwt = user.accessToken
 
   if (!jwt || typeof jwt !== 'string') {
     return false

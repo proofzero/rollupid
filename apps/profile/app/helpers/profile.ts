@@ -5,12 +5,18 @@ import { getGalaxyClient } from '~/helpers/clients'
 
 export const getAccountProfile = async (jwt: string) => {
   const galaxyClient = await getGalaxyClient()
+
   const profileRes = await galaxyClient.getProfile(undefined, {
     [PlatformJWTAssertionHeader]: jwt,
   })
 
   const { profile, links, gallery, addresses } = profileRes
-  return { profile, links, gallery, addresses }
+  return { profile, links, gallery, addresses } as {
+    profile: Profile
+    links: Link[]
+    gallery: Gallery[]
+    addresses: Node[]
+  }
 }
 
 export const getAccountAddresses = async (jwt: string) => {

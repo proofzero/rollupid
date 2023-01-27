@@ -83,10 +83,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const user = session.get('user')
 
   let basePath = undefined
-  let loggedInProfile
-  let profile, links, addresses, gallery
+  let loggedInUserProfile
   let accountURN
-  let handle
 
   if (user) {
     const {
@@ -97,27 +95,25 @@ export const loader: LoaderFunction = async ({ request }) => {
       parseJwt(jwt).sub as `urn:${string}:${string}${string}`
     ).decoded
 
-    loggedInProfile = await getAccountProfile(jwt)
+    const fetchedLoggedInProfile = await getAccountProfile(jwt)
 
-    loggedInProfile = {
-      ...loggedInProfile.profile,
-      links: loggedInProfile.links,
-      gallery: loggedInProfile.gallery,
-      addresses: loggedInProfile.addresses,
+    loggedInUserProfile = {
+      ...fetchedLoggedInProfile.profile,
+      links: fetchedLoggedInProfile.links,
+      gallery: fetchedLoggedInProfile.gallery,
+      addresses: fetchedLoggedInProfile.addresses,
     }
 
-    if (!profile) throw new Error('Could not retrieve logged in use profile.')
+    if (!loggedInUserProfile)
+      throw new Error('Could not retrieve logged in use profile.')
 
-    basePath = getRedirectUrlForProfile(loggedInProfile)
+    basePath = getRedirectUrlForProfile(loggedInUserProfile)
   }
-
-  console.log({ profile, links, addresses, gallery })
 
   return json({
     basePath,
-    profile: loggedInProfile,
+    loggedInUserProfile,
     accountURN,
-    handle,
     ENV: {
       INTERNAL_GOOGLE_ANALYTICS_TAG,
       CONSOLE_APP_URL,
@@ -132,10 +128,11 @@ export default function App() {
       INTERNAL_GOOGLE_ANALYTICS_TAG: string
       CONSOLE_APP_URL: string
     }
-    loggedInUserProfile: GetProfileQuery['profile'] | null
+    loggedInUserProfile: any
     basePath: string | undefined
     accountURN: string
   }>()
+
   const transition = useTransition()
   const GATag = ENV.INTERNAL_GOOGLE_ANALYTICS_TAG
 
