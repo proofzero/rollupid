@@ -183,7 +183,6 @@ export default /* GraphQL */ `
       excludeFilters: [String]
       pageSize: Int
     ): NFTContracts
-    getCuratedGallery(addressURN: URN): NFTsWithChain
     getNFTMetadataBatch(input: [NFTMetadataInput]): NFTs
   }
 `

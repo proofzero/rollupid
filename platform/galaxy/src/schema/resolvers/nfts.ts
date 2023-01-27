@@ -207,30 +207,6 @@ const nftsResolvers: Resolvers = {
         ownedNfts: NFTPropertyMapper(ownedNfts.filter((nft) => !nft.error)),
       }
     },
-
-    //@ts-ignore
-    getCuratedGallery: async (
-      _parent: any,
-      { addressURN }: { addressURN: AddressURN },
-      { env }: ResolverContext
-    ) => {
-      const indexerClient = createIndexerClient(env.Indexer)
-
-      let gallery: any = []
-
-      try {
-        gallery = await indexerClient.kb_getGallery([
-          `urn:threeid:address/${AddressURNSpace.parse(addressURN).decoded}`,
-        ])
-      } catch (ex) {
-        console.error(ex)
-      }
-
-      // TODO: fetch from account
-      return {
-        gallery: [],
-      }
-    },
   },
 
   Mutation: {},
@@ -240,7 +216,6 @@ const NFTsResolverComposition = {
   'Query.nftsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.contractsForAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.getNFTMetadataBatch': [setupContext(), logAnalytics()],
-  'Query.getCuratedGallery': [setupContext(), logAnalytics()],
 }
 
 export default composeResolvers(nftsResolvers, NFTsResolverComposition)

@@ -181,5 +181,6 @@ export const getConnectedCryptoAddresses = async ({
     account: accountURN,
   })
 
-  return addresses.map((address) => address.qc.alias)
+  // for alchemy calls they need to be lowercased
+  return addresses.map((address) => address.qc.alias.toLowerCase())
 }

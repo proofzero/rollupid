@@ -3,7 +3,14 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 
-import { setupContext, isAuthorized, hasApiKey, logAnalytics } from './utils'
+import {
+  setupContext,
+  isAuthorized,
+  hasApiKey,
+  logAnalytics,
+  getConnectedCryptoAddresses,
+  getAlchemyClients,
+} from './utils'
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
@@ -209,11 +216,6 @@ const accountResolvers: Resolvers = {
         ...profile,
       } as Profile
 
-      // TODO: Return the profile we've created. Need to enforce
-      // the GraphQL types when setting data otherwise we're able
-      // to set a value that can't be returned.
-      // TODO: handle and return form errors
-
       await accountClient.setProfile.mutate({
         name: accountURN,
         profile: newProfile,
@@ -242,6 +244,7 @@ const accountResolvers: Resolvers = {
       })
       return true
     },
+    //@ts-ignore
     updateGallery: async (
       _parent: any,
       { gallery }: { gallery: Gallery },
@@ -257,15 +260,41 @@ const accountResolvers: Resolvers = {
         },
       })
 
-      // TODO: Return the profile we've created. Need to enforce
-      // the GraphQL types when setting data otherwise we're able
-      // to set a value that can't be returned.
-      // TODO: handle and return form errors
+      const connectedAddresses = await getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
+
+      const owners: any = await Promise.all(
+        gallery.map(async (token) => {
+          const [ethereumOwners, polygonOwners]: any = await Promise.all([
+            ethereumClient.getOwnersForToken({
+              tokenId: token.tokenId,
+              contractAddress: token.contract,
+            }),
+            polygonClient.getOwnersForToken({
+              tokenId: token.tokenId,
+              contractAddress: token.contract,
+            }),
+          ])
+          return ethereumOwners.owners.concat(polygonOwners.owners)
+        })
+      )
+
+      gallery = gallery.filter((nft, i) => {
+        return connectedAddresses.some((address) => {
+          return owners[i].includes(address)
+        })
+      })
 
       await accountClient.setGallery.mutate({
         name: accountURN,
         gallery,
       })
+
       return true
     },
   },

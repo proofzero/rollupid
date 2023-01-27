@@ -77,6 +77,7 @@ export const nftBatchesFetcher = async ({
     45
   )
   // Promise.all only to avoid promise chains
+  // TODO: chang to async npm package
   return Promise.all(
     batches.map(async (batch: any) => {
       const visitedMap: any = {}
