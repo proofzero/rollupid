@@ -44,8 +44,6 @@ const comingNext = [
 export default function Welcome() {
   const { profile } = useOutletContext<{ profile: Profile }>()
 
-  console.log('dashboard', { profile })
-
   completeSteps[0].isCompleted = Object.keys(profile || {}).length > 1
 
   const percentage =
