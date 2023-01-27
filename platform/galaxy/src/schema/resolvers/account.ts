@@ -266,6 +266,7 @@ const accountResolvers: Resolvers = {
         jwt,
       })
 
+      // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
 
       const owners: any = await Promise.all(
