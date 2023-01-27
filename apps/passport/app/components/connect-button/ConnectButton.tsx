@@ -52,11 +52,10 @@ export function ConnectButton({
               disabled={isConnecting}
               onClick={show}
               style={{
-                width: 328,
                 height: 50,
+                width: '100%',
                 fontSize: 16,
                 fontWeight: 500,
-                lineHeight: 24,
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
