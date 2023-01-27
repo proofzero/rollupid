@@ -287,6 +287,7 @@ const UserAddressLayout = () => {
 export default UserAddressLayout
 
 export function CatchBoundary() {
+  //TODO: try getting params injected, as well as useParams below
   //   console.debug('ERROR', error)
   //   const caught = useCatch()
   //   console.debug('CAUGHT', caught)
@@ -302,20 +303,3 @@ export function CatchBoundary() {
     </div>
   )
 }
-
-// export function ErrorBoundary() {
-//   //   console.debug('ERROR', error)
-//   //   const caught = useCatch()
-//   //   console.debug('CAUGHT', caught)
-//   //   const { address, type } = useParams()
-
-//   return (
-//     <div>
-//       <h3>404 page - Replace me with real, provider-specific components</h3>
-//       <div>
-//         This account is waiting to be unlocked. Do you own this account?
-//       </div>
-//       <div>{/* {type} / {address} */}</div>
-//     </div>
-//   )
-// }

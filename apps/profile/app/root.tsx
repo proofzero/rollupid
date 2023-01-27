@@ -205,7 +205,7 @@ export default function App() {
 // https://remix.run/docs/en/v1/guides/errors
 // @ts-ignore
 export function ErrorBoundary({ error }) {
-  console.debug('ERROR', { error })
+  console.error('ERROR', { error })
   return (
     <html lang="en">
       <head>
@@ -240,7 +240,7 @@ export function ErrorBoundary({ error }) {
 export function CatchBoundary() {
   const caught = useCatch()
 
-  console.debug('CAUGHT', { caught })
+  console.error('CAUGHT', { caught })
   let secondary = 'Something went wrong'
   switch (caught.status) {
     case 404:
