@@ -18,7 +18,7 @@ const getUserSessionStorage = (env: Env) => {
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV == 'production',
-      maxAge: 60 * 60 * 24 * 120,
+      maxAge: 60 * 60 * 24 * 90,
       httpOnly: true,
       secrets: [env.SECRET_SESSION_SALT],
     },

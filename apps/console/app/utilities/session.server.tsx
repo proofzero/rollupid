@@ -25,7 +25,7 @@ invariant(COOKIE_DOMAIN, 'COOKIE_DOMAIN must be set')
 // Definitions
 // -----------------------------------------------------------------------------
 
-const MAX_AGE = 60 * 60 * 4
+const MAX_AGE = 60 * 60 * 24 * 90 // 90 days
 
 // createCookieSessionStorage
 // -----------------------------------------------------------------------------
