@@ -1,6 +1,6 @@
 # Table of contents
 
-[Introduction to Rollup](introduction-to-rollup.md)
+- [Introduction to Rollup](introduction-to-rollup.md)
 
 ## Getting Started
 
@@ -25,7 +25,7 @@
 - [Galaxy GQL API](reference/galaxy-api.md)
 - [Scopes](reference/scopes.md)
 
-## [Contributing](contributing.md)
+-## [Contributing](contributing.md)
 
 ## Troubleshooting
 

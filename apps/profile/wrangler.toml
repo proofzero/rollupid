@@ -63,7 +63,7 @@ services = [
 ]
 [env.dev.vars]
 PASSPORT_URL = "https://passport-dev.threeid.xyz"
-CONSOLE_APP_URL = "https://console-dev.threid.xyz"
+CONSOLE_APP_URL = "https://console-dev.threeid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-dev.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
@@ -92,7 +92,7 @@ command = "yarn build"
 
 [env.next.vars]
 PASSPORT_URL = "https://passport-next.threeid.xyz"
-CONSOLE_APP_URL = "https://console-next.threid.xyz"
+CONSOLE_APP_URL = "https://console-next.threeid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my-next.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
@@ -120,7 +120,7 @@ command = "yarn build"
 
 [env.current.vars]
 PASSPORT_URL = "https://passport.threeid.xyz"
-CONSOLE_APP_URL = "https://console.threid.xyz"
+CONSOLE_APP_URL = "https://console.threeid.xyz"
 CLIENT_ID = "<console client id>"
 REDIRECT_URI = "https://my.threeid.xyz/auth/callback"
 COOKIE_DOMAIN = "threeid.xyz"
