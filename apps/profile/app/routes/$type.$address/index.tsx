@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { LoaderFunction, MetaFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
+  useCatch,
   useFetcher,
   useLoaderData,
   useNavigate,
   useOutletContext,
+  useParams,
 } from '@remix-run/react'
 
 import { FaBriefcase, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa'
@@ -29,67 +31,84 @@ import ProfileLayout from '~/components/profile/layout'
 import { Links } from '~/components/profile/links/links'
 
 import defaultOG from '~/assets/3ID_profiles_OG.png'
+import { getRedirectUrlForProfile } from '~/utils/redirects.server'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const address = params.address as string
+  const { address, type } = params
 
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
-  const {
-    user: { accessToken: jwt },
-  } = session.data
-
+  if (!address) throw new Error('No address provided in URL')
   const urn = AddressURNSpace.urn(address)
 
-  // first lets check if this address is a valid handle
-  // TODO: create a getProfileFromHandle method
-
   // if not handle is this let's assume this is an idref
-  const profile = await galaxyClient
-    .getProfileFromAddress(
-      {
-        addressURN: `${urn}`,
-      },
-      {
-        [PlatformJWTAssertionHeader]: jwt,
+  let profile = undefined
+  try {
+    console.debug('BEFORE CONST')
+    const user = session.get('user')
+    let jwt = user?.accessToken
+    profile = await galaxyClient
+      .getProfileFromAddress(
+        {
+          addressURN: `${urn}`,
+        },
+        jwt
+          ? {
+              [PlatformJWTAssertionHeader]: jwt,
+            }
+          : {}
+      )
+      .then((res) => res.profileFromAddress)
+
+    if (!profile) {
+      throw json({ message: 'Profile could not be resolved' }, { status: 404 })
+    }
+
+    if (profile) {
+      if (type === 'a') {
+        let redirectUrl = getRedirectUrlForProfile(profile)
+        const originalRoute = `/${type}/${address}`
+        //Redirect if we've found a better route
+        if (redirectUrl && originalRoute !== redirectUrl)
+          return redirect(redirectUrl)
+        //otherwise stay on current route
+      } else if (type === 'u') {
+        //TODO: galaxy search by handle
+        console.error('Not implemented')
+      } else {
+        //TODO: Type-based resolvers to be tackled in separate PR
       }
+    }
+
+    const ogImage = await ogImageFromProfile(
+      profile.pfp?.image as string,
+      profile.cover as string
     )
-    .then((res) => res.profileFromAddress)
-    .catch((err) => {
-      console.error({ err })
-      // this could return null if the address is not linked to an account
-      // or the account is linked and marked as private
-      // or if the account is invalid
-      return null
+
+    const splittedUrl = request.url.split('/')
+    const path = splittedUrl[splittedUrl.length - 1]
+
+    const cryptoAddresses = profile.addresses?.filter(
+      (addr) => addr.rc.node_type === NodeType.Crypto
+    )
+
+    const matches = profile.addresses?.filter((addr) => urn === addr.urn)
+
+    return json({
+      profile,
+      cryptoAddresses,
+      uname: profile.handle || address,
+      ogImage: ogImage || defaultOG,
+      path,
+      isOwner: jwt && matches && matches.length > 0,
     })
-
-  if (!profile) {
-    throw json({ message: 'Profile could not be resolved' }, { status: 404 })
+  } catch (e) {
+    console.log(
+      `Galaxy did not return a profile for address ${urn}. Moving on.`
+    )
+    throw new Response('No address found', { status: 404 })
   }
-
-  const ogImage = await ogImageFromProfile(
-    profile.pfp?.image as string,
-    profile.cover as string
-  )
-
-  const splittedUrl = request.url.split('/')
-  const path = splittedUrl[splittedUrl.length - 1]
-
-  const cryptoAddresses = profile.addresses?.filter(
-    (addr) => addr.rc.node_type === NodeType.Crypto
-  )
-
-  const matches = profile.addresses?.filter((addr) => urn === addr.urn)
-
-  return json({
-    profile,
-    cryptoAddresses,
-    uname: profile.handle || address,
-    ogImage: ogImage || defaultOG,
-    path,
-    isOwner: matches && matches.length > 0,
-  })
 }
 
 // Wire the loaded profile json, above, to the og meta tags.
@@ -125,6 +144,8 @@ export const meta: MetaFunction = ({
 }
 
 const UserAddressLayout = () => {
+  //TODO: this needs to be optimized so profile isn't fetched from the loader
+  //but used from context alone.
   const { profile, path, cryptoAddresses, isOwner } = useLoaderData<{
     profile: Profile
     path: string
@@ -133,13 +154,14 @@ const UserAddressLayout = () => {
   }>()
   const ctx = useOutletContext<{
     loggedInProfile: Profile | null
+    profile: Profile
   }>()
-
+  const finalProfile = profile ?? ctx.profile
   const navigate = useNavigate()
   const fetcher = useFetcher()
 
   const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(profile.cover as string)
+    gatewayFromIpfs(finalProfile.cover as string)
   )
 
   useEffect(() => {
@@ -170,7 +192,7 @@ const UserAddressLayout = () => {
       }
       Avatar={
         <Avatar
-          src={gatewayFromIpfs(profile.pfp?.image as string) as string}
+          src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
           size="lg"
           hex={true}
           border
@@ -179,7 +201,7 @@ const UserAddressLayout = () => {
       Claim={
         <div className="px-3 lg:px-4">
           <Text className="mt-5 mb-2.5 text-gray-800" weight="bold" size="4xl">
-            {profile.displayName}
+            {finalProfile.displayName}
           </Text>
 
           <div className="flex flex-col space-around">
@@ -188,43 +210,47 @@ const UserAddressLayout = () => {
               size="base"
               weight="medium"
             >
-              {profile.bio}
+              {finalProfile.bio}
             </Text>
 
             <div
               className="flex flex-col lg:flex-row lg:space-x-10 justify-start
               lg:items-center text-gray-500 font-size-lg"
             >
-              {profile.location && (
+              {finalProfile.location && (
                 <div className="flex flex-row space-x-2 items-center wrap">
                   <FaMapMarkerAlt />
                   <Text weight="medium" className="text-gray-500">
-                    {profile.location}
+                    {finalProfile.location}
                   </Text>
                 </div>
               )}
 
-              {profile.job && (
+              {finalProfile.job && (
                 <div className="flex flex-row space-x-2 items-center">
                   <FaBriefcase />
                   <Text weight="medium" className="text-gray-500">
-                    {profile.job}
+                    {finalProfile.job}
                   </Text>
                 </div>
               )}
 
-              {profile.website && (
+              {finalProfile.website && (
                 <div className="flex flex-row space-x-2 items-center">
                   <FaGlobe />
-                  <a href={profile.website} rel="noreferrer" target="_blank">
+                  <a
+                    href={finalProfile.website}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
                     <Text weight="medium" className="text-indigo-500">
-                      {profile.website}
+                      {finalProfile.website}
                     </Text>
                   </a>
                 </div>
               )}
             </div>
-            <Links links={profile.links} />
+            <Links links={finalProfile.links} />
           </div>
         </div>
       }
@@ -253,9 +279,27 @@ const UserAddressLayout = () => {
       // }
       Tabs={<ProfileTabs path={path} handleTab={navigate} />}
     >
-      <Outlet context={{ ...ctx, profile, path, cryptoAddresses }} />
+      <Outlet context={{ ...ctx, finalProfile, path, cryptoAddresses }} />
     </ProfileLayout>
   )
 }
 
 export default UserAddressLayout
+
+export function CatchBoundary() {
+  //TODO: try getting params injected, as well as useParams below
+  //   console.debug('ERROR', error)
+  //   const caught = useCatch()
+  //   console.debug('CAUGHT', caught)
+  //   const { address, type } = useParams()
+
+  return (
+    <div>
+      <h3>404 page - Replace me with real, provider-specific components</h3>
+      <div>
+        This account is waiting to be unlocked. Do you own this account?
+      </div>
+      <div>{/* {type} / {address} */}</div>
+    </div>
+  )
+}

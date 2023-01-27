@@ -34,8 +34,8 @@ export const getRollupAuthenticator = () => {
     {
       authorizationURL: PASSPORT_AUTH_URL,
       tokenURL: PASSPORT_TOKEN_URL,
-      clientID: CONSOLE_CLIENT_ID,
-      clientSecret: CONSOLE_CLIENT_SECRET,
+      clientID: PROFILE_CLIENT_ID,
+      clientSecret: PROFILE_CLIENT_SECRET,
       callbackURL: REDIRECT_URI,
     },
     async ({ accessToken, refreshToken, extraParams }) => {
@@ -121,6 +121,22 @@ export async function requireJWT(request: Request, headers = new Headers()) {
     // throw again any unexpected error that could've happened
     throw error
   }
+}
+
+export async function isValidJWT(request: Request): Promise<boolean> {
+  const session = await getProfileSession(request)
+  const jwt = session.get('jwt')
+
+  if (!jwt || typeof jwt !== 'string') {
+    return false
+  }
+
+  const parsedJWT = parseJwt(jwt)
+  if (!parsedJWT.exp || parsedJWT.exp < Date.now() / 1000) {
+    return false
+  }
+
+  return true
 }
 
 export function parseJwt(token: string): JWTPayload {

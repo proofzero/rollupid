@@ -102,15 +102,6 @@ class TypedComponentsURNSpace<
     urn: `urn:${string}:${string}${string}`
   ): ParsedComponentizedURN<string, string, RCompType, QCompType> {
     const s = super.parse(urn)
-    console.debug('COMPONENTIZED PARSE', {
-      urn,
-      rcomps: s.rcomponent,
-      qcomps: s.qcomponent,
-      nid: s.nid,
-      nss: s.nss,
-      nss_encoded: s.nss_encoded,
-      base_urn: this.getBaseURN(urn),
-    })
     let rcomps = null
     if (s.rcomponent) {
       const params = new URLSearchParams(decodeURIComponent(s.rcomponent))

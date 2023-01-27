@@ -21,7 +21,7 @@ export type GetAddressesParams = z.infer<typeof GetAddressesInput>
 export const GetAddressesOutput = z.array(Node)
 export type GetAddressesOutput = z.infer<typeof GetAddressesOutput>
 
-export const getAddressesMethod = async ({
+export const getPublicAddressesMethod = async ({
   input,
   ctx,
 }: {

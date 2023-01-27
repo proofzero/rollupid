@@ -30,7 +30,7 @@ const user = {
 }
 
 type HeadNavProps = {
-  handle: string | undefined
+  basePath: string | undefined
   avatarUrl?: string | undefined
   isToken?: boolean | undefined
   loggedIn?: boolean | undefined
@@ -38,7 +38,7 @@ type HeadNavProps = {
 }
 
 export default function HeadNav({
-  handle,
+  basePath,
   avatarUrl,
   loggedIn,
   isToken = false,
@@ -53,7 +53,7 @@ export default function HeadNav({
   const navigation = [
     {
       name: 'My Profile',
-      to: handle ? `/u/${handle}` : '/account/settings/connections',
+      to: basePath ? `${basePath}` : '/account/settings/connections',
     },
     { name: 'Account', to: '/account' },
   ]
@@ -96,7 +96,7 @@ export default function HeadNav({
                 <div className="ml-4 flex items-center md:ml-6">
                   {!loggedIn && (
                     <div className="flex flex-row items-center space-x-8">
-                      <Link to="/">
+                      <Link to="/auth">
                         <Text
                           weight="semibold"
                           size="sm"

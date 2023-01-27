@@ -29,6 +29,7 @@ import { Scopes } from '@kubelt/platform-middleware/scopes'
 
 import { initAccountNodeByName } from '../nodes'
 import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { getPublicAddressesMethod } from './methods/getPublicAddresses'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -92,7 +93,7 @@ export const appRouter = t.router({
     .use(Analytics)
     .input(GetAddressesInput)
     // .output(AddressListSchema)
-    .query(getOwnAddressesMethod),
+    .query(getPublicAddressesMethod),
   hasAddresses: t.procedure
     .use(JWTAssertionTokenFromHeader)
     .use(ValidateJWT)

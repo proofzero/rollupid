@@ -1,6 +1,5 @@
 export default /* GraphQL */ `
   type Node {
-    id: String!
     urn: String!
     nid: String!
     nss: String!

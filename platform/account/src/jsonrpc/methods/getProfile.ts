@@ -29,7 +29,6 @@ export const getProfileMethod = async ({
 }): Promise<GetProfileOutputParams> => {
   const node = await initAccountNodeByName(input.account, ctx.Account)
   const caller = appRouter.createCaller(ctx)
-
   const getAddressesCall = ctx.token
     ? caller.getOwnAddresses
     : caller.getPublicAddresses
