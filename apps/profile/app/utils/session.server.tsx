@@ -38,7 +38,7 @@ export const getRollupAuthenticator = () => {
       clientSecret: CONSOLE_CLIENT_SECRET,
       callbackURL: REDIRECT_URI,
     },
-    async ({ accessToken, refreshToken, extraParams, context }) => {
+    async ({ accessToken, refreshToken, extraParams }) => {
       return { accessToken, refreshToken, extraParams }
     }
   )
