@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { LoaderFunction, MetaFunction } from '@remix-run/cloudflare'
+import { LoaderFunction, MetaFunction, redirect } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
 import {
   Outlet,
@@ -31,14 +31,15 @@ import ProfileLayout from '~/components/profile/layout'
 import { Links } from '~/components/profile/links/links'
 
 import defaultOG from '~/assets/3ID_profiles_OG.png'
+import { getRedirectUrlForProfile } from '~/utils/redirects.server'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const address = params.address as string
+  const { address, type } = params
 
   const galaxyClient = await getGalaxyClient()
 
   const session = await getProfileSession(request)
-
+  if (!address) throw new Error('No address provided in URL')
   const urn = AddressURNSpace.urn(address)
 
   // if not handle is this let's assume this is an idref
@@ -62,6 +63,22 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
+    }
+
+    if (profile) {
+      if (type === 'a') {
+        let redirectUrl = getRedirectUrlForProfile(profile)
+        const originalRoute = `/${type}/${address}`
+        //Redirect if we've found a better route
+        if (redirectUrl && originalRoute !== redirectUrl)
+          return redirect(redirectUrl)
+        //otherwise stay on current route
+      } else if (type === 'u') {
+        //TODO: galaxy search by handle
+        console.error('Not implemented')
+      } else {
+        //TODO: Type-based resolvers to be tackled in separate PR
+      }
     }
 
     const ogImage = await ogImageFromProfile(
