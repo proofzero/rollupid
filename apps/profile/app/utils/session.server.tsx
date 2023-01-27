@@ -34,8 +34,8 @@ export const getRollupAuthenticator = () => {
     {
       authorizationURL: PASSPORT_AUTH_URL,
       tokenURL: PASSPORT_TOKEN_URL,
-      clientID: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
+      clientID: CONSOLE_CLIENT_ID,
+      clientSecret: CONSOLE_CLIENT_SECRET,
       callbackURL: REDIRECT_URI,
     },
     async ({ accessToken, refreshToken, extraParams, context }) => {
