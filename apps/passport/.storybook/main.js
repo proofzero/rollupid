@@ -1,7 +1,7 @@
 module.exports = {
   stories: [
     '../app/components/**/*.stories.mdx',
-    '../app/components/**/*.stories.@(js|jsx|ts|tsx)',
+    '../app/components/**/*.stories.@(ts|tsx)',
   ],
   addons: [
     '@storybook/addon-links',
@@ -13,7 +13,7 @@ module.exports = {
     hashFunction: 'xxhash64',
   },
   core: {
-    builder: '@storybook/builder-webpack5',
+    builder: 'webpack5',
   },
   refs: () => {
     return {
@@ -23,12 +23,4 @@ module.exports = {
       },
     }
   },
-  // webpackFinal: async (config, { configType }) => {
-  //   const { module } = config
-  //   const { rules } = module
-  //   return {
-  //     ...config,
-  //     module: { ...config.module, rules: rules },
-  //   }
-  // },
 }

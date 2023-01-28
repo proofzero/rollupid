@@ -24,18 +24,19 @@ export const Template = (args) => <Authorization {...args} />
         clientName: '3ID Profile',
         published: true,
         icon: circleLogo,
-        app: {
-          name: '3ID Profile',
-          icon: '',
-          redirectURI: 'localhost:9797/0xauth',
-          termsURL: '',
-          websiteURL: 'localhost:9797',
-          mirrorURL: '',
-          discordUser: '',
-          mediumUser: '',
-          twitterUser: ''
-        }
-      }
+        scopes: [
+          'scope://threeid.xyz/profile.write',
+          'scope://threeid.xyx/connected-accounts.read',
+          'scope://threeid.xyz/blockchain-account/{{ account }}.manage',
+        ],
+        redirectURI: 'localhost:9797/0xauth',
+        termsURL: '',
+        websiteURL: 'localhost:9797',
+        mirrorURL: '',
+        discordUser: '',
+        mediumUser: '',
+        twitterUser: '',
+      },
       userProfile: {
         name: 'John Doe',
         pfp: {
