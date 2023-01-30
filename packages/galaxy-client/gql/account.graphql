@@ -23,7 +23,7 @@ query getProfile {
     url
     verified
   }
-  addresses {
+  connectedAddresses {
     urn
     nid
     nss
@@ -62,7 +62,7 @@ query getProfileFromAddress($addressURN: URN!) {
     url
     verified
   }
-  addresses {
+  connectedAddresses {
     urn
     nid
     nss

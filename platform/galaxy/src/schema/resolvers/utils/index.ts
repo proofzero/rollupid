@@ -172,15 +172,10 @@ export const getConnectedCryptoAddresses = async ({
       [PlatformJWTAssertionHeader]: jwt,
     },
   })
-
-  const addressesCall = jwt
-    ? accountClient.getOwnAddresses
-    : accountClient.getPublicAddresses
-
-  const addresses = await addressesCall.query({
+  const addresses = await accountClient.getAddresses.query({
     account: accountURN,
   })
 
   // for alchemy calls they need to be lowercased
-  return addresses.map((address) => address.qc.alias.toLowerCase())
+  return addresses
 }

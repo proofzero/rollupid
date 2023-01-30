@@ -64,11 +64,13 @@ const nftsResolvers: Resolvers = {
 
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
-      const addresses = await getConnectedCryptoAddresses({
-        accountURN,
-        Account: env.Account,
-        jwt,
-      })
+      const addresses = (
+        (await getConnectedCryptoAddresses({
+          accountURN,
+          Account: env.Account,
+          jwt,
+        })) || []
+      ).map((address) => address.qc.alias.toLowerCase())
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
@@ -114,11 +116,13 @@ const nftsResolvers: Resolvers = {
 
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
-      const addresses = await getConnectedCryptoAddresses({
-        accountURN,
-        Account: env.Account,
-        jwt,
-      })
+      const addresses = (
+        (await getConnectedCryptoAddresses({
+          accountURN,
+          Account: env.Account,
+          jwt,
+        })) || []
+      ).map((address) => address.qc.alias.toLowerCase())
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })

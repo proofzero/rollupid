@@ -84,26 +84,6 @@ const accountResolvers: Resolvers = {
       return gallery
     },
 
-    addresses: async (
-      _parent: any,
-      {},
-      { env, accountURN, jwt }: ResolverContext
-    ) => {
-      console.log(
-        `galaxy:addresses: getting addresses for account: ${accountURN}`
-      )
-      const accountClient = createAccountClient(env.Account, {
-        headers: {
-          [PlatformJWTAssertionHeader]: jwt,
-        },
-      })
-      let addresses = await accountClient.getAddresses.query({
-        account: accountURN,
-      })
-
-      return addresses
-    },
-
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -170,23 +150,10 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(
-        env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
-      )
-
-      const addressesCall = jwt
-        ? accountClient.getOwnAddresses
-        : accountClient.getPublicAddresses
-
-      const addresses = await addressesCall.query({
-        account: accountURN,
+      const addresses = getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
 
       return addresses
@@ -260,11 +227,13 @@ const accountResolvers: Resolvers = {
         },
       })
 
-      const connectedAddresses = await getConnectedCryptoAddresses({
-        accountURN,
-        Account: env.Account,
-        jwt,
-      })
+      const connectedAddresses = (
+        (await getConnectedCryptoAddresses({
+          accountURN,
+          Account: env.Account,
+          jwt,
+        })) || []
+      ).map((address) => address.qc.alias.toLowerCase())
 
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
@@ -313,7 +282,6 @@ const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.addresses': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
   'Mutation.updateProfile': [

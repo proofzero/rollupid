@@ -10,12 +10,12 @@ export const getAccountProfile = async (jwt: string) => {
     [PlatformJWTAssertionHeader]: jwt,
   })
 
-  const { profile, links, gallery, addresses } = profileRes
-  return { profile, links, gallery, addresses } as {
+  const { profile, links, gallery, connectedAddresses } = profileRes
+  return { profile, links, gallery, connectedAddresses } as {
     profile: Profile
     links: Link[]
     gallery: Gallery[]
-    addresses: Node[]
+    connectedAddresses: Node[]
   }
 }
 

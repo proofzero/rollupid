@@ -101,7 +101,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       ...fetchedLoggedInProfile.profile,
       links: fetchedLoggedInProfile.links,
       gallery: fetchedLoggedInProfile.gallery,
-      addresses: fetchedLoggedInProfile.addresses,
+      addresses: fetchedLoggedInProfile.connectedAddresses,
     }
 
     if (!loggedInUserProfile)
