@@ -13,6 +13,10 @@ export default {
       defaultValue: 'Book',
       control: { type: 'text' },
     },
+    btnText: {
+      defaultValue: 'Click',
+      control: { type: 'text' },
+    },
   },
 }
 
@@ -22,6 +26,7 @@ const Template = (args) => {
     <CTA
       header={args.header}
       description={args.description}
+      btnText={args.btnText}
       clickHandler={() => {
         return
       }}

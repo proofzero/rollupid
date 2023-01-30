@@ -6,10 +6,16 @@ import { Button } from '../../atoms/buttons/Button'
 export type CTAProps = {
   header: string
   description: string
+  btnText: string
   clickHandler?: () => void
 }
 
-export const CTA = ({ header, description, clickHandler }: CTAProps) => (
+export const CTA = ({
+  header,
+  description,
+  clickHandler,
+  btnText,
+}: CTAProps) => (
   <div
     className="w-full bg-white flex items-center justify-between
 rounded-lg border shadow"
@@ -43,7 +49,7 @@ rounded-lg border shadow"
         clickHandler()
       }}
     >
-      Complete Setup
+      {btnText}
     </Button>
   </div>
 )
