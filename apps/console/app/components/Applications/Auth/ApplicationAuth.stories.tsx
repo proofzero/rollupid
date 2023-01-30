@@ -1,3 +1,4 @@
+import { SCOPES } from '@kubelt/security/scopes'
 import { ApplicationAuth } from './ApplicationAuth'
 
 export default {
@@ -14,9 +15,11 @@ const Template = () => (
       onKeyRoll: () => {},
     }}
     onDelete={() => {}}
+    scopeMeta={SCOPES}
     appDetails={{
       app: {
         name: 'Foo',
+        scopes: [],
       },
       published: true,
     }}
