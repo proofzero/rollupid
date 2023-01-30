@@ -4,7 +4,12 @@
 
 import type { ActionFunction } from '@remix-run/cloudflare'
 import { json } from '@remix-run/cloudflare'
-import { useActionData, useOutletContext, useSubmit } from '@remix-run/react'
+import {
+  useActionData,
+  useOutletContext,
+  useSubmit,
+  useNavigate,
+} from '@remix-run/react'
 import invariant from 'tiny-invariant'
 import { ApplicationDashboard } from '~/components/Applications/Dashboard/ApplicationDashboard'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
@@ -68,6 +73,7 @@ export default function AppDetailIndexPage() {
       appDetails: appDetailsProps
       rotationResult: RotatedSecrets
     }>()
+  const navigate = useNavigate()
 
   const { appDetails: app } = outletContext
 
@@ -80,6 +86,12 @@ export default function AppDetailIndexPage() {
 
   return (
     <ApplicationDashboard
+      CTAprops={{
+        clickHandler: () => {
+          navigate('./auth')
+        },
+        CTAneeded: !app.app.icon || !app.app.redirectURI || !app.app.name,
+      }}
       galaxyGql={{
         createdAt: new Date(app.apiKeyTimestamp as number),
         apiKey: rotatedApiKey as string,
