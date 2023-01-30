@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import ConditionalTooltip from '~/components/conditional-tooltip'
 import classNames from 'classnames'
+import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 const tabs: Record<string, string> = {
+  links: 'Links',
+  activity: 'Activity',
   gallery: 'Gallery',
-  collections: 'NFT Collections',
 }
 
 export type ProfileTabsProps = {
@@ -18,38 +19,39 @@ const ProfileTabs = ({
   enableGallery = false,
   handleTab,
 }: ProfileTabsProps) => {
-  const [currentTab, setCurrentTab] = useState<string>(
-    tabs[path] || 'collections'
-  )
+  const [currentTab, setCurrentTab] = useState<string>(path || 'links')
   return (
     <div className="block px-3 lg:px-4">
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+        <nav className="-mb-px flex" aria-label="Tabs">
           {Object.keys(tabs).map((tab) => {
-            if (!enableGallery && tab === 'gallery') return null
             return (
-              <ConditionalTooltip
-                key={tabs[tab]}
-                content="Gallery is empty"
-                condition={tab === 'gallery' && enableGallery}
+              <button
+                key={tab}
+                disabled={tab === 'activity' || tab === 'gallery'}
+                onClick={() => {
+                  setCurrentTab(tab)
+                  handleTab(`./${tab}`, { replace: true })
+                }}
+                className={classNames(
+                  tab === currentTab
+                    ? 'border-indigo-500 font-semibold text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                  'whitespace-nowrap py-4 px-1 border-b-2 flex-1'
+                )}
               >
-                <button
-                  disabled={tab === 'gallery' && enableGallery}
-                  onClick={() => {
-                    setCurrentTab(tabs[tab])
-                    handleTab(`./${tab}`, { replace: true })
-                  }}
+                <Text
+                  size="sm"
+                  weight="medium"
                   className={classNames(
-                    tabs[tab] === currentTab
-                      ? 'border-indigo-500 font-semibold text-gray-800'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                    '',
-                    'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
+                    tab === 'activity' || tab === 'gallery'
+                      ? 'text-gray-300'
+                      : null
                   )}
                 >
                   {tabs[tab]}
-                </button>
-              </ConditionalTooltip>
+                </Text>
+              </button>
             )
           })}
         </nav>
