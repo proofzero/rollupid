@@ -88,13 +88,11 @@ export type ExchangeTokenResult = {
 export type Gallery = {
   __typename?: 'Gallery';
   contract: Scalars['String'];
-  galleryOrder: Scalars['Int'];
   tokenId: Scalars['String'];
 };
 
 export type GalleryInput = {
   contract: Scalars['String'];
-  galleryOrder: Scalars['Int'];
   tokenId: Scalars['String'];
 };
 
@@ -199,7 +197,6 @@ export type NftContracts = {
 export type NftInput = {
   addressURN?: InputMaybe<Scalars['String']>;
   contract?: InputMaybe<Scalars['String']>;
-  galleryOrder?: InputMaybe<Scalars['Int']>;
   tokenId?: InputMaybe<Scalars['String']>;
 };
 
@@ -503,14 +500,14 @@ export type RefreshTokenMutation = { __typename?: 'Mutation', exchangeRefreshTok
 export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, galleryOrder: number }> | null };
+export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string, galleryOrder: number }> | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -645,7 +642,6 @@ export const GetProfileDocument = gql`
   gallery {
     contract
     tokenId
-    galleryOrder
   }
 }
     `;
@@ -686,7 +682,6 @@ export const GetProfileFromAddressDocument = gql`
   gallery {
     contract
     tokenId
-    galleryOrder
   }
 }
     `;

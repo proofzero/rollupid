@@ -145,7 +145,6 @@ export default /* GraphQL */ `
   type Gallery {
     contract: String!
     tokenId: String!
-    galleryOrder: Int!
   }
 
   input ContractInput {
@@ -161,7 +160,6 @@ export default /* GraphQL */ `
     tokenId: String
     contract: String
     addressURN: String
-    galleryOrder: Int
   }
 
   input NFTMetadataInput {
@@ -173,7 +171,6 @@ export default /* GraphQL */ `
   input GalleryInput {
     contract: String!
     tokenId: String!
-    galleryOrder: Int!
   }
 
   type Query {

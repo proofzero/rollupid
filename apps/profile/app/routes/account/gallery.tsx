@@ -100,7 +100,6 @@ export const action: ActionFunction = async ({ request }) => {
   const gallery = nfts.map((nft: any, i: number) => ({
     contract: nft.contract.address,
     tokenId: nft.tokenId,
-    galleryOrder: i,
   }))
 
   const galaxyClient = await getGalaxyClient()

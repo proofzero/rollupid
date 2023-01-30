@@ -34,7 +34,6 @@ query getProfile {
   gallery {
     contract
     tokenId
-    galleryOrder
   }
 }
 
@@ -74,7 +73,6 @@ query getProfileFromAddress($addressURN: URN!) {
   gallery {
     contract
     tokenId
-    galleryOrder
   }
 }
 

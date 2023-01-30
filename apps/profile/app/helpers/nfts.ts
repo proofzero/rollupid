@@ -196,13 +196,6 @@ export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
     }
   )
 
-  const GalleryOrders: any = {}
-  gallery?.forEach(
-    (nft: { contract: string; tokenId: string; galleryOrder: number }) => {
-      GalleryOrders[`${nft.contract}${nft.tokenId}`] = nft.galleryOrder
-    }
-  )
-
   const ownedNfts = metadata?.ownedNfts.map((nft) => {
     const media = Array.isArray(nft.media) ? nft.media[0] : nft.media
     let error = false
@@ -239,13 +232,9 @@ export const getGalleryWithMetadata = async (owner: string, jwt: string) => {
       collectionTitle: nft.contractMetadata?.name,
       properties: nft.metadata?.properties,
       details,
-      galleryOrder: GalleryOrders[`${nft.contract?.address}${nft.id?.tokenId}`],
     }
   })
 
-  /** Trick to perform permutation according to galleryOrder param  */
-  const result = Array.from(Array((ownedNfts as any[]).length))
-  ownedNfts?.forEach((nft) => (result[nft.galleryOrder] = nft))
   // Setup og tag data
   // check generate and return og image
 
