@@ -21,7 +21,7 @@ const ProfileTabs = ({
 }: ProfileTabsProps) => {
   const [currentTab, setCurrentTab] = useState<string>(path || 'links')
   return (
-    <div className="block px-3 lg:px-4">
+    <div className="block">
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex" aria-label="Tabs">
           {Object.keys(tabs).map((tab) => {
