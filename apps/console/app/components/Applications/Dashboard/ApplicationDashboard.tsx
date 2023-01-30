@@ -2,6 +2,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
+import { CTA } from '@kubelt/design-system/src/molecules/cta/cta'
 import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
 import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
@@ -12,6 +13,10 @@ type ApplicationDashboardProps = {
     apiKey?: string
     createdAt: Date
     onKeyRoll: () => void
+  }
+  CTAprops: {
+    clickHandler: () => void
+    CTAneeded: boolean
   }
   oAuth: {
     appId: string
@@ -25,6 +30,7 @@ type ApplicationDashboardProps = {
 export const ApplicationDashboard = ({
   galaxyGql,
   oAuth,
+  CTAprops,
 }: ApplicationDashboardProps) => {
   const [apiKeyRollModalOpen, setApiKeyRollModalOpen] = useState(false)
   const [clientSecretRollModalOpen, setClientSecretRollModalOpen] =
@@ -54,6 +60,16 @@ export const ApplicationDashboard = ({
         closeCallback={() => setClientSecretRollModalOpen(false)}
       />
 
+      {CTAprops.CTAneeded && (
+        <div className="mb-3">
+          <CTA
+            clickHandler={CTAprops.clickHandler}
+            header="Yo're almost there!"
+            description="Head on to the 0xAuth page to complete the setup"
+            btnText="Complete Setup"
+          />
+        </div>
+      )}
       <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">
         <div className="flex-1 flex flex-col space-y-5">
           <Panel
