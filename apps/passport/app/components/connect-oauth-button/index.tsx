@@ -1,4 +1,4 @@
-import { Form } from '@remix-run/react'
+// import { Form } from '@remix-run/react'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 
 import appleIcon from './apple.svg'
@@ -24,7 +24,7 @@ type ConnectOAuthButtonProps = {
 }
 
 const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => (
-  <Form className="w-full" action={`/authenticate/${provider}`} method="post">
+  <form className="w-full" action={`/authenticate/${provider}`} method="post">
     <Button className={'w-full'} btnType={'secondary-alt'} isSubmit={true}>
       <div className="flex justify-center items-center w-full py-1.5">
         <img
@@ -34,7 +34,7 @@ const ConnectOAuthButton = ({ provider }: ConnectOAuthButtonProps) => (
         />
       </div>
     </Button>
-  </Form>
+  </form>
 )
 
 export default ConnectOAuthButton
