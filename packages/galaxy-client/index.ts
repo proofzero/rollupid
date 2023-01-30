@@ -410,6 +410,7 @@ export type Query = {
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
+  profileFromAlias?: Maybe<Profile>;
 };
 
 
@@ -448,6 +449,12 @@ export type QueryNftsForAddressArgs = {
 
 export type QueryProfileFromAddressArgs = {
   addressURN: Scalars['URN'];
+};
+
+
+export type QueryProfileFromAliasArgs = {
+  alias: Scalars['String'];
+  providerType: Scalars['String'];
 };
 
 export type RefreshTokenInput = {
@@ -500,6 +507,14 @@ export type GetProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetProfileQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
+
+export type GetProfileFromAliasQueryVariables = Exact<{
+  alias: Scalars['String'];
+  providerType: Scalars['String'];
+}>;
+
+
+export type GetProfileFromAliasQuery = { __typename?: 'Query', profileFromAlias?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -641,6 +656,42 @@ export const GetProfileDocument = gql`
   gallery {
     contract
     tokenId
+  }
+}
+    `;
+export const GetProfileFromAliasDocument = gql`
+    query getProfileFromAlias($alias: String!, $providerType: String!) {
+  profileFromAlias(alias: $alias, providerType: $providerType) {
+    pfp {
+      ... on StandardPFP {
+        image
+      }
+      ... on NFTPFP {
+        image
+        isToken
+      }
+    }
+    displayName
+    handle
+    defaultAddress
+    cover
+    location
+    job
+    bio
+    links {
+      name
+      url
+      verified
+    }
+    addresses {
+      urn
+      nid
+      nss
+      qc
+      rc
+      fragment
+    }
+    website
   }
 }
     `;
@@ -919,6 +970,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProfile(variables?: GetProfileQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileQuery>(GetProfileDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfile', 'query');
+    },
+    getProfileFromAlias(variables: GetProfileFromAliasQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAliasQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAliasQuery>(GetProfileFromAliasDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAlias', 'query');
     },
     getProfileFromAddress(variables: GetProfileFromAddressQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<GetProfileFromAddressQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetProfileFromAddressQuery>(GetProfileFromAddressDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProfileFromAddress', 'query');

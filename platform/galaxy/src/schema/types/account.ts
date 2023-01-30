@@ -57,6 +57,7 @@ export default /* GraphQL */ `
     links: [Link!]
     gallery: [Gallery!]
     profileFromAddress(addressURN: URN!): Profile
+    profileFromAlias(alias: String!, providerType: String!): Profile
     connectedAddresses: [Node!]
   }
 

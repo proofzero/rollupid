@@ -145,6 +145,31 @@ const accountResolvers: Resolvers = {
 
       return accountProfile
     },
+    profileFromAlias: async (
+      _parent: any,
+      { providerType, alias },
+      { env, jwt }: ResolverContext
+    ) => {
+      // get the account profile
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
+
+      console.log("galaxy.profileFromAddress: getting account's profile")
+      // should also return the handle if it exists
+      // let accountProfile = await accountClient.getProfile.query({
+
+      // })
+
+      return accountProfile
+    },
     connectedAddresses: async (
       _parent: any,
       {},
@@ -284,6 +309,7 @@ const ProfileResolverComposition = {
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.profileFromAlias': [setupContext(), hasApiKey(), logAnalytics()],
   'Mutation.updateProfile': [
     setupContext(),
     hasApiKey(),
