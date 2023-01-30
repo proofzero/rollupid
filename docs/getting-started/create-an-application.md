@@ -6,13 +6,13 @@ description: Step-by-step guide to creating a Rollup application.
 
 ### Step 1: Connect with Rollup Passport
 
-First, connect with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id). You’ll see a screen like this:
+First, connect with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id). You’ll see a screen like this where you can choose your favorite authentication method to register / login with:
 
 <figure><img src="../.gitbook/assets/authenticate.svg" alt=""><figcaption><p>Rollup Passport Authentication</p></figcaption></figure>
 
 ### Step 2: Create an App
 
-After logging in you will be redirected to the **Rollup Console dashboard**. This is where you’ll create and configure your Rollup Application.
+After logging in you will be redirected to the **Rollup Console dashboard**. This is where you’ll register and configure your Rollup Application.
 
 <div>
 
@@ -28,7 +28,11 @@ From here you will want to click the  “Create Application” button in the mid
 
 ### Step 3: Configure your Application
 
-The first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.** The application secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
+The first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.**&#x20;
+
+{% hint style="info" %}
+The application secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
+{% endhint %}
 
 <div>
 
@@ -46,12 +50,12 @@ Next click the "OAuth" link on the left navigation bar to view the full applicat
 
 Here you will see the standard [OAuth 2.0](https://oauth.net/2/) form where you will need to set the following fields.
 
-* Redirect URL: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md))
-* App Icon: The logo of you application you want displyed to users during the auth flow ([see passport for more](../platform/passport.md))
-* Terms of Service URL: A link to your application's TOS
-* Website: A link to your application's website
-* Scopes: \[coming soon]
-* Domains: \[coming soon]
+* **Redirect URL**: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md))
+* **App Icon**: The logo of you application you want displyed to users during the auth flow ([see passport for more](../platform/passport.md))
+* **Terms of Service URL**: A link to your application's TOS
+* **Website**: A link to your application's website
+* **Scopes**: \[coming soon]
+* **Domains**: \[coming soon]
 
 {% hint style="warning" %}
 In most cases you will need to setup an app for each environment and save the correct **redirect url** for each. For example, a "localhost" redirect url for local development and a "staging" redirect url for test environments.
