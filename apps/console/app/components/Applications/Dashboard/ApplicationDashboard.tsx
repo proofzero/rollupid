@@ -3,9 +3,8 @@ import { Panel } from '@kubelt/design-system/src/atoms/panels/Panel'
 import { ReadOnlyInput } from '@kubelt/design-system/src/atoms/form/ReadOnlyInput'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { LoginsPanel } from '../LoginsPanel/LoginsPanel'
-import { RotateCredsModal } from '~/components/RotateCredsModal/RotateCredsModal'
+import { RotateCredsModal } from '../../RotateCredsModal/RotateCredsModal'
 import { useState } from 'react'
-import { FaCopy } from 'react-icons/fa'
 import { Toaster, toast } from 'react-hot-toast'
 
 type ApplicationDashboardProps = {

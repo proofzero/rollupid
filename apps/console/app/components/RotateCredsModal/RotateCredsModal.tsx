@@ -4,7 +4,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
-import dangerVector from '~/images/danger.svg'
+import dangerVector from '../../images/danger.svg'
 
 export type RotateCredsModalProps = {
   isOpen: boolean
@@ -35,23 +35,19 @@ export const RotateCredsModal = ({
               Are you sure you want to roll the key?
             </Text>
             <Text size="sm" weight="normal" className="text-gray-500">
-              This action cannot be undone and your new key will only be presented once.
+              This action cannot be undone and your new key will only be
+              presented once.
             </Text>
           </section>
 
-            <div className="flex justify-end items-center space-x-3">
-              <Button
-                btnType="secondary-alt"
-                onClick={() => closeCallback()}
-              >
-                Cancel
-              </Button>
-              <Button 
-                btnType="dangerous"
-                onClick={() => rotateCallback()}>
-                Roll
-              </Button>
-            </div>
+          <div className="flex justify-end items-center space-x-3">
+            <Button btnType="secondary-alt" onClick={() => closeCallback()}>
+              Cancel
+            </Button>
+            <Button btnType="dangerous" onClick={() => rotateCallback()}>
+              Roll
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>
