@@ -14,7 +14,13 @@ function pickIcon(setIcon, setIconUrl) {
   return async (e) => {
     // e.target is the input control that trigger the event.
     const files = e.target.files
-    if (files && files.length > 0) {
+    const errors: any = {}
+
+    if (files[0].size >= 1048576) {
+      errors['imgSize'] = 'Image size limit is 1MB'
+    }
+
+    if (files && files.length > 0 && !Object.keys(errors).length) {
       // FileList is *like* an Array but you can't pop().
       const iconFile = files.item(0)
       const reader = new FileReader()
@@ -50,6 +56,7 @@ function pickIcon(setIcon, setIconUrl) {
         setIconUrl(publicVariantUrls[0])
       }
     }
+    return errors
   }
 }
 
@@ -78,6 +85,8 @@ export default function IconPicker({
 }: IconPickerProps) {
   const [icon, setIcon] = useState(url !== undefined ? url : '')
   const [iconUrl, setIconUrl] = useState(url !== undefined ? url : '')
+  const [invalidState, setInvalidState] = useState(invalid)
+  const [errorMessageState, setErrorMessageState] = useState(errorMessage)
 
   const handleDrop = async (e) => {
     e.preventDefault()
@@ -162,7 +171,13 @@ export default function IconPicker({
                   event.stopPropagation()
                   setIsFormChanged(false)
                   setIsImgUploading(true)
-                  await pickIcon(setIcon, setIconUrl)(event)
+                  const errors = await pickIcon(setIcon, setIconUrl)(event)
+                  if (Object.keys(errors).length) {
+                    setInvalidState(true)
+                    setErrorMessageState(errors[Object.keys(errors)[0]])
+                  } else {
+                    setInvalidState(false)
+                  }
                   setIsImgUploading(false)
                   setIsFormChanged(true)
                 }}
@@ -170,14 +185,14 @@ export default function IconPicker({
             </label>
           </div>
         </div>
-        {invalid && (
+        {invalidState && (
           <Text
             className="text-red-500"
             size="xs"
             weight="normal"
             id="icon-error"
           >
-            {errorMessage}
+            {errorMessageState}
           </Text>
         )}
       </div>
