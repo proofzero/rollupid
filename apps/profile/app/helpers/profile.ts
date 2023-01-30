@@ -42,9 +42,14 @@ export const getAddressProfile = async (
     }
   )
 
-  const profile = addressProfile.profile
+  const profile = addressProfile
 
-  return profile
+  return {
+    ...profile.profile,
+    links: profile.links,
+    gallery: profile.gallery,
+    connectedAccounts: profile.connectedAddresses,
+  }
 }
 
 export const getAddressProfiles = async (
