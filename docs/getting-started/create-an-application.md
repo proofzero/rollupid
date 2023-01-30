@@ -2,30 +2,61 @@
 description: Step-by-step guide to creating a Rollup application.
 ---
 
-## Connect with Rollup Passport
+# Create an application
 
-First, connect with Rollup Passport: [https://passport.rollup.id](https://passport.rollup.id). You’ll see a screen like this:
+### Step 1: Connect with Rollup Passport
 
-![Rollup Passport is your launchpad.](../../img/passport.png)
+First, connect with Rollup Passport by visiting [https://passport.rollup.id](https://passport.rollup.id). You’ll see a screen like this:
 
-## Select Console
+<figure><img src="../.gitbook/assets/authenticate.svg" alt=""><figcaption><p>Rollup Passport Authentication</p></figcaption></figure>
 
-Console is where you’ll create and configure your Rollup Application. Select Console and you’ll see your list of applications —
+### Step 2: Create an App
 
-![Console is your command center -- but first you need an app!](../../img/console-dashboard.png)
+After logging in you will be redirected to the **Rollup Console dashboard**. This is where you’ll create and configure your Rollup Application.
 
-## Click “Create Application”
+<div>
 
-— but you don’t have one yet! Click the big “Create Application” button in the middle of the screen and you’ll be taken to the dashboard for a new application.
+<figure><img src="../.gitbook/assets/DashboardInstruction.png" alt=""><figcaption></figcaption></figure>
 
-![Your command and control plane for your app.](../../img/console-app-create.png)
+ 
 
-## Open 0xAuth Settings
+<figure><img src="../.gitbook/assets/Create Application.png" alt=""><figcaption></figcaption></figure>
 
-Click the second item in the sidebar on the left, **0xAuth**. This will open the authorization configuration settings for your Rollup application. If you’ve configured an OAuth application before, 0xAuth configuration should look familiar:
+</div>
 
-![Configure your OxAuth/OAuth settings!](../../img/console-app-0xauth.png)
+From here you will want to click the  “Create Application” button in the middle of the screen where you will be prompted to give your application a name and finally redirected to your new application's configuration screen.
 
-## Configure Your Application Data
+### Step 3: Configure your Application
 
-Now you can configure your application data. [See the Console Reference](../reference/console.md) for more information.
+The first screen you will see is your application dashboard. This is where you can copy your [Galaxy API key](../reference/galaxy-api.md) and your application keys. **Please copy the application secret and store it somewhere secure.** The application secret is only shared once so, if you missed it you can click the "roll keys" link to regenerate the keys.
+
+<div>
+
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
+
+ 
+
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard (1).png" alt=""><figcaption></figcaption></figure>
+
+</div>
+
+Next click the "OAuth" link on the left navigation bar to view the full application configuration screen.
+
+<figure><img src="../.gitbook/assets/oauth.png" alt=""><figcaption></figcaption></figure>
+
+Here you will see the standard [OAuth 2.0](https://oauth.net/2/) form where you will need to set the following fields.
+
+* Redirect URL: The address where Rollup will redirect your users to after they have completed the auth flow ([more on next page](auth-flow.md))
+* App Icon: The logo of you application you want displyed to users during the auth flow ([see passport for more](../platform/passport.md))
+* Terms of Service URL: A link to your application's TOS
+* Website: A link to your application's website
+* Scopes: \[coming soon]
+* Domains: \[coming soon]
+
+{% hint style="warning" %}
+In most cases you will need to setup an app for each environment and save the correct **redirect url** for each. For example, a "localhost" redirect url for local development and a "staging" redirect url for test environments.
+{% endhint %}
+
+All other fields are optional. Once complete click the "Published" toggle and "Save" button.
+
+Now that you have a fully configured application you can complete the integration...

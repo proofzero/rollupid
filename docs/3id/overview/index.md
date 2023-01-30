@@ -1,14 +1,12 @@
 ---
-description: >-
-  3ID is authorization infrastructure for you apps so you can build great
-  relationships with your users.
+description: Rollup is authorization infrastructure designed to streamline user onboarding.
 ---
 
 # Introduction to Rollup
 
-We want to help developers onboard users to their applications without compromising on security or privacy. We do this by providing a set of tools that make it easy to get users into your application safely and securely with traditional, social, and crypto logins that make them most comfortable.
+Rollup is designed to enhance the user experience in your applications with progressive authorizations. With Rollup, you can foster secure and trustworthy relationships with your users, while maintaining the privacy of their data.
 
-No matter how those users connect, you get one unified user profile: social logins can provision social wallets, crypto users can share their emails privately, and both parties can engage online in valuable ways.
+Our goal is to simplify the onboarding process for both developers and users by offering a comprehensive suite of tools that enable seamless and secure login experiences -- no matter how those users want to connect you get one unified user profile.
 
 #### Get Started
 
