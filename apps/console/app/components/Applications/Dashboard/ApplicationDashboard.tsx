@@ -62,7 +62,11 @@ export const ApplicationDashboard = ({
 
       {CTAprops.CTAneeded && (
         <div className="mb-3">
-          <CTA clickHandler={CTAprops.clickHandler} />
+          <CTA
+            clickHandler={CTAprops.clickHandler}
+            header="Yo're almost there!"
+            description="Head on to the 0xAuth page to complete the setup"
+          />
         </div>
       )}
       <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-5">

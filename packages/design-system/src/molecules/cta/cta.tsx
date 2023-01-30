@@ -4,10 +4,12 @@ import { BsGear } from 'react-icons/bs'
 import { Button } from '../../atoms/buttons/Button'
 
 export type CTAProps = {
+  header: string
+  description: string
   clickHandler?: () => void
 }
 
-export const CTA = ({ clickHandler }: CTAProps) => (
+export const CTA = ({ header, description, clickHandler }: CTAProps) => (
   <div
     className="w-full bg-white flex items-center justify-between
 rounded-lg border shadow"
@@ -26,10 +28,10 @@ rounded-lg border shadow"
       </div>
       <div>
         <Text weight="medium" size="lg" className="mb-1">
-          You're almost there!
+          {header}
         </Text>
         <Text weight="normal" size="sm" className="text-gray-500">
-          Head on to the 0xAuth page to complete the setup
+          {description}
         </Text>
       </div>
     </div>
