@@ -48,18 +48,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     console.debug('BEFORE CONST')
     const user = session.get('user')
     let jwt = user?.accessToken
-    profile = await galaxyClient
-      .getProfileFromAddress(
-        {
-          addressURN: `${urn}`,
-        },
-        jwt
-          ? {
-              [PlatformJWTAssertionHeader]: jwt,
-            }
-          : {}
-      )
-      .then((res) => res.profileFromAddress)
+    profile = await galaxyClient.getProfileFromAddress(
+      {
+        addressURN: `${urn}`,
+      },
+      jwt
+        ? {
+            [PlatformJWTAssertionHeader]: jwt,
+          }
+        : {}
+    )
+
+    profile = {
+      ...profile.profile,
+      links: profile.links,
+      gallery: profile.gallery,
+      connectedAddresses: profile.connectedAddresses,
+    }
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })

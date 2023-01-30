@@ -42,7 +42,9 @@ export const getAddressProfile = async (
     }
   )
 
-  const profile = addressProfile.profileFromAddress
+  console.log({ 'PROFILE FROM ADDRESS': { addressProfile } })
+
+  const profile = addressProfile.profile
 
   return profile
 }
