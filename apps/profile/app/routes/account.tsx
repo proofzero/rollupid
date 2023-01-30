@@ -1,5 +1,6 @@
-import { json, LoaderFunction } from '@remix-run/cloudflare'
-import { useLoaderData, NavLink } from '@remix-run/react'
+import { json } from '@remix-run/cloudflare'
+import type { LoaderFunction } from '@remix-run/cloudflare'
+import { useLoaderData, NavLink, useOutletContext } from '@remix-run/react'
 
 import { Outlet } from '@remix-run/react'
 
@@ -16,7 +17,7 @@ import { links as faqStyles } from '~/components/FAQ'
 import ConditionalTooltip from '~/components/conditional-tooltip'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
-import { getAccountAddresses, getAccountProfile } from '~/helpers/profile'
+import { getAccountAddresses } from '~/helpers/profile'
 import type { Node, Profile } from '@kubelt/galaxy-client'
 
 export function links() {
@@ -26,12 +27,7 @@ export function links() {
 export const loader: LoaderFunction = async ({ request }) => {
   const jwt = await requireJWT(request)
 
-  const [profile, addresses] = await Promise.all([
-    getAccountProfile(jwt),
-    getAccountAddresses(jwt),
-  ])
-
-  console.log(profile)
+  const addresses = await getAccountAddresses(jwt)
 
   const cryptoAddresses =
     addresses?.filter((e) => {
@@ -40,7 +36,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     }) || []
 
   return json({
-    profile,
     addresses,
     cryptoAddresses,
   })
@@ -65,11 +60,15 @@ const subNavigation = [
 ]
 
 export default function AccountLayout() {
-  const { profile, addresses, cryptoAddresses } = useLoaderData<{
-    profile: Profile
+  const { addresses, cryptoAddresses } = useLoaderData<{
     addresses: Node[]
     cryptoAddresses: Node[]
   }>()
+  const { profile, accountURN } = useOutletContext<{
+    profile: Profile
+    accountURN: string
+  }>()
+
   return (
     <main className="-mt-72 pb-12">
       <div className="mx-auto max-w-screen-xl lg:px-4 md:px-4 pb-6 sm:px-6 lg:px-8 lg:pb-16">
@@ -88,6 +87,7 @@ export default function AccountLayout() {
                   profile,
                   addresses,
                   cryptoAddresses,
+                  accountURN,
                 }}
               />
             </div>

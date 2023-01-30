@@ -3,12 +3,19 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
 
-import { setupContext, isAuthorized, hasApiKey, logAnalytics } from './utils'
+import {
+  setupContext,
+  isAuthorized,
+  hasApiKey,
+  logAnalytics,
+  getConnectedCryptoAddresses,
+  getAlchemyClients,
+} from './utils'
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
-import { Profile } from '@kubelt/platform.account/src/types'
+import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import {
   PlatformAddressURNHeader,
@@ -39,6 +46,44 @@ const accountResolvers: Resolvers = {
 
       return accountProfile
     },
+
+    //@ts-ignore
+    links: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      console.log(`galaxy:links: getting links for account: ${accountURN}`)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let links = await accountClient.getLinks.query({
+        account: accountURN,
+      })
+
+      return links
+    },
+
+    gallery: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      console.log(`galaxy:gallery: getting gallery for account: ${accountURN}`)
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+      let gallery = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+
+      return gallery
+    },
+
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -50,6 +95,7 @@ const accountResolvers: Resolvers = {
         },
       })
       const accountURN = await addressClient.getAccount.query()
+
       // return the address profile if no account is associated with the address
       if (!accountURN) {
         console.log(
@@ -104,23 +150,10 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const accountClient = createAccountClient(
-        env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
-              },
-            }
-          : {}
-      )
-
-      const addressesCall = jwt
-        ? accountClient.getOwnAddresses
-        : accountClient.getPublicAddresses
-
-      const addresses = await addressesCall.query({
-        account: accountURN,
+      const addresses = getConnectedCryptoAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
       })
 
       return addresses
@@ -150,13 +183,86 @@ const accountResolvers: Resolvers = {
         ...profile,
       } as Profile
 
-      // TODO: Return the profile we've created. Need to enforce
-      // the GraphQL types when setting data otherwise we're able
-      // to set a value that can't be returned.
-      // TODO: handle and return form errors
       await accountClient.setProfile.mutate({
         name: accountURN,
         profile: newProfile,
+      })
+      return true
+    },
+    //@ts-ignore
+    updateLinks: async (
+      _parent: any,
+      { links }: { links: Links },
+      { env, jwt, accountURN }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+      )
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      await accountClient.setLinks.mutate({
+        name: accountURN,
+        links,
+      })
+      return true
+    },
+    //@ts-ignore
+    updateGallery: async (
+      _parent: any,
+      { gallery }: { gallery: Gallery },
+      { env, jwt, accountURN }: ResolverContext
+    ) => {
+      console.log(
+        `galaxy.updateProfile: updating profile for account: ${accountURN}`
+      )
+
+      const accountClient = createAccountClient(env.Account, {
+        headers: {
+          [PlatformJWTAssertionHeader]: jwt,
+        },
+      })
+
+      const connectedAddresses = (
+        (await getConnectedCryptoAddresses({
+          accountURN,
+          Account: env.Account,
+          jwt,
+        })) || []
+      ).map((address) => address.qc.alias.toLowerCase())
+
+      // GALLERY VALIDATION
+      const { ethereumClient, polygonClient } = getAlchemyClients({ env })
+
+      const owners: any = await Promise.all(
+        gallery.map(async (token) => {
+          const [ethereumOwners, polygonOwners]: any = await Promise.all([
+            ethereumClient.getOwnersForToken({
+              tokenId: token.tokenId,
+              contractAddress: token.contract,
+            }),
+            polygonClient.getOwnersForToken({
+              tokenId: token.tokenId,
+              contractAddress: token.contract,
+            }),
+          ])
+          return ethereumOwners.owners.concat(polygonOwners.owners)
+        })
+      )
+
+      gallery = gallery.filter((nft, i) => {
+        return connectedAddresses.some((address) => {
+          return owners[i].includes(address)
+        })
+      })
+
+      await accountClient.setGallery.mutate({
+        name: accountURN,
+        gallery,
       })
 
       return true
@@ -174,9 +280,23 @@ const accountResolvers: Resolvers = {
 
 const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
   'Mutation.updateProfile': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.updateLinks': [
+    setupContext(),
+    hasApiKey(),
+    isAuthorized(),
+    logAnalytics(),
+  ],
+  'Mutation.updateGallery': [
     setupContext(),
     hasApiKey(),
     isAuthorized(),

@@ -34,12 +34,14 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
+import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import SaveButton from '~/components/accounts/SaveButton'
 import PfpNftModal from '~/components/accounts/PfpNftModal'
 import { LoadingGridSquaresGallery } from '~/components/nfts/grid/loading'
 
 // Other helpers
-
+import { getProfileSession } from '~/utils/session.server'
+import { getGalaxyClient } from '~/helpers/clients'
 import { AddressURNSpace } from '@kubelt/urns/address'
 import { generateHashedIDRef } from '@kubelt/urns/idref'
 import type { Node, Profile } from '@kubelt/galaxy-client'
@@ -52,6 +54,10 @@ export const action: ActionFunction = async ({ request }) => {
   const urn = AddressURNSpace.urn(
     generateHashedIDRef(CryptoAddressType.ETH, targetAddress)
   )
+  const session = await getProfileSession(request)
+  const user = session.get('user')
+
+  const jwt = user.accessToken
 
   let errors: any = {}
 
@@ -92,15 +98,23 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const gallery = nfts.map((nft: any, i: number) => ({
-    tokenId: nft.tokenId,
     contract: nft.contract.address,
-    addressURN: urn,
-    gallery_order: i,
+    tokenId: nft.tokenId,
   }))
+
+  const galaxyClient = await getGalaxyClient()
+  await galaxyClient.updateGallery(
+    {
+      gallery,
+    },
+    {
+      [PlatformJWTAssertionHeader]: jwt,
+    }
+  )
 
   // TODO: update gallery on account
 
-  return null
+  return true
 }
 
 export type GalleryData = {
@@ -184,9 +198,10 @@ const SortableNft = (props: any) => {
 
 const Gallery = () => {
   const actionData = useActionData()
-  const { profile, cryptoAddresses } = useOutletContext<{
+  const { profile, cryptoAddresses, accountURN } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
+    accountURN: string
   }>()
 
   //TODO: update pfp components to take multiple addresses
@@ -212,6 +227,7 @@ const Gallery = () => {
   const curatedNftsLinks = curatedNfts.map((nft: any[]) => nft.url)
 
   // REACT HOOKS FOR DISPLAYING AND SORTING GALLERY
+
   useEffect(() => {
     if (JSON.stringify(curatedNfts) !== JSON.stringify(initialState)) {
       setFormChanged(true)
@@ -228,9 +244,10 @@ const Gallery = () => {
   useEffect(() => {
     ;(async () => {
       const addressQueryParams = new URLSearchParams({
-        owner: tempTargetAddress,
+        owner: accountURN,
       })
       const request = `/nfts/gallery?${addressQueryParams.toString()}`
+
       galleryFetcher.load(request)
     })()
   }, [])
@@ -311,13 +328,13 @@ const Gallery = () => {
   }, [modalFetcher.data])
 
   useEffect(() => {
-    getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+    getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
   }, [collection])
 
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -331,7 +348,7 @@ const Gallery = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsModal(modalFetcher, tempTargetAddress, collection, pageKey)
+      getMoreNftsModal(modalFetcher, accountURN, collection, pageKey)
     }
     if (refresh) {
       asyncFn()

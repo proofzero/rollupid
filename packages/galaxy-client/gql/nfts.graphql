@@ -113,35 +113,3 @@ query getNFTMetadata($input: [NFTMetadataInput]) {
     }
   }
 }
-
-query getGallery($addressURN: URN!) {
-  getCuratedGallery(addressURN: $addressURN) {
-    ownedNfts {
-      contract {
-        address
-      }
-      title
-      description
-      media {
-        raw
-        thumbnail
-      }
-      metadata {
-        properties {
-          name
-          value
-          display
-        }
-      }
-      error
-      contractMetadata {
-        name
-        tokenType
-      }
-    }
-  }
-}
-
-mutation updateGallery($gallery: [NFTInput]) {
-  updateCuratedGallery(gallery: $gallery)
-}

@@ -17,7 +17,7 @@ import { FiEdit } from 'react-icons/fi'
 import { TbLink } from 'react-icons/tb'
 import { AiOutlinePlus } from 'react-icons/ai'
 
-import { Profile } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { SortableList } from '@kubelt/design-system/src/atoms/lists/SortableList'
@@ -88,21 +88,15 @@ export const action: ActionFunction = async ({ request }) => {
     return { errors }
   }
   const galaxyClient = await getGalaxyClient()
-  const profileRes = await galaxyClient.getProfile(undefined, {
-    [PlatformJWTAssertionHeader]: jwt,
-  })
-  const updatedProfile = profileRes.profile
 
   /** TODO:
    * fetch errors when this updated profile doesn't
    * pass back-end schema validation
    */
-  await galaxyClient.updateProfile(
+
+  await galaxyClient.updateLinks(
     {
-      profile: {
-        ...updatedProfile,
-        links: updatedLinks,
-      },
+      links: updatedLinks,
     },
     {
       [PlatformJWTAssertionHeader]: jwt,
@@ -165,6 +159,7 @@ export default function AccountSettingsLinks() {
     profile: Profile
     notificationHandler: (success: boolean) => void
   }>()
+
   const transition = useTransition()
   const actionData = useActionData()
 

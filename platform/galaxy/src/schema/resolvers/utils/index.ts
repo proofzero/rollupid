@@ -4,12 +4,21 @@ import type { JWTPayload } from 'jose'
 
 import { AccountURN } from '@kubelt/urns/account'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
+import createAccountClient from '@kubelt/platform-clients/account'
 
 import Env from '../../../env'
 import { isFromCFBinding } from '@kubelt/utils'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import { WriteAnalyticsDataPoint } from '@kubelt/packages/platform-clients/analytics'
+export {
+  getAllNfts,
+  getAlchemyClients,
+  nftBatchesFetcher,
+  sliceIntoChunks,
+  beautifyContracts,
+  fetchContracts,
+} from './nfts'
 
 // 404: 'USER_NOT_FOUND' as string,
 export function parseJwt(token: string): JWTPayload {
@@ -134,15 +143,6 @@ export async function getRPCResult(response: Response) {
   return json.result?.value
 }
 
-export function sliceIntoChunks(arr: any, chunkSize: number) {
-  const res = []
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize)
-    res.push(chunk)
-  }
-  return res
-}
-
 export const logAnalytics =
   () => (next) => async (root, args, context, info) => {
     const method = info?.operation?.name?.value || 'unknown'
@@ -157,3 +157,25 @@ export const logAnalytics =
 
     return next(root, args, context, info)
   }
+
+export const getConnectedCryptoAddresses = async ({
+  accountURN,
+  Account,
+  jwt,
+}: {
+  accountURN: AccountURN
+  Account: Fetcher
+  jwt: any
+}) => {
+  const accountClient = createAccountClient(Account, {
+    headers: {
+      [PlatformJWTAssertionHeader]: jwt,
+    },
+  })
+  const addresses = await accountClient.getAddresses.query({
+    account: accountURN,
+  })
+
+  // for alchemy calls they need to be lowercased
+  return addresses
+}

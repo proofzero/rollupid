@@ -56,7 +56,7 @@ export const getOwnAddressesMethod = async ({
 
   // Return the list of edges between the account node and any address
   // nodes, filtered by address type if provided.
-  return ctx.edges.getEdges
-    .query({ query })
-    .then((res) => res.edges.map((e) => e.dst))
+  const { edges } = await ctx.edges.getEdges.query({ query })
+
+  return edges.map((e) => e.dst)
 }

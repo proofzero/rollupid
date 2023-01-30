@@ -23,10 +23,11 @@ export const loader: LoaderFunction = async (args) => {
 
 const CollectionForProfileRoute = () => {
   const { collection } = useLoaderData()
-  const { profile, cryptoAddresses, isOwner } = useOutletContext<{
+  const { profile, cryptoAddresses, isOwner, accountURN } = useOutletContext<{
     profile: Profile
     cryptoAddresses: Node[]
     isOwner: boolean
+    accountURN: string
   }>()
 
   // TODO: change the ProfileNFTGallery to take multiple addresses
@@ -59,12 +60,7 @@ const CollectionForProfileRoute = () => {
   useEffect(() => {
     if (pageKey) {
       setLoading(true)
-      getMoreNftsSingleCollection(
-        fetcher,
-        tempTargetAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsSingleCollection(fetcher, accountURN, collection, pageKey)
     } else if (pageKey === null) {
       setLoading(false)
     }
@@ -72,12 +68,7 @@ const CollectionForProfileRoute = () => {
 
   useEffect(() => {
     const asyncFn = async () => {
-      getMoreNftsSingleCollection(
-        fetcher,
-        tempTargetAddress,
-        collection,
-        pageKey
-      )
+      getMoreNftsSingleCollection(fetcher, accountURN, collection, pageKey)
     }
 
     if (refresh) {

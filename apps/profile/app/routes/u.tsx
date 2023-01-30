@@ -3,7 +3,7 @@ import { json } from '@remix-run/cloudflare'
 import { Outlet, useCatch, useOutletContext } from '@remix-run/react'
 
 import { ErrorPage } from '@kubelt/design-system/src/pages/error/ErrorPage'
-import type { GetProfileQuery } from '@kubelt/galaxy-client'
+import type { Profile } from '@kubelt/galaxy-client'
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { address } = params
@@ -16,10 +16,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 }
 
 const UserLayout = () => {
-  const { loggedInUserProfile } = useOutletContext<{
-    loggedInUserProfile: GetProfileQuery['profile'] | null
+  const { profile: loggedInUserProfile, accountURN } = useOutletContext<{
+    profile: Profile | null
+    accountURN: string
   }>()
-  return <Outlet context={{ loggedInUserProfile }} />
+  return <Outlet context={{ loggedInUserProfile, accountURN }} />
 }
 
 export default UserLayout

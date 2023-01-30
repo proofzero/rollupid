@@ -16,20 +16,24 @@ query getProfile {
     location
     job
     bio
-    links {
-      name
-      url
-      verified
-    }
-    addresses {
-      urn
-      nid
-      nss
-      qc
-      rc
-      fragment
-    }
     website
+  }
+  links {
+    name
+    url
+    verified
+  }
+  connectedAddresses {
+    urn
+    nid
+    nss
+    fragment
+    qc
+    rc
+  }
+  gallery {
+    contract
+    tokenId
   }
 }
 
@@ -51,20 +55,24 @@ query getProfileFromAddress($addressURN: URN!) {
     location
     job
     bio
-    links {
-      name
-      url
-      verified
-    }
-    addresses {
-      urn
-      nid
-      nss
-      qc
-      rc
-      fragment
-    }
     website
+  }
+  links {
+    name
+    url
+    verified
+  }
+  connectedAddresses {
+    urn
+    nid
+    nss
+    fragment
+    qc
+    rc
+  }
+  gallery {
+    contract
+    tokenId
   }
 }
 
@@ -81,4 +89,10 @@ query getConnectedAddresses {
 
 mutation updateProfile($profile: ProfileInput) {
   updateProfile(profile: $profile)
+}
+mutation updateLinks($links: [LinkInput!]) {
+  updateLinks(links: $links)
+}
+mutation updateGallery($gallery: [GalleryInput!]) {
+  updateGallery(gallery: $gallery)
 }

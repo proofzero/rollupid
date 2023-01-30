@@ -12,7 +12,7 @@ export type GetNFTsParams = {
 export type GetNFTsResult = unknown
 
 export type GetContractsForOwnerParams = {
-  owner: string
+  address: string
   pageKey?: string
   pageSize?: number
   excludeFilters?: string[]
@@ -186,7 +186,7 @@ export class AlchemyClient {
   ): Promise<GetContractsForOwnerResult> {
     const url = this.getNFTAPIURL('getContractsForOwner/')
 
-    url.searchParams.set('owner', params.owner)
+    url.searchParams.set('owner', params.address)
 
     params.pageKey && url.searchParams.set('pageKey', params.pageKey)
 
