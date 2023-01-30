@@ -8,7 +8,7 @@ import {
   isAuthorized,
   hasApiKey,
   logAnalytics,
-  getConnectedCryptoAddresses,
+  getConnectedAddresses,
   getAlchemyClients,
 } from './utils'
 
@@ -89,7 +89,7 @@ const accountResolvers: Resolvers = {
       {},
       { env, accountURN, jwt }: ResolverContext
     ) => {
-      const addresses = getConnectedCryptoAddresses({
+      const addresses = getConnectedAddresses({
         accountURN,
         Account: env.Account,
         jwt,
@@ -264,7 +264,7 @@ const accountResolvers: Resolvers = {
 
       console.log("galaxy.galleryFromAddress: getting account's gallery")
       // should also return the handle if it exists
-      const connectedAddressesFromAddress = getConnectedCryptoAddresses({
+      const connectedAddressesFromAddress = getConnectedAddresses({
         accountURN,
         Account: env.Account,
         jwt,
@@ -342,7 +342,7 @@ const accountResolvers: Resolvers = {
       })
 
       const connectedAddresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,

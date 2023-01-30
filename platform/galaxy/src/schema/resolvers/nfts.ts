@@ -27,7 +27,7 @@ import {
   getAlchemyClients,
   nftBatchesFetcher,
   beautifyContracts,
-  getConnectedCryptoAddresses,
+  getConnectedAddresses,
   fetchContracts,
 } from './utils'
 
@@ -65,7 +65,7 @@ const nftsResolvers: Resolvers = {
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
       const addresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,
@@ -117,7 +117,7 @@ const nftsResolvers: Resolvers = {
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
       const addresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,

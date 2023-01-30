@@ -158,7 +158,7 @@ export const logAnalytics =
     return next(root, args, context, info)
   }
 
-export const getConnectedCryptoAddresses = async ({
+export const getConnectedAddresses = async ({
   accountURN,
   Account,
   jwt,
