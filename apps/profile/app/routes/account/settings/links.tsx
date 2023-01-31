@@ -30,6 +30,8 @@ import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { AddressURN } from '@kubelt/urns/address'
 
+import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
+
 export type ProfileData = {
   targetAddress: string
   displayName: string
@@ -159,7 +161,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
   const connectedAccountLinks = connectedAccounts
-    .filter((ca: any) => ca.address !== '')
+    .filter((ca: any) => ca.enabled)
     .map((ca: any) => ({
       name: ca.title,
       url: ca.address,
@@ -243,8 +245,15 @@ export default function AccountSettingsLinks() {
   const [links, setLinks] = useState(
     initialOldLinks.filter((iol: any) => iol.provider === 'manual')
   )
-  const [oAuthLinks, setOAuthLinks] = useState(oAuthProfiles)
 
+  const [oAuthLinks, setOAuthLinks] = useState(
+    oAuthProfiles.map((profile: any) => ({
+      ...profile,
+      enabled:
+        initialOldLinks.findIndex((iol: any) => profile.address === iol.url) !==
+        -1,
+    }))
+  )
   const [isFormChanged, setFormChanged] = useState(false)
 
   const initialLinks: any[] = []
@@ -276,7 +285,7 @@ export default function AccountSettingsLinks() {
           <div className="flex flex-row items-center w-full">
             <img className="w-9 h-9 rounded-full mr-3.5" src={item.val.icon} />
 
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-1.5 flex-1">
               <Text size="sm" weight="medium" className="text-gray-700">
                 {item.val.title}
               </Text>
@@ -284,6 +293,28 @@ export default function AccountSettingsLinks() {
                 {item.val.address}
               </Text>
             </div>
+
+            <InputToggle
+              id={`enable_${item.val.id}`}
+              label={''}
+              checked={item.val.enabled}
+              onToggle={(val) => {
+                const index = oAuthLinks.findIndex(
+                  (oal: any) => oal.id === item.val.id
+                )
+
+                setOAuthLinks([
+                  ...oAuthLinks.slice(0, index),
+                  {
+                    ...oAuthLinks[index],
+                    enabled: val,
+                  },
+                  ...oAuthLinks.slice(index + 1),
+                ])
+
+                setFormChanged(true)
+              }}
+            />
           </div>
         )}
         onItemsReordered={(items) => {
