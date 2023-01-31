@@ -57,7 +57,9 @@ export const ApplicationListItem = ({
     <section className="px-4 flex-1">
       <div className="flex flex-row space-x-2 items-center">
         <Text size="sm" weight="medium" className="text-gray-900">
-          <a href={`/apps/${id}`}>{name}</a>
+          <a href={`/apps/${id}`} className="hover:underline">
+            {name}
+          </a>
         </Text>
         <ApplicationListItemPublishedState published={published} />
       </div>

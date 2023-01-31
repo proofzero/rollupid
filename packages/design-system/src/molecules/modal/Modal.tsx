@@ -10,12 +10,14 @@ export type ModalProps = {
   handleClose?: (value: boolean) => void
 
   fixed?: boolean
+  closable?: boolean
 }
 
 export const Modal = ({
   isOpen = false,
   fixed = false,
   handleClose,
+  closable = true,
   children,
   ...rest
 }: ModalProps) => {
@@ -61,9 +63,10 @@ export const Modal = ({
                 >
                   <div className="flex flex-row justify-end p-3">
                     <div
-                      className="bg-white rounded-full p-2 text-3xl cursor-pointer"
+                      className={`bg-white rounded-full p-2 text-3xl cursor-pointer
+                      ${!closable ? 'bg-[#f3f4f6] text-[#d1d5db]' : ''}`}
                       onClick={() => {
-                        if (handleClose) handleClose(false)
+                        if (handleClose && closable) handleClose(false)
                       }}
                     >
                       <HiOutlineX />

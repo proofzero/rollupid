@@ -16,7 +16,12 @@ export const NewAppModal = ({
 }: NewAppModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => newAppCreateCallback(null)}>
+    <Modal
+      isOpen={isOpen}
+      fixed
+      closable={!isSubmitting}
+      handleClose={() => newAppCreateCallback(null)}
+    >
       <div
         className={`relative w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto`}
