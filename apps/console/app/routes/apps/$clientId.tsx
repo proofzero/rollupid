@@ -13,6 +13,7 @@ import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import { RotatedSecrets } from '~/types'
 
 type AppData = {
   clientId: string
@@ -47,7 +48,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
-
     let avatarUrl = ''
     try {
       const profileRes = await galaxyClient.getProfile(undefined, {
@@ -91,8 +91,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       rotationResult,
     })
   } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
+    console.error('Caught error in loader', { error })
+    if (error instanceof Response) {
+      throw error
+    } else throw json({ error }, { status: 500 })
   }
 }
 

@@ -24,6 +24,7 @@ import {
   useLocation,
   useLoaderData,
   useTransition,
+  useCatch,
 } from '@remix-run/react'
 
 import { useEffect } from 'react'
@@ -125,6 +126,7 @@ export const ErrorBoundary = ({
     message: string
   }
 }) => {
+  console.error('Error in error boundary', error)
   return (
     <html lang="en">
       <head>
@@ -140,6 +142,41 @@ export const ErrorBoundary = ({
             trace={error?.stack}
             error={error}
           />
+        </div>
+
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  )
+}
+
+export function CatchBoundary() {
+  const caught = useCatch()
+
+  console.error('Error in Catch boundary', { caught })
+  let secondary = 'Something went wrong'
+  switch (caught.status) {
+    case 404:
+      secondary = 'Page not found'
+      break
+    case 400:
+      secondary = 'Bad Request'
+      break
+    case 500:
+      secondary = 'Internal Server Error'
+      break
+  }
+  return (
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+
+      <body className="min-h-[100dvh] flex justify-center items-center">
+        <div className="w-full">
+          <ErrorPage code={caught.status.toString()} message={secondary} />
         </div>
 
         <ScrollRestoration />

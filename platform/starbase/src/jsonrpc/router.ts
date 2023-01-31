@@ -53,6 +53,7 @@ import { getScopes } from './methods/getScopes'
 import { NoInput } from '@kubelt/platform-middleware/inputValidators'
 
 import { Analytics } from '@kubelt/platform-middleware/analytics'
+import { OwnAppsMiddleware } from './ownAppsMiddleware'
 
 const t = initTRPC.context<Context>().create()
 
@@ -70,6 +71,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(DeleteAppInput)
     .mutation(deleteApp),
   updateApp: t.procedure
@@ -77,6 +79,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(UpdateAppInput)
     .mutation(updateApp),
   getAppDetails: t.procedure
@@ -84,6 +87,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(GetAppDetailsInput)
     .output(GetAppDetailsOutput)
     .query(getAppDetails),
@@ -92,6 +96,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(GetAppProfileInput)
     .output(GetAppProfileOutput)
     .query(getAppProfile),
@@ -100,6 +105,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(NoInput)
     .output(ListAppsOutput)
     .query(listApps),
@@ -108,6 +114,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(RotateClientSecretInput)
     .output(RotateClientSecretOutput)
     .mutation(rotateClientSecret),
@@ -116,6 +123,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(RotateApiKeyInput)
     .output(RotateApiKeyOutput)
     .mutation(rotateApiKey),
@@ -130,6 +138,7 @@ export const appRouter = t.router({
     .use(ValidateJWT)
     .use(LogUsage)
     .use(Analytics)
+    .use(OwnAppsMiddleware)
     .input(PublishAppInput)
     .output(PublishAppOutput)
     .mutation(publishApp),
