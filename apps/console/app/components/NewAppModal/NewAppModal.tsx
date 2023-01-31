@@ -3,6 +3,7 @@ import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
 import { useState } from 'react'
+import { RiLoader5Fill } from 'react-icons/ri'
 
 export type NewAppModalProps = {
   isOpen: boolean
@@ -45,7 +46,19 @@ export const NewAppModal = ({
             >
               Cancel
             </Button>
-            <Button type="submit" btnType="primary-alt" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              btnType="primary-alt"
+              className={
+                isSubmitting
+                  ? 'flex items-center justify-between transition'
+                  : ''
+              }
+              disabled={isSubmitting}
+            >
+              {isSubmitting && (
+                <RiLoader5Fill className="animate-spin" size={22} />
+              )}
               Create
             </Button>
           </div>
