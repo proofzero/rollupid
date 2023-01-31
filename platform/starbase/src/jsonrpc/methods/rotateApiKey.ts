@@ -18,6 +18,11 @@ export const rotateApiKey = async ({
   ctx: Context
 }): Promise<z.infer<typeof RotateApiKeyOutput>> => {
   const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
+  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+    throw new Error(
+      `Request received for clientId ${input.clientId} which is not owned by provided account.`
+    )
+
   console.log(`rotating API key for ${appURN}`)
 
   const appDO = await getApplicationNodeByClientId(

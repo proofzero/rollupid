@@ -4,6 +4,7 @@ import type { Environment } from '../types'
 import createEdgesClient from '@kubelt/platform-clients/edges'
 import { AccountURN } from '@kubelt/urns/account'
 import { FetchCreateContextFnOptions } from '@trpc/server/adapters/fetch'
+import { ApplicationURN } from '@kubelt/urns/application'
 
 /**
  * Defines your inner context shape.
@@ -16,6 +17,7 @@ interface CreateInnerContextOptions
   StarbaseApp: DurableObjectNamespace
   Edges: Fetcher
   accountURN?: AccountURN
+  ownAppURNs?: ApplicationURN[]
 }
 /**
  * Inner context. Will always be available in your procedures, in contrast to the outer context.

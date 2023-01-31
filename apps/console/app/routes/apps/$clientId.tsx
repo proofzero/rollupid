@@ -13,6 +13,7 @@ import { getGalaxyClient } from '~/utilities/platform.server'
 import createStarbaseClient from '@kubelt/platform-clients/starbase'
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 import type { appDetailsProps } from '~/components/Applications/Auth/ApplicationAuth'
+import { RotatedSecrets } from '~/types'
 
 type AppData = {
   clientId: string
@@ -47,9 +48,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
-    if (!reshapedApps.map((a) => a.clientId).includes(clientId)) {
-      throw json({ message: 'Invalid ClientID' }, 404)
-    }
     let avatarUrl = ''
     try {
       const profileRes = await galaxyClient.getProfile(undefined, {

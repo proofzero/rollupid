@@ -6,6 +6,8 @@ import {
   AppReadableFieldsSchema,
   AppUpdateableFieldsSchema,
 } from '../validators/app'
+import createEdgesClient from '@kubelt/platform-clients/edges'
+import { ApplicationURNSpace } from '@kubelt/urns/application'
 
 export const GetAppDetailsInput = AppClientIdParamSchema
 
@@ -20,6 +22,11 @@ export const getAppDetails = async ({
   input: z.infer<typeof GetAppDetailsInput>
   ctx: Context
 }): Promise<z.infer<typeof GetAppDetailsOutput>> => {
+  const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
+  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+    throw new Error(
+      `Request received for clientId ${input.clientId} which is not owned by provided account.`
+    )
   const appDO = await getApplicationNodeByClientId(
     input.clientId,
     ctx.StarbaseApp

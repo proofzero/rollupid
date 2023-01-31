@@ -15,7 +15,12 @@ export const deleteApp = async ({
   input: z.infer<typeof DeleteAppInput>
   ctx: Context
 }): Promise<void> => {
-  const appURN = ApplicationURNSpace.urn(input.clientId)
+  const appURN = ApplicationURNSpace.componentizedUrn(input.clientId)
+  if (!ctx.ownAppURNs || !ctx.ownAppURNs.includes(appURN))
+    throw new Error(
+      `Request received for clientId ${input.clientId} which is not owned by provided account.`
+    )
+
   if (!ctx.accountURN) throw new Error('No account URN in context')
 
   const appDO = await getApplicationNodeByClientId(
