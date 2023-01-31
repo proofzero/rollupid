@@ -8,7 +8,7 @@ description: Authenticating and authorizing users into your application.
 For this step you will need the **Application ID** and the **Application Secret** from the [previous step](create-an-application.md).
 {% endhint %}
 
-Rollup is **standards compliant** so, integrating Rollup into your application is identical to integrating any OAuth-based authentication services like [Auth0](https://auth0.com/), [Okta](https://auth0.com/), [Cognito](https://aws.amazon.com/cognito/), or [Azure AD B2C](https://azure.microsoft.com/en-us/services/active-directory/external-identities/b2c/#overview) meaning you can run off-the-shelf open source libraries to build your OAuth flow.
+Rollup is **standards compliant** so, integrating Rollup into your application is identical to integrating any OAuth-based authentication services like [Auth0](https://auth0.com/), [Okta](https://auth0.com/), [Cognito](https://aws.amazon.com/cognito/), [Azure AD B2C](https://azure.microsoft.com/en-us/services/active-directory/external-identities/b2c/#overview), [Firebase](https://firebase.google.com/) or [Supabase](https://supabase.com/), meaning you can run off-the-shelf open source libraries to build your OAuth flow.
 
 {% hint style="info" %}
 We have created a reference implementation using [Remix](https://remix.run/) and the [Remix OAuth](https://github.com/sergiodxa/remix-auth) library [here](https://github.com/kubelt/kubelt/tree/main/apps/profile/app/routes/auth) which we will refer to several times in this step.

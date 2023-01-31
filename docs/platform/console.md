@@ -26,13 +26,15 @@ Within an application context you will be presented with a few tabs.
 
 The dashboard is where you will be presented with an overview your application keys, connected smart contracts, and user sessions.&#x20;
 
-<figure><img src="../.gitbook/assets/Application Detail - Dashboard.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/Application Detail - Dashboard (1).png" alt=""><figcaption></figcaption></figure>
 
 #### OAuth
 
 The OAuth tab is where you can configure your applications standard OAuth settings including the name and logo that will appear in the [Passport](passport.md) flow for your users.
 
-#### Smart Contract
+However, the most important configuration in this tab is the [Scopes](../reference/scopes.md). Every scope is represents an authorization request that will be presented to the user during the auth flow in [Passport](passport.md).
+
+#### Smart Contracts
 
 Coming Soon
 

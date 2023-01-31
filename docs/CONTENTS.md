@@ -13,9 +13,8 @@
 
 * [Console](platform/console.md)
 * [Passport](platform/passport.md)
-* [Profile Graph](platform/profile-graph.md)
-* [Galaxy](platform/galaxy.md)
-* [My Profile](platform/my-profile.md)
+* [Profile](platform/my-profile.md)
+* [Auth Graph](platform/profile-graph.md)
 
 ## Reference
 
