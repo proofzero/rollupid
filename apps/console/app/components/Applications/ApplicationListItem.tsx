@@ -26,7 +26,9 @@ export const ApplicationListItemIcon = ({
   iconUrl,
 }: ApplicationListItemIconProps) => (
   <div className="rounded-l w-16 h-14 flex justify-center items-center bg-gray-200 overflow-hidden">
-    {!iconUrl && <Text className="text-gray-500">{title?.substring(0, 1)}</Text>}
+    {!iconUrl && (
+      <Text className="text-gray-500">{title?.substring(0, 1)}</Text>
+    )}
     {iconUrl && <img src={iconUrl} className="object-cover" />}
   </div>
 )
@@ -55,13 +57,15 @@ export const ApplicationListItem = ({
     <section className="px-4 flex-1">
       <div className="flex flex-row space-x-2 items-center">
         <Text size="sm" weight="medium" className="text-gray-900">
-          {name}
+          <a href={`/apps/${id}`} className="hover:underline">
+            {name}
+          </a>
         </Text>
         <ApplicationListItemPublishedState published={published} />
       </div>
 
       <Text size="sm" weight="normal" className="text-gray-400">
-        { createdTimestamp && new Date(createdTimestamp).toDateString() }
+        {createdTimestamp && new Date(createdTimestamp).toDateString()}
       </Text>
     </section>
 
@@ -85,18 +89,18 @@ export const ApplicationListItem = ({
         >
           <Menu.Items className="absolute z-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-y divide-gray-100">
             <div className="p-1">
-              <Menu.Item
-                as="div"
-                className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
-              >
-                <HiOutlineCog className="text-xl font-normal text-gray-400" />
+              <a href={`/apps/${id}`}>
+                <Menu.Item
+                  as="div"
+                  className="py-2 px-4 flex items-center space-x-3 cursor-pointer"
+                >
+                  <HiOutlineCog className="text-xl font-normal text-gray-400" />
 
-                <a href={`/apps/${id}`}>
                   <Text size="sm" weight="normal" className="text-gray-700">
                     Settings
                   </Text>
-                </a>
-              </Menu.Item>
+                </Menu.Item>
+              </a>
             </div>
 
             <div className="p-1">

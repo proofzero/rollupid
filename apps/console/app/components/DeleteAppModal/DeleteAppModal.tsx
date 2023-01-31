@@ -6,6 +6,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import dangerVector from '../../images/danger.svg'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
+import { RiLoader5Fill } from 'react-icons/ri'
 
 export type DeleteAppModalProps = {
   clientId: string
@@ -21,9 +22,14 @@ export const DeleteAppModal = ({
   deleteAppCallback,
 }: DeleteAppModalProps) => {
   const [isAppNameMatches, setAppNameMatches] = useState(false)
-
+  const [isSubmitting, setIsSubmitting] = useState(false)
   return (
-    <Modal isOpen={isOpen} fixed handleClose={() => deleteAppCallback(false)}>
+    <Modal
+      isOpen={isOpen}
+      fixed
+      closable={!isSubmitting}
+      handleClose={() => deleteAppCallback(false)}
+    >
       <div
         className={`w-[62vw] transform rounded-lg  bg-white px-4 pt-5 pb-4 
          text-left shadow-xl transition-all sm:p-6 overflow-y-auto flex items-start space-x-4`}
@@ -35,7 +41,13 @@ export const DeleteAppModal = ({
             Delete Application
           </Text>
 
-          <form method="post" action="/apps/delete">
+          <form
+            method="post"
+            action="/apps/delete"
+            onSubmit={() => {
+              setIsSubmitting(true)
+            }}
+          >
             <section className="mb-4">
               <Text size="sm" weight="normal" className="text-gray-500 my-3">
                 Are you sure you want to delete <b>{appName}</b> app? This
@@ -61,15 +73,24 @@ export const DeleteAppModal = ({
             <div className="flex justify-end items-center space-x-3">
               <Button
                 btnType="secondary-alt"
+                disabled={isSubmitting}
                 onClick={() => deleteAppCallback(false)}
               >
                 Cancel
               </Button>
               <Button
-                disabled={!isAppNameMatches}
+                disabled={!isAppNameMatches || isSubmitting}
                 type="submit"
                 btnType="dangerous"
+                className={
+                  isSubmitting
+                    ? 'flex items-center justify-between transition'
+                    : ''
+                }
               >
+                {isSubmitting && (
+                  <RiLoader5Fill className="animate-spin" size={22} />
+                )}
                 Delete
               </Button>
             </div>
