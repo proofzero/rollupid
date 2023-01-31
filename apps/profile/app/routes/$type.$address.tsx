@@ -46,18 +46,23 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     console.debug('BEFORE CONST')
     const user = session.get('user')
     let jwt = user?.accessToken
-    profile = await galaxyClient
-      .getProfileFromAddress(
-        {
-          addressURN: `${urn}`,
-        },
-        jwt
-          ? {
-              [PlatformJWTAssertionHeader]: jwt,
-            }
-          : {}
-      )
-      .then((res) => res.profileFromAddress)
+    profile = await galaxyClient.getProfileFromAddress(
+      {
+        addressURN: `${urn}`,
+      },
+      jwt
+        ? {
+            [PlatformJWTAssertionHeader]: jwt,
+          }
+        : {}
+    )
+
+    profile = {
+      ...profile.profile,
+      links: profile.links,
+      gallery: profile.gallery,
+      connectedAddresses: profile.connectedAddresses,
+    }
 
     if (!profile) {
       throw json({ message: 'Profile could not be resolved' }, { status: 404 })
@@ -87,22 +92,21 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    const { connectedAddresses } = await galaxyClient.getConnectedAddresses(
-      undefined,
-      jwt
-        ? {
-            [PlatformJWTAssertionHeader]: jwt,
-          }
-        : {}
+    const cryptoAddresses = profile.connectedAddresses?.filter(
+      (addr) => addr.rc.node_type === NodeType.Crypto
     )
 
-    const match = connectedAddresses?.find((ca) => ca.urn === urn)
+    const matches = profile.connectedAddresses?.filter(
+      (addr) => urn === addr.urn
+    )
 
     return json({
+      profile,
+      cryptoAddresses,
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       path,
-      isOwner: jwt && match != null,
+      isOwner: jwt && matches && matches.length > 0,
     })
   } catch (e) {
     console.log(
