@@ -6,7 +6,7 @@ import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 
 import dangerVector from '../../images/danger.svg'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
-import { useState } from 'react'
+import { RiLoader5Fill } from 'react-icons/ri'
 
 export type DeleteAppModalProps = {
   clientId: string
@@ -83,6 +83,9 @@ export const DeleteAppModal = ({
                 type="submit"
                 btnType="dangerous"
               >
+                {isSubmitting && (
+                  <RiLoader5Fill className="animate-spin" size={22} />
+                )}
                 Delete
               </Button>
             </div>
