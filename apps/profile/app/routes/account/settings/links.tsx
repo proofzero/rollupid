@@ -29,7 +29,6 @@ import SaveButton from '~/components/accounts/SaveButton'
 import { ActionFunction, LoaderFunction } from '@remix-run/cloudflare'
 import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { AddressURN } from '@kubelt/urns/address'
-import { NodeType } from '@kubelt/types/address'
 
 export type ProfileData = {
   targetAddress: string
@@ -48,12 +47,21 @@ export type ProfileData = {
 
 const normalizeProfile = (profile: any) => {
   switch (profile.__typename) {
+    case 'CryptoAddressProfile':
+      return {
+        id: profile.urn,
+        address: `https://etherscan.io/address/${profile.address}`,
+        title: profile.displayName,
+        icon: profile.avatar,
+        provider: 'ethereum',
+      }
     case 'OAuthGithubProfile':
       return {
         id: profile.urn,
         address: profile.html_url,
         title: 'GitHub',
         icon: profile.avatar_url,
+        provider: 'github',
       }
   }
 }
@@ -82,7 +90,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   }))
 
   const oAuthProfiles = mappedProfiles
-    .filter((p) => p?.nodeType === NodeType.OAuth)
+    .filter(
+      (p) =>
+        p?.profile?.__typename === 'CryptoAddressProfile' ||
+        p?.profile?.__typename === 'OAuthGithubProfile'
+    )
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfile)
 
@@ -111,6 +123,7 @@ export const action: ActionFunction = async ({ request }) => {
         name,
         url: updatedUrls[i],
         verified: false,
+        provider: 'manual',
       }
     })
   )
@@ -144,9 +157,19 @@ export const action: ActionFunction = async ({ request }) => {
    * pass back-end schema validation
    */
 
+  const connectedAccounts: any = JSON.parse(formData.get('connected') as string)
+  const connectedAccountLinks = connectedAccounts
+    .filter((ca: any) => ca.address !== '')
+    .map((ca: any) => ({
+      name: ca.title,
+      url: ca.address,
+      provider: ca.provider,
+      verified: true,
+    }))
+
   await galaxyClient.updateLinks(
     {
-      links: updatedLinks,
+      links: connectedAccountLinks.concat(updatedLinks),
     },
     {
       [PlatformJWTAssertionHeader]: jwt,
@@ -217,7 +240,9 @@ export default function AccountSettingsLinks() {
 
   const initialOldLinks = profile.links || []
 
-  const [links, setLinks] = useState(initialOldLinks)
+  const [links, setLinks] = useState(
+    initialOldLinks.filter((iol: any) => iol.provider === 'manual')
+  )
   const [oAuthLinks, setOAuthLinks] = useState(oAuthProfiles)
 
   const [isFormChanged, setFormChanged] = useState(false)
@@ -313,6 +338,11 @@ export default function AccountSettingsLinks() {
               }}
             />
           </div>
+          <input
+            type="hidden"
+            name="connected"
+            value={JSON.stringify(oAuthLinks)}
+          />
           <input type="hidden" name="links" value={JSON.stringify(links)} />
           {newLinks.map((link: any, i: number) => {
             //Check if there is an error
