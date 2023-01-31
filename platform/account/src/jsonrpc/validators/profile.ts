@@ -25,6 +25,7 @@ export const LinksSchema = z
       name: z.string(),
       url: z.string().url().or(z.literal('')),
       verified: z.boolean(),
+      provider: z.string(),
     })
   )
   .optional()
