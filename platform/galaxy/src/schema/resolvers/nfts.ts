@@ -15,6 +15,8 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
+import { NodeType } from '@kubelt/types/address'
+
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import {
@@ -71,7 +73,9 @@ const nftsResolvers: Resolvers = {
           jwt,
         })) || []
       )
-        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
         .map((address) => address.qc.alias.toLowerCase())
 
       try {
@@ -125,7 +129,9 @@ const nftsResolvers: Resolvers = {
           jwt,
         })) || []
       )
-        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
         .map((address) => address.qc.alias.toLowerCase())
 
       try {

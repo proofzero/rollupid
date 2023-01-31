@@ -15,6 +15,7 @@ import {
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { NodeType } from '@kubelt/types/address'
 import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import {
@@ -348,7 +349,9 @@ const accountResolvers: Resolvers = {
           jwt,
         })) || []
       )
-        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
         .map((address) => address.qc.alias.toLowerCase())
 
       // GALLERY VALIDATION
