@@ -82,6 +82,11 @@ export const DeleteAppModal = ({
                 disabled={!isAppNameMatches || isSubmitting}
                 type="submit"
                 btnType="dangerous"
+                className={
+                  isSubmitting
+                    ? 'flex items-center justify-between transition'
+                    : ''
+                }
               >
                 {isSubmitting && (
                   <RiLoader5Fill className="animate-spin" size={22} />
