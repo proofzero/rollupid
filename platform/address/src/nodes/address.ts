@@ -1,10 +1,12 @@
 import { DOProxy, DurableObjectStubProxy } from 'do-proxy'
 
 import { AccountURN } from '@kubelt/urns/account'
-import { Environment, NodeType } from '../types'
-import { AddressType } from '@kubelt/types/address'
-import CryptoAddress from './crypto'
+import { AddressType, NodeType } from '@kubelt/types/address'
+
+import type { Environment } from '../types'
+
 import ContractAddress from './contract'
+import CryptoAddress from './crypto'
 import OAuthAddress from './oauth'
 
 export default class Address extends DOProxy {

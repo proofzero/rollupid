@@ -3,6 +3,7 @@ export enum NodeType {
   Vault = 'vault',
   Contract = 'contract',
   OAuth = 'oauth',
+  Handle = 'handle',
 }
 
 export enum CryptoAddressType {
@@ -21,7 +22,12 @@ export enum OAuthAddressType {
   Apple = 'apple',
 }
 
+export enum HandleAddressType {
+  Handle = 'handle',
+}
+
 export type AddressType =
   | CryptoAddressType
   | OAuthAddressType
   | ContractAddressType
+  | HandleAddressType
