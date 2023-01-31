@@ -2,6 +2,7 @@ import { Button } from '@kubelt/design-system/src/atoms/buttons/Button'
 import { Modal } from '@kubelt/design-system/src/molecules/modal/Modal'
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { Input } from '@kubelt/design-system/src/atoms/form/Input'
+import { useState } from 'react'
 
 export type NewAppModalProps = {
   isOpen: boolean
@@ -12,6 +13,7 @@ export const NewAppModal = ({
   isOpen,
   newAppCreateCallback,
 }: NewAppModalProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   return (
     <Modal isOpen={isOpen} fixed handleClose={() => newAppCreateCallback(null)}>
       <div
@@ -22,7 +24,11 @@ export const NewAppModal = ({
           Create Application
         </Text>
 
-        <form method="post" action="/apps/new">
+        <form
+          method="post"
+          action="/apps/new"
+          onSubmit={() => setIsSubmitting(true)}
+        >
           <Input
             id="client_name"
             label="Application Name"
@@ -34,6 +40,7 @@ export const NewAppModal = ({
           <div className="flex justify-end items-center space-x-3">
             <Button
               btnType="secondary-alt"
+              disabled={isSubmitting}
               onClick={() => newAppCreateCallback(null)}
             >
               Cancel
