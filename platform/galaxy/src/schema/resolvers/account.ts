@@ -8,13 +8,14 @@ import {
   isAuthorized,
   hasApiKey,
   logAnalytics,
-  getConnectedCryptoAddresses,
+  getConnectedAddresses,
   getAlchemyClients,
 } from './utils'
 
 import { Resolvers } from './typedefs'
 import { GraphQLError } from 'graphql'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
+import { NodeType } from '@kubelt/types/address'
 import { Gallery, Links, Profile } from '@kubelt/platform.account/src/types'
 import { ResolverContext } from './common'
 import {
@@ -84,6 +85,20 @@ const accountResolvers: Resolvers = {
       return gallery
     },
 
+    connectedAddresses: async (
+      _parent: any,
+      {},
+      { env, accountURN, jwt }: ResolverContext
+    ) => {
+      const addresses = getConnectedAddresses({
+        accountURN,
+        Account: env.Account,
+        jwt,
+      })
+
+      return addresses
+    },
+
     profileFromAddress: async (
       _parent: any,
       { addressURN }: { addressURN: AddressURN },
@@ -145,18 +160,118 @@ const accountResolvers: Resolvers = {
 
       return accountProfile
     },
-    connectedAddresses: async (
+
+    linksFromAddress: async (
       _parent: any,
-      {},
-      { env, accountURN, jwt }: ResolverContext
+      { addressURN }: { addressURN: AddressURN },
+      { env, jwt }: ResolverContext
     ) => {
-      const addresses = getConnectedCryptoAddresses({
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
+        },
+      })
+      const accountURN = await addressClient.getAccount.query()
+
+      // return the address profile if no account is associated with the address
+      if (!accountURN) {
+        console.log(
+          'galaxy.linksFromAddress: attempt to resolve profile from address w/o account'
+        )
+        throw new GraphQLError("Address doesn't have an associated account")
+      }
+
+      // get the account profile
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
+
+      console.log("galaxy.linksFromAddress: getting account's links")
+      // should also return the handle if it exists
+      const linksFromAddress = await accountClient.getLinks.query({
+        account: accountURN,
+      })
+
+      return linksFromAddress
+    },
+
+    galleryFromAddress: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { env, jwt }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
+        },
+      })
+      const accountURN = await addressClient.getAccount.query()
+
+      // return the address profile if no account is associated with the address
+      if (!accountURN) {
+        console.log(
+          'galaxy.galleryFromAddress: attempt to resolve profile from address w/o account'
+        )
+        throw new GraphQLError("Address doesn't have an associated account")
+      }
+
+      // get the account profile
+      const accountClient = createAccountClient(
+        env.Account,
+        jwt
+          ? {
+              headers: {
+                [PlatformJWTAssertionHeader]: jwt,
+              },
+            }
+          : {}
+      )
+
+      console.log("galaxy.galleryFromAddress: getting account's gallery")
+      // should also return the handle if it exists
+      const galleryFromAddress = await accountClient.getGallery.query({
+        account: accountURN,
+      })
+
+      return galleryFromAddress
+    },
+
+    connectedAddressesFromAddress: async (
+      _parent: any,
+      { addressURN }: { addressURN: AddressURN },
+      { env, jwt }: ResolverContext
+    ) => {
+      const addressClient = createAddressClient(env.Address, {
+        headers: {
+          [PlatformAddressURNHeader]: addressURN, // note: ens names will be resolved
+        },
+      })
+      const accountURN = await addressClient.getAccount.query()
+
+      // return the address profile if no account is associated with the address
+      if (!accountURN) {
+        console.log(
+          'galaxy.galleryFromAddress: attempt to resolve profile from address w/o account'
+        )
+        throw new GraphQLError("Address doesn't have an associated account")
+      }
+
+      console.log("galaxy.galleryFromAddress: getting account's gallery")
+      // should also return the handle if it exists
+      const connectedAddressesFromAddress = getConnectedAddresses({
         accountURN,
         Account: env.Account,
         jwt,
       })
 
-      return addresses
+      return connectedAddressesFromAddress
     },
   },
   Mutation: {
@@ -228,12 +343,16 @@ const accountResolvers: Resolvers = {
       })
 
       const connectedAddresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,
         })) || []
-      ).map((address) => address.qc.alias.toLowerCase())
+      )
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
+        .map((address) => address.qc.alias.toLowerCase())
 
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
@@ -282,8 +401,15 @@ const ProfileResolverComposition = {
   'Query.profile': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.links': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.gallery': [setupContext(), hasApiKey(), logAnalytics()],
-  'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
   'Query.connectedAddresses': [setupContext(), hasApiKey(), logAnalytics()],
+  // 'Query.profileFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.linksFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.galleryFromAddress': [setupContext(), hasApiKey(), logAnalytics()],
+  'Query.connectedAddressesFromAddress': [
+    setupContext(),
+    hasApiKey(),
+    logAnalytics(),
+  ],
   'Mutation.updateProfile': [
     setupContext(),
     hasApiKey(),

@@ -38,7 +38,7 @@ query getProfile {
 }
 
 query getProfileFromAddress($addressURN: URN!) {
-  profileFromAddress(addressURN: $addressURN) {
+  profile: profileFromAddress(addressURN: $addressURN) {
     pfp {
       ... on StandardPFP {
         image
@@ -57,22 +57,22 @@ query getProfileFromAddress($addressURN: URN!) {
     bio
     website
   }
-  links {
+  links: linksFromAddress(addressURN: $addressURN) {
     name
     url
     verified
   }
-  connectedAddresses {
+  gallery: galleryFromAddress(addressURN: $addressURN) {
+    contract
+    tokenId
+  }
+  connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
     urn
     nid
     nss
     fragment
     qc
     rc
-  }
-  gallery {
-    contract
-    tokenId
   }
 }
 

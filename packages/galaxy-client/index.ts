@@ -402,11 +402,14 @@ export type Query = {
   addressProfile?: Maybe<AddressProfile>;
   addressProfiles?: Maybe<Array<Maybe<AddressProfile>>>;
   connectedAddresses?: Maybe<Array<Node>>;
+  connectedAddressesFromAddress?: Maybe<Array<Node>>;
   contractsForAddress?: Maybe<NftContracts>;
   ensProfile?: Maybe<CryptoAddressProfile>;
   gallery?: Maybe<Array<Gallery>>;
+  galleryFromAddress?: Maybe<Array<Gallery>>;
   getNFTMetadataBatch?: Maybe<NfTs>;
   links?: Maybe<Array<Link>>;
+  linksFromAddress?: Maybe<Array<Link>>;
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
@@ -423,6 +426,11 @@ export type QueryAddressProfilesArgs = {
 };
 
 
+export type QueryConnectedAddressesFromAddressArgs = {
+  addressURN: Scalars['URN'];
+};
+
+
 export type QueryContractsForAddressArgs = {
   excludeFilters?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   owner: Scalars['String'];
@@ -435,8 +443,18 @@ export type QueryEnsProfileArgs = {
 };
 
 
+export type QueryGalleryFromAddressArgs = {
+  addressURN: Scalars['URN'];
+};
+
+
 export type QueryGetNftMetadataBatchArgs = {
   input?: InputMaybe<Array<InputMaybe<NftMetadataInput>>>;
+};
+
+
+export type QueryLinksFromAddressArgs = {
+  addressURN: Scalars['URN'];
 };
 
 
@@ -506,7 +524,7 @@ export type GetProfileFromAddressQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -646,7 +664,7 @@ export const GetProfileDocument = gql`
     `;
 export const GetProfileFromAddressDocument = gql`
     query getProfileFromAddress($addressURN: URN!) {
-  profileFromAddress(addressURN: $addressURN) {
+  profile: profileFromAddress(addressURN: $addressURN) {
     pfp {
       ... on StandardPFP {
         image
@@ -665,22 +683,22 @@ export const GetProfileFromAddressDocument = gql`
     bio
     website
   }
-  links {
+  links: linksFromAddress(addressURN: $addressURN) {
     name
     url
     verified
   }
-  connectedAddresses {
+  gallery: galleryFromAddress(addressURN: $addressURN) {
+    contract
+    tokenId
+  }
+  connectedAddresses: connectedAddressesFromAddress(addressURN: $addressURN) {
     urn
     nid
     nss
     fragment
     qc
     rc
-  }
-  gallery {
-    contract
-    tokenId
   }
 }
     `;

@@ -15,6 +15,8 @@ import {
   NFTPropertyMapper,
 } from '../../../../../packages/alchemy-client'
 
+import { NodeType } from '@kubelt/types/address'
+
 import { PlatformJWTAssertionHeader } from '@kubelt/types/headers'
 
 import {
@@ -27,7 +29,7 @@ import {
   getAlchemyClients,
   nftBatchesFetcher,
   beautifyContracts,
-  getConnectedCryptoAddresses,
+  getConnectedAddresses,
   fetchContracts,
 } from './utils'
 
@@ -65,12 +67,16 @@ const nftsResolvers: Resolvers = {
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
       const addresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,
         })) || []
-      ).map((address) => address.qc.alias.toLowerCase())
+      )
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
+        .map((address) => address.qc.alias.toLowerCase())
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
@@ -117,12 +123,16 @@ const nftsResolvers: Resolvers = {
       const accountURN = AccountURNSpace.componentizedUrn(owner)
 
       const addresses = (
-        (await getConnectedCryptoAddresses({
+        (await getConnectedAddresses({
           accountURN,
           Account: env.Account,
           jwt,
         })) || []
-      ).map((address) => address.qc.alias.toLowerCase())
+      )
+        .filter((address) =>
+          [NodeType.Crypto, NodeType.Vault].includes(address.rc.node_type)
+        )
+        .map((address) => address.qc.alias.toLowerCase())
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
