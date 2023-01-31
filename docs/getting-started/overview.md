@@ -8,6 +8,6 @@ Rollup improves user experience in apps with secure and progressive authorizatio
 
 Access to this profile is controlled with an OAuth-like system called 0xAuth. 0xAuth is a standard OAuth implementation with extensions to handle authorizations to a users profile. To learn more what you can do with 0xAuth authorizations, check out the [Scopes Reference](../reference/scopes.md).
 
-\[TODO - add a diagram of the profile graph]
+<figure><img src="../.gitbook/assets/Docs_-_Overview_V2.png" alt=""><figcaption></figcaption></figure>
 
 Like any OAuth system, to get started you'll need to create an application in [Console](create-an-application.md). Once you've created an application, you can start using the [Galaxy API](../reference/galaxy-api.md) to interact with your users.

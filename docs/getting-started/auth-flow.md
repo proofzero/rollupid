@@ -65,7 +65,7 @@ Application secret
 "authorization_code" or "refresh_token"
 {% endswagger-parameter %}
 
-{% swagger-response status="200: OK" description="" %}
+{% swagger-response status="201: Created" description="" %}
 ```javascript
 {
     access_token: "ey....",

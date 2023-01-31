@@ -15,5 +15,5 @@ Our goal is to simplify the onboarding process for both developers and users by 
 #### Learn More
 
 1. [Understanding Passport](../../platform/passport.md)
-2. [Explore the Galaxy API](../../reference/galaxy.md)
+2. [Explore the Galaxy API](../../reference/galaxy-api.md)
 3. [Learn about the Profile Graph](../../platform/profile-graph.md)

@@ -19,7 +19,6 @@
 
 ## Reference
 
-* [Profile API](reference/profile-api.md)
 * [Passport API](reference/passport-api.md)
 * [Galaxy GQL API](reference/galaxy-api.md)
 * [Scopes](reference/scopes.md)
