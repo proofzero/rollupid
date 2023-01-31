@@ -16,6 +16,7 @@ query getAddressProfile($addressURN: URN!) {
 
       ... on OAuthTwitterProfile {
         name
+        screen_name
         profile_image_url_https
       }
 
@@ -56,6 +57,7 @@ query getAddressProfiles($addressURNList: [URN!]) {
 
       ... on OAuthTwitterProfile {
         name
+        screen_name
         profile_image_url_https
       }
 

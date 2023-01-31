@@ -31,6 +31,7 @@ import { getAccountAddresses, getAddressProfiles } from '~/helpers/profile'
 import { AddressURN } from '@kubelt/urns/address'
 
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
+import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
 export type ProfileData = {
   targetAddress: string
@@ -56,24 +57,24 @@ const normalizeProfile = (profile: any) => {
         address: `https://etherscan.io/address/${profile.address}`,
         title: profile.displayName,
         icon: profile.avatar,
-        provider: 'ethereum',
+        provider: CryptoAddressType.ETH,
         linkable: true,
       }
     case 'OAuthGoogleProfile':
       return {
         id: profile.urn,
-        address: profile.html_url,
+        address: '',
         title: 'Google',
-        icon: profile.avatar_url,
-        provider: 'google',
+        icon: profile.picture,
+        provider: OAuthAddressType.Google,
       }
     case 'OAuthTwitterProfile':
       return {
         id: profile.urn,
-        address: profile.html_url,
+        address: `https://twitter.com/${profile.screen_name}`,
         title: 'Twitter',
-        icon: profile.avatar_url,
-        provider: 'twitter',
+        icon: profile.profile_image_url_https,
+        provider: OAuthAddressType.Twitter,
         linkable: true,
       }
     case 'OAuthGithubProfile':
@@ -82,16 +83,16 @@ const normalizeProfile = (profile: any) => {
         address: profile.html_url,
         title: 'GitHub',
         icon: profile.avatar_url,
-        provider: 'github',
+        provider: OAuthAddressType.GitHub,
         linkable: true,
       }
     case 'OAuthMicrosoftProfile':
       return {
         id: profile.urn,
-        address: profile.html_url,
+        address: '',
         title: 'Microsoft',
-        icon: profile.avatar_url,
-        provider: 'microsoft',
+        icon: profile.picture,
+        provider: OAuthAddressType.Microsoft,
       }
   }
 }
