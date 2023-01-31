@@ -535,13 +535,7 @@ export type GetProfileFromAddressQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
-
-export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-
-export type GetProfileFromAddressQuery = { __typename?: 'Query', profileFromAddress?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null };
+export type GetProfileFromAddressQuery = { __typename?: 'Query', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null, provider?: string | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null };
 
 export type GetConnectedAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -705,6 +699,7 @@ export const GetProfileFromAddressDocument = gql`
     name
     url
     verified
+    provider
   }
   gallery: galleryFromAddress(addressURN: $addressURN) {
     contract
