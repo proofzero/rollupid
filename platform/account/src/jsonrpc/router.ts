@@ -44,6 +44,11 @@ import {
   GetGalleryOutput,
 } from './methods/getGallery'
 import { SetGalleryInput, setGalleryMethod } from './methods/setGallery'
+import {
+  getAccountByAlias,
+  GetAliasAccountOutput,
+  GetAliasAccountParams,
+} from './methods/getProfileByAlias'
 
 const t = initTRPC.context<Context>().create({
   errorFormatter({ shape, error }) {
@@ -167,4 +172,10 @@ export const appRouter = t.router({
     .input(GetSessionsMethodInput)
     .output(GetSessionsMethodOutput)
     .mutation(getSessionsMethod),
+  getAccountByAlias: t.procedure
+    .use(JWTAssertionTokenFromHeader)
+    .use(LogUsage)
+    .input(GetAliasAccountParams)
+    .output(GetAliasAccountOutput)
+    .query(getAccountByAlias),
 })

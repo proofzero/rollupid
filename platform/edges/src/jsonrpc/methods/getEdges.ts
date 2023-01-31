@@ -15,7 +15,7 @@ export const GetEdgesMethodInput = z.object({
 })
 
 export const GetEdgesMethodOutput = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   edges: z.array(EdgeInput),
 })
 
@@ -27,11 +27,8 @@ export const getEdgesMethod = async ({
 }: {
   input: GetEdgesParams
   ctx: Context
-}): Promise<{
-  id: string
-  edges: Edge[]
-}> => {
-  const nodeId = input.query.id
+}): Promise<z.infer<typeof GetEdgesMethodOutput>> => {
+  const nodeId = input.query.id || undefined
 
   // Get the list of the edges selected by the query, modifying the
   // result as per any options.

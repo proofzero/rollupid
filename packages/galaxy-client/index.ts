@@ -85,6 +85,14 @@ export type ExchangeTokenResult = {
   refreshToken: Scalars['String'];
 };
 
+export type FullProfile = {
+  __typename?: 'FullProfile';
+  connectedAddresses?: Maybe<Array<Node>>;
+  gallery?: Maybe<Array<Gallery>>;
+  links?: Maybe<Array<Link>>;
+  profile?: Maybe<Profile>;
+};
+
 export type Gallery = {
   __typename?: 'Gallery';
   contract: Scalars['String'];
@@ -410,7 +418,7 @@ export type Query = {
   nftsForAddress?: Maybe<NfTs>;
   profile?: Maybe<Profile>;
   profileFromAddress?: Maybe<Profile>;
-  profileFromAlias?: Maybe<Profile>;
+  profileFromAlias?: Maybe<FullProfile>;
 };
 
 
@@ -514,7 +522,7 @@ export type GetProfileFromAliasQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileFromAliasQuery = { __typename?: 'Query', profileFromAlias?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, addresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, qc?: any | null, rc?: any | null, fragment?: string | null }> | null } | null };
+export type GetProfileFromAliasQuery = { __typename?: 'Query', profileFromAlias?: { __typename?: 'FullProfile', profile?: { __typename?: 'Profile', displayName?: string | null, handle?: string | null, defaultAddress?: any | null, cover?: string | null, location?: string | null, job?: string | null, bio?: string | null, website?: string | null, pfp?: { __typename?: 'NFTPFP', image?: string | null, isToken?: boolean | null } | { __typename?: 'StandardPFP', image?: string | null } | null } | null, links?: Array<{ __typename?: 'Link', name?: string | null, url?: string | null, verified?: boolean | null }> | null, connectedAddresses?: Array<{ __typename?: 'Node', urn: string, nid: string, nss: string, fragment?: string | null, qc?: any | null, rc?: any | null }> | null, gallery?: Array<{ __typename?: 'Gallery', contract: string, tokenId: string }> | null } | null };
 
 export type GetProfileFromAddressQueryVariables = Exact<{
   addressURN: Scalars['URN'];
@@ -662,36 +670,42 @@ export const GetProfileDocument = gql`
 export const GetProfileFromAliasDocument = gql`
     query getProfileFromAlias($alias: String!, $providerType: String!) {
   profileFromAlias(alias: $alias, providerType: $providerType) {
-    pfp {
-      ... on StandardPFP {
-        image
+    profile {
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
       }
-      ... on NFTPFP {
-        image
-        isToken
-      }
+      displayName
+      handle
+      defaultAddress
+      cover
+      location
+      job
+      bio
+      website
     }
-    displayName
-    handle
-    defaultAddress
-    cover
-    location
-    job
-    bio
     links {
       name
       url
       verified
     }
-    addresses {
+    connectedAddresses {
       urn
       nid
       nss
+      fragment
       qc
       rc
-      fragment
     }
-    website
+    gallery {
+      contract
+      tokenId
+    }
   }
 }
     `;

@@ -52,12 +52,19 @@ export default /* GraphQL */ `
     defaultAddress: URN
   }
 
+  type FullProfile {
+    profile: Profile
+    links: [Link!]
+    gallery: [Gallery!]
+    connectedAddresses: [Node!]
+  }
+
   type Query {
     profile: Profile
     links: [Link!]
     gallery: [Gallery!]
     profileFromAddress(addressURN: URN!): Profile
-    profileFromAlias(alias: String!, providerType: String!): Profile
+    profileFromAlias(alias: String!, providerType: String!): FullProfile
     connectedAddresses: [Node!]
   }
 

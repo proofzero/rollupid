@@ -21,6 +21,7 @@ import {
   PlatformAddressURNHeader,
   PlatformJWTAssertionHeader,
 } from '@kubelt/types/headers'
+import { AccountURN } from '@kubelt/urns/account'
 
 const accountResolvers: Resolvers = {
   Query: {
@@ -151,24 +152,49 @@ const accountResolvers: Resolvers = {
       { env, jwt }: ResolverContext
     ) => {
       // get the account profile
-      const accountClient = createAccountClient(
-        env.Account,
-        jwt
-          ? {
-              headers: {
-                [PlatformJWTAssertionHeader]: jwt,
+      const accountClient = createAccountClient(env.Account, {})
+
+      const accounts: AccountURN[] =
+        await accountClient.getAccountByAlias.query({
+          alias: alias,
+          provider: providerType,
+        })
+
+      if (accounts.length !== 1) {
+        console.error(
+          `Expected a single edge for provider ${providerType} and alias ${alias}. Got ${accounts.length}.`
+        )
+        throw new GraphQLError(
+          `Expected a single edge for provider ${providerType} and alias ${alias}. Got ${accounts.length}.`,
+          {
+            extensions: {
+              code: 'Unexpected number of edges results in provider+alias lookup.',
+              http: {
+                status: 500,
               },
-            }
-          : {}
-      )
+            },
+          }
+        )
+      }
+
+      const accountURNInput = { account: accounts[0] }
 
       console.log("galaxy.profileFromAddress: getting account's profile")
-      // should also return the handle if it exists
-      // let accountProfile = await accountClient.getProfile.query({
+      const profileFields = await Promise.all([
+        accountClient.getProfile.query(accountURNInput),
+        accountClient.getLinks.query(accountURNInput),
+        accountClient.getGallery.query(accountURNInput),
+        accountClient.getAddresses.query(accountURNInput),
+      ])
 
-      // })
+      const result = {
+        profile: profileFields[0],
+        links: profileFields[1],
+        gallery: profileFields[2],
+        addresses: profileFields[3],
+      }
 
-      return accountProfile
+      return result
     },
     connectedAddresses: async (
       _parent: any,

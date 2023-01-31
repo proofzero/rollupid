@@ -39,36 +39,42 @@ query getProfile {
 
 query getProfileFromAlias($alias: String!, $providerType: String!) {
   profileFromAlias(alias: $alias, providerType: $providerType) {
-    pfp {
-      ... on StandardPFP {
-        image
+    profile {
+      pfp {
+        ... on StandardPFP {
+          image
+        }
+        ... on NFTPFP {
+          image
+          isToken
+        }
       }
-      ... on NFTPFP {
-        image
-        isToken
-      }
+      displayName
+      handle
+      defaultAddress
+      cover
+      location
+      job
+      bio
+      website
     }
-    displayName
-    handle
-    defaultAddress
-    cover
-    location
-    job
-    bio
     links {
       name
       url
       verified
     }
-    addresses {
+    connectedAddresses {
       urn
       nid
       nss
+      fragment
       qc
       rc
-      fragment
     }
-    website
+    gallery {
+      contract
+      tokenId
+    }
   }
 }
 

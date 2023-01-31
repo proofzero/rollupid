@@ -141,41 +141,49 @@ export async function edges(
   opt?: any
 ): Promise<Edge[]> {
   let sql: string
-
+  let statement: D1PreparedStatement
   // If a node ID is not supplied, we're returning no edges.
   //
   // TODO we don't want to allow for the possibility of all edges being
   // returned until pagination is in place. Revisit this behavior if we
   // decide to implement it.
-  if (!query.id) {
-    return []
-  }
+  // if (!query.id) {
+  //   return []
+  // }
 
   // Filter returned edges by direction; if we're asked for "outgoing"
   // edges, the node ID is for the "source" node of the edge. If we're
   // asked for "incoming" edges, the node ID is for the "destination"
   // node of the edge. If no direction is supplied, return all edges
   // that originate or terminate at the given node ID.
-  switch (query.dir) {
-    case Graph.EdgeDirection.Incoming:
-      sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
-      break
-    case Graph.EdgeDirection.Outgoing:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
-      break
-    default:
-      sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
-  }
+  if (query.id) {
+    switch (query.dir) {
+      case Graph.EdgeDirection.Incoming:
+        sql = `SELECT * FROM edge e WHERE (e.dst = ?1)`
+        break
+      case Graph.EdgeDirection.Outgoing:
+        sql = `SELECT * FROM edge e WHERE (e.src = ?1)`
+        break
+      default:
+        sql = `SELECT * FROM edge e WHERE (e.src = ?1 OR e.dst = ?1)`
+    }
+    // Filter edges by tag, if provided.
+    if (query.tag) {
+      sql = [sql, 'e.tag = ?2'].join(' AND ')
 
-  let statement
-
-  // Filter edges by tag, if provided.
-  if (query.tag) {
-    sql = [sql, 'e.tag = ?2'].join(' AND ')
-
-    statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
+      statement = g.db.prepare(sql).bind(query.id.toString(), query.tag)
+    } else {
+      statement = g.db.prepare(sql).bind(query.id.toString())
+    }
   } else {
-    statement = g.db.prepare(sql).bind(query.id.toString())
+    sql = `SELECT * FROM edge e`
+    if (query.tag) {
+      sql = [sql, 'e.tag = ?1'].join(' WHERE ')
+
+      statement = g.db.prepare(sql).bind(query.tag)
+    } else {
+      statement = g.db.prepare(sql).bind()
+    }
   }
 
   const result = await statement.all()
@@ -231,7 +239,7 @@ export async function edges(
       edge: EdgeRecord
     ): Promise<EdgeRecord[]> {
       const result = await resultPromise
-
+      console.debug('RESULT BEFORE COMP', result)
       // SRC
 
       // fragment
@@ -282,8 +290,10 @@ export async function edges(
 
       // Include the current edge in the list of returned edges; it has
       // passed filtering.
+      console.debug('RESULT BEFORE PUSH', result)
       result.push(edge)
 
+      console.debug('RESULT BEFORE RETURN', result)
       return result
     }
 
