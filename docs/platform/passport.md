@@ -31,6 +31,10 @@ Passport's authentication flow currently supports the following authentication m
 
 The key feature about Rollup's Profile is the authorization step. Based on what you set as your [Scopes](../reference/scopes.md) in the [Console](console.md) OAuth settings, the user will be presented with a branded authorization request to permission and/or provision access to the users identity features on the [Profile Graph](profile-graph.md).
 
+{% hint style="info" %}
+No scope is equivalent to an auto authorization with access only to public profile information. If no scopes are configured in Console the user will not be presented the authorization screen.
+{% endhint %}
+
 <figure><img src="../.gitbook/assets/MacBook Pro 14_ - 4.png" alt=""><figcaption></figcaption></figure>
 
 Once authorized your the user will be redirected back to your application with the state and exchange code [described in the guide](../getting-started/auth-flow.md) to complete the auth flow and receive an access token.
