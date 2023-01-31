@@ -45,7 +45,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   // if not handle is this let's assume this is an idref
   let profile = undefined
   try {
-    console.debug('BEFORE CONST')
     const user = session.get('user')
     let jwt = user?.accessToken
     profile = await galaxyClient.getProfileFromAddress(
@@ -293,10 +292,8 @@ export default UserAddressLayout
 
 export function CatchBoundary() {
   //TODO: try getting params injected, as well as useParams below
-  //   console.debug('ERROR', error)
-  //   const caught = useCatch()
-  //   console.debug('CAUGHT', caught)
-  //   const { address, type } = useParams()
+  const caught = useCatch()
+  console.error('Caught in catch boundary', { caught })
 
   return (
     <div>

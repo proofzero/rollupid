@@ -47,7 +47,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const reshapedApps = apps.map((a) => {
       return { clientId: a.clientId, name: a.app?.name, icon: a.app?.icon }
     })
-
+    if (!reshapedApps.map((a) => a.clientId).includes(clientId)) {
+      throw json({ message: 'Invalid ClientID' }, 404)
+    }
     let avatarUrl = ''
     try {
       const profileRes = await galaxyClient.getProfile(undefined, {
@@ -91,8 +93,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       rotationResult,
     })
   } catch (error) {
-    console.error({ error })
-    return json({ error }, { status: 500 })
+    console.error('Caught error in loader', { error })
+    if (error instanceof Response) {
+      throw error
+    } else throw json({ error }, { status: 500 })
   }
 }
 
