@@ -45,7 +45,7 @@ export const NewAppModal = ({
             >
               Cancel
             </Button>
-            <Button type="submit" btnType="primary-alt">
+            <Button type="submit" btnType="primary-alt" disabled={isSubmitting}>
               Create
             </Button>
           </div>
