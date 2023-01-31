@@ -6,9 +6,14 @@ import { RxDragHandleDots2 } from 'react-icons/rx'
 export type SortableListItemProps = {
   children: ReactNode
   id: Key
+  disabled?: boolean
 }
 
-export const SortableListItem = ({ id, children }: SortableListItemProps) => {
+export const SortableListItem = ({
+  id,
+  children,
+  disabled = false,
+}: SortableListItemProps) => {
   const {
     attributes,
     listeners,
@@ -30,6 +35,7 @@ export const SortableListItem = ({ id, children }: SortableListItemProps) => {
                 px-4 py-3 mb-3 bg-white
                 flex flex-row items-center justify-between
                 ${isDragging ? 'shadow-inner z-100' : ''}
+                ${disabled ? 'bg-gray-100' : null}
                  `}
       ref={setNodeRef}
       style={style}

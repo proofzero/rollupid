@@ -44,6 +44,7 @@ export type ProfileData = {
     name: string
     url: string
     verified: boolean
+    provider: string
   }[]
 }
 
@@ -56,6 +57,24 @@ const normalizeProfile = (profile: any) => {
         title: profile.displayName,
         icon: profile.avatar,
         provider: 'ethereum',
+        linkable: true,
+      }
+    case 'OAuthGoogleProfile':
+      return {
+        id: profile.urn,
+        address: profile.html_url,
+        title: 'Google',
+        icon: profile.avatar_url,
+        provider: 'google',
+      }
+    case 'OAuthTwitterProfile':
+      return {
+        id: profile.urn,
+        address: profile.html_url,
+        title: 'Twitter',
+        icon: profile.avatar_url,
+        provider: 'twitter',
+        linkable: true,
       }
     case 'OAuthGithubProfile':
       return {
@@ -64,6 +83,15 @@ const normalizeProfile = (profile: any) => {
         title: 'GitHub',
         icon: profile.avatar_url,
         provider: 'github',
+        linkable: true,
+      }
+    case 'OAuthMicrosoftProfile':
+      return {
+        id: profile.urn,
+        address: profile.html_url,
+        title: 'Microsoft',
+        icon: profile.avatar_url,
+        provider: 'microsoft',
       }
   }
 }
@@ -92,11 +120,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }))
 
   const oAuthProfiles = mappedProfiles
-    .filter(
-      (p) =>
-        p?.profile?.__typename === 'CryptoAddressProfile' ||
-        p?.profile?.__typename === 'OAuthGithubProfile'
-    )
     .map((p) => ({ urn: p.urn, ...p?.profile }))
     .map(normalizeProfile)
 
@@ -280,9 +303,13 @@ export default function AccountSettingsLinks() {
       </Text>
 
       <SortableList
-        items={oAuthLinks.map((l: any) => ({ key: `${l.id}`, val: l }))}
+        items={oAuthLinks.map((l: any) => ({
+          key: `${l.id}`,
+          val: l,
+          disabled: !l.linkable,
+        }))}
         itemRenderer={(item) => (
-          <div className="flex flex-row items-center w-full">
+          <div className={`flex flex-row items-center w-full`}>
             <img className="w-9 h-9 rounded-full mr-3.5" src={item.val.icon} />
 
             <div className="flex flex-col space-y-1.5 flex-1">
@@ -296,6 +323,7 @@ export default function AccountSettingsLinks() {
 
             <InputToggle
               id={`enable_${item.val.id}`}
+              disabled={!item.val.linkable}
               label={''}
               checked={item.val.enabled}
               onToggle={(val) => {

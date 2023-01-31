@@ -9,6 +9,7 @@ export type InputToggleProps = {
   onToggle?: (val: boolean) => void
   checked?: boolean
   className?: string
+  disabled?: boolean
 }
 
 function classNames(...classes) {
@@ -20,6 +21,7 @@ export const InputToggle = ({
   name,
   label,
   checked,
+  disabled = false,
   onToggle,
 }: InputToggleProps) => {
   const [enabled, setEnabled] = useState(checked)
@@ -34,6 +36,7 @@ export const InputToggle = ({
       <input
         id={id}
         name={computedName}
+        disabled={disabled}
         type="hidden"
         defaultChecked={enabled}
         defaultValue={enabled ? 1 : 0}
@@ -41,6 +44,7 @@ export const InputToggle = ({
 
       <Switch
         checked={enabled}
+        disabled={disabled}
         onChange={(state) => {
           setEnabled(state)
           onToggle(state)

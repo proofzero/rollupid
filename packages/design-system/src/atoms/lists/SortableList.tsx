@@ -20,6 +20,7 @@ import { SortableListItem } from './SortableListItem'
 type SortableItem = {
   key: Key
   val: any
+  disabled?: boolean
 }
 
 export type SortableListProps<T extends SortableItem> = {
@@ -78,7 +79,11 @@ export const SortableList = <T extends SortableItem>({
           strategy={verticalListSortingStrategy}
         >
           {itemList.map((item) => (
-            <SortableListItem key={item.key} id={item.key}>
+            <SortableListItem
+              key={item.key}
+              id={item.key}
+              disabled={item.disabled}
+            >
               {itemRenderer(item)}
             </SortableListItem>
           ))}
