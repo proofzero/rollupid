@@ -13,7 +13,6 @@ import classNames from 'classnames'
 
 import { Text } from '@kubelt/design-system/src/atoms/text/Text'
 import { json } from '@remix-run/cloudflare'
-import type { ConnectedAddresses, Node, Profile } from '@kubelt/galaxy-client'
 
 export const loader: LoaderFunction = async ({ request }) => {
   const splittedUrl = request.url.split('/')

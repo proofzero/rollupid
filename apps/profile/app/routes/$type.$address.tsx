@@ -87,19 +87,22 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     const splittedUrl = request.url.split('/')
     const path = splittedUrl[splittedUrl.length - 1]
 
-    const cryptoAddresses = profile.addresses?.filter(
-      (addr) => addr.rc.node_type === NodeType.Crypto
+    const { connectedAddresses } = await galaxyClient.getConnectedAddresses(
+      undefined,
+      jwt
+        ? {
+            [PlatformJWTAssertionHeader]: jwt,
+          }
+        : {}
     )
 
-    const matches = profile.addresses?.filter((addr) => urn === addr.urn)
+    const match = connectedAddresses?.find((ca) => ca.urn === urn)
 
     return json({
-      profile,
-      cryptoAddresses,
       uname: profile.handle || address,
       ogImage: ogImage || defaultOG,
       path,
-      isOwner: jwt && matches && matches.length > 0,
+      isOwner: jwt && match != null,
     })
   } catch (e) {
     console.log(
@@ -144,22 +147,19 @@ export const meta: MetaFunction = ({
 const UserAddressLayout = () => {
   //TODO: this needs to be optimized so profile isn't fetched from the loader
   //but used from context alone.
-  const { profile, path, cryptoAddresses, isOwner } = useLoaderData<{
-    profile: Profile
+  const { path, isOwner } = useLoaderData<{
     path: string
-    cryptoAddresses: Node[]
     isOwner: boolean
   }>()
-  const ctx = useOutletContext<{
-    loggedInProfile: Profile | null
+  const { profile } = useOutletContext<{
     profile: Profile
   }>()
-  const finalProfile = profile ?? ctx.profile
+
   const navigate = useNavigate()
   const fetcher = useFetcher()
 
   const [coverUrl, setCoverUrl] = useState(
-    gatewayFromIpfs(finalProfile.cover as string)
+    gatewayFromIpfs(profile.cover as string)
   )
 
   useEffect(() => {
@@ -190,7 +190,7 @@ const UserAddressLayout = () => {
       }
       Avatar={
         <Avatar
-          src={gatewayFromIpfs(finalProfile.pfp?.image as string) as string}
+          src={gatewayFromIpfs(profile.pfp?.image as string) as string}
           size="lg"
           hex={true}
           border
@@ -203,7 +203,7 @@ const UserAddressLayout = () => {
             weight="bold"
             size="4xl"
           >
-            {finalProfile.displayName}
+            {profile.displayName}
           </Text>
 
           <div className="flex flex-col justify-center items-center">
@@ -212,27 +212,27 @@ const UserAddressLayout = () => {
               size="base"
               weight="normal"
             >
-              {finalProfile.bio}
+              {profile.bio}
             </Text>
 
             <div
               className="flex flex-col lg:flex-row lg:space-x-10 justify-start
               lg:items-center text-gray-500 font-size-lg"
             >
-              {finalProfile.location && (
+              {profile.location && (
                 <div className="flex flex-row space-x-3 items-center wrap">
                   <HiOutlineMapPin className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
-                    {finalProfile.location}
+                    {profile.location}
                   </Text>
                 </div>
               )}
 
-              {finalProfile.job && (
+              {profile.job && (
                 <div className="flex flex-row space-x-3 items-center">
                   <HiOutlineBriefcase className="h-5 w-5" />
                   <Text weight="medium" className="text-gray-500">
-                    {finalProfile.job}
+                    {profile.job}
                   </Text>
                 </div>
               )}
@@ -267,7 +267,7 @@ const UserAddressLayout = () => {
         <ProfileTabs path={path} handleTab={navigate} enableGallery={true} />
       }
     >
-      <Outlet context={{ ...ctx, finalProfile, path, cryptoAddresses }} />
+      <Outlet context={{ profile, path }} />
     </ProfileLayout>
   )
 }

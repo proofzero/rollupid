@@ -3,11 +3,17 @@ import { useOutletContext } from '@remix-run/react'
 import { Links as LinksComponent } from '~/components/profile/links/links'
 
 const Links = () => {
-  const { finalProfile } = useOutletContext<{
-    finalProfile: Profile
+  const { profile } = useOutletContext<{
+    profile: {
+      links: {
+        name: string
+        url: string
+        verified: string
+      }
+    }
   }>()
 
-  return <LinksComponent links={finalProfile.links} />
+  return <LinksComponent links={profile.links} />
 }
 
 export default Links
