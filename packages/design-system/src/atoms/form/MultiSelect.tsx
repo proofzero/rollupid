@@ -54,6 +54,7 @@ export function MultiSelect({
       as="div"
       by="id" // compare values
       value={selectedValues}
+      disabled={disabled}
       onChange={(e) => {
         console.log({ e })
         console.log({ selectedValues })

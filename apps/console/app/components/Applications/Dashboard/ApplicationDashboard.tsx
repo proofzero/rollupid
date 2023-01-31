@@ -60,7 +60,7 @@ export const ApplicationDashboard = ({
         closeCallback={() => setClientSecretRollModalOpen(false)}
       />
 
-      {CTAprops.CTAneeded && (
+      {CTAprops?.CTAneeded && (
         <div className="mb-3">
           <CTA
             clickHandler={CTAprops.clickHandler}
