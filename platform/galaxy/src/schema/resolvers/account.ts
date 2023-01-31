@@ -2,7 +2,6 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
-import { isAddress } from '@ethersproject/address'
 
 import {
   setupContext,
@@ -349,8 +348,8 @@ const accountResolvers: Resolvers = {
           jwt,
         })) || []
       )
+        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
         .map((address) => address.qc.alias.toLowerCase())
-        .filter((address) => isAddress(address))
 
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })

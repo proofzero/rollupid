@@ -5,8 +5,6 @@ import createAccountClient from '@kubelt/platform-clients/account'
 import { AddressURN, AddressURNSpace } from '@kubelt/urns/address'
 import { AccountURN, AccountURNSpace } from '@kubelt/urns/account'
 
-import { isAddress } from '@ethersproject/address'
-
 import { Resolvers } from './typedefs'
 import { Profile } from '@kubelt/platform.account/src/types'
 import Env from '../../env'
@@ -73,8 +71,8 @@ const nftsResolvers: Resolvers = {
           jwt,
         })) || []
       )
+        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
         .map((address) => address.qc.alias.toLowerCase())
-        .filter((address) => isAddress(address))
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
@@ -127,8 +125,8 @@ const nftsResolvers: Resolvers = {
           jwt,
         })) || []
       )
+        .filter((address) => ['crypto', 'vault'].includes(address.rc.node_type))
         .map((address) => address.qc.alias.toLowerCase())
-        .filter((address) => isAddress(address))
 
       try {
         const { ethereumClient, polygonClient } = getAlchemyClients({ env })
