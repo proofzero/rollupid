@@ -14,7 +14,7 @@
 * [Console](platform/console.md)
 * [Passport](platform/passport.md)
 * [Profile](platform/my-profile.md)
-* [Auth Graph](platform/profile-graph.md)
+* [Profile Graph](platform/profile-graph.md)
 
 ## Reference
 
