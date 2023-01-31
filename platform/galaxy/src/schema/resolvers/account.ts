@@ -2,6 +2,7 @@ import { composeResolvers } from '@graphql-tools/resolvers-composition'
 
 import createAccountClient from '@kubelt/platform-clients/account'
 import createAddressClient from '@kubelt/platform-clients/address'
+import { isAddress } from '@ethersproject/address'
 
 import {
   setupContext,
@@ -347,7 +348,9 @@ const accountResolvers: Resolvers = {
           Account: env.Account,
           jwt,
         })) || []
-      ).map((address) => address.qc.alias.toLowerCase())
+      )
+        .map((address) => address.qc.alias.toLowerCase())
+        .filter((address) => isAddress(address))
 
       // GALLERY VALIDATION
       const { ethereumClient, polygonClient } = getAlchemyClients({ env })
