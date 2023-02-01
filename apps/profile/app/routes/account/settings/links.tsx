@@ -33,6 +33,11 @@ import { AddressURN } from '@kubelt/urns/address'
 import { InputToggle } from '@kubelt/design-system/src/atoms/form/InputToggle'
 import { CryptoAddressType, OAuthAddressType } from '@kubelt/types/address'
 
+import githubIcon from '@kubelt/design-system/src/assets/social_icons/github.svg'
+import googleIcon from '@kubelt/design-system/src/assets/social_icons/google.svg'
+import microsoftIcon from '@kubelt/design-system/src/assets/social_icons/microsoft.svg'
+import twitterIcon from '@kubelt/design-system/src/assets/social_icons/twitter.svg'
+
 export type ProfileData = {
   targetAddress: string
   displayName: string
@@ -65,7 +70,7 @@ const normalizeProfile = (profile: any) => {
         id: profile.urn,
         address: '',
         title: 'Google',
-        icon: profile.picture,
+        icon: googleIcon,
         provider: OAuthAddressType.Google,
       }
     case 'OAuthTwitterProfile':
@@ -74,7 +79,7 @@ const normalizeProfile = (profile: any) => {
         address: `https://twitter.com/${profile.screen_name}`,
         title: 'Twitter',
         icon: profile.profile_image_url_https,
-        provider: OAuthAddressType.Twitter,
+        provider: twitterIcon,
         linkable: true,
       }
     case 'OAuthGithubProfile':
@@ -82,7 +87,7 @@ const normalizeProfile = (profile: any) => {
         id: profile.urn,
         address: profile.html_url,
         title: 'GitHub',
-        icon: profile.avatar_url,
+        icon: githubIcon,
         provider: OAuthAddressType.GitHub,
         linkable: true,
       }
@@ -91,7 +96,7 @@ const normalizeProfile = (profile: any) => {
         id: profile.urn,
         address: '',
         title: 'Microsoft',
-        icon: profile.picture,
+        icon: microsoftIcon,
         provider: OAuthAddressType.Microsoft,
       }
   }
