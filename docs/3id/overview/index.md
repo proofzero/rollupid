@@ -4,7 +4,7 @@ description: Rollup is authorization infrastructure designed to streamline user 
 
 # Introduction to Rollup
 
-Rollup is designed to enhance the user experience in your applications with progressive authorizations. With Rollup, you can foster secure and trustworthy relationships with your users, while maintaining the privacy of their rich user data.
+Rollup is an open source platform designed to enhance the user experience in your applications with progressive authorizations. With Rollup, you can foster secure and trustworthy relationships with your users, while maintaining the privacy of their rich user data.
 
 Our goal is to simplify the onboarding process for both developers and users by offering a comprehensive suite of tools that enable seamless and secure login experiences -- no matter how those users want to connect you get one unified user profile.
 

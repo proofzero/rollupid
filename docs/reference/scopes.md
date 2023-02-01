@@ -1,3 +1,7 @@
 ---
-description: TODO scopes reference
+description: Scopes Definitions
 ---
+
+# Scopes
+
+TODO

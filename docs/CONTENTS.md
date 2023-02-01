@@ -14,7 +14,11 @@
 * [Console](platform/console.md)
 * [Passport](platform/passport.md)
 * [Profile](platform/my-profile.md)
-* [Profile Graph](platform/profile-graph.md)
+* [Galaxy](platform/profile-graph.md)
+
+## Advanced
+
+* [Migration Guide](advanced/migration-guide.md)
 
 ## Reference
 

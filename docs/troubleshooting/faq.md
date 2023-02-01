@@ -1,5 +1,5 @@
 ---
-description: Frequently Asked Questions for the Rollup project.
+description: Frequently Asked Questions
 ---
 
 # FAQ

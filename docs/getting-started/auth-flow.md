@@ -94,3 +94,5 @@ Inside the profile object you will find a unique identifier called "id" which wi
 {% endhint %}
 
 Here is a [link](../../apps/profile/app/routes/auth/callback.tsx) to the reference implementation doing just this. With the access token you can make authorized requests to the [Profile Graph](../platform/profile-graph.md) for this user.
+
+If you are coming from an existing provider please check out the [Migration Guide](../advanced/migration-guide.md).
